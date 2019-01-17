@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55162)
+Received: from eggs.gnu.org ([209.51.188.92]:55478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gk5zQ-0001tW-3I
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:37:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gk60Z-0002Yp-1L
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:38:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gk5zM-0007jh-3U
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:37:38 -0500
-Received: from mga04.intel.com ([192.55.52.120]:40248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gk5zK-0007ek-2u
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:37:36 -0500
-Date: Thu, 17 Jan 2019 19:33:50 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190117113350.GE11760@yangzhon-Virtual>
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-5-yang.zhong@intel.com>
-	<99cdf618-d63c-3362-9143-513cbad2febc@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gk60X-0000D3-SB
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:38:50 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 17 Jan 2019 11:38:20 +0000
+Message-ID: <7b3e80fd-e982-20d1-5885-255eb7a123ae@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EDF67691F0615C47B9A684171325A500@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99cdf618-d63c-3362-9143-513cbad2febc@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 04/37] hw/m68k/Makefile.objs:
- Conditionally build boards
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, =?iso-8859-1?Q?=E1kos_Kov=E1cs?= <akoskovacs@gmx.com>, pbonzini@redhat.com, ehabkost@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Wed, Jan 16, 2019 at 08:15:23AM +0100, Thomas Huth wrote:
-> On 2019-01-15 15:10, Yang Zhong wrote:
-[...] 
-> The naming of the files is a little bit unfortunate, but
-> there are only two Coldfire boards: an5206 and mcf5208evb.
-> mcf5206.c belongs to the an5206 board.
-> So may I suggest to only use two CONFIG switches like this:
-> 
-> obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
-> obj-$(CONFIG_MCF5208EVB) += mcf5208.o mcf_intc.o
-> 
-  Yes, thanks Thomas, i will change this.  
-  
-  Regards,
-  Yang
-> ?
-> 
->  Thanks,
->   Thomas
+MTIuMDEuMjAxOSAyMDo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gSSBnb3QgdGlyZWQgb2YgZGVi
+dWdnaW5nIHdoZXRoZXIgYSBzZXJ2ZXIgd2FzIGFkdmVydGlzaW5nIHRoZQ0KPiBjb3JyZWN0IHRo
+aW5ncyBkdXJpbmcgbmVnb3RpYXRpb24gYnkgaW5zcGVjdGluZyB0aGUgdHJhY2UNCj4gbG9ncyBv
+ZiBxZW11LWlvIGFzIGNsaWVudCAtIG5vdCB0byBtZW50aW9uIHRoYXQgd2l0aG91dCBTT01FDQo+
+IHNvcnQgb2YgY2xpZW50IHRyYWNpbmcgcGFydGljdWxhciBjb21tYW5kcywgd2UgY2FuJ3QgZWFz
+aWx5DQo+IHJlZ3Jlc3Npb24gdGVzdCB0aGUgc2VydmVyIGZvciBjb3JyZWN0IGJlaGF2aW9yLiAg
+VGhlIGZpbmFsDQo+IHN0cmF3IHdhcyBhdCBLVk0gRm9ydW0sIHdoZW4gTmlyIGFza2VkIG1lIHRv
+IG1ha2Ugc3VyZSB0aGVyZQ0KPiB3YXMgYSB3YXkgdG8gZWFzaWx5IGRldGVybWluZSBpZiBhbiBO
+QkQgc2VydmVyIGlzIGV4cG9zaW5nIHdoYXQNCj4gd2UgcmVhbGx5IHdhbnQgKGFuZCBmaXhpbmcg
+eC1kaXJ0eS1iaXRtYXAgdG8gYmVoYXZlIHNhbmVyIGZlbGwNCj4gb3V0IGFzIGEgcmVzdWx0IG9m
+IGFuc3dlcmluZyB0aGF0IHF1ZXN0aW9uKS4NCj4gDQo+IEkgbm90ZSB0aGF0IHVwc3RyZWFtIE5C
+RCBoYXMgJ25iZC1jbGllbnQgLWwgJGhvc3QnIGZvciBxdWVyeWluZw0KPiBqdXN0IGV4cG9ydCBu
+YW1lcyAod2l0aCBubyBxdW90aW5nLCBzbyB5b3UgaGF2ZSB0byBrbm93IHRoYXQNCj4gYSBibGFu
+ayBsaW5lIG1lYW5zIHRoZSBkZWZhdWx0IGV4cG9ydCksIGJ1dCBpdCB3YXNuJ3QgcG93ZXJmdWwN
+Cj4gZW5vdWdoLCBzbyBJIGltcGxlbWVudGVkICdxZW11LW5iZCAtTCcgdG8gZG9jdW1lbnQgZXZl
+cnl0aGluZy4NCj4gVXBzdHJlYW0gTkJEIGhhcyBzZXBhcmF0ZSAnbmJkLWNsaWVudCcgYW5kICdu
+YmQtc2VydmVyJyBiaW5hcmllcywNCj4gd2hpbGUgd2Ugb25seSBoYXZlICdxZW11LW5iZCcgKHdo
+aWNoIGlzIG5vcm1hbGx5IGp1c3QgYSBzZXJ2ZXIsDQo+IGJ1dCAncWVtdS1uYmQgLWMnIGFsc28g
+b3BlcmF0ZXMgYSBzZWNvbmQgdGhyZWFkIGFzIGEgY2xpZW50KS4NCj4gT3VyIG90aGVyIHVzZXMg
+b2YgcWVtdSBhcyBOQkQgY2xpZW50IGFyZSBmb3IgY29uc3VtaW5nIGEgYmxvY2sNCj4gZGV2aWNl
+IChhcyBpbiBxZW11LWlvLCBxZW11LWltZywgb3IgYSBkcml2ZSB0byBxZW11KSAtIGJ1dCB0aG9z
+ZQ0KPiBiaW5hcmllcyBhcmUgbGVzcyBzdWl0ZWQgdG8gc29tZXRoaW5nIHNvIHNwZWNpZmljIHRv
+IHRoZSBOQkQNCj4gcHJvdG9jb2wuDQo+IA0KPiBCb251czogQXMgYSByZXN1bHQgb2YgbXkgd29y
+ayBvbiB0aGlzIHNlcmllcywgbmJka2l0IG5vdyBzdXBwb3J0cw0KPiBOQkRfT1BUX0lORk8gKG15
+IGludGVyb3BlcmFiaWxpdHkgdGVzdGluZyBiZXR3ZWVuIHNlcnZlcg0KPiBpbXBsZW1lbnRhdGlv
+bnMgaGFzIGJlZW4gcGF5aW5nIG9mZiwgYm90aCBhdCBmaXhpbmcgc2VydmVyIGJ1Z3MsDQo+IGFu
+ZCBhdCBtYWtpbmcgdGhpcyBjb2RlIG1vcmUgcmVsaWFibGUgYWNyb3NzIGRpZmZlcmVuY2UgaW4g
+dmFsaWQNCj4gc2VydmVycykuDQo+IA0KPiBBbHNvIGF2YWlsYWJsZSBhdDoNCj4gaHR0cHM6Ly9y
+ZXBvLm9yLmN6L3FlbXUvZXJpY2IuZ2l0IHFlbXUtbmJkLWxpc3QtdjINCj4gDQo+IEJhc2VkLW9u
+OiA8MjAxODEyMjEwOTM1MjkuMjM4NTUtMS1qc25vd0ByZWRoYXQuY29tPg0KPiBbanNub3c6IDAv
+MTEgYml0bWFwczogcmVtb3ZlIHgtIHByZWZpeCBmcm9tIFFNUCBhcGldDQo+IEJhc2VkLW9uOiA8
+MjAxOTAxMTExNjM1MTkuMTE0NTctMS1waGlsbWRAcmVkaGF0LmNvbT4NCj4gW3BoaWxtZDogcWVt
+dS1uYmQ6IFJlbmFtZSAnZXhwJyB2YXJpYWJsZSBjbGFzaGluZyB3aXRoIG1hdGg6OmV4cCgpIHN5
+bWJvbF0NCj4gQmFzZWQtb246IDwyMDE5MDExMTE5NDcyMC4xNTY3MS0xLWVibGFrZUByZWRoYXQu
+Y29tPg0KPiBbZWJsYWtlOiAwLzggUHJvbW90ZSB4LW5iZC1zZXJ2ZXItYWRkLWJpdG1hcCB0byBz
+dGFibGVdDQo+IA0KPiBTaW5jZSB2MjoNCj4gLSBTZXZlcmFsIHBhdGNoZXMgbWVyZ2VkIGFscmVh
+ZHkNCj4gLSAzIG5ldyBwYXRjaGVzIGJhc2VkIG9uIGF1ZGl0IG9mIG9mZl90IHZzLiBzdHJ0b2wN
+Cj4gLSByZWJhc2UgcGF0Y2hlcyBvbiB0b3Agb2Ygb3RoZXIgY2hhbmdlcywgc3VjaCBhcyBxZW11
+LW5iZCAtLWJpdG1hcA0KPiAtIGFkZHJlc3MgdmFyaW91cyByZXZpZXcgY29tbWVudHMgW1ZsYWRp
+bWlyLCBSaWNoXQ0KPiAtIGRyb3AgcGF0Y2ggMTIvMjINCj4gDQo+IDAwMS8xOTpbMDAyMF0gW0ZD
+XSAnbWFpbnQ6IEFsbG93IGZvciBFWEFNUExFUyBpbiB0ZXhpMnBvZCcNCj4gMDAyLzE5OlswMDMw
+XSBbRkNdICdxZW11LW5iZDogRW5oYW5jZSBtYW4gcGFnZScNCg0KU3RyYW5nZSwgYnV0IEkgZG9u
+J3QgaGF2ZSAwMiBpbiBteSBtYWlsYm94Li4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
