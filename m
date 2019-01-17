@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43470)
+Received: from eggs.gnu.org ([209.51.188.92]:44948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gk6xv-0002VH-0f
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:40:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1gk73b-0003ou-OS
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:46:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gk6xu-0000hJ-6k
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:40:10 -0500
-Received: from mga04.intel.com ([192.55.52.120]:44570)
+	(envelope-from <armbru@redhat.com>) id 1gk73a-0008OJ-Vl
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:46:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gk6xt-0000Zs-Ja
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:40:10 -0500
-Date: Thu, 17 Jan 2019 20:36:26 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190117123626.GI11760@yangzhon-Virtual>
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-14-yang.zhong@intel.com>
-	<a7abd300-9898-45cd-5e3d-9a8c79374ac7@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gk73a-0008Js-QG
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:46:02 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190117073649.5399.97670.stgit@pasha-VirtualBox>
+	<20190117073736.5399.81520.stgit@pasha-VirtualBox>
+Date: Thu, 17 Jan 2019 13:45:54 +0100
+In-Reply-To: <20190117073736.5399.81520.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Thu, 17 Jan 2019 10:37:36 +0300")
+Message-ID: <877ef34flp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7abd300-9898-45cd-5e3d-9a8c79374ac7@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/37] hw/riscv/Makefile.objs:
- Create CONFIG_* for riscv boards
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 08/24] migration: introduce icount
+ field for snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, =?iso-8859-1?Q?=E1kos_Kov=E1cs?= <akoskovacs@gmx.com>, pbonzini@redhat.com, ehabkost@redhat.com, Yang Zhong <yang.zhong@intel.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Wed, Jan 16, 2019 at 10:46:45AM +0100, Thomas Huth wrote:
-> > +obj-$(CONFIG_HTIF) += riscv_htif.o
-> 
-> riscv_htif.o seems to belong to the spike machine, so I think you don't
-> need a separate config switch for that and could simply use CONFIG_SPIKE
-> here.
-> 
-> > +obj-$(CONFIG_HART) += riscv_hart.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_e.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_clint.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_prci.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_plic.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_test.o
-> > +obj-$(CONFIG_SIFIVE) += sifive_u.o
-> 
-> Looking at the output of "qemu-system-riscv64 -M help", sifive_e and
-> sifive_u are two separate machines. So should we use two different
-> config switches here?
-> 
-> > +obj-$(CONFIG_SIFIVE) += sifive_uart.o
-> > +obj-$(CONFIG_SPIKE) += spike.o
-> > +obj-$(CONFIG_RISCV_VIRTIO) += virt.o
-> 
-> The machine is only called "virt", so I'd suggest to call the config
-> switch CONFIG_RISCV_VIRT only.
-> 
->  Thomas
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-   Hello Thomas,
+> Saving icount as a parameters of the snapshot allows navigation between
+> them in the execution replay scenario.
+> This information can be used for finding a specific snapshot for proceeding
+> the recorded execution to the specific moment of the time.
+> E.g., 'reverse step' action (introduced in one of the following patches)
+> needs to load the nearest snapshot which is prior to the current moment
+> of time .
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-   Thanks, i did below changes
-
-   +obj-$(CONFIG_SPIKE) += riscv_htif.o
-   +obj-$(CONFIG_HART) += riscv_hart.o
-   +obj-$(CONFIG_SIFIVE_E) += sifive_e.o
-   +obj-$(CONFIG_SIFIVE) += sifive_clint.o
-   +obj-$(CONFIG_SIFIVE) += sifive_prci.o
-   +obj-$(CONFIG_SIFIVE) += sifive_plic.o
-   +obj-$(CONFIG_SIFIVE) += sifive_test.o
-   +obj-$(CONFIG_SIFIVE_U) += sifive_u.o
-   +obj-$(CONFIG_SIFIVE) += sifive_uart.o
-   +obj-$(CONFIG_SPIKE) += spike.o
-   +obj-$(CONFIG_RISCV_VIRT) += virt.o
-
-   Regards,
-
-   Yang
+QAPI schema part
+Acked-by: Markus Armbruster <armbru@redhat.com>
