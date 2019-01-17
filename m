@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40836)
+Received: from eggs.gnu.org ([209.51.188.92]:41413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gk3my-0002rF-ES
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:42 -0500
+	(envelope-from <thuth@redhat.com>) id 1gk3o6-0003PF-5N
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gk3mw-0002H1-QG
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56910)
+	(envelope-from <thuth@redhat.com>) id 1gk3o4-0004Zo-5u
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:17:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gk3mw-00022u-Gw
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:38 -0500
-References: <20190111165801.15181-1-eric.auger@redhat.com>
-	<20190111165801.15181-2-eric.auger@redhat.com>
-	<faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <739abfa7-5faa-0c0c-7e81-80136e702e08@redhat.com>
-Date: Thu, 17 Jan 2019 10:16:32 +0100
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gk3o1-0004IU-OM
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:17:46 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-20-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6aaf7d2d-42d4-aaca-7634-4c44b9164c42@redhat.com>
+Date: Thu, 17 Jan 2019 10:17:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
+In-Reply-To: <20190115141108.934-20-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-pci: Introduce
- vfio_register_event_notifier helper
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 19/37] kconfig: introduce kconfig
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,397 +29,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
 
-Hi Alexey, Cornelia,
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> The Kconfig files were generated mostly with this script:
+>=20
+>   for i in `grep -ho CONFIG_[A-Z0-9_]* default-configs/* | sort -u`; do
+>     set fnord `git grep -lw $i -- 'hw/*/Makefile.objs' `
+>     shift
+>     if test $# =3D 1; then
+>       cat >> $(dirname $1)/Kconfig << EOF
+> config ${i#CONFIG_}
+>     bool
+>=20
+> EOF
+>       git add $(dirname $1)/Kconfig
+>     else
+>       echo $i $*
+>     fi
+>   done
+>   sed -i '$d' hw/*/Kconfig
+>   for i in hw/*; do
+>     if test -d $i && ! test -f $i/Kconfig; then
+>       touch $i/Kconfig
+>       git add $i/Kconfig
+>     fi
+>   done
+>=20
+> Whenever a symbol is referenced from multiple subdirectories, the
+> script prints the list of directories that reference the symbol.
+> These symbols have to be added manually to the Kconfig files.
+>=20
+> Kconfig.host and hw/Kconfig were created manually.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+[...]
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> new file mode 100644
+> index 0000000000..34e4a32a71
+> --- /dev/null
+> +++ b/hw/arm/Kconfig
+> @@ -0,0 +1,98 @@
+> +config VIRT
+> +    bool
+> +
+> +config DIGIC
+> +    bool
+> +
+> +config EXYNOS4
+> +    bool
+> +
+> +config HIGHBANK
+> +    bool
+> +
+> +config INTEGRATOR
+> +    bool
+> +
+> +config MAINSTONE
+> +    bool
+> +
+> +config MUSICPAL
+> +    bool
+> +
+> +config NETDUINO2
+> +    bool
+> +
+> +config NSERIES
+> +    bool
+> +
+> +config OMAP
+> +    bool
+> +
+> +config PXA2XX
+> +    bool
+> +
+> +config REALVIEW
+> +    bool
+> +
+> +config STELLARIS
+> +    bool
+> +
+> +config STRONGARM
+> +    bool
+> +
+> +config VERSATILE
+> +    bool
+> +
+> +config ZYNQ
+> +    bool
+> +
+> +config ARM_V7M
+> +    bool
+> +
+> +config EXYNOS4
+> +    bool
+> +
+> +config ALLWINNER_A10
+> +    bool
+> +
+> +config RASPI
+> +    bool
+> +
+> +config STM32F205_SOC
+> +    bool
+> +
+> +config XLNX_ZYNQMP_ARM
+> +    bool
+> +
+> +config XLNX_VERSAL
+> +    bool
+> +
+> +config FSL_IMX25
+> +    bool
+> +
+> +config FSL_IMX31
+> +    bool
+> +
+> +config FSL_IMX6
+> +    bool
+> +
+> +config ASPEED_SOC
+> +    bool
+> +
+> +config MPS2
+> +    bool
+> +
+> +config IOTKIT
+> +    bool
+> +
+> +config FSL_IMX7
+> +    bool
+> +
+> +config ARM_SMMUV3
+> +    bool
+> +
+> +config FSL_IMX6UL
+> +    bool
+> +
+> +config NRF51_SOC
+> +    bool
 
-On 1/17/19 4:46 AM, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 12/01/2019 03:58, Eric Auger wrote:
->> The code used to attach the eventfd handler for the ERR and
->> REQ irq indices can be factorized into a helper. In subsequent
->> patches we will extend this helper to support other irq indices.
->>
->> We test the notification is allowed outside of the helper:
->> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
->> Depending on the returned value we set vdev->pci_aer and
->> vdev->req_enabled. An error handle is introduced for future usage
->> although not strictly useful here.>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/vfio/pci.c | 291 ++++++++++++++++++++++----------------------------
->>  1 file changed, 127 insertions(+), 164 deletions(-)
->>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index c0cb1ec289..c589a4e666 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -105,6 +105,95 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
->>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
->>  }
->>  
->> +/*
->> + * vfio_register_event_notifier - setup/tear down eventfd
->> + * notification and handling for IRQ indices that span over
->> + * a single IRQ
->> + *
->> + * @vdev: VFIO device handle
->> + * @index: IRQ index the eventfd/handler is associated to
->> + * @target_state: true means notifier needs to be set up
->> + * @handler to attach if @target_state is true
->> + * @errp error handle
->> + */
->> +static int vfio_register_event_notifier(VFIOPCIDevice *vdev,
->> +                                        int index,
->> +                                        bool target_state,
->> +                                        void (*handler)(void *opaque),
->> +                                        Error **errp)
->> +{
->> +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
->> +                                      .index = index };
->> +    struct vfio_irq_set *irq_set;
->> +    EventNotifier *notifier;
->> +    int argsz, ret = 0;
->> +    int32_t *pfd, fd;
->> +
->> +    switch (index) {
-> 
-> I'd pass the notifier as a parameter as well so index/handler/notifier
-> would walk together.
+After playing with your patch series a little bit, I think we also need
+the following config options here for arm:
 
-I tend to agree with Cornelia. moving the notifier out of this helper
-would remove some factorization and this way, the caller does not have
-to care about it.
-> 
-> 
->> +    case VFIO_PCI_REQ_IRQ_INDEX:
->> +        notifier = &vdev->req_notifier;
->> +        break;
->> +    case VFIO_PCI_ERR_IRQ_INDEX:
->> +        notifier = &vdev->err_notifier;
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +
->> +    if (ioctl(vdev->vbasedev.fd,
->> +              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
->> +        error_setg_errno(errp, errno,
->> +                         "no irq index %d available", index);
->> +        return -EINVAL;
->> +    }
->> +
->> +    if (target_state) {
->> +        ret = event_notifier_init(notifier, 0);
->> +        if (ret) {
->> +            error_setg_errno(errp, -ret,
->> +                             "Unable to init event notifier for irq index %d",
->> +                             index);
->> +            return ret;
->> +        }
->> +    }
->> +
->> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> +
->> +    irq_set = g_malloc0(argsz);
->> +    irq_set->argsz = argsz;
->> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> +    irq_set->index = index;
->> +    irq_set->start = 0;
->> +    irq_set->count = 1;
->> +    pfd = (int32_t *)&irq_set->data;
->> +
->> +    if (!notifier) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    fd = event_notifier_get_fd(notifier);
->> +
->> +    if (target_state) {
->> +        qemu_set_fd_handler(fd, handler, NULL, vdev);
->> +        *pfd = fd;
->> +    } else {
->> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
->> +        event_notifier_cleanup(notifier);
->> +        *pfd = -1;
->> +    }
->> +
->> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
->> +    g_free(irq_set);
->> +
->> +    if (ret) {
->> +        error_setg_errno(errp, -ret,
->> +                         "vfio: Failed to %s eventfd signalling for index %d",
->> +                         *pfd < 0 ? "set up" : "tear down", index);
->> +    }
->> +    return ret;
->> +}
->> +
->>  static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
->>  {
->>  #ifdef CONFIG_KVM
->> @@ -2621,86 +2710,6 @@ static void vfio_err_notifier_handler(void *opaque)
->>      vm_stop(RUN_STATE_INTERNAL_ERROR);
->>  }
->>  
->> -/*
->> - * Registers error notifier for devices supporting error recovery.
->> - * If we encounter a failure in this function, we report an error
->> - * and continue after disabling error recovery support for the
->> - * device.
->> - */
->> -static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
->> -{
->> -    int ret;
->> -    int argsz;
->> -    struct vfio_irq_set *irq_set;
->> -    int32_t *pfd;
->> -
->> -    if (!vdev->pci_aer) {
->> -        return;
->> -    }
->> -
->> -    if (event_notifier_init(&vdev->err_notifier, 0)) {
->> -        error_report("vfio: Unable to init event notifier for error detection");
->> -        vdev->pci_aer = false;
->> -        return;
->> -    }
->> -
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *)&irq_set->data;
->> -
->> -    *pfd = event_notifier_get_fd(&vdev->err_notifier);
->> -    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
->> -
->> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
->> -    if (ret) {
->> -        error_report("vfio: Failed to set up error notification");
->> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
->> -        event_notifier_cleanup(&vdev->err_notifier);
-> 
-> 
-> qemu_set_fd_handler() and event_notifier_cleanup() have not made it to
-> the new vfio_register_event_notifier() for the case when
-> ioctl(VFIO_DEVICE_SET_IRQS) failed.
+config MSF2
+    bool
 
-definitively missing. Thanks!
-> 
-> 
->> -        vdev->pci_aer = false;
->> -    }
->> -    g_free(irq_set);
->> -}
->> -
->> -static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
->> -{
->> -    int argsz;
->> -    struct vfio_irq_set *irq_set;
->> -    int32_t *pfd;
->> -    int ret;
->> -
->> -    if (!vdev->pci_aer) {
->> -        return;
->> -    }
->> -
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *)&irq_set->data;
->> -    *pfd = -1;
->> -
->> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
->> -    if (ret) {
->> -        error_report("vfio: Failed to de-assign error fd: %m");
->> -    }
->> -    g_free(irq_set);
->> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
->> -                        NULL, NULL, vdev);
->> -    event_notifier_cleanup(&vdev->err_notifier);
->> -}
->> -
->>  static void vfio_req_notifier_handler(void *opaque)
->>  {
->>      VFIOPCIDevice *vdev = opaque;
->> @@ -2716,86 +2725,6 @@ static void vfio_req_notifier_handler(void *opaque)
->>      }
->>  }
->>  
->> -static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
->> -{
->> -    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
->> -                                      .index = VFIO_PCI_REQ_IRQ_INDEX };
->> -    int argsz;
->> -    struct vfio_irq_set *irq_set;
->> -    int32_t *pfd;
->> -
->> -    if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
->> -        return;
->> -    }
->> -
->> -    if (ioctl(vdev->vbasedev.fd,
->> -              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
->> -        return;
->> -    }
->> -
->> -    if (event_notifier_init(&vdev->req_notifier, 0)) {
->> -        error_report("vfio: Unable to init event notifier for device request");
->> -        return;
->> -    }
->> -
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *)&irq_set->data;
->> -
->> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
->> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
->> -
->> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
->> -        error_report("vfio: Failed to set up device request notification");
->> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-> 
-> Same here.
-> 
-> 
->> -        event_notifier_cleanup(&vdev->req_notifier);
->> -    } else {
->> -        vdev->req_enabled = true;
->> -    }
->> -
->> -    g_free(irq_set);
->> -}
->> -
->> -static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->> -{
->> -    int argsz;
->> -    struct vfio_irq_set *irq_set;
->> -    int32_t *pfd;
->> -
->> -    if (!vdev->req_enabled) {
->> -        return;
->> -    }
->> -
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> -
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *)&irq_set->data;
->> -    *pfd = -1;
->> -
->> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
->> -        error_report("vfio: Failed to de-assign device request fd: %m");
->> -    }
->> -    g_free(irq_set);
->> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
->> -                        NULL, NULL, vdev);
->> -    event_notifier_cleanup(&vdev->req_notifier);
->> -
->> -    vdev->req_enabled = false;
->> -}
->> -
->>  static void vfio_realize(PCIDevice *pdev, Error **errp)
->>  {
->>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
->> @@ -3069,8 +2998,29 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->>          goto out_teardown;
->>      }
->>  
->> -    vfio_register_err_notifier(vdev);
->> -    vfio_register_req_notifier(vdev);
->> +    if (vdev->pci_aer) {
->> +        /*
->> +         * Registers error notifier for devices supporting error recovery.
->> +         * If we encounter a failure in this function, we report an error
->> +         * and continue after disabling error recovery support for the
->> +         * device.
->> +         */
->> +        vdev->pci_aer =
->> +            !vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
->> +                                          vfio_err_notifier_handler, &err);
->> +        if (err) {
->> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        }
-> 
-> 
-> As the commit log said, these returned @err are not particularly useful
-> as they are handled exactly the same way and they are not forwarded further.
-Yes that's awkward but the issue is vfio_intx_enable() propagates the error.
-> 
-> Also, the new helper returns int which is not tested anywhere and it can
-> also return with an error and err==NULL so these errors will be silently
-> skipped. Some consistency here would not hurt :)
-Yes I think I will make it a void function and the caller will only test
-err.
+config ZAURUS
+    bool
 
-Thank you for the review!
+config A9MPCORE
+    bool
 
-Eric
-> 
-> 
->> +    }
->> +
->> +    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
->> +        vdev->req_enabled =
->> +            !vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
->> +                                          vfio_req_notifier_handler, &err);
->> +        if (err) {
->> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        }
->> +    }
->>      vfio_setup_resetfn_quirk(vdev);
->>  
->>      return;
->> @@ -3106,9 +3056,22 @@ static void vfio_instance_finalize(Object *obj)
->>  static void vfio_exitfn(PCIDevice *pdev)
->>  {
->>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
->> +    Error *err = NULL;
->>  
->> -    vfio_unregister_req_notifier(vdev);
->> -    vfio_unregister_err_notifier(vdev);
->> +    if (vdev->req_enabled) {
->> +        vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX,
->> +                                     false, NULL, &err);
->> +        if (err) {
->> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        }
->> +    }
->> +    if (vdev->pci_aer) {
->> +        vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX,
->> +                                     false, NULL, &err);
->> +        if (err) {
->> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        }
->> +    }
->>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
->>      vfio_disable_interrupts(vdev);
->>      if (vdev->intx.mmap_timer) {
->>
-> 
+config A15MPCORE
+    bool
+
+config ARM11MPCORE
+    bool
+
+Could you please add them in v3?
+
+> diff --git a/hw/nios2/Kconfig b/hw/nios2/Kconfig
+> new file mode 100644
+> index 0000000000..986c1cc0a1
+> --- /dev/null
+> +++ b/hw/nios2/Kconfig
+> @@ -0,0 +1,2 @@
+> +config NIOS2_10M50_BOARD
+> +    bool
+
+Some Makefiles use CONFIG_NIOS2, so we also need:
+
+config NIOS2
+    bool
+
+> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
+> new file mode 100644
+> index 0000000000..44b01acdd9
+> --- /dev/null
+> +++ b/hw/ppc/Kconfig
+> @@ -0,0 +1,38 @@
+> +config PSERIES
+> +    bool
+> +
+> +config SPAPR_RNG
+> +    bool
+> +
+> +config POWERNV
+> +    bool
+> +
+> +config PPC405
+> +    bool
+> +
+> +config PPC440
+> +    bool
+> +
+> +config PPC4XX
+> +    bool
+> +
+> +config SAM460EX
+> +    bool
+> +
+> +config PREP
+> +    bool
+> +
+> +config RS6000_MC
+> +    bool
+> +
+> +config MAC_OLDWORLD
+> +    bool
+> +
+> +config MAC_NEWWORLD
+> +    bool
+> +
+> +config E500
+> +    bool
+> +
+> +config VIRTEX
+> +    bool
+
+When I tried to compile the ppc part, I found out that the following
+config options are still missing for ppc:
+
+config MAC_DBDMA
+    bool
+
+config MAC_PMU
+    bool
+
+config XIVE
+    bool
+
+config MACIO_GPIO
+    bool
+
+config XIVE_SPAPR
+    bool
+
+config CUDA
+    bool
+
+Could you please add them in v3?
+
+> diff --git a/hw/sh4/Kconfig b/hw/sh4/Kconfig
+> new file mode 100644
+> index 0000000000..b2faf1489e
+> --- /dev/null
+> +++ b/hw/sh4/Kconfig
+> @@ -0,0 +1,8 @@
+> +config R2D
+> +    bool
+> +
+> +config SHIX
+> +    bool
+> +
+> +config SH7750
+> +    bool
+
+Some Makefiles also use CONFIG_SH4, so please add:
+
+config SH4
+    bool
+
+> diff --git a/hw/smbios/Kconfig b/hw/smbios/Kconfig
+> new file mode 100644
+> index 0000000000..553adf4bfc
+> --- /dev/null
+> +++ b/hw/smbios/Kconfig
+> @@ -0,0 +1,2 @@
+> +config SMBIOS
+> +    bool
+> diff --git a/hw/sparc/Kconfig b/hw/sparc/Kconfig
+> new file mode 100644
+> index 0000000000..529fca328f
+> --- /dev/null
+> +++ b/hw/sparc/Kconfig
+> @@ -0,0 +1,5 @@
+> +config SUN4M
+> +    bool
+> +
+> +config LEON3
+> +    bool
+
+For sparc, we also need:
+
+config GRLIB
+    bool
+
+config SLAVIO
+    bool
+
+ Thanks,
+  Thomas
