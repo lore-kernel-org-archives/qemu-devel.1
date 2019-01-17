@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37950)
+Received: from eggs.gnu.org ([209.51.188.92]:38122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBHS-0003RC-Oq
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:40 -0500
+	(envelope-from <groug@kaod.org>) id 1gkBHe-0003ZS-Kq
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBHR-00021z-TS
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:38 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49782
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1gkBHc-0002GD-OR
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBHM-0001R3-JQ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:35 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0HHEP8L010482
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:15 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2um6y5ck-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBHc-0001nw-Aw
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:48 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0HHF5S9052863
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:29 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q2wxeg1va-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:14 -0500
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:29 -0500
 Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 17 Jan 2019 17:16:12 -0000
+	Thu, 17 Jan 2019 17:16:26 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 17 Jan 2019 18:16:05 +0100
+Date: Thu, 17 Jan 2019 18:16:18 +0100
 In-Reply-To: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <154774536496.1208625.12823909967079119637.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH v3 15/19] spapr_xive: Cache device tree
- nodename in sPAPRXive
+Message-Id: <154774537811.1208625.5130988447516010112.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH v3 17/19] spapr_irq: Expose the phandle of the
+ interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,61 +43,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-PHB hotplug will need to know the name of the XIVE controller node. Since
-it is an invariant for the machine lifetime, compute it at realize and
-store it under the sPAPRXive structure.
+This will be used by PHB hotplug in order to create the "interrupt-map"
+property of the PHB node.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/spapr_xive.c        |    9 ++++-----
- include/hw/ppc/spapr_xive.h |    3 +++
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ hw/ppc/spapr_irq.c         |   44 +++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/ppc/spapr_irq.h |    3 +++
+ 2 files changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index e542ae59d7fd..9732c3d89c77 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -316,6 +316,9 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
-     /* Map all regions */
-     spapr_xive_map_mmio(xive);
- 
-+    xive->nodename = g_strdup_printf("interrupt-controller@%" PRIx64,
-+                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_SHIFT));
-+
-     qemu_register_reset(spapr_xive_reset, dev);
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index b3e0713428ed..93243cfd0644 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -243,6 +243,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
+     /* TODO: create the KVM XICS device */
  }
  
-@@ -1436,7 +1439,6 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt)
-         cpu_to_be32(7),    /* start */
-         cpu_to_be32(0xf8), /* count */
-     };
--    gchar *nodename;
- 
-     /*
-      * The "ibm,plat-res-int-priorities" property defines the priority
-@@ -1453,10 +1455,7 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt)
-                            XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
-     timas[3] = cpu_to_be64(1ull << TM_SHIFT);
- 
--    nodename = g_strdup_printf("interrupt-controller@%" PRIx64,
--                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_SHIFT));
--    _FDT(node = fdt_add_subnode(fdt, 0, nodename));
--    g_free(nodename);
-+    _FDT(node = fdt_add_subnode(fdt, 0, xive->nodename));
- 
-     _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
-     _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 29dafead9ba0..deea34b03ee5 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -26,6 +26,9 @@ typedef struct sPAPRXive {
-     XiveENDSource end_source;
-     hwaddr        end_base;
- 
-+    /* DT */
-+    gchar *nodename;
++static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
++{
++    return xics_spapr_get_nodename();
++}
 +
-     /* Routing table */
-     XiveEAS       *eat;
-     uint32_t      nr_irqs;
+ #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+ #define SPAPR_IRQ_XICS_NR_MSIS     \
+     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+@@ -263,6 +268,7 @@ sPAPRIrq spapr_irq_xics = {
+     .post_load   = spapr_irq_post_load_xics,
+     .reset       = spapr_irq_reset_xics,
+     .set_irq     = spapr_irq_set_irq_xics,
++    .get_nodename = spapr_irq_get_nodename_xics,
+ };
+ 
+ /*
+@@ -401,6 +407,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int srcno, int val)
+     xive_source_set_irq(&spapr->xive->source, srcno, val);
+ }
+ 
++static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
++{
++    return spapr_xive_get_nodename(spapr->xive);
++}
++
+ /*
+  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+  * with XICS.
+@@ -425,6 +436,7 @@ sPAPRIrq spapr_irq_xive = {
+     .post_load   = spapr_irq_post_load_xive,
+     .reset       = spapr_irq_reset_xive,
+     .set_irq     = spapr_irq_set_irq_xive,
++    .get_nodename = spapr_irq_get_nodename_xive,
+ };
+ 
+ /*
+@@ -588,6 +600,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int srcno, int val)
+     spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
+ }
+ 
++static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
++{
++    return spapr_irq_current(spapr)->get_nodename(spapr);
++}
++
+ /*
+  * Define values in sync with the XIVE and XICS backend
+  */
+@@ -609,7 +626,8 @@ sPAPRIrq spapr_irq_dual = {
+     .cpu_intc_create = spapr_irq_cpu_intc_create_dual,
+     .post_load   = spapr_irq_post_load_dual,
+     .reset       = spapr_irq_reset_dual,
+-    .set_irq     = spapr_irq_set_irq_dual
++    .set_irq     = spapr_irq_set_irq_dual,
++    .get_nodename = spapr_irq_get_nodename_dual,
+ };
+ 
+ /*
+@@ -680,6 +698,29 @@ void spapr_irq_dt_populate(sPAPRMachineState *spapr, uint32_t nr_servers,
+     _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
+ }
+ 
++uint32_t spapr_irq_get_phandle(sPAPRMachineState *spapr, void *fdt,
++                               Error **errp)
++{
++    const char *nodename = spapr->irq->get_nodename(spapr);
++    int phandle, offset;
++
++    offset = fdt_subnode_offset(fdt, 0, nodename);
++    if (offset < 0) {
++        error_setg(errp, "Can't find node \"%s\": %s", nodename,
++                   fdt_strerror(offset));
++        return -1;
++    }
++
++    phandle = fdt_get_phandle(fdt, offset);
++    if (phandle < 0) {
++        error_setg(errp, "Can't get phandle of node \"%s\": %s",
++                   nodename, fdt_strerror(phandle));
++        return -1;
++    }
++
++    return phandle;
++}
++
+ /*
+  * XICS legacy routines - to deprecate one day
+  */
+@@ -752,4 +793,5 @@ sPAPRIrq spapr_irq_xics_legacy = {
+     .cpu_intc_create = spapr_irq_cpu_intc_create_xics,
+     .post_load   = spapr_irq_post_load_xics,
+     .set_irq     = spapr_irq_set_irq_xics,
++    .get_nodename = spapr_irq_get_nodename_xics,
+ };
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index dfed6b7e9976..d44d659231a6 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -48,6 +48,7 @@ typedef struct sPAPRIrq {
+     int (*post_load)(sPAPRMachineState *spapr, int version_id);
+     void (*reset)(sPAPRMachineState *spapr, Error **errp);
+     void (*set_irq)(void *opaque, int srcno, int val);
++    const char *(*get_nodename)(sPAPRMachineState *spapr);
+ } sPAPRIrq;
+ 
+ extern sPAPRIrq spapr_irq_xics;
+@@ -65,6 +66,8 @@ int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
+ void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
+ void spapr_irq_dt_populate(sPAPRMachineState *spapr, uint32_t nr_servers,
+                            void *fdt, uint32_t phandle);
++uint32_t spapr_irq_get_phandle(sPAPRMachineState *spapr, void *fdt,
++                               Error **errp);
+ 
+ /*
+  * XICS legacy routines
