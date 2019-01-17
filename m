@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39001)
+Received: from eggs.gnu.org ([209.51.188.92]:39224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gk9gn-0001s2-9Z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:45 -0500
+	(envelope-from <berto@igalia.com>) id 1gk9gt-0001xw-6B
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gk9gl-0007lR-DM
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:41 -0500
+	(envelope-from <berto@igalia.com>) id 1gk9go-0007qS-25
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:47 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 17 Jan 2019 17:33:57 +0200
-Message-Id: <f112a3019e4e1dfc2de6c275edadb5fc3a58ade0.1547739122.git.berto@igalia.com>
+Date: Thu, 17 Jan 2019 17:34:03 +0200
+Message-Id: <0bdcfe1afa7b1b60eda0258861d4239ef85b1788.1547739122.git.berto@igalia.com>
 In-Reply-To: <cover.1547739122.git.berto@igalia.com>
 References: <cover.1547739122.git.berto@igalia.com>
 In-Reply-To: <cover.1547739122.git.berto@igalia.com>
 References: <cover.1547739122.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 06/13] block: Handle child references in
- bdrv_reopen_queue()
+Subject: [Qemu-devel] [PATCH 12/13] block: Add an 'x-blockdev-reopen' QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,141 +25,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Children in QMP are specified with BlockdevRef / BlockdevRefOrNull,
-which can contain a set of child options, a child reference, or
-NULL. In optional attributes like "backing" it can also be missing.
+This command allows reopening an arbitrary BlockDriverState with a
+new set of options. Some options (e.g node-name) cannot be changed
+and some block drivers don't allow reopening, but otherwise this
+command is modelled after 'blockdev-add' and the state of the reopened
+BlockDriverState should generally be the same as if it had just been
+added by 'blockdev-add' with the same set of options.
 
-Only the first case (set of child options) is being handled properly
-by bdrv_reopen_queue(). This patch deals with all the others.
+One notable exception is the 'backing' option: 'x-blockdev-reopen'
+requires that it is always present unless the BlockDriverState in
+question doesn't have a current or default backing file.
 
-Here's how these cases should be handled when bdrv_reopen_queue() is
-deciding what to do with each child of a BlockDriverState:
+This command allows reconfiguring the graph by using the appropriate
+options to change the children of a node. At the moment it's possible
+to change a backing file by setting the 'backing' option to the name
+of the new node, but it should also be possible to add a similar
+functionality to other block drivers (e.g. Quorum, blkverify).
 
-   1) Set of child options: the options are removed from the parent's
-      options QDict and are passed to the child with a recursive
-      bdrv_reopen_queue() call. This case was already working fine.
-
-   2) Child reference: there's two possibilites here.
-
-      2a) Reference to the current child: the child is put in the
-          reopen queue, keeping its current set of options (since this
-          was a child reference there was no way to specify a
-          different set of options).
-
-      2b) Reference to a different BDS: the current child is not put
-          in the reopen queue at all. Passing a reference to a
-          different BDS can be used to replace a child, although at
-          the moment no driver implements this, so it results in an
-          error. In any case, the current child is not going to be
-          reopened (and might in fact disappear if it's replaced)
-
-   3) NULL: This is similar to (2b). Although no driver allows this
-      yet it can be used to detach the current child so it should not
-      be put in the reopen queue.
-
-   4) Missing option: at the moment "backing" is the only case where
-      this can happen. With "blockdev-add", leaving "backing" out
-      means that the default backing file is opened. We don't want to
-      open a new image during reopen, so we require that "backing" is
-      always present. We'll relax this requirement a bit in the next
-      patch.
+Although the API is unlikely to change, this command is marked
+experimental for the time being so there's room to see if the
+semantics need changes.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c               | 51 ++++++++++++++++++++++++++++++++++++++++++++-------
- include/block/block.h |  1 +
- 2 files changed, 45 insertions(+), 7 deletions(-)
+ blockdev.c           | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/block.c b/block.c
-index 056a620eb2..fd51f1cd35 100644
---- a/block.c
-+++ b/block.c
-@@ -3032,9 +3032,21 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     bs_entry->state.perm = UINT64_MAX;
-     bs_entry->state.shared_perm = 0;
+diff --git a/blockdev.c b/blockdev.c
+index a8fa8748a9..d8831db7e1 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4258,6 +4258,53 @@ fail:
+     visit_free(v);
+ }
  
-+    /*
-+     * If keep_old_opts is false then it means that unspecified
-+     * options must be reset to its original value. We don't allow
-+     * resetting 'backing' but we need to know if the option is
-+     * missing in order to decide if we have to return an error.
-+     */
-+    if (!keep_old_opts) {
-+        bs_entry->state.backing_missing =
-+            !qdict_haskey(options, "backing") &&
-+            !qdict_haskey(options, "backing.driver");
++void qmp_x_blockdev_reopen(BlockdevOptions *options, Error **errp)
++{
++    BlockDriverState *bs;
++    AioContext *ctx;
++    QObject *obj;
++    Visitor *v = qobject_output_visitor_new(&obj);
++    Error *local_err = NULL;
++    BlockReopenQueue *queue;
++    QDict *qdict;
++
++    /* Check for the selected node name */
++    if (!options->has_node_name) {
++        error_setg(errp, "Node name not specified");
++        goto fail;
 +    }
 +
-     QLIST_FOREACH(child, &bs->children, next) {
--        QDict *new_child_options;
--        char *child_key_dot;
-+        QDict *new_child_options = NULL;
-+        bool child_keep_old = keep_old_opts;
- 
-         /* reopen can only change the options of block devices that were
-          * implicitly created and inherited options. For other (referenced)
-@@ -3043,13 +3055,31 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-             continue;
-         }
- 
--        child_key_dot = g_strdup_printf("%s.", child->name);
--        qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
--        qdict_extract_subqdict(options, &new_child_options, child_key_dot);
--        g_free(child_key_dot);
-+        /* Check if the options contain a child reference */
-+        if (qdict_haskey(options, child->name)) {
-+            const char *childref = qdict_get_try_str(options, child->name);
-+            /*
-+             * The current child must not be reopened if the child
-+             * reference does not point to it.
-+             */
-+            if (g_strcmp0(childref, child->bs->node_name)) {
-+                continue;
-+            }
-+            /*
-+             * If the child reference points to the current child then
-+             * reopen it with its existing set of options.
-+             */
-+            child_keep_old = true;
-+        } else {
-+            /* Extract child options ("child-name.*") */
-+            char *child_key_dot = g_strdup_printf("%s.", child->name);
-+            qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
-+            qdict_extract_subqdict(options, &new_child_options, child_key_dot);
-+            g_free(child_key_dot);
-+        }
- 
-         bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
--                                child->role, options, flags, keep_old_opts);
-+                                child->role, options, flags, child_keep_old);
-     }
- 
-     return bs_queue;
-@@ -3306,6 +3336,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
- 
-     drv_prepared = true;
- 
-+    if (reopen_state->backing_missing) {
-+        error_setg(errp, "backing is missing for '%s'",
-+                   reopen_state->bs->node_name);
-+        ret = -EINVAL;
-+        goto error;
++    bs = bdrv_find_node(options->node_name);
++    if (!bs) {
++        error_setg(errp, "Cannot find node named '%s'", options->node_name);
++        goto fail;
 +    }
 +
-     /* Options that are not handled are only okay if they are unchanged
-      * compared to the old state. It is expected that some options are only
-      * used for the initial open, but not reopen (e.g. filename) */
-diff --git a/include/block/block.h b/include/block/block.h
-index a061ef3944..e21616a038 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -187,6 +187,7 @@ typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-     BlockdevDetectZeroesOptions detect_zeroes;
-+    bool backing_missing;
-     uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
++    /* Put all options in a QDict and flatten it */
++    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
++    }
++
++    visit_complete(v, &obj);
++    qdict = qobject_to(QDict, obj);
++
++    qdict_flatten(qdict);
++
++    /* Perform the reopen operation */
++    ctx = bdrv_get_aio_context(bs);
++    aio_context_acquire(ctx);
++    bdrv_subtree_drained_begin(bs);
++    queue = bdrv_reopen_queue(NULL, bs, qdict, false);
++    bdrv_reopen_multiple(queue, errp);
++    bdrv_subtree_drained_end(bs);
++    aio_context_release(ctx);
++
++fail:
++    visit_free(v);
++}
++
+ void qmp_blockdev_del(const char *node_name, Error **errp)
+ {
+     AioContext *aio_context;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 91685be6c2..1cfaccd500 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3816,6 +3816,48 @@
+ { 'command': 'blockdev-add', 'data': 'BlockdevOptions', 'boxed': true }
+ 
+ ##
++# @x-blockdev-reopen:
++#
++# Reopens a block device using the given set of options. Any option
++# not specified will be reset to its default value regardless of its
++# previous status. If an option cannot be changed or a particular
++# driver does not support reopening then the command will return an
++# error.
++#
++# The top-level @node-name option (from BlockdevOptions) must be
++# specified and is used to select the block device to be reopened.
++# Other @node-name options must be either omitted or set to the
++# current name of the appropriate node. This command won't change any
++# node name and any attempt to do it will result in an error.
++#
++# In the case of options that refer to child nodes, the behavior of
++# this command depends on the value:
++#
++#  1) A set of options (BlockdevOptions): the child is reopened with
++#     the specified set of options.
++#
++#  2) A reference to the current child: the child is reopened using
++#     its existing set of options.
++#
++#  3) A reference to a different node: the current child is replaced
++#     with the specified one.
++#
++#  4) NULL: the current child (if any) is detached.
++#
++# Options (1) and (2) are supported in all cases, but at the moment
++# only @backing allows replacing or detaching an existing child.
++#
++# Unlike with blockdev-add, the @backing option must always be present
++# unless the node being reopened does not have a backing file and its
++# image does not have a default backing file name as part of its
++# metadata.
++#
++# Since: 4.0
++##
++{ 'command': 'x-blockdev-reopen',
++  'data': 'BlockdevOptions', 'boxed': true }
++
++##
+ # @blockdev-del:
+ #
+ # Deletes a block device that has been added using blockdev-add.
 -- 
 2.11.0
