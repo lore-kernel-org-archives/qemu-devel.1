@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38124)
+Received: from eggs.gnu.org ([209.51.188.92]:38272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gk6YQ-0001vw-3w
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:13:51 -0500
+	(envelope-from <groug@kaod.org>) id 1gk6Z2-0002Rc-NU
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gk6YP-00082u-4O
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:13:50 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 17 Jan 2019 12:13:35 +0000
-Message-ID: <4899ffae-b6f6-f2ac-1f91-83e73ca662cf@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-8-vsementsov@virtuozzo.com>
-	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-In-Reply-To: <5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <17B495B6A392AA4887F6DB6EF588689A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <groug@kaod.org>) id 1gk6Yz-0000N5-3Y
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:14:27 -0500
+Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:50095)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gk6Yt-0000D2-Q0
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:14:24 -0500
+Received: from player791.ha.ovh.net (unknown [10.109.143.208])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id B330C45BCF
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 13:14:11 +0100 (CET)
+Date: Thu, 17 Jan 2019 13:14:01 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190117131401.64bbd52d@bahia.lan>
+In-Reply-To: <20190115193750.17234-2-farosas@linux.ibm.com>
+References: <20190115193750.17234-1-farosas@linux.ibm.com>
+	<20190115193750.17234-2-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
- filter driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 1/3] target/ppc: Add SPRs XML
+ generation code for gdbstub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-MTYuMDEuMjAxOSAxOTowMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEJhY2t1cC10b3AgZmlsdGVy
-IGRvZXMgY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0aW9uLiBJdCBzaG91bGQgYmUNCj4+IGluc2Vy
-dGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQgbm9kZSBmb3IgQ0JXLCBsaWtl
-IHRoZQ0KPj4gZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgKy0tLS0tLS0rDQo+PiAgICAgIHwgR3Vl
-c3QgfA0KPj4gICAgICArLS0tKy0tLSsNCj4+ICAgICAgICAgIHxyLHcNCj4+ICAgICAgICAgIHYN
-Cj4+ICAgICAgKy0tLSstLS0tLS0tLS0tLSsgIHRhcmdldCAgICstLS0tLS0tLS0tLS0tLS0rDQo+
-PiAgICAgIHwgYmFja3VwX3RvcCAgICB8LS0tLS0tLS0tLT58IHRhcmdldChxY293MikgfA0KPj4g
-ICAgICArLS0tKy0tLS0tLS0tLS0tKyAgIENCVyAgICAgKy0tLSstLS0tLS0tLS0tLSsNCj4+ICAg
-ICAgICAgIHwNCj4+IGJhY2tpbmcgfHIsdw0KPj4gICAgICAgICAgdg0KPj4gICAgICArLS0tKy0t
-LS0tLS0tLSsNCj4+ICAgICAgfCBBY3RpdmUgZGlzayB8DQo+PiAgICAgICstLS0tLS0tLS0tLS0t
-Kw0KPj4NCj4+IFRoZSBkcml2ZXIgd2lsbCBiZSB1c2VkIGluIGJhY2t1cCBpbnN0ZWFkIG9mIHdy
-aXRlLW5vdGlmaWVycy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2sv
-YmFja3VwLXRvcC5oICB8ICA0MyArKysrKysrDQo+PiAgIGJsb2NrL2JhY2t1cC10b3AuYyAgfCAz
-MDYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+ICAgYmxv
-Y2svTWFrZWZpbGUub2JqcyB8ICAgMiArDQo+PiAgIDMgZmlsZXMgY2hhbmdlZCwgMzUxIGluc2Vy
-dGlvbnMoKykNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuaA0KPj4g
-ICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5jDQo+IA0KPiBMb29rcyBnb29k
-IHRvIG1lIG92ZXJhbGwsIGNvbW1lbnRzIGJlbG93Og0KPiANCg0KWy4uXQ0KDQogPj4gK3N0YXRp
-YyBjb3JvdXRpbmVfZm4gaW50IGJhY2t1cF90b3BfY2J3KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1
-aW50NjRfdCBvZmZzZXQsDQogPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHVpbnQ2NF90IGJ5dGVzKQ0KDQpbLi5dDQoNCj4+ICsNCj4+ICsgICAgLyoNCj4+ICsg
-ICAgICogRmVhdHVyZXMgdG8gYmUgaW1wbGVtZW50ZWQ6DQo+PiArICAgICAqIEYzLiBwYXJhbGxl
-bGl6ZSBjb3B5aW5nIGxvb3ANCj4+ICsgICAgICogRjQuIGRldGVjdCB6ZXJvcw0KPiANCj4gSXNu
-J3QgdGhlcmUgZGV0ZWN0LXplcm9lcyBmb3IgdGhhdD8NCg0KSG1tIGludGVyZXN0aW5nIG5vdGUu
-IEkndmUgcGxhY2VkIEY0IGhlcmUsIGFzIHdlIGRvIGhhdmUgZGV0ZWN0aW5nIHplcm9zIGJ5IGhh
-bmQgaW4NCmN1cnJlbnQgYmFja3VwIGNvZGUuIFNob3VsZCB3ZSBkcm9wIGl0IGZyb20gYmFja3Vw
-LCBvciBzd2l0Y2ggdG8ganVzdCBlbmFibGluZw0KZGV0ZWN0LXplcm9zIG9uIHRhcmdldD8NCg0K
-PiANCj4+ICsgICAgICogRjUuIHVzZSBibG9ja19zdGF0dXMgPw0KPj4gKyAgICAgKiBGNi4gZG9u
-J3QgY29weSBjbHVzdGVycyB3aGljaCBhcmUgYWxyZWFkeSBjYWNoZWQgYnkgQ09SIFtzZWUgRjFd
-DQo+PiArICAgICAqIEY3LiBpZiB0YXJnZXQgaXMgcmFtLWNhY2hlIGFuZCBpdCBpcyBmdWxsLCB0
-aGVyZSBzaG91bGQgYmUgYSBwb3NzaWJpbGl0eQ0KPj4gKyAgICAgKiAgICAgdG8gZHJvcCBub3Qg
-bmVjZXNzYXJ5IGRhdGEgKGNhY2hlZCBieSBDT1IgW3NlZSBGMV0pIHRvIGhhbmRsZSBDQlcNCj4+
-ICsgICAgICogICAgIGZhc3QuDQo+IA0KPiBBbm90aGVyIGlkZWE6IFJlYWQgYWxsIGRpcnR5IGRh
-dGEgZnJvbSBicy0+YmFja2luZyAoaW4gcGFyYWxsZWwsIG1vcmUgb3INCj4gbGVzcyksIGFuZCB0
-aGVuIHBlcmZvcm0gYWxsIHdyaXRlcyAodG8gYnMtPmJhY2tpbmcgYW5kIHMtPnRhcmdldCkgaW4N
-Cj4gcGFyYWxsZWwgYXMgd2VsbC4NCj4gDQo+IChTbyB0aGUgd3JpdGVzIGRvIG5vdCBoYXZlIHRv
-IHdhaXQgb24gb25lIGFub3RoZXIpDQoNClllcywgd2UgY2FuIGNvbnRpbnVlIGd1ZXN0IHdyaXRl
-IGFmdGVyIHJlYWQgcGFydCBvZiBDQlcsIGJ1dCB3ZSBjYW4ndCBkbyBpdCBhbHdheXMsDQphcyB3
-ZSB3YW50IHRvIGxpbWl0IFJBTSB1c2FnZSB0byBzdG9yZSBhbGwgdGhlc2UgaW4tZmxpZ2h0IHJl
-cXVlc3RzLiBBbmQgSSB0aGluaywNCmluIHNjaGVtZSB3aXRoIHJhbS1jYWNoZSwgcmFtLWNhY2hl
-IGl0c2VsZiBzaG91bGQgYmUgYWN0dWFsbHkgYSBraW5kIG9mIHN0b3JhZ2UNCmZvciBpbi1mbGln
-aHQgcmVxdWVzdHMuIEFuZCBpbiB0aGlzIHRlcm1pbm9sb2d5LCBpZiByYW0tY2FjaGUgaXMgZnVs
-bCwgd2UgY2FuJ3QNCnByb2NlZWQgd2l0aCBndWVzdCB3cml0ZS4gSXQncyB0aGUgc2FtZSBhcyB3
-ZSByZWFjaGVkIGxpbWl0IG9uIGluLWZsaWdodCByZXF1ZXN0cw0KY291bnQuDQoNClsuLl0NCg0K
-Pj4gKw0KPj4gK3N0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIGJhY2t1cF90b3BfY29fcGRpc2NhcmQo
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IG9mZnNldCwgaW50IGJ5dGVzKQ0KPiANCj4gKElu
-ZGVudGF0aW9uKQ0KDQpsb29rcyBsaWtlIGl0IHdhcyBhZnRlciByZW5hbWluZw0KZmxlZWNpbmdf
-aG9vaw0KdG8NCmJhY2t1cF90b3ANCg0Kd2lsbCBmaXggYWxsDQoNClsuLl0NCg0KPj4gKw0KPj4g
-K3N0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIGJhY2t1cF90b3BfY29fZmx1c2goQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMpDQo+PiArew0KPj4gKyAgICBpZiAoIWJzLT5iYWNraW5nKSB7DQo+PiArICAgICAg
-ICByZXR1cm4gMDsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICByZXR1cm4gYmRydl9jb19mbHVz
-aChicy0+YmFja2luZy0+YnMpOw0KPiANCj4gV2h5IG5vdCB0aGUgdGFyZ2V0IGFzIHdlbGw/DQoN
-ClNob3VsZCB3ZT8gSXQgbWF5IGJlIGd1ZXN0IGZsdXNoLCB3aHkgdG8gZmx1c2ggYmFja3VwIHRh
-cmdldCBvbiBpdD8NCg0KWy4uXQ0KDQo+PiArc3RhdGljIHZvaWQgYmFja3VwX3RvcF9jaGlsZF9w
-ZXJtKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2Q2hpbGQgKmMsDQo+PiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgQmRydkNoaWxkUm9sZSAqcm9sZSwNCj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja1Jlb3BlblF1ZXVl
-ICpyZW9wZW5fcXVldWUsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgdWludDY0X3QgcGVybSwgdWludDY0X3Qgc2hhcmVkLA0KPj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90ICpucGVybSwgdWludDY0X3QgKm5zaGFyZWQp
-DQo+IA0KPiAoSW5kZW50YXRpb24pDQo+IA0KPj4gK3sNCj4+ICsgICAgYmRydl9maWx0ZXJfZGVm
-YXVsdF9wZXJtcyhicywgYywgcm9sZSwgcmVvcGVuX3F1ZXVlLCBwZXJtLCBzaGFyZWQsIG5wZXJt
-LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5zaGFyZWQpOw0KPj4gKw0KPj4g
-KyAgICBpZiAocm9sZSA9PSAmY2hpbGRfZmlsZSkgew0KPj4gKyAgICAgICAgLyoNCj4+ICsgICAg
-ICAgICAqIHNoYXJlIHdyaXRlIHRvIHRhcmdldCwgdG8gbm90IGludGVyZmVyZSBndWVzdCB3cml0
-ZXMgdG8gaXQncyBkaXNrDQo+IA0KPiAqaW50ZXJmZXJlIHdpdGggZ3Vlc3Qgd3JpdGVzIHRvIGl0
-cyBkaXNrDQo+IA0KPj4gKyAgICAgICAgICogd2hpY2ggd2lsbCBiZSBpbiB0YXJnZXQgYmFja2lu
-ZyBjaGFpbg0KPj4gKyAgICAgICAgICovDQo+PiArICAgICAgICAqbnNoYXJlZCA9ICpuc2hhcmVk
-IHwgQkxLX1BFUk1fV1JJVEU7DQo+PiArICAgICAgICAqbnBlcm0gPSAqbnBlcm0gfCBCTEtfUEVS
-TV9XUklURTsNCj4gDQo+IFdoeSBkbyB5b3UgbmVlZCB0byB0YWtlIHRoZSB3cml0ZSBwZXJtaXNz
-aW9uPyAgVGhpcyBmaWx0ZXIgZG9lcyBub3QNCj4gcGVyZm9ybSBhbnkgd3JpdGVzIHVubGVzcyBp
-dCByZWNlaXZlcyB3cml0ZXMsIHJpZ2h0PyAgKFNvDQo+IGJkcnZfZmlsdGVyX2RlZmF1bHRfcGVy
-bXMoKSBzaG91bGQgdGFrZSBjYXJlIG9mIHRoaXMuKQ0KDQpZb3VyIGNvbW1pdCBzaGVkIGEgYml0
-IG9mIGxpZ2h0IG9uIHBlcm1pc3Npb24gc3lzdGVtIGZvciBtZSkgT2ssIEknbGwgY2hlY2ssIGlm
-DQp0aGF0IHdvcmsgd2l0aG91dCBQRVJNX1dSSVRFIGhlcmUuDQoNCj4gDQo+PiArICAgIH0gZWxz
-ZSB7DQo+PiArICAgICAgICAqbnBlcm0gPSAqbnBlcm0gfCBCTEtfUEVSTV9DT05TSVNURU5UX1JF
-QUQ7DQo+PiArICAgIH0NCj4+ICt9DQo+PiArDQoNClRoYW5rIHlvdSEgRm9yIG90aGVyIGNvbW1l
-bnRzOiBhcmdlZSBvciB3aWxsLXRyeQ0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+On Tue, 15 Jan 2019 17:37:48 -0200
+Fabiano Rosas <farosas@linux.ibm.com> wrote:
+
+> A following patch will add support for handling the Special Purpose
+> Registers (SPR) in GDB via gdbstub. For that purpose, GDB needs to be
+> provided with an XML description of the registers (see gdb-xml
+> directory).
+> 
+> This patch adds the code that generates the XML dynamically based on
+> the SPRs already defined in the machine. This eliminates the need for
+> several XML files to match each possible ppc machine.
+> 
+> A "group" is defined so that the GDB command `info registers spr` can
+> be used.
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/cpu.h     |  8 +++++++
+>  target/ppc/gdbstub.c | 54 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 62 insertions(+)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 486abaf99b..34f0d2d419 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -230,6 +230,7 @@ struct ppc_spr_t {
+>      void (*oea_write)(DisasContext *ctx, int spr_num, int gpr_num);
+>      void (*hea_read)(DisasContext *ctx, int gpr_num, int spr_num);
+>      void (*hea_write)(DisasContext *ctx, int spr_num, int gpr_num);
+> +    unsigned int gdb_id;
+>  #endif
+>      const char *name;
+>      target_ulong default_value;
+> @@ -1053,6 +1054,9 @@ struct CPUPPCState {
+>      /* Special purpose registers */
+>      target_ulong spr[1024];
+>      ppc_spr_t spr_cb[1024];
+> +#if !defined(CONFIG_USER_ONLY)
+> +    const char *gdb_spr_xml;
+> +#endif
+>      /* Vector status and control register */
+>      uint32_t vscr;
+>      /* VSX registers (including FP and AVR) */
+> @@ -1267,6 +1271,10 @@ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+>  int ppc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+> +#ifndef CONFIG_USER_ONLY
+> +int ppc_gdb_gen_spr_xml(CPUState *cpu);
+> +const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
+> +#endif
+>  int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>                                 int cpuid, void *opaque);
+>  int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+> diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+> index 19565b584d..ce4b728028 100644
+> --- a/target/ppc/gdbstub.c
+> +++ b/target/ppc/gdbstub.c
+> @@ -319,3 +319,57 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
+>      }
+>      return r;
+>  }
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +int ppc_gdb_gen_spr_xml(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    GString *s = g_string_new(NULL);
+> +    unsigned int num_regs = 0;
+> +    int i;
+> +
+> +    g_string_printf(s, "<?xml version=\"1.0\"?>");
+> +    g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
+> +    g_string_append_printf(s, "<feature name=\"org.qemu.power.spr\">");
+> +
+> +    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+> +        ppc_spr_t *spr = &env->spr_cb[i];
+> +
+> +        if (!spr->name) {
+> +            continue;
+> +        }
+> +
+> +        g_string_append_printf(s, "<reg name=\"%s\"",
+> +                               g_ascii_strdown(spr->name, -1));
+> +        g_string_append_printf(s, " bitsize=\"%d\"", TARGET_LONG_BITS);
+> +        g_string_append_printf(s, " group=\"spr\"/>");
+> +
+> +        /*
+> +         * GDB identifies registers based on the order they are
+> +         * presented in the XML. These ids will not match QEMU's
+> +         * representation (which follows the PowerISA).
+> +         *
+> +         * Store the position of the current register description so
+> +         * we can make the correspondence later.
+> +         */
+> +        spr->gdb_id = num_regs;
+> +        num_regs++;
+> +    }
+> +
+> +    g_string_append_printf(s, "</feature>");
+> +    env->gdb_spr_xml = g_string_free(s, false);
+
+The g_string_free() documentation says that its up to the caller to g_free()
+the character data in this case. If the CPU gets hot-unplugged at some point,
+gdb_spr_xml is leaked since I see no g_free(env->gdb_spr_xml) in this patch.
+
+This makes me think that all CPUs are supposed to have the same set of SPRs.
+What about moving gdb_spr_xml to PowerPCCPUClass and have the first CPU
+to set it once and far all ?
+
+> +    return num_regs;
+> +}
+> +
+> +const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +
+> +    if (strcmp(xml_name, "power-spr.xml") == 0) {
+> +        return env->gdb_spr_xml;
+> +    }
+> +    return NULL;
+> +}
+> +#endif
