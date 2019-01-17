@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45620)
+Received: from eggs.gnu.org ([209.51.188.92]:46917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjy7l-00067i-Jj
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:13:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjyFW-0007Xq-3a
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:21:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjy7k-0001zU-Ke
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:13:45 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33205)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gjy7k-0001xL-2i
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:13:44 -0500
-Received: by mail-pl1-x642.google.com with SMTP id z23so4032867plo.0
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 19:13:44 -0800 (PST)
-References: <20190116041916.130523-1-aik@ozlabs.ru>
-	<511a675b-fa61-1ef0-643f-9c568b5daaa8@linaro.org>
-	<alpine.BSF.2.21.9999.1901161259260.16452@zero.eik.bme.hu>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <1ab8c2ba-92c1-757a-5e19-7e4c8719179b@ozlabs.ru>
-Date: Thu, 17 Jan 2019 14:13:38 +1100
+	(envelope-from <eblake@redhat.com>) id 1gjyFT-0000aN-Gz
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:21:46 -0500
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-19-eblake@redhat.com>
+	<0aee5c7f-2503-a927-c4ec-48a93b883d43@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0bace5ce-8d59-0996-51b8-39d584729acd@redhat.com>
+Date: Wed, 16 Jan 2019 21:21:32 -0600
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901161259260.16452@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc]  [PATCH qemu] spapr: Fix fdt warnings
+In-Reply-To: <0aee5c7f-2503-a927-c4ec-48a93b883d43@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KLOYR5q1JqxF81lcd57LqytlBUnmxhSK1"
+Subject: Re: [Qemu-devel] [PATCH v3 18/19] nbd/client: Work around 3.0 bug
+ for listing meta contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KLOYR5q1JqxF81lcd57LqytlBUnmxhSK1
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <0bace5ce-8d59-0996-51b8-39d584729acd@redhat.com>
+Subject: Re: [PATCH v3 18/19] nbd/client: Work around 3.0 bug for listing meta
+ contexts
+References: <20190112175812.27068-1-eblake@redhat.com>
+ <20190112175812.27068-19-eblake@redhat.com>
+ <0aee5c7f-2503-a927-c4ec-48a93b883d43@virtuozzo.com>
+In-Reply-To: <0aee5c7f-2503-a927-c4ec-48a93b883d43@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 1/16/19 9:43 AM, Vladimir Sementsov-Ogievskiy wrote:
 
-On 16/01/2019 23:01, BALATON Zoltan wrote:
-> On Wed, 16 Jan 2019, Richard Henderson wrote:
->> On 1/16/19 3:19 PM, Alexey Kardashevskiy wrote:
->>> because TARGET_FMT_lx is defined as "%016"PRIx64.
->>>
->>> This uses simple "%lx" to suppress the warning. Since it is spapr which
->>> is always 64bit, we assume here that hwaddr is always "long".
+>> @@ -839,9 +842,25 @@ static int nbd_list_meta_contexts(QIOChannel *ioc=
+,
 >>
->> This file is not solely for kvm, i.e. ppc64 hosts.  Thus this
->> is a bad assumption and will fail for a 32-bit host.
->>
->> You may want to use PRIx64 and assume hwaddr == uint64_t, or
->> also include an explicit cast to uint64_t.
-> 
-> I don't know the context of this but there's HWADDR_PRIx as well so if
-> you want to print a hwaddr that's probably the one to use.
+>>           ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_LIST_META_=
+CONTEXT,
+>>                                              &context, NULL, errp);
+>> +        if (ret =3D=3D 0 && seen_any && !seen_qemu) {
+>> +            /*
+>> +             * Work around qemu 3.0 bug: the server forgot to send
+>> +             * "qemu:" replies to 0 queries. If we saw at least one
+>> +             * reply (probably base:allocation), but none of them wer=
+e
+>=20
+> if we are saying about 3.0, it is base:allocation for sure, isn't it?
+>=20
+>> +             * qemu:, then run a more specific query to make sure.
+
+If the server is qemu 3.0, then yes, it is base:allocation. But it could
+be some other server that has its own custom return without implementing
+base:allocation.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-Oh, thanks! I missed that :-/ I'll repost if otherwise the idea is
-correct and nothing relies on leading zeroes (hi, David :) ).
+--KLOYR5q1JqxF81lcd57LqytlBUnmxhSK1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/9LwACgkQp6FrSiUn
+Q2rmfgf9EBPn+h19cw1+FD8qOYWjEhtz+ufsUmugn4O0pxSOpE6xjg9bmEGealjC
+mITRLEnTecJGV47y7O5kIU0scRef41AedvAPKtesJrsxqOwlIrW/hJajdj+k7Chq
+Qkz8LlBXf1BBk5eboJaHYlLCgh/2bqu/TzDy4ogGqHJciHHLWD913mjl02IjF/5y
+6+MtBj56ds15wFr5KgKBTnZx3UH2K3mpqeUx27qfK7h9WMii7KjC6UfDHcCd+dmZ
+8lV3ySPp/SEuatZvu8NUNB5WyPQe0Z1Ct4EHGTWjbcFLxM8yCvauPH1VdDuDtG9u
+rhzpFMr+asjH25YboCGu4Ojuks8HQg==
+=cXR8
+-----END PGP SIGNATURE-----
 
--- 
-Alexey
+--KLOYR5q1JqxF81lcd57LqytlBUnmxhSK1--
