@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53644)
+Received: from eggs.gnu.org ([209.51.188.92]:55724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkASL-0008Sw-9p
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:49 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gkAZW-0002O2-4y
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkASJ-0002RP-Ea
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:49 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:38445)
+	(envelope-from <alex.bennee@linaro.org>) id 1gkAZV-00027S-28
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:14 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkASG-0002Na-8o
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:45 -0500
-Received: by mail-ot1-x335.google.com with SMTP id e12so11646096otl.5
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:23:43 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gkAZU-00025b-RA
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:13 -0500
+Received: by mail-wr1-x443.google.com with SMTP id t27so11725883wra.6
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:31:12 -0800 (PST)
+References: <20190116170114.26802-1-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190116170114.26802-1-cota@braap.org>
+Date: Thu, 17 Jan 2019 16:31:09 +0000
+Message-ID: <8736prz1o2.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20190117161355.18204-1-philmd@redhat.com>
-In-Reply-To: <20190117161355.18204-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Jan 2019 16:23:30 +0000
-Message-ID: <CAFEAcA84VVc399dv3HT7PYBCPA6CvyL8jp+MtytAEbTVK9QtNg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Fix utf-8 mangling
+Subject: Re: [Qemu-devel] [PATCH v7 0/3] Dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On Thu, 17 Jan 2019 at 16:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+
+Emilio G. Cota <cota@braap.org> writes:
+
+> v6: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02998.html
 >
-> Patch incorrectly applied as 15ffb43cbf4.
+> Changes since v6:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Paolo can this be a patchew bug?
+> - Define TCG_TARGET_IMPLEMENTS_DYN_TLB for tcg/riscv (patch 2).
+>
+> - Fix --disable-tcg breakage (reported by Alex) by moving
+>   tlb_entry_is_empty to cputlb.c, since the function's only caller
+>   is in that file (patch 1).
+>
+> You can fetch this series from:
+>   https://github.com/cota/qemu/tree/tlb-dyn-v7
+>
 
-Putting a suitable check into checkpatch would probably
-be a good idea.
+Well so far this has proved to be stable whilst I've been stressing it
+out so have a:
 
-thanks
--- PMM
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+I'm currently benchmarking on my build workload but it's taking a while
+to run.
+
+--
+Alex Benn=C3=A9e
