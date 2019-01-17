@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33700)
+Received: from eggs.gnu.org ([209.51.188.92]:45097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkEuy-0006sh-2W
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:09:40 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1gkFbE-0001Rr-Q9
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:53:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkEuu-0000eo-1y
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:09:37 -0500
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-5-vsementsov@virtuozzo.com>
-	<91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <584b60bb-e5cd-6678-0988-a9ee825d0064@redhat.com>
-Date: Thu, 17 Jan 2019 16:09:20 -0500
-MIME-Version: 1.0
-In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <brijesh.singh@amd.com>) id 1gkFbD-0000ZK-Rv
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:53:20 -0500
+Received: from mail-eopbgr740047.outbound.protection.outlook.com
+	([40.107.74.47]:8750
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1gkFbD-0000WF-N7
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:53:19 -0500
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Thu, 17 Jan 2019 21:53:16 +0000
+Message-ID: <20190117215300.29694-3-brijesh.singh@amd.com>
+References: <20190117215300.29694-1-brijesh.singh@amd.com>
+In-Reply-To: <20190117215300.29694-1-brijesh.singh@amd.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
- export
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH 2/2] target/i386: sev: Do not pin the ram
+ device memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+The RAM device presents a memory region that should be handled
+as an IO region and should not be pinned.
 
+In the case of the vfio-pci, RAM device represents a MMIO BAR
+and the memory region is not backed by pages hence
+KVM_MEMORY_ENCRYPT_REG_REGION fails to lock the memory range.
 
-On 1/9/19 2:21 PM, Eric Blake wrote:
-> Why are we restricting things to only export disabled bitmaps?
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1667249
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ target/i386/sev.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Late reply, but the original thought almost surely was that we would
-only be exporting bitmaps for fleecing use, which should have a
-non-changing bitmap attached to it.
-
-Just some error checking to make sure the user didn't accidentally use
-the live copy attached to the active disk image, versus the one prepared
-for this purpose.
-
-If that's not true anymore, that's fine if the NBD server can handle the
-bits changing while it responds to requests... especially if a client
-wants to just watch the bitmap change live and query sectors every now
-and again, but it's a different use case from the one fairly targeted
-one we were pursuing at the time.
-
---js
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 20b2d325d8..3e9d5c02fa 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -131,6 +131,17 @@ sev_ram_block_added(RAMBlockNotifier *n, void *host, s=
+ize_t size)
+ {
+     int r;
+     struct kvm_enc_region range;
++    ram_addr_t offset;
++    MemoryRegion *mr;
++
++    mr =3D memory_region_from_host(host, &offset);
++    /*
++     * The RAM device presents a memory region that should be treated
++     * as IO region and should not be pinned.
++     */
++    if (memory_region_is_ram_device(mr)) {
++        return;
++    }
+=20
+     range.addr =3D (__u64)(unsigned long)host;
+     range.size =3D size;
+--=20
+2.17.1
