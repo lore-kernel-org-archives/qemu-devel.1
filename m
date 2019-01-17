@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34748)
+Received: from eggs.gnu.org ([209.51.188.92]:35076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gk9Pu-0003BL-7h
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:17:16 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gk9Qy-0003eu-PK
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gk9Pr-0005KD-2n
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:17:12 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55159)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gk9Pq-00050r-6p
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:17:10 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a62so1442687wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 07:17:09 -0800 (PST)
-References: <20190117133834.7480-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <530d35a3-3efd-efcc-3ec2-a113b540b392@redhat.com>
-Date: Thu, 17 Jan 2019 16:17:06 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gk9Qv-0002ay-2u
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:18:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gk9Qu-0002Nx-Q5
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:18:17 -0500
+References: <20190117090259.32713-1-sgarzare@redhat.com>
+	<20190117090259.32713-6-sgarzare@redhat.com>
+	<0bbdcb55-27d9-7098-10f4-aa7aef0a1c24@oracle.com>
+	<aa7f4f9e-90b2-c53c-9ddb-b27fd2977d2d@redhat.com>
+	<8cdb60f6-4a52-f968-d498-ee9273cb69b3@oracle.com>
+	<20190117150515.rr2ksgkob7t6kene@steredhat>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d3180f6c-8d35-4d82-4bde-ddec5116b88f@redhat.com>
+Date: Thu, 17 Jan 2019 16:18:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190117133834.7480-1-peter.maydell@linaro.org>
+In-Reply-To: <20190117150515.rr2ksgkob7t6kene@steredhat>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] exec.c: Use correct attrs in
- cpu_memory_rw_debug()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] optionrom/pvh: load initrd from
+ fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>, George Kennedy <george.kennedy@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-On 1/17/19 2:38 PM, Peter Maydell wrote:
-> In the softmmu version of cpu_memory_rw_debug(), we ask the
-> CPU for the attributes to use for the virtual memory access,
-> and we correctly use those to identify the address space
-> index. However, we were not passing them in to the
-> address_space_write_rom() and address_space_rw() functions.
-> 
-> The effect of this was that a memory access from the gdbstub
-> to a device which had behaviour that was sensitive to the
-> memory attributes (such as some ARMv8M NVIC registers) was
-> incorrectly always performed as if non-secure, rather than
-> using the right security state for the CPU's current state.
-> 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1812091
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 17/01/19 16:05, Stefano Garzarella wrote:
+>> That's part of what I didn't quite understand.
+>> pc-bios/optionrom/linuxboot.bin (and the other binaries in the 'build-all'
+>> target in pc-bios/optionrom/Makefile) are in .gitignore.
+>>
+>> Also, should pvh.bin be added to BLOBS in Makefile like those files?
+> Yes, indeed I added pvh.bin to BLOBS in patch 3/5 and I committed the
+> binary file in /pc-bios/ (note: not in /pc-bios/optionrom/ where it is
+> compiled, maybe is here the confusion, but I following what was done for
+> the other option roms)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Nevermind---I was totally sure .bin files are committed.  Though perhaps
+they should, since non-x86 binaries are.
 
-> ---
->  exec.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 6e875f0640a..2f0f40b0be6 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3881,12 +3881,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
->          phys_addr += (addr & ~TARGET_PAGE_MASK);
->          if (is_write) {
->              address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr,
-> -                                    MEMTXATTRS_UNSPECIFIED,
-> -                                    buf, l);
-> +                                    attrs, buf, l);
->          } else {
->              address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
-> -                             MEMTXATTRS_UNSPECIFIED,
-> -                             buf, l, 0);
-> +                             attrs, buf, l, 0);
->          }
->          len -= l;
->          buf += l;
-> 
+Paolo
