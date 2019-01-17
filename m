@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35371)
+Received: from eggs.gnu.org ([209.51.188.92]:35568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk3Wu-0000j5-RG
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:00:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gk3XW-00011x-4J
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:00:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk3Ws-0008FH-OY
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:00:04 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 17 Jan 2019 09:59:52 +0100
-Message-Id: <1547715592-27740-1-git-send-email-thuth@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gk3XQ-0000qi-P3
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:00:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gk3XP-0000lJ-Hb
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:00:36 -0500
+Date: Thu, 17 Jan 2019 09:59:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190117095956.29cbd8ab.cohuck@redhat.com>
+In-Reply-To: <faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
+References: <20190111165801.15181-1-eric.auger@redhat.com>
+	<20190111165801.15181-2-eric.auger@redhat.com>
+	<faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6] ppc: Fix duplicated typedefs to be able to
- compile with Clang in gnu99 mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-pci: Introduce
+ vfio_register_event_notifier helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,102 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-When compiling the ppc code with clang and -std=3Dgnu99, there are a
-couple of warnings/errors like this one:
+On Thu, 17 Jan 2019 14:46:42 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-  CC      ppc64-softmmu/hw/intc/xics.o
-In file included from hw/intc/xics.c:35:
-include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is=
- a C11 feature
-      [-Werror,-Wtypedef-redefinition]
-typedef struct ICPState ICPState;
-                        ^
-target/ppc/cpu.h:1181:25: note: previous definition is here
-typedef struct ICPState ICPState;
-                        ^
-Work around the problems by including the proper headers in spapr.h
-and by using struct forward declarations in cpu.h.
+> On 12/01/2019 03:58, Eric Auger wrote:
+> > The code used to attach the eventfd handler for the ERR and
+> > REQ irq indices can be factorized into a helper. In subsequent
+> > patches we will extend this helper to support other irq indices.
+> > 
+> > We test the notification is allowed outside of the helper:
+> > respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+> > Depending on the returned value we set vdev->pci_aer and
+> > vdev->req_enabled. An error handle is introduced for future usage
+> > although not strictly useful here.>
+> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > ---
+> >  hw/vfio/pci.c | 291 ++++++++++++++++++++++----------------------------
+> >  1 file changed, 127 insertions(+), 164 deletions(-)
+> > 
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index c0cb1ec289..c589a4e666 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -105,6 +105,95 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+> >      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+> >  }
+> >  
+> > +/*
+> > + * vfio_register_event_notifier - setup/tear down eventfd
+> > + * notification and handling for IRQ indices that span over
+> > + * a single IRQ
+> > + *
+> > + * @vdev: VFIO device handle
+> > + * @index: IRQ index the eventfd/handler is associated to
+> > + * @target_state: true means notifier needs to be set up
+> > + * @handler to attach if @target_state is true
+> > + * @errp error handle
+> > + */
+> > +static int vfio_register_event_notifier(VFIOPCIDevice *vdev,
+> > +                                        int index,
+> > +                                        bool target_state,
+> > +                                        void (*handler)(void *opaque),
+> > +                                        Error **errp)
+> > +{
+> > +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+> > +                                      .index = index };
+> > +    struct vfio_irq_set *irq_set;
+> > +    EventNotifier *notifier;
+> > +    int argsz, ret = 0;
+> > +    int32_t *pfd, fd;
+> > +
+> > +    switch (index) {  
+> 
+> I'd pass the notifier as a parameter as well so index/handler/notifier
+> would walk together.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- As discussed on IRC, C=C3=A9dric's patches likely should go via David's =
-ppc-
- tree, so I'll go with this version here for my gnu99-PULL request.
- (v6: Don't use #includes in cpu.h, use forward struct definitions instea=
-d)
+I first had the same thought, but I actually like that everything is
+together in this switch statement.
 
- include/hw/ppc/spapr.h      | 5 +++--
- include/hw/ppc/spapr_xive.h | 2 --
- target/ppc/cpu.h            | 9 +++++----
- 3 files changed, 8 insertions(+), 8 deletions(-)
+Alternatively, pack it together in an indexed array? But that gets a
+bit awkward with the intx stuff.
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9e01a5a..a947a0a 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -8,15 +8,16 @@
- #include "hw/mem/pc-dimm.h"
- #include "hw/ppc/spapr_ovec.h"
- #include "hw/ppc/spapr_irq.h"
-+#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
-+#include "hw/ppc/xics.h"        /* For ICSState */
-=20
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
- struct sPAPRNVRAM;
-+
- typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
--typedef struct ICSState ICSState;
--typedef struct sPAPRXive sPAPRXive;
-=20
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 7fdc250..9bec919 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lis=
-n, bool lsi);
- bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-=20
--typedef struct sPAPRMachineState sPAPRMachineState;
--
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-                    uint32_t phandle);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf..a62ff60 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1177,8 +1177,9 @@ do {                                            \
-=20
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
--typedef struct XiveTCTX XiveTCTX;
--typedef struct ICPState ICPState;
-+
-+struct XiveTCTX;
-+struct ICPState;
-=20
- /**
-  * PowerPCCPU:
-@@ -1197,8 +1198,8 @@ struct PowerPCCPU {
-     int vcpu_id;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
--    ICPState *icp;
--    XiveTCTX *tctx;
-+    struct ICPState *icp;
-+    struct XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-     PPCHash64Options *hash64_opts;
---=20
-1.8.3.1
+> 
+> 
+> > +    case VFIO_PCI_REQ_IRQ_INDEX:
+> > +        notifier = &vdev->req_notifier;
+> > +        break;
+> > +    case VFIO_PCI_ERR_IRQ_INDEX:
+> > +        notifier = &vdev->err_notifier;
+> > +        break;
+> > +    default:
+> > +        return -EINVAL;
+> > +    }
