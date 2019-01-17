@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51845)
+Received: from eggs.gnu.org ([209.51.188.92]:52122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkALX-0003zE-0G
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:16:47 -0500
+	(envelope-from <jusual@mail.ru>) id 1gkAM6-0004K4-27
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:17:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkALW-0008RV-6t
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:16:46 -0500
-References: <20190117153338.11820-1-alex.bennee@linaro.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <5258121f-d54b-8b58-f393-7f9140760950@redhat.com>
-Date: Thu, 17 Jan 2019 11:08:29 -0500
-MIME-Version: 1.0
-In-Reply-To: <20190117153338.11820-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scripts/replay-dump.py: fix utf-8 mangling
+	(envelope-from <jusual@mail.ru>) id 1gkAM5-0000fe-9q
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:17:21 -0500
+Received: from smtp45.i.mail.ru ([94.100.177.105]:35880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gkAM5-0000Tp-0W
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:17:21 -0500
+From: Julia Suvorova <jusual@mail.ru>
+Date: Thu, 17 Jan 2019 19:16:37 +0300
+Message-Id: <20190117161640.5496-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH v4 0/3] tests/microbit-test: Add UART device
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +22,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-trivial@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
+v4:
+    * Replace sprintf with g_strdup_printf [Peter]
+    * Move socket connection to qtest library [Peter]
+    * Use memcmp instead of strcmp [Stefan]
+    * Remove using global_qtest [Thomas]
+v3:
+    * Fix directory leak [Stefan]
 
+Based-on: <20190110094020.18354-1-stefanha@redhat.com>
 
-On 1/17/19 10:33 AM, Alex Benn=C3=A9e wrote:
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  scripts/replay-dump.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
-> index 5ae77c8a92..ee7fda2638 100755
-> --- a/scripts/replay-dump.py
-> +++ b/scripts/replay-dump.py
-> @@ -3,7 +3,7 @@
->  #
->  # Dump the contents of a recorded execution stream
->  #
-> -#  Copyright (c) 2017 Alex Benn=C3=83=C2=A9e <alex.bennee@linaro.org>
-> +#  Copyright (c) 2017 Alex Benn=C3=A9e <alex.bennee@linaro.org>
->  #
->  # This library is free software; you can redistribute it and/or
->  # modify it under the terms of the GNU Lesser General Public
->=20
+Julia Suvorova (3):
+  tests/libqtest: Introduce qtest_init_with_serial()
+  tests/microbit-test: Make test independent of global_qtest
+  tests/microbit-test: Check nRF51 UART functionality
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+ tests/libqtest.c      |  26 ++++
+ tests/libqtest.h      |  11 ++
+ tests/microbit-test.c | 331 +++++++++++++++++++++++++++---------------
+ 3 files changed, 250 insertions(+), 118 deletions(-)
+
+-- 
+2.17.1
