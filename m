@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53134)
+Received: from eggs.gnu.org ([209.51.188.92]:53644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkAQF-0007Gq-8k
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:21:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkASL-0008Sw-9p
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkAQE-0000IJ-Jy
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:21:39 -0500
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:39144)
+	(envelope-from <peter.maydell@linaro.org>) id 1gkASJ-0002RP-Ea
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:49 -0500
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:38445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkAQE-0000EC-Bp
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:21:38 -0500
-Received: by mail-ot1-x336.google.com with SMTP id n8so11613145otl.6
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:21:37 -0800 (PST)
+	id 1gkASG-0002Na-8o
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:23:45 -0500
+Received: by mail-ot1-x335.google.com with SMTP id e12so11646096otl.5
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:23:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20190115200252.25911-1-mst@redhat.com>
-	<CAFEAcA_CurRe0i7pU10OkNBFi53ayA4Y01HtF27qN1xo5nJqxg@mail.gmail.com>
-	<20190117084350-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190117084350-mutt-send-email-mst@kernel.org>
+References: <20190117161355.18204-1-philmd@redhat.com>
+In-Reply-To: <20190117161355.18204-1-philmd@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Jan 2019 16:21:24 +0000
-Message-ID: <CAFEAcA_G_og2AXsDKYnPVhRXsvMUb8MnR0yc8JzCwS4xaPJpGg@mail.gmail.com>
+Date: Thu, 17 Jan 2019 16:23:30 +0000
+Message-ID: <CAFEAcA84VVc399dv3HT7PYBCPA6CvyL8jp+MtytAEbTVK9QtNg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/49] pci, pc, virtio: fixes, features
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Fix utf-8 mangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Thu, 17 Jan 2019 at 13:44, Michael S. Tsirkin <mst@redhat.com> wrote:
+On Thu, 17 Jan 2019 at 16:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
 >
-> On Thu, Jan 17, 2019 at 12:48:22PM +0000, Peter Maydell wrote:
-> > This fails 'make check' on s390x host:
-
-> Oh. I am pretty sure it's endian-ness :(
+> Patch incorrectly applied as 15ffb43cbf4.
 >
-> Any chance you can quickly test the below?
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Paolo can this be a patchew bug?
 
-Yes, that change allows the tests to pass on the s390 box.
+Putting a suitable check into checkpatch would probably
+be a good idea.
 
 thanks
 -- PMM
