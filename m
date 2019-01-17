@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49133)
+Received: from eggs.gnu.org ([209.51.188.92]:49504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gkABL-0006va-2m
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1gkACf-0007qN-8g
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:07:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gkABJ-0003aa-RQ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:14 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gkABJ-0003X7-HE
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:13 -0500
-Received: by mail-wr1-f68.google.com with SMTP id s12so11638259wrt.4
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:06:13 -0800 (PST)
-References: <20190117153338.11820-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c451b6fa-b692-378f-13a4-b22c5c06f461@redhat.com>
-Date: Thu, 17 Jan 2019 17:06:10 +0100
+	(envelope-from <berrange@redhat.com>) id 1gkACe-0005ep-9E
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:07:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkACd-0005Vn-FU
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:07:36 -0500
+Date: Thu, 17 Jan 2019 16:06:57 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190117160657.GD11022@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190117153321.29749-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190117153338.11820-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] scripts/replay-dump.py: fix utf-8 mangling
+Content-Disposition: inline
+In-Reply-To: <20190117153321.29749-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Expand 'qemu-img info' to show
+ protocol details
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-trivial@nongnu.org
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com
 
-On 1/17/19 4:33 PM, Alex Bennée wrote:
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  scripts/replay-dump.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Jan 17, 2019 at 09:33:18AM -0600, Eric Blake wrote:
+> Posting this now to get feedback on the general idea; it would still
+> need to be polished into a form I'd feel happy committing, including
+> reworking 'qemu-nbd --list' to reuse the new NBD-specific QAPI type.
 > 
-> diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
-> index 5ae77c8a92..ee7fda2638 100755
-> --- a/scripts/replay-dump.py
-> +++ b/scripts/replay-dump.py
-> @@ -3,7 +3,7 @@
->  #
->  # Dump the contents of a recorded execution stream
->  #
-> -#  Copyright (c) 2017 Alex BennÃ©e <alex.bennee@linaro.org>
-> +#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
->  #
->  # This library is free software; you can redistribute it and/or
->  # modify it under the terms of the GNU Lesser General Public
+> Based-on: <20190112175812.27068-1-eblake@redhat.com>
+> [0/19 nbd: add qemu-nbd --list]
 > 
+> Examples with this applied:
+> $ ./qemu-img info file
+> image: file
+> file format: qcow2
+> virtual size: 1.0M (1048576 bytes)
+> disk size: 672K
+> cluster_size: 65536
+> Format specific information:
+>     compat: 1.1
+>     lazy refcounts: false
+>     refcount bits: 16
+>     corrupt: false
+> Protocol specific information:
+>     write zero: true
+>     discard zero: true
+>     discard: true
+>     align: 1
+> $ qemu-nbd file &
+> $ ./qemu-img info nbd://localhost:10809
+> image: nbd://localhost:10809
+> file format: raw
+> virtual size: 1.0M (1048576 bytes)
+> disk size: unavailable
+> Protocol specific information:
+>     flags:
+>     active contexts:
+>         [0]:
+>             name: base:allocation
+>             id: 0
+>     unknown flags: 1260
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+One thing that occurs to me is that the qemu-img info output data is
+getting larger & larger over time. Especially with LUKS, the format
+specific data is quite huge. Adding protocol specific info makes it
+larger again.
+
+In retrospect, IMHO, it would have been nice to not show the format
+specific info by default, requiring a --verbose arg. Assuming we don't
+want to change default behaviour though, we might as well show protocol
+specific info by default too.
+
+I wonder though if we could benefit from a '-b' / '--brief' arg to make
+it switch to show only the short common metadata, for people who want a
+more concise output.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
