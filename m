@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58449)
+Received: from eggs.gnu.org ([209.51.188.92]:33289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkDLj-0000fb-V5
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:29:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkDTR-0004Bk-55
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkDLj-0003sx-7N
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:29:11 -0500
-References: <20181221135803.9583-1-npes87184@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8736abeb-60b6-e077-b6ad-0f01da4f8c0a@redhat.com>
-Date: Thu, 17 Jan 2019 14:29:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkDTQ-00088k-5x
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:09 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkDTP-00086p-BU
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:08 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x23so7119935oix.3
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 11:37:06 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181221135803.9583-1-npes87184@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dmg: fix binary search
+References: <20190117030917.18844-1-shannon.zhaosl@gmail.com>
+In-Reply-To: <20190117030917.18844-1-shannon.zhaosl@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Jan 2019 19:36:54 +0000
+Message-ID: <CAFEAcA8w-JSvCcU70W63Yr_L0ZS44H26LPrPn4TgL=rW+2FULQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] ARM: GIC: error out early when creating
+ VGICv2 failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuchenlin <npes87184@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com
+To: Shannon Zhao <shannon.zhaosl@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-
-On 12/21/18 8:58 AM, yuchenlin wrote:
-> There is a possible hang in original binary searsh implemtation. That is
-> if chunk1 = 4, chunk2 = 5, chunk3 = 4, and we go else case.
-> 
-> The chunk1 will be still 4, and so on.
-> 
-> Signed-off-by: yuchenlin <npes87184@gmail.com>
-
-Generally we ask that people use their full names for their
-Signed-off-by (for legal and copyright reasons) and not an alias.
-
-If I am mistaken and your name is a mononym or written as a mononym,
-please forgive me and disregard.
-
+On Thu, 17 Jan 2019 at 03:09, Shannon Zhao <shannon.zhaosl@gmail.com> wrote:
+>
+> Currently if creating a gicv2 VM on the platform without
+> VGICv2 support, it failed in kvm_arm_pmu_set_irq while
+> trying to set the interrupt number for PMU with below
+> error message.
+> KVM_SET_DEVICE_ATTR failed: Invalid argument
+>
+> This error log is a little confused. Also it should error
+> out in kvm_arm_gic_realize early.
+>
+> Signed-off-by: Shannon Zhao <shannon.zhaosl@gmail.com>
 > ---
->  block/dmg.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/dmg.c b/block/dmg.c
-> index 50e91aef6d..0e05702f5d 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -572,14 +572,14 @@ static inline uint32_t search_chunk(BDRVDMGState *s, uint64_t sector_num)
->  {
->      /* binary search */
->      uint32_t chunk1 = 0, chunk2 = s->n_chunks, chunk3;
-> -    while (chunk1 != chunk2) {
-> +    while (chunk1 <= chunk2) {
->          chunk3 = (chunk1 + chunk2) / 2;
->          if (s->sectors[chunk3] > sector_num) {
-> -            chunk2 = chunk3;
-> +            chunk2 = chunk3 - 1;
->          } else if (s->sectors[chunk3] + s->sectorcounts[chunk3] > sector_num) {
->              return chunk3;
->          } else {
-> -            chunk1 = chunk3;
-> +            chunk1 = chunk3 + 1;
+>  hw/intc/arm_gic_kvm.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+> index a611e8e..b4f2133 100644
+> --- a/hw/intc/arm_gic_kvm.c
+> +++ b/hw/intc/arm_gic_kvm.c
+> @@ -554,8 +554,9 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+>                                KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true,
+>                                &error_abort);
 >          }
+> -    } else if (ret != -ENODEV && ret != -ENOTSUP) {
+> -        error_setg_errno(errp, -ret, "error creating in-kernel VGIC");
+> +    } else if (ret != -ENOTSUP) {
+> +        error_setg_errno(errp, -ret, "error creating in-kernel VGIC, maybe "
+> +                                     "vGICv2 not support on this platform");
+>          return;
 >      }
->      return s->n_chunks; /* error */
-> 
 
-yuchenlin, did you see Stefan's response to your patch? Do you have any
-plans to send a follow-up?
+Shouldn't we be able to tell specifically whether the
+vGICv2 is not supported on this platform, without
+having to emit an error message that says "we got
+some error, maybe it was that there's no vGICv2
+support but maybe it was something else" ?
 
---js
+It's not clear to me what the various
+possible kvm_create_device returns are. We have
+I guess several cases:
+ * new device control API supported, vGICv2 supported:
+   return >= 0
+ * new device control API not supported at all (ie
+   old host kernel version): return some error, which one?
+ * new device control API supported, but vGICv2 not
+   supported: return some error, which one?
+ * new device control API supported, vGICv2 supported,
+   but something unlikely went wrong in the kernel:
+   return any other error
+
+What are the errnos for the middle two cases, and can
+we end up with userspace code that can distinguish
+these four cases rather than merging some of them
+together?
+
+thanks
+-- PMM
