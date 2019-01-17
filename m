@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57980)
+Received: from eggs.gnu.org ([209.51.188.92]:58449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkDKT-0007tc-5G
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:27:53 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gkDLj-0000fb-V5
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkDKS-0001q1-Er
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:27:53 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36378)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkDKR-0001nI-W4
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:27:52 -0500
-Received: by mail-oi1-x243.google.com with SMTP id x23so7096810oix.3
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 11:27:51 -0800 (PST)
+	(envelope-from <jsnow@redhat.com>) id 1gkDLj-0003sx-7N
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:29:11 -0500
+References: <20181221135803.9583-1-npes87184@gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8736abeb-60b6-e077-b6ad-0f01da4f8c0a@redhat.com>
+Date: Thu, 17 Jan 2019 14:29:05 -0500
 MIME-Version: 1.0
-References: <20190115143650.15725-1-jusual@mail.ru>
-	<CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
-	<797be79d-7ffc-222a-6acd-b01ff7269a63@mail.ru>
-	<20190117101309.GA27840@stefanha-x1.localdomain>
-	<960bbd92-a160-a65c-22c7-9e899dc3fa78@mail.ru>
-In-Reply-To: <960bbd92-a160-a65c-22c7-9e899dc3fa78@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Jan 2019 19:27:39 +0000
-Message-ID: <CAFEAcA8vWOiXS7iM8heAG5wV1u8Dh_295NbWiqcXCmar9ePuPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
+In-Reply-To: <20181221135803.9583-1-npes87184@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] dmg: fix binary search
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Alistair Francis <alistair23@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: yuchenlin <npes87184@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com
 
-On Thu, 17 Jan 2019 at 10:58, Julia Suvorova <jusual@mail.ru> wrote:
->
-> On 17.01.2019 13:13, Stefan Hajnoczi wrote:
-> > generic_loader_reset() calls cpu_reset(s->cpu) followed by
-> > CPUClass->set_pc(s->cpu, s->addr).
-> >
-> > ARM's arm_cpu_set_pc() doesn't special-case the Thumb bit (that's only
-> > done in arm_cpu_reset()) so we end up with an invalid PC for Thumb mode
-> > addresses.
-> >
-> > Maybe the following arm_cpu_reset() code should be moved to
-> > arm_cpu_set_pc():
-> >
-> >    env->regs[15] = initial_pc & ~1;
-> >    env->thumb = initial_pc & 1;
-> >
-> > Then arm_cpu_reset() can call arm_cpu_set_pc() instead of duplicating
-> > this code.
->
-> No, set_pc() is called in cpu_tb_exec() to restore the PC value and
-> therefore should not be changed.
 
-The set_pc hook is also called for the gdbstub 'c' and 's' packets
-if they supply an address. I am not sure what the correct behaviour
-there is (it might be tricky to find out or test, because the
-'c' and 's' packets are deprecated in favour of vCont which doesn't
-allow the address argument at all, and recent gdb neither emits
-'c addr' nor supports it in its gdbserver implementation).
 
-I notice that the MIPS set_pc() hook implementation does
-set the M16 bit based on the low bit of the PC value;
-they avoid the problem in cpu_tb_exec() by providing
-the alternative synchronize_from_tb hook instead.
+On 12/21/18 8:58 AM, yuchenlin wrote:
+> There is a possible hang in original binary searsh implemtation. That is
+> if chunk1 = 4, chunk2 = 5, chunk3 = 4, and we go else case.
+> 
+> The chunk1 will be still 4, and so on.
+> 
+> Signed-off-by: yuchenlin <npes87184@gmail.com>
 
-I think that probably what we ought to do is define that:
- * set_pc has the logic that does whatever is expected
-   when the user sets the PC either by hand or when a
-   ELF file is loaded
- * if that is not what is wanted in cpu_tb_exec() then
-   the target must implement the synchronize_from_tb hook
-   as well
+Generally we ask that people use their full names for their
+Signed-off-by (for legal and copyright reasons) and not an alias.
 
-The trick here is figuring out whether we have a coherent
-cross-architecture definition of what we want set_pc's
-behaviour to be (or at least, if we are just baking in
-"act like an ELF file" we should document that...)
+If I am mistaken and your name is a mononym or written as a mononym,
+please forgive me and disregard.
 
-thanks
--- PMM
+> ---
+>  block/dmg.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/dmg.c b/block/dmg.c
+> index 50e91aef6d..0e05702f5d 100644
+> --- a/block/dmg.c
+> +++ b/block/dmg.c
+> @@ -572,14 +572,14 @@ static inline uint32_t search_chunk(BDRVDMGState *s, uint64_t sector_num)
+>  {
+>      /* binary search */
+>      uint32_t chunk1 = 0, chunk2 = s->n_chunks, chunk3;
+> -    while (chunk1 != chunk2) {
+> +    while (chunk1 <= chunk2) {
+>          chunk3 = (chunk1 + chunk2) / 2;
+>          if (s->sectors[chunk3] > sector_num) {
+> -            chunk2 = chunk3;
+> +            chunk2 = chunk3 - 1;
+>          } else if (s->sectors[chunk3] + s->sectorcounts[chunk3] > sector_num) {
+>              return chunk3;
+>          } else {
+> -            chunk1 = chunk3;
+> +            chunk1 = chunk3 + 1;
+>          }
+>      }
+>      return s->n_chunks; /* error */
+> 
+
+yuchenlin, did you see Stefan's response to your patch? Do you have any
+plans to send a follow-up?
+
+--js
