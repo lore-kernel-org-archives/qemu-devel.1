@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49734)
+Received: from eggs.gnu.org ([209.51.188.92]:49857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gk8af-0003VB-1O
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:24:18 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gk8bF-0003rv-J2
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:24:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gk8ad-00059q-Sx
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:24:17 -0500
-Date: Thu, 17 Jan 2019 15:23:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190117142353.GA6761@localhost.localdomain>
-References: <20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-	<2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
-	<9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
-	<ccb5e146-a601-81d6-28ca-8717adbdb701@virtuozzo.com>
-	<83610386-bc64-6691-9af8-e98eb0a68342@virtuozzo.com>
+	(envelope-from <imammedo@redhat.com>) id 1gk8bE-0007n8-K4
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:24:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47067)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gk8bE-0007hX-BC
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:24:52 -0500
+Date: Thu, 17 Jan 2019 15:24:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190117152444.16163014@redhat.com>
+In-Reply-To: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
+References: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <83610386-bc64-6691-9af8-e98eb0a68342@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] PING: [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] Introduce cpu die topology and
+ enable CPUID.1F for i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,191 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: qemu-devel@nongnu.org, drjones@redhat.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, like.xu@intel.com, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 17.01.2019 um 13:57 hat Denis Plotnikov geschrieben:
-> Kevin,
->=20
-> could you please take a look at my last comments?
+On Mon, 14 Jan 2019 20:24:54 +0800
+Like Xu <like.xu@linux.intel.com> wrote:
 
-I read it, and what it told me is essentially that I need to work on it
-myself to fully understand the problem and possible acceptable solutions
-because you can't seem to find one yourself. I will, but I can't
-guarantee when I can find the time for it.
+> As we know, die is a rectangular piece of a semiconductor wafer. It's very common
+> that chip manufacturers put a multi-core die in one package and one die always has
+> a one-to-one relationship with one socket. Inside the die, it cotains multi-cores
+> and core contains threads topologically. We apply this socket/core/thread model to
+> the qemu -smp configurable space and save it into APIC_IDs for identification.
+> 
+> The undercurrent Is surging. Multi-chip packaging technology allows for integration
+> of multi-die devices in a single package, for example Intel CLX-AP or AMD EPYC.
+> Integration can be enabled by high-performance, heterogeneous, multi-dies interconnect
+> technology, providing a more cost-effective manner. QEMU and guests may take advantages
+> of multi-dies host for such as guest placing or energy efficiency management...
+> 
+> This patch series extend the CPU topology to the socket/dies/core/thread model,
+> allowing the setting of dies number per one socket on -smp qemu command. For
+> i386, it upgrades APIC_IDs generation and reversion functions with a new exposed
+> leaf called CPUID.1F, which is a preferred superset to leaf 0BH. The CPUID.1F
+> spec is on https://software.intel.com/en-us/articles/intel-sdm, 3-190 Vol 2A.
 
-Kevin
+Looked into discussion within this mail thread, so here is my thoughts
+on mentioned issues:
 
-> On 15.01.2019 10:22, Denis Plotnikov wrote:
-> > ping ping ping ping!!!!
-> >=20
-> > On 09.01.2019 11:18, Denis Plotnikov wrote:
-> >> ping ping!!!
-> >>
-> >> On 18.12.2018 11:53, Denis Plotnikov wrote:
-> >>> ping ping
-> >>>
-> >>> On 14.12.2018 14:54, Denis Plotnikov wrote:
-> >>>>
-> >>>>
-> >>>> On 13.12.2018 15:20, Kevin Wolf wrote:
-> >>>>> Am 13.12.2018 um 12:07 hat Denis Plotnikov geschrieben:
-> >>>>>> On 12.12.2018 15:24, Kevin Wolf wrote:
-> >>>>>>> Am 11.12.2018 um 17:55 hat Denis Plotnikov geschrieben:
-> >>>>>>>>> Why involve the AioContext at all? This could all be kept at =
-the
-> >>>>>>>>> BlockBackend level without extending the layering violation t=
-hat
-> >>>>>>>>> aio_disable_external() is.
-> >>>>>>>>>
-> >>>>>>>>> BlockBackends get notified when their root node is drained, s=
-o=20
-> >>>>>>>>> hooking
-> >>>>>>>>> things up there should be as easy, if not even easier than in
-> >>>>>>>>> AioContext.
-> >>>>>>>>
-> >>>>>>>> Just want to make sure that I understood correctly what you=20
-> >>>>>>>> meant by
-> >>>>>>>> "BlockBackends get notified". Did you mean that bdrv_drain_end=
-=20
-> >>>>>>>> calls
-> >>>>>>>> child's role callback blk_root_drained_end by calling
-> >>>>>>>> bdrv_parent_drained_end?
-> >>>>>>>
-> >>>>>>> Yes, blk_root_drained_begin/end calls are all you need.=20
-> >>>>>>> Specifically,
-> >>>>>>> their adjustments to blk->quiesce_counter that are already ther=
-e,=20
-> >>>>>>> and in
-> >>>>>>> the 'if (--blk->quiesce_counter =3D=3D 0)' block of=20
-> >>>>>>> blk_root_drained_end()
-> >>>>>>> we can resume the queued requests.
-> >>>>>> Sounds it should be so, but it doesn't work that way and that's =
-why:
-> >>>>>> when doing mirror we may resume postponed coroutines too early=20
-> >>>>>> when the
-> >>>>>> underlying bs is protected from writing at and thus we encounter=
- the
-> >>>>>> assert on a write request execution at bdrv_co_write_req_prepare=
- when
-> >>>>>> resuming the postponed coroutines.
-> >>>>>>
-> >>>>>> The thing is that the bs is protected for writing before executi=
-on of
-> >>>>>> bdrv_replace_node at mirror_exit_common and bdrv_replace_node ca=
-lls
-> >>>>>> bdrv_replace_child_noperm which, in turn, calls=20
-> >>>>>> child->role->drained_end
-> >>>>>> where one of the callbacks is blk_root_drained_end which check
-> >>>>>> if(--blk->quiesce_counter =3D=3D 0) and runs the postponed reque=
-sts
-> >>>>>> (coroutines) if the coundition is true.
-> >>>>>
-> >>>>> Hm, so something is messed up with the drain sections in the mirr=
-or
-> >>>>> driver. We have:
-> >>>>>
-> >>>>> =A0=A0=A0=A0 bdrv_drained_begin(target_bs);
-> >>>>> =A0=A0=A0=A0 bdrv_replace_node(to_replace, target_bs, &local_err)=
-;
-> >>>>> =A0=A0=A0=A0 bdrv_drained_end(target_bs);
-> >>>>>
-> >>>>> Obviously, the intention was to keep the BlockBackend drained dur=
-ing
-> >>>>> bdrv_replace_node(). So how could blk->quiesce_counter ever get t=
-o 0
-> >>>>> inside bdrv_replace_node() when target_bs is drained?
-> >>>>>
-> >>>>> Looking at bdrv_replace_child_noperm(), it seems that the functio=
-n has
-> >>>>> a bug: Even if old_bs and new_bs are both drained, the quiesce_co=
-unter
-> >>>>> for the parent reaches 0 for a moment because we call .drained_en=
-d for
-> >>>>> the old child first and .drained_begin for the new one later.
-> >>>>>
-> >>>>> So it seems the fix would be to reverse the order and first call
-> >>>>> .drained_begin for the new child and then .drained_end for the ol=
-d
-> >>>>> child. Sounds like a good new testcase for tests/test-bdrv-drain.=
-c,=20
-> >>>>> too.
-> >>>> Yes, it's true, but it's not enough...
-> >>>> In mirror_exit_common() we actively manipulate with block driver=20
-> >>>> states.
-> >>>> When we replaced a node in the snippet you showed we can't allow t=
-he=20
-> >>>> postponed coroutines to run because the block tree isn't ready to=20
-> >>>> receive the requests yet.
-> >>>> To be ready, we need to insert a proper block driver state to the=20
-> >>>> block backend which is done here
-> >>>>
-> >>>> =A0=A0=A0=A0 blk_remove_bs(bjob->blk);
-> >>>> =A0=A0=A0=A0 blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort=
-);
-> >>>> =A0=A0=A0=A0 blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort)=
-; << << << <<
-> >>>>
-> >>>> =A0=A0=A0=A0 bs_opaque->job =3D NULL;
-> >>>>
-> >>>> =A0=A0=A0=A0 bdrv_drained_end(src);
-> >>>>
-> >>>> If the tree isn't ready and we resume the coroutines, we'll end up=
-=20
-> >>>> with the request landed in a wrong block driver state.
-> >>>>
-> >>>> So, we explicitly should stop all activities on all the driver sta=
-tes
-> >>>> and its parents and allow the activities when everything is ready =
-to=20
-> >>>> go.
-> >>>>
-> >>>> Why explicitly, because the block driver states may belong to=20
-> >>>> different block backends at the moment of the manipulation beginni=
-ng.
-> >>>>
-> >>>> So, it seems we need to disable all their contexts until the=20
-> >>>> manipulation ends.
-> >>>>
-> >>>> Please, correct me if I'm wrong.
-> >>>>
-> >>>>>
-> >>>>>> In seems that if the external requests disabled on the context w=
-e=20
-> >>>>>> can't
-> >>>>>> rely on anything or should check where the underlying bs and its
-> >>>>>> underlying nodes are ready to receive requests which sounds quit=
-e
-> >>>>>> complicated.
-> >>>>>> Please correct me if still don't understand something in that=20
-> >>>>>> routine.
-> >>>>>
-> >>>>> I think the reason why reyling on aio_disable_external() works is=
-=20
-> >>>>> simply
-> >>>>> because src is also drained, which keeps external events in the
-> >>>>> AioContext disabled despite the bug in draining the target node.
-> >>>>>
-> >>>>> The bug would become apparent even with aio_disable_external() if=
- we
-> >>>>> didn't drain src, or even if we just supported src and target bei=
-ng in
-> >>>>> different AioContexts.
-> >>>>
-> >>>> Why don't we disable all those contexts involved until the end of=20
-> >>>> the block device tree reconstruction?
-> >>>>
-> >>>> Thanks!
-> >>>>
-> >>>> Denis
-> >>>>>
-> >>>>> Kevin
-> >>>>>
-> >>>>
-> >>>
-> >>
-> >=20
->=20
-> --=20
-> Best,
-> Denis
+ * I agree with Daniel on the point that "-smp cores" should change 'cores'
+   meaning to cores within die when die is used.
+ * I dislike extending smp_parse() though and adding one more global,
+   as it just adds up more mess to topology thingy QEMU has and puts
+   an additional burden on whoever comes later to make it right.
+   After talking with Eduardo, I think it's reasonable to refactor
+   smp_parse() into machine properties first before adding 'dies',
+   i.e. 'dies' and the rest of '-smp' should be implemented as machine
+   properties where 'cpu_dies' is PCMachine specific property.
+   If it ever becomes useful for other machines we can move common code up
+   hierarchy to the generic Machine object later and let machine versions take
+   care of compat issues if any (which is not possible with generic smp_parse()).
+   So I'd suggest to:
+      1: make existing cores/threads/sockets into machine properties and
+         get rid of global variables they use currently
+      2: #1 should make this trivial: add 'cpu_dies' to PCMachine and
+         an optional CpuInstanceProperties::die-id with necessary generic glue
+         where it's necessary.
+         * for 'cpu_dies', we may use 0 (default) to make old machines work as they
+           used to (i.e. not reporting dies existence) and new machines could
+           enable/require dies by default or on request. In this case it should
+           not cause any migration/hotplug issues.
