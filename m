@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33187)
+Received: from eggs.gnu.org ([209.51.188.92]:34433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkB0F-0000Ly-2Z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:58:52 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gkB4x-000466-Tc
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkB0C-0000FY-My
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:58:51 -0500
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-18-eblake@redhat.com>
-	<2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
-Date: Thu, 17 Jan 2019 10:58:00 -0600
+	(envelope-from <amarkovic@wavecomp.com>) id 1gkB4v-0005N7-OJ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:43 -0500
+Received: from mail-eopbgr680127.outbound.protection.outlook.com
+	([40.107.68.127]:37924
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gkB4v-0005GL-IV
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:41 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 17 Jan 2019 17:03:29 +0000
+Message-ID: <BN6PR2201MB12512974D97B0E8BD05D162FC6830@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1547403692.git.noring@nocrew.org>,
+	<dccb35585b1e6f333e6809234cb9eacf63d5a686.1547403692.git.noring@nocrew.org>,
+	<BN6PR2201MB125192D10C9D6C9D52F0E01FC6810@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB125192D10C9D6C9D52F0E01FC6810@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QH76GhdsNOrTMdFOFWUDBhTWF9dav61pU"
-Subject: Re: [Qemu-devel] [PATCH v3 17/19] qemu-nbd: Add --list option
+Subject: Re: [Qemu-devel] [PATCH 2/9] target/mips: Introduce 32 R5900
+ 128-bit multimedia registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,206 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QH76GhdsNOrTMdFOFWUDBhTWF9dav61pU
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
-Subject: Re: [PATCH v3 17/19] qemu-nbd: Add --list option
-References: <20190112175812.27068-1-eblake@redhat.com>
- <20190112175812.27068-18-eblake@redhat.com>
- <2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
-In-Reply-To: <2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/17/19 4:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.01.2019 20:58, Eric Blake wrote:
->> We want to be able to detect whether a given qemu NBD server is
->> exposing the right export(s) and dirty bitmaps, at least for
->> regression testing.  We could use 'nbd-client -l' from the upstream
->> NBD project to list exports, but it's annoying to rely on
->> out-of-tree binaries; furthermore, nbd-client doesn't necessarily
->> know about all of the qemu NBD extensions.  Thus, it is time to add
->> a new mode to qemu-nbd that merely sniffs all possible information
->> from the server during handshake phase, then disconnects and dumps
->> the information.
->>
->> This patch actually implements --list/-L, while reusing other
->> options such as --tls-creds for now designating how to connect
->> as the client (rather than their non-list usage of how to operate
->> as the server).
->>
-
->>
->> Not done here, but maybe worth future experiments: capture
->> the meat of NBDExportInfo into a QAPI struct, and use the
->> generated QAPI pretty-printers instead of hand-rolling our
->> output loop.  It would also permit us to add a JSON output
->> mode for machine parsing.
-
-A start of that experiment has now been posted:
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg04196.html
-
-
->>   @item --tls-creds=3DID
->>   Enable mandatory TLS encryption for the server by setting the ID
->>   of the TLS credentials object previously created with the --object
->> -option.
->> +option; or provide the credentials needed for connecting as a client
->> +in list mode.
+> From: Aleksandar Markovic
+> Sent: Tuesday, January 15, 2019 10:20 PM
+> To: Fredrik Noring; Aurelien Jarno; Philippe Mathieu-Daud=E9
+> Cc: J=FCrgen Urban; Maciej W. Rozycki; qemu-devel@nongnu.org
+> Subject: Re: [PATCH 2/9] target/mips: Introduce 32 R5900 128-bit multimed=
+ia registers
 >=20
-> may be "list mode (--list)", as "list mode" is not directly defined. On=
- the other hand,
-> list option is extremely close to tls-creds, so it is obvious anyway.
+> > From: Fredrik Noring <noring@nocrew.org>
+> > Sent: Sunday, January 13, 2019 8:03 PM
+> > To: Aleksandar Markovic; Aurelien Jarno; Philippe Mathieu-Daud=E9
+> > Cc: J=FCrgen Urban; Maciej W. Rozycki; qemu-devel@nongnu.org
+> > Subject: [PATCH 2/9] target/mips: Introduce 32 R5900 128-bit multimedia=
+ registers
+> >
+> > The 32 R5900 128-bit MMRs are split into two 64-bit halves: the lower
+> > halves are the GPRs and the upper halves are accessible by the R5900-
+> > specific multimedia instructions.
+> >
+> > Signed-off-by: Fredrik Noring <noring@nocrew.org>
+> > ---
 
-I'm thinking of adding this (and see conversation below that mentions [1]=
-):
+Since this patch is not a subject of any disagreement, and "#ifdef"
+structure is of a cosmetic nature, I will do these minor cosmetic
+changes while applying, and insert this patch in the next MIPS pull
+request, scheduled shortly.
 
-diff --git i/qemu-nbd.texi w/qemu-nbd.texi
-index 65caeb7874a..0d297eed6db 100644
---- i/qemu-nbd.texi
-+++ w/qemu-nbd.texi
-@@ -105,7 +105,9 @@ Set the NBD volume export description, as a
-human-readable
- string.
- @item -L, --list
- Connect as a client and list all details about the exports exposed by
--a remote NBD server.
-+a remote NBD server.  This enables list mode, and is incompatible
-+with options that change behavior related to a specific export (such as
-+@option{--export-name}, @option{--offset}, ...).
- @item --tls-creds=3DID
- Enable mandatory TLS encryption for the server by setting the ID
- of the TLS credentials object previously created with the --object
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
+Other patches from this series will not be in the pull request.
 
->> +static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds=
- *tls,
->> +                                const char *hostname)
->> +{
->> +    int ret =3D EXIT_FAILURE;
->> +    int rc;
->> +    Error *err =3D NULL;
->> +    QIOChannelSocket *sioc;
->> +    NBDExportInfo *list;
->> +    int i, j;
->> +
->> +    sioc =3D qio_channel_socket_new();
->> +    if (qio_channel_socket_connect_sync(sioc, saddr, &err) < 0) {
->> +        error_report_err(err);
->> +        goto out;
+> >  target/mips/cpu.h       |  2 ++
+> >  target/mips/translate.c | 14 ++++++++++++--
+> >  2 files changed, 14 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> > index 03c03fd8c6..9ff4a68d90 100644
+> > --- a/target/mips/cpu.h
+> > +++ b/target/mips/cpu.h
+> > @@ -180,6 +180,8 @@ struct TCState {
+> >  #define MXU_CR_RD_EN    1
+> >  #define MXU_CR_MXU_EN   0
+> >
+> > +    /* Upper 64-bit MMRs (multimedia registers); the lower 64-bit are =
+GPRs */
+> > +    uint64_t mmr[32];
+> >  };
+> >
+> >  typedef struct CPUMIPSState CPUMIPSState;
+> > diff --git a/target/mips/translate.c b/target/mips/translate.c
+> > index a538351032..9d5150ec8b 100644
+> > --- a/target/mips/translate.c
+> > +++ b/target/mips/translate.c
+> > @@ -2455,7 +2455,10 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
+> >  static TCGv_i64 fpu_f64[32];
+> >  static TCGv_i64 msa_wr_d[64];
+> >
+> > -#if !defined(TARGET_MIPS64)
+> > +#if defined(TARGET_MIPS64)
+> > +/* Upper 64-bit MMRs (multimedia registers); the lower 64-bit are GPRs=
+ */
+> > +static TCGv_i64 cpu_mmr[32];
+> > +#else
 >=20
-> May be just return EXIT_FAUILURE here;
-> remove out label;
-> s/out_socket/out
-
-Will do. Probably leftovers from earlier attempts as I changed my
-approach over time.
-
-
->> +    printf("exports available: %d\n", rc);
->> +    for (i =3D 0; i < rc; i++) {
->> +        printf(" export: '%s'\n", list[i].name);
->> +        if (list[i].description && *list[i].description) {
->> +            printf("  description: %s\n", list[i].description);
->> +        }
->> +        if (list[i].flags & NBD_FLAG_HAS_FLAGS) {
+> Naming is perfect, but:
 >=20
-> actually this is
+> #if-#else-#endif is confusing here:
+> - MMR declaration should be under it own #if defined(TARGET_MIPS64)
+> - MXU declaration should be under separate #if !defined(TARGET_MIPS64)
+> (we are not dealing with two variants (64/32) of the same item, but with =
+two
+> separate items, one is valid for 64-bit only, another for 32-bit only)
 >=20
-> if (server not have a bug of not setting NBD_FLAG_HAS_FLAGS) {
-
-Which, as the commit message mentions, is for servers so old and rare
-that it really doesn't matter.
-
->   ...
-> }
+> >  /* MXU registers */
+> >  static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+> >  static TCGv mxu_CR;
+> > @@ -29785,7 +29788,14 @@ void mips_tcg_init(void)
+> >      fpu_fcr31 =3D tcg_global_mem_new_i32(cpu_env,
+> >                                         offsetof(CPUMIPSState, active_f=
+pu.fcr31),
+> >                                         "fcr31");
+> > -#if !defined(TARGET_MIPS64)
+> > +#if defined(TARGET_MIPS64)
+> > +    cpu_mmr[0] =3D NULL;
+> > +    for (i =3D 1; i < 32; i++)
+> > +        cpu_mmr[i] =3D tcg_global_mem_new_i64(cpu_env,
+> > +                                            offsetof(CPUMIPSState,
+> > +                                                     active_tc.mmr[i])=
+,
+> > +                                            regnames[i]);
+> > +#else
+> >      for (i =3D 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
+> >          mxu_gpr[i] =3D tcg_global_mem_new(cpu_env,
+> >                                          offsetof(CPUMIPSState,
+> > --
 >=20
-> Why not to print @size for example, if @flags field has a bug?
+> The same applies here.
 >=20
-> Or, then, why to print flags, if @size has a bug?
-
-Because we don't have to worry about those servers being mainstream.
-
->>
->> -    if ((argc - optind) !=3D 1) {
->> +    if (list) {
->> +        if (argc !=3D optind) {
->> +            error_report("List mode is incompatible with a file name"=
-);
->> +            exit(EXIT_FAILURE);
->> +        }
->> +        if (export_name || export_description || dev_offset || partit=
-ion ||
->> +            device || disconnect || fmt || sn_id_or_name || bitmap) {=
-
->> +            error_report("List mode is incompatible with per-device s=
-ettings");
->> +            exit(EXIT_FAILURE);
+> > 2.19.2
 >=20
-> and what about aio, discard, etc?
-
-I don't mind adding in any more options that you think are useful to
-flag the user on.  Looks like I missed seen_aio, seen_cache,
-seen_discard.  Catching '-s' is harder, as it merely sets a bit within
-flags rather than a witness variable.
-
-> Also, I think, it would be good to specify in Usage
-> (or in man), which options are available for list mode.
-
-I worry that keeping an exact list may be a maintenance nightmare (the
-two are likely to get out of sync); does my proposed wording above at
-[1] satisfy the problem by at least making the user aware that not all
-combinations will work?
-
-Another alternative would be to just silently ignore all per-export
-options, instead of warning the user that they are incompatible.  I
-don't know if that's any friendlier, but it is less code.
-
->=20
-> Hm, note, --help has grouping of options and man don't.
-
-That could be a separate patch, if it is desired (or squashed into 2/19)
-
->=20
->=20
-> I don't have good understanding of tls related things, the rest looks O=
-K,
-> my suggestions are optional, so, if you don't want to improve docs and
-> option conflict checking now:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---QH76GhdsNOrTMdFOFWUDBhTWF9dav61pU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxAtBgACgkQp6FrSiUn
-Q2r6kAf8CjQb87rNbxOk6/3fqy4UzB8lKVHNvSZ3DJKAm+H4xQ4Xa37gjh//1F5p
-wSmKvWD47NDVWyHfb3xWnxY44lt/+KBa4tW4PZjvsucl62XGW3Lnm1RFrbs+w3De
-YV+sNXxxYKz1f1gRe8ld6mR+UqGipBtmuZNj8XPGPLp8xjPhXyXh/+dnVOGahzZk
-m8EC0joUt8bcQFKsUe/4ZMEXybQOj+y0n2Hytuz4GCZa5b4ywubk2nD0W/b1FL7D
-dEvvHKnemUj4qbJS6fVhUQ6s6qdw8MppD9j+MAp1h5IjJvDibTuVzurnDagTGvhC
-6kiKYe5igFTaogWiZVZsvR5cyzXcvw==
-=7Tll
------END PGP SIGNATURE-----
-
---QH76GhdsNOrTMdFOFWUDBhTWF9dav61pU--
+> =
