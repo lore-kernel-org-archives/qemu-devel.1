@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57327)
+Received: from eggs.gnu.org ([209.51.188.92]:57392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66S-0005cl-Nj
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:57 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66e-0005pA-Av
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66P-0004i2-0X
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59608)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66a-0004sO-95
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gk66O-0004fg-O7
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:52 -0500
+	id 1gk66Y-0004pa-9m
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:04 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 17 Jan 2019 15:43:41 +0400
-Message-Id: <20190117114359.5164-10-marcandre.lureau@redhat.com>
+Date: Thu, 17 Jan 2019 15:43:43 +0400
+Message-Id: <20190117114359.5164-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/27] slirp: replace qemu_set_nonblock()
+Subject: [Qemu-devel] [PATCH 11/27] slirp: replace qemu_notify_event() with
+ a callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +31,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>
 
-Replace qemu_set_nonblock() with slirp_set_nonblock()
+Introduce a SlirpCb callback to kick the main io-thread.
 
-qemu_set_nonblock() does some event registration with the main
-loop. Add a new callback register_poll_fd() for that reason.
-
-Always build the fd-register stub, to avoid #if WIN32.
+Add an intermediary sodrop() function that will call SlirpCb.notify
+callback when sbdrop() returns true.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/libslirp.h    |  2 ++
- slirp/util.h        |  1 +
- net/slirp.c         |  6 ++++++
- slirp/misc.c        |  3 ++-
- slirp/tcp_subr.c    |  6 ++++--
- slirp/util.c        | 12 ++++++++++++
- stubs/Makefile.objs |  2 +-
- 7 files changed, 28 insertions(+), 4 deletions(-)
+ slirp/libslirp.h  | 2 ++
+ slirp/sbuf.h      | 2 +-
+ slirp/socket.h    | 1 +
+ net/slirp.c       | 1 +
+ slirp/sbuf.c      | 6 ++++--
+ slirp/socket.c    | 7 +++++++
+ slirp/tcp_input.c | 6 +++---
+ 7 files changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e75dadfa31..70e99139bf6 100644
+index 8ce69f0be39..679a25422b9 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -27,6 +27,8 @@ typedef struct SlirpCb {
-     void (*timer_free)(void *timer);
-     /* Modify a timer to expire at @expire_time */
-     void (*timer_mod)(void *timer, int64_t expire_time);
-+    /* Register a fd for future polling */
-+    void (*register_poll_fd)(int fd);
+@@ -31,6 +31,8 @@ typedef struct SlirpCb {
+     void (*register_poll_fd)(int fd);
+     /* Unregister a fd */
+     void (*unregister_poll_fd)(int fd);
++    /* Kick the io-thread, to signal that new events may be processed */
++    void (*notify)(void);
  } SlirpCb;
 =20
 =20
-diff --git a/slirp/util.h b/slirp/util.h
-index 050ca7f1a3f..782ae8ef0ee 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -66,6 +66,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
- #endif
+diff --git a/slirp/sbuf.h b/slirp/sbuf.h
+index 644c2013413..1cb9a428341 100644
+--- a/slirp/sbuf.h
++++ b/slirp/sbuf.h
+@@ -21,7 +21,7 @@ struct sbuf {
+ };
 =20
- int slirp_socket(int domain, int type, int protocol);
-+void slirp_set_nonblock(int fd);
+ void sbfree(struct sbuf *);
+-void sbdrop(struct sbuf *, int);
++bool sbdrop(struct sbuf *, int);
+ void sbreserve(struct sbuf *, int);
+ void sbappend(struct socket *, struct mbuf *);
+ void sbcopy(struct sbuf *, int, int, char *);
+diff --git a/slirp/socket.h b/slirp/socket.h
+index fc35ca5f72a..1c1c8b5871c 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -156,6 +156,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
+ size);
+ void sotranslate_out(struct socket *, struct sockaddr_storage *);
+ void sotranslate_in(struct socket *, struct sockaddr_storage *);
+ void sotranslate_accept(struct socket *);
++void sodrop(struct socket *, int num);
 =20
- static inline int slirp_socket_set_nodelay(int fd)
- {
+=20
+ #endif /* SLIRP_SOCKET_H */
 diff --git a/net/slirp.c b/net/slirp.c
-index c24a779425b..6f756a4dccc 100644
+index 78ba96b63f7..7b4f9f5c5ee 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -186,6 +186,11 @@ static void net_slirp_timer_mod(void *timer, int64_t=
- expire_timer)
-     timer_mod(timer, expire_timer);
- }
-=20
-+static void net_slirp_register_poll_fd(int fd)
-+{
-+    qemu_fd_register(fd);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-@@ -193,6 +198,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_new =3D net_slirp_timer_new,
-     .timer_free =3D net_slirp_timer_free,
+@@ -205,6 +205,7 @@ static const SlirpCb slirp_cb =3D {
      .timer_mod =3D net_slirp_timer_mod,
-+    .register_poll_fd =3D net_slirp_register_poll_fd,
+     .register_poll_fd =3D net_slirp_register_poll_fd,
+     .unregister_poll_fd =3D net_slirp_unregister_poll_fd,
++    .notify =3D qemu_notify_event,
  };
 =20
  static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 32ec02a5251..4ee20a10e44 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -163,7 +163,8 @@ fork_exec(struct socket *so, const char *ex)
-     slirp_socket_set_fast_reuse(so->s);
-     opt =3D 1;
-     slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
-;
--    qemu_set_nonblock(so->s);
-+    slirp_set_nonblock(so->s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     return 1;
+diff --git a/slirp/sbuf.c b/slirp/sbuf.c
+index 912f235f652..17f28e97a63 100644
+--- a/slirp/sbuf.c
++++ b/slirp/sbuf.c
+@@ -17,7 +17,7 @@ sbfree(struct sbuf *sb)
+ 	free(sb->sb_data);
  }
 =20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 3567f320ff0..8087ffc047f 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -412,7 +412,8 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     int opt, s=3Dso->s;
-     struct sockaddr_storage addr;
-=20
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -484,7 +485,8 @@ void tcp_connect(struct socket *inso)
-         tcp_close(sototcpcb(so)); /* This will sofree() as well */
-         return;
-     }
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-diff --git a/slirp/util.c b/slirp/util.c
-index b1a36b27bc5..499c5cea46f 100644
---- a/slirp/util.c
-+++ b/slirp/util.c
-@@ -43,6 +43,18 @@ int inet_aton(const char *cp, struct in_addr *ia)
- }
- #endif
-=20
-+void slirp_set_nonblock(int fd)
-+{
-+#ifndef _WIN32
-+    int f;
-+    f =3D fcntl(fd, F_GETFL);
-+    fcntl(fd, F_SETFL, f | O_NONBLOCK);
-+#else
-+    unsigned long opt =3D 1;
-+    ioctlsocket(fd, FIONBIO, &opt);
-+#endif
-+}
-+
- static void slirp_set_cloexec(int fd)
+-void
++bool
+ sbdrop(struct sbuf *sb, int num)
  {
- #ifndef _WIN32
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5dd0aeeec69..cda0efa4e86 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -33,7 +33,7 @@ stub-obj-y +=3D trace-control.o
- stub-obj-y +=3D uuid.o
- stub-obj-y +=3D vm-stop.o
- stub-obj-y +=3D vmstate.o
--stub-obj-$(CONFIG_WIN32) +=3D fd-register.o
-+stub-obj-y +=3D fd-register.o
- stub-obj-y +=3D qmp_memory_device.o
- stub-obj-y +=3D target-monitor-defs.o
- stub-obj-y +=3D target-get-monitor-def.o
+     int limit =3D sb->sb_datalen / 2;
+@@ -34,8 +34,10 @@ sbdrop(struct sbuf *sb, int num)
+ 		sb->sb_rptr -=3D sb->sb_datalen;
+=20
+     if (sb->sb_cc < limit && sb->sb_cc + num >=3D limit) {
+-        qemu_notify_event();
++        return true;
+     }
++
++    return false;
+ }
+=20
+ void
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 5805d30f3d8..2e8dc22fb62 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -928,3 +928,10 @@ void sotranslate_accept(struct socket *so)
+         break;
+     }
+ }
++
++void sodrop(struct socket *s, int num)
++{
++    if (sbdrop(&s->so_snd, num)) {
++        s->slirp->cb->notify();
++    }
++}
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index de5b74a52b1..7c1fe18fec1 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -506,7 +506,7 @@ findso:
+ 				    SEQ_GT(ti->ti_ack, tp->t_rtseq))
+ 					tcp_xmit_timer(tp, tp->t_rtt);
+ 				acked =3D ti->ti_ack - tp->snd_una;
+-				sbdrop(&so->so_snd, acked);
++				sodrop(so, acked);
+ 				tp->snd_una =3D ti->ti_ack;
+ 				m_free(m);
+=20
+@@ -1118,10 +1118,10 @@ trimthenstep6:
+ 		}
+ 		if (acked > so->so_snd.sb_cc) {
+ 			tp->snd_wnd -=3D so->so_snd.sb_cc;
+-			sbdrop(&so->so_snd, (int )so->so_snd.sb_cc);
++			sodrop(so, (int)so->so_snd.sb_cc);
+ 			ourfinisacked =3D 1;
+ 		} else {
+-			sbdrop(&so->so_snd, acked);
++			sodrop(so, acked);
+ 			tp->snd_wnd -=3D acked;
+ 			ourfinisacked =3D 0;
+ 		}
 --=20
 2.20.1.98.gecbdaf0899
