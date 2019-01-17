@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57255)
+Received: from eggs.gnu.org ([209.51.188.92]:57638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkAfn-0004WV-2Q
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:37:43 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gkAho-0005DV-Qx
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkAfm-0008TH-AJ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:37:43 -0500
-Date: Thu, 17 Jan 2019 17:37:33 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190117173733.47e6e0d5.cohuck@redhat.com>
-In-Reply-To: <1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
-References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
-	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+	(envelope-from <kwolf@redhat.com>) id 1gkAho-0001ss-4R
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:39:48 -0500
+Date: Thu, 17 Jan 2019 17:39:39 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190117163939.GB6761@localhost.localdomain>
+References: <20190117153321.29749-1-eblake@redhat.com>
+	<20190117153321.29749-2-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
- measurement block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190117153321.29749-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: Expose protocol-specific data
+ to 'qemu-img info'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Tue,  8 Jan 2019 18:37:30 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Am 17.01.2019 um 16:33 hat Eric Blake geschrieben:
+> 'qemu-img info' is useful for showing additional information
+> about an image - but sometimes the interesting information is
+> specific to the protocol rather than to the format layer.  Set
+> the groundwork for showing this information; further patches
+> will then enable specific pieces of information.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-> From: Yi Min Zhao <zyimin@linux.ibm.com>
-> 
-> Common function measurement block is used to report zPCI internal
-> counters of successful pcilg/stg/stb and rpcit instructions to
-> a memory location provided by the program.
-> 
-> This patch introduces a new ZpciFmb structure and schedules a timer
-> callback to copy the zPCI measures to the FMB in the guest memory
-> at an interval time set to 4s.
-> 
-> An error while attemping to update the FMB, would generate an error
-> event to the guest.
-> 
-> The pcilg/stg/stb and rpcit interception handlers increase the
-> related counter on a successful call.
-> The guest shall pass a null FMBA (FMB address) in the FIB (Function
-> Information Block) when it issues a Modify PCI Function Control
-> instruction to switch off FMB and stop the corresponding timer.
-> 
-> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  |   4 +-
->  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
->  hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
->  hw/s390x/s390-pci-inst.h |   1 +
->  4 files changed, 163 insertions(+), 4 deletions(-)
+Isn't this making invalid assumptions about the structure of the block
+graph? Who says that I don't have a quorum node below the format layer
+with five different protocol layer children? Some of which may have
+filter nodes on top?
 
-Thanks, applied.
+Kevin
