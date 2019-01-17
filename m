@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44461)
+Received: from eggs.gnu.org ([209.51.188.92]:44681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkCrW-0005vI-4g
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:21 -0500
+	(envelope-from <crosa@redhat.com>) id 1gkCrc-00064H-RA
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkCrK-0007Eb-9G
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:57:57 -0500
+	(envelope-from <crosa@redhat.com>) id 1gkCrL-0007Hx-FD
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:04 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 17 Jan 2019 13:56:17 -0500
-Message-Id: <20190117185628.21862-8-crosa@redhat.com>
+Date: Thu, 17 Jan 2019 13:56:16 -0500
+Message-Id: <20190117185628.21862-7-crosa@redhat.com>
 In-Reply-To: <20190117185628.21862-1-crosa@redhat.com>
 References: <20190117185628.21862-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/18] Acceptance tests: look for target
- architecture in test tags first
+Subject: [Qemu-devel] [PATCH 06/18] Acceptance tests: use "arch:" tag to
+ filter target specific tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +25,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-A test can, optionally, be tagged for one or many architectures.  If a
-test has been tagged for a single architecture, there's a high chance
-that the test won't run on other architectures.  This changes the
-default order of choosing a default target architecture to use based
-on the 'arch' tag value first.
+Currently, the only test that contains some target architecture
+information is "boot_linux_console.py" which test contains a "x86_64"
+tag.  But that tag is not respected in the default execution, that is,
+"make check-acceptance" doesn't do anything with it.
 
-The precedence order is for choosing a QEMU binary to use for a test
-is now:
+That said, even the target architecture handling currently present in
+the "avocado_qemu.Test" class, class is pretty limited.  For instance,
+by default, it chooses a target based on the host architecture.
 
- * qemu_bin parameter
- * arch parameter
- * arch tag value (for example, x86_64 if ":avocado: tags=3Darch:x86_64
-   is used)
+Because the original implementation of the tags feature in Avocado did
+not include any time of namespace or "key:val" mechanism, no tag has
+relation to another tag.  The new implementation of the tags feature
+from version 67.0 onwards, allows "key:val" tags, and because of that,
+a test can be classified with a tag in a given key.  For instance, the
+new proposed version of the "boot_linux_console.py" test, which
+downloads and attempts to run a x86_64 kernel, is now tagged as:
 
-This means that if one runs:
+  :avocado: tags=3Darch:x86_64
 
- $ avocado run -p qemu_bin=3D/usr/bin/qemu-system-x86_64 test.py
-
-No arch parameter or tag will influence the selection of the QEMU
-target binary.  If one runs:
-
- $ avocado run -p arch=3Dppc64 test.py
-
-The target binary selection mechanism will attempt to find a binary
-such as "ppc64-softmmu/qemu-system-ppc64".  And finally, if one runs
-a test that is tagged (in its docstring) with "arch:aarch64":
-
- $ avocado run aarch64.py
-
-The target binary selection mechanism will attempt to find a binary
-such as "aarch64-softmmu/qemu-system-aarch64".
-
-At this time, no provision is made to cancel the execution of tests if
-the arch parameter given (manually) does not match the test "arch"
-tag, but it may be a useful default behavior to be added in the
-future.
+This means that it can be filtered (out) when no x86_64 target is
+available.  At the same time, tests that don't have a "arch:" tag,
+will not be filtered out.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/acceptance/avocado_qemu/__init__.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/Makefile.include                 | 3 +++
+ tests/acceptance/boot_linux_console.py | 2 +-
+ tests/requirements.txt                 | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index 7a38851753..ddbdb7b926 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -53,7 +53,12 @@ def pick_default_qemu_bin(arch=3DNone):
- class Test(avocado.Test):
-     def setUp(self):
-         self.vm =3D None
--        self.arch =3D self.params.get('arch')
-+        arches =3D self.tags.get('arch', [])
-+        if len(arches) =3D=3D 1:
-+            arch =3D arches.pop()
-+        else:
-+            arch =3D None
-+        self.arch =3D self.params.get('arch', default=3Darch)
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Dpick_default_qemu_bin(=
-self.arch))
-         if self.qemu_bin is None:
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c73298740d..af00c35ff5 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -957,6 +957,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+ # Any number of command separated loggers are accepted.  For more
+ # information please refer to "avocado --help".
+ AVOCADO_SHOW=3Dapp
++AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
+ET_DIRS)))
+=20
+ PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_inf=
+o >=3D (3, 0) else 0)')
+ ifeq ($(PYTHON3), 1)
+@@ -983,6 +984,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ 	$(call quiet-command, \
+             $(TESTS_VENV_DIR)/bin/python -m avocado \
+             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RES=
+ULTS_DIR) \
++            --filter-by-tags-include-empty --filter-by-tags-include-empt=
+y-key \
++            $(AVOCADO_TAGS) \
+             --failfast=3Don $(SRC_PATH)/tests/acceptance, \
+             "AVOCADO", "tests/acceptance")
+=20
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index 98324f7591..46b20bdfe2 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
+     and the kernel command line is properly passed from QEMU to the kern=
+el
+=20
+     :avocado: enable
+-    :avocado: tags=3Dx86_64
++    :avocado: tags=3Darch:x86_64
+     """
+=20
+     timeout =3D 60
+diff --git a/tests/requirements.txt b/tests/requirements.txt
+index 64c6e27a94..426a9e8a9a 100644
+--- a/tests/requirements.txt
++++ b/tests/requirements.txt
+@@ -1,4 +1,4 @@
+ # Add Python module requirements, one per line, to be installed
+ # in the tests/venv Python virtual environment. For more info,
+ # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+-avocado-framework=3D=3D65.0
++avocado-framework=3D=3D67.0
 --=20
 2.20.1
