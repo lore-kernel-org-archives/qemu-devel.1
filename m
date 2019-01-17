@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39379)
+Received: from eggs.gnu.org ([209.51.188.92]:39487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkDgh-0007vw-5N
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:50:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gkDgx-0008Cw-6z
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:51:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkDgg-0001ct-In
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:50:51 -0500
-From: John Snow <jsnow@redhat.com>
-References: <20181221135803.9583-1-npes87184@gmail.com>
-	<8736abeb-60b6-e077-b6ad-0f01da4f8c0a@redhat.com>
-Message-ID: <85ba040e-3e44-c8d5-568c-2b219939eb88@redhat.com>
-Date: Thu, 17 Jan 2019 14:50:42 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gkDgv-0001wb-CH
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:51:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gkDgv-0001qY-5D
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:51:05 -0500
+Date: Thu, 17 Jan 2019 17:50:52 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190117195052.GG14807@habkost.net>
+References: <1547729344-3895-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1547729344-3895-5-git-send-email-lizhijian@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <8736abeb-60b6-e077-b6ad-0f01da4f8c0a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dmg: fix binary search
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547729344-3895-5-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v6 4/4] i386: allow to load initrd below 4
+ GB for recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuchenlin <npes87184@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, zhijianx.li@intel.com, philip.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
+On Thu, Jan 17, 2019 at 08:49:04PM +0800, Li Zhijian wrote:
+> Since linux commit: cf8fa920cb42 ("i386: handle an initrd in highmem (version 2)")
+> linux has supported initrd up to 4 GB, but the header field
+> ramdisk_max is still set to 2 GB to avoid "possible bootloader bugs".
+> 
+> When use '-kernel vmlinux -initrd initrd.cgz' to launch a VM,
+> the firmware(it could be linuxboot_dma.bin) helps to read initrd
+> contents into guest memory(below ramdisk_max) and jump to kernel.
+> that's similar with what bootloader does, like grub.
+> 
+> In addition, initrd_max is uint32_t simply because QEMU doesn't support
+> the 64-bit boot protocol (specifically the ext_ramdisk_image field).
+> 
+> Therefore here just limit initrd_max to UINT32_MAX simply as well to
+> allow initrd to be loaded below 4 GB.
+> 
+> NOTE: it's possible that linux protocol within [0x208, 0x20c]
+> supports up to 4 GB initrd as well.
+> 
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-On 1/17/19 2:29 PM, John Snow wrote:
-> 
-> 
-> On 12/21/18 8:58 AM, yuchenlin wrote:
->> There is a possible hang in original binary searsh implemtation. That is
->> if chunk1 = 4, chunk2 = 5, chunk3 = 4, and we go else case.
->>
->> The chunk1 will be still 4, and so on.
->>
->> Signed-off-by: yuchenlin <npes87184@gmail.com>
-> 
-> Generally we ask that people use their full names for their
-> Signed-off-by (for legal and copyright reasons) and not an alias.
-> 
-> If I am mistaken and your name is a mononym or written as a mononym,
-> please forgive me and disregard.
-> 
+Michael, should this go through your tree?
 
-ah, just found the later threads. Still email backlogged, disregard.
+-- 
+Eduardo
