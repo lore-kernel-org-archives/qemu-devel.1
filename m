@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35899)
+Received: from eggs.gnu.org ([209.51.188.92]:36086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gk4p2-0003wo-4b
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gk4pr-0004OS-GU
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:23:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gk4p0-0001Jk-1k
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gk4oy-0001HJ-2q
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:48 -0500
-Date: Thu, 17 Jan 2019 11:22:39 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190117102239.mnixjppxpuprjwau@sirius.home.kraxel.org>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
-	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
-	<20190116132953.404247ec@redhat.com>
-	<20190116110052-mutt-send-email-mst@kernel.org>
-	<d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gk4pq-00026i-KG
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:23:43 -0500
+Date: Thu, 17 Jan 2019 10:23:31 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190117102331.GD27840@stefanha-x1.localdomain>
+References: <20190115132942.b7xgq7dpwpkrmebb@perseus.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DiL7RhKs8rK9YGuF"
 Content-Disposition: inline
-In-Reply-To: <d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
+In-Reply-To: <20190115132942.b7xgq7dpwpkrmebb@perseus.local>
+Subject: Re: [Qemu-devel] [Qemu-block] Crash when deleting an iothread that
+ is being used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-  Hi,
 
-> >>>>  create mode 100644 pc-bios/avmf.img
-> >>>>  create mode 100644 pc-bios/avmf_vars.img  
-> >>>
-> >>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
-> >>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
-> >>> would be more precise, but those are verbose. Sigh, why are names so
-> >>> hard. What does everyone think?
-> >> I'm fine with either version.
+--DiL7RhKs8rK9YGuF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-How about placing them in pc-bios/efi-$arch subdirs and not renaming the
-files, i.e. that would be ...
+On Tue, Jan 15, 2019 at 03:29:42PM +0200, Alberto Garcia wrote:
+> Here's how to reproduce the crash:
+>=20
+> { "execute": "qmp_capabilities" }
+> { "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-nam=
+e": "hd0"}}
+> { "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "i=
+othread0"}}
+> { "execute": "x-blockdev-set-iothread", "arguments": {"node-name": "hd0",=
+ "iothread": "iothread0"}}
+> { "execute": "object-del", "arguments": {"id": "iothread0"}}
+> { "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
+>=20
+> The problem is that bs->aio_context is the one that belonged to the
+> IOThread and was destroyed by the object-del call. One would need to
+> do x-blockdev-set-iothread(hd0, null) before deleting the thread.
+>=20
+> The IOThread class does not have a can_be_deleted() method to prevent
+> threads from being deleted. One possible implementation would require
+> a reference count but that doesn't seem immediately trivial because
+> users don't use the IOThread itself but its AioContext, and not all
+> bdrv_set_aio_context() are related to IOThreads.
+>=20
+> A quicker fix is of course to prevent the threads from being deleted
+> at all :-)
 
-	pc-bios/efi-aarch64/QEMU_EFI.fd
-	pc-bios/efi-aarch64/QEMU_VARS.fd
+What is the real-world scenario for crashes like this?
 
-... for arm, and ...
+object-del on an IOThread that is currently in use by
+virtio-blk/virtio-scsi?
 
-	pc-bios/efi-x86_64/OVMF_CODE.fd
-	pc-bios/efi-x86_64/OVMF_VARS.fd
+I'm asking because x-blockdev-set-iothread is a low-level testing
+command and it can create IOThread configurations that real-world users
+never reach.  It's only worth worrying about if users are affected.
 
-... for x86.
+Stefan
 
-> Could we please decide for (1) vs (2), before I put more work into (1)?
+--DiL7RhKs8rK9YGuF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'd tend to prefer (1).
+-----BEGIN PGP SIGNATURE-----
 
-cheers,
-  Gerd
+iQEcBAEBAgAGBQJcQFejAAoJEJykq7OBq3PIII0H/jQS7k0LJ8hf25w92TAXUEjG
+eqwKtzZvxinEBgJvXAzxfDLYiXibGbxdkWpcFps0NO3vjuxNFts3KGU/7CPLzjQj
+1a6RK2JruZ7hrrhVM+hU/O9cm/RhgXZUFK9StAcVoLU2KkdMaFod2mTtARWktY6X
+9/p0qSwulDdvFGwP777iQhiTbQrBw7aoJaHpLQh4Bt09Sb1bH9MIfYcSeFz6aJj+
+MAVUieTRUkUE9XhqV8q3lV7pleeH2XTBhz2viMFmlUNks/7miK6rIAYTXul1Zw/g
+4tOc1gE9HFMySMoRveU5z9KJVO7Ci+/QckzGTML0S9I7kEqH+wx/OqWgXYz2iWE=
+=7R40
+-----END PGP SIGNATURE-----
+
+--DiL7RhKs8rK9YGuF--
