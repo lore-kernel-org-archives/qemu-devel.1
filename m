@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43172)
+Received: from eggs.gnu.org ([209.51.188.92]:43282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjxwv-000871-LC
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:02:35 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjxwx-00088i-JF
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 22:02:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjxme-00065L-Ux
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 21:51:57 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjxm9-0004Xn-Kf
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 21:51:26 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 17 Jan 2019 13:51:14 +1100
-Message-Id: <20190117025115.81178-3-aik@ozlabs.ru>
-In-Reply-To: <20190117025115.81178-1-aik@ozlabs.ru>
-References: <20190117025115.81178-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu 2/3] vfio: Make vfio_get_region_info_cap
- public
+Date: Thu, 17 Jan 2019 13:51:12 +1100
+Message-Id: <20190117025115.81178-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu 0/3] spapr_pci,
+ vfio: NVIDIA V100 + P9 passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +21,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>, Alex Williamson <alex.williamson@redhat.com>
 
-This makes vfio_get_region_info_cap() to be used in quirks.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- include/hw/vfio/vfio-common.h | 2 ++
- hw/vfio/common.c              | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+This is for passing through NVIDIA V100 GPUs on POWER9 systems.
 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 1b434d0..abc82f9 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -189,6 +189,8 @@ int vfio_get_region_info(VFIODevice *vbasedev, int index,
- int vfio_get_dev_region_info(VFIODevice *vbasedev, uint32_t type,
-                              uint32_t subtype, struct vfio_region_info **info);
- bool vfio_has_region_cap(VFIODevice *vbasedev, int region, uint16_t cap_type);
-+struct vfio_info_cap_header *
-+vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id);
- #endif
- extern const MemoryListener vfio_prereg_listener;
- 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a..f58b487 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -711,7 +711,7 @@ static void vfio_listener_release(VFIOContainer *container)
-     }
- }
- 
--static struct vfio_info_cap_header *
-+struct vfio_info_cap_header *
- vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
- {
-     struct vfio_info_cap_header *hdr;
+This implements a subdriver for NVIDIA V100 GPU with coherent memory and
+NPU/ATS support available in the POWER9 CPU.
+
+1/3 is not strictly related but since new memory also needs to be mapped
+to the 64bit DMA window and it is located quite high in the address space,
+some adjustments are needed.
+
+
+This is based on dwg/ppc-for-4.0 sha1 a0a8bff and requires headers update
+from v5.0-rc1 staged by Paolo already.
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (3):
+  vfio/spapr: Fix indirect levels calculation
+  vfio: Make vfio_get_region_info_cap public
+  spapr: Support NVIDIA V100 GPU with NVLink2
+
+ hw/vfio/pci.h                 |   2 +
+ include/hw/pci-host/spapr.h   |   9 +
+ include/hw/ppc/spapr.h        |   3 +-
+ include/hw/vfio/vfio-common.h |   2 +
+ hw/ppc/spapr.c                |  25 ++-
+ hw/ppc/spapr_pci.c            | 333 +++++++++++++++++++++++++++++++++-
+ hw/vfio/common.c              |   2 +-
+ hw/vfio/pci-quirks.c          | 120 ++++++++++++
+ hw/vfio/pci.c                 |  14 ++
+ hw/vfio/spapr.c               |  38 +++-
+ hw/vfio/trace-events          |   6 +-
+ 11 files changed, 539 insertions(+), 15 deletions(-)
+
 -- 
 2.17.1
