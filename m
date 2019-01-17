@@ -1,38 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37306)
+Received: from eggs.gnu.org ([209.51.188.92]:37392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBGV-0002fx-Pv
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:42 -0500
+	(envelope-from <groug@kaod.org>) id 1gkBGX-0002hR-OF
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBGT-0008MR-Ov
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53272
+	(envelope-from <groug@kaod.org>) id 1gkBGU-0008Q6-JK
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55486
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBGT-00083D-Hj
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:37 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBGU-00088I-Bu
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:38 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0HHEqUB094315
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:27 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2ub7fcrx-1
+	x0HHEVlO017470
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:29 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2whj975r-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:26 -0500
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:29 -0500
 Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 17 Jan 2019 17:15:24 -0000
+	Thu, 17 Jan 2019 17:15:27 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 17 Jan 2019 18:15:05 +0100
+Date: Thu, 17 Jan 2019 18:15:18 +0100
 In-Reply-To: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <154774530571.1208625.5318753891932747707.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH v3 06/19] spapr: Identify LSIs of all possible
- PHBs at machine init
+Message-Id: <154774531889.1208625.5660560200829360093.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH v3 08/19] spapr: create DR connectors for PHBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,101 +43,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-Every PHB needs to claim 4 LSIs to support legacy PCI devices. This is
-currently done at PHB realize. When using in-kernel XICS (or upcoming
-in-kernel XIVE), QEMU synchronizes the state of all irqs, including
-these LSIs, later on at machine reset.
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-In order to support PHB hotplug, we need a way to tell KVM about the
-LSIs that doesn't require a machine reset. Since these irq numbers are
-fixed values derived from the PHB index, let's identify them all at
-machine init. Older machines that don't have fixed irq numbers cannot
-support PHB hotplug and keep the existing behavior.
-
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c              |    6 ++++++
- hw/ppc/spapr_pci.c          |   20 ++++++++++++++++++--
- include/hw/pci-host/spapr.h |    2 ++
- 3 files changed, 26 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c             |   13 +++++++++++++
+ hw/ppc/spapr_drc.c         |   17 +++++++++++++++++
+ include/hw/ppc/spapr.h     |    1 +
+ include/hw/ppc/spapr_drc.h |    8 ++++++++
+ 4 files changed, 39 insertions(+)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 26f8e55cc25e..9189b4d3a9d6 100644
+index 9189b4d3a9d6..5be8f76351fd 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2802,6 +2802,12 @@ static void spapr_machine_init(MachineState *machine)
+@@ -2797,6 +2797,19 @@ static void spapr_machine_init(MachineState *machine)
+     /* We always have at least the nvram device on VIO */
+     spapr_create_nvram(spapr);
  
-     phb = spapr_create_default_phb();
- 
-+    if (!smc->legacy_irq_allocation) {
++    /*
++     * Setup hotplug / dynamic-reconfiguration connectors. top-level
++     * connectors (described in root DT node's "ibm,drc-types" property)
++     * are pre-initialized here. additional child connectors (such as
++     * connectors for a PHBs PCI slots) are added as needed during their
++     * parent's realization.
++     */
++    if (smc->dr_phb_enabled) {
 +        for (i = 0; i < SPAPR_MAX_PHBS; i++) {
-+            spapr_phb_set_lsis(i, spapr);
++            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, i);
 +        }
 +    }
 +
-     for (i = 0; i < nb_nics; i++) {
-         NICInfo *nd = &nd_table[i];
+     /* Set up PCI */
+     spapr_pci_rtas_init();
  
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index ec9d4d28004c..f5f13a4d4816 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1559,6 +1559,22 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
-     }
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 2edb7d1e9c8c..189ee681062a 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -696,6 +696,15 @@ static void spapr_drc_lmb_class_init(ObjectClass *k, void *data)
+     drck->release = spapr_lmb_release;
  }
  
-+static uint32_t spapr_phb_index_to_lsi(int phb_index, int irq_index)
++static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
 +{
-+    return SPAPR_IRQ_PCI_LSI + phb_index * PCI_NUM_PINS + irq_index;
++    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
++
++    drck->typeshift = SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
++    drck->typename = "PHB";
++    drck->drc_name_prefix = "PHB ";
 +}
 +
-+void spapr_phb_set_lsis(int index, sPAPRMachineState *spapr)
-+{
-+    int i;
+ static const TypeInfo spapr_dr_connector_info = {
+     .name          = TYPE_SPAPR_DR_CONNECTOR,
+     .parent        = TYPE_DEVICE,
+@@ -739,6 +748,13 @@ static const TypeInfo spapr_drc_lmb_info = {
+     .class_init    = spapr_drc_lmb_class_init,
+ };
+ 
++static const TypeInfo spapr_drc_phb_info = {
++    .name          = TYPE_SPAPR_DRC_PHB,
++    .parent        = TYPE_SPAPR_DRC_LOGICAL,
++    .instance_size = sizeof(sPAPRDRConnector),
++    .class_init    = spapr_drc_phb_class_init,
++};
 +
-+    for (i = 0; i < PCI_NUM_PINS; i++) {
-+        uint32_t irq = spapr_phb_index_to_lsi(index, i);
+ /* helper functions for external users */
+ 
+ sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
+@@ -1189,6 +1205,7 @@ static void spapr_drc_register_types(void)
+     type_register_static(&spapr_drc_cpu_info);
+     type_register_static(&spapr_drc_pci_info);
+     type_register_static(&spapr_drc_lmb_info);
++    type_register_static(&spapr_drc_phb_info);
+ 
+     spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
+                         rtas_set_indicator);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f988dc6924b8..bc8ebb072258 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -103,6 +103,7 @@ struct sPAPRMachineClass {
+ 
+     /*< public >*/
+     bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMBs */
++    bool dr_phb_enabled;       /* enable dynamic-reconfig/hotplug of PHBs */
+     bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+     bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+     bool pre_2_10_has_unused_icps;
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index f6ff32e7e2f2..56bba36ad4da 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -70,6 +70,14 @@
+ #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+                                         TYPE_SPAPR_DRC_LMB)
+ 
++#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
++#define SPAPR_DRC_PHB_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DRC_PHB)
++#define SPAPR_DRC_PHB_CLASS(klass) \
++        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAPR_DRC_PHB)
++#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
++                                        TYPE_SPAPR_DRC_PHB)
 +
-+        spapr_irq_set_type(spapr, irq, true);
-+    }
-+}
-+
- static void spapr_phb_realize(DeviceState *dev, Error **errp)
- {
-     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
-@@ -1726,7 +1742,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
- 
-     /* Initialize the LSI table */
-     for (i = 0; i < PCI_NUM_PINS; i++) {
--        uint32_t irq = SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
-+        uint32_t irq = spapr_phb_index_to_lsi(sphb->index, i);
-         Error *local_err = NULL;
- 
-         if (smc->legacy_irq_allocation) {
-@@ -1736,6 +1752,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-                                         "can't allocate LSIs: ");
-                 return;
-             }
-+            spapr_irq_set_type(spapr, irq, true);
-         }
- 
-         spapr_irq_claim(spapr, irq, &local_err);
-@@ -1743,7 +1760,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-             error_propagate_prepend(errp, local_err, "can't allocate LSIs: ");
-             return;
-         }
--        spapr_irq_set_type(spapr, irq, true);
- 
-         sphb->lsi_table[i].irq = irq;
-     }
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index e0e683c32469..bb0ae7fdd41d 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -164,4 +164,6 @@ static inline void spapr_phb_vfio_reset(DeviceState *qdev)
- 
- void spapr_phb_dma_reset(sPAPRPHBState *sphb);
- 
-+void spapr_phb_set_lsis(int index, sPAPRMachineState *spapr);
-+
- #endif /* PCI_HOST_SPAPR_H */
+ /*
+  * Various hotplug types managed by sPAPRDRConnector
+  *
