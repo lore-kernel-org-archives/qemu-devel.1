@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57149)
+Received: from eggs.gnu.org ([209.51.188.92]:57247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66G-0005SX-LY
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:46 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66M-0005YE-DL
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66E-0004Tz-DT
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35728)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66K-0004cW-Bm
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gk66E-0004Rs-2H
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:42 -0500
+	id 1gk66J-0004Z6-H4
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:48 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 17 Jan 2019 15:43:39 +0400
-Message-Id: <20190117114359.5164-8-marcandre.lureau@redhat.com>
+Date: Thu, 17 Jan 2019 15:43:40 +0400
+Message-Id: <20190117114359.5164-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/27] slirp: replace QEMU_PACKED with
- SLIRP_PACKED
+Subject: [Qemu-devel] [PATCH 08/27] slirp: replace most qemu socket
+ utilities with slirp own version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,208 +31,390 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>
 
+qemu_set_nonblock() is slightly more problematic and will be dealt
+with in a separate patch.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/ip.h       | 14 +++++++-------
- slirp/ip6.h      |  4 ++--
- slirp/ip6_icmp.h | 16 ++++++++--------
- slirp/slirp.h    |  5 +++--
- slirp/util.h     | 32 ++++++++++++++++++++++++++++++++
- 5 files changed, 52 insertions(+), 19 deletions(-)
- create mode 100644 slirp/util.h
+ slirp/util.h        |  59 +++++++++++++++
+ slirp/ip_icmp.c     |   6 +-
+ slirp/misc.c        |  20 ++---
+ slirp/socket.c      |  18 ++---
+ slirp/tcp_subr.c    |  18 ++---
+ slirp/udp.c         |   8 +-
+ slirp/util.c        | 176 ++++++++++++++++++++++++++++++++++++++++++++
+ slirp/Makefile.objs |   1 +
+ 8 files changed, 271 insertions(+), 35 deletions(-)
+ create mode 100644 slirp/util.c
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index 243b6c8b249..cd6ddf2bb7a 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -89,7 +89,7 @@ struct ip {
- 	uint8_t ip_p;			/* protocol */
- 	uint16_t	ip_sum;			/* checksum */
- 	struct	in_addr ip_src,ip_dst;	/* source and dest address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define	IP_MAXPACKET	65535		/* maximum packet size */
-=20
-@@ -151,7 +151,7 @@ struct	ip_timestamp {
- 			n_long ipt_time;
- 		} ipt_ta[1];
- 	} ipt_timestamp;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /* flag bits for ipt_flg */
- #define	IPOPT_TS_TSONLY		0		/* timestamps only */
-@@ -181,11 +181,11 @@ struct	ip_timestamp {
- struct mbuf_ptr {
- 	struct mbuf *mptr;
- 	uint32_t dummy;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
- #else
- struct mbuf_ptr {
- 	struct mbuf *mptr;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
- #endif
- struct qlink {
- 	void *next, *prev;
-@@ -201,7 +201,7 @@ struct ipovly {
- 	uint16_t	ih_len;			/* protocol length */
- 	struct	in_addr ih_src;		/* source internet address */
- 	struct	in_addr ih_dst;		/* destination internet address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /*
-  * Ip reassembly queue structure.  Each fragment
-@@ -217,7 +217,7 @@ struct ipq {
- 	uint8_t	ipq_p;			/* protocol of this fragment */
- 	uint16_t	ipq_id;			/* sequence id for reassembly */
- 	struct	in_addr ipq_src,ipq_dst;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /*
-  * Ip header, when holding a fragment.
-@@ -227,7 +227,7 @@ struct ipq {
- struct	ipasfrag {
- 	struct qlink ipf_link;
- 	struct ip ipf_ip;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define ipf_off      ipf_ip.ip_off
- #define ipf_tos      ipf_ip.ip_tos
-diff --git a/slirp/ip6.h b/slirp/ip6.h
-index 14e9c787357..b6ba0a63927 100644
---- a/slirp/ip6.h
-+++ b/slirp/ip6.h
-@@ -133,7 +133,7 @@ struct ip6 {
-     uint8_t     ip_nh;               /* next header */
-     uint8_t     ip_hl;               /* hop limit */
-     struct in6_addr ip_src, ip_dst;  /* source and dest address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /*
-  * IPv6 pseudo-header used by upper-layer protocols
-@@ -145,7 +145,7 @@ struct ip6_pseudohdr {
-     uint16_t    ih_zero_hi;       /* zero */
-     uint8_t     ih_zero_lo;       /* zero */
-     uint8_t     ih_nh;            /* next header */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
-=20
- #endif
-diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
-index 32b0914055a..1f09b485e32 100644
---- a/slirp/ip6_icmp.h
-+++ b/slirp/ip6_icmp.h
-@@ -48,12 +48,12 @@ struct ndp_ra {     /* Router Advertisement Message *=
-/
-     uint16_t lifetime;      /* Router Lifetime */
-     uint32_t reach_time;    /* Reachable Time */
-     uint32_t retrans_time;  /* Retrans Timer */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- struct ndp_ns {     /* Neighbor Solicitation Message */
-     uint32_t reserved;
-     struct in6_addr target; /* Target Address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- struct ndp_na {     /* Neighbor Advertisement Message */
- #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-@@ -72,13 +72,13 @@ struct ndp_na {     /* Neighbor Advertisement Message=
- */
-         reserved_lo:24;
- #endif
-     struct in6_addr target; /* Target Address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- struct ndp_redirect {
-     uint32_t reserved;
-     struct in6_addr target; /* Target Address */
-     struct in6_addr dest;   /* Destination Address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /*
-  * Structure of an icmpv6 header.
-@@ -103,7 +103,7 @@ struct icmp6 {
- #define icmp6_nns icmp6_body.ndp_ns
- #define icmp6_nna icmp6_body.ndp_na
- #define icmp6_redirect icmp6_body.ndp_redirect
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define ICMP6_MINLEN    4
- #define ICMP6_ERROR_MINLEN  8
-@@ -134,16 +134,16 @@ struct ndpopt {
-             uint32_t    pref_lt;                /* Preferred Lifetime */
-             uint32_t    reserved2;
-             struct in6_addr prefix;
--        } QEMU_PACKED prefixinfo;
-+        } SLIRP_PACKED prefixinfo;
- #define ndpopt_prefixinfo ndpopt_body.prefixinfo
-         struct rdnss {
-             uint16_t reserved;
-             uint32_t lifetime;
-             struct in6_addr addr;
--        } QEMU_PACKED rdnss;
-+        } SLIRP_PACKED rdnss;
- #define ndpopt_rdnss ndpopt_body.rdnss
-     } ndpopt_body;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /* NDP options type */
- #define NDPOPT_LINKLAYER_SOURCE     1   /* Source Link-Layer Address */
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 17056f4b836..67ff4d610c4 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -45,6 +45,7 @@ typedef char *caddr_t;
- #define quehead slirp_quehead
-=20
- #include "debug.h"
-+#include "util.h"
-=20
- #include "qemu/queue.h"
- #include "qemu/sockets.h"
-@@ -93,7 +94,7 @@ struct slirp_arphdr {
-     uint32_t      ar_sip;           /* sender IP address       */
-     unsigned char ar_tha[ETH_ALEN]; /* target hardware address */
-     uint32_t      ar_tip;           /* target IP address       */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define ARP_TABLE_SIZE 16
-=20
-@@ -110,7 +111,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
- struct ndpentry {
-     unsigned char   eth_addr[ETH_ALEN];     /* sender hardware address *=
-/
-     struct in6_addr ip_addr;                /* sender IP address       *=
-/
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define NDP_TABLE_SIZE 16
-=20
 diff --git a/slirp/util.h b/slirp/util.h
-new file mode 100644
-index 00000000000..00291c30a67
---- /dev/null
+index 00291c30a67..050ca7f1a3f 100644
+--- a/slirp/util.h
 +++ b/slirp/util.h
-@@ -0,0 +1,32 @@
+@@ -23,10 +23,69 @@
+ #ifndef UTIL_H_
+ #define UTIL_H_
+=20
++#include <stdlib.h>
++#include <stdio.h>
++#include <assert.h>
++#include <errno.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <inttypes.h>
++
++#ifdef _WIN32
++#include <winsock2.h>
++#include <windows.h>
++#else
++#include <sys/socket.h>
++#include <netinet/tcp.h>
++#include <netinet/in.h>
++#endif
++
+ #if defined(_WIN32)
+ # define SLIRP_PACKED __attribute__((gcc_struct, packed))
+ #else
+ # define SLIRP_PACKED __attribute__((packed))
+ #endif
+=20
++#ifdef _WIN32
++int slirp_closesocket(int fd);
++int slirp_ioctlsocket(int fd, int req, void *val);
++int inet_aton(const char *cp, struct in_addr *ia);
++#define slirp_getsockopt(sockfd, level, optname, optval, optlen) \
++    getsockopt(sockfd, level, optname, (void *)optval, optlen)
++#define slirp_setsockopt(sockfd, level, optname, optval, optlen)        =
+\
++    setsockopt(sockfd, level, optname, (const void *)optval, optlen)
++#define slirp_recv(sockfd, buf, len, flags) recv(sockfd, (void *)buf, le=
+n, flags)
++#else
++#define slirp_setsockopt setsockopt
++#define slirp_getsockopt getsockopt
++#define slirp_recv recv
++#define slirp_closesocket close
++#define slirp_ioctlsocket ioctl
++#endif
++
++int slirp_socket(int domain, int type, int protocol);
++
++static inline int slirp_socket_set_nodelay(int fd)
++{
++    int v =3D 1;
++    return slirp_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &v, sizeof(v))=
+;
++}
++
++static inline int slirp_socket_set_fast_reuse(int fd)
++{
++#ifndef _WIN32
++    int v =3D 1;
++    return slirp_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v))=
+;
++#else
++    /* Enabling the reuse of an endpoint that was used by a socket still=
+ in
++     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On =
+Windows
++     * fast reuse is the default and SO_REUSEADDR does strange things. S=
+o we
++     * don't have to do anything here. More info can be found at:
++     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.=
+aspx */
++    return 0;
++#endif
++}
++
+ #endif
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index 7c7e042049d..b59daa801d1 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -83,7 +83,7 @@ static int icmp_send(struct socket *so, struct mbuf *m,=
+ int hlen)
+     struct ip *ip =3D mtod(m, struct ip *);
+     struct sockaddr_in addr;
+=20
+-    so->s =3D qemu_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
++    so->s =3D slirp_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+     if (so->s =3D=3D -1) {
+         return -1;
+     }
+@@ -114,7 +114,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
+m, int hlen)
+=20
+ void icmp_detach(struct socket *so)
+ {
+-    closesocket(so->s);
++    slirp_closesocket(so->s);
+     sofree(so);
+ }
+=20
+@@ -421,7 +421,7 @@ void icmp_receive(struct socket *so)
+     icp =3D mtod(m, struct icmp *);
+=20
+     id =3D icp->icmp_id;
+-    len =3D qemu_recv(so->s, icp, M_ROOM(m), 0);
++    len =3D slirp_recv(so->s, icp, M_ROOM(m), 0);
+     /*
+      * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is incons=
+istent
+      * between host OSes.  On Linux, only the ICMP header and payload is
+diff --git a/slirp/misc.c b/slirp/misc.c
+index b8a2bf971af..32ec02a5251 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -72,14 +72,14 @@ slirp_socketpair_with_oob(int sv[2])
+     int ret, s;
+=20
+     sv[1] =3D -1;
+-    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
++    s =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+     if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
+         listen(s, 1) < 0 ||
+         getsockname(s, (struct sockaddr *)&addr, &addrlen) < 0) {
+         goto err;
+     }
+=20
+-    sv[1] =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
++    sv[1] =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+     if (sv[1] < 0) {
+         goto err;
+     }
+@@ -102,16 +102,16 @@ slirp_socketpair_with_oob(int sv[2])
+         goto err;
+     }
+=20
+-    closesocket(s);
++    slirp_closesocket(s);
+     return 0;
+=20
+ err:
+     g_critical("slirp_socketpair(): %s", strerror(errno));
+     if (s >=3D 0) {
+-        closesocket(s);
++        slirp_closesocket(s);
+     }
+     if (sv[1] >=3D 0) {
+-        closesocket(sv[1]);
++        slirp_closesocket(sv[1]);
+     }
+     return -1;
+ }
+@@ -153,16 +153,16 @@ fork_exec(struct socket *so, const char *ex)
+     if (err) {
+         g_critical("fork_exec: %s", err->message);
+         g_error_free(err);
+-        closesocket(sp[0]);
+-        closesocket(sp[1]);
++        slirp_closesocket(sp[0]);
++        slirp_closesocket(sp[1]);
+         return 0;
+     }
+=20
+     so->s =3D sp[0];
+-    closesocket(sp[1]);
+-    socket_set_fast_reuse(so->s);
++    slirp_closesocket(sp[1]);
++    slirp_socket_set_fast_reuse(so->s);
+     opt =3D 1;
+-    qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
+;
+     qemu_set_nonblock(so->s);
+     return 1;
+ }
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 5ffbaa064a5..5805d30f3d8 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -187,7 +187,7 @@ soread(struct socket *so)
+ 	 */
+ 	sopreprbuf(so, iov, &n);
+=20
+-	nn =3D qemu_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
++	nn =3D slirp_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+ 	if (nn <=3D 0) {
+ 		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
+ 			return 0;
+@@ -203,7 +203,7 @@ soread(struct socket *so)
+ 				if (getpeername(so->s, paddr, &alen) < 0) {
+ 					err =3D errno;
+ 				} else {
+-					getsockopt(so->s, SOL_SOCKET, SO_ERROR,
++					slirp_getsockopt(so->s, SOL_SOCKET, SO_ERROR,
+ 						&err, &elen);
+ 				}
+ 			}
+@@ -233,7 +233,7 @@ soread(struct socket *so)
+ 	 */
+ 	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+             int ret;
+-            ret =3D qemu_recv(so->s, iov[1].iov_base, iov[1].iov_len,0);
++            ret =3D slirp_recv(so->s, iov[1].iov_base, iov[1].iov_len,0)=
+;
+             if (ret > 0)
+                 nn +=3D ret;
+         }
+@@ -554,7 +554,7 @@ sorecvfrom(struct socket *so)
+ 	   */
+ 	  len =3D M_FREEROOM(m);
+ 	  /* if (so->so_fport !=3D htons(53)) { */
+-	  ioctlsocket(so->s, FIONREAD, &n);
++	  slirp_ioctlsocket(so->s, FIONREAD, &n);
+=20
+ 	  if (n > len) {
+ 	    n =3D (m->m_data - m->m_dat) + m->m_len + n + 1;
+@@ -719,14 +719,14 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hpor=
+t, uint32_t laddr,
+ 	addr.sin_addr.s_addr =3D haddr;
+ 	addr.sin_port =3D hport;
+=20
+-	if (((s =3D qemu_socket(AF_INET,SOCK_STREAM,0)) < 0) ||
+-	    (socket_set_fast_reuse(s) < 0) ||
++	if (((s =3D slirp_socket(AF_INET,SOCK_STREAM,0)) < 0) ||
++	    (slirp_socket_set_fast_reuse(s) < 0) ||
+ 	    (bind(s,(struct sockaddr *)&addr, sizeof(addr)) < 0) ||
+ 	    (listen(s,1) < 0)) {
+ 		int tmperrno =3D errno; /* Don't clobber the real reason we failed */
+=20
+                 if (s >=3D 0) {
+-                    closesocket(s);
++                    slirp_closesocket(s);
+                 }
+ 		sofree(so);
+ 		/* Restore the real errno */
+@@ -737,9 +737,9 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
+ uint32_t laddr,
+ #endif
+ 		return NULL;
+ 	}
+-	qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++	slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+ 	opt =3D 1;
+-	qemu_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
++	slirp_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
+=20
+ 	getsockname(s,(struct sockaddr *)&addr,&addrlen);
+ 	so->so_ffamily =3D AF_INET;
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 4e81736d6fd..3567f320ff0 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -337,7 +337,7 @@ tcp_close(struct tcpcb *tp)
+ 	/* clobber input socket cache if we're closing the cached connection */
+ 	if (so =3D=3D slirp->tcp_last_so)
+ 		slirp->tcp_last_so =3D &slirp->tcb;
+-	closesocket(so->s);
++	slirp_closesocket(so->s);
+ 	sbfree(&so->so_rcv);
+ 	sbfree(&so->so_snd);
+ 	sofree(so);
+@@ -407,17 +407,17 @@ int tcp_fconnect(struct socket *so, unsigned short =
+af)
+   DEBUG_CALL("tcp_fconnect");
+   DEBUG_ARG("so =3D %p", so);
+=20
+-  ret =3D so->s =3D qemu_socket(af, SOCK_STREAM, 0);
++  ret =3D so->s =3D slirp_socket(af, SOCK_STREAM, 0);
+   if (ret >=3D 0) {
+     int opt, s=3Dso->s;
+     struct sockaddr_storage addr;
+=20
+     qemu_set_nonblock(s);
+-    socket_set_fast_reuse(s);
++    slirp_socket_set_fast_reuse(s);
+     opt =3D 1;
+-    qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
++    slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
+     opt =3D 1;
+-    qemu_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
++    slirp_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
+=20
+     addr =3D so->fhost.ss;
+     DEBUG_CALL(" connect()ing");
+@@ -485,10 +485,10 @@ void tcp_connect(struct socket *inso)
+         return;
+     }
+     qemu_set_nonblock(s);
+-    socket_set_fast_reuse(s);
++    slirp_socket_set_fast_reuse(s);
+     opt =3D 1;
+-    qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-    socket_set_nodelay(s);
++    slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    slirp_socket_set_nodelay(s);
+=20
+     so->fhost.ss =3D addr;
+     sotranslate_accept(so);
+@@ -496,7 +496,7 @@ void tcp_connect(struct socket *inso)
+     /* Close the accept() socket, set right state */
+     if (inso->so_state & SS_FACCEPTONCE) {
+         /* If we only accept once, close the accept() socket */
+-        closesocket(so->s);
++        slirp_closesocket(so->s);
+=20
+         /* Don't select it yet, even though we have an FD */
+         /* if it's not FACCEPTONCE, it's already NOFDREF */
+diff --git a/slirp/udp.c b/slirp/udp.c
+index 309feb9aaef..6c3fb9a29ff 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -281,7 +281,7 @@ int udp_output(struct socket *so, struct mbuf *m,
+ int
+ udp_attach(struct socket *so, unsigned short af)
+ {
+-  so->s =3D qemu_socket(af, SOCK_DGRAM, 0);
++  so->s =3D slirp_socket(af, SOCK_DGRAM, 0);
+   if (so->s !=3D -1) {
+     so->so_expire =3D curtime + SO_EXPIRE;
+     insque(so, &so->slirp->udb);
+@@ -292,7 +292,7 @@ udp_attach(struct socket *so, unsigned short af)
+ void
+ udp_detach(struct socket *so)
+ {
+-	closesocket(so->s);
++	slirp_closesocket(so->s);
+ 	sofree(so);
+ }
+=20
+@@ -327,7 +327,7 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
+ uint32_t laddr,
+ 	socklen_t addrlen =3D sizeof(struct sockaddr_in);
+=20
+ 	so =3D socreate(slirp);
+-	so->s =3D qemu_socket(AF_INET,SOCK_DGRAM,0);
++	so->s =3D slirp_socket(AF_INET,SOCK_DGRAM,0);
+         if (so->s < 0) {
+             sofree(so);
+             return NULL;
+@@ -343,7 +343,7 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
+ uint32_t laddr,
+ 		udp_detach(so);
+ 		return NULL;
+ 	}
+-	socket_set_fast_reuse(so->s);
++	slirp_socket_set_fast_reuse(so->s);
+=20
+ 	getsockname(so->s,(struct sockaddr *)&addr,&addrlen);
+ 	so->fhost.sin =3D addr;
+diff --git a/slirp/util.c b/slirp/util.c
+new file mode 100644
+index 00000000000..b1a36b27bc5
+--- /dev/null
++++ b/slirp/util.c
+@@ -0,0 +1,176 @@
 +/*
++ * util.c (mostly based on QEMU os-win32.c)
++ *
 + * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2010-2019 Red Hat, Inc.
++ * Copyright (c) 2010-2016 Red Hat, Inc.
++ *
++ * QEMU library functions for win32 which are shared between QEMU and
++ * the QEMU tools.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining=
  a copy
@@ -263,15 +445,166 @@ NG FROM,
 S IN
 + * THE SOFTWARE.
 + */
-+#ifndef UTIL_H_
-+#define UTIL_H_
++#include "util.h"
 +
-+#if defined(_WIN32)
-+# define SLIRP_PACKED __attribute__((gcc_struct, packed))
-+#else
-+# define SLIRP_PACKED __attribute__((packed))
++#include <glib.h>
++#include <fcntl.h>
++#include <stdint.h>
++
++#if defined(_WIN32) && !defined(WITH_QEMU)
++int inet_aton(const char *cp, struct in_addr *ia)
++{
++    uint32_t addr =3D inet_addr(cp);
++    if (addr =3D=3D 0xffffffff) {
++        return 0;
++    }
++    ia->s_addr =3D addr;
++    return 1;
++}
 +#endif
 +
++static void slirp_set_cloexec(int fd)
++{
++#ifndef _WIN32
++    int f;
++    f =3D fcntl(fd, F_GETFD);
++    assert(f !=3D -1);
++    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
++    assert(f !=3D -1);
 +#endif
++}
++
++/*
++ * Opens a socket with FD_CLOEXEC set
++ */
++int slirp_socket(int domain, int type, int protocol)
++{
++    int ret;
++
++#ifdef SOCK_CLOEXEC
++    ret =3D socket(domain, type | SOCK_CLOEXEC, protocol);
++    if (ret !=3D -1 || errno !=3D EINVAL) {
++        return ret;
++    }
++#endif
++    ret =3D socket(domain, type, protocol);
++    if (ret >=3D 0) {
++        slirp_set_cloexec(ret);
++    }
++
++    return ret;
++}
++
++#ifdef _WIN32
++static int socket_error(void)
++{
++    switch (WSAGetLastError()) {
++    case 0:
++        return 0;
++    case WSAEINTR:
++        return EINTR;
++    case WSAEINVAL:
++        return EINVAL;
++    case WSA_INVALID_HANDLE:
++        return EBADF;
++    case WSA_NOT_ENOUGH_MEMORY:
++        return ENOMEM;
++    case WSA_INVALID_PARAMETER:
++        return EINVAL;
++    case WSAENAMETOOLONG:
++        return ENAMETOOLONG;
++    case WSAENOTEMPTY:
++        return ENOTEMPTY;
++    case WSAEWOULDBLOCK:
++         /* not using EWOULDBLOCK as we don't want code to have
++          * to check both EWOULDBLOCK and EAGAIN */
++        return EAGAIN;
++    case WSAEINPROGRESS:
++        return EINPROGRESS;
++    case WSAEALREADY:
++        return EALREADY;
++    case WSAENOTSOCK:
++        return ENOTSOCK;
++    case WSAEDESTADDRREQ:
++        return EDESTADDRREQ;
++    case WSAEMSGSIZE:
++        return EMSGSIZE;
++    case WSAEPROTOTYPE:
++        return EPROTOTYPE;
++    case WSAENOPROTOOPT:
++        return ENOPROTOOPT;
++    case WSAEPROTONOSUPPORT:
++        return EPROTONOSUPPORT;
++    case WSAEOPNOTSUPP:
++        return EOPNOTSUPP;
++    case WSAEAFNOSUPPORT:
++        return EAFNOSUPPORT;
++    case WSAEADDRINUSE:
++        return EADDRINUSE;
++    case WSAEADDRNOTAVAIL:
++        return EADDRNOTAVAIL;
++    case WSAENETDOWN:
++        return ENETDOWN;
++    case WSAENETUNREACH:
++        return ENETUNREACH;
++    case WSAENETRESET:
++        return ENETRESET;
++    case WSAECONNABORTED:
++        return ECONNABORTED;
++    case WSAECONNRESET:
++        return ECONNRESET;
++    case WSAENOBUFS:
++        return ENOBUFS;
++    case WSAEISCONN:
++        return EISCONN;
++    case WSAENOTCONN:
++        return ENOTCONN;
++    case WSAETIMEDOUT:
++        return ETIMEDOUT;
++    case WSAECONNREFUSED:
++        return ECONNREFUSED;
++    case WSAELOOP:
++        return ELOOP;
++    case WSAEHOSTUNREACH:
++        return EHOSTUNREACH;
++    default:
++        return EIO;
++    }
++}
++
++#undef ioctlsocket
++int slirp_ioctlsocket(int fd, int req, void *val)
++{
++    int ret;
++    ret =3D ioctlsocket(fd, req, val);
++    if (ret < 0) {
++        errno =3D socket_error();
++    }
++    return ret;
++}
++
++#undef closesocket
++int slirp_closesocket(int fd)
++{
++    int ret;
++    ret =3D closesocket(fd);
++    if (ret < 0) {
++        errno =3D socket_error();
++    }
++    return ret;
++}
++#endif /* WIN32 */
+diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
+index 959558c7328..38ebdb416e3 100644
+--- a/slirp/Makefile.objs
++++ b/slirp/Makefile.objs
+@@ -27,6 +27,7 @@ slirp.mo-objs =3D \
+ 	tftp.o \
+ 	udp.o \
+ 	udp6.o \
++	util.o \
+ 	$(NULL)
+=20
+ slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\"
 --=20
 2.20.1.98.gecbdaf0899
