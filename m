@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58995)
+Received: from eggs.gnu.org ([209.51.188.92]:58487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gk7mv-0000o9-VE
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:32:58 -0500
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gk7mx-0000JF-JN
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:33:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gk7b2-0003Tt-6e
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:20:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gk7b1-0003Qz-HX
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:20:35 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190117073649.5399.97670.stgit@pasha-VirtualBox>
-	<20190117073753.5399.4488.stgit@pasha-VirtualBox>
-Date: Thu, 17 Jan 2019 14:20:30 +0100
-In-Reply-To: <20190117073753.5399.4488.stgit@pasha-VirtualBox> (Pavel
-	Dovgalyuk's message of "Thu, 17 Jan 2019 10:37:53 +0300")
-Message-ID: <87y37j2zfl.fsf@dusky.pond.sub.org>
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gk7aI-0002Kq-Cb
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:19:51 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gk7aI-0002H7-7u
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:19:50 -0500
+Received: by mail-ot1-x343.google.com with SMTP id i20so11108027otl.0
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 05:19:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v10 11/24] replay: introduce info hmp/qmp
- command
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+	<000601d4a8e8$a8a10170$f9e30450$@ru>
+	<CANzW0mtY6R0HtZJCoT5OTNdz9+ycrktnbMVjZ0uMAmXT69=N3g@mail.gmail.com>
+	<001301d4ad62$f3f44820$dbdcd860$@ru>
+	<CANzW0mtVkiZJdYMytbDf2QwGDKTKL453zNbQDV6=xO=XvewmZg@mail.gmail.com>
+	<000601d4ae38$35431f60$9fc95e20$@ru>
+In-Reply-To: <000601d4ae38$35431f60$9fc95e20$@ru>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Thu, 17 Jan 2019 19:19:37 +0600
+Message-ID: <CANzW0mv0C6Kytf8jrOC-ec7MU6Q9BAi8rcDksVPxPT94NisjQg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+> The source is the external timers, that depend on "outer world", e.g., slirp.
+> These timers are not recorded/replayed, but may affect the icount warping
+> (which should remain deterministic).
 
-> This patch introduces 'info replay' monitor command and
-> corresponding qmp request.
-> These commands request the current record/replay mode, replay log file
-> name, and the instruction count (number of recorded/replayed
-> instructions).  The instruction count can be used with the
-> replay_seek/replay_break commands added in the next two patches.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-[...]
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 6d45c29..d70e584 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -28,7 +28,8 @@
->  #
->  # @icount: Current instruction count. Appears when execution record/replay
->  #          is enabled. Used for "time-traveling" to match the moment
-> -#          in the recorded execution with the snapshots. (since 4.0)
-> +#          in the recorded execution with the snapshots. This counter may
-> +#          be obtained through @query-replay command (since 4.0)
->  #
->  # Since: 1.3
->  #
-> diff --git a/qapi/replay.json b/qapi/replay.json
-> index 9e13551..ef2fb4b 100644
-> --- a/qapi/replay.json
-> +++ b/qapi/replay.json
-> @@ -24,3 +24,42 @@
->  ##
->  { 'enum': 'ReplayMode',
->    'data': [ 'none', 'record', 'play' ] }
-> +
-> +##
-> +# @ReplayInfo:
-> +#
-> +# Record/replay information.
-> +#
-> +# @mode: current mode.
-> +#
-> +# @filename: name of the record/replay log file.
-> +#            It is present only in record or replay modes, when the log
-> +#            is recorded or replayed.
-> +#
-> +# @icount: current number of executed instructions.
-> +#
-> +# Since: 4.0
-> +#
-> +##
-> +{ 'struct': 'ReplayInfo',
-> +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'icount': 'int' } }
-> +
-> +##
-> +# @query-replay:
-> +#
-> +# Retrieves the record/replay information.
+I thought we agreed earlier in this discussion that external timers
+are deterministic by design, because they are subset of virtual clock
+timers. Regarding slirp module, although it interfaces "outer world"
+(except when 'restrict' option is on), it still uses IPv6 timer
+deterministically. You may check it yourself. Otherwise it shouldn't
+use timer of 'virtual clock' type for this purpose and this needs to
+be fixed.
+So I still don't understand. And I'm not asking you to explain. I'm
+just hinting you that your fix may finally happen to be incorrect in
+case if it based on wrong assertion I'm talking about.
 
-Imperative mood: Retrieve the record/replay information.
+> Please check the new version of the series.
 
-> +# It includes current instruction count which may be used for replay-break and
-> +# replay-seek commands.
-
-Please wrap comment lines around column 70.
-
-> +#
-> +# Returns: record/replay information.
-> +#
-> +# Since: 4.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-replay" }
-> +# <- { "return": { "mode": "play", "filename": "log.rr", "icount": 220414 } }
-> +#
-> +##
-> +{ 'command': 'query-replay',
-> +  'returns': 'ReplayInfo' }
-
-Preferably with these minor touch-ups, QAPI schema part
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
-[...]
+Sorry, I'm too busy right now for deep analysis. I've just tried to
+briefly understand issue you pointed and provide minimal feedback in
+order to prevent possible wrong decisions. I'll return to this work
+later.
