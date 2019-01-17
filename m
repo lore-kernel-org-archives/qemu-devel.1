@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36596)
+Received: from eggs.gnu.org ([209.51.188.92]:36618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=91354dfb7=Paul.Durrant@citrix.com>)
-	id 1gk3aU-00034S-4Z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:46 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gk3aX-00038z-KM
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=91354dfb7=Paul.Durrant@citrix.com>)
-	id 1gk3aQ-00048t-6R
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:45 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 17 Jan 2019 09:02:26 +0000
-Message-ID: <7ca53707d96344d885bb91701b84b547@AMSPEX02CL03.citrite.net>
-References: <20190116121350.23863-1-alex.bennee@linaro.org>
-	<c8f655ea-3c3b-290e-1bc2-8f7bb755f4af@citrix.com>
-	<874la7zocp.fsf@linaro.org>
-In-Reply-To: <874la7zocp.fsf@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <sgarzare@redhat.com>) id 1gk3aU-0004CR-3K
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gk3aQ-00047Q-4c
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:44 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 17 Jan 2019 10:02:56 +0100
+Message-Id: <20190117090259.32713-3-sgarzare@redhat.com>
+In-Reply-To: <20190117090259.32713-1-sgarzare@redhat.com>
+References: <20190117090259.32713-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] hw/block/xen: use proper
- format string for printing sectors
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 2/5] linuxboot_dma: move common functions in
+ a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +27,401 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?J0FsZXggQmVubsOpZSc=?= <alex.bennee@linaro.org>, Andrew Cooper <Andrew.Cooper3@citrix.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "open
-	list:Block layer core" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>, George Kennedy <george.kennedy@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4IEJlbm7DqWUgW21haWx0
-bzphbGV4LmJlbm5lZUBsaW5hcm8ub3JnXQ0KPiBTZW50OiAxNyBKYW51YXJ5IDIwMTkgMDg6MjEN
-Cj4gVG86IEFuZHJldyBDb29wZXIgPEFuZHJldy5Db29wZXIzQGNpdHJpeC5jb20+DQo+IENjOiBw
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+OyBT
-dGVmYW5vDQo+IFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBvcGVuIGxpc3Q6
-QmxvY2sgbGF5ZXIgY29yZSA8cWVtdS0NCj4gYmxvY2tAbm9uZ251Lm9yZz47IHFlbXUtZGV2ZWxA
-bm9uZ251Lm9yZzsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47DQo+IFBhdWwgRHVycmFu
-dCA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+OyBBbnRob255IFBlcmFyZA0KPiA8YW50aG9ueS5w
-ZXJhcmRAY2l0cml4LmNvbT47IG9wZW4gbGlzdDpYODYgPHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVu
-cHJvamVjdC5vcmc+DQo+IFN1YmplY3Q6IFJlOiBbWGVuLWRldmVsXSBbUEFUQ0hdIGh3L2Jsb2Nr
-L3hlbjogdXNlIHByb3BlciBmb3JtYXQgc3RyaW5nDQo+IGZvciBwcmludGluZyBzZWN0b3JzDQo+
-IA0KPiANCj4gQW5kcmV3IENvb3BlciA8YW5kcmV3LmNvb3BlcjNAY2l0cml4LmNvbT4gd3JpdGVz
-Og0KPiANCj4gPiBPbiAxNi8wMS8yMDE5IDEyOjEzLCBBbGV4IEJlbm7DqWUgd3JvdGU6DQo+ID4+
-IFRoZSAlbHUgZm9ybWF0IHN0cmluZyBpcyBkaWZmZXJlbnQgZGVwZW5kaW5nIG9uIHRoZSBob3N0
-IGFyY2hpdGVjdHVyZQ0KPiA+PiB3aGljaCBjYXVzZXMgYnVpbGRzIGxpa2UgdGhlIGRlYmlhbi1h
-cm1oZi1jcm9zcyBidWlsZCB0byBmYWlsLiBVc2UgdGhlDQo+ID4+IGNvcnJlY3QgUFJpNjQgZm9y
-bWF0IHN0cmluZy4NCj4gPj4NCj4gPj4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4
-LmJlbm5lZUBsaW5hcm8ub3JnPg0KPiA+PiAtLS0NCj4gPj4gIGh3L2Jsb2NrL3hlbi1ibG9jay5j
-IHwgMiArLQ0KPiA+PiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9u
-KC0pDQo+ID4+DQo+ID4+IGRpZmYgLS1naXQgYS9ody9ibG9jay94ZW4tYmxvY2suYyBiL2h3L2Js
-b2NrL3hlbi1ibG9jay5jDQo+ID4+IGluZGV4IGJlMjhiNjM0NDIuLmE2MzY0ODdiM2UgMTAwNjQ0
-DQo+ID4+IC0tLSBhL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+ID4+ICsrKyBiL2h3L2Jsb2NrL3hl
-bi1ibG9jay5jDQo+ID4+IEBAIC0yMTUsNyArMjE1LDcgQEAgc3RhdGljIHZvaWQgeGVuX2Jsb2Nr
-X3JlYWxpemUoWGVuRGV2aWNlICp4ZW5kZXYsDQo+IEVycm9yICoqZXJycCkNCj4gPj4NCj4gPj4g
-ICAgICB4ZW5fZGV2aWNlX2JhY2tlbmRfcHJpbnRmKHhlbmRldiwgInNlY3Rvci1zaXplIiwgIiV1
-IiwNCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbmYtPmxvZ2ljYWxfYmxv
-Y2tfc2l6ZSk7DQo+ID4+IC0gICAgeGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5kZXYsICJz
-ZWN0b3JzIiwgIiVsdSIsDQo+ID4+ICsgICAgeGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5k
-ZXYsICJzZWN0b3JzIiwgIiUiUFJJaTY0LA0KPiA+DQo+ID4gUFJJdTY0Lg0KPiA+DQo+ID4gWW91
-J3ZlIGNoYW5nZWQgdGhlIHNpZ25lZC1uZXNzIG9mIHdoYXQgZ2V0cyBwcmludGVkLg0KPiANCj4g
-SSB3YXMgZGVsaWJlcmF0ZSBhczoNCj4gICBpbnQ2NF90IGJsa19nZXRsZW5ndGgoQmxvY2tCYWNr
-ZW5kICpibGspOw0KPiANCj4gYWx0aG91Z2ggSSBoYXZlIHRvIGFkbWl0IGEgc2lnbmVkIGJsb2Nr
-IGxlbmd0aCBkb2Vzbid0IG1ha2UgbXVjaCBzZW5zZQ0KPiB0byBtZS4gQXQgbGVhc3QgaXQgaXNu
-J3QgZ29pbmcgdG8gb3ZlcmZsb3cgYW5kIHdpbGwgc2hvdy11cCBpZiB0aGUgYmxvY2sNCj4gbGVu
-Z3RoIGlzIGV2ZXIgbmVnYXRpdmUuDQoNClllcywgdGhhdCdzIGEgbXVjaCBiZXR0ZXIgZmFpbHVy
-ZSBtb2RlIHRoYW4gc29tZSB3ZWlyZCBodWdlIG51bWJlciBvZiBzZWN0b3JzLg0KDQogIFBhdWwN
-Cg0KPiANCj4gPg0KPiA+IH5BbmRyZXcNCj4gDQo+IA0KPiAtLQ0KPiBBbGV4IEJlbm7DqWUNCg==
+In order to allow other option roms to use these common
+useful functions and definitions, this patch put them
+in two new C header files called optrom.h and
+optrom_fw_cfg.h. We also add useful out*() in*()
+functions for different size, and new fw_cfg functions
+to use when DMA feature is not available.
+
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+---
+ pc-bios/optionrom/linuxboot_dma.c | 102 ++++++---------------------
+ pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++++++++++++++++
+ pc-bios/optionrom/optrom_fw_cfg.h |  92 +++++++++++++++++++++++++
+ 3 files changed, 221 insertions(+), 83 deletions(-)
+ create mode 100644 pc-bios/optionrom/optrom.h
+ create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
+
+diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxb=
+oot_dma.c
+index f728dc839f..cbcf6679d9 100644
+--- a/pc-bios/optionrom/linuxboot_dma.c
++++ b/pc-bios/optionrom/linuxboot_dma.c
+@@ -58,21 +58,13 @@ asm(
+ "   jmp load_kernel\n"
+ );
+=20
+-#define BIOS_CFG_DMA_ADDR_HIGH 0x514
+-#define BIOS_CFG_DMA_ADDR_LOW  0x518
+-
+-#define uint64_t unsigned long long
+-#define uint32_t unsigned int
+-#define uint16_t unsigned short
+-
+-#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
+-
+-#define barrier() asm("" : : : "memory")
+-
+-static inline void outl(uint32_t value, uint16_t port)
+-{
+-    asm("outl %0, %w1" : : "a"(value), "Nd"(port));
+-}
++/*
++ * The includes of C headers must be after the asm block to avoid compil=
+er
++ * errors.
++ */
++#include <stdint.h>
++#include "optrom.h"
++#include "optrom_fw_cfg.h"
+=20
+ static inline void set_es(void *addr)
+ {
+@@ -80,12 +72,6 @@ static inline void set_es(void *addr)
+     asm("movl %0, %%es" : : "r"(seg));
+ }
+=20
+-#ifdef __clang__
+-#define ADDR32
+-#else
+-#define ADDR32 "addr32 "
+-#endif
+-
+ static inline uint16_t readw_es(uint16_t offset)
+ {
+     uint16_t val;
+@@ -108,56 +94,6 @@ static inline void writel_es(uint16_t offset, uint32_=
+t val)
+     asm(ADDR32 "movl %0, %%es:(%1)" : : "r"(val), "r"((uint32_t)offset))=
+;
+ }
+=20
+-static inline uint32_t bswap32(uint32_t x)
+-{
+-    asm("bswapl %0" : "=3Dr" (x) : "0" (x));
+-    return x;
+-}
+-
+-static inline uint64_t bswap64(uint64_t x)
+-{
+-    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=3DA" (x) : "=
+0" (x));
+-    return x;
+-}
+-
+-static inline uint64_t cpu_to_be64(uint64_t x)
+-{
+-    return bswap64(x);
+-}
+-
+-static inline uint32_t cpu_to_be32(uint32_t x)
+-{
+-    return bswap32(x);
+-}
+-
+-static inline uint32_t be32_to_cpu(uint32_t x)
+-{
+-    return bswap32(x);
+-}
+-
+-/* clang is happy to inline this function, and bloats the
+- * ROM.
+- */
+-static __attribute__((__noinline__))
+-void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
+-{
+-    struct fw_cfg_dma_access access;
+-    uint32_t control =3D (entry << 16) | FW_CFG_DMA_CTL_SELECT
+-                        | FW_CFG_DMA_CTL_READ;
+-
+-    access.address =3D cpu_to_be64((uint64_t)(uint32_t)buf);
+-    access.length =3D cpu_to_be32(len);
+-    access.control =3D cpu_to_be32(control);
+-
+-    barrier();
+-
+-    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
+-
+-    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
+-        barrier();
+-    }
+-}
+-
+ /* Return top of memory using BIOS function E801. */
+ static uint32_t get_e801_addr(void)
+ {
+@@ -211,9 +147,9 @@ void load_kernel(void)
+     uint32_t initrd_end_page, max_allowed_page;
+     uint32_t segment_addr, stack_addr;
+=20
+-    bios_cfg_read_entry(&setup_addr, FW_CFG_SETUP_ADDR, 4);
+-    bios_cfg_read_entry(&setup_size, FW_CFG_SETUP_SIZE, 4);
+-    bios_cfg_read_entry(setup_addr, FW_CFG_SETUP_DATA, setup_size);
++    bios_cfg_read_entry_dma(&setup_addr, FW_CFG_SETUP_ADDR, 4);
++    bios_cfg_read_entry_dma(&setup_size, FW_CFG_SETUP_SIZE, 4);
++    bios_cfg_read_entry_dma(setup_addr, FW_CFG_SETUP_DATA, setup_size);
+=20
+     set_es(setup_addr);
+=20
+@@ -223,8 +159,8 @@ void load_kernel(void)
+         writel_es(0x22c, 0x37ffffff);
+     }
+=20
+-    bios_cfg_read_entry(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
+-    bios_cfg_read_entry(&initrd_size, FW_CFG_INITRD_SIZE, 4);
++    bios_cfg_read_entry_dma(&initrd_addr, FW_CFG_INITRD_ADDR, 4);
++    bios_cfg_read_entry_dma(&initrd_size, FW_CFG_INITRD_SIZE, 4);
+=20
+     initrd_end_page =3D ((uint32_t)(initrd_addr + initrd_size) & -4096);
+     max_allowed_page =3D (readl_es(0x22c) & -4096);
+@@ -239,15 +175,15 @@ void load_kernel(void)
+=20
+     }
+=20
+-    bios_cfg_read_entry(initrd_addr, FW_CFG_INITRD_DATA, initrd_size);
++    bios_cfg_read_entry_dma(initrd_addr, FW_CFG_INITRD_DATA, initrd_size=
+);
+=20
+-    bios_cfg_read_entry(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
+-    bios_cfg_read_entry(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
+-    bios_cfg_read_entry(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size);
++    bios_cfg_read_entry_dma(&kernel_addr, FW_CFG_KERNEL_ADDR, 4);
++    bios_cfg_read_entry_dma(&kernel_size, FW_CFG_KERNEL_SIZE, 4);
++    bios_cfg_read_entry_dma(kernel_addr, FW_CFG_KERNEL_DATA, kernel_size=
+);
+=20
+-    bios_cfg_read_entry(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
+-    bios_cfg_read_entry(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
+-    bios_cfg_read_entry(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size)=
+;
++    bios_cfg_read_entry_dma(&cmdline_addr, FW_CFG_CMDLINE_ADDR, 4);
++    bios_cfg_read_entry_dma(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4);
++    bios_cfg_read_entry_dma(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_s=
+ize);
+=20
+     /* Boot linux */
+     segment_addr =3D ((uint32_t)setup_addr >> 4);
+diff --git a/pc-bios/optionrom/optrom.h b/pc-bios/optionrom/optrom.h
+new file mode 100644
+index 0000000000..c5c8caa22f
+--- /dev/null
++++ b/pc-bios/optionrom/optrom.h
+@@ -0,0 +1,110 @@
++/*
++ * Common Option ROM Functions for C code
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Copyright (c) 2015-2019 Red Hat Inc.
++ *   Authors:
++ *     Marc Mar=C3=AD <marc.mari.barcelo@gmail.com>
++ *     Richard W.M. Jones <rjones@redhat.com>
++ *     Stefano Garzarella <sgarzare@redhat.com>
++ */
++
++#ifndef OPTROM_H
++#define OPTROM_H
++
++#include <stdint.h>
++#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
++
++#define barrier() asm("" : : : "memory")
++
++#ifdef __clang__
++#define ADDR32
++#else
++#define ADDR32 "addr32 "
++#endif
++
++static inline void outb(uint8_t value, uint16_t port)
++{
++    asm volatile("outb %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline void outw(uint16_t value, uint16_t port)
++{
++    asm volatile("outw %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline void outl(uint32_t value, uint16_t port)
++{
++    asm volatile("outl %0, %w1" : : "a"(value), "Nd"(port));
++}
++
++static inline uint8_t inb(uint16_t port)
++{
++    uint8_t value;
++
++    asm volatile("outl %w1, %0" : : "a"(value), "Nd"(port));
++    return value;
++}
++
++static inline uint16_t inw(uint16_t port)
++{
++    uint16_t value;
++
++    asm volatile("outl %w1, %0" : : "a"(value), "Nd"(port));
++    return value;
++}
++
++static inline uint32_t inl(uint16_t port)
++{
++    uint32_t value;
++
++    asm volatile("outl %w1, %0" : : "a"(value), "Nd"(port));
++    return value;
++}
++
++static inline void insb(uint16_t port, uint8_t *buf, uint32_t len)
++{
++    asm volatile("rep insb (%%dx), %%es:(%%edi)"
++                 : "+c"(len), "+D"(buf) : "d"(port) : "memory");
++}
++
++static inline uint32_t bswap32(uint32_t x)
++{
++    asm("bswapl %0" : "=3Dr" (x) : "0" (x));
++    return x;
++}
++
++static inline uint64_t bswap64(uint64_t x)
++{
++    asm("bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx" : "=3DA" (x) : "=
+0" (x));
++    return x;
++}
++
++static inline uint64_t cpu_to_be64(uint64_t x)
++{
++    return bswap64(x);
++}
++
++static inline uint32_t cpu_to_be32(uint32_t x)
++{
++    return bswap32(x);
++}
++
++static inline uint32_t be32_to_cpu(uint32_t x)
++{
++    return bswap32(x);
++}
++
++#endif /* OPTROM_H */
+diff --git a/pc-bios/optionrom/optrom_fw_cfg.h b/pc-bios/optionrom/optrom=
+_fw_cfg.h
+new file mode 100644
+index 0000000000..a3660a5200
+--- /dev/null
++++ b/pc-bios/optionrom/optrom_fw_cfg.h
+@@ -0,0 +1,92 @@
++/*
++ * Common Option ROM Functions for fw_cfg
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * Copyright (c) 2015-2019 Red Hat Inc.
++ *   Authors:
++ *     Marc Mar=C3=AD <marc.mari.barcelo@gmail.com>
++ *     Richard W.M. Jones <rjones@redhat.com>
++ *     Stefano Garzarella <sgarzare@redhat.com>
++ */
++
++#ifndef OPTROM_FW_CFG_H
++#define OPTROM_FW_CFG_H
++
++#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
++
++#define BIOS_CFG_IOPORT_CFG     0x510
++#define BIOS_CFG_IOPORT_DATA    0x511
++#define BIOS_CFG_DMA_ADDR_HIGH  0x514
++#define BIOS_CFG_DMA_ADDR_LOW   0x518
++
++static __attribute__((unused))
++void bios_cfg_select(uint16_t key)
++{
++    outw(key, BIOS_CFG_IOPORT_CFG);
++}
++
++static __attribute__((unused))
++void bios_cfg_read_entry_io(void *buf, uint16_t entry, uint32_t len)
++{
++    bios_cfg_select(entry);
++    insb(BIOS_CFG_IOPORT_DATA, buf, len);
++}
++
++/*
++ * clang is happy to inline this function, and bloats the
++ * ROM.
++ */
++static __attribute__((__noinline__)) __attribute__((unused))
++void bios_cfg_read_entry_dma(void *buf, uint16_t entry, uint32_t len)
++{
++    struct fw_cfg_dma_access access;
++    uint32_t control =3D (entry << 16) | FW_CFG_DMA_CTL_SELECT
++                        | FW_CFG_DMA_CTL_READ;
++
++    access.address =3D cpu_to_be64((uint64_t)(uint32_t)buf);
++    access.length =3D cpu_to_be32(len);
++    access.control =3D cpu_to_be32(control);
++
++    barrier();
++
++    outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
++
++    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
++        barrier();
++    }
++}
++
++static __attribute__((unused))
++void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len,
++                         uint32_t version)
++{
++    if (version & FW_CFG_VERSION_DMA) {
++        bios_cfg_read_entry_dma(buf, entry, len);
++    } else {
++        bios_cfg_read_entry_io(buf, entry, len);
++    }
++}
++
++static __attribute__((unused))
++uint32_t bios_cfg_version(void)
++{
++    uint32_t version;
++
++    bios_cfg_read_entry_io(&version, FW_CFG_ID, sizeof(version));
++
++    return version;
++}
++
++#endif /* OPTROM_FW_CFG_H */
+--=20
+2.20.1
