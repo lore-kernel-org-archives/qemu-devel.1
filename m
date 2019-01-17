@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42758)
+Received: from eggs.gnu.org ([209.51.188.92]:43054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gk3rI-0004qT-Vs
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1gk3rs-00057s-8L
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gk3rG-00088F-Vf
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:08 -0500
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:45007)
+	(envelope-from <armbru@redhat.com>) id 1gk3rp-0001QA-N8
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gk3rG-0007LH-NB
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:06 -0500
-Received: from player794.ha.ovh.net (unknown [10.109.159.159])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id ADE3D109E6A
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:20:51 +0100 (CET)
-Date: Thu, 17 Jan 2019 10:20:39 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190117102039.7199d827@bahia.lan>
-In-Reply-To: <1547715649-27868-1-git-send-email-thuth@redhat.com>
-References: <2e726e3f-048d-f9ce-4884-1cdebf7f0997@kaod.org>
-	<1547715649-27868-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gk3rp-0001Js-EC
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:21:41 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-2-berrange@redhat.com>
+	<a53244ea-4ff3-c5d6-73b2-9f839b6b0195@redhat.com>
+	<20190116092741.GB20275@redhat.com>
+Date: Thu, 17 Jan 2019 10:21:34 +0100
+In-Reply-To: <20190116092741.GB20275@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Wed, 16 Jan 2019 09:27:41 +0000")
+Message-ID: <8736pr63mp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6] ppc: Fix duplicated typedefs to be able
- to compile with Clang in gnu99 mode
+Subject: Re: [Qemu-devel] [PATCH 01/12] chardev: fix validation of options
+ for QMP created chardevs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +32,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Yongji Xie <elohimes@gmail.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, 17 Jan 2019 10:00:49 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Eric, there's a QAPI code generation idea at the end.
 
-> When compiling the ppc code with clang and -std=3Dgnu99, there are a
-> couple of warnings/errors like this one:
->=20
->   CC      ppc64-softmmu/hw/intc/xics.o
-> In file included from hw/intc/xics.c:35:
-> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is=
- a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct ICPState ICPState;
->                         ^
-> target/ppc/cpu.h:1181:25: note: previous definition is here
-> typedef struct ICPState ICPState;
->                         ^
-> Work around the problems by including the proper headers in spapr.h
-> and by using struct forward declarations in cpu.h.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  As discussed on IRC, C=C3=A9dric's patches likely should go via David's =
-ppc-
->  tree, so I'll go with this version here for my gnu99-PULL request.
->  (v6: Don't use #includes in cpu.h, use forward struct definitions instea=
-d)
->=20
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Yeah, now that we know where we're going, I would certainly not hold your
-gnu99 work off anymore :)
+> On Wed, Jan 16, 2019 at 06:07:41AM +0100, Thomas Huth wrote:
+>> On 2019-01-15 15:52, Daniel P. Berrang=C3=A9 wrote:
+>> > The TLS creds option is not valid with certain address types. The user
+>> > config was only checked for errors when parsing legacy QemuOpts, thus
+>> > the user could pass unsupported values via QMP.
+>> >=20
+>> > Pull all code for validating options out into a new method
+>> > qmp_chardev_validate_socket, that is called from the main
+>> > qmp_chardev_open_socket method. This adds a missing check for rejecting
+>> > TLS creds with the vsock address type.
+>> >=20
+>> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> > ---
+>> >  chardev/char-socket.c | 92 +++++++++++++++++++++++++++++++------------
+>> >  1 file changed, 66 insertions(+), 26 deletions(-)
+>> >=20
+>> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> > index eaa8e8b68f..6669acb35f 100644
+>> > --- a/chardev/char-socket.c
+>> > +++ b/chardev/char-socket.c
+>> > @@ -987,6 +987,65 @@ static gboolean socket_reconnect_timeout(gpointer=
+ opaque)
+>> >      return false;
+>> >  }
+>> >=20=20
+>> > +
+>>=20
+>> Please remove the additional empty line.
+>
+> Having two blanks lines between functions is intentional to
+> give visual separation.
+>
+>> > +static bool qmp_chardev_validate_socket(ChardevSocket *sock,
+>> > +                                        SocketAddress *addr,
+>> > +                                        Error **errp)
+>> > +{
+>> > +    /* Validate any options which have a dependancy on address type */
+>>=20
+>> I'd maybe rather write "dependency" which is AFAIK the more common
+>> spelling - but I'm not a native speaker, so feel free to ignore me here.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+For what it's worth, my dictionary wants dependency.
 
->  include/hw/ppc/spapr.h      | 5 +++--
->  include/hw/ppc/spapr_xive.h | 2 --
->  target/ppc/cpu.h            | 9 +++++----
->  3 files changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 9e01a5a..a947a0a 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -8,15 +8,16 @@
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include "hw/ppc/spapr_irq.h"
-> +#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
-> +#include "hw/ppc/xics.h"        /* For ICSState */
-> =20
->  struct VIOsPAPRBus;
->  struct sPAPRPHBState;
->  struct sPAPRNVRAM;
-> +
->  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
->  typedef struct sPAPREventSource sPAPREventSource;
->  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> -typedef struct ICSState ICSState;
-> -typedef struct sPAPRXive sPAPRXive;
-> =20
->  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->  #define SPAPR_ENTRY_POINT       0x100
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 7fdc250..9bec919 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lis=
-n, bool lsi);
->  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
->  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> =20
-> -typedef struct sPAPRMachineState sPAPRMachineState;
-> -
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
->                     uint32_t phandle);
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 486abaf..a62ff60 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1177,8 +1177,9 @@ do {                                            \
-> =20
->  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
->  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-> -typedef struct XiveTCTX XiveTCTX;
-> -typedef struct ICPState ICPState;
-> +
-> +struct XiveTCTX;
-> +struct ICPState;
-> =20
->  /**
->   * PowerPCCPU:
-> @@ -1197,8 +1198,8 @@ struct PowerPCCPU {
->      int vcpu_id;
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
-> -    ICPState *icp;
-> -    XiveTCTX *tctx;
-> +    struct ICPState *icp;
-> +    struct XiveTCTX *tctx;
->      void *machine_data;
->      int32_t node_id; /* NUMA node this CPU belongs to */
->      PPCHash64Options *hash64_opts;
+>> > +    switch (addr->type) {
+>> > +    case SOCKET_ADDRESS_TYPE_FD:
+>> > +        if (sock->has_reconnect) {
+>> > +            error_setg(errp,
+>> > +                       "'reconnect' option is incompatible with "
+>> > +                       "'fd' address type");
+>> > +            return false;
+>> > +        }
+>> > +        if (sock->has_tls_creds &&
+>> > +            !(sock->has_server && sock->server)) {
+>> > +            error_setg(errp,
+>> > +                       "'tls_creds' option is incompatible with "
+>> > +                       "'fd' address type as client");
+>> > +            return false;
+>> > +        }
+>> > +        break;
+>> > +
+>> > +    case SOCKET_ADDRESS_TYPE_UNIX:
+>> > +        if (sock->has_tls_creds) {
+>> > +            error_setg(errp,
+>> > +                       "'tls_creds' option is incompatible with "
+>> > +                       "'unix' address type");
+>> > +            return false;
+>> > +        }
+>> > +        break;
+>> > +
+>> > +    case SOCKET_ADDRESS_TYPE_INET:
+>> > +        break;
+>>=20
+>> You could drop the empty case.
+>
+> I preferred to explicitly list all cases, so it is clear what
+> needs to be handled here when further checks are added later.
+
+Matter of taste, your choice unless maintainer overrules.
+
+>>=20
+>> > +    case SOCKET_ADDRESS_TYPE_VSOCK:
+>> > +        if (sock->has_tls_creds) {
+>> > +            error_setg(errp,
+>> > +                       "'tls_creds' option is incompatible with "
+>> > +                       "'vsock' address type");
+>> > +            return false;
+>> > +        }
+>> > +
+>
+> Opps, missing default.
+
+I guess you mean break.
+
+>> > +    default:
+>> > +        break;
+>>=20
+>> You could drop the empty default case.
+>
+> If that is not there, then the compiler forces the
+> listing of SOCKET_ADDRESS_TYPE__MAX instead due
+> to -Wswitch
+
+I wonder whether generating something like
+
+    typedef enum SocketAddressType {
+        SOCKET_ADDRESS_TYPE_INET,
+        SOCKET_ADDRESS_TYPE_UNIX,
+        SOCKET_ADDRESS_TYPE_VSOCK,
+        SOCKET_ADDRESS_TYPE_FD,
+    } SocketAddressType;
+
+    #define SOCKET_ADDRESS_TYPE__MAX (SOCKET_ADDRESS_TYPE_FD + 1)
+
+would be better.
