@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57761)
+Received: from eggs.gnu.org ([209.51.188.92]:57806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gk996-0007hA-QS
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:59:53 -0500
+	(envelope-from <smarkovic@wavecomp.com>) id 1gk99J-0007sX-8r
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:00:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gk990-0000kh-Vt
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:59:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38942)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gk990-0000if-K6
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:59:46 -0500
-Date: Thu, 17 Jan 2019 09:59:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190117095848-mutt-send-email-mst@kernel.org>
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-5-xieyongji@baidu.com>
-	<ce11d062-1d64-3d35-b617-5c135f1506eb@redhat.com>
-	<CAONzpcY6pdSz65Tzj_Ws0M4vskUOXMuaxQ-uYz6NnCvdMgkFOA@mail.gmail.com>
-	<a6e0c0b2-bd0b-454c-8280-12e0ec964240@redhat.com>
-	<CAONzpcb-TrxZVBtfP=3PCqq-3r1NwX93C4xSd9MsM4DCTZMguA@mail.gmail.com>
-	<ed0dc117-89f6-5fd6-a5f6-91f781a6b09e@redhat.com>
+	(envelope-from <smarkovic@wavecomp.com>) id 1gk99H-00017s-Az
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:00:05 -0500
+Received: from mail-co1nam05on071b.outbound.protection.outlook.com
+	([2a01:111:f400:fe50::71b]:17483
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gk99C-0000vO-CA
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:59:59 -0500
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Thu, 17 Jan 2019 14:59:52 +0000
+Message-ID: <49dd5885-c4b8-cfe6-0faa-aadfe29a3f5f@wavecomp.com>
+References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1546533252-26601-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1546533252-26601-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DBBC1DF83E30C84395412950CE4AB62C@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ed0dc117-89f6-5fd6-a5f6-91f781a6b09e@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 4/7] libvhost-user: Support
- tracking inflight I/O in shared memory
+Subject: Re: [Qemu-devel] [PATCH 4/8] target/mips: Add fields for SAARI and
+ SAAR CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yongji Xie <elohimes@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Thu, Jan 17, 2019 at 05:57:29PM +0800, Jason Wang wrote:
->=20
-> On 2019/1/15 =E4=B8=8B=E5=8D=8810:51, Yongji Xie wrote:
-> > > Well, this may work but here're my points:
-> > >=20
-> > > 1) The code want to recover from backed crash by introducing extra =
-space
-> > > to store inflight data, but it still depends on the backend to set/=
-get
-> > > the inflight state
-> > >=20
-> > > 2) Since the backend could be killed at any time, the backend must =
-have
-> > > the ability to recover from the partial inflight state
-> > >=20
-> > > So it looks to me 1) tends to be self-contradictory and 2) tends to=
- be
-> > > recursive. The above lines show how tricky could the code looks lik=
-e.
-> > >=20
-> > > Solving this at vhost-user level through at backend is probably wro=
-ng.
-> > > It's time to consider the support from virtio itself.
-> > >=20
-> > I agree that supporting this in virtio level may be better. For
-> > example, resubmitting inflight I/O once DEVICE_NEEDS_RESET is set in
-> > Stefan's proposal. But I still think QEMU should be able to provide
-> > this ability too. Supposed that one vhost-user backend need to suppor=
-t
-> > multiple VMs. We can't enable reconnect ability until all VMs' guest
-> > driver support the new feature. It's limited.
->=20
->=20
-> That's the way virtio evolves.
->=20
->=20
-> >   But if QEMU have the
-> > ability to store inflight buffer, the backend could at least have a
-> > chance to support this case.
->=20
->=20
-> The problem is, you need a careful designed protocol described somewher=
-e (is
-> vhost-user.txt a good place for this?). And this work will be (partial)
-> duplicated for the future support from virtio spec itself.
->=20
->=20
-> > Maybe backend could have other way to
-> > avoid the tricky code.
->=20
->=20
-> I'm not sure, but it was probably not easy.
-
-I see an implementation in libvhost-user.
-
-Do you see an issue there?
-
-
-> Thanks
->=20
->=20
-> >=20
-> > Thanks,
+DQpPbiAzLjEuMTkuIDE3OjM0LCBBbGVrc2FuZGFyIE1hcmtvdmljIHdyb3RlOg0KPiBGcm9tOiBZ
+b25nYm9rIEtpbSA8eW9uZ2Jvay5raW1AbWlwcy5jb20+DQo+DQo+IEFkZCBmaWVsZHMgZm9yIFNB
+QVJJIGFuZCBTQUFSIENQMCByZWdpc3RlcnMuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IFlvbmdib2sg
+S2ltIDx5b25nYm9rLmtpbUBtaXBzLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogQWxla3NhbmRhciBN
+YXJrb3ZpYyA8YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gLS0tDQo+ICAgdGFyZ2V0L21pcHMv
+Y3B1LmggICAgIHwgMTAgKysrKysrKystLQ0KPiAgIHRhcmdldC9taXBzL21hY2hpbmUuYyB8ICA2
+ICsrKystLQ0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlv
+bnMoLSkNCg0KDQpSZXZpZXdlZC1ieTogU3RlZmFuIE1hcmtvdmljIDxzbWFyb2t2aWNAd2F2ZWNv
+bXAuY29tPg0KDQoNCj4gZGlmZiAtLWdpdCBhL3RhcmdldC9taXBzL2NwdS5oIGIvdGFyZ2V0L21p
+cHMvY3B1LmgNCj4gaW5kZXggYjA5NTQyMi4uMWMyYzY4MiAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0
+L21pcHMvY3B1LmgNCj4gKysrIGIvdGFyZ2V0L21pcHMvY3B1LmgNCj4gQEAgLTE2NCw4ICsxNjQs
+OCBAQCB0eXBlZGVmIHN0cnVjdCBtaXBzX2RlZl90IG1pcHNfZGVmX3Q7DQo+ICAgICogMyAgIEJh
+ZEluc3RyWA0KPiAgICAqIDQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBH
+dWVzdEN0bDEgICAgICAgICBHdWVzdEN0bDBFeHQNCj4gICAgKiA1ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgR3Vlc3RDdGwyDQo+IC0gKiA2ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgR3Vlc3RDdGwzDQo+IC0gKiA3DQo+ICsgKiA2ICAgICAgICAg
+ICAgICAgICAgICAgU0FBUkkgICAgICAgICAgICAgR3Vlc3RDdGwzDQo+ICsgKiA3ICAgICAgICAg
+ICAgICAgICAgICAgU0FBUg0KPiAgICAqDQo+ICAgICoNCj4gICAgKiAgICAgUmVnaXN0ZXIgMTIg
+ICAgICAgUmVnaXN0ZXIgMTMgICAgICAgUmVnaXN0ZXIgMTQgICAgICAgUmVnaXN0ZXIgMTUNCj4g
+QEAgLTU0Niw2ICs1NDYsMTIgQEAgc3RydWN0IENQVU1JUFNTdGF0ZSB7DQo+ICAgICogQ1AwIFJl
+Z2lzdGVyIDkNCj4gICAgKi8NCj4gICAgICAgaW50MzJfdCBDUDBfQ291bnQ7DQo+ICsgICAgdWlu
+dDMyX3QgQ1AwX1NBQVJJOw0KPiArI2RlZmluZSBDUDBTQUFSSV9UQVJHRVQgMCAgICAvKiAgNS4u
+MCAgKi8NCj4gKyAgICB1aW50NjRfdCBDUDBfU0FBUlsyXTsNCj4gKyNkZWZpbmUgQ1AwU0FBUl9C
+QVNFICAgIDEyICAgLyogNDMuLjEyICovDQo+ICsjZGVmaW5lIENQMFNBQVJfU0laRSAgICAxICAg
+IC8qICA1Li4xICAqLw0KPiArI2RlZmluZSBDUDBTQUFSX0VOICAgICAgMA0KPiAgIC8qDQo+ICAg
+ICogQ1AwIFJlZ2lzdGVyIDEwDQo+ICAgICovDQo+IGRpZmYgLS1naXQgYS90YXJnZXQvbWlwcy9t
+YWNoaW5lLmMgYi90YXJnZXQvbWlwcy9tYWNoaW5lLmMNCj4gaW5kZXggNzA0ZTljMC4uMTExZDdj
+MyAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L21pcHMvbWFjaGluZS5jDQo+ICsrKyBiL3RhcmdldC9t
+aXBzL21hY2hpbmUuYw0KPiBAQCAtMjE0LDggKzIxNCw4IEBAIGNvbnN0IFZNU3RhdGVEZXNjcmlw
+dGlvbiB2bXN0YXRlX3RsYiA9IHsNCj4gICANCj4gICBjb25zdCBWTVN0YXRlRGVzY3JpcHRpb24g
+dm1zdGF0ZV9taXBzX2NwdSA9IHsNCj4gICAgICAgLm5hbWUgPSAiY3B1IiwNCj4gLSAgICAudmVy
+c2lvbl9pZCA9IDE1LA0KPiAtICAgIC5taW5pbXVtX3ZlcnNpb25faWQgPSAxNSwNCj4gKyAgICAu
+dmVyc2lvbl9pZCA9IDE2LA0KPiArICAgIC5taW5pbXVtX3ZlcnNpb25faWQgPSAxNiwNCj4gICAg
+ICAgLnBvc3RfbG9hZCA9IGNwdV9wb3N0X2xvYWQsDQo+ICAgICAgIC5maWVsZHMgPSAoVk1TdGF0
+ZUZpZWxkW10pIHsNCj4gICAgICAgICAgIC8qIEFjdGl2ZSBUQyAqLw0KPiBAQCAtMjc0LDYgKzI3
+NCw4IEBAIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX21pcHNfY3B1ID0gew0KPiAg
+ICAgICAgICAgVk1TVEFURV9VSU5UMzIoZW52LkNQMF9CYWRJbnN0clAsIE1JUFNDUFUpLA0KPiAg
+ICAgICAgICAgVk1TVEFURV9VSU5UMzIoZW52LkNQMF9CYWRJbnN0clgsIE1JUFNDUFUpLA0KPiAg
+ICAgICAgICAgVk1TVEFURV9JTlQzMihlbnYuQ1AwX0NvdW50LCBNSVBTQ1BVKSwNCj4gKyAgICAg
+ICAgVk1TVEFURV9VSU5UMzIoZW52LkNQMF9TQUFSSSwgTUlQU0NQVSksDQo+ICsgICAgICAgIFZN
+U1RBVEVfVUlOVDY0X0FSUkFZKGVudi5DUDBfU0FBUiwgTUlQU0NQVSwgMiksDQo+ICAgICAgICAg
+ICBWTVNUQVRFX1VJTlRUTChlbnYuQ1AwX0VudHJ5SGksIE1JUFNDUFUpLA0KPiAgICAgICAgICAg
+Vk1TVEFURV9JTlQzMihlbnYuQ1AwX0NvbXBhcmUsIE1JUFNDUFUpLA0KPiAgICAgICAgICAgVk1T
+VEFURV9JTlQzMihlbnYuQ1AwX1N0YXR1cywgTUlQU0NQVSksDQo=
