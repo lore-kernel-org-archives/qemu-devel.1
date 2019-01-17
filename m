@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42406)
+Received: from eggs.gnu.org ([209.51.188.92]:42427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gk8Dv-0007Q6-HG
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:00:49 -0500
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gk8Dw-0007Qq-Lm
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gk8Dt-0002Pc-4n
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:00:46 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:35472 helo=huawei.com)
+	(envelope-from <ann.zhuangyanying@huawei.com>) id 1gk8Dt-0002PX-4i
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:00:47 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:46618 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <ann.zhuangyanying@huawei.com>)
-	id 1gk8Dr-0001VR-1z
+	id 1gk8Dr-0001Y2-22
 	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:00:43 -0500
 From: Zhuangyanying <ann.zhuangyanying@huawei.com>
-Date: Thu, 17 Jan 2019 13:55:27 +0000
-Message-ID: <1547733331-16140-1-git-send-email-ann.zhuangyanying@huawei.com>
+Date: Thu, 17 Jan 2019 13:55:28 +0000
+Message-ID: <1547733331-16140-2-git-send-email-ann.zhuangyanying@huawei.com>
+In-Reply-To: <1547733331-16140-1-git-send-email-ann.zhuangyanying@huawei.com>
+References: <1547733331-16140-1-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/4] KVM: MMU: fast cleanup D bit based on fast
- write protect
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 1/4] KVM: MMU: correct the behavior of
+ mmu_spte_update_no_track
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +28,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xiaoguangrong@tencent.com, pbonzini@redhat.com, arei.gonglei@huawei.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, liu.jinsong@huawei.com, Zhuang Yanying <ann.zhuangyanying@huawei.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, liu.jinsong@huawei.com
 
-From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Recently I tested live-migration with large-memory guests, find vcpu may =
-hang for a long time while starting migration, such as 9s for 2048G(linux=
--5.0.0-rc2+qemu-3.1.0).
-The reason is memory_global_dirty_log_start() taking too long, and the vc=
-pu is waiting for BQL. The page-by-page D bit clearup is the main time co=
-nsumption.
-I think that the idea of "KVM: MMU: fast write protect" by xiaoguangrong,=
- especially the function kvm_mmu_write_protect_all_pages(), is very helpf=
-ul.
-After a little modifcation, on his patch, can solve this problem, 9s to 0=
-.5s.
+Current behavior of mmu_spte_update_no_track() does not match
+the name of _no_track() as actually the A/D bits are tracked
+and returned to the caller
 
-At the begining of live migration, write protection is only applied to th=
-e top-level SPTE. Then the write from vm trigger the EPT violation, with =
-for_each_shadow_entry write protection is performed at dirct_map.
-Finally the Dirty bit of the target page(at level 1 page table) is cleare=
-d, and the dirty page tracking is started. Of coure, the page where GPA i=
-s located is marked dirty when mmu_set_spte.
-A similar implementation on xen, just emt instead of write protection.
+This patch introduces the real _no_track() function to update
+the spte regardless of A/D bits and rename the original function
+to _track()
 
-What do you think about this solution?
+The _no_track() function will be used by later patches to update
+upper spte which need not care of A/D bits indeed
 
-Xiao Guangrong (3):
-  KVM: MMU: correct the behavior of mmu_spte_update_no_track
-  KVM: MMU: introduce possible_writable_spte_bitmap
-  KVM: MMU: introduce kvm_mmu_write_protect_all_pages
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+---
+ arch/x86/kvm/mmu.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-Zhuang Yanying (1):
-  KVM: MMU: fast cleanup D bit based on fast write protect
-
- arch/x86/include/asm/kvm_host.h |  25 +++-
- arch/x86/kvm/mmu.c              | 259 ++++++++++++++++++++++++++++++++++=
-++++--
- arch/x86/kvm/mmu.h              |   1 +
- arch/x86/kvm/paging_tmpl.h      |  13 +-
- arch/x86/kvm/vmx/vmx.c          |   3 +-
- 5 files changed, 286 insertions(+), 15 deletions(-)
-
---=20
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index ce770b4..eeb3bac 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -731,10 +731,29 @@ static void mmu_spte_set(u64 *sptep, u64 new_spte)
+ }
+ 
+ /*
+- * Update the SPTE (excluding the PFN), but do not track changes in its
++ * Update the SPTE (excluding the PFN) regardless of accessed/dirty
++ * status which is used to update the upper level spte.
++ */
++static void mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
++{
++	u64 old_spte = *sptep;
++
++	WARN_ON(!is_shadow_present_pte(new_spte));
++
++	if (!is_shadow_present_pte(old_spte)) {
++		mmu_spte_set(sptep, new_spte);
++		return;
++	}
++
++	__update_clear_spte_fast(sptep, new_spte);
++}
++
++/*
++ * Update the SPTE (excluding the PFN), the original value is
++ * returned, based on it, the caller can track changes of its
+  * accessed/dirty status.
+  */
+-static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
++static u64 mmu_spte_update_track(u64 *sptep, u64 new_spte)
+ {
+ 	u64 old_spte = *sptep;
+ 
+@@ -769,7 +788,7 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ {
+ 	bool flush = false;
+-	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
++	u64 old_spte = mmu_spte_update_track(sptep, new_spte);
+ 
+ 	if (!is_shadow_present_pte(old_spte))
+ 		return false;
+-- 
 1.8.3.1
