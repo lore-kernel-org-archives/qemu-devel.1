@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40948)
+Received: from eggs.gnu.org ([209.51.188.92]:40934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk59M-0007d8-F8
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:43:55 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gk59S-0007d0-Qe
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:43:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk52w-00056m-60
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:37:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gk52v-00056R-TU
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:37:14 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-35-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d1c5781a-3bcf-6731-a301-4f7e5a42ca87@redhat.com>
-Date: Thu, 17 Jan 2019 11:37:09 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1gk521-0004DL-Ll
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:36:19 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gk521-0004BN-Ev
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:36:17 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t6so10350437wrr.12
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 02:36:13 -0800 (PST)
+Date: Thu, 17 Jan 2019 11:36:09 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190117103609.dzauq4ut2pkqyyqf@steredhat>
+References: <20190116174941.342900-1-sgarzare@redhat.com>
+	<00ff0393-1eab-9bc4-6370-0f959df9dca0@redhat.com>
+	<bbec0a30-6b3e-6ba1-b439-7cc72999ea6b@redhat.com>
+	<20190117075049.lm5sbws73swdmrgq@steredhat>
+	<8108b59f-5140-0bc6-f92e-3ac931753da5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-35-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 34/37] virtio: make virtio
- dependencies with Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8108b59f-5140-0bc6-f92e-3ac931753da5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] pvh: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>
 
-On 2019-01-15 15:11, Yang Zhong wrote:
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/i386-softmmu.mak  |  1 -
->  default-configs/s390x-softmmu.mak |  1 -
->  default-configs/virtio.mak        | 14 --------------
->  hw/9pfs/Kconfig                   |  2 ++
->  hw/block/Kconfig                  |  2 ++
->  hw/char/Kconfig                   |  2 ++
->  hw/display/Kconfig                |  5 +++++
->  hw/input/Kconfig                  |  2 ++
->  hw/net/Kconfig                    |  2 ++
->  hw/pci-host/Kconfig               |  2 ++
->  hw/scsi/Kconfig                   |  1 +
->  hw/virtio/Kconfig                 |  9 ++++++++-
->  12 files changed, 26 insertions(+), 17 deletions(-)
->  delete mode 100644 default-configs/virtio.mak
+On Thu, Jan 17, 2019 at 11:31:27AM +0100, Paolo Bonzini wrote:
+> On 17/01/19 08:50, Stefano Garzarella wrote:
+> >> Also, the $? in the new rule should be $^.  I wouldn't use a pattern
+> >> rule for that, writing it explicitly as "pvh.img: pvh.S pvh_main.c"
+> > I'll fix the Makefile.
+> 
+> (of course it's "pvh.img: pvh.o pvh_main.o").
+> 
+> I can fix up as well if it's okay for you.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I already sent a v4 fixing your comments (and I put "pvh.img: pvh.o
+pvh_main.o" :) ), but if want to fix this series is okay for me.
+
+Thanks,
+Stefano
