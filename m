@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56353)
+Received: from eggs.gnu.org ([209.51.188.92]:56855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gk2vX-0000wr-F1
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 03:21:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1gk2xL-00020u-9O
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 03:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gk2vQ-0004Ki-M5
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 03:21:23 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38931)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gk2vL-0004Db-5n
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 03:21:15 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t27so9929622wra.6
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 00:21:13 -0800 (PST)
-References: <20190116121350.23863-1-alex.bennee@linaro.org>
-	<c8f655ea-3c3b-290e-1bc2-8f7bb755f4af@citrix.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <c8f655ea-3c3b-290e-1bc2-8f7bb755f4af@citrix.com>
-Date: Thu, 17 Jan 2019 08:21:10 +0000
-Message-ID: <874la7zocp.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gk2xK-0006FZ-K7
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 03:23:19 -0500
+References: <20190117075327.22194-1-clg@kaod.org>
+	<20190117075327.22194-5-clg@kaod.org>
+	<20190117092054.355ff46e@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bb422368-b2ea-9239-121b-1dbe78130d1f@redhat.com>
+Date: Thu, 17 Jan 2019 09:23:12 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190117092054.355ff46e@bahia.lan>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] hw/block/xen: use proper
- format string for printing sectors
+Subject: Re: [Qemu-devel] [PATCH 4/4] ppc: remove the interrupt presenters
+ from under PowerPCCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Cooper <andrew.cooper3@citrix.com>
-Cc: peter.maydell@linaro.org, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:Block layer core" <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-
-Andrew Cooper <andrew.cooper3@citrix.com> writes:
-
-> On 16/01/2019 12:13, Alex Benn=C3=A9e wrote:
->> The %lu format string is different depending on the host architecture
->> which causes builds like the debian-armhf-cross build to fail. Use the
->> correct PRi64 format string.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On 2019-01-17 09:20, Greg Kurz wrote:
+> On Thu, 17 Jan 2019 08:53:27 +0100
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >> ---
->>  hw/block/xen-block.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
->> index be28b63442..a636487b3e 100644
->> --- a/hw/block/xen-block.c
->> +++ b/hw/block/xen-block.c
->> @@ -215,7 +215,7 @@ static void xen_block_realize(XenDevice *xendev, Err=
-or **errp)
->>
->>      xen_device_backend_printf(xendev, "sector-size", "%u",
->>                                conf->logical_block_size);
->> -    xen_device_backend_printf(xendev, "sectors", "%lu",
->> +    xen_device_backend_printf(xendev, "sectors", "%"PRIi64,
->
-> PRIu64.
->
-> You've changed the signed-ness of what gets printed.
+>=20
+> The patch looks good, but I think it would be even better to apply this=
+ before
+> Thomas's -std=3Dc99 patchset. This would allow to get rid of the contro=
+versial
+> "ppc: Fix duplicated typedefs to be able to compile  with Clang in gnu9=
+9 mode"
+> patch :)
 
-I was deliberate as:
-  int64_t blk_getlength(BlockBackend *blk);
+Ok, I haven't started to send v3 of my PULL request yet, so I can try to
+use these patches here instead...
 
-although I have to admit a signed block length doesn't make much sense
-to me. At least it isn't going to overflow and will show-up if the block
-length is ever negative.
-
->
-> ~Andrew
-
-
---
-Alex Benn=C3=A9e
+ Thomas
