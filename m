@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57549)
+Received: from eggs.gnu.org ([209.51.188.92]:58266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gk4Uc-0005rl-CH
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:01:52 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gk4WT-0006oQ-2J
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gk4UW-0003Po-Pp
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:01:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42252)
+	(envelope-from <kraxel@redhat.com>) id 1gk4WS-000631-4G
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:03:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gk4UW-0003N0-Jq
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:01:40 -0500
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-5-xieyongji@baidu.com>
-	<ce11d062-1d64-3d35-b617-5c135f1506eb@redhat.com>
-	<CAONzpcY6pdSz65Tzj_Ws0M4vskUOXMuaxQ-uYz6NnCvdMgkFOA@mail.gmail.com>
-	<a6e0c0b2-bd0b-454c-8280-12e0ec964240@redhat.com>
-	<20190115105548-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <3ead48a9-9cf9-33f6-b258-7068265c1a99@redhat.com>
-Date: Thu, 17 Jan 2019 18:01:16 +0800
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gk4WQ-000608-0M
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:03:39 -0500
+Date: Thu, 17 Jan 2019 11:03:34 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190117100334.vh3nbg4pjfwo4eye@sirius.home.kraxel.org>
+References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
+	<82a755097c6aaa16363348599110f9af3bb07583.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115105548-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <82a755097c6aaa16363348599110f9af3bb07583.1547681517.git.DirtY.iCE.hu@gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 4/7] libvhost-user: Support
- tracking inflight I/O in shared memory
+Subject: Re: [Qemu-devel] [PATCH v3 47/50] paaudio: channel-map option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Yongji Xie <elohimes@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+On Thu, Jan 17, 2019 at 12:37:20AM +0100, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1=
+n wrote:
+> Add an option to change the channel map used by pulseaudio.  If not
+> specified, falls back to an OSS compatible channel map.
+>=20
+> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
+om>
+> ---
+>  qapi/audio.json |  5 ++++-
+>  audio/paaudio.c | 18 ++++++++++++++----
+>  qemu-options.hx |  9 +++++++++
+>  3 files changed, 27 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/qapi/audio.json b/qapi/audio.json
+> index 7bcea6240f..86078039dc 100644
+> --- a/qapi/audio.json
+> +++ b/qapi/audio.json
+> @@ -107,11 +107,14 @@
+>  #
+>  # @name: name of the sink/source to use
+>  #
+> +# @channel-map: channel map to use (default: OSS compatible map)
+> +#
+>  # Since: 4.0
+>  ##
+>  { 'struct': 'AudiodevPaPerDirectionOptions',
+>    'data': {
+> -    '*name': 'str' } }
+> +    '*name':        'str',
+> +    '*channel-map': 'str' } }
 
-On 2019/1/15 =E4=B8=8B=E5=8D=8811:58, Michael S. Tsirkin wrote:
-> On Tue, Jan 15, 2019 at 03:52:21PM +0800, Jason Wang wrote:
->> Well, this may work but here're my points:
->>
->> 1) The code want to recover from backed crash by introducing extra spa=
-ce to
->> store inflight data, but it still depends on the backend to set/get th=
-e
->> inflight state
->>
->> 2) Since the backend could be killed at any time, the backend must hav=
-e the
->> ability to recover from the partial inflight state
->>
->> So it looks to me 1) tends to be self-contradictory and 2) tends to be
->> recursive. The above lines show how tricky could the code looks like.
-> This is a well studied field. Basically you make sure you commit with a=
-n
-> atomic write.  Restartable sequences allow accelerating this even
-> further.
+Ah, I see.  Thats why patch #1 creates a AudiodevPaPerDirectionOptions
+struct with just one field ...
 
-
-I'm not sure I get this. But the issue is to exactly deduce all the=20
-inflight descriptors even if backend could be killed when doing the=20
-logging. If we could not be 100% accurate, it's have much less value.
-
-
->
->> Solving this at vhost-user level through at backend is probably wrong.=
- It's
->> time to consider the support from virtio itself.
->>
->> Thanks
-> I think both approaches have their space.
-
-
-But there will be a lot of duplicated work if we decide to support it=20
-from virtio.
-
-Thanks
-
-
->
-> -- MST
+cheers,
+  Gerd
