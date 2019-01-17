@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58705)
+Received: from eggs.gnu.org ([209.51.188.92]:58729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gk69S-00084b-DX
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:48:03 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gk69U-00088J-Cb
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gk69O-0007LI-QF
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:48:00 -0500
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:37132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gk69N-0007HM-Vz
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:47:58 -0500
-Received: by mail-wr1-f51.google.com with SMTP id s12so10672189wrt.4
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 03:47:55 -0800 (PST)
-Date: Thu, 17 Jan 2019 12:47:51 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190117114751.52h3aeg3e4lrf5i6@steredhat>
-References: <1547615970-23545-1-git-send-email-changpeng.liu@intel.com>
+	(envelope-from <yang.zhong@intel.com>) id 1gk69S-0007Rg-U8
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:48:04 -0500
+Received: from mga11.intel.com ([192.55.52.93]:31963)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gk69S-0007Lc-KU
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:48:02 -0500
+Date: Thu, 17 Jan 2019 19:44:20 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190117114420.GF11760@yangzhon-Virtual>
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-7-yang.zhong@intel.com>
+	<56bbd753-dc3d-fef0-0416-cb204893f722@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1547615970-23545-1-git-send-email-changpeng.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] contrib: compile vhost-user-blk
- tool by default
+In-Reply-To: <56bbd753-dc3d-fef0-0416-cb204893f722@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 06/37] hw/mips/Makefile.objs: Create
+ CONFIG_* for r4k, malta, mipssim boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, =?iso-8859-1?Q?=E1kos_Kov=E1cs?= <akoskovacs@gmx.com>, pbonzini@redhat.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-Note: I removed my wrong e-mail address in CC.
-
-On Wed, Jan 16, 2019 at 01:19:28PM +0800, Changpeng Liu wrote:
-> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-> ---
->  configure | 3 +++
->  1 file changed, 3 insertions(+)
+On Wed, Jan 16, 2019 at 09:34:15AM +0100, Thomas Huth wrote:
+> On 2019-01-15 15:10, Yang Zhong wrote:
+[...] 
+> I think that change to the CONFIG_VT82C686 is unrelated and should not
+> be part of this patch. Also looking at commit
 > 
+>  dff4021730b112ca00522d4c98c24a15feeef5a0
+>  mips: Remove CONFIG_VT82C686 from non-Fulong configs
+> 
+> it seems like it should stay in mips64el-softmmu.mak and not be moved to
+> mips-softmmu-common.mak.
+> 
+  Hello Thomas,
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+  Wow, you can find this corner case, and thanks for you detailed review.
+
+  Regards,
+
+  Yang
+
+>  Thomas
