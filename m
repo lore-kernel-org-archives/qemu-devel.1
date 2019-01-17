@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33998)
+Received: from eggs.gnu.org ([209.51.188.92]:34059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk7sS-0006GZ-7o
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gk7sV-0006Jy-Nm
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk7sQ-00064W-Fh
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gk7sO-0005tP-5T
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:34 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 17 Jan 2019 14:38:09 +0100
-Message-Id: <1547732292-14021-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gk7sU-00069r-2h
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:39 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gk7sT-00067s-Pq
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:38:37 -0500
+Received: by mail-wr1-x442.google.com with SMTP id v13so11057502wrw.5
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 05:38:37 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Jan 2019 13:38:34 +0000
+Message-Id: <20190117133834.7480-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
- typedefs and gnu99
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] exec.c: Use correct attrs in
+ cpu_memory_rw_debug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, groug@kaod.org, clg@kaod.org, mst@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
- Hi Peter!
+In the softmmu version of cpu_memory_rw_debug(), we ask the
+CPU for the attributes to use for the virtual memory access,
+and we correctly use those to identify the address space
+index. However, we were not passing them in to the
+address_space_write_rom() and address_space_rw() functions.
 
-The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d970=
-94:
+The effect of this was that a memory access from the gdbstub
+to a device which had behaviour that was sensitive to the
+memory attributes (such as some ARMv8M NVIC registers) was
+incorrectly always performed as if non-secure, rather than
+using the right security state for the CPU's current state.
 
-  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' in=
-to staging (2019-01-15 18:32:57 +0000)
+Fixes: https://bugs.launchpad.net/qemu/+bug/1812091
 
-are available in the git repository at:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ exec.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-  https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
-
-for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1c:
-
-  tests/hexloader-test: Don't pass -nographic to the QEMU under test (201=
-9-01-17 14:25:12 +0100)
-
-----------------------------------------------------------------
-- Remove deprecated "ivshmem" legacy device
-- Bug fix for vhost-user-test
-- Use more CONFIG Makefile switches for qtests
-- Get rid of global_qtests in some more qtests
-- typedef cleanups
-- Fixes for compiling with Clang
-- Force C standard to gnu99
-----------------------------------------------------------------
-
-Li Qiang (3):
-      tests: vhost-user-test: initialize 'fd' in chr_read
-      vhost-user: fix ioeventfd_enabled
-      util: check the return value of fcntl in qemu_set_{block, nonblock}
-
-Peter Maydell (1):
-      tests/hexloader-test: Don't pass -nographic to the QEMU under test
-
-Philippe Mathieu-Daud=C3=A9 (12):
-      hw/input/ps2: Remove PS2State from "qemu/typedefs.h"
-      hw/pcmcia: Remove PCMCIACardState from "qemu/typedefs.h"
-      hw/ide/ahci: Remove AllwinnerAHCIState from "qemu/typedefs.h"
-      hw/i2c/smbus: Remove SMBusDevice from "qemu/typedefs.h"
-      hw/bt: Remove HCIInfo from "qemu/typedefs.h"
-      hw/char/serial: Remove SerialState from "qemu/typedefs.h"
-      hw/i386: Remove PCMachineClass from "qemu/typedefs.h"
-      audio: Remove AudioState from "qemu/typedefs.h"
-      ui/console: Remove QemuDmaBuf from "qemu/typedefs.h"
-      ui/console: Remove DisplayState/DisplaySurface from "qemu/typedefs.=
-h"
-      ui/console: Remove MouseTransformInfo from qemu/typedefs.h
-      ui/console: Remove PixelFormat from qemu/typedefs.h
-
-Thomas Huth (12):
-      hw/misc/ivshmem: Remove deprecated "ivshmem" legacy device
-      tests/Makefile: Use some more CONFIG switches for x86 tests
-      tests/Makefile: Use some more CONFIG switches for ppc tests
-      tests/endianesss: Make test independent of global_qtest
-      tests/boot-order: Make test independent of global_qtest
-      tests/pnv-xscom: Make test independent of global_qtest
-      ppc: Move spapr-related prototypes from xics.h into a seperate head=
-er file
-      ppc: Fix duplicated typedefs to be able to compile with Clang in gn=
-u99 mode
-      linux-user: Fix compilation with clang 3.4
-      block: Work-around a bug in libiscsi 1.9.0 when used in gnu99 mode
-      seccomp: Work-around GCC 4.x bug in gnu99 mode
-      configure: Force the C standard to gnu99
-
- audio/audio_int.h           |   4 +-
- block/iscsi.c               |   2 +
- configure                   |   5 +-
- docs/specs/ivshmem-spec.txt |   8 +-
- hw/i386/pc_piix.c           |   1 -
- hw/intc/xics_kvm.c          |   1 +
- hw/intc/xics_spapr.c        |   1 +
- hw/misc/ivshmem.c           | 210 +---------------------------
- hw/ppc/spapr_irq.c          |   1 +
- hw/virtio/vhost-user.c      |   2 +-
- include/hw/arm/pxa.h        |   1 +
- include/hw/char/serial.h    |   4 +-
- include/hw/devices.h        |   1 +
- include/hw/i2c/smbus.h      |   2 +
- include/hw/i386/pc.h        |   4 +-
- include/hw/ide/ahci.h       |   4 +-
- include/hw/input/ps2.h      |   2 +
- include/hw/pcmcia.h         |   4 +-
- include/hw/ppc/spapr.h      |   5 +-
- include/hw/ppc/spapr_xive.h |   2 -
- include/hw/ppc/xics.h       |   7 -
- include/hw/ppc/xics_spapr.h |  37 +++++
- include/qemu/compiler.h     |   4 +
- include/qemu/typedefs.h     |  13 --
- include/sysemu/bt.h         |   4 +-
- include/ui/console.h        |  24 ++--
- include/ui/qemu-pixman.h    |  10 ++
- linux-user/qemu.h           |   6 +-
- qemu-deprecated.texi        |   5 -
- qemu-seccomp.c              |   3 +-
- scripts/device-crash-test   |   1 -
- target/ppc/cpu.h            |   9 +-
- tests/Makefile.include      |  22 +--
- tests/boot-order-test.c     |  59 ++++----
- tests/endianness-test.c     | 329 ++++++++++++++++++++++----------------=
-------
- tests/hexloader-test.c      |   2 +-
- tests/ivshmem-test.c        |  67 ++++-----
- tests/pnv-xscom-test.c      |  29 ++--
- tests/vhost-user-test.c     |   2 +-
- util/oslib-posix.c          |   8 +-
- 40 files changed, 361 insertions(+), 544 deletions(-)
- create mode 100644 include/hw/ppc/xics_spapr.h
+diff --git a/exec.c b/exec.c
+index 6e875f0640a..2f0f40b0be6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3881,12 +3881,10 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+         phys_addr += (addr & ~TARGET_PAGE_MASK);
+         if (is_write) {
+             address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr,
+-                                    MEMTXATTRS_UNSPECIFIED,
+-                                    buf, l);
++                                    attrs, buf, l);
+         } else {
+             address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
+-                             MEMTXATTRS_UNSPECIFIED,
+-                             buf, l, 0);
++                             attrs, buf, l, 0);
+         }
+         len -= l;
+         buf += l;
+-- 
+2.20.1
