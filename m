@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37965)
+Received: from eggs.gnu.org ([209.51.188.92]:40836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gk3eg-0006fJ-EC
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:08:08 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gk3my-0002rF-ES
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gk3ec-0003pU-BL
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:08:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35080)
+	(envelope-from <eric.auger@redhat.com>) id 1gk3mw-0002H1-QG
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56910)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gk3ec-0003p2-11
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:08:02 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
-	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
-	<20190116132953.404247ec@redhat.com>
-	<20190116110052-mutt-send-email-mst@kernel.org>
-	<d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
-Message-ID: <979f490a-f316-fb4b-b4fb-3ef563882b8d@redhat.com>
-Date: Thu, 17 Jan 2019 09:58:12 +0100
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gk3mw-00022u-Gw
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:16:38 -0500
+References: <20190111165801.15181-1-eric.auger@redhat.com>
+	<20190111165801.15181-2-eric.auger@redhat.com>
+	<faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <739abfa7-5faa-0c0c-7e81-80136e702e08@redhat.com>
+Date: Thu, 17 Jan 2019 10:16:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
+In-Reply-To: <faafbd89-9420-d0ae-5bed-409056ba86b6@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-pci: Introduce
+ vfio_register_event_notifier helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,125 +31,397 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
-On 01/17/19 09:53, Laszlo Ersek wrote:
-> Hello Michael,
+Hi Alexey, Cornelia,
+
+On 1/17/19 4:46 AM, Alexey Kardashevskiy wrote:
 > 
-> On 01/16/19 17:01, Michael S. Tsirkin wrote:
->> On Wed, Jan 16, 2019 at 01:29:53PM +0100, Igor Mammedov wrote:
->>> On Tue, 15 Jan 2019 21:47:49 +0100
->>> Laszlo Ersek <lersek@redhat.com> wrote:
->>>
->>>> On 01/15/19 16:41, Igor Mammedov wrote:
->>>>> Add firmware blobs built with PcdAcpiTestSupport=TRUE,
->>>>> that puts RSDP address in RAM after 1Mb aligned GUID
->>>>>   AB87A6B1-2034-BDA0-71BD-375007757785
->>>>> so that tests could scan and find it in RAM once firmware's
->>>>> initialized ACPI tables.
->>>>>
->>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>>> ---
->>>>>  Makefile              |   3 ++-
->>>>>  pc-bios/avmf.img      | Bin 0 -> 2097152 bytes
->>>>>  pc-bios/avmf_vars.img | Bin 0 -> 786432 bytes
->>>>>  3 files changed, 2 insertions(+), 1 deletion(-)
->>>>>  create mode 100644 pc-bios/avmf.img
->>>>>  create mode 100644 pc-bios/avmf_vars.img  
->>>>
->>>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
->>>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
->>>> would be more precise, but those are verbose. Sigh, why are names so
->>>> hard. What does everyone think?
->>> I'm fine with either version.
->>>  
->>>> Also, do you have to care about the license of firmware images built
->>>> from edk2 when bundling such images? Since edk2 commit 9a67ba261fe9
->>>> ("ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF.",
->>>> 2018-12-14), you cannot build the ArmVirtQemu (aka AAVMF) firmware
->>>> without OpenSSL. Thus, the resultant license is 2-BSDL + OpenSSL -- for
->>>> now anyway.
->>>>
->>>> Because, in the near future, that might change again. edk2 is in the
->>>> process of moving to Apache-2.0, and OpenSSL will also move (AFAICT) to
->>>> Apache-2.0 starting with release 3.0.0. (See commit 151333164ece,
->>>> "Change license to the Apache License v2.0", 2018-12-06.)
->>> That's another reason to look into EFI app approach (a simple one without
->>> dependencies) ans let distro to provide firmware image.
+> 
+> On 12/01/2019 03:58, Eric Auger wrote:
+>> The code used to attach the eventfd handler for the ERR and
+>> REQ irq indices can be factorized into a helper. In subsequent
+>> patches we will extend this helper to support other irq indices.
 >>
->> That will mean supporting very old firmware with the app.
->> I'm all for the EFI app approach for modularity
->> but I think we should include the batteries with this toy.
+>> We test the notification is allowed outside of the helper:
+>> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+>> Depending on the returned value we set vdev->pci_aer and
+>> vdev->req_enabled. An error handle is introduced for future usage
+>> although not strictly useful here.>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/vfio/pci.c | 291 ++++++++++++++++++++++----------------------------
+>>  1 file changed, 127 insertions(+), 164 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index c0cb1ec289..c589a4e666 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -105,6 +105,95 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+>>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+>>  }
+>>  
+>> +/*
+>> + * vfio_register_event_notifier - setup/tear down eventfd
+>> + * notification and handling for IRQ indices that span over
+>> + * a single IRQ
+>> + *
+>> + * @vdev: VFIO device handle
+>> + * @index: IRQ index the eventfd/handler is associated to
+>> + * @target_state: true means notifier needs to be set up
+>> + * @handler to attach if @target_state is true
+>> + * @errp error handle
+>> + */
+>> +static int vfio_register_event_notifier(VFIOPCIDevice *vdev,
+>> +                                        int index,
+>> +                                        bool target_state,
+>> +                                        void (*handler)(void *opaque),
+>> +                                        Error **errp)
+>> +{
+>> +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+>> +                                      .index = index };
+>> +    struct vfio_irq_set *irq_set;
+>> +    EventNotifier *notifier;
+>> +    int argsz, ret = 0;
+>> +    int32_t *pfd, fd;
+>> +
+>> +    switch (index) {
 > 
-> There are two approaches here. (Both require that edk2 be present in the
-> QEMU source tree as a submodule, and both require QEMU to receive a
-> script for building edk2 in *some* way.)
-> 
-> 
-> (1) Carry the bios-tables-test helper UEFI app as an "out of tree"
-> module, from the perspective of edk2; carry it natively in the QEMU tree.
-> 
-> * Edk2 supports this use case as a first class citizen.
-> 
-> * In this case, the UEFI application is permitted to link only such
-> libraries from edk2 that the resultant binary inherit no platform
-> dependencies. The app can only be made dependent on a minimum UEFI spec
-> release, if necessary. The resultant binary can be run on any conformant
-> UEFI implementation, including physical hardware.
-> 
-> An example for "platform dependency prohibition" is that the X64 build
-> of the app could not print debug messages to the QEMU debug port (like
-> the rest of OVMF does), only to the UEFI console. On OVMF, that console
-> would direct the debug messages to the serial port and the graphics card.
-> 
-> Regarding a minimum UEFI spec release, the oldest UEFI spec I have on my
-> disk is "2.3.1, Errata C", dated "June 27, 2012". I'm not aware of
-> anything in the helper app that requires more recent spec features.
-> 
-> * Should we have to extend the UEFI app with a feature, we could easily
-> do that in sync with the consumer QEMU test code.
-> 
-> * The build output to commit to the QEMU repo would be an ISO image
-> containing the UEFI binary as a "boot loader". It would not contain
-> OpenSSL bits. The derived license would be a combination of core edk2's
-> license and our out-of-edk2-module's license.
-> 
-> 
-> (2) Carry the bios-tables-test helper *functionality* (not necessarily a
-> standalone UEFI application) in edk2; add a custom build flag to the
-> OVMF and ArmVirtQemu firmware platforms to enable the helper functionality.
-> 
-> * In this case, the test helper logic is permitted to rely on platform
-> internals. For example, on X64, it could print debug messages to the
-> QEMU debug port, like the rest of OVMF does.
-> 
-> * Whenever a new feature became necessary, edk2 would get new patches,
-> then QEMU would bump the submodule commit reference accordingly.
-> 
-> * The build output to commit to the QEMU repo would be a custom firmware
-> image (built with the special build flag mentioned above), and no other
-> bootable media would be formatted / saved. The custom firmware image
-> would contain OpenSSL bits. The image's license would be derived from
-> edk2 and from the OpenSSL submodule used by edk2.
-> 
-> * Also, the custom firmware image would not be suitable for "production"
-> use, so it couldn't be at once bundled under pc-bios as well -- that
-> would remain a separate RFE.
-> 
-> 
-> Since last night, I have some rough patches for (1), including the
-> QEMU-side Makefile + build script.
-> 
-> Regarding (2), I also have the edk2-native code ready (I had posted it a
-> few weeks back -- that's what Igor used now). For the QEMU side of
-> approach (2), I reckon I could reuse most of the build script I already
-> have for (1).
-> 
-> Could we please decide for (1) vs (2), before I put more work into (1)?
+> I'd pass the notifier as a parameter as well so index/handler/notifier
+> would walk together.
 
-Sorry, borked English, I meant "decide between (1) and (2)". I didn't
-intend to express a preference (I don't have one).
+I tend to agree with Cornelia. moving the notifier out of this helper
+would remove some factorization and this way, the caller does not have
+to care about it.
+> 
+> 
+>> +    case VFIO_PCI_REQ_IRQ_INDEX:
+>> +        notifier = &vdev->req_notifier;
+>> +        break;
+>> +    case VFIO_PCI_ERR_IRQ_INDEX:
+>> +        notifier = &vdev->err_notifier;
+>> +        break;
+>> +    default:
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    if (ioctl(vdev->vbasedev.fd,
+>> +              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+>> +        error_setg_errno(errp, errno,
+>> +                         "no irq index %d available", index);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    if (target_state) {
+>> +        ret = event_notifier_init(notifier, 0);
+>> +        if (ret) {
+>> +            error_setg_errno(errp, -ret,
+>> +                             "Unable to init event notifier for irq index %d",
+>> +                             index);
+>> +            return ret;
+>> +        }
+>> +    }
+>> +
+>> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> +
+>> +    irq_set = g_malloc0(argsz);
+>> +    irq_set->argsz = argsz;
+>> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> +    irq_set->index = index;
+>> +    irq_set->start = 0;
+>> +    irq_set->count = 1;
+>> +    pfd = (int32_t *)&irq_set->data;
+>> +
+>> +    if (!notifier) {
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    fd = event_notifier_get_fd(notifier);
+>> +
+>> +    if (target_state) {
+>> +        qemu_set_fd_handler(fd, handler, NULL, vdev);
+>> +        *pfd = fd;
+>> +    } else {
+>> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+>> +        event_notifier_cleanup(notifier);
+>> +        *pfd = -1;
+>> +    }
+>> +
+>> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> +    g_free(irq_set);
+>> +
+>> +    if (ret) {
+>> +        error_setg_errno(errp, -ret,
+>> +                         "vfio: Failed to %s eventfd signalling for index %d",
+>> +                         *pfd < 0 ? "set up" : "tear down", index);
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>>  static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>>  {
+>>  #ifdef CONFIG_KVM
+>> @@ -2621,86 +2710,6 @@ static void vfio_err_notifier_handler(void *opaque)
+>>      vm_stop(RUN_STATE_INTERNAL_ERROR);
+>>  }
+>>  
+>> -/*
+>> - * Registers error notifier for devices supporting error recovery.
+>> - * If we encounter a failure in this function, we report an error
+>> - * and continue after disabling error recovery support for the
+>> - * device.
+>> - */
+>> -static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int ret;
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!vdev->pci_aer) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (event_notifier_init(&vdev->err_notifier, 0)) {
+>> -        error_report("vfio: Unable to init event notifier for error detection");
+>> -        vdev->pci_aer = false;
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -
+>> -    *pfd = event_notifier_get_fd(&vdev->err_notifier);
+>> -    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
+>> -
+>> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> -    if (ret) {
+>> -        error_report("vfio: Failed to set up error notification");
+>> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+>> -        event_notifier_cleanup(&vdev->err_notifier);
+> 
+> 
+> qemu_set_fd_handler() and event_notifier_cleanup() have not made it to
+> the new vfio_register_event_notifier() for the case when
+> ioctl(VFIO_DEVICE_SET_IRQS) failed.
 
-Thanks,
-Laszlo
+definitively missing. Thanks!
+> 
+> 
+>> -        vdev->pci_aer = false;
+>> -    }
+>> -    g_free(irq_set);
+>> -}
+>> -
+>> -static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -    int ret;
+>> -
+>> -    if (!vdev->pci_aer) {
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -    *pfd = -1;
+>> -
+>> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> -    if (ret) {
+>> -        error_report("vfio: Failed to de-assign error fd: %m");
+>> -    }
+>> -    g_free(irq_set);
+>> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
+>> -                        NULL, NULL, vdev);
+>> -    event_notifier_cleanup(&vdev->err_notifier);
+>> -}
+>> -
+>>  static void vfio_req_notifier_handler(void *opaque)
+>>  {
+>>      VFIOPCIDevice *vdev = opaque;
+>> @@ -2716,86 +2725,6 @@ static void vfio_req_notifier_handler(void *opaque)
+>>      }
+>>  }
+>>  
+>> -static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+>> -                                      .index = VFIO_PCI_REQ_IRQ_INDEX };
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd,
+>> -              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (event_notifier_init(&vdev->req_notifier, 0)) {
+>> -        error_report("vfio: Unable to init event notifier for device request");
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -
+>> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
+>> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+>> -        error_report("vfio: Failed to set up device request notification");
+>> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> 
+> Same here.
+> 
+> 
+>> -        event_notifier_cleanup(&vdev->req_notifier);
+>> -    } else {
+>> -        vdev->req_enabled = true;
+>> -    }
+>> -
+>> -    g_free(irq_set);
+>> -}
+>> -
+>> -static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!vdev->req_enabled) {
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -    *pfd = -1;
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+>> -        error_report("vfio: Failed to de-assign device request fd: %m");
+>> -    }
+>> -    g_free(irq_set);
+>> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
+>> -                        NULL, NULL, vdev);
+>> -    event_notifier_cleanup(&vdev->req_notifier);
+>> -
+>> -    vdev->req_enabled = false;
+>> -}
+>> -
+>>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>  {
+>>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+>> @@ -3069,8 +2998,29 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>          goto out_teardown;
+>>      }
+>>  
+>> -    vfio_register_err_notifier(vdev);
+>> -    vfio_register_req_notifier(vdev);
+>> +    if (vdev->pci_aer) {
+>> +        /*
+>> +         * Registers error notifier for devices supporting error recovery.
+>> +         * If we encounter a failure in this function, we report an error
+>> +         * and continue after disabling error recovery support for the
+>> +         * device.
+>> +         */
+>> +        vdev->pci_aer =
+>> +            !vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
+>> +                                          vfio_err_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+> 
+> 
+> As the commit log said, these returned @err are not particularly useful
+> as they are handled exactly the same way and they are not forwarded further.
+Yes that's awkward but the issue is vfio_intx_enable() propagates the error.
+> 
+> Also, the new helper returns int which is not tested anywhere and it can
+> also return with an error and err==NULL so these errors will be silently
+> skipped. Some consistency here would not hurt :)
+Yes I think I will make it a void function and the caller will only test
+err.
+
+Thank you for the review!
+
+Eric
+> 
+> 
+>> +    }
+>> +
+>> +    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
+>> +        vdev->req_enabled =
+>> +            !vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
+>> +                                          vfio_req_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>>      vfio_setup_resetfn_quirk(vdev);
+>>  
+>>      return;
+>> @@ -3106,9 +3056,22 @@ static void vfio_instance_finalize(Object *obj)
+>>  static void vfio_exitfn(PCIDevice *pdev)
+>>  {
+>>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+>> +    Error *err = NULL;
+>>  
+>> -    vfio_unregister_req_notifier(vdev);
+>> -    vfio_unregister_err_notifier(vdev);
+>> +    if (vdev->req_enabled) {
+>> +        vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX,
+>> +                                     false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>> +    if (vdev->pci_aer) {
+>> +        vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX,
+>> +                                     false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+>>      vfio_disable_interrupts(vdev);
+>>      if (vdev->intx.mmap_timer) {
+>>
+> 
