@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39393)
+Received: from eggs.gnu.org ([209.51.188.92]:42517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gk6dM-0005lX-Sd
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:18:57 -0500
+	(envelope-from <david@redhat.com>) id 1gk6vd-0000rB-Qs
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gk6dM-00078j-1d
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:18:56 -0500
+	(envelope-from <david@redhat.com>) id 1gk6iJ-0004Tx-OD
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:24:04 -0500
 References: <20190116113523.9213-1-david@redhat.com>
 	<20190116113523.9213-5-david@redhat.com>
-	<7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
+	<20190116192025.GB27437@kermit-br-ibm-com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <61f73087-0de9-fb38-fa5d-237a1640ff79@redhat.com>
-Date: Thu, 17 Jan 2019 13:18:34 +0100
+Message-ID: <e76b42e6-c7bb-2ed4-bfa3-07d979bb9da4@redhat.com>
+Date: Thu, 17 Jan 2019 13:23:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
+In-Reply-To: <20190116192025.GB27437@kermit-br-ibm-com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC 04/10] virtio-pmem: Prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 16.01.19 15:46, Eric Blake wrote:
-> On 1/16/19 5:35 AM, David Hildenbrand wrote:
->> From: Pankaj Gupta <pagupta@redhat.com>
->>
->> This is the current protoype of virtio-pmem. Support will require
->> machine changes for the architectures that will support it, so it will
->> not yet be compiled.
->>
->> TODO:
->> - Use separate struct for tracking requests internally
->> - Move request/response structs to linux headers
->> - Factor out linux header sync
->> - Drop debug printfs
->>
->> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
->> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
->>   split up patches, unplug handler ]
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
+>> +static void virtio_pmem_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>> +    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
+>> +
+>> +    if (!pmem->memdev) {
+>> +        error_setg(errp, "virtio-pmem memdev not set");
+>> +        return;
+>> +    } else if (host_memory_backend_is_mapped(pmem->memdev)) {
+>> +        char *path = object_get_canonical_path_component(OBJECT(pmem->memdev));
+>> +        error_setg(errp, "can't use already busy memdev: %s", path);
+>> +        g_free(path);
+>> +        return;
+>> +    }
 > 
->> +++ b/qapi/misc.json
->> @@ -2949,6 +2949,29 @@
->>            }
->>  }
->>  
->> +##
->> +# @VirtioPMEMDeviceInfo:
->> +#
->> +# VirtioPMEM state information
->> +#
->> +# @id: device's ID
->> +#
->> +# @memaddr: physical address in memory, where device is mapped
->> +#
->> +# @size: size of memory that the device provides
->> +#
->> +# @memdev: memory backend linked with device
->> +#
->> +# Since: 3.1
-> 
-> Now 4.0
+> Perhaps splitting this if-else block could improve readability:
 
-Indeed. (if we'll get it into 4.0 of course ;) )
+Makes sense, this was kept similar to from
+hw/mem/pc-dimm.c:pc_dimm_realize()
+
 > 
->> +##
->> +{ 'struct': 'VirtioPMEMDeviceInfo',
->> +  'data': { '*id': 'str',
->> +            'memaddr': 'size',
->> +            'size': 'size',
->> +            'memdev': 'str'
->> +          }
+>     if (!pmem->memdev) {
+>         error_setg(...);
+> 	return;
+>     }
+> 
+>     if (host_memory_backend_is_mapped(pmem->memdev)) {
+>        /* do stuff */
+>        return;
+>     }
+> 
+>     /* do other stuffs */
+> 
+>> +
+>> +    host_memory_backend_set_mapped(pmem->memdev, true);
+>> +    virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
+>> +                                          sizeof(struct virtio_pmem_config));
+> 
+> I'm not quite sure what's the QEMU style for indenting this.  There
+> are, for example, calls to warn_report() in other source files that
+> are indented at the left side after the opening parenthesis.
+> 
+> Perhaps indenting it like this is preferable?
+> 
+>     virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
+>                 sizeof(struct virtio_pmem_config));
+
+Indeed, that looks weird.
+
+> 
+>> +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
 >> +}
 >> +
->>  ##
->>  # @MemoryDeviceInfo:
->>  #
->> @@ -2958,7 +2981,8 @@
->>  ##
->>  { 'union': 'MemoryDeviceInfo',
+>> +static void virtio_pmem_unrealize(DeviceState *dev, Error **errp)
+>> +{
+>> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>> +    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
+>> +
+>> +    host_memory_backend_set_mapped(pmem->memdev, false);
+>> +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
+>> +    virtio_cleanup(vdev);
+>> +}
+>> +
+>> +static void virtio_pmem_fill_device_info(const VirtIOPMEM *pmem,
+>> +                                         VirtioPMEMDeviceInfo *vi)
+>> +{
+>> +    vi->memaddr = pmem->start;
+>> +    vi->size = pmem->memdev ? memory_region_size(&pmem->memdev->mr) : 0;
+>> +    vi->memdev = object_get_canonical_path(OBJECT(pmem->memdev));
+>> +}
+>> +
+>> +static MemoryRegion *virtio_pmem_get_memory_region(VirtIOPMEM *pmem,
+>> +                                                   Error **errp)
+>> +{
+>> +    if (!pmem->memdev) {
+>> +        error_setg(errp, "'%s' property must be set", VIRTIO_PMEM_MEMDEV_PROP);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    return &pmem->memdev->mr;
+>> +}
+>> +
+>> +static Property virtio_pmem_properties[] = {
+>> +    DEFINE_PROP_UINT64(VIRTIO_PMEM_ADDR_PROP, VirtIOPMEM, start, 0),
+>> +    DEFINE_PROP_LINK(VIRTIO_PMEM_MEMDEV_PROP, VirtIOPMEM, memdev,
+>> +                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void virtio_pmem_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+>> +    VirtIOPMEMClass *vpc = VIRTIO_PMEM_CLASS(klass);
+>> +
+>> +    dc->props = virtio_pmem_properties;
+>> +
+>> +    vdc->realize = virtio_pmem_realize;
+>> +    vdc->unrealize = virtio_pmem_unrealize;
+>> +    vdc->get_config = virtio_pmem_get_config;
+>> +    vdc->get_features = virtio_pmem_get_features;
+>> +
+>> +    vpc->fill_device_info = virtio_pmem_fill_device_info;
+>> +    vpc->get_memory_region = virtio_pmem_get_memory_region;
+>> +}
+>> +
+>> +static TypeInfo virtio_pmem_info = {
+>> +    .name          = TYPE_VIRTIO_PMEM,
+>> +    .parent        = TYPE_VIRTIO_DEVICE,
+>> +    .class_size    = sizeof(VirtIOPMEMClass),
+>> +    .class_init    = virtio_pmem_class_init,
+>> +    .instance_size = sizeof(VirtIOPMEM),
+>> +};
+>> +
+>> +static void virtio_register_types(void)
+>> +{
+>> +    type_register_static(&virtio_pmem_info);
+>> +}
+>> +
+>> +type_init(virtio_register_types)
+>> diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-pmem.h
+>> new file mode 100644
+>> index 0000000000..85cee3ef39
+>> --- /dev/null
+>> +++ b/include/hw/virtio/virtio-pmem.h
+>> @@ -0,0 +1,54 @@
+>> +/*
+>> + * Virtio pmem device
 > 
-> Does this union need a documentation update that virtio-pmem was added
-> in 4.0?
+> What if "pmem" was in upper case to match the header in virtio-pmem.c?
+> 
+>> + *
+>> + * Copyright Red Hat, Inc. 2018
+> 
+> This is slightly different from what is in virtio-pmem.c header.
+> Perhaps "(C)" is missing here.
 
-We can add that, makes sense!
+Thanks for the hint, that is indeed not consistent.
+
+[...]
+>> +#define TYPE_VIRTIO_PMEM "virtio-pmem"
+>> +
+>> +#define VIRTIO_PMEM(obj) \
+>> +        OBJECT_CHECK(VirtIOPMEM, (obj), TYPE_VIRTIO_PMEM)
+> 
+> This indentation is slightly different from the other two macros
+> below.
+
+Will be made consistent.
 
 Thanks!
-
-> 
->>    'data': { 'dimm': 'PCDIMMDeviceInfo',
->> -            'nvdimm': 'PCDIMMDeviceInfo'
->> +            'nvdimm': 'PCDIMMDeviceInfo',
->> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
->>            }
->>  }
->>  
->>
-> 
-
 
 -- 
 
