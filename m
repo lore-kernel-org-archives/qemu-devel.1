@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34433)
+Received: from eggs.gnu.org ([209.51.188.92]:36298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gkB4x-000466-Tc
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkBCf-0000ai-N8
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gkB4v-0005N7-OJ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:43 -0500
-Received: from mail-eopbgr680127.outbound.protection.outlook.com
-	([40.107.68.127]:37924
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gkB4v-0005GL-IV
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:03:41 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 17 Jan 2019 17:03:29 +0000
-Message-ID: <BN6PR2201MB12512974D97B0E8BD05D162FC6830@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1547403692.git.noring@nocrew.org>,
-	<dccb35585b1e6f333e6809234cb9eacf63d5a686.1547403692.git.noring@nocrew.org>,
-	<BN6PR2201MB125192D10C9D6C9D52F0E01FC6810@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB125192D10C9D6C9D52F0E01FC6810@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkBCe-0004xo-Gh
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:11:41 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 17 Jan 2019 17:11:31 +0000
+Message-ID: <a62787bc-b6cb-5fe6-75bb-c67c6ec5db01@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-18-eblake@redhat.com>
+	<2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
+	<071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
+In-Reply-To: <071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0EA81AC68B21A04287A8293766DE7320@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/9] target/mips: Introduce 32 R5900
- 128-bit multimedia registers
+Subject: Re: [Qemu-devel] [PATCH v3 17/19] qemu-nbd: Add --list option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +27,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-> From: Aleksandar Markovic
-> Sent: Tuesday, January 15, 2019 10:20 PM
-> To: Fredrik Noring; Aurelien Jarno; Philippe Mathieu-Daud=E9
-> Cc: J=FCrgen Urban; Maciej W. Rozycki; qemu-devel@nongnu.org
-> Subject: Re: [PATCH 2/9] target/mips: Introduce 32 R5900 128-bit multimed=
-ia registers
->=20
-> > From: Fredrik Noring <noring@nocrew.org>
-> > Sent: Sunday, January 13, 2019 8:03 PM
-> > To: Aleksandar Markovic; Aurelien Jarno; Philippe Mathieu-Daud=E9
-> > Cc: J=FCrgen Urban; Maciej W. Rozycki; qemu-devel@nongnu.org
-> > Subject: [PATCH 2/9] target/mips: Introduce 32 R5900 128-bit multimedia=
- registers
-> >
-> > The 32 R5900 128-bit MMRs are split into two 64-bit halves: the lower
-> > halves are the GPRs and the upper halves are accessible by the R5900-
-> > specific multimedia instructions.
-> >
-> > Signed-off-by: Fredrik Noring <noring@nocrew.org>
-> > ---
-
-Since this patch is not a subject of any disagreement, and "#ifdef"
-structure is of a cosmetic nature, I will do these minor cosmetic
-changes while applying, and insert this patch in the next MIPS pull
-request, scheduled shortly.
-
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-Other patches from this series will not be in the pull request.
-
-> >  target/mips/cpu.h       |  2 ++
-> >  target/mips/translate.c | 14 ++++++++++++--
-> >  2 files changed, 14 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> > index 03c03fd8c6..9ff4a68d90 100644
-> > --- a/target/mips/cpu.h
-> > +++ b/target/mips/cpu.h
-> > @@ -180,6 +180,8 @@ struct TCState {
-> >  #define MXU_CR_RD_EN    1
-> >  #define MXU_CR_MXU_EN   0
-> >
-> > +    /* Upper 64-bit MMRs (multimedia registers); the lower 64-bit are =
-GPRs */
-> > +    uint64_t mmr[32];
-> >  };
-> >
-> >  typedef struct CPUMIPSState CPUMIPSState;
-> > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> > index a538351032..9d5150ec8b 100644
-> > --- a/target/mips/translate.c
-> > +++ b/target/mips/translate.c
-> > @@ -2455,7 +2455,10 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
-> >  static TCGv_i64 fpu_f64[32];
-> >  static TCGv_i64 msa_wr_d[64];
-> >
-> > -#if !defined(TARGET_MIPS64)
-> > +#if defined(TARGET_MIPS64)
-> > +/* Upper 64-bit MMRs (multimedia registers); the lower 64-bit are GPRs=
- */
-> > +static TCGv_i64 cpu_mmr[32];
-> > +#else
->=20
-> Naming is perfect, but:
->=20
-> #if-#else-#endif is confusing here:
-> - MMR declaration should be under it own #if defined(TARGET_MIPS64)
-> - MXU declaration should be under separate #if !defined(TARGET_MIPS64)
-> (we are not dealing with two variants (64/32) of the same item, but with =
-two
-> separate items, one is valid for 64-bit only, another for 32-bit only)
->=20
-> >  /* MXU registers */
-> >  static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-> >  static TCGv mxu_CR;
-> > @@ -29785,7 +29788,14 @@ void mips_tcg_init(void)
-> >      fpu_fcr31 =3D tcg_global_mem_new_i32(cpu_env,
-> >                                         offsetof(CPUMIPSState, active_f=
-pu.fcr31),
-> >                                         "fcr31");
-> > -#if !defined(TARGET_MIPS64)
-> > +#if defined(TARGET_MIPS64)
-> > +    cpu_mmr[0] =3D NULL;
-> > +    for (i =3D 1; i < 32; i++)
-> > +        cpu_mmr[i] =3D tcg_global_mem_new_i64(cpu_env,
-> > +                                            offsetof(CPUMIPSState,
-> > +                                                     active_tc.mmr[i])=
-,
-> > +                                            regnames[i]);
-> > +#else
-> >      for (i =3D 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
-> >          mxu_gpr[i] =3D tcg_global_mem_new(cpu_env,
-> >                                          offsetof(CPUMIPSState,
-> > --
->=20
-> The same applies here.
->=20
-> > 2.19.2
->=20
-> =
+MTcuMDEuMjAxOSAxOTo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNy8xOSA0OjA1IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
+OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBXZSB3YW50IHRvIGJlIGFibGUgdG8gZGV0ZWN0IHdo
+ZXRoZXIgYSBnaXZlbiBxZW11IE5CRCBzZXJ2ZXIgaXMNCj4+PiBleHBvc2luZyB0aGUgcmlnaHQg
+ZXhwb3J0KHMpIGFuZCBkaXJ0eSBiaXRtYXBzLCBhdCBsZWFzdCBmb3INCj4+PiByZWdyZXNzaW9u
+IHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhlIHVwc3RyZWFt
+DQo+Pj4gTkJEIHByb2plY3QgdG8gbGlzdCBleHBvcnRzLCBidXQgaXQncyBhbm5veWluZyB0byBy
+ZWx5IG9uDQo+Pj4gb3V0LW9mLXRyZWUgYmluYXJpZXM7IGZ1cnRoZXJtb3JlLCBuYmQtY2xpZW50
+IGRvZXNuJ3QgbmVjZXNzYXJpbHkNCj4+PiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBOQkQg
+ZXh0ZW5zaW9ucy4gIFRodXMsIGl0IGlzIHRpbWUgdG8gYWRkDQo+Pj4gYSBuZXcgbW9kZSB0byBx
+ZW11LW5iZCB0aGF0IG1lcmVseSBzbmlmZnMgYWxsIHBvc3NpYmxlIGluZm9ybWF0aW9uDQo+Pj4g
+ZnJvbSB0aGUgc2VydmVyIGR1cmluZyBoYW5kc2hha2UgcGhhc2UsIHRoZW4gZGlzY29ubmVjdHMg
+YW5kIGR1bXBzDQo+Pj4gdGhlIGluZm9ybWF0aW9uLg0KPj4+DQo+Pj4gVGhpcyBwYXRjaCBhY3R1
+YWxseSBpbXBsZW1lbnRzIC0tbGlzdC8tTCwgd2hpbGUgcmV1c2luZyBvdGhlcg0KPj4+IG9wdGlv
+bnMgc3VjaCBhcyAtLXRscy1jcmVkcyBmb3Igbm93IGRlc2lnbmF0aW5nIGhvdyB0byBjb25uZWN0
+DQo+Pj4gYXMgdGhlIGNsaWVudCAocmF0aGVyIHRoYW4gdGhlaXIgbm9uLWxpc3QgdXNhZ2Ugb2Yg
+aG93IHRvIG9wZXJhdGUNCj4+PiBhcyB0aGUgc2VydmVyKS4NCj4+Pg0KPiANCj4+Pg0KPj4+IE5v
+dCBkb25lIGhlcmUsIGJ1dCBtYXliZSB3b3J0aCBmdXR1cmUgZXhwZXJpbWVudHM6IGNhcHR1cmUN
+Cj4+PiB0aGUgbWVhdCBvZiBOQkRFeHBvcnRJbmZvIGludG8gYSBRQVBJIHN0cnVjdCwgYW5kIHVz
+ZSB0aGUNCj4+PiBnZW5lcmF0ZWQgUUFQSSBwcmV0dHktcHJpbnRlcnMgaW5zdGVhZCBvZiBoYW5k
+LXJvbGxpbmcgb3VyDQo+Pj4gb3V0cHV0IGxvb3AuICBJdCB3b3VsZCBhbHNvIHBlcm1pdCB1cyB0
+byBhZGQgYSBKU09OIG91dHB1dA0KPj4+IG1vZGUgZm9yIG1hY2hpbmUgcGFyc2luZy4NCj4gDQo+
+IEEgc3RhcnQgb2YgdGhhdCBleHBlcmltZW50IGhhcyBub3cgYmVlbiBwb3N0ZWQ6DQo+IGh0dHBz
+Oi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTAxL21zZzA0MTk2
+Lmh0bWwNCj4gDQo+IA0KPj4+ICAgIEBpdGVtIC0tdGxzLWNyZWRzPUlEDQo+Pj4gICAgRW5hYmxl
+IG1hbmRhdG9yeSBUTFMgZW5jcnlwdGlvbiBmb3IgdGhlIHNlcnZlciBieSBzZXR0aW5nIHRoZSBJ
+RA0KPj4+ICAgIG9mIHRoZSBUTFMgY3JlZGVudGlhbHMgb2JqZWN0IHByZXZpb3VzbHkgY3JlYXRl
+ZCB3aXRoIHRoZSAtLW9iamVjdA0KPj4+IC1vcHRpb24uDQo+Pj4gK29wdGlvbjsgb3IgcHJvdmlk
+ZSB0aGUgY3JlZGVudGlhbHMgbmVlZGVkIGZvciBjb25uZWN0aW5nIGFzIGEgY2xpZW50DQo+Pj4g
+K2luIGxpc3QgbW9kZS4NCj4+DQo+PiBtYXkgYmUgImxpc3QgbW9kZSAoLS1saXN0KSIsIGFzICJs
+aXN0IG1vZGUiIGlzIG5vdCBkaXJlY3RseSBkZWZpbmVkLiBPbiB0aGUgb3RoZXIgaGFuZCwNCj4+
+IGxpc3Qgb3B0aW9uIGlzIGV4dHJlbWVseSBjbG9zZSB0byB0bHMtY3JlZHMsIHNvIGl0IGlzIG9i
+dmlvdXMgYW55d2F5Lg0KPiANCj4gSSdtIHRoaW5raW5nIG9mIGFkZGluZyB0aGlzIChhbmQgc2Vl
+IGNvbnZlcnNhdGlvbiBiZWxvdyB0aGF0IG1lbnRpb25zIFsxXSk6DQo+IA0KPiBkaWZmIC0tZ2l0
+IGkvcWVtdS1uYmQudGV4aSB3L3FlbXUtbmJkLnRleGkNCj4gaW5kZXggNjVjYWViNzg3NGEuLjBk
+Mjk3ZWVkNmRiIDEwMDY0NA0KPiAtLS0gaS9xZW11LW5iZC50ZXhpDQo+ICsrKyB3L3FlbXUtbmJk
+LnRleGkNCj4gQEAgLTEwNSw3ICsxMDUsOSBAQCBTZXQgdGhlIE5CRCB2b2x1bWUgZXhwb3J0IGRl
+c2NyaXB0aW9uLCBhcyBhDQo+IGh1bWFuLXJlYWRhYmxlDQo+ICAgc3RyaW5nLg0KPiAgIEBpdGVt
+IC1MLCAtLWxpc3QNCj4gICBDb25uZWN0IGFzIGEgY2xpZW50IGFuZCBsaXN0IGFsbCBkZXRhaWxz
+IGFib3V0IHRoZSBleHBvcnRzIGV4cG9zZWQgYnkNCj4gLWEgcmVtb3RlIE5CRCBzZXJ2ZXIuDQo+
+ICthIHJlbW90ZSBOQkQgc2VydmVyLiAgVGhpcyBlbmFibGVzIGxpc3QgbW9kZSwgYW5kIGlzIGlu
+Y29tcGF0aWJsZQ0KPiArd2l0aCBvcHRpb25zIHRoYXQgY2hhbmdlIGJlaGF2aW9yIHJlbGF0ZWQg
+dG8gYSBzcGVjaWZpYyBleHBvcnQgKHN1Y2ggYXMNCj4gK0BvcHRpb257LS1leHBvcnQtbmFtZX0s
+IEBvcHRpb257LS1vZmZzZXR9LCAuLi4pLg0KPiAgIEBpdGVtIC0tdGxzLWNyZWRzPUlEDQo+ICAg
+RW5hYmxlIG1hbmRhdG9yeSBUTFMgZW5jcnlwdGlvbiBmb3IgdGhlIHNlcnZlciBieSBzZXR0aW5n
+IHRoZSBJRA0KPiAgIG9mIHRoZSBUTFMgY3JlZGVudGlhbHMgb2JqZWN0IHByZXZpb3VzbHkgY3Jl
+YXRlZCB3aXRoIHRoZSAtLW9iamVjdA0KPiANCj4gDQo+Pj4gK3N0YXRpYyBpbnQgcWVtdV9uYmRf
+Y2xpZW50X2xpc3QoU29ja2V0QWRkcmVzcyAqc2FkZHIsIFFDcnlwdG9UTFNDcmVkcyAqdGxzLA0K
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKmhvc3RuYW1l
+KQ0KPj4+ICt7DQo+Pj4gKyAgICBpbnQgcmV0ID0gRVhJVF9GQUlMVVJFOw0KPj4+ICsgICAgaW50
+IHJjOw0KPj4+ICsgICAgRXJyb3IgKmVyciA9IE5VTEw7DQo+Pj4gKyAgICBRSU9DaGFubmVsU29j
+a2V0ICpzaW9jOw0KPj4+ICsgICAgTkJERXhwb3J0SW5mbyAqbGlzdDsNCj4+PiArICAgIGludCBp
+LCBqOw0KPj4+ICsNCj4+PiArICAgIHNpb2MgPSBxaW9fY2hhbm5lbF9zb2NrZXRfbmV3KCk7DQo+
+Pj4gKyAgICBpZiAocWlvX2NoYW5uZWxfc29ja2V0X2Nvbm5lY3Rfc3luYyhzaW9jLCBzYWRkciwg
+JmVycikgPCAwKSB7DQo+Pj4gKyAgICAgICAgZXJyb3JfcmVwb3J0X2VycihlcnIpOw0KPj4+ICsg
+ICAgICAgIGdvdG8gb3V0Ow0KPj4NCj4+IE1heSBiZSBqdXN0IHJldHVybiBFWElUX0ZBVUlMVVJF
+IGhlcmU7DQo+PiByZW1vdmUgb3V0IGxhYmVsOw0KPj4gcy9vdXRfc29ja2V0L291dA0KPiANCj4g
+V2lsbCBkby4gUHJvYmFibHkgbGVmdG92ZXJzIGZyb20gZWFybGllciBhdHRlbXB0cyBhcyBJIGNo
+YW5nZWQgbXkNCj4gYXBwcm9hY2ggb3ZlciB0aW1lLg0KPiANCj4gDQo+Pj4gKyAgICBwcmludGYo
+ImV4cG9ydHMgYXZhaWxhYmxlOiAlZFxuIiwgcmMpOw0KPj4+ICsgICAgZm9yIChpID0gMDsgaSA8
+IHJjOyBpKyspIHsNCj4+PiArICAgICAgICBwcmludGYoIiBleHBvcnQ6ICclcydcbiIsIGxpc3Rb
+aV0ubmFtZSk7DQo+Pj4gKyAgICAgICAgaWYgKGxpc3RbaV0uZGVzY3JpcHRpb24gJiYgKmxpc3Rb
+aV0uZGVzY3JpcHRpb24pIHsNCj4+PiArICAgICAgICAgICAgcHJpbnRmKCIgIGRlc2NyaXB0aW9u
+OiAlc1xuIiwgbGlzdFtpXS5kZXNjcmlwdGlvbik7DQo+Pj4gKyAgICAgICAgfQ0KPj4+ICsgICAg
+ICAgIGlmIChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfSEFTX0ZMQUdTKSB7DQo+Pg0KPj4gYWN0
+dWFsbHkgdGhpcyBpcw0KPj4NCj4+IGlmIChzZXJ2ZXIgbm90IGhhdmUgYSBidWcgb2Ygbm90IHNl
+dHRpbmcgTkJEX0ZMQUdfSEFTX0ZMQUdTKSB7DQo+IA0KPiBXaGljaCwgYXMgdGhlIGNvbW1pdCBt
+ZXNzYWdlIG1lbnRpb25zLCBpcyBmb3Igc2VydmVycyBzbyBvbGQgYW5kIHJhcmUNCj4gdGhhdCBp
+dCByZWFsbHkgZG9lc24ndCBtYXR0ZXIuDQo+IA0KPj4gICAgLi4uDQo+PiB9DQo+Pg0KPj4gV2h5
+IG5vdCB0byBwcmludCBAc2l6ZSBmb3IgZXhhbXBsZSwgaWYgQGZsYWdzIGZpZWxkIGhhcyBhIGJ1
+Zz8NCj4+DQo+PiBPciwgdGhlbiwgd2h5IHRvIHByaW50IGZsYWdzLCBpZiBAc2l6ZSBoYXMgYSBi
+dWc/DQo+IA0KPiBCZWNhdXNlIHdlIGRvbid0IGhhdmUgdG8gd29ycnkgYWJvdXQgdGhvc2Ugc2Vy
+dmVycyBiZWluZyBtYWluc3RyZWFtLg0KPiANCj4+Pg0KPj4+IC0gICAgaWYgKChhcmdjIC0gb3B0
+aW5kKSAhPSAxKSB7DQo+Pj4gKyAgICBpZiAobGlzdCkgew0KPj4+ICsgICAgICAgIGlmIChhcmdj
+ICE9IG9wdGluZCkgew0KPj4+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkxpc3QgbW9kZSBp
+cyBpbmNvbXBhdGlibGUgd2l0aCBhIGZpbGUgbmFtZSIpOw0KPj4+ICsgICAgICAgICAgICBleGl0
+KEVYSVRfRkFJTFVSRSk7DQo+Pj4gKyAgICAgICAgfQ0KPj4+ICsgICAgICAgIGlmIChleHBvcnRf
+bmFtZSB8fCBleHBvcnRfZGVzY3JpcHRpb24gfHwgZGV2X29mZnNldCB8fCBwYXJ0aXRpb24gfHwN
+Cj4+PiArICAgICAgICAgICAgZGV2aWNlIHx8IGRpc2Nvbm5lY3QgfHwgZm10IHx8IHNuX2lkX29y
+X25hbWUgfHwgYml0bWFwKSB7DQo+Pj4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiTGlzdCBt
+b2RlIGlzIGluY29tcGF0aWJsZSB3aXRoIHBlci1kZXZpY2Ugc2V0dGluZ3MiKTsNCj4+PiArICAg
+ICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4NCj4+IGFuZCB3aGF0IGFib3V0IGFpbywg
+ZGlzY2FyZCwgZXRjPw0KPiANCj4gSSBkb24ndCBtaW5kIGFkZGluZyBpbiBhbnkgbW9yZSBvcHRp
+b25zIHRoYXQgeW91IHRoaW5rIGFyZSB1c2VmdWwgdG8NCj4gZmxhZyB0aGUgdXNlciBvbi4gIExv
+b2tzIGxpa2UgSSBtaXNzZWQgc2Vlbl9haW8sIHNlZW5fY2FjaGUsDQo+IHNlZW5fZGlzY2FyZC4g
+IENhdGNoaW5nICctcycgaXMgaGFyZGVyLCBhcyBpdCBtZXJlbHkgc2V0cyBhIGJpdCB3aXRoaW4N
+Cj4gZmxhZ3MgcmF0aGVyIHRoYW4gYSB3aXRuZXNzIHZhcmlhYmxlLg0KPiANCj4+IEFsc28sIEkg
+dGhpbmssIGl0IHdvdWxkIGJlIGdvb2QgdG8gc3BlY2lmeSBpbiBVc2FnZQ0KPj4gKG9yIGluIG1h
+biksIHdoaWNoIG9wdGlvbnMgYXJlIGF2YWlsYWJsZSBmb3IgbGlzdCBtb2RlLg0KPiANCj4gSSB3
+b3JyeSB0aGF0IGtlZXBpbmcgYW4gZXhhY3QgbGlzdCBtYXkgYmUgYSBtYWludGVuYW5jZSBuaWdo
+dG1hcmUgKHRoZQ0KPiB0d28gYXJlIGxpa2VseSB0byBnZXQgb3V0IG9mIHN5bmMpOyBkb2VzIG15
+IHByb3Bvc2VkIHdvcmRpbmcgYWJvdmUgYXQNCj4gWzFdIHNhdGlzZnkgdGhlIHByb2JsZW0gYnkg
+YXQgbGVhc3QgbWFraW5nIHRoZSB1c2VyIGF3YXJlIHRoYXQgbm90IGFsbA0KPiBjb21iaW5hdGlv
+bnMgd2lsbCB3b3JrPw0KDQpJIGRvbid0IHJlYWxseSBjYXJlIG9mIGl0LCBjdXJyZW50IHZlcnNp
+b24gaXMgT0sgdG9vLiBPZiBjb3Vyc2UsIGFuIGFkZGl0aW9uDQpzb3VuZHMgYmV0dGVyIHRoYW4g
+bm90aGluZykNCg0KPiANCj4gQW5vdGhlciBhbHRlcm5hdGl2ZSB3b3VsZCBiZSB0byBqdXN0IHNp
+bGVudGx5IGlnbm9yZSBhbGwgcGVyLWV4cG9ydA0KPiBvcHRpb25zLCBpbnN0ZWFkIG9mIHdhcm5p
+bmcgdGhlIHVzZXIgdGhhdCB0aGV5IGFyZSBpbmNvbXBhdGlibGUuICBJDQo+IGRvbid0IGtub3cg
+aWYgdGhhdCdzIGFueSBmcmllbmRsaWVyLCBidXQgaXQgaXMgbGVzcyBjb2RlLg0KPiANCj4+DQo+
+PiBIbSwgbm90ZSwgLS1oZWxwIGhhcyBncm91cGluZyBvZiBvcHRpb25zIGFuZCBtYW4gZG9uJ3Qu
+DQo+IA0KPiBUaGF0IGNvdWxkIGJlIGEgc2VwYXJhdGUgcGF0Y2gsIGlmIGl0IGlzIGRlc2lyZWQg
+KG9yIHNxdWFzaGVkIGludG8gMi8xOSkNCj4gDQo+Pg0KPj4NCj4+IEkgZG9uJ3QgaGF2ZSBnb29k
+IHVuZGVyc3RhbmRpbmcgb2YgdGxzIHJlbGF0ZWQgdGhpbmdzLCB0aGUgcmVzdCBsb29rcyBPSywN
+Cj4+IG15IHN1Z2dlc3Rpb25zIGFyZSBvcHRpb25hbCwgc28sIGlmIHlvdSBkb24ndCB3YW50IHRv
+IGltcHJvdmUgZG9jcyBhbmQNCj4+IG9wdGlvbiBjb25mbGljdCBjaGVja2luZyBub3c6DQo+PiBS
+ZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0
+dW96em8uY29tPg0KPj4NCj4+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
+Cg==
