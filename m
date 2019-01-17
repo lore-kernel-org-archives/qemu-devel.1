@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48836)
+Received: from eggs.gnu.org ([209.51.188.92]:49133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gkAAR-0006Vi-E0
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:05:24 -0500
+	(envelope-from <philmd@redhat.com>) id 1gkABL-0006va-2m
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gkAAO-0008VG-Rf
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:05:19 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
-References: <cover.1547739122.git.berto@igalia.com>
-	<23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
-Date: Thu, 17 Jan 2019 17:05:08 +0100
-Message-ID: <w51a7jz2rt7.fsf@maestria.local.igalia.com>
+	(envelope-from <philmd@redhat.com>) id 1gkABJ-0003aa-RQ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:14 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:37488)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gkABJ-0003X7-HE
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:06:13 -0500
+Received: by mail-wr1-f68.google.com with SMTP id s12so11638259wrt.4
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:06:13 -0800 (PST)
+References: <20190117153338.11820-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c451b6fa-b692-378f-13a4-b22c5c06f461@redhat.com>
+Date: Thu, 17 Jan 2019 17:06:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 00/13] Add a 'x-blockdev-reopen' QMP command
+In-Reply-To: <20190117153338.11820-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] scripts/replay-dump.py: fix utf-8 mangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,23 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-trivial@nongnu.org
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On Thu 17 Jan 2019 04:50:20 PM CET, Eric Blake wrote:
+On 1/17/19 4:33 PM, Alex Bennée wrote:
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  scripts/replay-dump.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/replay-dump.py b/scripts/replay-dump.py
+> index 5ae77c8a92..ee7fda2638 100755
+> --- a/scripts/replay-dump.py
+> +++ b/scripts/replay-dump.py
+> @@ -3,7 +3,7 @@
+>  #
+>  # Dump the contents of a recorded execution stream
+>  #
+> -#  Copyright (c) 2017 Alex BennÃ©e <alex.bennee@linaro.org>
+> +#  Copyright (c) 2017 Alex Bennée <alex.bennee@linaro.org>
+>  #
+>  # This library is free software; you can redistribute it and/or
+>  # modify it under the terms of the GNU Lesser General Public
+> 
 
->> Removing the backing file can be done by simply passing the option {
->> ..., "backing": null } to x-blockdev-reopen.
->> 
-> Hmm - that makes my proposal of "option":null as an explicit request
-> to the default a bit trickier, if we are already using null for a
-> different meaning for backing files.
-
-At the moment 'backing' seems to be the only option that allows a null
-value (BlockdevRefOrNull in particular). I suppose there could be more
-in the future?
-
-Also, having 'null' meaning 'reset to default' would make this API
-differ from blockdev-add, which I'm trying not to do.
-
-Berto
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
