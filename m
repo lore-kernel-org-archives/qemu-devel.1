@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47243)
+Received: from eggs.gnu.org ([209.51.188.92]:47380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk5V0-0001Nx-LA
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:15 -0500
+	(envelope-from <groug@kaod.org>) id 1gk5VY-0001cZ-N9
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk5Uz-0007eP-Pd
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49692)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gk5Uz-0007dn-Fs
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:13 -0500
-References: <20190116173527.27741-1-anthony.perard@citrix.com>
-	<e34776ec-6af9-0521-266f-80f83030c8c0@redhat.com>
-	<20190117105520.GJ1271@perard.uk.xensource.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8e70ddf3-12be-b896-2834-fd315eda9aaa@redhat.com>
-Date: Thu, 17 Jan 2019 12:06:09 +0100
+	(envelope-from <groug@kaod.org>) id 1gk5VY-0008O5-1n
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gk5VX-0008KD-NP
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:06:47 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0HB5QM1084027
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 06:06:46 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q2qqejaxh-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 06:06:45 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 17 Jan 2019 11:06:43 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 17 Jan 2019 12:06:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190117105520.GJ1271@perard.uk.xensource.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] accel: Allow to build QEMU without TCG or
- KVM support
+Message-Id: <154772319819.1163472.4313149332350138217.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH] spapr: Forbid setting ic-mode for old machine
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +38,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-On 2019-01-17 11:55, Anthony PERARD wrote:
-> On Thu, Jan 17, 2019 at 07:02:24AM +0100, Thomas Huth wrote:
->> On 2019-01-16 18:35, Anthony PERARD wrote:
->>> Instead of deny build of QEMU without a default accelerator, simply
->>> report an error when the user haven't passed -accel or -machine accel=
->>> and TCG and KVM isn't builtin.
->>>
->>> ./configure already check that at least one accelerator is available.
->>>
->>> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
->>> ---
->>>  accel/accel.c | 4 +++-
->>>  1 file changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/accel/accel.c b/accel/accel.c
->>> index 68b6d56323..0d5b370dfd 100644
->>> --- a/accel/accel.c
->>> +++ b/accel/accel.c
->>> @@ -91,7 +91,9 @@ void configure_accelerator(MachineState *ms, const char *progname)
->>>  #elif defined(CONFIG_KVM)
->>>              accel = "kvm";
->>>  #else
->>> -#error "No default accelerator available"
->>> +            error_report("No accelerator selected and"
->>> +                         " no default accelerator available");
->>> +            exit(1);
->>>  #endif
->>>          }
->>>      }
->>
->> That looks a little bit friendlier, indeed.
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>
->> Out of curiosity: Did you hit the #error while compiling? Or just by
->> reading the recent patches?
-> 
-> I've hit the #error. I often build QEMU with --disable-tcg --disable-kvm
-> --enable-xen just because I only need to build/test xen. So if I can
-> disable features that I don't need to build QEMU a tiny bit faster, I do
-> :).
+Machine types 3.0 and older only know about the legacy XICS backend.
+Make it clear by erroring out if the user tries to set ic-mode on
+such machines.
 
-Oh, good to know that this configuration works, too. Maybe you should
-also add a
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
 
-#elif defined(CONFIG_XEN)
-	accel = "xen";
-#...
+Motivation for this comes from a failing backward migration test, caused
+by ic-mode=xics I forgot to drop from the command line :)
+---
+ hw/ppc/spapr.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-part in that case?
-
- Thomas
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0942f35bf87e..6b8dbf5c5a3c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3126,6 +3126,11 @@ static void spapr_set_ic_mode(Object *obj, const char *value, Error **errp)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+ 
++    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
++        error_setg(errp, "This machine only uses the legacy XICS backend, don't pass ic-mode");
++        return;
++    }
++
+     /* The legacy IRQ backend can not be set */
+     if (strcmp(value, "xics") == 0) {
+         spapr->irq = &spapr_irq_xics;
