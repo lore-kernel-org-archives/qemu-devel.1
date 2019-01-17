@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56260)
+Received: from eggs.gnu.org ([209.51.188.92]:56981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gk959-0004EK-IJ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:55:49 -0500
+	(envelope-from <smarkovic@wavecomp.com>) id 1gk95z-00057r-Jg
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gk8r1-0000QL-TG
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:41:12 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gk8r1-0000Js-NJ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:41:11 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gk8qy-0001JW-9e
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 14:41:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C3E2F2E8181
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 14:41:04 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <smarkovic@wavecomp.com>) id 1gk95y-00054G-BQ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:56:39 -0500
+Received: from mail-eopbgr780090.outbound.protection.outlook.com
+	([40.107.78.90]:10176
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
+	id 1gk95w-0004pV-2a
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:56:36 -0500
+From: Stefan Markovic <smarkovic@wavecomp.com>
+Date: Thu, 17 Jan 2019 14:56:26 +0000
+Message-ID: <3c1d98cb-2bc8-90a0-e4a6-c2d8dc331241@wavecomp.com>
+References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 17 Jan 2019 14:30:53 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1812091 <1812091@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154766268387.1937.11188043264522807203.malonedeb@wampee.canonical.com>
-Message-Id: <154773545331.1787.9857250531252435343.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1812091] Re: gdbstub memory accesses performed
- with wrong attributes
+Content-ID: <9C463967E0683B40987ECEFA5084680E@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
+ summary of CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +33,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Patch sent to list:
-
-https://patchwork.ozlabs.org/patch/1026664/
-
-
-** Changed in: qemu
-       Status: New =3D> In Progress
-
-** Tags added: arm
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1812091
-
-Title:
-  gdbstub memory accesses performed with wrong attributes
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Qemu-commit: b2f7c27f56bf1116ebb7848c75914aa7c5d6a040
-
-  =
-
-  The ARMv8-M architecture (with security extensions) contains a SAU, the S=
-ecurity Attribution Unit. After booting the mps2-an505 and immediately halt=
-ing (`-S`), I attempt to read the SAU_TYPE register, located at 0xE000EDD4,=
- using gdb (x 0xE000EDD4). The returned value is 0, while the expected valu=
-e is 8 (number of regions).
-
-  On further investigation, it seems that `attrs.secure` is set to false
-  (armv7m_nvic.c - nvic_readl, line 1167). Commenting out the check will
-  return the correct value.
-
-  As the CPU should be in 'secure' mode after reset, I think this
-  behavior is wrong.
-
-  Steps to reproduce:
-  Example code that loads an endless loop into the beginning of secure memo=
-ry: https://github.com/ajblane/armv8m-hello
-
-  Commandline: qemu-system-arm -machine mps2-an505 -cpu cortex-m33 \
-  	                    -m 4096 \
-  			    -nographic -serial mon:stdio \
-  	                    -kernel $(IMAGE) -s -S
-
-  Attach with arm-none-eabi-gdb, and run x 0xE000EDD4.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1812091/+subscriptions
+DQpPbiAzLjEuMTkuIDE3OjM0LCBBbGVrc2FuZGFyIE1hcmtvdmljIHdyb3RlOg0KPiBGcm9tOiBB
+bGVrc2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPg0KPiBNb3ZlIGNv
+bW1lbnQgY29udGFpbmluZyBzdW1tYXJ5IG9mIENQMCByZWdpc3RlcnMuIENoZWNrcGF0Y2gNCj4g
+c2NyaXB0IHJlcG9ydGVkIHNvbWUgdGFicyBpbiB0aGUgcmVzdXRsaW5nIGRpZmYsIHNvIGNvbnZl
+cnQNCj4gdGhlc2UgdGFicyB0byBzcGFjZXMgdG9vLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVr
+c2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiAtLS0NCj4gICB0YXJn
+ZXQvbWlwcy9jcHUuaCB8IDE2NSArKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgODQgaW5zZXJ0aW9ucygrKSwg
+ODEgZGVsZXRpb25zKC0pDQoNCg0KUmV2aWV3ZWQtYnk6IFN0ZWZhbiBNYXJrb3ZpYyA8c21hcm9r
+dmljQHdhdmVjb21wLmNvbT4NCg0KDQo+IGRpZmYgLS1naXQgYS90YXJnZXQvbWlwcy9jcHUuaCBi
+L3RhcmdldC9taXBzL2NwdS5oDQo+IGluZGV4IDAzYzAzZmQuLjZjMmE3ZTQgMTAwNjQ0DQo+IC0t
+LSBhL3RhcmdldC9taXBzL2NwdS5oDQo+ICsrKyBiL3RhcmdldC9taXBzL2NwdS5oDQo+IEBAIC0x
+MjMsODcgKzEyMyw2IEBAIHR5cGVkZWYgc3RydWN0IG1pcHNfZGVmX3QgbWlwc19kZWZfdDsNCj4g
+ICAjZGVmaW5lIE1JUFNfS1NDUkFUQ0hfTlVNIDYNCj4gICAjZGVmaW5lIE1JUFNfTUFBUl9NQVgg
+MTYgLyogTXVzdCBiZSBhbiBldmVuIG51bWJlci4gKi8NCj4gICANCj4gLXR5cGVkZWYgc3RydWN0
+IFRDU3RhdGUgVENTdGF0ZTsNCj4gLXN0cnVjdCBUQ1N0YXRlIHsNCj4gLSAgICB0YXJnZXRfdWxv
+bmcgZ3ByWzMyXTsNCj4gLSAgICB0YXJnZXRfdWxvbmcgUEM7DQo+IC0gICAgdGFyZ2V0X3Vsb25n
+IEhJW01JUFNfRFNQX0FDQ107DQo+IC0gICAgdGFyZ2V0X3Vsb25nIExPW01JUFNfRFNQX0FDQ107
+DQo+IC0gICAgdGFyZ2V0X3Vsb25nIEFDWFtNSVBTX0RTUF9BQ0NdOw0KPiAtICAgIHRhcmdldF91
+bG9uZyBEU1BDb250cm9sOw0KPiAtICAgIGludDMyX3QgQ1AwX1RDU3RhdHVzOw0KPiAtI2RlZmlu
+ZSBDUDBUQ1N0X1RDVTMJMzENCj4gLSNkZWZpbmUgQ1AwVENTdF9UQ1UyCTMwDQo+IC0jZGVmaW5l
+IENQMFRDU3RfVENVMQkyOQ0KPiAtI2RlZmluZSBDUDBUQ1N0X1RDVTAJMjgNCj4gLSNkZWZpbmUg
+Q1AwVENTdF9UTVgJMjcNCj4gLSNkZWZpbmUgQ1AwVENTdF9STlNUCTIzDQo+IC0jZGVmaW5lIENQ
+MFRDU3RfVERTCTIxDQo+IC0jZGVmaW5lIENQMFRDU3RfRFQJMjANCj4gLSNkZWZpbmUgQ1AwVENT
+dF9EQQkxNQ0KPiAtI2RlZmluZSBDUDBUQ1N0X0EJMTMNCj4gLSNkZWZpbmUgQ1AwVENTdF9US1NV
+CTExDQo+IC0jZGVmaW5lIENQMFRDU3RfSVhNVAkxMA0KPiAtI2RlZmluZSBDUDBUQ1N0X1RBU0lE
+CTANCj4gLSAgICBpbnQzMl90IENQMF9UQ0JpbmQ7DQo+IC0jZGVmaW5lIENQMFRDQmRfQ3VyVEMJ
+MjENCj4gLSNkZWZpbmUgQ1AwVENCZF9UQkUJMTcNCj4gLSNkZWZpbmUgQ1AwVENCZF9DdXJWUEUJ
+MA0KPiAtICAgIHRhcmdldF91bG9uZyBDUDBfVENIYWx0Ow0KPiAtICAgIHRhcmdldF91bG9uZyBD
+UDBfVENDb250ZXh0Ow0KPiAtICAgIHRhcmdldF91bG9uZyBDUDBfVENTY2hlZHVsZTsNCj4gLSAg
+ICB0YXJnZXRfdWxvbmcgQ1AwX1RDU2NoZUZCYWNrOw0KPiAtICAgIGludDMyX3QgQ1AwX0RlYnVn
+X3Rjc3RhdHVzOw0KPiAtICAgIHRhcmdldF91bG9uZyBDUDBfVXNlckxvY2FsOw0KPiAtDQo+IC0g
+ICAgaW50MzJfdCBtc2Fjc3I7DQo+IC0NCj4gLSNkZWZpbmUgTVNBQ1NSX0ZTICAgICAgIDI0DQo+
+IC0jZGVmaW5lIE1TQUNTUl9GU19NQVNLICAoMSA8PCBNU0FDU1JfRlMpDQo+IC0jZGVmaW5lIE1T
+QUNTUl9OWCAgICAgICAxOA0KPiAtI2RlZmluZSBNU0FDU1JfTlhfTUFTSyAgKDEgPDwgTVNBQ1NS
+X05YKQ0KPiAtI2RlZmluZSBNU0FDU1JfQ0VGICAgICAgMg0KPiAtI2RlZmluZSBNU0FDU1JfQ0VG
+X01BU0sgKDB4ZmZmZiA8PCBNU0FDU1JfQ0VGKQ0KPiAtI2RlZmluZSBNU0FDU1JfUk0gICAgICAg
+MA0KPiAtI2RlZmluZSBNU0FDU1JfUk1fTUFTSyAgKDB4MyA8PCBNU0FDU1JfUk0pDQo+IC0jZGVm
+aW5lIE1TQUNTUl9NQVNLICAgICAoTVNBQ1NSX1JNX01BU0sgfCBNU0FDU1JfQ0VGX01BU0sgfCBN
+U0FDU1JfTlhfTUFTSyB8IFwNCj4gLSAgICAgICAgTVNBQ1NSX0ZTX01BU0spDQo+IC0NCj4gLSAg
+ICBmbG9hdF9zdGF0dXMgbXNhX2ZwX3N0YXR1czsNCj4gLQ0KPiAtI2RlZmluZSBOVU1CRVJfT0Zf
+TVhVX1JFR0lTVEVSUyAxNg0KPiAtICAgIHRhcmdldF91bG9uZyBteHVfZ3ByW05VTUJFUl9PRl9N
+WFVfUkVHSVNURVJTIC0gMV07DQo+IC0gICAgdGFyZ2V0X3Vsb25nIG14dV9jcjsNCj4gLSNkZWZp
+bmUgTVhVX0NSX0xDICAgICAgIDMxDQo+IC0jZGVmaW5lIE1YVV9DUl9SQyAgICAgICAzMA0KPiAt
+I2RlZmluZSBNWFVfQ1JfQklBUyAgICAgMg0KPiAtI2RlZmluZSBNWFVfQ1JfUkRfRU4gICAgMQ0K
+PiAtI2RlZmluZSBNWFVfQ1JfTVhVX0VOICAgMA0KPiAtDQo+IC19Ow0KPiAtDQo+IC10eXBlZGVm
+IHN0cnVjdCBDUFVNSVBTU3RhdGUgQ1BVTUlQU1N0YXRlOw0KPiAtc3RydWN0IENQVU1JUFNTdGF0
+ZSB7DQo+IC0gICAgVENTdGF0ZSBhY3RpdmVfdGM7DQo+IC0gICAgQ1BVTUlQU0ZQVUNvbnRleHQg
+YWN0aXZlX2ZwdTsNCj4gLQ0KPiAtICAgIHVpbnQzMl90IGN1cnJlbnRfdGM7DQo+IC0gICAgdWlu
+dDMyX3QgY3VycmVudF9mcHU7DQo+IC0NCj4gLSAgICB1aW50MzJfdCBTRUdCSVRTOw0KPiAtICAg
+IHVpbnQzMl90IFBBQklUUzsNCj4gLSNpZiBkZWZpbmVkKFRBUkdFVF9NSVBTNjQpDQo+IC0jIGRl
+ZmluZSBQQUJJVFNfQkFTRSAzNg0KPiAtI2Vsc2UNCj4gLSMgZGVmaW5lIFBBQklUU19CQVNFIDMy
+DQo+IC0jZW5kaWYNCj4gLSAgICB0YXJnZXRfdWxvbmcgU0VHTWFzazsNCj4gLSAgICB1aW50NjRf
+dCBQQU1hc2s7DQo+IC0jZGVmaW5lIFBBTUFTS19CQVNFICgoMVVMTCA8PCBQQUJJVFNfQkFTRSkg
+LSAxKQ0KPiAtDQo+IC0gICAgaW50MzJfdCBtc2FpcjsNCj4gLSNkZWZpbmUgTVNBSVJfUHJvY0lE
+ICAgIDgNCj4gLSNkZWZpbmUgTVNBSVJfUmV2ICAgICAgIDANCj4gICANCj4gICAvKg0KPiAgICAq
+ICAgICBTdW1tYXJ5IG9mIENQMCByZWdpc3RlcnMNCj4gQEAgLTMxNCw2ICsyMzMsOTAgQEAgc3Ry
+dWN0IENQVU1JUFNTdGF0ZSB7DQo+ICAgICogNyAgIFRhZ0xvICAgICAgICAgICAgIFRhZ0hpICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIEtTY3JhdGNoPG4+DQo+ICAgICoNCj4gICAgKi8N
+Cj4gKw0KPiArDQo+ICt0eXBlZGVmIHN0cnVjdCBUQ1N0YXRlIFRDU3RhdGU7DQo+ICtzdHJ1Y3Qg
+VENTdGF0ZSB7DQo+ICsgICAgdGFyZ2V0X3Vsb25nIGdwclszMl07DQo+ICsgICAgdGFyZ2V0X3Vs
+b25nIFBDOw0KPiArICAgIHRhcmdldF91bG9uZyBISVtNSVBTX0RTUF9BQ0NdOw0KPiArICAgIHRh
+cmdldF91bG9uZyBMT1tNSVBTX0RTUF9BQ0NdOw0KPiArICAgIHRhcmdldF91bG9uZyBBQ1hbTUlQ
+U19EU1BfQUNDXTsNCj4gKyAgICB0YXJnZXRfdWxvbmcgRFNQQ29udHJvbDsNCj4gKyAgICBpbnQz
+Ml90IENQMF9UQ1N0YXR1czsNCj4gKyNkZWZpbmUgQ1AwVENTdF9UQ1UzICAgIDMxDQo+ICsjZGVm
+aW5lIENQMFRDU3RfVENVMiAgICAzMA0KPiArI2RlZmluZSBDUDBUQ1N0X1RDVTEgICAgMjkNCj4g
+KyNkZWZpbmUgQ1AwVENTdF9UQ1UwICAgIDI4DQo+ICsjZGVmaW5lIENQMFRDU3RfVE1YICAgICAy
+Nw0KPiArI2RlZmluZSBDUDBUQ1N0X1JOU1QgICAgMjMNCj4gKyNkZWZpbmUgQ1AwVENTdF9URFMg
+ICAgIDIxDQo+ICsjZGVmaW5lIENQMFRDU3RfRFQgICAgICAyMA0KPiArI2RlZmluZSBDUDBUQ1N0
+X0RBICAgICAgMTUNCj4gKyNkZWZpbmUgQ1AwVENTdF9BICAgICAgIDEzDQo+ICsjZGVmaW5lIENQ
+MFRDU3RfVEtTVSAgICAxMQ0KPiArI2RlZmluZSBDUDBUQ1N0X0lYTVQgICAgMTANCj4gKyNkZWZp
+bmUgQ1AwVENTdF9UQVNJRCAgIDANCj4gKyAgICBpbnQzMl90IENQMF9UQ0JpbmQ7DQo+ICsjZGVm
+aW5lIENQMFRDQmRfQ3VyVEMgICAyMQ0KPiArI2RlZmluZSBDUDBUQ0JkX1RCRSAgICAgMTcNCj4g
+KyNkZWZpbmUgQ1AwVENCZF9DdXJWUEUgIDANCj4gKyAgICB0YXJnZXRfdWxvbmcgQ1AwX1RDSGFs
+dDsNCj4gKyAgICB0YXJnZXRfdWxvbmcgQ1AwX1RDQ29udGV4dDsNCj4gKyAgICB0YXJnZXRfdWxv
+bmcgQ1AwX1RDU2NoZWR1bGU7DQo+ICsgICAgdGFyZ2V0X3Vsb25nIENQMF9UQ1NjaGVGQmFjazsN
+Cj4gKyAgICBpbnQzMl90IENQMF9EZWJ1Z190Y3N0YXR1czsNCj4gKyAgICB0YXJnZXRfdWxvbmcg
+Q1AwX1VzZXJMb2NhbDsNCj4gKw0KPiArICAgIGludDMyX3QgbXNhY3NyOw0KPiArDQo+ICsjZGVm
+aW5lIE1TQUNTUl9GUyAgICAgICAyNA0KPiArI2RlZmluZSBNU0FDU1JfRlNfTUFTSyAgKDEgPDwg
+TVNBQ1NSX0ZTKQ0KPiArI2RlZmluZSBNU0FDU1JfTlggICAgICAgMTgNCj4gKyNkZWZpbmUgTVNB
+Q1NSX05YX01BU0sgICgxIDw8IE1TQUNTUl9OWCkNCj4gKyNkZWZpbmUgTVNBQ1NSX0NFRiAgICAg
+IDINCj4gKyNkZWZpbmUgTVNBQ1NSX0NFRl9NQVNLICgweGZmZmYgPDwgTVNBQ1NSX0NFRikNCj4g
+KyNkZWZpbmUgTVNBQ1NSX1JNICAgICAgIDANCj4gKyNkZWZpbmUgTVNBQ1NSX1JNX01BU0sgICgw
+eDMgPDwgTVNBQ1NSX1JNKQ0KPiArI2RlZmluZSBNU0FDU1JfTUFTSyAgICAgKE1TQUNTUl9STV9N
+QVNLIHwgTVNBQ1NSX0NFRl9NQVNLIHwgTVNBQ1NSX05YX01BU0sgfCBcDQo+ICsgICAgICAgIE1T
+QUNTUl9GU19NQVNLKQ0KPiArDQo+ICsgICAgZmxvYXRfc3RhdHVzIG1zYV9mcF9zdGF0dXM7DQo+
+ICsNCj4gKyNkZWZpbmUgTlVNQkVSX09GX01YVV9SRUdJU1RFUlMgMTYNCj4gKyAgICB0YXJnZXRf
+dWxvbmcgbXh1X2dwcltOVU1CRVJfT0ZfTVhVX1JFR0lTVEVSUyAtIDFdOw0KPiArICAgIHRhcmdl
+dF91bG9uZyBteHVfY3I7DQo+ICsjZGVmaW5lIE1YVV9DUl9MQyAgICAgICAzMQ0KPiArI2RlZmlu
+ZSBNWFVfQ1JfUkMgICAgICAgMzANCj4gKyNkZWZpbmUgTVhVX0NSX0JJQVMgICAgIDINCj4gKyNk
+ZWZpbmUgTVhVX0NSX1JEX0VOICAgIDENCj4gKyNkZWZpbmUgTVhVX0NSX01YVV9FTiAgIDANCj4g
+Kw0KPiArfTsNCj4gKw0KPiArdHlwZWRlZiBzdHJ1Y3QgQ1BVTUlQU1N0YXRlIENQVU1JUFNTdGF0
+ZTsNCj4gK3N0cnVjdCBDUFVNSVBTU3RhdGUgew0KPiArICAgIFRDU3RhdGUgYWN0aXZlX3RjOw0K
+PiArICAgIENQVU1JUFNGUFVDb250ZXh0IGFjdGl2ZV9mcHU7DQo+ICsNCj4gKyAgICB1aW50MzJf
+dCBjdXJyZW50X3RjOw0KPiArICAgIHVpbnQzMl90IGN1cnJlbnRfZnB1Ow0KPiArDQo+ICsgICAg
+dWludDMyX3QgU0VHQklUUzsNCj4gKyAgICB1aW50MzJfdCBQQUJJVFM7DQo+ICsjaWYgZGVmaW5l
+ZChUQVJHRVRfTUlQUzY0KQ0KPiArIyBkZWZpbmUgUEFCSVRTX0JBU0UgMzYNCj4gKyNlbHNlDQo+
+ICsjIGRlZmluZSBQQUJJVFNfQkFTRSAzMg0KPiArI2VuZGlmDQo+ICsgICAgdGFyZ2V0X3Vsb25n
+IFNFR01hc2s7DQo+ICsgICAgdWludDY0X3QgUEFNYXNrOw0KPiArI2RlZmluZSBQQU1BU0tfQkFT
+RSAoKDFVTEwgPDwgUEFCSVRTX0JBU0UpIC0gMSkNCj4gKw0KPiArICAgIGludDMyX3QgbXNhaXI7
+DQo+ICsjZGVmaW5lIE1TQUlSX1Byb2NJRCAgICA4DQo+ICsjZGVmaW5lIE1TQUlSX1JldiAgICAg
+ICAwDQo+ICsNCj4gICAvKg0KPiAgICAqIENQMCBSZWdpc3RlciAwDQo+ICAgICovDQo=
