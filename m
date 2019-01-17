@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53536)
+Received: from eggs.gnu.org ([209.51.188.92]:58401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkCCI-0000N1-4U
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:15:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkCGh-00049n-Ir
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkCCH-0006A8-9l
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:15:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gkCCG-00066b-O6
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:15:20 -0500
-References: <1547745248-1750-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA_TSSCUGXO-ze6QBfZsiddszywBCMgrX=kYjORwJsrdbA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <01f7a34e-878c-8bc4-6fca-ac6d24519784@redhat.com>
-Date: Thu, 17 Jan 2019 12:15:17 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gkCGd-0006NE-LO
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:19:53 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:42733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkCGa-0005qK-3g
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:19:48 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id w13so6899892oiw.9
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:19:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TSSCUGXO-ze6QBfZsiddszywBCMgrX=kYjORwJsrdbA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZwLy61rNHyM3IsgYgyTvSiSgVp02aWMGy"
-Subject: Re: [Qemu-devel] [PATCH] configure: Add a proper check for
- openpty() in libutil
+References: <20190107163117.16269-1-peter.maydell@linaro.org>
+	<20190107163117.16269-7-peter.maydell@linaro.org>
+	<CAFEAcA9-rLt5H_+qci8tMZ5p67i56VYfow5ZJZyKUjrYftr3gw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9-rLt5H_+qci8tMZ5p67i56VYfow5ZJZyKUjrYftr3gw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Jan 2019 18:19:20 +0000
+Message-ID: <CAFEAcA9L3PigRydywfwwtx-wjjJ0-nhKRzOxZ1qPDSJaphrquA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 06/37] gdbstub: add multiprocess support to
+ 'H' and 'T' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Luc Michel <luc.michel@greensocs.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZwLy61rNHyM3IsgYgyTvSiSgVp02aWMGy
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <01f7a34e-878c-8bc4-6fca-ac6d24519784@redhat.com>
-Subject: Re: [PATCH] configure: Add a proper check for openpty() in libutil
-References: <1547745248-1750-1-git-send-email-thuth@redhat.com>
- <CAFEAcA_TSSCUGXO-ze6QBfZsiddszywBCMgrX=kYjORwJsrdbA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_TSSCUGXO-ze6QBfZsiddszywBCMgrX=kYjORwJsrdbA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 17 Jan 2019 at 18:13, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 7 Jan 2019 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > From: Luc Michel <luc.michel@greensocs.com>
+> >
+> > Add a couple of helper functions to cope with GDB threads and processes.
+> >
+> > The gdb_get_process() function looks for a process given a pid.
+> >
+> > The gdb_get_cpu() function returns the CPU corresponding to the (pid,
+> > tid) pair given as parameters.
+> >
+> > The read_thread_id() function parses the thread-id sent by the peer.
+> > This function supports the multiprocess extension thread-id syntax.  The
+> > return value specifies if the parsing failed, or if a special case was
+> > encountered (all processes or all threads).
+> >
+> > Use them in 'H' and 'T' packets handling to support the multiprocess
+> > extension.
+>
+> > +static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
+> > +{
+> > +    GDBProcess *process;
+> > +    CPUState *cpu;
+> > +
+> > +    if (!tid) {
+> > +        /* 0 means any thread, we take the first one */
+> > +        tid = 1;
+> > +    }
+> > +
+> > +    cpu = find_cpu(tid);
+> > +
+> > +    if (cpu == NULL) {
+> > +        return NULL;
+> > +    }
+> > +
+> > +    process = gdb_get_cpu_process(s, cpu);
+> > +
+> > +    if (process->pid != pid) {
+> > +        return NULL;
+> > +    }
+> > +
+> > +    if (!process->attached) {
+> > +        return NULL;
+> > +    }
+> > +
+> > +    return cpu;
+> > +}
+>
+> I'm finding that (with my out-of-tree board model) gdb
+> asks for "process 0 thread 0", which should mean "anything you
+> like", so we end up calling gdb_get_cpu(s, 0, 0). Then we
+> find a CPU via its TID, and of course it has some specific
+> PID in process->pid which is not zero, so we fail the
+> "process->pid != pid" test and return NULL here incorrectly.
 
-On 1/17/19 12:07 PM, Peter Maydell wrote:
-> On Thu, 17 Jan 2019 at 17:14, Thomas Huth <thuth@redhat.com> wrote:
->>
->> On Linux (and maybe some BSDs), we require libutil for the openpty()
->> function. However, this library is not available on some other systems=
-, so
->> we currently use a fragile if-statement in the configure script to che=
-ck
->> whether we need the library or not. Unfortunately, we also hard-coded =
-a
->> "-lutil" in the tests/Makefile.include file, so this breaks the build =
-on
->> Solaris, for example (see buglink below). To fix the issue, add the "-=
-lutil"
->> to "libs_tools" in the configure script instead, then this gets proper=
-ly
->> propagated to the tests, too.
->=20
-> It also gets propagated to every tool binary we build even if
-> it doesn't use openpty(), but I guess that's not a big deal.
+Also, the "use TID 1 if asked for any-task" logic assumes
+that TID 1 is actually part of the requested process and
+that that task is attached. Shouldn't we instead find the
+requested process (or any random attached process, if tid == 0)
+and then pick one of the TIDs it has?
 
-Statically linking against libraries only pulls in symbols that the
-library provides but which have not been satisfied earlier in the link
-line. For programs which do not use openpty(), and where no other
-unsatisfied symbols remain which -lutil would satisfy in a shadowing
-effect on symbols normally provided by remaining libraries on the
-command line, then yeah, it shouldn't change the compiled size of those
-binaries.  Dynamic linking might change the binary slightly because of
-tracking that the library was linked, but again the behavior shouldn't
-change.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---ZwLy61rNHyM3IsgYgyTvSiSgVp02aWMGy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxAxjUACgkQp6FrSiUn
-Q2qfvgf/fBzPSQAbzdRgOFTf1x/pueWe5ZwO6uFjGZ0z/ag7g7SGfYBIPdB98J6J
-1D/mUOF0bf+xZTdXBUWy3wYT/CVaxeuVx+8aVUKTyMdUFfvmd2ptyRWl5dTW4EzS
-msAAEDJDGnCr6RGWiD2cCYyRvo3eLnX6PnTYOPo5b84CYNgvc59C6dWGGTwnm/FZ
-iJblMSeF3uBZreEWXKcxW2X3DVkhVWLtVMN02p7FCILt2T6VpQ6PvH15SApi+WdD
-QzRixugJjhflSpwDoLCnG7mzDhEgp5JDdwDYRUY2eVitmncz3iNTcS3vPgil3MBe
-Th0d/u/emkQcq1xdeW69/ggKzardGA==
-=I3h8
------END PGP SIGNATURE-----
-
---ZwLy61rNHyM3IsgYgyTvSiSgVp02aWMGy--
+thanks
+-- PMM
