@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37484)
+Received: from eggs.gnu.org ([209.51.188.92]:37630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBGe-0002m1-7l
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:49 -0500
+	(envelope-from <groug@kaod.org>) id 1gkBGo-0002vu-Sr
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBGV-0008Re-5S
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37028
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1gkBGm-0000YL-1z
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBGU-0008PC-TR
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:39 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0HHETGa019878
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:38 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBGl-0007ul-Lh
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:15:55 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0HHES4f033990
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:22 -0500
 Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2v6bwcpu-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q2u5m0as5-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:35 -0500
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:15:21 -0500
 Received: from localhost
 	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 17 Jan 2019 17:15:32 -0000
+	Thu, 17 Jan 2019 17:15:18 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Thu, 17 Jan 2019 18:15:25 +0100
+Date: Thu, 17 Jan 2019 18:15:12 +0100
 In-Reply-To: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <154774532548.1208625.1331299923906836771.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH v3 09/19] spapr: populate PHB DRC entries for
- root DT node
+Message-Id: <154774531230.1208625.17504534121479554909.stgit@bahia.lan>
+Subject: [Qemu-devel] [PATCH v3 07/19] spapr_pci: add PHB unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,35 +42,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-From: Nathan Fontenot <nfont@linux.vnet.ibm.com>
+To support PHB hotplug we need to clean up lingering references,
+memory, child properties, etc. prior to the PHB object being
+finalized. Generally this will be called as a result of calling
+object_unparent() on the PHB object, which in turn would normally
+be called as the result of an unplug() operation.
 
-This add entries to the root OF node to advertise our PHBs as being
-DR-capable in accordance with PAPR specification.
+When the PHB is finalized, child objects will be unparented in
+turn, and finalized if the PHB was the only reference holder. so
+we don't bother to explicitly unparent child objects of the PHB
+(spapr_iommu, spapr_drc, etc).
 
-Signed-off-by: Nathan Fontenot <nfont@linux.vnet.ibm.com>
+The formula that gives the number of DMA windows is moved to an
+inline function in the hw/pci-host/spapr.h header because it
+will have other users.
+
+The unrealize function is able to cope with partially realized PHBs.
+It is hence used to implement proper rollback on the realize error
+path. Note that older machines that used the legacy irq allocation
+cannot support PHB hotplug, so we don't care to free their LSIs in
+the unrealize function.
+
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+v3: - don't free LSIs at unrealize
+v2: - implement rollback with unrealize function
+---
+ hw/ppc/spapr_pci.c          |   63 ++++++++++++++++++++++++++++++++++++++++---
+ include/hw/pci-host/spapr.h |    5 +++
+ 2 files changed, 64 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5be8f76351fd..83ec79caf48e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1350,6 +1350,14 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-         exit(1);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f5f13a4d4816..0f6a173d5323 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1559,6 +1559,56 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
      }
+ }
  
-+    if (smc->dr_phb_enabled) {
-+        ret = spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
-+        if (ret < 0) {
-+            error_report("Couldn't set up PHB DR device tree properties");
-+            exit(1);
++static void spapr_phb_finalizefn(Object *obj)
++{
++    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(obj);
++
++    g_free(sphb->dtbusname);
++    sphb->dtbusname = NULL;
++}
++
++static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
++{
++    SysBusDevice *s = SYS_BUS_DEVICE(dev);
++    PCIHostState *phb = PCI_HOST_BRIDGE(s);
++    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(phb);
++    sPAPRTCETable *tcet;
++    int i;
++    const unsigned windows_supported = spapr_phb_windows_supported(sphb);
++
++    if (sphb->msi) {
++        g_hash_table_unref(sphb->msi);
++        sphb->msi = NULL;
++    }
++
++    /*
++     * Remove IO/MMIO subregions and aliases, rest should get cleaned
++     * via PHB's unrealize->object_finalize
++     */
++    for (i = windows_supported - 1; i >= 0; i--) {
++        tcet = spapr_tce_find_by_liobn(sphb->dma_liobn[i]);
++        if (tcet) {
++            memory_region_del_subregion(&sphb->iommu_root,
++                                        spapr_tce_get_iommu(tcet));
 +        }
 +    }
 +
-     return fdt;
++    QLIST_REMOVE(sphb, list);
++
++    memory_region_del_subregion(&sphb->iommu_root, &sphb->msiwindow);
++
++    address_space_destroy(&sphb->iommu_as);
++
++    qbus_set_hotplug_handler(BUS(phb->bus), NULL, &error_abort);
++    pci_unregister_root_bus(phb->bus);
++
++    memory_region_del_subregion(get_system_memory(), &sphb->iowindow);
++    if (sphb->mem64_win_pciaddr != (hwaddr)-1) {
++        memory_region_del_subregion(get_system_memory(), &sphb->mem64window);
++    }
++    memory_region_del_subregion(get_system_memory(), &sphb->mem32window);
++}
++
+ static uint32_t spapr_phb_index_to_lsi(int phb_index, int irq_index)
+ {
+     return SPAPR_IRQ_PCI_LSI + phb_index * PCI_NUM_PINS + irq_index;
+@@ -1592,8 +1642,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     PCIBus *bus;
+     uint64_t msi_window_size = 4096;
+     sPAPRTCETable *tcet;
+-    const unsigned windows_supported =
+-        sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
++    const unsigned windows_supported = spapr_phb_windows_supported(sphb);
+ 
+     if (!spapr) {
+         error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
+@@ -1750,7 +1799,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+             if (local_err) {
+                 error_propagate_prepend(errp, local_err,
+                                         "can't allocate LSIs: ");
+-                return;
++                goto unrealize;
+             }
+             spapr_irq_set_type(spapr, irq, true);
+         }
+@@ -1778,13 +1827,17 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+         if (!tcet) {
+             error_setg(errp, "Creating window#%d failed for %s",
+                        i, sphb->dtbusname);
+-            return;
++            goto unrealize;
+         }
+         memory_region_add_subregion(&sphb->iommu_root, 0,
+                                     spapr_tce_get_iommu(tcet));
+     }
+ 
+     sphb->msi = g_hash_table_new_full(g_int_hash, g_int_equal, g_free, g_free);
++    return;
++
++unrealize:
++    spapr_phb_unrealize(dev, NULL);
  }
  
+ static int spapr_phb_children_reset(Object *child, void *opaque)
+@@ -1983,6 +2036,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
+ 
+     hc->root_bus_path = spapr_phb_root_bus_path;
+     dc->realize = spapr_phb_realize;
++    dc->unrealize = spapr_phb_unrealize;
+     dc->props = spapr_phb_properties;
+     dc->reset = spapr_phb_reset;
+     dc->vmsd = &vmstate_spapr_pci;
+@@ -1998,6 +2052,7 @@ static const TypeInfo spapr_phb_info = {
+     .name          = TYPE_SPAPR_PCI_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(sPAPRPHBState),
++    .instance_finalize = spapr_phb_finalizefn,
+     .class_init    = spapr_phb_class_init,
+     .interfaces    = (InterfaceInfo[]) {
+         { TYPE_HOTPLUG_HANDLER },
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index bb0ae7fdd41d..2ab75e28dbb5 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -166,4 +166,9 @@ void spapr_phb_dma_reset(sPAPRPHBState *sphb);
+ 
+ void spapr_phb_set_lsis(int index, sPAPRMachineState *spapr);
+ 
++static inline unsigned spapr_phb_windows_supported(sPAPRPHBState *sphb)
++{
++    return sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
++}
++
+ #endif /* PCI_HOST_SPAPR_H */
