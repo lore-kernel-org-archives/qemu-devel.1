@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44614)
+Received: from eggs.gnu.org ([209.51.188.92]:46550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gk2K3-0001rO-KD
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:42:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gk2Pq-0006dk-Fo
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:48:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gk2K2-0001Dn-QK
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:42:43 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:58390)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gk2K2-00013X-HQ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:42:42 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<000601d4a8e8$a8a10170$f9e30450$@ru>
-	<CANzW0mtY6R0HtZJCoT5OTNdz9+ycrktnbMVjZ0uMAmXT69=N3g@mail.gmail.com>
-	<001301d4ad62$f3f44820$dbdcd860$@ru>
-	<CANzW0mtVkiZJdYMytbDf2QwGDKTKL453zNbQDV6=xO=XvewmZg@mail.gmail.com>
-In-Reply-To: <CANzW0mtVkiZJdYMytbDf2QwGDKTKL453zNbQDV6=xO=XvewmZg@mail.gmail.com>
-Date: Thu, 17 Jan 2019 10:42:33 +0300
-Message-ID: <000601d4ae38$35431f60$9fc95e20$@ru>
+	(envelope-from <alex.bennee@linaro.org>) id 1gk2Pp-0000gD-7m
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:48:42 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gk2Pp-0000a8-0w
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:48:41 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p4so9816467wrt.7
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 23:48:33 -0800 (PST)
+References: <20190116202349.29272-1-alex.bennee@linaro.org>
+	<20190116202349.29272-5-alex.bennee@linaro.org>
+	<1bef2aae-06dc-5062-4ce6-8e2e9adefb46@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1bef2aae-06dc-5062-4ce6-8e2e9adefb46@linaro.org>
+Date: Thu, 17 Jan 2019 07:48:30 +0000
+Message-ID: <875zunzpv5.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
- subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] softfloat: fallback to __int128
+ maths for s390x and others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>
-Cc: 'qemu-devel' <qemu-devel@nongnu.org>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, cohuck@redhat.com, "open list:S390" <qemu-s390x@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-> From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
-> =D1=81=D1=80, 16 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 12:15, Pavel =
-Dovgalyuk <dovgaluk@ispras.ru>:
-> >
-> > > From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
-> > > > It seems, that this approach is not always correct.
-> > > > Now timerlist_deadline_ns uses all virtual timers for deadline =
-calculation (including
-> > > external
-> > > > ones).
-> > > > qemu_start_warp_timer uses the deadline for setting warp timer =
-(which should be
-> > > deterministic).
-> > > > Therefore warp timer may become non-deterministic and replay may =
-behave differently
-> compared
-> > > to
-> > > > recording phase.
-> > > >
-> > > > We have to rollback these or improve somehow to avoid =
-non-determinism.
-> > >
-> > > I dont understand how this approach would even introduce
-> > > non-determinism. I'm not sure about aspects of timers subsystem =
-you
-> > > mentioned, assuming that maybe we missed something when tried to
-> > > optimize. But this has nothing to do with determinism as long as =
-we
-> > > treat all virtual clock timers as deterministic, regardless of
-> > > EXTERNAL attribute being set or not. They are intended to be used =
-as
-> > > such by design, aren't? This attribute was introduced purely to =
-avoid
-> > > extra events in log.
-> >
-> > Right, but deadline calculation and icount warp events (that are =
-written into the log too)
-> > depend on the active virtual timers. Therefore external ones may =
-affect icount warp
-> > operation sequence.
-> >
-> > Pavel Dovgalyuk
-> >
->=20
-> Sorry, but I still don't understand the source of non-determinism.
 
-The source is the external timers, that depend on "outer world", e.g., =
-slirp.
-These timers are not recorded/replayed, but may affect the icount =
-warping
-(which should remain deterministic).
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> From what you said I may understand that replay module actually has
-> some additional non-trivial (for me) dependencies on EXTERNAL
-> attribute other than one, introduced in 'timerlist_run_timers()' (i.e.
-> it expects deadline calculations somewhere else to match decisions
-> made in this function, or something like that). I would agree that
-> these patch series might introduce some incorrect behavior. But it
-> must be identical in all emulations running in same conditions,
-> because deadline, warp timer and their effects are all dependent only
-> on virtual timers, and, therefore, are deterministic too. Of course,
-> it needs to be fixed. Did you find solution ?
+> On 1/17/19 7:23 AM, Alex Benn=C3=A9e wrote:
+>> Apparently some versions of clang can't handle inline assembly with
+>> __int128 parameters, especially on s390. Instead of hand-coding the
+>> s390 divide provide a generic fallback for anything that provides
+>> __int128 capable maths.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  include/fpu/softfloat-macros.h | 10 ++++------
+>>  1 file changed, 4 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macr=
+os.h
+>> index b1d772e6d4..1a43609eef 100644
+>> --- a/include/fpu/softfloat-macros.h
+>> +++ b/include/fpu/softfloat-macros.h
+>> @@ -641,12 +641,6 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint=
+64_t n1,
+>>      uint64_t q;
+>>      asm("divq %4" : "=3Da"(q), "=3Dd"(*r) : "0"(n0), "1"(n1), "rm"(d));
+>>      return q;
+>> -#elif defined(__s390x__)
+>> -    /* Need to use a TImode type to get an even register pair for DLGR.=
+  */
+>> -    unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>> -    asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>> -    *r =3D n >> 64;
+>> -    return n;
+>>  #elif defined(_ARCH_PPC64) && defined(_ARCH_PWR7)
+>>      /* From Power ISA 2.06, programming note for divdeu.  */
+>>      uint64_t q1, q2, Q, r1, r2, R;
+>> @@ -663,6 +657,10 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint=
+64_t n1,
+>>      }
+>>      *r =3D R;
+>>      return Q;
+>> +#elif defined(CONFIG_INT128)
+>> +    unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>> +    *r =3D n % d;
+>> +    return n / d;
+>>  #else
+>
+> I thought that we'd shown that, at least at present, no compiler is taking
+> advantage of hardware insns for this, and is promoting this to a full 128=
+-bit
+> divide.  And further that the version using 64-bit arithmetic was competi=
+tive
+> with the hardware insn.
 
-Please check the new version of the series.
-Patch 22
+Yeah it seems so. While Thomas' numbers weren't convincing the
+CONFIG_INT128 fallback did trigger on my SynQuacer an knocked off about
+2 MFlops of it's admittedly slow performance. Amusingly of course it's
+faster under translation because of the hardware fall back:
 
-Pavel Dovgalyuk
+07:44:44 [alex@idun:~/l/q/t/fp] (8973c1e5=E2=80=A6) + ./fp-bench -o div -p =
+double
+13.28 MFlops
+07:44:49 [alex@idun:~/l/q/t/fp] (8973c1e5=E2=80=A6) + ./fp-bench -o div -p =
+double -t host
+498.20 MFlops
+07:44:53 [alex@idun:~/l/q/t/fp] (8973c1e5=E2=80=A6) + ../../aarch64-linux-u=
+ser/qemu-aarch64  ./fp-bench -o div -p double -t host
+52.71 MFlops
+
+I'll drop this and use Thomas' #elif defined(__s390x__) &&
+!defined(__clang__) version in the pull-request.
+
+--
+Alex Benn=C3=A9e
