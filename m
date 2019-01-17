@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35174)
+Received: from eggs.gnu.org ([209.51.188.92]:39816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gkCR2-00041c-58
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:30:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkCdj-0000QB-Cx
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gkCQm-0000mr-TH
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:30:28 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:37419)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gkCQl-0000Hv-Na
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:30:20 -0500
-Date: Thu, 17 Jan 2019 13:30:02 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190117183002.GA21582@flamenco>
-References: <20190117132703.17790-1-alex.bennee@linaro.org>
-	<CAFEAcA_E2Lf9Zh2WhVDddJiD5TPPyLk1RvT7_Asn4vXnao1NjQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gkCdg-0007C9-Kd
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:43:43 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:46043)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkCde-000744-Nm
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:43:40 -0500
+Received: by mail-ot1-x334.google.com with SMTP id 32so12014846ota.12
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:43:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA_E2Lf9Zh2WhVDddJiD5TPPyLk1RvT7_Asn4vXnao1NjQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 0/7] check-softfloat,
- fp-bench and clang compile fixes
+References: <20190109152430.32359-1-agraf@suse.de>
+	<CAFEAcA9zugZiWirk9QjqmAO9QKhLdCAWuG1PX5z7Nxm4O69aTg@mail.gmail.com>
+	<CAFEAcA8Xzi8GjzUtzxbFzxdCS4kn0Cps+_bF70ZS0KnH0W8SvQ@mail.gmail.com>
+	<92dba7da-f3fc-b7dc-6896-cf8d58cc7f17@suse.de>
+	<CAFEAcA_sxvfHG6ryA4xHMfbwhDaRrF_+6xaef_0RqqH-7JESzQ@mail.gmail.com>
+	<0673d8c0-16f0-49e7-f002-06491353cc6c@suse.de>
+	<CAFEAcA-duBwj2-DG=dQLo-448ca--+C6Fu54avwEFQ5D-bwy8A@mail.gmail.com>
+In-Reply-To: <CAFEAcA-duBwj2-DG=dQLo-448ca--+C6Fu54avwEFQ5D-bwy8A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Jan 2019 18:43:20 +0000
+Message-ID: <CAFEAcA8UxBW1JCp4ky-OxsAV1ip_rkRp1ZCb=bK5nwG5ickStQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow to switch from MON->HYP
+ on AArch32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Tom Rini <trini@konsulko.com>, Michal Simek <michal.simek@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Stephen Warren <swarren@wwwdotorg.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Thu, Jan 17, 2019 at 17:37:54 +0000, Peter Maydell wrote:
-> On Thu, 17 Jan 2019 at 13:27, Alex Bennée <alex.bennee@linaro.org> wrote:
+On Thu, 10 Jan 2019 at 10:34, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Thu, 10 Jan 2019 at 06:43, Alexander Graf <agraf@suse.de> wrote:
 > >
-> > The following changes since commit 4b9f0b0f7c84eea2dfb0d5be3e0254bc91319dbc:
 > >
-> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-15 17:24:00 +0000)
 > >
-> > are available in the Git repository at:
+> > On 10.01.19 00:08, Peter Maydell wrote:
+> > > On Wed, 9 Jan 2019 at 17:14, Alexander Graf <agraf@suse.de> wrote:
+> > >>
+> > >> On 01/09/2019 05:59 PM, Peter Maydell wrote:
+> > >>> On Wed, 9 Jan 2019 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > >>>> On Wed, 9 Jan 2019 at 15:26, Alexander Graf <agraf@suse.de> wrote:
+> > >>>>> In U-boot, we switch from S-SVC -> MON -> HYP when we want to enter
+> > >>>>> HYP mode. This dance seems to work ok (hence it's there in the code
+> > >>>>> base), but breaks with current QEMU.
+> > >>> PS: it would be helpful if the commit message said how u-boot
+> > >>> is trying to go from Mon to Hyp -- some ways to try to do
+> > >>> this are OK, and some are not, so whether it's supposed to
+> > >>> work or not depends on what u-boot is actually doing...
+> > >>
+> > >> I don't fully understand all of it to be honest :). But the code is here:
+> > >>
+> > >> http://git.denx.de/?p=u-boot.git;a=blob;f=arch/arm/cpu/armv7/nonsec_virt.S
+> > >>
+> > >> What I managed to understand so far is that it goes to MON using the smc
+> > >> #0 call and then changes SPSR so that on return (movs pc) the mode will
+> > >> be different.
+> > >
+> > > Thanks -- yes, that's an exception return so it's the
+> > > expected way to go from Mon to Hyp.
 > >
-> >   https://github.com/stsquad/qemu.git tags/pull-fpu-next-170119-1
-(snip)
-> 
-> FreeBSD, OSX, x86-64 Linux clang builds:
-(snip)
-> PPC64, AArch64:
-(snip)
-> NetBSD:
-(snip)
+> > That was my understanding, yes. Do you still want me to change the
+> > commit message to mention that or will you just do it when applying?
+>
+> I'll add a note when I apply it; thanks.
 
-I have added a few commits to fix these -- diff below.
-Note that one fix requires a small change in the testfloat
-submodule, which I'm pulling here.
+Now applied to target-arm.next with a rewritten commit message; thanks.
 
-Alex, can you cherry-pick the commits in this branch?
-
-  https://github.com/cota/qemu/tree/bennee-pull
-
-They should go in before adding fp-test to the automated build,
-of course. I left them at the top to make it easier for
-you to cherry-pick.
-
-Also, since this will require a respin, you might want to fix the
-"Makfile" typo in patch 7's title.
-
-> S390X host:
-> Looks like a failure running the tests, but no diagnostics about
-> what exactly went wrong or clear "test failed" indicator:
-> 
-> cd /home/linux1/qemu/build/all/tests/fp && ./fp-test -s -l 1
-> i32_to_f16 i64_to_f16 i32_to_f32 i64_t
-> o_f32 i32_to_f64 i64_to_f64 i32_to_f128 i64_to_f128 >
-> int-to-float.out 2>  int-to-float.err
-> /home/linux1/qemu/tests/Makefile.include:913: recipe for target
-> 'check-softfloat-conv' failed
-> make: *** [check-softfloat-conv] Error 1
-
-What are the contents of "int-to-float.err"?
-
-Thanks,
-
-		Emilio
-
----
-diff --git a/tests/fp/Makefile b/tests/fp/Makefile
-index 5019dcdca0..5a35e7c210 100644
---- a/tests/fp/Makefile
-+++ b/tests/fp/Makefile
-@@ -65,8 +65,7 @@ QEMU_CFLAGS += $(TF_OPTS)
- TF_CFLAGS :=
- TF_CFLAGS += -Wno-strict-prototypes
- TF_CFLAGS += -Wno-unknown-pragmas
--TF_CFLAGS += -Wno-discarded-qualifiers
--TF_CFLAGS += -Wno-maybe-uninitialized
-+TF_CFLAGS += -Wno-uninitialized
- TF_CFLAGS += -Wno-missing-prototypes
- TF_CFLAGS += -Wno-return-type
- TF_CFLAGS += -Wno-unused-function
-diff --git a/tests/fp/berkeley-testfloat-3 b/tests/fp/berkeley-testfloat-3
-index ca9fa2ba05..5a59dcec19 160000
---- a/tests/fp/berkeley-testfloat-3
-+++ b/tests/fp/berkeley-testfloat-3
-@@ -1 +1 @@
--Subproject commit ca9fa2ba05625ba929958f163b01747e07dd39cc
-+Subproject commit 5a59dcec19327396a011a17fd924aed4fec416b3
-diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
-index fca576309c..2a35ef601d 100644
---- a/tests/fp/fp-test.c
-+++ b/tests/fp/fp-test.c
-@@ -789,7 +789,7 @@ static int set_init_flags(const char *flags)
-     return 0;
- }
-
--static uint8_t slow_clear_flags(void)
-+static uint_fast8_t slow_clear_flags(void)
- {
-     uint8_t prev = slowfloat_exceptionFlags;
-
-@@ -797,7 +797,7 @@ static uint8_t slow_clear_flags(void)
-     return prev;
- }
-
--static uint8_t qemu_clear_flags(void)
-+static uint_fast8_t qemu_clear_flags(void)
- {
-     uint8_t prev = qemu_flags_to_sf(qsf.float_exception_flags);
+-- PMM
