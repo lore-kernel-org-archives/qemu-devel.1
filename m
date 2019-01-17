@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36095)
+Received: from eggs.gnu.org ([209.51.188.92]:36405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gk3Ym-0001qw-RR
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:02:04 -0500
+	(envelope-from <lersek@redhat.com>) id 1gk3Zq-0002dg-QM
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gk3Yg-0002MG-OT
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:02:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
-	<87sgxtatod.fsf@dusky.pond.sub.org>
-	<4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
-	<20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
-	<ad34caf3-5f1f-dffc-4aed-60bb90ba2e5f@redhat.com>
-	<20190116091801-mutt-send-email-mst@kernel.org>
-Date: Thu, 17 Jan 2019 10:01:04 +0100
-In-Reply-To: <20190116091801-mutt-send-email-mst@kernel.org> (Michael
-	S. Tsirkin's message of "Wed, 16 Jan 2019 09:48:52 -0500")
-Message-ID: <87imyn64kv.fsf@dusky.pond.sub.org>
+	(envelope-from <lersek@redhat.com>) id 1gk3Zm-0003Yb-Ig
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gk3Zm-0003We-9k
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 04:03:02 -0500
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
+	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
+	<20190116132953.404247ec@redhat.com>
+	<20190116110052-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
+Date: Thu, 17 Jan 2019 09:53:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+In-Reply-To: <20190116110052-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Laszlo Ersek <lersek@redhat.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+Hello Michael,
 
-> On Wed, Jan 16, 2019 at 12:49:07PM +0100, Paolo Bonzini wrote:
->> On 16/01/19 12:34, Gerd Hoffmann wrote:
->> >   Hi,
->> > 
->> >> typedefs.h is useful to avoid rebuilding the world too often if a type
->> >> is used many times as a pointer, but rarely as a struct and rarely has
->> >> functions called on its instances.
->> > 
->> > Related:  Can also be used to keep struct content private.  struct
->> > QemuConsole for example is private to ui/console.c, but pointers to
->> > QemuConsole are passed around alot in ui/* and hw/display/* code.
->> 
->> True, though as we switch more and more from pointers to embedded
->> structs that does not work that much anymore.  Another way to do that is
->> to split the header in include/path/to/foo.h and path/to/foo_internal.h.
->> 
->> Paolo
->
-> Not sure this will help since no tool checks structure isn't
-> actually used even though it's in internal.
->
-> If you want to go overboard it's solvable of course, e.g.
-> something like this will work:
->
->
-> E.g. in virtio.h
->
-> #ifndef VIRTIO_PRIVATE
-> #define VIRTIO_PRIVATE(f) (VIRTIO_PIVATE_##f)
-> #endif
->
-> struct VirtioPrivate {
-> 	int VIRTIO_PRIVATE(bar);
-> };
->
-> and in virtio.c:
->
-> #define VIRTIO_PRIVATE(f) (f)
-> #include <virtio.h>
+On 01/16/19 17:01, Michael S. Tsirkin wrote:
+> On Wed, Jan 16, 2019 at 01:29:53PM +0100, Igor Mammedov wrote:
+>> On Tue, 15 Jan 2019 21:47:49 +0100
+>> Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>>> On 01/15/19 16:41, Igor Mammedov wrote:
+>>>> Add firmware blobs built with PcdAcpiTestSupport=TRUE,
+>>>> that puts RSDP address in RAM after 1Mb aligned GUID
+>>>>   AB87A6B1-2034-BDA0-71BD-375007757785
+>>>> so that tests could scan and find it in RAM once firmware's
+>>>> initialized ACPI tables.
+>>>>
+>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>>> ---
+>>>>  Makefile              |   3 ++-
+>>>>  pc-bios/avmf.img      | Bin 0 -> 2097152 bytes
+>>>>  pc-bios/avmf_vars.img | Bin 0 -> 786432 bytes
+>>>>  3 files changed, 2 insertions(+), 1 deletion(-)
+>>>>  create mode 100644 pc-bios/avmf.img
+>>>>  create mode 100644 pc-bios/avmf_vars.img  
+>>>
+>>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
+>>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
+>>> would be more precise, but those are verbose. Sigh, why are names so
+>>> hard. What does everyone think?
+>> I'm fine with either version.
+>>  
+>>> Also, do you have to care about the license of firmware images built
+>>> from edk2 when bundling such images? Since edk2 commit 9a67ba261fe9
+>>> ("ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF.",
+>>> 2018-12-14), you cannot build the ArmVirtQemu (aka AAVMF) firmware
+>>> without OpenSSL. Thus, the resultant license is 2-BSDL + OpenSSL -- for
+>>> now anyway.
+>>>
+>>> Because, in the near future, that might change again. edk2 is in the
+>>> process of moving to Apache-2.0, and OpenSSL will also move (AFAICT) to
+>>> Apache-2.0 starting with release 3.0.0. (See commit 151333164ece,
+>>> "Change license to the Apache License v2.0", 2018-12-06.)
+>> That's another reason to look into EFI app approach (a simple one without
+>> dependencies) ans let distro to provide firmware image.
+> 
+> That will mean supporting very old firmware with the app.
+> I'm all for the EFI app approach for modularity
+> but I think we should include the batteries with this toy.
 
-I don't like such games at all.
+There are two approaches here. (Both require that edk2 be present in the
+QEMU source tree as a submodule, and both require QEMU to receive a
+script for building edk2 in *some* way.)
 
-Instead, I'd recommend to keep internal headers out of include/, and
-rely on review / grep to catch, correct and prevent inappropriate uses.
+
+(1) Carry the bios-tables-test helper UEFI app as an "out of tree"
+module, from the perspective of edk2; carry it natively in the QEMU tree.
+
+* Edk2 supports this use case as a first class citizen.
+
+* In this case, the UEFI application is permitted to link only such
+libraries from edk2 that the resultant binary inherit no platform
+dependencies. The app can only be made dependent on a minimum UEFI spec
+release, if necessary. The resultant binary can be run on any conformant
+UEFI implementation, including physical hardware.
+
+An example for "platform dependency prohibition" is that the X64 build
+of the app could not print debug messages to the QEMU debug port (like
+the rest of OVMF does), only to the UEFI console. On OVMF, that console
+would direct the debug messages to the serial port and the graphics card.
+
+Regarding a minimum UEFI spec release, the oldest UEFI spec I have on my
+disk is "2.3.1, Errata C", dated "June 27, 2012". I'm not aware of
+anything in the helper app that requires more recent spec features.
+
+* Should we have to extend the UEFI app with a feature, we could easily
+do that in sync with the consumer QEMU test code.
+
+* The build output to commit to the QEMU repo would be an ISO image
+containing the UEFI binary as a "boot loader". It would not contain
+OpenSSL bits. The derived license would be a combination of core edk2's
+license and our out-of-edk2-module's license.
+
+
+(2) Carry the bios-tables-test helper *functionality* (not necessarily a
+standalone UEFI application) in edk2; add a custom build flag to the
+OVMF and ArmVirtQemu firmware platforms to enable the helper functionality.
+
+* In this case, the test helper logic is permitted to rely on platform
+internals. For example, on X64, it could print debug messages to the
+QEMU debug port, like the rest of OVMF does.
+
+* Whenever a new feature became necessary, edk2 would get new patches,
+then QEMU would bump the submodule commit reference accordingly.
+
+* The build output to commit to the QEMU repo would be a custom firmware
+image (built with the special build flag mentioned above), and no other
+bootable media would be formatted / saved. The custom firmware image
+would contain OpenSSL bits. The image's license would be derived from
+edk2 and from the OpenSSL submodule used by edk2.
+
+* Also, the custom firmware image would not be suitable for "production"
+use, so it couldn't be at once bundled under pc-bios as well -- that
+would remain a separate RFE.
+
+
+Since last night, I have some rough patches for (1), including the
+QEMU-side Makefile + build script.
+
+Regarding (2), I also have the edk2-native code ready (I had posted it a
+few weeks back -- that's what Igor used now). For the QEMU side of
+approach (2), I reckon I could reuse most of the build script I already
+have for (1).
+
+Could we please decide for (1) vs (2), before I put more work into (1)?
+
+Thanks
+Laszlo
