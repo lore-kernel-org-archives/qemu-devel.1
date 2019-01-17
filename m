@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38210)
+Received: from eggs.gnu.org ([209.51.188.92]:42662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBHk-0003eu-Gn
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:57 -0500
+	(envelope-from <sean.j.christopherson@intel.com>) id 1gk9qu-0002Qb-8C
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gkBHj-0002Ly-Cv
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkBHg-00028f-PL
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:16:54 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0HHEPXr000683
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:41 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q2tuuhmc3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 12:16:41 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Thu, 17 Jan 2019 17:16:38 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 17 Jan 2019 18:16:31 +0100
-In-Reply-To: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+	(envelope-from <sean.j.christopherson@intel.com>) id 1gk9qr-00063L-LX
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:07 -0500
+Received: from mga01.intel.com ([192.55.52.88]:51081)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sean.j.christopherson@intel.com>)
+	id 1gk9qr-0005gM-Bq
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:05 -0500
+Date: Thu, 17 Jan 2019 07:44:54 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+Message-ID: <20190117154454.GA22169@linux.intel.com>
+References: <1547733331-16140-1-git-send-email-ann.zhuangyanying@huawei.com>
+	<1547733331-16140-2-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <154774539126.1208625.11769078525063939706.stgit@bahia.lan>
-Subject: [Qemu-devel] [PATCH v3 19/19] spapr: enable PHB hotplug for default
- pseries machine type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547733331-16140-2-git-send-email-ann.zhuangyanying@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] KVM: MMU: correct the behavior of
+ mmu_spte_update_no_track
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,43 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Zhuangyanying <ann.zhuangyanying@huawei.com>
+Cc: xiaoguangrong@tencent.com, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, liu.jinsong@huawei.com
 
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
+On Thu, Jan 17, 2019 at 01:55:28PM +0000, Zhuangyanying wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Current behavior of mmu_spte_update_no_track() does not match
+> the name of _no_track() as actually the A/D bits are tracked
+> and returned to the caller
 
-The 'dr_phb_enabled' field of that class can be set as part of
-machine-specific init code. It will be used to conditionally
-enable creation of DRC objects and device-tree description to
-facilitate hotplug of PHBs.
+Sentences should be terminated with periods.
 
-Since we can't migrate this state to older machine types,
-default the option to true and disable it for older machine
-types.
+> This patch introduces the real _no_track() function to update
 
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |    2 ++
- 1 file changed, 2 insertions(+)
+"This patch" is redundant, e.g. simply state "Introduce ...".
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d94284f423be..2687b65798d7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4169,6 +4169,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_xics;
-+    smc->dr_phb_enabled = true;
- }
- 
- static const TypeInfo spapr_machine_info = {
-@@ -4234,6 +4235,7 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
-     compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     smc->update_dt_enabled = false;
-+    smc->dr_phb_enabled = false;
- }
- 
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> the spte regardless of A/D bits and rename the original function
+> to _track()
+
+The function also avoids __update_clear_spte_slow(), i.e. AFAICT it
+doesn't guarantee volatile bits will be preserved.  I assume this is
+intentional, but it'd be nice to explain why this is ok.
+
+> The _no_track() function will be used by later patches to update
+> upper spte which need not care of A/D bits indeed
+
+The _no_track() variant is already used (by mmu_spte_age()), I don't
+see any point in having this blurb on the changelog, e.g. it led me
+to incorrectly think an unused function was being introduced.
+
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> ---
+>  arch/x86/kvm/mmu.c | 25 ++++++++++++++++++++++---
+>  1 file changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index ce770b4..eeb3bac 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -731,10 +731,29 @@ static void mmu_spte_set(u64 *sptep, u64 new_spte)
+>  }
+>  
+>  /*
+> - * Update the SPTE (excluding the PFN), but do not track changes in its
+> + * Update the SPTE (excluding the PFN) regardless of accessed/dirty
+> + * status which is used to update the upper level spte.
+> + */
+> +static void mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+> +{
+> +	u64 old_spte = *sptep;
+
+No need to snapshot the old spte since it's not being returned.
+
+> +	WARN_ON(!is_shadow_present_pte(new_spte));
+> +
+> +	if (!is_shadow_present_pte(old_spte)) {
+> +		mmu_spte_set(sptep, new_spte);
+> +		return;
+
+Similarly, this is more complex than it needs to be, e.g. the function
+can be simplified to:
+
+static void mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+{
+	WARN_ON(!is_shadow_present_pte(new_spte));
+
+	if (!is_shadow_present_pte(*sptep))
+		mmu_spte_set(sptep, new_spte);
+	else
+		__update_clear_spte_fast(sptep, new_spte);
+}
+
+> +	}
+> +
+> +	__update_clear_spte_fast(sptep, new_spte);
+> +}
+> +
+> +/*
+> + * Update the SPTE (excluding the PFN), the original value is
+> + * returned, based on it, the caller can track changes of its
+>   * accessed/dirty status.
+>   */
+> -static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+> +static u64 mmu_spte_update_track(u64 *sptep, u64 new_spte)
+>  {
+>  	u64 old_spte = *sptep;
+>  
+> @@ -769,7 +788,7 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+>  static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+>  {
+>  	bool flush = false;
+> -	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
+> +	u64 old_spte = mmu_spte_update_track(sptep, new_spte);
+>  
+>  	if (!is_shadow_present_pte(old_spte))
+>  		return false;
+> -- 
+> 1.8.3.1
+> 
+> 
