@@ -1,30 +1,46 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41980)
+Received: from eggs.gnu.org ([209.51.188.92]:42678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gk9oy-0000fM-L0
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:43:09 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gk9qw-0002VF-Rj
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gk9ow-0002Vs-Jc
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:43:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gk9ow-000254-7g
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:43:06 -0500
-Date: Thu, 17 Jan 2019 16:42:40 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190117164240.7fc3208d@redhat.com>
-In-Reply-To: <a436b1e2-1010-624d-4415-46450f4bedda@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
-	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
-	<20190116132953.404247ec@redhat.com>
-	<20190116110052-mutt-send-email-mst@kernel.org>
-	<d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
-	<20190117102239.mnixjppxpuprjwau@sirius.home.kraxel.org>
-	<a436b1e2-1010-624d-4415-46450f4bedda@redhat.com>
+	(envelope-from <walling@linux.ibm.com>) id 1gk9qr-00062a-6z
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45654
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gk9qp-0005pU-8F
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:45:03 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0HFi4M2078657
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:44:59 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2vbh0tjb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:44:59 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Thu, 17 Jan 2019 15:44:58 -0000
+References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+	<be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
+	<e5c4fa66-b83d-7f98-4f05-ccf26375a3ac@redhat.com>
+	<3f286f5b-9403-4a4d-5af0-1c0297c0b97e@linux.ibm.com>
+	<879a92e3-cfd9-b26f-a45a-ab8c20c5ffaa@redhat.com>
+	<20190114104436.46ab183c.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Thu, 17 Jan 2019 10:44:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190114104436.46ab183c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
+Message-Id: <b2cf21a6-e27c-8422-81c0-e82000e0510d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v7] s390x/pci: add common
+ function measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +49,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: pmorel@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, thuth@redhat.com, rth@twiddle.net
 
-On Thu, 17 Jan 2019 13:54:51 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+On 1/14/19 4:44 AM, Cornelia Huck wrote:
+> On Mon, 14 Jan 2019 10:23:58 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 14.01.19 10:18, Pierre Morel wrote:
+>>> On 09/01/2019 12:43, David Hildenbrand wrote:
+>>>> On 09.01.19 12:29, David Hildenbrand wrote:
+>>>>> On 08.01.19 18:37, Pierre Morel wrote:
+>>>>>> From: Yi Min Zhao <zyimin@linux.ibm.com>
+>>>>>>
+>>>>>> Common function measurement block is used to report zPCI internal
+>>>>>> counters of successful pcilg/stg/stb and rpcit instructions to
+>>>>>> a memory location provided by the program.
+>>>>>>
+>>>>>> This patch introduces a new ZpciFmb structure and schedules a timer
+>>>>>> callback to copy the zPCI measures to the FMB in the guest memory
+>>>>>> at an interval time set to 4s.
+>>>>>>
+>>>>>> An error while attemping to update the FMB, would generate an error
+>>>>>> event to the guest.
+>>>>>>
+>>>>>> The pcilg/stg/stb and rpcit interception handlers increase the
+>>>>>> related counter on a successful call.
+>>>>>> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+>>>>>> Information Block) when it issues a Modify PCI Function Control
+>>>>>> instruction to switch off FMB and stop the corresponding timer.
+>>>>>>
+>>>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>>>> ---
+>>>>>>    hw/s390x/s390-pci-bus.c  |   4 +-
+>>>>>>    hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>>>>>>    hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
+>>>>>>    hw/s390x/s390-pci-inst.h |   1 +
+>>>>>>    4 files changed, 163 insertions(+), 4 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>>> index 060ff06..f0d34dd 100644
+>>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>>> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+>>>>>>        bus = pci_get_bus(pci_dev);
+>>>>>>        devfn = pci_dev->devfn;
+>>>>>>        object_unparent(OBJECT(pci_dev));
+>>>>>> +    fmb_timer_free(pbdev);
+>>>>>
+>>>>> I still think this is the wrong place. it has nothing to do with
+>>>>> hotplug/unplug. This belongs into unrealize/finalize.
+>>>>>
+>>>>>   
+>>>>
+>>>> ... but I see the issue. It boils down to the bad design of zPCI. The
+>>>> PCI device has no clue about the pbdev. So this has to stay here because
+>>>> in unrealize of pbdev it would be wrong and into unrealize of pci_dev,
+>>>> we can't move it.
+>>>>   
+>>>
+>>> OK, thanks.
+>>> So is it a ack from you?
+>>
+>> Acked-by: David Hildenbrand <david@redhat.com>
+>>
+>> :)
+> 
+> Great!
+> 
+> Still waiting for an ack from Collin (nudge, nudge :) before applying
+> this.
+> 
 
-> On 01/17/19 11:22, Gerd Hoffmann wrote:
-> >   Hi,
-> >   
-> >>>>>>  create mode 100644 pc-bios/avmf.img
-> >>>>>>  create mode 100644 pc-bios/avmf_vars.img    
-> >>>>>
-> >>>>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
-> >>>>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
-> >>>>> would be more precise, but those are verbose. Sigh, why are names so
-> >>>>> hard. What does everyone think?  
-> >>>> I'm fine with either version.  
-> > 
-> > How about placing them in pc-bios/efi-$arch subdirs and not renaming the
-> > files, i.e. that would be ...
-> > 
-> > 	pc-bios/efi-aarch64/QEMU_EFI.fd
-> > 	pc-bios/efi-aarch64/QEMU_VARS.fd
-> > 
-> > ... for arm, and ...
-> > 
-> > 	pc-bios/efi-x86_64/OVMF_CODE.fd
-> > 	pc-bios/efi-x86_64/OVMF_VARS.fd
-> > 
-> > ... for x86.  
-if it's non production images (i.e. openssl-less) than maybe use
-tests/data/acpi instead of pc-bios for now, once we have pc-bios ones
-ready we drop test specific and use production ones.
+Whoops, thought I already acked this one -- sorry!
 
-> That sounds good to me. One thing to note is that the arm/aarch64 images
-> have to be padded to 64MB, so I generally append ".padded" to those file
-> names. Would that be OK? Any better ideas?
-Images could be pre-padded and ready for commit, wrt large size we can commit
-them compressed and decompress for using in tests instead of padding padding
-I'm doing now before I use them.
-
-> >> Could we please decide for (1) vs (2), before I put more work into (1)?  
-> > 
-> > I'd tend to prefer (1).  
-
-+1
-
-> 
-> Thanks. I have a patch set that's almost suitable for posting as an RFC.
-> I should split the last patch and write some sensible commit messages.
-> 
-> BTW, the bundling under pc-bios is a bit larger task than it immediately
-> appears:
-> 
-> - there are many build options to consider (as you know perfectly well
->   :) ),
-> 
-> - plus now we have the "docs/interop/firmware.json" schema too, hence
->   whatever images we build for end-user consumption, should likely be
->   accompanied by metafiles that conform to this schema.
-> 
-> I think once we introduce the "roms/edk2" submodule for the current
-> purpose, we could address the pc-bios binaries (+metafiles) in a
-> separate series, on top.
-> 
-> Thanks,
-> Laszlo
-> 
+I give this my full Reviewed-by: Collin Walling <walling@linux.ibm.com>
