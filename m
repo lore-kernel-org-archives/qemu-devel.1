@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44110)
+Received: from eggs.gnu.org ([209.51.188.92]:47482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gkOoW-0002nf-0V
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 02:43:41 -0500
+	(envelope-from <bsd@redhat.com>) id 1gkP2T-0005vP-5S
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 02:58:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gkOoS-00073h-ON
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 02:43:38 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 07:43:22 +0000
-Message-ID: <5be49f7c-1f24-e6a1-eabf-bd5711f46566@virtuozzo.com>
-References: <20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-	<2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
-	<9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
-	<ccb5e146-a601-81d6-28ca-8717adbdb701@virtuozzo.com>
-	<83610386-bc64-6691-9af8-e98eb0a68342@virtuozzo.com>
-	<20190117142353.GA6761@localhost.localdomain>
-In-Reply-To: <20190117142353.GA6761@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <978A0CC9FEAF5A41A456124ADD8E2160@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bsd@redhat.com>) id 1gkP2S-0002KN-7p
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 02:58:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50570)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1gkP2R-0002D9-UW
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 02:58:04 -0500
+From: Bandan Das <bsd@redhat.com>
+References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
+	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
+	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+	<e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
+	<CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
+	<CABiizES5O1zGF_7CxnSCfVQL39=Ov0Bf61-U2XwvoS1_xDi2ew@mail.gmail.com>
+	<8ebdfb3b-f99b-4dbc-0389-b96b3f9fb633@redhat.com>
+	<CABiizERPJa06YNEyUxEAgDaSgjJny4bTa4qpTDCwKzKMn5Ji=Q@mail.gmail.com>
+	<0387b8e9-2b4f-ce1a-05df-b508851b84f0@redhat.com>
+	<20190114092459.GA7038@stefanha-x1.localdomain>
+Date: Fri, 18 Jan 2019 02:51:23 -0500
+In-Reply-To: <20190114092459.GA7038@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 14 Jan 2019 09:24:59 +0000")
+Message-ID: <jpgh8e6o138.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] PING: [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrey Konovalov <andreyknvl@google.com>, qemu-devel <qemu-devel@nongnu.org>, Kostya Serebryany <kcc@google.com>, Jonathan Metzman <metzman@google.com>, Max Moroz <mmoroz@google.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Nitesh Narayan Lal <nitesh@redhat.com>
 
-DQoNCk9uIDE3LjAxLjIwMTkgMTc6MjMsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDE3LjAxLjIw
-MTkgdW0gMTM6NTcgaGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+IEtldmluLA0K
-Pj4NCj4+IGNvdWxkIHlvdSBwbGVhc2UgdGFrZSBhIGxvb2sgYXQgbXkgbGFzdCBjb21tZW50cz8N
-Cj4gDQo+IEkgcmVhZCBpdCwgYW5kIHdoYXQgaXQgdG9sZCBtZSBpcyBlc3NlbnRpYWxseSB0aGF0
-IEkgbmVlZCB0byB3b3JrIG9uIGl0DQo+IG15c2VsZiB0byBmdWxseSB1bmRlcnN0YW5kIHRoZSBw
-cm9ibGVtIGFuZCBwb3NzaWJsZSBhY2NlcHRhYmxlIHNvbHV0aW9ucw0KPiBiZWNhdXNlIHlvdSBj
-YW4ndCBzZWVtIHRvIGZpbmQgb25lIHlvdXJzZWxmLiBJIHdpbGwsIGJ1dCBJIGNhbid0DQo+IGd1
-YXJhbnRlZSB3aGVuIEkgY2FuIGZpbmQgdGhlIHRpbWUgZm9yIGl0Lg0KPiANCj4gS2V2aW4NCm9r
-LiBUaGFua3MhDQoNCkRlbmlzDQo+IA0KPj4gT24gMTUuMDEuMjAxOSAxMDoyMiwgRGVuaXMgUGxv
-dG5pa292IHdyb3RlOg0KPj4+IHBpbmcgcGluZyBwaW5nIHBpbmchISEhDQo+Pj4NCj4+PiBPbiAw
-OS4wMS4yMDE5IDExOjE4LCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6DQo+Pj4+IHBpbmcgcGluZyEh
-IQ0KPj4+Pg0KPj4+PiBPbiAxOC4xMi4yMDE4IDExOjUzLCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6
-DQo+Pj4+PiBwaW5nIHBpbmcNCj4+Pj4+DQo+Pj4+PiBPbiAxNC4xMi4yMDE4IDE0OjU0LCBEZW5p
-cyBQbG90bmlrb3Ygd3JvdGU6DQo+Pj4+Pj4NCj4+Pj4+Pg0KPj4+Pj4+IE9uIDEzLjEyLjIwMTgg
-MTU6MjAsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+Pj4+IEFtIDEzLjEyLjIwMTggdW0gMTI6MDcg
-aGF0IERlbmlzIFBsb3RuaWtvdiBnZXNjaHJpZWJlbjoNCj4+Pj4+Pj4+IE9uIDEyLjEyLjIwMTgg
-MTU6MjQsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+Pj4+Pj4gQW0gMTEuMTIuMjAxOCB1bSAxNzo1
-NSBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+Pj4+Pj4+Pj4gV2h5IGludm9s
-dmUgdGhlIEFpb0NvbnRleHQgYXQgYWxsPyBUaGlzIGNvdWxkIGFsbCBiZSBrZXB0IGF0IHRoZQ0K
-Pj4+Pj4+Pj4+Pj4gQmxvY2tCYWNrZW5kIGxldmVsIHdpdGhvdXQgZXh0ZW5kaW5nIHRoZSBsYXll
-cmluZyB2aW9sYXRpb24gdGhhdA0KPj4+Pj4+Pj4+Pj4gYWlvX2Rpc2FibGVfZXh0ZXJuYWwoKSBp
-cy4NCj4+Pj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+PiBCbG9ja0JhY2tlbmRzIGdldCBub3RpZmllZCB3
-aGVuIHRoZWlyIHJvb3Qgbm9kZSBpcyBkcmFpbmVkLCBzbw0KPj4+Pj4+Pj4+Pj4gaG9va2luZw0K
-Pj4+Pj4+Pj4+Pj4gdGhpbmdzIHVwIHRoZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBub3QgZXZl
-biBlYXNpZXIgdGhhbiBpbg0KPj4+Pj4+Pj4+Pj4gQWlvQ29udGV4dC4NCj4+Pj4+Pj4+Pj4NCj4+
-Pj4+Pj4+Pj4gSnVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0aGF0IEkgdW5kZXJzdG9vZCBjb3JyZWN0
-bHkgd2hhdCB5b3UNCj4+Pj4+Pj4+Pj4gbWVhbnQgYnkNCj4+Pj4+Pj4+Pj4gIkJsb2NrQmFja2Vu
-ZHMgZ2V0IG5vdGlmaWVkIi4gRGlkIHlvdSBtZWFuIHRoYXQgYmRydl9kcmFpbl9lbmQNCj4+Pj4+
-Pj4+Pj4gY2FsbHMNCj4+Pj4+Pj4+Pj4gY2hpbGQncyByb2xlIGNhbGxiYWNrIGJsa19yb290X2Ry
-YWluZWRfZW5kIGJ5IGNhbGxpbmcNCj4+Pj4+Pj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/
-DQo+Pj4+Pj4+Pj4NCj4+Pj4+Pj4+PiBZZXMsIGJsa19yb290X2RyYWluZWRfYmVnaW4vZW5kIGNh
-bGxzIGFyZSBhbGwgeW91IG5lZWQuDQo+Pj4+Pj4+Pj4gU3BlY2lmaWNhbGx5LA0KPj4+Pj4+Pj4+
-IHRoZWlyIGFkanVzdG1lbnRzIHRvIGJsay0+cXVpZXNjZV9jb3VudGVyIHRoYXQgYXJlIGFscmVh
-ZHkgdGhlcmUsDQo+Pj4+Pj4+Pj4gYW5kIGluDQo+Pj4+Pj4+Pj4gdGhlICdpZiAoLS1ibGstPnF1
-aWVzY2VfY291bnRlciA9PSAwKScgYmxvY2sgb2YNCj4+Pj4+Pj4+PiBibGtfcm9vdF9kcmFpbmVk
-X2VuZCgpDQo+Pj4+Pj4+Pj4gd2UgY2FuIHJlc3VtZSB0aGUgcXVldWVkIHJlcXVlc3RzLg0KPj4+
-Pj4+Pj4gU291bmRzIGl0IHNob3VsZCBiZSBzbywgYnV0IGl0IGRvZXNuJ3Qgd29yayB0aGF0IHdh
-eSBhbmQgdGhhdCdzIHdoeToNCj4+Pj4+Pj4+IHdoZW4gZG9pbmcgbWlycm9yIHdlIG1heSByZXN1
-bWUgcG9zdHBvbmVkIGNvcm91dGluZXMgdG9vIGVhcmx5DQo+Pj4+Pj4+PiB3aGVuIHRoZQ0KPj4+
-Pj4+Pj4gdW5kZXJseWluZyBicyBpcyBwcm90ZWN0ZWQgZnJvbSB3cml0aW5nIGF0IGFuZCB0aHVz
-IHdlIGVuY291bnRlciB0aGUNCj4+Pj4+Pj4+IGFzc2VydCBvbiBhIHdyaXRlIHJlcXVlc3QgZXhl
-Y3V0aW9uIGF0IGJkcnZfY29fd3JpdGVfcmVxX3ByZXBhcmUgd2hlbg0KPj4+Pj4+Pj4gcmVzdW1p
-bmcgdGhlIHBvc3Rwb25lZCBjb3JvdXRpbmVzLg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+IFRoZSB0aGlu
-ZyBpcyB0aGF0IHRoZSBicyBpcyBwcm90ZWN0ZWQgZm9yIHdyaXRpbmcgYmVmb3JlIGV4ZWN1dGlv
-biBvZg0KPj4+Pj4+Pj4gYmRydl9yZXBsYWNlX25vZGUgYXQgbWlycm9yX2V4aXRfY29tbW9uIGFu
-ZCBiZHJ2X3JlcGxhY2Vfbm9kZSBjYWxscw0KPj4+Pj4+Pj4gYmRydl9yZXBsYWNlX2NoaWxkX25v
-cGVybSB3aGljaCwgaW4gdHVybiwgY2FsbHMNCj4+Pj4+Pj4+IGNoaWxkLT5yb2xlLT5kcmFpbmVk
-X2VuZA0KPj4+Pj4+Pj4gd2hlcmUgb25lIG9mIHRoZSBjYWxsYmFja3MgaXMgYmxrX3Jvb3RfZHJh
-aW5lZF9lbmQgd2hpY2ggY2hlY2sNCj4+Pj4+Pj4+IGlmKC0tYmxrLT5xdWllc2NlX2NvdW50ZXIg
-PT0gMCkgYW5kIHJ1bnMgdGhlIHBvc3Rwb25lZCByZXF1ZXN0cw0KPj4+Pj4+Pj4gKGNvcm91dGlu
-ZXMpIGlmIHRoZSBjb3VuZGl0aW9uIGlzIHRydWUuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IEhtLCBzbyBz
-b21ldGhpbmcgaXMgbWVzc2VkIHVwIHdpdGggdGhlIGRyYWluIHNlY3Rpb25zIGluIHRoZSBtaXJy
-b3INCj4+Pj4+Pj4gZHJpdmVyLiBXZSBoYXZlOg0KPj4+Pj4+Pg0KPj4+Pj4+PiAgwqDCoMKgwqAg
-YmRydl9kcmFpbmVkX2JlZ2luKHRhcmdldF9icyk7DQo+Pj4+Pj4+ICDCoMKgwqDCoCBiZHJ2X3Jl
-cGxhY2Vfbm9kZSh0b19yZXBsYWNlLCB0YXJnZXRfYnMsICZsb2NhbF9lcnIpOw0KPj4+Pj4+PiAg
-wqDCoMKgwqAgYmRydl9kcmFpbmVkX2VuZCh0YXJnZXRfYnMpOw0KPj4+Pj4+Pg0KPj4+Pj4+PiBP
-YnZpb3VzbHksIHRoZSBpbnRlbnRpb24gd2FzIHRvIGtlZXAgdGhlIEJsb2NrQmFja2VuZCBkcmFp
-bmVkIGR1cmluZw0KPj4+Pj4+PiBiZHJ2X3JlcGxhY2Vfbm9kZSgpLiBTbyBob3cgY291bGQgYmxr
-LT5xdWllc2NlX2NvdW50ZXIgZXZlciBnZXQgdG8gMA0KPj4+Pj4+PiBpbnNpZGUgYmRydl9yZXBs
-YWNlX25vZGUoKSB3aGVuIHRhcmdldF9icyBpcyBkcmFpbmVkPw0KPj4+Pj4+Pg0KPj4+Pj4+PiBM
-b29raW5nIGF0IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0oKSwgaXQgc2VlbXMgdGhhdCB0aGUg
-ZnVuY3Rpb24gaGFzDQo+Pj4+Pj4+IGEgYnVnOiBFdmVuIGlmIG9sZF9icyBhbmQgbmV3X2JzIGFy
-ZSBib3RoIGRyYWluZWQsIHRoZSBxdWllc2NlX2NvdW50ZXINCj4+Pj4+Pj4gZm9yIHRoZSBwYXJl
-bnQgcmVhY2hlcyAwIGZvciBhIG1vbWVudCBiZWNhdXNlIHdlIGNhbGwgLmRyYWluZWRfZW5kIGZv
-cg0KPj4+Pj4+PiB0aGUgb2xkIGNoaWxkIGZpcnN0IGFuZCAuZHJhaW5lZF9iZWdpbiBmb3IgdGhl
-IG5ldyBvbmUgbGF0ZXIuDQo+Pj4+Pj4+DQo+Pj4+Pj4+IFNvIGl0IHNlZW1zIHRoZSBmaXggd291
-bGQgYmUgdG8gcmV2ZXJzZSB0aGUgb3JkZXIgYW5kIGZpcnN0IGNhbGwNCj4+Pj4+Pj4gLmRyYWlu
-ZWRfYmVnaW4gZm9yIHRoZSBuZXcgY2hpbGQgYW5kIHRoZW4gLmRyYWluZWRfZW5kIGZvciB0aGUg
-b2xkDQo+Pj4+Pj4+IGNoaWxkLiBTb3VuZHMgbGlrZSBhIGdvb2QgbmV3IHRlc3RjYXNlIGZvciB0
-ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYywNCj4+Pj4+Pj4gdG9vLg0KPj4+Pj4+IFllcywgaXQncyB0
-cnVlLCBidXQgaXQncyBub3QgZW5vdWdoLi4uDQo+Pj4+Pj4gSW4gbWlycm9yX2V4aXRfY29tbW9u
-KCkgd2UgYWN0aXZlbHkgbWFuaXB1bGF0ZSB3aXRoIGJsb2NrIGRyaXZlcg0KPj4+Pj4+IHN0YXRl
-cy4NCj4+Pj4+PiBXaGVuIHdlIHJlcGxhY2VkIGEgbm9kZSBpbiB0aGUgc25pcHBldCB5b3Ugc2hv
-d2VkIHdlIGNhbid0IGFsbG93IHRoZQ0KPj4+Pj4+IHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRvIHJ1
-biBiZWNhdXNlIHRoZSBibG9jayB0cmVlIGlzbid0IHJlYWR5IHRvDQo+Pj4+Pj4gcmVjZWl2ZSB0
-aGUgcmVxdWVzdHMgeWV0Lg0KPj4+Pj4+IFRvIGJlIHJlYWR5LCB3ZSBuZWVkIHRvIGluc2VydCBh
-IHByb3BlciBibG9jayBkcml2ZXIgc3RhdGUgdG8gdGhlDQo+Pj4+Pj4gYmxvY2sgYmFja2VuZCB3
-aGljaCBpcyBkb25lIGhlcmUNCj4+Pj4+Pg0KPj4+Pj4+ICDCoMKgwqDCoCBibGtfcmVtb3ZlX2Jz
-KGJqb2ItPmJsayk7DQo+Pj4+Pj4gIMKgwqDCoMKgIGJsa19zZXRfcGVybShiam9iLT5ibGssIDAs
-IEJMS19QRVJNX0FMTCwgJmVycm9yX2Fib3J0KTsNCj4+Pj4+PiAgwqDCoMKgwqAgYmxrX2luc2Vy
-dF9icyhiam9iLT5ibGssIG1pcnJvcl90b3BfYnMsICZlcnJvcl9hYm9ydCk7IDw8IDw8IDw8IDw8
-DQo+Pj4+Pj4NCj4+Pj4+PiAgwqDCoMKgwqAgYnNfb3BhcXVlLT5qb2IgPSBOVUxMOw0KPj4+Pj4+
-DQo+Pj4+Pj4gIMKgwqDCoMKgIGJkcnZfZHJhaW5lZF9lbmQoc3JjKTsNCj4+Pj4+Pg0KPj4+Pj4+
-IElmIHRoZSB0cmVlIGlzbid0IHJlYWR5IGFuZCB3ZSByZXN1bWUgdGhlIGNvcm91dGluZXMsIHdl
-J2xsIGVuZCB1cA0KPj4+Pj4+IHdpdGggdGhlIHJlcXVlc3QgbGFuZGVkIGluIGEgd3JvbmcgYmxv
-Y2sgZHJpdmVyIHN0YXRlLg0KPj4+Pj4+DQo+Pj4+Pj4gU28sIHdlIGV4cGxpY2l0bHkgc2hvdWxk
-IHN0b3AgYWxsIGFjdGl2aXRpZXMgb24gYWxsIHRoZSBkcml2ZXIgc3RhdGVzDQo+Pj4+Pj4gYW5k
-IGl0cyBwYXJlbnRzIGFuZCBhbGxvdyB0aGUgYWN0aXZpdGllcyB3aGVuIGV2ZXJ5dGhpbmcgaXMg
-cmVhZHkgdG8NCj4+Pj4+PiBnby4NCj4+Pj4+Pg0KPj4+Pj4+IFdoeSBleHBsaWNpdGx5LCBiZWNh
-dXNlIHRoZSBibG9jayBkcml2ZXIgc3RhdGVzIG1heSBiZWxvbmcgdG8NCj4+Pj4+PiBkaWZmZXJl
-bnQgYmxvY2sgYmFja2VuZHMgYXQgdGhlIG1vbWVudCBvZiB0aGUgbWFuaXB1bGF0aW9uIGJlZ2lu
-bmluZy4NCj4+Pj4+Pg0KPj4+Pj4+IFNvLCBpdCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxs
-IHRoZWlyIGNvbnRleHRzIHVudGlsIHRoZQ0KPj4+Pj4+IG1hbmlwdWxhdGlvbiBlbmRzLg0KPj4+
-Pj4+DQo+Pj4+Pj4gUGxlYXNlLCBjb3JyZWN0IG1lIGlmIEknbSB3cm9uZy4NCj4+Pj4+Pg0KPj4+
-Pj4+Pg0KPj4+Pj4+Pj4gSW4gc2VlbXMgdGhhdCBpZiB0aGUgZXh0ZXJuYWwgcmVxdWVzdHMgZGlz
-YWJsZWQgb24gdGhlIGNvbnRleHQgd2UNCj4+Pj4+Pj4+IGNhbid0DQo+Pj4+Pj4+PiByZWx5IG9u
-IGFueXRoaW5nIG9yIHNob3VsZCBjaGVjayB3aGVyZSB0aGUgdW5kZXJseWluZyBicyBhbmQgaXRz
-DQo+Pj4+Pj4+PiB1bmRlcmx5aW5nIG5vZGVzIGFyZSByZWFkeSB0byByZWNlaXZlIHJlcXVlc3Rz
-IHdoaWNoIHNvdW5kcyBxdWl0ZQ0KPj4+Pj4+Pj4gY29tcGxpY2F0ZWQuDQo+Pj4+Pj4+PiBQbGVh
-c2UgY29ycmVjdCBtZSBpZiBzdGlsbCBkb24ndCB1bmRlcnN0YW5kIHNvbWV0aGluZyBpbiB0aGF0
-DQo+Pj4+Pj4+PiByb3V0aW5lLg0KPj4+Pj4+Pg0KPj4+Pj4+PiBJIHRoaW5rIHRoZSByZWFzb24g
-d2h5IHJleWxpbmcgb24gYWlvX2Rpc2FibGVfZXh0ZXJuYWwoKSB3b3JrcyBpcw0KPj4+Pj4+PiBz
-aW1wbHkNCj4+Pj4+Pj4gYmVjYXVzZSBzcmMgaXMgYWxzbyBkcmFpbmVkLCB3aGljaCBrZWVwcyBl
-eHRlcm5hbCBldmVudHMgaW4gdGhlDQo+Pj4+Pj4+IEFpb0NvbnRleHQgZGlzYWJsZWQgZGVzcGl0
-ZSB0aGUgYnVnIGluIGRyYWluaW5nIHRoZSB0YXJnZXQgbm9kZS4NCj4+Pj4+Pj4NCj4+Pj4+Pj4g
-VGhlIGJ1ZyB3b3VsZCBiZWNvbWUgYXBwYXJlbnQgZXZlbiB3aXRoIGFpb19kaXNhYmxlX2V4dGVy
-bmFsKCkgaWYgd2UNCj4+Pj4+Pj4gZGlkbid0IGRyYWluIHNyYywgb3IgZXZlbiBpZiB3ZSBqdXN0
-IHN1cHBvcnRlZCBzcmMgYW5kIHRhcmdldCBiZWluZyBpbg0KPj4+Pj4+PiBkaWZmZXJlbnQgQWlv
-Q29udGV4dHMuDQo+Pj4+Pj4NCj4+Pj4+PiBXaHkgZG9uJ3Qgd2UgZGlzYWJsZSBhbGwgdGhvc2Ug
-Y29udGV4dHMgaW52b2x2ZWQgdW50aWwgdGhlIGVuZCBvZg0KPj4+Pj4+IHRoZSBibG9jayBkZXZp
-Y2UgdHJlZSByZWNvbnN0cnVjdGlvbj8NCj4+Pj4+Pg0KPj4+Pj4+IFRoYW5rcyENCj4+Pj4+Pg0K
-Pj4+Pj4+IERlbmlzDQo+Pj4+Pj4+DQo+Pj4+Pj4+IEtldmluDQo+Pj4+Pj4+DQo+Pj4+Pj4NCj4+
-Pj4+DQo+Pj4+DQo+Pj4NCj4+DQo+PiAtLSANCj4+IEJlc3QsDQo+PiBEZW5pcw0KDQotLSANCkJl
-c3QsDQpEZW5pcw0K
+[Ccing Nitesh]
+Stefan Hajnoczi <stefanha@gmail.com> writes:
+
+> On Fri, Jan 11, 2019 at 05:16:40PM +0100, Paolo Bonzini wrote:
+>> On 11/01/19 16:41, Max Moroz wrote:
+>> > On Fri, Jan 11, 2019 at 7:34 AM Paolo Bonzini <pbonzini@redhat.com
+>> > <mailto:pbonzini@redhat.com>> wrote:
+>> >=20
+>> >     On 11/01/19 16:04, Max Moroz wrote:
+>> >     > We usually have a single fuzzing process, it starts with a fuzzi=
+ng
+>> >     > engine's main function and is calling=C2=A0LLVMFuzzerTestOneInpu=
+t with
+>> >     > various inputs and keep mutating them based on the coverage feed=
+back.
+>> >     > Running a second process which you don't care too much about mig=
+ht be
+>> >     > fine, but the fuzzing process should be "replacing" or should I =
+say
+>> >     > "imitating" the process whose coverage you're interested in.
+>> >=20
+>> >     What do you mean by replacing or imitating?
+>> >=20
+>> > To give you an example, when we fuzz ffmpeg, we do not run ffmpeg's ma=
+in
+>> > function. We write=C2=A0LLVMFuzzerTestOneInput that would do the neces=
+sary
+>> > initialization, reset the state, etc, and then would pass (data, size)
+>> > provided by a fuzzing engine to the API(s) we're trying to fuzz. So, in
+>> > your case, there should not be a regular QEMU process, and instead the
+>> > fuzz target (i.e. LLVMFuzzerTestOneInput) should be doing certain
+>> > initialization (which is usually done by the QEMU process) and then ca=
+ll
+>> > the API you want to fuzz.
+>>=20
+>> The main issue is that we are not really testing an API and QEMU has a
+>> lot of global state.
+>
+> With regards to the GSoC/Outreachy project, I think the mentors (me?)
+> need to figure this out beforehand by experimentation.  The QEMU folks
+> don't know the details of oss-fuzz and vice versa.  But with a weekend
+> or two's worth of playing around we could figure out a reasonable way of
+> integrating qtest/oss-fuzz.
+>
+
+If you recall, Nitesh and myself did experiment with the plumbing although
+our entry point in qtest for calling the fuzzing function was simpler. Figu=
+ring out
+the right entry point with a subset of absolutely necessary initialization
+is what's next.
+
+Bandan
+
+> Then the intern has a clear direction to follow this summer and won't be
+> demotivated by failed attempts at working with two codebases they are
+> unfamiliar with :).
+>
+> Stefan
