@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52387)
+Received: from eggs.gnu.org ([209.51.188.92]:52435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkT7h-0004zj-6O
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:19:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gkT7m-00056c-6G
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkT7g-0001TB-G7
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:19:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gkT7l-0001Xt-Hw
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:19:50 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 18 Jan 2019 13:19:20 +0100
-Message-Id: <20190118121925.24468-7-cohuck@redhat.com>
+Date: Fri, 18 Jan 2019 13:19:21 +0100
+Message-Id: <20190118121925.24468-8-cohuck@redhat.com>
 In-Reply-To: <20190118121925.24468-1-cohuck@redhat.com>
 References: <20190118121925.24468-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 06/11] s390x/pci: Set the iommu region size
- mpcifc request
+Subject: [Qemu-devel] [PULL 07/11] s390x/pci: Use hotplug_dev instead of
+ looking up the host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,38 +21,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-The size of the accessible iommu memory region in the guest
-is given to the IOMMU by the guest through the mpcifc request
-specifying the PCI Base Address and the PCI Address Limit.
+We directly have it in our hands.
 
-Let's set the size of the IOMMU region to:
-    (PCI Address Limit) - (PCI Base Address) + 1.
-
-Fixes: f7c40aa1e7 ("s390x/pci: fix failures of dma map/unmap")
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Message-Id: <1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
-Acked-by: Collin Walling <walling@linux.ibm.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20190114103110.10909-2-david@redhat.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/s390x/s390-pci-bus.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 1579989213..400d9e4f28 100644
+index 400d9e4f28..248e0eb295 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
-     char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
-     memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
-                              TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
--                             name, iommu->pal + 1);
-+                             name, iommu->pal - iommu->pba + 1);
-     iommu->enabled = true;
-     memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
-     g_free(name);
+@@ -826,9 +826,9 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                               Error **errp)
+ {
++    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+     PCIDevice *pdev = NULL;
+     S390PCIBusDevice *pbdev = NULL;
+-    S390pciState *s = s390_get_phb();
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+         BusState *bus;
+@@ -937,11 +937,11 @@ static void s390_pcihost_timer_cb(void *opaque)
+ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                 Error **errp)
+ {
++    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+     PCIDevice *pci_dev = NULL;
+     PCIBus *bus;
+     int32_t devfn;
+     S390PCIBusDevice *pbdev = NULL;
+-    S390pciState *s = s390_get_phb();
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+         error_setg(errp, "PCI bridge hot unplug currently not supported");
 -- 
 2.17.2
