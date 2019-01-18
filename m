@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44159)
+Received: from eggs.gnu.org ([209.51.188.92]:44662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkR1x-0007lr-Mn
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:05:42 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gkR3s-0000iP-FB
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkR1w-00028T-VB
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:05:41 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gkR1v-00023e-Hb
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:05:40 -0500
-Received: by mail-wm1-x332.google.com with SMTP id m1so3918745wml.2
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 02:05:38 -0800 (PST)
-Date: Fri, 18 Jan 2019 10:05:35 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190118100535.GC21579@stefanha-x1.localdomain>
-References: <20190117145207.31212-1-berrange@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gkR3k-00047F-LN
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:07:35 -0500
+Date: Fri, 18 Jan 2019 11:07:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190118110709.07c08ec5@redhat.com>
+In-Reply-To: <20190116113523.9213-4-david@redhat.com>
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-4-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Izn7cH1Com+I3R9J"
-Content-Disposition: inline
-In-Reply-To: <20190117145207.31212-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: add ability to do simple printf
- logging via systemtap
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 03/10] qdev: Provide
+ qdev_get_bus_hotplug_handler()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
+On Wed, 16 Jan 2019 12:35:16 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
---Izn7cH1Com+I3R9J
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Let's use a wrapper instead of looking it up manually. This function can
+> than be reused when we explicitly want to have the bus hotplug handler
+> (e.g. when the bus hotplug handler was overwritten by the machine
+> hotplug handler).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-On Thu, Jan 17, 2019 at 02:52:07PM +0000, Daniel P. Berrang=E9 wrote:
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Nice improvement, thanks!  Do you want to send a docs/devel/tracing.txt
-follow-up patch to document this feature?
-
-Thanks, applied to my tracing tree:
-https://github.com/stefanha/qemu/commits/tracing
-
-Stefan
-
---Izn7cH1Com+I3R9J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcQaTvAAoJEJykq7OBq3PIAYUIAL4vygBB/R/yAyeVxhLWpR3l
-+4haCNMTUKDgAM5zftMFfjNXSW7QdWrU8kRta6RZ8G4b92iM35/XEj7RrhLyaH8K
-L1dzbPBKbWjZGLBDDa4gTOy/IYzZ8wsfS3MJQAEKIeo/+c4Sd4Ylg79YwTe87s+W
-4qp742sEspy+G5IJowH6DeO+onJrDlhi9Uw03KVsiw1vVt+uiMJuGSKW9kM5ibLc
-Uha6PqAkSy0TEQ+tyuz28x0B6HNryALlXzs22+PEBY7LdDpSnFo3ND1c0PrXhVfY
-Ea2qEnPU6qaJisA4XQN/8vPayV/kWWY0fg0X8MWAiVSfQ4frqLHjSe6TDvsbva4=
-=ICX9
------END PGP SIGNATURE-----
-
---Izn7cH1Com+I3R9J--
+> ---
+>  hw/core/qdev.c         | 10 +++++++++-
+>  include/hw/qdev-core.h |  1 +
+>  2 files changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 7ad45c0bd6..e2207d77a4 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+>      return NULL;
+>  }
+>  
+> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
+> +{
+> +    if (dev->parent_bus) {
+> +        return dev->parent_bus->hotplug_handler;
+> +    }
+> +    return NULL;
+> +}
+> +
+>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+>  {
+>      HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+>  
+>      if (hotplug_ctrl == NULL && dev->parent_bus) {
+> -        hotplug_ctrl = dev->parent_bus->hotplug_handler;
+> +        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
+>      }
+>      return hotplug_ctrl;
+>  }
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 0632057fd6..893acc19b9 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -277,6 +277,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
+>  void qdev_init_nofail(DeviceState *dev);
+>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>                                   int required_for_version);
+> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+>  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+>  /**
+>   * qdev_get_hotplug_handler: Get handler responsible for device wiring
