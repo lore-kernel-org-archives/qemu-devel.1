@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42225)
+Received: from eggs.gnu.org ([209.51.188.92]:42809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkSaO-0008At-6k
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:45:20 -0500
+	(envelope-from <thuth@redhat.com>) id 1gkSc0-0001BK-VV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:47:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkSaN-0008Lg-JD
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:45:20 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkSaM-0008Bc-97
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:45:19 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 81so14148506otj.2
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:45:14 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gkSbw-0001Jz-0d
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:47:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gkSbv-0001H0-MD
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:46:55 -0500
+References: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
+	<1547576349-13337-2-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8caf272f-f229-c890-89e8-9e76882eb1e0@redhat.com>
+Date: Fri, 18 Jan 2019 12:46:44 +0100
 MIME-Version: 1.0
-References: <20190108223129.5570-1-richard.henderson@linaro.org>
-	<20190108223129.5570-20-richard.henderson@linaro.org>
-In-Reply-To: <20190108223129.5570-20-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 11:45:02 +0000
-Message-ID: <CAFEAcA-o-R6PQpkFkFVOUPgJ68NGG2QO51YKe0N-FrHXW8J0gw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 19/31] target/arm: Merge TBFLAG_AA_TB{0,
- 1} to TBII
+In-Reply-To: <1547576349-13337-2-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] tests/libqos: introduce
+ virtio_start_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-On Tue, 8 Jan 2019 at 22:32, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We will shortly want to talk about TBI as it relates to data.
-> Passing around a pair of variables is less convenient than a
-> single variable.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 2019-01-15 19:19, Paolo Bonzini wrote:
+> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> 
+> This function is intended to group all the qvirtio_* functions that
+> start the qvirtio devices.
+> Applied in all tests using this combination of functions.
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+[..]
+> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> index 04c6087..f97c158 100644
+> --- a/tests/virtio-blk-test.c
+> +++ b/tests/virtio-blk-test.c
+> @@ -116,10 +116,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus *bus, int slot)
+>      g_assert_cmphex(dev->pdev->devfn, ==, ((slot << 3) | PCI_FN));
+>  
+>      qvirtio_pci_device_enable(dev);
+> -    qvirtio_reset(&dev->vdev);
+> -    qvirtio_set_acknowledge(&dev->vdev);
+> -    qvirtio_set_driver(&dev->vdev);
+> -
+> +    qvirtio_start_device(&dev->vdev);
+>      return dev;
+>  }
+>  
+> @@ -333,6 +330,7 @@ static void pci_indirect(void)
+>      qvirtio_set_features(&dev->vdev, features);
+>  
+>      vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
+> +
+>      qvirtio_set_driver_ok(&dev->vdev);
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Still unnecessary white-space change.
 
-(apologies for the content-free other email: mail client misfire.)
+Apart from that nit, still:
 
-thanks
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
