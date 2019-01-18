@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53298)
+Received: from eggs.gnu.org ([209.51.188.92]:53926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkRVM-00014K-Da
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:36:05 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gkRYN-0002jS-Fk
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkRVI-0005Ws-GW
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:36:02 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gkRVF-0005ET-CD
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:35:58 -0500
-Received: by mail-oi1-x243.google.com with SMTP id y23so8614577oia.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 02:35:56 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gkRYM-0005Gq-Md
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:39:11 -0500
+Date: Fri, 18 Jan 2019 11:38:55 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190118113855.020dc3c0.cohuck@redhat.com>
+In-Reply-To: <20190117185628.21862-7-crosa@redhat.com>
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-7-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1547807155-4526-2-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1547807155-4526-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1547807155-4526-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 18 Jan 2019 11:35:54 +0100
-Message-ID: <CAL1e-=hokKEVkzCf63UYuL67wfEnETgK9ZuZ=R8miY7SDHNsFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] contrib: gitdm: Update domain-map
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/18] Acceptance tests: use "arch:" tag to
+ filter target specific tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Friday, January 18, 2019, Aleksandar Markovic <
-aleksandar.markovic@rt-rk.com> wrote:
+On Thu, 17 Jan 2019 13:56:16 -0500
+Cleber Rosa <crosa@redhat.com> wrote:
 
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Add Citrix, Huawei, Intel, and Microsoft to domain-map.
->
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Currently, the only test that contains some target architecture
+> information is "boot_linux_console.py" which test contains a "x86_64"
+> tag.  But that tag is not respected in the default execution, that is,
+> "make check-acceptance" doesn't do anything with it.
+> 
+> That said, even the target architecture handling currently present in
+> the "avocado_qemu.Test" class, class is pretty limited.  For instance,
+> by default, it chooses a target based on the host architecture.
+> 
+> Because the original implementation of the tags feature in Avocado did
+> not include any time of namespace or "key:val" mechanism, no tag has
+> relation to another tag.  The new implementation of the tags feature
+> from version 67.0 onwards, allows "key:val" tags, and because of that,
+> a test can be classified with a tag in a given key.  For instance, the
+> new proposed version of the "boot_linux_console.py" test, which
+> downloads and attempts to run a x86_64 kernel, is now tagged as:
+> 
+>   :avocado: tags=arch:x86_64
+> 
+> This means that it can be filtered (out) when no x86_64 target is
+> available.  At the same time, tests that don't have a "arch:" tag,
+> will not be filtered out.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  contrib/gitdm/domain-map | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
-> index 0ab41ee..9c09285 100644
-> --- a/contrib/gitdm/domain-map
-> +++ b/contrib/gitdm/domain-map
-> @@ -5,10 +5,14 @@
->  #
->
->  amd.com         AMD
-> +citrix.com      Citrix
->  greensocs.com   GreenSocs
-> +huawei.com      Huawei
->  ibm.com         IBM
-> +intel.com       Intel
->  igalia.com      Igalia
+>  tests/Makefile.include                 | 3 +++
+>  tests/acceptance/boot_linux_console.py | 2 +-
+>  tests/requirements.txt                 | 2 +-
+>  3 files changed, 5 insertions(+), 2 deletions(-)
+> 
 
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 98324f7591..46b20bdfe2 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
+>      and the kernel command line is properly passed from QEMU to the kernel
+>  
+>      :avocado: enable
+> -    :avocado: tags=x86_64
+> +    :avocado: tags=arch:x86_64
+>      """
+>  
+>      timeout = 60
 
-Intel should be after Igalia, in alphabethical order, I just noticed.
-
-
->  linaro.org      Linaro
-> +microsoft.com   Microsoft
->  nokia.com       Nokia
->  oracle.com      Oracle
->  proxmox.com     Proxmox
-> --
-> 2.7.4
->
->
->
+You probably want to do the same change in virtio_version.py;
+otherwise, if I run the acceptance tests on s390x, it will run into
+timeouts (it looks like that test is intended to be run with x86
+machines anyway.)
