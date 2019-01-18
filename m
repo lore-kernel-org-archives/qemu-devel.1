@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33477)
+Received: from eggs.gnu.org ([209.51.188.92]:35598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkV11-00010g-Cr
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:21:00 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1gkV8W-0005QF-9u
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkV0z-0006MX-SS
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:20:59 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 14:20:47 +0000
-Message-ID: <2371f754-2546-8027-a697-6175cfa4ac4f@virtuozzo.com>
-References: <20190117153321.29749-1-eblake@redhat.com>
-	<20190117153321.29749-2-eblake@redhat.com>
-In-Reply-To: <20190117153321.29749-2-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F7BC01F04DE9CB49A4C430FA9CDF16A6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ccarrara@redhat.com>) id 1gkV8V-0003Ak-DD
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:28:44 -0500
+Date: Fri, 18 Jan 2019 12:28:30 -0200
+From: Caio Carrara <ccarrara@redhat.com>
+Message-ID: <20190118142830.GB24013@localhost.localdomain>
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-6-crosa@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: Expose protocol-specific data
- to 'qemu-img info'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190117185628.21862-6-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/18] Acceptance tests: introduce arch
+ parameter and attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +24,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-MTcuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gJ3FlbXUtaW1nIGluZm8nIGlz
-IHVzZWZ1bCBmb3Igc2hvd2luZyBhZGRpdGlvbmFsIGluZm9ybWF0aW9uDQo+IGFib3V0IGFuIGlt
-YWdlIC0gYnV0IHNvbWV0aW1lcyB0aGUgaW50ZXJlc3RpbmcgaW5mb3JtYXRpb24gaXMNCj4gc3Bl
-Y2lmaWMgdG8gdGhlIHByb3RvY29sIHJhdGhlciB0aGFuIHRvIHRoZSBmb3JtYXQgbGF5ZXIuICBT
-ZXQNCj4gdGhlIGdyb3VuZHdvcmsgZm9yIHNob3dpbmcgdGhpcyBpbmZvcm1hdGlvbjsgZnVydGhl
-ciBwYXRjaGVzDQo+IHdpbGwgdGhlbiBlbmFibGUgc3BlY2lmaWMgcGllY2VzIG9mIGluZm9ybWF0
-aW9uLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+
-DQo+IC0tLQ0KPiAgIHFhcGkvYmxvY2stY29yZS5qc29uIHwgNiArKysrKy0NCj4gICBibG9jay9x
-YXBpLmMgICAgICAgICB8IDcgKysrKysrKw0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0
-aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29y
-ZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXggOTE2ODViZTZjMjkuLmYyOGQ1
-ZjVmYzc2IDEwMDY0NA0KPiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPiArKysgYi9xYXBp
-L2Jsb2NrLWNvcmUuanNvbg0KPiBAQCAtMTUyLDYgKzE1Miw5IEBADQo+ICAgIyBAZm9ybWF0LXNw
-ZWNpZmljOiBzdHJ1Y3R1cmUgc3VwcGx5aW5nIGFkZGl0aW9uYWwgZm9ybWF0LXNwZWNpZmljDQo+
-ICAgIyBpbmZvcm1hdGlvbiAoc2luY2UgMS43KQ0KPiAgICMNCj4gKyMgQHByb3RvY29sLXNwZWNp
-ZmljOiBzdHJ1Y3R1cmUgc3VwcGx5aW5nIGFkZGl0aW9uYWwgcHJvdG9jb2wtc3BlY2lmaWMNCj4g
-KyMgaW5mb3JtYXRpb24gKHNpbmNlIDQuMCkNCj4gKyMNCj4gICAjIFNpbmNlOiAxLjMNCj4gICAj
-DQo+ICAgIyMNCj4gQEAgLTE2Miw3ICsxNjUsOCBAQA0KPiAgICAgICAgICAgICAgJypiYWNraW5n
-LWZpbGVuYW1lJzogJ3N0cicsICcqZnVsbC1iYWNraW5nLWZpbGVuYW1lJzogJ3N0cicsDQo+ICAg
-ICAgICAgICAgICAnKmJhY2tpbmctZmlsZW5hbWUtZm9ybWF0JzogJ3N0cicsICcqc25hcHNob3Rz
-JzogWydTbmFwc2hvdEluZm8nXSwNCj4gICAgICAgICAgICAgICcqYmFja2luZy1pbWFnZSc6ICdJ
-bWFnZUluZm8nLA0KPiAtICAgICAgICAgICAnKmZvcm1hdC1zcGVjaWZpYyc6ICdJbWFnZUluZm9T
-cGVjaWZpYycgfSB9DQo+ICsgICAgICAgICAgICcqZm9ybWF0LXNwZWNpZmljJzogJ0ltYWdlSW5m
-b1NwZWNpZmljJywNCj4gKyAgICAgICAgICAgJypwcm90b2NvbC1zcGVjaWZpYyc6ICdJbWFnZUlu
-Zm9TcGVjaWZpYycgfSB9DQo+IA0KPiAgICMjDQo+ICAgIyBASW1hZ2VDaGVjazoNCj4gZGlmZiAt
-LWdpdCBhL2Jsb2NrL3FhcGkuYyBiL2Jsb2NrL3FhcGkuYw0KPiBpbmRleCBjNjZmOTQ5ZGI4My4u
-YThkMTA0YmE4Y2UgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3FhcGkuYw0KPiArKysgYi9ibG9jay9x
-YXBpLmMNCj4gQEAgLTI4NCw2ICsyODQsOSBAQCB2b2lkIGJkcnZfcXVlcnlfaW1hZ2VfaW5mbyhC
-bG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfQ0KPiAgICAgICBpbmZvLT5mb3JtYXRfc3Bl
-Y2lmaWMgICAgID0gYmRydl9nZXRfc3BlY2lmaWNfaW5mbyhicyk7DQo+ICAgICAgIGluZm8tPmhh
-c19mb3JtYXRfc3BlY2lmaWMgPSBpbmZvLT5mb3JtYXRfc3BlY2lmaWMgIT0gTlVMTDsNCj4gKyAg
-ICBpbmZvLT5wcm90b2NvbF9zcGVjaWZpYyA9DQo+ICsgICAgICAgIGJzLT5maWxlID8gYmRydl9n
-ZXRfc3BlY2lmaWNfaW5mbyhicy0+ZmlsZS0+YnMpIDogTlVMTDsNCj4gKyAgICBpbmZvLT5oYXNf
-cHJvdG9jb2xfc3BlY2lmaWMgPSBpbmZvLT5wcm90b2NvbF9zcGVjaWZpYyAhPSBOVUxMOw0KPiAN
-Cj4gICAgICAgYmFja2luZ19maWxlbmFtZSA9IGJzLT5iYWNraW5nX2ZpbGU7DQo+ICAgICAgIGlm
-IChiYWNraW5nX2ZpbGVuYW1lWzBdICE9ICdcMCcpIHsNCj4gQEAgLTg3MCw0ICs4NzMsOCBAQCB2
-b2lkIGJkcnZfaW1hZ2VfaW5mb19kdW1wKGZwcmludGZfZnVuY3Rpb24gZnVuY19mcHJpbnRmLCB2
-b2lkICpmLA0KPiAgICAgICAgICAgZnVuY19mcHJpbnRmKGYsICJGb3JtYXQgc3BlY2lmaWMgaW5m
-b3JtYXRpb246XG4iKTsNCj4gICAgICAgICAgIGJkcnZfaW1hZ2VfaW5mb19zcGVjaWZpY19kdW1w
-KGZ1bmNfZnByaW50ZiwgZiwgaW5mby0+Zm9ybWF0X3NwZWNpZmljKTsNCj4gICAgICAgfQ0KPiAr
-ICAgIGlmIChpbmZvLT5oYXNfcHJvdG9jb2xfc3BlY2lmaWMpIHsNCj4gKyAgICAgICAgZnVuY19m
-cHJpbnRmKGYsICJQcm90b2NvbCBzcGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPiArICAgICAg
-ICBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNfZHVtcChmdW5jX2ZwcmludGYsIGYsIGluZm8tPnBy
-b3RvY29sX3NwZWNpZmljKTsNCj4gKyAgICB9DQo+ICAgfQ0KPiANCg0KDQpBIGJpdCByZWxhdGVk
-IHF1ZXN0aW9uOg0KDQpXaHkgZG8gd2UgYWx3YXlzIGhhdmUgbmJkIG5vZGUgYXMgYSBwcm90b2Nv
-bCBub2RlPyBDYW4ndCB3ZSB1c2UgbmJkIG5vZGUgZGlyZWN0bHksDQp3aXRob3V0IHJhdyBsYXll
-cj8NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Hi, Cleber.
+
+On Thu, Jan 17, 2019 at 01:56:15PM -0500, Cleber Rosa wrote:
+> It's useful to define the architecture that should be used in
+> situations such as:
+>  * the intended target of the QEMU binary to be used on tests
+>  * the architecture of code to be run within the QEMU binary, such
+>    as a kernel image or a full blown guest OS image
+> 
+> This commit introduces both a test parameter and a test instance
+> attribute, that will contain such a value.
+> 
+> Now, when the "arch" test parameter is given, it will influence the
+> selection of the default QEMU binary, if one is not given explicitly
+> by means of the "qemu_img" parameter.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  docs/devel/testing.rst                    | 18 ++++++++++++++++++
+>  tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
+>  2 files changed, 28 insertions(+), 3 deletions(-)
+> 
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index 44c9b3ae74..60a16c5834 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -689,6 +689,17 @@ vm
+>  A QEMUMachine instance, initially configured according to the given
+>  ``qemu_bin`` parameter.
+>  
+> +arch
+> +~~~~
+> +
+> +The architecture that will be used on a number of different
+> +scenarios.  For instance, when a QEMU binary is not explicitly given,
+> +the one selected will depend on this attribute.
+> +
+> +The ``arch`` attribute will be set to the test parameter of the same
+> +name, and if one is not given explicitly, it will default to the
+> +system architecture (as given by ``uname``).
+
+Would you think it's important to make explicit that it's the *host*
+system architecture? Just like you did in the docstrings of
+pick_default_qemu_bin().
+
+> +
+>  qemu_bin
+>  ~~~~~~~~
+>  
+> @@ -711,6 +722,13 @@ like the following:
+>  
+>    PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
+>  
+> +arch
+> +~~~~
+> +
+> +The architecture that will be used on a number of different scenarios.
+> +This parameter has a direct relation with the ``arch`` attribute.  If
+> +not given, it will default to None.
+> +
+>  qemu_bin
+>  ~~~~~~~~
+>  
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+> index d8d5b48dac..7a38851753 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -23,16 +23,22 @@ def is_readable_executable_file(path):
+>      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
+>  
+>  
+> -def pick_default_qemu_bin():
+> +def pick_default_qemu_bin(arch=None):
+>      """
+>      Picks the path of a QEMU binary, starting either in the current working
+>      directory or in the source tree root directory.
+>  
+> +    :param arch: the arch to use when looking for a QEMU binary (the target
+> +                 will match the arch given).  If None (the default) arch
+> +                 will be the current host system arch (as given by
+> +                 :func:`os.uname`).
+> +    :type arch: str
+>      :returns: the path to the default QEMU binary or None if one could not
+>                be found
+>      :rtype: str or None
+>      """
+> -    arch = os.uname()[4]
+> +    if arch is None:
+> +        arch = os.uname()[4]
+>      qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
+>                                            "qemu-system-%s" % arch)
+>      if is_readable_executable_file(qemu_bin_relative_path):
+> @@ -47,8 +53,9 @@ def pick_default_qemu_bin():
+>  class Test(avocado.Test):
+>      def setUp(self):
+>          self.vm = None
+> +        self.arch = self.params.get('arch')
+>          self.qemu_bin = self.params.get('qemu_bin',
+> -                                        default=pick_default_qemu_bin())
+> +                                        default=pick_default_qemu_bin(self.arch))
+
+Since it was used the named argument in function declaration I think
+it's more consistent also use the argument name here in the function
+call: `pick_default_qemu_bin(arch=self.arch)`
+
+>          if self.qemu_bin is None:
+>              self.cancel("No QEMU binary defined or found in the source tree")
+>          self.vm = QEMUMachine(self.qemu_bin)
+> -- 
+> 2.20.1
+> 
+
+Thanks,
+-- 
+Caio Carrara
+Software Engineer, Virt Team - Red Hat
+ccarrara@redhat.com
