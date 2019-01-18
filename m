@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56307)
+Received: from eggs.gnu.org ([209.51.188.92]:56358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl4-0005eC-Qw
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:00 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbl8-0005gN-QJ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl3-0005KB-5t
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:58 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43471)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbl6-0005Q0-Nq
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:02 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36046)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbl2-0005D1-Sg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:57 -0500
-Received: by mail-pf1-x443.google.com with SMTP id w73so7189495pfk.10
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:52 -0800 (PST)
+	id 1gkbl6-0005NR-Hg
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:00 -0500
+Received: by mail-pg1-x543.google.com with SMTP id n2so6650602pgm.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:59 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:31:09 +1100
-Message-Id: <20190118213122.22865-36-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:31:12 +1100
+Message-Id: <20190118213122.22865-39-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 36/49] linux-user: Split out utime, utimes,
- futimesat
+Subject: [Qemu-devel] [PATCH v6 39/49] linux-user: Split out sync, syncfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,314 +29,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+Note that syncfs is universally available.
+If !CONFIG_SYNCFS, provide our own syscall replacement.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  9 ++++
- linux-user/strace.c           | 41 ---------------
- linux-user/syscall-file.inc.c | 95 +++++++++++++++++++++++++++++++++++
- linux-user/syscall.c          | 63 -----------------------
- linux-user/strace.list        |  9 ----
- 5 files changed, 104 insertions(+), 113 deletions(-)
+ linux-user/syscall-defs.h     |  2 ++
+ linux-user/syscall-file.inc.c | 11 +++++++++++
+ linux-user/syscall.c          | 20 ++++++++++++--------
+ linux-user/strace.list        |  6 ------
+ 4 files changed, 25 insertions(+), 14 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 9d0dd7457b..2767e335d8 100644
+index 860754aaca..497fbdba66 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -36,6 +36,9 @@ SYSCALL_DEF(execve, ARG_STR, ARG_PTR, ARG_PTR);
- SYSCALL_DEF(execveat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
- SYSCALL_DEF(fchmod, ARG_DEC, ARG_MODEFLAG);
- SYSCALL_DEF(fchmodat, ARG_ATDIRFD, ARG_STR, ARG_MODEFLAG);
-+#ifdef TARGET_NR_futimesat
-+SYSCALL_DEF(futimesat, ARG_ATDIRFD, ARG_STR, ARG_PTR);
-+#endif
- #ifdef TARGET_NR_fork
- SYSCALL_DEF(fork);
+@@ -171,6 +171,8 @@ SYSCALL_DEF(shmget, ARG_DEC, ARG_DEC, ARG_HEX);
+ #ifdef TARGET_NR_stime
+ SYSCALL_DEF(stime, ARG_PTR);
  #endif
-@@ -172,6 +175,12 @@ SYSCALL_DEF(umount2, ARG_STR, ARG_UMOUNTFLAG);
- SYSCALL_DEF(unlink, ARG_STR);
++SYSCALL_DEF(sync);
++SYSCALL_DEF(syncfs, ARG_DEC);
+ #ifdef TARGET_NR_time
+ SYSCALL_DEF(time, ARG_PTR);
  #endif
- SYSCALL_DEF(unlinkat, ARG_ATDIRFD, ARG_STR, ARG_UNLINKATFLAG);
-+#ifdef TARGET_NR_utime
-+SYSCALL_DEF(utime, ARG_STR, ARG_PTR);
-+#endif
-+#ifdef TARGET_NR_utimes
-+SYSCALL_DEF(utimes, ARG_STR, ARG_PTR);
-+#endif
- #ifdef TARGET_NR_vfork
- /* Emulate vfork() with fork().  */
- SYSCALL_DEF_FULL(vfork, .impl = impl_fork);
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 78781b8817..b54949df27 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1284,21 +1284,6 @@ print_fcntl(const struct syscallname *name,
- #endif
- 
- 
--#ifdef TARGET_NR_futimesat
--static void
--print_futimesat(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_at_dirfd(arg0, 0);
--    print_string(arg1, 0);
--    print_timeval(arg2, 0);
--    print_timeval(arg2 + sizeof (struct target_timeval), 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #if defined(TARGET_NR_socket)
- static void
- print_socket(const struct syscallname *name,
-@@ -2003,32 +1988,6 @@ print_symlinkat(const struct syscallname *name,
- }
- #endif
- 
--#ifdef TARGET_NR_utime
--static void
--print_utime(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
--#ifdef TARGET_NR_utimes
--static void
--print_utimes(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #ifdef TARGET_NR_utimensat
- static void
- print_utimensat(const struct syscallname *name,
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 7ec1c26347..6a7ef80bfc 100644
+index 3111abd861..80dec33971 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -84,6 +84,38 @@ SYSCALL_IMPL(fchmodat)
-     return do_fchmodat(arg1, arg2, arg3);
+@@ -867,6 +867,17 @@ SYSCALL_IMPL(readlinkat)
  }
+ #endif
  
-+#ifdef TARGET_NR_futimesat
-+SYSCALL_IMPL(futimesat)
++SYSCALL_IMPL(sync)
 +{
-+    int dirfd = arg1;
-+    abi_ulong target_path = arg2;
-+    abi_ulong target_tv = arg3;
-+    struct timeval *tvp, tv[2];
-+    char *p;
-+    abi_long ret;
-+
-+    if (target_tv) {
-+        if (copy_from_user_timeval(&tv[0], target_tv)
-+            || copy_from_user_timeval(&tv[1],
-+                                      target_tv +
-+                                      sizeof(struct target_timeval))) {
-+            return -TARGET_EFAULT;
-+        }
-+        tvp = tv;
-+    } else {
-+        tvp = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(futimesat(dirfd, path(p), tvp));
-+    unlock_user(p, target_path, 0);
-+    return ret;
++    sync();
++    return 0;
 +}
-+#endif
 +
- static abi_long do_linkat(int olddirfd, abi_ulong target_oldpath,
-                           int newdirfd, abi_ulong target_newpath,
-                           int flags)
-@@ -867,6 +899,69 @@ SYSCALL_IMPL(unlinkat)
-     return do_unlinkat(arg1, arg2, arg3);
- }
- 
-+#ifdef TARGET_NR_utime
-+SYSCALL_IMPL(utime)
++SYSCALL_IMPL(syncfs)
 +{
-+    abi_ulong target_path = arg1;
-+    abi_ulong target_times = arg2;
-+    struct utimbuf tbuf, *host_tbuf;
-+    struct target_utimbuf *target_tbuf;
-+    char *p;
-+    abi_long ret;
-+
-+    if (target_times) {
-+        if (!lock_user_struct(VERIFY_READ, target_tbuf, target_times, 1)) {
-+            return -TARGET_EFAULT;
-+        }
-+        tbuf.actime = tswapal(target_tbuf->actime);
-+        tbuf.modtime = tswapal(target_tbuf->modtime);
-+        unlock_user_struct(target_tbuf, arg2, 0);
-+        host_tbuf = &tbuf;
-+    } else {
-+        host_tbuf = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(utime(p, host_tbuf));
-+    unlock_user(p, target_path, 0);
-+    return ret;
++    return get_errno(syncfs(arg1));
 +}
-+#endif
 +
-+#ifdef TARGET_NR_utimes
-+SYSCALL_IMPL(utimes)
-+{
-+    abi_ulong target_path = arg1;
-+    abi_ulong target_tv = arg2;
-+    struct timeval *tvp, tv[2];
-+    char *p;
-+    abi_long ret;
-+
-+    if (target_tv) {
-+        if (copy_from_user_timeval(&tv[0], target_tv)
-+            || copy_from_user_timeval(&tv[1],
-+                                      target_tv +
-+                                      sizeof(struct target_timeval))) {
-+            return -TARGET_EFAULT;
-+        }
-+        tvp = tv;
-+    } else {
-+        tvp = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(utimes(p, tvp));
-+    unlock_user(p, target_path, 0);
-+    return ret;
-+}
-+#endif
-+
- SYSCALL_IMPL(write)
+ static abi_long do_umount2(abi_ulong target_path, int flags)
  {
-     int fd = arg1;
+     char *p = lock_user_string(target_path);
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f3ea9600c8..ca462fde61 100644
+index 351b2a6288..6668e4ada8 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5327,69 +5327,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -199,6 +199,15 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
+ #define TARGET_NR_llseek TARGET_NR__llseek
+ #endif
+ 
++/*
++ * These definitions produce an ENOSYS from the host kernel.
++ * Performing a bogus sysacll is lazier than boilerplating
++ * the replacement functions here in C.
++ */
++#ifndef __NR_syncfs
++#define __NR_syncfs  -1
++#endif
++
+ #ifdef __NR_gettid
+ _syscall0(int, gettid)
+ #else
+@@ -264,11 +273,13 @@ _syscall3(int, ioprio_set, int, which, int, who, int, ioprio)
+ #if defined(TARGET_NR_getrandom) && defined(__NR_getrandom)
+ _syscall3(int, getrandom, void *, buf, size_t, buflen, unsigned int, flags)
+ #endif
+-
+ #if defined(TARGET_NR_kcmp) && defined(__NR_kcmp)
+ _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
+           unsigned long, idx1, unsigned long, idx2)
+ #endif
++#ifndef CONFIG_SYNCFS
++_syscall1(int, syncfs, int, fd)
++#endif
+ 
+ static bitmask_transtbl fcntl_flags_tbl[] = {
+   { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
+@@ -5327,13 +5338,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_utime
--    case TARGET_NR_utime:
--        {
--            struct utimbuf tbuf, *host_tbuf;
--            struct target_utimbuf *target_tbuf;
--            if (arg2) {
--                if (!lock_user_struct(VERIFY_READ, target_tbuf, arg2, 1))
--                    return -TARGET_EFAULT;
--                tbuf.actime = tswapal(target_tbuf->actime);
--                tbuf.modtime = tswapal(target_tbuf->modtime);
--                unlock_user_struct(target_tbuf, arg2, 0);
--                host_tbuf = &tbuf;
--            } else {
--                host_tbuf = NULL;
--            }
--            if (!(p = lock_user_string(arg1)))
--                return -TARGET_EFAULT;
--            ret = get_errno(utime(p, host_tbuf));
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
+-    case TARGET_NR_sync:
+-        sync();
+-        return 0;
+-#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
+-    case TARGET_NR_syncfs:
+-        return get_errno(syncfs(arg1));
 -#endif
--#ifdef TARGET_NR_utimes
--    case TARGET_NR_utimes:
--        {
--            struct timeval *tvp, tv[2];
--            if (arg2) {
--                if (copy_from_user_timeval(&tv[0], arg2)
--                    || copy_from_user_timeval(&tv[1],
--                                              arg2 + sizeof(struct target_timeval)))
--                    return -TARGET_EFAULT;
--                tvp = tv;
--            } else {
--                tvp = NULL;
--            }
--            if (!(p = lock_user_string(arg1)))
--                return -TARGET_EFAULT;
--            ret = get_errno(utimes(p, tvp));
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
--#endif
--#if defined(TARGET_NR_futimesat)
--    case TARGET_NR_futimesat:
--        {
--            struct timeval *tvp, tv[2];
--            if (arg3) {
--                if (copy_from_user_timeval(&tv[0], arg3)
--                    || copy_from_user_timeval(&tv[1],
--                                              arg3 + sizeof(struct target_timeval)))
--                    return -TARGET_EFAULT;
--                tvp = tv;
--            } else {
--                tvp = NULL;
--            }
--            if (!(p = lock_user_string(arg2))) {
--                return -TARGET_EFAULT;
--            }
--            ret = get_errno(futimesat(arg1, path(p), tvp));
--            unlock_user(p, arg2, 0);
--        }
--        return ret;
--#endif
- #ifdef TARGET_NR_access
-     case TARGET_NR_access:
-         if (!(p = lock_user_string(arg1))) {
+     case TARGET_NR_kill:
+         return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
+ #ifdef TARGET_NR_rename
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index b119b7a20c..c0c1b896f7 100644
+index aaea23d433..56f25c15b7 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -226,9 +226,6 @@
- #ifdef TARGET_NR_futex
- { TARGET_NR_futex, "futex" , NULL, print_futex, NULL },
+@@ -1260,12 +1260,6 @@
+ #ifdef TARGET_NR_symlinkat
+ { TARGET_NR_symlinkat, "symlinkat", NULL, print_symlinkat, NULL },
  #endif
--#ifdef TARGET_NR_futimesat
--{ TARGET_NR_futimesat, "futimesat" , NULL, print_futimesat, NULL },
+-#ifdef TARGET_NR_sync
+-{ TARGET_NR_sync, "sync" , NULL, NULL, NULL },
 -#endif
- #ifdef TARGET_NR_getcpu
- { TARGET_NR_getcpu, "getcpu" , "%s(%p,%d)", NULL, NULL },
- #endif
-@@ -1392,12 +1389,6 @@
- #ifdef TARGET_NR_ustat
- { TARGET_NR_ustat, "ustat" , "%s(%#x,%p)", NULL, NULL },
- #endif
--#ifdef TARGET_NR_utime
--{ TARGET_NR_utime, "utime" , NULL, print_utime, NULL },
+-#ifdef TARGET_NR_syncfs
+-{ TARGET_NR_syncfs, "syncfs" , "%s(%d)", NULL, NULL },
 -#endif
--#ifdef TARGET_NR_utimes
--{ TARGET_NR_utimes, "utimes" , NULL, print_utimes, NULL },
--#endif
- #ifdef TARGET_NR_utrap_install
- { TARGET_NR_utrap_install, "utrap_install" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_syscall
+ { TARGET_NR_syscall, "syscall" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.2
