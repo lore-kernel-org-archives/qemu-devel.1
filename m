@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37678)
+Received: from eggs.gnu.org ([209.51.188.92]:38503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gkWvu-0003ni-7Z
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:23:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkWyd-0004ey-Vd
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gkWvs-00006x-CZ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:23:50 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:40848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gkWvo-0007yK-Gk
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:23:46 -0500
-Date: Fri, 18 Jan 2019 18:23:23 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190118162322.GA3558@lap1>
-References: <20190109201559.3906-1-yuval.shaia@oracle.com>
-	<9cde91d0-ec6a-d66c-c699-1d35f8dd84a5@gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gkWyc-0004Yy-VX
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:26:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gkWyc-0004QM-L0
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:26:38 -0500
+References: <20190118132750.25932-1-peter.maydell@linaro.org>
+	<64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
+	<CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d1ea9ac6-37b3-5c74-fb54-16ad12e1582e@redhat.com>
+Date: Fri, 18 Jan 2019 10:26:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <9cde91d0-ec6a-d66c-c699-1d35f8dd84a5@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pvrdma: Post CQE when receive invalid
- gid index
+In-Reply-To: <CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2i6CaWdVT0YVS2OMiiWTAwLDMGnOWbUYR"
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: Don't spuriously warn about
+ /** comment starters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, liq3ea@163.com, philmd@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Reported-by : Thomas Huth" <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, Jan 18, 2019 at 03:55:36PM +0200, Marcel Apfelbaum wrote:
-> Hi Yuval,
->=20
-> On 1/9/19 10:15 PM, Yuval Shaia wrote:
-> > This error should propagate back to guest.
-> >=20
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >   hw/rdma/rdma_backend.h      | 1 +
-> >   hw/rdma/vmw/pvrdma_qp_ops.c | 6 ++++--
-> >   2 files changed, 5 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> > index a9ba40ae48..5114c90e67 100644
-> > --- a/hw/rdma/rdma_backend.h
-> > +++ b/hw/rdma/rdma_backend.h
-> > @@ -32,6 +32,7 @@
-> >   #define VENDOR_ERR_INVLKEY          0x207
-> >   #define VENDOR_ERR_MR_SMALL         0x208
-> >   #define VENDOR_ERR_INV_MAD_BUFF     0x209
-> > +#define VENDOR_ERR_INV_GID_IDX      0x210
-> >   /* Add definition for QP0 and QP1 as there is no userspace enums fo=
-r them */
-> >   enum ibv_special_qp_type {
-> > diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.=
-c
-> > index 465bee8641..0565eba981 100644
-> > --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> > +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> > @@ -178,7 +178,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_ha=
-ndle)
-> >           sgid =3D rdma_rm_get_gid(&dev->rdma_dev_res, wqe->hdr.wr.ud=
-.av.gid_index);
-> >           if (!sgid) {
-> >               pr_dbg("Fail to get gid for idx %d\n", wqe->hdr.wr.ud.a=
-v.gid_index);
-> > -            return -EIO;
-> > +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
->=20
-> There may be a problem here, comp_ctx may be uninitialized at this poin=
-t.
-> I see that comp_ctx gets initalized after this call:
->=20
-> =A0=A0=A0=A0=A0=A0=A0=A0 /* Prepare CQE */
-> =A0=A0=A0=A0=A0=A0=A0 comp_ctx =3D g_malloc(sizeof(CompHandlerCtx));
-> =A0=A0=A0=A0=A0=A0=A0 comp_ctx->dev =3D dev;
->=20
->=20
-> What do you think?
->=20
-> Thanks,
-> Marcel
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2i6CaWdVT0YVS2OMiiWTAwLDMGnOWbUYR
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Reported-by : Thomas Huth" <thuth@redhat.com>,
+ "patches@linaro.org" <patches@linaro.org>
+Message-ID: <d1ea9ac6-37b3-5c74-fb54-16ad12e1582e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: Don't spuriously warn about /**
+ comment starters
+References: <20190118132750.25932-1-peter.maydell@linaro.org>
+ <64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
+ <CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
+In-Reply-To: <CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applying this patch on top of upstream make sense.
-Problem start because you probably applied Li Qiang's patch "[PATCH v2] h=
-w:
-pvrdma: fix memory leak in error path" which moves the initialization of
-comp_ctx to be right after all checks are done.
+On 1/18/19 10:08 AM, Peter Maydell wrote:
 
-More than that, accepting this patch makes Li Qiang's patch redundant sin=
-ce
-the cleanup of comp_ctx will be taken care by the usual process of
-'completion' (see the callback function pvrdma_qp_ops_comp_handler).
-Li Qiang, can you confirm?
+>>> The sequence "/\*\*?" was intended to match either "/*" or "/**",
+>>> but Perl's semantics for '?' allow it to backtrack and try the
+>>> "matches 0 chars" option if the "matches 1 char" choice leads to
+>>> a failure of the rest of the regex to match.  Switch to "/\*\*?+"
+>>> which uses what perlre(1) calls the "possessive" quantifier form:
+>>> this means that if it matches the "/**" string it will not later
+>>> backtrack to matching just the "/*" prefix.
+>>
+>> Just wondering if "/\*{1,2}" would also work (it may have to be spelle=
+d
+>> "/\*\{1,2}" - I never remember which flavors of regex have which
+>> extensions without rereading docs)
+>=20
+> Oh yes, that would probably be the less perl-specific way
+> to write it.
 
-Yuval
+Except it would probably fail in the same way as the non-greedy \*? -
+when \*{2} can't satisfy the regex, the engine will retry with \*{1} and
+then see the second * as noise.
+
+
+>>>               # Block comments use /* on a line of its own
+>>>               if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&      #inline=
+ /*...*/
+>>> -                 $rawline =3D~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /*=
+ or /** non-blank
+>>> +                 $rawline =3D~ m@^\+.*/\*\*?+[ \t]*.+[ \t]*$@) { # /=
+* or /** non-blank
+>>
+>> Hmm - Isn't "[ \t]*.+[ \t]*$" the same as ".+$?"
+>=20
+> (do you mean '$?"' at the end of your sentence, or '$" ?' ?)
+
+Serves me right for adding "" after the fact.  You are correct, intended
+punctuation should be ".+$"? (the 3-character regex, concluded by asking
+a question if the 3-character form is the same as the 15-character
+form), and where I should have gone further and asked if it was the same
+as "." (since who cares whether there are more than one extra characters
+between there and the end of the line - once we've found any character
+at all, we've already found enough to flag the line).
 
 >=20
-> > +            continue;
-> >           }
-> >           pr_dbg("sgid_id=3D%d, sgid=3D0x%llx\n", wqe->hdr.wr.ud.av.g=
-id_index,
-> >                  sgid->global.interface_id);
-> > @@ -189,7 +190,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_ha=
-ndle)
-> >           if (sgid_idx <=3D 0) {
-> >               pr_dbg("Fail to get bk sgid_idx for sgid_idx %d\n",
-> >                      wqe->hdr.wr.ud.av.gid_index);
-> > -            return -EIO;
-> > +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
-> > +            continue;
-> >           }
-> >           if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
->=20
+> I'm not sure exactly what I was aiming for with that
+> part of the regex when I wrote it. The comment suggests
+> that I was looking for "non-blank", ie I didn't want to
+> fire on /* or /** followed by just trailing whitespace.
+> The regex as written is clearly not actually doing that,
+> though...
+
+Trailing whitespace is generally a problem anyways, though :)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--2i6CaWdVT0YVS2OMiiWTAwLDMGnOWbUYR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxB/jcACgkQp6FrSiUn
+Q2oROgf+JQsRDKX7c8lsJZGliSj2xGH3vYlP8NeYfvivFztQVGM606ZAjyZLbZg4
+FLkl3f67XY4Sk9nMn1VV6glfRJO06anG/NhKTAwriryuxZm6Gl5CosJYgwo28UnA
+HVp0w388jezgsdXfj0Xodab6dKEe8RBt5g42J7BDZoHFplbYH6GBZkwgeyn7qbzt
+0S8rrxXF/UsKuBl2/z0gnF+4ncPzEFcM9pTYzMUMnoK66FzeybX0J11kkfJZrdgG
+WrSJsR4SzzhKFoiN5LI5ZxajkJnluitoDW5ZoZgeimPfQELaFE/4X1tpWGnDAa1T
+yYY3dbs6Ltkun/jdMRtEQlXgQax8Cw==
+=RLKQ
+-----END PGP SIGNATURE-----
+
+--2i6CaWdVT0YVS2OMiiWTAwLDMGnOWbUYR--
