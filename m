@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55184)
+Received: from eggs.gnu.org ([209.51.188.92]:58214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkRdV-0004KS-Er
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:44:30 -0500
+	(envelope-from <eskultet@redhat.com>) id 1gkRps-00072z-Fp
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:57:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkRdL-0001rx-Pt
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:44:24 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gkRdL-0001rO-IW
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:44:19 -0500
-Received: by mail-wr1-x442.google.com with SMTP id u4so14456789wrp.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 02:44:19 -0800 (PST)
-Date: Fri, 18 Jan 2019 10:44:16 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190118104416.GF21579@stefanha-x1.localdomain>
-References: <20190117145207.31212-1-berrange@redhat.com>
+	(envelope-from <eskultet@redhat.com>) id 1gkRpp-0007A0-PS
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:57:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gkRpp-000781-9n
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:57:13 -0500
+Date: Fri, 18 Jan 2019 11:56:58 +0100
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20190118105658.GB24176@beluga.usersys.redhat.com>
+References: <20190118093935.GA1142@beluga.usersys.redhat.com>
+	<20190118101638.GE20660@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="65ImJOski3p8EhYV"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190117145207.31212-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: add ability to do simple printf
- logging via systemtap
+In-Reply-To: <20190118101638.GE20660@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] AMD SEV's /dev/sev permissions and
+ probing QEMU for capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, dinechin@redhat.com, mkletzan@redhat.com, brijesh.singh@amd.com, qemu-devel@nongnu.org
 
+On Fri, Jan 18, 2019 at 10:16:38AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Jan 18, 2019 at 10:39:35AM +0100, Erik Skultety wrote:
+> > Hi,
+> > this is a summary of a private discussion I've had with guys CC'd on =
+this email
+> > about finding a solution to [1] - basically, the default permissions =
+on
+> > /dev/sev (below) make it impossible to query for SEV platform capabil=
+ities,
+> > since by default we run QEMU as qemu:qemu when probing for capabiliti=
+es. It's
+> > worth noting is that this is only relevant to probing, since for a pr=
+oper QEMU
+> > VM we create a mount namespace for the process and chown all the node=
+s (needs a
+> > SEV fix though).
+> >
+> > # ll /dev/sev
+> > crw-------. 1 root root
+> >
+> > I suggested either force running QEMU as root for probing (despite th=
+e obvious
+> > security implications) or using namespaces for probing too. Dan argue=
+d that
+> > this would have a significant perf impact and suggested we ask system=
+d to add a
+> > global udev rule.
+>
+> I've just realized there is a potential 3rd solution. Remember there is
+> actually nothing inherantly special about the 'root' user as an account
+> ID. 'root' gains its powers from the fact that it has many capabilities
+> by default.  'qemu' can't access /dev/sev because it is owned by a
+> different user (happens to be root) and 'qemu' does not have capabiliti=
+es.
+>
+> So we can make probing work by using our capabilities code to grant
+> CAP_DAC_OVERRIDE to the qemu process we spawn. So probing still runs
+> as 'qemu', but can none the less access /dev/sev while it is owned
+> by root.  We were not using 'qemu' for sake of security, as the probing
+> process is not executing any untrusthworthy code, so we don't  loose an=
+y
+> security protection by granting CAP_DAC_OVERRIDE.
 
---65ImJOski3p8EhYV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Truth to be told, I was playing with the idea of using CAP_ capabilities,
+however, because I'm paranoid (maybe too much) I took your comment "malic=
+ious
+QEMU" as an axiom for the process not be trusted *at all*, regardless of =
+what
+it's doing, I decided to ditch the idea, because with CAP_DAC_OVERRIDE, y=
+ou're
+essentially giving QEMU an open ticket to any file on the filesystem (oka=
+y, not
+any and not always because QEMU executed by system libvirt will be confin=
+ed so
+SElinux will still be our guardian angel).
 
-On Thu, Jan 17, 2019 at 02:52:07PM +0000, Daniel P. Berrang=E9 wrote:
+[...]
 
-Dequeued.  I encountered two issues during testing:
+> >
+> > So, in conclusion, we absolutely need input from Brijesh (AMD) whethe=
+r there
+> > was something more than the low limit on number of guests behind the =
+default
+> > permissions. Also, we'd like to get some details on how the limit is =
+managed,
+> > helping to assess the approaches mentioned above.
+>
+> Regardless of this problem, I think it is important to have some docs
+> in either libvirt or QEMU that describe the resource usage constraints
+> so that management apps can decide how to best take advantage of SEV.
 
-1. s/binary/file/ in qemu-trace-stap's which() function:
+Agreed. In the meantime, I'll start working on adding /dev/sev into the
+namespace only for SEV-enabled guests.
 
-diff --git a/scripts/qemu-trace-stap b/scripts/qemu-trace-stap
-index b2eb41fbb0..3b4ec5e9b9 100755
---- a/scripts/qemu-trace-stap
-+++ b/scripts/qemu-trace-stap
-@@ -37,7 +37,7 @@ def which(file):
-         if os.path.exists(os.path.join(path, file)):
-                 return os.path.join(path, file)
-=20
--    print("Unable to find '%s' in $PATH" % binary)
-+    print("Unable to find '%s' in $PATH" % file)
-     sys.exit(1)
-=20
-=20
-
-2. The tpm_crb_mmio_read trace event's TARGET_FMT_plx format specifier
-   macro isn't handled.  stap sees a literal "TARGET_FMT_plx" string and
-   reports that the number of format string arguments is incorrect:
-
-   semantic error: Wrong number of args to formatted print operator: identi=
-fier 'printf' at :9189:5
-   source:     printf("%d@%d tpm_crb_mmio_read CRB read 0x TARGET_FMT_plx  =
-len:%u val: 0x%x\n", pid(), gettimeofday_ns(), addr, size, val)
-
---65ImJOski3p8EhYV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcQa4AAAoJEJykq7OBq3PIbGYH/1j7o9VfX0yzfik7qYdSdHJY
-U00Z+COf57cc4aUEc7fswwqJN1v9xbp/xS57uhMFUWSgXQyyS+yLEqn79WkYPOXP
-KCvhVYZXjjYLYd3ihkofKuMWS1AqFDoCrHdtyKO5qm/DxqDakYcfIoiYrojDOdxD
-blPVvsy5P7PmUzwlL6CQN83RgNVWKrp0JZ4Q2jKMZvRFtMA2eUzlkXDcwJD6oiLb
-DMEsUZYTecRdcy6WVdFoDSr9GnGFR/0UHkGtrXgX2CFDU7c6GyCGfRfC2Z0l/rtn
-dX6A2hEJ+/7DFxthh94A+UFc77E+TTkeR1iq0+dHKlw3xB5h/64MD0EfM7vgPIU=
-=9cip
------END PGP SIGNATURE-----
-
---65ImJOski3p8EhYV--
+Thanks,
+Erik
