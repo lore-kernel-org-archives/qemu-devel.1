@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55735)
+Received: from eggs.gnu.org ([209.51.188.92]:55785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbjv-0004i0-70
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:49 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbjx-0004jZ-94
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbjt-0003xT-HD
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:47 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33666)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbjv-00041s-KK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:49 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42254)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbjt-0003ss-9V
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:45 -0500
-Received: by mail-pg1-x544.google.com with SMTP id z11so6660047pgu.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:31:43 -0800 (PST)
+	id 1gkbjv-00040B-Bw
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:47 -0500
+Received: by mail-pf1-x441.google.com with SMTP id 64so7190254pfr.9
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:31:47 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:30:39 +1100
-Message-Id: <20190118213122.22865-6-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:30:41 +1100
+Message-Id: <20190118213122.22865-8-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 06/49] linux-user: Split out readlink,
- readlinkat
+Subject: [Qemu-devel] [PATCH v6 08/49] linux-user: Split out read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,216 +29,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Split out a shared implementation for both of these;
-unify the best parts of /proc/self/exe checking.
-
-Remove the temporary forward declaration for is_proc_self.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  6 ++++
- linux-user/strace.c           | 29 ------------------
- linux-user/syscall-file.inc.c | 45 ++++++++++++++++++++++++++++
- linux-user/syscall.c          | 55 -----------------------------------
+ linux-user/syscall-defs.h     |  2 ++
+ linux-user/syscall-file.inc.c | 58 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c          | 34 --------------------
  linux-user/strace.list        |  6 ----
- 5 files changed, 51 insertions(+), 90 deletions(-)
+ 4 files changed, 60 insertions(+), 40 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 1f3a9c47ab..d1a6c6fa3c 100644
+index 797426ae6f..b031de1375 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -20,3 +20,9 @@
+@@ -21,9 +21,11 @@ SYSCALL_DEF(close, ARG_DEC);
  SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
  #endif
  SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-+#ifdef TARGET_NR_readlink
-+SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-+#ifdef TARGET_NR_readlinkat
-+SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 1e4f6c9b53..4faeb8c031 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -2244,35 +2244,6 @@ print_fstatat64(const struct syscallname *name,
- #define print_newfstatat    print_fstatat64
++SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
+ #ifdef TARGET_NR_readlink
+ SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
  #endif
- 
--#ifdef TARGET_NR_readlink
--static void
--print_readlink(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 0);
--    print_raw_param("%u", arg2, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
--#ifdef TARGET_NR_readlinkat
--static void
--print_readlinkat(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_at_dirfd(arg0, 0);
--    print_string(arg1, 0);
--    print_pointer(arg2, 0);
--    print_raw_param("%u", arg3, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #ifdef TARGET_NR_rename
- static void
- print_rename(const struct syscallname *name,
+ #ifdef TARGET_NR_readlinkat
+ SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
+ #endif
++SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index f202a4c8f4..841795f8aa 100644
+index feb83c4e87..9c8025b252 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -308,3 +308,48 @@ SYSCALL_IMPL(openat)
- {
+@@ -317,6 +317,32 @@ SYSCALL_IMPL(openat)
      return do_openat(cpu_env, arg1, arg2, arg3, arg4);
  }
-+
-+static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
-+                              abi_ulong target_buf, abi_ulong bufsiz)
+ 
++SYSCALL_IMPL(read)
 +{
-+    char *p = lock_user_string(target_path);
-+    void *buf = lock_user(VERIFY_WRITE, target_buf, bufsiz, 0);
++    int fd = arg1;
++    abi_ulong target_p = arg2;
++    abi_ulong size = arg3;
++    void *p;
 +    abi_long ret;
 +
-+    if (!p || !buf) {
-+        ret = -TARGET_EFAULT;
-+    } else if (!bufsiz) {
-+        /* Short circuit this for the magic exe check. */
-+        ret = -TARGET_EINVAL;
-+    } else if (is_proc_myself((const char *)p, "exe")) {
-+        char real[PATH_MAX];
-+        char *temp = realpath(exec_path, real);
-+
-+        if (temp == NULL) {
-+            ret = -host_to_target_errno(errno);
-+        } else {
-+            ret = MIN(strlen(real), bufsiz);
-+            /* We cannot NUL terminate the string. */
-+            memcpy(buf, real, ret);
-+        }
-+    } else {
-+        ret = get_errno(readlinkat(dirfd, path(p), buf, bufsiz));
++    if (size == 0) {
++        return 0;
 +    }
-+    unlock_user(buf, target_buf, ret);
-+    unlock_user(p, target_path, 0);
++    p = lock_user(VERIFY_WRITE, target_p, size, 0);
++    if (p == NULL) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(safe_read(fd, p, size));
++    if (!is_error(ret)) {
++        TargetFdDataFunc trans = fd_trans_host_to_target_data(fd);
++        if (trans) {
++            ret = trans(p, ret);
++        }
++    }
++    unlock_user(p, target_p, ret);
 +    return ret;
 +}
 +
-+#ifdef TARGET_NR_readlink
-+SYSCALL_IMPL(readlink)
-+{
-+    return do_readlinkat(AT_FDCWD, arg1, arg2, arg3);
-+}
-+#endif
+ static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
+                               abi_ulong target_buf, abi_ulong bufsiz)
+ {
+@@ -361,3 +387,35 @@ SYSCALL_IMPL(readlinkat)
+     return do_readlinkat(arg1, arg2, arg3, arg4);
+ }
+ #endif
 +
-+#ifdef TARGET_NR_readlinkat
-+SYSCALL_IMPL(readlinkat)
++SYSCALL_IMPL(write)
 +{
-+    return do_readlinkat(arg1, arg2, arg3, arg4);
++    int fd = arg1;
++    abi_ulong target_p = arg2;
++    abi_ulong size = arg3;
++    TargetFdDataFunc trans;
++    abi_long ret;
++    void *p;
++
++    if (target_p == 0 && size == 0) {
++        return get_errno(safe_write(fd, 0, 0));
++    }
++    p = lock_user(VERIFY_READ, target_p, size, 1);
++    if (p == NULL) {
++        return -TARGET_EFAULT;
++    }
++    trans = fd_trans_target_to_host_data(fd);
++    if (trans) {
++        void *copy = g_malloc(size);
++        memcpy(copy, p, size);
++        ret = trans(copy, size);
++        if (ret >= 0) {
++            ret = get_errno(safe_write(fd, copy, ret));
++        }
++        g_free(copy);
++    } else {
++        ret = get_errno(safe_write(fd, p, size));
++    }
++    unlock_user(p, target_p, 0);
++    return ret;
 +}
-+#endif
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 32d1a285eb..035f17c0d9 100644
+index f230fe161e..d4d5c25803 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -6577,8 +6577,6 @@ int host_to_target_waitstatus(int status)
-     return status;
- }
- 
--static int is_proc_myself(const char *filename, const char *entry);
+@@ -6726,40 +6726,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         preexit_cleanup(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
+-    case TARGET_NR_read:
+-        if (arg3 == 0) {
+-            return 0;
+-        } else {
+-            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(safe_read(arg1, p, arg3));
+-            if (ret >= 0 &&
+-                fd_trans_host_to_target_data(arg1)) {
+-                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+-            }
+-            unlock_user(p, arg2, ret);
+-        }
+-        return ret;
+-    case TARGET_NR_write:
+-        if (arg2 == 0 && arg3 == 0) {
+-            return get_errno(safe_write(arg1, 0, 0));
+-        }
+-        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+-            return -TARGET_EFAULT;
+-        if (fd_trans_target_to_host_data(arg1)) {
+-            void *copy = g_malloc(arg3);
+-            memcpy(copy, p, arg3);
+-            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+-            if (ret >= 0) {
+-                ret = get_errno(safe_write(arg1, copy, ret));
+-            }
+-            g_free(copy);
+-        } else {
+-            ret = get_errno(safe_write(arg1, p, arg3));
+-        }
+-        unlock_user(p, arg2, 0);
+-        return ret;
 -
- #define TIMER_MAGIC 0x0caf0000
- #define TIMER_MAGIC_MASK 0xffff0000
- 
-@@ -8052,59 +8050,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-         return ret;
- #endif
--#ifdef TARGET_NR_readlink
--    case TARGET_NR_readlink:
--        {
--            void *p2;
--            p = lock_user_string(arg1);
--            p2 = lock_user(VERIFY_WRITE, arg2, arg3, 0);
--            if (!p || !p2) {
--                ret = -TARGET_EFAULT;
--            } else if (!arg3) {
--                /* Short circuit this for the magic exe check. */
--                ret = -TARGET_EINVAL;
--            } else if (is_proc_myself((const char *)p, "exe")) {
--                char real[PATH_MAX], *temp;
--                temp = realpath(exec_path, real);
--                /* Return value is # of bytes that we wrote to the buffer. */
--                if (temp == NULL) {
--                    ret = get_errno(-1);
--                } else {
--                    /* Don't worry about sign mismatch as earlier mapping
--                     * logic would have thrown a bad address error. */
--                    ret = MIN(strlen(real), arg3);
--                    /* We cannot NUL terminate the string. */
--                    memcpy(p2, real, ret);
--                }
--            } else {
--                ret = get_errno(readlink(path(p), p2, arg3));
--            }
--            unlock_user(p2, arg2, ret);
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
--#endif
--#if defined(TARGET_NR_readlinkat)
--    case TARGET_NR_readlinkat:
--        {
--            void *p2;
--            p  = lock_user_string(arg2);
--            p2 = lock_user(VERIFY_WRITE, arg3, arg4, 0);
--            if (!p || !p2) {
--                ret = -TARGET_EFAULT;
--            } else if (is_proc_myself((const char *)p, "exe")) {
--                char real[PATH_MAX], *temp;
--                temp = realpath(exec_path, real);
--                ret = temp == NULL ? get_errno(-1) : strlen(real) ;
--                snprintf((char *)p2, arg4, "%s", real);
--            } else {
--                ret = get_errno(readlinkat(arg1, path(p), p2, arg4));
--            }
--            unlock_user(p2, arg3, ret);
--            unlock_user(p, arg2, 0);
--        }
--        return ret;
--#endif
- #ifdef TARGET_NR_swapon
-     case TARGET_NR_swapon:
-         if (!(p = lock_user_string(arg1)))
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+     case TARGET_NR_name_to_handle_at:
+         ret = do_name_to_handle_at(arg1, arg2, arg3, arg4, arg5);
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index b2d3e99df7..2f466e5699 100644
+index 71a18123bf..f3a1b0fe31 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -1079,12 +1079,6 @@
- #ifdef TARGET_NR_readdir
- { TARGET_NR_readdir, "readdir" , NULL, NULL, NULL },
+@@ -1067,9 +1067,6 @@
+ #ifdef TARGET_NR_quotactl
+ { TARGET_NR_quotactl, "quotactl" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_readlink
--{ TARGET_NR_readlink, "readlink" , NULL, print_readlink, NULL },
+-#ifdef TARGET_NR_read
+-{ TARGET_NR_read, "read" , "%s(%d,%#x,%d)", NULL, NULL },
 -#endif
--#ifdef TARGET_NR_readlinkat
--{ TARGET_NR_readlinkat, "readlinkat" , NULL, print_readlinkat, NULL },
+ #ifdef TARGET_NR_readahead
+ { TARGET_NR_readahead, "readahead" , NULL, NULL, NULL },
+ #endif
+@@ -1611,9 +1608,6 @@
+ #ifdef TARGET_NR_waitpid
+ { TARGET_NR_waitpid, "waitpid" , "%s(%d,%p,%#x)", NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_write
+-{ TARGET_NR_write, "write" , "%s(%d,%#x,%d)", NULL, NULL },
 -#endif
- #ifdef TARGET_NR_readv
- { TARGET_NR_readv, "readv" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_writev
+ { TARGET_NR_writev, "writev" , "%s(%d,%p,%#x)", NULL, NULL },
  #endif
 -- 
 2.17.2
