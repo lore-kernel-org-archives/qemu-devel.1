@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42073)
+Received: from eggs.gnu.org ([209.51.188.92]:42388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkQtU-000224-V8
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:56:57 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gkQuY-0002cA-Ha
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:58:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gkQtT-0003ll-Ro
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:56:56 -0500
-Date: Fri, 18 Jan 2019 09:56:52 +0000
+	(envelope-from <stefanha@gmail.com>) id 1gkQuX-0004Vc-Rm
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:58:02 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:42734)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gkQuX-0004TV-L7
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:58:01 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id q18so14242717wrx.9
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 01:58:01 -0800 (PST)
+Date: Fri, 18 Jan 2019 09:57:58 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190118095652.GA21579@stefanha-x1.localdomain>
-References: <cover.1547475602.git.berto@igalia.com>
-	<20190116135444.GA16898@stefanha-x1.localdomain>
-	<w51d0ov2z9h.fsf@maestria.local.igalia.com>
+Message-ID: <20190118095758.GB21579@stefanha-x1.localdomain>
+References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
+	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
+	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
+	<CAJSP0QXAz3W=qi96EL6vCn187j0QUtjGLKwVk5wWTST40h+JMg@mail.gmail.com>
+	<CAObpvQkbk4j+zOz4VDeKwRc8=UqRw3aK4=0yWabS0gvBTDzBwA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+	protocol="application/pgp-signature"; boundary="wzJLGUyc3ArbnUjN"
 Content-Disposition: inline
-In-Reply-To: <w51d0ov2z9h.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during
- _realize()
+In-Reply-To: <CAObpvQkbk4j+zOz4VDeKwRc8=UqRw3aK4=0yWabS0gvBTDzBwA@mail.gmail.com>
+Subject: Re: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Nick Renieris <makren67@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
 
---6TrnltStXW4iwmi0
+--wzJLGUyc3ArbnUjN
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 17, 2019 at 02:24:10PM +0100, Alberto Garcia wrote:
-> On Wed 16 Jan 2019 02:54:44 PM CET, Stefan Hajnoczi wrote:
-> > This patch series makes virtio-blk and virtio-scsi more robust,
-> > although I haven't checked what happens if the drive is attached to a
-> > different IOThread than the device - will the switchover work?
->=20
-> You mean if you use x-blockdev-set-iothread with a drive and then attach
-> it to a device using a different thread? That seems to work (with my
-> patch).
+On Thu, Jan 17, 2019 at 03:57:08PM +0200, Nick Renieris wrote:
+> Just a heads up, I don't know if I want to go for this myself yet.
+> I'm still not sure I'll even be able to deliver the refactoring in
+> time (Step 2 in your list), and I hadn't even considered tests for SSE
+> as something I'd have to do since they're already implemented.
+> In addition, there's been talks with a different project that I might apply for.
+> I'll keep in touch if that changes, of course.
 
-Does it work with a running VM that will do I/O?  If yes, then that's
-great and we should merge the virtio-blk/scsi patches to make them
-robust for this case.  I'm a little surprised it works though :-)
-because the code wasn't designed or tested for this.
+No worries.  It's still an interesting project idea and if Richard wants
+to mentor it then maybe we can find an intern to work on it this summer.
+You're always welcome to apply to QEMU projects!
 
 Stefan
 
---6TrnltStXW4iwmi0
+--wzJLGUyc3ArbnUjN
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcQaLjAAoJEJykq7OBq3PIVW8IAJNVRKEIrXC+PSwkBVhf4U4S
-wDt+Gjt3kLa/1eXeC4prWt/5w8xo9GXU+ijsp6dkz7zv2Glm3tnjp2/JXNYytWU2
-5j13M+DgjzjJawxoQXRUfpv4scrmGN9QFpZMzu9G/l9OF0g/G4F41Y84RF5KCPQl
-HzZneGTeG5xGdL2IK0N5Shq5swr2+pAZti+t3nzOgamvygs7pkNdLIr3UwEVeipm
-OdOEUvDr5g/cqkkmJyXbrzgIH6zPKOq6mjhHjQykIHYKOQdPkcSEg/sB43b3jWuD
-KkD708dFbKHFsVyayJiQ5Qhe06Ut0zKeAhG3JsRuR209uY7b0H9zpeILde99lEI=
-=KpGN
+iQEcBAEBAgAGBQJcQaMmAAoJEJykq7OBq3PI9d8IAJT/qJSG2ttkYvBXpmEZ52d8
+jqXH6o2VFRugu8ZnGrxlNSsIqmQL55qzuu103dVUMyuqqXuUzr1gFwkmEFIcDDxG
+S5dC6dSvH1NoaC1iH6SsQRxx2ge6aILZD3T7oqZ+hq/pTVDuLQEp8SwT1mAFTxuT
+jgmcMlzPr1s4CYGBlARArs4afW2ZN5nbPikntibWVKx0xKOSx5YRf+czreZcgUNy
+lY1Wk2FerNTADTqlJtWZhMmuVHf4UskqsDPvHZ2SfMfOsF4EzWJXcJPEdQxL8Gdr
+1QGRSQw+iT25zy1295DdOTzXGKhIETxcdpyTRr1WXRlEQxvzm588imaqax6O4MQ=
+=n6p3
 -----END PGP SIGNATURE-----
 
---6TrnltStXW4iwmi0--
+--wzJLGUyc3ArbnUjN--
