@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45540)
+Received: from eggs.gnu.org ([209.51.188.92]:45580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXV9-0003be-Sj
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:16 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXVA-0003cu-Lf
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXV7-00079v-I2
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:15 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:52993 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXV9-0007Au-Jp
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:16 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:52988 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gkXV7-00077W-9o
+	id 1gkXV7-000770-CN
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:13 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 18 Jan 2019 17:59:45 +0100
-Message-Id: <1547830785-7079-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 18 Jan 2019 17:59:39 +0100
+Message-Id: <1547830785-7079-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1547830785-7079-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1547830785-7079-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 12/12] target/mips: Introduce 32 R5900
- multimedia registers
+Subject: [Qemu-devel] [PULL v2 06/12] target/mips: Add field and R/W access
+ to ITU control register ICR0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +28,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Fredrik Noring <noring@nocrew.org>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-The 32 R5900 128-bit registers are split into two 64-bit halves:
-the lower halves are the GPRs and the upper halves are accessible
-by the R5900-specific multimedia instructions.
+Add field and R/W access to ITU control register ICR0.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  3 +++
- target/mips/translate.c | 16 ++++++++++++++++
- 2 files changed, 19 insertions(+)
+ hw/misc/mips_itu.c         | 22 +++++++++++++++++++++-
+ include/hw/misc/mips_itu.h |  4 ++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 21daf50..c4da7df 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -429,6 +429,9 @@ struct TCState {
+diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
+index 43bbec4..4801958 100644
+--- a/hw/misc/mips_itu.c
++++ b/hw/misc/mips_itu.c
+@@ -55,9 +55,17 @@ typedef enum ITCView {
+     ITCVIEW_EF_SYNC = 2,
+     ITCVIEW_EF_TRY  = 3,
+     ITCVIEW_PV_SYNC = 4,
+-    ITCVIEW_PV_TRY  = 5
++    ITCVIEW_PV_TRY  = 5,
++    ITCVIEW_PV_ICR0 = 15,
+ } ITCView;
  
-     float_status msa_fp_status;
++#define ITC_ICR0_CELL_NUM        16
++#define ITC_ICR0_BLK_GRAIN       8
++#define ITC_ICR0_BLK_GRAIN_MASK  0x7
++#define ITC_ICR0_ERR_AXI         2
++#define ITC_ICR0_ERR_PARITY      1
++#define ITC_ICR0_ERR_EXEC        0
++
+ MemoryRegion *mips_itu_get_tag_region(MIPSITUState *itu)
+ {
+     return &itu->tag_io;
+@@ -382,6 +390,9 @@ static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
+     case ITCVIEW_PV_TRY:
+         ret = view_pv_try_read(cell);
+         break;
++    case ITCVIEW_PV_ICR0:
++        ret = s->icr0;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "itc_storage_read: Bad ITC View %d\n", (int)view);
+@@ -417,6 +428,15 @@ static void itc_storage_write(void *opaque, hwaddr addr, uint64_t data,
+     case ITCVIEW_PV_TRY:
+         view_pv_try_write(cell);
+         break;
++    case ITCVIEW_PV_ICR0:
++        if (data & 0x7) {
++            /* clear ERROR bits */
++            s->icr0 &= ~(data & 0x7);
++        }
++        /* set BLK_GRAIN */
++        s->icr0 &= ~0x700;
++        s->icr0 |= data & 0x700;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "itc_storage_write: Bad ITC View %d\n", (int)view);
+diff --git a/include/hw/misc/mips_itu.h b/include/hw/misc/mips_itu.h
+index 030eb4a..45a0c51 100644
+--- a/include/hw/misc/mips_itu.h
++++ b/include/hw/misc/mips_itu.h
+@@ -66,6 +66,10 @@ typedef struct MIPSITUState {
+     /* ITC Configuration Tags */
+     uint64_t ITCAddressMap[ITC_ADDRESSMAP_NUM];
+     MemoryRegion tag_io;
++
++    /* ITU Control Register */
++    uint64_t icr0;
++
+ } MIPSITUState;
  
-+    /* Upper 64-bit MMRs (multimedia registers); the lower 64-bit are GPRs */
-+    uint64_t mmr[32];
-+
- #define NUMBER_OF_MXU_REGISTERS 16
-     target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-     target_ulong mxu_cr;
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3ac0b1f..ab307c4 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -2455,6 +2455,11 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
- static TCGv_i64 fpu_f64[32];
- static TCGv_i64 msa_wr_d[64];
- 
-+#if defined(TARGET_MIPS64)
-+/* Upper halves of R5900's 128-bit registers: MMRs (multimedia registers) */
-+static TCGv_i64 cpu_mmr[32];
-+#endif
-+
- #if !defined(TARGET_MIPS64)
- /* MXU registers */
- static TCGv mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-@@ -29845,6 +29850,17 @@ void mips_tcg_init(void)
-     fpu_fcr31 = tcg_global_mem_new_i32(cpu_env,
-                                        offsetof(CPUMIPSState, active_fpu.fcr31),
-                                        "fcr31");
-+
-+#if defined(TARGET_MIPS64)
-+    cpu_mmr[0] = NULL;
-+    for (i = 1; i < 32; i++) {
-+        cpu_mmr[i] = tcg_global_mem_new_i64(cpu_env,
-+                                            offsetof(CPUMIPSState,
-+                                                     active_tc.mmr[i]),
-+                                            regnames[i]);
-+    }
-+#endif
-+
- #if !defined(TARGET_MIPS64)
-     for (i = 0; i < NUMBER_OF_MXU_REGISTERS - 1; i++) {
-         mxu_gpr[i] = tcg_global_mem_new(cpu_env,
+ /* Get ITC Configuration Tag memory region. */
 -- 
 2.7.4
