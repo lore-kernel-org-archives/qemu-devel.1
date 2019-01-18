@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52548)
+Received: from eggs.gnu.org ([209.51.188.92]:53269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkT88-0005Mu-1v
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:20:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gkTAX-0007Pv-GK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:22:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gkT82-00020q-9v
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:20:12 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 18 Jan 2019 13:19:24 +0100
-Message-Id: <20190118121925.24468-11-cohuck@redhat.com>
-In-Reply-To: <20190118121925.24468-1-cohuck@redhat.com>
-References: <20190118121925.24468-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 10/11] s390x/pci: Ignore the unplug call if we
- already have a release_timer
+	(envelope-from <kraxel@redhat.com>) id 1gkTAW-0004sF-Hj
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:22:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gkTAW-0004Ta-AW
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:22:40 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD768C05090E
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 12:22:11 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 18 Jan 2019 13:22:10 +0100
+Message-Id: <20190118122210.505-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] audio: fix pc speaker init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +27,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+Get rid of the pcspk_state global, allow pc speaker
+be added using "-device isa-pcspk".
 
-... otherwise two successive calls to qdev_unplug() (e.g. by an impatient
-user) will effectively overwrite pbdev->release_timer, resulting in a
-memory leak. We are already processing the unplug.
-
-If there is already a release_timer, the unplug will be performed after
-the timeout.
-
-Can be easily triggered by
-(hmp) device_add virtio-mouse-pci,id=test
-(hmp) stop
-(hmp) device_del test
-(hmp) device_del test
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190114103110.10909-5-david@redhat.com>
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/audio/pcspk.c | 35 +++++++++++++++--------------------
+ 1 file changed, 15 insertions(+), 20 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index e5a4cf03b2..9d23c1b300 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -976,6 +976,9 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     case ZPCI_FS_STANDBY:
-         break;
-     default:
-+        if (pbdev->release_timer) {
-+            return;
-+        }
-         s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
-                                      pbdev->fh, pbdev->fid);
-         pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index 908696d483..acd80eb674 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -57,7 +57,6 @@ typedef struct {
+ } PCSpkState;
+ 
+ static const char *s_spk = "pcspk";
+-static PCSpkState *pcspk_state;
+ 
+ static inline void generate_samples(PCSpkState *s)
+ {
+@@ -111,22 +110,6 @@ static void pcspk_callback(void *opaque, int free)
+     }
+ }
+ 
+-static int pcspk_audio_init(ISABus *bus)
+-{
+-    PCSpkState *s = pcspk_state;
+-    struct audsettings as = {PCSPK_SAMPLE_RATE, 1, AUD_FMT_U8, 0};
+-
+-    AUD_register_card(s_spk, &s->card);
+-
+-    s->voice = AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback, &as);
+-    if (!s->voice) {
+-        AUD_log(s_spk, "Could not open voice\n");
+-        return -1;
+-    }
+-
+-    return 0;
+-}
+-
+ static uint64_t pcspk_io_read(void *opaque, hwaddr addr,
+                               unsigned size)
+ {
+@@ -179,12 +162,20 @@ static void pcspk_initfn(Object *obj)
+ 
+ static void pcspk_realizefn(DeviceState *dev, Error **errp)
+ {
++    struct audsettings as = {PCSPK_SAMPLE_RATE, 1, AUD_FMT_U8, 0};
+     ISADevice *isadev = ISA_DEVICE(dev);
+     PCSpkState *s = PC_SPEAKER(dev);
+ 
+     isa_register_ioport(isadev, &s->ioport, s->iobase);
+ 
+-    pcspk_state = s;
++    AUD_register_card(s_spk, &s->card);
++
++    s->voice = AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback, &as);
++    if (!s->voice) {
++        error_setg (errp, "Initializing audio voice failed");
++        AUD_remove_card (&s->card);
++        return;
++    }
+ }
+ 
+ static bool migrate_needed(void *opaque)
+@@ -221,8 +212,6 @@ static void pcspk_class_initfn(ObjectClass *klass, void *data)
+     set_bit(DEVICE_CATEGORY_SOUND, dc->categories);
+     dc->vmsd = &vmstate_spk;
+     dc->props = pcspk_properties;
+-    /* Reason: realize sets global pcspk_state */
+-    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo pcspk_info = {
+@@ -233,6 +222,12 @@ static const TypeInfo pcspk_info = {
+     .class_init     = pcspk_class_initfn,
+ };
+ 
++static int pcspk_audio_init(ISABus *bus)
++{
++    isa_create_simple (bus, TYPE_PC_SPEAKER);
++    return 0;
++}
++
+ static void pcspk_register(void)
+ {
+     type_register_static(&pcspk_info);
 -- 
-2.17.2
+2.9.3
