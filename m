@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44512)
+Received: from eggs.gnu.org ([209.51.188.92]:44892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkXRE-0001hd-2u
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:12 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gkXT5-0002Mq-TK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkXRD-0001hX-2o
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:11 -0500
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:40560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkXRC-0001gP-O1
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:11 -0500
-Received: by mail-ot1-x330.google.com with SMTP id s5so14954342oth.7
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 08:56:10 -0800 (PST)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gkXT5-0003z4-7K
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:58:07 -0500
+Received: from mail-eopbgr780134.outbound.protection.outlook.com
+	([40.107.78.134]:5043
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gkXT4-0003u7-RY
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:58:07 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 18 Jan 2019 16:58:01 +0000
+Message-ID: <BN6PR2201MB12514D15D1681048BD350A80C69C0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<CAFEAcA_+=6Ls4wYWgGc4+vFvmLPhNMVjuonUsWv=bXKCp79n2Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA_+=6Ls4wYWgGc4+vFvmLPhNMVjuonUsWv=bXKCp79n2Q@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190117201743.20470-1-ehabkost@redhat.com>
-In-Reply-To: <20190117201743.20470-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 16:55:57 +0000
-Message-ID: <CAFEAcA_whv5envgZ+dq1p+Hpd0j6H6oVkwq6wFym1rS5N_iDOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/9] Python queue, 2019-01-17
+Subject: Re: [Qemu-devel] [PULL 00/12] MIPS queue for January 17, 2019*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +31,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 17 Jan 2019 at 20:17, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 681d61362d3f766a00806b89d6581869041f73cb:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-01-17 12:48:42 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 49ebe9b15876f3ce9a5f45cb53a16b6a788d65fd:
->
->   scripts/replay-dump.py: fix utf-8 mangling (2019-01-17 17:52:40 -0200)
->
-> ----------------------------------------------------------------
-> Python queue, 2019-01-17
->
-> Fixes:
-> * Actually test different Python versions on Travis CI
-> * Fix qemu.py error message when qemu dies from signal
->
-> Cleanups:
-> * Track Python version on config-host.mak
-> * Remove fixed crashes from scripts/device-crash-test
-> * Acceptance tests: Linux initrd checking test
-> * Fix utf-8 mangling at scripts/replay-dump.py
-> * Remove unused python imports from multiple scripts
->
-> ----------------------------------------------------------------
+> Hi; I'm afraid this fails 'make check' on all platforms:
 
-Applied, thanks.
+My bad. The culprit is found, the fix developed, tests rechecked, and the v=
+2 of the pull request is going to be sent shortly.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+My apologies, and thanks,
+Aleksandar=
