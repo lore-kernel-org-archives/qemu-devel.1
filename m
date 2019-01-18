@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44662)
+Received: from eggs.gnu.org ([209.51.188.92]:45043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gkR3s-0000iP-FB
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:07:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gkR58-0001f1-NI
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:08:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gkR3k-00047F-LN
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:07:35 -0500
-Date: Fri, 18 Jan 2019 11:07:09 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190118110709.07c08ec5@redhat.com>
-In-Reply-To: <20190116113523.9213-4-david@redhat.com>
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-4-david@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gkR57-00063l-I1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:08:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:18166)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gkR57-00060i-8a
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:08:57 -0500
+Date: Fri, 18 Jan 2019 10:02:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190118100159.GA2483@work-vm>
+References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 03/10] qdev: Provide
- qdev_get_bus_hotplug_handler()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
+ hosts, with VMX flag enabled in the guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Mark Mielke <mark.mielke@gmail.com>, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
 
-On Wed, 16 Jan 2019 12:35:16 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> Let's use a wrapper instead of looking it up manually. This function can
-> than be reused when we explicitly want to have the bus hotplug handler
-> (e.g. when the bus hotplug handler was overwritten by the machine
-> hotplug handler).
+* Mark Mielke (mark.mielke@gmail.com) wrote:
+> Thank you for the work on nested virtualization. Having had live migrations
+> fail in the past when nested virtualization has been active, it is great to
+> see that clever people have been working on this problem!
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/core/qdev.c         | 10 +++++++++-
->  include/hw/qdev-core.h |  1 +
->  2 files changed, 10 insertions(+), 1 deletion(-)
+> My question is about whether a migration path has been considered to allow
+> live migration from Qemu 2.12 hosts to Qemu 3.2 hosts, with VMX flag
+> enabled in the guest?
 > 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 7ad45c0bd6..e2207d77a4 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
->      return NULL;
->  }
->  
-> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
-> +{
-> +    if (dev->parent_bus) {
-> +        return dev->parent_bus->hotplug_handler;
+> Qemu 2.12 doesn't know about the new nested state available from newer
+> Linux kernels, and it might be used on a machine with an older kernel that
+> doesn't make the nested state available. If Qemu 3.2 is on an up-to-date
+> host with an up-to-date kernel that does support the nested state, I'd like
+> to ensure we have the ability to try the migrations.
+> 
+> In the past, I've found that:
+> 
+> 1) If the guest had used nested virtualization before, the migration often
+> fails. However, if we reboot the guest and do not use nested
+> virtualization, this simplifies to...
+> 2) If the guest has never used nested virtualization before, the migration
+> succeeds.
+> 
+> I would like to leverage 2) as much as possible to migrate forwards to Qemu
+> 3.2 hosts (once it is available). I can normally enter the guest to see if
+> 1) is likely or not, and handle these ones specially. If only 20% of the
+> guests have ever used nested virtualization, then I would like the option
+> to safely migrate 80% of the guests using live migration, and handle the
+> 20% as exceptions.
+> 
+> This is the 3.1 change log that got my attention:
+> 
+> 
+>    - x86 machines cannot be live-migrated if nested Intel virtualization is
+>    enabled. The next version of QEMU will be able to do live migration when
+>    nested virtualization is enabled, if supported by the kernel.
+> 
+> 
+> I believe this is the change it refers to:
+> 
+> commit d98f26073bebddcd3da0ba1b86c3a34e840c0fb8
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Wed Nov 14 10:38:13 2018 +0100
+> 
+>     target/i386: kvm: add VMX migration blocker
+> 
+>     Nested VMX does not support live migration yet.  Add a blocker
+>     until that is worked out.
+> 
+>     Nested SVM only does not support it, but unfortunately it is
+>     enabled by default for -cpu host so we cannot really disable it.
+> 
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> 
+> This particular check seems very simplistic:
+> 
+> +    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
+> +        error_setg(&vmx_mig_blocker,
+> +                   "Nested VMX virtualization does not support live
+> migration yet");
+> +        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +            error_free(vmx_mig_blocker);
+> +            return r;
+> +        }
 > +    }
-> +    return NULL;
-> +}
 > +
->  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
->  {
->      HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
->  
->      if (hotplug_ctrl == NULL && dev->parent_bus) {
-> -        hotplug_ctrl = dev->parent_bus->hotplug_handler;
-> +        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
->      }
->      return hotplug_ctrl;
->  }
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 0632057fd6..893acc19b9 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -277,6 +277,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
->  void qdev_init_nofail(DeviceState *dev);
->  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
->                                   int required_for_version);
-> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
->  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
->  /**
->   * qdev_get_hotplug_handler: Get handler responsible for device wiring
+> 
+> It fails if the flag is set, rather than if any nested virtualization has
+> been used before.
+> 
+> I'm concerned I will end up with a requirement for *all* guests to be
+> restarted in order to migrate them to the new hosts, rather than just the
+> ones that would have a problem.
+
+I think you should be able to migrate from 2.12->3.1 like this, but
+you'd hit the problem when you then try and migrate again between your
+new QEMUs.
+
+I guess we could modify it to wire it to machine type, so that
+older machine types didn't block.
+
+Dave
+
+> Thoughts?
+> 
+> Thanks!
+> 
+> -- 
+> Mark Mielke <mark.mielke@gmail.com>
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
