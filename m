@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60042)
+Received: from eggs.gnu.org ([209.51.188.92]:60161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gkTT1-0007TI-Rw
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:49 -0500
+	(envelope-from <berto@igalia.com>) id 1gkTT8-0007Xs-2k
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gkTSz-0002O9-SF
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:47 -0500
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-2-david@redhat.com>
-	<20190118105806.5c00605e@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7d455ae2-7752-b7d0-bd1c-c9454f9a6a7d@redhat.com>
-Date: Fri, 18 Jan 2019 13:41:06 +0100
+	(envelope-from <berto@igalia.com>) id 1gkTT6-0002bG-PR
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:53 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190108170655.29766-10-vsementsov@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+	<20190108170655.29766-10-vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 13:41:40 +0100
+Message-ID: <w51munyw323.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190118105806.5c00605e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 01/10] qdev: Let the
- hotplug_handler_unplug() caller delete the device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 9/9] qcow2: do encryption in threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,166 +22,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On 18.01.19 10:58, Igor Mammedov wrote:
-> On Wed, 16 Jan 2019 12:35:14 +0100
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> When unplugging a device, at one point the device will be destroyed
->> via object_unparent(). This will, one the one hand, unrealize the
->> removed device hierarchy, and on the other hand, destroy/free the
->> device hierarchy.
->>
->> When chaining interrupt handlers, we want to overwrite a bus hotplug
-> s/interrupt/hotplug/
+On Tue 08 Jan 2019 06:06:55 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+> Do encryption/decryption in threads, like it is already done for
+> compression. This improves asynchronous encrypted io.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-whoops :)
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
->=20
->> handler by the machine hotplug handler, to be able to perform
->> some part of the plug/unplug and to forward the calls to the bus hotpl=
-ug
->> handler.
->>
->> For now, the bus hotplug handler would trigger an object_unparent(), n=
-ot
->> allowing us to perform some unplug action on a device after we forward=
-ed
->> the call to the bus hotplug handler. The device would be gone at that
->> point.
->>
->> machine_unplug_handler(dev)
->>     /* eventually do unplug stuff */
->>     bus_unplug_handler(dev)
->>     /* dev is gone, we can't do more unplug stuff */
->>
->> So move the object_unparent() to the original caller of the unplug. Fo=
-r
->> now, keep the unrealize() at the original places of the
->> object_unparent(). For implicitly chained hotplug handlers (e.g. pc
->> code calling acpi hotplug handlers), the object_unparent() has to be
->> done by the outermost caller. So when calling hotplug_handler_unplug()
->> from inside an unplug handler, nothing is to be done.
->>
->> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
->>     machine_unplug_handler(dev) {
->>         /* eventually do unplug stuff */
->>         bus_unplug_handler(dev) -> calls unrealize(dev)
->>         /* we can do more unplug stuff but device already unrealized *=
-/
->>     }
->> object_unparent(dev)
->>
->> In the long run, every unplug action should be factored out of the
->> unrealize() function into the unplug handler (especially for PCI). The=
-n
->> we can get rid of the additonal unrealize() calls and object_unparent(=
-)
->> will properly unrealize the device hierarchy after the device has been
->> unplugged.
->>
->> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
->>     machine_unplug_handler(dev) {
->>         /* eventually do unplug stuff */
->>         bus_unplug_handler(dev) -> only unplugs, does not unrealize
->>         /* we can do more unplug stuff */
->>     }
->> object_unparent(dev) -> will unrealize
->>
->> The original approach was suggested by Igor Mammedov for the PCI
->> part, but I extended it to all hotplug handlers. I consider this one
->> step into the right direction.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->=20
-> Have you tested all affect use-cases after this patch?
-
-I tested some (e.g. ACPI PCI hotplug/unplug, s390x PCI hotplug/unplug
-...) to make sure this fundamentally workd, but certainly not all yet :)
-
->=20
->> ---
->>  hw/acpi/cpu.c            |  1 +
->>  hw/acpi/memory_hotplug.c |  1 +
->>  hw/acpi/pcihp.c          |  3 ++-
->>  hw/core/qdev.c           |  3 +--
->>  hw/i386/pc.c             |  5 ++---
->>  hw/pci/pcie.c            |  3 ++-
->>  hw/pci/shpc.c            |  3 ++-
->>  hw/ppc/spapr.c           |  4 ++--
->>  hw/ppc/spapr_pci.c       |  3 ++-
->>  hw/s390x/css-bridge.c    |  2 +-
->>  hw/s390x/s390-pci-bus.c  | 13 ++++++++-----
->>  qdev-monitor.c           |  9 +++++++--
->>  12 files changed, 31 insertions(+), 19 deletions(-)
->>
-> [...]
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index d59071b8ed..278cc094ec 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -286,8 +286,7 @@ void qbus_reset_all_fn(void *opaque)
->>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
->>                                    DeviceState *dev, Error **errp)
->>  {
->> -    /* just zap it */
->> -    object_unparent(OBJECT(dev));
->> +    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
->>  }
->> =20
->>  /*
-> [...]
->> diff --git a/qdev-monitor.c b/qdev-monitor.c
->> index 07147c63bf..7705acd6c7 100644
->> --- a/qdev-monitor.c
->> +++ b/qdev-monitor.c
->> @@ -862,6 +862,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
->>      DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
->>      HotplugHandler *hotplug_ctrl;
->>      HotplugHandlerClass *hdc;
->> +    Error *local_err =3D NULL;
->> =20
->>      if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
->>          error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
->> @@ -890,10 +891,14 @@ void qdev_unplug(DeviceState *dev, Error **errp)
->>       * otherwise just remove it synchronously */
->>      hdc =3D HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
->>      if (hdc->unplug_request) {
->> -        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
->> +        hotplug_handler_unplug_request(hotplug_ctrl, dev, &local_err)=
-;
->>      } else {
->> -        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
->> +        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err);
->> +        if (!local_err) {
->> +            object_unparent(OBJECT(dev));
-> Is this object_unparent() that you moved from qdev_simple_device_unplug=
-_cb()
-> in the hunk above?
-
-Yes, I moved it from all unplug handlers that do an object_unparent().
-
->=20
-> IS it possible to split patch per subsystem for easier review?
-
-I am afraid not, unless you have an idea on how to do that (we could
-temporarily somehow remember for each hotplug handler if it will delete
-device itself or not - but I don't really like that approach).
-
-Thanks!
-
->> +        }
->>      }
->> +    error_propagate(errp, local_err);
->>  }
->> =20
->>  void qmp_device_del(const char *id, Error **errp)
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+Berto
