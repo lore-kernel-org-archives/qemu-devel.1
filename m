@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48316)
+Received: from eggs.gnu.org ([209.51.188.92]:48470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkZHM-0002Ws-99
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkZHy-0002mq-8N
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkZHL-0005Ej-Jg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:08 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41423)
+	(envelope-from <peter.maydell@linaro.org>) id 1gkZHw-0005Z5-UZ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:46 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkZHK-0005BZ-Bq
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:07 -0500
-Received: by mail-wr1-x441.google.com with SMTP id x10so16273867wrs.8
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 10:54:05 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 18:54:02 +0000
-Message-Id: <20190118185402.3065-1-peter.maydell@linaro.org>
+	id 1gkZHw-0005Tn-NV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 13:54:44 -0500
+Received: by mail-ot1-x343.google.com with SMTP id k98so15305662otk.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 10:54:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tests: Disable ipmi-bt-test
+References: <20190118121925.24468-1-cohuck@redhat.com>
+In-Reply-To: <20190118121925.24468-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 18:54:24 +0000
+Message-ID: <CAFEAcA9cUmJ=EqP=uBN_r9d2jw-FtNbuL+D+tFDjJCNPojQQhQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] s390x updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The ipmi-bt-test fails intermittently, especially on the NetBSD VM.
-The frequency of this failure has recently gone up sharply to the
-point that I'm having to retry the NetBSD build multiple times
-to get a pass when merging pull requests.
+On Fri, 18 Jan 2019 at 12:19, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 681d61362d3f766a00806b89d6581869041f73cb:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-01-17 12:48:42 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190118
+>
+> for you to fetch changes up to 6e92c70c37547b6a247a206651dfcc583a57f484:
+>
+>   s390x/pci: add common function measurement block (2019-01-18 11:52:01 +0100)
+>
+> ----------------------------------------------------------------
+> s390x updates:
+> - clang compilation fixes
+> - fixes in zpci hotplug code
+> - handle unimplemented diag 308 subcodes correctly
+> - add common fmb in zpci
+>
 
-Disable the test until we can figure out why it's failing.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Fed up with this failing all the time so let's just turn it off.
-Feel free to investigate what's actually going wrong with it...
+Applied, thanks.
 
- tests/Makefile.include | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index eaa81ee1d07..5e6b2c7058d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -186,7 +186,8 @@ check-qtest-i386-$(CONFIG_SGA) += tests/boot-serial-test$(EXESUF)
- check-qtest-i386-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-i386-y += tests/rtc-test$(EXESUF)
- check-qtest-i386-y += tests/ipmi-kcs-test$(EXESUF)
--check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
-+# Disabled temporarily as it fails intermittently especially under NetBSD VM
-+# check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
- check-qtest-i386-y += tests/i440fx-test$(EXESUF)
- check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
- check-qtest-i386-y += tests/drive_del-test$(EXESUF)
--- 
-2.20.1
+-- PMM
