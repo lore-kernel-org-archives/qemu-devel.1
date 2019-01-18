@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52215)
+Received: from eggs.gnu.org ([209.51.188.92]:53956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gkW6W-0005BG-TC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:30:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1gkWCo-0001Ky-QK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:37:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gkW6T-00087Y-M7
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:30:44 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:44109)
+	(envelope-from <thuth@redhat.com>) id 1gkWCn-0006C3-BR
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:37:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gkW6T-000865-65
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:30:41 -0500
-Date: Fri, 18 Jan 2019 10:30:39 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190118153039.GA10734@flamenco>
-References: <20190116170114.26802-1-cota@braap.org>
-	<20190116170114.26802-4-cota@braap.org> <87y37ixb09.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gkWCj-00065h-3L
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:37:10 -0500
+References: <20190118112410.3010-1-yang.zhong@intel.com>
+	<20190118112410.3010-42-yang.zhong@intel.com>
+	<b6cb87d1-5378-de3d-8633-0ce07c8a55e6@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b58cb429-010e-a0d9-b4f9-c6107d3ee5d8@redhat.com>
+Date: Fri, 18 Jan 2019 16:37:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87y37ixb09.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v7 3/3] tcg/i386: enable dynamic TLB sizing
+In-Reply-To: <b6cb87d1-5378-de3d-8633-0ce07c8a55e6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v3 41/43] i386-softmmu.mak: remove all
+ CONFIG_* except boards definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com
 
-On Fri, Jan 18, 2019 at 15:04:38 +0000, Alex Bennée wrote:
-(snip)
-> Tested-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+On 2019-01-18 16:28, Paolo Bonzini wrote:
+> On 18/01/19 12:24, Yang Zhong wrote:
+>>  config ACPI_NVDIMM
+>>      bool
+>> +    default y
+>> +    depends on I440FX || Q35
+> 
+> This is "depends on PC".
+> 
+>>  config ACPI_VMGENID
+>>      bool
+>> +    default y
+>> +    depends on I440FX || Q35
+>>  
+>>  config IPMI
+>>      bool
+> 
+> IPMI should have a "depends on PC" too.
 
-Thanks!
+config ISAPC selects PC, too, and I don't think that ISAPC has ACPI, has it?
 
-> Do you have access to any aarch64 hardware? It would be nice to see if
-> we could support it there as well.
-
-I don't have time to implement this for the aarch64 backend,
-but if you (or anyone else) want to do it, I can run benchmarks --
-I do have access to an aarch64 host, and also have spec06 compiled
-for aarch64.
-
-		E.
+ Thomas
