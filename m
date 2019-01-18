@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39981)
+Received: from eggs.gnu.org ([209.51.188.92]:40865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkQlT-0007UU-JO
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:48:40 -0500
+	(envelope-from <berto@igalia.com>) id 1gkQog-0000I6-6e
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkQlO-0004wD-IO
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:48:37 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 09:48:06 +0000
-Message-ID: <af3e202b-25d1-0f37-727f-f5aa4f619415@virtuozzo.com>
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<20190117193658.16413-6-eblake@redhat.com>
-In-Reply-To: <20190117193658.16413-6-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B6B62A19FFBED944B50745AF15A84B99@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berto@igalia.com>) id 1gkQoe-00084s-C1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:51:58 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190108170655.29766-9-vsementsov@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+	<20190108170655.29766-9-vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 10:51:36 +0100
+Message-ID: <w51pnsuwaxj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 05/21] nbd/server: Hoist length check to
- qmp_nbd_server_add
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 8/9] qcow2: bdrv_co_pwritev: move
+ encryption code out of the lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugb25seSBoYWQgdHdvIGNh
-bGxlcnMgdG8gbmJkX2V4cG9ydF9uZXc7IHFlbXUtbmJkLmMgYWx3YXlzDQo+IHBhc3NlZCBhIHZh
-bGlkIG9mZnNldC9sZW5ndGggcGFpciAoYmVjYXVzZSBpdCBhbHJlYWR5IGNoZWNrZWQNCj4gdGhl
-IGZpbGUgbGVuZ3RoLCB0byBlbnN1cmUgdGhhdCBvZmZzZXQgd2FzIGluIGJvdW5kcyksIHdoaWxl
-DQo+IGJsb2NrZGV2LW5iZC5jIGFsd2F5cyBwYXNzZWQgMC8tMS4gIFRoZW4gbmJkX2V4cG9ydF9u
-ZXcgcmVkdWNlcw0KPiB0aGUgc2l6ZSB0byBhIG11bHRpcGxlIG9mIEJEUlZfU0VDVE9SX1NJWkUg
-KGNhbiBvbmx5IGhhcHBlbg0KPiB3aGVuIG9mZnNldCBpcyBub3Qgc2VjdG9yLWFsaWduZWQsIHNp
-bmNlIGJkcnZfZ2V0bGVuZ3RoKCkNCj4gY3VycmVudGx5IHJvdW5kcyB1cCksIHdoaWNoIGNhbiBy
-ZXN1bHQgaW4gb2Zmc2V0IGJlaW5nIGdyZWF0ZXINCj4gdGhhbiB0aGUgZW5mb3JjZWQgbGVuZ3Ro
-LCBidXQgdGhhdCdzIG5vdCBmYXRhbCAodGhlIHNlcnZlcg0KPiByZWplY3RzIGNsaWVudCByZXF1
-ZXN0cyB0aGF0IGV4Y2VlZCB0aGUgYWR2ZXJ0aXNlZCBsZW5ndGgpLg0KPiANCj4gSG93ZXZlciwg
-SSdtIGZpbmRpbmcgaXQgZWFzaWVyIHRvIHdvcmsgd2l0aCB0aGUgY29kZSBpZiB3ZSBhcmUNCj4g
-Y29uc2lzdGVudCBvbiBoYXZpbmcgYm90aCBjYWxsZXJzIHBhc3MgaW4gYSB2YWxpZCBsZW5ndGgs
-IGFuZA0KPiBqdXN0IGFzc2VydCB0aGF0IHRoaW5ncyBhcmUgc2FuZSBpbiBuYmRfZXhwb3J0X25l
-dywgbWVhbmluZw0KPiB0aGF0IG5vIG5lZ2F0aXZlIHZhbHVlcyB3ZXJlIHBhc3NlZCwgYW5kIHRo
-YXQgb2Zmc2V0K3NpemUgZG9lcw0KPiBub3QgZXhjZWVkIDYzIGJpdHMgKGFzIHRoYXQgcmVhbGx5
-IGlzIGEgZnVuZGFtZW50YWwgbGltaXQgdG8NCj4gbGF0ZXIgb3BlcmF0aW9ucywgd2hldGhlciB3
-ZSB1c2Ugb2ZmX3Qgb3IgdWludDY0X3QpLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFr
-ZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRz
-LA0KVmxhZGltaXINCg==
+On Tue 08 Jan 2019 06:06:54 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+> Encryption will be done in threads, to take benefit of it, we should
+> move it out of the lock first.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index d6ef606d89..76d3715350 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2077,11 +2077,20 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>          ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
+>                                           &cluster_offset, &l2meta);
+>          if (ret < 0) {
+> -            goto fail;
+> +            goto out_locked;
+>          }
+>  
+>          assert((cluster_offset & 511) == 0);
+>  
+> +        ret = qcow2_pre_write_overlap_check(bs, 0,
+> +                                            cluster_offset + offset_in_cluster,
+> +                                            cur_bytes);
+> +        if (ret < 0) {
+> +            goto out_locked;
+> +        }
+> +
+> +        qemu_co_mutex_unlock(&s->lock);
+
+The usage of lock() and unlock() functions inside and outside of the
+loop plus the two 'locked' and 'unlocked' exit paths is starting to make
+things a bit more messy.
+
+Having a look at the code it seems that there's only these three parts
+in the whole function that need to have the lock held:
+
+one:
+   ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
+                                    &cluster_offset, &l2meta);
+   /* ... */
+   ret = qcow2_pre_write_overlap_check(bs, 0,
+                                       cluster_offset +
+                                       offset_in_cluster,
+                                       cur_bytes);
+
+two:
+
+   ret = qcow2_handle_l2meta(bs, &l2meta, true);
+
+
+three:
+   qcow2_handle_l2meta(bs, &l2meta, false);
+
+
+So I wonder if it's perhaps simpler to add lock/unlock calls around
+those blocks?
+
+Berto
