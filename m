@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48779)
+Received: from eggs.gnu.org ([209.51.188.92]:48824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSwK-000271-LJ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:08:01 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gkSwV-0002GN-Og
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:08:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSwH-0001ly-Ag
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:08:00 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 12:07:43 +0000
-Message-ID: <857845c9-325e-a525-c9e3-a39c33571bc0@virtuozzo.com>
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<20190117193658.16413-18-eblake@redhat.com>
-In-Reply-To: <20190117193658.16413-18-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D610F51C6F114245A566337D00CFC622@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <sgarzare@redhat.com>) id 1gkSwU-00020C-PP
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:08:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gkSwS-0001p8-F2
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:08:10 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 18 Jan 2019 13:01:38 +0100
+Message-Id: <20190118120143.21631-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 17/21] nbd/client: Add
- nbd_receive_export_list()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/5] pvh: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Liam Merwick <liam.merwick@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugd2FudCB0byBiZSBhYmxl
-IHRvIGRldGVjdCB3aGV0aGVyIGEgZ2l2ZW4gcWVtdSBOQkQgc2VydmVyIGlzDQo+IGV4cG9zaW5n
-IHRoZSByaWdodCBleHBvcnQocykgYW5kIGRpcnR5IGJpdG1hcHMsIGF0IGxlYXN0IGZvcg0KPiBy
-ZWdyZXNzaW9uIHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhl
-IHVwc3RyZWFtDQo+IE5CRCBwcm9qZWN0IHRvIGxpc3QgZXhwb3J0cywgYnV0IGl0J3MgYW5ub3lp
-bmcgdG8gcmVseSBvbg0KPiBvdXQtb2YtdHJlZSBiaW5hcmllczsgZnVydGhlcm1vcmUsIG5iZC1j
-bGllbnQgZG9lc24ndCBuZWNlc3NhcmlseQ0KPiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBO
-QkQgZXh0ZW5zaW9ucy4gIFRodXMsIHdlIHBsYW4gb24gYWRkaW5nDQo+IGEgbmV3IG1vZGUgdG8g
-cWVtdS1uYmQgdGhhdCBtZXJlbHkgc25pZmZzIGFsbCBwb3NzaWJsZSBpbmZvcm1hdGlvbg0KPiBm
-cm9tIHRoZSBzZXJ2ZXIgZHVyaW5nIGhhbmRzaGFrZSBwaGFzZSwgdGhlbiBkaXNjb25uZWN0cyBh
-bmQgZHVtcHMNCj4gdGhlIGluZm9ybWF0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBhZGRzIHRoZSBs
-b3ctbGV2ZWwgY2xpZW50IGNvZGUgZm9yIGdyYWJiaW5nIHRoZSBsaXN0DQo+IG9mIGV4cG9ydHMu
-ICBJdCBiZW5lZml0cyBmcm9tIHRoZSByZWNlbnQgcmVmYWN0b3JpbmcgcGF0Y2hlcywgaW4NCj4g
-b3JkZXIgdG8gc2hhcmUgYXMgbXVjaCBjb2RlIGFzIHBvc3NpYmxlIHdoZW4gaXQgY29tZXMgdG8g
-ZG9pbmcNCj4gdmFsaWRhdGlvbiBvZiBzZXJ2ZXIgcmVwbGllcy4gIFRoZSByZXN1bHRpbmcgaW5m
-b3JtYXRpb24gaXMgc3RvcmVkDQo+IGluIGFuIGFycmF5IG9mIE5CREV4cG9ydEluZm8gd2hpY2gg
-aGFzIGJlZW4gZXhwYW5kZWQgdG8gYW55DQo+IGRlc2NyaXB0aW9uIHN0cmluZywgYWxvbmcgd2l0
-aCBhIGNvbnZlbmllbmNlIGZ1bmN0aW9uIGZvciBmcmVlaW5nDQo+IHRoZSBsaXN0Lg0KPiANCj4g
-Tm90ZTogYSBtYWxpY2lvdXMgc2VydmVyIGNvdWxkIGV4aGF1c3QgbWVtb3J5IG9mIGEgY2xpZW50
-IGJ5IGZlZWRpbmcNCj4gYW4gdW5lbmRpbmcgbG9vcCBvZiBleHBvcnRzOyBwZXJoYXBzIHdlIHNo
-b3VsZCBwbGFjZSBhIGxpbWl0IG9uIGhvdw0KPiBtYW55IHdlIGFyZSB3aWxsaW5nIHRvIHJlY2Vp
-dmUuIEJ1dCBub3RlIHRoYXQgYSBzZXJ2ZXIgY291bGQNCj4gcmVhc29uYWJseSBiZSBzZXJ2aW5n
-IGFuIGV4cG9ydCBmb3IgZXZlcnkgZmlsZSBpbiBhIGxhcmdlIGRpcmVjdG9yeSwNCj4gd2hlcmUg
-YW4gYXJiaXRyYXJ5IGxpbWl0IGluIHRoZSBjbGllbnQgbWVhbnMgd2UgY2FuJ3QgbGlzdCBhbnl0
-aGluZw0KPiBmcm9tIHN1Y2ggYSBzZXJ2ZXI7IHRoZSBzYW1lIGhhcHBlbnMgaWYgd2UganVzdCBy
-dW4gdW50aWwgdGhlIGNsaWVudA0KPiBmYWlscyB0byBtYWxsb2MoKSBhbmQgdGh1cyBkaWVzIGJ5
-IGFuIGFib3J0KCksIHdoZXJlIHRoZSBsaW1pdCBpcw0KPiBubyBsb25nZXIgYXJiaXRyYXJ5IGJ1
-dCBkZXRlcm1pbmVkIGJ5IGF2YWlsYWJsZSBtZW1vcnkuICBTaW5jZSB0aGUNCj4gY2xpZW50IGlz
-IGFscmVhZHkgcGxhbm5pbmcgb24gYmVpbmcgc2hvcnQtbGl2ZWQsIGl0J3MgaGFyZCB0byBjYWxs
-DQo+IHRoaXMgYSBkZW5pYWwgb2Ygc2VydmljZSBhdHRhY2sgdGhhdCB3b3VsZCBzdGFydmUgb2Zm
-IG90aGVyIHVzZXMsDQo+IHNvIGl0IGRvZXMgbm90IGFwcGVhciB0byBiZSBhIHNlY3VyaXR5IGlz
-c3VlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZTxlYmxha2VAcmVkaGF0LmNvbT4N
-Cj4gUmV2aWV3ZWQtYnk6IFJpY2hhcmQgVy5NLiBKb25lczxyam9uZXNAcmVkaGF0LmNvbT4NCg0K
-UmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmly
-dHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This patch series is based on "[PATCH v3 0/4] QEMU changes to do PVH boot=
+" and
+provides a PVH option rom that can be used with SeaBIOS to boot uncompres=
+sed
+kernel using the x86/HVM direct boot ABI.
+
+Patches 1 and 2 are to prepare the PVH option rom, moving common function=
+s in
+the new headers.  Patch 3 adds the new PVH option rom. Patch 4 uses it wh=
+en we
+are booting an uncompressed kernel using the x86/HVM direct boot ABI. Pat=
+ch 5
+adds the support of loading the initrd in the PVH option rom.
+
+Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
+
+Changes in v5:
+- Patch 5: added R-b's
+- Patch 3: updated .gitignore (by Liam)
+
+Changes in v4:
+- addressed comments by Paolo:
+  - Patch 2: linuxboot_dma.c: moved includes after the asm block to avoid
+    compiler error
+  - Patch 3: Makefile: fixed pvh.img rule
+
+Changes in v3:
+- added R-b's
+- added Patch 5 to support initrd
+- addressed comments by Eric and Liam:
+    - Patch 3: comments by Liam
+    - Patch 4: moved Based-on tag in the cover letter (by Eric)
+- Patch 3: added pc-bios/pvh.bin binary in the commit
+
+Changes in v2:
+- addressed comments by Stefan and Eric:
+  - Patch 2: moved inludes on top of linuxboot_dma.c and add <stdint.h> i=
+n
+    optrom.h
+  - Patch 4: added check of pvh.bin in xen_load_linux()
+- modified commit message of patch 2 to explain better the patch
+
+Stefano Garzarella (5):
+  linuxboot_dma: remove duplicate definitions of FW_CFG
+  linuxboot_dma: move common functions in a new header
+  optionrom: add new PVH option rom
+  hw/i386/pc: use PVH option rom
+  optionrom/pvh: load initrd from fw_cfg
+
+ .gitignore                        |   4 +
+ Makefile                          |   2 +-
+ hw/i386/pc.c                      |   5 +
+ pc-bios/optionrom/Makefile        |   5 +-
+ pc-bios/optionrom/linuxboot_dma.c | 114 +++--------------
+ pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++
+ pc-bios/optionrom/optrom_fw_cfg.h |  92 ++++++++++++++
+ pc-bios/optionrom/pvh.S           | 200 ++++++++++++++++++++++++++++++
+ pc-bios/optionrom/pvh_main.c      | 133 ++++++++++++++++++++
+ pc-bios/pvh.bin                   | Bin 0 -> 1536 bytes
+ 10 files changed, 568 insertions(+), 97 deletions(-)
+ create mode 100644 pc-bios/optionrom/optrom.h
+ create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
+ create mode 100644 pc-bios/optionrom/pvh.S
+ create mode 100644 pc-bios/optionrom/pvh_main.c
+ create mode 100644 pc-bios/pvh.bin
+
+--=20
+2.20.1
