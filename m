@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43476)
+Received: from eggs.gnu.org ([209.51.188.92]:44512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkXM9-00088b-By
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:50:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXRE-0001hd-2u
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkXM8-0006ep-6x
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:50:57 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36032)
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXRD-0001hX-2o
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:11 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:40560)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkXM8-0006bw-0O
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:50:56 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id u4so15875764wrp.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 08:50:55 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 16:50:50 +0000
-Message-Id: <20190118165050.22270-1-peter.maydell@linaro.org>
+	id 1gkXRC-0001gP-O1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:56:11 -0500
+Received: by mail-ot1-x330.google.com with SMTP id s5so14954342oth.7
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 08:56:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] checkpatch: Don't emit spurious warnings
- about block comments
+References: <20190117201743.20470-1-ehabkost@redhat.com>
+In-Reply-To: <20190117201743.20470-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 16:55:57 +0000
+Message-ID: <CAFEAcA_whv5envgZ+dq1p+Hpd0j6H6oVkwq6wFym1rS5N_iDOg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] Python queue, 2019-01-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>
 
-In checkpatch we attempt to check for and warn about
-block comments which start with /* or /** followed by a
-non-blank. Unfortunately a bug in the regex meant that
-we would incorrectly warn about comments starting with
-"/**" with no following text:
+On Thu, 17 Jan 2019 at 20:17, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit 681d61362d3f766a00806b89d6581869041f73cb:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-01-17 12:48:42 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to 49ebe9b15876f3ce9a5f45cb53a16b6a788d65fd:
+>
+>   scripts/replay-dump.py: fix utf-8 mangling (2019-01-17 17:52:40 -0200)
+>
+> ----------------------------------------------------------------
+> Python queue, 2019-01-17
+>
+> Fixes:
+> * Actually test different Python versions on Travis CI
+> * Fix qemu.py error message when qemu dies from signal
+>
+> Cleanups:
+> * Track Python version on config-host.mak
+> * Remove fixed crashes from scripts/device-crash-test
+> * Acceptance tests: Linux initrd checking test
+> * Fix utf-8 mangling at scripts/replay-dump.py
+> * Remove unused python imports from multiple scripts
+>
+> ----------------------------------------------------------------
 
-  git show 9813dc6ac3954d58ba16b3920556f106f97e1c67|./scripts/checkpatch.pl -
-  WARNING: Block comments use a leading /* on a separate line
-  #34: FILE: tests/libqtest.h:233:
-  +/**
+Applied, thanks.
 
-The sequence "/\*\*?" was intended to match either "/*" or "/**",
-but Perl's semantics for '?' allow it to backtrack and try the
-"matches 0 chars" option if the "matches 1 char" choice leads to
-a failure of the rest of the regex to match.  Switch to "/\*\*?+"
-which uses what perlre(1) calls the "possessive" quantifier form:
-this means that if it matches the "/**" string it will not later
-backtrack to matching just the "/*" prefix.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-The other end of the regex is also wrong: it is attempting
-to check for "/* or /** followed by something that isn't
-just whitespace", but [ \t]*.+[ \t]* will match on pure
-whitespace. This is less significant but means that a line
-with just a comment-starter followed by trailing whitespace
-will generate an incorrect warning about block comment style
-as well as the correct error about trailing whitespace which
-a different checkpatch test emits.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Reported-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This comment check is unique to QEMU checkpatch so the bugs
-don't exist in the Linux version.
-
-v1->v2 changes: Add the fix to the other end of the regex
-pointed out by Eric, so that we don't emit spurious warnings
-for block comment starters with trailing whitespace.
-
----
- scripts/checkpatch.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index d10dddf1be4..88682cb0a9f 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1624,7 +1624,7 @@ sub process {
- 
- 		# Block comments use /* on a line of its own
- 		if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&	#inline /*...*/
--		    $rawline =~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-blank
-+		    $rawline =~ m@^\+.*/\*\*?+[ \t]*[^ \t]@) { # /* or /** non-blank
- 			WARN("Block comments use a leading /* on a separate line\n" . $herecurr);
- 		}
- 
--- 
-2.20.1
+-- PMM
