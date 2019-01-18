@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52447)
+Received: from eggs.gnu.org ([209.51.188.92]:53809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gkUW1-0000HZ-Vw
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:58 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gkUad-0003rD-JL
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gkUVz-0003OO-Qn
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gkUVx-0003Im-SX
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:54 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68D09C067831
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:48:50 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 18 Jan 2019 17:48:43 +0400
-Message-Id: <20190118134843.28916-1-marcandre.lureau@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gkUac-0001vJ-KV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:53:43 -0500
+Date: Fri, 18 Jan 2019 14:53:23 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190118145323.0734fdaa.cohuck@redhat.com>
+In-Reply-To: <a9eb4e42-536e-efa4-7097-c05492078fb0@linux.ibm.com>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<b5066f7a-7024-ac3e-a91d-938fd845e1d9@linux.ibm.com>
+	<20181128100249.72d4299a.cohuck@redhat.com>
+	<25021742-a7a8-a90c-a2a3-eb8a78bf1fb0@linux.ibm.com>
+	<20181128155201.5be1d582.cohuck@redhat.com>
+	<1feb66c0-ce80-2853-1522-e7d787471fd3@linux.ibm.com>
+	<20181128163547.7eb33873.cohuck@redhat.com>
+	<a9eb4e42-536e-efa4-7097-c05492078fb0@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qemu-gdb: add a QObject pretty printer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, crosa@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Inspired by GObject/GType pretty printer.
+On Wed, 28 Nov 2018 10:55:11 -0500
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Example:
-machine_set_accel (obj=3D0x555556807550 [pc-i440fx-4.0-machine],...
+> On 11/28/2018 10:35 AM, Cornelia Huck wrote:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- scripts/qemu-gdb.py | 58 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
- mode change 100644 =3D> 100755 scripts/qemu-gdb.py
+> > I hacked up the following (still untested):
+> > 
+> >  From e771c8dc5abbfbd19688b452096bab9d032e0df5 Mon Sep 17 00:00:00 2001
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Date: Wed, 28 Nov 2018 16:30:51 +0100
+> > Subject: [PATCH] vfio-ccw: make it safe to access channel programs
+> > 
+> > When we get a solicited interrupt, the start function may have
+> > been cleared by a csch, but we still have a channel program
+> > structure allocated. Make it safe to call the cp accessors in
+> > any case, so we can call them unconditionally.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_cp.c  | 9 ++++++++-
+> >   drivers/s390/cio/vfio_ccw_cp.h  | 2 ++
+> >   drivers/s390/cio/vfio_ccw_drv.c | 3 +--
+> >   3 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
-old mode 100644
-new mode 100755
-index 690827e6fc6..90c6fd13b93
---- a/scripts/qemu-gdb.py
-+++ b/scripts/qemu-gdb.py
-@@ -21,6 +21,9 @@ import gdb
-=20
- import os, sys
-=20
-+if sys.version_info[0] >=3D 3:
-+    long =3D int
-+
- # Annoyingly, gdb doesn't put the directory of scripts onto the
- # module search path. Do it manually.
-=20
-@@ -47,3 +50,58 @@ coroutine.CoroutinePCFunction()
- # Default to silently passing through SIGUSR1, because QEMU sends it
- # to itself a lot.
- gdb.execute('handle SIGUSR1 pass noprint nostop')
-+
-+
-+def is_object(val):
-+    def is_object_helper(type):
-+        if str(type) =3D=3D "Object":
-+            return True
-+
-+        while type.code =3D=3D gdb.TYPE_CODE_TYPEDEF:
-+            type =3D type.target()
-+
-+        if type.code !=3D gdb.TYPE_CODE_STRUCT:
-+            return False
-+
-+        fields =3D type.fields()
-+        if len (fields) < 1:
-+            return False
-+
-+        first_field =3D fields[0]
-+        return is_object_helper(first_field.type)
-+
-+    type =3D val.type
-+    if type.code !=3D gdb.TYPE_CODE_PTR:
-+        return False
-+    type =3D type.target()
-+    return is_object_helper (type)
-+
-+
-+def object_class_name(instance):
-+    try:
-+        inst =3D instance.cast(gdb.lookup_type("Object").pointer())
-+        klass =3D inst["class"]
-+        typ =3D klass["type"]
-+        return typ["name"].string()
-+    except RuntimeError:
-+        pass
-+
-+
-+class QObjectPrinter:
-+    def __init__(self, val):
-+        self.val =3D val
-+
-+    def to_string(self):
-+        name =3D object_class_name(self.val)
-+        if name:
-+            return ("0x%x [%s]")% (long(self.val), name)
-+        return  ("0x%x") % (long(self.val))
-+
-+
-+def lookup_type(val):
-+    if is_object(val):
-+        return QObjectPrinter(val)
-+    return None
-+
-+
-+gdb.pretty_printers.append(lookup_type)
---=20
-2.20.1.98.gecbdaf0899
+Hm, this one seems to have fallen through the cracks; but it still does
+look useful, especially if we want to allow concurrent handling of
+channel operations.
+
+> > 
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> > index 70a006ba4d05..35f87514276b 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.c
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> > @@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
+> >   	struct ccwchain *chain, *temp;
+> >   	int i;
+> >   
+> > +	cp->initialized = false;
+> >   	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+> >   		for (i = 0; i < chain->ch_len; i++) {
+> >   			pfn_array_table_unpin_free(chain->ch_pat + i,
+> > @@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+> >   	 */
+> >   	cp->orb.cmd.c64 = 1;
+> >   
+> > +	cp->initialized = true;
+> > +
+> >   	return ret;
+> >   }
+> >   
+> > @@ -715,7 +718,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+> >    */
+> >   void cp_free(struct channel_program *cp)
+> >   {
+> > -	cp_unpin_free(cp);
+> > +	if (cp->initialized)
+> > +		cp_unpin_free(cp);
+> >   }
+> >   
+> >   /**
+> > @@ -831,6 +835,9 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+> >   	u32 cpa = scsw->cmd.cpa;
+> >   	u32 ccw_head, ccw_tail;
+> >   
+> > +	if (!cp->initialized)
+> > +		return;
+> > +
+> >   	/*
+> >   	 * LATER:
+> >   	 * For now, only update the cmd.cpa part. We may need to deal with
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+> > index a4b74fb1aa57..3c20cd208da5 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.h
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.h
+> > @@ -21,6 +21,7 @@
+> >    * @ccwchain_list: list head of ccwchains
+> >    * @orb: orb for the currently processed ssch request
+> >    * @mdev: the mediated device to perform page pinning/unpinning
+> > + * @initialized: whether this instance is actually initialized
+> >    *
+> >    * @ccwchain_list is the head of a ccwchain list, that contents the
+> >    * translated result of the guest channel program that pointed out by
+> > @@ -30,6 +31,7 @@ struct channel_program {
+> >   	struct list_head ccwchain_list;
+> >   	union orb orb;
+> >   	struct device *mdev;
+> > +	bool initialized;
+> >   };
+> >   
+> >   extern int cp_init(struct channel_program *cp, struct device *mdev,
+> > diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> > index 890c588a3a61..83d6f43792b6 100644
+> > --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > @@ -79,8 +79,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+> >   	private = container_of(work, struct vfio_ccw_private, io_work);
+> >   	irb = &private->irb;
+> >   
+> > -	if (scsw_is_solicited(&irb->scsw) &&
+> > -	    (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC)) {
+> > +	if (scsw_is_solicited(&irb->scsw)) {
+> >   		cp_update_scsw(&private->cp, &irb->scsw);
+> >   		cp_free(&private->cp);
+> >   	}
+> >   
+> 
+> The changes look good to me.
+
+Thanks!
+
+> 
+> Thanks
+> Farhan
+> 
