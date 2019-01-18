@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49440)
+Received: from eggs.gnu.org ([209.51.188.92]:50322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gkUMQ-0006xE-Fj
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:39:03 -0500
+	(envelope-from <mark.mielke@gmail.com>) id 1gkUOb-0000Y4-9k
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gkUMP-0003LZ-6X
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:39:02 -0500
-Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:40821)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gkUMN-0003AQ-3Q
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:39:00 -0500
-Received: from player750.ha.ovh.net (unknown [10.109.143.201])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id CF69710D5B3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 14:38:55 +0100 (CET)
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<154774536496.1208625.12823909967079119637.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f132cca0-c163-6791-75e0-25783578263a@kaod.org>
-Date: Fri, 18 Jan 2019 14:38:31 +0100
+	(envelope-from <mark.mielke@gmail.com>) id 1gkUOa-00059b-0I
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:41:17 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33735)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mark.mielke@gmail.com>)
+	id 1gkUOZ-00058U-NA
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:41:15 -0500
+Received: by mail-wm1-x341.google.com with SMTP id r24so1027043wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 05:41:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <154774536496.1208625.12823909967079119637.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/19] spapr_xive: Cache device tree
- nodename in sPAPRXive
+References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
+	<20190118100159.GA2483@work-vm>
+	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
+	<20190118101633.GC2146@work-vm> <20190118102102.GH20660@redhat.com>
+	<328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
+In-Reply-To: <328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
+From: Mark Mielke <mark.mielke@gmail.com>
+Date: Fri, 18 Jan 2019 08:41:02 -0500
+Message-ID: <CALm7yL0nFGC1hYfvASrOL2FzO88oZURiLs-a6pR7Cjp3XS0U_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
+ hosts, with VMX flag enabled in the guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
 
-On 1/17/19 6:16 PM, Greg Kurz wrote:
-> PHB hotplug will need to know the name of the XIVE controller node. Since
-> it is an invariant for the machine lifetime, compute it at realize and
-> store it under the sPAPRXive structure.
-Could you please gather all these changes [15-17] in one patch. It would 
-be easier to track. 
+On Fri, Jan 18, 2019 at 7:57 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/intc/spapr_xive.c        |    9 ++++-----
->  include/hw/ppc/spapr_xive.h |    3 +++
->  2 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index e542ae59d7fd..9732c3d89c77 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -316,6 +316,9 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
->      /* Map all regions */
->      spapr_xive_map_mmio(xive);
->  
-> +    xive->nodename = g_strdup_printf("interrupt-controller@%" PRIx64,
-> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_SHIFT));
-
-I would use a helper routine instead.
- 
->      qemu_register_reset(spapr_xive_reset, dev);
->  }
->  
-> @@ -1436,7 +1439,6 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt)
->          cpu_to_be32(7),    /* start */
->          cpu_to_be32(0xf8), /* count */
->      };
-> -    gchar *nodename;
->  
->      /*
->       * The "ibm,plat-res-int-priorities" property defines the priority
-> @@ -1453,10 +1455,7 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt)
->                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
->      timas[3] = cpu_to_be64(1ull << TM_SHIFT);
->  
-> -    nodename = g_strdup_printf("interrupt-controller@%" PRIx64,
-> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 << TM_SHIFT));
-> -    _FDT(node = fdt_add_subnode(fdt, 0, nodename));
-> -    g_free(nodename);
-> +    _FDT(node = fdt_add_subnode(fdt, 0, xive->nodename));
-
-and use the helper routine here.
-
->      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
->      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 29dafead9ba0..deea34b03ee5 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
->      XiveENDSource end_source;
->      hwaddr        end_base;
->  
-> +    /* DT */
-> +    gchar *nodename;
-
-I don't think this is needed. See other patches for why.
-
-Thanks,
-
-C.
- 
+> On 18/01/19 11:21, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Jan 18, 2019 at 10:16:34AM +0000, Dr. David Alan Gilbert wrote:
+> >> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+> >>> The solution is to restart the VM using "-cpu host,-vmx".
+> >> The problem as Christian explained in that thread is that it was commo=
+n
+> >> for them to start VMs with vmx enabled but for people not to use it
+> >> on most of the VMs, so we break migration for most VMs even though mos=
+t
+> >> don't use it.
+> >> It might not be robust, but it worked for a lot of people most of the
+> >> time.
+> It's not "not robust" (like, it usually works but sometimes fails
+> mysteriously).  It's entirely broken, you just don't notice that it is
+> if you're not using the feature.
 >
->      /* Routing table */
->      XiveEAS       *eat;
->      uint32_t      nr_irqs;
-> 
+
+It is useful to understand the risk. However, this is the same risk we have
+been successfully living with for several years now, and it seems abrupt to
+declare 3.1 and 3.2 as the Qemu version beyond which migration requires a
+whole cluster restart whether or not a L2 guest had been, or will ever be
+started on any of the guests.
+
+I would like to see the risk clearly communicated, and have the option of
+proceeding anyways (as we have every day since first deploying the
+solution). I think I am not alone here, otherwise I would have quietly
+implemented a naive patch myself without raising this for discussion. :-)
+
+Given the known risk, I'm happy to restart all machines that have or will
+likely use an L2 guest, and leverage this capability for the 80%+ of
+machines that will never launch an L2 guest. Although, detecting it and
+using this to block live migration in case any mistakes in detection were
+made would be very cool as well.
+
+Is this something that will already work with the pending 3.2 code? Or is
+any change required to achieve this? Is it best to upgrade to 3.0 before
+proceeding to 3.2 (once it is released), or will it be acceptable to
+migrate from 2.12 directly to 3.2 in this manner?
+
+
+> Yes, this is exactly why I said we should make the migration blocker
+> > be conditional on any L2 guest having been started. I vaguely recall
+> > someone saying there wasn't any way to detect this situation from
+> > QEMU though ?
+> You can check that and give a warning (check that CR4.VMXE=3D1 but no
+> other live migration state was transferred).  However, without live
+> migration support in the kernel and in QEMU you cannot start VMs *for
+> the entire future life of the VM* after a live migration.  So even if we
+> implemented that kind of blocker, it would fail even if no VM has been
+> started, as long as the kvm_intel module is loaded on migration.  That
+> would be no different in practice from what we have now.
+>
+> It might work to unload the kvm_intel module and run live migration with
+> the CPU configured differently ("-cpu host,-vmx") on the destination.
+>
+
+For machines that will not use L2 guest, would it be a good precaution to
+unload kvm_intel pre-emptively before live migration just in case? In
+particular, I'm curious if doing anything at all increases the risk of
+failure, or if it should be left alone entirely and never used as the
+lowest risk option (and what we have traditionally been doing anyways).
+
+I do appreciate the warnings and details. Just not the enforcement piece.
+
+Thanks!
+
+--=20
+Mark Mielke <mark.mielke@gmail.com>
