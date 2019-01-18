@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47471)
+Received: from eggs.gnu.org ([209.51.188.92]:53313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkHav-0005Iy-DJ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:01:10 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1gkHzS-0001ew-IH
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:26:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gkHau-00054I-1L
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:01:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38906)
+	(envelope-from <guoheyi@huawei.com>) id 1gkHzO-0001pt-Nz
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:26:29 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:33922 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gkHat-0004yK-Ng
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:01:07 -0500
-References: <alpine.LRH.2.21.1901051827350.16856@linux.fjfi.cvut.cz>
-	<20190107091618.GD27089@stefanha-x1.localdomain>
-	<e2e14237-32be-8e3d-242c-c19e98d04d60@redhat.com>
-	<alpine.LRH.2.21.1901172312550.8075@linux.fjfi.cvut.cz>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <aeb7e3b4-b776-1ee3-d4a0-d39c3e44ac31@redhat.com>
-Date: Thu, 17 Jan 2019 19:01:02 -0500
+	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1gkHzM-0001ly-1F
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 19:26:25 -0500
+References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
+	<20190114090757.68bfa839@x1.home>
+	<aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
+	<20190115091817.07d9916c@x1.home>
+	<a317f715-e146-d63e-5da8-0f6beb85d93a@huawei.com>
+	<20190117082102.236fd268@x1.home>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <af5ecc1c-f9fa-7f1b-957d-ebe11f8b76f8@huawei.com>
+Date: Fri, 18 Jan 2019 08:26:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.21.1901172312550.8075@linux.fjfi.cvut.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190117082102.236fd268@x1.home>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Emulation of TCG OPAL self-encrypting drive
+Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +31,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Kozub <zub@linux.fjfi.cvut.cz>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, kwolf@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
 
 
 
-On 1/17/19 6:04 PM, David Kozub wrote:
-> On Wed, 16 Jan 2019, John Snow wrote:
-> 
->> I can answer some questions about the ATA layer, but I'm not well read
->> on OPAL or the interrelationship between the two.
+On 2019/1/17 23:21, Alex Williamson wrote:
+> On Thu, 17 Jan 2019 20:55:05 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> On 2019/1/16 0:18, Alex Williamson wrote:
+>>> On Tue, 15 Jan 2019 11:21:51 +0800
+>>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>>   
+>>>> Hi Alex,
+>>>>
+>>>> Really appreciate your comments. I have some more questions below.
+>>>>
+>>>>
+>>>> On 2019/1/15 0:07, Alex Williamson wrote:
+>>>>> On Sat, 12 Jan 2019 10:30:40 +0800
+>>>>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>>>>      
+>>>>>> Hi folks,
+>>>>>>
+>>>>>> I have some questions about vfio_msix_vector_do_use() in
+>>>>>> hw/vfio/pci.c, could you help to explain?
+>>>>>>
+>>>>>> We can see that when guest tries to enable one specific MSIX vector
+>>>>>> by unmasking MSIX Vector Control, the access will be trapped and then
+>>>>>> into function vfio_msix_vector_do_use(). And we may go to the below
+>>>>>> branch in line 525:
+>>>>>>
+>>>>>>
+>>>>>> 520 /*
+>>>>>> 521  * We don't want to have the host allocate all possible MSI vectors
+>>>>>> 522  * for a device if they're not in use, so we shutdown and incrementally
+>>>>>> 523  * increase them as needed.
+>>>>>> 524  */
+>>>>>> 525  if (vdev->nr_vectors < nr + 1) {
+>>>>>> 526      vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
+>>>>>> 527      vdev->nr_vectors = nr + 1;
+>>>>>> 528      ret = vfio_enable_vectors(vdev, true);
+>>>>>> 529      if (ret) {
+>>>>>> 530          error_report("vfio: failed to enable vectors, %d", ret);
+>>>>>> 531      }
+>>>>>>
+>>>>>> Here all MSIX vectors will be disabled first and then enabled, with
+>>>>>> one more MSIX. The comment is there but I still don't quite
+>>>>>> understand. It makes sense for not allocating all possible MSI
+>>>>>> vectors, but why shall we shutdown the whole MSI when being requested
+>>>>>> to enable one specific vector? Can't we just enable the user
+>>>>>> specified vector indexed by "nr"?
+>>>>> What internal kernel API would vfio-pci make use of to achieve that?
+>>>>> We can't know the intentions of the guest and we have a limited set of
+>>>>> tools to manage the MSI-X state in the host kernel.  It's generally the
+>>>>> case that MSI-X vectors are only manipulated during driver setup and
+>>>>> shutdown, so while the current behavior isn't necessarily efficient, it
+>>>>> works within the constraints and generally doesn't have a runtime impact
+>>>>> on performance.  We also recognize that this behavior may change in the
+>>>>> future depending on more dynamic internal host kernel interfaces, thus
+>>>>> we export the VFIO_IRQ_INFO_NORESIZE flag to indicate to userspace
+>>>>> whether this procedure is required.
+>>>> I tried to enable the specified MSIX vector only, and finally
+>>>> understood the original QEMU code after always getting EINVAL from
+>>>> ioctl->VFIO_DEVICE_SET_IRQS. Then I tried to allocate all MSIX
+>>>> vectors in vfio_msix_enable(), not only MSIX vector 0. The change
+>>>> works, but it definitely doesn't follow the comment in the code "We
+>>>> don't want to have the host allocate all possible MSI vectors for a
+>>>> device if they're not in use". May I ask what the side effect is if
+>>>> we really allocate all possible vectors at the beginning?
+>>> Host IRQ vector exhaustion.  Very few devices seem to make use of the
+>>> their full compliment of available vectors and some devices support a
+>>> very, very large number of vectors.  The current approach only consumes
+>>> the host resources that the guest is actually making use of.
+>>>   
+>>>>>> What's more, on ARM64 systems with GIC ITS, the kernel will issue
+>>>>>> an ITS discard command when disabling a MSI vector, which will drop
+>>>>>> currently pending MSI interrupt. If device driver in guest system
+>>>>>> enables some MSIs first and interrupts may come at any time, and
+>>>>>> then it tries to enable other MSIs, is it possible for the above
+>>>>>> code to cause interrupts missing?
+>>>>> Interrupt reconfiguration is generally during driver setup or
+>>>>> teardown when the device is considered idle or lost interrupts are
+>>>>> not a concern.  If you have a device which manipulates interrupt
+>>>>> configuration runtime, you can expect that lost interrupts won't be
+>>>>> the only problem,
+>>>> On physical machine, if the driver enables vector 0 first, and then
+>>>> vector 1 later, will the vector 0 interrupt be lost for some
+>>>> possibility? In my opinion the manipulation of vector 1 should not
+>>>> affect the interrupt of vector 0, isn't it? But if this is possible
+>>>> in virtual world, what do we consider it as? A bug to be fixed in
+>>>> future, or a known limitation of virtualization that won't be fixed
+>>>> and all driver developers should pay attention to it?
+>>> Are you experiencing an actual problem with lost interrupts or is this
+>>> a theoretical question?  There is a difference in programming of MSI-X
+>>> for an assigned device because we cannot know the intentions of the
+>>> guest with respect to how many vectors they intend to use.  We can only
+>>> know as individual vectors are unmasked that a vector is now used.
+>>> Allocating the maximum compliment of interrupts supported on the device
+>>> is wasteful of host resources.  Given this, combined with the fact that
+>>> drivers generally configure vectors only at device setup time, the
+>>> existing code generally works well.  Ideally drivers should not be
+>>> required to modify their behavior to support device assignment, but
+>>> certain actions, like high frequency masking/unmasking of interrupts
+>>> through the vector table impose unavoidable virtualization overhead
+>>> and should be avoided.  I believe older Linux guests (RHEL5 time frame)
+>>> had such behavior.
+>> Yes we are experiencing occasional interrupts missing for Huawei
+>> Hi1822 NIC VF used on Guest. Once I suspected the workflow in qemu
+>> could cause this issue, but after more investigation these two days,
+>> we found it should only be the trigger of the issue. The root cause
+>> may be on kernel or ARM GICR in the chip, for kernel always maps vPE
+>> to the first CPU (normally CPU 0), and then moves the map to the
+>> scheduled CPU. But there is a time window between these two actions,
+>> and interrupts may get lost when triggered in this short time window.
+>> However we have not come to a final conclusion yet.
 >>
->> We don't have an ATA-style passthrough in QEMU right now and nobody has
->> ever asked! Would you mind elaborating for me what kind of setup you're
->> looking to accomplish and maybe I can give you some better hints?
->>
->> --js
-> 
-> Hi John,
-> 
-> I'm thinking about adding OPAL support into grub. And I thought being
-> able to do the development with qemu would make the development much
-> easier.
-> 
-> While I read the OPAL spec, I can't say I understand it. But as far as I
-> know, the relationship between OPAL and ATA is not too complicated. The
-> OPAL spec itself is written in interface-agnostic way. It just defines
-> there should be two interface commands ("Trusted Commands"), described
-> as "IF-SEND" and "IF-RECV". (See [1], 1.4.1 Global Terminology and 2.3.1
-> Host <-> TPer Communication Infrastructure) and the OPAL spec
-> essentially defines the paylods for these.
-> 
-> The actual definition of what "Trused Commands" are for ATA comes from
-> "TCG Storage Interface Interactions Specification (SIIS)"[3],
-> specifically "4.2 Mapping of IF-SEND and IF-RECV". (Well, it's not that
-> simple, as there are other things like error handling.)
-> 
-> Of course, OPAL affects other commands, like reads and writes, based on
-> the OPAL state (see [1], 5.7 Locking Template).
-> 
-> Furthermore, there is the "shadow MBR" feature, which, when enabled (and
-> not marked as done), makes the disk present a different content at the
-> beginning. (This is typically used to store a program that can be
-> booted, asks for password, unlocks the disk, sets the "mbr done" flag to
-> hide the shadow MBR and reboots to the real OS. - see e.g. 5.7.2.5.3
-> Done in [1].)
-> 
-> Here are the specs relevant for OPAL v2:
-> [1]
-> https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage_Architecture_Core_Spec_v2.01_r1.00.pdf
-> 
-> [2]
-> https://trustedcomputinggroup.org/wp-content/uploads/TCG_Storage-Opal_SSC_v2.01_rev1.00.pdf
-> 
-> [3]
-> https://trustedcomputinggroup.org/wp-content/uploads/TCG_SWG_SIIS_v1.08_r1.00.pdf
-> 
-> 
-> Implementing the spec (for what an "OPAL" disk need to support, I think
-> [2] is the important document) seems like a big task.
-> 
-> So I'm thinking ATA passthrough might be a more attainable goal. This
-> way I could use a real OPAL drive w/o needing a spare controller for PCI
-> passthrough. And with some more fiddling, I could even connect this to
-> userspace (I was thinking of ATA over Ethernet). This could be useful
-> for other development/fiddling scenarios too.
-> 
-> But I don't know much about ATA. Would it be sufficient to just do an
-> SG_IO IOCTL on the target block device for each ide_exec_cmd? How do
-> things like NCQ fit into this?
-> 
-> Best regards,
-> David
+>>> It's possible that current IRQ domains alleviate some of the concern
+>>> for host IRQ exhaustion and that vfio-pci could be made to allocate
+>>> the maximum supported vectors per device, removing the use of the
+>>> NORESIZE flag for the index.  Userspace would need to continue to
+>>> support both modes of operation and the kernel would need to
+>>> continue to be compatible with that.  Thanks,
+>> How about we set a threshold (maybe 16, 32) that only allocating
+>> vectors of number = min (maximum supported vectors, threshold), and
+>> go thru the original work flow if the specified vector is larger than
+>> the initially allocated?
+> I would not support such a solution, it's not only still wasteful of
+> interrupt vectors but it introduces an inflection point in the behavior
+> which means that "high-end" configurations exercise code paths that
+> "low-end" configurations do not.  Besides, it seems you haven't yet
+> even proven that this is an issue.  If we wanted to remove the NORESIZE
+> flag for this vector index, I think the host would need to allocate all
+> vectors supported by the MSI-X capability in advance, which means we
+> need to verify that vector exhaustion is no longer a concern on the
+> host.  Thanks,
+Sure, we can leave it as it is now.
 
-Admittedly I'm not too sure of how the ATA support in Linux works to
-know what the passthrough would actually look like, bit-wise. I know
-there's some SCSI abstraction layer that can drive ATA devices, but I'm
-not completely clear on the actual plumbing. How you want to attempt
-this might depend on what the linux ATA drivers look like and at which
-interface layer you could conceivably drive them. I don't know the
-answer to this.
-
-I can give you maybe a brief overview of some of the obviously useful
-choke points in QEMU, though...
-
-the ATA support in QEMU comes in a few different levels:
-
-(1) IDE/ATA/PATA disks use a register set and PIO to directly read and
-write values to individual registers. You can see this interface in
-hw/ide.core.c for ide_ioport_write, ide_status_read, and ide_cmd_write.
-When the drive is in a PIO data loop, you can read or write data to a
-buffer by repeatedly writing to a certain register address, implemented
-with ide_data_[read|write][w|l].
+Thanks,
+Heyi
 
 
-ide_exec_cmd serves as the "start processing" signal in QEMU, and uses
-the various registers manipulated in the above calls stored in `IDEState
-*s` to know which command to emulate. The arguments to ide_exec_cmd
-aren't sufficient instruction alone. ide_exec_cmd is triggered whenever
-the guest updates the command register.
-
-CDROM emulation actually does use SCSI packets. Generally the guest
-sends the 0xA0 PACKET command to the drive and then the drive waits for
-a SCSI CDB to arrive via PIO. When the packet has arrived in full,
-ide_atapi_cmd() processes it. However, there are a few places in this
-code where we dip into the ATA registers to formulate a reply, so the
-logical split isn't perfect.
-
-(2) PCI IDE utilizes additional BMDMA features outside of those core
-registers and are driven separately. It does not fully wrap the register
-interface present.
-
-(3) SATA devices begin using FIS packets. They're a message format that
-lets you send commands, update registers, read values, etc. They're the
-basic interface unit at this level. Both NCQ and traditional ATA
-commands are delivered using FIS Register Host-to-Device update packets.
-(The command, as always, is activated when the ATA device itself
-receives an update to its command register.)
-
-QEMU doesn't have a clean separation for ATA and SATA emulation, so the
-SATA device emulation actually happens at the interface layer in QEMU
-instead, as a hack. See hw/ide/ahci.c and look for this blurb:
-
-```
-    /* Check for NCQ command */
-    if (is_ncq(cmd_fis[2])) {
-	process_ncq_command(s, port, cmd_fis, slot);
-        return;
-    }
-```
-
-This feels like maybe high level and useful enough to be able to
-intercept for passthrough purposes, but I'm not sure how to handle
-things like DMA routing or PIO access, which is still... technically
-allowed at this layer, and might be used by early bootup routines.
-
-A problem is that QEMU does not really disentangle the concept of a
-"SATA Device" and the "AHCI controller", so a lot of the FIS responses
-in QEMU go straight into the controller's buffer, and we'd have to split
-all of that out.
-
-(4) the AHCI controller manages sending and receiving the FIS packets.
-You fill a buffer with the FIS packet to send and manipulate AHCI PCI
-registers to send it off. FIS responses are buffered from the SATA
-drives informing the controller of the new register values.
-
-the AHCI command buffers include space for guests to pre-write their
-SCSI CDBs, and the controller handles sending both the outer ATA command
-and the inner ATAPI packet to the device.
-
-Again, in QEMU, we cheat a little and layers (3) and (4) are pretty well
-smooshed together. In general, the AHCI layer sends FIS packets back and
-forth from the SATA layer, which decomposes the FIS packets into
-constituent register updates, which are sent into layer (1) for
-processing. None of these layers are really truly strictly separated,
-unfortunately.
-
-
-
-
-...I'd have to read up a bit on what interfaces Linux offers where we
-might be able to do an ATA passthrough and I can make better
-recommendations on where to take the surgeon's scalpel.
-
-Hope this helps even 1% instead of just being a useless info dump.
-
---js
+>
+> Alex
+>
+> .
+>
