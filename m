@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56001)
+Received: from eggs.gnu.org ([209.51.188.92]:56049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbkd-0005Kt-Ad
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:32 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbke-0005MB-IG
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbkb-0004ql-CF
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:31 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36043)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbkd-0004t6-MG
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:32 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbkZ-0004iA-Nq
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:28 -0500
-Received: by mail-pg1-x544.google.com with SMTP id n2so6649960pgm.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:19 -0800 (PST)
+	id 1gkbkd-0004r5-AK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:31 -0500
+Received: by mail-pg1-x543.google.com with SMTP id n2so6650154pgm.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:30 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:30:54 +1100
-Message-Id: <20190118213122.22865-21-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:30:59 +1100
+Message-Id: <20190118213122.22865-26-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 21/49] linux-user: Split out creat
+Subject: [Qemu-devel] [PATCH v6 26/49] linux-user: Split out chdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +29,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+Note that chdir is universally provided.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  3 +++
- linux-user/strace.c           | 13 -------------
- linux-user/syscall-file.inc.c | 16 ++++++++++++++++
- linux-user/syscall.c          |  9 ---------
+ linux-user/syscall-defs.h     |  1 +
+ linux-user/strace.c           | 12 ------------
+ linux-user/syscall-file.inc.c | 14 ++++++++++++++
+ linux-user/syscall.c          |  6 ------
  linux-user/strace.list        |  3 ---
- 5 files changed, 19 insertions(+), 25 deletions(-)
+ 5 files changed, 15 insertions(+), 21 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index f099d98fa3..de7a99f0c6 100644
+index 392bd1579c..3fad9d51f0 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -21,6 +21,9 @@ SYSCALL_DEF_FULL(brk, .impl = impl_brk,
+@@ -19,6 +19,7 @@
+ SYSCALL_DEF_FULL(brk, .impl = impl_brk,
+                  .print_ret = print_syscall_ptr_ret,
                   .arg_type = { ARG_PTR });
++SYSCALL_DEF(chdir, ARG_STR);
  SYSCALL_DEF_ARGS(clone, ARG_CLONEFLAG, ARG_PTR, ARG_PTR, ARG_PTR, ARG_PTR);
  SYSCALL_DEF(close, ARG_DEC);
-+#ifdef TARGET_NR_creat
-+SYSCALL_DEF(creat, ARG_STR, ARG_MODEFLAG);
-+#endif
- SYSCALL_DEF(exit, ARG_DEC);
- #ifdef TARGET_NR_fork
- SYSCALL_DEF(fork);
+ #ifdef TARGET_NR_creat
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index d7847e7cd6..5cb77223fd 100644
+index 43865e9df9..5133998c4f 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1183,19 +1183,6 @@ print_clock_adjtime(const struct syscallname *name,
+@@ -1113,18 +1113,6 @@ print_access(const struct syscallname *name,
  }
  #endif
  
--#ifdef TARGET_NR_creat
+-#ifdef TARGET_NR_chdir
 -static void
--print_creat(const struct syscallname *name,
+-print_chdir(const struct syscallname *name,
 -    abi_long arg0, abi_long arg1, abi_long arg2,
 -    abi_long arg3, abi_long arg4, abi_long arg5)
 -{
 -    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_file_mode(arg1, 1);
+-    print_string(arg0, 1);
 -    print_syscall_epilogue(name);
 -}
 -#endif
 -
- #ifdef TARGET_NR_execv
+ #ifdef TARGET_NR_chmod
  static void
- print_execv(const struct syscallname *name,
+ print_chmod(const struct syscallname *name,
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 81423cfd64..62e1790e3b 100644
+index 2dd57176b3..7a4751d460 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -24,6 +24,22 @@ SYSCALL_IMPL(close)
-     return get_errno(close(fd));
- }
+@@ -16,6 +16,20 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
  
-+#ifdef TARGET_NR_creat
-+SYSCALL_IMPL(creat)
++SYSCALL_IMPL(chdir)
 +{
-+    char *p = lock_user_string(arg1);
++    abi_ulong target_path = arg1;
++    char *p = lock_user_string(target_path);
 +    abi_long ret;
 +
 +    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(creat(p, arg2));
-+    fd_trans_unregister(ret);
-+    unlock_user(p, arg1, 0);
++    ret = get_errno(chdir(p));
++    unlock_user(p, target_path, 0);
 +    return ret;
 +}
-+#endif
 +
- /*
-  * Helpers for do_openat, manipulating /proc/self/foo.
-  */
+ SYSCALL_IMPL(close)
+ {
+     int fd = arg1;
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8da92dd188..1e9478611c 100644
+index 3a027651e3..1cdc9727a9 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5330,15 +5330,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -5331,12 +5331,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_creat /* not on alpha */
--    case TARGET_NR_creat:
+-    case TARGET_NR_chdir:
 -        if (!(p = lock_user_string(arg1)))
 -            return -TARGET_EFAULT;
--        ret = get_errno(creat(p, arg2));
--        fd_trans_unregister(ret);
+-        ret = get_errno(chdir(p));
 -        unlock_user(p, arg1, 0);
 -        return ret;
--#endif
- #ifdef TARGET_NR_link
-     case TARGET_NR_link:
+ #ifdef TARGET_NR_time
+     case TARGET_NR_time:
          {
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index afa1521e2d..be0392810c 100644
+index 202bfa8f9e..357984dd6f 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -94,9 +94,6 @@
- #ifdef TARGET_NR_connect
- { TARGET_NR_connect, "connect" , "%s(%d,%#x,%d)", NULL, NULL },
+@@ -61,9 +61,6 @@
+ #ifdef TARGET_NR_capset
+ { TARGET_NR_capset, "capset" , "%s(%p,%p)", NULL, NULL },
  #endif
--#ifdef TARGET_NR_creat
--{ TARGET_NR_creat, "creat" , NULL, print_creat, NULL },
+-#ifdef TARGET_NR_chdir
+-{ TARGET_NR_chdir, "chdir" , NULL, print_chdir, NULL },
 -#endif
- #ifdef TARGET_NR_create_module
- { TARGET_NR_create_module, "create_module" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_chmod
+ { TARGET_NR_chmod, "chmod" , NULL, print_chmod, NULL },
  #endif
 -- 
 2.17.2
