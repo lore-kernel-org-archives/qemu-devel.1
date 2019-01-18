@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56328)
+Received: from eggs.gnu.org ([209.51.188.92]:56369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl6-0005g5-JH
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkblA-0005hV-N3
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl4-0005Lo-DL
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:00 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33671)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbl8-0005S4-Rz
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:04 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36456)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbl3-0005Fk-2l
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:57 -0500
-Received: by mail-pg1-x542.google.com with SMTP id z11so6661221pgu.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:54 -0800 (PST)
+	id 1gkbl8-0005Qc-3b
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:02 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g9so6895762plo.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:33:01 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:31:10 +1100
-Message-Id: <20190118213122.22865-37-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:31:13 +1100
+Message-Id: <20190118213122.22865-40-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 37/49] linux-user: Split out access,
- faccessat
+Subject: [Qemu-devel] [PATCH v6 40/49] linux-user: Split out kill
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,212 +29,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Note that faccessat is unconditionally available.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  4 ++++
- linux-user/syscall.h          |  1 +
- linux-user/strace.c           | 33 ++++-----------------------------
- linux-user/syscall-file.inc.c | 25 +++++++++++++++++++++++++
- linux-user/syscall.c          | 18 ------------------
- linux-user/strace.list        |  6 ------
- 6 files changed, 34 insertions(+), 53 deletions(-)
+ linux-user/syscall-defs.h    |  1 +
+ linux-user/syscall.h         |  7 +++-
+ linux-user/strace.c          | 76 ++++++++++++++++++------------------
+ linux-user/syscall-sig.inc.c |  5 +++
+ linux-user/syscall.c         |  2 -
+ linux-user/strace.list       |  3 --
+ 6 files changed, 48 insertions(+), 46 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 2767e335d8..39e3ae3c21 100644
+index 497fbdba66..c672b5ad99 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -16,6 +16,9 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#ifdef TARGET_NR_access
-+SYSCALL_DEF(access, ARG_STR, ARG_ACCESSFLAG);
-+#endif
- #ifdef TARGET_NR_alarm
- SYSCALL_DEF(alarm, ARG_DEC);
+@@ -58,6 +58,7 @@ SYSCALL_DEF(getxpid);
+ #ifdef TARGET_NR_ipc
+ SYSCALL_DEF_ARGS(ipc, ARG_HEX, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR, ARG_HEX);
  #endif
-@@ -34,6 +37,7 @@ SYSCALL_DEF(creat, ARG_STR, ARG_MODEFLAG);
- SYSCALL_DEF(exit, ARG_DEC);
- SYSCALL_DEF(execve, ARG_STR, ARG_PTR, ARG_PTR);
- SYSCALL_DEF(execveat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
-+SYSCALL_DEF(faccessat, ARG_ATDIRFD, ARG_STR, ARG_ACCESSFLAG);
- SYSCALL_DEF(fchmod, ARG_DEC, ARG_MODEFLAG);
- SYSCALL_DEF(fchmodat, ARG_ATDIRFD, ARG_STR, ARG_MODEFLAG);
- #ifdef TARGET_NR_futimesat
++SYSCALL_DEF(kill, ARG_DEC, ARG_SIGNAL);
+ #ifdef TARGET_NR_link
+ SYSCALL_DEF(link, ARG_STR, ARG_STR);
+ #endif
 diff --git a/linux-user/syscall.h b/linux-user/syscall.h
-index 3c936b648a..84a52b2d9a 100644
+index 84a52b2d9a..642fb6dccb 100644
 --- a/linux-user/syscall.h
 +++ b/linux-user/syscall.h
-@@ -57,6 +57,7 @@ typedef enum {
+@@ -55,8 +55,12 @@ typedef enum {
+     ARG_HEX,
+     ARG_OCT,
  
-     /* These print as sets of flags.  */
+-    /* These print as sets of flags.  */
++    /* These numbers are interpreted.  */
      ARG_ATDIRFD,
-+    ARG_ACCESSFLAG,
++    ARG_SIGNAL,
++    ARG_LSEEKWHENCE,
++
++    /* These print as sets of flags.  */
+     ARG_ACCESSFLAG,
      ARG_ATFLAG,
      ARG_CLONEFLAG,
-     ARG_MMAPFLAG,
+@@ -67,7 +71,6 @@ typedef enum {
+     ARG_OPENFLAG,
+     ARG_UMOUNTFLAG,
+     ARG_UNLINKATFLAG,
+-    ARG_LSEEKWHENCE,
+ 
+     /* These are interpreted as pointers.  */
+     ARG_PTR,
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index b54949df27..da2cc30f82 100644
+index da2cc30f82..ec36fcf2c2 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -634,7 +634,7 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
-     gemu_log("\n");
+@@ -70,35 +70,43 @@ UNUSED static void print_socket_protocol(int domain, int type, int protocol);
+ /*
+  * Utility functions
+  */
++static int
++add_signal(char *buf, int size, int sig)
++{
++    static const char * const signals[] = {
++        [TARGET_SIGHUP]  = "SIGHUP",
++        [TARGET_SIGINT]  = "SIGINT",
++        [TARGET_SIGQUIT] = "SIGQUIT",
++        [TARGET_SIGILL]  = "SIGILL",
++        [TARGET_SIGABRT] = "SIGABRT",
++        [TARGET_SIGFPE]  = "SIGFPE",
++        [TARGET_SIGKILL] = "SIGKILL",
++        [TARGET_SIGSEGV] = "SIGSEGV",
++        [TARGET_SIGPIPE] = "SIGPIPE",
++        [TARGET_SIGALRM] = "SIGALRM",
++        [TARGET_SIGTERM] = "SIGTERM",
++        [TARGET_SIGUSR1] = "SIGUSR1",
++        [TARGET_SIGUSR2] = "SIGUSR2",
++        [TARGET_SIGCHLD] = "SIGCHLD",
++        [TARGET_SIGCONT] = "SIGCONT",
++        [TARGET_SIGSTOP] = "SIGSTOP",
++        [TARGET_SIGTTIN] = "SIGTTIN",
++        [TARGET_SIGTTOU] = "SIGTTOU",
++    };
++
++    if (sig >= 0 && sig < ARRAY_SIZE(signals) && signals[sig]) {
++        return snprintf(buf, size, "%s", signals[sig]);
++    } else {
++        return snprintf(buf, size, "%d", sig);
++    }
++}
++
+ static void
+ print_signal(abi_ulong arg, int last)
+ {
+-    const char *signal_name = NULL;
+-    switch(arg) {
+-    case TARGET_SIGHUP: signal_name = "SIGHUP"; break;
+-    case TARGET_SIGINT: signal_name = "SIGINT"; break;
+-    case TARGET_SIGQUIT: signal_name = "SIGQUIT"; break;
+-    case TARGET_SIGILL: signal_name = "SIGILL"; break;
+-    case TARGET_SIGABRT: signal_name = "SIGABRT"; break;
+-    case TARGET_SIGFPE: signal_name = "SIGFPE"; break;
+-    case TARGET_SIGKILL: signal_name = "SIGKILL"; break;
+-    case TARGET_SIGSEGV: signal_name = "SIGSEGV"; break;
+-    case TARGET_SIGPIPE: signal_name = "SIGPIPE"; break;
+-    case TARGET_SIGALRM: signal_name = "SIGALRM"; break;
+-    case TARGET_SIGTERM: signal_name = "SIGTERM"; break;
+-    case TARGET_SIGUSR1: signal_name = "SIGUSR1"; break;
+-    case TARGET_SIGUSR2: signal_name = "SIGUSR2"; break;
+-    case TARGET_SIGCHLD: signal_name = "SIGCHLD"; break;
+-    case TARGET_SIGCONT: signal_name = "SIGCONT"; break;
+-    case TARGET_SIGSTOP: signal_name = "SIGSTOP"; break;
+-    case TARGET_SIGTTIN: signal_name = "SIGTTIN"; break;
+-    case TARGET_SIGTTOU: signal_name = "SIGTTOU"; break;
+-    }
+-    if (signal_name == NULL) {
+-        print_raw_param("%ld", arg, last);
+-        return;
+-    }
+-    gemu_log("%s%s", signal_name, get_comma(last));
++    char buf[16];
++    add_signal(buf, sizeof(buf), arg);
++    gemu_log("%s%s", buf, get_comma(last));
  }
  
--UNUSED static struct flags access_flags[] = {
-+static struct flags const access_flags[] = {
-     FLAG_GENERIC(F_OK),
-     FLAG_GENERIC(R_OK),
-     FLAG_GENERIC(W_OK),
-@@ -1114,19 +1114,6 @@ print_accept(const struct syscallname *name,
+ static void print_si_code(int arg)
+@@ -2032,19 +2040,6 @@ print_futex(const struct syscallname *name,
  }
  #endif
  
--#ifdef TARGET_NR_access
+-#ifdef TARGET_NR_kill
 -static void
--print_access(const struct syscallname *name,
+-print_kill(const struct syscallname *name,
 -    abi_long arg0, abi_long arg1, abi_long arg2,
 -    abi_long arg3, abi_long arg4, abi_long arg5)
 -{
 -    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_flags(access_flags, arg1, 1);
+-    print_raw_param("%d", arg0, 0);
+-    print_signal(arg1, 1);
 -    print_syscall_epilogue(name);
 -}
 -#endif
 -
- #ifdef TARGET_NR_clock_adjtime
+ #ifdef TARGET_NR_tkill
  static void
- print_clock_adjtime(const struct syscallname *name,
-@@ -1153,21 +1140,6 @@ print_execv(const struct syscallname *name,
- }
- #endif
- 
--#ifdef TARGET_NR_faccessat
--static void
--print_faccessat(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_at_dirfd(arg0, 0);
--    print_string(arg1, 0);
--    print_flags(access_flags, arg2, 0);
--    print_flags(at_file_flags, arg3, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #ifdef TARGET_NR_fchownat
- static void
- print_fchownat(const struct syscallname *name,
-@@ -2206,6 +2178,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
+ print_tkill(const struct syscallname *name,
+@@ -2178,6 +2173,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
          case ARG_ATDIRFD:
              len = add_atdirfd(b, rest, arg);
              break;
-+        case ARG_ACCESSFLAG:
-+            len = add_flags(b, rest, access_flags, arg, false);
++        case ARG_SIGNAL:
++            len = add_signal(b, rest, arg);
 +            break;
-         case ARG_ATFLAG:
-             len = add_flags(b, rest, at_file_flags, arg, false);
+         case ARG_ACCESSFLAG:
+             len = add_flags(b, rest, access_flags, arg, false);
              break;
-diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 6a7ef80bfc..3111abd861 100644
---- a/linux-user/syscall-file.inc.c
-+++ b/linux-user/syscall-file.inc.c
-@@ -16,6 +16,26 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+static abi_long do_faccessat(int dirfd, abi_ulong target_path, int mode)
-+{
-+    char *p = lock_user_string(target_path);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(faccessat(dirfd, p, mode, 0));
-+    unlock_user(p, target_path, 0);
-+    return ret;
-+}
-+
-+#ifdef TARGET_NR_access
-+SYSCALL_IMPL(access)
-+{
-+    return do_faccessat(AT_FDCWD, arg1, arg2);
-+}
-+#endif
-+
- SYSCALL_IMPL(chdir)
- {
-     abi_ulong target_path = arg1;
-@@ -74,6 +94,11 @@ SYSCALL_IMPL(creat)
+diff --git a/linux-user/syscall-sig.inc.c b/linux-user/syscall-sig.inc.c
+index f4e43eb00e..a4fbcc567d 100644
+--- a/linux-user/syscall-sig.inc.c
++++ b/linux-user/syscall-sig.inc.c
+@@ -23,6 +23,11 @@ SYSCALL_IMPL(alarm)
  }
  #endif
  
-+SYSCALL_IMPL(faccessat)
++SYSCALL_IMPL(kill)
 +{
-+    return do_faccessat(arg1, arg2, arg3);
++    return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
 +}
 +
- SYSCALL_IMPL(fchmod)
+ #ifdef TARGET_NR_pause
+ SYSCALL_IMPL(pause)
  {
-     return get_errno(fchmod(arg1, arg2));
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ca462fde61..9074cf8b8d 100644
+index 6668e4ada8..fef955ce66 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5327,24 +5327,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -5338,8 +5338,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_access
--    case TARGET_NR_access:
--        if (!(p = lock_user_string(arg1))) {
--            return -TARGET_EFAULT;
--        }
--        ret = get_errno(access(path(p), arg2));
--        unlock_user(p, arg1, 0);
--        return ret;
--#endif
--#if defined(TARGET_NR_faccessat) && defined(__NR_faccessat)
--    case TARGET_NR_faccessat:
--        if (!(p = lock_user_string(arg2))) {
--            return -TARGET_EFAULT;
--        }
--        ret = get_errno(faccessat(arg1, p, arg3, 0));
--        unlock_user(p, arg2, 0);
--        return ret;
--#endif
- #ifdef TARGET_NR_nice /* not on alpha */
-     case TARGET_NR_nice:
-         return get_errno(nice(arg1));
+-    case TARGET_NR_kill:
+-        return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
+ #ifdef TARGET_NR_rename
+     case TARGET_NR_rename:
+         {
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index c0c1b896f7..fc0eb91e29 100644
+index 56f25c15b7..b120f11dc2 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -9,9 +9,6 @@
- #ifdef TARGET_NR_accept4
- { TARGET_NR_accept4, "accept4" , NULL, NULL, NULL },
+@@ -410,9 +410,6 @@
+ #ifdef TARGET_NR_keyctl
+ { TARGET_NR_keyctl, "keyctl" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_access
--{ TARGET_NR_access, "access" , NULL, print_access, NULL },
+-#ifdef TARGET_NR_kill
+-{ TARGET_NR_kill, "kill", NULL, print_kill, NULL },
 -#endif
- #ifdef TARGET_NR_acct
- { TARGET_NR_acct, "acct" , NULL, NULL, NULL },
- #endif
-@@ -142,9 +139,6 @@
- #ifdef TARGET_NR_exit_group
- { TARGET_NR_exit_group, "exit_group" , "%s(%d)\n", NULL, NULL },
- #endif
--#ifdef TARGET_NR_faccessat
--{ TARGET_NR_faccessat, "faccessat" , NULL, print_faccessat, NULL },
--#endif
- #ifdef TARGET_NR_fadvise64
- { TARGET_NR_fadvise64, "fadvise64" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_lchown
+ { TARGET_NR_lchown, "lchown" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.2
