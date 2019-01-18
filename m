@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38296)
+Received: from eggs.gnu.org ([209.51.188.92]:37861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1gkSNL-0005ZL-1m
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:31:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gkVHi-0003Hb-Gp
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mkletzan@redhat.com>) id 1gkSNK-0002vV-25
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:31:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mkletzan@redhat.com>) id 1gkSNJ-0002ua-QE
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:31:50 -0500
-Date: Fri, 18 Jan 2019 12:31:38 +0100
-From: Martin Kletzander <mkletzan@redhat.com>
-Message-ID: <20190118113138.GA8296@wheatley>
-References: <20190118093935.GA1142@beluga.usersys.redhat.com>
-	<20190118101638.GE20660@redhat.com>
-	<20190118111150.GA28476@wheatley>
-	<20190118111711.GJ20660@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gkVHh-0001Cd-9l
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:38:14 -0500
+Date: Fri, 18 Jan 2019 15:37:58 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190118153758.2c45a31a@redhat.com>
+In-Reply-To: <1f1b6173-ba9f-46b8-4e54-846f48459b4d@redhat.com>
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-10-david@redhat.com>
+	<20190118112001.4bb2cf6f@redhat.com>
+	<1f1b6173-ba9f-46b8-4e54-846f48459b4d@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
-Content-Disposition: inline
-In-Reply-To: <20190118111711.GJ20660@redhat.com>
-Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
- for capabilities
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 09/10] pc: Support for PCI based memory
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +26,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Erik Skultety <eskultet@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, brijesh.singh@amd.com, dinechin@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
+On Fri, 18 Jan 2019 13:53:14 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
---MGYHOYXEY6WxJCY8
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 18.01.19 11:20, Igor Mammedov wrote:
+> > On Wed, 16 Jan 2019 12:35:22 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> Override the PCI device hotplug handler to properly handle the
+> >> memory device part from the machine hotplug handler and forward to the
+> >> actual PCI bus hotplug handler.
+> >>
+> >> As PCI hotplug has not been properly factored out into hotplug handlers,
+> >> most magic is performed in the (un)realize functions. Also some buses don't  
+> >                                                              ^^^^^^^^ pls, be more specific  
+> 
+> Last time I checked there were some TYPE_PCI_HOST_BRIDGE devices in QEMU
+> that would not have a hotplug handler. I *think* they are all unrelated
+> to x86/pc. But as I was not sure if I am missing something, I introduced
+> a simple error check.
+> 
+> >   
+> >> have a PCI hotplug handler at all yet (not sure if they are actually used
+> >> on x86, but just to be sure).
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/i386/pc.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 89 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >> index fd0cb29ba9..62f83859fa 100644
+> >> --- a/hw/i386/pc.c
+> >> +++ b/hw/i386/pc.c
+> >> @@ -75,6 +75,7 @@
+> >>  #include "hw/usb.h"
+> >>  #include "hw/i386/intel_iommu.h"
+> >>  #include "hw/net/ne2000-isa.h"
+> >> +#include "hw/mem/memory-device.h"
+> >>  
+> >>  /* debug PC/ISA interrupts */
+> >>  //#define DEBUG_IRQ
+> >> @@ -2224,6 +2225,84 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> >>      numa_cpu_pre_plug(cpu_slot, dev, errp);
+> >>  }
+> >>  
+> >> +static void pc_pci_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> +                            Error **errp)
+> >> +{
+> >> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> >> +        if (!hotplug_dev2) {
+> >> +            /*
+> >> +             * Without a bus hotplug handler, we cannot control the plug/unplug
+> >> +             * order. Disallow memory devices on such buses.
+> >> +             */
+> >> +            error_setg(errp, "Memory devices not supported on this bus.");
+> >> +            return;
+> >> +        }
+> >> +        memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev),
+> >> +                               NULL, errp);
+> >> +    }
+> >> +
+> >> +    if (hotplug_dev2) {
+> >> +        hotplug_handler_pre_plug(hotplug_dev2, dev, errp);
+> >> +        if (local_err) {
+> >> +            error_propagate(errp, local_err);
+> >> +            return;
+> >> +        }
+> >> +    }
+> >> +}
+> >> +
+> >> +static void pc_pci_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> +                        Error **errp)
+> >> +{
+> >> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> >> +        memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> >> +    }
+> >> +
+> >> +    if (hotplug_dev2) {
+> >> +        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
+> >> +    }
+> >> +
+> >> +    if (local_err) {
+> >> +        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> >> +            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> >> +        }
+> >> +    }
+> >> +    error_propagate(errp, local_err);
+> >> +}
+> >> +
+> >> +static void pc_pci_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> +                                  Error **errp)
+> >> +{
+> >> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+> >> +
+> >> +    if (hotplug_dev2) {
+> >> +        hotplug_handler_unplug_request(hotplug_dev2, dev, errp);
+> >> +    }
+> >> +}
+> >> +
+> >> +static void pc_pci_device_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >> +                                 Error **errp)
+> >> +{
+> >> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    if (hotplug_dev2) {
+> >> +        hotplug_handler_unplug(hotplug_dev2, dev, &local_err);
+> >> +    }
+> >> +
+> >> +    if (!local_err) {
+> >> +        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> >> +            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
+> >> +        }
+> >> +    }
+> >> +    error_propagate(errp, local_err);
+> >> +}
+> >> +
+> >>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >>                                            DeviceState *dev, Error **errp)
+> >>  {
+> >> @@ -2231,6 +2310,8 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >>          pc_memory_pre_plug(hotplug_dev, dev, errp);
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >>          pc_cpu_pre_plug(hotplug_dev, dev, errp);
+> >> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> +        pc_pci_pre_plug(hotplug_dev, dev, errp);
+> >>      }
+> >>  }
+> >>  
+> >> @@ -2241,6 +2322,8 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+> >>          pc_memory_plug(hotplug_dev, dev, errp);
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >>          pc_cpu_plug(hotplug_dev, dev, errp);
+> >> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> +        pc_pci_plug(hotplug_dev, dev, errp);
+> >>      }
+> >>  }
+> >>  
+> >> @@ -2251,6 +2334,8 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> >>          pc_memory_unplug_request(hotplug_dev, dev, errp);
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >>          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+> >> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> +        pc_pci_unplug_request(hotplug_dev, dev, errp);
+> >>      } else {
+> >>          error_setg(errp, "acpi: device unplug request for not supported device"
+> >>                     " type: %s", object_get_typename(OBJECT(dev)));
+> >> @@ -2264,6 +2349,8 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+> >>          pc_memory_unplug(hotplug_dev, dev, errp);
+> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >>          pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+> >> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> >> +        pc_pci_device_unplug(hotplug_dev, dev, errp);
+> >>      } else {
+> >>          error_setg(errp, "acpi: device unplug for not supported device"
+> >>                     " type: %s", object_get_typename(OBJECT(dev)));
+> >> @@ -2274,7 +2361,8 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
+> >>                                               DeviceState *dev)
+> >>  {
+> >>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> >> -        object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> >> +        object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
+> >> +        object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {  
+> > why all PCI devices instead of virtio-pmem-pci one?
+> >   
+> 
+> Last time I tried to include "hw/virtio/virtio-pci.h" in pc.c it
+> resulted in an inclusion error madness. But this should be easy to fix I
+> guess. (the basic idea of this patch is the important bit)
+> 
+> And I just tried to include and it seems to result in no errors right now
+I'd prefer override for concrete devices only and the rest PCI devices
+handled as they used to. That also should simplify hotplug handlers you
+are adding here.
 
-On Fri, Jan 18, 2019 at 11:17:11AM +0000, Daniel P. Berrang=E9 wrote:
->On Fri, Jan 18, 2019 at 12:11:50PM +0100, Martin Kletzander wrote:
->> On Fri, Jan 18, 2019 at 10:16:38AM +0000, Daniel P. Berrang=E9 wrote:
->> > I've just realized there is a potential 3rd solution. Remember there is
->> > actually nothing inherantly special about the 'root' user as an account
->> > ID. 'root' gains its powers from the fact that it has many capabilities
->> > by default.  'qemu' can't access /dev/sev because it is owned by a
->> > different user (happens to be root) and 'qemu' does not have capabilit=
-ies.
->> >
->> > So we can make probing work by using our capabilities code to grant
->> > CAP_DAC_OVERRIDE to the qemu process we spawn. So probing still runs
->> > as 'qemu', but can none the less access /dev/sev while it is owned
->> > by root.  We were not using 'qemu' for sake of security, as the probing
->> > process is not executing any untrusthworthy code, so we don't  loose a=
-ny
->> > security protection by granting CAP_DAC_OVERRIDE.
->> >
->>
->> IMHO CAP_DAC_OVERRIDE is a lot, especially on systems without SELinux.
->
->Probing of QEMU capabilities is not a security critical task. QEMU is
->run with "-machine none" so does not even create the virtual machine
->hardware, nor have any guest image that it would run. All it is running
->is the QEMU class initialization code. The only way for that to act in
->a malicious way is for a backdoor to have been inserted when QEMU was
->built by the OS vendor, or fo the QEMU binary on disk to have been
->replaced by something malcious (which would require root privileges
->itself).
->
-
-So you are trying to protect from buggy qemu with malicious guest, not real=
-ly a
-malicious qemu.  I got confused as SEV is trying to protect against
-untrustworthy host including binaries like qemu.  OK
-
->
->We must of coure *NEVER* give CAP_DAC_OVERRIDE to a QEMU that is running
->the real, untrustworty, end user VM.
->
->Regards,
->Daniel
->--=20
->|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrang=
-e :|
->|: https://libvirt.org         -o-            https://fstop138.berrange.co=
-m :|
->|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrang=
-e :|
-
---MGYHOYXEY6WxJCY8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiXAnXDYdKAaCyvS1CB/CnyQXht0FAlxBuRoACgkQCB/CnyQX
-ht2ECw//b9nfHX49JK3Yv/IakpN3sa7YDj7NAMjNttzKUci43bR+XD4Bdo8W6Rau
-AwtDt10hjCoybaWAILf23K/Bg59b78aA4tam+7lhr9AUqlmA35vQbIggXkbVnJGn
-OTFZM513P+CtnUeoakGWrEt0lErN49CLkhAJlgISociwyGveYkFFlgivLEz7KCuD
-T3fxbZRPzV5+l9YUy/UeMmSKTH6wfgSPN991e7hHyWQOOtaUdJGwkGCqknHLfKpc
-OzdRJzUMJO+B1yLMXMqOIksbYr6H5ww2Cw2Xbx4etoDLH8HqyirV6ZzCXHmE3sLM
-1FkWhPrU9SE0BFQffFwTNFHFPV8IGWxWh/TYGZCpL2poCC7Gyawd5uyeitWum4UL
-TEIrMJ4o20czbuRPzgPvsvrLol1xDHYkXdPXQyGAcj3IOLfQhTlFAE+gSt447vuv
-JJ0oMpbcTvsjWEettMWh9v1xoaSrkTDcvGm4sB6JFI8Af8HDB4Nt/oS0llvsbpVT
-g5/4FZ4x9Si3y5fbSZ3QUCktjiiYj69Of0j9fWVjVcTvxvz99ovVsm0kV74jv6ks
-haWjOSBQMThKa3LcTrVwhaWJKCywmyinLXGsQpxiUShfCwIhLPr+Aj5QcM24KuxP
-LPyOcEoGrd818uJlTRZmOSpaAug7fmFC7aAeWloHPbPi3qnOuP8=
-=XFgw
------END PGP SIGNATURE-----
-
---MGYHOYXEY6WxJCY8--
+> 
+> >>          return HOTPLUG_HANDLER(machine);
+> >>      }
+> >>    
+> >   
+> 
+> 
