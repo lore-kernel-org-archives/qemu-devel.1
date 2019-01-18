@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33455)
+Received: from eggs.gnu.org ([209.51.188.92]:33477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkV0y-0000vu-20
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:20:57 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkV11-00010g-Cr
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkV0w-0006Gn-49
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:20:56 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44162)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkV0s-0006AI-KC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:20:53 -0500
-Received: by mail-ot1-x342.google.com with SMTP id f18so14460255otl.11
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:20:50 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkV0z-0006MX-SS
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:20:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 14:20:47 +0000
+Message-ID: <2371f754-2546-8027-a697-6175cfa4ac4f@virtuozzo.com>
+References: <20190117153321.29749-1-eblake@redhat.com>
+	<20190117153321.29749-2-eblake@redhat.com>
+In-Reply-To: <20190117153321.29749-2-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F7BC01F04DE9CB49A4C430FA9CDF16A6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 14:20:38 +0000
-Message-ID: <CAFEAcA-xfLEEW6qrcoHPsyxt1QGMwJ7ez_TKTTpUX1LA6zDFOw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
- typedefs and gnu99
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: Expose protocol-specific data
+ to 'qemu-img info'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Fri, 18 Jan 2019 at 11:47, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Thu, 17 Jan 2019 at 13:38, Thomas Huth <thuth@redhat.com> wrote:
-> >
-> >  Hi Peter!
-> >
-> > The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d97094:
-> >
-> >   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2019-01-15 18:32:57 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
-> >
-> > for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1c:
-> >
-> >   tests/hexloader-test: Don't pass -nographic to the QEMU under test (2019-01-17 14:25:12 +0100)
-> >
-> > ----------------------------------------------------------------
-> > - Remove deprecated "ivshmem" legacy device
-> > - Bug fix for vhost-user-test
-> > - Use more CONFIG Makefile switches for qtests
-> > - Get rid of global_qtests in some more qtests
-> > - typedef cleanups
-> > - Fixes for compiling with Clang
-> > - Force C standard to gnu99
-> > ----------------------------------------------------------------
->
-> In the netbsd VM, the ipmi-bt-test is consistently failing:
->
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=i386-softmmu
-> /qemu-system-i386 QTEST_QEMU_IMG=qemu-img tests/ipmi-bt-test -m=quick
-> -k --tap < /dev/null | ./s
-> cripts/tap-driver.pl --test-name="ipmi-bt-test"
-> **
-> ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv == 1)
-> ERROR - too few tests run (expected 4, got 0)
-> [1]   Abort trap (core dumped) MALLOC_PERTURB_=... |
->       Done(1)                 ./scripts/tap-dr...
-> /var/tmp/qemu-test.7opHvo/tests/Makefile.include:856: recipe for
-> target 'check-qtest-i386' faile
-> d
-> gmake: *** [check-qtest-i386] Error 1
-> gmake: *** Waiting for unfinished jobs....
->
->
-> This has been kind of intermittent for a while, I've seen
-> it on-and-off, but with this pullreq it's failed four times
-> in a row, so maybe something in here is making it less
-> intermittent.
-
-I tried the "raise the timeout" change you suggested on IRC.
-That gave me a pass the first time around but the same failure
-second time I tried it:
-
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
-QTEST_QEMU_IMG=qemu-img tests/ipmi-bt-test -m=quick -k --tap <
-/dev/null | ./scripts/tap-driver.pl --test-name="ipmi-bt-test"
-**
-ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv == 1)
-ERROR - too few tests run (expected 4, got 0)
-[1]   Abort trap (core dumped) MALLOC_PERTURB_=... |
-      Done(1)                 ./scripts/tap-dr...
-/var/tmp/qemu-test.TATvqX/tests/Makefile.include:856: recipe for
-target 'check-qtest-i386' failed
-
-
-
-thanks
--- PMM
+MTcuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gJ3FlbXUtaW1nIGluZm8nIGlz
+IHVzZWZ1bCBmb3Igc2hvd2luZyBhZGRpdGlvbmFsIGluZm9ybWF0aW9uDQo+IGFib3V0IGFuIGlt
+YWdlIC0gYnV0IHNvbWV0aW1lcyB0aGUgaW50ZXJlc3RpbmcgaW5mb3JtYXRpb24gaXMNCj4gc3Bl
+Y2lmaWMgdG8gdGhlIHByb3RvY29sIHJhdGhlciB0aGFuIHRvIHRoZSBmb3JtYXQgbGF5ZXIuICBT
+ZXQNCj4gdGhlIGdyb3VuZHdvcmsgZm9yIHNob3dpbmcgdGhpcyBpbmZvcm1hdGlvbjsgZnVydGhl
+ciBwYXRjaGVzDQo+IHdpbGwgdGhlbiBlbmFibGUgc3BlY2lmaWMgcGllY2VzIG9mIGluZm9ybWF0
+aW9uLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+
+DQo+IC0tLQ0KPiAgIHFhcGkvYmxvY2stY29yZS5qc29uIHwgNiArKysrKy0NCj4gICBibG9jay9x
+YXBpLmMgICAgICAgICB8IDcgKysrKysrKw0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0
+aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29y
+ZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gaW5kZXggOTE2ODViZTZjMjkuLmYyOGQ1
+ZjVmYzc2IDEwMDY0NA0KPiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPiArKysgYi9xYXBp
+L2Jsb2NrLWNvcmUuanNvbg0KPiBAQCAtMTUyLDYgKzE1Miw5IEBADQo+ICAgIyBAZm9ybWF0LXNw
+ZWNpZmljOiBzdHJ1Y3R1cmUgc3VwcGx5aW5nIGFkZGl0aW9uYWwgZm9ybWF0LXNwZWNpZmljDQo+
+ICAgIyBpbmZvcm1hdGlvbiAoc2luY2UgMS43KQ0KPiAgICMNCj4gKyMgQHByb3RvY29sLXNwZWNp
+ZmljOiBzdHJ1Y3R1cmUgc3VwcGx5aW5nIGFkZGl0aW9uYWwgcHJvdG9jb2wtc3BlY2lmaWMNCj4g
+KyMgaW5mb3JtYXRpb24gKHNpbmNlIDQuMCkNCj4gKyMNCj4gICAjIFNpbmNlOiAxLjMNCj4gICAj
+DQo+ICAgIyMNCj4gQEAgLTE2Miw3ICsxNjUsOCBAQA0KPiAgICAgICAgICAgICAgJypiYWNraW5n
+LWZpbGVuYW1lJzogJ3N0cicsICcqZnVsbC1iYWNraW5nLWZpbGVuYW1lJzogJ3N0cicsDQo+ICAg
+ICAgICAgICAgICAnKmJhY2tpbmctZmlsZW5hbWUtZm9ybWF0JzogJ3N0cicsICcqc25hcHNob3Rz
+JzogWydTbmFwc2hvdEluZm8nXSwNCj4gICAgICAgICAgICAgICcqYmFja2luZy1pbWFnZSc6ICdJ
+bWFnZUluZm8nLA0KPiAtICAgICAgICAgICAnKmZvcm1hdC1zcGVjaWZpYyc6ICdJbWFnZUluZm9T
+cGVjaWZpYycgfSB9DQo+ICsgICAgICAgICAgICcqZm9ybWF0LXNwZWNpZmljJzogJ0ltYWdlSW5m
+b1NwZWNpZmljJywNCj4gKyAgICAgICAgICAgJypwcm90b2NvbC1zcGVjaWZpYyc6ICdJbWFnZUlu
+Zm9TcGVjaWZpYycgfSB9DQo+IA0KPiAgICMjDQo+ICAgIyBASW1hZ2VDaGVjazoNCj4gZGlmZiAt
+LWdpdCBhL2Jsb2NrL3FhcGkuYyBiL2Jsb2NrL3FhcGkuYw0KPiBpbmRleCBjNjZmOTQ5ZGI4My4u
+YThkMTA0YmE4Y2UgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3FhcGkuYw0KPiArKysgYi9ibG9jay9x
+YXBpLmMNCj4gQEAgLTI4NCw2ICsyODQsOSBAQCB2b2lkIGJkcnZfcXVlcnlfaW1hZ2VfaW5mbyhC
+bG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfQ0KPiAgICAgICBpbmZvLT5mb3JtYXRfc3Bl
+Y2lmaWMgICAgID0gYmRydl9nZXRfc3BlY2lmaWNfaW5mbyhicyk7DQo+ICAgICAgIGluZm8tPmhh
+c19mb3JtYXRfc3BlY2lmaWMgPSBpbmZvLT5mb3JtYXRfc3BlY2lmaWMgIT0gTlVMTDsNCj4gKyAg
+ICBpbmZvLT5wcm90b2NvbF9zcGVjaWZpYyA9DQo+ICsgICAgICAgIGJzLT5maWxlID8gYmRydl9n
+ZXRfc3BlY2lmaWNfaW5mbyhicy0+ZmlsZS0+YnMpIDogTlVMTDsNCj4gKyAgICBpbmZvLT5oYXNf
+cHJvdG9jb2xfc3BlY2lmaWMgPSBpbmZvLT5wcm90b2NvbF9zcGVjaWZpYyAhPSBOVUxMOw0KPiAN
+Cj4gICAgICAgYmFja2luZ19maWxlbmFtZSA9IGJzLT5iYWNraW5nX2ZpbGU7DQo+ICAgICAgIGlm
+IChiYWNraW5nX2ZpbGVuYW1lWzBdICE9ICdcMCcpIHsNCj4gQEAgLTg3MCw0ICs4NzMsOCBAQCB2
+b2lkIGJkcnZfaW1hZ2VfaW5mb19kdW1wKGZwcmludGZfZnVuY3Rpb24gZnVuY19mcHJpbnRmLCB2
+b2lkICpmLA0KPiAgICAgICAgICAgZnVuY19mcHJpbnRmKGYsICJGb3JtYXQgc3BlY2lmaWMgaW5m
+b3JtYXRpb246XG4iKTsNCj4gICAgICAgICAgIGJkcnZfaW1hZ2VfaW5mb19zcGVjaWZpY19kdW1w
+KGZ1bmNfZnByaW50ZiwgZiwgaW5mby0+Zm9ybWF0X3NwZWNpZmljKTsNCj4gICAgICAgfQ0KPiAr
+ICAgIGlmIChpbmZvLT5oYXNfcHJvdG9jb2xfc3BlY2lmaWMpIHsNCj4gKyAgICAgICAgZnVuY19m
+cHJpbnRmKGYsICJQcm90b2NvbCBzcGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPiArICAgICAg
+ICBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNfZHVtcChmdW5jX2ZwcmludGYsIGYsIGluZm8tPnBy
+b3RvY29sX3NwZWNpZmljKTsNCj4gKyAgICB9DQo+ICAgfQ0KPiANCg0KDQpBIGJpdCByZWxhdGVk
+IHF1ZXN0aW9uOg0KDQpXaHkgZG8gd2UgYWx3YXlzIGhhdmUgbmJkIG5vZGUgYXMgYSBwcm90b2Nv
+bCBub2RlPyBDYW4ndCB3ZSB1c2UgbmJkIG5vZGUgZGlyZWN0bHksDQp3aXRob3V0IHJhdyBsYXll
+cj8NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
