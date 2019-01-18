@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32780)
+Received: from eggs.gnu.org ([209.51.188.92]:33762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkNnc-0005aQ-09
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:38:40 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gkNtV-00073T-Ts
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:44:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkNna-0006yn-9U
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:38:39 -0500
-Received: from mga03.intel.com ([134.134.136.65]:7582)
+	(envelope-from <yang.zhong@intel.com>) id 1gkNtU-0008Lz-TM
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:44:45 -0500
+Received: from mga04.intel.com ([192.55.52.120]:57799)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkNna-0006pC-1X
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:38:38 -0500
-Date: Fri, 18 Jan 2019 14:34:56 +0800
+	id 1gkNtU-0008Jh-Hz
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 01:44:44 -0500
+Date: Fri, 18 Jan 2019 14:41:03 +0800
 From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190118063456.GA13969@yangzhon-Virtual>
+Message-ID: <20190118064103.GB13969@yangzhon-Virtual>
 References: <20190115141108.934-1-yang.zhong@intel.com>
 	<20190115141108.934-20-yang.zhong@intel.com>
 	<8c5e79dd-b177-44fb-4a3d-7aa55216d13d@redhat.com>
+	<75ae9c60-de5f-3e69-f8af-94f3bc8d1db7@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8c5e79dd-b177-44fb-4a3d-7aa55216d13d@redhat.com>
+In-Reply-To: <75ae9c60-de5f-3e69-f8af-94f3bc8d1db7@redhat.com>
 Subject: Re: [Qemu-devel] [RFC PATCH v2 19/37] kconfig: introduce kconfig
  files
 List-Id: <qemu-devel.nongnu.org>
@@ -33,38 +34,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, Yang Zhong <yang.zhong@intel.com>
 
-On Wed, Jan 16, 2019 at 11:44:13AM +0100, Thomas Huth wrote:
-> > +source ipmi/Kconfig
-> > +source vfio/Kconfig
-> > +source adc/Kconfig
-> > +source pcmcia/Kconfig
-> > +source hyperv/Kconfig
+On Wed, Jan 16, 2019 at 03:06:33PM +0100, Thomas Huth wrote:
+> FWIW, looks like we still need alpha/Kconfig, cris/Kconfig,
+> hppa/Kconfig, unicore32/Kconfig, tricore/Kconfig and xtensa/Kconfig ?
 > 
-> Could you please sort the last 5 entries alphabetically into the list?
-  
-  Thanks Thomas, i will change this. Yang 
-> > +# arch Kconfig
-> > +source i386/Kconfig
-> > +source arm/Kconfig
-> > +source m68k/Kconfig
-> > +source microblaze/Kconfig
-> > +source mips/Kconfig
-> > +source ppc/Kconfig
-> > +source sh4/Kconfig
-> > +source sparc/Kconfig
-> > +source sparc64/Kconfig
-> > +source lm32/Kconfig
-> > +source xtensa/Kconfig
-> > +source nios2/Kconfig
-> > +source riscv/Kconfig
-> 
-> dito, please sort last 4 entries alphabetically into the list.
-> 
-  Thanks, i will change this. 
-  
-  Regards,
 
-  Yang
-> Apart from that, patch looks good to me.
-> 
+   Hello Thomas,
+
+   v3 will add below new ARCH/Kconfig
+   alpha/Kconfig
+   cris/Kconfig
+   hppa/Kconfig
+   unicore32/Kconfig
+   tricore/Kconfig
+   moxie/Kconfig
+   openrisc/Kconfig
+
+   So, i will also make those ARCH/Makefile.objs confighrable. thanks!
+
+   Please note: 
+   I will not add hw/s390x/Kconfig because i do not know how to configure this IBM platform.
+
+   Regards,
+
+   Yang
 >  Thomas
