@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36578)
+Received: from eggs.gnu.org ([209.51.188.92]:36585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSIM-0001Hu-65
+	(envelope-from <yang.zhong@intel.com>) id 1gkSIM-0001Hv-ER
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSIG-0007I4-Um
+	(envelope-from <yang.zhong@intel.com>) id 1gkSIH-0007II-0Z
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:42 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47041)
+Received: from mga06.intel.com ([134.134.136.31]:47096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSIG-0005r5-GM
+	id 1gkSIG-0006rc-JI
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:36 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:50 +0800
-Message-Id: <20190118112410.3010-24-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:23:53 +0800
+Message-Id: <20190118112410.3010-27-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 23/43] minikconfig: add semantic analysis
+Subject: [Qemu-devel] [RFC PATCH v3 26/43] build: switch to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,259 +29,332 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-There are three parts in the semantic analysis:
+The make_device_config.sh script is replaced by minikconf, which
+is modified to support the same command line as its predecessor.
 
-1) evaluating expressions.  This is done as a simple visit
-of the Expr nodes.
-
-2) ordering clauses.  This is done by constructing a graph of variables.
-There is an edge from X to Y if Y depends on X, if X selects Y, or if
-X appears in a conditional selection of Y; in other words, if the value
-of X can affect the value of Y.  Each clause has a "destination" variable
-whose value can be affected by the clause, and clauses will be processed
-according to a topological sorting of their destination variables.
-Defaults are processed after all other clauses with the same destination.
-
-3) deriving the value of the variables.  This is done by processing
-the clauses in the topological order provided by the previous step.
-A "depends on" clause will force a variable to False, a "select" clause
-will force a variable to True, an assignment will force a variable
-to its RHS.  A default will set a variable to its RHS if it has not
-been set before.  Because all variables have a default, after visiting
-all clauses all variables will have been set.
+The roots of the parsing are default-configs/*.mak, Kconfig.host and
+hw/Kconfig.  One difference with make_device_config.sh is that all symbols
+have to be defined in a Kconfig file, including those coming from the
+configure script.  This is the reason for the Kconfig.host file introduced
+in the previous patch. Whenever a file in default-configs/*.mak used
+$(...) to refer to a config-host.mak symbol, this is replaced by a
+Kconfig dependency.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- scripts/minikconf.py | 129 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 124 insertions(+), 5 deletions(-)
+ Kconfig.host                     |  3 ++-
+ Makefile                         | 14 +++++++++++--
+ Makefile.target                  |  7 ++++++-
+ default-configs/i386-softmmu.mak |  3 ---
+ hw/display/Kconfig               |  2 ++
+ hw/i386/Kconfig                  |  6 ++++++
+ hw/intc/Kconfig                  |  8 ++++++++
+ hw/misc/Kconfig                  |  2 ++
+ hw/tpm/Kconfig                   |  1 +
+ rules.mak                        |  2 +-
+ scripts/make_device_config.sh    | 30 ---------------------------
+ scripts/minikconf.py             | 35 +++++++++++++++++++++++++++++---
+ 12 files changed, 72 insertions(+), 41 deletions(-)
+ delete mode 100644 scripts/make_device_config.sh
 
+diff --git a/Kconfig.host b/Kconfig.host
+index 2136a4c3ec..d7f503d0ca 100644
+--- a/Kconfig.host
++++ b/Kconfig.host
+@@ -1,5 +1,6 @@
+ # These are "proxy" symbols used to pass config-host.mak values
+-# down to Kconfig.
++# down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
++# these two need to be kept in sync.
+ 
+ config KVM
+     bool
+diff --git a/Makefile b/Makefile
+index a9ac16d94e..01e7c60a0d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -326,9 +326,19 @@ endif
+ 
+ -include $(SUBDIR_DEVICES_MAK_DEP)
+ 
+-%/config-devices.mak: default-configs/%.mak $(SRC_PATH)/scripts/make_device_config.sh
++# This has to be kept in sync with Kconfig.host.
++MINIKCONF_ARGS = \
++    CONFIG_KVM=$(CONFIG_KVM) \
++    CONFIG_SPICE=$(CONFIG_SPICE) \
++    CONFIG_TPM=$(CONFIG_TPM) \
++    CONFIG_XEN=$(CONFIG_XEN) \
++    CONFIG_OPENGL=$(CONFIG_OPENGL)
++
++MINIKCONF = $(SHELL) $(SRC_PATH)/scripts/minikconf.sh
++
++%/config-devices.mak: default-configs/%-softmmu.mak Kconfig.host hw/Kconfig
+ 	$(call quiet-command, \
+-            $(SHELL) $(SRC_PATH)/scripts/make_device_config.sh $< $*-config-devices.mak.d $@ > $@.tmp,"GEN","$@.tmp")
++            $(MINIKCONF) $@ $*-config-devices.mak.d $^ $(MINIKCONF_ARGS) > $@.tmp, "  GEN   $@.tmp")
+ 	$(call quiet-command, if test -f $@; then \
+ 	  if cmp -s $@.old $@; then \
+ 	    mv $@.tmp $@; \
+diff --git a/Makefile.target b/Makefile.target
+index 44ec4b630c..5aa8596a96 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -4,9 +4,12 @@ BUILD_DIR?=$(CURDIR)/..
+ 
+ include ../config-host.mak
+ include config-target.mak
+-include config-devices.mak
+ include $(SRC_PATH)/rules.mak
+ 
++ifdef CONFIG_SOFTMMU
++include config-devices.mak
++endif
++
+ $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
+ ifdef CONFIG_LINUX
+ QEMU_CFLAGS += -I../linux-headers
+@@ -187,7 +190,9 @@ all-obj-$(CONFIG_USER_ONLY) += $(crypto-aes-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
+ 
++ifdef CONFIG_SOFTMMU
+ $(QEMU_PROG_BUILD): config-devices.mak
++endif
+ 
+ COMMON_LDADDS = ../libqemuutil.a
+ 
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 8db7867015..f71284516c 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -4,7 +4,6 @@ include pci.mak
+ include sound.mak
+ include usb.mak
+ include hyperv.mak
+-CONFIG_QXL=$(CONFIG_SPICE)
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_CIRRUS=y
+ CONFIG_VMWARE_VGA=y
+@@ -37,8 +36,6 @@ CONFIG_HPET=y
+ CONFIG_APPLESMC=y
+ CONFIG_I8259=y
+ CONFIG_PFLASH_CFI01=y
+-CONFIG_TPM_TIS=$(CONFIG_TPM)
+-CONFIG_TPM_CRB=$(CONFIG_TPM)
+ CONFIG_MC146818RTC=y
+ CONFIG_PCI_PIIX=y
+ CONFIG_WDT_IB700=y
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index d5c022c886..132aeffdbe 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -51,6 +51,7 @@ config FRAMEBUFFER
+ 
+ config MILKYMIST_TMU2
+     bool
++    depends on OPENGL
+ 
+ config SM501
+     bool
+@@ -66,6 +67,7 @@ config VGA
+ 
+ config QXL
+     bool
++    depends on SPICE
+ 
+ config VIRTIO_GPU
+     bool
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 2dbe2b5d3e..427bda3717 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -3,12 +3,18 @@ config KVM
+ 
+ config I440FX
+     bool
++    select QXL if SPICE
++    select TPM_TIS if TPM
++    select XEN_I386 if XEN
+ 
+ config ISAPC
+     bool
+ 
+ config Q35
+     bool
++    select QXL if SPICE
++    select TPM_TIS if TPM
++    select XEN_I386 if XEN
+ 
+ config VTD
+     bool
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index 69adbd135f..226ef3ae2e 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -21,9 +21,13 @@ config APIC
+ 
+ config ARM_GIC_KVM
+     bool
++    default y
++    depends on ARM_GIC && KVM
+ 
+ config OPENPIC_KVM
+     bool
++    default y
++    depends on OPENPIC && KVM
+ 
+ config XICS
+     bool
+@@ -33,6 +37,8 @@ config XICS_SPAPR
+ 
+ config XICS_KVM
+     bool
++    default y
++    depends on XICS && KVM
+ 
+ config ALLWINNER_A10_PIC
+     bool
+@@ -42,6 +48,8 @@ config S390_FLIC
+ 
+ config S390_FLIC_KVM
+     bool
++    default y
++    depends on S390_FLIC && KVM
+ 
+ config OMPIC
+     bool
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index c006b046d4..cc8dbed24e 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -48,6 +48,8 @@ config MACIO
+ 
+ config IVSHMEM_DEVICE
+     bool
++    default y
++    depends on PCI
+ 
+ config ECCMEMCTL
+     bool
+diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
+index 2eee8eb865..da4bb5b6c7 100644
+--- a/hw/tpm/Kconfig
++++ b/hw/tpm/Kconfig
+@@ -3,6 +3,7 @@ config TPM
+ 
+ config TPM_TIS
+     bool
++    depends on TPM
+ 
+ config TPM_CRB
+     bool
+diff --git a/rules.mak b/rules.mak
+index 86e033d815..62cf02e92b 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -144,7 +144,7 @@ cc-option = $(if $(shell $(CC) $1 $2 -S -o /dev/null -xc /dev/null \
+ cc-c-option = $(if $(shell $(CC) $1 $2 -c -o /dev/null -xc /dev/null \
+                 >/dev/null 2>&1 && echo OK), $2, $3)
+ 
+-VPATH_SUFFIXES = %.c %.h %.S %.cc %.cpp %.m %.mak %.texi %.sh %.rc
++VPATH_SUFFIXES = %.c %.h %.S %.cc %.cpp %.m %.mak %.texi %.sh %.rc Kconfig%
+ set-vpath = $(if $1,$(foreach PATTERN,$(VPATH_SUFFIXES),$(eval vpath $(PATTERN) $1)))
+ 
+ # install-prog list, dir
+diff --git a/scripts/make_device_config.sh b/scripts/make_device_config.sh
+deleted file mode 100644
+index 354af317b3..0000000000
+--- a/scripts/make_device_config.sh
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#! /bin/sh
+-# Writes a target device config file to stdout, from a default and from
+-# include directives therein.  Also emits Makefile dependencies.
+-#
+-# Usage: make_device_config.sh SRC DEPFILE-NAME DEPFILE-TARGET > DEST
+-
+-src=$1
+-dep=$2
+-target=$3
+-src_dir=$(dirname $src)
+-all_includes=
+-
+-process_includes () {
+-  cat $1 | grep '^include' | \
+-  while read include file ; do
+-    all_includes="$all_includes $src_dir/$file"
+-    process_includes $src_dir/$file
+-  done
+-}
+-
+-f=$src
+-while [ -n "$f" ] ; do
+-  f=$(cat $f | tr -d '\r' | awk '/^include / {printf "'$src_dir'/%s ", $2}')
+-  [ $? = 0 ] || exit 1
+-  all_includes="$all_includes $f"
+-done
+-process_includes $src
+-
+-cat $src $all_includes | grep -v '^include'
+-echo "$target: $all_includes" > $dep
 diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index a6a28c9c47..48800591e2 100644
+index 48800591e2..b0b4f76733 100644
 --- a/scripts/minikconf.py
 +++ b/scripts/minikconf.py
-@@ -15,6 +15,10 @@ import sys
+@@ -12,6 +12,7 @@
+ 
+ import os
+ import sys
++import re
  
  __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
  
-+def debug_print(*args):
-+    #print ' '.join(str(x) for x in args)
-+    pass
-+
- # -------------------------------------------
- # KconfigData implements the Kconfig semantics.  For now it can only
- # detect undefined symbols, i.e. symbols that were referenced in
-@@ -34,6 +38,12 @@ class KconfigData:
-         def __invert__(self):
-             return KconfigData.NOT(self)
+@@ -329,6 +330,12 @@ class KconfigParser:
+         self.get_token()
+         self.parse_config()
  
-+        # Abstract methods
-+        def add_edges_to(self, var):
-+            pass
-+        def evaluate(self):
-+            assert False
++    def do_assignment(self, var, val):
++        if not var.startswith("CONFIG_"):
++            raise Error('assigned variable should start with CONFIG_')
++        var = self.data.do_var(var[7:])
++        self.data.do_assignment(var, val)
 +
-     class AND(Expr):
-         def __init__(self, lhs, rhs):
-             self.lhs = lhs
-@@ -41,6 +51,12 @@ class KconfigData:
-         def __str__(self):
-             return "(%s && %s)" % (self.lhs, self.rhs)
+     # file management -----
  
-+        def add_edges_to(self, var):
-+            self.lhs.add_edges_to(var)
-+            self.rhs.add_edges_to(var)
-+        def evaluate(self):
-+            return self.lhs.evaluate() and self.rhs.evaluate()
-+
-     class OR(Expr):
-         def __init__(self, lhs, rhs):
-             self.lhs = lhs
-@@ -48,22 +64,62 @@ class KconfigData:
-         def __str__(self):
-             return "(%s || %s)" % (self.lhs, self.rhs)
+     def error_path(self):
+@@ -617,6 +624,28 @@ class KconfigParser:
+         return None
  
-+        def add_edges_to(self, var):
-+            self.lhs.add_edges_to(var)
-+            self.rhs.add_edges_to(var)
-+        def evaluate(self):
-+            return self.lhs.evaluate() or self.rhs.evaluate()
-+
-     class NOT(Expr):
-         def __init__(self, lhs):
-             self.lhs = lhs
-         def __str__(self):
-             return "!%s" % (self.lhs)
- 
-+        def add_edges_to(self, var):
-+            self.lhs.add_edges_to(var)
-+        def evaluate(self):
-+            return not self.lhs.evaluate()
-+
-     class Var(Expr):
-         def __init__(self, name):
-             self.name = name
-             self.value = None
-+            self.outgoing = set()
-         def __str__(self):
-             return self.name
- 
-+        def has_value(self):
-+            return not (self.value is None)
-+        def set_value(self, val):
-+            if self.has_value() and self.value != val:
-+                raise Exception('contradiction between clauses when setting %s' % self)
-+            debug_print("=> %s is now %s" % (self.name, val))
-+            self.value = val
-+
-+        # depth first search of the dependency graph
-+        def dfs(self, visited, f):
-+            if self in visited:
-+                return
-+            visited.add(self)
-+            for v in self.outgoing:
-+                v.dfs(visited, f)
-+            f(self)
-+
-+        def add_edges_to(self, var):
-+            self.outgoing.add(var)
-+        def evaluate(self):
-+            if not self.has_value():
-+                raise Exception('cycle found including %s' % self)
-+            return self.value
-+
-     class Clause:
-         def __init__(self, dest):
-             self.dest = dest
-+        def priority(self):
-+            return 0
-+        def process(self):
-+            pass
- 
-     class AssignmentClause(Clause):
-         def __init__(self, dest, value):
-@@ -72,11 +128,16 @@ class KconfigData:
-         def __str__(self):
-             return "%s=%s" % (self.dest, 'y' if self.value else 'n')
- 
-+        def process(self):
-+            self.dest.set_value(self.value)
-+
-     class DefaultClause(Clause):
-         def __init__(self, dest, value, cond=None):
-             KconfigData.Clause.__init__(self, dest)
-             self.value = value
-             self.cond = cond
-+            if not (self.cond is None):
-+                self.cond.add_edges_to(self.dest)
-         def __str__(self):
-             value = 'y' if self.value else 'n'
-             if self.cond is None:
-@@ -84,20 +145,38 @@ class KconfigData:
-             else:
-                 return "config %s default %s if %s" % (self.dest, value, self.cond)
- 
-+        def priority(self):
-+            # Defaults are processed just before leaving the variable
-+            return -1
-+        def process(self):
-+            if not self.dest.has_value() and \
-+                    (self.cond is None or self.cond.evaluate()):
-+                self.dest.set_value(self.value)
-+
-     class DependsOnClause(Clause):
-         def __init__(self, dest, expr):
-             KconfigData.Clause.__init__(self, dest)
-             self.expr = expr
-+            self.expr.add_edges_to(self.dest)
-         def __str__(self):
-             return "config %s depends on %s" % (self.dest, self.expr)
- 
-+        def process(self):
-+            if not self.expr.evaluate():
-+                self.dest.set_value(False)
-+
-     class SelectClause(Clause):
-         def __init__(self, dest, cond):
-             KconfigData.Clause.__init__(self, dest)
-             self.cond = cond
-+            self.cond.add_edges_to(self.dest)
-         def __str__(self):
-             return "select %s if %s" % (self.dest, self.cond)
- 
-+        def process(self):
-+            if self.cond.evaluate():
-+                self.dest.set_value(True)
-+
-     def __init__(self):
-         self.previously_included = []
-         self.incl_info = None
-@@ -115,6 +194,50 @@ class KconfigData:
-                 undef = True
-         return undef
- 
-+    def compute_config(self):
-+        if self.check_undefined():
-+            raise Exception(parser, "there were undefined symbols")
-+            return None
-+
-+        debug_print("Input:")
-+        for clause in self.clauses:
-+            debug_print(clause)
-+
-+        debug_print("\nDependency graph:")
-+        for i in self.referenced_vars:
-+            debug_print(i, "->", [str(x) for x in self.referenced_vars[i].outgoing])
-+
-+        # The reverse of the depth-first order is the topological sort
-+        dfo = dict()
-+        visited = set()
-+        debug_print("\n")
-+        def visit_fn(var):
-+            debug_print(var, "has DFS number", len(dfo))
-+            dfo[var] = len(dfo)
-+
-+        for name in self.referenced_vars:
-+            v = self.referenced_vars[name]
-+            v.dfs(visited, visit_fn)
-+
-+        # Put higher DFS numbers and higher priorities first.  This
-+        # places the clauses in topological order and places defaults
-+        # after assignments and dependencies.
-+        self.clauses.sort(key=lambda x: (-dfo[x.dest], -x.priority()))
-+
-+        debug_print("\nSorted clauses:")
-+        for clause in self.clauses:
-+            debug_print(clause)
-+            clause.process()
-+
-+        debug_print("")
-+        values = dict()
-+        for name in self.referenced_vars:
-+            debug_print("Evaluating", name)
-+            v = self.referenced_vars[name]
-+            values[name] = v.evaluate()
-+
-+        return values
-+
-     # semantic actions -------------
- 
-     def do_declaration(self, var):
-@@ -188,9 +311,6 @@ class KconfigParser:
-         data = KconfigData()
-         parser = KconfigParser(data)
-         parser.parse_file(fp)
--        if data.check_undefined():
--            raise KconfigParserError(parser, "there were undefined symbols")
--
-         return data
- 
-     def __init__(self, data):
-@@ -499,5 +619,4 @@ class KconfigParser:
  if __name__ == '__main__':
-     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
-     data = KconfigParser.parse(open(fname, 'r'))
--    for i in data.clauses:
--        print i
-+    print data.compute_config()
+-    fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
+-    data = KconfigParser.parse(open(fname, 'r'))
+-    print data.compute_config()
++    argv = sys.argv
++    if len(argv) == 1:
++        print >>sys.stderr, "%s: at least one argument is required" % argv[0]
++        os.exit(1)
++
++    data = KconfigData()
++    parser = KconfigParser(data)
++    for arg in argv[3:]:
++        m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
++        if m is not None:
++            name, value = m.groups()
++            parser.do_assignment(name, value == 'y')
++        else:
++            fp = open(arg, 'r')
++            parser.parse_file(fp)
++            fp.close()
++
++    config = data.compute_config()
++    for key in sorted(config.keys()):
++        print 'CONFIG_%s=%s'% (key, (config[key] and 'y' or 'n'))
++
++    deps = open(argv[2], 'w')
++    for fname in data.previously_included:
++        print >>deps, '%s: %s' % (argv[1], fname)
++    deps.close()
 -- 
 2.17.1
