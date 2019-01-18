@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52010)
+Received: from eggs.gnu.org ([209.51.188.92]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gkUUN-0007U3-1z
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:47:16 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUV5-00081E-4b
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gkUUL-000259-3l
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:47:14 -0500
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:50737)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gkUUE-0001nU-7T
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:47:09 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.146.19])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 2743F17B37F
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 14:47:02 +0100 (CET)
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<154774537811.1208625.5130988447516010112.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <93efc5e4-26e2-b917-dbe5-0ae819b376d9@kaod.org>
-Date: Fri, 18 Jan 2019 14:46:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <154774537811.1208625.5130988447516010112.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUV3-0002mM-QO
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:47:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 13:47:49 +0000
+Message-ID: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
+References: <20190117193658.16413-1-eblake@redhat.com>
+	<f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
+In-Reply-To: <f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 17/19] spapr_irq: Expose the phandle of
- the interrupt controller
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4FE924AF31539844AF92B6B83109A5E4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,153 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 1/17/19 6:16 PM, Greg Kurz wrote:
-> This will be used by PHB hotplug in order to create the "interrupt-map"
-> property of the PHB node.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_irq.c         |   44 +++++++++++++++++++++++++++++++++++++++++++-
->  include/hw/ppc/spapr_irq.h |    3 +++
->  2 files changed, 46 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index b3e0713428ed..93243cfd0644 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -243,6 +243,11 @@ static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
->      /* TODO: create the KVM XICS device */
->  }
->  
-> +static const char *spapr_irq_get_nodename_xics(sPAPRMachineState *spapr)
-> +{
-> +    return xics_spapr_get_nodename();
-
-can't we just return XICS_NODENAME ?
-
-> +}
-> +
->  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->  #define SPAPR_IRQ_XICS_NR_MSIS     \
->      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> @@ -263,6 +268,7 @@ sPAPRIrq spapr_irq_xics = {
->      .post_load   = spapr_irq_post_load_xics,
->      .reset       = spapr_irq_reset_xics,
->      .set_irq     = spapr_irq_set_irq_xics,
-> +    .get_nodename = spapr_irq_get_nodename_xics,
->  };
->  
->  /*
-> @@ -401,6 +407,11 @@ static void spapr_irq_set_irq_xive(void *opaque, int srcno, int val)
->      xive_source_set_irq(&spapr->xive->source, srcno, val);
->  }
->  
-> +static const char *spapr_irq_get_nodename_xive(sPAPRMachineState *spapr)
-> +{
-> +    return spapr_xive_get_nodename(spapr->xive);
-> +}
-> +
->  /*
->   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->   * with XICS.
-> @@ -425,6 +436,7 @@ sPAPRIrq spapr_irq_xive = {
->      .post_load   = spapr_irq_post_load_xive,
->      .reset       = spapr_irq_reset_xive,
->      .set_irq     = spapr_irq_set_irq_xive,
-> +    .get_nodename = spapr_irq_get_nodename_xive,
->  };
->  
->  /*
-> @@ -588,6 +600,11 @@ static void spapr_irq_set_irq_dual(void *opaque, int srcno, int val)
->      spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
->  }
->  
-> +static const char *spapr_irq_get_nodename_dual(sPAPRMachineState *spapr)
-> +{
-> +    return spapr_irq_current(spapr)->get_nodename(spapr);
-> +}
-> +
->  /*
->   * Define values in sync with the XIVE and XICS backend
->   */
-> @@ -609,7 +626,8 @@ sPAPRIrq spapr_irq_dual = {
->      .cpu_intc_create = spapr_irq_cpu_intc_create_dual,
->      .post_load   = spapr_irq_post_load_dual,
->      .reset       = spapr_irq_reset_dual,
-> -    .set_irq     = spapr_irq_set_irq_dual
-> +    .set_irq     = spapr_irq_set_irq_dual,
-> +    .get_nodename = spapr_irq_get_nodename_dual,
->  };
->  
->  /*
-> @@ -680,6 +698,29 @@ void spapr_irq_dt_populate(sPAPRMachineState *spapr, uint32_t nr_servers,
->      _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
->  }
->  
-> +uint32_t spapr_irq_get_phandle(sPAPRMachineState *spapr, void *fdt,
-> +                               Error **errp)
-> +{
-> +    const char *nodename = spapr->irq->get_nodename(spapr);
-> +    int phandle, offset;
-> +
-> +    offset = fdt_subnode_offset(fdt, 0, nodename);
-
-if I am correct, you changed dt_populate() to return the same offset.
-
-> +    if (offset < 0) {
-> +        error_setg(errp, "Can't find node \"%s\": %s", nodename,
-> +                   fdt_strerror(offset));
-> +        return -1;
-> +    }
-> +
-> +    phandle = fdt_get_phandle(fdt, offset);
-
-if we stored the phandle when spapr_irq_dt_populate() is called, I think
-things would be easier. May be under the backend ? 
-
-C.
-
-
-> +    if (phandle < 0) {
-> +        error_setg(errp, "Can't get phandle of node \"%s\": %s",
-> +                   nodename, fdt_strerror(phandle));
-> +        return -1;
-> +    }
-> +
-> +    return phandle;
-> +}
-> +
->  /*
->   * XICS legacy routines - to deprecate one day
->   */
-> @@ -752,4 +793,5 @@ sPAPRIrq spapr_irq_xics_legacy = {
->      .cpu_intc_create = spapr_irq_cpu_intc_create_xics,
->      .post_load   = spapr_irq_post_load_xics,
->      .set_irq     = spapr_irq_set_irq_xics,
-> +    .get_nodename = spapr_irq_get_nodename_xics,
->  };
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index dfed6b7e9976..d44d659231a6 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -48,6 +48,7 @@ typedef struct sPAPRIrq {
->      int (*post_load)(sPAPRMachineState *spapr, int version_id);
->      void (*reset)(sPAPRMachineState *spapr, Error **errp);
->      void (*set_irq)(void *opaque, int srcno, int val);
-> +    const char *(*get_nodename)(sPAPRMachineState *spapr);
->  } sPAPRIrq;
->  
->  extern sPAPRIrq spapr_irq_xics;
-> @@ -65,6 +66,8 @@ int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
->  void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
->  void spapr_irq_dt_populate(sPAPRMachineState *spapr, uint32_t nr_servers,
->                             void *fdt, uint32_t phandle);
-> +uint32_t spapr_irq_get_phandle(sPAPRMachineState *spapr, void *fdt,
-> +                               Error **errp);
->  
->  /*
->   * XICS legacy routines
-> 
+MTguMDEuMjAxOSAxMToxNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IEkgZ290IHRpcmVkIG9mIGRl
+YnVnZ2luZyB3aGV0aGVyIGEgc2VydmVyIHdhcyBhZHZlcnRpc2luZyB0aGUNCj4+IGNvcnJlY3Qg
+dGhpbmdzIGR1cmluZyBuZWdvdGlhdGlvbiBieSBpbnNwZWN0aW5nIHRoZSB0cmFjZQ0KPj4gbG9n
+cyBvZiBxZW11LWlvIGFzIGNsaWVudCAtIG5vdCB0byBtZW50aW9uIHRoYXQgd2l0aG91dCBTT01F
+DQo+PiBzb3J0IG9mIGNsaWVudCB0cmFjaW5nIHBhcnRpY3VsYXIgY29tbWFuZHMsIHdlIGNhbid0
+IGVhc2lseQ0KPj4gcmVncmVzc2lvbiB0ZXN0IHRoZSBzZXJ2ZXIgZm9yIGNvcnJlY3QgYmVoYXZp
+b3IuwqAgVGhlIGZpbmFsDQo+PiBzdHJhdyB3YXMgYXQgS1ZNIEZvcnVtLCB3aGVuIE5pciBhc2tl
+ZCBtZSB0byBtYWtlIHN1cmUgdGhlcmUNCj4+IHdhcyBhIHdheSB0byBlYXNpbHkgZGV0ZXJtaW5l
+IGlmIGFuIE5CRCBzZXJ2ZXIgaXMgZXhwb3Npbmcgd2hhdA0KPj4gd2UgcmVhbGx5IHdhbnQgKGFu
+ZCBmaXhpbmcgeC1kaXJ0eS1iaXRtYXAgdG8gYmVoYXZlIHNhbmVyIGZlbGwNCj4+IG91dCBhcyBh
+IHJlc3VsdCBvZiBhbnN3ZXJpbmcgdGhhdCBxdWVzdGlvbikuDQo+Pg0KPj4gSSBub3RlIHRoYXQg
+dXBzdHJlYW0gTkJEIGhhcyAnbmJkLWNsaWVudCAtbCAkaG9zdCcgZm9yIHF1ZXJ5aW5nDQo+PiBq
+dXN0IGV4cG9ydCBuYW1lcyAod2l0aCBubyBxdW90aW5nLCBzbyB5b3UgaGF2ZSB0byBrbm93IHRo
+YXQNCj4+IGEgYmxhbmsgbGluZSBtZWFucyB0aGUgZGVmYXVsdCBleHBvcnQpLCBidXQgaXQgd2Fz
+bid0IHBvd2VyZnVsDQo+PiBlbm91Z2gsIHNvIEkgaW1wbGVtZW50ZWQgJ3FlbXUtbmJkIC1MJyB0
+byBkb2N1bWVudCBldmVyeXRoaW5nLg0KPj4gVXBzdHJlYW0gTkJEIGhhcyBzZXBhcmF0ZSAnbmJk
+LWNsaWVudCcgYW5kICduYmQtc2VydmVyJyBiaW5hcmllcywNCj4+IHdoaWxlIHdlIG9ubHkgaGF2
+ZSAncWVtdS1uYmQnICh3aGljaCBpcyBub3JtYWxseSBqdXN0IGEgc2VydmVyLA0KPj4gYnV0ICdx
+ZW11LW5iZCAtYycgYWxzbyBvcGVyYXRlcyBhIHNlY29uZCB0aHJlYWQgYXMgYSBjbGllbnQpLg0K
+Pj4gT3VyIG90aGVyIHVzZXMgb2YgcWVtdSBhcyBOQkQgY2xpZW50IGFyZSBmb3IgY29uc3VtaW5n
+IGEgYmxvY2sNCj4+IGRldmljZSAoYXMgaW4gcWVtdS1pbywgcWVtdS1pbWcsIG9yIGEgZHJpdmUg
+dG8gcWVtdSkgLSBidXQgdGhvc2UNCj4+IGJpbmFyaWVzIGFyZSBsZXNzIHN1aXRlZCB0byBzb21l
+dGhpbmcgc28gc3BlY2lmaWMgdG8gdGhlIE5CRA0KPj4gcHJvdG9jb2wuDQo+Pg0KPj4gQm9udXM6
+IEFzIGEgcmVzdWx0IG9mIG15IHdvcmsgb24gdGhpcyBzZXJpZXMsIG5iZGtpdCBub3cgc3VwcG9y
+dHMNCj4+IE5CRF9PUFRfSU5GTyAobXkgaW50ZXJvcGVyYWJpbGl0eSB0ZXN0aW5nIGJldHdlZW4g
+c2VydmVyDQo+PiBpbXBsZW1lbnRhdGlvbnMgaGFzIGJlZW4gcGF5aW5nIG9mZiwgYm90aCBhdCBm
+aXhpbmcgc2VydmVyIGJ1Z3MsDQo+PiBhbmQgYXQgbWFraW5nIHRoaXMgY29kZSBtb3JlIHJlbGlh
+YmxlIGFjcm9zcyBkaWZmZXJlbmNlIGluIHZhbGlkDQo+PiBzZXJ2ZXJzKS4NCj4+DQo+PiBBbHNv
+IGF2YWlsYWJsZSBhdDoNCj4+IGh0dHBzOi8vcmVwby5vci5jei9xZW11L2VyaWNiLmdpdCBxZW11
+LW5iZC1saXN0LXY0DQo+Pg0KPj4gQ3VycmVudGx5IGJhc2VkIG9uIG1hc3Rlci4NCj4+DQo+PiBT
+aW5jZSB2MzoNCj4+IC0gMSBuZXcgcGF0Y2ggKDEvMjEpDQo+PiAtIHNwbGl0IG9sZCBwYXRjaCAx
+NS8xOSBpbnRvIHR3byAoMTYsMTcvMjEpDQo+PiAtIHJldGl0bGUgdHdvIHBhdGNoZXMgKGdpdCBi
+YWNrcG9ydC1kaWZmIGRvZXNuJ3QgZG8gdG9vIHdlbGwgYXQgc2hvd2luZw0KPj4gdGhlIGRpZmYg
+b24gYSByZXRpdGxlZCBwYXRjaDsgNSwxMS8yMSkNCj4+IC0gZml4IHJldmlldyBjb21tZW50cyBm
+cm9tIFJpY2gsIFZsYWRpbWlyDQo+Pg0KPj4gMDAxLzIxOltkb3duXSAnaW90ZXN0czogTWFrZSAy
+MzMgb3V0cHV0IG1vcmUgcmVsaWFibGUnDQo+PiAwMDIvMjE6Wy0tLS1dIFstLV0gJ21haW50OiBB
+bGxvdyBmb3IgRVhBTVBMRVMgaW4gdGV4aTJwb2QnDQo+PiAwMDMvMjE6Wy0tLS1dIFstLV0gJ3Fl
+bXUtbmJkOiBFbmhhbmNlIG1hbiBwYWdlJw0KPiANCj4gSW50ZXJlc3RpbmcsIEkgZG9uJ3QgZ2V0
+IGl0IGFnYWluLiBTZWFyY2hlZCBpbiBvdXRsb29rIG9ubGluZSwgSSBmb3VuZCBvbmx5IHYyIG9m
+IGl0LA0KPiBjaGVja2VkIHNwYW0gZm9sZGVyIGFuZCBmaWx0ZXJzLiBNYWdpYy4NCj4gDQo+IGFu
+eXdheSwgSSBjYW4gbG9vayBhdCBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3Fl
+bXUtZGV2ZWwvMjAxOS0wMS9tc2cwNDMyOC5odG1sDQo+IA0KPiANCg0KanVzdCBsb29rIGF0IGl0
+IGluIHlvdXIgcWVtdS1uYmQtbGlzdC12NCB0YWc6DQoNCiA+IE9ubHkgZXhwb3NlIE1CUiBwYXJ0
+aXRpb24gQHZhcntudW19LiAgVW5kZXJzdGFuZHMgcGh5c2ljYWwgcGFydGl0aW9ucw0KID4gMS00
+IGFuZCBsb2dpY2FsIHBhcnRpdGlvbnMgNS04Lg0KDQpJJ20gYWZyYWlkLCBJJ20gdG9vIGxhenkg
+dG8gc29ydCBvdXQgdGhlc2UgdGhpbmdzIEkgZG9uJ3Qga25vdywgc28ganVzdCBiZWxpZXZlLiBJ
+dCBhdCBsZWFzdA0KY29ycmVzcG9uZHMgdG8gbGltaXRzIGluIGNvZGUgdGhhdCBpdCBzaG91bGQg
+YmUgMSA8PSBwYXJ0aXRpb24gPD0gOCA7KQ0KDQogPiBAaXRlbSAtYywgLS1jb25uZWN0PUB2YXJ7
+ZGV2fQ0KID4gQ29ubmVjdCBAdmFye2ZpbGVuYW1lfSB0byBOQkQgZGV2aWNlIEB2YXJ7ZGV2fSAo
+TGludXggb25seSkuDQogPiBAaXRlbSAtZCwgLS1kaXNjb25uZWN0DQogPiBEaXNjb25uZWN0IHRo
+ZSBkZXZpY2UgQHZhcntkZXZ9IChMaW51eCBvbmx5KS4NCg0KWWVzLCBhbmQgd2Ugbm93IGhhdmUg
+Y2xlYW4gY29kZSB3aGljaCBlc3RhYmxpc2ggdGhpcyBsaW1pdGF0aW9uDQoNCiA+IEBpdGVtIC1l
+LCAtLXNoYXJlZD1AdmFye251bX0NCiA+IEFsbG93IHVwIHRvIEB2YXJ7bnVtfSBjbGllbnRzIHRv
+IHNoYXJlIHRoZSBkZXZpY2UgKGRlZmF1bHQNCiA+IEBzYW1wezF9KS4gU2FmZSBmb3IgcmVhZGVy
+cywgYnV0IGZvciBub3csIGNvbnNpc3RlbmN5IGlzIG5vdA0KID4gZ3VhcmFudGVlZCBiZXR3ZWVu
+IG11bHRpcGxlIHdyaXRlcnMuDQoNCkhtbSwgZG9uJ3QgdW5kZXJzdGFuZCwgd2h5IHlvdSBkZWNp
+ZGVkIHRvIG1vdmUgQHNhbXB7MX0pLiBvbiB0aGUgZm9sbG93aW5nIGxpbmUsIGl0IGxvb2tzDQpi
+ZXR0ZXIgYXMgaXQgd2FzLiBBbmQgd2l0aCBhIHBlcmlvZCBpdCdzIG9ubHkgNjkgc3ltYm9scywg
+dGhlIGZpbGUgaGF2ZSBhIGxvdCBsb25nZXIgbGluZXMuDQoNCiA+IFN0YXJ0IGEgc2VydmVyIGxp
+c3RlbmluZyBvbiBwb3J0IDEwODA5IHRoYXQgZXhwb3NlcyBvbmx5IHRoZQ0KID4gZ3Vlc3Qtdmlz
+aWJsZSBjb250ZW50cyBvZiBhIHFjb3cyIGZpbGUsIHdpdGggbm8gVExTIGVuY3J5cHRpb24sIGFu
+ZA0KID4gd2l0aCB0aGUgZGVmYXVsdCBleHBvcnQgbmFtZSAoYW4gZW1wdHkgc3RyaW5nKS4gVGhl
+IGNvbW1hbmQgaXMNCiA+IG9uZS1zaG90LCBhbmQgd2lsbCBibG9jayB1bnRpbCB0aGUgZmlyc3Qg
+c3VjY2Vzc2Z1bCBjbGllbnQNCiA+IGRpc2Nvbm5lY3RzOg0KID4NCiA+IEBleGFtcGxlDQogPiBx
+ZW11LW5iZCAtZiBxY293MiBmaWxlLnFjb3cyDQogPiBAZW5kIGV4YW1wbGUNCiA+DQogPiBTdGFy
+dCBhIGxvbmctcnVubmluZyBzZXJ2ZXIgbGlzdGVuaW5nIHdpdGggZW5jcnlwdGlvbiBvbiBwb3J0
+IDEwODEwLA0KID4gYW5kIHJlcXVpcmUgY2xpZW50cyB0byBoYXZlIGEgY29ycmVjdCBYLjUwOSBj
+ZXJ0aWZpY2F0ZSB0byBjb25uZWN0IHRvDQogPiBhIDEgbWVnYWJ5dGUgc3Vic2V0IG9mIGEgcmF3
+IGZpbGUsIHVzaW5nIHRoZSBleHBvcnQgbmFtZSAnc3Vic2V0JzoNCiA+DQogPiBAZXhhbXBsZQ0K
+ID4gcWVtdS1uYmQgXA0KID4gICAtLW9iamVjdCB0bHMtY3JlZHMteDUwOSxpZD10bHMwLGVuZHBv
+aW50PXNlcnZlcixkaXI9L3BhdGgvdG8vcWVtdXRscyBcDQogPiAgIC0tdGxzLWNyZWRzIHRsczAg
+LXQgLXggc3Vic2V0IC1wIDEwODEwIFwNCiA+ICAgLS1pbWFnZS1vcHRzIGRyaXZlcj1yYXcsb2Zm
+c2V0PTFNLGxlbmd0aD0xTSxmaWxlLmRyaXZlcj1maWxlLGZpbGUuZmlsZW5hbWU9ZmlsZS5yYXcN
+CiA+IEBlbmQgZXhhbXBsZQ0KDQpJIGRvbid0IGtub3cgdGxzLXJlbGF0ZWQsIHRoZSBvdGhlciBv
+cHRpb25zIGxvb2tzIGZpbmUuDQoNCnVwZCAoZGVjaWRlZCB0byBydW4gdGhlIGNvbW1hbmQsIHdp
+dGggZHJvcHBlZCB0bHMpOg0KbG9va3MgZmluZSBidXQgbm90IHdvcmssIGFzIHMvbGVuZ3RoL3Np
+emUuDQoNCiA+DQogPiBTZXJ2ZSBhIHJlYWQtb25seSBjb3B5IG9mIGp1c3QgdGhlIGZpcnN0IE1C
+UiBwYXJ0aXRpb24gb2YgYSBndWVzdA0KID4gaW1hZ2Ugb3ZlciBhIFVuaXggc29ja2V0IHdpdGgg
+YXMgbWFueSBhcyA1IHNpbXVsdGFuZW91cyByZWFkZXJzLCB3aXRoDQogPiBhIHBlcnNpc3RlbnQg
+cHJvY2VzcyBmb3JrZWQgYXMgYSBkYWVtb246DQogPg0KID4gQGV4YW1wbGUNCiA+IHFlbXUtbmJk
+IC0tZm9yayAtdCAtZSA1IC1zIC9wYXRoL3RvL3NvY2sgLXAgMSAtciAtZiBxY293MiBmaWxlLnFj
+b3cyDQogPiBAZW5kIGV4YW1wbGUNCg0KT29wcy4gcy8tcy8tay8sIHMvLXAvLVAvLCBhbmQgaWRl
+YTogbWF5IGJlLCB1c2Ugc2VsZi1kZXNjcmlwdGl2ZSBsb25nIG9wdGlvbiBuYW1lcyBpbg0KZXhh
+bXBsZXM/DQoNCiA+DQogPiBFeHBvc2UgdGhlIGd1ZXN0LXZpc2libGUgY29udGVudHMgb2YgYSBx
+Y293MiBmaWxlIHZpYSBhIGJsb2NrIGRldmljZQ0KID4gL2Rldi9uYmQwIChhbmQgcG9zc2libHkg
+Y3JlYXRpbmcgL2Rldi9uYmQwcDEgYW5kIGZyaWVuZHMgZm9yDQogPiBwYXJ0aXRpb25zIGZvdW5k
+IHdpdGhpbiksIHRoZW4gZGlzY29ubmVjdCB0aGUgZGV2aWNlIHdoZW4gZG9uZS4NCiA+IEBlbXBo
+e0NBVVRJT059OiBEbyBub3QgdXNlIHRoaXMgbWV0aG9kIHRvIG1vdW50IGZpbGVzeXN0ZW1zIGZy
+b20gYW4NCiA+IHVudHJ1c3RlZCBndWVzdCBpbWFnZSAtIGEgbWFsaWNpb3VzIGd1ZXN0IG1heSBo
+YXZlIHByZXBhcmVkIHRoZSBpbWFnZQ0KID4gdG8gYXR0ZW1wdCB0byB0cmlnZ2VyIGtlcm5lbCBi
+dWdzIGluIHBhcnRpdGlvbiBwcm9iaW5nIG9yIGZpbGUgc3lzdGVtDQogPiBtb3VudGluZy4NCiA+
+DQogPiBAZXhhbXBsZQ0KDQpzaG91bGQgd2Ugbm90ZSwgdGhhdCBuYmQga2VybmVsLW1vZHVsZSBz
+aG91bGQgYmUgbG9hZGVkIGZvciB0aGlzIHRvIHdvcms/DQoNCiA+IHFlbXUtbmJkIC1jIC9kZXYv
+bmJkMCAtZiBxY293MiBmaWxlLnFjb3cyDQogPiBxZW11LW5iZCAtZCAvZGV2L25iZDANCiA+IEBl
+bmQgZXhhbXBsZQ0KDQpXaXRoIGZpeGVkIHdyb25nIG9wdGlvbiBuYW1lcyBhbmQgcy9sZW5ndGgv
+c2l6ZToNCmZvciAwMy8yMToNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
+bGFkaW1pcg0K
