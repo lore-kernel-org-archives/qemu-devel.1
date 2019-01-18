@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47843)
+Received: from eggs.gnu.org ([209.51.188.92]:49314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gkXYy-00076T-6v
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:04:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkXbU-0001A2-BM
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gkXYu-0002ZW-DX
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:04:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52802)
+	(envelope-from <eblake@redhat.com>) id 1gkXbT-0004KA-G4
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:06:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gkXYu-0002N2-2e
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:04:08 -0500
-References: <20190118112410.3010-1-yang.zhong@intel.com>
-	<20190118112410.3010-30-yang.zhong@intel.com>
-	<20190118113317-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <033a0646-955f-8888-381c-fa4656a2d849@redhat.com>
-Date: Fri, 18 Jan 2019 18:03:46 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gkXbT-0004JP-7B
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:06:47 -0500
+References: <20190118165050.22270-1-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e0d4eed9-c715-a20e-d3bc-85ab11876cca@redhat.com>
+Date: Fri, 18 Jan 2019 11:06:45 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190118113317-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 29/43] build: convert pci.mak to
- Kconfig
+In-Reply-To: <20190118165050.22270-1-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dtxZ2yghWBjsxLFPgd0IhSI1fsGaGUaQN"
+Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: Don't emit spurious
+ warnings about block comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Yang Zhong <yang.zhong@intel.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>
 
-On 18/01/19 17:36, Michael S. Tsirkin wrote:
->>  config PCI_GENERIC
->>      bool
->> +    select PCIE
->>
-> 
-> why is this?
->   
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dtxZ2yghWBjsxLFPgd0IhSI1fsGaGUaQN
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>
+Message-ID: <e0d4eed9-c715-a20e-d3bc-85ab11876cca@redhat.com>
+Subject: Re: [PATCH v2] checkpatch: Don't emit spurious warnings about block
+ comments
+References: <20190118165050.22270-1-peter.maydell@linaro.org>
+In-Reply-To: <20190118165050.22270-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-PCI_GENERIC is hw/pci-host/gpex.c, the "QEMU Generic PCI Express Bridge
-Emulation".
+On 1/18/19 10:50 AM, Peter Maydell wrote:
+> In checkpatch we attempt to check for and warn about
+> block comments which start with /* or /** followed by a
+> non-blank. Unfortunately a bug in the regex meant that
+> we would incorrectly warn about comments starting with
+> "/**" with no following text:
+>=20
+>   git show 9813dc6ac3954d58ba16b3920556f106f97e1c67|./scripts/checkpatc=
+h.pl -
+>   WARNING: Block comments use a leading /* on a separate line
+>   #34: FILE: tests/libqtest.h:233:
+>   +/**
+>=20
+> The sequence "/\*\*?" was intended to match either "/*" or "/**",
+> but Perl's semantics for '?' allow it to backtrack and try the
+> "matches 0 chars" option if the "matches 1 char" choice leads to
+> a failure of the rest of the regex to match.  Switch to "/\*\*?+"
+> which uses what perlre(1) calls the "possessive" quantifier form:
+> this means that if it matches the "/**" string it will not later
+> backtrack to matching just the "/*" prefix.
+>=20
+> The other end of the regex is also wrong: it is attempting
+> to check for "/* or /** followed by something that isn't
+> just whitespace", but [ \t]*.+[ \t]* will match on pure
+> whitespace. This is less significant but means that a line
+> with just a comment-starter followed by trailing whitespace
+> will generate an incorrect warning about block comment style
+> as well as the correct error about trailing whitespace which
+> a different checkpatch test emits.
+>=20
 
->>  config PCI_XILINX
->>      bool
->> +    select PCIE
->>  
->>  config PCI_DESIGNWARE
->>      bool
->> +    select PCIE
-> 
-> 
-> sure about the above?
+Fixes: 8c06fbdf36bf4d4d486116200248730887a4d7d6
 
-The comments at the top of the two files say they are PCIe.
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
-Paolo
+>  		# Block comments use /* on a line of its own
+>  		if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&	#inline /*...*/
+> -		    $rawline =3D~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-b=
+lank
+> +		    $rawline =3D~ m@^\+.*/\*\*?+[ \t]*[^ \t]@) { # /* or /** non-bla=
+nk
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--dtxZ2yghWBjsxLFPgd0IhSI1fsGaGUaQN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxCB6UACgkQp6FrSiUn
+Q2rkSAf/V8eQgdkqzBfFjtSAbvcBFBGSbrt8xFBZNegdxwht4r3jUPzts8d1nEHp
+vrlmFEyZ7q0tOmWbjWrzdXEdaUDY5oUtsRp3faASja9xaaWB999gfIg0yfGmU/TF
+aGKYwAhrca54yOxEHLbj6+j7ObTiMLrt0NeibVTzKS2mhiGPl0WHzTnbj87/2jwY
+dJmTaUPMTphgTe1NK1QItiJjOMYb5HD/Eya2QSHw3Kqlh9X/uDGAkV4xY46q5CAc
+ONJb34YcPQMg7LtQF7PeDls5TenCR0oZYelhTJrOf70i4rBoNknk3AOq2DzdffDo
+eefTDOC2dRcDOOgUa1f7CVvrrZEW4A==
+=av2o
+-----END PGP SIGNATURE-----
+
+--dtxZ2yghWBjsxLFPgd0IhSI1fsGaGUaQN--
