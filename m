@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36466)
+Received: from eggs.gnu.org ([209.51.188.92]:36510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSIH-0001EL-MJ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:43 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gkSIJ-0001Fy-GP
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSIG-0007G2-4m
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:37 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47096)
+	(envelope-from <yang.zhong@intel.com>) id 1gkSIH-0007J4-7Y
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:39 -0500
+Received: from mga06.intel.com ([134.134.136.31]:47045)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSIF-0006rc-RZ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:36 -0500
+	id 1gkSIG-0005vM-Qv
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:37 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:49 +0800
-Message-Id: <20190118112410.3010-23-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:23:54 +0800
+Message-Id: <20190118112410.3010-28-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 22/43] minikconfig: add AST
+Subject: [Qemu-devel] [RFC PATCH v3 27/43] ide: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,201 +30,93 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Add Python classes that represent the Kconfig abstract syntax tree.
-The abstract syntax tree is stored as a list of clauses.  For example:
-
-    config FOO
-        depends on BAR
-        select BAZ
-
-is represented as three clauses:
-
-    FOO depends on BAR
-    FOO default n
-    select BAZ if FOO
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- scripts/minikconf.py | 116 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 98 insertions(+), 18 deletions(-)
+ default-configs/alpha-softmmu.mak |  2 --
+ default-configs/pci.mak           |  3 ---
+ hw/ide/Kconfig                    | 15 +++++++++++++++
+ 3 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index fb39e35d6a..a6a28c9c47 100644
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -26,11 +26,84 @@ __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
- # -------------------------------------------
+diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
+index c570caccd1..400dff3c1c 100644
+--- a/default-configs/alpha-softmmu.mak
++++ b/default-configs/alpha-softmmu.mak
+@@ -11,8 +11,6 @@ CONFIG_PARALLEL=y
+ CONFIG_FDC=y
+ CONFIG_PCKBD=y
+ CONFIG_VGA_CIRRUS=y
+-CONFIG_IDE_CORE=y
+-CONFIG_IDE_QDEV=y
+ CONFIG_VMWARE_VGA=y
+ CONFIG_IDE_CMD646=y
+ CONFIG_I8259=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 171bdf48bc..c1b64922b9 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -23,9 +23,6 @@ CONFIG_MPTSAS_SCSI_PCI=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_E1000_PCI=y
+ CONFIG_E1000E_PCI=y
+-CONFIG_IDE_CORE=y
+-CONFIG_IDE_QDEV=y
+-CONFIG_IDE_PCI=y
+ CONFIG_AHCI=y
+ CONFIG_ESP=y
+ CONFIG_ESP_PCI=y
+diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+index 5ec449525f..fe27705790 100644
+--- a/hw/ide/Kconfig
++++ b/hw/ide/Kconfig
+@@ -3,33 +3,48 @@ config IDE_CORE
  
- class KconfigData:
-+    class Expr:
-+        def __and__(self, rhs):
-+            return KconfigData.AND(self, rhs)
-+        def __or__(self, rhs):
-+            return KconfigData.OR(self, rhs)
-+        def __invert__(self):
-+            return KconfigData.NOT(self)
-+
-+    class AND(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s && %s)" % (self.lhs, self.rhs)
-+
-+    class OR(Expr):
-+        def __init__(self, lhs, rhs):
-+            self.lhs = lhs
-+            self.rhs = rhs
-+        def __str__(self):
-+            return "(%s || %s)" % (self.lhs, self.rhs)
-+
-+    class NOT(Expr):
-+        def __init__(self, lhs):
-+            self.lhs = lhs
-+        def __str__(self):
-+            return "!%s" % (self.lhs)
-+
-+    class Var(Expr):
-+        def __init__(self, name):
-+            self.name = name
-+            self.value = None
-+        def __str__(self):
-+            return self.name
-+
-+    class Clause:
-+        def __init__(self, dest):
-+            self.dest = dest
-+
-+    class AssignmentClause(Clause):
-+        def __init__(self, dest, value):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+        def __str__(self):
-+            return "%s=%s" % (self.dest, 'y' if self.value else 'n')
-+
-+    class DefaultClause(Clause):
-+        def __init__(self, dest, value, cond=None):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.value = value
-+            self.cond = cond
-+        def __str__(self):
-+            value = 'y' if self.value else 'n'
-+            if self.cond is None:
-+                return "config %s default %s" % (self.dest, value)
-+            else:
-+                return "config %s default %s if %s" % (self.dest, value, self.cond)
-+
-+    class DependsOnClause(Clause):
-+        def __init__(self, dest, expr):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.expr = expr
-+        def __str__(self):
-+            return "config %s depends on %s" % (self.dest, self.expr)
-+
-+    class SelectClause(Clause):
-+        def __init__(self, dest, cond):
-+            KconfigData.Clause.__init__(self, dest)
-+            self.cond = cond
-+        def __str__(self):
-+            return "select %s if %s" % (self.dest, self.cond)
-+
-     def __init__(self):
-         self.previously_included = []
-         self.incl_info = None
-         self.defined_vars = set()
--        self.referenced_vars = set()
-+        self.referenced_vars = dict()
-+        self.clauses = list()
+ config IDE_QDEV
+     bool
++    select IDE_CORE
  
-     # semantic analysis -------------
+ config IDE_PCI
+     bool
++    select IDE_CORE
  
-@@ -48,26 +121,28 @@ class KconfigData:
-         if (var in self.defined_vars):
-             raise Exception('variable "' + var + '" defined twice')
+ config IDE_ISA
+     bool
++    select IDE_QDEV
  
--        self.defined_vars.add(var)
-+        self.defined_vars.add(var.name)
+ config IDE_PIIX
+     bool
++    select IDE_PCI
++    select IDE_QDEV
  
-     # var is a string with the variable's name.
--    #
--    # For now this just returns the variable's name itself.
-     def do_var(self, var):
--        self.referenced_vars.add(var)
--        return var
-+        if (var in self.referenced_vars):
-+            return self.referenced_vars[var]
-+
-+        var_obj = self.referenced_vars[var] = KconfigData.Var(var)
-+        return var_obj
+ config IDE_CMD646
+     bool
++    select IDE_PCI
++    select IDE_QDEV
  
-     def do_assignment(self, var, val):
--        pass
-+        self.clauses.append(KconfigData.AssignmentClause(var, val))
+ config IDE_MACIO
+     bool
++    select IDE_QDEV
  
-     def do_default(self, var, val, cond=None):
--        pass
-+        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ config IDE_MMIO
+     bool
++    select IDE_QDEV
  
-     def do_depends_on(self, var, expr):
--        pass
-+        self.clauses.append(KconfigData.DependsOnClause(var, expr))
+ config IDE_VIA
+     bool
++    select IDE_PCI
++    select IDE_QDEV
  
-     def do_select(self, var, symbol, cond=None):
--        pass
-+        cond = (cond & var) if cond is not None else var
-+        self.clauses.append(KconfigData.SelectClause(symbol, cond))
+ config MICRODRIVE
+     bool
++    select IDE_QDEV
  
- # -------------------------------------------
- # KconfigParser implements a recursive descent parser for (simplified)
-@@ -227,31 +302,34 @@ class KconfigParser:
-     def parse_primary(self):
-         if self.tok == TOK_NOT:
-             self.get_token()
--            self.parse_primary()
-+            val = ~self.parse_primary()
-         elif self.tok == TOK_LPAREN:
-             self.get_token()
--            self.parse_expr()
-+            val = self.parse_expr()
-             if self.tok != TOK_RPAREN:
-                 raise KconfigParserError(self, 'Expected ")"')
-             self.get_token()
-         elif self.tok == TOK_ID:
--            self.parse_var()
-+            val = self.parse_var()
-         else:
-             raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
-+        return val
+ config AHCI
+     bool
++    select IDE_QDEV
  
-     # disj: primary (OR primary)*
-     def parse_disj(self):
--        self.parse_primary()
-+        lhs = self.parse_primary()
-         while self.tok == TOK_OR:
-             self.get_token()
--            self.parse_primary()
-+            lhs = lhs | self.parse_primary()
-+        return lhs
- 
-     # expr: disj (AND disj)*
-     def parse_expr(self):
--        self.parse_disj()
-+        lhs = self.parse_disj()
-         while self.tok == TOK_AND:
-             self.get_token()
--            self.parse_disj()
-+            lhs = lhs & self.parse_disj()
-+        return lhs
- 
-     # condition: IF expr
-     #       | empty
-@@ -420,4 +498,6 @@ class KconfigParser:
- 
- if __name__ == '__main__':
-     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
--    KconfigParser.parse(open(fname, 'r'))
-+    data = KconfigParser.parse(open(fname, 'r'))
-+    for i in data.clauses:
-+        print i
+ config IDE_SII3112
+     bool
++    select IDE_PCI
++    select IDE_QDEV
 -- 
 2.17.1
