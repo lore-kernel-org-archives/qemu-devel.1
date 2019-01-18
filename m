@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56358)
+Received: from eggs.gnu.org ([209.51.188.92]:56330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl8-0005gN-QJ
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbl6-0005g6-JO
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl6-0005Q0-Nq
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:02 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36046)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbl4-0005N7-Qa
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:00 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbl6-0005NR-Hg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:00 -0500
-Received: by mail-pg1-x543.google.com with SMTP id n2so6650602pgm.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:59 -0800 (PST)
+	id 1gkbl3-0005J5-58
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:58 -0500
+Received: by mail-pg1-x542.google.com with SMTP id y4so6630308pgc.12
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:56 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:31:12 +1100
-Message-Id: <20190118213122.22865-39-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:31:11 +1100
+Message-Id: <20190118213122.22865-38-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 39/49] linux-user: Split out sync, syncfs
+Subject: [Qemu-devel] [PATCH v6 38/49] linux-user: Split out nice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,117 +29,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Note that syncfs is universally available.
-If !CONFIG_SYNCFS, provide our own syscall replacement.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  2 ++
- linux-user/syscall-file.inc.c | 11 +++++++++++
- linux-user/syscall.c          | 20 ++++++++++++--------
- linux-user/strace.list        |  6 ------
- 4 files changed, 25 insertions(+), 14 deletions(-)
+ linux-user/syscall-defs.h     | 3 +++
+ linux-user/syscall-proc.inc.c | 7 +++++++
+ linux-user/syscall.c          | 4 ----
+ linux-user/strace.list        | 3 ---
+ 4 files changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 860754aaca..497fbdba66 100644
+index 39e3ae3c21..860754aaca 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -171,6 +171,8 @@ SYSCALL_DEF(shmget, ARG_DEC, ARG_DEC, ARG_HEX);
- #ifdef TARGET_NR_stime
- SYSCALL_DEF(stime, ARG_PTR);
+@@ -111,6 +111,9 @@ SYSCALL_DEF(munlockall);
+ SYSCALL_DEF(munmap, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(name_to_handle_at,
+             ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
++#ifdef TARGET_NR_nice
++SYSCALL_DEF(nice, ARG_DEC);
++#endif
+ #ifdef TARGET_NR_open
+ SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
  #endif
-+SYSCALL_DEF(sync);
-+SYSCALL_DEF(syncfs, ARG_DEC);
- #ifdef TARGET_NR_time
- SYSCALL_DEF(time, ARG_PTR);
- #endif
-diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 3111abd861..80dec33971 100644
---- a/linux-user/syscall-file.inc.c
-+++ b/linux-user/syscall-file.inc.c
-@@ -867,6 +867,17 @@ SYSCALL_IMPL(readlinkat)
+diff --git a/linux-user/syscall-proc.inc.c b/linux-user/syscall-proc.inc.c
+index c09c83775c..58c0a22300 100644
+--- a/linux-user/syscall-proc.inc.c
++++ b/linux-user/syscall-proc.inc.c
+@@ -461,6 +461,13 @@ SYSCALL_IMPL(getxpid)
  }
  #endif
  
-+SYSCALL_IMPL(sync)
++#ifdef TARGET_NR_nice
++SYSCALL_IMPL(nice)
 +{
-+    sync();
-+    return 0;
++    return get_errno(nice(arg1));
 +}
++#endif
 +
-+SYSCALL_IMPL(syncfs)
-+{
-+    return get_errno(syncfs(arg1));
-+}
-+
- static abi_long do_umount2(abi_ulong target_path, int flags)
- {
-     char *p = lock_user_string(target_path);
+ /*
+  * Map host to target signal numbers for the wait family of syscalls.
+  * Assume all other status bits are the same.
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 351b2a6288..6668e4ada8 100644
+index 9074cf8b8d..351b2a6288 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -199,6 +199,15 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
- #define TARGET_NR_llseek TARGET_NR__llseek
- #endif
- 
-+/*
-+ * These definitions produce an ENOSYS from the host kernel.
-+ * Performing a bogus sysacll is lazier than boilerplating
-+ * the replacement functions here in C.
-+ */
-+#ifndef __NR_syncfs
-+#define __NR_syncfs  -1
-+#endif
-+
- #ifdef __NR_gettid
- _syscall0(int, gettid)
- #else
-@@ -264,11 +273,13 @@ _syscall3(int, ioprio_set, int, which, int, who, int, ioprio)
- #if defined(TARGET_NR_getrandom) && defined(__NR_getrandom)
- _syscall3(int, getrandom, void *, buf, size_t, buflen, unsigned int, flags)
- #endif
--
- #if defined(TARGET_NR_kcmp) && defined(__NR_kcmp)
- _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
-           unsigned long, idx1, unsigned long, idx2)
- #endif
-+#ifndef CONFIG_SYNCFS
-+_syscall1(int, syncfs, int, fd)
-+#endif
- 
- static bitmask_transtbl fcntl_flags_tbl[] = {
-   { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
-@@ -5327,13 +5338,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -5327,10 +5327,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_sync:
--        sync();
--        return 0;
--#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
--    case TARGET_NR_syncfs:
--        return get_errno(syncfs(arg1));
+-#ifdef TARGET_NR_nice /* not on alpha */
+-    case TARGET_NR_nice:
+-        return get_errno(nice(arg1));
 -#endif
-     case TARGET_NR_kill:
-         return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
- #ifdef TARGET_NR_rename
+     case TARGET_NR_sync:
+         sync();
+         return 0;
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index aaea23d433..56f25c15b7 100644
+index fc0eb91e29..aaea23d433 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -1260,12 +1260,6 @@
- #ifdef TARGET_NR_symlinkat
- { TARGET_NR_symlinkat, "symlinkat", NULL, print_symlinkat, NULL },
+@@ -527,9 +527,6 @@
+ #ifdef TARGET_NR_nfsservctl
+ { TARGET_NR_nfsservctl, "nfsservctl" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_sync
--{ TARGET_NR_sync, "sync" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_nice
+-{ TARGET_NR_nice, "nice" , NULL, NULL, NULL },
 -#endif
--#ifdef TARGET_NR_syncfs
--{ TARGET_NR_syncfs, "syncfs" , "%s(%d)", NULL, NULL },
--#endif
- #ifdef TARGET_NR_syscall
- { TARGET_NR_syscall, "syscall" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_old_adjtimex
+ { TARGET_NR_old_adjtimex, "old_adjtimex" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.2
