@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55748)
+Received: from eggs.gnu.org ([209.51.188.92]:57130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gkXp0-0005Km-9s
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:20:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gkXuE-000062-NL
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:26:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gkXoz-00083K-GY
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48452)
+	(envelope-from <bounces@canonical.com>) id 1gkXuD-0005NK-U2
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:26:10 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gkXoz-0007zJ-Az
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:20:45 -0500
+	id 1gkXuD-0005Mg-Nw
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:26:09 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gkXow-0001Iv-Pl
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:20:43 +0000
+	id 1gkXuC-0002gV-JW
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:26:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 43B532E80D1
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:20:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8F4262E80C7
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:26:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Jan 2019 17:01:25 -0000
+Date: Fri, 18 Jan 2019 17:20:15 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 741115 <741115@bugs.launchpad.net>
+Reply-To: Bug 1795148 <1795148@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20110323164949.17887.98157.malonedeb@soybean.canonical.com>
-Message-Id: <154783088576.16257.14307662353267598647.malone@soybean.canonical.com>
+References: <153823442833.30132.5797682134380809612.malonedeb@soybean.canonical.com>
+Message-Id: <154783201537.2523.491779516327012669.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 741115] Re: Add support of coprocessor cp15,
- cp14 registers exposion in the embedded gdb server
+Subject: [Qemu-devel] [Bug 1795148] Re: address_space_stw_le_cached:
+ Assertion `addr < cache->len && 2 <= cache ->len - addr' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,39 +39,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Since QEMU 3.0 the QEMU gdb stub supports read-only access to most
-cp14/cp15 registers. The gdb 'info all-registers' command will print all
-the registers (integer, fp and system registers), or individual
-registers can be read with commands like "print /x $SCTLR".
+In the absence of further information from the submitter, it seems
+reasonable to assume that this is indeed the bug fixed by commit
+db812c4073c77 (which resulted in this assertion when running OpenBSD
+guests). That commit is in 3.1, which was released in December.
 
-Write access isn't supported (that is a lot trickier to do in a reliable
-way since QEMU's internals make assumptions that system registers can
-only be changed in the ways that the guest validly can, and there's no
-easy API to connect to the debug stub that would allow the user to
-change system registers in only safe ways).
+
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/741115
+https://bugs.launchpad.net/bugs/1795148
 
 Title:
-  Add support of coprocessor cp15, cp14 registers exposion in the
-  embedded gdb server
+  address_space_stw_le_cached: Assertion `addr < cache->len && 2 <=3D
+  cache ->len - addr' failed
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  Please add support of exposion of ARM coprocesor registers/logic at the e=
-mbedded gdb server,
-   for example of cp15, cp14, etc registers.
+  When running OpenBSD-current as a guest, the following assertion is
+  hit after a few seconds, resulting in the virtual machine to crash:
 
-  Related project http://jtagarmgdbsrvr.sourceforge.net/index.html
+  ```
+  qemu-system-x86_64: /build/qemu/src/qemu-3.0.0/include/exec/memory_ldst_c=
+ached.inc.h:85: address_space_stw_le_cached: Assertion `addr < cache->len &=
+& 2 <=3D cache->len - addr' failed.
+  ```
 
-  Also filled bug in the GDB
-  http://sourceware.org/bugzilla/show_bug.cgi?id=3D12602
+  Host is Arch Linux stable, running on x86_64.
+
+  Qemu version is 3.0.0, installed via the standard Arch Linux package.
+
+  Version 2.12.1 didn't exhibit this behavior.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/741115/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1795148/+subscriptions
