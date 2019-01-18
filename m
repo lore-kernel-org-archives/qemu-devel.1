@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47736)
+Received: from eggs.gnu.org ([209.51.188.92]:47856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkRE7-0008AU-FG
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:16 -0500
+	(envelope-from <berrange@redhat.com>) id 1gkREk-0000Bx-Jv
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkRE6-00030U-DQ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:15 -0500
-Date: Fri, 18 Jan 2019 10:18:06 +0000
+	(envelope-from <berrange@redhat.com>) id 1gkREi-0004QM-Ij
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkREg-0004L0-NR
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:50 -0500
+Date: Fri, 18 Jan 2019 10:18:43 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190118101806.GF20660@redhat.com>
+Message-ID: <20190118101843.GG20660@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190118101114.11759-1-rjones@redhat.com>
-	<20190118101114.11759-2-rjones@redhat.com>
+References: <20190117145207.31212-1-berrange@redhat.com>
+	<20190118100535.GC21579@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190118101114.11759-2-rjones@redhat.com>
+In-Reply-To: <20190118100535.GC21579@stefanha-x1.localdomain>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] qemu-io: Add generic function for
- reinitializing optind.
+Subject: Re: [Qemu-devel] [PATCH] trace: add ability to do simple printf
+ logging via systemtap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Jan 18, 2019 at 10:11:14AM +0000, Richard W.M. Jones wrote:
-> On FreeBSD 11.2:
+On Fri, Jan 18, 2019 at 10:05:35AM +0000, Stefan Hajnoczi wrote:
+> On Thu, Jan 17, 2019 at 02:52:07PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
 >=20
->   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512=
-" $nbd'
->   Parsing error: non-numeric argument, or extraneous/unrecognized suffi=
-x -- aio_write
->=20
-> After main option parsing, we reinitialize optind so we can parse each
-> command.  However reinitializing optind to 0 does not work on FreeBSD.
-> What happens when you do this is optind remains 0 after the option
-> parsing loop, and the result is we try to parse argv[optind] =3D=3D
-> argv[0] =3D=3D "aio_write" as if it was the first parameter.
->=20
-> The FreeBSD manual page says:
->=20
->   In order to use getopt() to evaluate multiple sets of arguments, or t=
-o
->   evaluate a single set of arguments multiple times, the variable optre=
-set
->   must be set to 1 before the second and each additional set of calls t=
-o
->   getopt(), and the variable optind must be reinitialized.
->=20
-> (From the rest of the man page it is clear that optind must be
-> reinitialized to 1).
->=20
-> The glibc man page says:
->=20
->   A program that scans multiple argument vectors,  or  rescans  the  sa=
-me
->   vector  more than once, and wants to make use of GNU extensions such =
-as
->   '+' and '-' at  the  start  of  optstring,  or  changes  the  value  =
-of
->   POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetti=
-ng
->   optind to 0, rather than the traditional value of 1.  (Resetting  to =
- 0
->   forces  the  invocation  of  an  internal  initialization  routine th=
-at
->   rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)
->=20
-> This commit introduces an OS-portability function called
-> qemu_reset_optind which provides a way of resetting optind that works
-> on FreeBSD and platforms that use optreset, while keeping it the same
-> as now on other platforms.
->=20
-> Note that the qemu codebase sets optind in many other places, but in
-> those other places it's setting a local variable and not using getopt.
-> This change is only needed in places where we are using getopt and the
-> associated global variable optind.
->=20
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> ---
->  configure            | 14 ++++++++++++++
->  include/qemu/osdep.h | 16 ++++++++++++++++
->  qemu-img.c           |  2 +-
->  qemu-io-cmds.c       |  2 +-
->  4 files changed, 32 insertions(+), 2 deletions(-)
+> Nice improvement, thanks!  Do you want to send a docs/devel/tracing.txt
+> follow-up patch to document this feature?
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Ok, will do.
+
+>=20
+> Thanks, applied to my tracing tree:
+> https://github.com/stefanha/qemu/commits/tracing
+>=20
+> Stefan
 
 
 
