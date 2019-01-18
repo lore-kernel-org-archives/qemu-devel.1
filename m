@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47188)
+Received: from eggs.gnu.org ([209.51.188.92]:47736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkRCk-0007ED-VJ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:16:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1gkRE7-0008AU-FG
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkRCj-0007v0-JM
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:16:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkRCj-0007tf-AY
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:16:49 -0500
-Date: Fri, 18 Jan 2019 10:16:38 +0000
+	(envelope-from <berrange@redhat.com>) id 1gkRE6-00030U-DQ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:18:15 -0500
+Date: Fri, 18 Jan 2019 10:18:06 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190118101638.GE20660@redhat.com>
+Message-ID: <20190118101806.GF20660@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190118093935.GA1142@beluga.usersys.redhat.com>
+References: <20190118101114.11759-1-rjones@redhat.com>
+	<20190118101114.11759-2-rjones@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190118093935.GA1142@beluga.usersys.redhat.com>
-Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
- for capabilities
+In-Reply-To: <20190118101114.11759-2-rjones@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] qemu-io: Add generic function for
+ reinitializing optind.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, brijesh.singh@amd.com, dinechin@redhat.com, mkletzan@redhat.com
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com
 
-On Fri, Jan 18, 2019 at 10:39:35AM +0100, Erik Skultety wrote:
-> Hi,
-> this is a summary of a private discussion I've had with guys CC'd on this email
-> about finding a solution to [1] - basically, the default permissions on
-> /dev/sev (below) make it impossible to query for SEV platform capabilities,
-> since by default we run QEMU as qemu:qemu when probing for capabilities. It's
-> worth noting is that this is only relevant to probing, since for a proper QEMU
-> VM we create a mount namespace for the process and chown all the nodes (needs a
-> SEV fix though).
-> 
-> # ll /dev/sev
-> crw-------. 1 root root
-> 
-> I suggested either force running QEMU as root for probing (despite the obvious
-> security implications) or using namespaces for probing too. Dan argued that
-> this would have a significant perf impact and suggested we ask systemd to add a
-> global udev rule.
+On Fri, Jan 18, 2019 at 10:11:14AM +0000, Richard W.M. Jones wrote:
+> On FreeBSD 11.2:
+>=20
+>   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512=
+" $nbd'
+>   Parsing error: non-numeric argument, or extraneous/unrecognized suffi=
+x -- aio_write
+>=20
+> After main option parsing, we reinitialize optind so we can parse each
+> command.  However reinitializing optind to 0 does not work on FreeBSD.
+> What happens when you do this is optind remains 0 after the option
+> parsing loop, and the result is we try to parse argv[optind] =3D=3D
+> argv[0] =3D=3D "aio_write" as if it was the first parameter.
+>=20
+> The FreeBSD manual page says:
+>=20
+>   In order to use getopt() to evaluate multiple sets of arguments, or t=
+o
+>   evaluate a single set of arguments multiple times, the variable optre=
+set
+>   must be set to 1 before the second and each additional set of calls t=
+o
+>   getopt(), and the variable optind must be reinitialized.
+>=20
+> (From the rest of the man page it is clear that optind must be
+> reinitialized to 1).
+>=20
+> The glibc man page says:
+>=20
+>   A program that scans multiple argument vectors,  or  rescans  the  sa=
+me
+>   vector  more than once, and wants to make use of GNU extensions such =
+as
+>   '+' and '-' at  the  start  of  optstring,  or  changes  the  value  =
+of
+>   POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetti=
+ng
+>   optind to 0, rather than the traditional value of 1.  (Resetting  to =
+ 0
+>   forces  the  invocation  of  an  internal  initialization  routine th=
+at
+>   rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)
+>=20
+> This commit introduces an OS-portability function called
+> qemu_reset_optind which provides a way of resetting optind that works
+> on FreeBSD and platforms that use optreset, while keeping it the same
+> as now on other platforms.
+>=20
+> Note that the qemu codebase sets optind in many other places, but in
+> those other places it's setting a local variable and not using getopt.
+> This change is only needed in places where we are using getopt and the
+> associated global variable optind.
+>=20
+> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+> ---
+>  configure            | 14 ++++++++++++++
+>  include/qemu/osdep.h | 16 ++++++++++++++++
+>  qemu-img.c           |  2 +-
+>  qemu-io-cmds.c       |  2 +-
+>  4 files changed, 32 insertions(+), 2 deletions(-)
 
-I've just realized there is a potential 3rd solution. Remember there is
-actually nothing inherantly special about the 'root' user as an account
-ID. 'root' gains its powers from the fact that it has many capabilities
-by default.  'qemu' can't access /dev/sev because it is owned by a
-different user (happens to be root) and 'qemu' does not have capabilities.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-So we can make probing work by using our capabilities code to grant
-CAP_DAC_OVERRIDE to the qemu process we spawn. So probing still runs
-as 'qemu', but can none the less access /dev/sev while it is owned
-by root.  We were not using 'qemu' for sake of security, as the probing
-process is not executing any untrusthworthy code, so we don't  loose any
-security protection by granting CAP_DAC_OVERRIDE.
 
-> I proceeded with cloning [1] to systemd and creating an udev rule that I planned
-> on submitting to systemd upstream - the initial idea was to mimic /dev/kvm and
-> make it world accessible to which Brijesh from AMD expressed a concern that
-> regular users might deplete the resources (limit on the number of guests
-> allowed by the platform). But since the limit is claimed to be around 4, Dan
-> discouraged me to continue with restricting the udev rule to only the 'kvm'
-> group which Laszlo suggested earlier as the limit is so small that a malicious
-> QEMU could easily deplete this during probing. This fact also ruled out any
-> kind of ACL we could create dynamically. Instead, he suggested that we filter
-> out the kvm-capable QEMU and put only that one in the namespace without a
-> significant perf impact.
-
-Yes, my suggestion to mimic /dev/kvm was based on the mistaken mis-understanding
-that there was not a finite resource limit. Given that there are one or more
-finite resource limits, we need access control on which unprivileged users, and
-/or which individual QEMU instances are permitted access. This means /dev/sev
-must remain with restrictive user/group/permissions that prevent any unprivilegd
-account from having access. This means either root:root 0770/0700, or possibly
-having an 'sev' group and using root:sev 0770, so that users can be granted
-access via 'sev' group membership which (might?) allow unprivileged libvirtd to
-use 'sev' if the user was added.
-
->     - my take on this is that there could potentially be more than a single
->       kvm-enabled QEMU and therefore we'd need to create more than just a
->       single namespace.
-
-True, I guess qemu-system-x86_64 and qemu-system-i386 both get KVM
-on an x86_64 host, and likewise for many other 64-bit archs supporting.
-32-bit apps.
-
->     - I also argued that I can image that the same kind of DOS attack might be
->       possible from within the namespace, even if we created the /dev/sev node
->       only in SEV-enabled guests (which we currently don't). All of us have
->       agreed that allowing /dev/sev in the namespace for only SEV-enabled
->       guests is worth doing nonetheless.
-
-There's never any perfect level of protection. We're just striving to
-minimize the attack surface by only exposing it where there's a genuine
-need to use it.
-
-> In the meantime, Christophe went through the kernel code to verify how the SEV
-> resources are managed and what protection is currently in place to mitigate the
-> chance of a process easily depleting the limit on SEV guests. He found that
-> ASID, which determines the encryption key, is allocated from a single ASID
-> bitmap and essentially guarded by a single 'sev->active' flag.
-> 
-> So, in conclusion, we absolutely need input from Brijesh (AMD) whether there
-> was something more than the low limit on number of guests behind the default
-> permissions. Also, we'd like to get some details on how the limit is managed,
-> helping to assess the approaches mentioned above.
-
-Regardless of this problem, I think it is important to have some docs
-in either libvirt or QEMU that describe the resource usage constraints
-so that management apps can decide how to best take advantage of SEV.
-
-> 
-> Thanks and please do share your ideas,
-> Erik
-> 
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1665400
-> [2] https://bugzilla.redhat.com/show_bug.cgi?id=1561113
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
