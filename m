@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51298)
+Received: from eggs.gnu.org ([209.51.188.92]:51345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkUSD-0004ZP-Lq
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:02 -0500
+	(envelope-from <clg@kaod.org>) id 1gkUSJ-0004ni-3t
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkUSA-00087G-5Q
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:44:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42906)
+	(envelope-from <clg@kaod.org>) id 1gkUSH-0008Hi-L7
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:07 -0500
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:37161)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkUS9-00085b-Tf
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:44:58 -0500
-Date: Fri, 18 Jan 2019 13:44:51 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190118134451.GM20660@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
-	<20190118100159.GA2483@work-vm>
-	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
-	<20190118101633.GC2146@work-vm> <20190118102102.GH20660@redhat.com>
-	<328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gkUSH-0008Bp-7u
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:05 -0500
+Received: from player759.ha.ovh.net (unknown [10.109.143.216])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id C699C10D66E
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 14:45:00 +0100 (CET)
+References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+	<154774537154.1208625.5549578310287539996.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ec1fc62d-6037-2b2c-5de1-969da276be98@kaod.org>
+Date: Fri, 18 Jan 2019 14:44:40 +0100
 MIME-Version: 1.0
+In-Reply-To: <154774537154.1208625.5549578310287539996.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
- hosts, with VMX flag enabled in the guest?
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 16/19] spapr: Expose the name of the
+ interrupt controller node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Mark Mielke <mark.mielke@gmail.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Jan 18, 2019 at 01:57:31PM +0100, Paolo Bonzini wrote:
-> On 18/01/19 11:21, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Jan 18, 2019 at 10:16:34AM +0000, Dr. David Alan Gilbert wrot=
-e:
-> >> * Paolo Bonzini (pbonzini@redhat.com) wrote:
-> >>> On 18/01/19 11:02, Dr. David Alan Gilbert wrote:
-> >>>>>
-> >>>>> It fails if the flag is set, rather than if any nested virtualiza=
-tion has
-> >>>>> been used before.
-> >>>>>
-> >>>>> I'm concerned I will end up with a requirement for *all* guests t=
-o be
-> >>>>> restarted in order to migrate them to the new hosts, rather than =
-just the
-> >>>>> ones that would have a problem.
-> >>>> I think you should be able to migrate from 2.12->3.1 like this, bu=
-t
-> >>>> you'd hit the problem when you then try and migrate again between =
-your
-> >>>> new QEMUs.
-> >>>>
-> >>>> I guess we could modify it to wire it to machine type, so that
-> >>>> older machine types didn't block.
-> >>>
-> >>> That would also be wrong.  The old machine types _could_ be using K=
-VM
-> >>> and they have no way to block the live migration.
-> >>>
-> >>> The solution is to restart the VM using "-cpu host,-vmx".
-> >>
-> >> The problem as Christian explained in that thread is that it was com=
-mon
-> >> for them to start VMs with vmx enabled but for people not to use it
-> >> on most of the VMs, so we break migration for most VMs even though m=
-ost
-> >> don't use it.
-> >>
-> >> It might not be robust, but it worked for a lot of people most of th=
-e
-> >> time.
->=20
-> It's not "not robust" (like, it usually works but sometimes fails
-> mysteriously).  It's entirely broken, you just don't notice that it is
-> if you're not using the feature.
->=20
-> > Yes, this is exactly why I said we should make the migration blocker
-> > be conditional on any L2 guest having been started. I vaguely recall
-> > someone saying there wasn't any way to detect this situation from
-> > QEMU though ?
->=20
-> You can check that and give a warning (check that CR4.VMXE=3D1 but no
-> other live migration state was transferred).  However, without live
-> migration support in the kernel and in QEMU you cannot start VMs *for
-> the entire future life of the VM* after a live migration.  So even if w=
-e
-> implemented that kind of blocker, it would fail even if no VM has been
-> started, as long as the kvm_intel module is loaded on migration.  That
-> would be no different in practice from what we have now.
+On 1/17/19 6:16 PM, Greg Kurz wrote:
+> This will be needed by PHB hotplug in order to access the "phandle"
+> property of the interrupt controller node.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/intc/xics_spapr.c        |    2 +-
+>  include/hw/ppc/spapr_xive.h |    5 +++++
+>  include/hw/ppc/xics_spapr.h |    7 +++++++
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 375cb883c86d..ec50e21b8607 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -252,7 +252,7 @@ int spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt)
+>      };
+>      int node;
+>  
+> -    _FDT(node = fdt_add_subnode(fdt, 0, "interrupt-controller"));
+> +    _FDT(node = fdt_add_subnode(fdt, 0, XICS_NODENAME));
+>  
+>      _FDT(fdt_setprop_string(fdt, node, "device_type",
+>                              "PowerPC-External-Interrupt-Presentation"));
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index deea34b03ee5..e769c2f9a018 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -51,4 +51,9 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt);
+>  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+>  void spapr_xive_mmio_set_enabled(sPAPRXive *xive, bool enable);
+>  
+> +static inline const char *spapr_xive_get_nodename(sPAPRXive *xive)
+> +{
+> +    return xive->nodename;
+> +}
 
-Ahh, I was mis-understanding that it only applied to L2 VMs that
-existed at the time the migration is performed. Given that it breaks
-all future possibility of launching an L2 VM, this strict blocker does
-make more sense.
+There I would compute the nodename here in a static char * and return it. 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  #endif /* PPC_SPAPR_XIVE_H */
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index 9f51f8621f75..fd66cf7bbba3 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -29,6 +29,13 @@
+>  
+>  #include "hw/ppc/spapr.h"
+>  
+> +#define XICS_NODENAME "interrupt-controller"
+> +
+> +static inline const char *xics_spapr_get_nodename(void)
+> +{
+> +    return XICS_NODENAME;
+> +}
+
+I don't see much point in that helper. 
+
+>  int spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt);
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+>  void xics_spapr_init(sPAPRMachineState *spapr);
+> 
