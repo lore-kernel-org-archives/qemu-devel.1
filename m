@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41877)
+Received: from eggs.gnu.org ([209.51.188.92]:41879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTzx-0004oU-E4
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTzx-0004oe-Hw
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTzu-0007Jw-Ow
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTzw-0007MJ-09
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:49 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 18 Jan 2019 14:14:25 +0100
-Message-Id: <20190118131456.32451-5-kbastian@mail.uni-paderborn.de>
+Date: Fri, 18 Jan 2019 14:14:34 +0100
+Message-Id: <20190118131456.32451-14-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
 References: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 04/35] target/riscv: Convert RV32I
- load/store insns to decodetree
+Subject: [Qemu-devel] [PATCH v4 13/35] target/riscv: Convert RV64F insns to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +25,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com, kbastian@mail.uni-paderborn.de
 Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
-v3 -> v4:
-    - removed accidental argument removal
+ target/riscv/insn32-64.decode           |  6 +++
+ target/riscv/insn_trans/trans_rvf.inc.c | 54 +++++++++++++++++++++++++
+ 2 files changed, 60 insertions(+)
 
- target/riscv/insn32.decode              | 10 ++++++
- target/riscv/insn_trans/trans_rvi.inc.c | 48 +++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
-
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 81f56c16b4..076de873c4 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -23,6 +23,7 @@
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 0bee95c984..6319f872ac 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -56,3 +56,9 @@ amomin_d   10000 . . ..... ..... 011 ..... 0101111 @atom_st
+ amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
+ amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
+ amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
++
++# *** RV64F Standard Extension (in addition to RV32F) ***
++fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
++fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
++fcvt_s_l   1101000  00010 ..... ... ..... 1010011 @r2_rm
++fcvt_s_lu  1101000  00011 ..... ... ..... 1010011 @r2_rm
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+index b101593ac4..b667c576d4 100644
+--- a/target/riscv/insn_trans/trans_rvf.inc.c
++++ b/target/riscv/insn_trans/trans_rvf.inc.c
+@@ -332,3 +332,57 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
  
- # immediates:
- %imm_i    20:s12
-+%imm_s    25:s7 7:5
- %imm_b    31:s1 7:1 25:6 8:4     !function=ex_shift_1
- %imm_j    31:s1 12:8 20:1 21:10  !function=ex_shift_1
- %imm_u    12:s20                 !function=ex_shift_12
-@@ -33,6 +34,7 @@
- # Formats 32:
- @i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
- @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
-+@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
- @u       ....................      ..... .......         imm=%imm_u          %rd
- @j       ....................      ..... .......         imm=%imm_j          %rd
- 
-@@ -47,3 +49,11 @@ blt      ....... .....    ..... 100 ..... 1100011 @b
- bge      ....... .....    ..... 101 ..... 1100011 @b
- bltu     ....... .....    ..... 110 ..... 1100011 @b
- bgeu     ....... .....    ..... 111 ..... 1100011 @b
-+lb       ............     ..... 000 ..... 0000011 @i
-+lh       ............     ..... 001 ..... 0000011 @i
-+lw       ............     ..... 010 ..... 0000011 @i
-+lbu      ............     ..... 100 ..... 0000011 @i
-+lhu      ............     ..... 101 ..... 0000011 @i
-+sb       .......  .....   ..... 000 ..... 0100011 @s
-+sh       .......  .....   ..... 001 ..... 0100011 @s
-+sw       .......  .....   ..... 010 ..... 0100011 @s
-diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index 0347461ee6..f3b88ebb69 100644
---- a/target/riscv/insn_trans/trans_rvi.inc.c
-+++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -82,3 +82,51 @@ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
-     gen_branch(ctx->env, ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
      return true;
  }
 +
-+static bool trans_lb(DisasContext *ctx, arg_lb *a)
++#ifdef TARGET_RISCV64
++static bool trans_fcvt_l_s(DisasContext *ctx, arg_fcvt_l_s *a)
 +{
-+    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
++    REQUIRE_FPU;
++
++    TCGv t0 = tcg_temp_new();
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
 +    return true;
 +}
 +
-+static bool trans_lh(DisasContext *ctx, arg_lh *a)
++static bool trans_fcvt_lu_s(DisasContext *ctx, arg_fcvt_lu_s *a)
 +{
-+    gen_load(ctx, OPC_RISC_LH, a->rd, a->rs1, a->imm);
++    REQUIRE_FPU;
++
++    TCGv t0 = tcg_temp_new();
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[a->rs1]);
++    gen_set_gpr(a->rd, t0);
++    tcg_temp_free(t0);
 +    return true;
 +}
 +
-+static bool trans_lw(DisasContext *ctx, arg_lw *a)
++static bool trans_fcvt_s_l(DisasContext *ctx, arg_fcvt_s_l *a)
 +{
-+    gen_load(ctx, OPC_RISC_LW, a->rd, a->rs1, a->imm);
++    REQUIRE_FPU;
++
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
++
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_s_l(cpu_fpr[a->rd], cpu_env, t0);
++
++    tcg_temp_free(t0);
 +    return true;
 +}
 +
-+static bool trans_lbu(DisasContext *ctx, arg_lbu *a)
++static bool trans_fcvt_s_lu(DisasContext *ctx, arg_fcvt_s_lu *a)
 +{
-+    gen_load(ctx, OPC_RISC_LBU, a->rd, a->rs1, a->imm);
-+    return true;
-+}
++    REQUIRE_FPU;
 +
-+static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
-+{
-+    gen_load(ctx, OPC_RISC_LHU, a->rd, a->rs1, a->imm);
-+    return true;
-+}
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
 +
-+static bool trans_sb(DisasContext *ctx, arg_sb *a)
-+{
-+    gen_store(ctx, OPC_RISC_SB, a->rs1, a->rs2, a->imm);
-+    return true;
-+}
++    gen_set_rm(ctx, a->rm);
++    gen_helper_fcvt_s_lu(cpu_fpr[a->rd], cpu_env, t0);
 +
-+static bool trans_sh(DisasContext *ctx, arg_sh *a)
-+{
-+    gen_store(ctx, OPC_RISC_SH, a->rs1, a->rs2, a->imm);
++    tcg_temp_free(t0);
 +    return true;
 +}
-+
-+static bool trans_sw(DisasContext *ctx, arg_sw *a)
-+{
-+    gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
-+    return true;
-+}
++#endif
 -- 
 2.20.1
