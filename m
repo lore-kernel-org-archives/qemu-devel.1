@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44597)
+Received: from eggs.gnu.org ([209.51.188.92]:45379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1gkU7a-00035s-0e
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:23:43 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gkU9c-0004tW-OV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1gkU7Y-00019G-R4
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:23:41 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41937)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gkU7Y-0000XX-Gb
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:23:40 -0500
-Received: by mail-wr1-f67.google.com with SMTP id x10so15002937wrs.8
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 05:23:18 -0800 (PST)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gkU9b-0004ox-9l
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:25:48 -0500
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20190102025904.GH27457@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
+Date: Fri, 18 Jan 2019 13:25:37 +0000
 MIME-Version: 1.0
-References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-	<adf15088-93e0-8cf5-988b-067afe39f6e1@redhat.com>
-In-Reply-To: <adf15088-93e0-8cf5-988b-067afe39f6e1@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 18 Jan 2019 14:23:06 +0100
-Message-ID: <CAP+75-Xt-DvOZs5JLm5TB+iP=yCee4oVHZ5XvEt+sEU5E=LKiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
- typedefs and gnu99
+In-Reply-To: <20190102025904.GH27457@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Corey Minyard <cminyard@mvista.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Jan 18, 2019 at 2:15 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
-> On 1/18/19 12:47 PM, Peter Maydell wrote:
-> > On Thu, 17 Jan 2019 at 13:38, Thomas Huth <thuth@redhat.com> wrote:
-> >>
-> >>  Hi Peter!
-> >>
-> >> The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d=
-97094:
-> >>
-> >>   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault'=
- into staging (2019-01-15 18:32:57 +0000)
-> >>
-> >> are available in the git repository at:
-> >>
-> >>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
-> >>
-> >> for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1=
-c:
-> >>
-> >>   tests/hexloader-test: Don't pass -nographic to the QEMU under test (=
-2019-01-17 14:25:12 +0100)
-> >>
-> >> ----------------------------------------------------------------
-> >> - Remove deprecated "ivshmem" legacy device
-> >> - Bug fix for vhost-user-test
-> >> - Use more CONFIG Makefile switches for qtests
-> >> - Get rid of global_qtests in some more qtests
-> >> - typedef cleanups
-> >> - Fixes for compiling with Clang
-> >> - Force C standard to gnu99
-> >> ----------------------------------------------------------------
-> >
-> > In the netbsd VM, the ipmi-bt-test is consistently failing:
-> >
-> > MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> > QTEST_QEMU_BINARY=3Di386-softmmu
-> > /qemu-system-i386 QTEST_QEMU_IMG=3Dqemu-img tests/ipmi-bt-test -m=3Dqui=
-ck
-> > -k --tap < /dev/null | ./s
-> > cripts/tap-driver.pl --test-name=3D"ipmi-bt-test"
-> > **
-> > ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv =3D=
-=3D 1)
-> > ERROR - too few tests run (expected 4, got 0)
-> > [1]   Abort trap (core dumped) MALLOC_PERTURB_=3D... |
-> >       Done(1)                 ./scripts/tap-dr...
-> > /var/tmp/qemu-test.7opHvo/tests/Makefile.include:856: recipe for
-> > target 'check-qtest-i386' faile
-> > d
-> > gmake: *** [check-qtest-i386] Error 1
-> > gmake: *** Waiting for unfinished jobs....
-> >
-> >
-> > This has been kind of intermittent for a while, I've seen
-> > it on-and-off, but with this pullreq it's failed four times
-> > in a row, so maybe something in here is making it less
-> > intermittent.
->
-> This file does:
->
->     qtest_add_func("/ipmi/extern/connect", test_connect);
->     qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
->     qtest_add_func("/ipmi/extern/bt_enable_irq", test_enable_irq);
->     qtest_add_func("/ipmi/extern/bt_base_irq", test_bt_base);
->     ret =3D g_test_run();
->
-> The first "test" test_connect() binds emu_lfd, the 2nd test
-> test_bt_base() calls bt_cmd() which also use emu_lfd... could it be unbou=
-nd?
+On 02/01/2019 02:59, David Gibson wrote:
 
-I meant 'emu_fd' (not emu_lfd) in both cases.
+> On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+>> >From working on the TCG vector operations patchset, it is apparent that there
+>> are a large number of endian-based hacks in int_helper.c which can be removed by
+>> making use of the various Vsr* macros.
+>>
+>> Patch 1 is simple enough, and implements the complete set of Vsr* macros for
+>> both big endian and little endian hosts.
+>>
+>> Patches 2 and 3 rework the vector merge and multiply algorithms so that they
+>> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+>>
+>> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macros by
+>> replacing the element accesses with their equivalent Vsr* macro instead.
+>>
+>> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift bug
+>> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the review of
+>> v1.
+>>
+>> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGENDIAN
+>> hacks in int_helper.c, again replacing accesses with the relevant Vsr* macro
+>> instead.
+>>
+>> Note that there are still some endian hacks left in int_helper.c after this
+>> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro still
+>> remains in places where the index variable was used for purposes other than
+>> accessing elements within the vector.
+>>
+>> There were also some parts where additional conversion could be done, but I
+>> wasn't confident enough to make the change without access to PPC64 test images
+>> or real big-endian host hardware.
+> 
+> Applied to ppc-for-4.0, thanks.
 
-> This is racy, since (from g_test_run() doc):
->
-> "In general, the tests and sub-suites within each suite are run in the
-> order in which they are defined. [...]
-> However, you should never make the actual result of a test depend on the
-> order that tests are run in. If you need to ensure that some particular
-> code runs before or after a given test case, use g_test_add(), which
-> lets you specify setup and teardown functions."
+Just checking your ppc-for-4.0 branch on github, I can't see where this has been
+applied? Is it queued in a local branch still?
+
+
+ATB,
+
+Mark.
