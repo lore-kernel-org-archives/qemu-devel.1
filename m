@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35899)
+Received: from eggs.gnu.org ([209.51.188.92]:35912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGj-0008NH-PC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:02 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGm-0008Pg-0f
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGh-0005nG-RZ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:01 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47015)
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGj-0005oe-Rg
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:03 -0500
+Received: from mga06.intel.com ([134.134.136.31]:46976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSGf-0005lq-T6
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:59 -0500
+	id 1gkSGh-0005dV-RR
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:01 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:36 +0800
-Message-Id: <20190118112410.3010-10-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:23:37 +0800
+Message-Id: <20190118112410.3010-11-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v3 09/43] hw/sparc/Makefile.objs: CONFIG_*
- for sun4m and leon3 created
+Subject: [Qemu-devel] [RFC PATCH v3 10/43] hw/lm32/Makefile.objs:
+ Conditionally build lm32 and milkmyst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +33,24 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_LEON3 added to default-configs/sparc-softmmu.mak.
+CONFIG_LM32 and CONFIG_MILKYMIST added for lm32 and milkmyst build.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/sparc-softmmu.mak | 2 ++
- hw/sparc/Makefile.objs            | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ hw/lm32/Makefile.objs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index 12f97eeb20..59a4a3d693 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -18,4 +18,6 @@ CONFIG_CS4231=y
- CONFIG_GRLIB=y
- CONFIG_STP2000=y
- CONFIG_ECCMEMCTL=y
-+
- CONFIG_SUN4M=y
-+CONFIG_LEON3=y
-diff --git a/hw/sparc/Makefile.objs b/hw/sparc/Makefile.objs
-index e2d0828c39..d57e33f83e 100644
---- a/hw/sparc/Makefile.objs
-+++ b/hw/sparc/Makefile.objs
-@@ -1 +1,3 @@
--obj-y += sun4m_iommu.o sun4m.o leon3.o
-+obj-$(CONFIG_SUN4M) += sun4m_iommu.o
-+obj-$(CONFIG_SUN4M) += sun4m.o
-+obj-$(CONFIG_LEON3) += leon3.o
+diff --git a/hw/lm32/Makefile.objs b/hw/lm32/Makefile.objs
+index ea6418ae59..c3941866c7 100644
+--- a/hw/lm32/Makefile.objs
++++ b/hw/lm32/Makefile.objs
+@@ -1,3 +1,3 @@
+ # LM32 boards
+-obj-y += lm32_boards.o
+-obj-y += milkymist.o
++obj-$(CONFIG_LM32) += lm32_boards.o
++obj-$(CONFIG_MILKYMIST) += milkymist.o
 -- 
 2.17.1
