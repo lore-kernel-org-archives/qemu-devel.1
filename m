@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45918)
+Received: from eggs.gnu.org ([209.51.188.92]:46528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gkR8A-0003ih-J9
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:12:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gkRAh-0005mO-8L
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:14:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gkR89-0001Cy-CN
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:12:06 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:44748
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gkR88-00016d-7n
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:12:05 -0500
-References: <1547805767-24863-1-git-send-email-lizhijian@cn.fujitsu.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <4a41e8be-eb7d-df71-e5fa-2fef12a2dd9b@cn.fujitsu.com>
-Date: Fri, 18 Jan 2019 18:11:55 +0800
+	(envelope-from <kwolf@redhat.com>) id 1gkRAg-0004fM-5B
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:14:43 -0500
+Date: Fri, 18 Jan 2019 11:14:15 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190118101415.GC4530@dhcp-200-176.str.redhat.com>
+References: <cover.1547475602.git.berto@igalia.com>
+	<20190116135444.GA16898@stefanha-x1.localdomain>
+	<w51d0ov2z9h.fsf@maestria.local.igalia.com>
+	<20190118095652.GA21579@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <1547805767-24863-1-git-send-email-lizhijian@cn.fujitsu.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] Acceptance tests: use linux-3.6 and
- set vm memory to 4GiB
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
+Content-Disposition: inline
+In-Reply-To: <20190118095652.GA21579@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during
+ _realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +27,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-
-Sorry, there are some typos, please ignore this version
-i will correct in V2
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com
 
 
-On 1/18/19 18:02, Li Zhijian wrote:
-> linux-3.6 kernel shipped by Fedora-19 cannot support xldflags so that it
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s/Fedora-19/Fedora-18
+Am 18.01.2019 um 10:56 hat Stefan Hajnoczi geschrieben:
+> On Thu, Jan 17, 2019 at 02:24:10PM +0100, Alberto Garcia wrote:
+> > On Wed 16 Jan 2019 02:54:44 PM CET, Stefan Hajnoczi wrote:
+> > > This patch series makes virtio-blk and virtio-scsi more robust,
+> > > although I haven't checked what happens if the drive is attached to a
+> > > different IOThread than the device - will the switchover work?
+> >=20
+> > You mean if you use x-blockdev-set-iothread with a drive and then attach
+> > it to a device using a different thread? That seems to work (with my
+> > patch).
+>=20
+> Does it work with a running VM that will do I/O?  If yes, then that's
+> great and we should merge the virtio-blk/scsi patches to make them
+> robust for this case.  I'm a little surprised it works though :-)
+> because the code wasn't designed or tested for this.
 
+There are two ways to trigger the crash even without
+x-blockdev-set-iothread:
 
-> cannot support loading more than 2GiB initrd
->
-> CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> CC: Caio Carrara <ccarrara@redhat.com>
-> CC: Cleber Rosa <crosa@redhat.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->
-> ---
-> this patch is basing on early Acceptance tests:
-> https://patchwork.kernel.org/patch/10676415/
-> ---
->   tests/acceptance/linux_initrd.py | 14 ++++++++------
->   1 file changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
-> index 737355c..aeb9fde 100644
-> --- a/tests/acceptance/linux_initrd.py
-> +++ b/tests/acceptance/linux_initrd.py
-> @@ -24,14 +24,16 @@ class LinuxInitrd(Test):
->   
->       timeout = 60
->   
-> -    def test_with_2gib_file_should_exit_error_msg(self):
-> +    def test_with_2gib_file_should_exit_error_msg_with_linux_v3_6(self):
->           """
->           Pretends to boot QEMU with an initrd file with size of 2GiB
->           and expect it exits with error message.
-> +        Fedora-19 shipped with linux-3.6 which have not supported xloadflags
+* device_del, then device_add for a device with iothread (virtio-scsi;
+  may or may not exist with virtio-blk)
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1656276
 
-Ditto
+* Simply attach two devices with iothread to the the same node
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1662508
 
-Thanks
+Maybe this series is actually papering over the real problems, though.
+Unplug should move the BDS back to the main AioContext, and attaching
+two users with different AioContexts must fail. If we don't take care
+there, the locking will be wrong.
 
-  
+Note that even though there are more problems, we still need this series
+so we can allow attaching two devices to the same node while using the
+same iothread.
 
-> +        cannot support more than 2GiB initrd.
->           """
-> -        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
-> -                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> -        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
-> +        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora/li'
-> +                      'nux/releases/18/Fedora/x86_64/os/images/pxeboot/vmlinuz')
-> +        kernel_hash = '41464f68efe42b9991250bed86c7081d2ccdbb21'
->           kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
->           max_size = 2 * (1024 ** 3) - 1
->   
-> @@ -39,8 +41,8 @@ class LinuxInitrd(Test):
->               initrd.seek(max_size)
->               initrd.write(b'\0')
->               initrd.flush()
-> -            cmd = "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_path,
-> -                                                initrd.name)
-> +            cmd = "%s -kernel %s -initrd %s -m 4096" % (
-> +                  self.qemu_bin, kernel_path, initrd.name)
->               res = run(cmd, ignore_status=True)
->               self.assertEqual(res.exit_status, 1)
->               expected_msg = r'.*initrd is too large.*max: \d+, need %s.*' % (
+Kevin
+
+--Dxnq1zWXvFF0Q93v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcQab3AAoJEH8JsnLIjy/WyUIQAKVDn8xzC6OqWjvahQ0lSxUV
+zkNC+Xan/JpeHzpkL0ekRk5PwxiIsjqvGu8CifYdBpTGFicnRLewUs56FDwSOpCo
+OG1ksxqUFhzBaiE9XdxQMQIKEnIXHl4WmWBRzDUNTPhdNQMC9uUi1R6c3RNTvBJt
+bht/2VTo8WrTTr52BM5DgN/HTphtO2O3TYroR73Mi/gVSBbjxLS1XCm4oAO2ws3L
++rSFZHHBELSYTkWy6fcT53FdWHQpbhKxqHhXg6f+Z7CPb3s3wNMZpsEQE/FlxQ5c
+e2xsdGZzl7ieeRd6mUFlkA3b7EmhlJzZkK1MXcV6fN+nSodvCOrqtg3nX/KzlCAc
+SgS7myyZ49k4JvPJA4k/WbKixmtfEPj3pM2/5rpO1lFIi8XxKtmDKPG08cl/R6cX
+BFDbtOLJ9gjWrXkeZb2017f3Q6vVv+l9qXjyPB6cAqj0BJ32XLGJzqXUvRrl50vx
+CqafFaWKXA+ECSh351rMze15g9/XrjggWhZ2YodS8qUMElqUVKOCqctVsOceoHgF
+ZP19WA1uOBxei6xW6IFn2j0yIBlHu0tnS9J+XxOzd1UGMk3DbbJXo61TGxiWE8/A
+xuAJYY84gZTY1j984Gzk6hIlkOpRgBTmt25rHRe3DPc+51LXwxtRyp0vcdsGK2b8
+YCYQgbYXTJW/TWrNZ5Qn
+=vnrH
+-----END PGP SIGNATURE-----
+
+--Dxnq1zWXvFF0Q93v--
