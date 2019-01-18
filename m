@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58780)
+Received: from eggs.gnu.org ([209.51.188.92]:59273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gkY1M-0004PI-0O
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:33:32 -0500
+	(envelope-from <david@redhat.com>) id 1gkY3o-0006Ru-JR
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gkY1L-0006U4-89
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:33:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gkY1L-0006Sz-2U
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:33:31 -0500
-Date: Fri, 18 Jan 2019 15:33:16 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190118173316.GH4136@habkost.net>
-References: <20190115100058.44712-1-sgarzare@redhat.com>
-	<20190115100058.44712-5-sgarzare@redhat.com>
-	<20190115135548-mutt-send-email-mst@kernel.org>
+	(envelope-from <david@redhat.com>) id 1gkY3j-0001RT-Tt
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:36:04 -0500
+References: <20190118171848.27332-1-alex.bennee@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <84ac5896-e865-9730-2b1d-2dfa6839e0c3@redhat.com>
+Date: Fri, 18 Jan 2019 18:35:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190115135548-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386/pc: use PVH option rom
+In-Reply-To: <20190118171848.27332-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: define TCG_GUEST_DEFAULT_MO
+ for MTTCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Maran Wilson <maran.wilson@oracle.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>
 
-On Tue, Jan 15, 2019 at 01:57:22PM -0500, Michael S. Tsirkin wrote:
-> On Tue, Jan 15, 2019 at 11:00:58AM +0100, Stefano Garzarella wrote:
-> > Use pvh.bin option rom when we are booting an uncompressed
-> > kernel using the x86/HVM direct boot ABI.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
-> 
-> I don't think this is a great way to give attribution.
-> Can you pls include the author name and the S.O.B from there as well?
-> 
-> 
-> > ---
-> >  hw/i386/pc.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 06bce6a101..7564ba51d2 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1005,6 +1005,10 @@ static void load_linux(PCMachineState *pcms,
-> >              fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
-> >                               header, sizeof(header));
-> >  
-> > +            option_rom[nb_option_roms].bootindex = 0;
-> > +            option_rom[nb_option_roms].name = "pvh.bin";
-> > +            nb_option_roms++;
-> > +
-> >              return;
-> >          }
-> >          /* This looks like a multiboot kernel. If it is, let's stop
-> > @@ -1456,6 +1460,7 @@ void xen_load_linux(PCMachineState *pcms)
-> >      for (i = 0; i < nb_option_roms; i++) {
-> >          assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
-> >                 !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
-> > +               !strcmp(option_rom[i].name, "pvh.bin") ||
-> >                 !strcmp(option_rom[i].name, "multiboot.bin"));
-> >          rom_add_option(option_rom[i].name, option_rom[i].bootindex);
-> >      }
-> 
-> OK but this is guest visible so needs to be guarded by the
-> new machine type.
+On 18.01.19 18:18, Alex Benn=C3=A9e wrote:
+> MTTCG should be enabled by default whenever the memory model allows
+> it. s390x was missing its definition of TCG_GUEST_DEFAULT_MO meaning
+> the user had to manually specify  --accel tcg,thread=3Dmulti.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 8c2320e882..47d2c2e9cf 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -35,6 +35,10 @@
+>  #define CPUArchState struct CPUS390XState
+> =20
+>  #include "exec/cpu-defs.h"
+> +
+> +/* The z/Architecture has a strong memory model with some store-after-=
+load re-ordering */
+> +#define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
 
-Aren't option ROMs treated like other firmware?  i.e.: guest
-visible, but copied during live migration and not considered part
-of guest ABI.
+Didn't know this was the way to make it be enabled as default.
 
--- 
-Eduardo
+As discussed on IRC
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+Thanks!
+
+> +
+>  #define TARGET_PAGE_BITS 12
+> =20
+>  #define TARGET_PHYS_ADDR_SPACE_BITS 64
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
