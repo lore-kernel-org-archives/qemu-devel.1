@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45600)
+Received: from eggs.gnu.org ([209.51.188.92]:45598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXVC-0003hC-Qn
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXVC-0003h7-PB
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXVA-0007Bj-2e
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:18 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:52995 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkXV5-00076R-6o
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:17 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:52902 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gkXV7-00077Y-GV
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:15 -0500
+	id 1gkXV3-0006pJ-6K
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:00:11 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 18 Jan 2019 17:59:41 +0100
-Message-Id: <1547830785-7079-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 18 Jan 2019 17:59:35 +0100
+Message-Id: <1547830785-7079-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1547830785-7079-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1547830785-7079-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 08/12] target/mips: Update ITU to handle bus
- errors
+Subject: [Qemu-devel] [PULL v2 02/12] target/mips: Add preprocessor
+ constants for 32 major CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +28,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update ITU to handle bus errors.
+Add preprocessor constants for 32 major CP0 registers.
 
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/misc/mips_itu.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ target/mips/cpu.h | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
-index ee1addc..1257d8f 100644
---- a/hw/misc/mips_itu.c
-+++ b/hw/misc/mips_itu.c
-@@ -375,6 +375,12 @@ static void view_pv_try_write(ITCStorageCell *c)
-     view_pv_common_write(c);
- }
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 6c2a7e4..b095422 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -233,6 +233,38 @@ typedef struct mips_def_t mips_def_t;
+  * 7   TagLo             TagHi                               KScratch<n>
+  *
+  */
++#define CPO_REGISTER_00     0
++#define CPO_REGISTER_01     1
++#define CPO_REGISTER_02     2
++#define CPO_REGISTER_03     3
++#define CPO_REGISTER_04     4
++#define CPO_REGISTER_05     5
++#define CPO_REGISTER_06     6
++#define CPO_REGISTER_07     7
++#define CPO_REGISTER_08     8
++#define CPO_REGISTER_09     9
++#define CPO_REGISTER_10    10
++#define CPO_REGISTER_11    11
++#define CPO_REGISTER_12    12
++#define CPO_REGISTER_13    13
++#define CPO_REGISTER_14    14
++#define CPO_REGISTER_15    15
++#define CPO_REGISTER_16    16
++#define CPO_REGISTER_17    17
++#define CPO_REGISTER_18    18
++#define CPO_REGISTER_19    19
++#define CPO_REGISTER_20    20
++#define CPO_REGISTER_21    21
++#define CPO_REGISTER_22    22
++#define CPO_REGISTER_23    23
++#define CPO_REGISTER_24    24
++#define CPO_REGISTER_25    25
++#define CPO_REGISTER_26    26
++#define CPO_REGISTER_27    27
++#define CPO_REGISTER_28    28
++#define CPO_REGISTER_29    29
++#define CPO_REGISTER_30    30
++#define CPO_REGISTER_31    31
  
-+static void raise_exception(int excp)
-+{
-+    current_cpu->exception_index = excp;
-+    cpu_loop_exit(current_cpu);
-+}
-+
- static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
- {
-     MIPSITUState *s = (MIPSITUState *)opaque;
-@@ -382,6 +388,14 @@ static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
-     ITCView view = get_itc_view(addr);
-     uint64_t ret = -1;
  
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        s->icr0 |= 1 << ITC_ICR0_ERR_AXI;
-+        raise_exception(EXCP_DBE);
-+        return 0;
-+    }
-+
-     switch (view) {
-     case ITCVIEW_BYPASS:
-         ret = view_bypass_read(cell);
-@@ -420,6 +434,14 @@ static void itc_storage_write(void *opaque, hwaddr addr, uint64_t data,
-     ITCStorageCell *cell = get_cell(s, addr);
-     ITCView view = get_itc_view(addr);
- 
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        s->icr0 |= 1 << ITC_ICR0_ERR_AXI;
-+        raise_exception(EXCP_DBE);
-+        return;
-+    }
-+
-     switch (view) {
-     case ITCVIEW_BYPASS:
-         view_bypass_write(cell, data);
+ typedef struct TCState TCState;
 -- 
 2.7.4
