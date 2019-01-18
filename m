@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52227)
+Received: from eggs.gnu.org ([209.51.188.92]:52447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUV5-00081E-4b
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:00 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gkUW1-0000HZ-Vw
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUV3-0002mM-QO
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:47:59 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 13:47:49 +0000
-Message-ID: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
-In-Reply-To: <f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4FE924AF31539844AF92B6B83109A5E4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gkUVz-0003OO-Qn
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gkUVx-0003Im-SX
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:48:54 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 68D09C067831
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:48:50 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 18 Jan 2019 17:48:43 +0400
+Message-Id: <20190118134843.28916-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qemu-gdb: add a QObject pretty printer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, crosa@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-MTguMDEuMjAxOSAxMToxNSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IEkgZ290IHRpcmVkIG9mIGRl
-YnVnZ2luZyB3aGV0aGVyIGEgc2VydmVyIHdhcyBhZHZlcnRpc2luZyB0aGUNCj4+IGNvcnJlY3Qg
-dGhpbmdzIGR1cmluZyBuZWdvdGlhdGlvbiBieSBpbnNwZWN0aW5nIHRoZSB0cmFjZQ0KPj4gbG9n
-cyBvZiBxZW11LWlvIGFzIGNsaWVudCAtIG5vdCB0byBtZW50aW9uIHRoYXQgd2l0aG91dCBTT01F
-DQo+PiBzb3J0IG9mIGNsaWVudCB0cmFjaW5nIHBhcnRpY3VsYXIgY29tbWFuZHMsIHdlIGNhbid0
-IGVhc2lseQ0KPj4gcmVncmVzc2lvbiB0ZXN0IHRoZSBzZXJ2ZXIgZm9yIGNvcnJlY3QgYmVoYXZp
-b3IuwqAgVGhlIGZpbmFsDQo+PiBzdHJhdyB3YXMgYXQgS1ZNIEZvcnVtLCB3aGVuIE5pciBhc2tl
-ZCBtZSB0byBtYWtlIHN1cmUgdGhlcmUNCj4+IHdhcyBhIHdheSB0byBlYXNpbHkgZGV0ZXJtaW5l
-IGlmIGFuIE5CRCBzZXJ2ZXIgaXMgZXhwb3Npbmcgd2hhdA0KPj4gd2UgcmVhbGx5IHdhbnQgKGFu
-ZCBmaXhpbmcgeC1kaXJ0eS1iaXRtYXAgdG8gYmVoYXZlIHNhbmVyIGZlbGwNCj4+IG91dCBhcyBh
-IHJlc3VsdCBvZiBhbnN3ZXJpbmcgdGhhdCBxdWVzdGlvbikuDQo+Pg0KPj4gSSBub3RlIHRoYXQg
-dXBzdHJlYW0gTkJEIGhhcyAnbmJkLWNsaWVudCAtbCAkaG9zdCcgZm9yIHF1ZXJ5aW5nDQo+PiBq
-dXN0IGV4cG9ydCBuYW1lcyAod2l0aCBubyBxdW90aW5nLCBzbyB5b3UgaGF2ZSB0byBrbm93IHRo
-YXQNCj4+IGEgYmxhbmsgbGluZSBtZWFucyB0aGUgZGVmYXVsdCBleHBvcnQpLCBidXQgaXQgd2Fz
-bid0IHBvd2VyZnVsDQo+PiBlbm91Z2gsIHNvIEkgaW1wbGVtZW50ZWQgJ3FlbXUtbmJkIC1MJyB0
-byBkb2N1bWVudCBldmVyeXRoaW5nLg0KPj4gVXBzdHJlYW0gTkJEIGhhcyBzZXBhcmF0ZSAnbmJk
-LWNsaWVudCcgYW5kICduYmQtc2VydmVyJyBiaW5hcmllcywNCj4+IHdoaWxlIHdlIG9ubHkgaGF2
-ZSAncWVtdS1uYmQnICh3aGljaCBpcyBub3JtYWxseSBqdXN0IGEgc2VydmVyLA0KPj4gYnV0ICdx
-ZW11LW5iZCAtYycgYWxzbyBvcGVyYXRlcyBhIHNlY29uZCB0aHJlYWQgYXMgYSBjbGllbnQpLg0K
-Pj4gT3VyIG90aGVyIHVzZXMgb2YgcWVtdSBhcyBOQkQgY2xpZW50IGFyZSBmb3IgY29uc3VtaW5n
-IGEgYmxvY2sNCj4+IGRldmljZSAoYXMgaW4gcWVtdS1pbywgcWVtdS1pbWcsIG9yIGEgZHJpdmUg
-dG8gcWVtdSkgLSBidXQgdGhvc2UNCj4+IGJpbmFyaWVzIGFyZSBsZXNzIHN1aXRlZCB0byBzb21l
-dGhpbmcgc28gc3BlY2lmaWMgdG8gdGhlIE5CRA0KPj4gcHJvdG9jb2wuDQo+Pg0KPj4gQm9udXM6
-IEFzIGEgcmVzdWx0IG9mIG15IHdvcmsgb24gdGhpcyBzZXJpZXMsIG5iZGtpdCBub3cgc3VwcG9y
-dHMNCj4+IE5CRF9PUFRfSU5GTyAobXkgaW50ZXJvcGVyYWJpbGl0eSB0ZXN0aW5nIGJldHdlZW4g
-c2VydmVyDQo+PiBpbXBsZW1lbnRhdGlvbnMgaGFzIGJlZW4gcGF5aW5nIG9mZiwgYm90aCBhdCBm
-aXhpbmcgc2VydmVyIGJ1Z3MsDQo+PiBhbmQgYXQgbWFraW5nIHRoaXMgY29kZSBtb3JlIHJlbGlh
-YmxlIGFjcm9zcyBkaWZmZXJlbmNlIGluIHZhbGlkDQo+PiBzZXJ2ZXJzKS4NCj4+DQo+PiBBbHNv
-IGF2YWlsYWJsZSBhdDoNCj4+IGh0dHBzOi8vcmVwby5vci5jei9xZW11L2VyaWNiLmdpdCBxZW11
-LW5iZC1saXN0LXY0DQo+Pg0KPj4gQ3VycmVudGx5IGJhc2VkIG9uIG1hc3Rlci4NCj4+DQo+PiBT
-aW5jZSB2MzoNCj4+IC0gMSBuZXcgcGF0Y2ggKDEvMjEpDQo+PiAtIHNwbGl0IG9sZCBwYXRjaCAx
-NS8xOSBpbnRvIHR3byAoMTYsMTcvMjEpDQo+PiAtIHJldGl0bGUgdHdvIHBhdGNoZXMgKGdpdCBi
-YWNrcG9ydC1kaWZmIGRvZXNuJ3QgZG8gdG9vIHdlbGwgYXQgc2hvd2luZw0KPj4gdGhlIGRpZmYg
-b24gYSByZXRpdGxlZCBwYXRjaDsgNSwxMS8yMSkNCj4+IC0gZml4IHJldmlldyBjb21tZW50cyBm
-cm9tIFJpY2gsIFZsYWRpbWlyDQo+Pg0KPj4gMDAxLzIxOltkb3duXSAnaW90ZXN0czogTWFrZSAy
-MzMgb3V0cHV0IG1vcmUgcmVsaWFibGUnDQo+PiAwMDIvMjE6Wy0tLS1dIFstLV0gJ21haW50OiBB
-bGxvdyBmb3IgRVhBTVBMRVMgaW4gdGV4aTJwb2QnDQo+PiAwMDMvMjE6Wy0tLS1dIFstLV0gJ3Fl
-bXUtbmJkOiBFbmhhbmNlIG1hbiBwYWdlJw0KPiANCj4gSW50ZXJlc3RpbmcsIEkgZG9uJ3QgZ2V0
-IGl0IGFnYWluLiBTZWFyY2hlZCBpbiBvdXRsb29rIG9ubGluZSwgSSBmb3VuZCBvbmx5IHYyIG9m
-IGl0LA0KPiBjaGVja2VkIHNwYW0gZm9sZGVyIGFuZCBmaWx0ZXJzLiBNYWdpYy4NCj4gDQo+IGFu
-eXdheSwgSSBjYW4gbG9vayBhdCBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3Fl
-bXUtZGV2ZWwvMjAxOS0wMS9tc2cwNDMyOC5odG1sDQo+IA0KPiANCg0KanVzdCBsb29rIGF0IGl0
-IGluIHlvdXIgcWVtdS1uYmQtbGlzdC12NCB0YWc6DQoNCiA+IE9ubHkgZXhwb3NlIE1CUiBwYXJ0
-aXRpb24gQHZhcntudW19LiAgVW5kZXJzdGFuZHMgcGh5c2ljYWwgcGFydGl0aW9ucw0KID4gMS00
-IGFuZCBsb2dpY2FsIHBhcnRpdGlvbnMgNS04Lg0KDQpJJ20gYWZyYWlkLCBJJ20gdG9vIGxhenkg
-dG8gc29ydCBvdXQgdGhlc2UgdGhpbmdzIEkgZG9uJ3Qga25vdywgc28ganVzdCBiZWxpZXZlLiBJ
-dCBhdCBsZWFzdA0KY29ycmVzcG9uZHMgdG8gbGltaXRzIGluIGNvZGUgdGhhdCBpdCBzaG91bGQg
-YmUgMSA8PSBwYXJ0aXRpb24gPD0gOCA7KQ0KDQogPiBAaXRlbSAtYywgLS1jb25uZWN0PUB2YXJ7
-ZGV2fQ0KID4gQ29ubmVjdCBAdmFye2ZpbGVuYW1lfSB0byBOQkQgZGV2aWNlIEB2YXJ7ZGV2fSAo
-TGludXggb25seSkuDQogPiBAaXRlbSAtZCwgLS1kaXNjb25uZWN0DQogPiBEaXNjb25uZWN0IHRo
-ZSBkZXZpY2UgQHZhcntkZXZ9IChMaW51eCBvbmx5KS4NCg0KWWVzLCBhbmQgd2Ugbm93IGhhdmUg
-Y2xlYW4gY29kZSB3aGljaCBlc3RhYmxpc2ggdGhpcyBsaW1pdGF0aW9uDQoNCiA+IEBpdGVtIC1l
-LCAtLXNoYXJlZD1AdmFye251bX0NCiA+IEFsbG93IHVwIHRvIEB2YXJ7bnVtfSBjbGllbnRzIHRv
-IHNoYXJlIHRoZSBkZXZpY2UgKGRlZmF1bHQNCiA+IEBzYW1wezF9KS4gU2FmZSBmb3IgcmVhZGVy
-cywgYnV0IGZvciBub3csIGNvbnNpc3RlbmN5IGlzIG5vdA0KID4gZ3VhcmFudGVlZCBiZXR3ZWVu
-IG11bHRpcGxlIHdyaXRlcnMuDQoNCkhtbSwgZG9uJ3QgdW5kZXJzdGFuZCwgd2h5IHlvdSBkZWNp
-ZGVkIHRvIG1vdmUgQHNhbXB7MX0pLiBvbiB0aGUgZm9sbG93aW5nIGxpbmUsIGl0IGxvb2tzDQpi
-ZXR0ZXIgYXMgaXQgd2FzLiBBbmQgd2l0aCBhIHBlcmlvZCBpdCdzIG9ubHkgNjkgc3ltYm9scywg
-dGhlIGZpbGUgaGF2ZSBhIGxvdCBsb25nZXIgbGluZXMuDQoNCiA+IFN0YXJ0IGEgc2VydmVyIGxp
-c3RlbmluZyBvbiBwb3J0IDEwODA5IHRoYXQgZXhwb3NlcyBvbmx5IHRoZQ0KID4gZ3Vlc3Qtdmlz
-aWJsZSBjb250ZW50cyBvZiBhIHFjb3cyIGZpbGUsIHdpdGggbm8gVExTIGVuY3J5cHRpb24sIGFu
-ZA0KID4gd2l0aCB0aGUgZGVmYXVsdCBleHBvcnQgbmFtZSAoYW4gZW1wdHkgc3RyaW5nKS4gVGhl
-IGNvbW1hbmQgaXMNCiA+IG9uZS1zaG90LCBhbmQgd2lsbCBibG9jayB1bnRpbCB0aGUgZmlyc3Qg
-c3VjY2Vzc2Z1bCBjbGllbnQNCiA+IGRpc2Nvbm5lY3RzOg0KID4NCiA+IEBleGFtcGxlDQogPiBx
-ZW11LW5iZCAtZiBxY293MiBmaWxlLnFjb3cyDQogPiBAZW5kIGV4YW1wbGUNCiA+DQogPiBTdGFy
-dCBhIGxvbmctcnVubmluZyBzZXJ2ZXIgbGlzdGVuaW5nIHdpdGggZW5jcnlwdGlvbiBvbiBwb3J0
-IDEwODEwLA0KID4gYW5kIHJlcXVpcmUgY2xpZW50cyB0byBoYXZlIGEgY29ycmVjdCBYLjUwOSBj
-ZXJ0aWZpY2F0ZSB0byBjb25uZWN0IHRvDQogPiBhIDEgbWVnYWJ5dGUgc3Vic2V0IG9mIGEgcmF3
-IGZpbGUsIHVzaW5nIHRoZSBleHBvcnQgbmFtZSAnc3Vic2V0JzoNCiA+DQogPiBAZXhhbXBsZQ0K
-ID4gcWVtdS1uYmQgXA0KID4gICAtLW9iamVjdCB0bHMtY3JlZHMteDUwOSxpZD10bHMwLGVuZHBv
-aW50PXNlcnZlcixkaXI9L3BhdGgvdG8vcWVtdXRscyBcDQogPiAgIC0tdGxzLWNyZWRzIHRsczAg
-LXQgLXggc3Vic2V0IC1wIDEwODEwIFwNCiA+ICAgLS1pbWFnZS1vcHRzIGRyaXZlcj1yYXcsb2Zm
-c2V0PTFNLGxlbmd0aD0xTSxmaWxlLmRyaXZlcj1maWxlLGZpbGUuZmlsZW5hbWU9ZmlsZS5yYXcN
-CiA+IEBlbmQgZXhhbXBsZQ0KDQpJIGRvbid0IGtub3cgdGxzLXJlbGF0ZWQsIHRoZSBvdGhlciBv
-cHRpb25zIGxvb2tzIGZpbmUuDQoNCnVwZCAoZGVjaWRlZCB0byBydW4gdGhlIGNvbW1hbmQsIHdp
-dGggZHJvcHBlZCB0bHMpOg0KbG9va3MgZmluZSBidXQgbm90IHdvcmssIGFzIHMvbGVuZ3RoL3Np
-emUuDQoNCiA+DQogPiBTZXJ2ZSBhIHJlYWQtb25seSBjb3B5IG9mIGp1c3QgdGhlIGZpcnN0IE1C
-UiBwYXJ0aXRpb24gb2YgYSBndWVzdA0KID4gaW1hZ2Ugb3ZlciBhIFVuaXggc29ja2V0IHdpdGgg
-YXMgbWFueSBhcyA1IHNpbXVsdGFuZW91cyByZWFkZXJzLCB3aXRoDQogPiBhIHBlcnNpc3RlbnQg
-cHJvY2VzcyBmb3JrZWQgYXMgYSBkYWVtb246DQogPg0KID4gQGV4YW1wbGUNCiA+IHFlbXUtbmJk
-IC0tZm9yayAtdCAtZSA1IC1zIC9wYXRoL3RvL3NvY2sgLXAgMSAtciAtZiBxY293MiBmaWxlLnFj
-b3cyDQogPiBAZW5kIGV4YW1wbGUNCg0KT29wcy4gcy8tcy8tay8sIHMvLXAvLVAvLCBhbmQgaWRl
-YTogbWF5IGJlLCB1c2Ugc2VsZi1kZXNjcmlwdGl2ZSBsb25nIG9wdGlvbiBuYW1lcyBpbg0KZXhh
-bXBsZXM/DQoNCiA+DQogPiBFeHBvc2UgdGhlIGd1ZXN0LXZpc2libGUgY29udGVudHMgb2YgYSBx
-Y293MiBmaWxlIHZpYSBhIGJsb2NrIGRldmljZQ0KID4gL2Rldi9uYmQwIChhbmQgcG9zc2libHkg
-Y3JlYXRpbmcgL2Rldi9uYmQwcDEgYW5kIGZyaWVuZHMgZm9yDQogPiBwYXJ0aXRpb25zIGZvdW5k
-IHdpdGhpbiksIHRoZW4gZGlzY29ubmVjdCB0aGUgZGV2aWNlIHdoZW4gZG9uZS4NCiA+IEBlbXBo
-e0NBVVRJT059OiBEbyBub3QgdXNlIHRoaXMgbWV0aG9kIHRvIG1vdW50IGZpbGVzeXN0ZW1zIGZy
-b20gYW4NCiA+IHVudHJ1c3RlZCBndWVzdCBpbWFnZSAtIGEgbWFsaWNpb3VzIGd1ZXN0IG1heSBo
-YXZlIHByZXBhcmVkIHRoZSBpbWFnZQ0KID4gdG8gYXR0ZW1wdCB0byB0cmlnZ2VyIGtlcm5lbCBi
-dWdzIGluIHBhcnRpdGlvbiBwcm9iaW5nIG9yIGZpbGUgc3lzdGVtDQogPiBtb3VudGluZy4NCiA+
-DQogPiBAZXhhbXBsZQ0KDQpzaG91bGQgd2Ugbm90ZSwgdGhhdCBuYmQga2VybmVsLW1vZHVsZSBz
-aG91bGQgYmUgbG9hZGVkIGZvciB0aGlzIHRvIHdvcms/DQoNCiA+IHFlbXUtbmJkIC1jIC9kZXYv
-bmJkMCAtZiBxY293MiBmaWxlLnFjb3cyDQogPiBxZW11LW5iZCAtZCAvZGV2L25iZDANCiA+IEBl
-bmQgZXhhbXBsZQ0KDQpXaXRoIGZpeGVkIHdyb25nIG9wdGlvbiBuYW1lcyBhbmQgcy9sZW5ndGgv
-c2l6ZToNCmZvciAwMy8yMToNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+Inspired by GObject/GType pretty printer.
+
+Example:
+machine_set_accel (obj=3D0x555556807550 [pc-i440fx-4.0-machine],...
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/qemu-gdb.py | 58 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ mode change 100644 =3D> 100755 scripts/qemu-gdb.py
+
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+old mode 100644
+new mode 100755
+index 690827e6fc6..90c6fd13b93
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -21,6 +21,9 @@ import gdb
+=20
+ import os, sys
+=20
++if sys.version_info[0] >=3D 3:
++    long =3D int
++
+ # Annoyingly, gdb doesn't put the directory of scripts onto the
+ # module search path. Do it manually.
+=20
+@@ -47,3 +50,58 @@ coroutine.CoroutinePCFunction()
+ # Default to silently passing through SIGUSR1, because QEMU sends it
+ # to itself a lot.
+ gdb.execute('handle SIGUSR1 pass noprint nostop')
++
++
++def is_object(val):
++    def is_object_helper(type):
++        if str(type) =3D=3D "Object":
++            return True
++
++        while type.code =3D=3D gdb.TYPE_CODE_TYPEDEF:
++            type =3D type.target()
++
++        if type.code !=3D gdb.TYPE_CODE_STRUCT:
++            return False
++
++        fields =3D type.fields()
++        if len (fields) < 1:
++            return False
++
++        first_field =3D fields[0]
++        return is_object_helper(first_field.type)
++
++    type =3D val.type
++    if type.code !=3D gdb.TYPE_CODE_PTR:
++        return False
++    type =3D type.target()
++    return is_object_helper (type)
++
++
++def object_class_name(instance):
++    try:
++        inst =3D instance.cast(gdb.lookup_type("Object").pointer())
++        klass =3D inst["class"]
++        typ =3D klass["type"]
++        return typ["name"].string()
++    except RuntimeError:
++        pass
++
++
++class QObjectPrinter:
++    def __init__(self, val):
++        self.val =3D val
++
++    def to_string(self):
++        name =3D object_class_name(self.val)
++        if name:
++            return ("0x%x [%s]")% (long(self.val), name)
++        return  ("0x%x") % (long(self.val))
++
++
++def lookup_type(val):
++    if is_object(val):
++        return QObjectPrinter(val)
++    return None
++
++
++gdb.pretty_printers.append(lookup_type)
+--=20
+2.20.1.98.gecbdaf0899
