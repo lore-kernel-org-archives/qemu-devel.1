@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35912)
+Received: from eggs.gnu.org ([209.51.188.92]:35929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGm-0008Pg-0f
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:04 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGp-0008V7-5R
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGj-0005oe-Rg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:03 -0500
-Received: from mga06.intel.com ([134.134.136.31]:46976)
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGm-0005qY-33
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:07 -0500
+Received: from mga06.intel.com ([134.134.136.31]:47015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSGh-0005dV-RR
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:01 -0500
+	id 1gkSGj-0005lq-SD
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:03 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:37 +0800
-Message-Id: <20190118112410.3010-11-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:23:38 +0800
+Message-Id: <20190118112410.3010-12-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v3 10/43] hw/lm32/Makefile.objs:
- Conditionally build lm32 and milkmyst
+Subject: [Qemu-devel] [RFC PATCH v3 11/43] hw/xtensa/Makefile.objs: Build
+ xtensa_sim and xtensa_fpga conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +33,50 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_LM32 and CONFIG_MILKYMIST added for lm32 and milkmyst build.
+Add the new CONFIG_* values to default-config/xtensa*-softmmu.mak.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- hw/lm32/Makefile.objs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ default-configs/xtensa-softmmu.mak   | 3 +++
+ default-configs/xtensaeb-softmmu.mak | 3 +++
+ hw/xtensa/Makefile.objs              | 4 ++--
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/lm32/Makefile.objs b/hw/lm32/Makefile.objs
-index ea6418ae59..c3941866c7 100644
---- a/hw/lm32/Makefile.objs
-+++ b/hw/lm32/Makefile.objs
-@@ -1,3 +1,3 @@
- # LM32 boards
--obj-y += lm32_boards.o
--obj-y += milkymist.o
-+obj-$(CONFIG_LM32) += lm32_boards.o
-+obj-$(CONFIG_MILKYMIST) += milkymist.o
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+index 9d8899cde7..baf90ca162 100644
+--- a/default-configs/xtensa-softmmu.mak
++++ b/default-configs/xtensa-softmmu.mak
+@@ -3,3 +3,6 @@
+ CONFIG_SERIAL=y
+ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
++
++CONFIG_XTENSA_SIM=y
++CONFIG_XTENSA_FPGA=y
+diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xtensaeb-softmmu.mak
+index 9d8899cde7..baf90ca162 100644
+--- a/default-configs/xtensaeb-softmmu.mak
++++ b/default-configs/xtensaeb-softmmu.mak
+@@ -3,3 +3,6 @@
+ CONFIG_SERIAL=y
+ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
++
++CONFIG_XTENSA_SIM=y
++CONFIG_XTENSA_FPGA=y
+diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
+index cb4998d2bf..62e244fa53 100644
+--- a/hw/xtensa/Makefile.objs
++++ b/hw/xtensa/Makefile.objs
+@@ -1,4 +1,4 @@
+ obj-y += pic_cpu.o
+-obj-y += sim.o
+ obj-y += xtensa_memory.o
+-obj-y += xtfpga.o
++obj-$(CONFIG_XTENSA_SIM) += sim.o
++obj-$(CONFIG_XTENSA_FPGA) += xtfpga.o
 -- 
 2.17.1
