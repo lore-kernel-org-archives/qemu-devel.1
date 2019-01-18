@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56369)
+Received: from eggs.gnu.org ([209.51.188.92]:56386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkblA-0005hV-N3
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:05 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkblD-0005l4-6v
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbl8-0005S4-Rz
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:04 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36456)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkblA-0005Ub-Vj
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:06 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36454)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbl8-0005Qc-3b
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:02 -0500
-Received: by mail-pl1-x644.google.com with SMTP id g9so6895762plo.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:33:01 -0800 (PST)
+	id 1gkblA-0005TQ-Ns
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:04 -0500
+Received: by mail-pl1-x641.google.com with SMTP id g9so6895802plo.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:33:04 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:31:13 +1100
-Message-Id: <20190118213122.22865-40-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:31:14 +1100
+Message-Id: <20190118213122.22865-41-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 40/49] linux-user: Split out kill
+Subject: [Qemu-devel] [PATCH v6 41/49] linux-user: Split out rename, renameat,
+ renameat2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,200 +30,278 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+Note that renameat2 is universally available for guests.
+Merge sys_renameat2 into the new do_renameat2 helper.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h    |  1 +
- linux-user/syscall.h         |  7 +++-
- linux-user/strace.c          | 76 ++++++++++++++++++------------------
- linux-user/syscall-sig.inc.c |  5 +++
- linux-user/syscall.c         |  2 -
- linux-user/strace.list       |  3 --
- 6 files changed, 48 insertions(+), 46 deletions(-)
+ linux-user/syscall-defs.h     |  8 +++++
+ linux-user/syscall.h          |  1 +
+ linux-user/strace.c           | 39 ++++++---------------
+ linux-user/syscall-file.inc.c | 45 ++++++++++++++++++++++++
+ linux-user/syscall.c          | 64 -----------------------------------
+ linux-user/strace.list        |  9 -----
+ 6 files changed, 65 insertions(+), 101 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 497fbdba66..c672b5ad99 100644
+index c672b5ad99..0ed01aa100 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -58,6 +58,7 @@ SYSCALL_DEF(getxpid);
- #ifdef TARGET_NR_ipc
- SYSCALL_DEF_ARGS(ipc, ARG_HEX, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR, ARG_HEX);
+@@ -142,6 +142,14 @@ SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
+ #ifdef TARGET_NR_readlinkat
+ SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
  #endif
-+SYSCALL_DEF(kill, ARG_DEC, ARG_SIGNAL);
- #ifdef TARGET_NR_link
- SYSCALL_DEF(link, ARG_STR, ARG_STR);
- #endif
++#ifdef TARGET_NR_rename
++SYSCALL_DEF(rename, ARG_STR, ARG_STR);
++#endif
++#ifdef TARGET_NR_renameat
++SYSCALL_DEF(renameat, ARG_ATDIRFD, ARG_STR, ARG_ATDIRFD, ARG_STR);
++#endif
++SYSCALL_DEF(renameat2, ARG_ATDIRFD, ARG_STR,
++            ARG_ATDIRFD, ARG_STR, ARG_RENAMEFLAG);
+ SYSCALL_DEF(readv, ARG_DEC, ARG_PTR, ARG_DEC);
+ #ifdef TARGET_NR_rmdir
+ SYSCALL_DEF(rmdir, ARG_STR);
 diff --git a/linux-user/syscall.h b/linux-user/syscall.h
-index 84a52b2d9a..642fb6dccb 100644
+index 642fb6dccb..7b197840f5 100644
 --- a/linux-user/syscall.h
 +++ b/linux-user/syscall.h
-@@ -55,8 +55,12 @@ typedef enum {
-     ARG_HEX,
-     ARG_OCT,
- 
--    /* These print as sets of flags.  */
-+    /* These numbers are interpreted.  */
-     ARG_ATDIRFD,
-+    ARG_SIGNAL,
-+    ARG_LSEEKWHENCE,
-+
-+    /* These print as sets of flags.  */
-     ARG_ACCESSFLAG,
-     ARG_ATFLAG,
-     ARG_CLONEFLAG,
-@@ -67,7 +71,6 @@ typedef enum {
+@@ -69,6 +69,7 @@ typedef enum {
+     ARG_MODEFLAG,
+     ARG_MOUNTFLAG,
      ARG_OPENFLAG,
++    ARG_RENAMEFLAG,
      ARG_UMOUNTFLAG,
      ARG_UNLINKATFLAG,
--    ARG_LSEEKWHENCE,
  
-     /* These are interpreted as pointers.  */
-     ARG_PTR,
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index da2cc30f82..ec36fcf2c2 100644
+index ec36fcf2c2..6dce7e52c0 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -70,35 +70,43 @@ UNUSED static void print_socket_protocol(int domain, int type, int protocol);
- /*
-  * Utility functions
-  */
-+static int
-+add_signal(char *buf, int size, int sig)
-+{
-+    static const char * const signals[] = {
-+        [TARGET_SIGHUP]  = "SIGHUP",
-+        [TARGET_SIGINT]  = "SIGINT",
-+        [TARGET_SIGQUIT] = "SIGQUIT",
-+        [TARGET_SIGILL]  = "SIGILL",
-+        [TARGET_SIGABRT] = "SIGABRT",
-+        [TARGET_SIGFPE]  = "SIGFPE",
-+        [TARGET_SIGKILL] = "SIGKILL",
-+        [TARGET_SIGSEGV] = "SIGSEGV",
-+        [TARGET_SIGPIPE] = "SIGPIPE",
-+        [TARGET_SIGALRM] = "SIGALRM",
-+        [TARGET_SIGTERM] = "SIGTERM",
-+        [TARGET_SIGUSR1] = "SIGUSR1",
-+        [TARGET_SIGUSR2] = "SIGUSR2",
-+        [TARGET_SIGCHLD] = "SIGCHLD",
-+        [TARGET_SIGCONT] = "SIGCONT",
-+        [TARGET_SIGSTOP] = "SIGSTOP",
-+        [TARGET_SIGTTIN] = "SIGTTIN",
-+        [TARGET_SIGTTOU] = "SIGTTOU",
-+    };
-+
-+    if (sig >= 0 && sig < ARRAY_SIZE(signals) && signals[sig]) {
-+        return snprintf(buf, size, "%s", signals[sig]);
-+    } else {
-+        return snprintf(buf, size, "%d", sig);
-+    }
-+}
-+
- static void
- print_signal(abi_ulong arg, int last)
- {
--    const char *signal_name = NULL;
--    switch(arg) {
--    case TARGET_SIGHUP: signal_name = "SIGHUP"; break;
--    case TARGET_SIGINT: signal_name = "SIGINT"; break;
--    case TARGET_SIGQUIT: signal_name = "SIGQUIT"; break;
--    case TARGET_SIGILL: signal_name = "SIGILL"; break;
--    case TARGET_SIGABRT: signal_name = "SIGABRT"; break;
--    case TARGET_SIGFPE: signal_name = "SIGFPE"; break;
--    case TARGET_SIGKILL: signal_name = "SIGKILL"; break;
--    case TARGET_SIGSEGV: signal_name = "SIGSEGV"; break;
--    case TARGET_SIGPIPE: signal_name = "SIGPIPE"; break;
--    case TARGET_SIGALRM: signal_name = "SIGALRM"; break;
--    case TARGET_SIGTERM: signal_name = "SIGTERM"; break;
--    case TARGET_SIGUSR1: signal_name = "SIGUSR1"; break;
--    case TARGET_SIGUSR2: signal_name = "SIGUSR2"; break;
--    case TARGET_SIGCHLD: signal_name = "SIGCHLD"; break;
--    case TARGET_SIGCONT: signal_name = "SIGCONT"; break;
--    case TARGET_SIGSTOP: signal_name = "SIGSTOP"; break;
--    case TARGET_SIGTTIN: signal_name = "SIGTTIN"; break;
--    case TARGET_SIGTTOU: signal_name = "SIGTTOU"; break;
--    }
--    if (signal_name == NULL) {
--        print_raw_param("%ld", arg, last);
--        return;
--    }
--    gemu_log("%s%s", signal_name, get_comma(last));
-+    char buf[16];
-+    add_signal(buf, sizeof(buf), arg);
-+    gemu_log("%s%s", buf, get_comma(last));
- }
+@@ -4,6 +4,7 @@
+ #include <arpa/inet.h>
+ #include <netinet/tcp.h>
+ #include <linux/if_packet.h>
++#include <linux/fs.h>
+ #include <sched.h>
+ #include "qemu.h"
+ #include "syscall.h"
+@@ -741,6 +742,13 @@ static struct flags const mount_flags[] = {
+     FLAG_END,
+ };
  
- static void print_si_code(int arg)
-@@ -2032,19 +2040,6 @@ print_futex(const struct syscallname *name,
- }
++static struct flags const renameat2_flags[] = {
++    FLAG_GENERIC(RENAME_EXCHANGE),
++    FLAG_GENERIC(RENAME_NOREPLACE),
++    FLAG_GENERIC(RENAME_WHITEOUT),
++    FLAG_END,
++};
++
+ static struct flags const umount2_flags[] = {
+ #ifdef MNT_FORCE
+     FLAG_GENERIC(MNT_FORCE),
+@@ -1887,34 +1895,6 @@ print_fstatat64(const struct syscallname *name,
+ #define print_newfstatat    print_fstatat64
  #endif
  
--#ifdef TARGET_NR_kill
+-#ifdef TARGET_NR_rename
 -static void
--print_kill(const struct syscallname *name,
+-print_rename(const struct syscallname *name,
 -    abi_long arg0, abi_long arg1, abi_long arg2,
 -    abi_long arg3, abi_long arg4, abi_long arg5)
 -{
 -    print_syscall_prologue(name);
--    print_raw_param("%d", arg0, 0);
--    print_signal(arg1, 1);
+-    print_string(arg0, 0);
+-    print_string(arg1, 1);
 -    print_syscall_epilogue(name);
 -}
 -#endif
 -
- #ifdef TARGET_NR_tkill
+-#ifdef TARGET_NR_renameat
+-static void
+-print_renameat(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_at_dirfd(arg0, 0);
+-    print_string(arg1, 0);
+-    print_at_dirfd(arg2, 0);
+-    print_string(arg3, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_statfs
  static void
- print_tkill(const struct syscallname *name,
-@@ -2178,6 +2173,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
-         case ARG_ATDIRFD:
-             len = add_atdirfd(b, rest, arg);
+ print_statfs(const struct syscallname *name,
+@@ -2200,6 +2180,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
+         case ARG_OPENFLAG:
+             len = add_open_flags(b, rest, arg);
              break;
-+        case ARG_SIGNAL:
-+            len = add_signal(b, rest, arg);
++        case ARG_RENAMEFLAG:
++            len = add_flags(b, rest, renameat2_flags, arg, false);
 +            break;
-         case ARG_ACCESSFLAG:
-             len = add_flags(b, rest, access_flags, arg, false);
+         case ARG_UMOUNTFLAG:
+             len = add_flags(b, rest, umount2_flags, arg, false);
              break;
-diff --git a/linux-user/syscall-sig.inc.c b/linux-user/syscall-sig.inc.c
-index f4e43eb00e..a4fbcc567d 100644
---- a/linux-user/syscall-sig.inc.c
-+++ b/linux-user/syscall-sig.inc.c
-@@ -23,6 +23,11 @@ SYSCALL_IMPL(alarm)
+diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
+index 80dec33971..9099107631 100644
+--- a/linux-user/syscall-file.inc.c
++++ b/linux-user/syscall-file.inc.c
+@@ -867,6 +867,51 @@ SYSCALL_IMPL(readlinkat)
  }
  #endif
  
-+SYSCALL_IMPL(kill)
++static abi_long do_renameat2(int oldfd, abi_ulong target_oldpath,
++                             int newfd, abi_ulong target_newpath,
++                             unsigned int flags)
 +{
-+    return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
++    char *p_old = lock_user_string(target_oldpath);
++    char *p_new = lock_user_string(target_newpath);
++    abi_long ret = -TARGET_EFAULT;
++
++    if (p_old && p_new) {
++        if (flags == 0) {
++            ret = renameat(oldfd, p_old, newfd, p_new);
++        } else {
++#ifdef __NR_renameat2
++            ret = syscall(__NR_renameat2, oldfd, p_old, newfd, p_new, flags);
++#else
++            errno = ENOSYS;
++            ret = -1;
++#endif
++        }
++        ret = get_errno(ret);
++    }
++    unlock_user(p_old, target_oldpath, 0);
++    unlock_user(p_new, target_newpath, 0);
++    return ret;
 +}
 +
- #ifdef TARGET_NR_pause
- SYSCALL_IMPL(pause)
++#ifdef TARGET_NR_rename
++SYSCALL_IMPL(rename)
++{
++    return do_renameat2(AT_FDCWD, arg1, AT_FDCWD, arg2, 0);
++}
++#endif
++
++#ifdef TARGET_NR_renameat
++SYSCALL_IMPL(renameat)
++{
++    return do_renameat2(arg1, arg2, arg3, arg4, 0);
++}
++#endif
++
++SYSCALL_IMPL(renameat2)
++{
++    return do_renameat2(arg1, arg2, arg3, arg4, arg5);
++}
++
+ SYSCALL_IMPL(sync)
  {
+     sync();
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 6668e4ada8..fef955ce66 100644
+index fef955ce66..fe38ec59d4 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5338,8 +5338,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -341,24 +341,6 @@ static int sys_utimensat(int dirfd, const char *pathname,
+ #endif
+ #endif /* TARGET_NR_utimensat */
+ 
+-#ifdef TARGET_NR_renameat2
+-#if defined(__NR_renameat2)
+-#define __NR_sys_renameat2 __NR_renameat2
+-_syscall5(int, sys_renameat2, int, oldfd, const char *, old, int, newfd,
+-          const char *, new, unsigned int, flags)
+-#else
+-static int sys_renameat2(int oldfd, const char *old,
+-                         int newfd, const char *new, int flags)
+-{
+-    if (flags == 0) {
+-        return renameat(oldfd, old, newfd, new);
+-    }
+-    errno = ENOSYS;
+-    return -1;
+-}
+-#endif
+-#endif /* TARGET_NR_renameat2 */
+-
+ #ifdef CONFIG_INOTIFY
+ #include <sys/inotify.h>
+ 
+@@ -5338,52 +5320,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_kill:
--        return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
- #ifdef TARGET_NR_rename
-     case TARGET_NR_rename:
-         {
+-#ifdef TARGET_NR_rename
+-    case TARGET_NR_rename:
+-        {
+-            void *p2;
+-            p = lock_user_string(arg1);
+-            p2 = lock_user_string(arg2);
+-            if (!p || !p2)
+-                ret = -TARGET_EFAULT;
+-            else
+-                ret = get_errno(rename(p, p2));
+-            unlock_user(p2, arg2, 0);
+-            unlock_user(p, arg1, 0);
+-        }
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_renameat)
+-    case TARGET_NR_renameat:
+-        {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user_string(arg4);
+-            if (!p || !p2)
+-                ret = -TARGET_EFAULT;
+-            else
+-                ret = get_errno(renameat(arg1, p, arg3, p2));
+-            unlock_user(p2, arg4, 0);
+-            unlock_user(p, arg2, 0);
+-        }
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_renameat2)
+-    case TARGET_NR_renameat2:
+-        {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user_string(arg4);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else {
+-                ret = get_errno(sys_renameat2(arg1, p, arg3, p2, arg5));
+-            }
+-            unlock_user(p2, arg4, 0);
+-            unlock_user(p, arg2, 0);
+-        }
+-        return ret;
+-#endif
+ #ifdef TARGET_NR_mkdir
+     case TARGET_NR_mkdir:
+         if (!(p = lock_user_string(arg1)))
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 56f25c15b7..b120f11dc2 100644
+index b120f11dc2..56aab25d9f 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -410,9 +410,6 @@
- #ifdef TARGET_NR_keyctl
- { TARGET_NR_keyctl, "keyctl" , NULL, NULL, NULL },
+@@ -944,15 +944,6 @@
+ #ifdef TARGET_NR_removexattr
+ { TARGET_NR_removexattr, "removexattr" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_kill
--{ TARGET_NR_kill, "kill", NULL, print_kill, NULL },
+-#ifdef TARGET_NR_rename
+-{ TARGET_NR_rename, "rename" , NULL, print_rename, NULL },
 -#endif
- #ifdef TARGET_NR_lchown
- { TARGET_NR_lchown, "lchown" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_renameat
+-{ TARGET_NR_renameat, "renameat" , NULL, print_renameat, NULL },
+-#endif
+-#ifdef TARGET_NR_renameat2
+-{ TARGET_NR_renameat2, "renameat2" , NULL, NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_request_key
+ { TARGET_NR_request_key, "request_key" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.2
