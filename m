@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59219)
+Received: from eggs.gnu.org ([209.51.188.92]:59299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkWVg-0006Cw-RP
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:56:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkWVx-0006JS-7s
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:57:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkWVe-00060K-Py
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:56:44 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:38659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkWVc-0005xz-Sv
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:56:41 -0500
-Received: by mail-oi1-x233.google.com with SMTP id a77so9297342oii.5
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 07:56:38 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gkWVw-0006Du-Fy
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:57:01 -0500
+References: <20190117193658.16413-1-eblake@redhat.com>
+	<20190117193658.16413-2-eblake@redhat.com>
+	<20190118100257.GC20660@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <273740c7-c347-f79c-a776-c229bf35fcbf@redhat.com>
+Date: Fri, 18 Jan 2019 09:56:51 -0600
 MIME-Version: 1.0
-References: <20190115200252.25911-1-mst@redhat.com>
-	<CAFEAcA_CurRe0i7pU10OkNBFi53ayA4Y01HtF27qN1xo5nJqxg@mail.gmail.com>
-	<20190117084350-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_G_og2AXsDKYnPVhRXsvMUb8MnR0yc8JzCwS4xaPJpGg@mail.gmail.com>
-	<20190117211138-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190117211138-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 15:56:26 +0000
-Message-ID: <CAFEAcA_ZpxcfG7zVO31zWJifYBNFvwa15Z2eSXUeYVg7XsaZiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/49] pci, pc, virtio: fixes, features
+In-Reply-To: <20190118100257.GC20660@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aEhI6DyYNtAF1ssnuEtZZHLNYiAz0gVc0"
+Subject: Re: [Qemu-devel] [PATCH v4 01/21] iotests: Make 233 output more
+ reliable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, 18 Jan 2019 at 02:12, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Jan 17, 2019 at 04:21:24PM +0000, Peter Maydell wrote:
-> > On Thu, 17 Jan 2019 at 13:44, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Thu, Jan 17, 2019 at 12:48:22PM +0000, Peter Maydell wrote:
-> > > > This fails 'make check' on s390x host:
-> >
-> > > Oh. I am pretty sure it's endian-ness :(
-> > >
-> > > Any chance you can quickly test the below?
-> >
-> > Yes, that change allows the tests to pass on the s390 box.
-> >
-> > thanks
-> > -- PMM
->
-> Re-pushed a fixed patch to the same tag.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aEhI6DyYNtAF1ssnuEtZZHLNYiAz0gVc0
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, rjones@redhat.com,
+ jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <273740c7-c347-f79c-a776-c229bf35fcbf@redhat.com>
+Subject: Re: [PATCH v4 01/21] iotests: Make 233 output more reliable
+References: <20190117193658.16413-1-eblake@redhat.com>
+ <20190117193658.16413-2-eblake@redhat.com>
+ <20190118100257.GC20660@redhat.com>
+In-Reply-To: <20190118100257.GC20660@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 1/18/19 4:02 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Jan 17, 2019 at 01:36:38PM -0600, Eric Blake wrote:
+>> We have a race between the nbd server and the client both trying
+>> to report errors at once which can make the test sometimes fail
+>> if the output lines swap order under load.  Break the race by
+>> collecting server messages into a file and then replaying that
+>> at the end of the test.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> CC: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>>
+>> ---
+>> An alternative solution might be to silence the message from the
+>> server by default, and output it only when -v was passed
+>=20
+> I wouldn't consider this an either/or situation. It is probably
+> good practice to qemu-nbd to be completely silent wrt client
+> problems so a malicious client can't spam the qemu-nbd log (if
+> any). None the less it is also useful to have the iotests validate
+> that this log message is printed.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Thus, the idea for future patches is to:
+- teach qemu-nbd to be silent on client disconnects by default to avoid
+a malicious client performing DoS by excessive logging,
+- teach iotests to run qemu-nbd with -v to double-check what server
+logs, as verbose server logs are quite handy when debugging why a
+particular client can't connect
 
--- PMM
+Now that the issue is public, is this something I should report to
+secalert, or is it not at the level of a CVE?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--aEhI6DyYNtAF1ssnuEtZZHLNYiAz0gVc0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxB90MACgkQp6FrSiUn
+Q2rzpwgAqOi13RIQM+dqLafOWmnX8qO9oSnhHgD9Pe7VJS1wLK/q8S8TMrxMBd5o
+wwykvjiSvGTFXxEd6f43vPyNFDX7Hwnr4gwSq9CW0Yw1Kp0K6QKAfi5yIw41gFyE
+FnLxoOz0aMi5OltETRXq/7+Y/q+KPGai3YPIRlW+59J74UK1r9cZepZe/3rZ/MUJ
+Ir1+WAnijbXdZJXS6qcntPXPLcLLp2bsaY74KzQ4YzSWAOhjP0VodNsxwMBkl7GI
+ZjWl59gL/n6HpowAKqLf9vE2NvxCVZmkwAn8HI59F17RejPu/JyHKK6N0HmXVkr0
+VMreFG8te2qHyQd4RNTKgKnKQwZrfg==
+=f+Y7
+-----END PGP SIGNATURE-----
+
+--aEhI6DyYNtAF1ssnuEtZZHLNYiAz0gVc0--
