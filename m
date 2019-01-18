@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49720)
+Received: from eggs.gnu.org ([209.51.188.92]:50811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gkXcN-00025i-SS
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:07:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXeL-0004J0-F1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gkXcN-0004vB-6P
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:07:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gkXcM-0004oG-Rf
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:07:43 -0500
-References: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
-	<1547576349-13337-6-git-send-email-pbonzini@redhat.com>
-	<a4424580-d38d-492f-e996-f58a58485e81@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a7fe850-78af-8458-71cd-038a4fd71723@redhat.com>
-Date: Fri, 18 Jan 2019 18:07:21 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXeK-0007XI-9D
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:09:45 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34169)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkXeJ-0006yS-Gy
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:09:44 -0500
+Received: by mail-oi1-x244.google.com with SMTP id r62so9541431oie.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:09:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a4424580-d38d-492f-e996-f58a58485e81@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] tests: qgraph API for the qtest driver
- framework
+References: <20181024201303.114-1-likan_999.student@sina.com>
+	<0ad53de4-6910-240a-4732-82bf2dc94aec@vivier.eu>
+In-Reply-To: <0ad53de4-6910-240a-4732-82bf2dc94aec@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 17:09:15 +0000
+Message-ID: <CAFEAcA-UT_y=7B_155DFaMLByN4kDtQN0fFXPMp82XTT0WwEqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] Fix linux-user crashes in
+ ioctl(SIOCGIFCONF) when ifc_buf is NULL.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Kan Li <likan_999.student@sina.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On 18/01/19 17:39, Thomas Huth wrote:
-> [...]
+On Wed, 24 Oct 2018 at 22:05, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> On 24/10/2018 21:13, Kan Li wrote:
+> > Summary:
+> > This is to fix bug https://bugs.launchpad.net/qemu/+bug/1796754.
+> > It is valid for ifc_buf to be NULL according to
+> > http://man7.org/linux/man-pages/man7/netdevice.7.html.
+> >
+> > Signed-off-by: Kan Li <likan_999.student@sina.com>
+> > ---
+> >  linux-user/syscall.c | 55 ++++++++++++++++++++++++++++------------------------
+> >  1 file changed, 30 insertions(+), 25 deletions(-)
+> >
+>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-Sounds all good.  I'll make all the changes and send you a pull request
-for all of qgraph.
+Hi Laurent -- did this patch get lost? It doesn't seem to have
+made it into master.
 
-Thanks,
-
-Paolo
+thanks
+-- PMM
