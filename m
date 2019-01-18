@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57776)
+Received: from eggs.gnu.org ([209.51.188.92]:58130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUpR-0007pU-Od
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:02 -0500
+	(envelope-from <mark.mielke@gmail.com>) id 1gkUqB-0008UO-GT
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUpP-0003dm-81
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:01 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 14:08:45 +0000
-Message-ID: <38115456-3a5e-4a5f-d836-fab3aa666114@virtuozzo.com>
-References: <20190117153321.29749-1-eblake@redhat.com>
-	<20190117153321.29749-3-eblake@redhat.com>
-In-Reply-To: <20190117153321.29749-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C001AAC24CA63E478BD9562989D1E4E8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mark.mielke@gmail.com>) id 1gkUq8-0005Et-H4
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:47 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mark.mielke@gmail.com>)
+	id 1gkUq8-0005A4-3I
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:44 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t27so15220897wra.6
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:09:44 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/3] file: Expose some protocol-specific
- information
+References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
+	<20190118100159.GA2483@work-vm>
+	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
+	<20190118101633.GC2146@work-vm> <20190118102102.GH20660@redhat.com>
+	<328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
+	<20190118134451.GM20660@redhat.com>
+In-Reply-To: <20190118134451.GM20660@redhat.com>
+From: Mark Mielke <mark.mielke@gmail.com>
+Date: Fri, 18 Jan 2019 09:09:31 -0500
+Message-ID: <CALm7yL2g6a=3P_9ujmi_CbKXp8pisWfH1cD8hHMBhc7hf1aqUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
+ hosts, with VMX flag enabled in the guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +35,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:raw" <qemu-block@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
 
-MTcuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2hlbiBhbmFseXppbmcgcGVy
-Zm9ybWFuY2UsIGl0IG1pZ2h0IGJlIG5pY2UgdG8gbGV0ICdxZW11LWltZyBpbmZvJw0KPiBleHBv
-c2UgZGV0YWlscyB0aGF0IGl0IGxlYXJuZWQgZnJvbSB0aGUgdW5kZXJseWluZyBmaWxlIG9yIGJs
-b2NrDQo+IGRldmljZS4gIFN0YXJ0IHRoZSBwcm9jZXNzIGJ5IHBpY2tpbmcgYSBmZXcgdXNlZnVs
-IGl0ZW1zIGRldGVybWluZWQNCj4gZHVyaW5nIHJhd19vcGVuX2NvbW1vbigpLg0KPiANCj4gU2ln
-bmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIHFh
-cGkvYmxvY2stY29yZS5qc29uIHwgMjQgKysrKysrKysrKysrKysrKysrKysrKystDQo+ICAgYmxv
-Y2svZmlsZS1wb3NpeC5jICAgfCAyMSArKysrKysrKysrKysrKysrKysrKysNCj4gICAyIGZpbGVz
-IGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1n
-aXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IGluZGV4
-IGYyOGQ1ZjVmYzc2Li4yOTZjMjJhMTAwMyAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3Jl
-Lmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTEwMSw2ICsxMDEsMjUg
-QEANCj4gICAgICAgICAnZXh0ZW50cyc6IFsnSW1hZ2VJbmZvJ10NCj4gICAgIH0gfQ0KPiANCj4g
-KyMjDQo+ICsjIEBJbWFnZUluZm9TcGVjaWZpY0ZpbGU6DQo+ICsjDQo+ICsjIERldGFpbHMgYWJv
-dXQgYSBmaWxlIHByb3RvY29sIEJEUy4NCj4gKyMNCj4gKyMgQGFsaWduOiBBbGlnbm1lbnQgaW4g
-dXNlDQo+ICsjDQo+ICsjIEBkaXNjYXJkOiBUcnVlIGlmIGRpc2NhcmQgb3BlcmF0aW9ucyBjYW4g
-YmUgYXR0ZW1wdGVkDQo+ICsjDQo+ICsjIEB3cml0ZS16ZXJvOiBUcnVlIGlmIGVmZmljaWVudCB3
-cml0ZSB6ZXJvIG9wZXJhdGlvbnMgY2FuIGJlIGF0dGVtcHRlZA0KPiArIw0KPiArIyBAZGlzY2Fy
-ZC16ZXJvOiBUcnVlIGlmIGRpc2NhcmRpbmcgaXMga25vd24gdG8gcmVhZCBiYWNrIGFzIHplcm8N
-Cj4gKyMNCj4gKyMgU2luY2U6IDQuMA0KPiArIyMNCj4gK3sgJ3N0cnVjdCc6ICdJbWFnZUluZm9T
-cGVjaWZpY0ZpbGUnLA0KPiArICAnZGF0YSc6IHsgJ2FsaWduJzogJ2ludCcsICdkaXNjYXJkJzog
-J2Jvb2wnLCAnd3JpdGUtemVybyc6ICdib29sJywNCj4gKyAgICAgICAgICAgICcqZGlzY2FyZC16
-ZXJvJzogJ2Jvb2wnIH0gfQ0KDQpOb3Qgc3VyZSBpZiB0aGlzIHdvcmtzLCBhcyBJIHJlbWVtYmVy
-IHJhdy1wb3NpeCB3aWxsIGFkanVzdCB0aGVzZSBmaWVsZHMNCm9uIGZpcnN0IGZhaWxlZCB3cml0
-ZSwgYW5kIHdpdGhvdXQgdGhpcyBmaXJzdCB3cml0ZSwgd2Ugd2lsbCBub3QgYWN0dWFsbHkNCmtu
-b3cgYXJlIHRoZXkgc3VwcG9ydGVkLg0KDQo+ICsNCj4gICAjIw0KPiAgICMgQEltYWdlSW5mb1Nw
-ZWNpZmljOg0KPiAgICMNCj4gQEAgLTExMCwxMiArMTI5LDE1IEBADQo+ICAgIyMNCj4gICB7ICd1
-bmlvbic6ICdJbWFnZUluZm9TcGVjaWZpYycsDQo+ICAgICAnZGF0YSc6IHsNCj4gKyAgICAgICMg
-Rm9ybWF0IGRyaXZlcnM6DQo+ICAgICAgICAgJ3Fjb3cyJzogJ0ltYWdlSW5mb1NwZWNpZmljUUNv
-dzInLA0KPiAgICAgICAgICd2bWRrJzogJ0ltYWdlSW5mb1NwZWNpZmljVm1kaycsDQo+ICAgICAg
-ICAgIyBJZiB3ZSBuZWVkIHRvIGFkZCBibG9jayBkcml2ZXIgc3BlY2lmaWMgcGFyYW1ldGVycyBm
-b3INCj4gICAgICAgICAjIExVS1MgaW4gZnV0dXJlLCB0aGVuIHdlJ2xsIHN1YmNsYXNzIFFDcnlw
-dG9CbG9ja0luZm9MVUtTDQo+ICAgICAgICAgIyB0byBkZWZpbmUgYSBJbWFnZUluZm9TcGVjaWZp
-Y0xVS1MNCj4gLSAgICAgICdsdWtzJzogJ1FDcnlwdG9CbG9ja0luZm9MVUtTJw0KPiArICAgICAg
-J2x1a3MnOiAnUUNyeXB0b0Jsb2NrSW5mb0xVS1MnLA0KPiArICAgICAgIyBQcm90b2NvbCBkcml2
-ZXJzOg0KPiArICAgICAgJ2ZpbGUnOiAnSW1hZ2VJbmZvU3BlY2lmaWNGaWxlJw0KPiAgICAgfSB9
-DQo+IA0KPiAgICMjDQo+IGRpZmYgLS1naXQgYS9ibG9jay9maWxlLXBvc2l4LmMgYi9ibG9jay9m
-aWxlLXBvc2l4LmMNCj4gaW5kZXggOGFlZTdhM2ZiOGIuLmQ0Y2UwZTkxMTZjIDEwMDY0NA0KPiAt
-LS0gYS9ibG9jay9maWxlLXBvc2l4LmMNCj4gKysrIGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+IEBA
-IC0xMDc5LDYgKzEwNzksMjMgQEAgc3RhdGljIHZvaWQgcmF3X3JlZnJlc2hfbGltaXRzKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVycnApDQo+ICAgICAgIGJzLT5ibC5vcHRfbWVtX2Fs
-aWdubWVudCA9IE1BWChzLT5idWZfYWxpZ24sIGdldHBhZ2VzaXplKCkpOw0KPiAgIH0NCj4gDQo+
-ICtzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgKnJhd19nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0Ry
-aXZlclN0YXRlICpicykNCj4gK3sNCj4gKyAgICBCRFJWUmF3U3RhdGUgKnMgPSBicy0+b3BhcXVl
-Ow0KPiArICAgIEltYWdlSW5mb1NwZWNpZmljICppbmZvID0gZ19uZXcwKEltYWdlSW5mb1NwZWNp
-ZmljLCAxKTsNCj4gKyAgICBJbWFnZUluZm9TcGVjaWZpY0ZpbGUgKmluZm9maWxlID0gZ19uZXcw
-KEltYWdlSW5mb1NwZWNpZmljRmlsZSwgMSk7DQo+ICsNCj4gKyAgICBpbmZvLT50eXBlID0gSU1B
-R0VfSU5GT19TUEVDSUZJQ19LSU5EX0ZJTEU7DQo+ICsgICAgaW5mby0+dS5maWxlLmRhdGEgPSBp
-bmZvZmlsZTsNCj4gKyAgICBpbmZvZmlsZS0+YWxpZ24gPSBzLT5idWZfYWxpZ247DQo+ICsgICAg
-aW5mb2ZpbGUtPmRpc2NhcmQgPSBzLT5oYXNfZGlzY2FyZDsNCj4gKyAgICBpbmZvZmlsZS0+d3Jp
-dGVfemVybyA9IHMtPmhhc193cml0ZV96ZXJvZXM7DQo+ICsgICAgaW5mb2ZpbGUtPmhhc19kaXNj
-YXJkX3plcm8gPSBzLT5oYXNfZGlzY2FyZDsNCj4gKyAgICBpbmZvZmlsZS0+ZGlzY2FyZF96ZXJv
-ID0gcy0+ZGlzY2FyZF96ZXJvZXM7DQo+ICsNCj4gKyAgICByZXR1cm4gaW5mbzsNCj4gK30NCj4g
-Kw0KPiAgIHN0YXRpYyBpbnQgY2hlY2tfZm9yX2Rhc2QoaW50IGZkKQ0KPiAgIHsNCj4gICAjaWZk
-ZWYgQklPREFTRElORk8yDQo+IEBAIC0yNzY1LDYgKzI3ODIsNyBAQCBCbG9ja0RyaXZlciBiZHJ2
-X2ZpbGUgPSB7DQo+ICAgICAgIC5iZHJ2X2NvX2NvcHlfcmFuZ2VfZnJvbSA9IHJhd19jb19jb3B5
-X3JhbmdlX2Zyb20sDQo+ICAgICAgIC5iZHJ2X2NvX2NvcHlfcmFuZ2VfdG8gID0gcmF3X2NvX2Nv
-cHlfcmFuZ2VfdG8sDQo+ICAgICAgIC5iZHJ2X3JlZnJlc2hfbGltaXRzID0gcmF3X3JlZnJlc2hf
-bGltaXRzLA0KPiArICAgIC5iZHJ2X2dldF9zcGVjaWZpY19pbmZvID0gcmF3X2dldF9zcGVjaWZp
-Y19pbmZvLA0KPiAgICAgICAuYmRydl9pb19wbHVnID0gcmF3X2Fpb19wbHVnLA0KPiAgICAgICAu
-YmRydl9pb191bnBsdWcgPSByYXdfYWlvX3VucGx1ZywNCj4gICAgICAgLmJkcnZfYXR0YWNoX2Fp
-b19jb250ZXh0ID0gcmF3X2Fpb19hdHRhY2hfYWlvX2NvbnRleHQsDQo+IEBAIC0zMjQwLDYgKzMy
-NTgsNyBAQCBzdGF0aWMgQmxvY2tEcml2ZXIgYmRydl9ob3N0X2RldmljZSA9IHsNCj4gICAgICAg
-LmJkcnZfY29fY29weV9yYW5nZV9mcm9tID0gcmF3X2NvX2NvcHlfcmFuZ2VfZnJvbSwNCj4gICAg
-ICAgLmJkcnZfY29fY29weV9yYW5nZV90byAgPSByYXdfY29fY29weV9yYW5nZV90bywNCj4gICAg
-ICAgLmJkcnZfcmVmcmVzaF9saW1pdHMgPSByYXdfcmVmcmVzaF9saW1pdHMsDQo+ICsgICAgLmJk
-cnZfZ2V0X3NwZWNpZmljX2luZm8gPSByYXdfZ2V0X3NwZWNpZmljX2luZm8sDQo+ICAgICAgIC5i
-ZHJ2X2lvX3BsdWcgPSByYXdfYWlvX3BsdWcsDQo+ICAgICAgIC5iZHJ2X2lvX3VucGx1ZyA9IHJh
-d19haW9fdW5wbHVnLA0KPiAgICAgICAuYmRydl9hdHRhY2hfYWlvX2NvbnRleHQgPSByYXdfYWlv
-X2F0dGFjaF9haW9fY29udGV4dCwNCj4gQEAgLTMzNjMsNiArMzM4Miw3IEBAIHN0YXRpYyBCbG9j
-a0RyaXZlciBiZHJ2X2hvc3RfY2Ryb20gPSB7DQo+ICAgICAgIC5iZHJ2X2NvX3B3cml0ZXYgICAg
-ICAgID0gcmF3X2NvX3B3cml0ZXYsDQo+ICAgICAgIC5iZHJ2X2NvX2ZsdXNoX3RvX2Rpc2sgID0g
-cmF3X2NvX2ZsdXNoX3RvX2Rpc2ssDQo+ICAgICAgIC5iZHJ2X3JlZnJlc2hfbGltaXRzID0gcmF3
-X3JlZnJlc2hfbGltaXRzLA0KPiArICAgIC5iZHJ2X2dldF9zcGVjaWZpY19pbmZvID0gcmF3X2dl
-dF9zcGVjaWZpY19pbmZvLA0KPiAgICAgICAuYmRydl9pb19wbHVnID0gcmF3X2Fpb19wbHVnLA0K
-PiAgICAgICAuYmRydl9pb191bnBsdWcgPSByYXdfYWlvX3VucGx1ZywNCj4gICAgICAgLmJkcnZf
-YXR0YWNoX2Fpb19jb250ZXh0ID0gcmF3X2Fpb19hdHRhY2hfYWlvX2NvbnRleHQsDQo+IEBAIC0z
-NDk0LDYgKzM1MTQsNyBAQCBzdGF0aWMgQmxvY2tEcml2ZXIgYmRydl9ob3N0X2Nkcm9tID0gew0K
-PiAgICAgICAuYmRydl9jb19wd3JpdGV2ICAgICAgICA9IHJhd19jb19wd3JpdGV2LA0KPiAgICAg
-ICAuYmRydl9jb19mbHVzaF90b19kaXNrICA9IHJhd19jb19mbHVzaF90b19kaXNrLA0KPiAgICAg
-ICAuYmRydl9yZWZyZXNoX2xpbWl0cyA9IHJhd19yZWZyZXNoX2xpbWl0cywNCj4gKyAgICAuYmRy
-dl9nZXRfc3BlY2lmaWNfaW5mbyA9IHJhd19nZXRfc3BlY2lmaWNfaW5mbywNCj4gICAgICAgLmJk
-cnZfaW9fcGx1ZyA9IHJhd19haW9fcGx1ZywNCj4gICAgICAgLmJkcnZfaW9fdW5wbHVnID0gcmF3
-X2Fpb191bnBsdWcsDQo+ICAgICAgIC5iZHJ2X2F0dGFjaF9haW9fY29udGV4dCA9IHJhd19haW9f
-YXR0YWNoX2Fpb19jb250ZXh0LA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
-DQo=
+On Fri, Jan 18, 2019 at 8:44 AM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m>
+wrote:
+
+> On Fri, Jan 18, 2019 at 01:57:31PM +0100, Paolo Bonzini wrote:
+> > On 18/01/19 11:21, Daniel P. Berrang=C3=A9 wrote:
+> > > Yes, this is exactly why I said we should make the migration blocker
+> > > be conditional on any L2 guest having been started. I vaguely recall
+> > > someone saying there wasn't any way to detect this situation from
+> > > QEMU though ?
+> > You can check that and give a warning (check that CR4.VMXE=3D1 but no
+> > other live migration state was transferred).  However, without live
+> > migration support in the kernel and in QEMU you cannot start VMs *for
+> > the entire future life of the VM* after a live migration.  So even if w=
+e
+> > implemented that kind of blocker, it would fail even if no VM has been
+> > started, as long as the kvm_intel module is loaded on migration.  That
+> > would be no different in practice from what we have now.
+> Ahh, I was mis-understanding that it only applied to L2 VMs that
+> existed at the time the migration is performed. Given that it breaks
+> all future possibility of launching an L2 VM, this strict blocker does
+> make more sense.
+>
+
+To explain my use case more fully:
+
+Right now all guests are on Linux 4.14.79+ hypervisors, with Qemu 2.12.1+.
+
+I understand the value of this feature, and I need to get all the guests to
+Linux 4.19.16+ hypervisors, with Qemu 3.2 (once it is available).
+
+As documented, and as best as I can read from the source code and this
+mailing list, the recommended solution would be for me to upgrade Linux and
+Qemu on existing hypervisors, and then restart the entire environment.
+After it comes up with the new kernel, and the new qemu, everything will be
+"correct".
+
+This model will not be well received by users. We have long running
+operations of all sorts, and restarting them all at the same time is a very
+big problem.
+
+I would like to heal this system over time.
+
+The first stage will include introducing new Linux 4.19.16+ hypervisors,
+and migrating the guests to these machines carefully and opportunistically.
+Carefully means that machines that will use L2 guests will need to be
+restarted in discussion with the users(or their hypervisors avoided from
+this exercise), but most (80%+) of machines that will never launch an L2
+guest can migrate live with low risk (at least according to our experience
+to date). This will allow existing hypervisors to be freed up so that they
+too can be upgraded to Linux 4.19.16+.
+
+The second stage will include upgrading to Qemu 3.2 once it is available
+and demonstrated to be stable for our use cases. However, I will need to be
+able to live migrate most (80%+) systems from Qemu 2.12.1+ to Qemu 3.2. We
+would again handle the machines with L2 guests with care.
+
+If Qemu 3.2 will be ready sooner (weeks?), I would wait before migration,
+and combine the above two steps such the new hypervisors would have both
+Linux 4.19.16+ and Qemu 3.2. But, if Qemu 3.2 is months away, I would keep
+it as two steps.
+
+A large number of systems would be shut down and replaced as part of normal
+processes, which would automatically heal these.
+
+The long running machines would not be healed, but they would be no worse
+than they are today.
+
+To achieve this, I need a path to live migrate from Qemu 2.12.1+ with VMX
+bit set in the guest, to Qemu 3.2. Further complicating things is that we
+are using OpenStack, so options for tweaking flags on a case by case basis
+would be limited or non-existent.
+
+I'm totally fine with the understanding that any machine not restarted is
+still broken under Qemu 3.2, just as it was broken under Qemu 2.12. New
+machines will be correct, and the broken machines can be fixed
+opportunistically and in discussion with the users.
+
+And, we don't need a system-wide restart of the whole cluster to deploy
+Qemu 3.2.
+
+--=20
+Mark Mielke <mark.mielke@gmail.com>
