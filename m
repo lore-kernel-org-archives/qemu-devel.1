@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55891)
+Received: from eggs.gnu.org ([209.51.188.92]:55905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbk8-0004vC-Ox
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:02 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbkE-000530-Sb
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbk7-0004Nr-E7
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:00 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42952)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbkC-0004TA-Qw
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:06 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34618)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbk7-0004MC-5d
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:59 -0500
-Received: by mail-pl1-x643.google.com with SMTP id y1so6880156plp.9
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:31:59 -0800 (PST)
+	id 1gkbkC-0004SU-Ir
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:04 -0500
+Received: by mail-pf1-x441.google.com with SMTP id h3so7218223pfg.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:04 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:30:46 +1100
-Message-Id: <20190118213122.22865-13-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:30:48 +1100
+Message-Id: <20190118213122.22865-15-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 13/49] linux-user: Split out
- name_to_handle_at, open_by_handle_at
+Subject: [Qemu-devel] [PATCH v6 15/49] linux-user: Split out memory syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,341 +29,530 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets have these syscalls, so they need not be ifdefed.
-If we provide safe syscalls for the host, we can remove the
-configure test for this too.
+This includes mmap, mmap2, munmap, mlock, mlockall, munlock,
+munlockall, mprotect, mremap, msync.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |   3 +
- linux-user/syscall.h          |   1 +
- linux-user/strace.c           |   5 +-
- linux-user/syscall-file.inc.c |  81 +++++++++++++++++++++++++++
- linux-user/syscall.c          | 102 ++--------------------------------
- configure                     |  20 -------
- linux-user/strace.list        |   3 -
- 7 files changed, 93 insertions(+), 122 deletions(-)
+ linux-user/syscall-defs.h    |  24 ++++++
+ linux-user/syscall.h         |   2 +
+ linux-user/strace.c          |  55 ++-----------
+ linux-user/syscall-mem.inc.c | 154 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c         | 119 +--------------------------
+ linux-user/strace.list       |  33 --------
+ 6 files changed, 189 insertions(+), 198 deletions(-)
+ create mode 100644 linux-user/syscall-mem.inc.c
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index ae89be0e87..1fc89c1b08 100644
+index 6d6349da01..88f433e998 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -17,10 +17,13 @@
-  */
- 
- SYSCALL_DEF(close, ARG_DEC);
-+SYSCALL_DEF(name_to_handle_at,
-+            ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
- #ifdef TARGET_NR_open
- SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+@@ -20,6 +20,26 @@ SYSCALL_DEF(close, ARG_DEC);
+ #ifdef TARGET_NR_ipc
+ SYSCALL_DEF_ARGS(ipc, ARG_HEX, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR, ARG_HEX);
  #endif
- SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-+SYSCALL_DEF(open_by_handle_at, ARG_DEC, ARG_PTR, ARG_OPENFLAG);
- SYSCALL_DEF_FULL(pread64, .impl = impl_pread64,
-                  .args = args_pread64_pwrite64,
-                  .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 });
++SYSCALL_DEF(mlock, ARG_PTR, ARG_DEC);
++SYSCALL_DEF(mlockall, ARG_HEX);
++#ifdef TARGET_NR_mmap
++SYSCALL_DEF_FULL(mmap, .impl = impl_mmap,
++                 .args = args_mmap,
++                 .print_ret = print_syscall_ptr_ret,
++                 .arg_type = { ARG_PTR, ARG_DEC, ARG_MMAPPROT,
++                               ARG_MMAPFLAG, ARG_DEC, ARG_DEC });
++#endif
++#ifdef TARGET_NR_mmap2
++SYSCALL_DEF_FULL(mmap2, .impl = impl_mmap,
++                 .args = args_mmap2,
++                 .print_ret = print_syscall_ptr_ret,
++                 .arg_type = { ARG_PTR, ARG_DEC, ARG_MMAPPROT,
++                               ARG_MMAPFLAG, ARG_DEC, ARG_DEC64 });
++#endif
++SYSCALL_DEF(mprotect, ARG_PTR, ARG_DEC, ARG_MMAPPROT);
++SYSCALL_DEF_FULL(mremap, .impl = impl_mremap,
++                 .print_ret = print_syscall_ptr_ret,
++                 .arg_type = { ARG_PTR, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR });
+ #if !defined(SYSCALL_TABLE) || defined(TARGET_NR_msgctl)
+ SYSCALL_DEF(msgctl, ARG_DEC, ARG_DEC, ARG_PTR);
+ #endif
+@@ -32,6 +52,10 @@ SYSCALL_DEF(msgrcv, ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC, ARG_HEX);
+ #if !defined(SYSCALL_TABLE) || defined(TARGET_NR_msgsnd)
+ SYSCALL_DEF(msgsnd, ARG_DEC, ARG_PTR, ARG_DEC, ARG_HEX);
+ #endif
++SYSCALL_DEF(msync, ARG_PTR, ARG_DEC, ARG_HEX);
++SYSCALL_DEF(munlock, ARG_PTR, ARG_DEC);
++SYSCALL_DEF(munlockall);
++SYSCALL_DEF(munmap, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(name_to_handle_at,
+             ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
+ #ifdef TARGET_NR_open
 diff --git a/linux-user/syscall.h b/linux-user/syscall.h
-index 43b5dc0684..83f602f8e7 100644
+index 83f602f8e7..8175de4c31 100644
 --- a/linux-user/syscall.h
 +++ b/linux-user/syscall.h
-@@ -57,6 +57,7 @@ typedef enum {
- 
+@@ -58,6 +58,8 @@ typedef enum {
      /* These print as sets of flags.  */
      ARG_ATDIRFD,
-+    ARG_ATFLAG,
+     ARG_ATFLAG,
++    ARG_MMAPFLAG,
++    ARG_MMAPPROT,
      ARG_MODEFLAG,
      ARG_OPENFLAG,
  
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 4faeb8c031..ed311b081b 100644
+index 3233230527..5619defec8 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -780,7 +780,7 @@ UNUSED static struct flags access_flags[] = {
+@@ -801,7 +801,7 @@ UNUSED static struct flags umount2_flags[] = {
      FLAG_END,
  };
  
--UNUSED static struct flags at_file_flags[] = {
-+static struct flags const at_file_flags[] = {
- #ifdef AT_EACCESS
-     FLAG_GENERIC(AT_EACCESS),
+-UNUSED static struct flags mmap_prot_flags[] = {
++static struct flags const mmap_prot_flags[] = {
+     FLAG_GENERIC(PROT_NONE),
+     FLAG_GENERIC(PROT_EXEC),
+     FLAG_GENERIC(PROT_READ),
+@@ -812,7 +812,7 @@ UNUSED static struct flags mmap_prot_flags[] = {
+     FLAG_END,
+ };
+ 
+-UNUSED static struct flags mmap_flags[] = {
++static struct flags const mmap_flags[] = {
+     FLAG_TARGET(MAP_SHARED),
+     FLAG_TARGET(MAP_PRIVATE),
+     FLAG_TARGET(MAP_ANONYMOUS),
+@@ -2350,51 +2350,6 @@ print_utimensat(const struct syscallname *name,
+ }
  #endif
-@@ -2681,6 +2681,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
-         case ARG_ATDIRFD:
-             len = add_atdirfd(b, rest, arg);
+ 
+-#if defined(TARGET_NR_mmap) || defined(TARGET_NR_mmap2)
+-static void
+-print_mmap(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_pointer(arg0, 0);
+-    print_raw_param("%d", arg1, 0);
+-    print_flags(mmap_prot_flags, arg2, 0);
+-    print_flags(mmap_flags, arg3, 0);
+-    print_raw_param("%d", arg4, 0);
+-    print_raw_param("%#x", arg5, 1);
+-    print_syscall_epilogue(name);
+-}
+-#define print_mmap2     print_mmap
+-#endif
+-
+-#ifdef TARGET_NR_mprotect
+-static void
+-print_mprotect(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_pointer(arg0, 0);
+-    print_raw_param("%d", arg1, 0);
+-    print_flags(mmap_prot_flags, arg2, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+-#ifdef TARGET_NR_munmap
+-static void
+-print_munmap(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_pointer(arg0, 0);
+-    print_raw_param("%d", arg1, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_futex
+ static void print_futex_op(abi_long tflag, int last)
+ {
+@@ -2601,6 +2556,12 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
+         case ARG_ATFLAG:
+             len = add_flags(b, rest, at_file_flags, arg, false);
              break;
-+        case ARG_ATFLAG:
-+            len = add_flags(b, rest, at_file_flags, arg, false);
++        case ARG_MMAPFLAG:
++            len = add_flags(b, rest, mmap_flags, arg, false);
++            break;
++        case ARG_MMAPPROT:
++            len = add_flags(b, rest, mmap_prot_flags, arg, false);
 +            break;
          case ARG_MODEFLAG:
              len = add_flags(b, rest, mode_flags, arg, true);
              break;
-diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 63401684c3..81423cfd64 100644
---- a/linux-user/syscall-file.inc.c
-+++ b/linux-user/syscall-file.inc.c
-@@ -317,6 +317,87 @@ SYSCALL_IMPL(openat)
-     return do_openat(cpu_env, arg1, arg2, arg3, arg4);
- }
- 
-+SYSCALL_IMPL(name_to_handle_at)
-+{
-+    struct file_handle *target_fh;
-+    struct file_handle *fh;
-+    int mid = 0;
-+    abi_long ret;
-+    char *name;
-+    uint32_t size, total_size;
+diff --git a/linux-user/syscall-mem.inc.c b/linux-user/syscall-mem.inc.c
+new file mode 100644
+index 0000000000..d2ce0cb8cc
+--- /dev/null
++++ b/linux-user/syscall-mem.inc.c
+@@ -0,0 +1,154 @@
++/*
++ *  Linux memory-related syscalls
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+    if (get_user_s32(size, arg3)) {
-+        return -TARGET_EFAULT;
-+    }
-+    total_size = sizeof(struct file_handle) + size;
-+    target_fh = lock_user(VERIFY_WRITE, arg3, total_size, 0);
-+    if (!target_fh) {
-+        return -TARGET_EFAULT;
-+    }
 +
-+    name = lock_user_string(arg2);
-+    if (!name) {
-+        unlock_user(target_fh, arg3, 0);
-+        return -TARGET_EFAULT;
-+    }
-+
-+    fh = g_malloc0(total_size);
-+    fh->handle_bytes = size;
-+
-+    ret = get_errno(safe_name_to_handle_at(arg1, path(name), fh, &mid, arg5));
-+    unlock_user(name, arg2, 0);
-+
++static bitmask_transtbl const mmap_flags_tbl[] = {
++    { TARGET_MAP_SHARED, TARGET_MAP_SHARED, MAP_SHARED, MAP_SHARED },
++    { TARGET_MAP_PRIVATE, TARGET_MAP_PRIVATE, MAP_PRIVATE, MAP_PRIVATE },
++    { TARGET_MAP_FIXED, TARGET_MAP_FIXED, MAP_FIXED, MAP_FIXED },
++    { TARGET_MAP_ANONYMOUS, TARGET_MAP_ANONYMOUS,
++      MAP_ANONYMOUS, MAP_ANONYMOUS },
++    { TARGET_MAP_GROWSDOWN, TARGET_MAP_GROWSDOWN,
++      MAP_GROWSDOWN, MAP_GROWSDOWN },
++    { TARGET_MAP_DENYWRITE, TARGET_MAP_DENYWRITE,
++      MAP_DENYWRITE, MAP_DENYWRITE },
++    { TARGET_MAP_EXECUTABLE, TARGET_MAP_EXECUTABLE,
++      MAP_EXECUTABLE, MAP_EXECUTABLE },
++    { TARGET_MAP_LOCKED, TARGET_MAP_LOCKED, MAP_LOCKED, MAP_LOCKED },
++    { TARGET_MAP_NORESERVE, TARGET_MAP_NORESERVE,
++      MAP_NORESERVE, MAP_NORESERVE },
++    { TARGET_MAP_HUGETLB, TARGET_MAP_HUGETLB, MAP_HUGETLB, MAP_HUGETLB },
 +    /*
-+     * man name_to_handle_at(2):
-+     * Other than the use of the handle_bytes field, the caller should treat
-+     * the file_handle structure as an opaque data type
++     * MAP_STACK had been ignored by the kernel for quite some time.
++     * Recognize it for the target insofar as we do not want to pass
++     * it through to the host.
 +     */
-+    if (!is_error(ret)) {
-+        memcpy(target_fh, fh, total_size);
-+        target_fh->handle_bytes = tswap32(fh->handle_bytes);
-+        target_fh->handle_type = tswap32(fh->handle_type);
-+        g_free(fh);
-+        unlock_user(target_fh, arg3, total_size);
++    { TARGET_MAP_STACK, TARGET_MAP_STACK, 0, 0 },
++    { 0, 0, 0, 0 }
++};
 +
-+        if (put_user_s32(mid, arg4)) {
-+            return -TARGET_EFAULT;
-+        }
-+    }
-+    return ret;
-+}
 +
-+SYSCALL_IMPL(open_by_handle_at)
++SYSCALL_IMPL(mlock)
 +{
-+    abi_long mount_fd = arg1;
-+    abi_long handle = arg2;
-+    int host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
-+    struct file_handle *target_fh;
-+    struct file_handle *fh;
-+    unsigned int size, total_size;
-+    abi_long ret;
-+
-+    if (get_user_s32(size, handle)) {
-+        return -TARGET_EFAULT;
-+    }
-+    total_size = sizeof(struct file_handle) + size;
-+    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
-+    if (!target_fh) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    fh = g_memdup(target_fh, total_size);
-+    fh->handle_bytes = size;
-+    fh->handle_type = tswap32(target_fh->handle_type);
-+
-+    ret = get_errno(safe_open_by_handle_at(mount_fd, fh, host_flags));
-+
-+    g_free(fh);
-+    unlock_user(target_fh, handle, total_size);
-+
-+    fd_trans_unregister(ret);
-+    return ret;
++    return get_errno(mlock(g2h(arg1), arg2));
 +}
 +
- /*
-  * Both pread64 and pwrite64 merge args into a 64-bit offset,
-  * but the input registers and ordering are target specific.
++SYSCALL_IMPL(mlockall)
++{
++    int host_flag = 0;
++    if (arg1 & TARGET_MLOCKALL_MCL_CURRENT) {
++        host_flag |= MCL_CURRENT;
++    }
++    if (arg1 & TARGET_MLOCKALL_MCL_FUTURE) {
++        host_flag |= MCL_FUTURE;
++    }
++    return get_errno(mlockall(host_flag));
++}
++
++#if (defined(TARGET_I386) && defined(TARGET_ABI32)) || \
++    (defined(TARGET_ARM) && defined(TARGET_ABI32)) || \
++    defined(TARGET_M68K) || defined(TARGET_CRIS) || \
++    defined(TARGET_MICROBLAZE) || defined(TARGET_S390X)
++SYSCALL_ARGS(mmap)
++{
++    abi_ulong ptr = in[0];
++    abi_long *v = lock_user(VERIFY_READ, ptr, 6 * sizeof(abi_long), 1);
++    if (v == NULL) {
++        errno = EFAULT;
++        return NULL;
++    }
++    out[0] = tswapal(v[0]);
++    out[1] = tswapal(v[1]);
++    out[2] = tswapal(v[2]);
++    out[3] = tswapal(v[3]);
++    out[4] = tswapal(v[4]);
++    out[5] = tswapal(v[5]);
++    unlock_user(v, ptr, 0);
++    return def;
++}
++#else
++# define args_mmap NULL
++#endif
++
++SYSCALL_IMPL(mmap)
++{
++    int host_flags = target_to_host_bitmask(arg4, mmap_flags_tbl);
++    return get_errno(target_mmap(arg1, arg2, arg3, host_flags, arg5, arg6));
++}
++
++#ifdef TARGET_NR_mmap2
++/*
++ * Define mmap2 in terms of mmap.
++ * !!! Note that there is a fundamental problem here in that
++ * target_mmap has an offset parameter that is abi_ulong
++ * and not off_t.  This means that we cannot actually pass
++ * through a 64-bit file offset as intended.
++ */
++
++#ifndef MMAP_SHIFT
++# define MMAP_SHIFT 12
++#endif
++
++SYSCALL_ARGS(mmap2)
++{
++    /* We have already assigned out[0-4].  */
++    out[5] = (uint64_t)(abi_ulong)in[5] << MMAP_SHIFT;
++    return def;
++}
++#endif
++
++SYSCALL_IMPL(mprotect)
++{
++    CPUState *cpu = ENV_GET_CPU(cpu_env);
++    TaskState *ts = cpu->opaque;
++
++    /* Special hack to detect libc making the stack executable.  */
++    if ((arg3 & PROT_GROWSDOWN)
++        && arg1 >= ts->info->stack_limit
++        && arg1 <= ts->info->start_stack) {
++        arg3 &= ~PROT_GROWSDOWN;
++        arg2 = arg2 + arg1 - ts->info->stack_limit;
++        arg1 = ts->info->stack_limit;
++    }
++    return get_errno(target_mprotect(arg1, arg2, arg3));
++}
++
++SYSCALL_IMPL(mremap)
++{
++    return get_errno(target_mremap(arg1, arg2, arg3, arg4, arg5));
++}
++
++SYSCALL_IMPL(msync)
++{
++    return get_errno(msync(g2h(arg1), arg2, arg3));
++}
++
++SYSCALL_IMPL(munlock)
++{
++    return get_errno(munlock(g2h(arg1), arg2));
++}
++
++SYSCALL_IMPL(munlockall)
++{
++    return get_errno(munlockall());
++}
++
++SYSCALL_IMPL(munmap)
++{
++    return get_errno(target_munmap(arg1, arg2));
++}
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9606f15a09..18dea32b60 100644
+index ad5ccbefdb..142654a0a0 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -816,6 +816,10 @@ safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
- safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
-               size_t, len, unsigned *, prio, const struct timespec *, timeout)
- #endif
-+safe_syscall5(int, name_to_handle_at, int, dirfd, const char *, pathname,
-+              struct file_handle *, handle, int *, mount_id, int, flags)
-+safe_syscall3(int, open_by_handle_at, int, mount_fd,
-+              struct file_handle *, handle, int, flags)
- /* We do ioctl like this rather than via safe_syscall3 to preserve the
-  * "third argument might be integer or pointer or not present" behaviour of
-  * the libc function.
-@@ -6423,93 +6427,6 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
-         return -TARGET_ENOSYS;
-     }
+@@ -4130,29 +4130,6 @@ static const StructEntry struct_termios_def = {
+     .align = { __alignof__(struct target_termios), __alignof__(struct host_termios) },
+ };
+ 
+-static bitmask_transtbl mmap_flags_tbl[] = {
+-    { TARGET_MAP_SHARED, TARGET_MAP_SHARED, MAP_SHARED, MAP_SHARED },
+-    { TARGET_MAP_PRIVATE, TARGET_MAP_PRIVATE, MAP_PRIVATE, MAP_PRIVATE },
+-    { TARGET_MAP_FIXED, TARGET_MAP_FIXED, MAP_FIXED, MAP_FIXED },
+-    { TARGET_MAP_ANONYMOUS, TARGET_MAP_ANONYMOUS,
+-      MAP_ANONYMOUS, MAP_ANONYMOUS },
+-    { TARGET_MAP_GROWSDOWN, TARGET_MAP_GROWSDOWN,
+-      MAP_GROWSDOWN, MAP_GROWSDOWN },
+-    { TARGET_MAP_DENYWRITE, TARGET_MAP_DENYWRITE,
+-      MAP_DENYWRITE, MAP_DENYWRITE },
+-    { TARGET_MAP_EXECUTABLE, TARGET_MAP_EXECUTABLE,
+-      MAP_EXECUTABLE, MAP_EXECUTABLE },
+-    { TARGET_MAP_LOCKED, TARGET_MAP_LOCKED, MAP_LOCKED, MAP_LOCKED },
+-    { TARGET_MAP_NORESERVE, TARGET_MAP_NORESERVE,
+-      MAP_NORESERVE, MAP_NORESERVE },
+-    { TARGET_MAP_HUGETLB, TARGET_MAP_HUGETLB, MAP_HUGETLB, MAP_HUGETLB },
+-    /* MAP_STACK had been ignored by the kernel for quite some time.
+-       Recognize it for the target insofar as we do not want to pass
+-       it through to the host.  */
+-    { TARGET_MAP_STACK, TARGET_MAP_STACK, 0, 0 },
+-    { 0, 0, 0, 0 }
+-};
+-
+ #if defined(TARGET_I386)
+ 
+ /* NOTE: there is really one LDT for all the threads */
+@@ -5373,21 +5350,6 @@ static inline abi_long target_to_host_sigevent(struct sigevent *host_sevp,
+     return 0;
  }
--#if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
--                                     abi_long handle, abi_long mount_id,
--                                     abi_long flags)
+ 
+-#if defined(TARGET_NR_mlockall)
+-static inline int target_to_host_mlockall_arg(int arg)
 -{
--    struct file_handle *target_fh;
--    struct file_handle *fh;
--    int mid = 0;
--    abi_long ret;
--    char *name;
--    unsigned int size, total_size;
+-    int result = 0;
 -
--    if (get_user_s32(size, handle)) {
--        return -TARGET_EFAULT;
+-    if (arg & TARGET_MLOCKALL_MCL_CURRENT) {
+-        result |= MCL_CURRENT;
 -    }
--
--    name = lock_user_string(pathname);
--    if (!name) {
--        return -TARGET_EFAULT;
+-    if (arg & TARGET_MLOCKALL_MCL_FUTURE) {
+-        result |= MCL_FUTURE;
 -    }
--
--    total_size = sizeof(struct file_handle) + size;
--    target_fh = lock_user(VERIFY_WRITE, handle, total_size, 0);
--    if (!target_fh) {
--        unlock_user(name, pathname, 0);
--        return -TARGET_EFAULT;
--    }
--
--    fh = g_malloc0(total_size);
--    fh->handle_bytes = size;
--
--    ret = get_errno(name_to_handle_at(dirfd, path(name), fh, &mid, flags));
--    unlock_user(name, pathname, 0);
--
--    /* man name_to_handle_at(2):
--     * Other than the use of the handle_bytes field, the caller should treat
--     * the file_handle structure as an opaque data type
--     */
--
--    memcpy(target_fh, fh, total_size);
--    target_fh->handle_bytes = tswap32(fh->handle_bytes);
--    target_fh->handle_type = tswap32(fh->handle_type);
--    g_free(fh);
--    unlock_user(target_fh, handle, total_size);
--
--    if (put_user_s32(mid, mount_id)) {
--        return -TARGET_EFAULT;
--    }
--
--    return ret;
--
+-    return result;
 -}
 -#endif
 -
--#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--static abi_long do_open_by_handle_at(abi_long mount_fd, abi_long handle,
--                                     abi_long flags)
--{
--    struct file_handle *target_fh;
--    struct file_handle *fh;
--    unsigned int size, total_size;
--    abi_long ret;
--
--    if (get_user_s32(size, handle)) {
--        return -TARGET_EFAULT;
--    }
--
--    total_size = sizeof(struct file_handle) + size;
--    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
--    if (!target_fh) {
--        return -TARGET_EFAULT;
--    }
--
--    fh = g_memdup(target_fh, total_size);
--    fh->handle_bytes = size;
--    fh->handle_type = tswap32(target_fh->handle_type);
--
--    ret = get_errno(open_by_handle_at(mount_fd, fh,
--                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
--
--    g_free(fh);
--
--    unlock_user(target_fh, handle, total_size);
--
--    return ret;
--}
--#endif
- 
- #if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
- 
-@@ -6705,17 +6622,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         preexit_cleanup(cpu_env, arg1);
-         _exit(arg1);
-         return 0; /* avoid warning */
--#if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--    case TARGET_NR_name_to_handle_at:
--        ret = do_name_to_handle_at(arg1, arg2, arg3, arg4, arg5);
--        return ret;
--#endif
--#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--    case TARGET_NR_open_by_handle_at:
--        ret = do_open_by_handle_at(arg1, arg2, arg3);
--        fd_trans_unregister(ret);
--        return ret;
--#endif
-     case TARGET_NR_brk:
-         return do_brk(arg1);
- #ifdef TARGET_NR_fork
-diff --git a/configure b/configure
-index 3eee3fcf70..1d45056f62 100755
---- a/configure
-+++ b/configure
-@@ -5028,22 +5028,6 @@ if test "$debug_stack_usage" = "yes"; then
- fi
- 
- 
--##########################################
--# check if we have open_by_handle_at
--
--open_by_handle_at=no
--cat > $TMPC << EOF
--#include <fcntl.h>
--#if !defined(AT_EMPTY_PATH)
--# error missing definition
+ #if (defined(TARGET_NR_stat64) || defined(TARGET_NR_lstat64) ||     \
+      defined(TARGET_NR_fstat64) || defined(TARGET_NR_fstatat64) ||  \
+      defined(TARGET_NR_newfstatat))
+@@ -6997,86 +6959,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+            ret = get_errno(reboot(arg1, arg2, arg3, NULL));
+         }
+         return ret;
+-#ifdef TARGET_NR_mmap
+-    case TARGET_NR_mmap:
+-#if (defined(TARGET_I386) && defined(TARGET_ABI32)) || \
+-    (defined(TARGET_ARM) && defined(TARGET_ABI32)) || \
+-    defined(TARGET_M68K) || defined(TARGET_CRIS) || defined(TARGET_MICROBLAZE) \
+-    || defined(TARGET_S390X)
+-        {
+-            abi_ulong *v;
+-            abi_ulong v1, v2, v3, v4, v5, v6;
+-            if (!(v = lock_user(VERIFY_READ, arg1, 6 * sizeof(abi_ulong), 1)))
+-                return -TARGET_EFAULT;
+-            v1 = tswapal(v[0]);
+-            v2 = tswapal(v[1]);
+-            v3 = tswapal(v[2]);
+-            v4 = tswapal(v[3]);
+-            v5 = tswapal(v[4]);
+-            v6 = tswapal(v[5]);
+-            unlock_user(v, arg1, 0);
+-            ret = get_errno(target_mmap(v1, v2, v3,
+-                                        target_to_host_bitmask(v4, mmap_flags_tbl),
+-                                        v5, v6));
+-        }
 -#else
--int main(void) { struct file_handle fh; return open_by_handle_at(0, &fh, 0); }
+-        ret = get_errno(target_mmap(arg1, arg2, arg3,
+-                                    target_to_host_bitmask(arg4, mmap_flags_tbl),
+-                                    arg5,
+-                                    arg6));
 -#endif
--EOF
--if compile_prog "" "" ; then
--    open_by_handle_at=yes
--fi
--
- ########################################
- # check if we have linux/magic.h
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_mmap2
+-    case TARGET_NR_mmap2:
+-#ifndef MMAP_SHIFT
+-#define MMAP_SHIFT 12
+-#endif
+-        ret = target_mmap(arg1, arg2, arg3,
+-                          target_to_host_bitmask(arg4, mmap_flags_tbl),
+-                          arg5, arg6 << MMAP_SHIFT);
+-        return get_errno(ret);
+-#endif
+-    case TARGET_NR_munmap:
+-        return get_errno(target_munmap(arg1, arg2));
+-    case TARGET_NR_mprotect:
+-        {
+-            TaskState *ts = cpu->opaque;
+-            /* Special hack to detect libc making the stack executable.  */
+-            if ((arg3 & PROT_GROWSDOWN)
+-                && arg1 >= ts->info->stack_limit
+-                && arg1 <= ts->info->start_stack) {
+-                arg3 &= ~PROT_GROWSDOWN;
+-                arg2 = arg2 + arg1 - ts->info->stack_limit;
+-                arg1 = ts->info->stack_limit;
+-            }
+-        }
+-        return get_errno(target_mprotect(arg1, arg2, arg3));
+-#ifdef TARGET_NR_mremap
+-    case TARGET_NR_mremap:
+-        return get_errno(target_mremap(arg1, arg2, arg3, arg4, arg5));
+-#endif
+-        /* ??? msync/mlock/munlock are broken for softmmu.  */
+-#ifdef TARGET_NR_msync
+-    case TARGET_NR_msync:
+-        return get_errno(msync(g2h(arg1), arg2, arg3));
+-#endif
+-#ifdef TARGET_NR_mlock
+-    case TARGET_NR_mlock:
+-        return get_errno(mlock(g2h(arg1), arg2));
+-#endif
+-#ifdef TARGET_NR_munlock
+-    case TARGET_NR_munlock:
+-        return get_errno(munlock(g2h(arg1), arg2));
+-#endif
+-#ifdef TARGET_NR_mlockall
+-    case TARGET_NR_mlockall:
+-        return get_errno(mlockall(target_to_host_mlockall_arg(arg1)));
+-#endif
+-#ifdef TARGET_NR_munlockall
+-    case TARGET_NR_munlockall:
+-        return get_errno(munlockall());
+-#endif
+ #ifdef TARGET_NR_truncate
+     case TARGET_NR_truncate:
+         if (!(p = lock_user_string(arg1)))
+@@ -10001,6 +9883,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
  
-@@ -6701,10 +6685,6 @@ if test "$crypto_afalg" = "yes" ; then
-   echo "CONFIG_AF_ALG=y" >> $config_host_mak
- fi
+ #include "syscall-file.inc.c"
+ #include "syscall-ipc.inc.c"
++#include "syscall-mem.inc.c"
  
--if test "$open_by_handle_at" = "yes" ; then
--  echo "CONFIG_OPEN_BY_HANDLE=y" >> $config_host_mak
--fi
--
- if test "$linux_magic_h" = "yes" ; then
-   echo "CONFIG_LINUX_MAGIC_H=y" >> $config_host_mak
- fi
+ #undef SYSCALL_IMPL
+ #undef SYSCALL_ARGS
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 586eb55482..26ad95dc7e 100644
+index 15dc0e9087..d0160f841f 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -635,9 +635,6 @@
- #ifdef TARGET_NR_munmap
- { TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
+@@ -554,21 +554,6 @@
+ #ifdef TARGET_NR_mknodat
+ { TARGET_NR_mknodat, "mknodat" , NULL, print_mknodat, NULL },
  #endif
--#ifdef TARGET_NR_name_to_handle_at
--{ TARGET_NR_name_to_handle_at, "name_to_handle_at" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_mlock
+-{ TARGET_NR_mlock, "mlock" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_mlock2
+-{ TARGET_NR_mlock2, "mlock2" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_mlockall
+-{ TARGET_NR_mlockall, "mlockall" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_mmap
+-{ TARGET_NR_mmap, "mmap" , NULL, print_mmap, print_syscall_ret_addr },
+-#endif
+-#ifdef TARGET_NR_mmap2
+-{ TARGET_NR_mmap2, "mmap2" , NULL, print_mmap2, print_syscall_ret_addr },
+-#endif
+ #ifdef TARGET_NR_modify_ldt
+ { TARGET_NR_modify_ldt, "modify_ldt" , NULL, NULL, NULL },
+ #endif
+@@ -578,9 +563,6 @@
+ #ifdef TARGET_NR_move_pages
+ { TARGET_NR_move_pages, "move_pages" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_mprotect
+-{ TARGET_NR_mprotect, "mprotect" , NULL, print_mprotect, NULL },
+-#endif
+ #ifdef TARGET_NR_mpx
+ { TARGET_NR_mpx, "mpx" , NULL, NULL, NULL },
+ #endif
+@@ -602,24 +584,9 @@
+ #ifdef TARGET_NR_mq_unlink
+ { TARGET_NR_mq_unlink, "mq_unlink" , NULL, print_mq_unlink, NULL },
+ #endif
+-#ifdef TARGET_NR_mremap
+-{ TARGET_NR_mremap, "mremap" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_msync
+-{ TARGET_NR_msync, "msync" , NULL, NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_multiplexer
+ { TARGET_NR_multiplexer, "multiplexer" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_munlock
+-{ TARGET_NR_munlock, "munlock" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_munlockall
+-{ TARGET_NR_munlockall, "munlockall" , NULL, NULL, NULL },
+-#endif
+-#ifdef TARGET_NR_munmap
+-{ TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
 -#endif
  #ifdef TARGET_NR_nanosleep
  { TARGET_NR_nanosleep, "nanosleep" , NULL, NULL, NULL },
