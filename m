@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38633)
+Received: from eggs.gnu.org ([209.51.188.92]:43497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gkLbR-00078a-DF
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:17:58 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gkM8U-0005qh-3d
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gkLNa-0001BW-9t
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:03:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gkLNY-00012e-Ar
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:03:36 -0500
-Date: Thu, 17 Jan 2019 23:03:26 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190117230121-mutt-send-email-mst@kernel.org>
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-5-xieyongji@baidu.com>
-	<ce11d062-1d64-3d35-b617-5c135f1506eb@redhat.com>
-	<CAONzpcY6pdSz65Tzj_Ws0M4vskUOXMuaxQ-uYz6NnCvdMgkFOA@mail.gmail.com>
-	<a6e0c0b2-bd0b-454c-8280-12e0ec964240@redhat.com>
-	<CAONzpcb-TrxZVBtfP=3PCqq-3r1NwX93C4xSd9MsM4DCTZMguA@mail.gmail.com>
-	<ed0dc117-89f6-5fd6-a5f6-91f781a6b09e@redhat.com>
-	<CAONzpcYS7Knf3-uMCjX47KjWJ315SqXWxJKQ9SDNt0P6jP7axw@mail.gmail.com>
-	<de4691ae-e8cb-eaa2-e25f-fb7630a9007b@redhat.com>
+	(envelope-from <aik@ozlabs.ru>) id 1gkM8T-0000gQ-1T
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:52:06 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gkM8S-0000bs-I2
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 23:52:04 -0500
+Received: by mail-pl1-x642.google.com with SMTP id z23so5804875plo.0
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 20:52:03 -0800 (PST)
+References: <20190117210245.18364-1-eric.auger@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <801e1f19-4746-9485-670b-e1b958880f03@ozlabs.ru>
+Date: Fri, 18 Jan 2019 15:51:57 +1100
 MIME-Version: 1.0
+In-Reply-To: <20190117210245.18364-1-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <de4691ae-e8cb-eaa2-e25f-fb7630a9007b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 4/7] libvhost-user: Support
- tracking inflight I/O in shared memory
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/vfio/common: Refactor container
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,90 +30,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Yongji Xie <elohimes@gmail.com>, zhangyu31@baidu.com, Xie Yongji <xieyongji@baidu.com>, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, Yury Kotov <yury-kotov@yandex-team.ru>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, chaiwen@baidu.com, Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, nixun@baidu.com, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>
-
-On Fri, Jan 18, 2019 at 11:59:50AM +0800, Jason Wang wrote:
->=20
-> On 2019/1/18 =E4=B8=8A=E5=8D=8811:32, Yongji Xie wrote:
-> > On Thu, 17 Jan 2019 at 17:57, Jason Wang <jasowang@redhat.com> wrote:
-> > >=20
-> > > On 2019/1/15 =E4=B8=8B=E5=8D=8810:51, Yongji Xie wrote:
-> > > > > Well, this may work but here're my points:
-> > > > >=20
-> > > > > 1) The code want to recover from backed crash by introducing ex=
-tra space
-> > > > > to store inflight data, but it still depends on the backend to =
-set/get
-> > > > > the inflight state
-> > > > >=20
-> > > > > 2) Since the backend could be killed at any time, the backend m=
-ust have
-> > > > > the ability to recover from the partial inflight state
-> > > > >=20
-> > > > > So it looks to me 1) tends to be self-contradictory and 2) tend=
-s to be
-> > > > > recursive. The above lines show how tricky could the code looks=
- like.
-> > > > >=20
-> > > > > Solving this at vhost-user level through at backend is probably=
- wrong.
-> > > > > It's time to consider the support from virtio itself.
-> > > > >=20
-> > > > I agree that supporting this in virtio level may be better. For
-> > > > example, resubmitting inflight I/O once DEVICE_NEEDS_RESET is set=
- in
-> > > > Stefan's proposal. But I still think QEMU should be able to provi=
-de
-> > > > this ability too. Supposed that one vhost-user backend need to su=
-pport
-> > > > multiple VMs. We can't enable reconnect ability until all VMs' gu=
-est
-> > > > driver support the new feature. It's limited.
-> > >=20
-> > > That's the way virtio evolves.
-> > >=20
-> > >=20
-> > > >    But if QEMU have the
-> > > > ability to store inflight buffer, the backend could at least have=
- a
-> > > > chance to support this case.
-> > >=20
-> > > The problem is, you need a careful designed protocol described some=
-where
-> > That's what we should discuss in detail in this series.
->=20
->=20
-> Well, I ask some questions for this patch, but it looks like they were =
-still
-> not answered. No?
->=20
-
-Oh absolutely. I can't say I like the implementation,
-I think it's both not the most robust and suboptimal.
-
-> >=20
-> > > (is vhost-user.txt a good place for this?). And this work will be
-> > > (partial) duplicated for the future support from virtio spec itself=
-.
-> > >=20
-> > I think the duplicated code is to maintain the inflight descriptor
-> > list which should be in backend. That's not main work in this series.
-> > And backend could choose to include it or not.
->=20
->=20
-> You need to have a documentation to describe the protocol. Otherwise, i=
-t
-> would be very hard for other backend to implement.
->=20
-> Thanks
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+Cc: groug@kaod.org
 
 
-Meaning how the inflight descriptors are saved in the buffer.
-Yes I agree.
 
->=20
-> >=20
-> > Thanks,
-> > Yongji
-> >=20
+On 18/01/2019 08:02, Eric Auger wrote:
+> In vfio_connect_container() the code that selects the
+> iommu type can benefit from helpers such as
+> vfio_iommu_get_type() and vfio_init_container(). As
+> a result we end up with a switch/case on the iommu type
+> that makes the code a little bit more readable and ready
+> for addition of new iommu types. Also ioctl's get called
+> once per iommu_type.
+
+
+I'd argue that. This adds 2 more functions to deal with different IOMMU
+types: 75 insertions(+), 37 deletions(-).
+
+
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - handle SPAPR case, s/ret/errno in error error_setg_errno,
+>   fix ret value when vfio_iommu_get_type fails
+> - removed Greg's R-b
+> 
+> v1:
+> - originally submitted in [RFC v2 00/28] vSMMUv3/pSMMUv3
+>   2 stage VFIO integration
+> ---
+>  hw/vfio/common.c | 112 +++++++++++++++++++++++++++++++----------------
+>  1 file changed, 75 insertions(+), 37 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 4262b80c44..33335cee47 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1036,12 +1036,65 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
+>      }
+>  }
+>  
+> +/*
+> + * vfio_iommu_get_type - selects the richest iommu_type (v2 first)
+> + */
+> +static int vfio_iommu_get_type(VFIOContainer *container,
+> +                               Error **errp)
+> +{
+> +    int fd = container->fd;
+> +
+> +    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+> +        return VFIO_TYPE1v2_IOMMU;
+> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU)) {
+> +        return VFIO_TYPE1_IOMMU;
+> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+> +        return VFIO_SPAPR_TCE_v2_IOMMU;
+> +    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU)) {
+> +        return VFIO_SPAPR_TCE_IOMMU;
+> +    } else {
+> +        error_setg(errp, "No available IOMMU models");
+> +        return -EINVAL;
+> +    }
+> +}
+> +
+> +static int vfio_init_container(VFIOContainer *container, int group_fd,
+> +                               int iommu_type, Error **errp)
+> +{
+> +    int ret;
+> +
+> +    ret = ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
+> +    if (ret) {
+> +        error_setg_errno(errp, -ret, "failed to set group container");
+
+
+
+This replaces errno with ret which is not the same thing.
+
+
+> +        return ret;
+> +    }
+> +
+> +    ret = ioctl(container->fd, VFIO_SET_IOMMU, iommu_type);
+> +    if (ret && iommu_type == VFIO_SPAPR_TCE_v2_IOMMU) {
+> +        /*
+> +         * On sPAPR, despite the IOMMU subdriver always advertises v1 and v2,
+> +         * the running platform may not support v2 and there is no way to
+> +         * guess it until an IOMMU group gets added to the container. So in
+> +         * case it fails with v2, try v1 as a fallback
+> +         */
+> +        iommu_type = VFIO_SPAPR_TCE_IOMMU;
+> +        ret = ioctl(container->fd, VFIO_SET_IOMMU, iommu_type);
+> +    }
+> +    if (ret) {
+> +        error_setg_errno(errp, -ret, "failed to set iommu for container");
+> +        return ret;
+> +    }
+> +    container->iommu_type = iommu_type;
+> +    return ret;
+> +}
+> +
+>  static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>                                    Error **errp)
+>  {
+>      VFIOContainer *container;
+>      int ret, fd;
+>      VFIOAddressSpace *space;
+> +    int iommu_type;
+>  
+>      space = vfio_get_address_space(as);
+>  
+> @@ -1101,23 +1154,21 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>      container->fd = fd;
+>      QLIST_INIT(&container->giommu_list);
+>      QLIST_INIT(&container->hostwin_list);
+> -    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+> -        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
+> +
+> +    iommu_type = vfio_iommu_get_type(container, errp);
+> +    if (iommu_type < 0) {
+> +            ret = -EINVAL;
+> +            goto free_container_exit;
+> +    }
+> +
+> +    switch (iommu_type) {
+> +    case VFIO_TYPE1v2_IOMMU:
+> +    case VFIO_TYPE1_IOMMU:
+> +    {
+>          struct vfio_iommu_type1_info info;
+>  
+> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+>          if (ret) {
+> -            error_setg_errno(errp, errno, "failed to set group container");
+> -            ret = -errno;
+> -            goto free_container_exit;
+> -        }
+> -
+> -        container->iommu_type = v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_IOMMU;
+> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+> -        if (ret) {
+> -            error_setg_errno(errp, errno, "failed to set iommu for container");
+> -            ret = -errno;
+>              goto free_container_exit;
+>          }
+>  
+> @@ -1137,31 +1188,21 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>          }
+>          vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+>          container->pgsizes = info.iova_pgsizes;
+> -    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+> -               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+> +        break;
+> +    }
+> +    case VFIO_SPAPR_TCE_v2_IOMMU:
+> +    case VFIO_SPAPR_TCE_IOMMU:
+> +    {
+>          struct vfio_iommu_spapr_tce_info info;
+> -        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU);
+> +        bool v2;
+>  
+> -        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+> +        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+>          if (ret) {
+> -            error_setg_errno(errp, errno, "failed to set group container");
+> -            ret = -errno;
+> -            goto free_container_exit;
+> -        }
+> -        container->iommu_type =
+> -            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+> -        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+> -        if (ret) {
+> -            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
+> -            v2 = false;
+> -            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+> -        }
+> -        if (ret) {
+> -            error_setg_errno(errp, errno, "failed to set iommu for container");
+> -            ret = -errno;
+>              goto free_container_exit;
+>          }
+>  
+> +        v2 = container->iommu_type == VFIO_SPAPR_TCE_v2_IOMMU;
+> +
+>          /*
+>           * The host kernel code implementing VFIO_IOMMU_DISABLE is called
+>           * when container fd is closed so we do not call it explicitly
+> @@ -1222,10 +1263,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>                                info.dma32_window_size - 1,
+>                                0x1000);
+>          }
+> -    } else {
+> -        error_setg(errp, "No available IOMMU models");
+> -        ret = -EINVAL;
+> -        goto free_container_exit;
+> +    }
+>      }
+>  
+>      vfio_kvm_device_add_group(group);
+> 
+
+-- 
+Alexey
