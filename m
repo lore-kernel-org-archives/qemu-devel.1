@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59273)
+Received: from eggs.gnu.org ([209.51.188.92]:59265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gkY3o-0006Ru-JR
+	(envelope-from <bounces@canonical.com>) id 1gkY3o-0006Qh-JA
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gkY3j-0001RT-Tt
+	(envelope-from <bounces@canonical.com>) id 1gkY3l-0001Wt-VG
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:36:04 -0500
-References: <20190118171848.27332-1-alex.bennee@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <84ac5896-e865-9730-2b1d-2dfa6839e0c3@redhat.com>
-Date: Fri, 18 Jan 2019 18:35:52 +0100
+Received: from indium.canonical.com ([91.189.90.7]:53790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gkY3k-0001NC-1p
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:36:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gkY3f-0004Wg-QE
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:35:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9FB6A2E80CD
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 17:35:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190118171848.27332-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: define TCG_GUEST_DEFAULT_MO
- for MTTCG
+Date: Fri, 18 Jan 2019 17:22:25 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
+Message-Id: <154783214542.2544.207993916730063655.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
+ value function 'abs' given an argument of type 'long int' but has parameter
+ of type 'int' which may cause truncation of value [-Werror=absolute-value]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +38,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 18.01.19 18:18, Alex Benn=C3=A9e wrote:
-> MTTCG should be enabled by default whenever the memory model allows
-> it. s390x was missing its definition of TCG_GUEST_DEFAULT_MO meaning
-> the user had to manually specify  --accel tcg,thread=3Dmulti.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 8c2320e882..47d2c2e9cf 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -35,6 +35,10 @@
->  #define CPUArchState struct CPUS390XState
-> =20
->  #include "exec/cpu-defs.h"
-> +
-> +/* The z/Architecture has a strong memory model with some store-after-=
-load re-ordering */
-> +#define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+This bug would be better reported to the upstream for the ipxe rom -- we
+just ship the source code because we ship the binary.
 
-Didn't know this was the way to make it be enabled as default.
+-- =
 
-As discussed on IRC
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1801073
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Title:
+  util/zbin.c:390:37: error: absolute value function 'abs' given an
+  argument of type 'long int' but has parameter of type 'int' which may
+  cause truncation of value [-Werror=3Dabsolute-value]
 
-Thanks!
+Status in QEMU:
+  New
 
-> +
->  #define TARGET_PAGE_BITS 12
-> =20
->  #define TARGET_PHYS_ADDR_SPACE_BITS 64
->=20
+Bug description:
+  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
 
+  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
+  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
+  make -C ipxe/src CONFIG=3Dqemu \
+  	PACKAGING_TIMESTAMP=3D1534273834 \
+  	CROSS_COMPILE=3D \
+  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
+10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
+  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
+ipxe/src'
+  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
+il/zbin
+  util/zbin.c: In function 'process_zinfo_add':
+  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
+        |                                     ^~~
+  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
+        |                                     ^~~
+  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
+        |                                     ^~~
+  cc1: all warnings being treated as errors
+  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
 
---=20
-
-Thanks,
-
-David / dhildenb
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
