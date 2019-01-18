@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42809)
+Received: from eggs.gnu.org ([209.51.188.92]:43180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gkSc0-0001BK-VV
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:47:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkSdb-0002IR-Ak
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gkSbw-0001Jz-0d
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:47:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gkSbv-0001H0-MD
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:46:55 -0500
-References: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
-	<1547576349-13337-2-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8caf272f-f229-c890-89e8-9e76882eb1e0@redhat.com>
-Date: Fri, 18 Jan 2019 12:46:44 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gkSda-00031D-5m
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:39 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:38020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkSdZ-0002mK-N9
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:38 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id e12so14127519otl.5
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:48:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1547576349-13337-2-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] tests/libqos: introduce
- virtio_start_device
+References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1547732292-14021-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 11:47:55 +0000
+Message-ID: <CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
+ typedefs and gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 2019-01-15 19:19, Paolo Bonzini wrote:
-> From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> 
-> This function is intended to group all the qvirtio_* functions that
-> start the qvirtio devices.
-> Applied in all tests using this combination of functions.
-> 
-> Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-[..]
-> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-> index 04c6087..f97c158 100644
-> --- a/tests/virtio-blk-test.c
-> +++ b/tests/virtio-blk-test.c
-> @@ -116,10 +116,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus *bus, int slot)
->      g_assert_cmphex(dev->pdev->devfn, ==, ((slot << 3) | PCI_FN));
->  
->      qvirtio_pci_device_enable(dev);
-> -    qvirtio_reset(&dev->vdev);
-> -    qvirtio_set_acknowledge(&dev->vdev);
-> -    qvirtio_set_driver(&dev->vdev);
-> -
-> +    qvirtio_start_device(&dev->vdev);
->      return dev;
->  }
->  
-> @@ -333,6 +330,7 @@ static void pci_indirect(void)
->      qvirtio_set_features(&dev->vdev, features);
->  
->      vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
-> +
->      qvirtio_set_driver_ok(&dev->vdev);
+On Thu, 17 Jan 2019 at 13:38, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter!
+>
+> The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d97094:
+>
+>   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2019-01-15 18:32:57 +0000)
+>
+> are available in the git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
+>
+> for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1c:
+>
+>   tests/hexloader-test: Don't pass -nographic to the QEMU under test (2019-01-17 14:25:12 +0100)
+>
+> ----------------------------------------------------------------
+> - Remove deprecated "ivshmem" legacy device
+> - Bug fix for vhost-user-test
+> - Use more CONFIG Makefile switches for qtests
+> - Get rid of global_qtests in some more qtests
+> - typedef cleanups
+> - Fixes for compiling with Clang
+> - Force C standard to gnu99
+> ----------------------------------------------------------------
 
-Still unnecessary white-space change.
+In the netbsd VM, the ipmi-bt-test is consistently failing:
 
-Apart from that nit, still:
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+QTEST_QEMU_BINARY=i386-softmmu
+/qemu-system-i386 QTEST_QEMU_IMG=qemu-img tests/ipmi-bt-test -m=quick
+-k --tap < /dev/null | ./s
+cripts/tap-driver.pl --test-name="ipmi-bt-test"
+**
+ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv == 1)
+ERROR - too few tests run (expected 4, got 0)
+[1]   Abort trap (core dumped) MALLOC_PERTURB_=... |
+      Done(1)                 ./scripts/tap-dr...
+/var/tmp/qemu-test.7opHvo/tests/Makefile.include:856: recipe for
+target 'check-qtest-i386' faile
+d
+gmake: *** [check-qtest-i386] Error 1
+gmake: *** Waiting for unfinished jobs....
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+This has been kind of intermittent for a while, I've seen
+it on-and-off, but with this pullreq it's failed four times
+in a row, so maybe something in here is making it less
+intermittent.
+
+thanks
+-- PMM
