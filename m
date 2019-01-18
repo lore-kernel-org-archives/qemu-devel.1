@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57489)
+Received: from eggs.gnu.org ([209.51.188.92]:57535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUol-00077t-BX
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:20 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gkUou-0007Ec-Ql
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUok-0002Zw-4G
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51668
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <farosas@linux.ibm.com>) id 1gkUor-0002kq-0Q
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60746)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gkUoj-0002Xp-VR
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:18 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1gkUoq-0002gW-Fh
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:24 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0IDwvXk058816
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:16 -0500
+	x0IDwk5R102942
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:22 -0500
 Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q3e5kwgf9-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q3e4t5gan-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:14 -0500
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:21 -0500
 Received: from localhost
 	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Fri, 18 Jan 2019 14:08:12 -0000
+	Fri, 18 Jan 2019 14:08:19 -0000
 From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Fri, 18 Jan 2019 12:07:53 -0200
+Date: Fri, 18 Jan 2019 12:07:55 -0200
 In-Reply-To: <20190118140758.829-1-farosas@linux.ibm.com>
 References: <20190118140758.829-1-farosas@linux.ibm.com>
-Message-Id: <20190118140758.829-3-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v3 2/7] target/ppc: Add
- ppc_get_trace_int_handler_addr
+Message-Id: <20190118140758.829-5-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v3 4/7] kvm-all: Introduce
+ kvm_set_singlestep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,51 +41,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, david@gibson.dropbear.id.au, cohuck@redhat.com, aik@ozlabs.ru
 
-The upcoming single step functionality (KVM HV) needs to write to the
-Trace Interrupt handler's address for its mechanism to work. The
-address is calculated by applying an offset according to the value of
-the Alternate Interrupt Location (AIL) bits in the LPCR register.
+This will allow architecture-specifc implementations of a fallback
+mechanism for single stepping in cases where KVM does not support it
+via the KVM_SET_GUEST_DEBUG ioctl.
 
 Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 ---
- target/ppc/cpu.h         |  1 +
- target/ppc/excp_helper.c | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
+ accel/kvm/kvm-all.c             | 9 +++++++++
+ accel/stubs/kvm-stub.c          | 4 ++++
+ exec.c                          | 2 +-
+ include/sysemu/kvm.h            | 2 ++
+ stubs/Makefile.objs             | 1 +
+ stubs/kvm-arch-set-singlestep.c | 8 ++++++++
+ 6 files changed, 25 insertions(+), 1 deletion(-)
+ create mode 100644 stubs/kvm-arch-set-singlestep.c
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf99b..2185ef5e67 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1256,6 +1256,7 @@ struct PPCVirtualHypervisorClass {
-     OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
-                      TYPE_PPC_VIRTUAL_HYPERVISOR)
- 
-+target_ulong ppc_get_trace_int_handler_addr(CPUState *cs);
- void ppc_cpu_do_interrupt(CPUState *cpu);
- bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
- void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 337a3ef8bb..5d13d05c3b 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -746,6 +746,18 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-     check_tlb_flush(env, false);
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 0dc7a32883..8dc5d32f08 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2320,6 +2320,15 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
+     return data.err;
  }
  
-+target_ulong ppc_get_trace_int_handler_addr(CPUState *cs)
++void kvm_set_singlestep(CPUState *cs, int enabled)
 +{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    int ail;
-+
-+    ail = (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SHIFT;
-+    return env->excp_vectors[POWERPC_EXCP_TRACE] |
-+        ppc_excp_vector_offset(cs, ail);
++    if (kvm_has_guestdbg_singlestep()) {
++        kvm_update_guest_debug(cs, 0);
++    } else {
++        kvm_arch_set_singlestep(cs, enabled);
++    }
 +}
 +
-+
- void ppc_cpu_do_interrupt(CPUState *cs)
+ int kvm_insert_breakpoint(CPUState *cpu, target_ulong addr,
+                           target_ulong len, int type)
  {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 02d5170031..69bd07f50e 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -79,6 +79,10 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
+     return -ENOSYS;
+ }
+ 
++void kvm_set_singlestep(CPUState *cs, int enabled)
++{
++}
++
+ int kvm_insert_breakpoint(CPUState *cpu, target_ulong addr,
+                           target_ulong len, int type)
+ {
+diff --git a/exec.c b/exec.c
+index 895449f926..6612f90b3a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1234,7 +1234,7 @@ void cpu_single_step(CPUState *cpu, int enabled)
+     if (cpu->singlestep_enabled != enabled) {
+         cpu->singlestep_enabled = enabled;
+         if (kvm_enabled()) {
+-            kvm_update_guest_debug(cpu, 0);
++            kvm_set_singlestep(cpu, enabled);
+         } else {
+             /* must flush all the translated code to avoid inconsistencies */
+             /* XXX: only flush what is necessary */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index ca2bbff053..e1ef2f5b99 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -247,6 +247,7 @@ bool kvm_memcrypt_enabled(void);
+  */
+ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
+ 
++void kvm_arch_set_singlestep(CPUState *cpu, int enabled);
+ 
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+@@ -259,6 +260,7 @@ int kvm_remove_breakpoint(CPUState *cpu, target_ulong addr,
+                           target_ulong len, int type);
+ void kvm_remove_all_breakpoints(CPUState *cpu);
+ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap);
++void kvm_set_singlestep(CPUState *cs, int enabled);
+ 
+ int kvm_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+ int kvm_on_sigbus(int code, void *addr);
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 5dd0aeeec6..145ca9620b 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -16,6 +16,7 @@ stub-obj-y += get-vm-name.o
+ stub-obj-y += iothread.o
+ stub-obj-y += iothread-lock.o
+ stub-obj-y += is-daemonized.o
++stub-obj-y += kvm-arch-set-singlestep.o
+ stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+ stub-obj-y += machine-init-done.o
+ stub-obj-y += migr-blocker.o
+diff --git a/stubs/kvm-arch-set-singlestep.c b/stubs/kvm-arch-set-singlestep.c
+new file mode 100644
+index 0000000000..ba6e0323d6
+--- /dev/null
++++ b/stubs/kvm-arch-set-singlestep.c
+@@ -0,0 +1,8 @@
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "sysemu/kvm.h"
++
++void kvm_arch_set_singlestep(CPUState *cpu, int enabled)
++{
++    warn_report("KVM does not support single stepping");
++}
 -- 
 2.17.1
