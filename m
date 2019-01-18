@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60251)
+Received: from eggs.gnu.org ([209.51.188.92]:60383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkTTB-0007cG-5u
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkTTJ-0007ng-NL
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkTT9-0002fx-6y
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:56 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:37695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkTT8-0002ci-L2
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:41:55 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id s13so14252335otq.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 04:41:54 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkTTI-0002yX-J9
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:42:05 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 12:41:54 +0000
+Message-ID: <5a25b9b8-df4f-8aeb-6b41-a8ff668cd1fa@virtuozzo.com>
+References: <20190117193658.16413-1-eblake@redhat.com>
+	<20190117193658.16413-3-eblake@redhat.com>
+In-Reply-To: <20190117193658.16413-3-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <68D8287A85FFD24DBAF0DCA45A9E3806@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 12:41:40 +0000
-Message-ID: <CAFEAcA_+=6Ls4wYWgGc4+vFvmLPhNMVjuonUsWv=bXKCp79n2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] MIPS queue for January 17, 2019*
+Subject: Re: [Qemu-devel] [PATCH v4 02/21] maint: Allow for EXAMPLES in
+ texi2pod
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Thu, 17 Jan 2019 at 18:13, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 681d61362d3f766a00806b89d6581869041f73cb:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-01-17 12:48:42 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-january-17-2019
->
-> for you to fetch changes up to 60bfe335972213bada1ac954e84234aa7c4046f9:
->
->   target/mips: Introduce 32 R5900 multimedia registers (2019-01-17 19:06:56 +0100)
->
-> ----------------------------------------------------------------
->
-> MIPS queue for January 17, 2019
->
->   - provide access to configuration registers SAARI, SAAR, and
->     MemoryMapID
->   - update Inter-Thread Communication Unit
->   - CP0-related cleanups
->   - introduce R5900 multimedia registers
->
-
-Hi; I'm afraid this fails 'make check' on all platforms:
-
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=mips64el-softmmu
-/qemu-system-mips64el QTEST_QEMU_IMG=qemu-img tests/machine-none-test
--m=quick -k --tap < /dev/null
-| ./scripts/tap-driver.pl --test-name="machine-none-test"
-PASS 1 machine-none-test /mips64el/machine/none/cpu_option
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=mips64el-softmmu
-/qemu-system-mips64el QTEST_QEMU_IMG=qemu-img tests/qom-test -m=quick
--k --tap < /dev/null | ./scrip
-ts/tap-driver.pl --test-name="qom-test"
-qemu-system-mips64el: Property '.saar-present' not found
-Broken pipe
-/home/petmay01/linaro/qemu-for-merges/tests/libqtest.c:135:
-kill_qemu() tried to terminate QEMU proc
-ess but encountered exit status 1
-ERROR - too few tests run (expected 8, got 0)
-Aborted (core dumped)
-
-thanks
--- PMM
+MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGhlIG5leHQgY29tbWl0IHdp
+bGwgYWRkIGFuIEVYQU1QTEVTIHNlY3Rpb24gdG8gcWVtdS1uYmQuODsNCj4gZm9yIHRoYXQgdG8g
+d29yaywgd2UgbmVlZCB0byByZWNvZ25pemUgRVhBTVBMRVMgaW4gdGV4aTJwb2QuDQo+IFdlIGFs
+c28gbmVlZCB0byBhZGQgYSBkZXBlbmRlbmN5IGZyb20gYWxsIG1hbiBwYWdlcyBhZ2FpbnN0DQo+
+IHRoZSBnZW5lcmF0b3Igc2NyaXB0LCBzaW5jZSBhIGNoYW5nZSB0byB0aGUgZ2VuZXJhdG9yIG1h
+eQ0KPiBjYXVzZSB0aGUgcmVzdWx0aW5nIG1hbiBwYWdlIHRvIGRpZmZlci4NCj4gDQo+IFNpZ25l
+ZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTog
+UmljaGFyZCBXLk0uIEpvbmVzIDxyam9uZXNAcmVkaGF0LmNvbT4NCj4gDQo+IC0tLQ0KPiB2Mzog
+YWRkIGdlbmVyaWMgZGVwZW5kZW5jeSBmb3IgYWxsIG1hbiBwYWdlcyBpbiAkKERPQ1MpIGluc3Rl
+YWQgb2YNCj4gcGVyLWxpbmUgZWRpdGluZyBbVmxhZGltaXJdDQo+IC0tLQ0KPiAgIE1ha2VmaWxl
+ICAgICAgICAgICAgfCAyICsrDQo+ICAgc2NyaXB0cy90ZXhpMnBvZC5wbCB8IDIgKy0NCj4gICAy
+IGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlm
+ZiAtLWdpdCBhL01ha2VmaWxlIGIvTWFrZWZpbGUNCj4gaW5kZXggZGNjYmExZGNhMjcuLjI2Mzk0
+MzdjZGFmIDEwMDY0NA0KPiAtLS0gYS9NYWtlZmlsZQ0KPiArKysgYi9NYWtlZmlsZQ0KPiBAQCAt
+ODU4LDYgKzg1OCw4IEBAIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYuZHZpIGRvY3MvaW50ZXJv
+cC9xZW11LXFtcC1yZWYuaHRtbCBcDQo+ICAgICAgIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYu
+dHh0IGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYuNzogXA0KPiAgIAlkb2NzL2ludGVyb3AvcWVt
+dS1xbXAtcmVmLnRleGkgZG9jcy9pbnRlcm9wL3FlbXUtcW1wLXFhcGkudGV4aQ0KPiANCj4gKyQo
+ZmlsdGVyICUuMSAlLjcgJS44LCQoRE9DUykpOiBzY3JpcHRzL3RleGkycG9kLnBsDQo+ICsNCj4g
+ICAjIFJlcG9ydHMvQW5hbHlzaXMNCj4gDQo+ICAgJS9jb3ZlcmFnZS1yZXBvcnQuaHRtbDoNCj4g
+ZGlmZiAtLWdpdCBhL3NjcmlwdHMvdGV4aTJwb2QucGwgYi9zY3JpcHRzL3RleGkycG9kLnBsDQo+
+IGluZGV4IDM5Y2U1ODRhMzIyLi44MzliNzkxN2NmNyAxMDA3NTUNCj4gLS0tIGEvc2NyaXB0cy90
+ZXhpMnBvZC5wbA0KPiArKysgYi9zY3JpcHRzL3RleGkycG9kLnBsDQo+IEBAIC0zOTgsNyArMzk4
+LDcgQEAgJHNlY3Rze05BTUV9ID0gIiRmbiBcLSAkdGxcbiI7DQo+ICAgJHNlY3Rze0ZPT1ROT1RF
+U30gLj0gIj1iYWNrXG4iIGlmIGV4aXN0cyAkc2VjdHN7Rk9PVE5PVEVTfTsNCj4gDQo+ICAgZm9y
+ICRzZWN0IChxdyhOQU1FIFNZTk9QU0lTIERFU0NSSVBUSU9OIE9QVElPTlMgRU5WSVJPTk1FTlQg
+RklMRVMNCj4gLQkgICAgICBCVUdTIE5PVEVTIEZPT1ROT1RFUyBTRUVBTFNPIEFVVEhPUiBDT1BZ
+UklHSFQpKSB7DQo+ICsJICAgICAgQlVHUyBOT1RFUyBGT09UTk9URVMgRVhBTVBMRVMgU0VFQUxT
+TyBBVVRIT1IgQ09QWVJJR0hUKSkgew0KPiAgICAgICBpZihleGlzdHMgJHNlY3RzeyRzZWN0fSkg
+ew0KPiAgIAkkaGVhZCA9ICRzZWN0Ow0KPiAgIAkkaGVhZCA9fiBzL1NFRUFMU08vU0VFIEFMU08v
+Ow0KPiANCg0KSSd2ZSBubyBpZGVhIGFib3V0IGhvdyB0ZXhpMnBvZC5wbCB3b3JrcywgYnV0IE1h
+a2VmaWxlIGNoYW5nZSBsb29rcyBhIGxvdA0KY2xlYXJlciBub3csIHNvIEkgaGF2ZSBub3IgbW9y
+ZSBzdWdnZXN0aW9ucy4gQWxzbywgSSd2ZSBjaGVja2VkIHRoYXQgYWZ0ZXINCnRoaXMgcGF0Y2gg
+Y2hhbmdlIHRvIHNjcmlwdHMvdGV4aTJwb2QucGwgcmVhbGx5IHJlc3VsdHMgaW4gcmVtYWtpbmcg
+c2VsZWN0ZWQNCnRhcmdldHMgOikNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1P
+Z2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
