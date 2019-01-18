@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59691)
+Received: from eggs.gnu.org ([209.51.188.92]:59924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gkRxZ-0001cz-9i
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:05:18 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gkRyF-0001xH-UV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gkRxY-0005EQ-MN
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:05:13 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37187)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gkRxY-0005CM-EC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:05:12 -0500
-Received: by mail-wr1-x435.google.com with SMTP id s12so14548163wrt.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:05:12 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gkRyC-0005zi-Er
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:05:55 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <DB7PR04MB4505EEB04A9500D8162463B9B9830@DB7PR04MB4505.eurprd04.prod.outlook.com>
+	<DB7PR04MB45057508E2DF87EE77572CE3B9830@DB7PR04MB4505.eurprd04.prod.outlook.com>
+	<dbf1160d-be81-741c-acef-aabcf99179a9@amsat.org>
+	<32a14c0d-ca3b-f3aa-d277-9a15c9b8575e@adacore.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <aba0f3f3-c967-7edb-b172-216eb7d94766@amsat.org>
+Date: Fri, 18 Jan 2019 12:05:39 +0100
 MIME-Version: 1.0
-References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
-	<20190117114359.5164-2-marcandre.lureau@redhat.com>
-	<20190117230415.jmxjox3breoqj3g3@function>
-In-Reply-To: <20190117230415.jmxjox3breoqj3g3@function>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 18 Jan 2019 15:04:59 +0400
-Message-ID: <CAJ+F1CK3t51L+Qga3R+G1HSS-2jJAV8DYO2PVA5PC8Ebt+qCLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/27] slirp: generalize guestfwd with a
- callback based approach
+In-Reply-To: <32a14c0d-ca3b-f3aa-d277-9a15c9b8575e@adacore.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] Problems adding TMS570LC43 - Cortex-R5f
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +30,343 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?Q?Jo=c3=a3o_Gaspar?= <joaogaspar_csw_qemu@hotmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Julian Brown <julian@codesourcery.com>
 
-Hi
+On 1/18/19 11:14 AM, KONRAD Frederic wrote:
+> Le 1/17/19 à 7:00 PM, Philippe Mathieu-Daudé a écrit :
+>> On 1/17/19 5:54 PM, João Gaspar wrote:
+>>> Hi!
+>>> I'm new at QEMU so I have some questions.
+>>>
+>>> I'm trying to create a new support machine to QEMU, the TMS570LC43
+>>> board, this board use the Cortex-R5f microcontroller.
+>>> At this moment when I do the "qemu-system-arm -M help" my machine is
+>>> showed with the name "cortex-r5".
+>>
+>> OMG why on Earth do you want to model a Hercules SoC? Speaking of
+>> experience, I used to work with those and spend some time tring to model
+>> them, I don't recommend this to you to start modelling an ARM SoC with
+>> QEMU. So I'm curious to understand your goal here, is it for hobby or
+>> univ/job assignment?
+>> Do you plan to run real world firmwares or simple/generic programs?
+>> Designed for Safety critical/Real-Time embedded world, it has plenty of
+>> very specific features that a safe firmware should be using, thus making
+>> the work of modelling very teddious.
+>> Any unmodified firmware require you to implement the Clock Monitoring,
+>> PBIST, and part of the ESM.
+>> Also, you might be limited to run from SRAM then EMIF, because the flash
+>> registers (F021) aren't public.
+>> Also the CPU boots in Big Endian, and while QEMU backend support both
+>> endianess, there are no ARM system booting BE, and you might encounter
+>> weird bugs has it happened to me.
+> 
+> We have a TMS570 platform as well (very minimal though to boot our
+> runtimes) and
+> I can confirm that there are some endianness pain with this platform.
 
-On Fri, Jan 18, 2019 at 3:07 AM Samuel Thibault <samuel.thibault@gnu.org> w=
-rote:
->
-> Marc-Andr=C3=A9 Lureau, le jeu. 17 janv. 2019 15:43:33 +0400, a ecrit:
-> >          /* XXX this blocks entire thread. Rewrite to use
-> >           * qemu_chr_fe_write and background I/O callbacks */
->
-> Seeing this, I guess a whole pass will be useful to turn these qemu
-> comment references into something that does not require knowledge of
-> qemu internals :)
+There also used to be GCC (now fixed) and newlib (in specs) bugs...
+I.E. https://answers.launchpad.net/gcc-arm-embedded/+question/189066
+'Support for Cortex-R4F Big-Endian' asked on 2012-02-28, last comment on
+2018-06-11: "the tool chain does not support big-endian out of the box".
 
-Sure, we will have to do some doc/comments update. I can look at it.
-That's not a blocker imho.
+Frederic, one of my BE issues was fixed by this commit:
+https://git.qemu.org/?p=qemu.git;a=commitdiff;h=98f52cdbb5c
+"Fix access_with_adjusted_size(small size) on big-endian memory regions"
 
-thanks
+Also the Thumb code is now readable since this commit:
+https://git.qemu.org/?p=qemu.git;a=commitdiff;h=f7478a92dd9
+"Fix Thumb-1 BE32 execution and disassembly"
 
+João, something that helped me quite a lot (I guess Peter Maydell
+suggested it to me once at Connect) is to switch the CPU in
+little-endian, then modelling on QEMU is somehow easier.
+However at the time of my efforts, firmwares were only
+TÜV/SÜD/SIL3/MISRA certifiable for BE, and the F021 libs were only
+available for BE. At the time the LE series went out (RM48) I lost
+interest and moved on.
 
---=20
-Marc-Andr=C3=A9 Lureau
+An useful example of endianess switch is this test from Peter Crosthwaite:
+https://github.com/pcrost/arm-be-test/blob/master/main.c#L36
+
+Regards,
+
+Phil.
+
+> For the initial question it seems that you used "cortex-r5" in:
+> 
+>>>      DEFINE_MACHINE("cortex-r5", cortexR5_machine_init)
+> 
+> So expect the machine to be called like that.
+> 
+> Cheers,
+> Fred
+> 
+>>
+>> So if you don't have a strong reason, I'd redirect you to use another
+>> ARM SoC.
+>>
+>>> The probleme start when I try to instaciate the machine with the comand
+>>> "qemu-system-arm --machine cortex-r5 -cpu cortex-r5f", after that I
+>>> received the message "segmentation fault (core dump)".
+>>>
+>>> Does anyone have an possible cause to my problem or an tip?
+>>
+>> Since this question isn't ARM specific but generic about QEMU machines,
+>> I recommend you to also post to the qemu-devel@nongnu.org list (now
+>> copied).
+>>
+>> You can have a more verbose debug output configuring QEMU as:
+>>
+>> ./configure ... --extra-cflags=--ggdb --enable-debug
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+>>>
+>>> I'm gonna let the code too, because probably I'm doing aniything wrong!
+>>>
+>>>      #include "qemu/osdep.h"
+>>>      #include "qapi/error.h"
+>>>      #include "qemu-common.h"
+>>>      #include "hw/arm/arm.h"
+>>>      #include "exec/address-spaces.h"
+>>>      #include "qemu/error-report.h"
+>>>      #include "qom/object.h"
+>>>      #include "cpu.h"
+>>>      #include "hw/sysbus.h"
+>>>      #include "hw/arm/cortex-R5.h"
+>>>
+>>>      //RTI -> Real Time Interruption
+>>>      //static const uint32_t RTI_addr = 0xFFFFFC00;
+>>>
+>>>      //SPI
+>>>      static const uint32_t spi_addr[CR5_NUM_SPI] = {0xFFF7F400,
+>>>      0xFFF7F600, 0xFFF7F800, 0xFFF7FA00, 0xFFF7FC00};
+>>>      //I2C
+>>>      static const uint32_t i2c_addr[CR5_NUM_I2C] = {0xFFF7D400,
+>>> 0xFFF7D500};
+>>>      //CAN
+>>>      static const uint32_t can_addr[CR5_NUM_CAN] = {0XFFF7DC00,
+>>>      0XFFF7DE00, 0X0FFF7E00, 0X0FFF7E200};
+>>>      //ADC
+>>>      static const uint32_t adc_addr[CR5_NUM_ADC] = {0xFFF7C000,
+>>> 0xFFF7C200};
+>>>      //GIO
+>>>      static const uint32_t gio_addr[CR5_NUM_GIO] = {0xFFF7BC00};
+>>>
+>>>      /*IRQ
+>>>      Interrupt Request Assignement
+>>>      http://www.ti.com/lit/ds/spns195c/spns195c.pdf
+>>>      Page: 118
+>>>      */
+>>>      //irq RTI
+>>>      /* static const int rti_cmp_irq0 = 2;
+>>>      static const int rti_cmp_irq1 = 3;
+>>>      static const int rti_cmp_irq2 = 4;
+>>>      static const int rti_cmp_irq3 = 5;
+>>>      static const int rti_oflw_irq0 = 6;
+>>>      static const int rti_oflw_irq1 = 7;
+>>>      static const int rti_timebase_irq = 8; */
+>>>      //irq SPI
+>>>      static const int spi_l0_irq[CR5_NUM_SPI] = {12, 17, 37, 49, 53};
+>>>      static const int spi_l1_irq[CR5_NUM_SPI] = {26, 30, 38, 54, 56};
+>>>      //irq I2C
+>>>      static const int i2c_irq[CR5_NUM_I2C] = {66, 114};
+>>>      //irc CAN
+>>>      static const int can_l0_irq[CR5_NUM_CAN] = {16, 35, 45, 113};
+>>>      static const int can_l1_irq[CR5_NUM_CAN] = {29, 42, 55, 117};
+>>>      static const int can_if3_irq[CR5_NUM_CAN] = {44, 46, 60, 120};
+>>>      //irq ADC
+>>>      static const int adc_swgroup1_irq[CR5_NUM_ADC] = {15, 51};
+>>>      static const int adc_swgroup2_irq[CR5_NUM_ADC] = {28, 57};
+>>>      static const int adc_eventgroup_irq[CR5_NUM_ADC] = {14, 50};
+>>>      static const int adc_magnitudecmp_irq[CR5_NUM_ADC] = {31, 59};
+>>>      //irq GIO
+>>>      static const int gio_high_irq[CR5_NUM_GIO] = {9};
+>>>      static const int gio_low_irq[CR5_NUM_GIO] = {23};
+>>>
+>>>
+>>>      static void cortexR5_initf(MachineState *mc)
+>>>      {
+>>>          CORTEXR5State *s = g_new0(CORTEXR5State, 1);
+>>>
+>>>          DeviceState *dev;
+>>>          SysBusDevice *busdev;
+>>>          Error *err = NULL;
+>>>
+>>>          int i;
+>>>          ARMCPU *cpu;
+>>>
+>>>
+>>>          MemoryRegion *system_memory = get_system_memory();
+>>>          MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>>          MemoryRegion *flash = g_new(MemoryRegion, 1);
+>>>          MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
+>>>
+>>>        
+>>>          //s->cr5_cpu = ARM_CPU(object_new(mc->cpu_type));
+>>>          cpu = ARM_CPU(object_new(mc->cpu_type));
+>>>
+>>>          //object_initialize_child(obj, "cpu", &s->cr5_cpu,
+>>>      sizeof(s->cr5_cpu), ARM_CPU_TYPE_NAME("cortex-r5f"), &error_abort,
+>>>      NULL);
+>>>          object_property_set_bool(OBJECT(cpu), true, "realized",
+>>>      &error_fatal);
+>>>
+>>>          memory_region_init_ram(flash, NULL, "CORTEXR5.flash",
+>>>      FLASH_SIZE, &error_fatal);
+>>>
+>>>          memory_region_init_alias(flash_alias, NULL,
+>>>      "CORTEXR5.flash.alias", flash, 0, FLASH_SIZE);
+>>>
+>>>          memory_region_set_readonly(flash, true);
+>>>          memory_region_set_readonly(flash_alias, true);
+>>>
+>>>          memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS,
+>>>      flash);
+>>>          memory_region_add_subregion(system_memory, 0, flash_alias);
+>>>
+>>>          memory_region_init_ram(ram, NULL, "CORTEXR5.ram", SRAM_SIZE,
+>>>      &error_fatal);
+>>>          memory_region_add_subregion(system_memory, RAM_BASE_ADDRESS,
+>>> ram);
+>>>
+>>>          //SPI
+>>>          for (i = 0; i < CR5_NUM_SPI; i++)
+>>>          {
+>>>              dev = DEVICE(&(s->spi[i]));
+>>>              object_property_set_bool(OBJECT(&s->spi[i]), true,
+>>>      "realized", &err);
+>>>              if (err != NULL)
+>>>              {
+>>>                  //error_propagate(errp, err);
+>>>                  return;
+>>>              }
+>>>              busdev = SYS_BUS_DEVICE(dev);
+>>>              sysbus_mmio_map(busdev, 0, spi_addr[i]);
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      spi_l0_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      spi_l1_irq[i]));
+>>>          }
+>>>
+>>>          //I2C
+>>>          for (i = 0; i < CR5_NUM_I2C; i++)
+>>>          {
+>>>              dev = DEVICE(&(s->i2c[i]));
+>>>              object_property_set_bool(OBJECT(&s->i2c[i]), true,
+>>>      "realized", &err);
+>>>              if (err != NULL)
+>>>              {
+>>>                  //error_propagate(errp, err);
+>>>                  return;
+>>>              }
+>>>              busdev = SYS_BUS_DEVICE(dev);
+>>>              sysbus_mmio_map(busdev, 0, i2c_addr[i]);
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      i2c_irq[i]));
+>>>          }
+>>>
+>>>          //CAN
+>>>          for (i = 0; i < CR5_NUM_CAN; i++)
+>>>          {
+>>>              dev = DEVICE(&(s->can[i]));
+>>>              object_property_set_bool(OBJECT(&s->can[i]), true,
+>>>      "realized", &err);
+>>>              if (err != NULL)
+>>>              {
+>>>                  //error_propagate(errp, err);
+>>>                  return;
+>>>              }
+>>>              busdev = SYS_BUS_DEVICE(dev);
+>>>              sysbus_mmio_map(busdev, 0, can_addr[i]);
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      can_l0_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      can_l1_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      can_if3_irq[i]));
+>>>          }
+>>>
+>>>          //ADC
+>>>          object_property_set_int(OBJECT(s->adc_irqs), CR5_NUM_ADC,
+>>>      "num-lines", &err);
+>>>          object_property_set_bool(OBJECT(s->adc_irqs), true, "realized",
+>>>      &err);
+>>>          if (err != NULL)
+>>>          {
+>>>              //error_propagate(errp, err);
+>>>              return;
+>>>          }
+>>>         // qdev_connect_gpio_out(DEVICE(s->adc_irq), 0,
+>>>      qdev_get_gpio_in(dev));
+>>>
+>>>          for (i = 0; i < CR5_NUM_ADC; i++)
+>>>          {
+>>>              dev = DEVICE(&(s->adc[i]));
+>>>              object_property_set_bool(OBJECT(&s->adc[i]), true,
+>>>      "realized", &err);
+>>>              if (err != NULL)
+>>>              {
+>>>                  //error_propagate(errp, err);
+>>>                  return;
+>>>              }
+>>>              busdev = SYS_BUS_DEVICE(dev);
+>>>              sysbus_mmio_map(busdev, 0, adc_addr[i]);
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      adc_swgroup1_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      adc_swgroup2_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      adc_eventgroup_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      adc_magnitudecmp_irq[i]));
+>>>          }
+>>>
+>>>          //GIO
+>>>          for (i = 0; i < CR5_NUM_GIO; i++)
+>>>          {
+>>>              dev = DEVICE(&(s->gio[i]));
+>>>              object_property_set_bool(OBJECT(&s->gio[i]), true,
+>>>      "realized", &err);
+>>>              if (err != NULL)
+>>>              {
+>>>                  //error_propagate(errp, err);
+>>>                  return;
+>>>              }
+>>>              busdev = SYS_BUS_DEVICE(dev);
+>>>              sysbus_mmio_map(busdev, 0, gio_addr[i]);
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      gio_high_irq[i]));
+>>>              sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(dev),
+>>>      gio_low_irq[i]));
+>>>          }
+>>>      }
+>>>
+>>>
+>>>
+>>>      static void cortexR5_machine_init(MachineClass *mc){
+>>>         //mc->name = "Cortex-R5f";
+>>>          mc->desc = "Based on TMS570LC43x";
+>>>          mc->init =  cortexR5_initf;
+>>>          mc->max_cpus = 1;
+>>>          mc->ignore_memory_transaction_failures = true;
+>>>          mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-r5f");
+>>>      }
+>>>
+>>>
+>>>
+>>>      DEFINE_MACHINE("cortex-r5", cortexR5_machine_init)
+>>>
+>>>
+>>>
+>>>
+>>> Thanks in advanced,
+>>>
+>>> João Gaspar
+>>>
+>>> Enviado do Outlook <http://aka.ms/weboutlook>
+>>
+> 
