@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43180)
+Received: from eggs.gnu.org ([209.51.188.92]:43237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkSdb-0002IR-Ak
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:41 -0500
+	(envelope-from <groug@kaod.org>) id 1gkSdc-0002JQ-K7
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkSda-00031D-5m
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:39 -0500
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:38020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkSdZ-0002mK-N9
+	(envelope-from <groug@kaod.org>) id 1gkSda-00031r-Q8
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:40 -0500
+Received: from 9.mo1.mail-out.ovh.net ([178.32.108.172]:53224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gkSda-0002oY-Iv
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:48:38 -0500
-Received: by mail-ot1-x32d.google.com with SMTP id e12so14127519otl.5
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:48:07 -0800 (PST)
+Received: from player732.ha.ovh.net (unknown [10.109.159.20])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 74B4615073C
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 12:48:09 +0100 (CET)
+Date: Fri, 18 Jan 2019 12:47:47 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190118124747.2d78dfe6@bahia.lan>
+In-Reply-To: <154774528595.1208625.15523908858345133758.stgit@bahia.lan>
+References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+	<154774528595.1208625.15523908858345133758.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 11:47:55 +0000
-Message-ID: <CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
- typedefs and gnu99
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/19] xics: Disintricate allocation and
+ type setting of interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +31,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu, 17 Jan 2019 at 13:38, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter!
->
-> The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d97094:
->
->   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2019-01-15 18:32:57 +0000)
->
-> are available in the git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
->
-> for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1c:
->
->   tests/hexloader-test: Don't pass -nographic to the QEMU under test (2019-01-17 14:25:12 +0100)
->
-> ----------------------------------------------------------------
-> - Remove deprecated "ivshmem" legacy device
-> - Bug fix for vhost-user-test
-> - Use more CONFIG Makefile switches for qtests
-> - Get rid of global_qtests in some more qtests
-> - typedef cleanups
-> - Fixes for compiling with Clang
-> - Force C standard to gnu99
-> ----------------------------------------------------------------
+On Thu, 17 Jan 2019 18:14:46 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-In the netbsd VM, the ipmi-bt-test is consistently failing:
+> The current code assumes that an interrupt is allocated as soon as its
+> type is set to MSI or LSI. PHB hotplug will require to be able to set
+> the type of an interrupt before actually allocating it.
+> 
+> Disintricate type setting from allocation by using another flag bit for
+> the latter. Introduce a new ics_claim_irq() function for allocation. The
+> behavior of aborting if the same irq gets allocated twice is kept.
+> 
+> ics_set_irq_type() now only sets the type to MSI or LSI. It doesn't bring
+> anything to abort if the type was already set before. Drop the assert
+> and XICS_FLAGS_IRQ_MASK on the way.
+> 
 
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=i386-softmmu
-/qemu-system-i386 QTEST_QEMU_IMG=qemu-img tests/ipmi-bt-test -m=quick
--k --tap < /dev/null | ./s
-cripts/tap-driver.pl --test-name="ipmi-bt-test"
-**
-ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv == 1)
-ERROR - too few tests run (expected 4, got 0)
-[1]   Abort trap (core dumped) MALLOC_PERTURB_=... |
-      Done(1)                 ./scripts/tap-dr...
-/var/tmp/qemu-test.7opHvo/tests/Makefile.include:856: recipe for
-target 'check-qtest-i386' faile
-d
-gmake: *** [check-qtest-i386] Error 1
-gmake: *** Waiting for unfinished jobs....
+With some more testing (and thinking :) I now realize that the type of
+the irq should survive PHB unplug, which is not the case with this patch.
 
+This calls for a v4.
 
-This has been kind of intermittent for a while, I've seen
-it on-and-off, but with this pullreq it's failed four times
-in a row, so maybe something in here is making it less
-intermittent.
-
-thanks
--- PMM
+> Older QEMUs don't know about XICS_FLAGS_IRQ_CLAIMED. In order to safely
+> handle incoming migration, we must fix the irq flags. This is done at
+> post load thanks to a compat property. We don't need to do anything for
+> backward migration since older machines only care for the irq type.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/core/machine.c     |    4 ++++
+>  hw/intc/xics.c        |   28 +++++++++++++++++++++++++---
+>  hw/ppc/pnv_psi.c      |    1 +
+>  hw/ppc/spapr_irq.c    |    4 +---
+>  include/hw/ppc/xics.h |    8 ++++++--
+>  5 files changed, 37 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 1a0a9ab1117a..536a34092367 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -25,6 +25,10 @@
+>  
+>  GlobalProperty hw_compat_3_1[] = {
+>      {
+> +        .driver   = "ics-base",
+> +        .property = "has-claimed-flag",
+> +        .value    = "off",
+> +    },{
+>          .driver   = "pcie-root-port",
+>          .property = "x-speed",
+>          .value    = "2_5",
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index 16e8ffa2aaf7..82cf04548907 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -75,7 +75,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+>      for (i = 0; i < ics->nr_irqs; i++) {
+>          ICSIRQState *irq = ics->irqs + i;
+>  
+> -        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+> +        if (!(irq->flags & XICS_FLAGS_IRQ_CLAIMED)) {
+>              continue;
+>          }
+>          monitor_printf(mon, "  %4x %s %02x %02x\n",
+> @@ -662,6 +662,22 @@ static int ics_base_dispatch_post_load(void *opaque, int version_id)
+>      ICSState *ics = opaque;
+>      ICSStateClass *info = ICS_BASE_GET_CLASS(ics);
+>  
+> +    if (!ics->has_claimed_flag) {
+> +        int i;
+> +
+> +        for (i = 0; i < ics->nr_irqs; i++) {
+> +            ICSIRQState *irq = ics->irqs + i;
+> +
+> +            /*
+> +             * For older machines, allocating the irq and setting its type is
+> +             * the same thing.
+> +             */
+> +            if (irq->flags & (XICS_FLAGS_IRQ_LSI| XICS_FLAGS_IRQ_MSI)) {
+> +                irq->flags |= XICS_FLAGS_IRQ_CLAIMED;
+> +            }
+> +        }
+> +    }
+> +
+>      if (info->post_load) {
+>          return info->post_load(ics, version_id);
+>      }
+> @@ -702,6 +718,7 @@ static const VMStateDescription vmstate_ics_base = {
+>  
+>  static Property ics_base_properties[] = {
+>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> +    DEFINE_PROP_BOOL("has-claimed-flag", ICSState, has_claimed_flag, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -741,10 +758,15 @@ ICPState *xics_icp_get(XICSFabric *xi, int server)
+>      return xic->icp_get(xi, server);
+>  }
+>  
+> -void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
+> +void ics_claim_irq(ICSState *ics, int srcno)
+>  {
+> -    assert(!(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK));
+> +    assert(ICS_IRQ_FREE(ics, srcno));
+> +
+> +    ics->irqs[srcno].flags |= XICS_FLAGS_IRQ_CLAIMED;
+> +}
+>  
+> +void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
+> +{
+>      ics->irqs[srcno].flags |=
+>          lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
+>  }
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 8ced09506321..ced34e1119dc 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -488,6 +488,7 @@ static void pnv_psi_realize(DeviceState *dev, Error **errp)
+>  
+>      for (i = 0; i < ics->nr_irqs; i++) {
+>          ics_set_irq_type(ics, i, true);
+> +        ics_claim_irq(ics, i);
+>      }
+>  
+>      psi->qirqs = qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_irqs);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 1da7a32348fc..86c712d15382 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -125,9 +125,6 @@ error:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> -#define ICS_IRQ_FREE(ics, srcno)   \
+> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> -
+>  static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, bool lsi,
+>                                  Error **errp)
+>  {
+> @@ -146,6 +143,7 @@ static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, bool lsi,
+>      }
+>  
+>      ics_set_irq_type(ics, irq - ics->offset, lsi);
+> +    ics_claim_irq(ics, irq - ics->offset);
+>      return 0;
+>  }
+>  
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index fad786e8b22d..e3be5cc663c5 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -131,6 +131,7 @@ struct ICSState {
+>      /*< public >*/
+>      uint32_t nr_irqs;
+>      uint32_t offset;
+> +    bool has_claimed_flag;
+>      ICSIRQState *irqs;
+>      XICSFabric *xics;
+>  };
+> @@ -153,13 +154,15 @@ struct ICSIRQState {
+>  #define XICS_STATUS_PRESENTED          0x10
+>  #define XICS_STATUS_QUEUED             0x20
+>      uint8_t status;
+> -/* (flags & XICS_FLAGS_IRQ_MASK) == 0 means the interrupt is not allocated */
+>  #define XICS_FLAGS_IRQ_LSI             0x1
+>  #define XICS_FLAGS_IRQ_MSI             0x2
+> -#define XICS_FLAGS_IRQ_MASK            0x3
+> +#define XICS_FLAGS_IRQ_CLAIMED         0x4
+>      uint8_t flags;
+>  };
+>  
+> +#define ICS_IRQ_FREE(ics, srcno)   \
+> +    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_CLAIMED)))
+> +
+>  struct XICSFabric {
+>      Object parent;
+>  };
+> @@ -193,6 +196,7 @@ void ics_simple_write_xive(ICSState *ics, int nr, int server,
+>  void ics_simple_set_irq(void *opaque, int srcno, int val);
+>  void ics_kvm_set_irq(void *opaque, int srcno, int val);
+>  
+> +void ics_claim_irq(ICSState *ics, int srcno);
+>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon);
+> 
