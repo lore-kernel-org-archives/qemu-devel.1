@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39952)
+Received: from eggs.gnu.org ([209.51.188.92]:40248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSSw-0001n6-B2
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSTH-00025D-J1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:38:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSSu-0008HN-Ty
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:38 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33207)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gkSSu-00088J-6K
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:36 -0500
-Received: by mail-wm1-x344.google.com with SMTP id r24so788658wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:37:30 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSTD-0000Jg-CP
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:57 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 11:37:42 +0000
+Message-ID: <c135eaae-adc1-a5e3-1376-61bbe703cdfb@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+	<20190108170655.29766-9-vsementsov@virtuozzo.com>
+	<w51pnsuwaxj.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51pnsuwaxj.fsf@maestria.local.igalia.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <521D5F8C4664B2409D390B882052A785@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181226034254.17842-1-richard.henderson@linaro.org>
-	<20190116235009.tl4gcv53e62npecl@function>
-	<d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
-	<CAFEAcA9moCfRCHkivgU7Qesi3xeD=8u8+0WScM84f-dcwyYfrw@mail.gmail.com>
-	<CAJ+F1CK9Bkw0ULs5j2n9v_py1DRqLFgPGaHXBBvdWBb-eBDcvg@mail.gmail.com>
-In-Reply-To: <CAJ+F1CK9Bkw0ULs5j2n9v_py1DRqLFgPGaHXBBvdWBb-eBDcvg@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 18 Jan 2019 15:37:17 +0400
-Message-ID: <CAJ+F1C+PX8d+py3q=CZAND+TkgatXjAQPNP-NXZkz+NBChmZXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
+Subject: Re: [Qemu-devel] [PATCH v3 8/9] qcow2: bdrv_co_pwritev: move
+ encryption code out of the lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Richard Henderson <richard.henderson@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-Hi
-
-On Fri, Jan 18, 2019 at 3:25 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Thu, Jan 17, 2019 at 5:56 PM Peter Maydell <peter.maydell@linaro.org> =
-wrote:
-> >
-> > On Thu, 17 Jan 2019 at 13:41, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
-t.com> wrote:
-> > > On 1/17/19 12:50 AM, Samuel Thibault wrote:
-> > > > --- a/slirp/slirp.c
-> > > > +++ b/slirp/slirp.c
-> > > > @@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *p=
-kt, int pkt_len)
-> > > >      if (pkt_len < ETH_HLEN)
-> > > >          return;
-> > > >
-> > > > -    proto =3D ntohs(*(uint16_t *)(pkt + 12));
-> > > > +    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
-> > > >      switch(proto) {
-> > > >      case ETH_P_ARP:
-> > > >          arp_input(slirp, pkt, pkt_len);
-> > >
-> > > What about using memcpy?
-> >
-> > We should use whatever the new libslirp wants to consistently
-> > use as its mechanism for loading unaligned data. I don't
-> > suppose this is the only place where it ever needs to do this.
-> >
-> > Personally I would vote for having libslirp have versions of
-> > the ld*_p functions, because they solve the problem in a
-> > clear and correct way. But that's up to Marc-Andr=C3=A9 really.
->
-> I think I would go with a copy of qemu bswap.h, unless there is an
-> equivalent in glib (I don't think so) or gnulib? Or other standard
-> compiler solution.
->
-
-The GStreamer solution is also quite readable.
-https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/gst/gstutils=
-.h#L165
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+MTguMDEuMjAxOSAxMjo1MSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+IE9uIFR1ZSAwOCBKYW4g
+MjAxOSAwNjowNjo1NCBQTSBDRVQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
+DQo+PiBFbmNyeXB0aW9uIHdpbGwgYmUgZG9uZSBpbiB0aHJlYWRzLCB0byB0YWtlIGJlbmVmaXQg
+b2YgaXQsIHdlIHNob3VsZA0KPj4gbW92ZSBpdCBvdXQgb2YgdGhlIGxvY2sgZmlyc3QuDQo+Pg0K
+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
+dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGJsb2NrL3Fjb3cyLmMgfCAzNSArKysrKysr
+KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMjEgaW5z
+ZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
+b3cyLmMgYi9ibG9jay9xY293Mi5jDQo+PiBpbmRleCBkNmVmNjA2ZDg5Li43NmQzNzE1MzUwIDEw
+MDY0NA0KPj4gLS0tIGEvYmxvY2svcWNvdzIuYw0KPj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPj4g
+QEAgLTIwNzcsMTEgKzIwNzcsMjAgQEAgc3RhdGljIGNvcm91dGluZV9mbiBpbnQgcWNvdzJfY29f
+cHdyaXRldihCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3Qgb2Zmc2V0LA0KPj4gICAgICAg
+ICAgIHJldCA9IHFjb3cyX2FsbG9jX2NsdXN0ZXJfb2Zmc2V0KGJzLCBvZmZzZXQsICZjdXJfYnl0
+ZXMsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNsdXN0
+ZXJfb2Zmc2V0LCAmbDJtZXRhKTsNCj4+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4gLSAg
+ICAgICAgICAgIGdvdG8gZmFpbDsNCj4+ICsgICAgICAgICAgICBnb3RvIG91dF9sb2NrZWQ7DQo+
+PiAgICAgICAgICAgfQ0KPj4gICANCj4+ICAgICAgICAgICBhc3NlcnQoKGNsdXN0ZXJfb2Zmc2V0
+ICYgNTExKSA9PSAwKTsNCj4+ICAgDQo+PiArICAgICAgICByZXQgPSBxY293Ml9wcmVfd3JpdGVf
+b3ZlcmxhcF9jaGVjayhicywgMCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGNsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2luX2NsdXN0ZXIsDQo+PiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjdXJfYnl0ZXMpOw0KPj4g
+KyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+ICsgICAgICAgICAgICBnb3RvIG91dF9sb2NrZWQ7
+DQo+PiArICAgICAgICB9DQo+PiArDQo+PiArICAgICAgICBxZW11X2NvX211dGV4X3VubG9jaygm
+cy0+bG9jayk7DQo+IA0KPiBUaGUgdXNhZ2Ugb2YgbG9jaygpIGFuZCB1bmxvY2soKSBmdW5jdGlv
+bnMgaW5zaWRlIGFuZCBvdXRzaWRlIG9mIHRoZQ0KPiBsb29wIHBsdXMgdGhlIHR3byAnbG9ja2Vk
+JyBhbmQgJ3VubG9ja2VkJyBleGl0IHBhdGhzIGlzIHN0YXJ0aW5nIHRvIG1ha2UNCj4gdGhpbmdz
+IGEgYml0IG1vcmUgbWVzc3kuDQo+IA0KPiBIYXZpbmcgYSBsb29rIGF0IHRoZSBjb2RlIGl0IHNl
+ZW1zIHRoYXQgdGhlcmUncyBvbmx5IHRoZXNlIHRocmVlIHBhcnRzDQo+IGluIHRoZSB3aG9sZSBm
+dW5jdGlvbiB0aGF0IG5lZWQgdG8gaGF2ZSB0aGUgbG9jayBoZWxkOg0KPiANCj4gb25lOg0KPiAg
+ICAgcmV0ID0gcWNvdzJfYWxsb2NfY2x1c3Rlcl9vZmZzZXQoYnMsIG9mZnNldCwgJmN1cl9ieXRl
+cywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZjbHVzdGVyX29mZnNl
+dCwgJmwybWV0YSk7DQo+ICAgICAvKiAuLi4gKi8NCj4gICAgIHJldCA9IHFjb3cyX3ByZV93cml0
+ZV9vdmVybGFwX2NoZWNrKGJzLCAwLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgY2x1c3Rlcl9vZmZzZXQgKw0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgb2Zmc2V0X2luX2NsdXN0ZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBjdXJfYnl0ZXMpOw0KPiANCj4gdHdvOg0KPiANCj4gICAgIHJldCA9
+IHFjb3cyX2hhbmRsZV9sMm1ldGEoYnMsICZsMm1ldGEsIHRydWUpOw0KPiANCj4gDQo+IHRocmVl
+Og0KPiAgICAgcWNvdzJfaGFuZGxlX2wybWV0YShicywgJmwybWV0YSwgZmFsc2UpOw0KPiANCj4g
+DQo+IFNvIEkgd29uZGVyIGlmIGl0J3MgcGVyaGFwcyBzaW1wbGVyIHRvIGFkZCBsb2NrL3VubG9j
+ayBjYWxscyBhcm91bmQNCj4gdGhvc2UgYmxvY2tzPw0KDQp0aGlzIG1lYW5zLCB0aGF0IHdlJ2xs
+IHVubG9jayBhZnRlciBxY293Ml9oYW5kbGVfbDJtZXRhIGFuZCB0aGVuIGltbWVkaWF0ZWx5DQps
+b2NrIG9uIG5leHQgaXRlcmF0aW9uIGJlZm9yZSBxY293Ml9hbGxvY19jbHVzdGVyX29mZnNldCwg
+c28gY3VycmVudCBjb2RlDQphdm9pZHMgdGhpcyBleHRyYSB1bmxvY2svbG9jay4uDQoNCg0KPiAN
+Cj4gQmVydG8NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
