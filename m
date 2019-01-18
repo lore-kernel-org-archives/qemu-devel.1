@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55719)
+Received: from eggs.gnu.org ([209.51.188.92]:55735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbju-0004hk-V4
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbjv-0004i0-70
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbjt-0003xf-J0
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:46 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33615)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbjt-0003xT-HD
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:47 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33666)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbjs-0003mi-Ip
+	id 1gkbjt-0003ss-9V
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:31:45 -0500
-Received: by mail-pf1-x441.google.com with SMTP id c123so7220157pfb.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:31:38 -0800 (PST)
+Received: by mail-pg1-x544.google.com with SMTP id z11so6660047pgu.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:31:43 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:30:37 +1100
-Message-Id: <20190118213122.22865-4-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:30:39 +1100
+Message-Id: <20190118213122.22865-6-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 04/49] linux-user: Share more code for open
- and openat
+Subject: [Qemu-devel] [PATCH v6 06/49] linux-user: Split out readlink,
+ readlinkat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,131 +30,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-The do_openat helper can have all of the code that is not directly
-related to the argument ordering of these two syscalls.
+Split out a shared implementation for both of these;
+unify the best parts of /proc/self/exe checking.
+
+Remove the temporary forward declaration for is_proc_self.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-file.inc.c | 69 ++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 38 deletions(-)
+ linux-user/syscall-defs.h     |  6 ++++
+ linux-user/strace.c           | 29 ------------------
+ linux-user/syscall-file.inc.c | 45 ++++++++++++++++++++++++++++
+ linux-user/syscall.c          | 55 -----------------------------------
+ linux-user/strace.list        |  6 ----
+ 5 files changed, 51 insertions(+), 90 deletions(-)
 
+diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
+index 1f3a9c47ab..d1a6c6fa3c 100644
+--- a/linux-user/syscall-defs.h
++++ b/linux-user/syscall-defs.h
+@@ -20,3 +20,9 @@
+ SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+ #endif
+ SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
++#ifdef TARGET_NR_readlink
++SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
++#endif
++#ifdef TARGET_NR_readlinkat
++SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
++#endif
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 1e4f6c9b53..4faeb8c031 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -2244,35 +2244,6 @@ print_fstatat64(const struct syscallname *name,
+ #define print_newfstatat    print_fstatat64
+ #endif
+ 
+-#ifdef TARGET_NR_readlink
+-static void
+-print_readlink(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_string(arg0, 0);
+-    print_pointer(arg1, 0);
+-    print_raw_param("%u", arg2, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+-#ifdef TARGET_NR_readlinkat
+-static void
+-print_readlinkat(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_at_dirfd(arg0, 0);
+-    print_string(arg1, 0);
+-    print_pointer(arg2, 0);
+-    print_raw_param("%u", arg3, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_rename
+ static void
+ print_rename(const struct syscallname *name,
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index ca777da753..ffa70bbea8 100644
+index f202a4c8f4..841795f8aa 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -221,8 +221,8 @@ static int open_net_route(void *cpu_env, int fd)
- }
- #endif
- 
--static int do_openat(void *cpu_env, int dirfd, const char *pathname,
--                     int flags, mode_t mode)
-+static abi_long do_openat(void *cpu_env, int dirfd, abi_ulong target_path,
-+                          int target_flags, mode_t mode)
+@@ -308,3 +308,48 @@ SYSCALL_IMPL(openat)
  {
-     struct fake_open {
-         const char *filename;
-@@ -241,9 +241,20 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-         { NULL, NULL, NULL }
-     };
- 
-+    char *pathname = lock_user_string(target_path);
-+    int flags = target_to_host_bitmask(target_flags, fcntl_flags_tbl);
+     return do_openat(cpu_env, arg1, arg2, arg3, arg4);
+ }
++
++static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
++                              abi_ulong target_buf, abi_ulong bufsiz)
++{
++    char *p = lock_user_string(target_path);
++    void *buf = lock_user(VERIFY_WRITE, target_buf, bufsiz, 0);
 +    abi_long ret;
 +
-+    if (!pathname) {
-+        return -TARGET_EFAULT;
-+    }
++    if (!p || !buf) {
++        ret = -TARGET_EFAULT;
++    } else if (!bufsiz) {
++        /* Short circuit this for the magic exe check. */
++        ret = -TARGET_EINVAL;
++    } else if (is_proc_myself((const char *)p, "exe")) {
++        char real[PATH_MAX];
++        char *temp = realpath(exec_path, real);
 +
-     if (is_proc_myself(pathname, "exe")) {
--        int execfd = qemu_getauxval(AT_EXECFD);
--        return execfd ? execfd : safe_openat(dirfd, exec_path, flags, mode);
-+        ret = qemu_getauxval(AT_EXECFD);
-+        if (ret == 0) {
-+            ret = get_errno(safe_openat(dirfd, exec_path, flags, mode));
++        if (temp == NULL) {
++            ret = -host_to_target_errno(errno);
++        } else {
++            ret = MIN(strlen(real), bufsiz);
++            /* We cannot NUL terminate the string. */
++            memcpy(buf, real, ret);
 +        }
-+        goto done;
-     }
- 
-     for (fake_open = fakes; fake_open->filename; fake_open++) {
-@@ -255,7 +266,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-     if (fake_open->filename) {
-         const char *tmpdir;
-         char filename[PATH_MAX];
--        int fd, r;
-+        int fd;
- 
-         /* create temporary file to map stat to */
-         tmpdir = getenv("TMPDIR");
-@@ -265,55 +276,37 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-         snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
-         fd = mkstemp(filename);
-         if (fd < 0) {
--            return fd;
-+            ret = -TARGET_ENOENT;
-+            goto done;
-         }
-         unlink(filename);
- 
--        r = fake_open->fill(cpu_env, fd);
--        if (r) {
--            int e = errno;
-+        ret = fake_open->fill(cpu_env, fd);
-+        if (ret) {
-+            ret = get_errno(ret);
-             close(fd);
--            errno = e;
--            return r;
-+            goto done;
-         }
-         lseek(fd, 0, SEEK_SET);
--
--        return fd;
-+        ret = fd;
-+        goto done;
-     }
- 
--    return safe_openat(dirfd, path(pathname), flags, mode);
-+    ret = get_errno(safe_openat(dirfd, path(pathname), flags, mode));
-+ done:
-+    fd_trans_unregister(ret);
-+    unlock_user(pathname, target_path, 0);
++    } else {
++        ret = get_errno(readlinkat(dirfd, path(p), buf, bufsiz));
++    }
++    unlock_user(buf, target_buf, ret);
++    unlock_user(p, target_path, 0);
 +    return ret;
++}
++
++#ifdef TARGET_NR_readlink
++SYSCALL_IMPL(readlink)
++{
++    return do_readlinkat(AT_FDCWD, arg1, arg2, arg3);
++}
++#endif
++
++#ifdef TARGET_NR_readlinkat
++SYSCALL_IMPL(readlinkat)
++{
++    return do_readlinkat(arg1, arg2, arg3, arg4);
++}
++#endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 32d1a285eb..035f17c0d9 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6577,8 +6577,6 @@ int host_to_target_waitstatus(int status)
+     return status;
  }
  
- #ifdef TARGET_NR_open
- SYSCALL_IMPL(open)
- {
--    char *p = lock_user_string(arg1);
--    abi_long ret;
+-static int is_proc_myself(const char *filename, const char *entry);
 -
--    if (!p) {
--        return -TARGET_EFAULT;
--    }
--    ret = get_errno(do_openat(cpu_env, AT_FDCWD, p,
--                              target_to_host_bitmask(arg2, fcntl_flags_tbl),
--                              arg3));
--    fd_trans_unregister(ret);
--    unlock_user(p, arg1, 0);
--    return ret;
-+    return do_openat(cpu_env, AT_FDCWD, arg1, arg2, arg3);
- }
+ #define TIMER_MAGIC 0x0caf0000
+ #define TIMER_MAGIC_MASK 0xffff0000
+ 
+@@ -8052,59 +8050,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         }
+         return ret;
  #endif
- 
- SYSCALL_IMPL(openat)
- {
--    char *p = lock_user_string(arg2);
--    abi_long ret;
--
--    if (!p) {
--        return -TARGET_EFAULT;
--    }
--    ret = get_errno(do_openat(cpu_env, arg1, p,
--                              target_to_host_bitmask(arg3, fcntl_flags_tbl),
--                              arg4));
--    fd_trans_unregister(ret);
--    unlock_user(p, arg2, 0);
--    return ret;
-+    return do_openat(cpu_env, arg1, arg2, arg3, arg4);
- }
+-#ifdef TARGET_NR_readlink
+-    case TARGET_NR_readlink:
+-        {
+-            void *p2;
+-            p = lock_user_string(arg1);
+-            p2 = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else if (!arg3) {
+-                /* Short circuit this for the magic exe check. */
+-                ret = -TARGET_EINVAL;
+-            } else if (is_proc_myself((const char *)p, "exe")) {
+-                char real[PATH_MAX], *temp;
+-                temp = realpath(exec_path, real);
+-                /* Return value is # of bytes that we wrote to the buffer. */
+-                if (temp == NULL) {
+-                    ret = get_errno(-1);
+-                } else {
+-                    /* Don't worry about sign mismatch as earlier mapping
+-                     * logic would have thrown a bad address error. */
+-                    ret = MIN(strlen(real), arg3);
+-                    /* We cannot NUL terminate the string. */
+-                    memcpy(p2, real, ret);
+-                }
+-            } else {
+-                ret = get_errno(readlink(path(p), p2, arg3));
+-            }
+-            unlock_user(p2, arg2, ret);
+-            unlock_user(p, arg1, 0);
+-        }
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_readlinkat)
+-    case TARGET_NR_readlinkat:
+-        {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user(VERIFY_WRITE, arg3, arg4, 0);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else if (is_proc_myself((const char *)p, "exe")) {
+-                char real[PATH_MAX], *temp;
+-                temp = realpath(exec_path, real);
+-                ret = temp == NULL ? get_errno(-1) : strlen(real) ;
+-                snprintf((char *)p2, arg4, "%s", real);
+-            } else {
+-                ret = get_errno(readlinkat(arg1, path(p), p2, arg4));
+-            }
+-            unlock_user(p2, arg3, ret);
+-            unlock_user(p, arg2, 0);
+-        }
+-        return ret;
+-#endif
+ #ifdef TARGET_NR_swapon
+     case TARGET_NR_swapon:
+         if (!(p = lock_user_string(arg1)))
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index b2d3e99df7..2f466e5699 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1079,12 +1079,6 @@
+ #ifdef TARGET_NR_readdir
+ { TARGET_NR_readdir, "readdir" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_readlink
+-{ TARGET_NR_readlink, "readlink" , NULL, print_readlink, NULL },
+-#endif
+-#ifdef TARGET_NR_readlinkat
+-{ TARGET_NR_readlinkat, "readlinkat" , NULL, print_readlinkat, NULL },
+-#endif
+ #ifdef TARGET_NR_readv
+ { TARGET_NR_readv, "readv" , NULL, NULL, NULL },
+ #endif
 -- 
 2.17.2
