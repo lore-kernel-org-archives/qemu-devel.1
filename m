@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40865)
+Received: from eggs.gnu.org ([209.51.188.92]:42073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gkQog-0000I6-6e
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:51:58 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gkQtU-000224-V8
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:56:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gkQoe-00084s-C1
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:51:58 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190108170655.29766-9-vsementsov@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-	<20190108170655.29766-9-vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 10:51:36 +0100
-Message-ID: <w51pnsuwaxj.fsf@maestria.local.igalia.com>
+	(envelope-from <stefanha@gmail.com>) id 1gkQtT-0003ll-Ro
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 04:56:56 -0500
+Date: Fri, 18 Jan 2019 09:56:52 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190118095652.GA21579@stefanha-x1.localdomain>
+References: <cover.1547475602.git.berto@igalia.com>
+	<20190116135444.GA16898@stefanha-x1.localdomain>
+	<w51d0ov2z9h.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] qcow2: bdrv_co_pwritev: move
- encryption code out of the lock
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+Content-Disposition: inline
+In-Reply-To: <w51d0ov2z9h.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during
+ _realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, den@openvz.org, pbonzini@redhat.com
-
-On Tue 08 Jan 2019 06:06:54 PM CET, Vladimir Sementsov-Ogievskiy wrote:
-> Encryption will be done in threads, to take benefit of it, we should
-> move it out of the lock first.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.c | 35 +++++++++++++++++++++--------------
->  1 file changed, 21 insertions(+), 14 deletions(-)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index d6ef606d89..76d3715350 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2077,11 +2077,20 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
->          ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
->                                           &cluster_offset, &l2meta);
->          if (ret < 0) {
-> -            goto fail;
-> +            goto out_locked;
->          }
->  
->          assert((cluster_offset & 511) == 0);
->  
-> +        ret = qcow2_pre_write_overlap_check(bs, 0,
-> +                                            cluster_offset + offset_in_cluster,
-> +                                            cur_bytes);
-> +        if (ret < 0) {
-> +            goto out_locked;
-> +        }
-> +
-> +        qemu_co_mutex_unlock(&s->lock);
-
-The usage of lock() and unlock() functions inside and outside of the
-loop plus the two 'locked' and 'unlocked' exit paths is starting to make
-things a bit more messy.
-
-Having a look at the code it seems that there's only these three parts
-in the whole function that need to have the lock held:
-
-one:
-   ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
-                                    &cluster_offset, &l2meta);
-   /* ... */
-   ret = qcow2_pre_write_overlap_check(bs, 0,
-                                       cluster_offset +
-                                       offset_in_cluster,
-                                       cur_bytes);
-
-two:
-
-   ret = qcow2_handle_l2meta(bs, &l2meta, true);
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
-three:
-   qcow2_handle_l2meta(bs, &l2meta, false);
+--6TrnltStXW4iwmi0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jan 17, 2019 at 02:24:10PM +0100, Alberto Garcia wrote:
+> On Wed 16 Jan 2019 02:54:44 PM CET, Stefan Hajnoczi wrote:
+> > This patch series makes virtio-blk and virtio-scsi more robust,
+> > although I haven't checked what happens if the drive is attached to a
+> > different IOThread than the device - will the switchover work?
+>=20
+> You mean if you use x-blockdev-set-iothread with a drive and then attach
+> it to a device using a different thread? That seems to work (with my
+> patch).
 
-So I wonder if it's perhaps simpler to add lock/unlock calls around
-those blocks?
+Does it work with a running VM that will do I/O?  If yes, then that's
+great and we should merge the virtio-blk/scsi patches to make them
+robust for this case.  I'm a little surprised it works though :-)
+because the code wasn't designed or tested for this.
 
-Berto
+Stefan
+
+--6TrnltStXW4iwmi0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcQaLjAAoJEJykq7OBq3PIVW8IAJNVRKEIrXC+PSwkBVhf4U4S
+wDt+Gjt3kLa/1eXeC4prWt/5w8xo9GXU+ijsp6dkz7zv2Glm3tnjp2/JXNYytWU2
+5j13M+DgjzjJawxoQXRUfpv4scrmGN9QFpZMzu9G/l9OF0g/G4F41Y84RF5KCPQl
+HzZneGTeG5xGdL2IK0N5Shq5swr2+pAZti+t3nzOgamvygs7pkNdLIr3UwEVeipm
+OdOEUvDr5g/cqkkmJyXbrzgIH6zPKOq6mjhHjQykIHYKOQdPkcSEg/sB43b3jWuD
+KkD708dFbKHFsVyayJiQ5Qhe06Ut0zKeAhG3JsRuR209uY7b0H9zpeILde99lEI=
+=KpGN
+-----END PGP SIGNATURE-----
+
+--6TrnltStXW4iwmi0--
