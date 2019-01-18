@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35838)
+Received: from eggs.gnu.org ([209.51.188.92]:35887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGd-0008It-Oc
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:57 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGh-0008Kh-PV
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSGZ-0005hl-Os
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:55 -0500
-Received: from mga06.intel.com ([134.134.136.31]:46974)
+	(envelope-from <yang.zhong@intel.com>) id 1gkSGf-0005mG-SS
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:59 -0500
+Received: from mga06.intel.com ([134.134.136.31]:46976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSGX-0005cV-Rv
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:51 -0500
+	id 1gkSGd-0005dV-S0
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:24:57 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:31 +0800
-Message-Id: <20190118112410.3010-5-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:23:35 +0800
+Message-Id: <20190118112410.3010-9-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v3 04/43] hw/m68k/Makefile.objs:
- Conditionally build boards
+Subject: [Qemu-devel] [RFC PATCH v3 08/43] hw/sh4/Makefile.objs: New
+ CONFIG_* varibales created for sh4 boards and device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +33,46 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_AN5206, CONFIG_MCF5206 and CONFIG_MCF5208 make
-variables created for m68k boards, and added to
-default-configs/m86k-softmmu.mak.
+Make hw/sh4 configurable and add new CONFIG_* to the default-configs/sh4*-softmmu.mak.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/m68k-softmmu.mak | 2 ++
- hw/m68k/Makefile.objs            | 4 ++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ default-configs/sh4-softmmu.mak   | 2 ++
+ default-configs/sh4eb-softmmu.mak | 2 ++
+ hw/sh4/Makefile.objs              | 4 ++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index 60f7cdfbf2..27f5274244 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -2,3 +2,5 @@
- 
- CONFIG_COLDFIRE=y
- CONFIG_PTIMER=y
-+CONFIG_AN5206=y
-+CONFIG_MCF5208=y
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index d1f089c08a..482f8477b4 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,2 +1,2 @@
--obj-y += an5206.o mcf5208.o
--obj-y += mcf5206.o mcf_intc.o
-+obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
-+obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
+index caeccd55be..1fdb009151 100644
+--- a/default-configs/sh4-softmmu.mak
++++ b/default-configs/sh4-softmmu.mak
+@@ -19,3 +19,5 @@ CONFIG_PCSPK=y
+ CONFIG_I82374=y
+ CONFIG_I8257=y
+ CONFIG_MC146818RTC=y
++CONFIG_R2D=y
++CONFIG_SHIX=y
+diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
+index 53b9cd7b5a..3b550a5fe8 100644
+--- a/default-configs/sh4eb-softmmu.mak
++++ b/default-configs/sh4eb-softmmu.mak
+@@ -19,3 +19,5 @@ CONFIG_PCSPK=y
+ CONFIG_I82374=y
+ CONFIG_I8257=y
+ CONFIG_MC146818RTC=y
++CONFIG_R2D=y
++CONFIG_SHIX=y
+diff --git a/hw/sh4/Makefile.objs b/hw/sh4/Makefile.objs
+index 2393702c57..2a707f9473 100644
+--- a/hw/sh4/Makefile.objs
++++ b/hw/sh4/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y += shix.o r2d.o
+-
+ obj-y += sh7750.o sh7750_regnames.o
+ obj-y += sh_pci.o
++obj-$(CONFIG_R2D) +=  r2d.o
++obj-$(CONFIG_SHIX) += shix.o
 -- 
 2.17.1
