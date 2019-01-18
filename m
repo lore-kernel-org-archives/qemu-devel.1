@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42871)
+Received: from eggs.gnu.org ([209.51.188.92]:42899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkVbP-0002ht-Ty
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkVbR-0002jQ-Ux
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkVbO-0007JG-Jt
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:35 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:34424)
+	(envelope-from <peter.maydell@linaro.org>) id 1gkVbP-0007Jz-TF
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:37 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:33776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkVbN-00077x-Rw
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:33 -0500
-Received: by mail-wr1-x432.google.com with SMTP id j2so15495837wrw.1
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:58:16 -0800 (PST)
+	id 1gkVbN-00078I-Vh
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:35 -0500
+Received: by mail-wr1-x433.google.com with SMTP id c14so15472063wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:58:17 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	e27sm92094561wra.67.2019.01.18.06.58.14 for <qemu-devel@nongnu.org>
+	e27sm92094561wra.67.2019.01.18.06.58.15 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Fri, 18 Jan 2019 06:58:14 -0800 (PST)
+	Fri, 18 Jan 2019 06:58:15 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 14:57:23 +0000
-Message-Id: <20190118145805.6852-8-peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 14:57:24 +0000
+Message-Id: <20190118145805.6852-9-peter.maydell@linaro.org>
 In-Reply-To: <20190118145805.6852-1-peter.maydell@linaro.org>
 References: <20190118145805.6852-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/49] target/arm: Add PAuth active bit to
- tbflags
+Subject: [Qemu-devel] [PULL 08/49] target/arm: Introduce raise_exception_ra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,87 +37,75 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-There are 5 bits of state that could be added, but to save
-space within tbflags, add only a single enable bit.
-Helpers will determine the rest of the state at runtime.
+This path uses cpu_loop_exit_restore to unwind current processor state.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190108223129.5570-4-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190108223129.5570-5-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h           |  1 +
- target/arm/translate.h     |  2 ++
- target/arm/helper.c        | 19 +++++++++++++++++++
- target/arm/translate-a64.c |  1 +
- 4 files changed, 23 insertions(+)
+ target/arm/internals.h |  7 +++++++
+ target/arm/op_helper.c | 19 +++++++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 843d5936ead..9ad7b2d11ed 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3014,6 +3014,7 @@ FIELD(TBFLAG_A64, TBI0, 0, 1)
- FIELD(TBFLAG_A64, TBI1, 1, 1)
- FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
- FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
-+FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 78e026d6e90..c01a3f8c968 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -103,6 +103,13 @@ FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
+ void QEMU_NORETURN raise_exception(CPUARMState *env, uint32_t excp,
+                                    uint32_t syndrome, uint32_t target_el);
  
- static inline bool bswap_code(bool sctlr_b)
- {
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 1550aa8bc7f..d8a8bb4e9c0 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -68,6 +68,8 @@ typedef struct DisasContext {
-     bool is_ldex;
-     /* True if a single-step exception will be taken to the current EL */
-     bool ss_same_el;
-+    /* True if v8.3-PAuth is active.  */
-+    bool pauth_active;
-     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
-     int c15_cpar;
-     /* TCG op of the current insn_start.  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9bf8fbd8f9b..caea722c9b8 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12983,6 +12983,25 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-             flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
-             flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
-         }
++/*
++ * Similarly, but also use unwinding to restore cpu state.
++ */
++void QEMU_NORETURN raise_exception_ra(CPUARMState *env, uint32_t excp,
++                                      uint32_t syndrome, uint32_t target_el,
++                                      uintptr_t ra);
 +
-+        if (cpu_isar_feature(aa64_pauth, cpu)) {
-+            /*
-+             * In order to save space in flags, we record only whether
-+             * pauth is "inactive", meaning all insns are implemented as
-+             * a nop, or "active" when some action must be performed.
-+             * The decision of which action to take is left to a helper.
-+             */
-+            uint64_t sctlr;
-+            if (current_el == 0) {
-+                /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-+                sctlr = env->cp15.sctlr_el[1];
-+            } else {
-+                sctlr = env->cp15.sctlr_el[current_el];
-+            }
-+            if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
-+                flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
-+            }
-+        }
-     } else {
-         *pc = env->regs[15];
-         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b7b6ab63716..37a57af7150 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13409,6 +13409,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
-     dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
-     dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
-+    dc->pauth_active = FIELD_EX32(tb_flags, TBFLAG_A64, PAUTH_ACTIVE);
-     dc->vec_len = 0;
-     dc->vec_stride = 0;
-     dc->cp_regs = arm_cpu->cp_regs;
+ /*
+  * For AArch64, map a given EL to an index in the banked_spsr array.
+  * Note that this mapping and the AArch32 mapping defined in bank_number()
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index ef72361a36d..8b31c6a13b8 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -28,8 +28,8 @@
+ #define SIGNBIT (uint32_t)0x80000000
+ #define SIGNBIT64 ((uint64_t)1 << 63)
+ 
+-void raise_exception(CPUARMState *env, uint32_t excp,
+-                     uint32_t syndrome, uint32_t target_el)
++static CPUState *do_raise_exception(CPUARMState *env, uint32_t excp,
++                                    uint32_t syndrome, uint32_t target_el)
+ {
+     CPUState *cs = CPU(arm_env_get_cpu(env));
+ 
+@@ -50,9 +50,24 @@ void raise_exception(CPUARMState *env, uint32_t excp,
+     cs->exception_index = excp;
+     env->exception.syndrome = syndrome;
+     env->exception.target_el = target_el;
++
++    return cs;
++}
++
++void raise_exception(CPUARMState *env, uint32_t excp,
++                     uint32_t syndrome, uint32_t target_el)
++{
++    CPUState *cs = do_raise_exception(env, excp, syndrome, target_el);
+     cpu_loop_exit(cs);
+ }
+ 
++void raise_exception_ra(CPUARMState *env, uint32_t excp, uint32_t syndrome,
++                        uint32_t target_el, uintptr_t ra)
++{
++    CPUState *cs = do_raise_exception(env, excp, syndrome, target_el);
++    cpu_loop_exit_restore(cs, ra);
++}
++
+ static int exception_target_el(CPUARMState *env)
+ {
+     int target_el = MAX(1, arm_current_el(env));
 -- 
 2.20.1
