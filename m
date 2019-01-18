@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48234)
+Received: from eggs.gnu.org ([209.51.188.92]:48630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gkRGA-0001UR-1A
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:20:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1gkRGz-0002BN-Hh
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:21:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gkRG8-0006CA-RY
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:20:21 -0500
-Date: Fri, 18 Jan 2019 11:20:01 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190118112001.4bb2cf6f@redhat.com>
-In-Reply-To: <20190116113523.9213-10-david@redhat.com>
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-10-david@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gkRGt-0007Te-U8
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:21:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkRGt-0007TC-OC
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:21:07 -0500
+Date: Fri, 18 Jan 2019 10:21:02 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190118102102.GH20660@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
+	<20190118100159.GA2483@work-vm>
+	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
+	<20190118101633.GC2146@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 09/10] pc: Support for PCI based memory
- devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190118101633.GC2146@work-vm>
+Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
+ hosts, with VMX flag enabled in the guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,170 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Mielke <mark.mielke@gmail.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
 
-On Wed, 16 Jan 2019 12:35:22 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> Override the PCI device hotplug handler to properly handle the
-> memory device part from the machine hotplug handler and forward to the
-> actual PCI bus hotplug handler.
+On Fri, Jan 18, 2019 at 10:16:34AM +0000, Dr. David Alan Gilbert wrote:
+> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+> > On 18/01/19 11:02, Dr. David Alan Gilbert wrote:
+> > >>
+> > >> It fails if the flag is set, rather than if any nested virtualization has
+> > >> been used before.
+> > >>
+> > >> I'm concerned I will end up with a requirement for *all* guests to be
+> > >> restarted in order to migrate them to the new hosts, rather than just the
+> > >> ones that would have a problem.
+> > > I think you should be able to migrate from 2.12->3.1 like this, but
+> > > you'd hit the problem when you then try and migrate again between your
+> > > new QEMUs.
+> > > 
+> > > I guess we could modify it to wire it to machine type, so that
+> > > older machine types didn't block.
+> > 
+> > That would also be wrong.  The old machine types _could_ be using KVM
+> > and they have no way to block the live migration.
+> > 
+> > The solution is to restart the VM using "-cpu host,-vmx".
 > 
-> As PCI hotplug has not been properly factored out into hotplug handlers,
-> most magic is performed in the (un)realize functions. Also some buses don't
-                                                             ^^^^^^^^ pls, be more specific
-
-> have a PCI hotplug handler at all yet (not sure if they are actually used
-> on x86, but just to be sure).
+> The problem as Christian explained in that thread is that it was common
+> for them to start VMs with vmx enabled but for people not to use it
+> on most of the VMs, so we break migration for most VMs even though most
+> don't use it.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/i386/pc.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 89 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index fd0cb29ba9..62f83859fa 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -75,6 +75,7 @@
->  #include "hw/usb.h"
->  #include "hw/i386/intel_iommu.h"
->  #include "hw/net/ne2000-isa.h"
-> +#include "hw/mem/memory-device.h"
->  
->  /* debug PC/ISA interrupts */
->  //#define DEBUG_IRQ
-> @@ -2224,6 +2225,84 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->      numa_cpu_pre_plug(cpu_slot, dev, errp);
->  }
->  
-> +static void pc_pci_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                            Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +        if (!hotplug_dev2) {
-> +            /*
-> +             * Without a bus hotplug handler, we cannot control the plug/unplug
-> +             * order. Disallow memory devices on such buses.
-> +             */
-> +            error_setg(errp, "Memory devices not supported on this bus.");
-> +            return;
-> +        }
-> +        memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev),
-> +                               NULL, errp);
-> +    }
-> +
-> +    if (hotplug_dev2) {
-> +        hotplug_handler_pre_plug(hotplug_dev2, dev, errp);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
-> +    }
-> +}
-> +
-> +static void pc_pci_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                        Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +        memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-> +    }
-> +
-> +    if (hotplug_dev2) {
-> +        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
-> +    }
-> +
-> +    if (local_err) {
-> +        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-> +        }
-> +    }
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void pc_pci_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                  Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +
-> +    if (hotplug_dev2) {
-> +        hotplug_handler_unplug_request(hotplug_dev2, dev, errp);
-> +    }
-> +}
-> +
-> +static void pc_pci_device_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp)
-> +{
-> +    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-> +    Error *local_err = NULL;
-> +
-> +    if (hotplug_dev2) {
-> +        hotplug_handler_unplug(hotplug_dev2, dev, &local_err);
-> +    }
-> +
-> +    if (!local_err) {
-> +        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-> +        }
-> +    }
-> +    error_propagate(errp, local_err);
-> +}
-> +
->  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->                                            DeviceState *dev, Error **errp)
->  {
-> @@ -2231,6 +2310,8 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_pre_plug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_pre_plug(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        pc_pci_pre_plug(hotplug_dev, dev, errp);
->      }
->  }
->  
-> @@ -2241,6 +2322,8 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_plug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_plug(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        pc_pci_plug(hotplug_dev, dev, errp);
->      }
->  }
->  
-> @@ -2251,6 +2334,8 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          pc_memory_unplug_request(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        pc_pci_unplug_request(hotplug_dev, dev, errp);
->      } else {
->          error_setg(errp, "acpi: device unplug request for not supported device"
->                     " type: %s", object_get_typename(OBJECT(dev)));
-> @@ -2264,6 +2349,8 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
->          pc_memory_unplug(hotplug_dev, dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          pc_cpu_unplug_cb(hotplug_dev, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        pc_pci_device_unplug(hotplug_dev, dev, errp);
->      } else {
->          error_setg(errp, "acpi: device unplug for not supported device"
->                     " type: %s", object_get_typename(OBJECT(dev)));
-> @@ -2274,7 +2361,8 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
->                                               DeviceState *dev)
->  {
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-> -        object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> +        object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
-> +        object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-why all PCI devices instead of virtio-pmem-pci one?
+> It might not be robust, but it worked for a lot of people most of the
+> time.
 
->          return HOTPLUG_HANDLER(machine);
->      }
->  
+Yes, this is exactly why I said we should make the migration blocker
+be conditional on any L2 guest having been started. I vaguely recall
+someone saying there wasn't any way to detect this situation from
+QEMU though ?
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
