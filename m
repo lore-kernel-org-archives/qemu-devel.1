@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37018)
+Received: from eggs.gnu.org ([209.51.188.92]:39952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSJH-00022l-Hj
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:40 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSSw-0001n6-B2
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSJG-0007ry-Ng
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:39 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47041)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSJF-0005r5-8S
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:38 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:24:09 +0800
-Message-Id: <20190118112410.3010-43-yang.zhong@intel.com>
-In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
-References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 42/43] minikconf: implement allyesconfig,
- allnoconfig, randconfig, defconfig
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSSu-0008HN-Ty
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:38 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gkSSu-00088J-6K
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:36 -0500
+Received: by mail-wm1-x344.google.com with SMTP id r24so788658wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:37:30 -0800 (PST)
+MIME-Version: 1.0
+References: <20181226034254.17842-1-richard.henderson@linaro.org>
+	<20190116235009.tl4gcv53e62npecl@function>
+	<d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
+	<CAFEAcA9moCfRCHkivgU7Qesi3xeD=8u8+0WScM84f-dcwyYfrw@mail.gmail.com>
+	<CAJ+F1CK9Bkw0ULs5j2n9v_py1DRqLFgPGaHXBBvdWBb-eBDcvg@mail.gmail.com>
+In-Reply-To: <CAJ+F1CK9Bkw0ULs5j2n9v_py1DRqLFgPGaHXBBvdWBb-eBDcvg@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 18 Jan 2019 15:37:17 +0400
+Message-ID: <CAJ+F1C+PX8d+py3q=CZAND+TkgatXjAQPNP-NXZkz+NBChmZXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,134 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Richard Henderson <richard.henderson@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Hi
 
-Apart from defconfig (which is a no-op), the others are implemented
-implemented simply by ignoring the RHS of assignments and "default"
-statements.  The RHS is replaced respectively by "true", "false" or
-a random value.
+On Fri, Jan 18, 2019 at 3:25 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Thu, Jan 17, 2019 at 5:56 PM Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+> >
+> > On Thu, 17 Jan 2019 at 13:41, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
+> > > On 1/17/19 12:50 AM, Samuel Thibault wrote:
+> > > > --- a/slirp/slirp.c
+> > > > +++ b/slirp/slirp.c
+> > > > @@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *p=
+kt, int pkt_len)
+> > > >      if (pkt_len < ETH_HLEN)
+> > > >          return;
+> > > >
+> > > > -    proto =3D ntohs(*(uint16_t *)(pkt + 12));
+> > > > +    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
+> > > >      switch(proto) {
+> > > >      case ETH_P_ARP:
+> > > >          arp_input(slirp, pkt, pkt_len);
+> > >
+> > > What about using memcpy?
+> >
+> > We should use whatever the new libslirp wants to consistently
+> > use as its mechanism for loading unaligned data. I don't
+> > suppose this is the only place where it ever needs to do this.
+> >
+> > Personally I would vote for having libslirp have versions of
+> > the ld*_p functions, because they solve the problem in a
+> > clear and correct way. But that's up to Marc-Andr=C3=A9 really.
+>
+> I think I would go with a copy of qemu bswap.h, unless there is an
+> equivalent in glib (I don't think so) or gnulib? Or other standard
+> compiler solution.
+>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile             |  5 +++++
- scripts/minikconf.py | 43 ++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 41 insertions(+), 7 deletions(-)
+The GStreamer solution is also quite readable.
+https://gitlab.freedesktop.org/gstreamer/gstreamer/blob/master/gst/gstutils=
+.h#L165
 
-diff --git a/Makefile b/Makefile
-index 01e7c60a0d..b2d45aa6d4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -336,6 +336,11 @@ MINIKCONF_ARGS = \
- 
- MINIKCONF = $(SHELL) $(SRC_PATH)/scripts/minikconf.sh
- 
-+.PHONY: allyesconfig allnoconfig defconfig randconfig
-+allyesconfig allnoconfig defconfig randconfig:
-+	rm */config-devices.mak config-all-devices.mak
-+	$(MAKE) MINIKCONF="$(MINIKCONF) --$<" config-all-devices.mak
-+
- %/config-devices.mak: default-configs/%-softmmu.mak Kconfig.host hw/Kconfig
- 	$(call quiet-command, \
-             $(MINIKCONF) $@ $*-config-devices.mak.d $^ $(MINIKCONF_ARGS) > $@.tmp, "  GEN   $@.tmp")
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index b0b4f76733..a6c2f0c759 100644
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -13,8 +13,10 @@
- import os
- import sys
- import re
-+import random
- 
--__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
-+__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser',
-+        'defconfig', 'allyesconfig', 'allnoconfig', 'randconfig' ]
- 
- def debug_print(*args):
-     #print ' '.join(str(x) for x in args)
-@@ -30,6 +32,11 @@ def debug_print(*args):
- # just its name).
- # -------------------------------------------
- 
-+allyesconfig = lambda x: True
-+allnoconfig = lambda x: False
-+defconfig = lambda x: x
-+randconfig = lambda x: random.randint(0, 1) == 1
-+
- class KconfigData:
-     class Expr:
-         def __and__(self, rhs):
-@@ -178,7 +185,8 @@ class KconfigData:
-             if self.cond.evaluate():
-                 self.dest.set_value(True)
- 
--    def __init__(self):
-+    def __init__(self, value_mangler=defconfig):
-+        self.value_mangler = value_mangler
-         self.previously_included = []
-         self.incl_info = None
-         self.defined_vars = set()
-@@ -256,10 +264,12 @@ class KconfigData:
-         return var_obj
- 
-     def do_assignment(self, var, val):
--        self.clauses.append(KconfigData.AssignmentClause(var, val))
-+        f = self.value_mangler
-+        self.clauses.append(KconfigData.AssignmentClause(var, f(val)))
- 
-     def do_default(self, var, val, cond=None):
--        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
-+        f = self.value_mangler
-+        self.clauses.append(KconfigData.DefaultClause(var, f(val), cond))
- 
-     def do_depends_on(self, var, expr):
-         self.clauses.append(KconfigData.DependsOnClause(var, expr))
-@@ -307,9 +317,10 @@ class KconfigParserError(Exception):
-         return "%s: %s" % (self.loc, self.msg)
- 
- class KconfigParser:
-+
-     @classmethod
--    def parse(self, fp):
--        data = KconfigData()
-+    def parse(self, fp, mode=None):
-+        data = KconfigData(mode or KconfigParser.defconfig)
-         parser = KconfigParser(data)
-         parser.parse_file(fp)
-         return data
-@@ -625,11 +636,29 @@ class KconfigParser:
- 
- if __name__ == '__main__':
-     argv = sys.argv
-+    mode = defconfig
-+    if len(sys.argv) > 1:
-+        if argv[1] == '--defconfig':
-+            del argv[1]
-+        elif argv[1] == '--randconfig':
-+            mode = randconfig
-+            del argv[1]
-+        elif argv[1] == '--allyesconfig':
-+            mode = allyesconfig
-+            del argv[1]
-+        elif argv[1] == '--allnoconfig':
-+            mode = allnoconfig
-+            del argv[1]
-+
-     if len(argv) == 1:
-         print >>sys.stderr, "%s: at least one argument is required" % argv[0]
-         os.exit(1)
- 
--    data = KconfigData()
-+    if argv[1].startswith('-'):
-+        print >>sys.stderr, "%s: invalid option %s" % (argv[0], argv[1])
-+        os.exit(1)
-+
-+    data = KconfigData(mode)
-     parser = KconfigParser(data)
-     for arg in argv[3:]:
-         m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
--- 
-2.17.1
+
+--=20
+Marc-Andr=C3=A9 Lureau
