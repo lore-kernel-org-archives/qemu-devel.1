@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53943)
+Received: from eggs.gnu.org ([209.51.188.92]:54867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkdUY-0003ft-HX
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:24:03 -0500
+	(envelope-from <lersek@redhat.com>) id 1gkdYv-0005Ll-Bl
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkdUX-0005NE-KI
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:24:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47108)
+	(envelope-from <lersek@redhat.com>) id 1gkdYo-0002O1-Sg
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gkdUX-0005Lo-CZ
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:24:01 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gkdYl-0002Gu-1e
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:23 -0500
 References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
-	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
-	<20190116132953.404247ec@redhat.com>
-	<20190116110052-mutt-send-email-mst@kernel.org>
-	<d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
-	<20190117102239.mnixjppxpuprjwau@sirius.home.kraxel.org>
-	<a436b1e2-1010-624d-4415-46450f4bedda@redhat.com>
-	<20190117140950.grbbjyhcbv6kob74@sirius.home.kraxel.org>
+	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
+	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
+	<20190116113227.47ebdea2@redhat.com>
+	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
+	<20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
+	<20190116133133.3c43531f@redhat.com>
+	<ad76d8d9-fd8e-c7ef-405a-5eb9adf8f3a0@redhat.com>
+	<20190117161122.457fb2f3@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0e617949-e603-7f8e-d235-17f675204db2@redhat.com>
-Date: Sat, 19 Jan 2019 00:23:45 +0100
+Message-ID: <cc072ba3-b49b-7b6b-fa32-8fad3d404316@redhat.com>
+Date: Sat, 19 Jan 2019 00:28:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190117140950.grbbjyhcbv6kob74@sirius.home.kraxel.org>
+In-Reply-To: <20190117161122.457fb2f3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
+Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
+ when UEFI firmware is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,72 +36,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On 01/17/19 15:09, Gerd Hoffmann wrote:
-> On Thu, Jan 17, 2019 at 01:54:51PM +0100, Laszlo Ersek wrote:
->> On 01/17/19 11:22, Gerd Hoffmann wrote:
->>>   Hi,
->>>
->>>>>>>>  create mode 100644 pc-bios/avmf.img
->>>>>>>>  create mode 100644 pc-bios/avmf_vars.img  
->>>>>>>
->>>>>>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
->>>>>>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
->>>>>>> would be more precise, but those are verbose. Sigh, why are names so
->>>>>>> hard. What does everyone think?
->>>>>> I'm fine with either version.
->>>
->>> How about placing them in pc-bios/efi-$arch subdirs and not renaming the
->>> files, i.e. that would be ...
->>>
->>> 	pc-bios/efi-aarch64/QEMU_EFI.fd
->>> 	pc-bios/efi-aarch64/QEMU_VARS.fd
->>>
->>> ... for arm, and ...
->>>
->>> 	pc-bios/efi-x86_64/OVMF_CODE.fd
->>> 	pc-bios/efi-x86_64/OVMF_VARS.fd
->>>
->>> ... for x86.
+On 01/17/19 16:11, Igor Mammedov wrote:
+> On Wed, 16 Jan 2019 17:22:31 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> On 01/16/19 13:31, Igor Mammedov wrote:
+>>> On Wed, 16 Jan 2019 12:52:17 +0100
+>>> Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>>   
+>>>>   Hi,
+>>>>  
+>>>>> This approach allows the UEFI app source to live in the QEMU tree, and
+>>>>> the affected maintainer(s) would be personally responsible for setting
+>>>>> up their edk2 clones, and compilers. (The edk2 clone could even be a
+>>>>> submodule of QEMU, for example at roms/edk2.) For example,
+>>>>> "roms/Makefile" already calls an external EFIROM utility (also from
+>>>>> edk2) in order to build the combined iPXE option ROMs.
+>>>>>
+>>>>> And yes, we could turn the UEFI binaries into bootable ISO images at once.
+>>>>>
+>>>>> I'll try to post some patches soon (or not so soon). I think the app's
+>>>>> source code, and the edk2 submodule, should live under roms/, and the
+>>>>> bootable images should live under pc-bios/.
+>>>>>
+>>>>> (In fact we could use this opportunity to build & bundle OVMF itself...
+>>>>> not sure if that's in scope for now. Gerd, what's your take?)    
+>>>>
+>>>> Well, there is still the idea to move over firmware submodules and
+>>>> prebuilt firmware blobs to a separate repo.  Expermimental repo:
+>>>> https://git.kraxel.org/cgit/qemu-firmware/.  Not touched for more than a
+>>>> year due to being busy with other stuff.  Oh well ...
+>>>>
+>>>> (if someone feels like picking this up feel free to do so).
+>>>>
+>>>> I think adding edk2 as submodule below roms/ makes sense.  Adding rules
+>>>> to roms/Makefile to build the blobs makes sense too.  Not sure we want
+>>>> the binaries actually copied over to pc-bios/ and commited as the uefi
+>>>> firmware is pretty big ...
+>>>>
+>>>> Not sure what a good place for the uefi app would be.  I'd tend to not
+>>>> use roms/, that is the place for firmware submodules.  
 >>
->> That sounds good to me. One thing to note is that the arm/aarch64 images
->> have to be padded to 64MB, so I generally append ".padded" to those file
->> names. Would that be OK? Any better ideas?
-> 
-> Ah, right, the arm versions can't be used as-is with pflash.  In my rpm
-> builds I've named the padded version "QEMU_EFI-pflash.raw".  Using
-> .padded looks fine to me too.
-> 
-> Other idea:  Does it make sense to use qcow2 for the pflash images?
-> i.e. "qemu-img create -f qcow2 -b QEMU_EFI.fd -F raw QEMU_EFI.qcow2 64M"?
+>> I figured the source code for the UEFI app would fit due to the script
+>> "configure-seabios.sh" and some actual config files being there already.
+>> But, I'm happy to follow directions. :)
+>>
+>>>>  contrib/ or test/ maybe?  
+>>
+>>> Could be tests/data/acpi in this case  
+>>
+>> If "tests/data/acpi" is appropriate for source code, that works for me.
+>> We already have "rebuild-expected-aml.sh" there, so I guess another
+>> build script and the UEFI app source code would fit there too.
+> I suggested tests/data/acpi for binary EFI app blobs
+> For EFI app source maybe just 'tests' or sub-directory there and make
+> 'make check-efi-app' build EFI app (doing all needed magic and asking for things that missing)
+> if source is newer than blobs.
 
-That's a long story.
+I've been busy all day hacking and staying away from email, so when you see that my patches didn't follow this closely in the end, please know that I didn't deliberately ignore your point -- I'm just getting to it now. Let's continue the discussion under
 
-In a perfect world, the answer would be, "qcow2 (and all its features)
-make perfect sense for pflash images". In the world we have however,
-"savevm" exists, which might dump live guest RAM into whichever qcow2
-disk it finds first. See
-<https://bugzilla.redhat.com/show_bug.cgi?id=1214187>.
+  [qemu-devel] [PATCH 0/5] add the BiosTablesTest UEFI app, build it with the new roms/edk2 submodule
 
-(I apologize to any non-RedHatters reading this; that's a private RHBZ
-for some obscure reason, and I dare not open it up myself.)
-
-See also libvirt commit 9e2465834f4b ("qemu: snapshot: Forbid internal
-snapshots with pflash firmware", 2017-03-24).
-
-So, for now, it remains the case that we're better off with raw, at
-least for the writeable (=varstore) pflash chip.
-
-In addition, when libvirt composes the cmdline, it specifies format=raw
-for unit=0 (i.e., firmware image pflash) as well. (That's actually a
-good thing, because we shouldn't auto-detect the format, and qcow2 is
-out (for now), so we should specify format=raw. In the future, the
-domain XML schema may have to be extended with "format" too.)
-
-... For now, it's probably best to check the unpadded FDs into git, and
-pad them only in "make install".
-
-Thanks,
+Thanks!
 Laszlo
+
+> 
+>>
+>> It would be nice if I could get around submitting some patches this
+>> week. Sigh. :/
+>>
+>> Thanks,
+>> Laszlo
+>>
+> 
