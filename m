@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44822)
+Received: from eggs.gnu.org ([209.51.188.92]:45023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gkVhb-00085U-4g
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:05:01 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gkViL-0000Ht-Br
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:05:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gkVha-0005tg-92
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:04:59 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gkVhW-0005TR-M9
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:04:56 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p6so4797537wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 07:04:41 -0800 (PST)
-References: <20190116170114.26802-1-cota@braap.org>
-	<20190116170114.26802-4-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190116170114.26802-4-cota@braap.org>
-Date: Fri, 18 Jan 2019 15:04:38 +0000
-Message-ID: <87y37ixb09.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1gkViI-0006Yi-Q3
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 10:05:44 -0500
+Date: Fri, 18 Jan 2019 16:05:29 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190118160529.73e98f56@redhat.com>
+In-Reply-To: <7d455ae2-7752-b7d0-bd1c-c9454f9a6a7d@redhat.com>
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-2-david@redhat.com>
+	<20190118105806.5c00605e@redhat.com>
+	<7d455ae2-7752-b7d0-bd1c-c9454f9a6a7d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 3/3] tcg/i386: enable dynamic TLB sizing
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 01/10] qdev: Let the
+ hotplug_handler_unplug() caller delete the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +26,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+
+On Fri, 18 Jan 2019 13:41:06 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 18.01.19 10:58, Igor Mammedov wrote:
+> > On Wed, 16 Jan 2019 12:35:14 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> When unplugging a device, at one point the device will be destroyed
+> >> via object_unparent(). This will, one the one hand, unrealize the
+> >> removed device hierarchy, and on the other hand, destroy/free the
+> >> device hierarchy.
+> >>
+> >> When chaining interrupt handlers, we want to overwrite a bus hotplug  
+> > s/interrupt/hotplug/  
+> 
+> whoops :)
+> 
+> >   
+> >> handler by the machine hotplug handler, to be able to perform
+> >> some part of the plug/unplug and to forward the calls to the bus hotplug
+> >> handler.
+> >>
+> >> For now, the bus hotplug handler would trigger an object_unparent(), not
+> >> allowing us to perform some unplug action on a device after we forwarded
+> >> the call to the bus hotplug handler. The device would be gone at that
+> >> point.
+> >>
+> >> machine_unplug_handler(dev)
+> >>     /* eventually do unplug stuff */
+> >>     bus_unplug_handler(dev)
+> >>     /* dev is gone, we can't do more unplug stuff */
+> >>
+> >> So move the object_unparent() to the original caller of the unplug. For
+> >> now, keep the unrealize() at the original places of the
+> >> object_unparent(). For implicitly chained hotplug handlers (e.g. pc
+> >> code calling acpi hotplug handlers), the object_unparent() has to be
+> >> done by the outermost caller. So when calling hotplug_handler_unplug()
+> >> from inside an unplug handler, nothing is to be done.
+> >>
+> >> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+> >>     machine_unplug_handler(dev) {
+> >>         /* eventually do unplug stuff */
+> >>         bus_unplug_handler(dev) -> calls unrealize(dev)
+> >>         /* we can do more unplug stuff but device already unrealized */
+> >>     }
+> >> object_unparent(dev)
+> >>
+> >> In the long run, every unplug action should be factored out of the
+> >> unrealize() function into the unplug handler (especially for PCI). Then
+> >> we can get rid of the additonal unrealize() calls and object_unparent()
+> >> will properly unrealize the device hierarchy after the device has been
+> >> unplugged.
+> >>
+> >> hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+> >>     machine_unplug_handler(dev) {
+> >>         /* eventually do unplug stuff */
+> >>         bus_unplug_handler(dev) -> only unplugs, does not unrealize
+> >>         /* we can do more unplug stuff */
+> >>     }
+> >> object_unparent(dev) -> will unrealize
+> >>
+> >> The original approach was suggested by Igor Mammedov for the PCI
+> >> part, but I extended it to all hotplug handlers. I consider this one
+> >> step into the right direction.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>  
+> > 
+> > Have you tested all affect use-cases after this patch?  
+> 
+> I tested some (e.g. ACPI PCI hotplug/unplug, s390x PCI hotplug/unplug
+> ...) to make sure this fundamentally workd, but certainly not all yet :)
+
+I've looked at acpi/pci/pcie/shcp and qdev parts and it looks correct,
+so for that parts on condition of complete manual testing (a device per affected unplug chain),
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 
-Emilio G. Cota <cota@braap.org> writes:
+we have limited coverage in tests, see qtest_qmp_device_del() for devices
+that allow surprise removal but that covers only qdev_simple_device_unplug_cb()
+part and is not sufficient.
 
-> As the following experiments show, this series is a net perf gain,
-> particularly for memory-heavy workloads. Experiments are run on an
-> Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
->
-> 1. System boot + shudown, debian aarch64:
->
-> - Before (v3.1.0):
->  Performance counter stats for './die.sh v3.1.0' (10 runs):
->
->        9019.797015      task-clock (msec)         #    0.993 CPUs utilize=
-d            ( +-  0.23% )
->     29,910,312,379      cycles                    #    3.316 GHz         =
-             ( +-  0.14% )
->     54,699,252,014      instructions              #    1.83  insn per cyc=
-le           ( +-  0.08% )
->     10,061,951,686      branches                  # 1115.541 M/sec       =
-             ( +-  0.08% )
->        172,966,530      branch-misses             #    1.72% of all branc=
-hes          ( +-  0.07% )
->
->        9.084039051 seconds time elapsed                                  =
-        ( +-  0.23% )
->
-> - After:
->  Performance counter stats for './die.sh tlb-dyn-v5' (10 runs):
->
->        8624.084842      task-clock (msec)         #    0.993 CPUs utilize=
-d            ( +-  0.23% )
->     28,556,123,404      cycles                    #    3.311 GHz         =
-             ( +-  0.13% )
->     51,755,089,512      instructions              #    1.81  insn per cyc=
-le           ( +-  0.05% )
->      9,526,513,946      branches                  # 1104.641 M/sec       =
-             ( +-  0.05% )
->        166,578,509      branch-misses             #    1.75% of all branc=
-hes          ( +-  0.19% )
->
->        8.680540350 seconds time elapsed                                  =
-        ( +-  0.24% )
->
-> That is, a 4.4% perf increase.
->
-> 2. System boot + shutdown, ubuntu 18.04 x86_64:
->
-> - Before (v3.1.0):
->       56100.574751      task-clock (msec)         #    1.016 CPUs utilize=
-d            ( +-  4.81% )
->    200,745,466,128      cycles                    #    3.578 GHz         =
-             ( +-  5.24% )
->    431,949,100,608      instructions              #    2.15  insn per cyc=
-le           ( +-  5.65% )
->     77,502,383,330      branches                  # 1381.490 M/sec       =
-             ( +-  6.18% )
->        844,681,191      branch-misses             #    1.09% of all branc=
-hes          ( +-  3.82% )
->
->       55.221556378 seconds time elapsed                                  =
-        ( +-  5.01% )
->
-> - After:
->       56603.419540      task-clock (msec)         #    1.019 CPUs utilize=
-d            ( +- 10.19% )
->    202,217,930,479      cycles                    #    3.573 GHz         =
-             ( +- 10.69% )
->    439,336,291,626      instructions              #    2.17  insn per cyc=
-le           ( +- 14.14% )
->     80,538,357,447      branches                  # 1422.853 M/sec       =
-             ( +- 16.09% )
->        776,321,622      branch-misses             #    0.96% of all branc=
-hes          ( +-  3.77% )
->
->       55.549661409 seconds time elapsed                                  =
-        ( +- 10.44% )
->
-> No improvement (within noise range). Note that for this workload,
-> increasing the time window too much can lead to perf degradation,
-> since it flushes the TLB *very* frequently.
+It might be better adding missing ones at least one per category there,
+but it implies simulating eject sequence from guest side (we do similar
+thing to test device models using qtest accelerator), that should cover
+all cases.
 
-I would expect this to be fairly minimal in the amount of memory that is
-retouched. We spend a bunch of time paging things in just to drop
-everything and die. However heavy memory operations like my build stress
-test do see a performance boost.
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >   
+> >> ---
+> >>  hw/acpi/cpu.c            |  1 +
+> >>  hw/acpi/memory_hotplug.c |  1 +
+> >>  hw/acpi/pcihp.c          |  3 ++-
+> >>  hw/core/qdev.c           |  3 +--
+> >>  hw/i386/pc.c             |  5 ++---
+> >>  hw/pci/pcie.c            |  3 ++-
+> >>  hw/pci/shpc.c            |  3 ++-
+> >>  hw/ppc/spapr.c           |  4 ++--
+> >>  hw/ppc/spapr_pci.c       |  3 ++-
+> >>  hw/s390x/css-bridge.c    |  2 +-
+> >>  hw/s390x/s390-pci-bus.c  | 13 ++++++++-----
+> >>  qdev-monitor.c           |  9 +++++++--
+> >>  12 files changed, 31 insertions(+), 19 deletions(-)
+> >>  
+> > [...]  
+> >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >> index d59071b8ed..278cc094ec 100644
+> >> --- a/hw/core/qdev.c
+> >> +++ b/hw/core/qdev.c
+> >> @@ -286,8 +286,7 @@ void qbus_reset_all_fn(void *opaque)
+> >>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+> >>                                    DeviceState *dev, Error **errp)
+> >>  {
+> >> -    /* just zap it */
+> >> -    object_unparent(OBJECT(dev));
+> >> +    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+> >>  }
+> >>  
+> >>  /*  
+> > [...]  
+> >> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> >> index 07147c63bf..7705acd6c7 100644
+> >> --- a/qdev-monitor.c
+> >> +++ b/qdev-monitor.c
+> >> @@ -862,6 +862,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+> >>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> >>      HotplugHandler *hotplug_ctrl;
+> >>      HotplugHandlerClass *hdc;
+> >> +    Error *local_err = NULL;
+> >>  
+> >>      if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
+> >>          error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
+> >> @@ -890,10 +891,14 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+> >>       * otherwise just remove it synchronously */
+> >>      hdc = HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
+> >>      if (hdc->unplug_request) {
+> >> -        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
+> >> +        hotplug_handler_unplug_request(hotplug_ctrl, dev, &local_err);
+> >>      } else {
+> >> -        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
+> >> +        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err);
+> >> +        if (!local_err) {
+> >> +            object_unparent(OBJECT(dev));  
+> > Is this object_unparent() that you moved from qdev_simple_device_unplug_cb()
+> > in the hunk above?  
+> 
+> Yes, I moved it from all unplug handlers that do an object_unparent().
+> 
+> > 
+> > IS it possible to split patch per subsystem for easier review?  
+> 
+> I am afraid not, unless you have an idea on how to do that (we could
+> temporarily somehow remember for each hotplug handler if it will delete
+> device itself or not - but I don't really like that approach).
 
-Do you have access to any aarch64 hardware? It would be nice to see if
-we could support it there as well.
+ok, It's big but still manageable to review and better than temporary things
+that would just add confusion.
 
---
-Alex Benn=C3=A9e
+> 
+> Thanks!
+> 
+> >> +        }
+> >>      }
+> >> +    error_propagate(errp, local_err);
+> >>  }
+> >>  
+> >>  void qmp_device_del(const char *id, Error **errp)  
+> 
+> 
