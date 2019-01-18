@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57614)
+Received: from eggs.gnu.org ([209.51.188.92]:57776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUp0-0007KM-Dj
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:35 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUpR-0007pU-Od
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUoz-0002v5-3W
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gkUoy-0002t8-P0
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:33 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0IDx0QQ017335
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:31 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q3e5vwpqr-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:31 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Fri, 18 Jan 2019 14:08:29 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Fri, 18 Jan 2019 12:07:58 -0200
-In-Reply-To: <20190118140758.829-1-farosas@linux.ibm.com>
-References: <20190118140758.829-1-farosas@linux.ibm.com>
-Message-Id: <20190118140758.829-8-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v3 7/7] target/ppc: support single stepping
- with KVM HV
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gkUpP-0003dm-81
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:09:01 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 18 Jan 2019 14:08:45 +0000
+Message-ID: <38115456-3a5e-4a5f-d836-fab3aa666114@virtuozzo.com>
+References: <20190117153321.29749-1-eblake@redhat.com>
+	<20190117153321.29749-3-eblake@redhat.com>
+In-Reply-To: <20190117153321.29749-3-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C001AAC24CA63E478BD9562989D1E4E8@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/3] file: Expose some protocol-specific
+ information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,281 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, david@gibson.dropbear.id.au, cohuck@redhat.com, aik@ozlabs.ru
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:raw" <qemu-block@nongnu.org>
 
-The hardware singlestep mechanism in POWER works via a Trace Interrupt
-(0xd00) that happens after any instruction executes, whenever MSR_SE =
-1 (PowerISA Section 6.5.15 - Trace Interrupt).
-
-However, with kvm_hv, the Trace Interrupt happens inside the guest and
-KVM has no visibility of it. Therefore, when the gdbstub uses the
-KVM_SET_GUEST_DEBUG ioctl to enable singlestep, KVM simply ignores it.
-
-This patch takes advantage of the Trace Interrupt to perform the step
-inside the guest, but uses a breakpoint at the Trace Interrupt handler
-to return control to KVM. The exit is treated by KVM as a regular
-breakpoint and it returns to the host (and QEMU eventually).
-
-Before signalling GDB, QEMU sets the Next Instruction Pointer to the
-instruction following the one being stepped and restores the MSR,
-SRR0, SRR1 values from before the step, effectively skipping the
-interrupt handler execution and hiding the trace interrupt breakpoint
-from GDB.
-
-This approach works with both of GDB's 'scheduler-locking' options
-(off, step).
-
-Note:
-
-- kvm_arch_set_singlestep happens after GDB asks for a single step,
-  while the vcpus are stopped.
-
-- kvm_handle_singlestep executes after the step, during the handling
-  of the Emulation Assist Interrupt (breakpoint).
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/cpu.h |   5 ++
- target/ppc/kvm.c | 180 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 178 insertions(+), 7 deletions(-)
-
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 2185ef5e67..c7320c908e 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1157,6 +1157,11 @@ struct CPUPPCState {
-     uint32_t tm_vscr;
-     uint64_t tm_dscr;
-     uint64_t tm_tar;
-+
-+    /* Used for software single step */
-+    target_ulong sstep_msr;
-+    target_ulong sstep_srr0;
-+    target_ulong sstep_srr1;
- };
- 
- #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index c27190d7fb..880597a4a6 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1555,6 +1555,68 @@ void kvm_arch_remove_all_hw_breakpoints(void)
-     nb_hw_breakpoint = nb_hw_watchpoint = 0;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    target_ulong trace_handler_addr;
-+    uint32_t insn;
-+
-+    if (enabled) {
-+        cpu_synchronize_state(cs);
-+
-+        /*
-+         * Save the registers that will be affected by the single step
-+         * mechanism. These will be restored after the step at
-+         * kvm_handle_singlestep.
-+         */
-+        env->sstep_msr = env->msr;
-+        env->sstep_srr0 = env->spr[SPR_SRR0];
-+        env->sstep_srr1 = env->spr[SPR_SRR1];
-+
-+        cpu_memory_rw_debug(cs, env->nip, (uint8_t *)&insn, sizeof(insn), 0);
-+
-+        /*
-+         * rfid overwrites MSR with SRR1. Check if it has the SE bit
-+         * already set, meaning the guest is doing a single step
-+         * itself and set the SRR1_SE bit instead of MSR_SE to trigger
-+         * our own single step.
-+         */
-+        if (extract32(insn, 26, 6) == 19 && extract32(insn, 1, 10) == 18) {
-+            if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
-+                env->sstep_msr |= (1ULL << MSR_SE);
-+            }
-+
-+            env->spr[SPR_SRR1] |= (1ULL << MSR_SE);
-+        } else {
-+            /*
-+             * MSR_SE = 1 will cause a Trace Interrupt in the guest
-+             * after the next instruction executes.
-+             */
-+            env->msr |= (1ULL << MSR_SE);
-+        }
-+
-+        /*
-+         * We set a breakpoint at the interrupt handler address so
-+         * that the singlestep will be seen by KVM (this is treated by
-+         * KVM like an ordinary breakpoint) and control is returned to
-+         * QEMU.
-+         */
-+        trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+        if (env->nip == trace_handler_addr) {
-+            /*
-+             * We are trying to step over the interrupt handler
-+             * address itself; move the breakpoint to the next
-+             * instruction.
-+             */
-+            trace_handler_addr += 4;
-+        }
-+
-+        kvm_insert_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+    }
-+}
-+
- void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
- {
-     int n;
-@@ -1594,6 +1656,93 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
-     }
- }
- 
-+/* Revert any side-effects caused during single step */
-+static void restore_singlestep_env(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    uint32_t insn;
-+    int reg;
-+    int spr;
-+    int opcode;
-+
-+    cpu_memory_rw_debug(cs, env->spr[SPR_SRR0] - 4, (uint8_t *)&insn,
-+                        sizeof(insn), 0);
-+
-+    env->spr[SPR_SRR0] = env->sstep_srr0;
-+    env->spr[SPR_SRR1] = env->sstep_srr1;
-+
-+    if (extract32(insn, 26, 6) == 31) {
-+        opcode = extract32(insn, 1, 10);
-+        reg = extract32(insn, 21, 5);
-+
-+        switch (opcode) {
-+        case 467:
-+            /*
-+             * mtspr: the guest altered the SRR, so do not use the
-+             *        pre-step value.
-+             */
-+            spr = ((insn >> 16) & 0x1f) | ((insn >> 6) & 0x3e0);
-+            if (spr == SPR_SRR0 || spr == SPR_SRR1) {
-+                env->spr[spr] = env->gpr[reg];
-+            }
-+            break;
-+        case 83:
-+            /*
-+             * msfmsr: clear MSR_SE bit to avoid the guest knowing
-+             *         that it is being single-stepped.
-+             */
-+            env->gpr[reg] &= ~(1ULL << MSR_SE);
-+            break;
-+        }
-+    }
-+}
-+
-+static int kvm_handle_singlestep(CPUState *cs,
-+                                 struct kvm_debug_exit_arch *arch_info)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    target_ulong trace_handler_addr;
-+
-+    if (kvm_has_guestdbg_singlestep()) {
-+        return 1;
-+    }
-+
-+    cpu_synchronize_state(cs);
-+    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+    if (arch_info->address == trace_handler_addr) {
-+        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+
-+        if (env->sstep_msr & (1ULL << MSR_SE)) {
-+            /*
-+             * The guest expects the last instruction to have caused a
-+             * single step, go back into the interrupt handler.
-+             */
-+            return 1;
-+        }
-+
-+        env->nip = env->spr[SPR_SRR0];
-+        /* Bits 33-36, 43-47 are set by the interrupt */
-+        env->msr = env->spr[SPR_SRR1] & ~(1ULL << MSR_SE |
-+                                          PPC_BITMASK(33, 36) |
-+                                          PPC_BITMASK(43, 47));
-+        restore_singlestep_env(cs);
-+
-+    } else if (arch_info->address == trace_handler_addr + 4) {
-+        /*
-+         * A step at trace_handler_addr would interfere with the
-+         * singlestep mechanism itself, so we have previously
-+         * displaced the breakpoint to the next instruction.
-+         */
-+        kvm_remove_breakpoint(cs, trace_handler_addr + 4, 4, GDB_BREAKPOINT_SW);
-+        restore_singlestep_env(cs);
-+    }
-+
-+    return 1;
-+}
-+
- static int kvm_handle_hw_breakpoint(CPUState *cs,
-                                     struct kvm_debug_exit_arch *arch_info)
- {
-@@ -1621,13 +1770,30 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
-     return handle;
- }
- 
--static int kvm_handle_singlestep(void)
-+static int kvm_handle_sw_breakpoint(CPUState *cs,
-+                                    struct kvm_debug_exit_arch *arch_info)
- {
--    return 1;
--}
-+    target_ulong trace_handler_addr;
- 
--static int kvm_handle_sw_breakpoint(void)
--{
-+    if (kvm_has_guestdbg_singlestep()) {
-+        return 1;
-+    }
-+
-+    cpu_synchronize_state(cs);
-+    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
-+
-+    if (arch_info->address == trace_handler_addr) {
-+        CPU_FOREACH(cs) {
-+            if (cs->singlestep_enabled) {
-+                /*
-+                 * We hit this breakpoint while another cpu is doing a
-+                 * software single step. Go back into the guest to
-+                 * give chance for the single step to finish.
-+                 */
-+                return 0;
-+            }
-+        }
-+    }
-     return 1;
- }
- 
-@@ -1638,7 +1804,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
-     struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
- 
-     if (cs->singlestep_enabled) {
--        return kvm_handle_singlestep();
-+        return kvm_handle_singlestep(cs, arch_info);
-     }
- 
-     if (arch_info->status) {
-@@ -1646,7 +1812,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
-     }
- 
-     if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
--        return kvm_handle_sw_breakpoint();
-+        return kvm_handle_sw_breakpoint(cs, arch_info);
-     }
- 
-     /*
--- 
-2.17.1
+MTcuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2hlbiBhbmFseXppbmcgcGVy
+Zm9ybWFuY2UsIGl0IG1pZ2h0IGJlIG5pY2UgdG8gbGV0ICdxZW11LWltZyBpbmZvJw0KPiBleHBv
+c2UgZGV0YWlscyB0aGF0IGl0IGxlYXJuZWQgZnJvbSB0aGUgdW5kZXJseWluZyBmaWxlIG9yIGJs
+b2NrDQo+IGRldmljZS4gIFN0YXJ0IHRoZSBwcm9jZXNzIGJ5IHBpY2tpbmcgYSBmZXcgdXNlZnVs
+IGl0ZW1zIGRldGVybWluZWQNCj4gZHVyaW5nIHJhd19vcGVuX2NvbW1vbigpLg0KPiANCj4gU2ln
+bmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIHFh
+cGkvYmxvY2stY29yZS5qc29uIHwgMjQgKysrKysrKysrKysrKysrKysrKysrKystDQo+ICAgYmxv
+Y2svZmlsZS1wb3NpeC5jICAgfCAyMSArKysrKysrKysrKysrKysrKysrKysNCj4gICAyIGZpbGVz
+IGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1n
+aXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IGluZGV4
+IGYyOGQ1ZjVmYzc2Li4yOTZjMjJhMTAwMyAxMDA2NDQNCj4gLS0tIGEvcWFwaS9ibG9jay1jb3Jl
+Lmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTEwMSw2ICsxMDEsMjUg
+QEANCj4gICAgICAgICAnZXh0ZW50cyc6IFsnSW1hZ2VJbmZvJ10NCj4gICAgIH0gfQ0KPiANCj4g
+KyMjDQo+ICsjIEBJbWFnZUluZm9TcGVjaWZpY0ZpbGU6DQo+ICsjDQo+ICsjIERldGFpbHMgYWJv
+dXQgYSBmaWxlIHByb3RvY29sIEJEUy4NCj4gKyMNCj4gKyMgQGFsaWduOiBBbGlnbm1lbnQgaW4g
+dXNlDQo+ICsjDQo+ICsjIEBkaXNjYXJkOiBUcnVlIGlmIGRpc2NhcmQgb3BlcmF0aW9ucyBjYW4g
+YmUgYXR0ZW1wdGVkDQo+ICsjDQo+ICsjIEB3cml0ZS16ZXJvOiBUcnVlIGlmIGVmZmljaWVudCB3
+cml0ZSB6ZXJvIG9wZXJhdGlvbnMgY2FuIGJlIGF0dGVtcHRlZA0KPiArIw0KPiArIyBAZGlzY2Fy
+ZC16ZXJvOiBUcnVlIGlmIGRpc2NhcmRpbmcgaXMga25vd24gdG8gcmVhZCBiYWNrIGFzIHplcm8N
+Cj4gKyMNCj4gKyMgU2luY2U6IDQuMA0KPiArIyMNCj4gK3sgJ3N0cnVjdCc6ICdJbWFnZUluZm9T
+cGVjaWZpY0ZpbGUnLA0KPiArICAnZGF0YSc6IHsgJ2FsaWduJzogJ2ludCcsICdkaXNjYXJkJzog
+J2Jvb2wnLCAnd3JpdGUtemVybyc6ICdib29sJywNCj4gKyAgICAgICAgICAgICcqZGlzY2FyZC16
+ZXJvJzogJ2Jvb2wnIH0gfQ0KDQpOb3Qgc3VyZSBpZiB0aGlzIHdvcmtzLCBhcyBJIHJlbWVtYmVy
+IHJhdy1wb3NpeCB3aWxsIGFkanVzdCB0aGVzZSBmaWVsZHMNCm9uIGZpcnN0IGZhaWxlZCB3cml0
+ZSwgYW5kIHdpdGhvdXQgdGhpcyBmaXJzdCB3cml0ZSwgd2Ugd2lsbCBub3QgYWN0dWFsbHkNCmtu
+b3cgYXJlIHRoZXkgc3VwcG9ydGVkLg0KDQo+ICsNCj4gICAjIw0KPiAgICMgQEltYWdlSW5mb1Nw
+ZWNpZmljOg0KPiAgICMNCj4gQEAgLTExMCwxMiArMTI5LDE1IEBADQo+ICAgIyMNCj4gICB7ICd1
+bmlvbic6ICdJbWFnZUluZm9TcGVjaWZpYycsDQo+ICAgICAnZGF0YSc6IHsNCj4gKyAgICAgICMg
+Rm9ybWF0IGRyaXZlcnM6DQo+ICAgICAgICAgJ3Fjb3cyJzogJ0ltYWdlSW5mb1NwZWNpZmljUUNv
+dzInLA0KPiAgICAgICAgICd2bWRrJzogJ0ltYWdlSW5mb1NwZWNpZmljVm1kaycsDQo+ICAgICAg
+ICAgIyBJZiB3ZSBuZWVkIHRvIGFkZCBibG9jayBkcml2ZXIgc3BlY2lmaWMgcGFyYW1ldGVycyBm
+b3INCj4gICAgICAgICAjIExVS1MgaW4gZnV0dXJlLCB0aGVuIHdlJ2xsIHN1YmNsYXNzIFFDcnlw
+dG9CbG9ja0luZm9MVUtTDQo+ICAgICAgICAgIyB0byBkZWZpbmUgYSBJbWFnZUluZm9TcGVjaWZp
+Y0xVS1MNCj4gLSAgICAgICdsdWtzJzogJ1FDcnlwdG9CbG9ja0luZm9MVUtTJw0KPiArICAgICAg
+J2x1a3MnOiAnUUNyeXB0b0Jsb2NrSW5mb0xVS1MnLA0KPiArICAgICAgIyBQcm90b2NvbCBkcml2
+ZXJzOg0KPiArICAgICAgJ2ZpbGUnOiAnSW1hZ2VJbmZvU3BlY2lmaWNGaWxlJw0KPiAgICAgfSB9
+DQo+IA0KPiAgICMjDQo+IGRpZmYgLS1naXQgYS9ibG9jay9maWxlLXBvc2l4LmMgYi9ibG9jay9m
+aWxlLXBvc2l4LmMNCj4gaW5kZXggOGFlZTdhM2ZiOGIuLmQ0Y2UwZTkxMTZjIDEwMDY0NA0KPiAt
+LS0gYS9ibG9jay9maWxlLXBvc2l4LmMNCj4gKysrIGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+IEBA
+IC0xMDc5LDYgKzEwNzksMjMgQEAgc3RhdGljIHZvaWQgcmF3X3JlZnJlc2hfbGltaXRzKEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVycnApDQo+ICAgICAgIGJzLT5ibC5vcHRfbWVtX2Fs
+aWdubWVudCA9IE1BWChzLT5idWZfYWxpZ24sIGdldHBhZ2VzaXplKCkpOw0KPiAgIH0NCj4gDQo+
+ICtzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgKnJhd19nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0Ry
+aXZlclN0YXRlICpicykNCj4gK3sNCj4gKyAgICBCRFJWUmF3U3RhdGUgKnMgPSBicy0+b3BhcXVl
+Ow0KPiArICAgIEltYWdlSW5mb1NwZWNpZmljICppbmZvID0gZ19uZXcwKEltYWdlSW5mb1NwZWNp
+ZmljLCAxKTsNCj4gKyAgICBJbWFnZUluZm9TcGVjaWZpY0ZpbGUgKmluZm9maWxlID0gZ19uZXcw
+KEltYWdlSW5mb1NwZWNpZmljRmlsZSwgMSk7DQo+ICsNCj4gKyAgICBpbmZvLT50eXBlID0gSU1B
+R0VfSU5GT19TUEVDSUZJQ19LSU5EX0ZJTEU7DQo+ICsgICAgaW5mby0+dS5maWxlLmRhdGEgPSBp
+bmZvZmlsZTsNCj4gKyAgICBpbmZvZmlsZS0+YWxpZ24gPSBzLT5idWZfYWxpZ247DQo+ICsgICAg
+aW5mb2ZpbGUtPmRpc2NhcmQgPSBzLT5oYXNfZGlzY2FyZDsNCj4gKyAgICBpbmZvZmlsZS0+d3Jp
+dGVfemVybyA9IHMtPmhhc193cml0ZV96ZXJvZXM7DQo+ICsgICAgaW5mb2ZpbGUtPmhhc19kaXNj
+YXJkX3plcm8gPSBzLT5oYXNfZGlzY2FyZDsNCj4gKyAgICBpbmZvZmlsZS0+ZGlzY2FyZF96ZXJv
+ID0gcy0+ZGlzY2FyZF96ZXJvZXM7DQo+ICsNCj4gKyAgICByZXR1cm4gaW5mbzsNCj4gK30NCj4g
+Kw0KPiAgIHN0YXRpYyBpbnQgY2hlY2tfZm9yX2Rhc2QoaW50IGZkKQ0KPiAgIHsNCj4gICAjaWZk
+ZWYgQklPREFTRElORk8yDQo+IEBAIC0yNzY1LDYgKzI3ODIsNyBAQCBCbG9ja0RyaXZlciBiZHJ2
+X2ZpbGUgPSB7DQo+ICAgICAgIC5iZHJ2X2NvX2NvcHlfcmFuZ2VfZnJvbSA9IHJhd19jb19jb3B5
+X3JhbmdlX2Zyb20sDQo+ICAgICAgIC5iZHJ2X2NvX2NvcHlfcmFuZ2VfdG8gID0gcmF3X2NvX2Nv
+cHlfcmFuZ2VfdG8sDQo+ICAgICAgIC5iZHJ2X3JlZnJlc2hfbGltaXRzID0gcmF3X3JlZnJlc2hf
+bGltaXRzLA0KPiArICAgIC5iZHJ2X2dldF9zcGVjaWZpY19pbmZvID0gcmF3X2dldF9zcGVjaWZp
+Y19pbmZvLA0KPiAgICAgICAuYmRydl9pb19wbHVnID0gcmF3X2Fpb19wbHVnLA0KPiAgICAgICAu
+YmRydl9pb191bnBsdWcgPSByYXdfYWlvX3VucGx1ZywNCj4gICAgICAgLmJkcnZfYXR0YWNoX2Fp
+b19jb250ZXh0ID0gcmF3X2Fpb19hdHRhY2hfYWlvX2NvbnRleHQsDQo+IEBAIC0zMjQwLDYgKzMy
+NTgsNyBAQCBzdGF0aWMgQmxvY2tEcml2ZXIgYmRydl9ob3N0X2RldmljZSA9IHsNCj4gICAgICAg
+LmJkcnZfY29fY29weV9yYW5nZV9mcm9tID0gcmF3X2NvX2NvcHlfcmFuZ2VfZnJvbSwNCj4gICAg
+ICAgLmJkcnZfY29fY29weV9yYW5nZV90byAgPSByYXdfY29fY29weV9yYW5nZV90bywNCj4gICAg
+ICAgLmJkcnZfcmVmcmVzaF9saW1pdHMgPSByYXdfcmVmcmVzaF9saW1pdHMsDQo+ICsgICAgLmJk
+cnZfZ2V0X3NwZWNpZmljX2luZm8gPSByYXdfZ2V0X3NwZWNpZmljX2luZm8sDQo+ICAgICAgIC5i
+ZHJ2X2lvX3BsdWcgPSByYXdfYWlvX3BsdWcsDQo+ICAgICAgIC5iZHJ2X2lvX3VucGx1ZyA9IHJh
+d19haW9fdW5wbHVnLA0KPiAgICAgICAuYmRydl9hdHRhY2hfYWlvX2NvbnRleHQgPSByYXdfYWlv
+X2F0dGFjaF9haW9fY29udGV4dCwNCj4gQEAgLTMzNjMsNiArMzM4Miw3IEBAIHN0YXRpYyBCbG9j
+a0RyaXZlciBiZHJ2X2hvc3RfY2Ryb20gPSB7DQo+ICAgICAgIC5iZHJ2X2NvX3B3cml0ZXYgICAg
+ICAgID0gcmF3X2NvX3B3cml0ZXYsDQo+ICAgICAgIC5iZHJ2X2NvX2ZsdXNoX3RvX2Rpc2sgID0g
+cmF3X2NvX2ZsdXNoX3RvX2Rpc2ssDQo+ICAgICAgIC5iZHJ2X3JlZnJlc2hfbGltaXRzID0gcmF3
+X3JlZnJlc2hfbGltaXRzLA0KPiArICAgIC5iZHJ2X2dldF9zcGVjaWZpY19pbmZvID0gcmF3X2dl
+dF9zcGVjaWZpY19pbmZvLA0KPiAgICAgICAuYmRydl9pb19wbHVnID0gcmF3X2Fpb19wbHVnLA0K
+PiAgICAgICAuYmRydl9pb191bnBsdWcgPSByYXdfYWlvX3VucGx1ZywNCj4gICAgICAgLmJkcnZf
+YXR0YWNoX2Fpb19jb250ZXh0ID0gcmF3X2Fpb19hdHRhY2hfYWlvX2NvbnRleHQsDQo+IEBAIC0z
+NDk0LDYgKzM1MTQsNyBAQCBzdGF0aWMgQmxvY2tEcml2ZXIgYmRydl9ob3N0X2Nkcm9tID0gew0K
+PiAgICAgICAuYmRydl9jb19wd3JpdGV2ICAgICAgICA9IHJhd19jb19wd3JpdGV2LA0KPiAgICAg
+ICAuYmRydl9jb19mbHVzaF90b19kaXNrICA9IHJhd19jb19mbHVzaF90b19kaXNrLA0KPiAgICAg
+ICAuYmRydl9yZWZyZXNoX2xpbWl0cyA9IHJhd19yZWZyZXNoX2xpbWl0cywNCj4gKyAgICAuYmRy
+dl9nZXRfc3BlY2lmaWNfaW5mbyA9IHJhd19nZXRfc3BlY2lmaWNfaW5mbywNCj4gICAgICAgLmJk
+cnZfaW9fcGx1ZyA9IHJhd19haW9fcGx1ZywNCj4gICAgICAgLmJkcnZfaW9fdW5wbHVnID0gcmF3
+X2Fpb191bnBsdWcsDQo+ICAgICAgIC5iZHJ2X2F0dGFjaF9haW9fY29udGV4dCA9IHJhd19haW9f
+YXR0YWNoX2Fpb19jb250ZXh0LA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
+DQo=
