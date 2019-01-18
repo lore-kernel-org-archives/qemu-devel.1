@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54431)
+Received: from eggs.gnu.org ([209.51.188.92]:55116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkXkU-0002Au-8Q
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:16:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXn0-0003nw-Pc
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:18:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkXkT-0003rW-Dc
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:16:06 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 17:15:59 +0000
-Message-ID: <f2a82e64-ce0d-1fce-cf03-f12557acbc1a@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-	<20190108170655.29766-9-vsementsov@virtuozzo.com>
-	<w51pnsuwaxj.fsf@maestria.local.igalia.com>
-	<c135eaae-adc1-a5e3-1376-61bbe703cdfb@virtuozzo.com>
-	<w51k1j2vxly.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51k1j2vxly.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B4352B165C8F3848925C2F80AD1EE5B4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gkXmy-000635-OK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:18:42 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:42761)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkXmu-0005zT-TG
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 12:18:38 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id w13so9508227oiw.9
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:18:35 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] qcow2: bdrv_co_pwritev: move
- encryption code out of the lock
+References: <153994006052.15678.15962440455123359491.malonedeb@gac.canonical.com>
+In-Reply-To: <153994006052.15678.15962440455123359491.malonedeb@gac.canonical.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 17:18:23 +0000
+Message-ID: <CAFEAcA9vczSpf+xd+3so1YKAW-d4RKY7iVEtMvJrgSNbRjQ+Zg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1798780] [NEW] hw/usb/dev-mtp.c:1616: bad
+ test ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Bug 1798780 <1798780@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-MTguMDEuMjAxOSAxNzozOSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+IE9uIEZyaSAxOCBKYW4g
-MjAxOSAxMjozNzo0MiBQTSBDRVQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
-DQo+PiAxOC4wMS4yMDE5IDEyOjUxLCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4+PiBPbiBUdWUg
-MDggSmFuIDIwMTkgMDY6MDY6NTQgUE0gQ0VULCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
-IHdyb3RlOg0KPj4+PiBFbmNyeXB0aW9uIHdpbGwgYmUgZG9uZSBpbiB0aHJlYWRzLCB0byB0YWtl
-IGJlbmVmaXQgb2YgaXQsIHdlIHNob3VsZA0KPj4+PiBtb3ZlIGl0IG91dCBvZiB0aGUgbG9jayBm
-aXJzdC4NCj4+Pj4NCj4+Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgYmxvY2sv
-cWNvdzIuYyB8IDM1ICsrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+Pj4+ICAg
-IDEgZmlsZSBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkNCj4+Pj4N
-Cj4+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+Pj4+IGlu
-ZGV4IGQ2ZWY2MDZkODkuLjc2ZDM3MTUzNTAgMTAwNjQ0DQo+Pj4+IC0tLSBhL2Jsb2NrL3Fjb3cy
-LmMNCj4+Pj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPj4+PiBAQCAtMjA3NywxMSArMjA3NywyMCBA
-QCBzdGF0aWMgY29yb3V0aW5lX2ZuIGludCBxY293Ml9jb19wd3JpdGV2KEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLCB1aW50NjRfdCBvZmZzZXQsDQo+Pj4+ICAgICAgICAgICAgcmV0ID0gcWNvdzJfYWxs
-b2NfY2x1c3Rlcl9vZmZzZXQoYnMsIG9mZnNldCwgJmN1cl9ieXRlcywNCj4+Pj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmY2x1c3Rlcl9vZmZzZXQsICZsMm1l
-dGEpOw0KPj4+PiAgICAgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+Pj4+IC0gICAgICAgICAgICBn
-b3RvIGZhaWw7DQo+Pj4+ICsgICAgICAgICAgICBnb3RvIG91dF9sb2NrZWQ7DQo+Pj4+ICAgICAg
-ICAgICAgfQ0KPj4+PiAgICANCj4+Pj4gICAgICAgICAgICBhc3NlcnQoKGNsdXN0ZXJfb2Zmc2V0
-ICYgNTExKSA9PSAwKTsNCj4+Pj4gICAgDQo+Pj4+ICsgICAgICAgIHJldCA9IHFjb3cyX3ByZV93
-cml0ZV9vdmVybGFwX2NoZWNrKGJzLCAwLA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyLA0K
-Pj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjdXJfYnl0
-ZXMpOw0KPj4+PiArICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4+PiArICAgICAgICAgICAgZ290
-byBvdXRfbG9ja2VkOw0KPj4+PiArICAgICAgICB9DQo+Pj4+ICsNCj4+Pj4gKyAgICAgICAgcWVt
-dV9jb19tdXRleF91bmxvY2soJnMtPmxvY2spOw0KPj4+DQo+Pj4gVGhlIHVzYWdlIG9mIGxvY2so
-KSBhbmQgdW5sb2NrKCkgZnVuY3Rpb25zIGluc2lkZSBhbmQgb3V0c2lkZSBvZiB0aGUNCj4+PiBs
-b29wIHBsdXMgdGhlIHR3byAnbG9ja2VkJyBhbmQgJ3VubG9ja2VkJyBleGl0IHBhdGhzIGlzIHN0
-YXJ0aW5nIHRvIG1ha2UNCj4+PiB0aGluZ3MgYSBiaXQgbW9yZSBtZXNzeS4NCj4+Pg0KPj4+IEhh
-dmluZyBhIGxvb2sgYXQgdGhlIGNvZGUgaXQgc2VlbXMgdGhhdCB0aGVyZSdzIG9ubHkgdGhlc2Ug
-dGhyZWUgcGFydHMNCj4+PiBpbiB0aGUgd2hvbGUgZnVuY3Rpb24gdGhhdCBuZWVkIHRvIGhhdmUg
-dGhlIGxvY2sgaGVsZDoNCj4+Pg0KPj4+IG9uZToNCj4+PiAgICAgIHJldCA9IHFjb3cyX2FsbG9j
-X2NsdXN0ZXJfb2Zmc2V0KGJzLCBvZmZzZXQsICZjdXJfYnl0ZXMsDQo+Pj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAmY2x1c3Rlcl9vZmZzZXQsICZsMm1ldGEpOw0KPj4+
-ICAgICAgLyogLi4uICovDQo+Pj4gICAgICByZXQgPSBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9j
-aGVjayhicywgMCwNCj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGNsdXN0ZXJfb2Zmc2V0ICsNCj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIG9mZnNldF9pbl9jbHVzdGVyLA0KPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgY3VyX2J5dGVzKTsNCj4+Pg0KPj4+IHR3bzoNCj4+Pg0KPj4+ICAgICAg
-cmV0ID0gcWNvdzJfaGFuZGxlX2wybWV0YShicywgJmwybWV0YSwgdHJ1ZSk7DQo+Pj4NCj4+Pg0K
-Pj4+IHRocmVlOg0KPj4+ICAgICAgcWNvdzJfaGFuZGxlX2wybWV0YShicywgJmwybWV0YSwgZmFs
-c2UpOw0KPj4+DQo+Pj4NCj4+PiBTbyBJIHdvbmRlciBpZiBpdCdzIHBlcmhhcHMgc2ltcGxlciB0
-byBhZGQgbG9jay91bmxvY2sgY2FsbHMgYXJvdW5kDQo+Pj4gdGhvc2UgYmxvY2tzPw0KPj4NCj4+
-IHRoaXMgbWVhbnMsIHRoYXQgd2UnbGwgdW5sb2NrIGFmdGVyIHFjb3cyX2hhbmRsZV9sMm1ldGEg
-YW5kIHRoZW4NCj4+IGltbWVkaWF0ZWx5IGxvY2sgb24gbmV4dCBpdGVyYXRpb24gYmVmb3JlIHFj
-b3cyX2FsbG9jX2NsdXN0ZXJfb2Zmc2V0LA0KPj4gc28gY3VycmVudCBjb2RlIGF2b2lkcyB0aGlz
-IGV4dHJhIHVubG9jay9sb2NrLi4NCj4gDQo+IEkgZG9uJ3QgaGF2ZSBhIHZlcnkgc3Ryb25nIG9w
-aW5pb24sIGJ1dCBtYXliZSBpdCdzIHdvcnRoIGhhdmluZyBpZiBpdA0KPiBtYWtlcyB0aGUgY29k
-ZSBlYXNpZXIgdG8gcmVhZCBhbmQgbWFpbnRhaW4uDQo+IA0KDQpJbnR1aXRpdmVseSBJIHRoaW5r
-LCB0aGF0IGxvY2tzIG9wdGltaXphdGlvbiB3b3J0aCB0aGlzIGRpZmZpY3VsdHksDQpzbyBJJ2Qg
-cHJlZmVyIHRvIGxlYXZlIHRoaXMgbG9naWMgYXMgaXMsIGF0IGxlYXN0IGluIHRoZXNlIHNlcmll
-cy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Fri, 19 Oct 2018 at 10:22, dcb <1798780@bugs.launchpad.net> wrote:
+> hw/usb/dev-mtp.c:1616:52: warning: logical =E2=80=98or=E2=80=99 of collec=
+tively
+> exhaustive tests is always true [-Wlogical-op]
+>
+> Source code is
+>
+>                 if ((ret =3D=3D -1) && (errno !=3D EINTR || errno !=3D EA=
+GAIN ||
+>                                     errno !=3D EWOULDBLOCK)) {
+>
+> Maybe better code
+>
+>                 if ((ret =3D=3D -1) && (errno !=3D EINTR && errno !=3D EA=
+GAIN &&
+>                                     errno !=3D EWOULDBLOCK)) {
+
+Hi Gerd, Bandan -- I was going through older launchpad bugs and
+noticed that this one about a dubious conditional in dev-mtp.c is
+still unfixed.
+
+Is the file descriptor being used here one that's in non-blocking
+mode? If so, then busy-waiting in a loop while the write() returns
+EWOULDBLOCK is probably not what you wanted. If it's not then
+there's no need to check for EAGAIN or EWOULDBLOCK, I think.
+Consider using qemu_write_full() instead of open-coding
+the retry loop ?
+
+thanks
+-- PMM
