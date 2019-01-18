@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56669)
+Received: from eggs.gnu.org ([209.51.188.92]:56693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkblx-0006S1-8g
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:55 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkblz-0006Yl-94
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:34:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkblp-0006Tm-G1
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:48 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42957)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkblr-0006XB-J7
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:54 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbln-0005vu-PM
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:45 -0500
-Received: by mail-pl1-x642.google.com with SMTP id y1so6881523plp.9
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:33:23 -0800 (PST)
+	id 1gkblp-0005to-EP
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:33:47 -0500
+Received: by mail-pf1-x443.google.com with SMTP id r136so7202449pfc.6
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:33:21 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:31:22 +1100
-Message-Id: <20190118213122.22865-49-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:31:21 +1100
+Message-Id: <20190118213122.22865-48-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 49/49] linux-user: Split out fcntl, fcntl64
+Subject: [Qemu-devel] [PATCH v6 48/49] linux-user: Split out ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,158 +29,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Preserving strace functionality is tricky with this one.
-Rearrange to lookup structures that contain the data for
-both execution and strace for each command.
-
-Do not allow lookup of 64-bit fcntl commands from 32-bit fcntl.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h      |   6 +
- linux-user/strace.c            | 100 ----------
- linux-user/syscall-fcntl.inc.c | 322 +++++++++++++++++++++++++++++++++
- linux-user/syscall.c           | 256 +-------------------------
- linux-user/strace.list         |   6 -
- 5 files changed, 329 insertions(+), 361 deletions(-)
- create mode 100644 linux-user/syscall-fcntl.inc.c
+ linux-user/syscall-defs.h      |   1 +
+ linux-user/syscall-ioctl.inc.c | 873 +++++++++++++++++++++++++++++++++
+ linux-user/syscall.c           | 843 +------------------------------
+ linux-user/strace.list         |   3 -
+ 4 files changed, 875 insertions(+), 845 deletions(-)
+ create mode 100644 linux-user/syscall-ioctl.inc.c
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index f58b9745a4..5cf39f2bb9 100644
+index f8f280f376..f58b9745a4 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -46,6 +46,12 @@ SYSCALL_DEF(execveat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
- SYSCALL_DEF(faccessat, ARG_ATDIRFD, ARG_STR, ARG_ACCESSFLAG);
- SYSCALL_DEF(fchmod, ARG_DEC, ARG_MODEFLAG);
- SYSCALL_DEF(fchmodat, ARG_ATDIRFD, ARG_STR, ARG_MODEFLAG);
-+#ifdef TARGET_NR_fcntl
-+SYSCALL_DEF_FULL(fcntl, .impl = impl_fcntl, .print = print_fcntl);
-+#endif
-+#if TARGET_ABI_BITS == 32
-+SYSCALL_DEF_FULL(fcntl64, .impl = impl_fcntl64, .print = print_fcntl64);
-+#endif
- #ifdef TARGET_NR_futimesat
- SYSCALL_DEF(futimesat, ARG_ATDIRFD, ARG_STR, ARG_PTR);
+@@ -61,6 +61,7 @@ SYSCALL_DEF(getppid);
+ #ifdef TARGET_NR_getxpid
+ SYSCALL_DEF(getxpid);
  #endif
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index ca8e110675..787bf41307 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1172,106 +1172,6 @@ print_fchownat(const struct syscallname *name,
- }
++SYSCALL_DEF(ioctl, ARG_DEC, ARG_HEX);
+ #ifdef TARGET_NR_ipc
+ SYSCALL_DEF_ARGS(ipc, ARG_HEX, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR, ARG_HEX);
  #endif
- 
--#if defined(TARGET_NR_fcntl) || defined(TARGET_NR_fcntl64)
--static void
--print_fcntl(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_raw_param("%d", arg0, 0);
--    switch(arg1) {
--    case TARGET_F_DUPFD:
--        gemu_log("F_DUPFD,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
--        break;
--    case TARGET_F_GETFD:
--        gemu_log("F_GETFD");
--        break;
--    case TARGET_F_SETFD:
--        gemu_log("F_SETFD,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
--        break;
--    case TARGET_F_GETFL:
--        gemu_log("F_GETFL");
--        break;
--    case TARGET_F_SETFL:
--        gemu_log("F_SETFL,");
--        print_open_flags(arg2, 1);
--        break;
--    case TARGET_F_GETLK:
--        gemu_log("F_GETLK,");
--        print_pointer(arg2, 1);
--        break;
--    case TARGET_F_SETLK:
--        gemu_log("F_SETLK,");
--        print_pointer(arg2, 1);
--        break;
--    case TARGET_F_SETLKW:
--        gemu_log("F_SETLKW,");
--        print_pointer(arg2, 1);
--        break;
--    case TARGET_F_GETOWN:
--        gemu_log("F_GETOWN");
--        break;
--    case TARGET_F_SETOWN:
--        gemu_log("F_SETOWN,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
--        break;
--    case TARGET_F_GETSIG:
--        gemu_log("F_GETSIG");
--        break;
--    case TARGET_F_SETSIG:
--        gemu_log("F_SETSIG,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
--        break;
--#if TARGET_ABI_BITS == 32
--    case TARGET_F_GETLK64:
--        gemu_log("F_GETLK64,");
--        print_pointer(arg2, 1);
--        break;
--    case TARGET_F_SETLK64:
--        gemu_log("F_SETLK64,");
--        print_pointer(arg2, 1);
--        break;
--    case TARGET_F_SETLKW64:
--        gemu_log("F_SETLKW64,");
--        print_pointer(arg2, 1);
--        break;
--#endif
--    case TARGET_F_SETLEASE:
--        gemu_log("F_SETLEASE,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
--        break;
--    case TARGET_F_GETLEASE:
--        gemu_log("F_GETLEASE");
--        break;
--    case TARGET_F_SETPIPE_SZ:
--        gemu_log("F_SETPIPE_SZ,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
--        break;
--    case TARGET_F_GETPIPE_SZ:
--        gemu_log("F_GETPIPE_SZ");
--        break;
--    case TARGET_F_DUPFD_CLOEXEC:
--        gemu_log("F_DUPFD_CLOEXEC,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
--        break;
--    case TARGET_F_NOTIFY:
--        gemu_log("F_NOTIFY,");
--        print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
--        break;
--    default:
--        print_raw_param(TARGET_ABI_FMT_ld, arg1, 0);
--        print_pointer(arg2, 1);
--        break;
--    }
--    print_syscall_epilogue(name);
--}
--#define print_fcntl64   print_fcntl
--#endif
--
--
- #if defined(TARGET_NR_socket)
- static void
- print_socket(const struct syscallname *name,
-diff --git a/linux-user/syscall-fcntl.inc.c b/linux-user/syscall-fcntl.inc.c
+diff --git a/linux-user/syscall-ioctl.inc.c b/linux-user/syscall-ioctl.inc.c
 new file mode 100644
-index 0000000000..768682bd17
+index 0000000000..820994105f
 --- /dev/null
-+++ b/linux-user/syscall-fcntl.inc.c
-@@ -0,0 +1,322 @@
++++ b/linux-user/syscall-ioctl.inc.c
+@@ -0,0 +1,873 @@
 +/*
-+ *  Linux fcntl syscall implementation
++ *  Linux ioctl syscall implementation
 + *  Copyright (c) 2003 Fabrice Bellard
 + *
 + *  This program is free software; you can redistribute it and/or modify
@@ -197,621 +74,1742 @@ index 0000000000..768682bd17
 + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+typedef struct FcntlEntry FcntlEntry;
++typedef struct IOCTLEntry IOCTLEntry;
 +
-+typedef abi_long FcntlFn(int fd, int host_cmd, abi_long arg);
++typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
++                             int fd, int cmd, abi_long arg);
 +
-+struct FcntlEntry {
++struct IOCTLEntry {
++    int target_cmd;
++    unsigned int host_cmd;
 +    const char *name;
-+    FcntlFn *host_fn;
-+    int host_cmd;
-+    SyscallArgType arg_type;
++    int access;
++    do_ioctl_fn *do_ioctl;
++    const argtype arg_type[5];
 +};
 +
-+static abi_long do_fcntl_int(int fd, int host_cmd, abi_long arg)
-+{
-+    return get_errno(safe_fcntl(fd, host_cmd, arg));
-+}
++#define IOC_R 0x0001
++#define IOC_W 0x0002
++#define IOC_RW (IOC_R | IOC_W)
 +
-+static abi_long do_fcntl_getfl(int fd, int host_cmd, abi_long arg)
-+{
-+    abi_long ret = get_errno(safe_fcntl(fd, host_cmd));
-+    if (!is_error(ret)) {
-+        ret = host_to_target_bitmask(ret, fcntl_flags_tbl);
-+    }
-+    return ret;
-+}
++#define MAX_STRUCT_SIZE 4096
 +
-+static abi_long do_fcntl_setfl(int fd, int host_cmd, abi_long arg)
-+{
-+    return get_errno(safe_fcntl(fd, host_cmd,
-+                                target_to_host_bitmask(arg, fcntl_flags_tbl)));
-+}
++#ifdef CONFIG_FIEMAP
++/*
++ * So fiemap access checks don't overflow on 32 bit systems.
++ * This is very slightly smaller than the limit imposed by
++ * the underlying kernel.
++ */
++#define FIEMAP_MAX_EXTENTS ((UINT_MAX - sizeof(struct fiemap))  \
++                            / sizeof(struct fiemap_extent))
 +
-+static abi_long do_fcntl_getlk_1(int fd, int host_cmd, abi_long arg,
-+                                 from_flock64_fn *copy_from,
-+                                 to_flock64_fn *copy_to)
++static abi_long do_ioctl_fs_ioc_fiemap(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                       int fd, int cmd, abi_long arg)
 +{
-+    struct flock64 fl64;
++    /*
++     * The parameter for this ioctl is a struct fiemap followed
++     * by an array of struct fiemap_extent whose size is set
++     * in fiemap->fm_extent_count. The array is filled in by the
++     * ioctl.
++     */
++    int target_size_in, target_size_out;
++    struct fiemap *fm;
++    const argtype *arg_type = ie->arg_type;
++    const argtype extent_arg_type[] = { MK_STRUCT(STRUCT_fiemap_extent) };
++    void *argptr, *p;
 +    abi_long ret;
++    int i, extent_size = thunk_type_size(extent_arg_type, 0);
++    uint32_t outbufsz;
++    int free_fm = 0;
 +
-+    ret = copy_from(&fl64, arg);
-+    if (ret == 0) {
-+        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
-+        if (ret == 0) {
-+            ret = copy_to(arg, &fl64);
-+        }
-+    }
-+    return ret;
-+}
-+
-+static abi_long do_fcntl_setlk_1(int fd, int host_cmd, abi_long arg,
-+                                 from_flock64_fn *copy_from)
-+{
-+    struct flock64 fl64;
-+    abi_long ret;
-+
-+    ret = copy_from(&fl64, arg);
-+    if (ret == 0) {
-+        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
-+    }
-+    return ret;
-+}
-+
-+static abi_long do_fcntl_getlk(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_getlk_1(fd, cmd, arg,
-+                            copy_from_user_flock,
-+                            copy_to_user_flock);
-+}
-+
-+static abi_long do_fcntl_setlk(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_setlk_1(fd, cmd, arg, copy_from_user_flock);
-+}
-+
-+static abi_long do_fcntl_getlk64(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_getlk_1(fd, cmd, arg,
-+                            copy_from_user_flock64,
-+                            copy_to_user_flock64);
-+}
-+
-+static abi_long do_fcntl_setlk64(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_setlk_1(fd, cmd, arg, copy_from_user_flock64);
-+}
-+
-+#if defined(TARGET_ARM) && TARGET_ABI_BITS == 32
-+static abi_long do_fcntl_oabi_getlk64(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_getlk_1(fd, cmd, arg,
-+                            copy_from_user_oabi_flock64,
-+                            copy_to_user_oabi_flock64);
-+}
-+
-+static abi_long do_fcntl_oabi_setlk64(int fd, int cmd, abi_long arg)
-+{
-+    return do_fcntl_setlk_1(fd, cmd, arg, copy_from_user_oabi_flock64);
-+}
-+#endif /* TARGET_ARM */
-+
-+#ifdef F_GETOWN_EX
-+static abi_long do_fcntl_getown_ex(int fd, int cmd, abi_long arg)
-+{
-+    struct f_owner_ex fox;
-+    abi_long ret = get_errno(safe_fcntl(fd, cmd, &fox));
-+
-+    if (!is_error(ret)) {
-+        struct target_f_owner_ex *target_fox;
-+        if (!lock_user_struct(VERIFY_WRITE, target_fox, arg, 0)) {
-+            return -TARGET_EFAULT;
-+        }
-+        target_fox->type = tswap32(fox.type);
-+        target_fox->pid = tswap32(fox.pid);
-+        unlock_user_struct(target_fox, arg, 1);
-+    }
-+    return ret;
-+}
-+
-+static abi_long do_fcntl_setown_ex(int fd, int cmd, abi_long arg)
-+{
-+    struct target_f_owner_ex *target_fox;
-+    struct f_owner_ex fox;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_fox, arg, 1)) {
++    assert(arg_type[0] == TYPE_PTR);
++    assert(ie->access == IOC_RW);
++    arg_type++;
++    target_size_in = thunk_type_size(arg_type, 0);
++    argptr = lock_user(VERIFY_READ, arg, target_size_in, 1);
++    if (!argptr) {
 +        return -TARGET_EFAULT;
 +    }
-+    fox.type = tswap32(target_fox->type);
-+    fox.pid = tswap32(target_fox->pid);
-+    unlock_user_struct(target_fox, arg, 0);
-+    return get_errno(safe_fcntl(fd, cmd, &fox));
-+}
-+#endif /* F_GETOWN_EX */
-+
-+static const FcntlEntry *target_fcntl_cmd(int cmd, int is_64)
-+{
-+#define CMD2(T, H, A, FN)                                            \
-+    case TARGET_##T: do {                                            \
-+        static const FcntlEntry ent_##T = {                          \
-+            .name = #T, .host_cmd = H, .host_fn = FN, .arg_type = A  \
-+        };                                                           \
-+        return &ent_##T;                                             \
-+    } while(0)
-+
-+#define CMD1(T, A, FN)                                               \
-+    case TARGET_##T: do {                                            \
-+        static const FcntlEntry ent_##T = {                          \
-+            .name = #T, .host_cmd = T, .host_fn = FN, .arg_type = A  \
-+        };                                                           \
-+        return &ent_##T;                                             \
-+    } while(0)
-+
-+#if TARGET_ABI_BITS == 64
-+# ifdef __powerpc64__
-+/*
-+ * On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
-+ * is not supported by kernel. The glibc fcntl call actually adjusts
-+ * them to 5, 6 and 7 before making the syscall(). Since we make the
-+ * syscall directly, adjust to what is supported by the kernel.
-+ */
-+#  define HOST_CMD_ADJ64(C)  (C - (F_GETLK64 - 5))
-+# else
-+#  define HOST_CMD_ADJ64(C)  C
-+# endif
-+# define CMD64(T, FN)                                                \
-+    case TARGET_##T: do {                                            \
-+        static const FcntlEntry ent_##T = {                          \
-+            .name = #T, .host_cmd = HOST_CMD_ADJ64(T),               \
-+            .host_fn = do_fcntl_##FN, .arg_type = ARG_PTR            \
-+        };                                                           \
-+        return &ent_##T;                                             \
-+    } while(0)
-+#elif defined(TARGET_ARM)
-+# define CMD64(T, FN)                                                \
-+    case TARGET_##T: do {                                            \
-+        if (!is_64) {                                                \
-+            return NULL;                                             \
-+        } else if (is_64 > 0) {                                      \
-+            static const FcntlEntry ent_##T = {                      \
-+                .name = #T, .host_cmd = T,                           \
-+                .host_fn = do_fcntl_##FN, .arg_type = ARG_PTR        \
-+            };                                                       \
-+            return &ent_##T;                                         \
-+        } else {                                                     \
-+            static const FcntlEntry ent_oabi_##T = {                 \
-+                .name = #T, .host_cmd = T,                           \
-+                .host_fn = do_fcntl_oabi_##FN, .arg_type = ARG_PTR   \
-+            };                                                       \
-+            return &ent_oabi_##T;                                    \
-+        }                                                            \
-+    } while (0)
-+#else
-+# define CMD64(T, FN)                                                \
-+    case TARGET_##T: do {                                            \
-+        static const FcntlEntry ent_##T = {                          \
-+            .name = #T, .host_cmd = T,                               \
-+            .host_fn = do_fcntl_##FN, .arg_type = ARG_PTR            \
-+        };                                                           \
-+        return is_64 ? &ent_##T : NULL;                              \
-+    } while (0)
-+#endif
-+
-+    switch (cmd) {
-+    CMD1(F_DUPFD, ARG_DEC, do_fcntl_int);
-+    CMD1(F_GETFD, ARG_NONE, do_fcntl_int);
-+    CMD1(F_SETFD, ARG_DEC, do_fcntl_int);
-+    CMD1(F_GETFL, ARG_NONE, do_fcntl_getfl);
-+    CMD1(F_SETFL, ARG_DEC, do_fcntl_setfl);
-+
-+    CMD2(F_GETLK, F_GETLK64, ARG_PTR, do_fcntl_getlk);
-+    CMD2(F_SETLK, F_SETLK64, ARG_PTR, do_fcntl_setlk);
-+    CMD2(F_SETLKW, F_SETLKW64, ARG_PTR, do_fcntl_setlk);
-+
-+    CMD1(F_GETOWN, ARG_NONE, do_fcntl_int);
-+    CMD1(F_SETOWN, ARG_DEC, do_fcntl_int);
-+    CMD1(F_GETSIG, ARG_NONE, do_fcntl_int);
-+    CMD1(F_SETSIG, ARG_DEC, do_fcntl_int);
-+
-+    CMD64(F_GETLK64, getlk64);
-+    CMD64(F_SETLK64, setlk64);
-+    CMD64(F_SETLKW64, setlk64);
-+
-+    CMD1(F_GETLEASE, ARG_NONE, do_fcntl_int);
-+    CMD1(F_SETLEASE, ARG_DEC, do_fcntl_int);
-+#ifdef F_DUPFD_CLOEXEC
-+    CMD1(F_DUPFD_CLOEXEC, ARG_DEC, do_fcntl_int);
-+#endif
-+    CMD1(F_NOTIFY, ARG_DEC, do_fcntl_int);
-+#ifdef F_GETOWN_EX
-+    CMD1(F_GETOWN_EX, ARG_PTR, do_fcntl_getown_ex);
-+    CMD1(F_SETOWN_EX, ARG_PTR, do_fcntl_setown_ex);
-+#endif
-+#ifdef F_SETPIPE_SZ
-+    CMD1(F_SETPIPE_SZ, ARG_DEC, do_fcntl_int);
-+    CMD1(F_GETPIPE_SZ, ARG_DEC, do_fcntl_int);
-+#endif
-+    }
-+    return NULL;
-+
-+#undef CMD1
-+#undef CMD2
-+#undef CMD64
-+#undef HOST_CMD_ADJ64
-+}
-+
-+static abi_long do_fcntl(int fd, int target_cmd, abi_ulong arg, int is_64)
-+{
-+    const FcntlEntry *ent = target_fcntl_cmd(target_cmd, is_64);
-+
-+    if (ent == NULL) {
++    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++    fm = (struct fiemap *)buf_temp;
++    if (fm->fm_extent_count > FIEMAP_MAX_EXTENTS) {
 +        return -TARGET_EINVAL;
 +    }
-+    return ent->host_fn(fd, ent->host_cmd, arg);
++
++    outbufsz = sizeof(*fm) + sizeof(struct fiemap_extent) * fm->fm_extent_count;
++
++    if (outbufsz > MAX_STRUCT_SIZE) {
++        /*
++         * We can't fit all the extents into the fixed size buffer.
++         * Allocate one that is large enough and use it instead.
++         */
++        fm = g_try_malloc(outbufsz);
++        if (!fm) {
++            return -TARGET_ENOMEM;
++        }
++        memcpy(fm, buf_temp, sizeof(struct fiemap));
++        free_fm = 1;
++    }
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, fm));
++    if (!is_error(ret)) {
++        target_size_out = target_size_in;
++        /*
++         * An extent_count of 0 means we were only counting the extents
++         * so there are no structs to copy
++         */
++        if (fm->fm_extent_count != 0) {
++            target_size_out += fm->fm_mapped_extents * extent_size;
++        }
++        argptr = lock_user(VERIFY_WRITE, arg, target_size_out, 0);
++        if (!argptr) {
++            ret = -TARGET_EFAULT;
++        } else {
++            /* Convert the struct fiemap */
++            thunk_convert(argptr, fm, arg_type, THUNK_TARGET);
++            if (fm->fm_extent_count != 0) {
++                p = argptr + target_size_in;
++                /* ...and then all the struct fiemap_extents */
++                for (i = 0; i < fm->fm_mapped_extents; i++) {
++                    thunk_convert(p, &fm->fm_extents[i], extent_arg_type,
++                                  THUNK_TARGET);
++                    p += extent_size;
++                }
++            }
++            unlock_user(argptr, arg, target_size_out);
++        }
++    }
++    if (free_fm) {
++        g_free(fm);
++    }
++    return ret;
++}
++#endif
++
++static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                int fd, int cmd, abi_long arg)
++{
++    const argtype *arg_type = ie->arg_type;
++    int target_size;
++    void *argptr;
++    int ret;
++    struct ifconf *host_ifconf;
++    uint32_t outbufsz;
++    const argtype ifreq_arg_type[] = { MK_STRUCT(STRUCT_sockaddr_ifreq) };
++    int target_ifreq_size;
++    int nb_ifreq;
++    int free_buf = 0;
++    int i;
++    int target_ifc_len;
++    abi_long target_ifc_buf;
++    int host_ifc_len;
++    char *host_ifc_buf;
++
++    assert(arg_type[0] == TYPE_PTR);
++    assert(ie->access == IOC_RW);
++
++    arg_type++;
++    target_size = thunk_type_size(arg_type, 0);
++
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        return -TARGET_EFAULT;
++    }
++    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++
++    host_ifconf = (struct ifconf *)(unsigned long)buf_temp;
++    target_ifc_len = host_ifconf->ifc_len;
++    target_ifc_buf = (abi_long)(unsigned long)host_ifconf->ifc_buf;
++
++    target_ifreq_size = thunk_type_size(ifreq_arg_type, 0);
++    nb_ifreq = target_ifc_len / target_ifreq_size;
++    host_ifc_len = nb_ifreq * sizeof(struct ifreq);
++
++    outbufsz = sizeof(*host_ifconf) + host_ifc_len;
++    if (outbufsz > MAX_STRUCT_SIZE) {
++        /*
++         * We can't fit all the extents into the fixed size buffer.
++         * Allocate one that is large enough and use it instead.
++         */
++        host_ifconf = malloc(outbufsz);
++        if (!host_ifconf) {
++            return -TARGET_ENOMEM;
++        }
++        memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
++        free_buf = 1;
++    }
++    host_ifc_buf = (char *)host_ifconf + sizeof(*host_ifconf);
++
++    host_ifconf->ifc_len = host_ifc_len;
++    host_ifconf->ifc_buf = host_ifc_buf;
++
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_ifconf));
++    if (!is_error(ret)) {
++        /* convert host ifc_len to target ifc_len */
++
++        nb_ifreq = host_ifconf->ifc_len / sizeof(struct ifreq);
++        target_ifc_len = nb_ifreq * target_ifreq_size;
++        host_ifconf->ifc_len = target_ifc_len;
++
++        /* restore target ifc_buf */
++
++        host_ifconf->ifc_buf = (char *)(unsigned long)target_ifc_buf;
++
++        /* copy struct ifconf to target user */
++
++        argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
++        if (!argptr) {
++            return -TARGET_EFAULT;
++        }
++        thunk_convert(argptr, host_ifconf, arg_type, THUNK_TARGET);
++        unlock_user(argptr, arg, target_size);
++
++        /* copy ifreq[] to target user */
++
++        argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
++        for (i = 0; i < nb_ifreq ; i++) {
++            thunk_convert(argptr + i * target_ifreq_size,
++                          host_ifc_buf + i * sizeof(struct ifreq),
++                          ifreq_arg_type, THUNK_TARGET);
++        }
++        unlock_user(argptr, target_ifc_buf, target_ifc_len);
++    }
++
++    if (free_buf) {
++        free(host_ifconf);
++    }
++
++    return ret;
 +}
 +
-+static void do_print_fcntl(const SyscallDef *def, int fd, int target_cmd,
-+                           abi_ulong arg, int is_64)
-+{
-+    const FcntlEntry *ent = target_fcntl_cmd(target_cmd, is_64);
++#if defined(CONFIG_USBFS)
++#if HOST_LONG_BITS > 64
++#error USBDEVFS thunks do not support >64 bit hosts yet.
++#endif
++struct live_urb {
++    uint64_t target_urb_adr;
++    uint64_t target_buf_adr;
++    char *target_buf_ptr;
++    struct usbdevfs_urb host_urb;
++};
 +
-+    switch (ent->arg_type) {
-+    case ARG_NONE:
-+        gemu_log("%d %s(%d,%s)", getpid(), def->name, fd, ent->name);
++static GHashTable *usbdevfs_urb_hashtable(void)
++{
++    static GHashTable *urb_hashtable;
++
++    if (!urb_hashtable) {
++        urb_hashtable = g_hash_table_new(g_int64_hash, g_int64_equal);
++    }
++    return urb_hashtable;
++}
++
++static void urb_hashtable_insert(struct live_urb *urb)
++{
++    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
++    g_hash_table_insert(urb_hashtable, urb, urb);
++}
++
++static struct live_urb *urb_hashtable_lookup(uint64_t target_urb_adr)
++{
++    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
++    return g_hash_table_lookup(urb_hashtable, &target_urb_adr);
++}
++
++static void urb_hashtable_remove(struct live_urb *urb)
++{
++    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
++    g_hash_table_remove(urb_hashtable, urb);
++}
++
++static abi_long
++do_ioctl_usbdevfs_reapurb(const IOCTLEntry *ie, uint8_t *buf_temp,
++                          int fd, int cmd, abi_long arg)
++{
++    const argtype usbfsurb_arg_type[] = { MK_STRUCT(STRUCT_usbdevfs_urb) };
++    const argtype ptrvoid_arg_type[] = { TYPE_PTRVOID, 0, 0 };
++    struct live_urb *lurb;
++    void *argptr;
++    uint64_t hurb;
++    int target_size;
++    uintptr_t target_urb_adr;
++    abi_long ret;
++
++    target_size = thunk_type_size(usbfsurb_arg_type, THUNK_TARGET);
++
++    memset(buf_temp, 0, sizeof(uint64_t));
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++    if (is_error(ret)) {
++        return ret;
++    }
++
++    memcpy(&hurb, buf_temp, sizeof(uint64_t));
++    lurb = (void *)((uintptr_t)hurb - offsetof(struct live_urb, host_urb));
++    if (!lurb->target_urb_adr) {
++        return -TARGET_EFAULT;
++    }
++    urb_hashtable_remove(lurb);
++    unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr,
++                lurb->host_urb.buffer_length);
++    lurb->target_buf_ptr = NULL;
++
++    /* restore the guest buffer pointer */
++    lurb->host_urb.buffer = (void *)(uintptr_t)lurb->target_buf_adr;
++
++    /* update the guest urb struct */
++    argptr = lock_user(VERIFY_WRITE, lurb->target_urb_adr, target_size, 0);
++    if (!argptr) {
++        g_free(lurb);
++        return -TARGET_EFAULT;
++    }
++    thunk_convert(argptr, &lurb->host_urb, usbfsurb_arg_type, THUNK_TARGET);
++    unlock_user(argptr, lurb->target_urb_adr, target_size);
++
++    target_size = thunk_type_size(ptrvoid_arg_type, THUNK_TARGET);
++    /* write back the urb handle */
++    argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
++    if (!argptr) {
++        g_free(lurb);
++        return -TARGET_EFAULT;
++    }
++
++    /* GHashTable uses 64-bit keys but thunk_convert expects uintptr_t */
++    target_urb_adr = lurb->target_urb_adr;
++    thunk_convert(argptr, &target_urb_adr, ptrvoid_arg_type, THUNK_TARGET);
++    unlock_user(argptr, arg, target_size);
++
++    g_free(lurb);
++    return ret;
++}
++
++static abi_long
++do_ioctl_usbdevfs_discardurb(const IOCTLEntry *ie,
++                             uint8_t *buf_temp __attribute__((unused)),
++                             int fd, int cmd, abi_long arg)
++{
++    struct live_urb *lurb;
++
++    /* map target address back to host URB with metadata. */
++    lurb = urb_hashtable_lookup(arg);
++    if (!lurb) {
++        return -TARGET_EFAULT;
++    }
++    return get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
++}
++
++static abi_long
++do_ioctl_usbdevfs_submiturb(const IOCTLEntry *ie, uint8_t *buf_temp,
++                            int fd, int cmd, abi_long arg)
++{
++    const argtype *arg_type = ie->arg_type;
++    int target_size;
++    abi_long ret;
++    void *argptr;
++    int rw_dir;
++    struct live_urb *lurb;
++
++    /*
++     * each submitted URB needs to map to a unique ID for the
++     * kernel, and that unique ID needs to be a pointer to
++     * host memory.  hence, we need to malloc for each URB.
++     * isochronous transfers have a variable length struct.
++     */
++    arg_type++;
++    target_size = thunk_type_size(arg_type, THUNK_TARGET);
++
++    /* construct host copy of urb and metadata */
++    lurb = g_try_malloc0(sizeof(struct live_urb));
++    if (!lurb) {
++        return -TARGET_ENOMEM;
++    }
++
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        g_free(lurb);
++        return -TARGET_EFAULT;
++    }
++    thunk_convert(&lurb->host_urb, argptr, arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++
++    lurb->target_urb_adr = arg;
++    lurb->target_buf_adr = (uintptr_t)lurb->host_urb.buffer;
++
++    /* buffer space used depends on endpoint type so lock the entire buffer */
++    /* control type urbs should check the buffer contents for true direction */
++    rw_dir = lurb->host_urb.endpoint & USB_DIR_IN ? VERIFY_WRITE : VERIFY_READ;
++    lurb->target_buf_ptr = lock_user(rw_dir, lurb->target_buf_adr,
++                                     lurb->host_urb.buffer_length, 1);
++    if (lurb->target_buf_ptr == NULL) {
++        g_free(lurb);
++        return -TARGET_EFAULT;
++    }
++
++    /* update buffer pointer in host copy */
++    lurb->host_urb.buffer = lurb->target_buf_ptr;
++
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
++    if (is_error(ret)) {
++        unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr, 0);
++        g_free(lurb);
++    } else {
++        urb_hashtable_insert(lurb);
++    }
++
++    return ret;
++}
++#endif /* CONFIG_USBFS */
++
++static abi_long do_ioctl_dm(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
++                            int cmd, abi_long arg)
++{
++    void *argptr;
++    struct dm_ioctl *host_dm;
++    abi_long guest_data;
++    uint32_t guest_data_size;
++    int target_size;
++    const argtype *arg_type = ie->arg_type;
++    abi_long ret;
++    void *big_buf = NULL;
++    char *host_data;
++
++    arg_type++;
++    target_size = thunk_type_size(arg_type, 0);
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        ret = -TARGET_EFAULT;
++        goto out;
++    }
++    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++
++    /* buf_temp is too small, so fetch things into a bigger buffer */
++    big_buf = g_malloc0(((struct dm_ioctl *)buf_temp)->data_size * 2);
++    memcpy(big_buf, buf_temp, target_size);
++    buf_temp = big_buf;
++    host_dm = big_buf;
++
++    guest_data = arg + host_dm->data_start;
++    if ((guest_data - arg) < 0) {
++        ret = -TARGET_EINVAL;
++        goto out;
++    }
++    guest_data_size = host_dm->data_size - host_dm->data_start;
++    host_data = (char *)host_dm + host_dm->data_start;
++
++    argptr = lock_user(VERIFY_READ, guest_data, guest_data_size, 1);
++    if (!argptr) {
++        ret = -TARGET_EFAULT;
++        goto out;
++    }
++
++    switch (ie->host_cmd) {
++    case DM_REMOVE_ALL:
++    case DM_LIST_DEVICES:
++    case DM_DEV_CREATE:
++    case DM_DEV_REMOVE:
++    case DM_DEV_SUSPEND:
++    case DM_DEV_STATUS:
++    case DM_DEV_WAIT:
++    case DM_TABLE_STATUS:
++    case DM_TABLE_CLEAR:
++    case DM_TABLE_DEPS:
++    case DM_LIST_VERSIONS:
++        /* no input data */
 +        break;
-+    case ARG_DEC:
-+        gemu_log("%d %s(%d,%s," TARGET_ABI_FMT_ld ")",
-+                 getpid(), def->name, fd, ent->name, arg);
++    case DM_DEV_RENAME:
++    case DM_DEV_SET_GEOMETRY:
++        /* data contains only strings */
++        memcpy(host_data, argptr, guest_data_size);
 +        break;
-+    case ARG_PTR:
-+        gemu_log("%d %s(%d,%s,0x" TARGET_ABI_FMT_lx ")",
-+                 getpid(), def->name, fd, ent->name, arg);
++    case DM_TARGET_MSG:
++        memcpy(host_data, argptr, guest_data_size);
++        *(uint64_t *)host_data = tswap64(*(uint64_t *)argptr);
++        break;
++    case DM_TABLE_LOAD:
++    {
++        void *gspec = argptr;
++        void *cur_data = host_data;
++        const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_target_spec) };
++        int spec_size = thunk_type_size(arg_type, 0);
++        int i;
++
++        for (i = 0; i < host_dm->target_count; i++) {
++            struct dm_target_spec *spec = cur_data;
++            uint32_t next;
++            int slen;
++
++            thunk_convert(spec, gspec, arg_type, THUNK_HOST);
++            slen = strlen((char *)gspec + spec_size) + 1;
++            next = spec->next;
++            spec->next = sizeof(*spec) + slen;
++            strcpy((char *)&spec[1], gspec + spec_size);
++            gspec += next;
++            cur_data += spec->next;
++        }
++        break;
++    }
++    default:
++        ret = -TARGET_EINVAL;
++        unlock_user(argptr, guest_data, 0);
++        goto out;
++    }
++    unlock_user(argptr, guest_data, 0);
++
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++    if (!is_error(ret)) {
++        guest_data = arg + host_dm->data_start;
++        guest_data_size = host_dm->data_size - host_dm->data_start;
++        argptr = lock_user(VERIFY_WRITE, guest_data, guest_data_size, 0);
++        switch (ie->host_cmd) {
++        case DM_REMOVE_ALL:
++        case DM_DEV_CREATE:
++        case DM_DEV_REMOVE:
++        case DM_DEV_RENAME:
++        case DM_DEV_SUSPEND:
++        case DM_DEV_STATUS:
++        case DM_TABLE_LOAD:
++        case DM_TABLE_CLEAR:
++        case DM_TARGET_MSG:
++        case DM_DEV_SET_GEOMETRY:
++            /* no return data */
++            break;
++        case DM_LIST_DEVICES:
++        {
++            struct dm_name_list *nl = (void *)host_dm + host_dm->data_start;
++            uint32_t remaining_data = guest_data_size;
++            void *cur_data = argptr;
++            const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_name_list) };
++            int nl_size = 12; /* can't use thunk_size due to alignment */
++
++            while (1) {
++                uint32_t next = nl->next;
++                if (next) {
++                    nl->next = nl_size + (strlen(nl->name) + 1);
++                }
++                if (remaining_data < nl->next) {
++                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
++                    break;
++                }
++                thunk_convert(cur_data, nl, arg_type, THUNK_TARGET);
++                strcpy(cur_data + nl_size, nl->name);
++                cur_data += nl->next;
++                remaining_data -= nl->next;
++                if (!next) {
++                    break;
++                }
++                nl = (void *)nl + next;
++            }
++            break;
++        }
++        case DM_DEV_WAIT:
++        case DM_TABLE_STATUS:
++        {
++            struct dm_target_spec *spec
++                = (void *)host_dm + host_dm->data_start;
++            void *cur_data = argptr;
++            const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_target_spec) };
++            int spec_size = thunk_type_size(arg_type, 0);
++            int i;
++
++            for (i = 0; i < host_dm->target_count; i++) {
++                uint32_t next = spec->next;
++                int slen = strlen((char *)&spec[1]) + 1;
++                spec->next = (cur_data - argptr) + spec_size + slen;
++                if (guest_data_size < spec->next) {
++                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
++                    break;
++                }
++                thunk_convert(cur_data, spec, arg_type, THUNK_TARGET);
++                strcpy(cur_data + spec_size, (char *)&spec[1]);
++                cur_data = argptr + spec->next;
++                spec = (void *)host_dm + host_dm->data_start + next;
++            }
++            break;
++        }
++        case DM_TABLE_DEPS:
++        {
++            void *hdata = (void *)host_dm + host_dm->data_start;
++            int count = *(uint32_t *)hdata;
++            uint64_t *hdev = hdata + 8;
++            uint64_t *gdev = argptr + 8;
++            int i;
++
++            *(uint32_t *)argptr = tswap32(count);
++            for (i = 0; i < count; i++) {
++                *gdev = tswap64(*hdev);
++                gdev++;
++                hdev++;
++            }
++            break;
++        }
++        case DM_LIST_VERSIONS:
++        {
++            struct dm_target_versions *vers
++                = (void *)host_dm + host_dm->data_start;
++            uint32_t remaining_data = guest_data_size;
++            void *cur_data = argptr;
++            const argtype arg_type[]
++                = { MK_STRUCT(STRUCT_dm_target_versions) };
++            int vers_size = thunk_type_size(arg_type, 0);
++
++            while (1) {
++                uint32_t next = vers->next;
++                if (next) {
++                    vers->next = vers_size + strlen(vers->name) + 1;
++                }
++                if (remaining_data < vers->next) {
++                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
++                    break;
++                }
++                thunk_convert(cur_data, vers, arg_type, THUNK_TARGET);
++                strcpy(cur_data + vers_size, vers->name);
++                cur_data += vers->next;
++                remaining_data -= vers->next;
++                if (!next) {
++                    break;
++                }
++                vers = (void *)vers + next;
++            }
++            break;
++        }
++        default:
++            unlock_user(argptr, guest_data, 0);
++            ret = -TARGET_EINVAL;
++            goto out;
++        }
++        unlock_user(argptr, guest_data, guest_data_size);
++
++        argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
++        if (!argptr) {
++            ret = -TARGET_EFAULT;
++            goto out;
++        }
++        thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
++        unlock_user(argptr, arg, target_size);
++    }
++out:
++    g_free(big_buf);
++    return ret;
++}
++
++static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
++                               int cmd, abi_long arg)
++{
++    void *argptr;
++    int target_size;
++    const argtype *arg_type = ie->arg_type;
++    const argtype part_arg_type[] = { MK_STRUCT(STRUCT_blkpg_partition) };
++    abi_long ret;
++    struct blkpg_ioctl_arg *host_blkpg = (void *)buf_temp;
++    struct blkpg_partition host_part;
++
++    /* Read and convert blkpg */
++    arg_type++;
++    target_size = thunk_type_size(arg_type, 0);
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        ret = -TARGET_EFAULT;
++        goto out;
++    }
++    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++
++    switch (host_blkpg->op) {
++    case BLKPG_ADD_PARTITION:
++    case BLKPG_DEL_PARTITION:
++        /* payload is struct blkpg_partition */
 +        break;
 +    default:
-+        g_assert_not_reached();
++        /* Unknown opcode */
++        ret = -TARGET_EINVAL;
++        goto out;
 +    }
-+}
 +
-+#ifdef TARGET_NR_fcntl
-+SYSCALL_IMPL(fcntl)
-+{
-+    return do_fcntl(arg1, arg2, arg3, 0);
-+}
-+
-+static void print_fcntl(const SyscallDef *def, int64_t in[6])
-+{
-+    return do_print_fcntl(def, in[0], in[1], in[2], 0);
-+}
-+#endif
-+
-+#if TARGET_ABI_BITS == 32
-+SYSCALL_IMPL(fcntl64)
-+{
-+    int is_64 = 1;
-+#ifdef TARGET_ARM
-+    if (!cpu_env->eabi) {
-+        is_64 = -1;
++    /* Read and convert blkpg->data */
++    arg = (abi_long)(uintptr_t)host_blkpg->data;
++    target_size = thunk_type_size(part_arg_type, 0);
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        ret = -TARGET_EFAULT;
++        goto out;
 +    }
-+#endif
-+    return do_fcntl(arg1, arg2, arg3, is_64);
++    thunk_convert(&host_part, argptr, part_arg_type, THUNK_HOST);
++    unlock_user(argptr, arg, 0);
++
++    /* Swizzle the data pointer to our local copy and call! */
++    host_blkpg->data = &host_part;
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_blkpg));
++
++out:
++    return ret;
 +}
 +
-+static void print_fcntl64(const SyscallDef *def, int64_t in[6])
++static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
++                            int fd, int cmd, abi_long arg)
 +{
-+    return do_print_fcntl(def, in[0], in[1], in[2], 1);
++    const argtype *arg_type = ie->arg_type;
++    const StructEntry *se;
++    const argtype *field_types;
++    const int *dst_offsets, *src_offsets;
++    int target_size;
++    void *argptr;
++    abi_ulong *target_rt_dev_ptr;
++    unsigned long *host_rt_dev_ptr;
++    abi_long ret;
++    int i;
++
++    assert(ie->access == IOC_W);
++    assert(*arg_type == TYPE_PTR);
++    arg_type++;
++    assert(*arg_type == TYPE_STRUCT);
++    target_size = thunk_type_size(arg_type, 0);
++    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++    if (!argptr) {
++        return -TARGET_EFAULT;
++    }
++    arg_type++;
++    assert(*arg_type == (int)STRUCT_rtentry);
++    se = struct_entries + *arg_type++;
++    assert(se->convert[0] == NULL);
++    /* convert struct here to be able to catch rt_dev string */
++    field_types = se->field_types;
++    dst_offsets = se->field_offsets[THUNK_HOST];
++    src_offsets = se->field_offsets[THUNK_TARGET];
++    for (i = 0; i < se->nb_fields; i++) {
++        if (dst_offsets[i] == offsetof(struct rtentry, rt_dev)) {
++            assert(*field_types == TYPE_PTRVOID);
++            target_rt_dev_ptr = (abi_ulong *)(argptr + src_offsets[i]);
++            host_rt_dev_ptr = (unsigned long *)(buf_temp + dst_offsets[i]);
++            if (*target_rt_dev_ptr != 0) {
++                *host_rt_dev_ptr = (unsigned long)lock_user_string(
++                    tswapal(*target_rt_dev_ptr));
++                if (!*host_rt_dev_ptr) {
++                    unlock_user(argptr, arg, 0);
++                    return -TARGET_EFAULT;
++                }
++            } else {
++                *host_rt_dev_ptr = 0;
++            }
++            field_types++;
++            continue;
++        }
++        field_types = thunk_convert(buf_temp + dst_offsets[i],
++                                    argptr + src_offsets[i],
++                                    field_types, THUNK_HOST);
++    }
++    unlock_user(argptr, arg, 0);
++
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++    if (*host_rt_dev_ptr != 0) {
++        unlock_user((void *)*host_rt_dev_ptr,
++                    *target_rt_dev_ptr, 0);
++    }
++    return ret;
++}
++
++static abi_long do_ioctl_kdsigaccept(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                     int fd, int cmd, abi_long arg)
++{
++    int sig = target_to_host_signal(arg);
++    return get_errno(safe_ioctl(fd, ie->host_cmd, sig));
++}
++
++#ifdef TIOCGPTPEER
++static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                     int fd, int cmd, abi_long arg)
++{
++    int flags = target_to_host_bitmask(arg, fcntl_flags_tbl);
++    return get_errno(safe_ioctl(fd, ie->host_cmd, flags));
 +}
 +#endif
++
++static IOCTLEntry ioctl_entries[] = {
++#define IOCTL(cmd, access, ...)                                 \
++    { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
++#define IOCTL_SPECIAL(cmd, access, dofn, ...)                           \
++    { TARGET_ ## cmd, cmd, #cmd, access, dofn, {  __VA_ARGS__ } },
++#define IOCTL_IGNORE(cmd)                       \
++    { TARGET_ ## cmd, 0, #cmd },
++#include "ioctls.h"
++    { 0, 0, },
++};
++
++/* ??? Implement proper locking for ioctls.  */
++SYSCALL_IMPL(ioctl)
++{
++    int fd = arg1;
++    abi_ulong cmd = arg2;
++    abi_ulong arg = arg3;
++    const IOCTLEntry *ie;
++    const argtype *arg_type;
++    abi_long ret;
++    uint8_t buf_temp[MAX_STRUCT_SIZE];
++    int target_size;
++    void *argptr;
++
++    for (ie = ioctl_entries; ; ie++) {
++        if (ie->target_cmd == 0) {
++            gemu_log("Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
++            return -TARGET_ENOSYS;
++        }
++        if (ie->target_cmd == cmd) {
++            break;
++        }
++    }
++
++    arg_type = ie->arg_type;
++    if (ie->do_ioctl) {
++        return ie->do_ioctl(ie, buf_temp, fd, cmd, arg);
++    } else if (!ie->host_cmd) {
++        /*
++         * Some architectures define BSD ioctls in their headers
++         * that are not implemented in Linux.
++         */
++        return -TARGET_ENOSYS;
++    }
++
++    switch (arg_type[0]) {
++    case TYPE_NULL:
++        /* no argument */
++        ret = get_errno(safe_ioctl(fd, ie->host_cmd));
++        break;
++    case TYPE_PTRVOID:
++    case TYPE_INT:
++        ret = get_errno(safe_ioctl(fd, ie->host_cmd, arg));
++        break;
++    case TYPE_PTR:
++        arg_type++;
++        target_size = thunk_type_size(arg_type, 0);
++        switch (ie->access) {
++        case IOC_R:
++            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++            if (!is_error(ret)) {
++                argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
++                if (!argptr) {
++                    return -TARGET_EFAULT;
++                }
++                thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
++                unlock_user(argptr, arg, target_size);
++            }
++            break;
++        case IOC_W:
++            argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++            if (!argptr) {
++                return -TARGET_EFAULT;
++            }
++            thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++            unlock_user(argptr, arg, 0);
++            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++            break;
++        default:
++        case IOC_RW:
++            argptr = lock_user(VERIFY_READ, arg, target_size, 1);
++            if (!argptr) {
++                return -TARGET_EFAULT;
++            }
++            thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
++            unlock_user(argptr, arg, 0);
++            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
++            if (!is_error(ret)) {
++                argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
++                if (!argptr) {
++                    return -TARGET_EFAULT;
++                }
++                thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
++                unlock_user(argptr, arg, target_size);
++            }
++            break;
++        }
++        break;
++    default:
++        gemu_log("Unsupported ioctl type: cmd=0x%04lx type=%d\n",
++                 (long)cmd, arg_type[0]);
++        ret = -TARGET_ENOSYS;
++        break;
++    }
++    return ret;
++}
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 03ecf0a15a..bce26592d2 100644
+index 82b7267b20..03ecf0a15a 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -3469,102 +3469,6 @@ static void *clone_func(void *arg)
-     return NULL;
- }
+@@ -2935,846 +2935,6 @@ STRUCT_MAX
+ #undef STRUCT
+ #undef STRUCT_SPECIAL
  
--/* warning : doesn't handle linux specific flags... */
--static int target_to_host_fcntl_cmd(int cmd)
--{
--    int ret;
+-typedef struct IOCTLEntry IOCTLEntry;
 -
--    switch(cmd) {
--    case TARGET_F_DUPFD:
--    case TARGET_F_GETFD:
--    case TARGET_F_SETFD:
--    case TARGET_F_GETFL:
--    case TARGET_F_SETFL:
--        ret = cmd;
--        break;
--    case TARGET_F_GETLK:
--        ret = F_GETLK64;
--        break;
--    case TARGET_F_SETLK:
--        ret = F_SETLK64;
--        break;
--    case TARGET_F_SETLKW:
--        ret = F_SETLKW64;
--        break;
--    case TARGET_F_GETOWN:
--        ret = F_GETOWN;
--        break;
--    case TARGET_F_SETOWN:
--        ret = F_SETOWN;
--        break;
--    case TARGET_F_GETSIG:
--        ret = F_GETSIG;
--        break;
--    case TARGET_F_SETSIG:
--        ret = F_SETSIG;
--        break;
--#if TARGET_ABI_BITS == 32
--    case TARGET_F_GETLK64:
--        ret = F_GETLK64;
--        break;
--    case TARGET_F_SETLK64:
--        ret = F_SETLK64;
--        break;
--    case TARGET_F_SETLKW64:
--        ret = F_SETLKW64;
--        break;
+-typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                             int fd, int cmd, abi_long arg);
+-
+-struct IOCTLEntry {
+-    int target_cmd;
+-    unsigned int host_cmd;
+-    const char *name;
+-    int access;
+-    do_ioctl_fn *do_ioctl;
+-    const argtype arg_type[5];
+-};
+-
+-#define IOC_R 0x0001
+-#define IOC_W 0x0002
+-#define IOC_RW (IOC_R | IOC_W)
+-
+-#define MAX_STRUCT_SIZE 4096
+-
+-#ifdef CONFIG_FIEMAP
+-/* So fiemap access checks don't overflow on 32 bit systems.
+- * This is very slightly smaller than the limit imposed by
+- * the underlying kernel.
+- */
+-#define FIEMAP_MAX_EXTENTS ((UINT_MAX - sizeof(struct fiemap))  \
+-                            / sizeof(struct fiemap_extent))
+-
+-static abi_long do_ioctl_fs_ioc_fiemap(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                                       int fd, int cmd, abi_long arg)
+-{
+-    /* The parameter for this ioctl is a struct fiemap followed
+-     * by an array of struct fiemap_extent whose size is set
+-     * in fiemap->fm_extent_count. The array is filled in by the
+-     * ioctl.
+-     */
+-    int target_size_in, target_size_out;
+-    struct fiemap *fm;
+-    const argtype *arg_type = ie->arg_type;
+-    const argtype extent_arg_type[] = { MK_STRUCT(STRUCT_fiemap_extent) };
+-    void *argptr, *p;
+-    abi_long ret;
+-    int i, extent_size = thunk_type_size(extent_arg_type, 0);
+-    uint32_t outbufsz;
+-    int free_fm = 0;
+-
+-    assert(arg_type[0] == TYPE_PTR);
+-    assert(ie->access == IOC_RW);
+-    arg_type++;
+-    target_size_in = thunk_type_size(arg_type, 0);
+-    argptr = lock_user(VERIFY_READ, arg, target_size_in, 1);
+-    if (!argptr) {
+-        return -TARGET_EFAULT;
+-    }
+-    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-    fm = (struct fiemap *)buf_temp;
+-    if (fm->fm_extent_count > FIEMAP_MAX_EXTENTS) {
+-        return -TARGET_EINVAL;
+-    }
+-
+-    outbufsz = sizeof (*fm) +
+-        (sizeof(struct fiemap_extent) * fm->fm_extent_count);
+-
+-    if (outbufsz > MAX_STRUCT_SIZE) {
+-        /* We can't fit all the extents into the fixed size buffer.
+-         * Allocate one that is large enough and use it instead.
+-         */
+-        fm = g_try_malloc(outbufsz);
+-        if (!fm) {
+-            return -TARGET_ENOMEM;
+-        }
+-        memcpy(fm, buf_temp, sizeof(struct fiemap));
+-        free_fm = 1;
+-    }
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, fm));
+-    if (!is_error(ret)) {
+-        target_size_out = target_size_in;
+-        /* An extent_count of 0 means we were only counting the extents
+-         * so there are no structs to copy
+-         */
+-        if (fm->fm_extent_count != 0) {
+-            target_size_out += fm->fm_mapped_extents * extent_size;
+-        }
+-        argptr = lock_user(VERIFY_WRITE, arg, target_size_out, 0);
+-        if (!argptr) {
+-            ret = -TARGET_EFAULT;
+-        } else {
+-            /* Convert the struct fiemap */
+-            thunk_convert(argptr, fm, arg_type, THUNK_TARGET);
+-            if (fm->fm_extent_count != 0) {
+-                p = argptr + target_size_in;
+-                /* ...and then all the struct fiemap_extents */
+-                for (i = 0; i < fm->fm_mapped_extents; i++) {
+-                    thunk_convert(p, &fm->fm_extents[i], extent_arg_type,
+-                                  THUNK_TARGET);
+-                    p += extent_size;
+-                }
+-            }
+-            unlock_user(argptr, arg, target_size_out);
+-        }
+-    }
+-    if (free_fm) {
+-        g_free(fm);
+-    }
+-    return ret;
+-}
 -#endif
--    case TARGET_F_SETLEASE:
--        ret = F_SETLEASE;
--        break;
--    case TARGET_F_GETLEASE:
--        ret = F_GETLEASE;
--        break;
--#ifdef F_DUPFD_CLOEXEC
--    case TARGET_F_DUPFD_CLOEXEC:
--        ret = F_DUPFD_CLOEXEC;
--        break;
+-
+-static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                                int fd, int cmd, abi_long arg)
+-{
+-    const argtype *arg_type = ie->arg_type;
+-    int target_size;
+-    void *argptr;
+-    int ret;
+-    struct ifconf *host_ifconf;
+-    uint32_t outbufsz;
+-    const argtype ifreq_arg_type[] = { MK_STRUCT(STRUCT_sockaddr_ifreq) };
+-    int target_ifreq_size;
+-    int nb_ifreq;
+-    int free_buf = 0;
+-    int i;
+-    int target_ifc_len;
+-    abi_long target_ifc_buf;
+-    int host_ifc_len;
+-    char *host_ifc_buf;
+-
+-    assert(arg_type[0] == TYPE_PTR);
+-    assert(ie->access == IOC_RW);
+-
+-    arg_type++;
+-    target_size = thunk_type_size(arg_type, 0);
+-
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr)
+-        return -TARGET_EFAULT;
+-    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-
+-    host_ifconf = (struct ifconf *)(unsigned long)buf_temp;
+-    target_ifc_len = host_ifconf->ifc_len;
+-    target_ifc_buf = (abi_long)(unsigned long)host_ifconf->ifc_buf;
+-
+-    target_ifreq_size = thunk_type_size(ifreq_arg_type, 0);
+-    nb_ifreq = target_ifc_len / target_ifreq_size;
+-    host_ifc_len = nb_ifreq * sizeof(struct ifreq);
+-
+-    outbufsz = sizeof(*host_ifconf) + host_ifc_len;
+-    if (outbufsz > MAX_STRUCT_SIZE) {
+-        /* We can't fit all the extents into the fixed size buffer.
+-         * Allocate one that is large enough and use it instead.
+-         */
+-        host_ifconf = malloc(outbufsz);
+-        if (!host_ifconf) {
+-            return -TARGET_ENOMEM;
+-        }
+-        memcpy(host_ifconf, buf_temp, sizeof(*host_ifconf));
+-        free_buf = 1;
+-    }
+-    host_ifc_buf = (char*)host_ifconf + sizeof(*host_ifconf);
+-
+-    host_ifconf->ifc_len = host_ifc_len;
+-    host_ifconf->ifc_buf = host_ifc_buf;
+-
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_ifconf));
+-    if (!is_error(ret)) {
+-	/* convert host ifc_len to target ifc_len */
+-
+-        nb_ifreq = host_ifconf->ifc_len / sizeof(struct ifreq);
+-        target_ifc_len = nb_ifreq * target_ifreq_size;
+-        host_ifconf->ifc_len = target_ifc_len;
+-
+-	/* restore target ifc_buf */
+-
+-        host_ifconf->ifc_buf = (char *)(unsigned long)target_ifc_buf;
+-
+-	/* copy struct ifconf to target user */
+-
+-        argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+-        if (!argptr)
+-            return -TARGET_EFAULT;
+-        thunk_convert(argptr, host_ifconf, arg_type, THUNK_TARGET);
+-        unlock_user(argptr, arg, target_size);
+-
+-	/* copy ifreq[] to target user */
+-
+-        argptr = lock_user(VERIFY_WRITE, target_ifc_buf, target_ifc_len, 0);
+-        for (i = 0; i < nb_ifreq ; i++) {
+-            thunk_convert(argptr + i * target_ifreq_size,
+-                          host_ifc_buf + i * sizeof(struct ifreq),
+-                          ifreq_arg_type, THUNK_TARGET);
+-        }
+-        unlock_user(argptr, target_ifc_buf, target_ifc_len);
+-    }
+-
+-    if (free_buf) {
+-        free(host_ifconf);
+-    }
+-
+-    return ret;
+-}
+-
+-#if defined(CONFIG_USBFS)
+-#if HOST_LONG_BITS > 64
+-#error USBDEVFS thunks do not support >64 bit hosts yet.
 -#endif
--    case TARGET_F_NOTIFY:
--        ret = F_NOTIFY;
+-struct live_urb {
+-    uint64_t target_urb_adr;
+-    uint64_t target_buf_adr;
+-    char *target_buf_ptr;
+-    struct usbdevfs_urb host_urb;
+-};
+-
+-static GHashTable *usbdevfs_urb_hashtable(void)
+-{
+-    static GHashTable *urb_hashtable;
+-
+-    if (!urb_hashtable) {
+-        urb_hashtable = g_hash_table_new(g_int64_hash, g_int64_equal);
+-    }
+-    return urb_hashtable;
+-}
+-
+-static void urb_hashtable_insert(struct live_urb *urb)
+-{
+-    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
+-    g_hash_table_insert(urb_hashtable, urb, urb);
+-}
+-
+-static struct live_urb *urb_hashtable_lookup(uint64_t target_urb_adr)
+-{
+-    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
+-    return g_hash_table_lookup(urb_hashtable, &target_urb_adr);
+-}
+-
+-static void urb_hashtable_remove(struct live_urb *urb)
+-{
+-    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
+-    g_hash_table_remove(urb_hashtable, urb);
+-}
+-
+-static abi_long
+-do_ioctl_usbdevfs_reapurb(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                          int fd, int cmd, abi_long arg)
+-{
+-    const argtype usbfsurb_arg_type[] = { MK_STRUCT(STRUCT_usbdevfs_urb) };
+-    const argtype ptrvoid_arg_type[] = { TYPE_PTRVOID, 0, 0 };
+-    struct live_urb *lurb;
+-    void *argptr;
+-    uint64_t hurb;
+-    int target_size;
+-    uintptr_t target_urb_adr;
+-    abi_long ret;
+-
+-    target_size = thunk_type_size(usbfsurb_arg_type, THUNK_TARGET);
+-
+-    memset(buf_temp, 0, sizeof(uint64_t));
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-    if (is_error(ret)) {
+-        return ret;
+-    }
+-
+-    memcpy(&hurb, buf_temp, sizeof(uint64_t));
+-    lurb = (void *)((uintptr_t)hurb - offsetof(struct live_urb, host_urb));
+-    if (!lurb->target_urb_adr) {
+-        return -TARGET_EFAULT;
+-    }
+-    urb_hashtable_remove(lurb);
+-    unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr,
+-        lurb->host_urb.buffer_length);
+-    lurb->target_buf_ptr = NULL;
+-
+-    /* restore the guest buffer pointer */
+-    lurb->host_urb.buffer = (void *)(uintptr_t)lurb->target_buf_adr;
+-
+-    /* update the guest urb struct */
+-    argptr = lock_user(VERIFY_WRITE, lurb->target_urb_adr, target_size, 0);
+-    if (!argptr) {
+-        g_free(lurb);
+-        return -TARGET_EFAULT;
+-    }
+-    thunk_convert(argptr, &lurb->host_urb, usbfsurb_arg_type, THUNK_TARGET);
+-    unlock_user(argptr, lurb->target_urb_adr, target_size);
+-
+-    target_size = thunk_type_size(ptrvoid_arg_type, THUNK_TARGET);
+-    /* write back the urb handle */
+-    argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+-    if (!argptr) {
+-        g_free(lurb);
+-        return -TARGET_EFAULT;
+-    }
+-
+-    /* GHashTable uses 64-bit keys but thunk_convert expects uintptr_t */
+-    target_urb_adr = lurb->target_urb_adr;
+-    thunk_convert(argptr, &target_urb_adr, ptrvoid_arg_type, THUNK_TARGET);
+-    unlock_user(argptr, arg, target_size);
+-
+-    g_free(lurb);
+-    return ret;
+-}
+-
+-static abi_long
+-do_ioctl_usbdevfs_discardurb(const IOCTLEntry *ie,
+-                             uint8_t *buf_temp __attribute__((unused)),
+-                             int fd, int cmd, abi_long arg)
+-{
+-    struct live_urb *lurb;
+-
+-    /* map target address back to host URB with metadata. */
+-    lurb = urb_hashtable_lookup(arg);
+-    if (!lurb) {
+-        return -TARGET_EFAULT;
+-    }
+-    return get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
+-}
+-
+-static abi_long
+-do_ioctl_usbdevfs_submiturb(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                            int fd, int cmd, abi_long arg)
+-{
+-    const argtype *arg_type = ie->arg_type;
+-    int target_size;
+-    abi_long ret;
+-    void *argptr;
+-    int rw_dir;
+-    struct live_urb *lurb;
+-
+-    /*
+-     * each submitted URB needs to map to a unique ID for the
+-     * kernel, and that unique ID needs to be a pointer to
+-     * host memory.  hence, we need to malloc for each URB.
+-     * isochronous transfers have a variable length struct.
+-     */
+-    arg_type++;
+-    target_size = thunk_type_size(arg_type, THUNK_TARGET);
+-
+-    /* construct host copy of urb and metadata */
+-    lurb = g_try_malloc0(sizeof(struct live_urb));
+-    if (!lurb) {
+-        return -TARGET_ENOMEM;
+-    }
+-
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr) {
+-        g_free(lurb);
+-        return -TARGET_EFAULT;
+-    }
+-    thunk_convert(&lurb->host_urb, argptr, arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-
+-    lurb->target_urb_adr = arg;
+-    lurb->target_buf_adr = (uintptr_t)lurb->host_urb.buffer;
+-
+-    /* buffer space used depends on endpoint type so lock the entire buffer */
+-    /* control type urbs should check the buffer contents for true direction */
+-    rw_dir = lurb->host_urb.endpoint & USB_DIR_IN ? VERIFY_WRITE : VERIFY_READ;
+-    lurb->target_buf_ptr = lock_user(rw_dir, lurb->target_buf_adr,
+-        lurb->host_urb.buffer_length, 1);
+-    if (lurb->target_buf_ptr == NULL) {
+-        g_free(lurb);
+-        return -TARGET_EFAULT;
+-    }
+-
+-    /* update buffer pointer in host copy */
+-    lurb->host_urb.buffer = lurb->target_buf_ptr;
+-
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
+-    if (is_error(ret)) {
+-        unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr, 0);
+-        g_free(lurb);
+-    } else {
+-        urb_hashtable_insert(lurb);
+-    }
+-
+-    return ret;
+-}
+-#endif /* CONFIG_USBFS */
+-
+-static abi_long do_ioctl_dm(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
+-                            int cmd, abi_long arg)
+-{
+-    void *argptr;
+-    struct dm_ioctl *host_dm;
+-    abi_long guest_data;
+-    uint32_t guest_data_size;
+-    int target_size;
+-    const argtype *arg_type = ie->arg_type;
+-    abi_long ret;
+-    void *big_buf = NULL;
+-    char *host_data;
+-
+-    arg_type++;
+-    target_size = thunk_type_size(arg_type, 0);
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr) {
+-        ret = -TARGET_EFAULT;
+-        goto out;
+-    }
+-    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-
+-    /* buf_temp is too small, so fetch things into a bigger buffer */
+-    big_buf = g_malloc0(((struct dm_ioctl*)buf_temp)->data_size * 2);
+-    memcpy(big_buf, buf_temp, target_size);
+-    buf_temp = big_buf;
+-    host_dm = big_buf;
+-
+-    guest_data = arg + host_dm->data_start;
+-    if ((guest_data - arg) < 0) {
+-        ret = -TARGET_EINVAL;
+-        goto out;
+-    }
+-    guest_data_size = host_dm->data_size - host_dm->data_start;
+-    host_data = (char*)host_dm + host_dm->data_start;
+-
+-    argptr = lock_user(VERIFY_READ, guest_data, guest_data_size, 1);
+-    if (!argptr) {
+-        ret = -TARGET_EFAULT;
+-        goto out;
+-    }
+-
+-    switch (ie->host_cmd) {
+-    case DM_REMOVE_ALL:
+-    case DM_LIST_DEVICES:
+-    case DM_DEV_CREATE:
+-    case DM_DEV_REMOVE:
+-    case DM_DEV_SUSPEND:
+-    case DM_DEV_STATUS:
+-    case DM_DEV_WAIT:
+-    case DM_TABLE_STATUS:
+-    case DM_TABLE_CLEAR:
+-    case DM_TABLE_DEPS:
+-    case DM_LIST_VERSIONS:
+-        /* no input data */
 -        break;
--#ifdef F_GETOWN_EX
--    case TARGET_F_GETOWN_EX:
--        ret = F_GETOWN_EX;
+-    case DM_DEV_RENAME:
+-    case DM_DEV_SET_GEOMETRY:
+-        /* data contains only strings */
+-        memcpy(host_data, argptr, guest_data_size);
 -        break;
--#endif
--#ifdef F_SETOWN_EX
--    case TARGET_F_SETOWN_EX:
--        ret = F_SETOWN_EX;
+-    case DM_TARGET_MSG:
+-        memcpy(host_data, argptr, guest_data_size);
+-        *(uint64_t*)host_data = tswap64(*(uint64_t*)argptr);
 -        break;
--#endif
--#ifdef F_SETPIPE_SZ
--    case TARGET_F_SETPIPE_SZ:
--        ret = F_SETPIPE_SZ;
+-    case DM_TABLE_LOAD:
+-    {
+-        void *gspec = argptr;
+-        void *cur_data = host_data;
+-        const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_target_spec) };
+-        int spec_size = thunk_type_size(arg_type, 0);
+-        int i;
+-
+-        for (i = 0; i < host_dm->target_count; i++) {
+-            struct dm_target_spec *spec = cur_data;
+-            uint32_t next;
+-            int slen;
+-
+-            thunk_convert(spec, gspec, arg_type, THUNK_HOST);
+-            slen = strlen((char*)gspec + spec_size) + 1;
+-            next = spec->next;
+-            spec->next = sizeof(*spec) + slen;
+-            strcpy((char*)&spec[1], gspec + spec_size);
+-            gspec += next;
+-            cur_data += spec->next;
+-        }
 -        break;
--    case TARGET_F_GETPIPE_SZ:
--        ret = F_GETPIPE_SZ;
--        break;
--#endif
+-    }
 -    default:
 -        ret = -TARGET_EINVAL;
--        break;
+-        unlock_user(argptr, guest_data, 0);
+-        goto out;
 -    }
+-    unlock_user(argptr, guest_data, 0);
 -
--#if defined(__powerpc64__)
--    /* On PPC64, glibc headers has the F_*LK* defined to 12, 13 and 14 and
--     * is not supported by kernel. The glibc fcntl call actually adjusts
--     * them to 5, 6 and 7 before making the syscall(). Since we make the
--     * syscall directly, adjust to what is supported by the kernel.
--     */
--    if (ret >= F_GETLK64 && ret <= F_SETLKW64) {
--        ret -= F_GETLK64 - 5;
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-    if (!is_error(ret)) {
+-        guest_data = arg + host_dm->data_start;
+-        guest_data_size = host_dm->data_size - host_dm->data_start;
+-        argptr = lock_user(VERIFY_WRITE, guest_data, guest_data_size, 0);
+-        switch (ie->host_cmd) {
+-        case DM_REMOVE_ALL:
+-        case DM_DEV_CREATE:
+-        case DM_DEV_REMOVE:
+-        case DM_DEV_RENAME:
+-        case DM_DEV_SUSPEND:
+-        case DM_DEV_STATUS:
+-        case DM_TABLE_LOAD:
+-        case DM_TABLE_CLEAR:
+-        case DM_TARGET_MSG:
+-        case DM_DEV_SET_GEOMETRY:
+-            /* no return data */
+-            break;
+-        case DM_LIST_DEVICES:
+-        {
+-            struct dm_name_list *nl = (void*)host_dm + host_dm->data_start;
+-            uint32_t remaining_data = guest_data_size;
+-            void *cur_data = argptr;
+-            const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_name_list) };
+-            int nl_size = 12; /* can't use thunk_size due to alignment */
+-
+-            while (1) {
+-                uint32_t next = nl->next;
+-                if (next) {
+-                    nl->next = nl_size + (strlen(nl->name) + 1);
+-                }
+-                if (remaining_data < nl->next) {
+-                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
+-                    break;
+-                }
+-                thunk_convert(cur_data, nl, arg_type, THUNK_TARGET);
+-                strcpy(cur_data + nl_size, nl->name);
+-                cur_data += nl->next;
+-                remaining_data -= nl->next;
+-                if (!next) {
+-                    break;
+-                }
+-                nl = (void*)nl + next;
+-            }
+-            break;
+-        }
+-        case DM_DEV_WAIT:
+-        case DM_TABLE_STATUS:
+-        {
+-            struct dm_target_spec *spec = (void*)host_dm + host_dm->data_start;
+-            void *cur_data = argptr;
+-            const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_target_spec) };
+-            int spec_size = thunk_type_size(arg_type, 0);
+-            int i;
+-
+-            for (i = 0; i < host_dm->target_count; i++) {
+-                uint32_t next = spec->next;
+-                int slen = strlen((char*)&spec[1]) + 1;
+-                spec->next = (cur_data - argptr) + spec_size + slen;
+-                if (guest_data_size < spec->next) {
+-                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
+-                    break;
+-                }
+-                thunk_convert(cur_data, spec, arg_type, THUNK_TARGET);
+-                strcpy(cur_data + spec_size, (char*)&spec[1]);
+-                cur_data = argptr + spec->next;
+-                spec = (void*)host_dm + host_dm->data_start + next;
+-            }
+-            break;
+-        }
+-        case DM_TABLE_DEPS:
+-        {
+-            void *hdata = (void*)host_dm + host_dm->data_start;
+-            int count = *(uint32_t*)hdata;
+-            uint64_t *hdev = hdata + 8;
+-            uint64_t *gdev = argptr + 8;
+-            int i;
+-
+-            *(uint32_t*)argptr = tswap32(count);
+-            for (i = 0; i < count; i++) {
+-                *gdev = tswap64(*hdev);
+-                gdev++;
+-                hdev++;
+-            }
+-            break;
+-        }
+-        case DM_LIST_VERSIONS:
+-        {
+-            struct dm_target_versions *vers = (void*)host_dm + host_dm->data_start;
+-            uint32_t remaining_data = guest_data_size;
+-            void *cur_data = argptr;
+-            const argtype arg_type[] = { MK_STRUCT(STRUCT_dm_target_versions) };
+-            int vers_size = thunk_type_size(arg_type, 0);
+-
+-            while (1) {
+-                uint32_t next = vers->next;
+-                if (next) {
+-                    vers->next = vers_size + (strlen(vers->name) + 1);
+-                }
+-                if (remaining_data < vers->next) {
+-                    host_dm->flags |= DM_BUFFER_FULL_FLAG;
+-                    break;
+-                }
+-                thunk_convert(cur_data, vers, arg_type, THUNK_TARGET);
+-                strcpy(cur_data + vers_size, vers->name);
+-                cur_data += vers->next;
+-                remaining_data -= vers->next;
+-                if (!next) {
+-                    break;
+-                }
+-                vers = (void*)vers + next;
+-            }
+-            break;
+-        }
+-        default:
+-            unlock_user(argptr, guest_data, 0);
+-            ret = -TARGET_EINVAL;
+-            goto out;
+-        }
+-        unlock_user(argptr, guest_data, guest_data_size);
+-
+-        argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+-        if (!argptr) {
+-            ret = -TARGET_EFAULT;
+-            goto out;
+-        }
+-        thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
+-        unlock_user(argptr, arg, target_size);
 -    }
--#endif
--
+-out:
+-    g_free(big_buf);
 -    return ret;
 -}
 -
- #define FLOCK_TRANSTBL \
-     switch (type) { \
-     TRANSTBL_CONVERT(F_RDLCK); \
-@@ -3730,114 +3634,6 @@ static inline abi_long copy_to_user_flock64(abi_ulong target_flock_addr,
-     return 0;
- }
- 
--static abi_long do_fcntl(int fd, int cmd, abi_ulong arg)
+-static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
+-                               int cmd, abi_long arg)
 -{
--    struct flock64 fl64;
--#ifdef F_GETOWN_EX
--    struct f_owner_ex fox;
--    struct target_f_owner_ex *target_fox;
--#endif
+-    void *argptr;
+-    int target_size;
+-    const argtype *arg_type = ie->arg_type;
+-    const argtype part_arg_type[] = { MK_STRUCT(STRUCT_blkpg_partition) };
 -    abi_long ret;
--    int host_cmd = target_to_host_fcntl_cmd(cmd);
 -
--    if (host_cmd == -TARGET_EINVAL)
--	    return host_cmd;
+-    struct blkpg_ioctl_arg *host_blkpg = (void*)buf_temp;
+-    struct blkpg_partition host_part;
 -
--    switch(cmd) {
--    case TARGET_F_GETLK:
--        ret = copy_from_user_flock(&fl64, arg);
--        if (ret) {
--            return ret;
--        }
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
--        if (ret == 0) {
--            ret = copy_to_user_flock(arg, &fl64);
--        }
+-    /* Read and convert blkpg */
+-    arg_type++;
+-    target_size = thunk_type_size(arg_type, 0);
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr) {
+-        ret = -TARGET_EFAULT;
+-        goto out;
+-    }
+-    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-
+-    switch (host_blkpg->op) {
+-    case BLKPG_ADD_PARTITION:
+-    case BLKPG_DEL_PARTITION:
+-        /* payload is struct blkpg_partition */
 -        break;
--
--    case TARGET_F_SETLK:
--    case TARGET_F_SETLKW:
--        ret = copy_from_user_flock(&fl64, arg);
--        if (ret) {
--            return ret;
--        }
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
--        break;
--
--    case TARGET_F_GETLK64:
--        ret = copy_from_user_flock64(&fl64, arg);
--        if (ret) {
--            return ret;
--        }
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
--        if (ret == 0) {
--            ret = copy_to_user_flock64(arg, &fl64);
--        }
--        break;
--    case TARGET_F_SETLK64:
--    case TARGET_F_SETLKW64:
--        ret = copy_from_user_flock64(&fl64, arg);
--        if (ret) {
--            return ret;
--        }
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fl64));
--        break;
--
--    case TARGET_F_GETFL:
--        ret = get_errno(safe_fcntl(fd, host_cmd, arg));
--        if (ret >= 0) {
--            ret = host_to_target_bitmask(ret, fcntl_flags_tbl);
--        }
--        break;
--
--    case TARGET_F_SETFL:
--        ret = get_errno(safe_fcntl(fd, host_cmd,
--                                   target_to_host_bitmask(arg,
--                                                          fcntl_flags_tbl)));
--        break;
--
--#ifdef F_GETOWN_EX
--    case TARGET_F_GETOWN_EX:
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fox));
--        if (ret >= 0) {
--            if (!lock_user_struct(VERIFY_WRITE, target_fox, arg, 0))
--                return -TARGET_EFAULT;
--            target_fox->type = tswap32(fox.type);
--            target_fox->pid = tswap32(fox.pid);
--            unlock_user_struct(target_fox, arg, 1);
--        }
--        break;
--#endif
--
--#ifdef F_SETOWN_EX
--    case TARGET_F_SETOWN_EX:
--        if (!lock_user_struct(VERIFY_READ, target_fox, arg, 1))
--            return -TARGET_EFAULT;
--        fox.type = tswap32(target_fox->type);
--        fox.pid = tswap32(target_fox->pid);
--        unlock_user_struct(target_fox, arg, 0);
--        ret = get_errno(safe_fcntl(fd, host_cmd, &fox));
--        break;
--#endif
--
--    case TARGET_F_SETOWN:
--    case TARGET_F_GETOWN:
--    case TARGET_F_SETSIG:
--    case TARGET_F_GETSIG:
--    case TARGET_F_SETLEASE:
--    case TARGET_F_GETLEASE:
--    case TARGET_F_SETPIPE_SZ:
--    case TARGET_F_GETPIPE_SZ:
--        ret = get_errno(safe_fcntl(fd, host_cmd, arg));
--        break;
--
 -    default:
--        ret = get_errno(safe_fcntl(fd, cmd, arg));
+-        /* Unknown opcode */
+-        ret = -TARGET_EINVAL;
+-        goto out;
+-    }
+-
+-    /* Read and convert blkpg->data */
+-    arg = (abi_long)(uintptr_t)host_blkpg->data;
+-    target_size = thunk_type_size(part_arg_type, 0);
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr) {
+-        ret = -TARGET_EFAULT;
+-        goto out;
+-    }
+-    thunk_convert(&host_part, argptr, part_arg_type, THUNK_HOST);
+-    unlock_user(argptr, arg, 0);
+-
+-    /* Swizzle the data pointer to our local copy and call! */
+-    host_blkpg->data = &host_part;
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_blkpg));
+-
+-out:
+-    return ret;
+-}
+-
+-static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                                int fd, int cmd, abi_long arg)
+-{
+-    const argtype *arg_type = ie->arg_type;
+-    const StructEntry *se;
+-    const argtype *field_types;
+-    const int *dst_offsets, *src_offsets;
+-    int target_size;
+-    void *argptr;
+-    abi_ulong *target_rt_dev_ptr;
+-    unsigned long *host_rt_dev_ptr;
+-    abi_long ret;
+-    int i;
+-
+-    assert(ie->access == IOC_W);
+-    assert(*arg_type == TYPE_PTR);
+-    arg_type++;
+-    assert(*arg_type == TYPE_STRUCT);
+-    target_size = thunk_type_size(arg_type, 0);
+-    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-    if (!argptr) {
+-        return -TARGET_EFAULT;
+-    }
+-    arg_type++;
+-    assert(*arg_type == (int)STRUCT_rtentry);
+-    se = struct_entries + *arg_type++;
+-    assert(se->convert[0] == NULL);
+-    /* convert struct here to be able to catch rt_dev string */
+-    field_types = se->field_types;
+-    dst_offsets = se->field_offsets[THUNK_HOST];
+-    src_offsets = se->field_offsets[THUNK_TARGET];
+-    for (i = 0; i < se->nb_fields; i++) {
+-        if (dst_offsets[i] == offsetof(struct rtentry, rt_dev)) {
+-            assert(*field_types == TYPE_PTRVOID);
+-            target_rt_dev_ptr = (abi_ulong *)(argptr + src_offsets[i]);
+-            host_rt_dev_ptr = (unsigned long *)(buf_temp + dst_offsets[i]);
+-            if (*target_rt_dev_ptr != 0) {
+-                *host_rt_dev_ptr = (unsigned long)lock_user_string(
+-                                                  tswapal(*target_rt_dev_ptr));
+-                if (!*host_rt_dev_ptr) {
+-                    unlock_user(argptr, arg, 0);
+-                    return -TARGET_EFAULT;
+-                }
+-            } else {
+-                *host_rt_dev_ptr = 0;
+-            }
+-            field_types++;
+-            continue;
+-        }
+-        field_types = thunk_convert(buf_temp + dst_offsets[i],
+-                                    argptr + src_offsets[i],
+-                                    field_types, THUNK_HOST);
+-    }
+-    unlock_user(argptr, arg, 0);
+-
+-    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-    if (*host_rt_dev_ptr != 0) {
+-        unlock_user((void *)*host_rt_dev_ptr,
+-                    *target_rt_dev_ptr, 0);
+-    }
+-    return ret;
+-}
+-
+-static abi_long do_ioctl_kdsigaccept(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                                     int fd, int cmd, abi_long arg)
+-{
+-    int sig = target_to_host_signal(arg);
+-    return get_errno(safe_ioctl(fd, ie->host_cmd, sig));
+-}
+-
+-#ifdef TIOCGPTPEER
+-static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+-                                     int fd, int cmd, abi_long arg)
+-{
+-    int flags = target_to_host_bitmask(arg, fcntl_flags_tbl);
+-    return get_errno(safe_ioctl(fd, ie->host_cmd, flags));
+-}
+-#endif
+-
+-static IOCTLEntry ioctl_entries[] = {
+-#define IOCTL(cmd, access, ...) \
+-    { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+-#define IOCTL_SPECIAL(cmd, access, dofn, ...)                      \
+-    { TARGET_ ## cmd, cmd, #cmd, access, dofn, {  __VA_ARGS__ } },
+-#define IOCTL_IGNORE(cmd) \
+-    { TARGET_ ## cmd, 0, #cmd },
+-#include "ioctls.h"
+-    { 0, 0, },
+-};
+-
+-/* ??? Implement proper locking for ioctls.  */
+-/* do_ioctl() Must return target values and target errnos. */
+-static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+-{
+-    const IOCTLEntry *ie;
+-    const argtype *arg_type;
+-    abi_long ret;
+-    uint8_t buf_temp[MAX_STRUCT_SIZE];
+-    int target_size;
+-    void *argptr;
+-
+-    ie = ioctl_entries;
+-    for(;;) {
+-        if (ie->target_cmd == 0) {
+-            gemu_log("Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
+-            return -TARGET_ENOSYS;
+-        }
+-        if (ie->target_cmd == cmd)
+-            break;
+-        ie++;
+-    }
+-    arg_type = ie->arg_type;
+-    if (ie->do_ioctl) {
+-        return ie->do_ioctl(ie, buf_temp, fd, cmd, arg);
+-    } else if (!ie->host_cmd) {
+-        /* Some architectures define BSD ioctls in their headers
+-           that are not implemented in Linux.  */
+-        return -TARGET_ENOSYS;
+-    }
+-
+-    switch(arg_type[0]) {
+-    case TYPE_NULL:
+-        /* no argument */
+-        ret = get_errno(safe_ioctl(fd, ie->host_cmd));
+-        break;
+-    case TYPE_PTRVOID:
+-    case TYPE_INT:
+-        ret = get_errno(safe_ioctl(fd, ie->host_cmd, arg));
+-        break;
+-    case TYPE_PTR:
+-        arg_type++;
+-        target_size = thunk_type_size(arg_type, 0);
+-        switch(ie->access) {
+-        case IOC_R:
+-            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-            if (!is_error(ret)) {
+-                argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+-                if (!argptr)
+-                    return -TARGET_EFAULT;
+-                thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
+-                unlock_user(argptr, arg, target_size);
+-            }
+-            break;
+-        case IOC_W:
+-            argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-            if (!argptr)
+-                return -TARGET_EFAULT;
+-            thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-            unlock_user(argptr, arg, 0);
+-            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-            break;
+-        default:
+-        case IOC_RW:
+-            argptr = lock_user(VERIFY_READ, arg, target_size, 1);
+-            if (!argptr)
+-                return -TARGET_EFAULT;
+-            thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+-            unlock_user(argptr, arg, 0);
+-            ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
+-            if (!is_error(ret)) {
+-                argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
+-                if (!argptr)
+-                    return -TARGET_EFAULT;
+-                thunk_convert(argptr, buf_temp, arg_type, THUNK_TARGET);
+-                unlock_user(argptr, arg, target_size);
+-            }
+-            break;
+-        }
+-        break;
+-    default:
+-        gemu_log("Unsupported ioctl type: cmd=0x%04lx type=%d\n",
+-                 (long)cmd, arg_type[0]);
+-        ret = -TARGET_ENOSYS;
 -        break;
 -    }
 -    return ret;
 -}
 -
- #ifdef USE_UID16
- 
- static inline int high2lowuid(int uid)
-@@ -4401,10 +4197,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ static const bitmask_transtbl iflag_tbl[] = {
+         { TARGET_IGNBRK, TARGET_IGNBRK, IGNBRK, IGNBRK },
+         { TARGET_BRKINT, TARGET_BRKINT, BRKINT, BRKINT },
+@@ -5241,8 +4401,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_fcntl
--    case TARGET_NR_fcntl:
--        return do_fcntl(arg1, arg2, arg3);
--#endif
-     case TARGET_NR_setpgid:
-         return get_errno(setpgid(arg1, arg2));
-     case TARGET_NR_umask:
-@@ -6935,53 +6727,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-            This is a hint, so ignoring and returning success is ok.  */
-         return 0;
- #endif
--#if TARGET_ABI_BITS == 32
--    case TARGET_NR_fcntl64:
--    {
--	int cmd;
--	struct flock64 fl;
--        from_flock64_fn *copyfrom = copy_from_user_flock64;
--        to_flock64_fn *copyto = copy_to_user_flock64;
--
--#ifdef TARGET_ARM
--        if (!((CPUARMState *)cpu_env)->eabi) {
--            copyfrom = copy_from_user_oabi_flock64;
--            copyto = copy_to_user_oabi_flock64;
--        }
--#endif
--
--	cmd = target_to_host_fcntl_cmd(arg2);
--        if (cmd == -TARGET_EINVAL) {
--            return cmd;
--        }
--
--        switch(arg2) {
--        case TARGET_F_GETLK64:
--            ret = copyfrom(&fl, arg3);
--            if (ret) {
--                break;
--            }
--            ret = get_errno(safe_fcntl(arg1, cmd, &fl));
--            if (ret == 0) {
--                ret = copyto(arg3, &fl);
--            }
--	    break;
--
--        case TARGET_F_SETLK64:
--        case TARGET_F_SETLKW64:
--            ret = copyfrom(&fl, arg3);
--            if (ret) {
--                break;
--            }
--            ret = get_errno(safe_fcntl(arg1, cmd, &fl));
--	    break;
--        default:
--            ret = do_fcntl(arg1, arg2, arg3);
--            break;
--        }
--        return ret;
--    }
--#endif
- #ifdef TARGET_NR_cacheflush
-     case TARGET_NR_cacheflush:
-         /* self-modifying code is handled automatically, so nothing needed */
-@@ -7968,6 +7713,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                                 int64_t arg2, int64_t arg3, int64_t arg4, \
+-    case TARGET_NR_ioctl:
+-        return do_ioctl(arg1, arg2, arg3);
+ #ifdef TARGET_NR_fcntl
+     case TARGET_NR_fcntl:
+         return do_fcntl(arg1, arg2, arg3);
+@@ -8811,6 +7969,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
                                  int64_t arg5, int64_t arg6)
  
-+#include "syscall-fcntl.inc.c"
  #include "syscall-file.inc.c"
- #include "syscall-ioctl.inc.c"
++#include "syscall-ioctl.inc.c"
  #include "syscall-ipc.inc.c"
+ #include "syscall-mem.inc.c"
+ #include "syscall-proc.inc.c"
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 15208b5349..8762892db5 100644
+index 9f2f8977b4..15208b5349 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -157,12 +157,6 @@
- #ifdef TARGET_NR_fchownat
- { TARGET_NR_fchownat, "fchownat" , NULL, print_fchownat, NULL },
+@@ -365,9 +365,6 @@
+ #ifdef TARGET_NR_io_cancel
+ { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_fcntl
--{ TARGET_NR_fcntl, "fcntl" , NULL, print_fcntl, NULL },
+-#ifdef TARGET_NR_ioctl
+-{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
 -#endif
--#ifdef TARGET_NR_fcntl64
--{ TARGET_NR_fcntl64, "fcntl64" , NULL, print_fcntl64, NULL },
--#endif
- #ifdef TARGET_NR_fdatasync
- { TARGET_NR_fdatasync, "fdatasync" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_io_destroy
+ { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.2
