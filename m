@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60383)
+Received: from eggs.gnu.org ([209.51.188.92]:33632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkTTJ-0007ng-NL
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:42:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gkTWq-0002wj-Hk
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:45:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkTTI-0002yX-J9
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:42:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 12:41:54 +0000
-Message-ID: <5a25b9b8-df4f-8aeb-6b41-a8ff668cd1fa@virtuozzo.com>
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<20190117193658.16413-3-eblake@redhat.com>
-In-Reply-To: <20190117193658.16413-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <68D8287A85FFD24DBAF0DCA45A9E3806@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1gkTWp-0007Di-KM
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:45:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gkTWp-00079h-Bu
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 07:45:43 -0500
+References: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
+	<1547576349-13337-3-git-send-email-pbonzini@redhat.com>
+	<2e5a5fec-3ba7-7bd6-6ffc-c9dfc7079e52@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <86aa40e4-ba32-d3d6-9164-7484086dad1a@redhat.com>
+Date: Fri, 18 Jan 2019 13:45:39 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 02/21] maint: Allow for EXAMPLES in
- texi2pod
+In-Reply-To: <2e5a5fec-3ba7-7bd6-6ffc-c9dfc7079e52@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] tests/libqos: rename qpci_init_pc and
+ qpci_init_spapr functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-MTcuMDEuMjAxOSAyMjozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGhlIG5leHQgY29tbWl0IHdp
-bGwgYWRkIGFuIEVYQU1QTEVTIHNlY3Rpb24gdG8gcWVtdS1uYmQuODsNCj4gZm9yIHRoYXQgdG8g
-d29yaywgd2UgbmVlZCB0byByZWNvZ25pemUgRVhBTVBMRVMgaW4gdGV4aTJwb2QuDQo+IFdlIGFs
-c28gbmVlZCB0byBhZGQgYSBkZXBlbmRlbmN5IGZyb20gYWxsIG1hbiBwYWdlcyBhZ2FpbnN0DQo+
-IHRoZSBnZW5lcmF0b3Igc2NyaXB0LCBzaW5jZSBhIGNoYW5nZSB0byB0aGUgZ2VuZXJhdG9yIG1h
-eQ0KPiBjYXVzZSB0aGUgcmVzdWx0aW5nIG1hbiBwYWdlIHRvIGRpZmZlci4NCj4gDQo+IFNpZ25l
-ZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTog
-UmljaGFyZCBXLk0uIEpvbmVzIDxyam9uZXNAcmVkaGF0LmNvbT4NCj4gDQo+IC0tLQ0KPiB2Mzog
-YWRkIGdlbmVyaWMgZGVwZW5kZW5jeSBmb3IgYWxsIG1hbiBwYWdlcyBpbiAkKERPQ1MpIGluc3Rl
-YWQgb2YNCj4gcGVyLWxpbmUgZWRpdGluZyBbVmxhZGltaXJdDQo+IC0tLQ0KPiAgIE1ha2VmaWxl
-ICAgICAgICAgICAgfCAyICsrDQo+ICAgc2NyaXB0cy90ZXhpMnBvZC5wbCB8IDIgKy0NCj4gICAy
-IGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiANCj4gZGlm
-ZiAtLWdpdCBhL01ha2VmaWxlIGIvTWFrZWZpbGUNCj4gaW5kZXggZGNjYmExZGNhMjcuLjI2Mzk0
-MzdjZGFmIDEwMDY0NA0KPiAtLS0gYS9NYWtlZmlsZQ0KPiArKysgYi9NYWtlZmlsZQ0KPiBAQCAt
-ODU4LDYgKzg1OCw4IEBAIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYuZHZpIGRvY3MvaW50ZXJv
-cC9xZW11LXFtcC1yZWYuaHRtbCBcDQo+ICAgICAgIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYu
-dHh0IGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYuNzogXA0KPiAgIAlkb2NzL2ludGVyb3AvcWVt
-dS1xbXAtcmVmLnRleGkgZG9jcy9pbnRlcm9wL3FlbXUtcW1wLXFhcGkudGV4aQ0KPiANCj4gKyQo
-ZmlsdGVyICUuMSAlLjcgJS44LCQoRE9DUykpOiBzY3JpcHRzL3RleGkycG9kLnBsDQo+ICsNCj4g
-ICAjIFJlcG9ydHMvQW5hbHlzaXMNCj4gDQo+ICAgJS9jb3ZlcmFnZS1yZXBvcnQuaHRtbDoNCj4g
-ZGlmZiAtLWdpdCBhL3NjcmlwdHMvdGV4aTJwb2QucGwgYi9zY3JpcHRzL3RleGkycG9kLnBsDQo+
-IGluZGV4IDM5Y2U1ODRhMzIyLi44MzliNzkxN2NmNyAxMDA3NTUNCj4gLS0tIGEvc2NyaXB0cy90
-ZXhpMnBvZC5wbA0KPiArKysgYi9zY3JpcHRzL3RleGkycG9kLnBsDQo+IEBAIC0zOTgsNyArMzk4
-LDcgQEAgJHNlY3Rze05BTUV9ID0gIiRmbiBcLSAkdGxcbiI7DQo+ICAgJHNlY3Rze0ZPT1ROT1RF
-U30gLj0gIj1iYWNrXG4iIGlmIGV4aXN0cyAkc2VjdHN7Rk9PVE5PVEVTfTsNCj4gDQo+ICAgZm9y
-ICRzZWN0IChxdyhOQU1FIFNZTk9QU0lTIERFU0NSSVBUSU9OIE9QVElPTlMgRU5WSVJPTk1FTlQg
-RklMRVMNCj4gLQkgICAgICBCVUdTIE5PVEVTIEZPT1ROT1RFUyBTRUVBTFNPIEFVVEhPUiBDT1BZ
-UklHSFQpKSB7DQo+ICsJICAgICAgQlVHUyBOT1RFUyBGT09UTk9URVMgRVhBTVBMRVMgU0VFQUxT
-TyBBVVRIT1IgQ09QWVJJR0hUKSkgew0KPiAgICAgICBpZihleGlzdHMgJHNlY3RzeyRzZWN0fSkg
-ew0KPiAgIAkkaGVhZCA9ICRzZWN0Ow0KPiAgIAkkaGVhZCA9fiBzL1NFRUFMU08vU0VFIEFMU08v
-Ow0KPiANCg0KSSd2ZSBubyBpZGVhIGFib3V0IGhvdyB0ZXhpMnBvZC5wbCB3b3JrcywgYnV0IE1h
-a2VmaWxlIGNoYW5nZSBsb29rcyBhIGxvdA0KY2xlYXJlciBub3csIHNvIEkgaGF2ZSBub3IgbW9y
-ZSBzdWdnZXN0aW9ucy4gQWxzbywgSSd2ZSBjaGVja2VkIHRoYXQgYWZ0ZXINCnRoaXMgcGF0Y2gg
-Y2hhbmdlIHRvIHNjcmlwdHMvdGV4aTJwb2QucGwgcmVhbGx5IHJlc3VsdHMgaW4gcmVtYWtpbmcg
-c2VsZWN0ZWQNCnRhcmdldHMgOikNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1P
-Z2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
-DQpWbGFkaW1pcg0K
+On 18/01/19 13:23, Thomas Huth wrote:
+>> diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
+>> index 491eeac..84cc300 100644
+>> --- a/tests/libqos/pci-pc.h
+>> +++ b/tests/libqos/pci-pc.h
+>> @@ -16,7 +16,14 @@
+>>  #include "libqos/pci.h"
+>>  #include "libqos/malloc.h"
+>>  
+>> -QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc);
+>> +/* qpci_new_pc():
+>> +* this function creates a new QPCIBusPC object,
+> 
+> Hmm, you did not notice my previous review, did you? See:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01417.html
+
+No, I missed it.
+
+> I'd also be fine if we keep "init" instead
+> of "new"... it's quite a bit of code churn ...
+
+It matches QOM's object_new vs. object_initialize.
+
+Paolo
