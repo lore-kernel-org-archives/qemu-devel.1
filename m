@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41512)
+Received: from eggs.gnu.org ([209.51.188.92]:41506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gkTze-0004XZ-1m
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:31 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTze-0004XV-0e
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gkTzR-0006Xt-O0
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkTzP-0006Ud-QC
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:21 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gkTzR-0006PO-2H
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:15:17 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y8so4446887wmi.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 05:15:09 -0800 (PST)
-References: <1547732292-14021-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <adf15088-93e0-8cf5-988b-067afe39f6e1@redhat.com>
-Date: Fri, 18 Jan 2019 14:15:06 +0100
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Date: Fri, 18 Jan 2019 14:14:24 +0100
+Message-Id: <20190118131456.32451-4-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
+References: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-q4T4B+rxZj+734W6K5R5jHB0AW2rFKDQKgwB_oacmVw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v3 00/28] ivshmem deprecation, qtests,
- typedefs and gnu99
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 03/35] target/riscv: Convert RVXI branch
+ insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +22,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Corey Minyard <cminyard@mvista.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com, kbastian@mail.uni-paderborn.de
+Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-On 1/18/19 12:47 PM, Peter Maydell wrote:
-> On Thu, 17 Jan 2019 at 13:38, Thomas Huth <thuth@redhat.com> wrote:
->>
->>  Hi Peter!
->>
->> The following changes since commit 6f2f34177a25bffd6fd92a05e6e66c8d22d97094:
->>
->>   Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2019-01-15 18:32:57 +0000)
->>
->> are available in the git repository at:
->>
->>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-17
->>
->> for you to fetch changes up to 3f0832c85380321ef697d64342b389648f8abb1c:
->>
->>   tests/hexloader-test: Don't pass -nographic to the QEMU under test (2019-01-17 14:25:12 +0100)
->>
->> ----------------------------------------------------------------
->> - Remove deprecated "ivshmem" legacy device
->> - Bug fix for vhost-user-test
->> - Use more CONFIG Makefile switches for qtests
->> - Get rid of global_qtests in some more qtests
->> - typedef cleanups
->> - Fixes for compiling with Clang
->> - Force C standard to gnu99
->> ----------------------------------------------------------------
-> 
-> In the netbsd VM, the ipmi-bt-test is consistently failing:
-> 
-> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> QTEST_QEMU_BINARY=i386-softmmu
-> /qemu-system-i386 QTEST_QEMU_IMG=qemu-img tests/ipmi-bt-test -m=quick
-> -k --tap < /dev/null | ./s
-> cripts/tap-driver.pl --test-name="ipmi-bt-test"
-> **
-> ERROR:tests/ipmi-bt-test.c:319:test_connect: assertion failed: (rv == 1)
-> ERROR - too few tests run (expected 4, got 0)
-> [1]   Abort trap (core dumped) MALLOC_PERTURB_=... |
->       Done(1)                 ./scripts/tap-dr...
-> /var/tmp/qemu-test.7opHvo/tests/Makefile.include:856: recipe for
-> target 'check-qtest-i386' faile
-> d
-> gmake: *** [check-qtest-i386] Error 1
-> gmake: *** Waiting for unfinished jobs....
-> 
-> 
-> This has been kind of intermittent for a while, I've seen
-> it on-and-off, but with this pullreq it's failed four times
-> in a row, so maybe something in here is making it less
-> intermittent.
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
+---
+v3 -> v4:
+    - moved uint32_t insn removal from patch 0004 here
 
-This file does:
+ target/riscv/insn32.decode              | 19 ++++++++++
+ target/riscv/insn_trans/trans_rvi.inc.c | 49 +++++++++++++++++++++++++
+ target/riscv/translate.c                | 12 +-----
+ 3 files changed, 69 insertions(+), 11 deletions(-)
 
-    qtest_add_func("/ipmi/extern/connect", test_connect);
-    qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
-    qtest_add_func("/ipmi/extern/bt_enable_irq", test_enable_irq);
-    qtest_add_func("/ipmi/extern/bt_base_irq", test_bt_base);
-    ret = g_test_run();
-
-The first "test" test_connect() binds emu_lfd, the 2nd test
-test_bt_base() calls bt_cmd() which also use emu_lfd... could it be unbound?
-This is racy, since (from g_test_run() doc):
-
-"In general, the tests and sub-suites within each suite are run in the
-order in which they are defined. [...]
-However, you should never make the actual result of a test depend on the
-order that tests are run in. If you need to ensure that some particular
-code runs before or after a given test case, use g_test_add(), which
-lets you specify setup and teardown functions."
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 44d4e922b6..81f56c16b4 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -17,14 +17,33 @@
+ # this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ # Fields:
++%rs2       20:5
++%rs1       15:5
+ %rd        7:5
+ 
+ # immediates:
++%imm_i    20:s12
++%imm_b    31:s1 7:1 25:6 8:4     !function=ex_shift_1
++%imm_j    31:s1 12:8 20:1 21:10  !function=ex_shift_1
+ %imm_u    12:s20                 !function=ex_shift_12
+ 
++# Argument sets:
++&b    imm rs2 rs1
++
+ # Formats 32:
++@i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
++@b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
+ @u       ....................      ..... .......         imm=%imm_u          %rd
++@j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+ # *** RV32I Base Instruction Set ***
+ lui      ....................       ..... 0110111 @u
+ auipc    ....................       ..... 0010111 @u
++jal      ....................       ..... 1101111 @j
++jalr     ............     ..... 000 ..... 1100111 @i
++beq      ....... .....    ..... 000 ..... 1100011 @b
++bne      ....... .....    ..... 001 ..... 1100011 @b
++blt      ....... .....    ..... 100 ..... 1100011 @b
++bge      ....... .....    ..... 101 ..... 1100011 @b
++bltu     ....... .....    ..... 110 ..... 1100011 @b
++bgeu     ....... .....    ..... 111 ..... 1100011 @b
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index 9885a8d275..0347461ee6 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -33,3 +33,52 @@ static bool trans_auipc(DisasContext *ctx, arg_auipc *a)
+     }
+     return true;
+ }
++
++static bool trans_jal(DisasContext *ctx, arg_jal *a)
++{
++    gen_jal(ctx->env, ctx, a->rd, a->imm);
++    return true;
++}
++
++static bool trans_jalr(DisasContext *ctx, arg_jalr *a)
++{
++    gen_jalr(ctx->env, ctx, OPC_RISC_JALR, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_beq(DisasContext *ctx, arg_beq *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BEQ, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bne(DisasContext *ctx, arg_bne *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BNE, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_blt(DisasContext *ctx, arg_blt *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BLT, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bge(DisasContext *ctx, arg_bge *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BGE, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bltu(DisasContext *ctx, arg_bltu *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BLTU, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
++{
++
++    gen_branch(ctx->env, ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
++    return true;
++}
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 99829a600d..b81297f23e 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -1682,6 +1682,7 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
+     {                                         \
+         return imm << amount;                 \
+     }
++EX_SH(1)
+ EX_SH(12)
+ 
+ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+@@ -1710,17 +1711,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+     imm = GET_IMM(ctx->opcode);
+ 
+     switch (op) {
+-    case OPC_RISC_JAL:
+-        imm = GET_JAL_IMM(ctx->opcode);
+-        gen_jal(env, ctx, rd, imm);
+-        break;
+-    case OPC_RISC_JALR:
+-        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
+-        break;
+-    case OPC_RISC_BRANCH:
+-        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
+-                   GET_B_IMM(ctx->opcode));
+-        break;
+     case OPC_RISC_LOAD:
+         gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
+         break;
+-- 
+2.20.1
