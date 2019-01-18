@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40248)
+Received: from eggs.gnu.org ([209.51.188.92]:40878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSTH-00025D-J1
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:38:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkSVo-0004Up-Mv
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkSTD-0000Jg-CP
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:37:57 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 18 Jan 2019 11:37:42 +0000
-Message-ID: <c135eaae-adc1-a5e3-1376-61bbe703cdfb@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-	<20190108170655.29766-9-vsementsov@virtuozzo.com>
-	<w51pnsuwaxj.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51pnsuwaxj.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <521D5F8C4664B2409D390B882052A785@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gkSVk-00033g-4S
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:40:35 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkSVY-0002bx-TZ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:40:22 -0500
+Received: by mail-oi1-x243.google.com with SMTP id x23so8744002oix.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:40:13 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] qcow2: bdrv_co_pwritev: move
- encryption code out of the lock
+References: <20190108223129.5570-1-richard.henderson@linaro.org>
+	<20190108223129.5570-13-richard.henderson@linaro.org>
+In-Reply-To: <20190108223129.5570-13-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 11:40:01 +0000
+Message-ID: <CAFEAcA_mAW1Nrj4O-+QPArGXLMfPaYLeUuP0XxB6w=mtNmiy_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 12/31] target/arm: Rearrange decode in
+ disas_uncond_b_reg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-MTguMDEuMjAxOSAxMjo1MSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+IE9uIFR1ZSAwOCBKYW4g
-MjAxOSAwNjowNjo1NCBQTSBDRVQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6
-DQo+PiBFbmNyeXB0aW9uIHdpbGwgYmUgZG9uZSBpbiB0aHJlYWRzLCB0byB0YWtlIGJlbmVmaXQg
-b2YgaXQsIHdlIHNob3VsZA0KPj4gbW92ZSBpdCBvdXQgb2YgdGhlIGxvY2sgZmlyc3QuDQo+Pg0K
-Pj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGJsb2NrL3Fjb3cyLmMgfCAzNSArKysrKysr
-KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLQ0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMjEgaW5z
-ZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
-b3cyLmMgYi9ibG9jay9xY293Mi5jDQo+PiBpbmRleCBkNmVmNjA2ZDg5Li43NmQzNzE1MzUwIDEw
-MDY0NA0KPj4gLS0tIGEvYmxvY2svcWNvdzIuYw0KPj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPj4g
-QEAgLTIwNzcsMTEgKzIwNzcsMjAgQEAgc3RhdGljIGNvcm91dGluZV9mbiBpbnQgcWNvdzJfY29f
-cHdyaXRldihCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3Qgb2Zmc2V0LA0KPj4gICAgICAg
-ICAgIHJldCA9IHFjb3cyX2FsbG9jX2NsdXN0ZXJfb2Zmc2V0KGJzLCBvZmZzZXQsICZjdXJfYnl0
-ZXMsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNsdXN0
-ZXJfb2Zmc2V0LCAmbDJtZXRhKTsNCj4+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4gLSAg
-ICAgICAgICAgIGdvdG8gZmFpbDsNCj4+ICsgICAgICAgICAgICBnb3RvIG91dF9sb2NrZWQ7DQo+
-PiAgICAgICAgICAgfQ0KPj4gICANCj4+ICAgICAgICAgICBhc3NlcnQoKGNsdXN0ZXJfb2Zmc2V0
-ICYgNTExKSA9PSAwKTsNCj4+ICAgDQo+PiArICAgICAgICByZXQgPSBxY293Ml9wcmVfd3JpdGVf
-b3ZlcmxhcF9jaGVjayhicywgMCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGNsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2luX2NsdXN0ZXIsDQo+PiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjdXJfYnl0ZXMpOw0KPj4g
-KyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+ICsgICAgICAgICAgICBnb3RvIG91dF9sb2NrZWQ7
-DQo+PiArICAgICAgICB9DQo+PiArDQo+PiArICAgICAgICBxZW11X2NvX211dGV4X3VubG9jaygm
-cy0+bG9jayk7DQo+IA0KPiBUaGUgdXNhZ2Ugb2YgbG9jaygpIGFuZCB1bmxvY2soKSBmdW5jdGlv
-bnMgaW5zaWRlIGFuZCBvdXRzaWRlIG9mIHRoZQ0KPiBsb29wIHBsdXMgdGhlIHR3byAnbG9ja2Vk
-JyBhbmQgJ3VubG9ja2VkJyBleGl0IHBhdGhzIGlzIHN0YXJ0aW5nIHRvIG1ha2UNCj4gdGhpbmdz
-IGEgYml0IG1vcmUgbWVzc3kuDQo+IA0KPiBIYXZpbmcgYSBsb29rIGF0IHRoZSBjb2RlIGl0IHNl
-ZW1zIHRoYXQgdGhlcmUncyBvbmx5IHRoZXNlIHRocmVlIHBhcnRzDQo+IGluIHRoZSB3aG9sZSBm
-dW5jdGlvbiB0aGF0IG5lZWQgdG8gaGF2ZSB0aGUgbG9jayBoZWxkOg0KPiANCj4gb25lOg0KPiAg
-ICAgcmV0ID0gcWNvdzJfYWxsb2NfY2x1c3Rlcl9vZmZzZXQoYnMsIG9mZnNldCwgJmN1cl9ieXRl
-cywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZjbHVzdGVyX29mZnNl
-dCwgJmwybWV0YSk7DQo+ICAgICAvKiAuLi4gKi8NCj4gICAgIHJldCA9IHFjb3cyX3ByZV93cml0
-ZV9vdmVybGFwX2NoZWNrKGJzLCAwLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgY2x1c3Rlcl9vZmZzZXQgKw0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgb2Zmc2V0X2luX2NsdXN0ZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBjdXJfYnl0ZXMpOw0KPiANCj4gdHdvOg0KPiANCj4gICAgIHJldCA9
-IHFjb3cyX2hhbmRsZV9sMm1ldGEoYnMsICZsMm1ldGEsIHRydWUpOw0KPiANCj4gDQo+IHRocmVl
-Og0KPiAgICAgcWNvdzJfaGFuZGxlX2wybWV0YShicywgJmwybWV0YSwgZmFsc2UpOw0KPiANCj4g
-DQo+IFNvIEkgd29uZGVyIGlmIGl0J3MgcGVyaGFwcyBzaW1wbGVyIHRvIGFkZCBsb2NrL3VubG9j
-ayBjYWxscyBhcm91bmQNCj4gdGhvc2UgYmxvY2tzPw0KDQp0aGlzIG1lYW5zLCB0aGF0IHdlJ2xs
-IHVubG9jayBhZnRlciBxY293Ml9oYW5kbGVfbDJtZXRhIGFuZCB0aGVuIGltbWVkaWF0ZWx5DQps
-b2NrIG9uIG5leHQgaXRlcmF0aW9uIGJlZm9yZSBxY293Ml9hbGxvY19jbHVzdGVyX29mZnNldCwg
-c28gY3VycmVudCBjb2RlDQphdm9pZHMgdGhpcyBleHRyYSB1bmxvY2svbG9jay4uDQoNCg0KPiAN
-Cj4gQmVydG8NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, 8 Jan 2019 at 22:32, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This will enable PAuth decode in a subsequent patch.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 47 +++++++++++++++++++++++++++++---------
+>  1 file changed, 36 insertions(+), 11 deletions(-)
+>
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
