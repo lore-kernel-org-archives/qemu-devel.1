@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43413)
+Received: from eggs.gnu.org ([209.51.188.92]:43274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkVbr-0003A5-NL
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:59:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkVbe-0002xQ-L5
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkVbq-0007lG-NL
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:59:03 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40191)
+	(envelope-from <peter.maydell@linaro.org>) id 1gkVbd-0007Yo-KO
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:50 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40302)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkVbq-0007ky-HP
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:59:02 -0500
-Received: by mail-wm1-x341.google.com with SMTP id f188so4752309wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:59:02 -0800 (PST)
+	id 1gkVbd-0007Y9-DQ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:58:49 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p4so15418836wrt.7
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 06:58:49 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	e27sm92094561wra.67.2019.01.18.06.58.58 for <qemu-devel@nongnu.org>
+	e27sm92094561wra.67.2019.01.18.06.58.47 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Fri, 18 Jan 2019 06:58:59 -0800 (PST)
+	Fri, 18 Jan 2019 06:58:47 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 14:58:02 +0000
-Message-Id: <20190118145805.6852-47-peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 14:57:52 +0000
+Message-Id: <20190118145805.6852-37-peter.maydell@linaro.org>
 In-Reply-To: <20190118145805.6852-1-peter.maydell@linaro.org>
 References: <20190118145805.6852-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 46/49] target/arm: PMU: Add instruction and
- cycle events
+Subject: [Qemu-devel] [PULL 36/49] migration: Add post_save function to
+ VMStateDescription
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,184 +38,84 @@ To: qemu-devel@nongnu.org
 
 From: Aaron Lindsay <aaron@os.amperecomputing.com>
 
-The instruction event is only enabled when icount is used, cycles are
-always supported. Always defining get_cycle_count (but altering its
-behavior depending on CONFIG_USER_ONLY) allows us to remove some
-CONFIG_USER_ONLY #defines throughout the rest of the code.
+In some cases it may be helpful to modify state before saving it for
+migration, and then modify the state back after it has been saved. The
+existing pre_save function provides half of this functionality. This
+patch adds a post_save function to provide the second half.
 
-Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20181211151945.29137-12-aaron@os.amperecomputing.com
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-id: 20181211151945.29137-2-aaron@os.amperecomputing.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 90 ++++++++++++++++++++++-----------------------
- 1 file changed, 44 insertions(+), 46 deletions(-)
+ include/migration/vmstate.h |  1 +
+ migration/vmstate.c         | 13 ++++++++++++-
+ docs/devel/migration.rst    |  9 +++++++--
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 168727242c8..35c105a8618 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -15,6 +15,7 @@
- #include "arm_ldst.h"
- #include <zlib.h> /* For crc32 */
- #include "exec/semihost.h"
-+#include "sysemu/cpus.h"
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
- #include "qemu/range.h"
-@@ -1021,7 +1022,48 @@ typedef struct pm_event {
-     uint64_t (*get_count)(CPUARMState *);
- } pm_event;
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 61bef3ef5c0..067b126cf16 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -185,6 +185,7 @@ struct VMStateDescription {
+     int (*pre_load)(void *opaque);
+     int (*post_load)(void *opaque, int version_id);
+     int (*pre_save)(void *opaque);
++    int (*post_save)(void *opaque);
+     bool (*needed)(void *opaque);
+     const VMStateField *fields;
+     const VMStateDescription **subsections;
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 80b59009aab..e2bbb7b5f7f 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -390,6 +390,9 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
+                 if (ret) {
+                     error_report("Save of field %s/%s failed",
+                                  vmsd->name, field->name);
++                    if (vmsd->post_save) {
++                        vmsd->post_save(opaque);
++                    }
+                     return ret;
+                 }
  
-+static bool event_always_supported(CPUARMState *env)
-+{
-+    return true;
-+}
+@@ -415,7 +418,15 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
+         json_end_array(vmdesc);
+     }
+ 
+-    return vmstate_subsection_save(f, vmsd, opaque, vmdesc);
++    ret = vmstate_subsection_save(f, vmsd, opaque, vmdesc);
 +
-+/*
-+ * Return the underlying cycle count for the PMU cycle counters. If we're in
-+ * usermode, simply return 0.
-+ */
-+static uint64_t cycles_get_count(CPUARMState *env)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                   ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-+#else
-+    return cpu_get_host_ticks();
-+#endif
-+}
-+
-+#ifndef CONFIG_USER_ONLY
-+static bool instructions_supported(CPUARMState *env)
-+{
-+    return use_icount == 1 /* Precise instruction counting */;
-+}
-+
-+static uint64_t instructions_get_count(CPUARMState *env)
-+{
-+    return (uint64_t)cpu_get_icount_raw();
-+}
-+#endif
-+
- static const pm_event pm_events[] = {
-+#ifndef CONFIG_USER_ONLY
-+    { .number = 0x008, /* INST_RETIRED, Instruction architecturally executed */
-+      .supported = instructions_supported,
-+      .get_count = instructions_get_count,
-+    },
-+    { .number = 0x011, /* CPU_CYCLES, Cycle */
-+      .supported = event_always_supported,
-+      .get_count = cycles_get_count,
++    if (vmsd->post_save) {
++        int ps_ret = vmsd->post_save(opaque);
++        if (!ret) {
++            ret = ps_ret;
++        }
 +    }
-+#endif
- };
- 
- /*
-@@ -1030,7 +1072,7 @@ static const pm_event pm_events[] = {
-  * should first be updated to something sparse instead of the current
-  * supported_event_map[] array.
-  */
--#define MAX_EVENT_ID 0x0
-+#define MAX_EVENT_ID 0x11
- #define UNSUPPORTED_EVENT UINT16_MAX
- static uint16_t supported_event_map[MAX_EVENT_ID + 1];
- 
-@@ -1131,8 +1173,6 @@ static CPAccessResult pmreg_access_swinc(CPUARMState *env,
-     return pmreg_access(env, ri, isread);
++    return ret;
  }
  
--#ifndef CONFIG_USER_ONLY
--
- static CPAccessResult pmreg_access_selr(CPUARMState *env,
-                                         const ARMCPRegInfo *ri,
-                                         bool isread)
-@@ -1243,9 +1283,7 @@ static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-  */
- void pmccntr_op_start(CPUARMState *env)
- {
--    uint64_t cycles = 0;
--    cycles = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--                          ARM_CPU_FREQ, NANOSECONDS_PER_SECOND);
-+    uint64_t cycles = cycles_get_count(env);
+ static const VMStateDescription *
+diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+index e7658ab0506..220059679ac 100644
+--- a/docs/devel/migration.rst
++++ b/docs/devel/migration.rst
+@@ -419,8 +419,13 @@ The functions to do that are inside a vmstate definition, and are called:
  
-     if (pmu_counter_enabled(env, 31)) {
-         uint64_t eff_cycles = cycles;
-@@ -1391,42 +1429,6 @@ static void pmccntr_write32(CPUARMState *env, const ARMCPRegInfo *ri,
-     pmccntr_write(env, ri, deposit64(cur_val, 0, 32, value));
- }
+   This function is called before we save the state of one device.
  
--#else /* CONFIG_USER_ONLY */
--
--void pmccntr_op_start(CPUARMState *env)
--{
--}
--
--void pmccntr_op_finish(CPUARMState *env)
--{
--}
--
--void pmevcntr_op_start(CPUARMState *env, uint8_t i)
--{
--}
--
--void pmevcntr_op_finish(CPUARMState *env, uint8_t i)
--{
--}
--
--void pmu_op_start(CPUARMState *env)
--{
--}
--
--void pmu_op_finish(CPUARMState *env)
--{
--}
--
--void pmu_pre_el_change(ARMCPU *cpu, void *ignored)
--{
--}
--
--void pmu_post_el_change(ARMCPU *cpu, void *ignored)
--{
--}
--
--#endif
--
- static void pmccfiltr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
-@@ -1823,7 +1825,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-     /* Unimplemented so WI. */
-     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
-       .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NOP },
--#ifndef CONFIG_USER_ONLY
-     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
-       .access = PL0_RW, .type = ARM_CP_ALIAS,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
-@@ -1845,7 +1846,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.c15_ccnt),
-       .readfn = pmccntr_read, .writefn = pmccntr_write,
-       .raw_readfn = raw_read, .raw_writefn = raw_write, },
--#endif
-     { .name = "PMCCFILTR", .cp = 15, .opc1 = 0, .crn = 14, .crm = 15, .opc2 = 7,
-       .writefn = pmccfiltr_write_a32, .readfn = pmccfiltr_read_a32,
-       .access = PL0_RW, .accessfn = pmreg_access,
-@@ -5675,7 +5675,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-          * count register.
-          */
-         unsigned int i, pmcrn = 0;
--#ifndef CONFIG_USER_ONLY
-         ARMCPRegInfo pmcr = {
-             .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
-             .access = PL0_RW,
-@@ -5732,7 +5731,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             g_free(pmevtyper_name);
-             g_free(pmevtyper_el0_name);
-         }
--#endif
-         ARMCPRegInfo clidr = {
-             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
-             .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
+-Example: You can look at hpet.c, that uses the three function to
+-massage the state that is transferred.
++- ``int (*post_save)(void *opaque);``
++
++  This function is called after we save the state of one device
++  (even upon failure, unless the call to pre_save returned an error).
++
++Example: You can look at hpet.c, that uses the first three functions
++to massage the state that is transferred.
+ 
+ The ``VMSTATE_WITH_TMP`` macro may be useful when the migration
+ data doesn't match the stored device data well; it allows an
 -- 
 2.20.1
