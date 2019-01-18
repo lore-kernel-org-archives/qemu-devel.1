@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42811)
+Received: from eggs.gnu.org ([209.51.188.92]:42832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkciO-0004ig-Cv
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:17 -0500
+	(envelope-from <lersek@redhat.com>) id 1gkcic-0004sm-AZ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkciN-0001lQ-EA
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60116)
+	(envelope-from <lersek@redhat.com>) id 1gkciQ-0001oa-Jv
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gkciN-0001i6-6I
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:15 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gkciQ-0001nM-DZ
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:34:18 -0500
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Fri, 18 Jan 2019 23:33:55 +0100
-Message-Id: <20190118223400.24311-1-lersek@redhat.com>
+Date: Fri, 18 Jan 2019 23:33:56 +0100
+Message-Id: <20190118223400.24311-2-lersek@redhat.com>
+In-Reply-To: <20190118223400.24311-1-lersek@redhat.com>
+References: <20190118223400.24311-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/5] add the BiosTablesTest UEFI app,
- build it with the new roms/edk2 submodule
+Subject: [Qemu-devel] [PATCH 1/5] roms: add the edk2 project as a git
+ submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +30,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel list <qemu-devel@nongnu.org>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-Igor's series
+The roms/edk2 submodule can help with three goals:
+- build the OVMF and ArmVirtQemu virtual UEFI firmware platforms (to be
+  implemented later),
+- build the EfiRom tool on the fly, which is used in roms/Makefile, for
+  building the "efirom" target,
+- build UEFI test applications (to be run in guests), for qtest support.
 
-  [Qemu-devel] [PATCH 00/14] tests: acpi: add UEFI (ARM) testing support
-  http://mid.mail-archive.com/1547566866-129386-1-git-send-email-imammedo=
-@redhat.com
+Edk2 commit 85588389222a3636baf0f9ed8227f2434af4c3f9 stands for the lates=
+t
+"stable tag", namely "edk2-stable201811".
 
-worked with my edk2 (guest firmware) series
-
-  [edk2] [PATCH 0/4] OvmfPkg, ArmVirtPkg: add ACPI Test Support
-  http://mid.mail-archive.com/20181125100152.25675-1-lersek@redhat.com
-
-as long as the guest firmware was built with the necessary extra build
-flag.
-
-However, in the discussion under Igor's series, we seemed to reconsider
-a standalone UEFI application for the QEMU tree to carry. This series
-seeks to implement that option.
+The edk2 repository tracks some binary files that should not be removed b=
+y
+QEMU's top-level "make clean"; exempt the full pathnames from the "find"
+command.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
@@ -52,76 +52,51 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+ Makefile    | 6 +++++-
+ .gitmodules | 3 +++
+ roms/edk2   | 1 +
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
-Thanks,
-Laszlo
-
-Laszlo Ersek (5):
-  roms: add the edk2 project as a git submodule
-  roms: build the EfiRom utility from the roms/edk2 submodule
-  tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
-  tests/uefi-test-tools: add build scripts
-  tests/data: introduce "uefi-boot-images" with the "bios-tables-test"
-    ISOs
-
- .gitmodules                                                             =
- |   3 +
- Makefile                                                                =
- |   6 +-
- roms/Makefile                                                           =
- |  13 +-
- roms/edk2                                                               =
- |   1 +
- tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
- | Bin 0 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
- | Bin 0 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
- | Bin 0 -> 12800 bytes
- tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
- | Bin 0 -> 13312 bytes
- tests/uefi-test-tools/.gitignore                                        =
- |   3 +
- tests/uefi-test-tools/LICENSE                                           =
- |  25 ++++
- tests/uefi-test-tools/Makefile                                          =
- |  92 +++++++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
- | 130 ++++++++++++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
- |  41 ++++++
- tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
- |  67 +++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec             =
- |  27 ++++
- tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc             =
- |  69 ++++++++++
- tests/uefi-test-tools/build.sh                                          =
- | 145 ++++++++++++++++++++
- 17 files changed, 614 insertions(+), 8 deletions(-)
- create mode 160000 roms/edk2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.=
-iso.qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.=
-qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso=
-.qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.i=
-so.qcow2
- create mode 100644 tests/uefi-test-tools/.gitignore
- create mode 100644 tests/uefi-test-tools/LICENSE
- create mode 100644 tests/uefi-test-tools/Makefile
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
-/BiosTablesTest.c
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
-/BiosTablesTest.inf
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/B=
-iosTablesTest.h
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
-kg.dec
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
-kg.dsc
- create mode 100755 tests/uefi-test-tools/build.sh
-
+diff --git a/Makefile b/Makefile
+index dccba1dca27f..1f768e2bcf8f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -602,7 +602,11 @@ clean:
+ 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h =
+gen-op-arm.h
+ 	rm -f qemu-options.def
+ 	rm -f *.msi
+-	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[od=
+a]' \) -type f -exec rm {} +
++	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[od=
+a]' \) -type f \
++		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
++		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
++		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
++		-exec rm {} +
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *=
+.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f qemu-img-cmds.h
+diff --git a/.gitmodules b/.gitmodules
+index 6b91176098c8..ceafb0ee29a0 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -49,3 +49,6 @@
+ [submodule "tests/fp/berkeley-softfloat-3"]
+ 	path =3D tests/fp/berkeley-softfloat-3
+ 	url =3D https://github.com/cota/berkeley-softfloat-3
++[submodule "roms/edk2"]
++	path =3D roms/edk2
++	url =3D https://github.com/tianocore/edk2.git
+diff --git a/roms/edk2 b/roms/edk2
+new file mode 160000
+index 000000000000..85588389222a
+--- /dev/null
++++ b/roms/edk2
+@@ -0,0 +1 @@
++Subproject commit 85588389222a3636baf0f9ed8227f2434af4c3f9
 --=20
 2.19.1.3.g30247aa5d201
