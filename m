@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56197)
+Received: from eggs.gnu.org ([209.51.188.92]:56754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gkZor-0002f1-BO
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:28:46 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gkZrB-00045g-68
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:31:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gkZoq-0003Ok-JF
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:28:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59768)
+	(envelope-from <dgilbert@redhat.com>) id 1gkZrA-00080N-0l
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:31:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gkZoq-0003BS-D6
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:28:44 -0500
-Date: Fri, 18 Jan 2019 14:28:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190118142758-mutt-send-email-mst@kernel.org>
-References: <20190118112410.3010-1-yang.zhong@intel.com>
-	<20190118112410.3010-29-yang.zhong@intel.com>
-	<20190118113051-mutt-send-email-mst@kernel.org>
-	<CABgObfZEGtdxGqGCRawW9Cd6c3NO0efwYWZCv3k4VvAJsm8-vw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gkZr9-0007wz-Ka
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 14:31:07 -0500
+Date: Fri, 18 Jan 2019 19:31:02 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190118193102.GJ2146@work-vm>
+References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
+	<20190118100159.GA2483@work-vm>
+	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
+	<20190118101633.GC2146@work-vm> <20190118102102.GH20660@redhat.com>
+	<328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
+	<CALm7yL0nFGC1hYfvASrOL2FzO88oZURiLs-a6pR7Cjp3XS0U_g@mail.gmail.com>
+	<19ec0017-bd05-a847-b211-ebbdb141ebf6@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CABgObfZEGtdxGqGCRawW9Cd6c3NO0efwYWZCv3k4VvAJsm8-vw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v3 28/43] hw/pci/Makefile.objs: make
- pcie configurable
+In-Reply-To: <19ec0017-bd05-a847-b211-ebbdb141ebf6@redhat.com>
+Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
+ hosts, with VMX flag enabled in the guest?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +34,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, "Maydell, Peter" <peter.maydell@linaro.org>, thuth@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, sameo@linux.intel.com
+Cc: Mark Mielke <mark.mielke@gmail.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
 
-On Fri, Jan 18, 2019 at 06:28:37PM +0100, Paolo Bonzini wrote:
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 18/01/19 14:41, Mark Mielke wrote:
+> > It is useful to understand the risk. However, this is the same risk we
+> > have been successfully living with for several years now, and it seems
+> > abrupt to declare 3.1 and 3.2 as the Qemu version beyond which migration
+> > requires a whole cluster restart whether or not a L2 guest had been, or
+> > will ever be started on any of the guests.
 > 
+> Only if nested was enabled for the kvm_intel module.  If you didn't
+> enable it, you didn't see any change with 3.1.
 > 
->     I think PCIE should depend on PCI or something like this.
->     That's because there are places in code that test CONFIG_PCI,
->     you want PCIE to enable them as well.
-> 
-> 
-> I agree, it should select PCI, so that PCIe bridges only need to select PCIE
-> (the model in QEMU is that you enable boards and pluggable devices; everything
-> else, especially buses, is then selected automatically based on whether any
-> controllers/bridges are enabled for those buses).
-> 
+> Nested was enabled for kvm_amd years ago.  It was a mistake, but that's
+> why we didn't add such a blocker for AMD.
+
+Still, it should have probably been machine-type tied;  there's lots and
+lots of broken things we've done in the past which we've kept
+compatibility with on old machine types.
+
+Dave
+
 > Paolo
-> 
-
-OK, and I also think we should rename it PCIE -> PCI_EXPRESS_, this way
-everything PCI starts with PCI.
-
--- 
-MST
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
