@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37041)
+Received: from eggs.gnu.org ([209.51.188.92]:37018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSJI-00022q-4G
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSJH-0007sG-5m
+	(envelope-from <yang.zhong@intel.com>) id 1gkSJH-00022l-Hj
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:40 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47043)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <yang.zhong@intel.com>) id 1gkSJG-0007ry-Ng
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:39 -0500
+Received: from mga06.intel.com ([134.134.136.31]:47041)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSJG-0005tr-TB
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:39 -0500
+	id 1gkSJF-0005r5-8S
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:38 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:24:07 +0800
-Message-Id: <20190118112410.3010-41-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:24:09 +0800
+Message-Id: <20190118112410.3010-43-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 40/43] virtio: make virtio dependencies
- with Kconfig
+Subject: [Qemu-devel] [RFC PATCH v3 42/43] minikconf: implement allyesconfig,
+ allnoconfig, randconfig, defconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,209 +28,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/i386-softmmu.mak  |  1 -
- default-configs/s390x-softmmu.mak |  1 -
- default-configs/virtio.mak        | 14 --------------
- hw/9pfs/Kconfig                   |  2 ++
- hw/block/Kconfig                  |  2 ++
- hw/char/Kconfig                   |  2 ++
- hw/display/Kconfig                |  5 +++++
- hw/input/Kconfig                  |  2 ++
- hw/net/Kconfig                    |  2 ++
- hw/pci-host/Kconfig               |  2 ++
- hw/scsi/Kconfig                   |  1 +
- hw/virtio/Kconfig                 |  9 ++++++++-
- 12 files changed, 26 insertions(+), 17 deletions(-)
- delete mode 100644 default-configs/virtio.mak
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index ab57978b9a..992aea8f30 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -1,7 +1,6 @@
- # Default configuration for i386-softmmu
+Apart from defconfig (which is a no-op), the others are implemented
+implemented simply by ignoring the RHS of assignments and "default"
+statements.  The RHS is replaced respectively by "true", "false" or
+a random value.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile             |  5 +++++
+ scripts/minikconf.py | 43 ++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 41 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 01e7c60a0d..b2d45aa6d4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -336,6 +336,11 @@ MINIKCONF_ARGS = \
  
- CONFIG_VMXNET3_PCI=y
--CONFIG_VIRTIO_VGA=y
- CONFIG_IPMI=y
- CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 5eef375924..6640af2ec2 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -1,6 +1,5 @@
- CONFIG_PCI=y
- CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
--include virtio.mak
- CONFIG_SCLPCONSOLE=y
- CONFIG_TERMINAL3270=y
- CONFIG_S390_FLIC=y
-diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
-deleted file mode 100644
-index 1304849018..0000000000
---- a/default-configs/virtio.mak
-+++ /dev/null
-@@ -1,14 +0,0 @@
--CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
--CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
--CONFIG_VIRTIO=y
--CONFIG_VIRTIO_9P=y
--CONFIG_VIRTIO_BALLOON=y
--CONFIG_VIRTIO_BLK=y
--CONFIG_VIRTIO_CRYPTO=y
--CONFIG_VIRTIO_GPU=y
--CONFIG_VIRTIO_INPUT=y
--CONFIG_VIRTIO_NET=y
--CONFIG_VIRTIO_RNG=y
--CONFIG_SCSI=y
--CONFIG_VIRTIO_SCSI=y
--CONFIG_VIRTIO_SERIAL=y
-diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
-index a4750999d9..d85869ca81 100644
---- a/hw/9pfs/Kconfig
-+++ b/hw/9pfs/Kconfig
-@@ -1,2 +1,4 @@
- config VIRTIO_9P
-     bool
-+    default y
-+    depends on VIRTIO
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index 83c2be5915..771967ad9f 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -28,6 +28,8 @@ config NVME_PCI
+ MINIKCONF = $(SHELL) $(SRC_PATH)/scripts/minikconf.sh
  
- config VIRTIO_BLK
-     bool
-+    default y
-+    depends on VIRTIO
++.PHONY: allyesconfig allnoconfig defconfig randconfig
++allyesconfig allnoconfig defconfig randconfig:
++	rm */config-devices.mak config-all-devices.mak
++	$(MAKE) MINIKCONF="$(MINIKCONF) --$<" config-all-devices.mak
++
+ %/config-devices.mak: default-configs/%-softmmu.mak Kconfig.host hw/Kconfig
+ 	$(call quiet-command, \
+             $(MINIKCONF) $@ $*-config-devices.mak.d $^ $(MINIKCONF_ARGS) > $@.tmp, "  GEN   $@.tmp")
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index b0b4f76733..a6c2f0c759 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -13,8 +13,10 @@
+ import os
+ import sys
+ import re
++import random
  
- config VHOST_USER_BLK
-     bool
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 56c1177f95..9836739679 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -26,6 +26,8 @@ config SERIAL_PCI
+-__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
++__all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser',
++        'defconfig', 'allyesconfig', 'allnoconfig', 'randconfig' ]
  
- config VIRTIO_SERIAL
-     bool
-+    default y
-+    depends on VIRTIO
+ def debug_print(*args):
+     #print ' '.join(str(x) for x in args)
+@@ -30,6 +32,11 @@ def debug_print(*args):
+ # just its name).
+ # -------------------------------------------
  
- config STM32F2XX_USART
-     bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 933793cc13..a80c0eace6 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -93,9 +93,14 @@ config QXL
++allyesconfig = lambda x: True
++allnoconfig = lambda x: False
++defconfig = lambda x: x
++randconfig = lambda x: random.randint(0, 1) == 1
++
+ class KconfigData:
+     class Expr:
+         def __and__(self, rhs):
+@@ -178,7 +185,8 @@ class KconfigData:
+             if self.cond.evaluate():
+                 self.dest.set_value(True)
  
- config VIRTIO_GPU
-     bool
-+    default y
-+    depends on VIRTIO
+-    def __init__(self):
++    def __init__(self, value_mangler=defconfig):
++        self.value_mangler = value_mangler
+         self.previously_included = []
+         self.incl_info = None
+         self.defined_vars = set()
+@@ -256,10 +264,12 @@ class KconfigData:
+         return var_obj
  
- config VIRTIO_VGA
-     bool
-+    default y
-+    depends on VIRTIO && PCI
-+    select VGA
+     def do_assignment(self, var, val):
+-        self.clauses.append(KconfigData.AssignmentClause(var, val))
++        f = self.value_mangler
++        self.clauses.append(KconfigData.AssignmentClause(var, f(val)))
  
- config DPCD
-     bool
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index 5d64e07fc6..7434a14cb0 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -21,6 +21,8 @@ config TSC2005
+     def do_default(self, var, val, cond=None):
+-        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
++        f = self.value_mangler
++        self.clauses.append(KconfigData.DefaultClause(var, f(val), cond))
  
- config VIRTIO_INPUT
-     bool
-+    default y
-+    depends on VIRTIO
+     def do_depends_on(self, var, expr):
+         self.clauses.append(KconfigData.DependsOnClause(var, expr))
+@@ -307,9 +317,10 @@ class KconfigParserError(Exception):
+         return "%s: %s" % (self.loc, self.msg)
  
- config TSC210X
-     bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index b54577e00b..94761f0d7e 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -94,6 +94,8 @@ config XILINX_ETHLITE
+ class KconfigParser:
++
+     @classmethod
+-    def parse(self, fp):
+-        data = KconfigData()
++    def parse(self, fp, mode=None):
++        data = KconfigData(mode or KconfigParser.defconfig)
+         parser = KconfigParser(data)
+         parser.parse_file(fp)
+         return data
+@@ -625,11 +636,29 @@ class KconfigParser:
  
- config VIRTIO_NET
-    bool
-+   default y
-+   depends on VIRTIO
+ if __name__ == '__main__':
+     argv = sys.argv
++    mode = defconfig
++    if len(sys.argv) > 1:
++        if argv[1] == '--defconfig':
++            del argv[1]
++        elif argv[1] == '--randconfig':
++            mode = randconfig
++            del argv[1]
++        elif argv[1] == '--allyesconfig':
++            mode = allyesconfig
++            del argv[1]
++        elif argv[1] == '--allnoconfig':
++            mode = allnoconfig
++            del argv[1]
++
+     if len(argv) == 1:
+         print >>sys.stderr, "%s: at least one argument is required" % argv[0]
+         os.exit(1)
  
- config ETSEC
-     bool
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index 84670ee37c..ee0111d061 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -22,6 +22,7 @@ config PCI_SABRE
- config PCI_PIIX
-     bool
-     select PCI
-+    select VIRTIO
- 
- config PCI_Q35
-     bool
-@@ -30,6 +31,7 @@ config PCI_Q35
-     select XIO3130
-     select IOH3420
-     select I82801B11
-+    select VIRTIO
- 
- config PCI_GENERIC
-     bool
-diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-index 7a9d373382..22281213ba 100644
---- a/hw/scsi/Kconfig
-+++ b/hw/scsi/Kconfig
-@@ -43,6 +43,7 @@ config SPAPR_VSCSI
- config VIRTIO_SCSI
-     bool
-     default y
-+    depends on VIRTIO
-     select SCSI
- 
- config VHOST_USER_SCSI
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index aabd6d4d96..a684de9af4 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -3,18 +3,25 @@ config VIRTIO
- 
- config VIRTIO_RNG
-     bool
-+    default y
-+    depends on VIRTIO
- 
- config VIRTIO_PCI
-     bool
-     default y
-     depends on PCI
--    select VIRTIO
-+    depends on VIRTIO
- 
- config VIRTIO_MMIO
-     bool
-+    depends on VIRTIO
- 
- config VIRTIO_BALLOON
-     bool
-+    default y
-+    depends on VIRTIO
- 
- config VIRTIO_CRYPTO
-     bool
-+    default y
-+    depends on VIRTIO
+-    data = KconfigData()
++    if argv[1].startswith('-'):
++        print >>sys.stderr, "%s: invalid option %s" % (argv[0], argv[1])
++        os.exit(1)
++
++    data = KconfigData(mode)
+     parser = KconfigParser(data)
+     for arg in argv[3:]:
+         m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
 -- 
 2.17.1
