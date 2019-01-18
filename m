@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33619)
+Received: from eggs.gnu.org ([209.51.188.92]:33734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkWhR-0005SA-F2
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkWhj-0005oQ-6D
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:09:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkWhP-00072c-2f
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:52 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:40243)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkWhL-0006a0-7b
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:49 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id s5so14808829oth.7
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 08:08:25 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gkWhZ-0007Hg-4m
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:09:03 -0500
+References: <20190117193658.16413-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <39599bab-cf0f-80d1-a9f4-d7735da2fe28@redhat.com>
+Date: Fri, 18 Jan 2019 10:08:26 -0600
 MIME-Version: 1.0
-References: <20190118132750.25932-1-peter.maydell@linaro.org>
-	<64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
-In-Reply-To: <64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Jan 2019 16:08:11 +0000
-Message-ID: <CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Don't spuriously warn about
- /** comment starters
+In-Reply-To: <20190117193658.16413-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kAT7CinLnBqX9yGLPTCnDN9vtEqDtjKs8"
+Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Reported-by : Thomas Huth" <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
 
-On Fri, 18 Jan 2019 at 15:53, Eric Blake <eblake@redhat.com> wrote:
->
-> On 1/18/19 7:27 AM, Peter Maydell wrote:
-> > In checkpatch we attempt to check for and warn about
-> > block comments which start with /* or /** followed by a
-> > non-blank. Unfortunately a bug in the regex meant that
-> > we would incorrectly warn about comments starting with
-> > "/**" with no following text:
-> >
-> >   git show 9813dc6ac3954d58ba16b3920556f106f97e1c67|./scripts/checkpatch.pl -
-> >   WARNING: Block comments use a leading /* on a separate line
-> >   #34: FILE: tests/libqtest.h:233:
-> >   +/**
-> >
-> > The sequence "/\*\*?" was intended to match either "/*" or "/**",
-> > but Perl's semantics for '?' allow it to backtrack and try the
-> > "matches 0 chars" option if the "matches 1 char" choice leads to
-> > a failure of the rest of the regex to match.  Switch to "/\*\*?+"
-> > which uses what perlre(1) calls the "possessive" quantifier form:
-> > this means that if it matches the "/**" string it will not later
-> > backtrack to matching just the "/*" prefix.
->
-> Just wondering if "/\*{1,2}" would also work (it may have to be spelled
-> "/\*\{1,2}" - I never remember which flavors of regex have which
-> extensions without rereading docs)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kAT7CinLnBqX9yGLPTCnDN9vtEqDtjKs8
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
+ rjones@redhat.com, qemu-block@nongnu.org
+Message-ID: <39599bab-cf0f-80d1-a9f4-d7735da2fe28@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
+References: <20190117193658.16413-1-eblake@redhat.com>
+In-Reply-To: <20190117193658.16413-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Oh yes, that would probably be the less perl-specific way
-to write it.
+On 1/17/19 1:36 PM, Eric Blake wrote:
+> I got tired of debugging whether a server was advertising the
+> correct things during negotiation by inspecting the trace
+> logs of qemu-io as client - not to mention that without SOME
+> sort of client tracing particular commands, we can't easily
+> regression test the server for correct behavior.  The final
+> straw was at KVM Forum, when Nir asked me to make sure there
+> was a way to easily determine if an NBD server is exposing what
+> we really want (and fixing x-dirty-bitmap to behave saner fell
+> out as a result of answering that question).
+>=20
+> I note that upstream NBD has 'nbd-client -l $host' for querying
+> just export names (with no quoting, so you have to know that
+> a blank line means the default export), but it wasn't powerful
+> enough, so I implemented 'qemu-nbd -L' to document everything.
+> Upstream NBD has separate 'nbd-client' and 'nbd-server' binaries,
+> while we only have 'qemu-nbd' (which is normally just a server,
+> but 'qemu-nbd -c' also operates a second thread as a client).
+> Our other uses of qemu as NBD client are for consuming a block
+> device (as in qemu-io, qemu-img, or a drive to qemu) - but those
+> binaries are less suited to something so specific to the NBD
+> protocol.
+>=20
+> Bonus: As a result of my work on this series, nbdkit now supports
+> NBD_OPT_INFO (my interoperability testing between server
+> implementations has been paying off, both at fixing server bugs,
+> and at making this code more reliable across difference in valid
+> servers).
+>=20
+> Also available at:
+> https://repo.or.cz/qemu/ericb.git qemu-nbd-list-v4
 
-Perl regexes have the convenient property that backslash
-followed by a punctuation character always means "that
-character literally", whether or not that punctuation
-character has a metacharacter meaning when not escaped.
-So it's definitely the non-backslash version.
-(As an aside, it's a bit sad that Rust regexes don't have
-this property.)
+Vladimir spotted a few more tweaks to make, but they all look
+sufficiently minor that I'll go ahead and queue this on my NBD tree for
+a pull request on Monday, rather than posting a v5, if there aren't any
+other major comments in the meantime.
 
-> > This comment check is unique to QEMU checkpatch so the bug
-> > doesn't exist in the Linux version.
-> > ---
-> >  scripts/checkpatch.pl | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> > index d10dddf1be4..5f1ec537d21 100755
-> > --- a/scripts/checkpatch.pl
-> > +++ b/scripts/checkpatch.pl
-> > @@ -1624,7 +1624,7 @@ sub process {
-> >
-> >               # Block comments use /* on a line of its own
-> >               if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&      #inline /*...*/
-> > -                 $rawline =~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-blank
-> > +                 $rawline =~ m@^\+.*/\*\*?+[ \t]*.+[ \t]*$@) { # /* or /** non-blank
->
-> Hmm - Isn't "[ \t]*.+[ \t]*$" the same as ".+$?"
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-(do you mean '$?"' at the end of your sentence, or '$" ?' ?)
 
-I'm not sure exactly what I was aiming for with that
-part of the regex when I wrote it. The comment suggests
-that I was looking for "non-blank", ie I didn't want to
-fire on /* or /** followed by just trailing whitespace.
-The regex as written is clearly not actually doing that,
-though...
+--kAT7CinLnBqX9yGLPTCnDN9vtEqDtjKs8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- PMM
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxB+foACgkQp6FrSiUn
+Q2rNnwf/Q2FTN1gBYq97WnN/MGCqElADDyGCZqP2oAjy8GOobm5ZIZjqioOCfyjz
+y0R48BkzXidJ0u9OQKXIsq321YmUYbGpWs2Kh2/0ZXrHKNSWm87TjHQ2wDTlhOKf
+FL2ekVXbtMY7WLjsRp9TxTWwcXB04ZNNeZ+jdavcDoDapLe/iPbt3IN0C+V3wJ05
+hYMJtvghLnKbeM9z8kIBClfd1Xch6EAjBj1DC2dLXoycoCJdAcZuN8YfrDpzCgkg
+xmiAhvhDXA5ncAUQH86lNNVhK9afc/ipsSXptntdFPIXBGZNLz5zdLn5ELuhwG3h
+ngwZeCOtVGxi4unH4n2d9KGBWJcjZQ==
+=8qP/
+-----END PGP SIGNATURE-----
+
+--kAT7CinLnBqX9yGLPTCnDN9vtEqDtjKs8--
