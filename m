@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43566)
+Received: from eggs.gnu.org ([209.51.188.92]:43645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gkQzI-0005gx-At
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:02:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1gkQzc-0005t0-Fh
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:03:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gkQzH-0008NG-Ar
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:02:56 -0500
-Received: from mga17.intel.com ([192.55.52.151]:16544)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
-	id 1gkQzH-0008Gw-2z
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:02:55 -0500
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Date: Fri, 18 Jan 2019 18:02:46 +0800
-Message-Id: <1547805767-24863-1-git-send-email-lizhijian@cn.fujitsu.com>
+	(envelope-from <berrange@redhat.com>) id 1gkQza-0000I8-CM
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 05:03:16 -0500
+Date: Fri, 18 Jan 2019 10:02:57 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190118100257.GC20660@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190117193658.16413-1-eblake@redhat.com>
+	<20190117193658.16413-2-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/2] Acceptance tests: use linux-3.6 and set vm
- memory to 4GiB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190117193658.16413-2-eblake@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 01/21] iotests: Make 233 output more
+ reliable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-linux-3.6 kernel shipped by Fedora-19 cannot support xldflags so that it
-cannot support loading more than 2GiB initrd
+On Thu, Jan 17, 2019 at 01:36:38PM -0600, Eric Blake wrote:
+> We have a race between the nbd server and the client both trying
+> to report errors at once which can make the test sometimes fail
+> if the output lines swap order under load.  Break the race by
+> collecting server messages into a file and then replaying that
+> at the end of the test.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> CC: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+> ---
+> An alternative solution might be to silence the message from the
+> server by default, and output it only when -v was passed
 
-CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
-CC: Caio Carrara <ccarrara@redhat.com>
-CC: Cleber Rosa <crosa@redhat.com>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+I wouldn't consider this an either/or situation. It is probably
+good practice to qemu-nbd to be completely silent wrt client
+problems so a malicious client can't spam the qemu-nbd log (if
+any). None the less it is also useful to have the iotests validate
+that this log message is printed.
 
----
-this patch is basing on early Acceptance tests:
-https://patchwork.kernel.org/patch/10676415/
----
- tests/acceptance/linux_initrd.py | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
-index 737355c..aeb9fde 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -24,14 +24,16 @@ class LinuxInitrd(Test):
- 
-     timeout = 60
- 
--    def test_with_2gib_file_should_exit_error_msg(self):
-+    def test_with_2gib_file_should_exit_error_msg_with_linux_v3_6(self):
-         """
-         Pretends to boot QEMU with an initrd file with size of 2GiB
-         and expect it exits with error message.
-+        Fedora-19 shipped with linux-3.6 which have not supported xloadflags
-+        cannot support more than 2GiB initrd.
-         """
--        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
--                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
--        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
-+        kernel_url = ('https://archives.fedoraproject.org/pub/archive/fedora/li'
-+                      'nux/releases/18/Fedora/x86_64/os/images/pxeboot/vmlinuz')
-+        kernel_hash = '41464f68efe42b9991250bed86c7081d2ccdbb21'
-         kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-         max_size = 2 * (1024 ** 3) - 1
- 
-@@ -39,8 +41,8 @@ class LinuxInitrd(Test):
-             initrd.seek(max_size)
-             initrd.write(b'\0')
-             initrd.flush()
--            cmd = "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_path,
--                                                initrd.name)
-+            cmd = "%s -kernel %s -initrd %s -m 4096" % (
-+                  self.qemu_bin, kernel_path, initrd.name)
-             res = run(cmd, ignore_status=True)
-             self.assertEqual(res.exit_status, 1)
-             expected_msg = r'.*initrd is too large.*max: \d+, need %s.*' % (
--- 
-2.7.4
+
+> ---
+>  tests/qemu-iotests/233     | 11 ++++++++---
+>  tests/qemu-iotests/233.out |  4 +++-
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+> index 1814efe3333..ab15c777370 100755
+> --- a/tests/qemu-iotests/233
+> +++ b/tests/qemu-iotests/233
+> @@ -2,7 +2,7 @@
+>  #
+>  # Test NBD TLS certificate / authorization integration
+>  #
+> -# Copyright (C) 2018 Red Hat, Inc.
+> +# Copyright (C) 2018-2019 Red Hat, Inc.
+>  #
+>  # This program is free software; you can redistribute it and/or modify
+>  # it under the terms of the GNU General Public License as published by
+> @@ -30,6 +30,7 @@ _cleanup()
+>  {
+>      nbd_server_stop
+>      _cleanup_test_img
+> +    rm -f "$TEST_DIR/server.log"
+>      tls_x509_cleanup
+>  }
+>  trap "_cleanup; exit \$status" 0 1 2 3 15
+> @@ -66,7 +67,7 @@ $QEMU_IO -c 'w -P 0x11 1m 1m' "$TEST_IMG" | _filter_q=
+emu_io
+>=20
+>  echo
+>  echo "=3D=3D check TLS client to plain server fails =3D=3D"
+> -nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG"
+> +nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG" 2> "$TEST_DIR/serve=
+r.log"
+>=20
+>  $QEMU_IMG info --image-opts \
+>      --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient=
+,id=3Dtls0 \
+> @@ -81,7 +82,7 @@ echo "=3D=3D check plain client to TLS server fails =3D=
+=3D"
+>  nbd_server_start_tcp_socket \
+>      --object tls-creds-x509,dir=3D${tls_dir}/server1,endpoint=3Dserver=
+,id=3Dtls0,verify-peer=3Dyes \
+>      --tls-creds tls0 \
+> -    -f $IMGFMT "$TEST_IMG"
+> +    -f $IMGFMT "$TEST_IMG" 2>> "$TEST_DIR/server.log"
+>=20
+>  $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_po=
+rt/PORT/g"
+>=20
+> @@ -109,6 +110,10 @@ $QEMU_IO -c 'r -P 0x11 1m 1m' -c 'w -P 0x22 1m 1m'=
+ --image-opts \
+>=20
+>  $QEMU_IO -f $IMGFMT -r -U -c 'r -P 0x22 1m 1m' "$TEST_IMG" | _filter_q=
+emu_io
+>=20
+> +echo
+> +echo "=3D=3D final server log =3D=3D"
+> +cat "$TEST_DIR/server.log"
+> +
+>  # success, all done
+>  echo "*** done"
+>  rm -f $seq.full
+> diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+> index 5f416721b03..2199d8a8b32 100644
+> --- a/tests/qemu-iotests/233.out
+> +++ b/tests/qemu-iotests/233.out
+> @@ -27,7 +27,6 @@ virtual size: 64M (67108864 bytes)
+>  disk size: unavailable
+>=20
+>  =3D=3D check TLS with different CA fails =3D=3D
+> -qemu-nbd: option negotiation failed: Verify failed: No certificate was=
+ found.
+>  qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,tl=
+s-creds=3Dtls0': The certificate hasn't got a known issuer
+>=20
+>  =3D=3D perform I/O over TLS =3D=3D
+> @@ -37,4 +36,7 @@ wrote 1048576/1048576 bytes at offset 1048576
+>  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  read 1048576/1048576 bytes at offset 1048576
+>  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +
+> +=3D=3D final server log =3D=3D
+> +qemu-nbd: option negotiation failed: Verify failed: No certificate was=
+ found.
+>  *** done
+> --=20
+> 2.20.1
+>=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
