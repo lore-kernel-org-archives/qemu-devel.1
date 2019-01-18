@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36824)
+Received: from eggs.gnu.org ([209.51.188.92]:36825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSId-0001Vl-My
+	(envelope-from <yang.zhong@intel.com>) id 1gkSId-0001Vm-NE
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:27:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSIc-0007Zx-LT
+	(envelope-from <yang.zhong@intel.com>) id 1gkSIc-0007Zs-L6
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:59 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47043)
+Received: from mga06.intel.com ([134.134.136.31]:47045)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSIb-0005tr-S4
+	id 1gkSIb-0005vM-U7
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:26:58 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:24:01 +0800
-Message-Id: <20190118112410.3010-35-yang.zhong@intel.com>
+Date: Fri, 18 Jan 2019 19:24:02 +0800
+Message-Id: <20190118112410.3010-36-yang.zhong@intel.com>
 In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
 References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 34/43] isa: express dependencies with
- kconfig
+Subject: [Qemu-devel] [RFC PATCH v3 35/43] i386: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,252 +30,276 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
+This way, the default-configs file only need to specify the boards
+and any optional devices.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- default-configs/i386-softmmu.mak | 9 ---------
- hw/audio/Kconfig                 | 2 ++
- hw/block/Kconfig                 | 2 ++
- hw/char/Kconfig                  | 6 ++++++
- hw/display/Kconfig               | 3 +++
- hw/i386/Kconfig                  | 1 +
- hw/ide/Kconfig                   | 1 +
- hw/input/Kconfig                 | 2 ++
- hw/isa/Kconfig                   | 5 +++++
- hw/misc/Kconfig                  | 4 ++++
- hw/net/Kconfig                   | 3 +++
- hw/watchdog/Kconfig              | 2 ++
- 12 files changed, 31 insertions(+), 9 deletions(-)
+ default-configs/i386-softmmu.mak | 39 ++++----------------
+ hw/acpi/Kconfig                  |  3 ++
+ hw/display/Kconfig               |  1 +
+ hw/i2c/Makefile.objs             |  4 +-
+ hw/i386/Kconfig                  | 63 +++++++++++++++++++++++++++++---
+ hw/isa/Kconfig                   |  1 +
+ hw/pci-host/Kconfig              |  5 +++
+ hw/tpm/Kconfig                   |  5 ++-
+ 8 files changed, 80 insertions(+), 41 deletions(-)
 
 diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 4ccf30da63..7b01e6c9b6 100644
+index 7b01e6c9b6..23ea6a3888 100644
 --- a/default-configs/i386-softmmu.mak
 +++ b/default-configs/i386-softmmu.mak
-@@ -7,19 +7,12 @@ CONFIG_VGA_ISA=y
- CONFIG_VMWARE_VGA=y
+@@ -1,10 +1,6 @@
+ # Default configuration for i386-softmmu
+ 
+-CONFIG_PCI=y
+-CONFIG_ISA_BUS=y
+ include hyperv.mak
+-CONFIG_VGA_ISA=y
+-CONFIG_VMWARE_VGA=y
  CONFIG_VMXNET3_PCI=y
  CONFIG_VIRTIO_VGA=y
--CONFIG_VMMOUSE=y
  CONFIG_IPMI=y
- CONFIG_IPMI_LOCAL=y
+@@ -12,46 +8,25 @@ CONFIG_IPMI_LOCAL=y
  CONFIG_IPMI_EXTERN=y
  CONFIG_ISA_IPMI_KCS=y
  CONFIG_ISA_IPMI_BT=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
--CONFIG_PARALLEL=y
- CONFIG_I8254=y
--CONFIG_PCSPK=y
--CONFIG_PCKBD=y
--CONFIG_FDC=y
- CONFIG_ACPI=y
- CONFIG_ACPI_X86=y
- CONFIG_ACPI_X86_ICH=y
-@@ -29,14 +22,12 @@ CONFIG_APM=y
- CONFIG_I8257=y
- CONFIG_IDE_ISA=y
- CONFIG_IDE_PIIX=y
--CONFIG_NE2000_ISA=y
+-CONFIG_I8254=y
+-CONFIG_ACPI=y
+-CONFIG_ACPI_X86=y
+-CONFIG_ACPI_X86_ICH=y
+-CONFIG_ACPI_MEMORY_HOTPLUG=y
+-CONFIG_ACPI_CPU_HOTPLUG=y
+-CONFIG_APM=y
+-CONFIG_I8257=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_PIIX=y
++
++# Optional devices:
++#
  CONFIG_HPET=y
  CONFIG_APPLESMC=y
- CONFIG_I8259=y
+-CONFIG_I8259=y
  CONFIG_PFLASH_CFI01=y
- CONFIG_MC146818RTC=y
- CONFIG_PCI_PIIX=y
--CONFIG_WDT_IB700=y
- CONFIG_ISA_DEBUG=y
+-CONFIG_MC146818RTC=y
+-CONFIG_PCI_PIIX=y
+-CONFIG_ISA_DEBUG=y
  CONFIG_ISA_TESTDEV=y
- CONFIG_VMPORT=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index bfb30276ec..350f2d4359 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -35,6 +35,8 @@ config HDA
+-CONFIG_VMPORT=y
+ CONFIG_SGA=y
+-CONFIG_LPC_ICH9=y
+-CONFIG_PCI_Q35=y
+-CONFIG_APIC=y
+-CONFIG_IOAPIC=y
+ CONFIG_PVPANIC=y
+ CONFIG_MEM_DEVICE=y
+-CONFIG_DIMM=y
+ CONFIG_NVDIMM=y
+ CONFIG_ACPI_NVDIMM=y
+-CONFIG_XIO3130=y
+-CONFIG_IOH3420=y
+-CONFIG_I82801B11=y
+-CONFIG_SMBIOS=y
+ CONFIG_PXB=y
+ CONFIG_ACPI_VMGENID=y
+-CONFIG_FW_CFG_DMA=y
+ CONFIG_I2C=y
+ CONFIG_SEV=$(CONFIG_KVM)
+-CONFIG_VTD=y
+-CONFIG_AMD_IOMMU=y
+-CONFIG_PAM=y
++
++# Boards:
++#
++CONFIG_ISAPC=y
+ CONFIG_I440FX=y
+ CONFIG_Q35=y
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 2f4871c10a..98bb3539e1 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -3,15 +3,18 @@ config ACPI
  
- config PCSPK
+ config ACPI_X86
      bool
-+    default y
-+    depends on ISA_BUS
++    select ACPI
  
- config WM8750
+ config ACPI_X86_ICH
      bool
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index 3710434436..83c2be5915 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -1,5 +1,7 @@
- config FDC
-     bool
-+    default y
-+    depends on ISA_BUS
++    select ACPI_X86
  
- config SSI_M25P80
+ config ACPI_CPU_HOTPLUG
      bool
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 1ed6f0dbce..56c1177f95 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -3,6 +3,8 @@ config ESCC
  
- config PARALLEL
+ config ACPI_MEMORY_HOTPLUG
      bool
-+    default y
-+    depends on ISA_BUS
++    select MEM_DEVICE
  
- config PL011
-     bool
-@@ -12,11 +14,15 @@ config SERIAL
- 
- config SERIAL_ISA
-     bool
-+    default y
-+    depends on ISA_BUS
-+    select SERIAL
- 
- config SERIAL_PCI
-     bool
-     default y
-     depends on PCI
-+    select SERIAL
- 
- config VIRTIO_SERIAL
+ config ACPI_NVDIMM
      bool
 diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 6bcfc10bcb..a53ca4601a 100644
+index a53ca4601a..3d69435982 100644
 --- a/hw/display/Kconfig
 +++ b/hw/display/Kconfig
-@@ -39,9 +39,12 @@ config VGA_PCI
+@@ -82,6 +82,7 @@ config VGA
  
- config VGA_ISA
+ config QXL
      bool
-+    depends on ISA_BUS
-+    select VGA
++    default y if PC
+     depends on SPICE && PCI
+     select VGA
  
- config VGA_ISA_MM
-     bool
-+    select VGA
- 
- config VMWARE_VGA
-     bool
+diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+index 37cacde978..48f7760379 100644
+--- a/hw/i2c/Makefile.objs
++++ b/hw/i2c/Makefile.objs
+@@ -1,8 +1,8 @@
+ common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
+ common-obj-$(CONFIG_DDC) += i2c-ddc.o
+ common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
+-common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
+-common-obj-$(CONFIG_APM) += pm_smbus.o
++common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
++common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
+ common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
+ common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
+ common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
 diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 427bda3717..68a9064558 100644
+index 68a9064558..b359319875 100644
 --- a/hw/i386/Kconfig
 +++ b/hw/i386/Kconfig
-@@ -9,6 +9,7 @@ config I440FX
+@@ -1,21 +1,71 @@
+ config KVM
+     bool
+ 
+-config I440FX
++config PC
+     bool
+-    select QXL if SPICE
++    select ISA_DEBUG
++    select I8259
++    select I8254
++    select PCSPK
++    select I82374
++    select I8257
++    select MC146818RTC
+     select TPM_TIS if TPM
+-    select XEN_I386 if XEN
++
++config PC_PCI
++    bool
++    select APIC
++    select IOAPIC
++    select APM
++    select PC
++
++config PC_ACPI
++    bool
++    select ACPI_X86
++    select ACPI_CPU_HOTPLUG
++    select ACPI_MEMORY_HOTPLUG
++    depends on ACPI_SMBUS
++
++config I440FX
++    bool
++    select PC_PCI
++    select PC_ACPI
++    select ACPI_SMBUS
++    select PCI_PIIX
++    select FDC
++    select IDE_PIIX
++    select PAM
++    select DIMM
++    select SMBIOS
++    select VMPORT
++    select VMMOUSE
++    select FW_CFG_DMA
  
  config ISAPC
      bool
-+    select ISA_BUS
+     select ISA_BUS
++    select PC
++    select IDE_ISA
++    select VGA_ISA
++    # FIXME: it is in the same file as i440fx, and does not compile
++    # if separated
++    depends on I440FX
  
  config Q35
      bool
-diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-index 3778580df2..fb15211379 100644
---- a/hw/ide/Kconfig
-+++ b/hw/ide/Kconfig
-@@ -12,6 +12,7 @@ config IDE_PCI
+-    select QXL if SPICE
+-    select TPM_TIS if TPM
+-    select XEN_I386 if XEN
++    select PC_PCI
++    select PC_ACPI
++    select PCI_Q35
++    select LPC_ICH9
++    select AHCI
++    select PAM
++    select AMD_IOMMU
++    select DIMM
++    select SMBIOS
++    select VMPORT
++    select VMMOUSE
++    select FW_CFG_DMA
++    select VTD
  
- config IDE_ISA
+ config VTD
      bool
-+    depends on ISA_BUS
-     select IDE_QDEV
+@@ -28,3 +78,4 @@ config VMPORT
  
- config IDE_PIIX
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index 91bae47498..01805ed17b 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -6,6 +6,8 @@ config LM832X
- 
- config PCKBD
+ config VMMOUSE
      bool
-+    default y
-+    depends on ISA_BUS
- 
- config PL050
-     bool
++    depends on VMPORT
 diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index b59d074453..3f451ef006 100644
+index 3f451ef006..bf72e4fef2 100644
 --- a/hw/isa/Kconfig
 +++ b/hw/isa/Kconfig
-@@ -9,15 +9,20 @@ config I82378
- 
- config PC87312
-     bool
-+    select ISA_BUS
- 
- config PIIX4
-     bool
-+    select ISA_BUS
- 
- config VT82C686
-     bool
-+    select ISA_BUS
- 
- config SMC37C669
-     bool
- 
+@@ -25,4 +25,5 @@ config SMC37C669
  config LPC_ICH9
      bool
-+    select ISA_BUS
-+    select ACPI_X86_ICH
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 1ca4b2464e..e6df7480c6 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -1,5 +1,6 @@
- config APPLESMC
-     bool
-+    depends on ISA_BUS
+     select ISA_BUS
++    select ACPI_SMBUS
+     select ACPI_X86_ICH
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index 20c3de37a3..84670ee37c 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -21,10 +21,15 @@ config PCI_SABRE
  
- config MAX111X
+ config PCI_PIIX
      bool
-@@ -12,9 +13,11 @@ config TMP421
++    select PCI
  
- config ISA_DEBUG
+ config PCI_Q35
      bool
-+    depends on ISA_BUS
+     select PCIE
++    select PCI
++    select XIO3130
++    select IOH3420
++    select I82801B11
  
- config SGA
+ config PCI_GENERIC
      bool
-+    depends on ISA_BUS
+diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
+index da4bb5b6c7..28acdb745e 100644
+--- a/hw/tpm/Kconfig
++++ b/hw/tpm/Kconfig
+@@ -3,10 +3,13 @@ config TPM
  
- config ISA_TESTDEV
+ config TPM_TIS
      bool
-@@ -93,6 +96,7 @@ config IOTKIT_SYSINFO
+-    depends on TPM
++    default y
++    depends on TPM && PC
  
- config PVPANIC
-     bool
-+    depends on ISA_BUS
- 
- config AUX
-     bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 35204260fa..07eda72d78 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -48,6 +48,9 @@ config LAN9118
- 
- config NE2000_ISA
+ config TPM_CRB
      bool
 +    default y
-+    depends on ISA_BUS
-+    depends on PCI # for NE2000State
++    depends on TPM && PC
  
- config OPENCORES_ETH
-     bool
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index 4e24bf8240..b5cd056b01 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -8,6 +8,8 @@ config WDT_IB6300ESB
- 
- config WDT_IB700
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config WDT_DIAG288
+ config TPM_PASSTHROUGH
      bool
 -- 
 2.17.1
