@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33344)
+Received: from eggs.gnu.org ([209.51.188.92]:33619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkWfi-0004k3-Gr
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:07:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gkWhR-0005SA-F2
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkWfh-0005gy-5w
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:07:06 -0500
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
-	<38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d697c04c-486d-06e7-8047-74ec597dd6e9@redhat.com>
-Date: Fri, 18 Jan 2019 10:06:23 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gkWhP-00072c-2f
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:52 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:40243)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gkWhL-0006a0-7b
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 11:08:49 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id s5so14808829oth.7
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 08:08:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pEPzQGyOcY2lesRdjfciqOIM9b3kZ8efC"
-Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
+References: <20190118132750.25932-1-peter.maydell@linaro.org>
+	<64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
+In-Reply-To: <64316a28-affa-11ca-2d25-5a34a7787a4a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 Jan 2019 16:08:11 +0000
+Message-ID: <CAFEAcA_SQ_zMeGxoTb4sYchv_7K=eNTV5XCUTjSp1mz7-igzng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: Don't spuriously warn about
+ /** comment starters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,176 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Reported-by : Thomas Huth" <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pEPzQGyOcY2lesRdjfciqOIM9b3kZ8efC
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <d697c04c-486d-06e7-8047-74ec597dd6e9@redhat.com>
-Subject: Re: [PATCH v4 00/21] nbd: add qemu-nbd --list
-References: <20190117193658.16413-1-eblake@redhat.com>
- <f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
- <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-In-Reply-To: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 18 Jan 2019 at 15:53, Eric Blake <eblake@redhat.com> wrote:
+>
+> On 1/18/19 7:27 AM, Peter Maydell wrote:
+> > In checkpatch we attempt to check for and warn about
+> > block comments which start with /* or /** followed by a
+> > non-blank. Unfortunately a bug in the regex meant that
+> > we would incorrectly warn about comments starting with
+> > "/**" with no following text:
+> >
+> >   git show 9813dc6ac3954d58ba16b3920556f106f97e1c67|./scripts/checkpatch.pl -
+> >   WARNING: Block comments use a leading /* on a separate line
+> >   #34: FILE: tests/libqtest.h:233:
+> >   +/**
+> >
+> > The sequence "/\*\*?" was intended to match either "/*" or "/**",
+> > but Perl's semantics for '?' allow it to backtrack and try the
+> > "matches 0 chars" option if the "matches 1 char" choice leads to
+> > a failure of the rest of the regex to match.  Switch to "/\*\*?+"
+> > which uses what perlre(1) calls the "possessive" quantifier form:
+> > this means that if it matches the "/**" string it will not later
+> > backtrack to matching just the "/*" prefix.
+>
+> Just wondering if "/\*{1,2}" would also work (it may have to be spelled
+> "/\*\{1,2}" - I never remember which flavors of regex have which
+> extensions without rereading docs)
 
-On 1/18/19 7:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+Oh yes, that would probably be the less perl-specific way
+to write it.
 
->>
->> Interesting, I don't get it again. Searched in outlook online, I found=
- only v2 of it,
->> checked spam folder and filters. Magic.
+Perl regexes have the convenient property that backslash
+followed by a punctuation character always means "that
+character literally", whether or not that punctuation
+character has a metacharacter meaning when not escaped.
+So it's definitely the non-backslash version.
+(As an aside, it's a bit sad that Rust regexes don't have
+this property.)
 
-Weird indeed.  Maybe there's enough @ signs due to .texi content in
-there that a spam filter somewhere along the line ate it silently?
+> > This comment check is unique to QEMU checkpatch so the bug
+> > doesn't exist in the Linux version.
+> > ---
+> >  scripts/checkpatch.pl | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> > index d10dddf1be4..5f1ec537d21 100755
+> > --- a/scripts/checkpatch.pl
+> > +++ b/scripts/checkpatch.pl
+> > @@ -1624,7 +1624,7 @@ sub process {
+> >
+> >               # Block comments use /* on a line of its own
+> >               if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&      #inline /*...*/
+> > -                 $rawline =~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-blank
+> > +                 $rawline =~ m@^\+.*/\*\*?+[ \t]*.+[ \t]*$@) { # /* or /** non-blank
+>
+> Hmm - Isn't "[ \t]*.+[ \t]*$" the same as ".+$?"
 
->>
->> anyway, I can look at https://lists.gnu.org/archive/html/qemu-devel/20=
-19-01/msg04328.html
->>
->>
->=20
-> just look at it in your qemu-nbd-list-v4 tag:
+(do you mean '$?"' at the end of your sentence, or '$" ?' ?)
 
-Thanks for that extra effort.
+I'm not sure exactly what I was aiming for with that
+part of the regex when I wrote it. The comment suggests
+that I was looking for "non-blank", ie I didn't want to
+fire on /* or /** followed by just trailing whitespace.
+The regex as written is clearly not actually doing that,
+though...
 
->=20
->  > Only expose MBR partition @var{num}.  Understands physical partition=
-s
->  > 1-4 and logical partitions 5-8.
->=20
-> I'm afraid, I'm too lazy to sort out these things I don't know, so just=
- believe. It at least
-> corresponds to limits in code that it should be 1 <=3D partition <=3D 8=
- ;)
->=20
->  > @item -c, --connect=3D@var{dev}
->  > Connect @var{filename} to NBD device @var{dev} (Linux only).
->  > @item -d, --disconnect
->  > Disconnect the device @var{dev} (Linux only).
->=20
-> Yes, and we now have clean code which establish this limitation
->=20
->  > @item -e, --shared=3D@var{num}
->  > Allow up to @var{num} clients to share the device (default
->  > @samp{1}). Safe for readers, but for now, consistency is not
->  > guaranteed between multiple writers.
->=20
-> Hmm, don't understand, why you decided to move @samp{1}). on the follow=
-ing line, it looks
-> better as it was. And with a period it's only 69 symbols, the file have=
- a lot longer lines.
-
-Emacs auto-reflowed the line as I edited the paragraph.  End-of-lines
-doesn't really matter in .texi files (it gets reflowed again in the
-creation of output documentation from the .texi input), so if my editor
-tries to stick to certain column lengths, I don't really fight it.
-
-
->  > @example
->  > qemu-nbd \
->  >   --object tls-creds-x509,id=3Dtls0,endpoint=3Dserver,dir=3D/path/to=
-/qemutls \
->  >   --tls-creds tls0 -t -x subset -p 10810 \
->  >   --image-opts driver=3Draw,offset=3D1M,length=3D1M,file.driver=3Dfi=
-le,file.filename=3Dfile.raw
->  > @end example
->=20
-> I don't know tls-related, the other options looks fine.
-
-I looked through past git logs to see the command lines that Dan used
-when initially implementing things; as well as comparison to iotest 233.
-
->=20
-> upd (decided to run the command, with dropped tls):
-> looks fine but not work, as s/length/size.
-
-Oh, good catch!  Will fix.
-
->=20
->  >
->  > Serve a read-only copy of just the first MBR partition of a guest
->  > image over a Unix socket with as many as 5 simultaneous readers, wit=
-h
->  > a persistent process forked as a daemon:
->  >
->  > @example
->  > qemu-nbd --fork -t -e 5 -s /path/to/sock -p 1 -r -f qcow2 file.qcow2=
-
->  > @end example
->=20
-> Oops. s/-s/-k/, s/-p/-P/,
-
-Ouch. Yes, thanks for catching that.
-
- and idea: may be, use self-descriptive long option names in
-> examples?
-
-Hmm. The nice part about short options is that they are less typing and
-shorter lines; but verbose options are also useful.  Maybe listing the
-same example twice, in both the short and long form?
-
->=20
->  >
->  > Expose the guest-visible contents of a qcow2 file via a block device=
-
->  > /dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
->  > partitions found within), then disconnect the device when done.
->  > @emph{CAUTION}: Do not use this method to mount filesystems from an
->  > untrusted guest image - a malicious guest may have prepared the imag=
-e
->  > to attempt to trigger kernel bugs in partition probing or file syste=
-m
->  > mounting.
->  >
->  > @example
->=20
-> should we note, that nbd kernel-module should be loaded for this to wor=
-k?
-
-Yes, that's worth mentioning (some distros include that module to be
-running or autoload already, but it's not universal, so such a note is
-indeed warranted).
-
->=20
->  > qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
->  > qemu-nbd -d /dev/nbd0
->  > @end example
->=20
-> With fixed wrong option names and s/length/size:
-> for 03/21:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---pEPzQGyOcY2lesRdjfciqOIM9b3kZ8efC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxB+X8ACgkQp6FrSiUn
-Q2q13wf6A+XqFwui699j2jnYzb6ctHy9jA0E4eERA/Hfn5tUYuKtUFGWuTRxLF6s
-5V5Xf9afLS4b+xYtW1ezwE1ZjWu4jah4s3jA5Gp9pLN68LPoqS69RoRySLExVxjy
-8P/Gn9GIKyI6iQiQ/t32kg2ImGirjsFeIYTkd4BfFYbc0sfWTGdDkKkxDuBOng2O
-C8Ez3ZRPDR0Symxw7SpvO1O9M/jMgCNuUqY05RaeERqLDrfWU/NygOTC2L6JMTsE
-pNf1mMqyIRuTifn8EgNs4sonIuFMpiODuuhZ6XL3fiM4Evi2IPmCtznduMjGEuMn
-xbWy07qpLdiyeV/FZWIBERSRKIvWWQ==
-=FCc2
------END PGP SIGNATURE-----
-
---pEPzQGyOcY2lesRdjfciqOIM9b3kZ8efC--
+-- PMM
