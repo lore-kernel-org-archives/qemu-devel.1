@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46054)
+Received: from eggs.gnu.org ([209.51.188.92]:46755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkcvd-0002V3-0C
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:47:59 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gkcyQ-0004T7-J1
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:50:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkcvb-0002xD-Tt
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:47:56 -0500
-References: <20190117193658.16413-1-eblake@redhat.com>
-	<f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
-	<38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <928553ea-9694-acc6-1c5f-5a09afc2c64c@redhat.com>
-Date: Fri, 18 Jan 2019 16:47:42 -0600
+	(envelope-from <alex.williamson@redhat.com>) id 1gkcyO-0006xF-EU
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:50:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gkcyM-0005ri-D5
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 17:50:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 943F73DE06
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 22:50:17 +0000 (UTC)
+Date: Fri, 18 Jan 2019 15:50:11 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190118155011.3c6a23d1@x1.home>
+In-Reply-To: <c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-4-berrange@redhat.com>
+	<c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bBBlU0QYJE0el3gxX4SsUAlX77DkOJFZV"
-Subject: Re: [Qemu-devel] [PATCH v4 00/21] nbd: add qemu-nbd --list
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
+ event format strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +36,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bBBlU0QYJE0el3gxX4SsUAlX77DkOJFZV
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <928553ea-9694-acc6-1c5f-5a09afc2c64c@redhat.com>
-Subject: Re: [PATCH v4 00/21] nbd: add qemu-nbd --list
-References: <20190117193658.16413-1-eblake@redhat.com>
- <f10654ba-04d3-3212-94ca-e72c511d51c2@virtuozzo.com>
- <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-In-Reply-To: <38eca33c-cbea-6948-0e05-86a5e0bbeb00@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 18 Jan 2019 11:50:39 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-On 1/18/19 7:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-
+> On 1/18/19 11:31 AM, Daniel P. Berrang=C3=A9 wrote:
+> > The '%m' format specifier instructs glibc's printf() implementation to
+> > insert the contents of strerror(errno). =20
 >=20
->  > Only expose MBR partition @var{num}.  Understands physical partition=
-s
->  > 1-4 and logical partitions 5-8.
+> That is a glibc-only extension in printf(), but mandatory (and supported
+> in ALL platforms) in syslog().  However, you are correct that:
 >=20
-> I'm afraid, I'm too lazy to sort out these things I don't know, so just=
- believe. It at least
-> corresponds to limits in code that it should be 1 <=3D partition <=3D 8=
- ;)
+> > This is not something that
+> > should ever be used in trace-events files because several of the
+> > backends do not use the format string and so this error information is
+> > invisible to them. The errno value should be given as an explicit
+> > trace argument instead. Use of '%m' should also be avoided as it is not
+> > portable to all QEMU build targets. =20
 
-It matches the code, but I just learned the code is buggy for anything
-larger than 5.  According to
-http://tldp.org/HOWTO/Large-Disk-HOWTO-13.html, MBR Extended/Logical
-partitions form a linked-list, something like:
+It's portable to all QEMU build targets that support vfio, but we can
+remove it if we want it out of the trace system, which of course does
+support other targets.
 
-MBR:              EBR1              EBR2
-+----------+      +----------+      +----------+
-+ Part 1   +   |->+ Part 5   +   |->+ Part 6   +
-+ Part 2   +   |  + Next --------|  + 0        +
-+ Part 3   +   |  + 0        +      + 0        +
-+ Part 4 -------  + 0        +      + 0        +
-+----------+      +----------+      +----------+
+> If all of our traces are compiled to syslog(), it would be portable, but
+> that's not the case.
+>=20
+> What's more, using %m is subject to race conditions - the more code you
+> have between when the format string containing %m is given, and the
+> point where the actual error message is emitted, the higher the
+> probability that some of the intermediate code could have stomped on
+> errno in the meantime, rendering the logged message incorrect.  And
+> forcing logging wrappers to save/restore the current state of errno,
+> just in case they might encounter %m, can get wasteful.
+>=20
+> Should checkpatch be taught to flag %m as suspicious?
+>=20
+> However, tracing the errno value is NOT what %m did; I'd rather see...
+>=20
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  hw/vfio/pci.c                 | 2 +-
+> >  hw/vfio/trace-events          | 2 +-
+> >  scripts/tracetool/__init__.py | 4 ++++
+> >  3 files changed, 6 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index c0cb1ec289..85f1908cfe 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2581,7 +2581,7 @@ static void vfio_populate_device(VFIOPCIDevice *v=
+dev, Error **errp)
+> >      ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_in=
+fo);
+> >      if (ret) {
+> >          /* This can fail for an old kernel or legacy PCI dev */
+> > -        trace_vfio_populate_device_get_irq_info_failure();
+> > +        trace_vfio_populate_device_get_irq_info_failure(errno); =20
+>=20
+> trace_vfio_populate_device_get_irq_info_failure(strerror(errno))
 
-In reality, ANY of part 1-4 can point to the first EBR, as long as there
-is at most one primary partition pointing to the extended partition -
-even crazier is that there are different magic numbers in historical
-use, such as type 5 for Part 3 and type 85 for Part 4, where MS-DOS
-would treat Partition 3 as the extended partition and ignore Part 4, but
-Linux would follow both chains (where the second extended partition thus
-allowed Linux access to logical partitions residing in space beyond what
-DOS could access).  But once you start the extended partition chain, all
-logical partitions within the chain each have their own EBR table with
-one entry for the partition and the next entry pointing to the next EBR,
-meaning you can have more than 8 logical partitions (provided your disk
-is big enough).
+Yep, I agree, the intent of the original code is not maintained.
+Thanks,
 
-But our find_partition() code stupidly assumes that if there is any
-extended partition type in the MBR (recognizing only type 5 or type F,
-but not Linux' type 85), then all four entries in that EBR are logical
-partitions 5-8 (and no more, rather than a linked list chain, as in:
+Alex
 
-MBR:              EBR
-+----------+      +----------+
-+ Part 1   +   |->+ Part 5   +
-+ Part 2   +   |  + Part 6   +
-+ Part 3   +   |  + Part 7   +
-+ Part 4 -------  + Part 8   +
-+----------+      +----------+
-
-It's highly unlikely that there are any BIOS implementations that would
-actually recognize such a partition beyond 5 as being bootable (there
-might be OSs which are a bit more tolerant, since MBR doesn't seem to
-have any one hard canonical specification).  I'd have to compare what
-the Linux kernel MBR code does, to see if we even stand a chance of
-being interoperable in any manner.  It doesn't help that nbdkit does not
-yet support Logical MBR partitions.
-
-Oh well, another project for another day; this documentation change is
-going in as-is because it at least matches the code, even if the code is
-buggy.  (I'm tempted to fix nbdkit to fully support MBR logical
-partitions, then rip out the partitioning code in qemu as redundant as
-you could get it via nbdkit if you really need it - qemu-nbd's -P 8 has
-unchanged, and thus buggy, since at least commit 7a5ca8648 in May 2008,
-with no user complaining of a bug for 11 years)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---bBBlU0QYJE0el3gxX4SsUAlX77DkOJFZV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxCV44ACgkQp6FrSiUn
-Q2o7qwf+N/Q83/KE0a0uJ5+7bhkfye0/+VsJBLZ03KL6WSNku81btxT2RVtqxjVB
-GOODSwdGTdTTMTc7y3M5fka8BCM5d1zA5U+ZKA6l2veHBKJuchrG0i7PT0mAXh00
-M3Qw9JG20RbusyYG6Gs1qD3IhPyYR79hP8Qvop5z1QPLpt/L2iRc7seFr6SHpuxy
-EbPSvKZbnpGGS1Yg0OytJ1tBOqwj+dQkp1UF17RgipdTXOzQQa56CVhn5XFHmbFU
-veQZDSNIyg47XkmNgcUFdhqfn0ga7PPnjtu2pEsgMj+W799YdjC/w1X8Vj4fRPjc
-76d7o/v7vBIny5TpUEQdMc2pNvN9PQ==
-=8V5+
------END PGP SIGNATURE-----
-
---bBBlU0QYJE0el3gxX4SsUAlX77DkOJFZV--
+> >      } else if (irq_info.count =3D=3D 1) {
+> >          vdev->pci_aer =3D true;
+> >      } else {
+> > diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> > index a85e8662ea..6d412afc83 100644
+> > --- a/hw/vfio/trace-events
+> > +++ b/hw/vfio/trace-events
+> > @@ -37,7 +37,7 @@ vfio_pci_hot_reset_has_dep_devices(const char *name) =
+"%s: hot reset dependent de
+> >  vfio_pci_hot_reset_dep_devices(int domain, int bus, int slot, int func=
+tion, int group_id) "\t%04x:%02x:%02x.%x group %d"
+> >  vfio_pci_hot_reset_result(const char *name, const char *result) "%s ho=
+t reset: %s"
+> >  vfio_populate_device_config(const char *name, unsigned long size, unsi=
+gned long offset, unsigned long flags) "Device %s config:\n  size: 0x%lx, o=
+ffset: 0x%lx, flags: 0x%lx"
+> > -vfio_populate_device_get_irq_info_failure(void) "VFIO_DEVICE_GET_IRQ_I=
+NFO failure: %m"
+> > +vfio_populate_device_get_irq_info_failure(int err) "VFIO_DEVICE_GET_IR=
+Q_INFO failure: %d" =20
+>=20
+> vfio_populate_device_get_irq_info_failur(const char *err)
+> "VFIO_DEVICE_GET_IRQ_INFO failure: %s"
+>=20
+> ...if we are trying to match the original intent.
+>=20
+> >  vfio_realize(const char *name, int group_id) " (%s) group %d"
+> >  vfio_mdev(const char *name, bool is_mdev) " (%s) is_mdev %d"
+> >  vfio_add_ext_cap_dropped(const char *name, uint16_t cap, uint16_t offs=
+et) "%s 0x%x@0x%x"
+> > diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__=
+.py
+> > index 3478ac93ab..6fca674936 100644
+> > --- a/scripts/tracetool/__init__.py
+> > +++ b/scripts/tracetool/__init__.py
+> > @@ -274,6 +274,10 @@ class Event(object):
+> >          props =3D groups["props"].split()
+> >          fmt =3D groups["fmt"]
+> >          fmt_trans =3D groups["fmt_trans"]
+> > +        if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
+> > +            raise ValueError("Event format '%m' is forbidden, pass the=
+ error "
+> > +                             "as an explicit trace argument") =20
+>=20
+> Whether or not checkpatch decides to flag %m as suspicious in the
+> overall code base, I like that you are forbidding it in trace files.
+>=20
