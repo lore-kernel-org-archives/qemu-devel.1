@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51573)
+Received: from eggs.gnu.org ([209.51.188.92]:51898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkUSx-0006Nd-Qn
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:48 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gkUTz-0007A0-74
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkUSv-0000Tn-TF
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:45:47 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-18-crosa@redhat.com>
-	<20190118095800.6d9bc2e1.cohuck@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <25f30f50-a693-315e-55a1-883f49845be4@redhat.com>
-Date: Fri, 18 Jan 2019 08:45:30 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gkUTx-0001Ul-6E
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:46:51 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:60336
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gkUTt-0001Lh-Jj
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:46:47 -0500
+References: <cover.1547166960.git.balaton@eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <604061b8-2045-566e-c5dc-41346bc1b1fd@ilande.co.uk>
+Date: Fri, 18 Jan 2019 13:46:29 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190118095800.6d9bc2e1.cohuck@redhat.com>
+In-Reply-To: <cover.1547166960.git.balaton@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/18] Boot Linux Console Test: add a test
- for s390x + s390-ccw-virtio
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] Refactor common PCI IDE functions from
+ CMD646
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On 11/01/2019 00:36, BALATON Zoltan wrote:
 
-
-On 1/18/19 3:58 AM, Cornelia Huck wrote:
+> Hello,
 > 
-> Cool, I had been looking at adding some of the tests I'm running here
-> to this framework as well, and this gives me a good base to work with :)
+> This series is a small refactoring that moves some common PCI IDE io
+> mem ops functions from the CMD646 model to the PCI IDE model so a
+> CMD646 specific type can be dropped from PCIIDEState, removes code
+> duplication from SiI3112 model (also fixing a bug) and allows these
+> functions to be used by future PCI IDE implementations.
 > 
-> I'll try to find some time to give it a whirl.
+> Also cc'd Mark and Richard because the CMD646 seems to be used by
+> Sparc, HPPA and Alpha machines.
 > 
+> Regards,
+> BALATON Zoltan
+> 
+> BALATON Zoltan (5):
+>   cmd646: Remove unused variable
+>   cmd646: Remove IDEBus from CMD646BAR
+>   cmd646: Move PCI IDE specific functions to ide/pci.c
+>   ide: Get rid of CMD646BAR struct
+>   sii3112: Remove duplicated code and use PCI IDE ops instead
+> 
+>  hw/ide/cmd646.c      | 102 ++++++++-------------------------------------------
+>  hw/ide/pci.c         |  65 ++++++++++++++++++++++++++++++++
+>  hw/ide/sii3112.c     |  52 ++++----------------------
+>  include/hw/ide/pci.h |  14 ++-----
+>  4 files changed, 93 insertions(+), 140 deletions(-)
 
-I can't assist you in finding some time, but for anything else, please
-ping me :)
+This looks like a good tidy-up to me. I've applied these patches locally and tried a
+quick boot test under qemu-system-sparc64 and it seems to work, so:
 
-Cheers,
-- Cleber.
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
