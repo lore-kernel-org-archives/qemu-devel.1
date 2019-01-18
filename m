@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36019)
+Received: from eggs.gnu.org ([209.51.188.92]:36039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSHJ-0000Td-Mg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:39 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSHN-0000Vx-Rd
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gkSHH-0006Ra-0r
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gkSHJ-0006UX-Mr
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:41 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gkSHF-0006An-L1
 	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:36 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47043)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gkSHD-0005tr-OC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 06:25:33 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 18 Jan 2019 19:23:41 +0800
-Message-Id: <20190118112410.3010-15-yang.zhong@intel.com>
-In-Reply-To: <20190118112410.3010-1-yang.zhong@intel.com>
-References: <20190118112410.3010-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v3 14/43] hw/sparc64/Makefile.objs: Create
- CONFIG_* for sparc64
+Received: by mail-wm1-x343.google.com with SMTP id y185so765318wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 03:25:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20181226034254.17842-1-richard.henderson@linaro.org>
+	<20190116235009.tl4gcv53e62npecl@function>
+	<d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
+	<CAFEAcA9moCfRCHkivgU7Qesi3xeD=8u8+0WScM84f-dcwyYfrw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9moCfRCHkivgU7Qesi3xeD=8u8+0WScM84f-dcwyYfrw@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 18 Jan 2019 15:25:07 +0400
+Message-ID: <CAJ+F1CK9Bkw0ULs5j2n9v_py1DRqLFgPGaHXBBvdWBb-eBDcvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Richard Henderson <richard.henderson@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Add the new configs to default-configs/sparc64-sofmmu.mak.
+Hi
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/sparc64-softmmu.mak | 2 ++
- hw/sparc64/Makefile.objs            | 6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+On Thu, Jan 17, 2019 at 5:56 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Thu, 17 Jan 2019 at 13:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+> > On 1/17/19 12:50 AM, Samuel Thibault wrote:
+> > > --- a/slirp/slirp.c
+> > > +++ b/slirp/slirp.c
+> > > @@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt=
+, int pkt_len)
+> > >      if (pkt_len < ETH_HLEN)
+> > >          return;
+> > >
+> > > -    proto =3D ntohs(*(uint16_t *)(pkt + 12));
+> > > +    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
+> > >      switch(proto) {
+> > >      case ETH_P_ARP:
+> > >          arp_input(slirp, pkt, pkt_len);
+> >
+> > What about using memcpy?
+>
+> We should use whatever the new libslirp wants to consistently
+> use as its mechanism for loading unaligned data. I don't
+> suppose this is the only place where it ever needs to do this.
+>
+> Personally I would vote for having libslirp have versions of
+> the ld*_p functions, because they solve the problem in a
+> clear and correct way. But that's up to Marc-Andr=C3=A9 really.
 
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index ce63d47046..1fae4888db 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -17,3 +17,5 @@ CONFIG_SUNHME=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_SUN4V_RTC=y
-+CONFIG_SUN4U=y
-+CONFIG_NIAGARA=y
-diff --git a/hw/sparc64/Makefile.objs b/hw/sparc64/Makefile.objs
-index 117e0ff27d..af0525c1a2 100644
---- a/hw/sparc64/Makefile.objs
-+++ b/hw/sparc64/Makefile.objs
-@@ -1,4 +1,4 @@
- obj-y += sparc64.o
--obj-y += sun4u_iommu.o
--obj-y += sun4u.o
--obj-y += niagara.o
-\ No newline at end of file
-+obj-$(CONFIG_SUN4U) += sun4u_iommu.o
-+obj-$(CONFIG_SUN4U) += sun4u.o
-+obj-$(CONFIG_NIAGARA) += niagara.o
--- 
-2.17.1
+I think I would go with a copy of qemu bswap.h, unless there is an
+equivalent in glib (I don't think so) or gnulib? Or other standard
+compiler solution.
+
+It's somehow surprising me that there is no goto solution :).
+
+> (As you can see from clang build logs:
+> https://travis-ci.org/qemu/qemu/jobs/480813811
+> slirp/ has a lot of as-yet-unfixed "takes address of packed
+> member" bugs, which suggest it's a bit slapdash with
+> alignment. Running it under the clang sanitizer to look
+> for runtime alignment errors might also be interesting.)
+>
+> thanks
+> -- PMM
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
