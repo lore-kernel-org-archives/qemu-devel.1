@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42368)
+Received: from eggs.gnu.org ([209.51.188.92]:42470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkU0c-0005Qy-FF
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:16:31 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkU0i-0005XC-8s
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:16:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkU0M-00087j-Mj
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:16:23 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gkU0X-0008GV-LN
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 08:16:29 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Fri, 18 Jan 2019 14:14:43 +0100
-Message-Id: <20190118131456.32451-23-kbastian@mail.uni-paderborn.de>
+Date: Fri, 18 Jan 2019 14:14:53 +0100
+Message-Id: <20190118131456.32451-33-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
 References: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 22/35] target/riscv: Remove manual decoding
- from gen_load()
+Subject: [Qemu-devel] [PATCH v4 32/35] target/riscv: Convert @cl_d, @cl_w,
+ @cs_d, @cs_w insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +25,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com, kbastian@mail.uni-paderborn.de
 Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-With decodetree we don't need to convert RISC-V opcodes into to MemOps
-as the old gen_load() did.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de><Paste>
 ---
-v3 -> v4:
-    - int memop -> TCGMemop memop
+ target/riscv/insn16.decode              | 20 ++++++++++----------
+ target/riscv/insn32.decode              |  3 ++-
+ target/riscv/insn_trans/trans_rvc.inc.c | 24 ------------------------
+ 3 files changed, 12 insertions(+), 35 deletions(-)
 
- target/riscv/insn_trans/trans_rvi.inc.c | 35 +++++++++++++++----------
- target/riscv/translate.c                |  6 +++--
- 2 files changed, 25 insertions(+), 16 deletions(-)
-
-diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index eb76763fa7..fddafd9f79 100644
---- a/target/riscv/insn_trans/trans_rvi.inc.c
-+++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -129,34 +129,43 @@ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
-     return gen_branch(ctx, a, TCG_COND_GEU);
+diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
+index c7a58d80e5..c215867ff9 100644
+--- a/target/riscv/insn16.decode
++++ b/target/riscv/insn16.decode
+@@ -43,14 +43,14 @@
+ 
+ # Argument sets imported from insn32.decode:
+ &r         rd rs1 rs2   !extern
++&i         imm rs1 rd   !extern
++&s         imm rs1 rs2  !extern
+ 
+ # Argument sets:
+ &cl               rs1 rd
+-&cl_dw     uimm   rs1 rd
+ &ci        imm        rd
+ &ciw       nzuimm     rd
+ &cs               rs1 rs2
+-&cs_dw     uimm   rs1 rs2
+ &cb        imm    rs1
+ &cr               rd  rs2
+ &c_j       imm
+@@ -67,13 +67,13 @@
+ @cr        ....  ..... .....  .. &cr                      rs2=%rs2_5  %rd
+ @ci        ... . ..... .....  .. &ci     imm=%imm_ci                  %rd
+ @ciw       ...   ........ ... .. &ciw    nzuimm=%nzuimm_ciw           rd=%rs2_3
+-@cl_d      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
+-@cl_w      ... ... ... .. ... .. &cl_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
++@cl_d      ... ... ... .. ... .. &i  imm=%uimm_cl_d  rs1=%rs1_3  rd=%rs2_3
++@cl_w      ... ... ... .. ... .. &i  imm=%uimm_cl_w  rs1=%rs1_3  rd=%rs2_3
+ @cl        ... ... ... .. ... .. &cl                      rs1=%rs1_3  rd=%rs2_3
+ @cs        ... ... ... .. ... .. &cs                      rs1=%rs1_3  rs2=%rs2_3
+ @cs_2      ... ... ... .. ... .. &r      rd=%rs1_3 rs1=%rs1_3 rs2=%rs2_3
+-@cs_d      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
+-@cs_w      ... ... ... .. ... .. &cs_dw  uimm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
++@cs_d      ... ... ... .. ... .. &s  imm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
++@cs_w      ... ... ... .. ... .. &s  imm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
+ @cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
+ @cj        ...    ........... .. &c_j    imm=%imm_cj
+ 
+@@ -95,11 +95,11 @@
+ 
+ # *** RV64C Standard Extension (Quadrant 0) ***
+ c_addi4spn        000    ........ ... 00 @ciw
+-c_fld             001  ... ... .. ... 00 @cl_d
+-c_lw              010  ... ... .. ... 00 @cl_w
++fld               001  ... ... .. ... 00 @cl_d
++lw                010  ... ... .. ... 00 @cl_w
+ c_flw_ld          011  --- ... -- ... 00 @cl    #Note: Must parse uimm manually
+-c_fsd             101  ... ... .. ... 00 @cs_d
+-c_sw              110  ... ... .. ... 00 @cs_w
++fsd               101  ... ... .. ... 00 @cs_d
++sw                110  ... ... .. ... 00 @cs_w
+ c_fsw_sd          111  --- ... -- ... 00 @cs    #Note: Must parse uimm manually
+ 
+ # *** RV64C Standard Extension (Quadrant 1) ***
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 6f3ab7aa52..b59a00cc42 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -37,6 +37,7 @@
+ &b    imm rs2 rs1
+ &i    imm rs1 rd
+ &r    rd rs1 rs2
++&s    imm rs2 rs1
+ &shift     shamt rs1 rd
+ &atomic    aq rl rs2 rs1 rd
+ 
+@@ -44,7 +45,7 @@
+ @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
+ @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
+ @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
+-@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
++@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
+ @u       ....................      ..... .......         imm=%imm_u          %rd
+ @j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
+index 639c381edf..d932bfd3e0 100644
+--- a/target/riscv/insn_trans/trans_rvc.inc.c
++++ b/target/riscv/insn_trans/trans_rvc.inc.c
+@@ -28,18 +28,6 @@ static bool trans_c_addi4spn(DisasContext *ctx, arg_c_addi4spn *a)
+     return trans_addi(ctx, &arg);
  }
  
--static bool trans_lb(DisasContext *ctx, arg_lb *a)
-+static bool gen_load(DisasContext *ctx, arg_lb *a, TCGMemOp memop)
+-static bool trans_c_fld(DisasContext *ctx, arg_c_fld *a)
+-{
+-    arg_fld arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
+-    return trans_fld(ctx, &arg);
+-}
+-
+-static bool trans_c_lw(DisasContext *ctx, arg_c_lw *a)
+-{
+-    arg_lw arg = { .rd = a->rd, .rs1 = a->rs1, .imm = a->uimm };
+-    return trans_lw(ctx, &arg);
+-}
+-
+ static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
  {
--    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
-+    TCGv t0 = tcg_temp_new();
-+    TCGv t1 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-+    tcg_gen_addi_tl(t0, t0, a->imm);
-+
-+    tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, memop);
-+    gen_set_gpr(a->rd, t1);
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-     return true;
+ #ifdef TARGET_RISCV32
+@@ -51,18 +39,6 @@ static bool trans_c_flw_ld(DisasContext *ctx, arg_c_flw_ld *a)
+ #endif
  }
  
-+static bool trans_lb(DisasContext *ctx, arg_lb *a)
-+{
-+    return gen_load(ctx, a, MO_SB);
-+}
-+
- static bool trans_lh(DisasContext *ctx, arg_lh *a)
+-static bool trans_c_fsd(DisasContext *ctx, arg_c_fsd *a)
+-{
+-    arg_fsd arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
+-    return trans_fsd(ctx, &arg);
+-}
+-
+-static bool trans_c_sw(DisasContext *ctx, arg_c_sw *a)
+-{
+-    arg_sw arg = { .rs1 = a->rs1, .rs2 = a->rs2, .imm = a->uimm };
+-    return trans_sw(ctx, &arg);
+-}
+-
+ static bool trans_c_fsw_sd(DisasContext *ctx, arg_c_fsw_sd *a)
  {
--    gen_load(ctx, OPC_RISC_LH, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_TESW);
- }
- 
- static bool trans_lw(DisasContext *ctx, arg_lw *a)
- {
--    gen_load(ctx, OPC_RISC_LW, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_TESL);
- }
- 
- static bool trans_lbu(DisasContext *ctx, arg_lbu *a)
- {
--    gen_load(ctx, OPC_RISC_LBU, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_UB);
- }
- 
- static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
- {
--    gen_load(ctx, OPC_RISC_LHU, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_TEUW);
- }
- 
- static bool trans_sb(DisasContext *ctx, arg_sb *a)
-@@ -180,14 +189,12 @@ static bool trans_sw(DisasContext *ctx, arg_sw *a)
- #ifdef TARGET_RISCV64
- static bool trans_lwu(DisasContext *ctx, arg_lwu *a)
- {
--    gen_load(ctx, OPC_RISC_LWU, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_TEUL);
- }
- 
- static bool trans_ld(DisasContext *ctx, arg_ld *a)
- {
--    gen_load(ctx, OPC_RISC_LD, a->rd, a->rs1, a->imm);
--    return true;
-+    return gen_load(ctx, a, MO_TEQ);
- }
- 
- static bool trans_sd(DisasContext *ctx, arg_sd *a)
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index a0e96b94a9..d0fefa8fb9 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -489,7 +489,8 @@ static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
-     ctx->base.is_jmp = DISAS_NORETURN;
- }
- 
--static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-+#ifdef TARGET_RISCV64
-+static void gen_load_c(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-         target_long imm)
- {
-     TCGv t0 = tcg_temp_new();
-@@ -508,6 +509,7 @@ static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-     tcg_temp_free(t0);
-     tcg_temp_free(t1);
- }
-+#endif
- 
- static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-         target_long imm)
-@@ -640,7 +642,7 @@ static void decode_RV32_64C0(DisasContext *ctx)
-     case 3:
- #if defined(TARGET_RISCV64)
-         /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
--        gen_load(ctx, OPC_RISC_LD, rd_rs2, rs1s,
-+        gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
-                  GET_C_LD_IMM(ctx->opcode));
- #else
-         /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
+ #ifdef TARGET_RISCV32
 -- 
 2.20.1
