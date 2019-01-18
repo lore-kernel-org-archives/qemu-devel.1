@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57446)
+Received: from eggs.gnu.org ([209.51.188.92]:57475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUok-00076n-08
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:18 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gkUol-00077e-0D
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gkUoi-0002XU-2G
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54042)
+	(envelope-from <farosas@linux.ibm.com>) id 1gkUok-0002a4-6G
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45364
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gkUog-0002Pq-Ie
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:15 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0IDwkMr136466
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:11 -0500
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q3fd1tgmt-1
+	id 1gkUok-0002Yf-0t
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:08:18 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0IDwjGr034566
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:17 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q3e5k5b4q-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:11 -0500
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 09:08:16 -0500
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Fri, 18 Jan 2019 14:08:10 -0000
+	Fri, 18 Jan 2019 14:08:16 -0000
 From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Fri, 18 Jan 2019 12:07:52 -0200
+Date: Fri, 18 Jan 2019 12:07:54 -0200
 In-Reply-To: <20190118140758.829-1-farosas@linux.ibm.com>
 References: <20190118140758.829-1-farosas@linux.ibm.com>
-Message-Id: <20190118140758.829-2-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH v3 1/7] target/ppc: Move exception vector
- offset computation into a function
+Message-Id: <20190118140758.829-4-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH v3 3/7] kvm: support checking for single
+ step capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,59 +42,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, david@gibson.dropbear.id.au, cohuck@redhat.com, aik@ozlabs.ru
 
+For single stepping (via KVM) of a guest vcpu to work, KVM needs not
+only to support the SET_GUEST_DEBUG ioctl but to also recognize the
+KVM_GUESTDBG_SINGLESTEP bit in the control field of the
+kvm_guest_debug struct.
+
+This patch adds support for querying the single step capability so
+that QEMU can decide what to do for the platforms that do not have
+such support.
+
 Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 ---
- target/ppc/excp_helper.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
+ accel/kvm/kvm-all.c  | 7 +++++++
+ include/sysemu/kvm.h | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 0ec7ae1ad4..337a3ef8bb 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -65,6 +65,25 @@ static inline void dump_syscall(CPUPPCState *env)
-                   ppc_dump_gpr(env, 6), env->nip);
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 4e1de942ce..0dc7a32883 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2264,6 +2264,13 @@ bool kvm_arm_supports_user_irq(void)
+     return kvm_check_extension(kvm_state, KVM_CAP_ARM_USER_IRQ);
  }
  
-+static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
++/* Whether the KVM_SET_GUEST_DEBUG ioctl supports single stepping */
++int kvm_has_guestdbg_singlestep(void)
 +{
-+    uint64_t offset;
-+
-+    switch (ail) {
-+    case AIL_0001_8000:
-+        offset = 0x18000;
-+        break;
-+    case AIL_C000_0000_0000_4000:
-+        offset = 0xc000000000004000ull;
-+        break;
-+    default:
-+        cpu_abort(cs, "Invalid AIL combination %d\n", ail);
-+        break;
-+    }
-+
-+    return offset;
++    /* return kvm_check_extension(kvm_state, KVM_CAP_GUEST_DEBUG_SSTEP); */
++    return 0;
 +}
 +
- /* Note that this function should be greatly optimized
-  * when called with a constant excp, from ppc_hw_interrupt
-  */
-@@ -685,17 +704,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
-     /* Handle AIL */
-     if (ail) {
-         new_msr |= (1 << MSR_IR) | (1 << MSR_DR);
--        switch(ail) {
--        case AIL_0001_8000:
--            vector |= 0x18000;
--            break;
--        case AIL_C000_0000_0000_4000:
--            vector |= 0xc000000000004000ull;
--            break;
--        default:
--            cpu_abort(cs, "Invalid AIL combination %d\n", ail);
--            break;
--        }
-+        vector |= ppc_excp_vector_offset(cs, ail);
-     }
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+ struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
+                                                  target_ulong pc)
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index a6d1cd190f..ca2bbff053 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -214,6 +214,7 @@ int kvm_has_pit_state2(void);
+ int kvm_has_many_ioeventfds(void);
+ int kvm_has_gsi_routing(void);
+ int kvm_has_intx_set_mask(void);
++int kvm_has_guestdbg_singlestep(void);
  
- #if defined(TARGET_PPC64)
+ int kvm_init_vcpu(CPUState *cpu);
+ int kvm_cpu_exec(CPUState *cpu);
 -- 
 2.17.1
