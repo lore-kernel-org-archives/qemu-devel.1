@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50482)
+Received: from eggs.gnu.org ([209.51.188.92]:52230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.mielke@gmail.com>) id 1gkMlq-0003Gv-Jb
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:32:47 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gkN1G-0005uP-SL
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:48:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.mielke@gmail.com>) id 1gkMlp-0002mk-FM
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:32:46 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:53264)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mark.mielke@gmail.com>)
-	id 1gkMlp-0002kh-8u
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:32:45 -0500
-Received: by mail-wm1-x330.google.com with SMTP id d15so3296949wmb.3
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 21:32:44 -0800 (PST)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gkMnw-0005Lo-RO
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:34:58 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:44078)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gkMnw-0005JZ-Jy
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 00:34:56 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20190117073649.5399.97670.stgit@pasha-VirtualBox>	<20190117073758.5399.16268.stgit@pasha-VirtualBox>
+	<87tvi72z8l.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tvi72z8l.fsf@dusky.pond.sub.org>
+Date: Fri, 18 Jan 2019 08:34:59 +0300
+Message-ID: <002701d4aeef$8dc965b0$a95c3110$@ru>
 MIME-Version: 1.0
-From: Mark Mielke <mark.mielke@gmail.com>
-Date: Fri, 18 Jan 2019 00:32:31 -0500
-Message-ID: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2 hosts,
- with VMX flag enabled in the guest?
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v10 12/24] replay: introduce breakpoint at
+ the specified step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Markus Armbruster' <armbru@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-Thank you for the work on nested virtualization. Having had live migrations
-fail in the past when nested virtualization has been active, it is great to
-see that clever people have been working on this problem!
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+> 
+> > This patch introduces replay_break, replay_delete_break
+> > qmp and hmp commands.
+> > These commands allow stopping at the specified instruction.
+> > It may be useful for debugging when there are some known
+> > events that should be investigated.
+> > replay_break command has one argument - number of instructions
+> > executed since the start of the replay.
+> > replay_delete_break removes previously set breakpoint.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> >
+> > --
+> > +
+> > +static void replay_break(uint64_t icount, QEMUTimerCB callback, void *opaque)
+> > +{
+> > +    assert(replay_mode == REPLAY_MODE_PLAY);
+> > +    assert(replay_mutex_locked());
+> > +    assert(replay_break_icount >= replay_get_current_step());
+> 
+> The identifier replay_get_current_step() is one of the few remaining
+> instances of "step" terminology.  Whether to normalize them to "icount"
+> is entirely up to you.
 
-My question is about whether a migration path has been considered to allow
-live migration from Qemu 2.12 hosts to Qemu 3.2 hosts, with VMX flag
-enabled in the guest?
+This is already done with the last patch in the series.
 
-Qemu 2.12 doesn't know about the new nested state available from newer
-Linux kernels, and it might be used on a machine with an older kernel that
-doesn't make the nested state available. If Qemu 3.2 is on an up-to-date
-host with an up-to-date kernel that does support the nested state, I'd like
-to ensure we have the ability to try the migrations.
-
-In the past, I've found that:
-
-1) If the guest had used nested virtualization before, the migration often
-fails. However, if we reboot the guest and do not use nested
-virtualization, this simplifies to...
-2) If the guest has never used nested virtualization before, the migration
-succeeds.
-
-I would like to leverage 2) as much as possible to migrate forwards to Qemu
-3.2 hosts (once it is available). I can normally enter the guest to see if
-1) is likely or not, and handle these ones specially. If only 20% of the
-guests have ever used nested virtualization, then I would like the option
-to safely migrate 80% of the guests using live migration, and handle the
-20% as exceptions.
-
-This is the 3.1 change log that got my attention:
-
-
-   - x86 machines cannot be live-migrated if nested Intel virtualization is
-   enabled. The next version of QEMU will be able to do live migration when
-   nested virtualization is enabled, if supported by the kernel.
-
-
-I believe this is the change it refers to:
-
-commit d98f26073bebddcd3da0ba1b86c3a34e840c0fb8
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed Nov 14 10:38:13 2018 +0100
-
-    target/i386: kvm: add VMX migration blocker
-
-    Nested VMX does not support live migration yet.  Add a blocker
-    until that is worked out.
-
-    Nested SVM only does not support it, but unfortunately it is
-    enabled by default for -cpu host so we cannot really disable it.
-
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-
-This particular check seems very simplistic:
-
-+    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
-+        error_setg(&vmx_mig_blocker,
-+                   "Nested VMX virtualization does not support live
-migration yet");
-+        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(vmx_mig_blocker);
-+            return r;
-+        }
-+    }
-+
-
-It fails if the flag is set, rather than if any nested virtualization has
-been used before.
-
-I'm concerned I will end up with a requirement for *all* guests to be
-restarted in order to migrate them to the new hosts, rather than just the
-ones that would have a problem.
-
-Thoughts?
-
-Thanks!
-
--- 
-Mark Mielke <mark.mielke@gmail.com>
+Pavel Dovgalyuk
