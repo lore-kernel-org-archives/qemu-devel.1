@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40100)
+Received: from eggs.gnu.org ([209.51.188.92]:42524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkVRk-0007Xg-1E
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:48:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gkVZz-0001uL-Gn
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gkVRY-00043O-MC
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:48:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gkVRS-0003uz-9c
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:48:18 -0500
-Date: Fri, 18 Jan 2019 14:48:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190118144809.GN20660@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
-	<20190118100159.GA2483@work-vm>
-	<8f0f7339-5f47-46d0-20a9-343badad4d0f@redhat.com>
-	<20190118101633.GC2146@work-vm> <20190118102102.GH20660@redhat.com>
-	<328f912c-e332-3bdc-d333-55c4af1a1fa1@redhat.com>
-	<20190118134451.GM20660@redhat.com>
-	<CALm7yL2g6a=3P_9ujmi_CbKXp8pisWfH1cD8hHMBhc7hf1aqUQ@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1gkVZx-0005q6-WD
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 09:57:07 -0500
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-12-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1ea09d99-04ff-711e-9137-cdae33ca8681@redhat.com>
+Date: Fri, 18 Jan 2019 15:56:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALm7yL2g6a=3P_9ujmi_CbKXp8pisWfH1cD8hHMBhc7hf1aqUQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
- hosts, with VMX flag enabled in the guest?
+In-Reply-To: <20181229122027.42245-12-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Xfe2USpCVcdiQTDILprq6YpAY2jyVk4KB"
+Subject: Re: [Qemu-devel] [PATCH v5 11/11] block/backup: use backup-top
+ instead of write notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,158 +25,425 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Mielke <mark.mielke@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, christian.ehrhardt@canonical.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-On Fri, Jan 18, 2019 at 09:09:31AM -0500, Mark Mielke wrote:
-> On Fri, Jan 18, 2019 at 8:44 AM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com>
-> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Xfe2USpCVcdiQTDILprq6YpAY2jyVk4KB
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+Message-ID: <1ea09d99-04ff-711e-9137-cdae33ca8681@redhat.com>
+Subject: Re: [PATCH v5 11/11] block/backup: use backup-top instead of write
+ notifiers
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-12-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-12-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> Drop write notifiers and use filter node instead. Changes:
 >=20
-> > On Fri, Jan 18, 2019 at 01:57:31PM +0100, Paolo Bonzini wrote:
-> > > On 18/01/19 11:21, Daniel P. Berrang=C3=A9 wrote:
-> > > > Yes, this is exactly why I said we should make the migration bloc=
-ker
-> > > > be conditional on any L2 guest having been started. I vaguely rec=
-all
-> > > > someone saying there wasn't any way to detect this situation from
-> > > > QEMU though ?
-> > > You can check that and give a warning (check that CR4.VMXE=3D1 but =
-no
-> > > other live migration state was transferred).  However, without live
-> > > migration support in the kernel and in QEMU you cannot start VMs *f=
-or
-> > > the entire future life of the VM* after a live migration.  So even =
-if we
-> > > implemented that kind of blocker, it would fail even if no VM has b=
-een
-> > > started, as long as the kvm_intel module is loaded on migration.  T=
-hat
-> > > would be no different in practice from what we have now.
-> > Ahh, I was mis-understanding that it only applied to L2 VMs that
-> > existed at the time the migration is performed. Given that it breaks
-> > all future possibility of launching an L2 VM, this strict blocker doe=
-s
-> > make more sense.
-> >
+> 1. copy-before-writes now handled by filter node, so, drop all
+>    is_write_notifier arguments.
 >=20
-> To explain my use case more fully:
+> 2. we don't have intersecting requests, so their handling is dropped.
+> Instead, synchronization works as follows:
+> when backup or backup-top starts copying of some area it firstly
+> clears copy-bitmap bits, and nobody touches areas, not marked with
+> dirty bits in copy-bitmap, so there is no intersection. Also, backup
+> job copy operations are surrounded by bdrv region lock, which is
+> actually serializing request, to not interfer with guest writes and
+> not read changed data from source (before reading we clear
+> corresponding bit in copy-bitmap, so, this area is not more handled by
+> backup-top).
 >=20
-> Right now all guests are on Linux 4.14.79+ hypervisors, with Qemu 2.12.=
-1+.
+> 3. To sync with in-flight requests we now just drain hook node, we
+> don't need rw-lock.
 >=20
-> I understand the value of this feature, and I need to get all the guest=
-s to
-> Linux 4.19.16+ hypervisors, with Qemu 3.2 (once it is available).
+> 4. After the whole backup loop (top, full, incremental modes), we need
+> to check for not copied clusters, which were under backup-top operation=
+
+> and we skipped them, but backup-top operation failed, error returned to=
+
+> the guest and dirty bits set back.
 >=20
-> As documented, and as best as I can read from the source code and this
-> mailing list, the recommended solution would be for me to upgrade Linux=
- and
-> Qemu on existing hypervisors, and then restart the entire environment.
-> After it comes up with the new kernel, and the new qemu, everything wil=
-l be
-> "correct".
-
-The recommendation depends on whether you actually need to run L2 guests
-or not.
-
-For people who don't need L2 guests, the recommendation solution is to
-simply disable the vmx flag in the guest CPU model and reboot the affecte=
-d
-L1 guests.
-
-Only people who need to run L2 guests would need to upgrade the software
-stack to get live migration working. That said there is a workaround I'll
-mention below...
-
-> The first stage will include introducing new Linux 4.19.16+ hypervisors=
-,
-> and migrating the guests to these machines carefully and opportunistica=
-lly.
-> Carefully means that machines that will use L2 guests will need to be
-> restarted in discussion with the users(or their hypervisors avoided fro=
-m
-> this exercise), but most (80%+) of machines that will never launch an L=
-2
-> guest can migrate live with low risk (at least according to our experie=
-nce
-> to date). This will allow existing hypervisors to be freed up so that t=
-hey
-> too can be upgraded to Linux 4.19.16+.
+> 5. Don't create additional blk, use backup-top children for copy
+> operations.
 >=20
-> The second stage will include upgrading to Qemu 3.2 once it is availabl=
-e
-> and demonstrated to be stable for our use cases. However, I will need t=
-o be
-> able to live migrate most (80%+) systems from Qemu 2.12.1+ to Qemu 3.2.=
- We
-> would again handle the machines with L2 guests with care.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 285 ++++++++++++++++++++++++++-----------------------=
 
-L1 guests with running L2 guests can not be live migrated from 2.12 no ma=
-tter
-what as both running guests will fail, and the L1 guest will also be unab=
-le
-to launch any new guests.
-
-You would need to boot a new L1 guest on a different host, then live migr=
-ate
-all the L2 guests to this new L1 guest. Since the L1 guest would presumab=
-ly
-then be empty there'd no longer be a need to live migrate the L1 guest, a=
-nd
-it can simply be powered off. IOW, this is pretty similar situation to
-doing physical hardware replacement of virt hosts.
-
-The serious pain point that I see is for people who have L1 guests which
-have VMX enabled, but which were not, and will never be, used for running
-L2 VMs. They can't live migrate thir L1 guests, so they'd need to restart
-their application workloads which is very unpleasant.
-
-I wonder if there's a case to be made to allow the QEMU migration blocker
-to be overridden in this case. Libvirt has a VIR_MIGRATE_UNSAFE flag that
-mgmt apps be set to tell libvirt to do the migration even if it believes
-the config to be unsafe. Libvirt has some migration restrictions around
-valid disk cache modes where this is used if libvirt made the wrong
-decision. There's no way for us to plumb it into the QEMU migration block=
-er
-for VMX though, so it can't currently be used in this scenario
-
-> If Qemu 3.2 will be ready sooner (weeks?), I would wait before migratio=
-n,
-> and combine the above two steps such the new hypervisors would have bot=
-h
-> Linux 4.19.16+ and Qemu 3.2. But, if Qemu 3.2 is months away, I would k=
-eep
-> it as two steps.
-
-NB the next release will be 4.0, as we switched policy to increment the
-major release number at the start of each year. QEMU follows a fixed
-schedule of 3-releases a year, which gives 4 month gaps. So assuming no
-slippage you can expect 4.0 in late April.
-
-> To achieve this, I need a path to live migrate from Qemu 2.12.1+ with V=
-MX
-> bit set in the guest, to Qemu 3.2. Further complicating things is that =
-we
-> are using OpenStack, so options for tweaking flags on a case by case ba=
-sis
-> would be limited or non-existent.
+>  1 file changed, 149 insertions(+), 136 deletions(-)
 >=20
-> I'm totally fine with the understanding that any machine not restarted =
-is
-> still broken under Qemu 3.2, just as it was broken under Qemu 2.12. New
-> machines will be correct, and the broken machines can be fixed
-> opportunistically and in discussion with the users.
->=20
-> And, we don't need a system-wide restart of the whole cluster to deploy
-> Qemu 3.2.
+> diff --git a/block/backup.c b/block/backup.c
+> index 88c0242b4e..e332909fb7 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+[...]
+
+> @@ -300,21 +231,23 @@ static void backup_abort(Job *job)
+>  static void backup_clean(Job *job)
+>  {
+>      BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job=
+);
+> -    assert(s->target);
+> -    blk_unref(s->target);
+> +
+> +    /* We must clean it to not crash in backup_drain. */
+>      s->target =3D NULL;
+
+Why not set s->source to NULL along with it?  It makes sense if you're
+going to drop the backup-top node because both of these are its children.=
+
+
+> =20
+>      if (s->copy_bitmap) {
+>          hbitmap_free(s->copy_bitmap);
+>          s->copy_bitmap =3D NULL;
+>      }
+> +
+> +    bdrv_backup_top_drop(s->backup_top);
+>  }
+
+[...]
+
+> @@ -386,21 +319,45 @@ static int coroutine_fn backup_run_incremental(Ba=
+ckupBlockJob *job)
+>      bool error_is_read;
+>      int64_t offset;
+>      HBitmapIter hbi;
+> +    void *lock =3D NULL;
+> =20
+>      hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+> -    while ((offset =3D hbitmap_iter_next(&hbi)) !=3D -1) {
+> +    while (hbitmap_count(job->copy_bitmap)) {
+> +        offset =3D hbitmap_iter_next(&hbi);
+> +        if (offset =3D=3D -1) {
+> +            /*
+> +             * we may have skipped some clusters, which were handled b=
+y
+> +             * backup-top, but failed and finished by returning error =
+to
+> +             * the guest and set dirty bit back.
+> +             */
+> +            hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+> +            offset =3D hbitmap_iter_next(&hbi);
+> +            assert(offset);
+
+I think you want to assert "offset >=3D 0".
+
+> +        }
+> +
+> +        lock =3D bdrv_co_try_lock(job->source, offset, job->cluster_si=
+ze);
+> +        /*
+> +         * Dirty bit is set, which means that there are no in-flight
+> +         * write requests on this area. We must succeed.
+> +         */
+> +        assert(lock);
+
+I'm not sure that is true right now, but more on that below in backup_run=
+().
+
+> +
+>          do {
+>              if (yield_and_check(job)) {
+> +                bdrv_co_unlock(lock);
+>                  return 0;
+>              }
+> -            ret =3D backup_do_cow(job, offset,
+> -                                job->cluster_size, &error_is_read, fal=
+se);
+> +            ret =3D backup_do_cow(job, offset, job->cluster_size, &err=
+or_is_read);
+>              if (ret < 0 && backup_error_action(job, error_is_read, -re=
+t) =3D=3D
+>                             BLOCK_ERROR_ACTION_REPORT)
+>              {
+> +                bdrv_co_unlock(lock);
+>                  return ret;
+>              }
+>          } while (ret < 0);
+> +
+> +        bdrv_co_unlock(lock);
+> +        lock =3D NULL;
+
+This statement seems unnecessary here.
+
+>      }
+> =20
+>      return 0;
+
+[...]
+
+> @@ -447,26 +402,39 @@ static int coroutine_fn backup_run(Job *job, Erro=
+r **errp)
+>          hbitmap_set(s->copy_bitmap, 0, s->len);
+>      }
+> =20
+> -    s->before_write.notify =3D backup_before_write_notify;
+> -    bdrv_add_before_write_notifier(bs, &s->before_write);
+> -
+>      if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_NONE) {
+>          /* All bits are set in copy_bitmap to allow any cluster to be =
+copied.
+>           * This does not actually require them to be copied. */
+>          while (!job_is_cancelled(job)) {
+> -            /* Yield until the job is cancelled.  We just let our befo=
+re_write
+> -             * notify callback service CoW requests. */
+> +            /*
+> +             * Yield until the job is cancelled.  We just let our back=
+up-top
+> +             * fileter driver service CbW requests.
+
+*filter
+
+> +             */
+>              job_yield(job);
+>          }
+>      } else if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
+>          ret =3D backup_run_incremental(s);
+>      } else {
+
+[...]
+
+> @@ -505,8 +474,20 @@ static int coroutine_fn backup_run(Job *job, Error=
+ **errp)
+>              if (alloced < 0) {
+>                  ret =3D alloced;
+>              } else {
+> +                if (!hbitmap_get(s->copy_bitmap, offset)) {
+> +                    trace_backup_do_cow_skip(job, offset);
+> +                    continue; /* already copied */
+> +                }
+> +                if (!lock) {
+> +                    lock =3D bdrv_co_try_lock(s->source, offset, s->cl=
+uster_size);
+> +                    /*
+> +                     * Dirty bit is set, which means that there are no=
+ in-flight
+> +                     * write requests on this area. We must succeed.
+> +                     */
+> +                    assert(lock);
+
+What if I have a different parent node for the source that issues
+concurrent writes?  This used to work fine because the before_write
+notifier would still work.  After this patch, that would be broken
+because those writes would not cause a CbW.
+
+That's not so bad because we just have to make sure that all writes go
+through the backup-top node.  That would make this assertion valid
+again, too.  But that means we cannot share PERM_WRITE; see [1].
+
+> +                }
+>                  ret =3D backup_do_cow(s, offset, s->cluster_size,
+> -                                    &error_is_read, false);
+> +                                    &error_is_read);
+>              }
+>              if (ret < 0) {
+>                  /* Depending on error action, fail now or retry cluste=
+r */
+> @@ -516,17 +497,34 @@ static int coroutine_fn backup_run(Job *job, Erro=
+r **errp)
+>                      break;
+>                  } else {
+>                      offset -=3D s->cluster_size;
+> +                    retry =3D true;
+>                      continue;
+>                  }
+>              }
+>          }
+> +        if (lock) {
+> +            bdrv_co_unlock(lock);
+> +            lock =3D NULL;
+> +        }
+> +        if (ret =3D=3D 0 && !job_is_cancelled(job) &&
+> +            hbitmap_count(s->copy_bitmap))
+> +        {
+> +            /*
+> +             * we may have skipped some clusters, which were handled b=
+y
+> +             * backup-top, but failed and finished by returning error =
+to
+> +             * the guest and set dirty bit back.
+
+So it's a matter of a race?
+
+> +             */
+> +            goto iteration;
+> +        }
+
+Why not wrap everything in a do {} while (ret =3D=3D 0 && !job_is...)
+instead?  Because it would mean reindenting everything?
+
+>      }
+> =20
+> -    notifier_with_return_remove(&s->before_write);
+> +    /* wait pending CBW operations in backup-top */
+> +    bdrv_drain(s->backup_top);
+> =20
+> -    /* wait until pending backup_do_cow() calls have completed */
+> -    qemu_co_rwlock_wrlock(&s->flush_rwlock);
+> -    qemu_co_rwlock_unlock(&s->flush_rwlock);
+> +    backup_top_progress =3D bdrv_backup_top_progress(s->backup_top);
+> +    job_progress_update(job, ret + backup_top_progress -
+
+Why the "ret"?
+
+> +                        s->backup_top_progress);
+> +    s->backup_top_progress =3D backup_top_progress;
+
+So the backup-top progress is ignored during basically all of the block
+job until it suddenly jumps to 100 % completion?  That doesn't sound idea=
+l.
+
+Or did you mean to put this into the for () loop of MODE_TOP/MODE_FULL?
+ (And the while() loop of MODE_NONE)
+
+> =20
+>      return ret;
+>  }
+> @@ -563,6 +561,9 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+>      int ret;
+>      int64_t cluster_size;
+>      HBitmap *copy_bitmap =3D NULL;
+> +    BlockDriverState *backup_top =3D NULL;
+> +    uint64_t all_except_resize =3D BLK_PERM_CONSISTENT_READ | BLK_PERM=
+_WRITE |
+> +                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_G=
+RAPH_MOD;
+
+BLK_PERM_ALL & ~BLK_PERM_RESIZE?
+
+[1] But we probably do not want to share either PERM_WRITE or
+PERM_WRITE_UNCHANGED because during the duration of the backup,
+everything should go through the backup-top filter (not sure about
+PERM_WRITE_UNCHANGED right now).  Or is that something that the filter
+node should enforce in backup_top_child_perm()?
+
+> =20
+>      assert(bs);
+>      assert(target);
+> @@ -655,25 +656,31 @@ BlockJob *backup_job_create(const char *job_id, B=
+lockDriverState *bs,
+> =20
+>      copy_bitmap =3D hbitmap_alloc(len, ctz32(cluster_size));
+> =20
+> -    /* job->len is fixed, so we can't allow resize */
+> -    job =3D block_job_create(job_id, &backup_job_driver, txn, bs,
+> -                           BLK_PERM_CONSISTENT_READ,
+> -                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |=
+
+> -                           BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_M=
+OD,
+> -                           speed, creation_flags, cb, opaque, errp);
+> -    if (!job) {
+> +    /*
+> +     * bdrv_get_device_name will not help to find device name starting=
+ from
+> +     * @bs after backup-top append,
+
+Why not?  Since backup-top is appended, shouldn't all parents of @bs be
+parents of @backup_top then?  (Making bdrv_get_parent_name() return the
+same result)
+
+>                                      so let's calculate job_id before. =
+Do
+> +     * it in the same way like block_job_create
+> +     */
+> +    if (job_id =3D=3D NULL && !(creation_flags & JOB_INTERNAL)) {
+> +        job_id =3D bdrv_get_device_name(bs);
+> +    }
+> +
+> +    backup_top =3D bdrv_backup_top_append(bs, target, copy_bitmap, err=
+p);
+> +    if (!backup_top) {
+>          goto error;
+>      }
+> =20
+> -    /* The target must match the source in size, so no resize here eit=
+her */
+> -    job->target =3D blk_new(BLK_PERM_WRITE,
+> -                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
+> -                          BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MO=
+D);
+> -    ret =3D blk_insert_bs(job->target, target, errp);
+> -    if (ret < 0) {
+> +    /* job->len is fixed, so we can't allow resize */
+> +    job =3D block_job_create(job_id, &backup_job_driver, txn, bs, 0,
+
+Is there a reason you dropped PERM_CONSISTENT_READ here?
+
+> +                           all_except_resize, speed, creation_flags,
+> +                           cb, opaque, errp);
+> +    if (!job) {
+>          goto error;
+>      }
+> =20
+> +    job->source =3D backup_top->backing;
+> +    job->target =3D ((BDRVBackupTopState *)backup_top->opaque)->target=
+;
+
+This looks really ugly.  I think as long as the block job performs
+writes itself, it should use its own BlockBackend.
+
+Alternatively, I think it would make sense for the backup-top filter to
+offer functions that this job can use to issue writes to the target.
+Then the backup job would no longer need direct access to the target as
+a BdrvChild.
+
+> +
+>      job->on_source_error =3D on_source_error;
+>      job->on_target_error =3D on_target_error;
+>      job->sync_mode =3D sync_mode;
+
+[...]
+
+> @@ -712,6 +722,9 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+>          backup_clean(&job->common.job);
+>          job_early_fail(&job->common.job);
+>      }
+> +    if (backup_top) {
+> +        bdrv_backup_top_drop(backup_top);
+> +    }
+
+While it shouldn't be a problem in practice, backup_top has a reference
+to copy_bitmap, so that bitmap should be freed after backup_top is droppe=
+d.
+
+Max
+
+> =20
+>      return NULL;
+>  }
+>=20
+
+
+
+--Xfe2USpCVcdiQTDILprq6YpAY2jyVk4KB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxB6S0ACgkQ9AfbAGHV
+z0Beqwf9EeX7d+pQUvjQFHRxgqmxMnrdqog0VcmtvKI01+dtBOhU9A3RoaH3ycQg
+Dl+quZTcZRorszbXNQQyoBfsQ1te3NblbqQ2mUfKm9PE3Hvz86AN8VkQTIGxnllR
+QqTYrNJ99nIvvs/ck8rr1fDdZLKf7zacVeNUnN5vjnKiHslNx17EeLDn2lFXxijf
+fxfGFdITDqyEhGFIdu8fPyZj/3LquHWCRnAqHuCprufIlP2zZHun1sAUqhv/stBS
+jWLNXi1gx2TQnVzHtzo1s9ZZIBipXskUGm5UlQGxvKBXsp8m6R7yziFwMXcf6DRU
+HM82ArcCOuY3flE5ZE0vfc3kA+pohg==
+=hiGV
+-----END PGP SIGNATURE-----
+
+--Xfe2USpCVcdiQTDILprq6YpAY2jyVk4KB--
