@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55990)
+Received: from eggs.gnu.org ([209.51.188.92]:56001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbkb-0005Iy-Bu
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbkd-0005Kt-Ad
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gkbkZ-0004oS-0V
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:29 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45977)
+	(envelope-from <richard.henderson@linaro.org>) id 1gkbkb-0004ql-CF
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:31 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gkbkQ-0004ea-L4
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:20 -0500
-Received: by mail-pl1-x641.google.com with SMTP id a14so6865894plm.12
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:15 -0800 (PST)
+	id 1gkbkZ-0004iA-Nq
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 16:32:28 -0500
+Received: by mail-pg1-x544.google.com with SMTP id n2so6649960pgm.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 13:32:19 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat, 19 Jan 2019 08:30:53 +1100
-Message-Id: <20190118213122.22865-20-richard.henderson@linaro.org>
+Date: Sat, 19 Jan 2019 08:30:54 +1100
+Message-Id: <20190118213122.22865-21-richard.henderson@linaro.org>
 In-Reply-To: <20190118213122.22865-1-richard.henderson@linaro.org>
 References: <20190118213122.22865-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 20/49] linux-user: Implement rusage argument
- to waitid
+Subject: [Qemu-devel] [PATCH v6 21/49] linux-user: Split out creat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +29,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-The kernel interface, which we are supposed to be implementing,
-takes a fifth argument: an rusage pointer akin to wait4.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  2 +-
- linux-user/syscall-proc.inc.c | 27 +++++++++++++++++++--------
- 2 files changed, 20 insertions(+), 9 deletions(-)
+ linux-user/syscall-defs.h     |  3 +++
+ linux-user/strace.c           | 13 -------------
+ linux-user/syscall-file.inc.c | 16 ++++++++++++++++
+ linux-user/syscall.c          |  9 ---------
+ linux-user/strace.list        |  3 ---
+ 5 files changed, 19 insertions(+), 25 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index a84050a318..f099d98fa3 100644
+index f099d98fa3..de7a99f0c6 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -119,7 +119,7 @@ SYSCALL_DEF(shmget, ARG_DEC, ARG_DEC, ARG_HEX);
- SYSCALL_DEF_FULL(vfork, .impl = impl_fork);
- #endif
- SYSCALL_DEF(wait4, ARG_DEC, ARG_PTR, ARG_HEX, ARG_PTR);
--SYSCALL_DEF(waitid, ARG_HEX, ARG_DEC, ARG_PTR, ARG_HEX);
-+SYSCALL_DEF(waitid, ARG_HEX, ARG_DEC, ARG_PTR, ARG_HEX, ARG_PTR);
- #ifdef TARGET_NR_waitpid
- SYSCALL_DEF(waitpid, ARG_DEC, ARG_PTR, ARG_HEX);
- #endif
-diff --git a/linux-user/syscall-proc.inc.c b/linux-user/syscall-proc.inc.c
-index 37f5bbe197..de4efed9f4 100644
---- a/linux-user/syscall-proc.inc.c
-+++ b/linux-user/syscall-proc.inc.c
-@@ -370,19 +370,30 @@ SYSCALL_IMPL(waitid)
-     id_t id = arg2;
-     abi_ulong target_info = arg3;
-     int options = arg4;
-+    abi_ulong target_rusage = arg5;
-     siginfo_t info, *info_ptr = target_info ? &info : NULL;
-+    struct rusage rusage;
-+    struct rusage *rusage_ptr = target_rusage ? &rusage : NULL;
-     abi_long ret;
- 
-     info.si_pid = 0;
--    ret = get_errno(safe_waitid(idtype, id, info_ptr, options, NULL));
--    if (!is_error(ret) && target_info && info.si_pid != 0) {
--        target_siginfo_t *p = lock_user(VERIFY_WRITE, target_info,
--                                        sizeof(target_siginfo_t), 0);
--        if (!p) {
--            return -TARGET_EFAULT;
-+    ret = get_errno(safe_waitid(idtype, id, info_ptr, options, rusage_ptr));
-+    if (!is_error(ret)) {
-+        if (target_info && info.si_pid != 0) {
-+            target_siginfo_t *p = lock_user(VERIFY_WRITE, target_info,
-+                                            sizeof(target_siginfo_t), 0);
-+            if (!p) {
-+                return -TARGET_EFAULT;
-+            }
-+            host_to_target_siginfo(p, &info);
-+            unlock_user(p, target_info, sizeof(target_siginfo_t));
-+        }
-+        if (target_rusage) {
-+            abi_long err = host_to_target_rusage(target_rusage, &rusage);
-+            if (err) {
-+                ret = err;
-+            }
-         }
--        host_to_target_siginfo(p, &info);
--        unlock_user(p, target_info, sizeof(target_siginfo_t));
-     }
-     return ret;
+@@ -21,6 +21,9 @@ SYSCALL_DEF_FULL(brk, .impl = impl_brk,
+                  .arg_type = { ARG_PTR });
+ SYSCALL_DEF_ARGS(clone, ARG_CLONEFLAG, ARG_PTR, ARG_PTR, ARG_PTR, ARG_PTR);
+ SYSCALL_DEF(close, ARG_DEC);
++#ifdef TARGET_NR_creat
++SYSCALL_DEF(creat, ARG_STR, ARG_MODEFLAG);
++#endif
+ SYSCALL_DEF(exit, ARG_DEC);
+ #ifdef TARGET_NR_fork
+ SYSCALL_DEF(fork);
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index d7847e7cd6..5cb77223fd 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1183,19 +1183,6 @@ print_clock_adjtime(const struct syscallname *name,
  }
+ #endif
+ 
+-#ifdef TARGET_NR_creat
+-static void
+-print_creat(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_string(arg0, 0);
+-    print_file_mode(arg1, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_execv
+ static void
+ print_execv(const struct syscallname *name,
+diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
+index 81423cfd64..62e1790e3b 100644
+--- a/linux-user/syscall-file.inc.c
++++ b/linux-user/syscall-file.inc.c
+@@ -24,6 +24,22 @@ SYSCALL_IMPL(close)
+     return get_errno(close(fd));
+ }
+ 
++#ifdef TARGET_NR_creat
++SYSCALL_IMPL(creat)
++{
++    char *p = lock_user_string(arg1);
++    abi_long ret;
++
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(creat(p, arg2));
++    fd_trans_unregister(ret);
++    unlock_user(p, arg1, 0);
++    return ret;
++}
++#endif
++
+ /*
+  * Helpers for do_openat, manipulating /proc/self/foo.
+  */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 8da92dd188..1e9478611c 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -5330,15 +5330,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     void *p;
+ 
+     switch(num) {
+-#ifdef TARGET_NR_creat /* not on alpha */
+-    case TARGET_NR_creat:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(creat(p, arg2));
+-        fd_trans_unregister(ret);
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+ #ifdef TARGET_NR_link
+     case TARGET_NR_link:
+         {
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index afa1521e2d..be0392810c 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -94,9 +94,6 @@
+ #ifdef TARGET_NR_connect
+ { TARGET_NR_connect, "connect" , "%s(%d,%#x,%d)", NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_creat
+-{ TARGET_NR_creat, "creat" , NULL, print_creat, NULL },
+-#endif
+ #ifdef TARGET_NR_create_module
+ { TARGET_NR_create_module, "create_module" , NULL, NULL, NULL },
+ #endif
 -- 
 2.17.2
