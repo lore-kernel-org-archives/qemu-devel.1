@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55289)
+Received: from eggs.gnu.org ([209.51.188.92]:55345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTa-0001MR-Go
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTb-0001NL-Fp
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-000832-GO
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:42 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37955)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00082m-FM
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:43 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37957)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gknTZ-0007un-5M
+	id 1gknTZ-0007wT-2u
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:41 -0500
-Received: by mail-wr1-x441.google.com with SMTP id v13so17926835wrw.5
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:28 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id v13so17926965wrw.5
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:31 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 19 Jan 2019 12:03:10 +0200
-Message-Id: <20190119100315.23985-6-marcel.apfelbaum@gmail.com>
+Date: Sat, 19 Jan 2019 12:03:12 +0200
+Message-Id: <20190119100315.23985-8-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
 References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH PULL 05/10] hw/pvrdma: Make function
- pvrdma_qp_send/recv return void.
+Subject: [Qemu-devel] [PATCH PULL 07/10] hw: rdma: fix an off-by-one issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +29,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, liq3ea@163.com, cohuck@redhat.com, philmd@redhat.com
 
-From: Yuval Shaia <yuval.shaia@oracle.com>
+From: Li Qiang <liq3ea@163.com>
 
-The functions handles errors internaly, callers have nothing to do with
-the return value.
+In rdma_rm_get_backend_gid_index(), the 'sgid_idx' is used
+to index the array 'dev_res->port.gid_tbl' which size is
+MAX_PORT_GIDS. Current the 'sgid_idx' may be MAX_PORT_GIDS
+thus cause an off-by-one issue.
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Message-Id: <20190109202140.4051-1-yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Spotted by Coverity: CID 1398594
+
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Message-Id: <20190103131251.49271-1-liq3ea@163.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_qp_ops.c | 14 ++++++--------
- hw/rdma/vmw/pvrdma_qp_ops.h |  4 ++--
- 2 files changed, 8 insertions(+), 10 deletions(-)
+ hw/rdma/rdma_rm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 0565eba981..ce5a60e184 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -143,7 +143,7 @@ int pvrdma_qp_ops_init(void)
-     return 0;
- }
- 
--int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
-+void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 8bf241e91f..268ff633a4 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -579,7 +579,7 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+ int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
+                                   RdmaBackendDev *backend_dev, int sgid_idx)
  {
-     RdmaRmQP *qp;
-     PvrdmaSqWqe *wqe;
-@@ -155,7 +155,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
- 
-     qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-     if (unlikely(!qp)) {
--        return -EINVAL;
-+        pr_dbg("Invalid qpn\n");
-+        return;
+-    if (unlikely(sgid_idx < 0 || sgid_idx > MAX_PORT_GIDS)) {
++    if (unlikely(sgid_idx < 0 || sgid_idx >= MAX_PORT_GIDS)) {
+         pr_dbg("Got invalid sgid_idx %d\n", sgid_idx);
+         return -EINVAL;
      }
- 
-     ring = (PvrdmaRing *)qp->opaque;
-@@ -212,11 +213,9 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
- 
-         wqe = pvrdma_ring_next_elem_read(ring);
-     }
--
--    return 0;
- }
- 
--int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-+void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
- {
-     RdmaRmQP *qp;
-     PvrdmaRqWqe *wqe;
-@@ -226,7 +225,8 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
- 
-     qp = rdma_rm_get_qp(&dev->rdma_dev_res, qp_handle);
-     if (unlikely(!qp)) {
--        return -EINVAL;
-+        pr_dbg("Invalid qpn\n");
-+        return;
-     }
- 
-     ring = &((PvrdmaRing *)qp->opaque)[1];
-@@ -262,8 +262,6 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
- 
-         wqe = pvrdma_ring_next_elem_read(ring);
-     }
--
--    return 0;
- }
- 
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle)
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.h b/hw/rdma/vmw/pvrdma_qp_ops.h
-index ac46bf7fdf..31cb48ba29 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.h
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.h
-@@ -20,8 +20,8 @@
- 
- int pvrdma_qp_ops_init(void);
- void pvrdma_qp_ops_fini(void);
--int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle);
--int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle);
-+void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle);
-+void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle);
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle);
- 
- #endif
 -- 
 2.17.1
