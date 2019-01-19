@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54867)
+Received: from eggs.gnu.org ([209.51.188.92]:36583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkdYv-0005Ll-Bl
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:34 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkeMr-0004Xr-94
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gkdYo-0002O1-Sg
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gkdYl-0002Gu-1e
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 18:28:23 -0500
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
-	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
-	<20190116113227.47ebdea2@redhat.com>
-	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
-	<20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
-	<20190116133133.3c43531f@redhat.com>
-	<ad76d8d9-fd8e-c7ef-405a-5eb9adf8f3a0@redhat.com>
-	<20190117161122.457fb2f3@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <cc072ba3-b49b-7b6b-fa32-8fad3d404316@redhat.com>
-Date: Sat, 19 Jan 2019 00:28:08 +0100
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkeMp-00021g-Q5
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:09 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gkeMp-00020Y-HK
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:07 -0500
+Received: by mail-ot1-x344.google.com with SMTP id s5so15991286oth.7
+	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 16:20:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190117161122.457fb2f3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
- when UEFI firmware is used
+In-Reply-To: <3c1d98cb-2bc8-90a0-e4a6-c2d8dc331241@wavecomp.com>
+References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
+	<3c1d98cb-2bc8-90a0-e4a6-c2d8dc331241@wavecomp.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 19 Jan 2019 01:20:05 +0100
+Message-ID: <CAL1e-=jKR+5FTWS9SyV_q_PMY5gAqOymrgYGGv-pmdM+OWm4gw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
+ summary of CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +31,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Stefan Markovic <smarkovic@wavecomp.com>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On 01/17/19 16:11, Igor Mammedov wrote:
-> On Wed, 16 Jan 2019 17:22:31 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
->> On 01/16/19 13:31, Igor Mammedov wrote:
->>> On Wed, 16 Jan 2019 12:52:17 +0100
->>> Gerd Hoffmann <kraxel@redhat.com> wrote:
->>>   
->>>>   Hi,
->>>>  
->>>>> This approach allows the UEFI app source to live in the QEMU tree, and
->>>>> the affected maintainer(s) would be personally responsible for setting
->>>>> up their edk2 clones, and compilers. (The edk2 clone could even be a
->>>>> submodule of QEMU, for example at roms/edk2.) For example,
->>>>> "roms/Makefile" already calls an external EFIROM utility (also from
->>>>> edk2) in order to build the combined iPXE option ROMs.
->>>>>
->>>>> And yes, we could turn the UEFI binaries into bootable ISO images at once.
->>>>>
->>>>> I'll try to post some patches soon (or not so soon). I think the app's
->>>>> source code, and the edk2 submodule, should live under roms/, and the
->>>>> bootable images should live under pc-bios/.
->>>>>
->>>>> (In fact we could use this opportunity to build & bundle OVMF itself...
->>>>> not sure if that's in scope for now. Gerd, what's your take?)    
->>>>
->>>> Well, there is still the idea to move over firmware submodules and
->>>> prebuilt firmware blobs to a separate repo.  Expermimental repo:
->>>> https://git.kraxel.org/cgit/qemu-firmware/.  Not touched for more than a
->>>> year due to being busy with other stuff.  Oh well ...
->>>>
->>>> (if someone feels like picking this up feel free to do so).
->>>>
->>>> I think adding edk2 as submodule below roms/ makes sense.  Adding rules
->>>> to roms/Makefile to build the blobs makes sense too.  Not sure we want
->>>> the binaries actually copied over to pc-bios/ and commited as the uefi
->>>> firmware is pretty big ...
->>>>
->>>> Not sure what a good place for the uefi app would be.  I'd tend to not
->>>> use roms/, that is the place for firmware submodules.  
->>
->> I figured the source code for the UEFI app would fit due to the script
->> "configure-seabios.sh" and some actual config files being there already.
->> But, I'm happy to follow directions. :)
->>
->>>>  contrib/ or test/ maybe?  
->>
->>> Could be tests/data/acpi in this case  
->>
->> If "tests/data/acpi" is appropriate for source code, that works for me.
->> We already have "rebuild-expected-aml.sh" there, so I guess another
->> build script and the UEFI app source code would fit there too.
-> I suggested tests/data/acpi for binary EFI app blobs
-> For EFI app source maybe just 'tests' or sub-directory there and make
-> 'make check-efi-app' build EFI app (doing all needed magic and asking for things that missing)
-> if source is newer than blobs.
+On Thursday, January 17, 2019, Stefan Markovic <smarkovic@wavecomp.com>
+wrote:
 
-I've been busy all day hacking and staying away from email, so when you see that my patches didn't follow this closely in the end, please know that I didn't deliberately ignore your point -- I'm just getting to it now. Let's continue the discussion under
+>
+> On 3.1.19. 17:34, Aleksandar Markovic wrote:
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Move comment containing summary of CP0 registers. Checkpatch
+> > script reported some tabs in the resutling diff, so convert
+> > these tabs to spaces too.
+> >
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > ---
+> >   target/mips/cpu.h | 165 +++++++++++++++++++++++++++---
+> ------------------------
+> >   1 file changed, 84 insertions(+), 81 deletions(-)
+>
+>
+> Reviewed-by: Stefan Markovic <smarokvic@wavecomp.com>
 
-  [qemu-devel] [PATCH 0/5] add the BiosTablesTest UEFI app, build it with the new roms/edk2 submodule
 
-Thanks!
-Laszlo
+Wrong mail (two letters permuted - marokvic should be markovic), but I
+corrected that in the pull request.
 
-> 
->>
->> It would be nice if I could get around submitting some patches this
->> week. Sigh. :/
->>
->> Thanks,
->> Laszlo
->>
-> 
+>
+>
+> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> > index 03c03fd..6c2a7e4 100644
+> > --- a/target/mips/cpu.h
+> > +++ b/target/mips/cpu.h
+> > @@ -123,87 +123,6 @@ typedef struct mips_def_t mips_def_t;
+> >   #define MIPS_KSCRATCH_NUM 6
+> >   #define MIPS_MAAR_MAX 16 /* Must be an even number. */
+> >
+> > -typedef struct TCState TCState;
+> > -struct TCState {
+> > -    target_ulong gpr[32];
+> > -    target_ulong PC;
+> > -    target_ulong HI[MIPS_DSP_ACC];
+> > -    target_ulong LO[MIPS_DSP_ACC];
+> > -    target_ulong ACX[MIPS_DSP_ACC];
+> > -    target_ulong DSPControl;
+> > -    int32_t CP0_TCStatus;
+> > -#define CP0TCSt_TCU3 31
+> > -#define CP0TCSt_TCU2 30
+> > -#define CP0TCSt_TCU1 29
+> > -#define CP0TCSt_TCU0 28
+> > -#define CP0TCSt_TMX  27
+> > -#define CP0TCSt_RNST 23
+> > -#define CP0TCSt_TDS  21
+> > -#define CP0TCSt_DT   20
+> > -#define CP0TCSt_DA   15
+> > -#define CP0TCSt_A    13
+> > -#define CP0TCSt_TKSU 11
+> > -#define CP0TCSt_IXMT 10
+> > -#define CP0TCSt_TASID        0
+> > -    int32_t CP0_TCBind;
+> > -#define CP0TCBd_CurTC        21
+> > -#define CP0TCBd_TBE  17
+> > -#define CP0TCBd_CurVPE       0
+> > -    target_ulong CP0_TCHalt;
+> > -    target_ulong CP0_TCContext;
+> > -    target_ulong CP0_TCSchedule;
+> > -    target_ulong CP0_TCScheFBack;
+> > -    int32_t CP0_Debug_tcstatus;
+> > -    target_ulong CP0_UserLocal;
+> > -
+> > -    int32_t msacsr;
+> > -
+> > -#define MSACSR_FS       24
+> > -#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+> > -#define MSACSR_NX       18
+> > -#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+> > -#define MSACSR_CEF      2
+> > -#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+> > -#define MSACSR_RM       0
+> > -#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+> > -#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
+> MSACSR_NX_MASK | \
+> > -        MSACSR_FS_MASK)
+> > -
+> > -    float_status msa_fp_status;
+> > -
+> > -#define NUMBER_OF_MXU_REGISTERS 16
+> > -    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+> > -    target_ulong mxu_cr;
+> > -#define MXU_CR_LC       31
+> > -#define MXU_CR_RC       30
+> > -#define MXU_CR_BIAS     2
+> > -#define MXU_CR_RD_EN    1
+> > -#define MXU_CR_MXU_EN   0
+> > -
+> > -};
+> > -
+> > -typedef struct CPUMIPSState CPUMIPSState;
+> > -struct CPUMIPSState {
+> > -    TCState active_tc;
+> > -    CPUMIPSFPUContext active_fpu;
+> > -
+> > -    uint32_t current_tc;
+> > -    uint32_t current_fpu;
+> > -
+> > -    uint32_t SEGBITS;
+> > -    uint32_t PABITS;
+> > -#if defined(TARGET_MIPS64)
+> > -# define PABITS_BASE 36
+> > -#else
+> > -# define PABITS_BASE 32
+> > -#endif
+> > -    target_ulong SEGMask;
+> > -    uint64_t PAMask;
+> > -#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
+> > -
+> > -    int32_t msair;
+> > -#define MSAIR_ProcID    8
+> > -#define MSAIR_Rev       0
+> >
+> >   /*
+> >    *     Summary of CP0 registers
+> > @@ -314,6 +233,90 @@ struct CPUMIPSState {
+> >    * 7   TagLo             TagHi
+>  KScratch<n>
+> >    *
+> >    */
+> > +
+> > +
+> > +typedef struct TCState TCState;
+> > +struct TCState {
+> > +    target_ulong gpr[32];
+> > +    target_ulong PC;
+> > +    target_ulong HI[MIPS_DSP_ACC];
+> > +    target_ulong LO[MIPS_DSP_ACC];
+> > +    target_ulong ACX[MIPS_DSP_ACC];
+> > +    target_ulong DSPControl;
+> > +    int32_t CP0_TCStatus;
+> > +#define CP0TCSt_TCU3    31
+> > +#define CP0TCSt_TCU2    30
+> > +#define CP0TCSt_TCU1    29
+> > +#define CP0TCSt_TCU0    28
+> > +#define CP0TCSt_TMX     27
+> > +#define CP0TCSt_RNST    23
+> > +#define CP0TCSt_TDS     21
+> > +#define CP0TCSt_DT      20
+> > +#define CP0TCSt_DA      15
+> > +#define CP0TCSt_A       13
+> > +#define CP0TCSt_TKSU    11
+> > +#define CP0TCSt_IXMT    10
+> > +#define CP0TCSt_TASID   0
+> > +    int32_t CP0_TCBind;
+> > +#define CP0TCBd_CurTC   21
+> > +#define CP0TCBd_TBE     17
+> > +#define CP0TCBd_CurVPE  0
+> > +    target_ulong CP0_TCHalt;
+> > +    target_ulong CP0_TCContext;
+> > +    target_ulong CP0_TCSchedule;
+> > +    target_ulong CP0_TCScheFBack;
+> > +    int32_t CP0_Debug_tcstatus;
+> > +    target_ulong CP0_UserLocal;
+> > +
+> > +    int32_t msacsr;
+> > +
+> > +#define MSACSR_FS       24
+> > +#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+> > +#define MSACSR_NX       18
+> > +#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+> > +#define MSACSR_CEF      2
+> > +#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+> > +#define MSACSR_RM       0
+> > +#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+> > +#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
+> MSACSR_NX_MASK | \
+> > +        MSACSR_FS_MASK)
+> > +
+> > +    float_status msa_fp_status;
+> > +
+> > +#define NUMBER_OF_MXU_REGISTERS 16
+> > +    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+> > +    target_ulong mxu_cr;
+> > +#define MXU_CR_LC       31
+> > +#define MXU_CR_RC       30
+> > +#define MXU_CR_BIAS     2
+> > +#define MXU_CR_RD_EN    1
+> > +#define MXU_CR_MXU_EN   0
+> > +
+> > +};
+> > +
+> > +typedef struct CPUMIPSState CPUMIPSState;
+> > +struct CPUMIPSState {
+> > +    TCState active_tc;
+> > +    CPUMIPSFPUContext active_fpu;
+> > +
+> > +    uint32_t current_tc;
+> > +    uint32_t current_fpu;
+> > +
+> > +    uint32_t SEGBITS;
+> > +    uint32_t PABITS;
+> > +#if defined(TARGET_MIPS64)
+> > +# define PABITS_BASE 36
+> > +#else
+> > +# define PABITS_BASE 32
+> > +#endif
+> > +    target_ulong SEGMask;
+> > +    uint64_t PAMask;
+> > +#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
+> > +
+> > +    int32_t msair;
+> > +#define MSAIR_ProcID    8
+> > +#define MSAIR_Rev       0
+> > +
+> >   /*
+> >    * CP0 Register 0
+> >    */
+>
