@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55286)
+Received: from eggs.gnu.org ([209.51.188.92]:55303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTa-0001MM-GR
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTa-0001Mg-Pt
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00082x-GA
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00083Q-Nt
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:42 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41305)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gknTZ-0007ve-4o
+	id 1gknTZ-0007tZ-Ge
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:41 -0500
-Received: by mail-wr1-x443.google.com with SMTP id x10so17872128wrs.8
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:30 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id c14so17960877wrr.0
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:26 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 19 Jan 2019 12:03:11 +0200
-Message-Id: <20190119100315.23985-7-marcel.apfelbaum@gmail.com>
+Date: Sat, 19 Jan 2019 12:03:09 +0200
+Message-Id: <20190119100315.23985-5-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
 References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH PULL 06/10] hw/rdma: Verify that ptr is not
- NULL before freeing
+Subject: [Qemu-devel] [PATCH PULL 04/10] hw/pvrdma: Post CQE when receive
+ invalid gid index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +32,56 @@ Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, li
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-To cover the case where fini() was called even when init() fails make
-sure objects are not NULL before calling to non-null-safe destructors.
+This error should propagate back to guest.
 
+Spotted by Coverity: CID 1398595
+
+Fixes: 2b05705dc8
+
+Reported-by: Li Qiang <liq3ea@163.com>
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190116151538.14088-1-yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c | 6 ++++--
- hw/rdma/rdma_rm.c      | 7 ++++++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ hw/rdma/rdma_backend.h      | 1 +
+ hw/rdma/vmw/pvrdma_qp_ops.c | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index b49edaacaf..3ee5172c96 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_dev)
-     pr_dbg("Stopping MAD\n");
-     disable_rdmacm_mux_async(backend_dev);
-     qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
--    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
--    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-+    if (backend_dev->recv_mads_list.list) {
-+        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
-+        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-+    }
- }
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index a9ba40ae48..5114c90e67 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -32,6 +32,7 @@
+ #define VENDOR_ERR_INVLKEY          0x207
+ #define VENDOR_ERR_MR_SMALL         0x208
+ #define VENDOR_ERR_INV_MAD_BUFF     0x209
++#define VENDOR_ERR_INV_GID_IDX      0x210
  
- int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index f5b1295890..8bf241e91f 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+ /* Add definition for QP0 and QP1 as there is no userspace enums for them */
+ enum ibv_special_qp_type {
+diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+index 465bee8641..0565eba981 100644
+--- a/hw/rdma/vmw/pvrdma_qp_ops.c
++++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+@@ -178,7 +178,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+         sgid = rdma_rm_get_gid(&dev->rdma_dev_res, wqe->hdr.wr.ud.av.gid_index);
+         if (!sgid) {
+             pr_dbg("Fail to get gid for idx %d\n", wqe->hdr.wr.ud.av.gid_index);
+-            return -EIO;
++            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
++            continue;
+         }
+         pr_dbg("sgid_id=%d, sgid=0x%llx\n", wqe->hdr.wr.ud.av.gid_index,
+                sgid->global.interface_id);
+@@ -189,7 +190,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+         if (sgid_idx <= 0) {
+             pr_dbg("Fail to get bk sgid_idx for sgid_idx %d\n",
+                    wqe->hdr.wr.ud.av.gid_index);
+-            return -EIO;
++            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
++            continue;
+         }
  
- static inline void res_tbl_free(RdmaRmResTbl *tbl)
- {
-+    if (!tbl->bitmap) {
-+        return;
-+    }
-     qemu_mutex_destroy(&tbl->lock);
-     g_free(tbl->tbl);
-     g_free(tbl->bitmap);
-@@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-     res_tbl_free(&dev_res->cq_tbl);
-     res_tbl_free(&dev_res->pd_tbl);
- 
--    g_hash_table_destroy(dev_res->qp_hash);
-+    if (dev_res->qp_hash) {
-+        g_hash_table_destroy(dev_res->qp_hash);
-+    }
- }
+         if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
 -- 
 2.17.1
