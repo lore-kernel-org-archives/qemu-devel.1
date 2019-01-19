@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36583)
+Received: from eggs.gnu.org ([209.51.188.92]:38643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkeMr-0004Xr-94
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:10 -0500
+	(envelope-from <michaeljclark@mac.com>) id 1gkeWd-0006v4-PN
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:30:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gkeMp-00021g-Q5
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:09 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gkeMp-00020Y-HK
-	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:20:07 -0500
-Received: by mail-ot1-x344.google.com with SMTP id s5so15991286oth.7
-	for <qemu-devel@nongnu.org>; Fri, 18 Jan 2019 16:20:07 -0800 (PST)
+	(envelope-from <michaeljclark@mac.com>) id 1gkeWb-0002Ob-QS
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:30:15 -0500
+Received: from mr85p00im-ztdg06011801.me.com ([17.58.23.199]:48015)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <michaeljclark@mac.com>)
+	id 1gkeWZ-0002Lg-Lp
+	for qemu-devel@nongnu.org; Fri, 18 Jan 2019 19:30:11 -0500
+From: Michael Clark <michaeljclark@mac.com>
+Date: Sat, 19 Jan 2019 13:29:57 +1300
+Message-Id: <20190119002957.9794-1-michaeljclark@mac.com>
 MIME-Version: 1.0
-In-Reply-To: <3c1d98cb-2bc8-90a0-e4a6-c2d8dc331241@wavecomp.com>
-References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
-	<3c1d98cb-2bc8-90a0-e4a6-c2d8dc331241@wavecomp.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 19 Jan 2019 01:20:05 +0100
-Message-ID: <CAL1e-=jKR+5FTWS9SyV_q_PMY5gAqOymrgYGGv-pmdM+OWm4gw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
- summary of CP0 registers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1] GLib sucks - Remove any connections between
+ me and GLib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,219 +26,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <smarkovic@wavecomp.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: Michael Clark <michaeljclark@mac.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-On Thursday, January 17, 2019, Stefan Markovic <smarkovic@wavecomp.com>
-wrote:
+One has a basic command of English but one cannot think of a
+more or less glib commit message for this commit so this is it.
 
->
-> On 3.1.19. 17:34, Aleksandar Markovic wrote:
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Move comment containing summary of CP0 registers. Checkpatch
-> > script reported some tabs in the resutling diff, so convert
-> > these tabs to spaces too.
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > ---
-> >   target/mips/cpu.h | 165 +++++++++++++++++++++++++++---
-> ------------------------
-> >   1 file changed, 84 insertions(+), 81 deletions(-)
->
->
-> Reviewed-by: Stefan Markovic <smarokvic@wavecomp.com>
+Palmer, I would like to send you an invoice for this commit
+but I do not know what value to place on it. 2^64-1, (-1)
+or 0xFFFFFFFFFFFFFFFF in hex, sounds too little or too much.
 
+You also will have to pay better for me to use nicer language,
+and you can bet your bottom dollar it won=E2=80=99t be C. Also, as we
+discussed, having one=E2=80=99s direct competitors in control of our
+emulation infrastructure is not a great idea. I thought we
+agreed on that then I find out we are in disagreement.
 
-Wrong mail (two letters permuted - marokvic should be markovic), but I
-corrected that in the pull request.
+However, I feel comfortable because, while I haven=E2=80=99t been paid
+since last August, I am arranging temporary support with
+WINZ <https://www.workandincome.govt.nz/>, however, one must
+note, that when one=E2=80=99s work is sabotaged in the real world,
+folk end up without jobs, whereas if we were just a student
+then we probably only end up with a bruised ego and perhaps
+lower grades if our supervisor is not happy. In the real world,
+we get the shit scared out of us because we think we could be
+fired at any moment. i.e. zero-day. I think because I dropped
+out of school, I never learned that. Anyhow, I didn=E2=80=99t read
+the contract. I just wanted to get a paycheck so I could play
+games with folk on the Internet. That=E2=80=99s bullshit. I wasn=E2=80=99=
+t
+playing games, now I am. I was released from a mental ward
+after a severe episode of anxiety and depression. True Story.
+Anyway Palmer fired me today. Performance issues I suspect.
+Could be trust, security, mistakes or simply misalignment on
+basic issues. Haven't had post-mortem yet.
 
->
->
-> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> > index 03c03fd..6c2a7e4 100644
-> > --- a/target/mips/cpu.h
-> > +++ b/target/mips/cpu.h
-> > @@ -123,87 +123,6 @@ typedef struct mips_def_t mips_def_t;
-> >   #define MIPS_KSCRATCH_NUM 6
-> >   #define MIPS_MAAR_MAX 16 /* Must be an even number. */
-> >
-> > -typedef struct TCState TCState;
-> > -struct TCState {
-> > -    target_ulong gpr[32];
-> > -    target_ulong PC;
-> > -    target_ulong HI[MIPS_DSP_ACC];
-> > -    target_ulong LO[MIPS_DSP_ACC];
-> > -    target_ulong ACX[MIPS_DSP_ACC];
-> > -    target_ulong DSPControl;
-> > -    int32_t CP0_TCStatus;
-> > -#define CP0TCSt_TCU3 31
-> > -#define CP0TCSt_TCU2 30
-> > -#define CP0TCSt_TCU1 29
-> > -#define CP0TCSt_TCU0 28
-> > -#define CP0TCSt_TMX  27
-> > -#define CP0TCSt_RNST 23
-> > -#define CP0TCSt_TDS  21
-> > -#define CP0TCSt_DT   20
-> > -#define CP0TCSt_DA   15
-> > -#define CP0TCSt_A    13
-> > -#define CP0TCSt_TKSU 11
-> > -#define CP0TCSt_IXMT 10
-> > -#define CP0TCSt_TASID        0
-> > -    int32_t CP0_TCBind;
-> > -#define CP0TCBd_CurTC        21
-> > -#define CP0TCBd_TBE  17
-> > -#define CP0TCBd_CurVPE       0
-> > -    target_ulong CP0_TCHalt;
-> > -    target_ulong CP0_TCContext;
-> > -    target_ulong CP0_TCSchedule;
-> > -    target_ulong CP0_TCScheFBack;
-> > -    int32_t CP0_Debug_tcstatus;
-> > -    target_ulong CP0_UserLocal;
-> > -
-> > -    int32_t msacsr;
-> > -
-> > -#define MSACSR_FS       24
-> > -#define MSACSR_FS_MASK  (1 << MSACSR_FS)
-> > -#define MSACSR_NX       18
-> > -#define MSACSR_NX_MASK  (1 << MSACSR_NX)
-> > -#define MSACSR_CEF      2
-> > -#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
-> > -#define MSACSR_RM       0
-> > -#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
-> > -#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
-> MSACSR_NX_MASK | \
-> > -        MSACSR_FS_MASK)
-> > -
-> > -    float_status msa_fp_status;
-> > -
-> > -#define NUMBER_OF_MXU_REGISTERS 16
-> > -    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-> > -    target_ulong mxu_cr;
-> > -#define MXU_CR_LC       31
-> > -#define MXU_CR_RC       30
-> > -#define MXU_CR_BIAS     2
-> > -#define MXU_CR_RD_EN    1
-> > -#define MXU_CR_MXU_EN   0
-> > -
-> > -};
-> > -
-> > -typedef struct CPUMIPSState CPUMIPSState;
-> > -struct CPUMIPSState {
-> > -    TCState active_tc;
-> > -    CPUMIPSFPUContext active_fpu;
-> > -
-> > -    uint32_t current_tc;
-> > -    uint32_t current_fpu;
-> > -
-> > -    uint32_t SEGBITS;
-> > -    uint32_t PABITS;
-> > -#if defined(TARGET_MIPS64)
-> > -# define PABITS_BASE 36
-> > -#else
-> > -# define PABITS_BASE 32
-> > -#endif
-> > -    target_ulong SEGMask;
-> > -    uint64_t PAMask;
-> > -#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
-> > -
-> > -    int32_t msair;
-> > -#define MSAIR_ProcID    8
-> > -#define MSAIR_Rev       0
-> >
-> >   /*
-> >    *     Summary of CP0 registers
-> > @@ -314,6 +233,90 @@ struct CPUMIPSState {
-> >    * 7   TagLo             TagHi
->  KScratch<n>
-> >    *
-> >    */
-> > +
-> > +
-> > +typedef struct TCState TCState;
-> > +struct TCState {
-> > +    target_ulong gpr[32];
-> > +    target_ulong PC;
-> > +    target_ulong HI[MIPS_DSP_ACC];
-> > +    target_ulong LO[MIPS_DSP_ACC];
-> > +    target_ulong ACX[MIPS_DSP_ACC];
-> > +    target_ulong DSPControl;
-> > +    int32_t CP0_TCStatus;
-> > +#define CP0TCSt_TCU3    31
-> > +#define CP0TCSt_TCU2    30
-> > +#define CP0TCSt_TCU1    29
-> > +#define CP0TCSt_TCU0    28
-> > +#define CP0TCSt_TMX     27
-> > +#define CP0TCSt_RNST    23
-> > +#define CP0TCSt_TDS     21
-> > +#define CP0TCSt_DT      20
-> > +#define CP0TCSt_DA      15
-> > +#define CP0TCSt_A       13
-> > +#define CP0TCSt_TKSU    11
-> > +#define CP0TCSt_IXMT    10
-> > +#define CP0TCSt_TASID   0
-> > +    int32_t CP0_TCBind;
-> > +#define CP0TCBd_CurTC   21
-> > +#define CP0TCBd_TBE     17
-> > +#define CP0TCBd_CurVPE  0
-> > +    target_ulong CP0_TCHalt;
-> > +    target_ulong CP0_TCContext;
-> > +    target_ulong CP0_TCSchedule;
-> > +    target_ulong CP0_TCScheFBack;
-> > +    int32_t CP0_Debug_tcstatus;
-> > +    target_ulong CP0_UserLocal;
-> > +
-> > +    int32_t msacsr;
-> > +
-> > +#define MSACSR_FS       24
-> > +#define MSACSR_FS_MASK  (1 << MSACSR_FS)
-> > +#define MSACSR_NX       18
-> > +#define MSACSR_NX_MASK  (1 << MSACSR_NX)
-> > +#define MSACSR_CEF      2
-> > +#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
-> > +#define MSACSR_RM       0
-> > +#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
-> > +#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
-> MSACSR_NX_MASK | \
-> > +        MSACSR_FS_MASK)
-> > +
-> > +    float_status msa_fp_status;
-> > +
-> > +#define NUMBER_OF_MXU_REGISTERS 16
-> > +    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-> > +    target_ulong mxu_cr;
-> > +#define MXU_CR_LC       31
-> > +#define MXU_CR_RC       30
-> > +#define MXU_CR_BIAS     2
-> > +#define MXU_CR_RD_EN    1
-> > +#define MXU_CR_MXU_EN   0
-> > +
-> > +};
-> > +
-> > +typedef struct CPUMIPSState CPUMIPSState;
-> > +struct CPUMIPSState {
-> > +    TCState active_tc;
-> > +    CPUMIPSFPUContext active_fpu;
-> > +
-> > +    uint32_t current_tc;
-> > +    uint32_t current_fpu;
-> > +
-> > +    uint32_t SEGBITS;
-> > +    uint32_t PABITS;
-> > +#if defined(TARGET_MIPS64)
-> > +# define PABITS_BASE 36
-> > +#else
-> > +# define PABITS_BASE 32
-> > +#endif
-> > +    target_ulong SEGMask;
-> > +    uint64_t PAMask;
-> > +#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
-> > +
-> > +    int32_t msair;
-> > +#define MSAIR_ProcID    8
-> > +#define MSAIR_Rev       0
-> > +
-> >   /*
-> >    * CP0 Register 0
-> >    */
->
+BTW What if we auctioned commits and if your commit didn=E2=80=99t
+get in, you don=E2=80=99t get paid. Commits would become expensive?
+(or cheap?). =F0=9F=A4=94
+
+Also, do we have MIA and KIA tags for MAINTAINERS? We could
+even put little Unicode medals next to titles like this:
+
+   (sub=C2=B3)=E2=88=98maintainer =F0=9F=8E=96=F0=9F=8E=96=EF=B8=8F  A. N=
+onymous
+
+What is the operator binding precedence? i.e. do we that need
+parenthesis there or does exponentiation bind more tightly
+than the ring operator?
+
+Otherwise, please just delete me. It=E2=80=99s bad memories all round.
+as I got fired today because of my QEMU performance. I am a
+terrible mess when using version control.
+
+Maybe when I have a secure job we can meet up for a beer and
+everything will be okay, but at this point we have the wolves
+at the door and are worried about an imminent eviction by the
+landlord. Also true story (the conditions of port submission).
+
+I know a lot of you are going to say, send me back to the
+mental ward, however, I will miss my partner/spouse. We were
+actually looking for a house in Palmerston North over the
+weekend in preparation for my imminent demise (she still thinks
+we can afford to live here in Auckland and everything is fine),
+as we thought it would be survivable on social security, however,
+I suspect she may not support me any more given the number of
+jobs I have lost in the past 6 years since we met. Indeed, rv8
+was written mostly on a benefit from the Ministry of Social
+Development, C/- New Zealand Government. Oesensibly Job Seeker
+Support, but we were searching for a job that didn=E2=80=99t have too
+many interruppts, and then SiFive put me to work on a bloody
+interrupt controller. That=E2=80=99s ironic. Of course I am slow and
+cannot multitask so QEMU queue management was neglected.
+
+Note: the auction reserve on this commit is ten bucks, or
+alternatively, /almost/ the price of a beer in Singapore,
+so someone will need to top it up. i.e. free as in /almost/
+free beer.
+
+P.S. Don=E2=80=99t mess with the RISC-V Virtual Machine Model without
+consulting RISC-V SW Dev list or RISC-V ISA Dev list or the
+closed doors working groups in the RISC-V Foundation. Personally
+I prefer open discussion. Also, it is not the QEMU virt machine,
+it is the RISC-V virt machine because SiFive has a VirtIO model
+on Amazon F1, so if you mess with it in QEMU you=E2=80=99ll break prod.
+
+P.P.S. No offence to the GLib maintainers, but automatic
+reference counting or garbage collection is much safer to
+use in higher level code that does user interaction. We could
+get all sorts of leaks and what not. As you know I missed free
+(or g_free, although you know what I mean).
+
+P.P.P.S I do not represent my employer because I just got
+fired today. Anyone know of any jobs going for a crusty old C++
+developer who prefers std::unique_ptr<T[]> over malloc/free?
+
+P.P.P.P.S Is firecracker written in C++? Rust I think dammit,
+maybe I should learn Rust. Don=E2=80=99t worry I know nobody likes me,
+so it won=E2=80=99t help me no matter how much I learn. I will still
+be an overweight middle-aged (human) with no sense of humour
+and a fond affection for C+.
+
+P.P.P.P.P.S I=E2=80=99m not trying to rub it in (I lied, I am).
+
+If you are curious about my alter-ego, it=E2=80=99s my (older) brother,
+he=E2=80=99s clever, and I am the dumb one with no sense of humour.
+I was trying to get a job in California by writing cloud apps
+and he somehow ends up in Walnut Creek. Yes, FreeBSD user
+apparently. We had a very long fight over what OS to use as
+a firewall (in a school of all places) and FreeBSD won apparently
+i.e. `ipfw`. I was a Linux user with an IBM ThinkPad and he was
+a macOS X user with a Titanium macbook. BTW Age is not really an
+asset unless you have a secure job as a gatekeeper somewhere.
+I guess here, in QEMU-land, performance is number of merged PRs,
+ideally nicely batched along with lots of testing, and not just
+regressions; also performance.
+
+And if you think this commit is staged, then you are wrong.
+Committed, but to where I do not know (my personal repository,
+hopefully not a mental institution). Also, apologies to my
+brother for mentioning him here, but when the person who does
+your AR/AP and payroll quits, and one is supposedly a charity
+case, then they can do quite a lot of damage. He is the high
+flighing wealthy expat with all the perks, including dental
+and I am looking at the Dole queue. Of course he has to work
+with morons. I'll only work with nice people, so life is hard.
+
+Our old website is still up and running, so if anyone wants
+firewalls, storage, security, compute; then my brother knows
+how to do that and I can do C++ apps for iOS, android, macOS,
+Windows, Linux and now bare metal (ideally something easier
+than using git or dealing with people which I suck at):
+
+- https://www.metaparadigm.com/
+
+You can pull my changes from my personal repo here:
+
+- https://github.com/michaeljclark/riscv-qemu/tree/qemu-mjc
+
+Apologies for the noise! and sorry for bringing GLib into
+this dispute between me and Palmer. =F0=9F=99=83
+
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Signed-off-by: Michael Clark <michaeljclark@mac.com>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index af339b86db76..47cb3c14298e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -259,7 +259,6 @@ F: include/hw/ppc/
+ F: disas/ppc.c
+=20
+ RISC-V
+-M: Michael Clark <mjc@sifive.com>
+ M: Palmer Dabbelt <palmer@sifive.com>
+ M: Alistair Francis <Alistair.Francis@wdc.com>
+ M: Sagar Karandikar <sagark@eecs.berkeley.edu>
+--=20
+2.17.1
