@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45681)
+Received: from eggs.gnu.org ([209.51.188.92]:54419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gkrxI-0003Fp-Io
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 09:50:41 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gkxNt-00024i-E5
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 15:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gkrxD-0000Z9-9d
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 09:50:38 -0500
-Received: from greensocs.com ([193.104.36.180]:41703)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gkrx9-00008s-2C
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 09:50:32 -0500
-References: <20190118112213.11173-1-philmd@redhat.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <867698a8-a20e-54a0-e9f2-9ab505876e9c@greensocs.com>
-Date: Sat, 19 Jan 2019 15:50:00 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gkxNs-00087Q-9h
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 15:38:28 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gkxNr-00083i-2N
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 15:38:27 -0500
+Received: by mail-pl1-x643.google.com with SMTP id b5so7897863plr.4
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 12:38:26 -0800 (PST)
+References: <20190108180014.32386-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5ef47526-1794-df32-1bbe-fa29f8cd028c@linaro.org>
+Date: Sun, 20 Jan 2019 07:38:18 +1100
 MIME-Version: 1.0
-In-Reply-To: <20190118112213.11173-1-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="H5nnptpp4fUZNMUaFmKsN2QFuUIROoFrx"
-Subject: Re: [Qemu-devel] [RFC PATCH] gdbstub: Avoid NULL dereference in
- gdb_handle_packet()
+In-Reply-To: <20190108180014.32386-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg/user-exec: Don't parse aarch64
+ insns to test for read vs write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,264 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---H5nnptpp4fUZNMUaFmKsN2QFuUIROoFrx
-From: Luc Michel <luc.michel@greensocs.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
-Message-ID: <867698a8-a20e-54a0-e9f2-9ab505876e9c@greensocs.com>
-Subject: Re: [RFC PATCH] gdbstub: Avoid NULL dereference in
- gdb_handle_packet()
-References: <20190118112213.11173-1-philmd@redhat.com>
-In-Reply-To: <20190118112213.11173-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/18/19 12:22 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The "Hg" GDB packet is used to select the current thread, and can fail.=
-
-> GDB doesn't not check for failure and emits further packets that can
-> access and dereference s->c_cpu or s->g_cpu.
->=20
-> Add a check that returns "E22" (EINVAL) when those pointers are not set=
-=2E
->=20
-> Peter Maydell reported:
->   GDB doesn't check the "Hg" packet failures and emit a
->   "qXfer:features:read" packet which accesses th
->   Looking at the protocol trace from the gdb end:
->   (gdb) set debug remote 1
->   (gdb) target remote :1234
->   Remote debugging using :1234
->   Sending packet:
->   $qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;=
-vfork-events+;exec-events+;vContSupported+;QThreadEvents+;no-resumed+;xml=
-Registers=3Di386#6a...Ack
->   Packet received: PacketSize=3D1000;qXfer:features:read+;multiprocess+=
-
->   Packet qSupported (supported-packets) is supported
->   Sending packet: $vMustReplyEmpty#3a...Ack
->   Packet received:
->   Sending packet: $Hgp0.0#ad...Ack
->   Packet received: E22
->   Sending packet: $qXfer:features:read:target.xml:0,ffb#79...Ack
->   [here is where QEMU crashes]
->=20
->   What seems to happen is that GDB's attempt to set the
->   current thread with the "Hg" command fails because
->   gdb_get_cpu() fails, and so we return an E22 error status.
->   GDB (incorrectly) ignores this and issues a general command
->   anyway, and then QEMU crashes because we don't handle s->g_cpu
->   being NULL in this command's handling code.
->=20
-> Fixes: c145eeae1cc
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 1/9/19 5:00 AM, Peter Maydell wrote:
+> In cpu_signal_handler() for aarch64 hosts, currently we parse
+> the faulting instruction to see if it is a load or a store.
+> Since the 3.16 kernel (~2014), the kernel has provided us with
+> the syndrome register for a fault, which includes the WnR bit.
+> Use this instead if it is present, only falling back to
+> instruction parsing if not.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> RFC because these are many if..break but I can't think of a cleaner way=
-
-> today.
-I can't think of a better way without an important refactoring of gdbstub=
-=2Ec.
-
-> The protocol isn't specific about the error, can it be "E03" for ESRCH
-> (No such process)?
+> Since I originally asked the kernel folks to add the ESR context
+> so we could use it in QEMU, I figured that it was about time
+> (five years later...) to write the code to make use of it.
+> 
+> I wanted to say "everybody surely has at least a 3.16
+> kernel for aarch64 machines" and delete the fallback code,
+> but it turns out that the gcc compile farm box has 3.13.0...
 > ---
->  gdbstub.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index bfc7afb509..480005b094 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1306,6 +1306,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          put_packet(s, "OK");
->          break;
->      case '?':
-> +        if (!s->c_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          /* TODO: Make this return the correct value for user-mode.  */=
+>  accel/tcg/user-exec.c | 66 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 52 insertions(+), 14 deletions(-)
 
->          snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,=
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
->                   gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thre=
-ad_id)));
-> @@ -1394,6 +1398,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          /* Detach packet */
->          pid =3D 1;
-> =20
-> +        if (!s->c_cpu || !s->g_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
-Even though this is probably true (s->[gc]_cpu =3D=3D NULL probably means=
-
-"no process attached"), the detach packet in itself carries the PID to
-detach from. So I would go for a code hardening, something like:
-
-         process =3D gdb_get_process(s, pid);
-+        if (!process->attached) {
-+            put_packet(s, "E22");
-+            break;
-+        }
-         gdb_process_breakpoint_remove_all(s, process);
-         process->attached =3D false;
-
--        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
-+        if (s->c_cpu && pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
-             s->c_cpu =3D gdb_first_attached_cpu(s);
-         }
-
--        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
-+        if (s->g_cpu && pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
-             s->g_cpu =3D gdb_first_attached_cpu(s);
-         }
+I should note that we fail to generate esr_context from aarch64-linux-user.
 
 
->          if (s->multiprocess) {
->              unsigned long lpid;
->              if (*p !=3D ';') {
-> @@ -1429,6 +1437,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          put_packet(s, "OK");
->          break;
->      case 's':
-> +        if (!s->s_cpu) {
-if (!s->c_cpu) {
-
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          if (*p !=3D '\0') {
->              addr =3D strtoull(p, (char **)&p, 16);
->              gdb_set_cpu_pc(s, addr);
-> @@ -1441,6 +1453,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->              target_ulong ret;
->              target_ulong err;
-> =20
-> +            if (!s->s_cpu) {
-if (!s->c_cpu) {
-
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
->              ret =3D strtoull(p, (char **)&p, 16);
->              if (*p =3D=3D ',') {
->                  p++;
-> @@ -1463,6 +1479,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          }
->          break;
->      case 'g':
-> +        if (!s->g_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          cpu_synchronize_state(s->g_cpu);
->          len =3D 0;
->          for (addr =3D 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
-> @@ -1473,6 +1493,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          put_packet(s, buf);
->          break;
->      case 'G':
-> +        if (!s->g_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          cpu_synchronize_state(s->g_cpu);
->          registers =3D mem_buf;
->          len =3D strlen(p) / 2;
-> @@ -1485,6 +1509,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          put_packet(s, "OK");
->          break;
->      case 'm':
-> +        if (!s->g_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          addr =3D strtoull(p, (char **)&p, 16);
->          if (*p =3D=3D ',')
->              p++;
-> @@ -1504,6 +1532,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->          }
->          break;
->      case 'M':
-> +        if (!s->g_cpu) {
-> +            put_packet(s, "E22");
-> +            break;
-> +        }
->          addr =3D strtoull(p, (char **)&p, 16);
->          if (*p =3D=3D ',')
->              p++;
-> @@ -1642,6 +1674,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->              put_packet(s, "OK");
->              break;
->          } else if (strcmp(p,"C") =3D=3D 0) {
-> +            if (!s->g_cpu) {
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
->              /*
->               * "Current thread" remains vague in the spec, so always r=
-eturn
->               * the first thread of the current process (gdb returns th=
-e
-> @@ -1745,6 +1781,10 @@ static int gdb_handle_packet(GDBState *s, const =
-char *line_buf)
->              const char *xml;
->              target_ulong total_len;
-> =20
-> +            if (!s->g_cpu) {
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
->              process =3D gdb_get_cpu_process(s, s->g_cpu);
->              cc =3D CPU_GET_CLASS(s->g_cpu);
->              if (cc->gdb_core_xml_file =3D=3D NULL) {
->=20
-
-I think you are missing the check for 'p' and 'P' packets, and for the
-qOffsets packet in user mode (around line 1701).
-
-Thanks.
-
---=20
-Luc
-
-
---H5nnptpp4fUZNMUaFmKsN2QFuUIROoFrx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlxDORgACgkQd8knW3Qn
-Tr5bBg//WWvmMoEMx6Q/FZ9Xex0BZngDxkM20pqPWzvTw8dZvz61lXQFLenB5tHk
-vHOCDCJ0oIFI1sgLErJfe5nA1y2cTTSoiEKrpndC65y1qM5bE12SGIaOj/9OgOll
-cg0mCih/llyT5PAANdj/30ffk8N5Z3hKjRpVvj4XKCq41vUQ0dgdOV9GdpxiglSv
-nWK77r8W/TEVvlE/L1dS2hkZsCPJxoQyIhwxYxTbGGwjskHY0JmkBaN5Lih40rPu
-2UoR3yStzpVX2H5wyTdgjBfzoTT9mfc45m6/eM4WrPv6IY7vfsjW+RfK+ehS2Zf/
-xguIL4xVtsYJfcA7wIPSnMRF8HGlALcc3i+sUcfSwIJi0gVKdYizFSpC6ti9rHmA
-1+uvFrRMVQSwFATGqdTYKPlmv8w/GsmTD/kBCvVdHLLHJYOtHFbpXBpH/q68TBU4
-S6ud5JbfnoE5F0qeKLd3D4sVt/Og+eNUoLTxDxXs3pG+fmEWCTBVkQY3JmYsWORB
-dUTM53l5PxaSWiCdFDWtVCJT44Q2a3usUJhQp7NwSx5mbM+/NXe8odeuUUPAafb1
-5GE6MuNrfmWJEBNhRc/WlTfAnbIVQgqwzmvFld7LineBJe7l7qh+tcADEgcw5p2R
-zC/XqA7D2kkzsWnZtaKoymMCyMtEO+/Twcn6uOy+RV7occeYrdE=
-=LVNl
------END PGP SIGNATURE-----
-
---H5nnptpp4fUZNMUaFmKsN2QFuUIROoFrx--
+r~
