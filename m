@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55345)
+Received: from eggs.gnu.org ([209.51.188.92]:55322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTb-0001NL-Fp
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTb-0001Mw-2w
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00082m-FM
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:43 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37957)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00083a-Pu
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:42 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39897)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gknTZ-0007wT-2u
+	id 1gknTZ-0007xI-HI
 	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:41 -0500
-Received: by mail-wr1-x443.google.com with SMTP id v13so17926965wrw.5
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:31 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id t27so17911906wra.6
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:33 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 19 Jan 2019 12:03:12 +0200
-Message-Id: <20190119100315.23985-8-marcel.apfelbaum@gmail.com>
+Date: Sat, 19 Jan 2019 12:03:13 +0200
+Message-Id: <20190119100315.23985-9-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
 References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 07/10] hw: rdma: fix an off-by-one issue
+Subject: [Qemu-devel] [PATCH PULL 08/10] contrib/rdmacm-mux: remove
+ Wno-format-truncation flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +30,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, liq3ea@163.com, cohuck@redhat.com, philmd@redhat.com
 
-From: Li Qiang <liq3ea@163.com>
+The flag is not recognized by some CLANG versions.
+Add proper constraints in code instead.
 
-In rdma_rm_get_backend_gid_index(), the 'sgid_idx' is used
-to index the array 'dev_res->port.gid_tbl' which size is
-MAX_PORT_GIDS. Current the 'sgid_idx' may be MAX_PORT_GIDS
-thus cause an off-by-one issue.
-
-Spotted by Coverity: CID 1398594
-
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-Id: <20190103131251.49271-1-liq3ea@163.com>
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Tested-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20190118124614.24548-2-marcel.apfelbaum@gmail.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ contrib/rdmacm-mux/Makefile.objs | 2 +-
+ contrib/rdmacm-mux/main.c        | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 8bf241e91f..268ff633a4 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -579,7 +579,7 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
- int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
-                                   RdmaBackendDev *backend_dev, int sgid_idx)
+diff --git a/contrib/rdmacm-mux/Makefile.objs b/contrib/rdmacm-mux/Makefile.objs
+index be3eacb6f7..e1ff4fe569 100644
+--- a/contrib/rdmacm-mux/Makefile.objs
++++ b/contrib/rdmacm-mux/Makefile.objs
+@@ -1,4 +1,4 @@
+ ifdef CONFIG_PVRDMA
+-CFLAGS += -libumad -Wno-format-truncation
++CFLAGS += -libumad
+ rdmacm-mux-obj-y = main.o
+ endif
+diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+index 835a7f9214..64676030c5 100644
+--- a/contrib/rdmacm-mux/main.c
++++ b/contrib/rdmacm-mux/main.c
+@@ -42,6 +42,8 @@
+ 
+ /* The below can be override by command line parameter */
+ #define UNIX_SOCKET_PATH "/var/run/rdmacm-mux"
++/* Has format %s-%s-%d" <path>-<rdma-dev--name>-<port> */
++#define SOCKET_PATH_MAX (PATH_MAX - NAME_MAX - sizeof(int) - 2)
+ #define RDMA_PORT_NUM 1
+ 
+ typedef struct RdmaCmServerArgs {
+@@ -95,7 +97,7 @@ static void help(const char *progname)
+ static void parse_args(int argc, char *argv[])
  {
--    if (unlikely(sgid_idx < 0 || sgid_idx > MAX_PORT_GIDS)) {
-+    if (unlikely(sgid_idx < 0 || sgid_idx >= MAX_PORT_GIDS)) {
-         pr_dbg("Got invalid sgid_idx %d\n", sgid_idx);
-         return -EINVAL;
-     }
+     int c;
+-    char unix_socket_path[PATH_MAX];
++    char unix_socket_path[SOCKET_PATH_MAX];
+ 
+     strcpy(server.args.rdma_dev_name, "");
+     strcpy(unix_socket_path, UNIX_SOCKET_PATH);
+@@ -113,7 +115,7 @@ static void parse_args(int argc, char *argv[])
+ 
+         case 's':
+             /* This is temporary, final name will build below */
+-            strncpy(unix_socket_path, optarg, PATH_MAX);
++            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
+             break;
+ 
+         case 'p':
 -- 
 2.17.1
