@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55240)
+Received: from eggs.gnu.org ([209.51.188.92]:55295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-0001Ls-Nf
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:42 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTa-0001MW-Ip
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00082M-06
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:41 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37957)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTZ-00082z-G7
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:42 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gknTW-0007pC-VR
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:40 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so17926606wrw.5
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:21 -0800 (PST)
+	id 1gknTZ-0007yC-51
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:41 -0500
+Received: by mail-wr1-x442.google.com with SMTP id c14so17961119wrr.0
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:35 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sat, 19 Jan 2019 12:03:06 +0200
-Message-Id: <20190119100315.23985-2-marcel.apfelbaum@gmail.com>
+Date: Sat, 19 Jan 2019 12:03:14 +0200
+Message-Id: <20190119100315.23985-10-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
 References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH PULL 01/10] docs/pvrdma: Update rdmacm-mux
- documentation
+Subject: [Qemu-devel] [PATCH PULL 09/10] hw/rdma: modify struct
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, liq3ea@163.com, cohuck@redhat.com, philmd@redhat.com
 
-From: Kamal Heib <kamalheib1@gmail.com>
+Do not initialize structs with {0} since some
+CLANG versions do not support it.
 
-Before running the rdmacm-mux need to make sure that both the ib_cm
-and rdma_cm kernel modules are unloaded.
+Use {} construct instead.
 
 Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
-Message-Id: <20190109132829.19164-1-kamalheib1@gmail.com>
+Tested-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20190118124614.24548-3-marcel.apfelbaum@gmail.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- docs/pvrdma.txt | 3 +++
- 1 file changed, 3 insertions(+)
+ contrib/rdmacm-mux/main.c | 6 +++---
+ hw/rdma/rdma_backend.c    | 8 ++++----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/docs/pvrdma.txt b/docs/pvrdma.txt
-index 5175251b47..81959378b1 100644
---- a/docs/pvrdma.txt
-+++ b/docs/pvrdma.txt
-@@ -99,6 +99,9 @@ MAD layer to send and receive RDMA-CM MAD packets.
- To build rdmacm-mux run
- # make rdmacm-mux
+diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+index 64676030c5..ae88c77a1e 100644
+--- a/contrib/rdmacm-mux/main.c
++++ b/contrib/rdmacm-mux/main.c
+@@ -350,7 +350,7 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+ static void *umad_recv_thread_func(void *args)
+ {
+     int rc;
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     int fd = -2;
  
-+Before running the rdmacm-mux make sure that both ib_cm and rdma_cm kernel
-+modules aren't loaded, otherwise the rdmacm-mux service will fail to start.
-+
- The application accepts 3 command line arguments and exposes a UNIX socket
- to pass control and data to it.
- -d rdma-device-name  Name of RDMA device to register with
+     msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_REQ;
+@@ -387,7 +387,7 @@ static void *umad_recv_thread_func(void *args)
+ static int read_and_process(int fd)
+ {
+     int rc;
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     struct umad_hdr *hdr;
+     uint32_t *comm_id = 0;
+     uint16_t attr_id;
+@@ -744,7 +744,7 @@ static void signal_handler(int sig, siginfo_t *siginfo, void *context)
+ static int init(void)
+ {
+     int rc;
+-    struct sigaction sig = {0};
++    struct sigaction sig = {};
+ 
+     rc = init_listener();
+     if (rc) {
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index 3ee5172c96..fd571f21e5 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -179,7 +179,7 @@ static inline int rdmacm_mux_can_process_async(RdmaBackendDev *backend_dev)
+ 
+ static int check_mux_op_status(CharBackend *mad_chr_be)
+ {
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     int ret;
+ 
+     pr_dbg("Reading response\n");
+@@ -376,7 +376,7 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+ static int mad_send(RdmaBackendDev *backend_dev, uint8_t sgid_idx,
+                     union ibv_gid *sgid, struct ibv_sge *sge, uint32_t num_sge)
+ {
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     char *hdr, *data;
+     int ret;
+ 
+@@ -1097,7 +1097,7 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+ int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+                          union ibv_gid *gid)
+ {
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     int ret;
+ 
+     pr_dbg("0x%llx, 0x%llx\n",
+@@ -1123,7 +1123,7 @@ int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+ int rdma_backend_del_gid(RdmaBackendDev *backend_dev, const char *ifname,
+                          union ibv_gid *gid)
+ {
+-    RdmaCmMuxMsg msg = {0};
++    RdmaCmMuxMsg msg = {};
+     int ret;
+ 
+     pr_dbg("0x%llx, 0x%llx\n",
 -- 
 2.17.1
