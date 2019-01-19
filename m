@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50702)
+Received: from eggs.gnu.org ([209.51.188.92]:55202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gkn8k-000545-16
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 04:42:10 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTW-0001KW-OD
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gkn8i-0003wK-55
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 04:42:09 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51494)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gknTT-0007yp-Pu
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:38 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gkn8h-0003tz-T5
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 04:42:08 -0500
-Received: by mail-wm1-x344.google.com with SMTP id b11so6643705wmj.1
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 01:42:07 -0800 (PST)
-References: <20190109201559.3906-1-yuval.shaia@oracle.com>
-	<9cde91d0-ec6a-d66c-c699-1d35f8dd84a5@gmail.com>
-	<20190118162322.GA3558@lap1>
+	id 1gknTI-0007nD-DQ
+	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 05:03:30 -0500
+Received: by mail-wr1-x444.google.com with SMTP id p4so17905560wrt.7
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 02:03:20 -0800 (PST)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <fe6996fe-58ea-0559-f9f2-2b0ad47eaab4@gmail.com>
-Date: Sat, 19 Jan 2019 11:42:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <20190118162322.GA3558@lap1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] hw/pvrdma: Post CQE when receive invalid
- gid index
+Date: Sat, 19 Jan 2019 12:03:05 +0200
+Message-Id: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel]  [PATCH PULL 00/10] RDMA queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, liq3ea@163.com, philmd@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, kamalheib1@gmail.com, liq3ea@163.com, cohuck@redhat.com, philmd@redhat.com
 
+The following changes since commit a8d2b0685681e2f291faaa501efbbd76875f8ec8:
 
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190118' into staging (2019-01-18 16:56:15 +0000)
 
-On 1/18/19 6:23 PM, Yuval Shaia wrote:
-> On Fri, Jan 18, 2019 at 03:55:36PM +0200, Marcel Apfelbaum wrote:
->> Hi Yuval,
->>
->> On 1/9/19 10:15 PM, Yuval Shaia wrote:
->>> This error should propagate back to guest.
->>>
->>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->>> ---
->>>    hw/rdma/rdma_backend.h      | 1 +
->>>    hw/rdma/vmw/pvrdma_qp_ops.c | 6 ++++--
->>>    2 files changed, 5 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
->>> index a9ba40ae48..5114c90e67 100644
->>> --- a/hw/rdma/rdma_backend.h
->>> +++ b/hw/rdma/rdma_backend.h
->>> @@ -32,6 +32,7 @@
->>>    #define VENDOR_ERR_INVLKEY          0x207
->>>    #define VENDOR_ERR_MR_SMALL         0x208
->>>    #define VENDOR_ERR_INV_MAD_BUFF     0x209
->>> +#define VENDOR_ERR_INV_GID_IDX      0x210
->>>    /* Add definition for QP0 and QP1 as there is no userspace enums for them */
->>>    enum ibv_special_qp_type {
->>> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
->>> index 465bee8641..0565eba981 100644
->>> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
->>> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
->>> @@ -178,7 +178,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
->>>            sgid = rdma_rm_get_gid(&dev->rdma_dev_res, wqe->hdr.wr.ud.av.gid_index);
->>>            if (!sgid) {
->>>                pr_dbg("Fail to get gid for idx %d\n", wqe->hdr.wr.ud.av.gid_index);
->>> -            return -EIO;
->>> +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
->> There may be a problem here, comp_ctx may be uninitialized at this point.
->> I see that comp_ctx gets initalized after this call:
->>
->>           /* Prepare CQE */
->>          comp_ctx = g_malloc(sizeof(CompHandlerCtx));
->>          comp_ctx->dev = dev;
->>
->>
->> What do you think?
->>
->> Thanks,
->> Marcel
-> Applying this patch on top of upstream make sense.
-> Problem start because you probably applied Li Qiang's patch "[PATCH v2] hw:
-> pvrdma: fix memory leak in error path" which moves the initialization of
-> comp_ctx to be right after all checks are done.
->
-> More than that, accepting this patch makes Li Qiang's patch redundant since
-> the cleanup of comp_ctx will be taken care by the usual process of
-> 'completion' (see the callback function pvrdma_qp_ops_comp_handler).
-> Li Qiang, can you confirm?
+are available in the Git repository at:
 
-Sounds right to me. I'll add Reported-by tag and keep the coverity info.
+  https://github.com/marcel-apf/qemu tags/rdma-pull-request
 
-Thanks,
-Marcel
+for you to fetch changes up to 0f645ba16c6b76ccf2076d38460aa998198893bc:
 
-> Yuval
->
->>> +            continue;
->>>            }
->>>            pr_dbg("sgid_id=%d, sgid=0x%llx\n", wqe->hdr.wr.ud.av.gid_index,
->>>                   sgid->global.interface_id);
->>> @@ -189,7 +190,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
->>>            if (sgid_idx <= 0) {
->>>                pr_dbg("Fail to get bk sgid_idx for sgid_idx %d\n",
->>>                       wqe->hdr.wr.ud.av.gid_index);
->>> -            return -EIO;
->>> +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
->>> +            continue;
->>>            }
->>>            if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
+  contrib/rdmacm-mux: fix clang compilation (2019-01-19 11:01:57 +0200)
+
+----------------------------------------------------------------
+RDMA queue
+ * Clang compilation fix
+ * Coverity fix
+ * Various fixes for the pvrdma device
+
+----------------------------------------------------------------
+Kamal Heib (1):
+      docs/pvrdma: Update rdmacm-mux documentation
+
+Li Qiang (1):
+      hw: rdma: fix an off-by-one issue
+
+Marcel Apfelbaum (3):
+      contrib/rdmacm-mux: remove Wno-format-truncation flag
+      hw/rdma: modify struct initialization
+      contrib/rdmacm-mux: fix clang compilation
+
+Yuval Shaia (5):
+      hw/pvrdma: Remove max-sge command-line param
+      hw/rdma: Delete unused struct member
+      hw/pvrdma: Post CQE when receive invalid gid index
+      hw/pvrdma: Make function pvrdma_qp_send/recv return void.
+      hw/rdma: Verify that ptr is not NULL before freeing
+
+ Makefile                         |  2 ++
+ contrib/rdmacm-mux/Makefile.objs |  1 -
+ contrib/rdmacm-mux/main.c        | 12 ++++----
+ docs/pvrdma.txt                  |  4 ++-
+ hw/rdma/rdma_backend.c           | 63 +++++++++++++++-------------------------
+ hw/rdma/rdma_backend.h           | 12 ++++++++
+ hw/rdma/rdma_backend_defs.h      |  1 -
+ hw/rdma/rdma_rm.c                |  9 ++++--
+ hw/rdma/vmw/pvrdma_main.c        | 10 +++----
+ hw/rdma/vmw/pvrdma_qp_ops.c      | 44 +++++++++++++++++++++-------
+ hw/rdma/vmw/pvrdma_qp_ops.h      |  4 +--
+ 11 files changed, 96 insertions(+), 66 deletions(-)
+-- 
+2.17.1
