@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58729)
+Received: from eggs.gnu.org ([209.51.188.92]:58779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1glECI-0002pf-70
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:35:40 -0500
+	(envelope-from <stefanha@redhat.com>) id 1glECM-0002rU-76
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1glECG-0002To-9u
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:35:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1glECC-0002Pf-2V
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:35:33 -0500
+	(envelope-from <stefanha@redhat.com>) id 1glECK-0002X3-46
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:35:41 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Sun, 20 Jan 2019 14:34:49 +0000
-Message-Id: <20190120143452.21683-2-stefanha@redhat.com>
+Date: Sun, 20 Jan 2019 14:34:51 +0000
+Message-Id: <20190120143452.21683-4-stefanha@redhat.com>
 In-Reply-To: <20190120143452.21683-1-stefanha@redhat.com>
 References: <20190120143452.21683-1-stefanha@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] memory: add
- memory_region_flush_rom_device()
+Subject: [Qemu-devel] [PATCH 3/4] arm: Instantiate NRF51 special NVM's and
+ NVMC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +26,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, jim@groklearning.com, jusual@mail.ru, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-ROM devices go via MemoryRegionOps->write() callbacks for write
-operations and do not dirty/invalidate that memory.  Device emulation
-must be able to mark memory ranges that have been modified internally
-(e.g. using memory_region_get_ram_ptr()).
+From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 
-Introduce the memory_region_flush_rom_device() API for this purpose.
+Instantiates UICR, FICR, FLASH and NVMC in nRF51 SOC.
 
+Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/exec/memory.h | 18 ++++++++++++++++++
- exec.c                | 12 ++++++++++++
- 2 files changed, 30 insertions(+)
+ include/hw/arm/nrf51_soc.h |  2 ++
+ hw/arm/nrf51_soc.c         | 41 +++++++++++++++++++++++++++-----------
+ 2 files changed, 31 insertions(+), 12 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index cd2f209b64..abe9cc79c0 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1344,6 +1344,24 @@ bool memory_region_snapshot_get_dirty(MemoryRegion=
- *mr,
- void memory_region_reset_dirty(MemoryRegion *mr, hwaddr addr,
-                                hwaddr size, unsigned client);
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index e06f0304b4..c8c91cf9ff 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -15,6 +15,7 @@
+ #include "hw/char/nrf51_uart.h"
+ #include "hw/misc/nrf51_rng.h"
+ #include "hw/gpio/nrf51_gpio.h"
++#include "hw/nvram/nrf51_nvm.h"
+ #include "hw/timer/nrf51_timer.h"
 =20
-+/**
-+ * memory_region_flush_rom_device: Mark a range of pages dirty and inval=
-idate
-+ *                                 TBs (for self-modifying code).
-+ *
-+ * The MemoryRegionOps->write() callback of a ROM device must use this f=
-unction
-+ * to mark byte ranges that have been modified internally, such as by di=
-rectly
-+ * accessing the memory returned by memory_region_get_ram_ptr().
-+ *
-+ * This function marks the range dirty and invalidates TBs so that TCG c=
-an
-+ * detect self-modifying code.
-+ *
-+ * @mr: the region being flushed.
-+ * @addr: the start, relative to the start of the region, of the range b=
-eing
-+ *        flushed.
-+ * @size: the size, in bytes, of the range being flushed.
-+ */
-+void memory_region_flush_rom_device(MemoryRegion *mr, hwaddr addr, hwadd=
-r size);
+ #define TYPE_NRF51_SOC "nrf51-soc"
+@@ -32,6 +33,7 @@ typedef struct NRF51State {
+=20
+     NRF51UARTState uart;
+     NRF51RNGState rng;
++    NRF51NVMState nvm;
+     NRF51GPIOState gpio;
+     NRF51TimerState timer[NRF51_NUM_TIMERS];
+=20
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index 1630c27594..b839daea8b 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -29,8 +29,10 @@
+  * are supported in the future, add a sub-class of NRF51SoC for
+  * the specific variants
+  */
+-#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
+-#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
++#define NRF51822_FLASH_PAGES    256
++#define NRF51822_SRAM_PAGES     16
++#define NRF51822_FLASH_SIZE     (NRF51822_FLASH_PAGES * NRF51_PAGE_SIZE)
++#define NRF51822_SRAM_SIZE      (NRF51822_SRAM_PAGES * NRF51_PAGE_SIZE)
+=20
+ #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
+=20
+@@ -81,14 +83,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Er=
+ror **errp)
+=20
+     memory_region_add_subregion_overlap(&s->container, 0, s->board_memor=
+y, -1);
+=20
+-    memory_region_init_rom(&s->flash, OBJECT(s), "nrf51.flash", s->flash=
+_size,
+-            &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->fla=
+sh);
+-
+     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &=
+err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -121,6 +115,29 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
+Error **errp)
+                        qdev_get_gpio_in(DEVICE(&s->cpu),
+                        BASE_TO_IRQ(NRF51_RNG_BASE)));
+=20
++    /* UICR, FICR, NVMC, FLASH */
++    object_property_set_uint(OBJECT(&s->nvm), s->flash_size, "flash-size=
+",
++                             &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
 +
- /**
-  * memory_region_set_readonly: Turn a memory region read-only (or read-w=
-rite)
-  *
-diff --git a/exec.c b/exec.c
-index 895449f926..105ff21e74 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3162,6 +3162,18 @@ static void invalidate_and_set_dirty(MemoryRegion =
-*mr, hwaddr addr,
-     cpu_physical_memory_set_dirty_range(addr, length, dirty_log_mask);
++    object_property_set_bool(OBJECT(&s->nvm), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 0);
++    memory_region_add_subregion_overlap(&s->container, NRF51_NVMC_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 1);
++    memory_region_add_subregion_overlap(&s->container, NRF51_FICR_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 2);
++    memory_region_add_subregion_overlap(&s->container, NRF51_UICR_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 3);
++    memory_region_add_subregion_overlap(&s->container, NRF51_FLASH_BASE,=
+ mr, 0);
++
+     /* GPIO */
+     object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
+     if (err) {
+@@ -158,8 +175,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+=20
+     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
+                                 NRF51_IOMEM_SIZE);
+-    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
+-                                NRF51_FICR_SIZE);
+     create_unimplemented_device("nrf51_soc.private",
+                                 NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
  }
+@@ -186,6 +201,8 @@ static void nrf51_soc_init(Object *obj)
+     sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
+                            TYPE_NRF51_RNG);
 =20
-+void memory_region_flush_rom_device(MemoryRegion *mr, hwaddr addr, hwadd=
-r size)
-+{
-+    /* In principle this function would work on other memory region type=
-s too,
-+     * but the ROM device use case is the only one where this operation =
-is
-+     * necessary.  Other memory regions should use the
-+     * address_space_read/write() APIs.
-+     */
-+    assert(memory_region_is_romd(mr));
++    sysbus_init_child_obj(obj, "nvm", &s->nvm, sizeof(s->nvm), TYPE_NRF5=
+1_NVM);
 +
-+    invalidate_and_set_dirty(mr, addr, size);
-+}
-+
- static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
- {
-     unsigned access_size_max =3D mr->ops->valid.max_access_size;
+     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
+                           TYPE_NRF51_GPIO);
+=20
 --=20
 2.20.1
