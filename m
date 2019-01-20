@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56666)
+Received: from eggs.gnu.org ([209.51.188.92]:58640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gl676-000638-DI
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 00:57:45 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gl6Hn-00028l-4M
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 01:08:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gl675-0004TA-Fo
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 00:57:44 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Sat, 19 Jan 2019 21:55:57 -0800
-Message-Id: <20190120055558.32984-3-liq3ea@163.com>
-In-Reply-To: <20190120055558.32984-1-liq3ea@163.com>
-References: <20190120055558.32984-1-liq3ea@163.com>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gl6Hm-0004PD-12
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 01:08:47 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gl6Hl-0004NP-Oj
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 01:08:45 -0500
+Received: by mail-wr1-x443.google.com with SMTP id j2so19742566wrw.1
+	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 22:08:44 -0800 (PST)
+References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
+	<4627c86e.406c.16869dbf8f9.Coremail.liq3ea@163.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f4d555ee-d524-a7ed-ae53-77377d147e2f@gmail.com>
+Date: Sun, 20 Jan 2019 08:08:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
+In-Reply-To: <4627c86e.406c.16869dbf8f9.Coremail.liq3ea@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/3] nvme: ensure the num_queues is not zero
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH PULL 00/10] RDMA queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com, philmd@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, yuval.shaia@oracle.com, kamalheib1@gmail.com, cohuck@redhat.com, philmd@redhat.com
 
-When it is zero, it causes segv.
-Using following command:
+Hi,
 
-"-drive file=//home/test/test1.img,if=none,id=id0
--device nvme,drive=id0,serial=test,num_queues=0"
-causes following Backtrack:
+On 1/20/19 8:04 AM, 李强 wrote:
+>
+> Hi Marcel,
+> Seems you lost another:
+>
 
-Thread 4 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7fffe9735700 (LWP 30952)]
-0x0000555555a7a77c in nvme_start_ctrl (n=0x5555577473f0) at hw/block/nvme.c:825
-825	    if (unlikely(n->cq[0])) {
-(gdb) bt
-0  0x0000555555a7a77c in nvme_start_ctrl (n=0x5555577473f0)
-    at hw/block/nvme.c:825
-1  0x0000555555a7af7f in nvme_write_bar (n=0x5555577473f0, offset=20,
-    data=4587521, size=4) at hw/block/nvme.c:969
-2  0x0000555555a7b81a in nvme_mmio_write (opaque=0x5555577473f0, addr=20,
-    data=4587521, size=4) at hw/block/nvme.c:1163
-3  0x0000555555869236 in memory_region_write_accessor (mr=0x555557747cd0,
-    addr=20, value=0x7fffe97320f8, size=4, shift=0, mask=4294967295, attrs=...)
-    at /home/test/qemu1/qemu/memory.c:502
-4  0x0000555555869446 in access_with_adjusted_size (addr=20,
-    value=0x7fffe97320f8, size=4, access_size_min=2, access_size_max=8,
-    access_fn=0x55555586914d <memory_region_write_accessor>,
-    mr=0x555557747cd0, attrs=...) at /home/test/qemu1/qemu/memory.c:568
-5  0x000055555586c479 in memory_region_dispatch_write (mr=0x555557747cd0,
-    addr=20, data=4587521, size=4, attrs=...)
-    at /home/test/qemu1/qemu/memory.c:1499
-6  0x00005555558030af in flatview_write_continue (fv=0x7fffe0061130,
-    addr=4273930260, attrs=..., buf=0x7ffff7ff0028 "\001", len=4, addr1=20,
-    l=4, mr=0x555557747cd0) at /home/test/qemu1/qemu/exec.c:3234
-7  0x00005555558031f9 in flatview_write (fv=0x7fffe0061130, addr=4273930260,
-    attrs=..., buf=0x7ffff7ff0028 "\001", len=4)
-    at /home/test/qemu1/qemu/exec.c:3273
-8  0x00005555558034ff in address_space_write (
----Type <return> to continue, or q <return> to quit---
-    as=0x555556758480 <address_space_memory>, addr=4273930260, attrs=...,
-    buf=0x7ffff7ff0028 "\001", len=4) at /home/test/qemu1/qemu/exec.c:3363
-9  0x0000555555803550 in address_space_rw (
-    as=0x555556758480 <address_space_memory>, addr=4273930260, attrs=...,
-    buf=0x7ffff7ff0028 "\001", len=4, is_write=true)
-    at /home/test/qemu1/qemu/exec.c:3374
-10 0x00005555558884a1 in kvm_cpu_exec (cpu=0x555556920e40)
-    at /home/test/qemu1/qemu/accel/kvm/kvm-all.c:2031
-11 0x000055555584cd9d in qemu_kvm_cpu_thread_fn (arg=0x555556920e40)
-    at /home/test/qemu1/qemu/cpus.c:1281
-12 0x0000555555dbaf6d in qemu_thread_start (args=0x5555569438a0)
-    at util/qemu-thread-posix.c:502
-13 0x00007ffff5dc86db in start_thread (arg=0x7fffe9735700)
-    at pthread_create.c:463
-14 0x00007ffff5af188f in clone ()
-    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+No,  I did not, please see below.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/block/nvme.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> hw: pvrdma: fix memory leak in error path
+> -->http://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01217.html
+>
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index f206391e8e..0b77b49b36 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1208,6 +1208,11 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     int64_t bs_size;
-     uint8_t *pci_conf;
- 
-+    if (!n->num_queues) {
-+        error_setg(errp, "num_queues can't be zero");
-+        return;
-+    }
-+
-     if (!n->conf.blk) {
-         error_setg(errp, "drive property not set");
-         return;
--- 
-2.17.1
+Please see this mail thread, you were cc--ed:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg588766.html
+
+Basically the following patch makes the the mentioned one obsolete.
+https://patchew.org/QEMU/20190109201559.3906-1-yuval.shaia@oracle.com/
+
+Thanks,
+Marcel
+
+> At 2019-01-19 18:03:05, "Marcel Apfelbaum" <marcel.apfelbaum@gmail.com> wrote:
+> >The following changes since commit a8d2b0685681e2f291faaa501efbbd76875f8ec8:
+> >
+> >  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190118' into staging (2019-01-18 16:56:15 +0000)
+> >
+> >are available in the Git repository at:
+> >
+> >  https://github.com/marcel-apf/qemu tags/rdma-pull-request
+> >
+> >for you to fetch changes up to 0f645ba16c6b76ccf2076d38460aa998198893bc:
+> >
+> >  contrib/rdmacm-mux: fix clang compilation (2019-01-19 11:01:57 +0200)
+> >
+> >----------------------------------------------------------------
+> >RDMA queue
+> > * Clang compilation fix
+> > * Coverity fix
+> > * Various fixes for the pvrdma device
+> >
+> >----------------------------------------------------------------
+> >Kamal Heib (1):
+> >      docs/pvrdma: Update rdmacm-mux documentation
+> >
+> >Li Qiang (1):
+> >      hw: rdma: fix an off-by-one issue
+> >
+> >Marcel Apfelbaum (3):
+> >      contrib/rdmacm-mux: remove Wno-format-truncation flag
+> >      hw/rdma: modify struct initialization
+> >      contrib/rdmacm-mux: fix clang compilation
+> >
+> >Yuval Shaia (5):
+> >      hw/pvrdma: Remove max-sge command-line param
+> >      hw/rdma: Delete unused struct member
+> >      hw/pvrdma: Post CQE when receive invalid gid index
+> >      hw/pvrdma: Make function pvrdma_qp_send/recv return void.
+> >      hw/rdma: Verify that ptr is not NULL before freeing
+> >
+> > Makefile                         |  2 ++
+> > contrib/rdmacm-mux/Makefile.objs |  1 -
+> > contrib/rdmacm-mux/main.c        | 12 ++++----
+> > docs/pvrdma.txt                  |  4 ++-
+> > hw/rdma/rdma_backend.c           | 63 +++++++++++++++-------------------------
+> > hw/rdma/rdma_backend.h           | 12 ++++++++
+> > hw/rdma/rdma_backend_defs.h      |  1 -
+> > hw/rdma/rdma_rm.c                |  9 ++++--
+> > hw/rdma/vmw/pvrdma_main.c        | 10 +++----
+> > hw/rdma/vmw/pvrdma_qp_ops.c      | 44 +++++++++++++++++++++-------
+> > hw/rdma/vmw/pvrdma_qp_ops.h      |  4 +--
+> > 11 files changed, 96 insertions(+), 66 deletions(-)
+> >-- 
+> >2.17.1
+>
+>
