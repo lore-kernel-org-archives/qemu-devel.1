@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40254)
+Received: from eggs.gnu.org ([209.51.188.92]:42143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glMps-0008Ch-A4
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 18:49:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1glN1Q-0001bt-Bz
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glMpr-0007ib-9j
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 18:49:04 -0500
-References: <20190118101114.11759-1-rjones@redhat.com>
-	<20190118101114.11759-2-rjones@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <58797614-1e73-8793-1444-f8177b4bb15e@redhat.com>
-Date: Mon, 21 Jan 2019 00:48:56 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1glN1O-0006FI-ML
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:01:00 -0500
+Date: Mon, 21 Jan 2019 09:29:30 +1300
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190120202930.GB2423@umbus>
+References: <154772319819.1163472.4313149332350138217.stgit@bahia.lan>
+	<9e554917-e78d-0cd6-8ed0-6fd2808c4a84@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20190118101114.11759-2-rjones@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RwwJ74GsCeHEgCEtd36D50fTHrRXDlOmd"
-Subject: Re: [Qemu-devel] [PATCH v4] qemu-io: Add generic function for
- reinitializing optind.
+	protocol="application/pgp-signature"; boundary="ZfOjI3PrQbgiZnxM"
+Content-Disposition: inline
+In-Reply-To: <9e554917-e78d-0cd6-8ed0-6fd2808c4a84@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Forbid setting ic-mode for old
+ machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, berrange@redhat.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RwwJ74GsCeHEgCEtd36D50fTHrRXDlOmd
-From: Max Reitz <mreitz@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com,
- berrange@redhat.com
-Message-ID: <58797614-1e73-8793-1444-f8177b4bb15e@redhat.com>
-Subject: Re: [PATCH v4] qemu-io: Add generic function for reinitializing
- optind.
-References: <20190118101114.11759-1-rjones@redhat.com>
- <20190118101114.11759-2-rjones@redhat.com>
-In-Reply-To: <20190118101114.11759-2-rjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--ZfOjI3PrQbgiZnxM
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 18.01.19 11:11, Richard W.M. Jones wrote:
-> On FreeBSD 11.2:
+On Thu, Jan 17, 2019 at 12:58:46PM +0100, C=E9dric Le Goater wrote:
+> On 1/17/19 12:06 PM, Greg Kurz wrote:
+> > Machine types 3.0 and older only know about the legacy XICS backend.
+> > Make it clear by erroring out if the user tries to set ic-mode on
+> > such machines.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
 >=20
->   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512=
-" $nbd'
->   Parsing error: non-numeric argument, or extraneous/unrecognized suffi=
-x -- aio_write
 >=20
-> After main option parsing, we reinitialize optind so we can parse each
-> command.  However reinitializing optind to 0 does not work on FreeBSD.
-> What happens when you do this is optind remains 0 after the option
-> parsing loop, and the result is we try to parse argv[optind] =3D=3D
-> argv[0] =3D=3D "aio_write" as if it was the first parameter.
 >=20
-> The FreeBSD manual page says:
->=20
->   In order to use getopt() to evaluate multiple sets of arguments, or t=
-o
->   evaluate a single set of arguments multiple times, the variable optre=
-set
->   must be set to 1 before the second and each additional set of calls t=
-o
->   getopt(), and the variable optind must be reinitialized.
->=20
-> (From the rest of the man page it is clear that optind must be
-> reinitialized to 1).
->=20
-> The glibc man page says:
->=20
->   A program that scans multiple argument vectors,  or  rescans  the  sa=
-me
->   vector  more than once, and wants to make use of GNU extensions such =
-as
->   '+' and '-' at  the  start  of  optstring,  or  changes  the  value  =
-of
->   POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetti=
-ng
->   optind to 0, rather than the traditional value of 1.  (Resetting  to =
- 0
->   forces  the  invocation  of  an  internal  initialization  routine th=
-at
->   rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)=
+> Tested-by: C=E9dric Le Goater <clg@kaod.org>
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied, thanks.
 
 >=20
-> This commit introduces an OS-portability function called
-> qemu_reset_optind which provides a way of resetting optind that works
-> on FreeBSD and platforms that use optreset, while keeping it the same
-> as now on other platforms.
+> Thanks,
 >=20
-> Note that the qemu codebase sets optind in many other places, but in
-> those other places it's setting a local variable and not using getopt.
-> This change is only needed in places where we are using getopt and the
-> associated global variable optind.
+> C.
 >=20
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> ---
->  configure            | 14 ++++++++++++++
->  include/qemu/osdep.h | 16 ++++++++++++++++
->  qemu-img.c           |  2 +-
->  qemu-io-cmds.c       |  2 +-
->  4 files changed, 32 insertions(+), 2 deletions(-)
+> > ---
+> >=20
+> > Motivation for this comes from a failing backward migration test, caused
+> > by ic-mode=3Dxics I forgot to drop from the command line :)
+> > ---
+> >  hw/ppc/spapr.c |    5 +++++
+> >  1 file changed, 5 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 0942f35bf87e..6b8dbf5c5a3c 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3126,6 +3126,11 @@ static void spapr_set_ic_mode(Object *obj, const=
+ char *value, Error **errp)
+> >  {
+> >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > =20
+> > +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> > +        error_setg(errp, "This machine only uses the legacy XICS backe=
+nd, don't pass ic-mode");
+> > +        return;
+> > +    }
+> > +
+> >      /* The legacy IRQ backend can not be set */
+> >      if (strcmp(value, "xics") =3D=3D 0) {
+> >          spapr->irq =3D &spapr_irq_xics;
+> >=20
 >=20
-> diff --git a/configure b/configure
-> index 3eee3fcf70..3d46df1517 100755
 
-(I'm not quite sure where along the way just using a weak optreset was
-discarded, but, oh well, this does make the code less ugly.)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-[...]
-
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 80df7253db..840af09cb0 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -109,6 +109,7 @@ extern int daemon(int, int);
->  #include <ctype.h>
->  #include <errno.h>
->  #include <fcntl.h>
-> +#include <getopt.h>
->  #include <sys/stat.h>
->  #include <sys/time.h>
->  #include <assert.h>
-> @@ -604,4 +605,19 @@ extern int qemu_icache_linesize_log;
->  extern int qemu_dcache_linesize;
->  extern int qemu_dcache_linesize_log;
-> =20
-> +/*
-> + * After using getopt or getopt_long, if you need to parse another set=
-
-> + * of options, then you must reset optind.  Unfortunately the way to
-> + * do this varies between implementations of getopt.
-> + */
-> +static inline void qemu_reset_optind(void)
-> +{
-> +#ifdef HAVE_OPTRESET
-> +    optind =3D 1;
-> +    optreset =3D 1;
-> +#else
-> +    optind =3D 0;
-
-So I take it this is supposed to always do a hard reset -- because if it
-isn't, it might have been better to just always set optind =3D 1 as Eric
-suggested.  But googling suggests OpenBSD and NetBSD both have optreset
-as well, and newlib accepts optind =3D 0 (and apparently did not accept
-optind =3D 1 in the past?), so I think this is good for that purpose.
-
-
-So thanks a lot (and sorry about me being so stupid about
-everything...), I've applied the patch to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-> +#endif
-> +}
-> +
->  #endif
-
-
---RwwJ74GsCeHEgCEtd36D50fTHrRXDlOmd
+--ZfOjI3PrQbgiZnxM
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxFCOgACgkQ9AfbAGHV
-z0CMqQgAnOCrRt8jFDdDKOHcCV9S/rkCrAZhHcak9TVfDcuhYhM2bweFmh2wMf23
-5pQrjgo2JuKs0C7agZSoeSeLW/APuE6qGImUTeUpbSKiI3W5PB/PkiOC353f+E7S
-l0SBkYIvTJNfMKZ5IgZohfau1iU/CfHWBDlVy5M9yQI3SFsKPBNxFHfMIv0bxUho
-6m83zJT76pNcwS/Pk3vhTdrjMdeMvy8vfP5njkQLPkm+YmaRihsW+GclgRh9jlW5
-XfcQJkzL85OXk5n2PmfljZBBUXui3eoHIkLTVJ6nO5YuwsKUP74Xr9IjLVDmUmhh
-MhimQH10gIOjdPh7dS1omWQj52MqQQ==
-=cWA8
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxE2ioACgkQbDjKyiDZ
+s5LljxAArXkF+BhUzoHbIyhJJa1VzCSfYER87fVhUJ7dGaa77NirKsBHSMm1UaBd
+Nhiwc3olwfIlDPSk8Xgr/mltDpfO6ePHmFmzwikGHQaMosbi1q0aN/nLOQC8qObe
+xY0yz56yOrY4JNFPp+9j8AyMvXkPMc5ZoIFVI2lVWMRA6lR1Xnx+qTaJ9GJYQUU2
+TqP79QTUXT5MseMEFxFHOpVcOQ46pWWWFBrsk8tkBGXGdfKqQ8An3xwhx58tSS00
+SBSC8aL1bBvKnntsfmrMlW/AG/sihKk4ynzsyjDU71fpi0ZRgVeFYd9THItf//X2
+2ZoZPCJtn5dUSfi8gXc0hEzJszaIiiAKCunEE6W0JDl0diM9dG9aTQ053YPo91n2
+bdR/lB3GrpjysWz+Tqu+0uCXANlU3D0mu3L1DtIYJnpMIpNL/1JfMMHkWYBNSmn0
+/5BMP2JmkwUkWkIsc1yYr1Kc7sjPmuQnarxn2Pc8vWobbmGOX81YjlORXUpbZ9Aq
+7IvBJQ9PBxJ+td38jIAsPkohceJ9ZjvqSdADfJEOH0TW9dMvpwdAqAWE7xpOJ+Bx
+qSB8bnCBO3ZErVihxzn+ChrL9oV0/03DQfR+j1+ZB9uJ4qBFQHBmUvIQh2Mp/+4I
+lqC7OpMpggm1UkVh7q7zMK9BKcO/zxH79ph/X+4plm3B4LLDNlw=
+=iOUu
 -----END PGP SIGNATURE-----
 
---RwwJ74GsCeHEgCEtd36D50fTHrRXDlOmd--
+--ZfOjI3PrQbgiZnxM--
