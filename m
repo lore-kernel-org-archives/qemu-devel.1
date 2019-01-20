@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56190)
+Received: from eggs.gnu.org ([209.51.188.92]:56719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1glDzo-00077S-EE
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:22:45 -0500
+	(envelope-from <groug@kaod.org>) id 1glE1m-000881-Pt
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1glDzn-00033Y-9u
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:22:44 -0500
-Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:54011)
+	(envelope-from <groug@kaod.org>) id 1glE1l-0003qc-Kr
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:24:46 -0500
+Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:46177)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1glDzn-0002vX-1b
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:22:43 -0500
-Received: from player755.ha.ovh.net (unknown [10.109.146.32])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 57BD41A33D6
-	for <qemu-devel@nongnu.org>; Sun, 20 Jan 2019 15:22:26 +0100 (CET)
-Date: Sun, 20 Jan 2019 15:22:03 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1glE1l-0003pQ-Dw
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:24:45 -0500
+Received: from player699.ha.ovh.net (unknown [10.109.146.137])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 6EC1E1CA083
+	for <qemu-devel@nongnu.org>; Sun, 20 Jan 2019 15:24:43 +0100 (CET)
+Date: Sun, 20 Jan 2019 15:24:22 +0100
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190120152006.525c5972@bahia.lan>
-In-Reply-To: <e42ae193-e49f-a976-16ce-f3a9a519fdf2@kaod.org>
+Message-ID: <20190120152422.5f257401@bahia.lan>
+In-Reply-To: <cba61268-408a-916a-7211-b5d8b0c1eee1@kaod.org>
 References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<154774527936.1208625.3070534654296462659.stgit@bahia.lan>
-	<e42ae193-e49f-a976-16ce-f3a9a519fdf2@kaod.org>
+	<154774528595.1208625.15523908858345133758.stgit@bahia.lan>
+	<cba61268-408a-916a-7211-b5d8b0c1eee1@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 02/19] spapr: Rename xics to intc in
- interrupt controller agnostic code
+Subject: Re: [Qemu-devel] [PATCH v3 03/19] xics: Disintricate allocation and
+ type setting of interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,165 +35,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, 18 Jan 2019 14:56:51 +0100
+On Fri, 18 Jan 2019 13:26:29 +0100
 C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
 > On 1/17/19 6:14 PM, Greg Kurz wrote:
-> > All this code is used with both the XICS and XIVE interrupt controllers.
+> > The current code assumes that an interrupt is allocated as soon as its
+> > type is set to MSI or LSI. PHB hotplug will require to be able to set
+> > the type of an interrupt before actually allocating it.
 > >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > ---
-> > v3: - s/spapr_dt_intc_irq/spapr_dt_irq
-> > ---
-> >  hw/ppc/spapr.c              |    6 +++---
-> >  hw/ppc/spapr_events.c       |    2 +-
-> >  hw/ppc/spapr_pci.c          |    6 +++---
-> >  hw/ppc/spapr_vio.c          |    2 +-
-> >  include/hw/pci-host/spapr.h |    2 +-
-> >  include/hw/ppc/spapr.h      |    2 +-
-> >  6 files changed, 10 insertions(+), 10 deletions(-)
+> > Disintricate type setting from allocation by using another flag bit for
+> > the latter. Introduce a new ics_claim_irq() function for allocation. The
+> > behavior of aborting if the same irq gets allocated twice is kept.
 > >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 83081defde4e..26f8e55cc25e 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -96,7 +96,7 @@
-> > =20
-> >  #define MIN_RMA_SLOF            128UL
-> > =20
-> > -#define PHANDLE_XICP            0x00001111
-> > +#define PHANDLE_INTC            0x00001111 =20
+> > ics_set_irq_type() now only sets the type to MSI or LSI. It doesn't bri=
+ng
+> > anything to abort if the type was already set before. Drop the assert
+> > and XICS_FLAGS_IRQ_MASK on the way.
+> >=20
+> > Older QEMUs don't know about XICS_FLAGS_IRQ_CLAIMED. In order to safely
+> > handle incoming migration, we must fix the irq flags. This is done at
+> > post load thanks to a compat property. We don't need to do anything for
+> > backward migration since older machines only care for the irq type.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
 >=20
-> Shouln't that define be under a spapr->irq field ?=20
+> =20
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >=20
-
-You're probably right but that's not in the scope of this patch
-which only does a global and trivial renaming. I'll have a closer
-look at your suggestion anyway since there will be a v4 :)
-
-> > =20
-> >  /* These two functions implement the VCPU id numbering: one to compute=
- them
-> >   * all and one to identify thread 0 of a VCORE. Any change to the firs=
-t one
-> > @@ -1276,7 +1276,7 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> > =20
-> >      /* /interrupt controller */
-> >      spapr->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
-> > -                          PHANDLE_XICP);
-> > +                          PHANDLE_INTC);
-> > =20
-> >      ret =3D spapr_populate_memory(spapr, fdt);
-> >      if (ret < 0) {
-> > @@ -1296,7 +1296,7 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> >      }
-> > =20
-> >      QLIST_FOREACH(phb, &spapr->phbs, list) {
-> > -        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt,
-> > +        ret =3D spapr_populate_pci_dt(phb, PHANDLE_INTC, fdt,
-> >                                      spapr->irq->nr_msis); =20
->=20
-> and there we could pass spapr->irq.
+> In case of a respin, may be transform macro ICS_IRQ_FREE() in a static=20
+> inline helper.
 >=20
 
-Yeah.
+Yeah, there will be a respin (see my other mail in this thread) and I'll
+just do that.
 
+> Thanks,
 >=20
-> >          if (ret < 0) {
-> >              error_report("couldn't setup PCI devices in fdt");
-> > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> > index 32719a1b72d0..b9c7ecb9e987 100644
-> > --- a/hw/ppc/spapr_events.c
-> > +++ b/hw/ppc/spapr_events.c
-> > @@ -282,7 +282,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void=
- *fdt)
+> C.
+>=20
+> > ---
+> >  hw/core/machine.c     |    4 ++++
+> >  hw/intc/xics.c        |   28 +++++++++++++++++++++++++---
+> >  hw/ppc/pnv_psi.c      |    1 +
+> >  hw/ppc/spapr_irq.c    |    4 +---
+> >  include/hw/ppc/xics.h |    8 ++++++--
+> >  5 files changed, 37 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 1a0a9ab1117a..536a34092367 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -25,6 +25,10 @@
+> > =20
+> >  GlobalProperty hw_compat_3_1[] =3D {
+> >      {
+> > +        .driver   =3D "ics-base",
+> > +        .property =3D "has-claimed-flag",
+> > +        .value    =3D "off",
+> > +    },{
+> >          .driver   =3D "pcie-root-port",
+> >          .property =3D "x-speed",
+> >          .value    =3D "2_5",
+> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> > index 16e8ffa2aaf7..82cf04548907 100644
+> > --- a/hw/intc/xics.c
+> > +++ b/hw/intc/xics.c
+> > @@ -75,7 +75,7 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
+> >      for (i =3D 0; i < ics->nr_irqs; i++) {
+> >          ICSIRQState *irq =3D ics->irqs + i;
+> > =20
+> > -        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+> > +        if (!(irq->flags & XICS_FLAGS_IRQ_CLAIMED)) {
 > >              continue;
 > >          }
+> >          monitor_printf(mon, "  %4x %s %02x %02x\n",
+> > @@ -662,6 +662,22 @@ static int ics_base_dispatch_post_load(void *opaqu=
+e, int version_id)
+> >      ICSState *ics =3D opaque;
+> >      ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
 > > =20
-> > -        spapr_dt_xics_irq(interrupts, source->irq, false);
-> > +        spapr_dt_irq(interrupts, source->irq, false);
-> > =20
-> >          _FDT(node_offset =3D fdt_add_subnode(fdt, event_sources, sourc=
-e_name));
-> >          _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index b74f2632ecc6..ccdaf2c9a606 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -2066,7 +2066,7 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState=
- *phb)
-> > =20
-> >  }
-> > =20
-> > -int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, v=
-oid *fdt,
-> > +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, v=
-oid *fdt,
-> >                            uint32_t nr_msis)
-> >  {
-> >      int bus_off, i, j, ret;
-> > @@ -2164,8 +2164,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uin=
-t32_t xics_phandle, void *fdt,
-> >              irqmap[1] =3D 0;
-> >              irqmap[2] =3D 0;
-> >              irqmap[3] =3D cpu_to_be32(j+1);
-> > -            irqmap[4] =3D cpu_to_be32(xics_phandle);
-> > -            spapr_dt_xics_irq(&irqmap[5], phb->lsi_table[lsi_num].irq,=
- true);
-> > +            irqmap[4] =3D cpu_to_be32(intc_phandle);
-> > +            spapr_dt_irq(&irqmap[5], phb->lsi_table[lsi_num].irq, true=
-);
-> >          }
+> > +    if (!ics->has_claimed_flag) {
+> > +        int i;
+> > +
+> > +        for (i =3D 0; i < ics->nr_irqs; i++) {
+> > +            ICSIRQState *irq =3D ics->irqs + i;
+> > +
+> > +            /*
+> > +             * For older machines, allocating the irq and setting its =
+type is
+> > +             * the same thing.
+> > +             */
+> > +            if (irq->flags & (XICS_FLAGS_IRQ_LSI| XICS_FLAGS_IRQ_MSI))=
+ {
+> > +                irq->flags |=3D XICS_FLAGS_IRQ_CLAIMED;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> >      if (info->post_load) {
+> >          return info->post_load(ics, version_id);
 > >      }
-> >      /* Write interrupt map */
-> > diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> > index 7e8a9ad09337..f80b70a39c46 100644
-> > --- a/hw/ppc/spapr_vio.c
-> > +++ b/hw/ppc/spapr_vio.c
-> > @@ -158,7 +158,7 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
-> >      if (dev->irq) {
-> >          uint32_t ints_prop[2];
+> > @@ -702,6 +718,7 @@ static const VMStateDescription vmstate_ics_base =
+=3D {
 > > =20
-> > -        spapr_dt_xics_irq(ints_prop, dev->irq, false);
-> > +        spapr_dt_irq(ints_prop, dev->irq, false);
-> >          ret =3D fdt_setprop(fdt, node_off, "interrupts", ints_prop,
-> >                            sizeof(ints_prop));
-> >          if (ret < 0) {
-> > diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> > index 4eb3a2ce3eb8..e0e683c32469 100644
-> > --- a/include/hw/pci-host/spapr.h
-> > +++ b/include/hw/pci-host/spapr.h
-> > @@ -113,7 +113,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sP=
-APRPHBState *phb, int pin)
-> >      return spapr_qirq(spapr, phb->lsi_table[pin].irq);
+> >  static Property ics_base_properties[] =3D {
+> >      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> > +    DEFINE_PROP_BOOL("has-claimed-flag", ICSState, has_claimed_flag, t=
+rue),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> > =20
+> > @@ -741,10 +758,15 @@ ICPState *xics_icp_get(XICSFabric *xi, int server)
+> >      return xic->icp_get(xi, server);
 > >  }
 > > =20
-> > -int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, v=
-oid *fdt,
-> > +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, v=
-oid *fdt,
-> >                            uint32_t nr_msis);
-> > =20
-> >  void spapr_pci_rtas_init(void);
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 9e01a5a12e4a..f988dc6924b8 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -682,7 +682,7 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void=
- *fdt, hwaddr addr);
-> >   * "interrupt-controller" node has its "#interrupt-cells" property set=
- to 2 (ie,
-> >   * VIO devices, RTAS event sources and PHBs).
-> >   */
-> > -static inline void spapr_dt_xics_irq(uint32_t *intspec, int irq, bool =
-is_lsi)
-> > +static inline void spapr_dt_irq(uint32_t *intspec, int irq, bool is_ls=
-i)
+> > -void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
+> > +void ics_claim_irq(ICSState *ics, int srcno)
 > >  {
-> >      intspec[0] =3D cpu_to_be32(irq);
-> >      intspec[1] =3D is_lsi ? cpu_to_be32(1) : 0;
+> > -    assert(!(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK));
+> > +    assert(ICS_IRQ_FREE(ics, srcno));
+> > +
+> > +    ics->irqs[srcno].flags |=3D XICS_FLAGS_IRQ_CLAIMED;
+> > +}
+> > =20
+> > +void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
+> > +{
+> >      ics->irqs[srcno].flags |=3D
+> >          lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
+> >  }
+> > diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> > index 8ced09506321..ced34e1119dc 100644
+> > --- a/hw/ppc/pnv_psi.c
+> > +++ b/hw/ppc/pnv_psi.c
+> > @@ -488,6 +488,7 @@ static void pnv_psi_realize(DeviceState *dev, Error=
+ **errp)
+> > =20
+> >      for (i =3D 0; i < ics->nr_irqs; i++) {
+> >          ics_set_irq_type(ics, i, true);
+> > +        ics_claim_irq(ics, i);
+> >      }
+> > =20
+> >      psi->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr=
+_irqs);
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index 1da7a32348fc..86c712d15382 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -125,9 +125,6 @@ error:
+> >      error_propagate(errp, local_err);
+> >  }
+> > =20
+> > -#define ICS_IRQ_FREE(ics, srcno)   \
+> > -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> > -
+> >  static int spapr_irq_claim_xics(sPAPRMachineState *spapr, int irq, boo=
+l lsi,
+> >                                  Error **errp)
+> >  {
+> > @@ -146,6 +143,7 @@ static int spapr_irq_claim_xics(sPAPRMachineState *=
+spapr, int irq, bool lsi,
+> >      }
+> > =20
+> >      ics_set_irq_type(ics, irq - ics->offset, lsi);
+> > +    ics_claim_irq(ics, irq - ics->offset);
+> >      return 0;
+> >  }
+> > =20
+> > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> > index fad786e8b22d..e3be5cc663c5 100644
+> > --- a/include/hw/ppc/xics.h
+> > +++ b/include/hw/ppc/xics.h
+> > @@ -131,6 +131,7 @@ struct ICSState {
+> >      /*< public >*/
+> >      uint32_t nr_irqs;
+> >      uint32_t offset;
+> > +    bool has_claimed_flag;
+> >      ICSIRQState *irqs;
+> >      XICSFabric *xics;
+> >  };
+> > @@ -153,13 +154,15 @@ struct ICSIRQState {
+> >  #define XICS_STATUS_PRESENTED          0x10
+> >  #define XICS_STATUS_QUEUED             0x20
+> >      uint8_t status;
+> > -/* (flags & XICS_FLAGS_IRQ_MASK) =3D=3D 0 means the interrupt is not a=
+llocated */
+> >  #define XICS_FLAGS_IRQ_LSI             0x1
+> >  #define XICS_FLAGS_IRQ_MSI             0x2
+> > -#define XICS_FLAGS_IRQ_MASK            0x3
+> > +#define XICS_FLAGS_IRQ_CLAIMED         0x4
+> >      uint8_t flags;
+> >  };
+> > =20
+> > +#define ICS_IRQ_FREE(ics, srcno)   \
+> > +    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_CLAIMED)))
+> > +
+> >  struct XICSFabric {
+> >      Object parent;
+> >  };
+> > @@ -193,6 +196,7 @@ void ics_simple_write_xive(ICSState *ics, int nr, i=
+nt server,
+> >  void ics_simple_set_irq(void *opaque, int srcno, int val);
+> >  void ics_kvm_set_irq(void *opaque, int srcno, int val);
+> > =20
+> > +void ics_claim_irq(ICSState *ics, int srcno);
+> >  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+> >  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+> >  void ics_pic_print_info(ICSState *ics, Monitor *mon);
 > >  =20
 >=20
