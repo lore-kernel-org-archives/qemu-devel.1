@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42131)
+Received: from eggs.gnu.org ([209.51.188.92]:42127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1glN1P-0001bP-Gw
+	(envelope-from <dgibson@ozlabs.org>) id 1glN1P-0001bO-8X
 	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1glN1O-0006FD-M1
+	(envelope-from <dgibson@ozlabs.org>) id 1glN1O-0006Er-6a
 	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:00:59 -0500
-Date: Mon, 21 Jan 2019 10:57:02 +1300
+Date: Mon, 21 Jan 2019 09:28:25 +1300
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190120215702.GC2423@umbus>
-References: <20190114081454.9991-1-aik@ozlabs.ru>
+Message-ID: <20190120202824.GA2423@umbus>
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20190102025904.GH27457@umbus.fritz.box>
+	<41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="R+My9LyyhiUvIEro"
+	protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
 Content-Disposition: inline
-In-Reply-To: <20190114081454.9991-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
- firmware image
+In-Reply-To: <41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---R+My9LyyhiUvIEro
+--EeQfGwPcQSOJBaQU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 14, 2019 at 07:14:54PM +1100, Alexey Kardashevskiy wrote:
-> The following changes since commit 27df21ca3886fff4dd3d70e515517667963a52=
-f1:
+On Fri, Jan 18, 2019 at 01:25:37PM +0000, Mark Cave-Ayland wrote:
+> On 02/01/2019 02:59, David Gibson wrote:
 >=20
->   Merge remote-tracking branch 'remotes/kraxel/tags/misc-20190111-pull-re=
-quest' into staging (2019-01-11 16:45:59 +0000)
+> > On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+> >> >From working on the TCG vector operations patchset, it is apparent th=
+at there
+> >> are a large number of endian-based hacks in int_helper.c which can be =
+removed by
+> >> making use of the various Vsr* macros.
+> >>
+> >> Patch 1 is simple enough, and implements the complete set of Vsr* macr=
+os for
+> >> both big endian and little endian hosts.
+> >>
+> >> Patches 2 and 3 rework the vector merge and multiply algorithms so tha=
+t they
+> >> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+> >>
+> >> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX ma=
+cros by
+> >> replacing the element accesses with their equivalent Vsr* macro instea=
+d.
+> >>
+> >> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shif=
+t bug
+> >> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the re=
+view of
+> >> v1.
+> >>
+> >> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIG=
+ENDIAN
+> >> hacks in int_helper.c, again replacing accesses with the relevant Vsr*=
+ macro
+> >> instead.
+> >>
+> >> Note that there are still some endian hacks left in int_helper.c after=
+ this
+> >> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I mac=
+ro still
+> >> remains in places where the index variable was used for purposes other=
+ than
+> >> accessing elements within the vector.
+> >>
+> >> There were also some parts where additional conversion could be done, =
+but I
+> >> wasn't confident enough to make the change without access to PPC64 tes=
+t images
+> >> or real big-endian host hardware.
+> >=20
+> > Applied to ppc-for-4.0, thanks.
 >=20
-> are available in the Git repository at:
->=20
->   git@github.com:aik/qemu.git tags/qemu-slof-20190114
->=20
-> for you to fetch changes up to c4560a5144a01ebda98830cfa3203ce26a020386:
->=20
->   pseries: Update SLOF firmware image (2019-01-14 18:06:53 +1100)
+> Just checking your ppc-for-4.0 branch on github, I can't see where this h=
+as been
+> applied? Is it queued in a local branch still?
 
-Merged, thanks.
-
->=20
-> ----------------------------------------------------------------
-> qemu-slof-20190114 signed update
->=20
-> ----------------------------------------------------------------
-> Alexey Kardashevskiy (1):
->       pseries: Update SLOF firmware image
->=20
->  pc-bios/README   |   2 +-
->  pc-bios/slof.bin | Bin 974544 -> 926392 bytes
->  roms/SLOF        |   2 +-
->  3 files changed, 2 insertions(+), 2 deletions(-)
->=20
->=20
-> *** Note: this is not for master, this is for pseries
->=20
+Yeah, probably.  I've pushed it out now.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -73,24 +98,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---R+My9LyyhiUvIEro
+--EeQfGwPcQSOJBaQU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxE7qwACgkQbDjKyiDZ
-s5LPyBAAo0CWpz1CRiNn40z/QDaIOG9ln2Sqn6Lcts3bsIAR+oOamYoXvRwMhmCv
-g4YVZHV1QBJGAflOQk9oy8YHaqB6c+620sF5SU3Et/sXZe3Ydim1s7DVuMqFjvFq
-We3Xj+03Qp5r9WtYIAs0ZAhhZ7CdoPiT0yrSu4sc2ercq3Hf2t+N8fQqgCrqY/43
-dq0TkqsFVqV6TGP5pl/l3NY85M9Cx8pQSXuEDzpoF8JoRZWGOPtt7RrNdUabRjMs
-5Vh5dVr2eE9xK+HM2CeqmWHUl8SvoyHlZt/kighaELtkbAN2QdRCqPOhL8TwCy9F
-KLcdRRwBaj5BUCsy0p6yi6b5YjP70e3nA5WTqHEsTtbUT9oKQGUyBoqI3HMsEfF0
-QYJtxgoKK9UnKuyqkICUAILgm2Y8gZVEpyo0WXZpfLDv3vclmLAWrkI7jbc4H/UE
-xQP1cvXTg4Ryv2xxpOQdBK8ExY9j1sXrtqQj13m0WuBm6eUBppKjgHtVwhV8REVi
-zxjsuDui2HpQiL8Ri/LEffCKB3Gqet0ZUekIuGFYtVPtZmefGBmZl7kAFHDWPBzv
-x7sAtQIFEC0GeHc1TmgSXsitkRpTmGuLbCmDmkdFek2kJ9NWO7Gc4FMgn9T89bUD
-Zrx6b7nSkxhUUQH0fON3cZWkDQ2JPUHKk5fdIDtlIVJOlS3fuMc=
-=KnTk
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxE2eYACgkQbDjKyiDZ
+s5LruQ/+LhMCJQ9IY88bAztKeZ6fNOUi6NPhMKs8yX2lLr7u29l5ZD5/7O6d6WAA
+LIyRP7W7pWEvtvyIcc4b6GLjfnVJcuBTP6qjo+V4ClZFZP9p9RotEEUWRu2UDWRv
+dVrHYCsR45HL2axMS7oJ7bTe5HiFc8dJPzFlBs2ARb1w41JC3pUKLkX4w44+SJ26
+GwRxWwBJOx6Vh2/a4cXoW6FENU06pnWbMe7O2ecJWe53UcdGetAHIuHj8jrFvBTP
+e00l/M1QkVxPZEQR2Ece/MFqbTmi3nbfFnyiab5UX5gcSP9WpNjKNlsXdFK+KKwT
++I66ITERa4aavTkZRDM6Bhy+U/okKG/GO42cU1uSPUnai9vM92hnKWzuQ5PK3kqJ
+1d97Nsmelp9ymhuudnC1omIDVL0Opn8LIrdYhWF5i7m5bcv6MIBtT1JCQhV42tlW
+Uj33fL59egmiWgfy+Up4j7k/5TjtW1q51NkbS9SMC7AnsO93m+PpyzJBE7LoYx+K
+mJGf5dSenVy0k/dVLNtj5qBbN1IZvIRUQWdrYbm5jE1Pmcn+B4SF4FK7bZC9Ge84
+B6GZ+/ARQu5Fz3LbyZ2sitUte8jqlLKbHsDEn/kzjWT2BvqKaon304kxzhfznIKz
+RLSGrJow/u7r8m32xt+Cnz7/9aH4taD++k1LDGVAKbPLm+kHxbM=
+=vCmJ
 -----END PGP SIGNATURE-----
 
---R+My9LyyhiUvIEro--
+--EeQfGwPcQSOJBaQU--
