@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43607)
+Received: from eggs.gnu.org ([209.51.188.92]:54236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <relkochta@gmail.com>) id 1gl4Vj-00085Z-VN
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 23:15:05 -0500
+	(envelope-from <stefanha@gmail.com>) id 1glDoc-00051P-7p
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <relkochta@gmail.com>) id 1gl4Vi-0001Gr-VO
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 23:15:03 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:42860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <relkochta@gmail.com>) id 1gl4Vi-0001G7-QO
-	for qemu-devel@nongnu.org; Sat, 19 Jan 2019 23:15:02 -0500
-Received: by mail-qt1-x841.google.com with SMTP id d19so19569587qtq.9
-	for <qemu-devel@nongnu.org>; Sat, 19 Jan 2019 20:15:02 -0800 (PST)
-From: Ryan El Kochta <relkochta@gmail.com>
-Date: Sat, 19 Jan 2019 23:14:27 -0500
-Message-Id: <20190120041427.21602-1-relkochta@gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1glDob-000541-C7
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 09:11:10 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] input-linux: customizable grab toggle keys v4
+References: <20190110094020.18354-1-stefanha@redhat.com>
+	<20190110094020.18354-2-stefanha@redhat.com>
+	<CAFEAcA9aypaAyroky0xpFzTUWp4PksqW17O8gkub2rLkS8o=ZQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9aypaAyroky0xpFzTUWp4PksqW17O8gkub2rLkS8o=ZQ@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Sun, 20 Jan 2019 14:10:55 +0000
+Message-ID: <CAJSP0QXytC=y-rjuRahU0Whgm2x1mvRcvTZS7=yKHCVrMUSNNg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] arm: Stub out NRF51 TWI
+ magnetometer/accelerometer detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,192 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: Ryan El Kochta <relkochta@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Julia Suvorova <jusual@mail.ru>
 
-This patch adds a new option to the input-linux object:
+On Fri, Jan 18, 2019 at 1:59 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Thu, 10 Jan 2019 at 09:40, Stefan Hajnoczi <stefanha@redhat.com> wrote=
+:
+> >
+> > From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> >
+> > Recent microbit firmwares panic if the TWI magnetometer/accelerometer
+> > devices are not detected during startup.  We don't implement TWI (I2C)
+> > so let's stub out these devices just to let the firmware boot.
+> >
+>
+> > --- a/hw/arm/microbit.c
+> > +++ b/hw/arm/microbit.c
+> > @@ -16,11 +16,13 @@
+> >  #include "exec/address-spaces.h"
+> >
+> >  #include "hw/arm/nrf51_soc.h"
+> > +#include "hw/i2c/microbit_i2c.h"
+> >
+> >  typedef struct {
+> >      MachineState parent;
+> >
+> >      NRF51State nrf51;
+> > +    MicrobitI2CState i2c;
+> >  } MicrobitMachineState;
+> >
+> >  #define TYPE_MICROBIT_MACHINE MACHINE_TYPE_NAME("microbit")
+> > @@ -32,7 +34,9 @@ static void microbit_init(MachineState *machine)
+> >  {
+> >      MicrobitMachineState *s =3D MICROBIT_MACHINE(machine);
+> >      MemoryRegion *system_memory =3D get_system_memory();
+> > +    MemoryRegion *mr;
+> >      Object *soc =3D OBJECT(&s->nrf51);
+> > +    Object *i2c =3D OBJECT(&s->i2c);
+> >
+> >      sysbus_init_child_obj(OBJECT(machine), "nrf51", soc, sizeof(s->nrf=
+51),
+> >                            TYPE_NRF51_SOC);
+> > @@ -41,6 +45,17 @@ static void microbit_init(MachineState *machine)
+> >                               &error_fatal);
+> >      object_property_set_bool(soc, true, "realized", &error_fatal);
+> >
+> > +    /* Overlap the TWI stub device into the SoC.  This is a microbit-s=
+pecific
+> > +     * hack until we implement the nRF51 TWI controller properly and t=
+he
+> > +     * magnetometer/accelerometer devices.
+> > +     */
+> > +    sysbus_init_child_obj(OBJECT(machine), "microbit.twi", i2c,
+> > +                          sizeof(s->i2c), TYPE_MICROBIT_I2C);
+> > +    object_property_set_bool(i2c, true, "realized", &error_fatal);
+> > +    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(i2c), 0);
+> > +    memory_region_add_subregion_overlap(&s->nrf51.container, NRF51_TWI=
+_BASE,
+> > +                                        mr, -1);
+>
+> This is an SoC device, right? Why are we creating it here
+> in the board code rather than in the SoC object's code ?
 
-grab-toggle=[key-combo]
+Yes, this is a microbit-specific hack.  We don't implement a full
+TWI/I2C bus for the nRF51 SoC.  This implementation is just aimed at
+stubbing out the microbit-specific accelerometer/magnetometer devices.
 
-The key combination can be one of the following:
+Therefore I decided it was cleanest to place it in the microbit
+machine type instead of dirtying the nRF51 SoC with a microbit hack.
 
-* ctrl-ctrl
-* alt-alt
-* meta-meta
-* ctrl-alt
-* scrolllock
-* ctrl-scrolllock
-* ctrl-backtick
+If the I2C passthrough GSoC 2019 project happens we'll get proper
+nRF51 TWI/I2C controller emulation and can eliminate this stub.  But
+for now this allows the microbit to boot and doesn't mess up any other
+potential machine types that will use the nRF51 SoC.
 
-The user can pick any of these key combinations. The VM's grab
-of the evdev device will be toggled when the key combination is
-pressed.
-
-Any invalid setting will result in an error. No setting will
-result in the current default of ctrl-ctrl.
-
-If scrolllock is selected as one of the grab-toggle keys, it
-will be entirely disabled and not passed to the guest at all.
-This is to prevent enabling it while attempting to leave or enter
-the VM. On the host, scrolllock can be disabled using xmodmap.
-
-First, find the modifier that Scroll_Lock is bound to:
-
-$ xmodmap -pm
-
-Then, remove Scroll_Lock from it, replacing modX with the modifier:
-
-$ xmodmap -e 'remove modX = Scroll_Lock'
-
-If Scroll_Lock is not bound to any modifier, it is already disabled.
-
-To save the changes, add them to your xinitrc.
-
-Side note - I have changed e-mail addresses from
-lightn1ngstr1ke@protonmail.com due to issues with git send-mail.
-I am the same person.
-
-Signed-off-by: Ryan El Kochta <relkochta@gmail.com>
----
- qapi/ui.json     | 10 +++++++
- ui/input-linux.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 78 insertions(+), 3 deletions(-)
-
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 5ad1324..487653a 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1016,6 +1016,16 @@
-             '*head'  : 'int',
-             'events' : [ 'InputEvent' ] } }
- 
-+##
-+# @GrabToggleKeys:
-+#
-+# Keys to toggle input-linux between host and guest.
-+#
-+# Since: 4.0
-+#
-+##
-+{ 'enum': 'GrabToggleKeys',
-+  'data': [ 'ctrl-ctrl', 'alt-alt', 'meta-meta', 'ctrl-alt', 'scrolllock', 'ctrl-scrolllock', 'ctrl-backtick' ] }
- 
- ##
- # @DisplayGTK:
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index 9720333..65d1fb9 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -63,6 +63,8 @@ struct InputLinux {
-     struct input_event event;
-     int         read_offset;
- 
-+    enum GrabToggleKeys grab_toggle;
-+
-     QTAILQ_ENTRY(InputLinux) next;
- };
- 
-@@ -98,6 +100,51 @@ static void input_linux_toggle_grab(InputLinux *il)
-     }
- }
- 
-+static bool input_linux_check_toggle(InputLinux *il)
-+{
-+    switch (il->grab_toggle) {
-+    case GRAB_TOGGLE_KEYS_CTRL_CTRL:
-+        return il->keydown[KEY_LEFTCTRL] &&
-+            il->keydown[KEY_RIGHTCTRL];
-+
-+    case GRAB_TOGGLE_KEYS_ALT_ALT:
-+        return il->keydown[KEY_LEFTALT] &&
-+            il->keydown[KEY_RIGHTALT];
-+
-+    case GRAB_TOGGLE_KEYS_META_META:
-+        return il->keydown[KEY_LEFTMETA] &&
-+            il->keydown[KEY_RIGHTMETA];
-+
-+    case GRAB_TOGGLE_KEYS_CTRL_ALT:
-+        return il->keydown[KEY_LEFTCTRL] &&
-+            il->keydown[KEY_LEFTALT];
-+
-+    case GRAB_TOGGLE_KEYS_SCROLLLOCK:
-+        return il->keydown[KEY_SCROLLLOCK];
-+
-+    case GRAB_TOGGLE_KEYS_CTRL_SCROLLLOCK:
-+        return il->keydown[KEY_LEFTCTRL] &&
-+            il->keydown[KEY_SCROLLLOCK];
-+
-+    case GRAB_TOGGLE_KEYS_CTRL_BACKTICK:
-+        return il->keydown[KEY_LEFTCTRL] &&
-+            il->keydown[KEY_GRAVE];
-+
-+    case GRAB_TOGGLE_KEYS__MAX:
-+        /* avoid gcc error */
-+        break;
-+    }
-+    return false;
-+}
-+
-+static bool input_linux_should_skip(InputLinux *il,
-+                                    struct input_event *event)
-+{
-+    return (il->grab_toggle == GRAB_TOGGLE_KEYS_SCROLLLOCK ||
-+            il->grab_toggle == GRAB_TOGGLE_KEYS_CTRL_SCROLLLOCK) &&
-+            event->code == KEY_SCROLLLOCK;
-+}
-+
- static void input_linux_handle_keyboard(InputLinux *il,
-                                         struct input_event *event)
- {
-@@ -128,14 +175,13 @@ static void input_linux_handle_keyboard(InputLinux *il,
-         }
- 
-         /* send event to guest when grab is active */
--        if (il->grab_active) {
-+        if (il->grab_active && !input_linux_should_skip(il, event)) {
-             int qcode = qemu_input_linux_to_qcode(event->code);
-             qemu_input_event_send_key_qcode(NULL, qcode, event->value);
-         }
- 
-         /* hotkey -> record switch request ... */
--        if (il->keydown[KEY_LEFTCTRL] &&
--            il->keydown[KEY_RIGHTCTRL]) {
-+        if (input_linux_check_toggle(il)) {
-             il->grab_request = true;
-         }
- 
-@@ -410,6 +456,21 @@ static void input_linux_set_repeat(Object *obj, bool value,
-     il->repeat = value;
- }
- 
-+static int input_linux_get_grab_toggle(Object *obj, Error **errp)
-+{
-+    InputLinux *il = INPUT_LINUX(obj);
-+
-+    return il->grab_toggle;
-+}
-+
-+static void input_linux_set_grab_toggle(Object *obj, int value,
-+                                       Error **errp)
-+{
-+    InputLinux *il = INPUT_LINUX(obj);
-+
-+    il->grab_toggle = value;
-+}
-+
- static void input_linux_instance_init(Object *obj)
- {
-     object_property_add_str(obj, "evdev",
-@@ -421,6 +482,10 @@ static void input_linux_instance_init(Object *obj)
-     object_property_add_bool(obj, "repeat",
-                              input_linux_get_repeat,
-                              input_linux_set_repeat, NULL);
-+    object_property_add_enum(obj, "grab-toggle", "GrabToggleKeys",
-+                             &GrabToggleKeys_lookup,
-+                             input_linux_get_grab_toggle,
-+                             input_linux_set_grab_toggle, NULL);
- }
- 
- static void input_linux_class_init(ObjectClass *oc, void *data)
--- 
-2.20.1
+Stefan
