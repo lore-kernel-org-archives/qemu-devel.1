@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40167)
+Received: from eggs.gnu.org ([209.51.188.92]:40340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO2-0001Oy-EI
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO8-0001Rv-E8
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNx-0005Bo-Ou
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO6-0005J1-Qk
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:52 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:49:02 -0600
-Message-Id: <20190121224907.26634-17-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:52 -0600
+Message-Id: <20190121224907.26634-7-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/21] nbd/client: Refactor nbd_opt_go() to
- support NBD_OPT_INFO
+Subject: [Qemu-devel] [PULL 06/21] nbd/server: Favor [u]int64_t over off_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,165 +22,199 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Rename the function to nbd_opt_info_or_go() with an added parameter
-and slight changes to comments and trace messages, in order to
-reuse the function for NBD_OPT_INFO.
+Although our compile-time environment is set up so that we always
+support long files with 64-bit off_t, we have no guarantee whether
+off_t is the same type as int64_t.  This requires casts when
+printing values, and prevents us from directly using qemu_strtoi64()
+(which will be done in the next patch). Let's just flip to uint64_t
+where possible, and stick to int64_t for detecting failure of
+blk_getlength(); we also keep the assertions added in the previous
+patch that the resulting values fit in 63 bits.  The overflow check
+in nbd_co_receive_request() was already sane (request->from is
+validated to fit in 63 bits, and request->len is 32 bits, so the
+addition can't overflow 64 bits), but rewrite it in a form easier
+to recognize as a typical overflow check.
 
+Rename the variable 'description' to keep line lengths reasonable.
+
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190117193658.16413-17-eblake@redhat.com>
+Message-Id: <20190117193658.16413-7-eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/client.c     | 36 ++++++++++++++++++++++--------------
- nbd/trace-events |  8 ++++----
- 2 files changed, 26 insertions(+), 18 deletions(-)
+ include/block/nbd.h |  4 ++--
+ nbd/server.c        | 18 +++++++++---------
+ qemu-nbd.c          | 29 +++++++++++------------------
+ 3 files changed, 22 insertions(+), 29 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 6829c684fec..fa1657a1cb3 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -330,11 +330,16 @@ static int nbd_receive_list(QIOChannel *ioc, char *=
-*name, char **description,
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 1971b557896..24be9570bb4 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -294,8 +294,8 @@ int nbd_errno_to_system_errno(int err);
+ typedef struct NBDExport NBDExport;
+ typedef struct NBDClient NBDClient;
+
+-NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
+-                          const char *name, const char *description,
++NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
++                          uint64_t size, const char *name, const char *d=
+esc,
+                           const char *bitmap, uint16_t nbdflags,
+                           void (*close)(NBDExport *), bool writethrough,
+                           BlockBackend *on_eject_blk, Error **errp);
+diff --git a/nbd/server.c b/nbd/server.c
+index 51ee8094e02..cb0d5634fa1 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -77,8 +77,8 @@ struct NBDExport {
+     BlockBackend *blk;
+     char *name;
+     char *description;
+-    off_t dev_offset;
+-    off_t size;
++    uint64_t dev_offset;
++    uint64_t size;
+     uint16_t nbdflags;
+     QTAILQ_HEAD(, NBDClient) clients;
+     QTAILQ_ENTRY(NBDExport) next;
+@@ -1455,8 +1455,8 @@ static void nbd_eject_notifier(Notifier *n, void *d=
+ata)
+     nbd_export_close(exp);
  }
 
+-NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
+-                          const char *name, const char *description,
++NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
++                          uint64_t size, const char *name, const char *d=
+esc,
+                           const char *bitmap, uint16_t nbdflags,
+                           void (*close)(NBDExport *), bool writethrough,
+                           BlockBackend *on_eject_blk, Error **errp)
+@@ -1495,12 +1495,12 @@ NBDExport *nbd_export_new(BlockDriverState *bs, o=
+ff_t dev_offset, off_t size,
+     exp->refcount =3D 1;
+     QTAILQ_INIT(&exp->clients);
+     exp->blk =3D blk;
+-    assert(dev_offset >=3D 0 && dev_offset <=3D INT64_MAX);
++    assert(dev_offset <=3D INT64_MAX);
+     exp->dev_offset =3D dev_offset;
+     exp->name =3D g_strdup(name);
+-    exp->description =3D g_strdup(description);
++    exp->description =3D g_strdup(desc);
+     exp->nbdflags =3D nbdflags;
+-    assert(size >=3D 0 && size <=3D INT64_MAX - dev_offset);
++    assert(size <=3D INT64_MAX - dev_offset);
+     exp->size =3D QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
 
--/* Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
-- * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
-+/*
-+ * nbd_opt_info_or_go:
-+ * Send option for NBD_OPT_INFO or NBD_OPT_GO and parse the reply.
-+ * Returns -1 if the option proves the export @info->name cannot be
-+ * used, 0 if the option is unsupported (fall back to NBD_OPT_LIST and
-  * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
-- * go (with the rest of @info populated). */
--static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo *info, Error **errp=
-)
-+ * go (with the rest of @info populated).
-+ */
-+static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
-+                              NBDExportInfo *info, Error **errp)
- {
-     NBDOptionReply reply;
-     uint32_t len =3D strlen(info->name);
-@@ -347,7 +352,8 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-      * flags still 0 is a witness of a broken server. */
-     info->flags =3D 0;
-
--    trace_nbd_opt_go_start(info->name);
-+    assert(opt =3D=3D NBD_OPT_GO || opt =3D=3D NBD_OPT_INFO);
-+    trace_nbd_opt_info_go_start(nbd_opt_lookup(opt), info->name);
-     buf =3D g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
-     stl_be_p(buf, len);
-     memcpy(buf + 4, info->name, len);
-@@ -356,7 +362,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-     if (info->request_sizes) {
-         stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
+     if (bitmap) {
+@@ -2130,10 +2130,10 @@ static int nbd_co_receive_request(NBDRequestData =
+*req, NBDRequest *request,
+         return -EROFS;
      }
--    error =3D nbd_send_option_request(ioc, NBD_OPT_GO,
-+    error =3D nbd_send_option_request(ioc, opt,
-                                     4 + len + 2 + 2 * info->request_size=
-s,
-                                     buf, errp);
-     g_free(buf);
-@@ -365,7 +371,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
+     if (request->from > client->exp->size ||
+-        request->from + request->len > client->exp->size) {
++        request->len > client->exp->size - request->from) {
+         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %"=
+ PRIu32
+                    ", Size: %" PRIu64, request->from, request->len,
+-                   (uint64_t)client->exp->size);
++                   client->exp->size);
+         return (request->type =3D=3D NBD_CMD_WRITE ||
+                 request->type =3D=3D NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -=
+EINVAL;
      }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 5c90c5e55f7..598caa656b2 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -176,7 +176,7 @@ static void read_partition(uint8_t *p, struct partiti=
+on_record *r)
+ }
 
-     while (1) {
--        if (nbd_receive_option_reply(ioc, NBD_OPT_GO, &reply, errp) < 0)=
+ static int find_partition(BlockBackend *blk, int partition,
+-                          off_t *offset, off_t *size)
++                          uint64_t *offset, uint64_t *size)
  {
-+        if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
-             return -1;
-         }
-         error =3D nbd_handle_reply_err(ioc, &reply, errp);
-@@ -375,8 +381,10 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo=
- *info, Error **errp)
-         len =3D reply.length;
-
-         if (reply.type =3D=3D NBD_REP_ACK) {
--            /* Server is done sending info and moved into transmission
--               phase, but make sure it sent flags */
-+            /*
-+             * Server is done sending info, and moved into transmission
-+             * phase for NBD_OPT_GO, but make sure it sent flags
-+             */
-             if (len) {
-                 error_setg(errp, "server sent invalid NBD_REP_ACK");
-                 return -1;
-@@ -385,7 +393,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-                 error_setg(errp, "broken server omitted NBD_INFO_EXPORT"=
-);
-                 return -1;
+     struct partition_record mbr[4];
+     uint8_t data[MBR_SIZE];
+@@ -500,14 +500,14 @@ int main(int argc, char **argv)
+ {
+     BlockBackend *blk;
+     BlockDriverState *bs;
+-    off_t dev_offset =3D 0;
++    uint64_t dev_offset =3D 0;
+     uint16_t nbdflags =3D 0;
+     bool disconnect =3D false;
+     const char *bindto =3D NULL;
+     const char *port =3D NULL;
+     char *sockpath =3D NULL;
+     char *device =3D NULL;
+-    off_t fd_size;
++    int64_t fd_size;
+     QemuOpts *sn_opts =3D NULL;
+     const char *sn_id_or_name =3D NULL;
+     const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:";
+@@ -665,10 +665,6 @@ int main(int argc, char **argv)
+                 error_report("Invalid offset `%s'", optarg);
+                 exit(EXIT_FAILURE);
              }
--            trace_nbd_opt_go_success();
-+            trace_nbd_opt_info_go_success(nbd_opt_lookup(opt));
-             return 1;
-         }
-         if (reply.type !=3D NBD_REP_INFO) {
-@@ -479,12 +487,12 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInf=
-o *info, Error **errp)
-                 nbd_send_opt_abort(ioc);
-                 return -1;
-             }
--            trace_nbd_opt_go_info_block_size(info->min_block, info->opt_=
-block,
--                                             info->max_block);
-+            trace_nbd_opt_info_block_size(info->min_block, info->opt_blo=
-ck,
-+                                          info->max_block);
+-            if (dev_offset < 0) {
+-                error_report("Offset must be positive `%s'", optarg);
+-                exit(EXIT_FAILURE);
+-            }
              break;
+         case 'l':
+             if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
+@@ -1005,15 +1001,14 @@ int main(int argc, char **argv)
+     }
 
-         default:
--            trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
-+            trace_nbd_opt_info_unknown(type, nbd_info_lookup(type));
-             if (nbd_drop(ioc, len, errp) < 0) {
-                 error_prepend(errp, "Failed to read info payload: ");
-                 nbd_send_opt_abort(ioc);
-@@ -993,7 +1001,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTL=
-SCreds *tlscreds,
-          * TLS).  If it is not available, fall back to
-          * NBD_OPT_LIST for nicer error messages about a missing
-          * export, then use NBD_OPT_EXPORT_NAME.  */
--        result =3D nbd_opt_go(ioc, info, errp);
-+        result =3D nbd_opt_info_or_go(ioc, NBD_OPT_GO, info, errp);
-         if (result < 0) {
-             return -EINVAL;
+     if (dev_offset >=3D fd_size) {
+-        error_report("Offset (%lld) has to be smaller than the image siz=
+e "
+-                     "(%lld)",
+-                     (long long int)dev_offset, (long long int)fd_size);
++        error_report("Offset (%" PRIu64 ") has to be smaller than the im=
+age "
++                     "size (%" PRId64 ")", dev_offset, fd_size);
+         exit(EXIT_FAILURE);
+     }
+     fd_size -=3D dev_offset;
+
+     if (partition !=3D -1) {
+-        off_t limit;
++        uint64_t limit;
+
+         if (dev_offset) {
+             error_report("Cannot request partition and offset together")=
+;
+@@ -1027,15 +1022,13 @@ int main(int argc, char **argv)
          }
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 663d11687ab..7f10ebd4e0b 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -4,10 +4,10 @@ nbd_receive_option_reply(uint32_t option, const char *o=
-ptname, uint32_t type, co
- nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "s=
-erver reported error 0x%" PRIx32 " (%s) with additional message: %s"
- nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't u=
-nderstand request %" PRIu32 " (%s), attempting fallback"
- nbd_receive_list(const char *name, const char *desc) "export list includ=
-es '%s', description '%s'"
--nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s=
-'"
--nbd_opt_go_success(void) "Export is good to go"
--nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown in=
-fo %d (%s)"
--nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_=
-t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
-+nbd_opt_info_go_start(const char *opt, const char *name) "Attempting %s =
-for export '%s'"
-+nbd_opt_info_go_success(const char *opt) "Export is ready after %s reque=
-st"
-+nbd_opt_info_unknown(int info, const char *name) "Ignoring unknown info =
-%d (%s)"
-+nbd_opt_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t m=
-aximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
- nbd_receive_query_exports_start(const char *wantname) "Querying export l=
-ist for '%s'"
- nbd_receive_query_exports_success(const char *wantname) "Found desired e=
-xport name '%s'"
- nbd_receive_starttls_new_client(void) "Setting up TLS"
+         /*
+          * MBR partition limits are (32-bit << 9); this assert lets
+-         * the compiler know that we have two positive values that
+-         * can't overflow 64 bits.
++         * the compiler know that we can't overflow 64 bits.
+          */
+-        assert(dev_offset >=3D 0 && dev_offset + limit >=3D dev_offset);
++        assert(dev_offset + limit >=3D dev_offset);
+         if (dev_offset + limit > fd_size) {
+-            error_report("Discovered partition %d at offset %lld size %l=
+ld, "
+-                         "but size exceeds file length %lld", partition,
+-                         (long long int) dev_offset, (long long int) lim=
+it,
+-                         (long long int) fd_size);
++            error_report("Discovered partition %d at offset %" PRIu64
++                         " size %" PRIu64 ", but size exceeds file lengt=
+h %"
++                         PRId64, partition, dev_offset, limit, fd_size);
+             exit(EXIT_FAILURE);
+         }
+         fd_size =3D limit;
 --=20
 2.20.1
