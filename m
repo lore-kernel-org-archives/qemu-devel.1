@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52348)
+Received: from eggs.gnu.org ([209.51.188.92]:53223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gla1h-0008V3-Ln
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:54:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gla5O-0001So-TF
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gla1g-000746-Ho
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:54:09 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39643)
+	(envelope-from <peter.maydell@linaro.org>) id 1gla5O-00017h-6q
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:57:58 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gla1g-00073n-Bo
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:54:08 -0500
-Received: by mail-ot1-x344.google.com with SMTP id n8so20568927otl.6
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 05:54:08 -0800 (PST)
+	id 1gla5O-00017J-2K
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:57:58 -0500
+Received: by mail-oi1-x243.google.com with SMTP id w13so14570432oiw.9
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 05:57:58 -0800 (PST)
 MIME-Version: 1.0
-References: <20190119140000.11767-1-luc.michel@greensocs.com>
-In-Reply-To: <20190119140000.11767-1-luc.michel@greensocs.com>
+References: <20190118185402.3065-1-peter.maydell@linaro.org>
+	<906bafd8-2a2a-9cae-142e-c7045edaa9d0@redhat.com>
+	<CAP+75-X_2oyq9siWs0ubUnUp0DGzp-CvYhwJZenfdz6b_BatrA@mail.gmail.com>
+In-Reply-To: <CAP+75-X_2oyq9siWs0ubUnUp0DGzp-CvYhwJZenfdz6b_BatrA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 13:53:55 +0000
-Message-ID: <CAFEAcA8h+rX_v+BBuhCr0t1sPSg56CsTnVGteFV5mgYa7HYJMw@mail.gmail.com>
+Date: Mon, 21 Jan 2019 13:57:45 +0000
+Message-ID: <CAFEAcA_0M-1HRyeytDrUT7WQpMgXbAC1qbFYDpVWU0UXMuAH+w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: fix gdb_get_cpu(s, pid,
- tid) when pid and/or tid are 0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: Disable ipmi-bt-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@wdc.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Mark Burton <mark.burton@greensocs.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>, "patches@linaro.org" <patches@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-On Sat, 19 Jan 2019 at 14:00, Luc Michel <luc.michel@greensocs.com> wrote:
+On Mon, 21 Jan 2019 at 10:40, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
 >
-> a TID or PID value means "any thread" (resp. "any process"). This commit
-> fixes the different combinations when at least one value is 0.
+> On Mon, Jan 21, 2019 at 11:39 AM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+> >
+> > Cc'ing Corey, the tests author.
+> >
+> > On 1/18/19 7:54 PM, Peter Maydell wrote:
+> > > The ipmi-bt-test fails intermittently, especially on the NetBSD VM.
+> > > The frequency of this failure has recently gone up sharply to the
+> > > point that I'm having to retry the NetBSD build multiple times
+> > > to get a pass when merging pull requests.
+> > >
+> > > Disable the test until we can figure out why it's failing.
+> > >
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> >
+> > Acked-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >
-> When both are 0, the function now returns the first attached CPU,
-> instead of the CPU with TID 1, which is not necessarily attached or even
-> existent.
->
-> When PID is specified but TID is 0, the function returns the first CPU
-> in the process, or NULL if the process does not exist or is not
-> attached.
->
-> In other cases, it returns the corresponding CPU, while ignoring the PID
-> check when PID is 0.
->
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> ---
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-I've tracked down why my code was running into this, incidentally:
-it turned out to be because I wasn't getting the parenting of the CPU
-objects into the container correct, so the gdbstub ended up with
-three processes, of which the first two were empty (and the CPUs
-in the third default process). So the first thread (cpu 0) wasn't
-in the first process, but in the last one.
+> Oops wrong paste, FWIW:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
-thanks
+Applied to master, thanks.
+
 -- PMM
