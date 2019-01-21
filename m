@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51509)
+Received: from eggs.gnu.org ([209.51.188.92]:51507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy1-0004GL-I9
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy1-0004GJ-I4
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldxz-00040b-Dg
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldxz-00041Y-PF
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:37 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:56120)
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:50433)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gldxw-0003xV-Q3
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:33 -0500
-Received: by mail-wm1-x329.google.com with SMTP id y139so11637310wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:32 -0800 (PST)
+	id 1gldxy-0003yP-BL
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:34 -0500
+Received: by mail-wm1-x329.google.com with SMTP id n190so11755785wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:33 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
 	133sm56197732wme.9.2019.01.21.10.06.30 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 21 Jan 2019 10:06:30 -0800 (PST)
+	Mon, 21 Jan 2019 10:06:31 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Jan 2019 19:05:39 +0100
-Message-Id: <1548093980-43088-9-git-send-email-pbonzini@redhat.com>
+Date: Mon, 21 Jan 2019 19:05:40 +0100
+Message-Id: <1548093980-43088-10-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 References: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/49] vhost-user-test: use g_cond_broadcast
+Subject: [Qemu-devel] [PULL 09/49] vhost-user-test: signal data_cond when
+ s->rings changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +37,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-g_cond_signal is rarely the right thing to do, it works now because
-vhost-user-test only has two threads but it is not correct in general.
-Fix it before adding more calls.
+This speeds up wait_for_rings_started, which currently is just waiting for
+the timeout before checking s->rings.
 
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-7-git-send-email-pbonzini@redhat.com>
+Message-Id: <1543851204-41186-8-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/vhost-user-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index e7900fa..52c4d39 100644
+index 52c4d39..409157d 100644
 --- a/tests/vhost-user-test.c
 +++ b/tests/vhost-user-test.c
-@@ -396,7 +396,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-                                             G_N_ELEMENTS(s->fds));
+@@ -387,6 +387,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
  
-         /* signal the test that it can continue */
--        g_cond_signal(&s->data_cond);
+         assert(msg.payload.state.index < s->queues * 2);
+         s->rings &= ~(0x1ULL << msg.payload.state.index);
 +        g_cond_broadcast(&s->data_cond);
          break;
  
-     case VHOST_USER_SET_VRING_KICK:
-@@ -422,7 +422,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         p = (uint8_t *) &msg;
-         qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE);
- 
--        g_cond_signal(&s->data_cond);
-+        g_cond_broadcast(&s->data_cond);
-         break;
- 
+     case VHOST_USER_SET_MEM_TABLE:
+@@ -428,6 +429,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
      case VHOST_USER_SET_VRING_BASE:
+         assert(msg.payload.state.index < s->queues * 2);
+         s->rings |= 0x1ULL << msg.payload.state.index;
++        g_cond_broadcast(&s->data_cond);
+         break;
+ 
+     case VHOST_USER_GET_QUEUE_NUM:
 -- 
 1.8.3.1
