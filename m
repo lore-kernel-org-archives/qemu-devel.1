@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57628)
+Received: from eggs.gnu.org ([209.51.188.92]:57742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1glgAX-0006pk-GH
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:27:42 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1glgAw-0007Ae-8O
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1glgAW-0004ol-Bh
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:27:41 -0500
-Date: Mon, 21 Jan 2019 18:27:13 -0200
+	(envelope-from <ccarrara@redhat.com>) id 1glgAv-00055P-0x
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:28:05 -0500
+Date: Mon, 21 Jan 2019 18:20:07 -0200
 From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20190121202712.GH17671@localhost.localdomain>
+Message-ID: <20190121202006.GB17671@localhost.localdomain>
 References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-10-crosa@redhat.com>
+	<20190117185628.21862-3-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190117185628.21862-10-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/18] Boot Linux Console Test: update the
- x86_64 kernel
+In-Reply-To: <20190117185628.21862-3-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/18] Acceptance tests: show avocado test
+ execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +27,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cleber Rosa <crosa@redhat.com>
 Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Thu, Jan 17, 2019 at 01:56:19PM -0500, Cleber Rosa wrote:
-> To the stock Fedora 29 kernel, from the Fedora 28.  New tests will be
-> added using the 29 kernel, so for consistency, let's also update it
-> here.
+On Thu, Jan 17, 2019 at 01:56:12PM -0500, Cleber Rosa wrote:
+> The current version of the "check-acceptance" target will only show
+> one line for execution of all tests.  That's probably OK if the tests
+> to be run are quick enough and they're always the same.
+> 
+> But, there's already one test alone that takes on average ~5 seconds
+> to run, we intend to adapt the list of tests to match the user's build
+> environment (among other choices).
+> 
+> Because of that, let's present the default Avocado UI by default.
+> Users can always choose a different output by setting the AVOCADO_SHOW
+> variable.
 > 
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
 Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 
 > ---
->  tests/acceptance/boot_linux_console.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  .travis.yml            | 2 +-
+>  tests/Makefile.include | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 89df7f6e4f..35b31162d4 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -28,9 +28,9 @@ class BootLinuxConsole(Test):
->          :avocado: tags=arch:x86_64
->          :avocado: tags=machine:pc
->          """
-> -        kernel_url = ('https://mirrors.kernel.org/fedora/releases/28/'
-> +        kernel_url = ('https://mirrors.kernel.org/fedora/releases/29/'
->                        'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> -        kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
-> +        kernel_hash = '23bebd2680757891cf7adedb033532163a792495'
->          kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+> diff --git a/.travis.yml b/.travis.yml
+> index 93fd0164a0..844d514afa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -188,7 +188,7 @@ matrix:
+>      # Acceptance (Functional) tests
+>      - env:
+>          - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
+> -        - TEST_CMD="make AVOCADO_SHOW=app check-acceptance"
+> +        - TEST_CMD="make check-acceptance"
+>        addons:
+>          apt:
+>            packages:
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f403a6571d..c73298740d 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -956,7 +956,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>  # Controls the output generated by Avocado when running tests.
+>  # Any number of command separated loggers are accepted.  For more
+>  # information please refer to "avocado --help".
+> -AVOCADO_SHOW=none
+> +AVOCADO_SHOW=app
 >  
->          self.vm.set_machine('pc')
+>  PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+>  ifeq ($(PYTHON3), 1)
 > -- 
 > 2.20.1
 > 
