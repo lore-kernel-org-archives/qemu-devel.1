@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55013)
+Received: from eggs.gnu.org ([209.51.188.92]:55537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1glaGD-00073g-G6
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:09:10 -0500
+	(envelope-from <kraxel@redhat.com>) id 1glaJ1-0008EO-O3
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:12:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1glaGB-0007XW-KK
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:09:09 -0500
-Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:39932)
+	(envelope-from <kraxel@redhat.com>) id 1glaJ0-0000jr-U6
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:12:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33195)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1glaGA-0007UA-To
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:09:07 -0500
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <20190111200943.GJ2738@work-vm>
-References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
-	<20190110201124.GJ2589@work-vm>
-	<2578541547221793@myt5-68ad52a76c91.qloud-c.yandex.net>
-	<20190111200943.GJ2738@work-vm>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glaJ0-0000jT-Iy
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:12:02 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D06A75D608
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 14:12:01 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 21 Jan 2019 15:11:50 +0100
+Message-Id: <20190121141152.948-5-kraxel@redhat.com>
+In-Reply-To: <20190121141152.948-1-kraxel@redhat.com>
+References: <20190121141152.948-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Date: Mon, 21 Jan 2019 17:09:02 +0300
-Message-Id: <3429361548079742@iva8-f16495710718.qloud-c.yandex.net>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/4] Add ignore-external migration
- capability
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 4/5] vnc: detect and optimize pageflips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>, "clg@kaod.org" <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Hi,
+When size and format of the display surface stays the same we can just
+tag the guest display as dirty and be done with it.
 
-Just want to clarify your suggestions.
+There is no need need to resize the vnc server display or to touch the
+vnc client dirty bits.  On the next refresh cycle
+vnc_refresh_server_surface() will check for actual display content
+changes and update the client dirty bits as needed.
 
-1) migrate=off/share=on
+The desktop resize and framebuffer format notifications to the vnc
+client will be skipped too.
 
-I'm not sure that adding new flag 'migrate=off' is a good idea. I think that
-share=on as you suggested at first is enough.
-* It's a new flag which has sense only with share=on
-* It seems to that the meaning of this flag isn't clear. migrate=off isn't
-  RAM_MIGRATABLE, it's rather RAM_IGNORABLE. I.e. it means that we don't migrate
-  such block only if the capability is enabled.
-If you don't mind, I'll prefer share=on and ignore-shared capability.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 20190116101049.8929-1-kraxel@redhat.com
+---
+ ui/vnc.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-2) Keep RAM migration version
-
-It's more complicated question. To validate GPAs for ignored blocks I have to
-change the stream format. I can do this conditionally (if (cap_enabled) { ... })
-but in this case, I want to make sure that the capability is enabled or disabled
-on both source and target. Otherwise, there is an undefined behavior on the
-target side (most likely some error during deserialization).
-To fix that I can add a capability validation feature.
-
-For example, add a new section to vmstate_configuration (not complete):
-+static const VMStateDescription vmstate_capabilites = {
-+    .name = "configuration/capabilities",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmstate_capabilites_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_V(caps_count, SaveState, 1),
-+        VMSTATE_VARRAY_UINT32_ALLOC(capabilities, SaveState, caps_count, 1,
-+                                    vmstate_info_bool, bool),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 9e4b2beb71..6002d09407 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -742,6 +742,17 @@ static void vnc_update_server_surface(VncDisplay *vd=
+)
+                        width, height);
+ }
+=20
++static bool vnc_check_pageflip(DisplaySurface *s1,
++                               DisplaySurface *s2)
++{
++    return (s1 !=3D NULL &&
++            s2 !=3D NULL &&
++            surface_width(s1) =3D=3D surface_width(s2) &&
++            surface_height(s1) =3D=3D surface_height(s2) &&
++            surface_format(s1) =3D=3D surface_format(s2));
 +
- static const VMStateDescription vmstate_configuration = {
-     .name = "configuration",
-     .version_id = 1,
-@@ -404,6 +456,7 @@ static const VMStateDescription vmstate_configuration = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_target_page_bits,
-+        &vmstate_capabilites,
-         NULL
-     }
- };
-
-It seems too complicated. If I should change the migration stream anyway, maybe
-it's better to increment the version?
-
-What do you think?
-
-Regards,
-Yury
++}
++
+ static void vnc_dpy_switch(DisplayChangeListener *dcl,
+                            DisplaySurface *surface)
+ {
+@@ -749,6 +760,7 @@ static void vnc_dpy_switch(DisplayChangeListener *dcl=
+,
+         "Display output is not active.";
+     static DisplaySurface *placeholder;
+     VncDisplay *vd =3D container_of(dcl, VncDisplay, dcl);
++    bool pageflip =3D vnc_check_pageflip(vd->ds, surface);
+     VncState *vs;
+=20
+     if (surface =3D=3D NULL) {
+@@ -761,14 +773,21 @@ static void vnc_dpy_switch(DisplayChangeListener *d=
+cl,
+     vnc_abort_display_jobs(vd);
+     vd->ds =3D surface;
+=20
+-    /* server surface */
+-    vnc_update_server_surface(vd);
+-
+     /* guest surface */
+     qemu_pixman_image_unref(vd->guest.fb);
+     vd->guest.fb =3D pixman_image_ref(surface->image);
+     vd->guest.format =3D surface->format;
+=20
++    if (pageflip) {
++        vnc_set_area_dirty(vd->guest.dirty, vd, 0, 0,
++                           surface_width(surface),
++                           surface_height(surface));
++        return;
++    }
++
++    /* server surface */
++    vnc_update_server_surface(vd);
++
+     QTAILQ_FOREACH(vs, &vd->clients, next) {
+         vnc_colordepth(vs);
+         vnc_desktop_resize(vs);
+--=20
+2.9.3
