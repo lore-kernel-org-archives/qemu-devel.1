@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38640)
+Received: from eggs.gnu.org ([209.51.188.92]:38654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gleuY-0007jA-EN
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:07:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gleui-0007jF-9f
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gletg-0002MY-1v
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:06:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gletf-0002MC-OZ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:06:12 -0500
-References: <20190118223400.24311-1-lersek@redhat.com>
-	<20190118223400.24311-5-lersek@redhat.com>
-	<fd79f085-f3d8-dc06-9d43-9c4fcea69317@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8d4dc6b0-d4d9-2919-194f-c27cb40699b3@redhat.com>
-Date: Mon, 21 Jan 2019 20:05:57 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1glefT-0002dr-6j
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:32 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1glefR-0002bk-B9
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:31 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so24556309wrr.12
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:28 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 18:51:01 +0000
+Message-Id: <20190121185118.18550-7-peter.maydell@linaro.org>
+In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <fd79f085-f3d8-dc06-9d43-9c4fcea69317@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/5] tests/uefi-test-tools: add build
- scripts
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 06/23] hw/arm/iotkit: Rename 'iotkit' local
+ variables and functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,273 +29,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 01/21/19 13:17, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Laszlo,
->=20
-> On 1/18/19 11:33 PM, Laszlo Ersek wrote:
->> Introduce the following build scripts under "tests/uefi-test-tools":
->>
->> * "build.sh" builds a single module (a UEFI application) from
->>   UefiTestToolsPkg, for a single QEMU emulation target.
->>
->>   "build.sh" relies on cross-compilers when the emulation target and t=
-he
->>   build host architecture don't match. The cross-compiler prefix is
->>   computed according to a fixed, Linux-specific pattern. No attempt is
->>   made to copy or reimplement the GNU Make magic from "qemu/roms/Makef=
-ile"
->>   for cross-compiler prefix determination. The reason is that the buil=
-d
->>   host OSes that are officially supported by edk2, and those that are
->>   supported by QEMU, intersect only in Linux. (Note that the UNIXGCC
->>   toolchain is being removed from edk2,
->>   <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1377>.)
->>
->> * "Makefile" currently builds the "UefiTestToolsPkg/BiosTablesTest"
->>   application, for arm, aarch64, i386, and x86_64, with the help of
->>   "build.sh".
->>
->>   "Makefile" turns each resultant UEFI executable into a UEFI-bootable=
-,
->>   qcow2-compressed ISO image. The ISO images are output as
->>   "tests/data/uefi-boot-images/bios-tables-test.<TARGET>.iso.qcow2".
->>
->>   Each ISO image should be passed to QEMU as follows:
->>
->>     -drive id=3Dboot-cd,if=3Dnone,readonly,format=3Dqcow2,file=3D$ISO =
-\
->>     -device virtio-scsi-pci,id=3Dscsi0 \
->>     -device scsi-cd,drive=3Dboot-cd,bus=3Dscsi0.0,bootindex=3D0 \
->>
->>   "Makefile" assumes that "mkdosfs", "mtools", and "genisoimage" are
->>   present.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>  tests/uefi-test-tools/Makefile   |  92 +++++++++++++
->>  tests/uefi-test-tools/.gitignore |   3 +
->>  tests/uefi-test-tools/build.sh   | 145 ++++++++++++++++++++
->>  3 files changed, 240 insertions(+)
->>
->> diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Ma=
-kefile
->> new file mode 100644
->> index 000000000000..7b6dd227e433
->> --- /dev/null
->> +++ b/tests/uefi-test-tools/Makefile
->> @@ -0,0 +1,92 @@
->> +# Makefile for the test helper UEFI applications that run in guests.
->> +#
->> +# Copyright (C) 2019, Red Hat, Inc.
->> +#
->> +# This program and the accompanying materials are licensed and made a=
-vailable
->> +# under the terms and conditions of the BSD License that accompanies =
-this
->> +# distribution. The full text of the license may be found at
->> +# <http://opensource.org/licenses/bsd-license.php>.
->> +#
->> +# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASI=
-S, WITHOUT
->> +# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIE=
-D.
->> +
->> +edk2_dir              :=3D ../../roms/edk2
->> +images_dir            :=3D ../data/uefi-boot-images
->> +emulation_targets     :=3D arm aarch64 i386 x86_64
->> +uefi_binaries         :=3D bios-tables-test
->> +intermediate_suffixes :=3D .efi .fat .iso.raw
->> +
->> +images: $(foreach binary,$(uefi_binaries), \
->> +		$(foreach target,$(emulation_targets), \
->> +			$(images_dir)/$(binary).$(target).iso.qcow2))
->> +
->> +# Preserve all intermediate targets if the build succeeds.
->> +# - Intermediate targets help with development & debugging.
->> +# - Preserving intermediate targets also keeps spurious changes out o=
-f the
->> +#   final build products, in case the user re-runs "make" without any=
- changes
->> +#   to the UEFI source code. Normally, the intermediate files would h=
-ave been
->> +#   removed by the last "make" invocation, hence the re-run would reb=
-uild them
->> +#   from the unchanged UEFI sources. Unfortunately, the "mkdosfs" and
->> +#   "genisoimage" utilities embed timestamp-based information in thei=
-r outputs,
->> +#   which causes git to report differences for the tracked qcow2 ISO =
-images.
->> +.SECONDARY: $(foreach binary,$(uefi_binaries), \
->> +		$(foreach target,$(emulation_targets), \
->> +			$(foreach suffix,$(intermediate_suffixes), \
->> +				Build/$(binary).$(target)$(suffix))))
->> +
->> +# In the pattern rules below, the stem (%, $*) stands for
->> +# "$(binary).$(target)".
->> +
->> +# Convert the raw ISO image to a qcow2 one, enabling compression, and=
- using a
->> +# small cluster size. This allows for small binary files under git co=
-ntrol,
->> +# hence for small binary patches.
->> +$(images_dir)/%.iso.qcow2: Build/%.iso.raw
->> +	mkdir -p -- $(images_dir)
->> +	$${QTEST_QEMU_IMG:-qemu-img} convert -f raw -O qcow2 -c \
->> +		-o cluster_size=3D512 -- $< $@
->> +
->> +# Embed the "UEFI system partition" into an ISO9660 file system as an=
- ElTorito
->> +# boot image.
->> +Build/%.iso.raw: Build/%.fat
->> +	genisoimage -input-charset ASCII -efi-boot $(notdir $<) -no-emul-boo=
-t \
->> +		-quiet -o $@ -- $<
->> +
->> +# Define chained macros in order to map QEMU system emulation targets=
- to
->> +# *short* UEFI architecture identifiers. Periods are allowed in, and =
-ultimately
->> +# stripped from, the argument.
->> +map_arm_to_uefi     =3D $(subst arm,ARM,$(1))
->> +map_aarch64_to_uefi =3D $(subst aarch64,AA64,$(call map_arm_to_uefi,$=
-(1)))
->> +map_i386_to_uefi    =3D $(subst i386,IA32,$(call map_aarch64_to_uefi,=
-$(1)))
->> +map_x86_64_to_uefi  =3D $(subst x86_64,X64,$(call map_i386_to_uefi,$(=
-1)))
->> +map_to_uefi         =3D $(subst .,,$(call map_x86_64_to_uefi,$(1)))
->> +
->> +# Format a "UEFI system partition", using the UEFI binary as the defa=
-ult boot
->> +# loader. Add 10% size for filesystem metadata, round up to the next =
-KB, and
->> +# make sure the size is large enough for a FAT filesystem. Name the f=
-ilesystem
->> +# after the UEFI binary. (Excess characters are automatically dropped=
- from the
->> +# filesystem label.)
->> +Build/%.fat: Build/%.efi
->> +	rm -f -- $@
->> +	uefi_bin_b=3D$$(stat --format=3D%s -- $<) && \
->> +		uefi_fat_kb=3D$$(( (uefi_bin_b * 11 / 10 + 1023) / 1024 )) && \
->> +		uefi_fat_kb=3D$$(( uefi_fat_kb >=3D 64 ? uefi_fat_kb : 64 )) && \
->> +		mkdosfs -C $@ -n $(basename $(@F)) -- $$uefi_fat_kb
->> +	MTOOLS_SKIP_CHECK=3D1 mmd -i $@ ::EFI
->> +	MTOOLS_SKIP_CHECK=3D1 mmd -i $@ ::EFI/BOOT
->> +	MTOOLS_SKIP_CHECK=3D1 mcopy -i $@ -- $< \
->> +		::EFI/BOOT/BOOT$(call map_to_uefi,$(suffix $*)).EFI
->> +
->> +# In the pattern rules below, the stem (%, $*) stands for "$(target)"=
- only. The
->> +# association between the UEFI binary (such as "bios-tables-test") an=
-d the
->> +# component name from the edk2 platform DSC file (such as "BiosTables=
-Test") is
->> +# explicit in each rule.
->> +
->> +Build/bios-tables-test.%.efi: build-edk2-tools
->> +	./build.sh $(edk2_dir) BiosTablesTest $* $@
->> +
->> +build-edk2-tools:
->> +	$(MAKE) -C $(edk2_dir)/BaseTools
->> +
-> [...]
->=20
-> I got errors [1] and [2] I couldn't figure out while running 'make -j4'=
-.
->=20
-> The following patch didn't help, any idea?
->=20
-> -- >8 --
-> diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Mak=
-efile
-> index 7b6dd227e4..798c55c823 100644
-> --- a/tests/uefi-test-tools/Makefile
-> +++ b/tests/uefi-test-tools/Makefile
-> @@ -81,6 +81,8 @@ Build/%.fat: Build/%.efi
->  # component name from the edk2 platform DSC file (such as
-> "BiosTablesTest") is
->  # explicit in each rule.
->=20
-> +.NOTPARALLEL: $(foreach
-> target,$(emulation_targets),Build/bios-tables-test.$(target).efi)
-> +
->  Build/bios-tables-test.%.efi: build-edk2-tools
->         ./build.sh $(edk2_dir) BiosTablesTest $* $@
->=20
-> diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/bui=
-ld.sh
-> index 155cb75c4d..13891a7385 100755
-> --- a/tests/uefi-test-tools/build.sh
-> +++ b/tests/uefi-test-tools/build.sh
-> @@ -133,6 +133,7 @@ esac
->  # Build the UEFI binary
->  mkdir -p log
->  build \
-> +  -n 1 \
->    --arch=3D"$edk2_arch" \
->    --buildtarget=3DDEBUG \
->    --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
-> ---
+Rename various internal uses of 'iotkit' in hw/arm/iotkit.c to
+'armsse', for consistency. The remaining occurences are:
+ * related to the devices TYPE_IOTKIT_SYSCTL, TYPE_IOTKIT_SYSINFO,
+   etc, which this refactor is not touching
+ * references that apply specifically to the IoTKit (like
+   the lack of a private CPU region)
+ * the vmstate, which keeps its old "iotkit" name for
+   migration compatibility reasons
 
-It wasn't clear to me whether and how multi-threaded builds were
-supposed to be used by maintainers, whenever they'd update
-"tests/data/uefi-boot-images/*".
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/iotkit.c | 68 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 34 insertions(+), 34 deletions(-)
 
-I saw that "make" was invoked everywhere as $(MAKE), but that didn't
-clarify any intent around "-j". So I didn't test "-j" at all, and in
-fact I wouldn't have expected it to work:
-
-- At any point in time, there shouldn't be more than one instance of the
-"build" base tool working.
-
-- the "build" base tool itself contains some level of support (although
-not complete) for parallelizing edk2 module builds: it does not
-parallelize the compilation of source files between each other *within*
-a single edk2 module (=3D INF file). It parallelizes modules (INF files)
-between each other.
-
-- This means if you build only one module at a time, passing the "-m"
-switch (plus an INF file) to the "build" base tool, then there's nothing
-to parallelize.
-
-- "build.sh" does pass the "-m" switch to the "build" tool, because I
-wanted the build output to be granular. That is, it should be possible
-for someone to build just a given uefi-test-tools image for just a given
-architecture, if they specify the corresponding pathname (as target)
-when they invoke "make". This usage requires the "-m" flag, which in
-turn precludes the parallelism built into the "build" base tool itself.
-And, invoking multiple "build" instances in parallel is not supposed to
-work.
-
-
-Regarding why ".NOTPARALLEL" doesn't work -- the GNU Make documentation
-writes:
-
-  [...]  Any recursively invoked make command will still run recipes in
-  parallel (unless its makefile also contains this target). [...]
-
-The "build" base tool in edk2 implements part of the job with generated
-makefiles and invoking "make" itself, thus, despite .NOTPARALLEL, it
-likely inherits the outermost -j<N> setting -- and it doesn't expect such=
-.
-
-So the best I can offer here is to check $MAKEFLAGS in "build.sh", and
-exit with an early, explicit error if $MAKEFLAGS contains "-j", "-l", or
-their long variants (--jobs, --load-average).
-
-I realize this would not be acceptable for building QEMU itself, but
-"tests/uefi-test-tools/Makefile" should be run by some subsystem
-maintainers only, interactively (or in their on custom scripts).
-
-Thanks
-Laszlo
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index d5b172933c3..7ff14fd5aef 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -56,7 +56,7 @@ static void nsccfg_handler(void *opaque, int n, int level)
+     s->nsccfg = level;
+ }
+ 
+-static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
++static void armsse_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
+ {
+     /* Each of the 4 AHB and 4 APB PPCs that might be present in a
+      * system using the ARMSSE has a collection of control lines which
+@@ -65,22 +65,22 @@ static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
+      * code using the ARMSSE can wire them up to the PPCs.
+      */
+     SplitIRQ *splitter = &s->ppc_irq_splitter[ppcnum];
+-    DeviceState *iotkitdev = DEVICE(s);
++    DeviceState *armssedev = DEVICE(s);
+     DeviceState *dev_secctl = DEVICE(&s->secctl);
+     DeviceState *dev_splitter = DEVICE(splitter);
+     char *name;
+ 
+     name = g_strdup_printf("%s_nonsec", ppcname);
+-    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    qdev_pass_gpios(dev_secctl, armssedev, name);
+     g_free(name);
+     name = g_strdup_printf("%s_ap", ppcname);
+-    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    qdev_pass_gpios(dev_secctl, armssedev, name);
+     g_free(name);
+     name = g_strdup_printf("%s_irq_enable", ppcname);
+-    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    qdev_pass_gpios(dev_secctl, armssedev, name);
+     g_free(name);
+     name = g_strdup_printf("%s_irq_clear", ppcname);
+-    qdev_pass_gpios(dev_secctl, iotkitdev, name);
++    qdev_pass_gpios(dev_secctl, armssedev, name);
+     g_free(name);
+ 
+     /* irq_status is a little more tricky, because we need to
+@@ -96,15 +96,15 @@ static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
+     qdev_connect_gpio_out(dev_splitter, 1,
+                           qdev_get_gpio_in(DEVICE(&s->ppc_irq_orgate), ppcnum));
+     s->irq_status_in[ppcnum] = qdev_get_gpio_in(dev_splitter, 0);
+-    qdev_init_gpio_in_named_with_opaque(iotkitdev, irq_status_forwarder,
++    qdev_init_gpio_in_named_with_opaque(armssedev, irq_status_forwarder,
+                                         s->irq_status_in[ppcnum], name, 1);
+     g_free(name);
+ }
+ 
+-static void iotkit_forward_sec_resp_cfg(ARMSSE *s)
++static void armsse_forward_sec_resp_cfg(ARMSSE *s)
+ {
+     /* Forward the 3rd output from the splitter device as a
+-     * named GPIO output of the iotkit object.
++     * named GPIO output of the armsse object.
+      */
+     DeviceState *dev = DEVICE(s);
+     DeviceState *dev_splitter = DEVICE(&s->sec_resp_splitter);
+@@ -115,12 +115,12 @@ static void iotkit_forward_sec_resp_cfg(ARMSSE *s)
+     qdev_connect_gpio_out(dev_splitter, 2, s->sec_resp_cfg_in);
+ }
+ 
+-static void iotkit_init(Object *obj)
++static void armsse_init(Object *obj)
+ {
+     ARMSSE *s = ARMSSE(obj);
+     int i;
+ 
+-    memory_region_init(&s->container, obj, "iotkit-container", UINT64_MAX);
++    memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
+ 
+     sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
+                           TYPE_ARMV7M);
+@@ -160,9 +160,9 @@ static void iotkit_init(Object *obj)
+                           sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
+     sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
+                           sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
+-    sysbus_init_child_obj(obj, "iotkit-sysctl", &s->sysctl,
++    sysbus_init_child_obj(obj, "armsse-sysctl", &s->sysctl,
+                           sizeof(s->sysctl), TYPE_IOTKIT_SYSCTL);
+-    sysbus_init_child_obj(obj, "iotkit-sysinfo", &s->sysinfo,
++    sysbus_init_child_obj(obj, "armsse-sysinfo", &s->sysinfo,
+                           sizeof(s->sysinfo), TYPE_IOTKIT_SYSINFO);
+     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
+                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
+@@ -183,20 +183,20 @@ static void iotkit_init(Object *obj)
+     }
+ }
+ 
+-static void iotkit_exp_irq(void *opaque, int n, int level)
++static void armsse_exp_irq(void *opaque, int n, int level)
+ {
+     ARMSSE *s = ARMSSE(opaque);
+ 
+     qemu_set_irq(s->exp_irqs[n], level);
+ }
+ 
+-static void iotkit_mpcexp_status(void *opaque, int n, int level)
++static void armsse_mpcexp_status(void *opaque, int n, int level)
+ {
+     ARMSSE *s = ARMSSE(opaque);
+     qemu_set_irq(s->mpcexp_status_in[n], level);
+ }
+ 
+-static void iotkit_realize(DeviceState *dev, Error **errp)
++static void armsse_realize(DeviceState *dev, Error **errp)
+ {
+     ARMSSE *s = ARMSSE(dev);
+     int i;
+@@ -287,7 +287,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < s->exp_numirq; i++) {
+         s->exp_irqs[i] = qdev_get_gpio_in(DEVICE(&s->armv7m), i + 32);
+     }
+-    qdev_init_gpio_in_named(dev, iotkit_exp_irq, "EXP_IRQ", s->exp_numirq);
++    qdev_init_gpio_in_named(dev, armsse_exp_irq, "EXP_IRQ", s->exp_numirq);
+ 
+     /* Set up the big aliases first */
+     make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
+@@ -336,7 +336,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+                                 qdev_get_gpio_in(dev_splitter, 0));
+ 
+     /* This RAM lives behind the Memory Protection Controller */
+-    memory_region_init_ram(&s->sram0, NULL, "iotkit.sram0", 0x00008000, &err);
++    memory_region_init_ram(&s->sram0, NULL, "armsse.sram0", 0x00008000, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -608,14 +608,14 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
+         char *ppcname = g_strdup_printf("ahb_ppcexp%d", i);
+ 
+-        iotkit_forward_ppc(s, ppcname, i);
++        armsse_forward_ppc(s, ppcname, i);
+         g_free(ppcname);
+     }
+ 
+     for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
+         char *ppcname = g_strdup_printf("apb_ppcexp%d", i);
+ 
+-        iotkit_forward_ppc(s, ppcname, i + IOTS_NUM_AHB_EXP_PPC);
++        armsse_forward_ppc(s, ppcname, i + IOTS_NUM_AHB_EXP_PPC);
+         g_free(ppcname);
+     }
+ 
+@@ -672,10 +672,10 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+     /* Create GPIO inputs which will pass the line state for our
+      * mpcexp_irq inputs to the correct splitter devices.
+      */
+-    qdev_init_gpio_in_named(dev, iotkit_mpcexp_status, "mpcexp_status",
++    qdev_init_gpio_in_named(dev, armsse_mpcexp_status, "mpcexp_status",
+                             IOTS_NUM_EXP_MPC);
+ 
+-    iotkit_forward_sec_resp_cfg(s);
++    armsse_forward_sec_resp_cfg(s);
+ 
+     /* Forward the MSC related signals */
+     qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
+@@ -695,7 +695,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+ }
+ 
+-static void iotkit_idau_check(IDAUInterface *ii, uint32_t address,
++static void armsse_idau_check(IDAUInterface *ii, uint32_t address,
+                               int *iregion, bool *exempt, bool *ns, bool *nsc)
+ {
+     /*
+@@ -713,7 +713,7 @@ static void iotkit_idau_check(IDAUInterface *ii, uint32_t address,
+     *iregion = region;
+ }
+ 
+-static const VMStateDescription iotkit_vmstate = {
++static const VMStateDescription armsse_vmstate = {
+     .name = "iotkit",
+     .version_id = 1,
+     .minimum_version_id = 1,
+@@ -723,7 +723,7 @@ static const VMStateDescription iotkit_vmstate = {
+     }
+ };
+ 
+-static Property iotkit_properties[] = {
++static Property armsse_properties[] = {
+     DEFINE_PROP_LINK("memory", ARMSSE, board_memory, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
+     DEFINE_PROP_UINT32("EXP_NUMIRQ", ARMSSE, exp_numirq, 64),
+@@ -731,24 +731,24 @@ static Property iotkit_properties[] = {
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+-static void iotkit_reset(DeviceState *dev)
++static void armsse_reset(DeviceState *dev)
+ {
+     ARMSSE *s = ARMSSE(dev);
+ 
+     s->nsccfg = 0;
+ }
+ 
+-static void iotkit_class_init(ObjectClass *klass, void *data)
++static void armsse_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
+     ARMSSEClass *asc = ARMSSE_CLASS(klass);
+ 
+-    dc->realize = iotkit_realize;
+-    dc->vmsd = &iotkit_vmstate;
+-    dc->props = iotkit_properties;
+-    dc->reset = iotkit_reset;
+-    iic->check = iotkit_idau_check;
++    dc->realize = armsse_realize;
++    dc->vmsd = &armsse_vmstate;
++    dc->props = armsse_properties;
++    dc->reset = armsse_reset;
++    iic->check = armsse_idau_check;
+     asc->info = data;
+ }
+ 
+@@ -756,7 +756,7 @@ static const TypeInfo armsse_info = {
+     .name = TYPE_ARMSSE,
+     .parent = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(ARMSSE),
+-    .instance_init = iotkit_init,
++    .instance_init = armsse_init,
+     .abstract = true,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_IDAU_INTERFACE },
+@@ -774,7 +774,7 @@ static void armsse_register_types(void)
+         TypeInfo ti = {
+             .name = armsse_variants[i].name,
+             .parent = TYPE_ARMSSE,
+-            .class_init = iotkit_class_init,
++            .class_init = armsse_class_init,
+             .class_data = (void *)&armsse_variants[i],
+         };
+         type_register(&ti);
+-- 
+2.20.1
