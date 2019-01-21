@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58665)
+Received: from eggs.gnu.org ([209.51.188.92]:59070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1glW6q-00032l-4y
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:43:13 -0500
+	(envelope-from <peterx@redhat.com>) id 1glW96-00048J-8U
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1glW6o-0000Jd-Vz
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:43:12 -0500
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:42833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1glW6n-0000IR-S2
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:43:10 -0500
-Received: by mail-qk1-x743.google.com with SMTP id 68so11872807qke.9
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 01:43:09 -0800 (PST)
-References: <20181107131000.27744-1-danielhb413@gmail.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <e8ec4a68-3dbf-c5c8-e9b5-8f403ac71a5a@gmail.com>
-Date: Mon, 21 Jan 2019 07:43:04 -0200
+	(envelope-from <peterx@redhat.com>) id 1glW8r-0001fv-Ku
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43452)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1glW8o-0001S1-S9
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:15 -0500
+Date: Mon, 21 Jan 2019 17:35:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190121093505.GA7669@xz-x1>
+References: <20190116030815.27273-1-peterx@redhat.com>
+	<154805952549.5550.9154893774048296420@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <20181107131000.27744-1-danielhb413@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 0/3] HMP/snapshot changes - do
- not use ID anymore
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <154805952549.5550.9154893774048296420@2d3111e9616b>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] intel_iommu: misc fixes for error
+ exposed after error_report_once()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +29,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, Eric Blake <eblake@redhat.com>
+Cc: fam@euphon.net, mst@redhat.com, jasowang@redhat.com, eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com
 
-Ping
+On Mon, Jan 21, 2019 at 12:32:07AM -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190116030815.27273-1-peterx@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-mingw@fedora build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> time make docker-test-mingw@fedora SHOW_ENV=1 J=14
+> === TEST SCRIPT END ===
+> 
+>   CC      hw/block/pflash_cfi01.o
+> In function 'acpi_table_install',
+>     inlined from 'acpi_table_add' at /tmp/qemu-test/src/hw/acpi/core.c:296:5:
+> /tmp/qemu-test/src/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
+>          strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/hw/acpi/core.c:203:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
+>          strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/hw/acpi/core.c:207:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
+>          strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->oem_table_id);
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/hw/acpi/core.c:216:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
+>          strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                  sizeof ext_hdr->asl_compiler_id);
+> ---
+> make: *** [/tmp/qemu-test/src/rules.mak:69: hw/acpi/core.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
+> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals destination size [-Werror=stringop-truncation]
+>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/tmp/qemu-test/src/rules.mak:69: block/sheepdog.o] Error 1
+> /tmp/qemu-test/src/hw/acpi/aml-build.c: In function 'build_header':
+> /tmp/qemu-test/src/hw/acpi/aml-build.c:1535:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
+>          strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/hw/acpi/aml-build.c:1541:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
+>          strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_table_id));
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
-I believe all the discussion that happened in v2 applies here as well. Do we
-have a plan for this series? Should I add something else (warning message
-or doc note) to indicate a deprecation of the old meaning of the arguments?
+I'm uncertain about these errors but it seems to be more likely to be
+caused by some configuration or compiler change instead of the series
+itself since this series never changed either acpi or sheepdog code.
+So I'll temporarily ignore them...
 
+Regards,
 
-Thanks,
-
-
-DHB
-
-On 11/7/18 11:09 AM, Daniel Henrique Barboza wrote:
-> changes in v3:
-> - rebased to v3.1.0-rc0 tag
-> - hmp-commands.hx documentation now mentions the change of semantics
-> starting version 3.2.
-> - previous version link:
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00629.html
->
->
-> It is not uncommon to see bugs being opened by testers that attempt to
-> create VM snapshots using HMP. It turns out that "0" and "1" are quite
-> common snapshot names and they trigger a lot of bugs. I gave an example
-> in the commit message of patch 1, but to sum up here: QEMU treats the
-> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
-> is documented as such, but this can lead to strange situations.
->
-> Given that it is strange for an API to consider a parameter to be 2 fields
-> at the same time, and inadvently treating them as one or the other, and
-> that removing the ID field is too drastic, my idea here is to keep the
-> ID field for internal control, but do not let the user set it.
->
-> This series simplifies the meaning of savevm/loadvm/delvm to be up to
-> par to what the QEMU code (and Libvirt) is already doing: snapshot
-> operations using "tag" semantics only, leaving the "id" to be
-> automatically calculated by the block drivers and used internally
-> only.
->
-> This change of semantics does not affect existing snapshots. What
-> changes is that any HMP operations with them will use the
-> updated semantics.
->
->
-> Daniel Henrique Barboza (3):
->    block/snapshot.c: eliminate use of ID input in snapshot operations
->    block/snapshot: remove bdrv_snapshot_delete_by_id_or_name
->    qcow2-snapshot: remove redundant find_snapshot_by_id_and_name call
->
->   block/qcow2-snapshot.c   |  5 -----
->   block/snapshot.c         | 25 +++----------------------
->   hmp-commands.hx          | 32 ++++++++++++++++++++------------
->   include/block/snapshot.h |  3 ---
->   qemu-img.c               | 15 +++++++++++----
->   5 files changed, 34 insertions(+), 46 deletions(-)
->
+-- 
+Peter Xu
