@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49934)
+Received: from eggs.gnu.org ([209.51.188.92]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glZqz-0001Gk-Cn
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:06 -0500
+	(envelope-from <david@redhat.com>) id 1glZr5-0001Hh-0t
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glZk3-0002wf-Fo
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:36:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glZjz-0002tl-U6
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:35:53 -0500
-References: <20190121131602.55003-1-ysato@users.sourceforge.jp>
-	<20190121131602.55003-2-ysato@users.sourceforge.jp>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <937dc78e-beea-aa9c-ee35-e92023f74ad7@redhat.com>
-Date: Mon, 21 Jan 2019 14:35:43 +0100
+	(envelope-from <david@redhat.com>) id 1glZgC-0000RD-Jp
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:31:57 -0500
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-5-david@redhat.com>
+	<7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
+	<d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
+	<20190121120252.GB2083@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
+Date: Mon, 21 Jan 2019 14:31:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190121131602.55003-2-ysato@users.sourceforge.jp>
+In-Reply-To: <20190121120252.GB2083@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 01/11] TCG translation
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +27,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-On 2019-01-21 14:15, Yoshinori Sato wrote:
-> This part only supported RXv1 instructions.
-> Instruction manual.
-> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01us00=
-32ej0120_rxsm.pdf
->=20
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
-[...]
-> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
-> new file mode 100644
-> index 0000000000..c9c87dc308
-> --- /dev/null
-> +++ b/target/rx/op_helper.c
-> @@ -0,0 +1,548 @@
-> +/*
-> + *  RX helper functions
-> + *
-> + *  Copyright (c) 2018 Yoshinori Sato
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
+On 21.01.19 13:02, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> On 16.01.19 15:46, Eric Blake wrote:
+>>> On 1/16/19 5:35 AM, David Hildenbrand wrote:
+>>>> From: Pankaj Gupta <pagupta@redhat.com>
+>>>>
+>>>> This is the current protoype of virtio-pmem. Support will require
+>>>> machine changes for the architectures that will support it, so it will
+>>>> not yet be compiled.
+>>>>
+>>>> TODO:
+>>>> - Use separate struct for tracking requests internally
+>>>> - Move request/response structs to linux headers
+>>>> - Factor out linux header sync
+>>>> - Drop debug printfs
+>>>>
+>>>> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+>>>> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
+>>>>   split up patches, unplug handler ]
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>
+>>>> +++ b/qapi/misc.json
+>>>> @@ -2949,6 +2949,29 @@
+>>>>            }
+>>>>  }
+>>>>  
+>>>> +##
+>>>> +# @VirtioPMEMDeviceInfo:
+>>>> +#
+>>>> +# VirtioPMEM state information
+>>>> +#
+>>>> +# @id: device's ID
+>>>> +#
+>>>> +# @memaddr: physical address in memory, where device is mapped
+>>>> +#
+>>>> +# @size: size of memory that the device provides
+>>>> +#
+>>>> +# @memdev: memory backend linked with device
+>>>> +#
+>>>> +# Since: 3.1
+>>>
+>>> Now 4.0
+>>>
+>>>> +##
+>>>> +{ 'struct': 'VirtioPMEMDeviceInfo',
+>>>> +  'data': { '*id': 'str',
+>>>> +            'memaddr': 'size',
+>>>> +            'size': 'size',
+>>>> +            'memdev': 'str'
+>>>> +          }
+>>>> +}
+>>>> +
+>>>>  ##
+>>>>  # @MemoryDeviceInfo:
+>>>>  #
+>>>> @@ -2958,7 +2981,8 @@
+>>>>  ##
+>>>>  { 'union': 'MemoryDeviceInfo',
+>>>
+>>> Does this union need a documentation update that virtio-pmem was added
+>>> in 4.0?
+>>
+>> Seems like:
+>>
+>> ##
+>> # @MemoryDeviceInfo:
+>> #
+>> # Union containing information about a memory device
+>> #
+>> # @dimm: Information about a pc-dimm device.
+>> #
+>> # @nvdimm: Information about a nvdimm device. (since 2.12)
+>> #
+>> # @virtio-pmem: Information about a virtio-pmem device. (since 4.0)
+>> #
+>> # Since: 2.1
+>> ##
+>>
+>> Does not work.
+>>
+>> In file included from /home/dhildenb/git/qemu/qapi/qapi-schema.json:97:
+>> /home/dhildenb/git/qemu/qapi/misc.json:2975: The following documented
+>> members are not in the declaration: dimm, nvdimm, virtio-pmem
+>>
+>> Any idea how to document this correctly?
+> 
+> No I don't, but looking at other Union's they only ever seem to document
+> the base members, not the data members, for example see CpuInfo.
+> 
 
- Hi,
+Yes, that's also what I noticed. Guess I'll simply change that to
 
-just a short meta comment for all the new files in your patch series:
-It's either
+"nvdimm is included since 2.12. virtio-pmem is included since 4.0."
 
- GNU *Library* General Public License, version 2
+Unless Eric has another idea.
 
-or
+Thanks!
 
- GNU Lesser General Public License, version *2.1*
+> Dave
+> 
+>> -- 
+>>
+>> Thanks,
+>>
+>> David / dhildenb
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
-I'd suggest to go with "Lesser" and "2.1".
 
-Apart from that, it might be a good idea to CC: some people who are
-familiar with TCG if you want to make sure to get some review (see the
-MAINTAINERS file for example).
+-- 
 
- Thanks,
-  Thomas
+Thanks,
 
-
-PS: Seems like we've got this "Lesser" vs. "Library" wrong in a couple
-of other source files in QEMU ... I'll try to come up with a patch to
-fix this in the files that we've already got in the repo.
+David / dhildenb
