@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40224)
+Received: from eggs.gnu.org ([209.51.188.92]:40335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO3-0001P7-T4
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO8-0001Rs-D1
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO1-0005FY-Qm
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO6-0005IN-DQ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:52 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:48:53 -0600
-Message-Id: <20190121224907.26634-8-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:59 -0600
+Message-Id: <20190121224907.26634-14-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/21] qemu-nbd: Avoid strtol open-coding
+Subject: [Qemu-devel] [PULL 13/21] nbd/client: Refactor return of
+ nbd_receive_negotiate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,99 +23,226 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Richard W . M . Jones" <rjones@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Our copy-and-pasted open-coding of strtol handling forgot to
-handle overflow conditions.  Use qemu_strto*() instead.
-
-In the case of --partition, since we insist on a user-supplied
-partition to be non-zero, we can use 0 rather than -1 for our
-initial value to distinguish when a partition is not being
-served, for slightly more optimal code.
-
-The error messages for out-of-bounds values are less specific,
-but should not be a terrible loss in quality.
+The function could only ever return 0 or -EINVAL; make this
+clearer by dropping a useless 'fail:' label.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Message-Id: <20190117193658.16413-8-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20190117193658.16413-14-eblake@redhat.com>
 ---
- qemu-nbd.c | 28 +++++++++-------------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+ nbd/client.c | 51 +++++++++++++++++++++++----------------------------
+ 1 file changed, 23 insertions(+), 28 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 598caa656b2..efca0e44a90 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -546,9 +546,8 @@ int main(int argc, char **argv)
-     };
-     int ch;
-     int opt_ind =3D 0;
--    char *end;
-     int flags =3D BDRV_O_RDWR;
--    int partition =3D -1;
-+    int partition =3D 0;
-     int ret =3D 0;
-     bool seen_cache =3D false;
-     bool seen_discard =3D false;
-@@ -660,9 +659,8 @@ int main(int argc, char **argv)
-             port =3D optarg;
-             break;
-         case 'o':
--                dev_offset =3D strtoll (optarg, &end, 0);
--            if (*end) {
--                error_report("Invalid offset `%s'", optarg);
-+            if (qemu_strtou64(optarg, NULL, 0, &dev_offset) < 0) {
-+                error_report("Invalid offset '%s'", optarg);
-                 exit(EXIT_FAILURE);
-             }
-             break;
-@@ -684,13 +682,9 @@ int main(int argc, char **argv)
-             flags &=3D ~BDRV_O_RDWR;
-             break;
-         case 'P':
--            partition =3D strtol(optarg, &end, 0);
--            if (*end) {
--                error_report("Invalid partition `%s'", optarg);
--                exit(EXIT_FAILURE);
--            }
--            if (partition < 1 || partition > 8) {
--                error_report("Invalid partition %d", partition);
-+            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
-+                partition < 1 || partition > 8) {
-+                error_report("Invalid partition '%s'", optarg);
-                 exit(EXIT_FAILURE);
-             }
-             break;
-@@ -711,15 +705,11 @@ int main(int argc, char **argv)
-             device =3D optarg;
-             break;
-         case 'e':
--            shared =3D strtol(optarg, &end, 0);
--            if (*end) {
-+            if (qemu_strtoi(optarg, NULL, 0, &shared) < 0 ||
-+                shared < 1) {
-                 error_report("Invalid shared device number '%s'", optarg=
-);
-                 exit(EXIT_FAILURE);
-             }
--            if (shared < 1) {
--                error_report("Shared device number must be greater than =
-0");
--                exit(EXIT_FAILURE);
--            }
-             break;
-         case 'f':
-             fmt =3D optarg;
-@@ -1007,7 +997,7 @@ int main(int argc, char **argv)
+diff --git a/nbd/client.c b/nbd/client.c
+index c7bb7081553..9028fd09397 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -814,7 +814,6 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+                           NBDExportInfo *info, Error **errp)
+ {
+     uint64_t magic;
+-    int rc;
+     bool zeroes =3D true;
+     bool structured_reply =3D info->structured_reply;
+     bool base_allocation =3D info->base_allocation;
+@@ -825,31 +824,30 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+     trace_nbd_receive_negotiate_name(info->name);
+     info->structured_reply =3D false;
+     info->base_allocation =3D false;
+-    rc =3D -EINVAL;
+
+     if (outioc) {
+         *outioc =3D NULL;
      }
-     fd_size -=3D dev_offset;
+     if (tlscreds && !outioc) {
+         error_setg(errp, "Output I/O channel required for TLS");
+-        goto fail;
++        return -EINVAL;
+     }
 
--    if (partition !=3D -1) {
-+    if (partition) {
-         uint64_t limit;
+     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+         error_prepend(errp, "Failed to read initial magic: ");
+-        goto fail;
++        return -EINVAL;
+     }
+     magic =3D be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
 
-         if (dev_offset) {
+     if (magic !=3D NBD_INIT_MAGIC) {
+         error_setg(errp, "Bad initial magic received: 0x%" PRIx64, magic=
+);
+-        goto fail;
++        return -EINVAL;
+     }
+
+     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+         error_prepend(errp, "Failed to read server magic: ");
+-        goto fail;
++        return -EINVAL;
+     }
+     magic =3D be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+@@ -861,7 +859,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+
+         if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) =
+{
+             error_prepend(errp, "Failed to read server flags: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         globalflags =3D be16_to_cpu(globalflags);
+         trace_nbd_receive_negotiate_server_flags(globalflags);
+@@ -877,18 +875,18 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+         clientflags =3D cpu_to_be32(clientflags);
+         if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0)=
+ {
+             error_prepend(errp, "Failed to send clientflags field: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         if (tlscreds) {
+             if (fixedNewStyle) {
+                 *outioc =3D nbd_receive_starttls(ioc, tlscreds, hostname=
+, errp);
+                 if (!*outioc) {
+-                    goto fail;
++                    return -EINVAL;
+                 }
+                 ioc =3D *outioc;
+             } else {
+                 error_setg(errp, "Server does not support STARTTLS");
+-                goto fail;
++                return -EINVAL;
+             }
+         }
+         if (fixedNewStyle) {
+@@ -899,7 +897,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+                                                    NBD_OPT_STRUCTURED_RE=
+PLY,
+                                                    errp);
+                 if (result < 0) {
+-                    goto fail;
++                    return -EINVAL;
+                 }
+                 info->structured_reply =3D result =3D=3D 1;
+             }
+@@ -907,7 +905,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+             if (info->structured_reply && base_allocation) {
+                 result =3D nbd_negotiate_simple_meta_context(ioc, info, =
+errp);
+                 if (result < 0) {
+-                    goto fail;
++                    return -EINVAL;
+                 }
+                 info->base_allocation =3D result =3D=3D 1;
+             }
+@@ -919,7 +917,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+              * export, then use NBD_OPT_EXPORT_NAME.  */
+             result =3D nbd_opt_go(ioc, info, errp);
+             if (result < 0) {
+-                goto fail;
++                return -EINVAL;
+             }
+             if (result > 0) {
+                 return 0;
+@@ -931,25 +929,25 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+              * export name is not available.
+              */
+             if (nbd_receive_query_exports(ioc, info->name, errp) < 0) {
+-                goto fail;
++                return -EINVAL;
+             }
+         }
+         /* write the export name request */
+         if (nbd_send_option_request(ioc, NBD_OPT_EXPORT_NAME, -1, info->=
+name,
+                                     errp) < 0) {
+-            goto fail;
++            return -EINVAL;
+         }
+
+         /* Read the response */
+         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+             error_prepend(errp, "Failed to read export length: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         info->size =3D be64_to_cpu(info->size);
+
+         if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) =
+{
+             error_prepend(errp, "Failed to read export flags: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         info->flags =3D be16_to_cpu(info->flags);
+     } else if (magic =3D=3D NBD_CLIENT_MAGIC) {
+@@ -957,43 +955,40 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+
+         if (*info->name) {
+             error_setg(errp, "Server does not support non-empty export n=
+ames");
+-            goto fail;
++            return -EINVAL;
+         }
+         if (tlscreds) {
+             error_setg(errp, "Server does not support STARTTLS");
+-            goto fail;
++            return -EINVAL;
+         }
+
+         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+             error_prepend(errp, "Failed to read export length: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         info->size =3D be64_to_cpu(info->size);
+
+         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+             error_prepend(errp, "Failed to read export flags: ");
+-            goto fail;
++            return -EINVAL;
+         }
+         oldflags =3D be32_to_cpu(oldflags);
+         if (oldflags & ~0xffff) {
+             error_setg(errp, "Unexpected export flags %0x" PRIx32, oldfl=
+ags);
+-            goto fail;
++            return -EINVAL;
+         }
+         info->flags =3D oldflags;
+     } else {
+         error_setg(errp, "Bad server magic received: 0x%" PRIx64, magic)=
+;
+-        goto fail;
++        return -EINVAL;
+     }
+
+     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+     if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
+         error_prepend(errp, "Failed to read reserved block: ");
+-        goto fail;
++        return -EINVAL;
+     }
+-    rc =3D 0;
+-
+-fail:
+-    return rc;
++    return 0;
+ }
+
+ #ifdef __linux__
 --=20
 2.20.1
