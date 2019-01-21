@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39934)
+Received: from eggs.gnu.org ([209.51.188.92]:39931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNq-0001Fb-08
+	(envelope-from <eblake@redhat.com>) id 1gliNp-0001Fa-VQ
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNl-00053e-Rx
+	(envelope-from <eblake@redhat.com>) id 1gliNn-00054I-C2
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:32 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:48:49 -0600
-Message-Id: <20190121224907.26634-4-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:50 -0600
+Message-Id: <20190121224907.26634-5-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/21] qemu-nbd: Enhance man page
+Subject: [Qemu-devel] [PULL 04/21] qemu-nbd: Sanity check partition bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,190 +22,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Richard W . M . Jones" <rjones@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Document some useful qemu-nbd command lines. Mention some restrictions
-on particular options, like -p being only for MBR images, or -c/-d
-being Linux-only.  Update some text given the recent change to no
-longer serve oldstyle protocol (missed in commit 7f7dfe2a).  Also,
-consistently use trailing '.' in describing options.
+When the user requests a partition, we were using data read
+from the disk as disk offsets without a bounds check. We got
+lucky that even when computed offsets are out-of-bounds,
+blk_pread() will gracefully catch the error later (so I don't
+think a malicious image can crash or exploit qemu-nbd, and am
+not treating this as a security flaw), but it's better to
+flag the problem up front than to risk permanent EIO death of
+the block device down the road.  The new bounds check adds
+an assertion that will never fail, but rather exists to help
+the compiler see that adding two positive 41-bit values
+(given MBR constraints) can't overflow 64-bit off_t.
+
+Using off_t to represent a partition length is a bit of a
+misnomer; a later patch will update to saner types, but it
+is left separate in case the bounds check needs to be
+backported in isolation.
+
+Also, note that the partition code blindly overwrites any
+non-zero offset passed in by the user; so for now, make the
+-o/-P combo an error for less confusion.  In the future, we
+may let -o and -P work together (selecting a subset of a
+partition); so it is okay that an explicit '-o 0' behaves
+no differently from omitting -o.
+
+This can be tested with nbdkit:
+$ echo hi > file
+$ nbdkit -fv --filter=3Dtruncate partitioning file truncate=3D64k
+
+Pre-patch:
+$ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809 &
+$ qemu-io -f raw nbd://localhost:10810
+qemu-io> r -v 0 1
+Disconnect client, due to: Failed to send reply: reading from file failed=
+: Input/output error
+Connection closed
+read failed: Input/output error
+qemu-io> q
+[1]+  Done                    qemu-nbd -p 10810 -P 1 -f raw nbd://localho=
+st:10809
+
+Post-patch:
+$ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809
+qemu-nbd: Discovered partition 1 at offset 1048576 size 512, but size exc=
+eeds file length 65536
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Message-Id: <20190117193658.16413-4-eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Message-Id: <20190117193658.16413-5-eblake@redhat.com>
 ---
- qemu-nbd.texi | 94 ++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 75 insertions(+), 19 deletions(-)
+ qemu-nbd.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/qemu-nbd.texi b/qemu-nbd.texi
-index 96b1546006a..f218291bf30 100644
---- a/qemu-nbd.texi
-+++ b/qemu-nbd.texi
-@@ -10,11 +10,17 @@
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 51b55f2e066..5c90c5e55f7 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1013,12 +1013,32 @@ int main(int argc, char **argv)
+     fd_size -=3D dev_offset;
 
- Export a QEMU disk image using the NBD protocol.
+     if (partition !=3D -1) {
+-        ret =3D find_partition(blk, partition, &dev_offset, &fd_size);
++        off_t limit;
++
++        if (dev_offset) {
++            error_report("Cannot request partition and offset together")=
+;
++            exit(EXIT_FAILURE);
++        }
++        ret =3D find_partition(blk, partition, &dev_offset, &limit);
+         if (ret < 0) {
+             error_report("Could not find partition %d: %s", partition,
+                          strerror(-ret));
+             exit(EXIT_FAILURE);
+         }
++        /*
++         * MBR partition limits are (32-bit << 9); this assert lets
++         * the compiler know that we have two positive values that
++         * can't overflow 64 bits.
++         */
++        assert(dev_offset >=3D 0 && dev_offset + limit >=3D dev_offset);
++        if (dev_offset + limit > fd_size) {
++            error_report("Discovered partition %d at offset %lld size %l=
+ld, "
++                         "but size exceeds file length %lld", partition,
++                         (long long int) dev_offset, (long long int) lim=
+it,
++                         (long long int) fd_size);
++            exit(EXIT_FAILURE);
++        }
++        fd_size =3D limit;
+     }
 
-+Other uses:
-+@itemize
-+@item
-+Bind a /dev/nbdX block device to a QEMU server (on Linux).
-+@end itemize
-+
- @c man end
-
- @c man begin OPTIONS
- @var{filename} is a disk image filename, or a set of block
--driver options if @var{--image-opts} is specified.
-+driver options if @option{--image-opts} is specified.
-
- @var{dev} is an NBD device.
-
-@@ -27,24 +33,25 @@ supported. The common object types that it makes sens=
-e to define are the
- keys, and the @code{tls-creds} object, which is used to supply TLS
- credentials for the qemu-nbd server.
- @item -p, --port=3D@var{port}
--The TCP port to listen on (default @samp{10809})
-+The TCP port to listen on (default @samp{10809}).
- @item -o, --offset=3D@var{offset}
--The offset into the image
-+The offset into the image.
- @item -b, --bind=3D@var{iface}
--The interface to bind to (default @samp{0.0.0.0})
-+The interface to bind to (default @samp{0.0.0.0}).
- @item -k, --socket=3D@var{path}
--Use a unix socket with path @var{path}
-+Use a unix socket with path @var{path}.
- @item --image-opts
- Treat @var{filename} as a set of image options, instead of a plain
- filename. If this flag is specified, the @var{-f} flag should
- not be used, instead the '@code{format=3D}' option should be set.
- @item -f, --format=3D@var{fmt}
- Force the use of the block driver for format @var{fmt} instead of
--auto-detecting
-+auto-detecting.
- @item -r, --read-only
--Export the disk as read-only
-+Export the disk as read-only.
- @item -P, --partition=3D@var{num}
--Only expose partition @var{num}
-+Only expose MBR partition @var{num}.  Understands physical partitions
-+1-4 and logical partitions 5-8.
- @item -B, --bitmap=3D@var{name}
- If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
- that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
-@@ -52,7 +59,7 @@ accessible through NBD_OPT_SET_META_CONTEXT.
- @item -s, --snapshot
- Use @var{filename} as an external snapshot, create a temporary
- file with backing_file=3D@var{filename}, redirect the write to
--the temporary one
-+the temporary one.
- @item -l, --load-snapshot=3D@var{snapshot_param}
- Load an internal snapshot inside @var{filename} and export it
- as an read-only device, @var{snapshot_param} format is
-@@ -76,19 +83,20 @@ driver-specific optimized zero write commands.  @var{=
-detect-zeroes} is one of
- converts a zero write to an unmap operation and can only be used if
- @var{discard} is set to @samp{unmap}.  The default is @samp{off}.
- @item -c, --connect=3D@var{dev}
--Connect @var{filename} to NBD device @var{dev}
-+Connect @var{filename} to NBD device @var{dev} (Linux only).
- @item -d, --disconnect
--Disconnect the device @var{dev}
-+Disconnect the device @var{dev} (Linux only).
- @item -e, --shared=3D@var{num}
--Allow up to @var{num} clients to share the device (default @samp{1})
-+Allow up to @var{num} clients to share the device (default
-+@samp{1}). Safe for readers, but for now, consistency is not
-+guaranteed between multiple writers.
- @item -t, --persistent
--Don't exit on the last connection
-+Don't exit on the last connection.
- @item -x, --export-name=3D@var{name}
--Set the NBD volume export name. This switches the server to use
--the new style NBD protocol negotiation
-+Set the NBD volume export name (default of a zero-length string).
- @item -D, --description=3D@var{description}
- Set the NBD volume export description, as a human-readable
--string. Requires the use of @option{-x}
-+string.
- @item --tls-creds=3DID
- Enable mandatory TLS encryption for the server by setting the ID
- of the TLS credentials object previously created with the --object
-@@ -96,11 +104,11 @@ option.
- @item --fork
- Fork off the server process and exit the parent once the server is runni=
-ng.
- @item -v, --verbose
--Display extra debugging information
-+Display extra debugging information.
- @item -h, --help
--Display this help and exit
-+Display this help and exit.
- @item -V, --version
--Display version information and exit
-+Display version information and exit.
- @item -T, --trace [[enable=3D]@var{pattern}][,events=3D@var{file}][,file=
-=3D@var{file}]
- @findex --trace
- @include qemu-option-trace.texi
-@@ -108,6 +116,54 @@ Display version information and exit
-
- @c man end
-
-+@c man begin EXAMPLES
-+Start a server listening on port 10809 that exposes only the
-+guest-visible contents of a qcow2 file, with no TLS encryption, and
-+with the default export name (an empty string). The command is
-+one-shot, and will block until the first successful client
-+disconnects:
-+
-+@example
-+qemu-nbd -f qcow2 file.qcow2
-+@end example
-+
-+Start a long-running server listening with encryption on port 10810,
-+and require clients to have a correct X.509 certificate to connect to
-+a 1 megabyte subset of a raw file, using the export name 'subset':
-+
-+@example
-+qemu-nbd \
-+  --object tls-creds-x509,id=3Dtls0,endpoint=3Dserver,dir=3D/path/to/qem=
-utls \
-+  --tls-creds tls0 -t -x subset -p 10810 \
-+  --image-opts driver=3Draw,offset=3D1M,size=3D1M,file.driver=3Dfile,fil=
-e.filename=3Dfile.raw
-+@end example
-+
-+Serve a read-only copy of just the first MBR partition of a guest
-+image over a Unix socket with as many as 5 simultaneous readers, with
-+a persistent process forked as a daemon:
-+
-+@example
-+qemu-nbd --fork --persistent --shared=3D5 --socket=3D/path/to/sock \
-+  --partition=3D1 --read-only --format=3Dqcow2 file.qcow2
-+@end example
-+
-+Expose the guest-visible contents of a qcow2 file via a block device
-+/dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
-+partitions found within), then disconnect the device when done.
-+Access to bind qemu-nbd to an /dev/nbd device generally requires root
-+privileges, and may also require the execution of @code{modprobe nbd}
-+to enable the kernel NBD client module.  @emph{CAUTION}: Do not use
-+this method to mount filesystems from an untrusted guest image - a
-+malicious guest may have prepared the image to attempt to trigger
-+kernel bugs in partition probing or file system mounting.
-+
-+@example
-+qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
-+qemu-nbd -d /dev/nbd0
-+@end example
-+
-+@c man end
-+
- @ignore
-
- @setfilename qemu-nbd
+     export =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
 --=20
 2.20.1
