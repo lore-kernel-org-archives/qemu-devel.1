@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45028)
+Received: from eggs.gnu.org ([209.51.188.92]:45321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1glXNn-0002ZJ-JB
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:04:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1glXOY-0003Aa-6O
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1glXNg-0003qd-Le
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:04:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1glXOL-00054L-LZ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:05:30 -0500
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Jan 2019 12:03:50 +0100
-Message-Id: <20190121110354.2247-2-cohuck@redhat.com>
-In-Reply-To: <20190121110354.2247-1-cohuck@redhat.com>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/5] vfio-ccw: make it safe to access
- channel programs
+Date: Mon, 21 Jan 2019 12:05:06 +0100
+Message-Id: <20190121110508.2320-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] vfio-ccw: support hsch/csch (QEMU part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +20,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
 Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-When we get a solicited interrupt, the start function may have
-been cleared by a csch, but we still have a channel program
-structure allocated. Make it safe to call the cp accessors in
-any case, so we can call them unconditionally.
+[This is the QEMU part, git tree is available at
+https://github.com/cohuck/qemu vfio-ccw-caps
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- drivers/s390/cio/vfio_ccw_cp.c | 3 +++
- drivers/s390/cio/vfio_ccw_cp.h | 2 ++
- 2 files changed, 5 insertions(+)
+The companion Linux kernel patches are available at
+https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps]
 
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 70a006ba4d05..714987ceea9a 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
- 	struct ccwchain *chain, *temp;
- 	int i;
- 
-+	cp->initialized = false;
- 	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
- 		for (i = 0; i < chain->ch_len; i++) {
- 			pfn_array_table_unpin_free(chain->ch_pat + i,
-@@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
- 	 */
- 	cp->orb.cmd.c64 = 1;
- 
-+	cp->initialized = true;
-+
- 	return ret;
- }
- 
-diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
-index a4b74fb1aa57..3c20cd208da5 100644
---- a/drivers/s390/cio/vfio_ccw_cp.h
-+++ b/drivers/s390/cio/vfio_ccw_cp.h
-@@ -21,6 +21,7 @@
-  * @ccwchain_list: list head of ccwchains
-  * @orb: orb for the currently processed ssch request
-  * @mdev: the mediated device to perform page pinning/unpinning
-+ * @initialized: whether this instance is actually initialized
-  *
-  * @ccwchain_list is the head of a ccwchain list, that contents the
-  * translated result of the guest channel program that pointed out by
-@@ -30,6 +31,7 @@ struct channel_program {
- 	struct list_head ccwchain_list;
- 	union orb orb;
- 	struct device *mdev;
-+	bool initialized;
- };
- 
- extern int cp_init(struct channel_program *cp, struct device *mdev,
+Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+device. This tends to work well for the most common 'good path' scenarios;
+however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+clearing pending requests at the device is currently not supported.
+This may be a problem for e.g. error recovery.
+
+This patch series makes use of the newly introduced async command region
+to issue hsch/csch; if it is not present, continue to emulate hsch/csch,
+as before.
+
+Note that the kernel side now returns -EAGAIN to trigger a retry in more
+cases; QEMU should already be fine with that.
+
+[I'm not quite happy with how this async processing hooks up in css.c;
+ideas welcome.]
+
+Lightly tested (I can interact with a dasd as before, and reserve/release
+seems to work well.) Not sure if there is a better way to test this, ideas
+welcome.
+
+Changes v1->v2:
+- update kernel header to v2 of kernel patches
+- rebased on master
+
+Cornelia Huck (2):
+  vfio-ccw: new capability chain support
+  vfio-ccw: support async command subregion
+
+ hw/s390x/css.c                 |  27 ++++++--
+ hw/vfio/ccw.c                  | 109 ++++++++++++++++++++++++++++++++-
+ include/hw/s390x/s390-ccw.h    |   3 +
+ linux-headers/linux/vfio.h     |   4 ++
+ linux-headers/linux/vfio_ccw.h |  12 ++++
+ 5 files changed, 149 insertions(+), 6 deletions(-)
+
 -- 
 2.17.2
