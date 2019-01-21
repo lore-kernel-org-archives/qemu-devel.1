@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39606)
+Received: from eggs.gnu.org ([209.51.188.92]:40070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1glX1d-00075u-Ci
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:41:54 -0500
+	(envelope-from <philmd@redhat.com>) id 1glX1z-0007sB-Ry
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1glWmO-0000NA-IQ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:26:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1glWmO-0000M3-9b
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:26:08 -0500
-References: <20190118112410.3010-1-yang.zhong@intel.com>
-	<20190118112410.3010-29-yang.zhong@intel.com>
-	<20190118113051-mutt-send-email-mst@kernel.org>
-	<CABgObfZEGtdxGqGCRawW9Cd6c3NO0efwYWZCv3k4VvAJsm8-vw@mail.gmail.com>
-	<20190118142758-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <154d7fa7-6941-2943-6338-a7440487b399@redhat.com>
-Date: Mon, 21 Jan 2019 11:25:57 +0100
+	(envelope-from <philmd@redhat.com>) id 1glX1z-0001Xi-5G
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:15 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:37289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glX1y-0001XI-Vg
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:15 -0500
+Received: by mail-wr1-f68.google.com with SMTP id s12so22725684wrt.4
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:42:14 -0800 (PST)
+References: <20190118183603.24757-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <07b9dbc7-e48d-adf7-d9cc-dc64de89e9d0@redhat.com>
+Date: Mon, 21 Jan 2019 11:42:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190118142758-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190118183603.24757-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 28/43] hw/pci/Makefile.objs: make
- pcie configurable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/virtio/virtio-balloon: zero-initialize
+ the virtio_balloon_config struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, "Maydell, Peter" <peter.maydell@linaro.org>, thuth@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org, sameo@linux.intel.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, patches@linaro.org
 
-On 18/01/19 20:28, Michael S. Tsirkin wrote:
-> OK, and I also think we should rename it PCIE -> PCI_EXPRESS_, this way
-> everything PCI starts with PCI.
+On 1/18/19 7:36 PM, Peter Maydell wrote:
+> In virtio_balloon_get_config() we initialize a struct virtio_balloon_config
+> which we then copy to guest memory. However, the local variable is not
+> zero initialized. This works OK at the moment because we initialize
+> all the fields in it; however an upcoming kernel header change will
+> add some new fields. If we don't zero out the whole struct then we
+> will start leaking a small amount of the contents of QEMU's stack
+> to the guest as soon as we update linux-headers/ to a set of headers
+> that includes the new fields.
 
-I have no preference for PCIE vs. PCI_EXPRESS (PCIE is universally known
-and shorter, but it's okay either way), but I agree it makes sense to
-rename everything that selects PCIE so that it starts with either PCIE
-or PCI_EXPRESS.  Yang, can you place a patch to do that before your
-series to do the rename?
+Is it worth Cc'ing qemu-stable@?
 
-Thanks,
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Paolo
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+> It looks like none of the other virtio devices have this bug.
+> Tested with "make check" only.
+> As the commit message notes, must go in before our next headers update.
+> ---
+>  hw/virtio/virtio-balloon.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1728e4f83af..a12677d4d5b 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -311,7 +311,7 @@ out:
+>  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+>  {
+>      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
+> -    struct virtio_balloon_config config;
+> +    struct virtio_balloon_config config = {};
+>  
+>      config.num_pages = cpu_to_le32(dev->num_pages);
+>      config.actual = cpu_to_le32(dev->actual);
+> 
