@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51584)
+Received: from eggs.gnu.org ([209.51.188.92]:59260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glRGI-00061c-6X
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 23:32:39 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1glS6o-0003Qi-81
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 00:26:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glRGG-0001l2-7B
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 23:32:38 -0500
-Resent-Message-Id: <E1glRGG-0001l2-7B@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glRGB-0001fc-Av
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 23:32:33 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190115165710.20116-1-mhines@scalecomputing.com>
-Message-ID: <154804511217.5550.13790444191417010991@2d3111e9616b>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1glRw0-0000cn-64
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 00:15:44 -0500
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20190102025904.GH27457@umbus.fritz.box>
+	<41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
+	<20190120202824.GA2423@umbus>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <38f72c0d-a64b-1ac5-d4cd-70c1a6087226@ilande.co.uk>
+Date: Mon, 21 Jan 2019 05:15:20 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 20:31:53 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] QGA: Fix guest-get-fsinfo PCI address
- collection in Windows
+In-Reply-To: <20190120202824.GA2423@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mhines@scalecomputing.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE2NTcxMC4yMDEx
-Ni0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAg
-ICAgaHcvYWNwaS92bWdlbmlkLm8KICBDQyAgICAgIGh3L2FjcGkvYWNwaV9pbnRlcmZhY2Uubwov
-dG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzogSW4gZnVuY3Rpb24gJ2ZpbmRfdmRp
-X25hbWUnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzoxMjM5OjU6IGVycm9y
-OiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDI1NiBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBb
-LVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgIHN0cm5jcHkoYnVmICsgU0RfTUFYX1ZE
-SV9MRU4sIHRhZywgU0RfTUFYX1ZESV9UQUdfTEVOKTsKICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVp
-bmcgdHJlYXRlZCBhcyBlcnJvcnMKLS0tCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
-IGpvYnMuLi4uCkluIGZ1bmN0aW9uICdhY3BpX3RhYmxlX2luc3RhbGwnLAogICAgaW5saW5lZCBm
-cm9tICdhY3BpX3RhYmxlX2FkZCcgYXQgL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY29yZS5j
-OjI5Njo1OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6MTg0Ojk6IGVycm9yOiAn
-c3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDQgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJy
-b3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweShleHRfaGRyLT5zaWcsIGhk
-cnMtPnNpZywgc2l6ZW9mIGV4dF9oZHItPnNpZyk7CiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9o
-dy9hY3BpL2NvcmUuYzoyMDM6OTogZXJyb3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgNiBl
-cXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAg
-ICAgICBzdHJuY3B5KGV4dF9oZHItPm9lbV9pZCwgaGRycy0+b2VtX2lkLCBzaXplb2YgZXh0X2hk
-ci0+b2VtX2lkKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY29y
-ZS5jOjIwNzo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA4IGVxdWFscyBkZXN0
-aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAgIHN0cm5j
-cHkoZXh0X2hkci0+b2VtX3RhYmxlX2lkLCBoZHJzLT5vZW1fdGFibGVfaWQsCiAgICAgICAgIF5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAg
-ICAgICAgICAgc2l6ZW9mIGV4dF9oZHItPm9lbV90YWJsZV9pZCk7CiAgICAgICAgICAgICAgICAg
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkv
-Y29yZS5jOjIxNjo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA0IGVxdWFscyBk
-ZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAgIHN0
-cm5jcHkoZXh0X2hkci0+YXNsX2NvbXBpbGVyX2lkLCBoZHJzLT5hc2xfY29tcGlsZXJfaWQsCiAg
-ICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+CiAgICAgICAgICAgICAgICAgc2l6ZW9mIGV4dF9oZHItPmFzbF9jb21waWxlcl9pZCk7
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDE5MDExNTE2NTcxMC4yMDExNi0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vdGVzdGluZy5k
-b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 20/01/2019 20:28, David Gibson wrote:
+> On Fri, Jan 18, 2019 at 01:25:37PM +0000, Mark Cave-Ayland wrote:
+>> On 02/01/2019 02:59, David Gibson wrote:
+>>
+>>> On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+>>>> >From working on the TCG vector operations patchset, it is apparent that there
+>>>> are a large number of endian-based hacks in int_helper.c which can be removed by
+>>>> making use of the various Vsr* macros.
+>>>>
+>>>> Patch 1 is simple enough, and implements the complete set of Vsr* macros for
+>>>> both big endian and little endian hosts.
+>>>>
+>>>> Patches 2 and 3 rework the vector merge and multiply algorithms so that they
+>>>> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+>>>>
+>>>> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macros by
+>>>> replacing the element accesses with their equivalent Vsr* macro instead.
+>>>>
+>>>> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift bug
+>>>> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the review of
+>>>> v1.
+>>>>
+>>>> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGENDIAN
+>>>> hacks in int_helper.c, again replacing accesses with the relevant Vsr* macro
+>>>> instead.
+>>>>
+>>>> Note that there are still some endian hacks left in int_helper.c after this
+>>>> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro still
+>>>> remains in places where the index variable was used for purposes other than
+>>>> accessing elements within the vector.
+>>>>
+>>>> There were also some parts where additional conversion could be done, but I
+>>>> wasn't confident enough to make the change without access to PPC64 test images
+>>>> or real big-endian host hardware.
+>>>
+>>> Applied to ppc-for-4.0, thanks.
+>>
+>> Just checking your ppc-for-4.0 branch on github, I can't see where this has been
+>> applied? Is it queued in a local branch still?
+> 
+> Yeah, probably.  I've pushed it out now.
+
+Thanks David. I've just had another quick look, and whilst I can see newer commits in
+the branch, I think these ones belonging to this patchset are still missing?
+
+
+ATB,
+
+Mark.
