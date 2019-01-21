@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41275)
+Received: from eggs.gnu.org ([209.51.188.92]:43000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1glUp2-0001Ak-3R
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:44 -0500
+	(envelope-from <no-reply@patchew.org>) id 1glUwB-0002bo-OL
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1glUp1-0002Ng-8I
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:44 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46876)
+	(envelope-from <no-reply@patchew.org>) id 1glUwA-0006NC-Eo
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:07 -0500
+Resent-Message-Id: <E1glUwA-0006NC-Eo@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21845)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1glUp0-0001YF-Vx
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:43 -0500
-References: <154803791641.5550.15254007790773130906@2d3111e9616b>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <7979bbc2-2713-4043-291b-79b7132634c0@oracle.com>
-Date: Mon, 21 Jan 2019 08:19:03 +0000
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1glUwA-0006Ki-4u
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:06 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190115165710.20116-1-mhines@scalecomputing.com>
+Message-ID: <154804572788.5550.2018374064474228883@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <154803791641.5550.15254007790773130906@2d3111e9616b>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] QEMU changes to do PVH boot
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 20 Jan 2019 20:42:09 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2] QGA: Fix guest-get-fsinfo PCI address
+ collection in Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, ehabkost@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, stefanha@redhat.com, xen-devel@lists.xenproject.org, pbonzini@redhat.com, boris.ostrovsky@oracle.com, rth@twiddle.net, sgarzare@redhat.com
+To: mhines@scalecomputing.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 21/01/2019 02:31, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/1547554687-12687-1-git-send-email=
--liam.merwick@oracle.com/
-...>
->    CC      dma-helpers.o
->    CC      vl.o
-> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
-> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified =
-bound 256 equals destination size [-Werror=3Dstringop-truncation]
->       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
->       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
->=20
-
-
-Given the PVH patch series was posted 5 days ago and the following=20
-change was committed 3 days ago, I'm assuming this is not related to the=20
-PVH changes (which do not touch this file).
-
-commit 97b583f46c435aaa40942ca73739d79190776b7f
-Author: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Date:   Thu Jan 3 09:56:35 2019 +0100
-
-     block/sheepdog: Use QEMU_NONSTRING for non NUL-terminated arrays
-
-Regards,
-Liam
-
-
->=20
-> The full log is available at
-> http://patchew.org/logs/1547554687-12687-1-git-send-email-liam.merwick@=
-oracle.com/testing.docker-mingw@fedora/?type=3Dmessage.
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
->=20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE2NTcxMC4yMDEx
+Ni0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
+dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
+bW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTE1MTY1NzEwLjIwMTE2LTEtbWhp
+bmVzQHNjYWxlY29tcHV0aW5nLmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCB2Ml0gUUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0
+aW9uIGluIFdpbmRvd3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg1YTc5NDAgUUdBOiBGaXggZ3Vl
+c3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRvd3MKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBv
+biBlYWNoIGxpbmUKIzE5NTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NTkyOgorICAgICAg
+ICAgICAgLyoKKyAgICAgICAgICAgICogQ00gQVBJIHVzZWQgaGVyZSBhcyBvcHBvc2VkIHRvCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjk5OiBGSUxFOiBxZ2EvY29tbWFuZHMt
+d2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRvIGFsbG9jYXRl
+IGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5HOiBCbG9jayBj
+b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjk5OiBGSUxFOiBx
+Z2EvY29tbWFuZHMtd2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVk
+IHRvIGFsbG9jYXRlIGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMDA6
+IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY2MjoKKyAgICAgICAgICAgIC8qIFRoZXJlIGlz
+IG5vIG5lZWQgdG8gYWxsb2NhdGUgYnVmZmVyIGluIHRoZSBuZXh0IGZ1bmN0aW9ucy4gVGhlIHNp
+emUKKyAgICAgICAgICAgICogaXMga25vd24gYW5kIFVMT05HIGFjY29yZGluZyB0bwoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnJicgKGN0eDpWeFYpCiMzMDU6IEZJTEU6IHFn
+YS9jb21tYW5kcy13aW4zMi5jOjY2NzoKKyAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUp
+JmJ1cywgc2l6ZSwgTlVMTCkpIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+V0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxp
+bmUKIzMyMzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjczOgorICAgICAgICAgICAgLyog
+VGhlIGZ1bmN0aW9uIHJldHJpZXZlcyB0aGUgZGV2aWNlJ3MgYWRkcmVzcy4gVGhpcyB2YWx1ZSB3
+aWxsIGJlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNl
+cGFyYXRlIGxpbmUKIzMyNDogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc0OgorICAgICAg
+ICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVyICovCgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMz
+MjQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY3NDoKKyAgICAgICAgICAgIC8qIFRoZSBm
+dW5jdGlvbiByZXRyaWV2ZXMgdGhlIGRldmljZSdzIGFkZHJlc3MuIFRoaXMgdmFsdWUgd2lsbCBi
+ZQorICAgICAgICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVt
+YmVyICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4OlZ4VikK
+IzMyNzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc3OgorICAgICAgICAgICAgICAgICAg
+ICAmdHlwZSwgKFBCWVRFKSZhZGRyLCBzaXplLCBOVUxMKSkgewogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcg
+Lyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzMzM6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4
+MzoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9D
+QVBBQklMSVRJRVMgc3RydWN0dXJlLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJh
+aWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzMzQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4z
+Mi5jOjY4NDoKKyAgICAgICAgICAgICogVGhpcyBudW1iZXIgaXMgdHlwaWNhbGx5IGEgdXNlci1w
+ZXJjZWl2ZWQgc2xvdCBudW1iZXIuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQg
+YWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMzQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5j
+OjY4NDoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklD
+RV9DQVBBQklMSVRJRVMgc3RydWN0dXJlLgorICAgICAgICAgICAgKiBUaGlzIG51bWJlciBpcyB0
+eXBpY2FsbHkgYSB1c2VyLXBlcmNlaXZlZCBzbG90IG51bWJlci4gKi8KCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyYnIChjdHg6VnhWKQojMzM3OiBGSUxFOiBxZ2EvY29tbWFu
+ZHMtd2luMzIuYzo2ODc6CisgICAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJnNsb3Qs
+IHNpemUsIE5VTEwpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzM0MzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjkzOgorICAgICAgICAgICAgLyogU2V0
+dXBBcGkgZ2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBlYWNoIGxpbmUKIzM0NDog
+RklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njk0OgorICAgICAgICAgICAgLyogU2V0dXBBcGkg
+Z2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKKyAgICAgICAgICAg
+ICogSW9HZXREZXZpY2VQcm9wZXJ0eS4gQWNjb3JkaW5nIHRvIE1pY3Jvc29mdAoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzNDg6
+IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY5ODoKKyAgICAgICAgICAgICogU1BEUlBfQURE
+UkVTUyBpcyBwcm9wZXJ0eUFkZHJlc3MsIHNvIHdlIGRvIHRoZSBzYW1lLiovCgp0b3RhbDogMyBl
+cnJvcnMsIDEzIHdhcm5pbmdzLCAzOTQgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDg1YTc5NDAzNmRl
+OCAoUUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdp
+bmRvd3MpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE1MTY1NzEwLjIwMTE2LTEtbWhpbmVz
+QHNjYWxlY29tcHV0aW5nLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
