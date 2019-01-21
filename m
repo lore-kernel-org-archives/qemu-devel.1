@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42286)
+Received: from eggs.gnu.org ([209.51.188.92]:42482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gldHW-00028q-Dm
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:22:43 -0500
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gldIc-00032M-0h
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gldHV-0006p7-La
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:22:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35744)
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gldIa-0007LF-2L
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:49 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:56425)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gldHV-0006oU-Dq
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:22:41 -0500
-Date: Mon, 21 Jan 2019 15:22:37 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190121172237.GO4136@habkost.net>
-References: <20190121155051.5628-1-vkuznets@redhat.com>
+	(Exim 4.71)
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gldIY-0007C8-FA
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:47 -0500
+Date: Mon, 21 Jan 2019 17:23:25 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20190121172324.GM1271@perard.uk.xensource.com>
+References: <20181026101016.28584-1-olaf@aepfle.de>
+	<20190121161635.GL1271@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20190121155051.5628-1-vkuznets@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] i386: Enable NPT and NRIPSAVE for AMD
- CPUs
+In-Reply-To: <20190121161635.GL1271@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [PATCH v1] xen: preserve COMPAT in CFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On Mon, Jan 21, 2019 at 04:50:51PM +0100, Vitaly Kuznetsov wrote:
-> Modern AMD CPUs support NPT and NRIPSAVE features and KVM exposes these
-> when present. NRIPSAVE apeared somewhere in Opteron_G3 lifetime (e.g.
-> QuadCore AMD Opteron 2378 has is but QuadCore AMD Opteron HE 2344 doesn't),
-> NPT was introduced a bit earlier.
-> 
-> Add the FEAT_SVM leaf to Opteron_G4/G5 and EPYC/EPYC-IBPB cpu models.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Mon, Jan 21, 2019 at 04:16:35PM +0000, Anthony PERARD wrote:
+> As for https://lists.xenproject.org/archives/html/xen-devel/2018-10/msg01950.html
+> It appear that the same QEMU 2.9.1 is used, but QEMU isn't supposed to
+> use the function xc_map_foreign_bulk when built against Xen 4.12. That
+> function is only supposed to be used when building against Xen 4.6 and
+> earlier.  QEMU 2.9.1 knows about Xen up to 4.8, it should have used
+> xenforeignmemory_map directly. So, this is probably an issue with
+> ./configure.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Queued, thanks!
+You may want to backport that patch:
+https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg05074.html
+That should help with building older version of QEMU against Xen 4.12
+and newer.
 
 -- 
-Eduardo
+Anthony PERARD
