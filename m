@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52534)
+Received: from eggs.gnu.org ([209.51.188.92]:52821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glflK-0002P1-SV
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:01:39 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1glfmK-0002zw-Uc
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:02:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glflH-0000PZ-0a
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:01:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1glflA-0000IQ-Ha
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:01:30 -0500
-Date: Mon, 21 Jan 2019 20:01:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190121200121.GD2083@work-vm>
-References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
-	<20190111161515.GG2738@work-vm>
-	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
-	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
-	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1glfmJ-0001LD-J7
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:02:40 -0500
+Date: Mon, 21 Jan 2019 12:01:59 -0800
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20190121200159.GA21062@toto>
+References: <20190121152218.9592-1-peter.maydell@linaro.org>
+	<20190121152218.9592-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] test-filter-mirror hangs
+In-Reply-To: <20190121152218.9592-3-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] qom/cpu: Add cluster_index to
+ CPUState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +25,206 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Thu, 17 Jan 2019 at 09:46, Jason Wang <jasowang@redhat.com> wrote:
-> >
-> >
-> > On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
-> > >
-> > >
-> > > On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
-> > > <dgilbert@redhat.com <mailto:dgilbert@redhat.com>> wrote:
-> > >
-> > >     * Peter Maydell (peter.maydell@linaro.org
-> > >     <mailto:peter.maydell@linaro.org>) wrote:
-> > >     > Recently I've noticed that test-filter-mirror has been hangin=
-g
-> > >     > intermittently, typically when run on some other TCG architec=
-ture.
-> > >     > In the instance I've just looked at, this was with s390x gues=
-t on
-> > >     > x86-64 host, though I've also seen it on other host archs and
-> > >     > perhaps with other guests.
-> > >
-> > >     Watch out to see if you really do see it for other guests;
-> > >     it carefully avoids using virtio-net to avoid vhost; but on s39=
-0x it
-> > >     uses virtio-net-ccw - could that hit the vhost it was trying to=
- avoid?
-> > >
-> > >     > Below is a backtrace, though it seems to be pretty unhelpful.
-> > >     > Anybody got any theories ? Does the mirror test rely on dirty
-> > >     > memory bitmaps like the migration test (which also hangs
-> > >     > occasionally with TCG due to some bug I'm sure we've investig=
-ated
-> > >     > in the past) ?
-> > >
-> > >     I don't think it relies on the CPU at all.
->=20
-> > >  I have no idea about this currently, but Jason and I designed the
-> > > test case.
-> > > Add Jason: Have any comments about this ?
-> >
-> >
-> > I can't reproduce this locally with s390x-softmmu. It looks to me the
-> > test should be independent to any kinds of emulation. It should pass
-> > when mainloop work.
->=20
-> I've just seen a hang with ppc64 guest on s390x host, so it is
-> indeed not specific to s390x guest (and so not specific to
-> virtio-net either, since the ppc64 guest setup uses e1000).
+On Mon, Jan 21, 2019 at 03:22:16PM +0000, Peter Maydell wrote:
+> For TCG we want to distinguish which cluster a CPU is in, and
+> we need to do it quickly. Cache the cluster index in the CPUState
+> struct, by having the cluster object set cpu->cluster_index for
+> each CPU child when it is realized.
+> 
+> This means that board/SoC code must add all CPUs to the cluster
+> before realizing the cluster object. Regrettably QOM provides no
+> way to prevent adding children to a realized object and no way for
+> the parent to be notified when a new child is added to it, so
+> we don't have any way to enforce/assert this constraint; all
+> we can do is document it in a comment. We can at least put in a
+> check that the cluster contains at least one CPU, which should
+> catch the typical cases of "realized cluster too early" or
+> "forgot to parent the CPUs into it".
+> 
+> The restriction on how many clusters can exist in the system
+> is imposed by TCG code which will be added in a subsequent commit,
+> but the check to enforce it in cluster.c fits better in this one.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Hmph, there goes that idea.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-I guess we need some tracing of the packet flow;  do you build with
-tracing on and can we enable it for a test?
 
-Dave
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ---
+> Changes v2->v3:
+>  * allow CPU objects to be indirect children of the cluster;
+>    this is useful for ARMv7M, where the CPU object is a child
+>    of the armv7m container and the board code that sets up
+>    the cluster object only has the armv7m container object:
+>    this is done by using object_child_foreach_recursive()
+>    rather than an open-coded child iteration
+>  * add an assertion that the cluster has at least one CPU,
+>    which catches the easiest-to-make errors when creating
+>    and populating the cluster
+> ---
+>  include/hw/cpu/cluster.h | 24 +++++++++++++++++++++
+>  include/qom/cpu.h        |  7 ++++++
+>  hw/cpu/cluster.c         | 46 ++++++++++++++++++++++++++++++++++++++++
+>  qom/cpu.c                |  1 +
+>  4 files changed, 78 insertions(+)
+> 
+> diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
+> index 73818232437..549c2d31d43 100644
+> --- a/include/hw/cpu/cluster.h
+> +++ b/include/hw/cpu/cluster.h
+> @@ -34,12 +34,36 @@
+>   * Arm big.LITTLE system) they should be in different clusters. If the CPUs do
+>   * not have the same view of memory (for example the main CPU and a management
+>   * controller processor) they should be in different clusters.
+> + *
+> + * A cluster is created by creating an object of TYPE_CPU_CLUSTER, and then
+> + * adding the CPUs to it as QOM child objects (e.g. using the
+> + * object_initialize_child() or object_property_add_child() functions).
+> + * The CPUs may be either direct children of the cluster object, or indirect
+> + * children (e.g. children of children of the cluster object).
+> + *
+> + * All CPUs must be added as children before the cluster is realized.
+> + * (Regrettably QOM provides no way to prevent adding children to a realized
+> + * object and no way for the parent to be notified when a new child is added
+> + * to it, so this restriction is not checked for, but the system will not
+> + * behave correctly if it is not adhered to. The cluster will assert that
+> + * it contains at least one CPU, which should catch most inadvertent
+> + * violations of this constraint.)
+> + *
+> + * A CPU which is not put into any cluster will be considered implicitly
+> + * to be in a cluster with all the other "loose" CPUs, so all CPUs that are
+> + * not assigned to clusters must be identical.
+>   */
+>  
+>  #define TYPE_CPU_CLUSTER "cpu-cluster"
+>  #define CPU_CLUSTER(obj) \
+>      OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
+>  
+> +/*
+> + * This limit is imposed by TCG, which puts the cluster ID into an
+> + * 8 bit field (and uses all-1s for the default "not in any cluster").
+> + */
+> +#define MAX_CLUSTERS 255
+> +
+>  /**
+>   * CPUClusterState:
+>   * @cluster_id: The cluster ID. This value is for internal use only and should
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 16bbed1ae09..4c2feb9c17b 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -280,6 +280,11 @@ struct qemu_work_item;
+>  /**
+>   * CPUState:
+>   * @cpu_index: CPU index (informative).
+> + * @cluster_index: Identifies which cluster this CPU is in.
+> + *   For boards which don't define clusters or for "loose" CPUs not assigned
+> + *   to a cluster this will be UNASSIGNED_CLUSTER_INDEX; otherwise it will
+> + *   be the same as the cluster-id property of the CPU object's TYPE_CPU_CLUSTER
+> + *   QOM parent.
+>   * @nr_cores: Number of cores within this CPU package.
+>   * @nr_threads: Number of threads within this CPU.
+>   * @running: #true if CPU is currently running (lockless).
+> @@ -405,6 +410,7 @@ struct CPUState {
+>  
+>      /* TODO Move common fields from CPUArchState here. */
+>      int cpu_index;
+> +    int cluster_index;
+>      uint32_t halted;
+>      uint32_t can_do_io;
+>      int32_t exception_index;
+> @@ -1111,5 +1117,6 @@ extern const struct VMStateDescription vmstate_cpu_common;
+>  #endif /* NEED_CPU_H */
+>  
+>  #define UNASSIGNED_CPU_INDEX -1
+> +#define UNASSIGNED_CLUSTER_INDEX -1
+>  
+>  #endif
+> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
+> index 9d50a235d5c..25f90702b16 100644
+> --- a/hw/cpu/cluster.c
+> +++ b/hw/cpu/cluster.c
+> @@ -20,19 +20,65 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/cpu/cluster.h"
+> +#include "qom/cpu.h"
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
+> +#include "qemu/cutils.h"
+>  
+>  static Property cpu_cluster_properties[] = {
+>      DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> +typedef struct CallbackData {
+> +    CPUClusterState *cluster;
+> +    int cpu_count;
+> +} CallbackData;
+> +
+> +static int add_cpu_to_cluster(Object *obj, void *opaque)
+> +{
+> +    CallbackData *cbdata = opaque;
+> +    CPUState *cpu = (CPUState *)object_dynamic_cast(obj, TYPE_CPU);
+> +
+> +    if (cpu) {
+> +        cpu->cluster_index = cbdata->cluster->cluster_id;
+> +        cbdata->cpu_count++;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void cpu_cluster_realize(DeviceState *dev, Error **errp)
+> +{
+> +    /* Iterate through all our CPU children and set their cluster_index */
+> +    CPUClusterState *cluster = CPU_CLUSTER(dev);
+> +    Object *cluster_obj = OBJECT(dev);
+> +    CallbackData cbdata = {
+> +        .cluster = cluster,
+> +        .cpu_count = 0,
+> +    };
+> +
+> +    if (cluster->cluster_id >= MAX_CLUSTERS) {
+> +        error_setg(errp, "cluster-id must be less than %d", MAX_CLUSTERS);
+> +        return;
+> +    }
+> +
+> +    object_child_foreach_recursive(cluster_obj, add_cpu_to_cluster, &cbdata);
+> +
+> +    /*
+> +     * A cluster with no CPUs is a bug in the board/SoC code that created it;
+> +     * if you hit this during development of new code, check that you have
+> +     * created the CPUs and parented them into the cluster object before
+> +     * realizing the cluster object.
+> +     */
+> +    assert(cbdata.cpu_count > 0);
+> +}
+> +
+>  static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->props = cpu_cluster_properties;
+> +    dc->realize = cpu_cluster_realize;
+>  }
+>  
+>  static const TypeInfo cpu_cluster_type_info = {
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 5442a7323be..f5579b1cd50 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -364,6 +364,7 @@ static void cpu_common_initfn(Object *obj)
+>      CPUClass *cc = CPU_GET_CLASS(obj);
+>  
+>      cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+> +    cpu->cluster_index = UNASSIGNED_CLUSTER_INDEX;
+>      cpu->gdb_num_regs = cpu->gdb_num_g_regs = cc->gdb_num_core_regs;
+>      /* *-user doesn't have configurable SMP topology */
+>      /* the default value is changed by qemu_init_vcpu() for softmmu */
+> -- 
+> 2.20.1
+> 
