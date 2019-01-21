@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40489)
+Received: from eggs.gnu.org ([209.51.188.92]:40507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gldB7-0005d1-GM
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:16:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1gldB8-0005eW-Ed
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gldB6-00038C-K8
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:16:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gldB6-000365-Aa
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:16:04 -0500
-References: <20190111153451.14304-1-tao3.xu@intel.com>
-	<20190111153451.14304-5-tao3.xu@intel.com>
-	<859ba7db-4129-1f8b-f4e4-8609f2d3755d@redhat.com>
-	<1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
+	(envelope-from <eblake@redhat.com>) id 1gldB7-00038x-LP
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:16:06 -0500
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-5-david@redhat.com>
+	<7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
+	<d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
+	<20190121120252.GB2083@work-vm>
+	<5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e781ace4-b415-2325-d74f-88f586de6dda@redhat.com>
-Date: Mon, 21 Jan 2019 11:09:04 -0600
+Message-ID: <8de5c4a4-27fe-7fe3-8605-8871fa376994@redhat.com>
+Date: Mon, 21 Jan 2019 11:15:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
+In-Reply-To: <5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="J4gBZjxvv12wflNWNKMRiUcByGcpDSTLF"
-Subject: Re: [Qemu-devel] [PATCH v2 4/9] Extend the command-line to provide
- memory latency and bandwidth information
+	boundary="e9neVyLuLGkz1ax7uyArJb3J2R48K7Duj"
+Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Xu <tao3.xu@intel.com>, mst@redhat.com, imammedo@redhat.com
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com, danmei.wei@intel.com, rth@twiddle.net
+To: David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J4gBZjxvv12wflNWNKMRiUcByGcpDSTLF
+--e9neVyLuLGkz1ax7uyArJb3J2R48K7Duj
 From: Eric Blake <eblake@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>, mst@redhat.com, imammedo@redhat.com
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, danmei.wei@intel.com, rth@twiddle.net
-Message-ID: <e781ace4-b415-2325-d74f-88f586de6dda@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/9] Extend the command-line to provide
- memory latency and bandwidth information
-References: <20190111153451.14304-1-tao3.xu@intel.com>
- <20190111153451.14304-5-tao3.xu@intel.com>
- <859ba7db-4129-1f8b-f4e4-8609f2d3755d@redhat.com>
- <1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
-In-Reply-To: <1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
+To: David Hildenbrand <david@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck
+ <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Collin Walling <walling@linux.ibm.com>, Markus Armbruster
+ <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
+ Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <8de5c4a4-27fe-7fe3-8605-8871fa376994@redhat.com>
+Subject: Re: [PATCH RFC 04/10] virtio-pmem: Prototype
+References: <20190116113523.9213-1-david@redhat.com>
+ <20190116113523.9213-5-david@redhat.com>
+ <7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
+ <d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
+ <20190121120252.GB2083@work-vm>
+ <5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
+In-Reply-To: <5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/21/19 12:03 AM, Tao Xu wrote:
+On 1/21/19 7:31 AM, David Hildenbrand wrote:
 
->>> =C2=A0 #
->>> +# @hmat-lb: memory latency and bandwidth information (Since: 2.13)
->> s/2.13/4.0/ (probably in multiple spots in your series)=20
-> Hi Eric,
+>>>>>  ##
+>>>>>  # @MemoryDeviceInfo:
+>>>>>  #
+>>>>> @@ -2958,7 +2981,8 @@
+>>>>>  ##
+>>>>>  { 'union': 'MemoryDeviceInfo',
+>>>>
+>>>> Does this union need a documentation update that virtio-pmem was add=
+ed
+>>>> in 4.0?
+>>>
+>>> Seems like:
+>>>
+>>> ##
+>>> # @MemoryDeviceInfo:
+>>> #
+>>> # Union containing information about a memory device
+>>> #
+>>> # @dimm: Information about a pc-dimm device.
+>>> #
+>>> # @nvdimm: Information about a nvdimm device. (since 2.12)
+>>> #
+>>> # @virtio-pmem: Information about a virtio-pmem device. (since 4.0)
+>>> #
+>>> # Since: 2.1
+>>> ##
+>>>
+>>> Does not work.
+>>>
+>>> In file included from /home/dhildenb/git/qemu/qapi/qapi-schema.json:9=
+7:
+>>> /home/dhildenb/git/qemu/qapi/misc.json:2975: The following documented=
+
+>>> members are not in the declaration: dimm, nvdimm, virtio-pmem
+>>>
+>>> Any idea how to document this correctly?
+>>
+>> No I don't, but looking at other Union's they only ever seem to docume=
+nt
+>> the base members, not the data members, for example see CpuInfo.
+>>
 >=20
-> Thank you for your comments. The spell mistakes in patches 1/9 to 6/9
-> have been corrected in patch 7/9. Because patches 1/9 to 6/9 are jingqi=
-'s
-> initial V1 patchesand7/9 to 9/9 are the changes compared withV1.
+> Yes, that's also what I noticed. Guess I'll simply change that to
+>=20
+> "nvdimm is included since 2.12. virtio-pmem is included since 4.0."
 
-Still, it's better to rebase the series to avoid the mistakes in the
-first place, instead of having churn with a mistake early in the series
-corrected only later in the series.  Even if the mistake is corrected by
-a different author than the bulk of the patch, as long as there are
-Signed-off-by lines for both the original author and the person making
-the spelling correction, then proper attribution has been made.
+Seems okay to me if we can't come up with something better.
 
 >=20
-> About s/2.13/4.0/,do you mean ACPI HMAT will not be merged before QEMU
-> 4.0?
+> Unless Eric has another idea.
 
-Correct - 4.0 is the next release planned.  There was no 2.13 release;
-after 2.12 was the 3.0 release; the current release is 3.1, and the next
-release is 4.0; for more details, see
-https://www.qemu.org/2018/08/15/qemu-3-0-0/ for a description of the
-current version numbering scheme.  And even making it in time for 4.0
-means polishing this by mid-March: https://wiki.qemu.org/Planning/4.0
-
->=20
-> In addition, do you have any other comments about these patches?
-
-I was commenting on the high-level user interface issues, but will leave
-the bulk of the technical review to those more familiar with the code
-being added.
+Or maybe Markus, since he's more familiar with the doc generator.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -94,21 +120,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---J4gBZjxvv12wflNWNKMRiUcByGcpDSTLF
+--e9neVyLuLGkz1ax7uyArJb3J2R48K7Duj
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxF/LAACgkQp6FrSiUn
-Q2pmzAf/Y5X9/d0m/SO1IG5TD2QVkebq39S2AHvHc39Rx3M63IKjOopcCtZAMhdN
-cXjcukZGwxbcT5dqi5GQygifEV1BZoxoHCPXI9mw0gypvy8cZW93PimvFxo/MeWC
-mmt6pt35yqIN7R5NJCpWIn9fsO3q7DBMAsfob/U7V6jDBx1IKbGPp3zRBqIG6L0G
-InGP7ySXxhVCSJrjdA9m4isPyXliKDbWiDsZ2bmIxjkavyeu7CLhDc17pztSScGF
-YYPZL+nTpPTjiFGH657iXRkWxqZnWPNsJllN+4wsR0oLreL03gkwsA1z91SXG7Wk
-ALL+Ip+BZu6NvEeFJDxE6AuqGAVIkQ==
-=T8p1
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxF/ksACgkQp6FrSiUn
+Q2rtcQf/c4rIQ5SfXTFTgmG6p7VDglXB75ySqFPwvNWp2n/9T0wCcbr79EuzMiN7
+j2XJZYlRmlGmOGT/S/OHBL4Gn7Q6kPGQKy8+b1RmW8Y6VWBaYKTmP/Ap3EwYMNBz
+o2th8M4dqpfJhihfJIxFprwd1CneH/dBvrrB9LnWFLmop1j4XWBLBNAqEyqkC7PO
+HqeH+toiHq88raE0n4m0rjHjeFrAENh2aKefstgqCXf/MiFmktzVLYWJ5VHvvLcH
+5KfkR1M8cGZakchji3l2OatYNUMCvUibL0cUso0OTfj8eiNWp1bSsdYHqCu8IXKo
+lSuSNLRxV80q5VFO/3tCtv1O5XDMMg==
+=Uh6W
 -----END PGP SIGNATURE-----
 
---J4gBZjxvv12wflNWNKMRiUcByGcpDSTLF--
+--e9neVyLuLGkz1ax7uyArJb3J2R48K7Duj--
