@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55316)
+Received: from eggs.gnu.org ([209.51.188.92]:56707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1glU7V-0008QQ-Ne
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:35:46 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1glUCe-0001kk-Cr
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1glU7U-0004M1-Fy
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:35:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55660)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glU7U-0004LD-72
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:35:44 -0500
-Date: Mon, 21 Jan 2019 08:35:37 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190121073537.kez4xvln7anz2vzr@sirius.home.kraxel.org>
-References: <20190118223400.24311-1-lersek@redhat.com>
-	<20190118223400.24311-3-lersek@redhat.com>
+	(envelope-from <liq3ea@gmail.com>) id 1glUCd-0007MG-7F
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:41:04 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:45874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1glUCd-0007LW-0j
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:41:03 -0500
+Received: by mail-io1-xd41.google.com with SMTP id c2so15631573iom.12
+	for <qemu-devel@nongnu.org>; Sun, 20 Jan 2019 23:41:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190118223400.24311-3-lersek@redhat.com>
+References: <20190118223152.24183-1-lersek@redhat.com>
+	<20190121072121.rid3fmx3i2a7s5gu@sirius.home.kraxel.org>
+In-Reply-To: <20190121072121.rid3fmx3i2a7s5gu@sirius.home.kraxel.org>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 21 Jan 2019 15:40:25 +0800
+Message-ID: <CAKXe6SJd=BmH8CttVu7wU9EGJDt6go06uZV0qVOV=ney6y8_Gg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/5] roms: build the EfiRom utility from
- the roms/edk2 submodule
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix the life cycle and the name of
+ "qemu_extra_params_fw"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, Jan 18, 2019 at 11:33:57PM +0100, Laszlo Ersek wrote:
-> Building the EfiRom utility from "roms/edk2/BaseTools" should make
-> "roms/Makefile" more self-contained. Otherwise, we'd call the system-wi=
-de
-> EfiRom for building the combined iPXE option ROMs, but call the sibling
-> utilities from "roms/edk2/BaseTools" for building "roms/edk2" content.
->=20
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2019=E5=B9=B41=E6=9C=8821=E6=97=
+=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=883:22=E5=86=99=E9=81=93=EF=BC=9A
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> On Fri, Jan 18, 2019 at 11:31:52PM +0100, Laszlo Ersek wrote:
+> > Commit 19bcc4bc3213 ("fw_cfg: Make qemu_extra_params_fw locally",
+> > 2019-01-04) changed the storage duration of the "qemu_extra_params_fw"
+> > array from static to automatic. This broke the interface contract on th=
+e
+> > fw_cfg_add_file() function, which is documented as follows, in
+> > "include/hw/nvram/fw_cfg.h":
+> >
+> > > [...] The data referenced by the starting pointer is only linked, NOT
+> > > copied, into the data structure of the fw_cfg device. [...]
+> >
+> > As a result, when guest firmware fetches the "etc/boot-menu-wait" fw_cf=
+g
+> > file, it now sees garbage. Fix the regression by changing the storage
+> > duration to allocated. (The call is reached at most once, on the realiz=
+e
+> > path of the board-specific fw_cfg sysbus device.)
+> >
+> > While at it, clean up the name and the assignment of the object as well=
+.
+>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+>
+> >
+> > Cc: Gerd Hoffmann <kraxel@redhat.com>
+> > Cc: Markus Armbruster <armbru@redhat.com>
+> > Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Fixes: 19bcc4bc3213e78c303ad480a7a578f62258252d
+> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>
 
-> ---
->  roms/Makefile | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
->=20
-> diff --git a/roms/Makefile b/roms/Makefile
-> index a6043eff37e9..78d5dd18c301 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -47,10 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
->  # We need that to combine multiple images (legacy bios,
->  # efi ia32, efi x64) into a single rom binary.
->  #
-> -# We try to find it in the path.  You can also pass the location on
-> -# the command line, i.e. "make EFIROM=3D/path/to/EfiRom efirom"
-> -#
-> -EFIROM ?=3D $(shell which EfiRom 2>/dev/null)
-> +EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> =20
->  default:
->  	@echo "nothing is build by default"
-> @@ -59,8 +56,7 @@ default:
->  	@echo "  vgabios        -- update vgabios binaries (seabios)"
->  	@echo "  sgabios        -- update sgabios binaries"
->  	@echo "  pxerom         -- update nic roms (bios only)"
-> -	@echo "  efirom         -- update nic roms (bios+efi, this needs"
-> -	@echo "                    the EfiRom utility from edk2 / tianocore)"
-> +	@echo "  efirom         -- update nic roms (bios+efi)"
->  	@echo "  slof           -- update slof.bin"
->  	@echo "  skiboot        -- update skiboot.lid"
->  	@echo "  u-boot.e500    -- update u-boot.e500"
-> @@ -106,7 +102,7 @@ pxe-rom-%: build-pxe-roms
-> =20
->  efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-> =20
-> -efi-rom-%: build-pxe-roms build-efi-roms
-> +efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
->  	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
->  		-b ipxe/src/bin/$(VID)$(DID).rom \
->  		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-> @@ -124,6 +120,8 @@ build-efi-roms: build-pxe-roms
->  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
->  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-> =20
-> +$(EFIROM):
-> +	$(MAKE) -C edk2/BaseTools
-> =20
->  slof:
->  	$(MAKE) -C SLOF CROSS=3D$(powerpc64_cross_prefix) qemu
-> @@ -150,6 +148,7 @@ clean:
->  	$(MAKE) -C sgabios clean
->  	rm -f sgabios/.depend
->  	$(MAKE) -C ipxe/src veryclean
-> +	$(MAKE) -C edk2/BaseTools clean
->  	$(MAKE) -C SLOF clean
->  	rm -rf u-boot/build.e500
->  	$(MAKE) -C u-boot-sam460ex distclean
-> --=20
-> 2.19.1.3.g30247aa5d201
->=20
->=20
+Oh my fault.
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+So I think my patch:
+-->http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg04896.html
+is useful to write this file entry test cases
+
+Thanks,
+Li Qiang
+
+
+> > ---
+> >  hw/nvram/fw_cfg.c | 9 +++++----
+> >  1 file changed, 5 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> > index 53e8e010a8b7..7fdf04adc97f 100644
+> > --- a/hw/nvram/fw_cfg.c
+> > +++ b/hw/nvram/fw_cfg.c
+> > @@ -118,7 +118,6 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+> >  {
+> >      const char *boot_splash_filename =3D NULL;
+> >      const char *boot_splash_time =3D NULL;
+> > -    uint8_t qemu_extra_params_fw[2];
+> >      char *filename, *file_data;
+> >      gsize file_size;
+> >      int file_type;
+> > @@ -132,6 +131,8 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+> >      /* insert splash time if user configurated */
+> >      if (boot_splash_time) {
+> >          int64_t bst_val =3D qemu_opt_get_number(opts, "splash-time", -=
+1);
+> > +        uint16_t bst_le16;
+> > +
+> >          /* validate the input */
+> >          if (bst_val < 0 || bst_val > 0xffff) {
+> >              error_report("splash-time is invalid,"
+> > @@ -139,9 +140,9 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+> >              exit(1);
+> >          }
+> >          /* use little endian format */
+> > -        qemu_extra_params_fw[0] =3D (uint8_t)(bst_val & 0xff);
+> > -        qemu_extra_params_fw[1] =3D (uint8_t)((bst_val >> 8) & 0xff);
+> > -        fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_fw,
+> 2);
+> > +        bst_le16 =3D cpu_to_le16(bst_val);
+> > +        fw_cfg_add_file(s, "etc/boot-menu-wait",
+> > +                        g_memdup(&bst_le16, sizeof bst_le16), sizeof
+> bst_le16);
+> >      }
+> >
+> >      /* insert splash file if user configurated */
+> > --
+> > 2.19.1.3.g30247aa5d201
+> >
+>
+>
