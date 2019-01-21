@@ -1,26 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:38827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gld6S-0001wk-BQ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:11:17 -0500
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gld6b-0001wk-P2
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:11:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gld4X-0006h8-At
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:09:18 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Mon, 21 Jan 2019 17:09:02 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA839292DA4@lhreml524-mbb.china.huawei.com>
-References: <20181018143042.29588-1-eric.auger@redhat.com>
-	<20181018143042.29588-12-eric.auger@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA8392925E9@lhreml524-mbb.china.huawei.com>
-	<b766bfce-6d19-393e-8f36-2f9320162150@redhat.com>
-In-Reply-To: <b766bfce-6d19-393e-8f36-2f9320162150@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gld3A-0005fR-6q
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:07:58 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:55575)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1gld39-0005ah-UP
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:07:52 -0500
+From: Anthony PERARD <anthony.perard@citrix.com>
+Date: Mon, 21 Jan 2019 17:07:13 +0000
+Message-ID: <20190121170713.11906-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v4 11/16] acpi: move
- build_srat_hotpluggable_memory to generic ACPI source
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] configure: xen: Stop build-testing for
+ xc_domain_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kwangwoo.lee@sk.com" <kwangwoo.lee@sk.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "david@redhat.com" <david@redhat.com>
-Cc: "drjones@redhat.com" <drjones@redhat.com>, Linuxarm <linuxarm@huawei.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Suzuki.Poulose@arm.com" <Suzuki.Poulose@arm.com>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiAyMSBKYW51YXJ5IDIw
-MTkgMTM6NTkNCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
-b3RodW0udGhvZGlAaHVhd2VpLmNvbT47DQo+IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNvbTsgcWVt
-dS1kZXZlbEBub25nbnUub3JnOyBxZW11LWFybUBub25nbnUub3JnOw0KPiBwZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmc7IGt3YW5nd29vLmxlZUBzay5jb207IGltYW1tZWRvQHJlZGhhdC5jb207DQo+
-IGRhdmlkQHJlZGhhdC5jb20NCj4gQ2M6IGRyam9uZXNAcmVkaGF0LmNvbTsgTGludXhhcm0gPGxp
-bnV4YXJtQGh1YXdlaS5jb20+Ow0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBTdXp1a2kuUG91bG9z
-ZUBhcm0uY29tDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1JGQyB2NCAxMS8xNl0gYWNw
-aTogbW92ZQ0KPiBidWlsZF9zcmF0X2hvdHBsdWdnYWJsZV9tZW1vcnkgdG8gZ2VuZXJpYyBBQ1BJ
-IHNvdXJjZQ0KDQpbLi4uXQ0KDQo+ID4+ICt2b2lkIGJ1aWxkX3NyYXRfaG90cGx1Z2dhYmxlX21l
-bW9yeShHQXJyYXkgKnRhYmxlX2RhdGEsIHVpbnQ2NF90IGJhc2UsDQo+ID4+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRfdCBsZW4sIGludCBkZWZhdWx0X25vZGUp
-DQo+ID4+ICt7DQo+ID4+ICsgICAgTWVtb3J5RGV2aWNlSW5mb0xpc3QgKmluZm9fbGlzdCA9IHFt
-cF9tZW1vcnlfZGV2aWNlX2xpc3QoKTsNCj4gPj4gKyAgICBNZW1vcnlEZXZpY2VJbmZvTGlzdCAq
-aW5mbzsNCj4gPj4gKyAgICBNZW1vcnlEZXZpY2VJbmZvICptaTsNCj4gPj4gKyAgICBQQ0RJTU1E
-ZXZpY2VJbmZvICpkaTsNCj4gPj4gKyAgICB1aW50NjRfdCBlbmQgPSBiYXNlICsgbGVuLCBjdXIs
-IHNpemU7DQo+ID4+ICsgICAgYm9vbCBpc19udmRpbW07DQo+ID4+ICsgICAgQWNwaVNyYXRNZW1v
-cnlBZmZpbml0eSAqbnVtYW1lbTsNCj4gPj4gKyAgICBNZW1vcnlBZmZpbml0eUZsYWdzIGZsYWdz
-Ow0KPiA+PiArDQo+ID4+ICsgICAgZm9yIChjdXIgPSBiYXNlLCBpbmZvID0gaW5mb19saXN0Ow0K
-PiA+PiArICAgICAgICAgY3VyIDwgZW5kOw0KPiA+PiArICAgICAgICAgY3VyICs9IHNpemUsIGlu
-Zm8gPSBpbmZvLT5uZXh0KSB7DQo+ID4+ICsgICAgICAgIG51bWFtZW0gPSBhY3BpX2RhdGFfcHVz
-aCh0YWJsZV9kYXRhLCBzaXplb2YgKm51bWFtZW0pOw0KPiA+PiArDQo+ID4+ICsgICAgICAgIGlm
-ICghaW5mbykgew0KPiA+PiArICAgICAgICAgICAgYnVpbGRfc3JhdF9tZW1vcnkobnVtYW1lbSwg
-Y3VyLCBlbmQgLSBjdXIsIGRlZmF1bHRfbm9kZSwNCj4gPj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIE1FTV9BRkZJTklUWV9IT1RQTFVHR0FCTEUgfA0KPiA+PiBNRU1fQUZGSU5JVFlf
-RU5BQkxFRCk7DQo+ID4+ICsgICAgICAgICAgICBicmVhazsNCj4gPj4gKyAgICAgICAgfQ0KPiA+
-PiArDQo+ID4+ICsgICAgICAgIG1pID0gaW5mby0+dmFsdWU7DQo+ID4+ICsgICAgICAgIGlzX252
-ZGltbSA9IChtaS0+dHlwZSA9PQ0KPiA+PiBNRU1PUllfREVWSUNFX0lORk9fS0lORF9OVkRJTU0p
-Ow0KPiA+PiArICAgICAgICBkaSA9ICFpc19udmRpbW0gPyBtaS0+dS5kaW1tLmRhdGEgOiBtaS0+
-dS5udmRpbW0uZGF0YTsNCj4gPj4gKw0KPiA+PiArICAgICAgICBpZiAoY3VyIDwgZGktPmFkZHIp
-IHsNCj4gPj4gKyAgICAgICAgICAgIGJ1aWxkX3NyYXRfbWVtb3J5KG51bWFtZW0sIGN1ciwgZGkt
-PmFkZHIgLSBjdXIsDQo+ID4+IGRlZmF1bHRfbm9kZSwNCj4gPj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIE1FTV9BRkZJTklUWV9IT1RQTFVHR0FCTEUgfA0KPiA+PiBNRU1fQUZGSU5J
-VFlfRU5BQkxFRCk7DQo+ID4+ICsgICAgICAgICAgICBudW1hbWVtID0gYWNwaV9kYXRhX3B1c2go
-dGFibGVfZGF0YSwgc2l6ZW9mDQo+ICpudW1hbWVtKTsNCj4gPj4gKyAgICAgICAgfQ0KPiA+PiAr
-DQo+ID4+ICsgICAgICAgIHNpemUgPSBkaS0+c2l6ZTsNCj4gPj4gKw0KPiA+PiArICAgICAgICBm
-bGFncyA9IE1FTV9BRkZJTklUWV9FTkFCTEVEOw0KPiA+PiArICAgICAgICBpZiAoZGktPmhvdHBs
-dWdnYWJsZSkgew0KPiA+PiArICAgICAgICAgICAgZmxhZ3MgfD0gTUVNX0FGRklOSVRZX0hPVFBM
-VUdHQUJMRTsNCj4gPj4gKyAgICAgICAgfQ0KPiA+PiArICAgICAgICBpZiAoaXNfbnZkaW1tKSB7
-DQo+ID4+ICsgICAgICAgICAgICBmbGFncyB8PSBNRU1fQUZGSU5JVFlfTk9OX1ZPTEFUSUxFOw0K
-PiA+PiArICAgICAgICB9DQo+ID4+ICsNCj4gPj4gKyAgICAgICAgYnVpbGRfc3JhdF9tZW1vcnko
-bnVtYW1lbSwgZGktPmFkZHIsIHNpemUsIGRpLT5ub2RlLCBmbGFncyk7DQo+ID4+ICsgICAgfQ0K
-PiA+PiArDQo+ID4+ICsgICAgcWFwaV9mcmVlX01lbW9yeURldmljZUluZm9MaXN0KGluZm9fbGlz
-dCk7DQo+ID4+ICt9DQo+ID4NCj4gPiBUaGUgYWJvdmUgbG9naWMgY2hhbmdlcyB0aGUgU1JBVCBl
-bnRyaWVzIGlmIGRpbW0gaXMgaG90LWFkZGVkIGFuZCBhIHJlYm9vdCBpcw0KPiA+IHBlcmZvcm1l
-ZCBhbmQgYXMgbWVudGlvbmVkIGFib3ZlLCBFREsyIHNlZW1zIHRvIGJlIG5vdCBoYXBweSB3aXRo
-IHRoaXMuDQo+ID4NCj4gPiBJIGhhZCBhIGxvb2sgYXQgdGhlIHBjIGNvZGUgYW5kIGl0IGxvb2tz
-IGxpa2UgaXQgb25seSBoYXMgb25lIFNSQVQgZW50cnkgZm9yIHRoZQ0KPiA+IHdob2xlIGhvdC1w
-bHVnZ2FibGUgYWRkcmVzcyBzcGFjZVsyXSB3aGljaCBwcm9iYWJsZSBtZWFucyBTUkFUIHJlbWFp
-bnMNCj4gc2FtZQ0KPiA+IGFjcm9zcyByZWJvb3QgZXZlbiBhZnRlciBtZW0gaXMgaG90IGFkZGVk
-LiBOb3Qgc3VyZSB3aHkgd2UgYXJlIGRvaW5nIHRoaXMNCj4gZGlmZmVyZW50bHkNCj4gPiBmb3Ig
-QVJNLg0KPiANCj4gSW5pdGlhbGx5IHRoaXMgY29kZSB3YXMgaW5waXJlZCBmcm9tIHg4NiBjb2Rl
-LiBUaGVuIElnb3IgZml4ZWQgaXQgb24geDg2DQo+ICB3aXRoOg0KPiBkYmI2ZGE4YmE3ZTAyMTA1
-YmRiYjMzYjUyN2UwODgyNDljOTg0M2M4ICBwYzogYWNwaTogcmV2ZXJ0IGJhY2sgdG8gMQ0KPiBT
-UkFUIGVudHJ5IGZvciBob3RwbHVnZ2FibGUgYXJlYQ0KDQpPay4gVGhhdCBleHBsYWlucyBpdC4g
-VGhhbmtzIGZvciB0aGUgaW5mby4NCg0KPiBTbyBpdCBsb29rcyB0aGUgc2FtZSBjaGFuZ2UgbXVz
-dCBiZSBkb25lIG9uIEFSTS4NCg0KT2suIA0KIA0KPiBJIGFtIGN1cnJlbnRseSBidXN5IHdpdGgg
-dGhpcyByZXNwaW4uIEFzIHN1Z2dlc3RlZCBieSBEYXZpZCBhbmQgSWdvciBJDQo+IGltcGxlbWVu
-dGVkIHRoZSBpbml0aWFsIFJBTSBhcyBkZXZpY2UgbWVtb3J5LiBJIGFtIG5vdyBsb29raW5nIGF0
-IE5VTUENCj4gaW1wYWN0cyBvZiB0aGF0IGNoYW5nZS4NCg0KU3VyZS4gTWVhbiB0aW1lIEkgd2ls
-bCBjb250aW51ZSB3aXRoIG15IHRlc3RpbmcgYW5kIHdpbGwgc2VudCBvdXQgdGhlIFJGQyBmb3Ig
-DQpob3QtYWRkIGZlYXR1cmUgb24gdG9wIG9mIHY1IG9mIHRoaXMgc2VyaWVzIHRoZW4uDQoNClRo
-YW5rcywNClNoYW1lZXIuDQo=
+Its last uses was removed by: 6d7c06c213ddcfabcafdc178ccef81736f85a7c2
+"Remove broken Xen PV domain builder".
+
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+---
+ configure | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/configure b/configure
+index 98b270974d..8684a6e5ef 100755
+--- a/configure
++++ b/configure
+@@ -2469,7 +2469,6 @@ int main(void) {
+   xenforeignmemory_handle *xfmem;
+   xenevtchn_handle *xe;
+   xengnttab_handle *xg;
+-  xen_domain_handle_t handle;
+   xengnttab_grant_copy_segment_t* seg = NULL;
+ 
+   xs_daemon_open();
+@@ -2479,7 +2478,6 @@ int main(void) {
+   xc_domain_add_to_physmap(0, 0, XENMAPSPACE_gmfn, 0, 0);
+   xc_hvm_inject_msi(xc, 0, 0xf0000000, 0x00000000);
+   xc_hvm_create_ioreq_server(xc, 0, HVM_IOREQSRV_BUFIOREQ_ATOMIC, NULL);
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
+ 
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map(xfmem, 0, 0, 0, 0, 0);
+@@ -2521,7 +2519,6 @@ int main(void) {
+   xenforeignmemory_handle *xfmem;
+   xenevtchn_handle *xe;
+   xengnttab_handle *xg;
+-  xen_domain_handle_t handle;
+ 
+   xs_daemon_open();
+ 
+@@ -2530,7 +2527,6 @@ int main(void) {
+   xc_domain_add_to_physmap(0, 0, XENMAPSPACE_gmfn, 0, 0);
+   xc_hvm_inject_msi(xc, 0, 0xf0000000, 0x00000000);
+   xc_hvm_create_ioreq_server(xc, 0, HVM_IOREQSRV_BUFIOREQ_ATOMIC, NULL);
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
+ 
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map(xfmem, 0, 0, 0, 0, 0);
+@@ -2548,21 +2544,6 @@ EOF
+       then
+       xen_ctrl_version=40701
+       xen=yes
+-    elif
+-        cat > $TMPC <<EOF &&
+-#include <xenctrl.h>
+-#include <stdint.h>
+-int main(void) {
+-  xc_interface *xc = NULL;
+-  xen_domain_handle_t handle;
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
+-  return 0;
+-}
+-EOF
+-        compile_prog "" "$xen_libs"
+-      then
+-      xen_ctrl_version=40700
+-      xen=yes
+ 
+     # Xen 4.6
+     elif
+-- 
+Anthony PERARD
