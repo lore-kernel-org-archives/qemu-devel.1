@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52054)
+Received: from eggs.gnu.org ([209.51.188.92]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyT-0004hn-Ov
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:06 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyN-0004ct-1I
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyT-0004aS-1t
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:05 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:34852)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyM-0004Rc-5l
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:59 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gldyS-0004Z8-QK
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:04 -0500
-Received: by mail-wm1-x335.google.com with SMTP id t200so11807624wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:07:04 -0800 (PST)
+	id 1gldyL-0004Qk-VJ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:58 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id r10so24429902wrs.10
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:57 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Jan 2019 19:06:12 +0100
-Message-Id: <1548093980-43088-42-git-send-email-pbonzini@redhat.com>
+Date: Mon, 21 Jan 2019 19:06:05 +0100
+Message-Id: <1548093980-43088-35-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 References: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 41/49] configure: enable elf2dmp build for
- Windows hosts
+Subject: [Qemu-devel] [PULL 34/49] Revert "i386: Add CPUID bit for PCONFIG"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +28,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Cc: Robert Hoo <robert.hu@linux.intel.com>
 
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+From: Robert Hoo <robert.hu@linux.intel.com>
 
-After this patch contrib/elf2dmp can be built for Windows x86 and x86_64
-hosts by mingw.
+This reverts commit 5131dc433df54b37e8e918d8fba7fe10344e7a7b.
+For new instruction 'PCONFIG' will not be exposed to guest.
 
-Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-7-viktor.prutyanov@phystech.edu>
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Message-Id: <1545227081-213696-3-git-send-email-robert.hu@linux.intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile  | 4 ++--
- configure | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 6de3a38..145a516 100644
---- a/Makefile
-+++ b/Makefile
-@@ -567,8 +567,8 @@ ifneq ($(EXESUF),)
- qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
- endif
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 2bcab80..d8430b4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1077,7 +1077,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, "pconfig", NULL,
++            NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", "stibp",
+             NULL, "arch-capabilities", NULL, "ssbd",
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 59656a7..95112b9 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -694,7 +694,6 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
  
--elf2dmp: LIBS = $(CURL_LIBS)
--elf2dmp: $(elf2dmp-obj-y)
-+elf2dmp$(EXESUF): LIBS += $(CURL_LIBS)
-+elf2dmp$(EXESUF): $(elf2dmp-obj-y)
- 	$(call LINK, $^)
- 
- ifdef CONFIG_IVSHMEM
-diff --git a/configure b/configure
-index 6a4d23c..b723dca 100755
---- a/configure
-+++ b/configure
-@@ -5797,8 +5797,8 @@ if test "$want_tools" = "yes" ; then
-   if [ "$ivshmem" = "yes" ]; then
-     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-   fi
--  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
--    tools="elf2dmp $tools"
-+  if [ "$curl" = "yes" ]; then
-+      tools="elf2dmp\$(EXESUF) $tools"
-   fi
- fi
- if test "$softmmu" = yes ; then
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+-#define CPUID_7_0_EDX_PCONFIG (1U << 18)       /* Platform Configuration */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
+ #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
 -- 
 1.8.3.1
