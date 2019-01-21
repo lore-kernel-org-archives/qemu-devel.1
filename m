@@ -1,26 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glX17-00076x-FS
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:41:22 -0500
+	(envelope-from <stefanha@gmail.com>) id 1glX1U-00076x-7e
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:41:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glWzC-000087-EO
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:39:23 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glWzC-0008WM-46
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:39:22 -0500
-Received: by mail-wr1-f68.google.com with SMTP id 96so22736453wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:39:15 -0800 (PST)
-References: <20190118185402.3065-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <906bafd8-2a2a-9cae-142e-c7045edaa9d0@redhat.com>
-Date: Mon, 21 Jan 2019 11:39:13 +0100
+	(envelope-from <stefanha@gmail.com>) id 1glWv2-0006Np-NG
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:35:05 -0500
+Date: Mon, 21 Jan 2019 10:35:01 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190121103501.GD30536@stefanha-x1.localdomain>
+References: <20190115111007.27159-1-stefanha@redhat.com>
+	<154803546492.5550.12597499001850601331@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <20190118185402.3065-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable ipmi-bt-test
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xB0nW4MQa6jZONgY"
+Content-Disposition: inline
+In-Reply-To: <154803546492.5550.12597499001850601331@2d3111e9616b>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] qcow2: include LUKS
+ payload overhead in qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Corey Minyard <cminyard@mvista.com>
-Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Cc'ing Corey, the tests author.
 
-On 1/18/19 7:54 PM, Peter Maydell wrote:
-> The ipmi-bt-test fails intermittently, especially on the NetBSD VM.
-> The frequency of this failure has recently gone up sharply to the
-> point that I'm having to retry the NetBSD build multiple times
-> to get a pass when merging pull requests.
-> 
-> Disable the test until we can figure out why it's failing.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+--xB0nW4MQa6jZONgY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Acked-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Sun, Jan 20, 2019 at 05:51:06PM -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190115111007.27159-1-stefanha@redhat.com/
+...
+> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
+> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals destination size [-Werror=stringop-truncation]
+>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
-> ---
-> Fed up with this failing all the time so let's just turn it off.
-> Feel free to investigate what's actually going wrong with it...
-> 
->  tests/Makefile.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index eaa81ee1d07..5e6b2c7058d 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -186,7 +186,8 @@ check-qtest-i386-$(CONFIG_SGA) += tests/boot-serial-test$(EXESUF)
->  check-qtest-i386-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
->  check-qtest-i386-y += tests/rtc-test$(EXESUF)
->  check-qtest-i386-y += tests/ipmi-kcs-test$(EXESUF)
-> -check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
-> +# Disabled temporarily as it fails intermittently especially under NetBSD VM
-> +# check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
->  check-qtest-i386-y += tests/i440fx-test$(EXESUF)
->  check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
->  check-qtest-i386-y += tests/drive_del-test$(EXESUF)
-> 
+Wasn't me, I swear!
+
+Stefan
+
+--xB0nW4MQa6jZONgY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcRaBVAAoJEJykq7OBq3PInrQIAKiABMaFNJdNk6gBwkcles6X
+9NYb6N8AF8ZL5ghxLzvG1evMvYYpi3q1uhYJzxXKO1XsHzEnWE6uZ/qGG/UQWvMa
+8e0OScHK8dpqsaHpzBA2hE5sKrvNywIsnykjNMVz1LtvrZfCL7Mhjd85z6lv/vhR
+NtPS9mVoXQ8bEZPTYmMmdKIarQE8F4NcnQVxdtaGythlSXwJQdamWZn3Mz/Gwwi7
+/C2LdL05ZHlKJEJzTjanZ07qpElkUmHYKqHG6fGAFGgBGaEVY60MADt1CrN6opP/
+B9tyeW76YBRhZ36Ts9xQ/3FD69FpUvMXtxsbe2fTVS4J1UWURVOeFATtbXVKBg8=
+=g3yF
+-----END PGP SIGNATURE-----
+
+--xB0nW4MQa6jZONgY--
