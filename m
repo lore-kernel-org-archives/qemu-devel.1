@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39234)
+Received: from eggs.gnu.org ([209.51.188.92]:38654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glevU-0008Da-D5
+	(envelope-from <peter.maydell@linaro.org>) id 1glevU-0007jF-Mk
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glefa-0002qQ-MP
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:40 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39575)
+	(envelope-from <peter.maydell@linaro.org>) id 1glefY-0002lJ-O3
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:37 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35695)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glefY-0002e8-V7
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:37 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t27so24610974wra.6
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:31 -0800 (PST)
+	id 1glefU-0002cN-VT
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:34 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t200so11925203wmt.0
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:29 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 18:51:04 +0000
-Message-Id: <20190121185118.18550-10-peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 18:51:02 +0000
+Message-Id: <20190121185118.18550-8-peter.maydell@linaro.org>
 In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
 References: <20190121185118.18550-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/23] hw/arm/armsse: Make number of SRAM banks
- parameterised
+Subject: [Qemu-devel] [PATCH 07/23] hw/arm/iotkit: Rename files to
+ hw/arm/armsse.[ch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,195 +32,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The SSE-200 has four banks of SRAM, each with its own
-Memory Protection Controller, where the IoTKit has only one.
-Make the number of SRAM banks a field in ARMSSEInfo.
+Rename the files that used to be iotkit.[ch] to
+armsse.[ch] to reflect the fact they new cover
+multiple Arm subsystems for embedded.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/armsse.h |  9 +++--
- hw/arm/armsse.c         | 78 ++++++++++++++++++++++++++---------------
- 2 files changed, 56 insertions(+), 31 deletions(-)
+ hw/arm/Makefile.objs                  | 2 +-
+ include/hw/arm/{iotkit.h => armsse.h} | 4 ++--
+ hw/arm/{iotkit.c => armsse.c}         | 2 +-
+ hw/arm/mps2-tz.c                      | 2 +-
+ MAINTAINERS                           | 4 ++--
+ default-configs/arm-softmmu.mak       | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+ rename include/hw/arm/{iotkit.h => armsse.h} (99%)
+ rename hw/arm/{iotkit.c => armsse.c} (99%)
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index ff512054988..99714aa63cd 100644
---- a/include/hw/arm/armsse.h
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 50c7b4a927d..22b7f0ed0ba 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -34,7 +34,7 @@ obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) += mps2.o
+ obj-$(CONFIG_MPS2) += mps2-tz.o
+ obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
+-obj-$(CONFIG_IOTKIT) += iotkit.o
++obj-$(CONFIG_ARMSSE) += armsse.o
+ obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
+ obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
+ obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o mcimx6ul-evk.o
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/armsse.h
+similarity index 99%
+rename from include/hw/arm/iotkit.h
+rename to include/hw/arm/armsse.h
+index 521d1f73757..ff512054988 100644
+--- a/include/hw/arm/iotkit.h
 +++ b/include/hw/arm/armsse.h
-@@ -90,6 +90,11 @@
- #define NUM_EXTERNAL_PPCS (IOTS_NUM_AHB_EXP_PPC + IOTS_NUM_APB_EXP_PPC)
- #define NUM_PPCS (NUM_EXTERNAL_PPCS + 2)
+@@ -58,8 +58,8 @@
+  *  + named GPIO outputs mscexp_ns[0..15]
+  */
  
-+#define MAX_SRAM_BANKS 4
-+#if MAX_SRAM_BANKS > IOTS_NUM_MPC
-+#error Too many SRAM banks
-+#endif
-+
- typedef struct ARMSSE {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -99,7 +104,7 @@ typedef struct ARMSSE {
-     IoTKitSecCtl secctl;
-     TZPPC apb_ppc0;
-     TZPPC apb_ppc1;
--    TZMPC mpc;
-+    TZMPC mpc[IOTS_NUM_MPC];
-     CMSDKAPBTIMER timer0;
-     CMSDKAPBTIMER timer1;
-     CMSDKAPBTIMER s32ktimer;
-@@ -123,7 +128,7 @@ typedef struct ARMSSE {
-     MemoryRegion alias1;
-     MemoryRegion alias2;
-     MemoryRegion alias3;
--    MemoryRegion sram0;
-+    MemoryRegion sram[MAX_SRAM_BANKS];
+-#ifndef IOTKIT_H
+-#define IOTKIT_H
++#ifndef ARMSSE_H
++#define ARMSSE_H
  
-     qemu_irq *exp_irqs;
-     qemu_irq ppc0_irq;
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 074c1d3a6cf..b639b54e0db 100644
---- a/hw/arm/armsse.c
+ #include "hw/sysbus.h"
+ #include "hw/arm/armv7m.h"
+diff --git a/hw/arm/iotkit.c b/hw/arm/armsse.c
+similarity index 99%
+rename from hw/arm/iotkit.c
+rename to hw/arm/armsse.c
+index 7ff14fd5aef..8554be14128 100644
+--- a/hw/arm/iotkit.c
 +++ b/hw/arm/armsse.c
-@@ -20,11 +20,13 @@
+@@ -15,7 +15,7 @@
+ #include "trace.h"
+ #include "hw/sysbus.h"
+ #include "hw/registerfields.h"
+-#include "hw/arm/iotkit.h"
++#include "hw/arm/armsse.h"
+ #include "hw/arm/arm.h"
  
  struct ARMSSEInfo {
-     const char *name;
-+    int sram_banks;
- };
- 
- static const ARMSSEInfo armsse_variants[] = {
-     {
-         .name = TYPE_IOTKIT,
-+        .sram_banks = 1,
-     },
- };
- 
-@@ -118,8 +120,12 @@ static void armsse_forward_sec_resp_cfg(ARMSSE *s)
- static void armsse_init(Object *obj)
- {
-     ARMSSE *s = ARMSSE(obj);
-+    ARMSSEClass *asc = ARMSSE_GET_CLASS(obj);
-+    const ARMSSEInfo *info = asc->info;
-     int i;
- 
-+    assert(info->sram_banks <= MAX_SRAM_BANKS);
-+
-     memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
- 
-     sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-@@ -133,12 +139,17 @@ static void armsse_init(Object *obj)
-                           TYPE_TZ_PPC);
-     sysbus_init_child_obj(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
-                           TYPE_TZ_PPC);
--    sysbus_init_child_obj(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
-+    for (i = 0; i < info->sram_banks; i++) {
-+        char *name = g_strdup_printf("mpc%d", i);
-+        sysbus_init_child_obj(obj, name, &s->mpc[i],
-+                              sizeof(s->mpc[i]), TYPE_TZ_MPC);
-+        g_free(name);
-+    }
-     object_initialize_child(obj, "mpc-irq-orgate", &s->mpc_irq_orgate,
-                             sizeof(s->mpc_irq_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
- 
--    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
-+    for (i = 0; i < IOTS_NUM_EXP_MPC + info->sram_banks; i++) {
-         char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
- 
-@@ -199,6 +210,8 @@ static void armsse_mpcexp_status(void *opaque, int n, int level)
- static void armsse_realize(DeviceState *dev, Error **errp)
- {
-     ARMSSE *s = ARMSSE(dev);
-+    ARMSSEClass *asc = ARMSSE_GET_CLASS(dev);
-+    const ARMSSEInfo *info = asc->info;
-     int i;
-     MemoryRegion *mr;
-     Error *err = NULL;
-@@ -335,35 +348,41 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     qdev_connect_gpio_out_named(dev_secctl, "sec_resp_cfg", 0,
-                                 qdev_get_gpio_in(dev_splitter, 0));
- 
--    /* This RAM lives behind the Memory Protection Controller */
--    memory_region_init_ram(&s->sram0, NULL, "armsse.sram0", 0x00008000, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    /* Each SRAM bank lives behind its own Memory Protection Controller */
-+    for (i = 0; i < info->sram_banks; i++) {
-+        char *ramname = g_strdup_printf("armsse.sram%d", i);
-+        SysBusDevice *sbd_mpc;
-+
-+        memory_region_init_ram(&s->sram[i], NULL, ramname, 0x00008000, &err);
-+        g_free(ramname);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_link(OBJECT(&s->mpc[i]), OBJECT(&s->sram[i]),
-+                                 "downstream", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_bool(OBJECT(&s->mpc[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        /* Map the upstream end of the MPC into the right place... */
-+        sbd_mpc = SYS_BUS_DEVICE(&s->mpc[i]);
-+        memory_region_add_subregion(&s->container, 0x20000000 + i * 0x8000,
-+                                    sysbus_mmio_get_region(sbd_mpc, 1));
-+        /* ...and its register interface */
-+        memory_region_add_subregion(&s->container, 0x50083000 + i * 0x1000,
-+                                    sysbus_mmio_get_region(sbd_mpc, 0));
-     }
--    object_property_set_link(OBJECT(&s->mpc), OBJECT(&s->sram0),
--                             "downstream", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    object_property_set_bool(OBJECT(&s->mpc), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    /* Map the upstream end of the MPC into the right place... */
--    memory_region_add_subregion(&s->container, 0x20000000,
--                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
--                                                       1));
--    /* ...and its register interface */
--    memory_region_add_subregion(&s->container, 0x50083000,
--                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
--                                                       0));
- 
-     /* We must OR together lines from the MPC splitters to go to the NVIC */
-     object_property_set_int(OBJECT(&s->mpc_irq_orgate),
--                            IOTS_NUM_EXP_MPC + 1, "num-lines", &err);
-+                            IOTS_NUM_EXP_MPC + info->sram_banks,
-+                            "num-lines", &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -636,7 +655,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Wire up the splitters for the MPC IRQs */
--    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
-+    for (i = 0; i < IOTS_NUM_EXP_MPC + info->sram_banks; i++) {
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
-         DeviceState *dev_splitter = DEVICE(splitter);
- 
-@@ -659,7 +678,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                                                          "mpcexp_status", i));
-         } else {
-             /* Splitter input is from our own MPC */
--            qdev_connect_gpio_out_named(DEVICE(&s->mpc), "irq", 0,
-+            qdev_connect_gpio_out_named(DEVICE(&s->mpc[i - IOTS_NUM_EXP_MPC]),
-+                                        "irq", 0,
-                                         qdev_get_gpio_in(dev_splitter, 0));
-             qdev_connect_gpio_out(dev_splitter, 0,
-                                   qdev_get_gpio_in_named(dev_secctl,
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 5824335b4fb..3859f17d98b 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -46,7 +46,7 @@
+ #include "hw/misc/mps2-fpgaio.h"
+ #include "hw/misc/tz-mpc.h"
+ #include "hw/misc/tz-msc.h"
+-#include "hw/arm/iotkit.h"
++#include "hw/arm/armsse.h"
+ #include "hw/dma/pl080.h"
+ #include "hw/ssi/pl022.h"
+ #include "hw/devices.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index af339b86db7..52222117d77 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -625,8 +625,8 @@ F: hw/arm/mps2.c
+ F: hw/arm/mps2-tz.c
+ F: hw/misc/mps2-*.c
+ F: include/hw/misc/mps2-*.h
+-F: hw/arm/iotkit.c
+-F: include/hw/arm/iotkit.h
++F: hw/arm/armsse.c
++F: include/hw/arm/armsse.h
+ F: hw/misc/iotkit-secctl.c
+ F: include/hw/misc/iotkit-secctl.h
+ F: hw/misc/iotkit-sysctl.c
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 2420491aacd..3f200157879 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -114,7 +114,7 @@ CONFIG_MPS2_SCC=y
+ CONFIG_TZ_MPC=y
+ CONFIG_TZ_MSC=y
+ CONFIG_TZ_PPC=y
+-CONFIG_IOTKIT=y
++CONFIG_ARMSSE=y
+ CONFIG_IOTKIT_SECCTL=y
+ CONFIG_IOTKIT_SYSCTL=y
+ CONFIG_IOTKIT_SYSINFO=y
 -- 
 2.20.1
