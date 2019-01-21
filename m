@@ -1,27 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:37809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glazX-00044o-Pn
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:56:00 -0500
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1glazY-00044o-Jb
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:56:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glatc-0003Yf-Tg
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:49:53 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33253)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glatc-0003X6-ET
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:49:52 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so20778649otl.0
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 06:49:51 -0800 (PST)
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1glaso-0003Cq-Ok
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:49:08 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:47411)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
+	id 1glasn-00039t-1b
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 09:49:02 -0500
+From: Anthony PERARD <anthony.perard@citrix.com>
+Date: Mon, 21 Jan 2019 14:48:41 +0000
+Message-ID: <20190121144841.24467-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-References: <20190118185402.3065-1-peter.maydell@linaro.org>
-	<75f3486c-a1a9-6025-16af-e9a34cc4a663@redhat.com>
-	<840a3bb1-1f60-50a6-5adb-2e3424a2d6b5@acm.org>
-In-Reply-To: <840a3bb1-1f60-50a6-5adb-2e3424a2d6b5@acm.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 14:49:38 +0000
-Message-ID: <CAFEAcA-CPNbgR=JHs0dcOyGm-67R-S==PfYe4cjz6nWeGjG+4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable ipmi-bt-test
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] configure: Don't add Xen's libs to LDFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, 21 Jan 2019 at 14:32, Corey Minyard <minyard@acm.org> wrote:
->
-> On 1/21/19 12:19 AM, Thomas Huth wrote:
-> > On 2019-01-18 19:54, Peter Maydell wrote:
-> >> The ipmi-bt-test fails intermittently, especially on the NetBSD VM.
-> >> The frequency of this failure has recently gone up sharply to the
-> >> point that I'm having to retry the NetBSD build multiple times
-> >> to get a pass when merging pull requests.
-> >>
-> >> Disable the test until we can figure out why it's failing.
+When Xen is detected via pkg-config, it isn't necessary to modify
+LDFLAGS as modifying libs_softmmu is enough.
 
-> I'll try to figure out why it's failing.  I assume I'll need a freebsd
-> system.
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+---
+ configure | 1 -
+ 1 file changed, 1 deletion(-)
 
-No, the tests/vm setup will let you run the VM on a Linux
-box (and that's what I do): just run
- make -C your-build-dir vm-build-netbsd J=8 V=1
-
-It's also possible to log in to the VM rather than just
-running tests and stopping: docs/devel/testing.rst has
-the details.
-
-thanks
--- PMM
+diff --git a/configure b/configure
+index 12fd34f30b..98b270974d 100755
+--- a/configure
++++ b/configure
+@@ -2355,7 +2355,6 @@ if test "$xen" != "no" ; then
+     fi
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+-    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+   else
+ 
+     xen_libs="-lxenstore -lxenctrl -lxenguest"
+-- 
+Anthony PERARD
