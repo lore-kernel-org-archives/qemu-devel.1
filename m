@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43000)
+Received: from eggs.gnu.org ([209.51.188.92]:47718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glUwB-0002bo-OL
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:08 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1glVJn-0005bj-E0
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glUwA-0006NC-Eo
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:07 -0500
-Resent-Message-Id: <E1glUwA-0006NC-Eo@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glUwA-0006Ki-4u
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:28:06 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190115165710.20116-1-mhines@scalecomputing.com>
-Message-ID: <154804572788.5550.2018374064474228883@2d3111e9616b>
+	(envelope-from <sgarzare@redhat.com>) id 1glVAN-0000x1-5W
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:42:47 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34586)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1glVAM-0000vz-W3
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:42:47 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j2so22328083wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 00:42:46 -0800 (PST)
+Date: Mon, 21 Jan 2019 09:42:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190121084241.wvqjkq2pfbnktqp4@steredhat>
+References: <1547729344-3895-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1547729344-3895-5-git-send-email-lizhijian@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 20:42:09 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] QGA: Fix guest-get-fsinfo PCI address
- collection in Windows
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547729344-3895-5-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v6 4/4] i386: allow to load initrd below 4
+ GB for recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mhines@scalecomputing.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>, philip.li@intel.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com, Richard Henderson <rth@twiddle.net>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE2NTcxMC4yMDEx
-Ni0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTE1MTY1NzEwLjIwMTE2LTEtbWhp
-bmVzQHNjYWxlY29tcHV0aW5nLmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2Ml0gUUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0
-aW9uIGluIFdpbmRvd3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg1YTc5NDAgUUdBOiBGaXggZ3Vl
-c3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRvd3MKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBv
-biBlYWNoIGxpbmUKIzE5NTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NTkyOgorICAgICAg
-ICAgICAgLyoKKyAgICAgICAgICAgICogQ00gQVBJIHVzZWQgaGVyZSBhcyBvcHBvc2VkIHRvCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjk5OiBGSUxFOiBxZ2EvY29tbWFuZHMt
-d2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRvIGFsbG9jYXRl
-IGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjk5OiBGSUxFOiBx
-Z2EvY29tbWFuZHMtd2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVk
-IHRvIGFsbG9jYXRlIGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJO
-SU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMDA6
-IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY2MjoKKyAgICAgICAgICAgIC8qIFRoZXJlIGlz
-IG5vIG5lZWQgdG8gYWxsb2NhdGUgYnVmZmVyIGluIHRoZSBuZXh0IGZ1bmN0aW9ucy4gVGhlIHNp
-emUKKyAgICAgICAgICAgICogaXMga25vd24gYW5kIFVMT05HIGFjY29yZGluZyB0bwoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnJicgKGN0eDpWeFYpCiMzMDU6IEZJTEU6IHFn
-YS9jb21tYW5kcy13aW4zMi5jOjY2NzoKKyAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUp
-JmJ1cywgc2l6ZSwgTlVMTCkpIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-V0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxp
-bmUKIzMyMzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjczOgorICAgICAgICAgICAgLyog
-VGhlIGZ1bmN0aW9uIHJldHJpZXZlcyB0aGUgZGV2aWNlJ3MgYWRkcmVzcy4gVGhpcyB2YWx1ZSB3
-aWxsIGJlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNl
-cGFyYXRlIGxpbmUKIzMyNDogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc0OgorICAgICAg
-ICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVyICovCgpX
-QVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMz
-MjQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY3NDoKKyAgICAgICAgICAgIC8qIFRoZSBm
-dW5jdGlvbiByZXRyaWV2ZXMgdGhlIGRldmljZSdzIGFkZHJlc3MuIFRoaXMgdmFsdWUgd2lsbCBi
-ZQorICAgICAgICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVt
-YmVyICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4OlZ4VikK
-IzMyNzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc3OgorICAgICAgICAgICAgICAgICAg
-ICAmdHlwZSwgKFBCWVRFKSZhZGRyLCBzaXplLCBOVUxMKSkgewogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcg
-Lyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzMzM6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4
-MzoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9D
-QVBBQklMSVRJRVMgc3RydWN0dXJlLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJh
-aWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzMzQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4z
-Mi5jOjY4NDoKKyAgICAgICAgICAgICogVGhpcyBudW1iZXIgaXMgdHlwaWNhbGx5IGEgdXNlci1w
-ZXJjZWl2ZWQgc2xvdCBudW1iZXIuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQg
-YWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMzQ6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5j
-OjY4NDoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklD
-RV9DQVBBQklMSVRJRVMgc3RydWN0dXJlLgorICAgICAgICAgICAgKiBUaGlzIG51bWJlciBpcyB0
-eXBpY2FsbHkgYSB1c2VyLXBlcmNlaXZlZCBzbG90IG51bWJlci4gKi8KCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyYnIChjdHg6VnhWKQojMzM3OiBGSUxFOiBxZ2EvY29tbWFu
-ZHMtd2luMzIuYzo2ODc6CisgICAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJnNsb3Qs
-IHNpemUsIE5VTEwpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
-IzM0MzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjkzOgorICAgICAgICAgICAgLyogU2V0
-dXBBcGkgZ2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKCldBUk5J
-Tkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBlYWNoIGxpbmUKIzM0NDog
-RklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njk0OgorICAgICAgICAgICAgLyogU2V0dXBBcGkg
-Z2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKKyAgICAgICAgICAg
-ICogSW9HZXREZXZpY2VQcm9wZXJ0eS4gQWNjb3JkaW5nIHRvIE1pY3Jvc29mdAoKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzNDg6
-IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY5ODoKKyAgICAgICAgICAgICogU1BEUlBfQURE
-UkVTUyBpcyBwcm9wZXJ0eUFkZHJlc3MsIHNvIHdlIGRvIHRoZSBzYW1lLiovCgp0b3RhbDogMyBl
-cnJvcnMsIDEzIHdhcm5pbmdzLCAzOTQgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDg1YTc5NDAzNmRl
-OCAoUUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdp
-bmRvd3MpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE1MTY1NzEwLjIwMTE2LTEtbWhpbmVz
-QHNjYWxlY29tcHV0aW5nLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+On Thu, Jan 17, 2019 at 08:49:04PM +0800, Li Zhijian wrote:
+> Since linux commit: cf8fa920cb42 ("i386: handle an initrd in highmem (version 2)")
+> linux has supported initrd up to 4 GB, but the header field
+> ramdisk_max is still set to 2 GB to avoid "possible bootloader bugs".
+> 
+> When use '-kernel vmlinux -initrd initrd.cgz' to launch a VM,
+> the firmware(it could be linuxboot_dma.bin) helps to read initrd
+> contents into guest memory(below ramdisk_max) and jump to kernel.
+> that's similar with what bootloader does, like grub.
+> 
+> In addition, initrd_max is uint32_t simply because QEMU doesn't support
+> the 64-bit boot protocol (specifically the ext_ramdisk_image field).
+> 
+> Therefore here just limit initrd_max to UINT32_MAX simply as well to
+> allow initrd to be loaded below 4 GB.
+> 
+> NOTE: it's possible that linux protocol within [0x208, 0x20c]
+> supports up to 4 GB initrd as well.
+> 
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> 
+> ---
+> V6: update comments
+> V5: udpate comments and changelog
+> V3: correct grammar and check XLF_CAN_BE_LOADED_ABOVE_4G first (Michael S. Tsirkin)
+> 
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> ---
+>  hw/i386/pc.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
