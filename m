@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51595)
+Received: from eggs.gnu.org ([209.51.188.92]:51506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy3-0004If-Rf
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy1-00044I-RS
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy1-0004GI-Ha
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:39 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39488)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldxz-00040q-E7
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:37 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:35779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gldy1-00041t-Hn
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:37 -0500
-Received: by mail-wm1-x334.google.com with SMTP id y8so11690349wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:36 -0800 (PST)
+	id 1gldxw-0003uT-Ow
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:33 -0500
+Received: by mail-wr1-x429.google.com with SMTP id 96so24515865wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:27 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	133sm56197732wme.9.2019.01.21.10.06.34 for <qemu-devel@nongnu.org>
+	133sm56197732wme.9.2019.01.21.10.06.25 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 21 Jan 2019 10:06:34 -0800 (PST)
+	Mon, 21 Jan 2019 10:06:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Jan 2019 19:05:43 +0100
-Message-Id: <1548093980-43088-13-git-send-email-pbonzini@redhat.com>
+Date: Mon, 21 Jan 2019 19:05:34 +0100
+Message-Id: <1548093980-43088-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 References: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/49] vhost-user-test: skip if there is no
- memory at address 0
+Subject: [Qemu-devel] [PULL 03/49] vhost-net: move stubs to a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,178 +36,228 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The virt machine cannot run the vhost-user qtests because they hardcode
-the presence of memory at address 0.  Report the tests as a skip so that
-they can be converted to use qgraph.
+There is no reason for CONFIG_VHOST_NET to be specific to a single target;
+it is a host feature that can be add to all targets, as long as they support
+the virtio-net device.  Currently CONFIG_VHOST_NET depends on CONFIG_KVM,
+but ioeventfd support is present in the core memory API and works with
+other accelerators as well.
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+As a first step, move the vhost-net stubs to a separate file.  Later, they
+will become conditional on CONFIG_VIRTIO_NET, which is not available in .c
+files.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-11-git-send-email-pbonzini@redhat.com>
+Message-Id: <1543851204-41186-2-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 58 ++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 45 insertions(+), 13 deletions(-)
+ hw/net/Makefile.objs    |  4 ++-
+ hw/net/vhost_net-stub.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/net/vhost_net.c      | 74 ---------------------------------------
+ 3 files changed, 95 insertions(+), 75 deletions(-)
+ create mode 100644 hw/net/vhost_net-stub.c
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index e36f3e6..30b0aba 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -231,9 +231,11 @@ static void uninit_virtio_dev(TestServer *s)
-     qvirtio_pci_device_free(s->dev);
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index fa461d4..c2705e6 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -37,7 +37,9 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
+ obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
+ 
+ obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+-obj-y += vhost_net.o
++obj-$(CONFIG_VHOST_NET) += vhost_net.o
++common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
++common-obj-$(CONFIG_ALL) += vhost_net-stub.o
+ 
+ obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
+ 			fsl_etsec/rings.o fsl_etsec/miim.o
+diff --git a/hw/net/vhost_net-stub.c b/hw/net/vhost_net-stub.c
+new file mode 100644
+index 0000000..aac0e98
+--- /dev/null
++++ b/hw/net/vhost_net-stub.c
+@@ -0,0 +1,92 @@
++/*
++ * vhost-net support
++ *
++ * Copyright Red Hat, Inc. 2010
++ *
++ * Authors:
++ *  Michael S. Tsirkin <mst@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "net/net.h"
++#include "net/tap.h"
++#include "net/vhost-user.h"
++
++#include "hw/virtio/virtio-net.h"
++#include "net/vhost_net.h"
++#include "qemu/error-report.h"
++
++
++uint64_t vhost_net_get_max_queues(VHostNetState *net)
++{
++    return 1;
++}
++
++struct vhost_net *vhost_net_init(VhostNetOptions *options)
++{
++    error_report("vhost-net support is not compiled in");
++    return NULL;
++}
++
++int vhost_net_start(VirtIODevice *dev,
++                    NetClientState *ncs,
++                    int total_queues)
++{
++    return -ENOSYS;
++}
++void vhost_net_stop(VirtIODevice *dev,
++                    NetClientState *ncs,
++                    int total_queues)
++{
++}
++
++void vhost_net_cleanup(struct vhost_net *net)
++{
++}
++
++uint64_t vhost_net_get_features(struct vhost_net *net, uint64_t features)
++{
++    return features;
++}
++
++void vhost_net_ack_features(struct vhost_net *net, uint64_t features)
++{
++}
++
++uint64_t vhost_net_get_acked_features(VHostNetState *net)
++{
++    return 0;
++}
++
++bool vhost_net_virtqueue_pending(VHostNetState *net, int idx)
++{
++    return false;
++}
++
++void vhost_net_virtqueue_mask(VHostNetState *net, VirtIODevice *dev,
++                              int idx, bool mask)
++{
++}
++
++int vhost_net_notify_migration_done(struct vhost_net *net, char* mac_addr)
++{
++    return -1;
++}
++
++VHostNetState *get_vhost_net(NetClientState *nc)
++{
++    return 0;
++}
++
++int vhost_set_vring_enable(NetClientState *nc, int enable)
++{
++    return 0;
++}
++
++int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
++{
++    return 0;
++}
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index e037db6..b901306 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -23,7 +23,6 @@
+ #include "qemu/error-report.h"
+ 
+ 
+-#ifdef CONFIG_VHOST_NET
+ #include <linux/vhost.h>
+ #include <sys/socket.h>
+ #include <linux/kvm.h>
+@@ -449,76 +448,3 @@ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+ 
+     return vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
  }
- 
--static void wait_for_fds(TestServer *s)
-+static bool wait_for_fds(TestServer *s)
- {
-     gint64 end_time;
-+    bool got_region;
-+    int i;
- 
-     g_mutex_lock(&s->data_mutex);
- 
-@@ -251,6 +253,19 @@ static void wait_for_fds(TestServer *s)
-     g_assert_cmpint(s->fds_num, ==, s->memory.nregions);
- 
-     g_mutex_unlock(&s->data_mutex);
-+
-+    got_region = false;
-+    for (i = 0; i < s->memory.nregions; ++i) {
-+        VhostUserMemoryRegion *reg = &s->memory.regions[i];
-+        if (reg->guest_phys_addr == 0) {
-+            got_region = true;
-+            break;
-+        }
-+    }
-+    if (!got_region) {
-+        g_test_skip("No memory at address 0x0");
-+    }
-+    return got_region;
- }
- 
- static void read_guest_mem_server(TestServer *s)
-@@ -259,8 +274,6 @@ static void read_guest_mem_server(TestServer *s)
-     int i, j;
-     size_t size;
- 
--    wait_for_fds(s);
 -
-     g_mutex_lock(&s->data_mutex);
- 
-     /* iterate all regions */
-@@ -582,8 +595,6 @@ static void write_guest_mem(TestServer *s, uint32_t seed)
-     int i, j;
-     size_t size;
- 
--    wait_for_fds(s);
+-#else
+-uint64_t vhost_net_get_max_queues(VHostNetState *net)
+-{
+-    return 1;
+-}
 -
-     /* iterate all regions */
-     for (i = 0; i < s->fds_num; i++) {
- 
-@@ -666,8 +677,13 @@ static void test_read_guest_mem(const void *arg)
- 
-     init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
- 
-+    if (!wait_for_fds(server)) {
-+        goto exit;
-+    }
-+
-     read_guest_mem_server(server);
- 
-+exit:
-     uninit_virtio_dev(server);
- 
-     qtest_quit(s);
-@@ -694,8 +710,10 @@ static void test_migrate(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-+
-     size = get_log_size(s);
-     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
- 
-@@ -704,6 +722,7 @@ static void test_migrate(void)
-     g_free(tmp);
-     to = qtest_init(cmd);
-     g_free(cmd);
-+    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
- 
-     source = g_source_new(&test_migrate_source_funcs,
-                           sizeof(TestMigrateSource));
-@@ -743,15 +762,18 @@ static void test_migrate(void)
-     global_qtest = to;
-     qmp_eventwait("RESUME");
- 
-+    g_assert(wait_for_fds(s));
-     read_guest_mem_server(dest);
- 
--    uninit_virtio_dev(s);
-     uninit_virtio_dev(dest);
-+    qtest_quit(to);
- 
-     g_source_destroy(source);
-     g_source_unref(source);
- 
--    qtest_quit(to);
-+exit:
-+    uninit_virtio_dev(s);
-+
-     test_server_free(dest);
-     qtest_quit(from);
-     test_server_free(s);
-@@ -815,16 +837,20 @@ static void test_reconnect_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-+
-     wait_for_rings_started(s, 2);
- 
-     /* reconnect */
-     s->fds_num = 0;
-     s->rings = 0;
-     g_idle_add(reconnect_cb, s);
--    wait_for_fds(s);
-+    g_assert(wait_for_fds(s));
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
-@@ -853,9 +879,12 @@ static void test_connect_fail_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
-@@ -883,9 +912,12 @@ static void test_flags_mismatch_subprocess(void)
-     g_free(cmd);
- 
-     init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
--    wait_for_fds(s);
-+    if (!wait_for_fds(s)) {
-+        goto exit;
-+    }
-     wait_for_rings_started(s, 2);
- 
-+exit:
-     uninit_virtio_dev(s);
- 
-     qtest_end();
+-struct vhost_net *vhost_net_init(VhostNetOptions *options)
+-{
+-    error_report("vhost-net support is not compiled in");
+-    return NULL;
+-}
+-
+-int vhost_net_start(VirtIODevice *dev,
+-                    NetClientState *ncs,
+-                    int total_queues)
+-{
+-    return -ENOSYS;
+-}
+-void vhost_net_stop(VirtIODevice *dev,
+-                    NetClientState *ncs,
+-                    int total_queues)
+-{
+-}
+-
+-void vhost_net_cleanup(struct vhost_net *net)
+-{
+-}
+-
+-uint64_t vhost_net_get_features(struct vhost_net *net, uint64_t features)
+-{
+-    return features;
+-}
+-
+-void vhost_net_ack_features(struct vhost_net *net, uint64_t features)
+-{
+-}
+-
+-uint64_t vhost_net_get_acked_features(VHostNetState *net)
+-{
+-    return 0;
+-}
+-
+-bool vhost_net_virtqueue_pending(VHostNetState *net, int idx)
+-{
+-    return false;
+-}
+-
+-void vhost_net_virtqueue_mask(VHostNetState *net, VirtIODevice *dev,
+-                              int idx, bool mask)
+-{
+-}
+-
+-int vhost_net_notify_migration_done(struct vhost_net *net, char* mac_addr)
+-{
+-    return -1;
+-}
+-
+-VHostNetState *get_vhost_net(NetClientState *nc)
+-{
+-    return 0;
+-}
+-
+-int vhost_set_vring_enable(NetClientState *nc, int enable)
+-{
+-    return 0;
+-}
+-
+-int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+-{
+-    return 0;
+-}
+-#endif
 -- 
 1.8.3.1
