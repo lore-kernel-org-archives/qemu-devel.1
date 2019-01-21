@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42544)
+Received: from eggs.gnu.org ([209.51.188.92]:42824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1glbHC-0003Ic-SZ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:14:15 -0500
+	(envelope-from <philmd@redhat.com>) id 1glbIl-0004EO-0n
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1glbHB-00081R-8d
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:14:13 -0500
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:39828)
+	(envelope-from <philmd@redhat.com>) id 1glbIk-0000Qh-Bh
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:15:51 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:40103)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1glbHB-000816-1x
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:14:13 -0500
-Received: by mail-wr1-f42.google.com with SMTP id t27so23783911wra.6
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 07:14:12 -0800 (PST)
-Date: Mon, 21 Jan 2019 16:14:08 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190121151408.3paksvv6vytjf7k7@steredhat>
-References: <20190118223152.24183-1-lersek@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glbIk-0000QJ-6E
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 10:15:50 -0500
+Received: by mail-wr1-f67.google.com with SMTP id p4so23789031wrt.7
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 07:15:50 -0800 (PST)
+References: <20190121144841.24467-1-anthony.perard@citrix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <721833db-06fc-5efd-92f5-7824e8b5143d@redhat.com>
+Date: Mon, 21 Jan 2019 16:15:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20190121144841.24467-1-anthony.perard@citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190118223152.24183-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix the life cycle and the name of
- "qemu_extra_params_fw"
+Subject: Re: [Qemu-devel] [PATCH] configure: Don't add Xen's libs to LDFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Jan 18, 2019 at 11:31:52PM +0100, Laszlo Ersek wrote:
-> Commit 19bcc4bc3213 ("fw_cfg: Make qemu_extra_params_fw locally",
-> 2019-01-04) changed the storage duration of the "qemu_extra_params_fw"
-> array from static to automatic. This broke the interface contract on the
-> fw_cfg_add_file() function, which is documented as follows, in
-> "include/hw/nvram/fw_cfg.h":
+On 1/21/19 3:48 PM, Anthony PERARD wrote:
+> When Xen is detected via pkg-config, it isn't necessary to modify
+> LDFLAGS as modifying libs_softmmu is enough.
 > 
-> > [...] The data referenced by the starting pointer is only linked, NOT
-> > copied, into the data structure of the fw_cfg device. [...]
-> 
-> As a result, when guest firmware fetches the "etc/boot-menu-wait" fw_cfg
-> file, it now sees garbage. Fix the regression by changing the storage
-> duration to allocated. (The call is reached at most once, on the realize
-> path of the board-specific fw_cfg sysbus device.)
-> 
-> While at it, clean up the name and the assignment of the object as well.
-> 
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Fixes: 19bcc4bc3213e78c303ad480a7a578f62258252d
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 > ---
->  hw/nvram/fw_cfg.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 12fd34f30b..98b270974d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2355,7 +2355,6 @@ if test "$xen" != "no" ; then
+>      fi
+>      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+>      libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+> -    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+>    else
+>  
+>      xen_libs="-lxenstore -lxenctrl -lxenguest"
+> 
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
