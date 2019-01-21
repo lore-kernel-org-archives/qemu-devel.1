@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45512)
+Received: from eggs.gnu.org ([209.51.188.92]:46348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gldVW-0002lg-Pz
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1gldZ4-0004SU-M1
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gldVV-00064P-WC
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:10 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38773)
+	(envelope-from <bounces@canonical.com>) id 1gldZ3-0007sS-UA
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:40:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gldVV-00063B-Oe
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:09 -0500
-Received: by mail-wr1-f68.google.com with SMTP id v13so24380916wrw.5
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:37:09 -0800 (PST)
-References: <20190118120143.21631-1-sgarzare@redhat.com>
-	<20190118120143.21631-4-sgarzare@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <18a8918c-b4d6-1165-4064-d80c97316eec@redhat.com>
-Date: Mon, 21 Jan 2019 18:37:04 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gldZ3-0007s6-Ok
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:40:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gldZ2-0000RP-8L
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 17:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 393952E80CC
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 17:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190118120143.21631-4-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/5] optionrom: add new PVH option rom
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Jan 2019 17:32:52 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1812694 <1812694@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154808795140.25200.13223693574023659013.malonedeb@wampee.canonical.com>
+Message-Id: <154809197269.7532.12740626127043480408.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1812694] Re: qemu-system-x86_64 version 3.0+ is
+ 20 times slower than version 2.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 18/01/19 13:01, Stefano Garzarella wrote:
-> The new pvh.bin option rom can be used with SeaBIOS to boot
-> uncompressed kernel using the x86/HVM direct boot ABI.
-> 
-> pvh.S contains the entry point of the option rom. It runs
-> in real mode, loads the e820 table querying the BIOS, and
-> then it switches to 32bit protected mode and jumps to the
-> pvh_load_kernel() written in pvh_main.c.
-> pvh_load_kernel() loads the cmdline and kernel entry_point
-> using fw_cfg, then it looks for RSDP, fills the
-> hvm_start_info required by x86/HVM ABI, and finally jumps
-> to the kernel entry_point.
-> 
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Your linked drive doesn't seem to have any readme or documentation for
+how this is invoked. Please see:
 
-... and, for mingw:
+  https://www.qemu.org/contribute/report-a-bug/
 
-diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
-index d1b8b4b..a015e1b 100644
---- a/pc-bios/optionrom/pvh_main.c
-+++ b/pc-bios/optionrom/pvh_main.c
-@@ -43,7 +43,7 @@ struct pvh_e820_table {
-     struct hvm_memmap_table_entry table[E820_MAXENTRIES];
- };
+Specifically the host/guest details and the full command line that you
+have used to run this binary.
 
--struct pvh_e820_table pvh_e820 __attribute__ ((aligned));
-+struct pvh_e820_table pvh_e820 asm("pvh_e820") __attribute__ ((aligned));
+As developers may be wary about running on unknown binary on their
+systems you may find it quicker to do some experiments yourself. If you
+run qemu under perf for 2.12 and 3.0+ (or current git) that might give
+some indication about what has changed.
 
- static struct hvm_start_info start_info;
- static struct hvm_modlist_entry ramdisk_mod;
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1812694
+
+Title:
+  qemu-system-x86_64 version 3.0+ is 20 times slower than version 2.12
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  version 3.0+ is 20 times slower than version 2.12
+  I wrote a small 64-bit operating system (SIGMAOS) in which I use the lzma=
+ decoder. unpacking the file takes 20 times slower than in version 2.12.
+  You can download it from https://drive.google.com/drive/folders/0B_wEiYjz=
+VkC0ZGtkbENENzF1Nms
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1812694/+subscriptions
