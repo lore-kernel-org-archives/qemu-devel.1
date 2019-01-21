@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59556)
+Received: from eggs.gnu.org ([209.51.188.92]:34785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1glgHa-0004Bp-JF
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:34:59 -0500
+	(envelope-from <jsnow@redhat.com>) id 1glgWn-0006mn-Tt
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1glgHZ-0001En-HH
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:34:58 -0500
-Date: Mon, 21 Jan 2019 18:34:43 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20190121203442.GQ17671@localhost.localdomain>
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-19-crosa@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1glgWm-00015S-K1
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:50:41 -0500
+References: <20181221234750.23577-1-mreitz@redhat.com>
+	<20181221234750.23577-4-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
+Date: Mon, 21 Jan 2019 15:50:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190117185628.21862-19-crosa@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 18/18] Boot Linux Console Test: add a test
- for alpha + clipper
+In-Reply-To: <20181221234750.23577-4-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be
+ run concurrently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +25,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Jan 17, 2019 at 01:56:28PM -0500, Cleber Rosa wrote:
-> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-> board and verify the serial is working.  One extra command added to
-> the QEMU command line is '-vga std', because the kernel used is
-> known to crash without it.
->=20
-> If alpha is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:alpha" tags.
->=20
-> Alternatively, this test can be run using:
->=20
->     $ avocado run -t arch:alpha tests/acceptance
->     $ avocado run -t machine:clipper tests/acceptance
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
-Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 
+On 12/21/18 6:47 PM, Max Reitz wrote:
+> To do this, we need to allow creating the NBD server on various ports
+> instead of a single one (which may not even work if you run just one
+> instance, because something entirely else might be using that port).
+> 
+> So we just pick a random port in [32768, 32768 + 1024) and try to create
+> a server there.  If that fails, we just retry until something sticks.
+> 
+> For the IPv6 test, we need a different range, though (just above that
+> one).  This is because "localhost" resolves to both 127.0.0.1 and ::1.
+> This means that if you bind to it, it will bind to both, if possible, or
+> just one if the other is already in use.  Therefore, if the IPv6 test
+> has already taken [::1]:some_port and we then try to take
+> localhost:some_port, that will work -- only the second server will be
+> bound to 127.0.0.1:some_port alone and not [::1]:some_port in addition.
+> So we have two different servers on the same port, one for IPv4 and one
+> for IPv6.
+> 
+> But when we then try to connect to the server through
+> localhost:some_port, we will always end up at the IPv6 one (as long as
+> it is up), and this may not be the one we want.
+> 
+> Thus, we must make sure not to create an IPv6-only NBD server on the
+> same port as a normal "dual-stack" NBD server -- which is done by using
+> distinct port ranges, as explained above.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  .travis.yml                            |  2 +-
->  scripts/qemu.py                        |  1 -
->  tests/acceptance/boot_linux_console.py | 22 ++++++++++++++++++++++
->  3 files changed, 23 insertions(+), 2 deletions(-)
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index 0d5a4b104b..73a113af87 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -187,7 +187,7 @@ matrix:
-> =20
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
--softmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,arm-=
-softmmu,s390x-softmmu"
-> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
--softmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,arm-=
-softmmu,s390x-softmmu,alpha-softmmu"
->          - TEST_CMD=3D"make check-acceptance"
->        addons:
->          apt:
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 1531e28fc1..a704da418a 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -34,7 +34,6 @@ def kvm_available(target_arch=3DNone):
-> =20
->  #: Maps machine types to the preferred console device types
->  CONSOLE_DEV_TYPES =3D {
-> -    r'^clipper$': 'isa-serial',
->      r'^(pc.*|q35.*|isapc)$': 'isa-serial',
->      r'^(40p|powernv|prep)$': 'isa-serial',
->      r'^s390-ccw-virtio.*': 'sclpconsole',
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index c4d5477d45..a8028a39d4 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -197,3 +197,25 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_alpha_clipper(self):
-> +        """
-> +        :avocado: tags=3Darch:alpha
-> +        :avocado: tags=3Dmachine:clipper
-> +        """
-> +        kernel_url =3D ('http://archive.debian.org/debian/dists/lenny/=
-main/'
-> +                      'installer-alpha/current/images/cdrom/vmlinuz')
-> +        kernel_hash =3D '3a943149335529e2ed3e74d0d787b85fb5671ba3'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> +
-> +        uncompressed_kernel =3D archive.uncompress(kernel_path, self.w=
-orkdir)
-> +
-> +        self.vm.set_machine('clipper')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D 'console=3DttyS0 printk.time=3D0'
-> +        self.vm.add_args('-vga', 'std',
-> +                         '-kernel', uncompressed_kernel,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
-> +        self.wait_for_console_pattern(console_pattern)
-> --=20
-> 2.20.1
->=20
+>  tests/qemu-iotests/147 | 98 +++++++++++++++++++++++++++++-------------
+>  1 file changed, 68 insertions(+), 30 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+> index 3e10a9969e..82513279b0 100755
+> --- a/tests/qemu-iotests/147
+> +++ b/tests/qemu-iotests/147
+> @@ -19,13 +19,17 @@
+>  #
+>  
+>  import os
+> +import random
+>  import socket
+>  import stat
+>  import time
+>  import iotests
+> -from iotests import cachemode, imgfmt, qemu_img, qemu_nbd
+> +from iotests import cachemode, imgfmt, qemu_img, qemu_nbd, qemu_nbd_pipe
+>  
+> -NBD_PORT = 10811
+> +NBD_PORT_START      = 32768
+> +NBD_PORT_END        = NBD_PORT_START + 1024
+> +NBD_IPV6_PORT_START = NBD_PORT_END
+> +NBD_IPV6_PORT_END   = NBD_IPV6_PORT_START + 1024
+>  
+>  test_img = os.path.join(iotests.test_dir, 'test.img')
+>  unix_socket = os.path.join(iotests.test_dir, 'nbd.socket')
+> @@ -88,17 +92,29 @@ class QemuNBD(NBDBlockdevAddBase):
+>          except OSError:
+>              pass
+>  
+> +    def _try_server_up(self, *args):
+> +        status, msg = qemu_nbd_pipe('-f', imgfmt, test_img, *args)
+> +        if status == 0:
+> +            return True
+> +        if 'Address already in use' in msg:
+> +            return False
 
---=20
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+My only half-empty question is if we are guaranteed to have a locale and
+environment such that this string will always be present when we
+encounter that specific error?
+
+I suppose even if not, that it'll just fail hard and it's no worse than
+what we had before.
+
+> +        self.fail(msg)
+> +
+>      def _server_up(self, *args):
+> -        self.assertEqual(qemu_nbd('-f', imgfmt, test_img, *args), 0)
+> +        self.assertTrue(self._try_server_up(*args))
+>  
+>      def test_inet(self):
+> -        self._server_up('-b', 'localhost', '-p', str(NBD_PORT))
+> +        while True:
+> +            nbd_port = random.randrange(NBD_PORT_START, NBD_PORT_END)
+> +            if self._try_server_up('-b', 'localhost', '-p', str(nbd_port)):
+> +                break
+
+Why not just iterate over the range so that once the range is exhausted
+we're guaranteed to fail?
+
+> +
+>          address = { 'type': 'inet',
+>                      'data': {
+>                          'host': 'localhost',
+> -                        'port': str(NBD_PORT)
+> +                        'port': str(nbd_port)
+>                      } }
+> -        self.client_test('nbd://localhost:%i' % NBD_PORT,
+> +        self.client_test('nbd://localhost:%i' % nbd_port,
+>                           flatten_sock_addr(address))
+>  
+>      def test_unix(self):
+> @@ -130,8 +146,13 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>          except OSError:
+>              pass
+>  
+> -    def _server_up(self, address, export_name=None, export_name2=None):
+> +    # Returns False on EADDRINUSE; fails an assertion on other errors.
+> +    # Returns True on success.
+> +    def _try_server_up(self, address, export_name=None, export_name2=None):
+>          result = self.server.qmp('nbd-server-start', addr=address)
+> +        if 'error' in result and \
+> +           'Address already in use' in result['error']['desc']:
+> +            return False
+>          self.assert_qmp(result, 'return', {})
+>  
+>          if export_name is None:
+> @@ -146,20 +167,28 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>                                       name=export_name2)
+>              self.assert_qmp(result, 'return', {})
+>  
+> +        return True
+> +
+> +    def _server_up(self, address, export_name=None, export_name2=None):
+> +        self.assertTrue(self._try_server_up(address, export_name, export_name2))
+>  
+>      def _server_down(self):
+>          result = self.server.qmp('nbd-server-stop')
+>          self.assert_qmp(result, 'return', {})
+>  
+>      def do_test_inet(self, export_name=None):
+> -        address = { 'type': 'inet',
+> -                    'data': {
+> -                        'host': 'localhost',
+> -                        'port': str(NBD_PORT)
+> -                    } }
+> -        self._server_up(address, export_name)
+> +        while True:
+> +            nbd_port = random.randrange(NBD_PORT_START, NBD_PORT_END)
+> +            address = { 'type': 'inet',
+> +                        'data': {
+> +                            'host': 'localhost',
+> +                            'port': str(nbd_port)
+> +                        } }
+> +            if self._try_server_up(address, export_name):
+> +                break
+> +
+>          export_name = export_name or 'nbd-export'
+> -        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, export_name),
+> +        self.client_test('nbd://localhost:%i/%s' % (nbd_port, export_name),
+>                           flatten_sock_addr(address), export_name)
+>          self._server_down()
+>  
+> @@ -173,15 +202,19 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>          self.do_test_inet('shadow')
+>  
+>      def test_inet_two_exports(self):
+> -        address = { 'type': 'inet',
+> -                    'data': {
+> -                        'host': 'localhost',
+> -                        'port': str(NBD_PORT)
+> -                    } }
+> -        self._server_up(address, 'exp1', 'exp2')
+> -        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp1'),
+> +        while True:
+> +            nbd_port = random.randrange(NBD_PORT_START, NBD_PORT_END)
+> +            address = { 'type': 'inet',
+> +                        'data': {
+> +                            'host': 'localhost',
+> +                            'port': str(nbd_port)
+> +                        } }
+> +            if self._try_server_up(address, 'exp1', 'exp2'):
+> +                break
+> +
+> +        self.client_test('nbd://localhost:%i/%s' % (nbd_port, 'exp1'),
+>                           flatten_sock_addr(address), 'exp1', 'node1', False)
+> -        self.client_test('nbd://localhost:%i/%s' % (NBD_PORT, 'exp2'),
+> +        self.client_test('nbd://localhost:%i/%s' % (nbd_port, 'exp2'),
+>                           flatten_sock_addr(address), 'exp2', 'node2', False)
+>          result = self.vm.qmp('blockdev-del', node_name='node1')
+>          self.assert_qmp(result, 'return', {})
+> @@ -197,20 +230,25 @@ class BuiltinNBD(NBDBlockdevAddBase):
+>          except socket.gaierror:
+>              # IPv6 not available, skip
+>              return
+> -        address = { 'type': 'inet',
+> -                    'data': {
+> -                        'host': '::1',
+> -                        'port': str(NBD_PORT),
+> -                        'ipv4': False,
+> -                        'ipv6': True
+> -                    } }
+> +
+> +        while True:
+> +            nbd_port = random.randrange(NBD_IPV6_PORT_START, NBD_IPV6_PORT_END)
+> +            address = { 'type': 'inet',
+> +                        'data': {
+> +                            'host': '::1',
+> +                            'port': str(nbd_port),
+> +                            'ipv4': False,
+> +                            'ipv6': True
+> +                        } }
+> +            if self._try_server_up(address):
+> +                break
+> +
+>          filename = { 'driver': 'raw',
+>                       'file': {
+>                           'driver': 'nbd',
+>                           'export': 'nbd-export',
+>                           'server': flatten_sock_addr(address)
+>                       } }
+> -        self._server_up(address)
+>          self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
+>          self._server_down()
+>  
+> 
+
+I guess my only other observation is that we have a lot of "while True"
+loops now, is it worth creating some kind of helper that does the dirty
+work of finding a serviceable port or nah?
+
+
+If none of my observations spark joy:
+
+1-3: Reviewed-By: John Snow <jsnow@redhat.com>
