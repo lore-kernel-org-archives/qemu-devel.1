@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59070)
+Received: from eggs.gnu.org ([209.51.188.92]:59852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1glW96-00048J-8U
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1glWE9-0005nt-6D
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1glW8r-0001fv-Ku
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1glW8o-0001S1-S9
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:45:15 -0500
-Date: Mon, 21 Jan 2019 17:35:05 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190121093505.GA7669@xz-x1>
-References: <20190116030815.27273-1-peterx@redhat.com>
-	<154805952549.5550.9154893774048296420@2d3111e9616b>
+	(envelope-from <bounces@canonical.com>) id 1glWE8-0004P7-CW
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1glWE8-0004Mq-6G
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1glWE4-0002Tb-84
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5CC102E80D7
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:50:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <154805952549.5550.9154893774048296420@2d3111e9616b>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] intel_iommu: misc fixes for error
- exposed after error_report_once()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Jan 2019 09:41:24 -0000
+From: Martin Liska <mliska@suse.cz>
+Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
+Message-Id: <154806368418.1312.9404758182083241030.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
+ value function 'abs' given an argument of type 'long int' but has parameter
+ of type 'int' which may cause truncation of value [-Werror=absolute-value]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +39,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, mst@redhat.com, jasowang@redhat.com, eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com
 
-On Mon, Jan 21, 2019 at 12:32:07AM -0800, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190116030815.27273-1-peterx@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-mingw@fedora build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> time make docker-test-mingw@fedora SHOW_ENV=1 J=14
-> === TEST SCRIPT END ===
-> 
->   CC      hw/block/pflash_cfi01.o
-> In function 'acpi_table_install',
->     inlined from 'acpi_table_add' at /tmp/qemu-test/src/hw/acpi/core.c:296:5:
-> /tmp/qemu-test/src/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
->          strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/acpi/core.c:203:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
->          strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id);
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/acpi/core.c:207:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
->          strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                  sizeof ext_hdr->oem_table_id);
->                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/acpi/core.c:216:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
->          strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                  sizeof ext_hdr->asl_compiler_id);
-> ---
-> make: *** [/tmp/qemu-test/src/rules.mak:69: hw/acpi/core.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
-> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals destination size [-Werror=stringop-truncation]
->      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/tmp/qemu-test/src/rules.mak:69: block/sheepdog.o] Error 1
-> /tmp/qemu-test/src/hw/acpi/aml-build.c: In function 'build_header':
-> /tmp/qemu-test/src/hw/acpi/aml-build.c:1535:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
->          strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /tmp/qemu-test/src/hw/acpi/aml-build.c:1541:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
->          strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_table_id));
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
+Thank you, I contacted IPXE folks.
 
-I'm uncertain about these errors but it seems to be more likely to be
-caused by some configuration or compiler change instead of the series
-itself since this series never changed either acpi or sheepdog code.
-So I'll temporarily ignore them...
+-- =
 
-Regards,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1801073
 
--- 
-Peter Xu
+Title:
+  util/zbin.c:390:37: error: absolute value function 'abs' given an
+  argument of type 'long int' but has parameter of type 'int' which may
+  cause truncation of value [-Werror=3Dabsolute-value]
+
+Status in QEMU:
+  New
+
+Bug description:
+  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
+
+  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
+  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
+  make -C ipxe/src CONFIG=3Dqemu \
+  	PACKAGING_TIMESTAMP=3D1534273834 \
+  	CROSS_COMPILE=3D \
+  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
+10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
+  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
+ipxe/src'
+  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
+il/zbin
+  util/zbin.c: In function 'process_zinfo_add':
+  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
+        |                                     ^~~
+  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
+        |                                     ^~~
+  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
+t of type 'long int' but has parameter of type 'int' which may cause trunca=
+tion of value [-Werror=3Dabsolute-value]
+    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
+        |                                     ^~~
+  cc1: all warnings being treated as errors
+  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
