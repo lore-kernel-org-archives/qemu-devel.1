@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38654)
+Received: from eggs.gnu.org ([209.51.188.92]:38984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glevS-0007jF-K3
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glevT-000854-2z
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gleff-0002tG-9q
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:45 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37154)
+	(envelope-from <peter.maydell@linaro.org>) id 1gleff-0002t1-7w
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:44 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54199)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glefe-0002q6-Tc
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:43 -0500
-Received: by mail-wm1-x341.google.com with SMTP id g67so11810974wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:38 -0800 (PST)
+	id 1glefe-0002fw-QL
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:42 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d15so11828499wmb.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:35 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 18:51:10 +0000
-Message-Id: <20190121185118.18550-16-peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 18:51:07 +0000
+Message-Id: <20190121185118.18550-13-peter.maydell@linaro.org>
 In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
 References: <20190121185118.18550-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 15/23] hw/arm/armsse: Add unimplemented-device
- stubs for MHUs
+Subject: [Qemu-devel] [PATCH 12/23] hw/arm/armsse: Give each CPU its own
+ view of memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,123 +32,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The SSE-200 has two Message Handling Units (MHUs), which sit behind
-the APB PPC0. Wire up some unimplemented-device stubs for these,
-since we don't yet implement a real model of this device.
+Give each CPU its own container memory region. This is necessary
+for two reasons:
+ * some devices are instantiated one per CPU and the CPU sees only
+   its own device
+ * since a memory region can only be put into one container, we must
+   give each armv7m object a different MemoryRegion as its 'memory'
+   property, or a dual-CPU configuration will assert on realize when
+   the second armv7m object tries to put the MR into a container when
+   it is already in the first armv7m object's container
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/armsse.h |  3 +++
- hw/arm/armsse.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
+ include/hw/arm/armsse.h | 10 ++++++++++
+ hw/arm/armsse.c         | 22 ++++++++++++++++++++--
+ 2 files changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index 999c2e4f7e5..dbfcb280605 100644
+index faf5dfed252..89f19a971f4 100644
 --- a/include/hw/arm/armsse.h
 +++ b/include/hw/arm/armsse.h
-@@ -78,6 +78,7 @@
- #include "hw/watchdog/cmsdk-apb-watchdog.h"
- #include "hw/misc/iotkit-sysctl.h"
- #include "hw/misc/iotkit-sysinfo.h"
-+#include "hw/misc/unimp.h"
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
- #include "hw/cpu/cluster.h"
-@@ -137,6 +138,8 @@ typedef struct ARMSSE {
+@@ -135,7 +135,17 @@ typedef struct ARMSSE {
      IoTKitSysCtl sysctl;
      IoTKitSysCtl sysinfo;
  
-+    UnimplementedDeviceState mhu[2];
-+
-     /*
-      * 'container' holds all devices seen by all CPUs.
-      * 'cpu_container[i]' is the view that CPU i has: this has the
++    /*
++     * 'container' holds all devices seen by all CPUs.
++     * 'cpu_container[i]' is the view that CPU i has: this has the
++     * per-CPU devices of that CPU, plus as the background 'container'
++     * (or an alias of it, since we can only use it directly once).
++     * container_alias[i] is the alias of 'container' used by CPU i+1;
++     * CPU 0 can use 'container' directly.
++     */
+     MemoryRegion container;
++    MemoryRegion container_alias[SSE_MAX_CPUS - 1];
++    MemoryRegion cpu_container[SSE_MAX_CPUS];
+     MemoryRegion alias1;
+     MemoryRegion alias2;
+     MemoryRegion alias3;
 diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 19cae77e770..1f3dc89c8e8 100644
+index 5cb2b78b1fc..2472dfef3a1 100644
 --- a/hw/arm/armsse.c
 +++ b/hw/arm/armsse.c
-@@ -30,6 +30,7 @@ struct ARMSSEInfo {
-     int num_cpus;
-     uint32_t sys_version;
-     SysConfigFormat sys_config_format;
-+    bool has_mhus;
- };
- 
- static const ARMSSEInfo armsse_variants[] = {
-@@ -39,6 +40,7 @@ static const ARMSSEInfo armsse_variants[] = {
-         .num_cpus = 1,
-         .sys_version = 0x41743,
-         .sys_config_format = IoTKitFormat,
-+        .has_mhus = false,
-     },
- };
- 
-@@ -257,6 +259,12 @@ static void armsse_init(Object *obj)
-                           sizeof(s->sysctl), TYPE_IOTKIT_SYSCTL);
-     sysbus_init_child_obj(obj, "armsse-sysinfo", &s->sysinfo,
-                           sizeof(s->sysinfo), TYPE_IOTKIT_SYSINFO);
-+    if (info->has_mhus) {
-+        sysbus_init_child_obj(obj, "mhu0", &s->mhu[0], sizeof(s->mhu[0]),
-+                              TYPE_UNIMPLEMENTED_DEVICE);
-+        sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
-+                              TYPE_UNIMPLEMENTED_DEVICE);
-+    }
-     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
-                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
-@@ -616,6 +624,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-      *   0x40000000: timer0
-      *   0x40001000: timer1
-      *   0x40002000: dual timer
-+     *   0x40003000: MHU0 (SSE-200 only)
-+     *   0x40004000: MHU1 (SSE-200 only)
-      * We must configure and realize each downstream device and connect
-      * it to the appropriate PPC port; then we can realize the PPC and
-      * map its upstream ends to the right place in the container.
-@@ -666,6 +676,31 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
+@@ -153,6 +153,15 @@ static void armsse_init(Object *obj)
+         qdev_prop_set_string(DEVICE(&s->armv7m[i]), "cpu-type",
+                              ARM_CPU_TYPE_NAME("cortex-m33"));
+         g_free(name);
++        name = g_strdup_printf("arm-sse-cpu-container%d", i);
++        memory_region_init(&s->cpu_container[i], obj, name, UINT64_MAX);
++        g_free(name);
++        if (i > 0) {
++            name = g_strdup_printf("arm-sse-container-alias%d", i);
++            memory_region_init_alias(&s->container_alias[i - 1], obj,
++                                     name, &s->container, 0, UINT64_MAX);
++            g_free(name);
++        }
      }
  
-+    if (info->has_mhus) {
-+        for (i = 0; i < ARRAY_SIZE(s->mhu); i++) {
-+            char *name = g_strdup_printf("MHU%d", i);
-+            char *port = g_strdup_printf("port[%d]", i + 3);
+     sysbus_init_child_obj(obj, "secctl", &s->secctl, sizeof(s->secctl),
+@@ -332,7 +341,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+      * 0x50000000..0x5fffffff  alias of 0x40000000..0x4fffffff
+      */
+ 
+-    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
++    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -2);
+ 
+     for (i = 0; i < info->num_cpus; i++) {
+         DeviceState *cpudev = DEVICE(&s->armv7m[i]);
+@@ -373,7 +382,16 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+                 return;
+             }
+         }
+-        object_property_set_link(cpuobj, OBJECT(&s->container), "memory", &err);
 +
-+            qdev_prop_set_string(DEVICE(&s->mhu[i]), "name", name);
-+            qdev_prop_set_uint64(DEVICE(&s->mhu[i]), "size", 0x1000);
-+            object_property_set_bool(OBJECT(&s->mhu[i]), true,
-+                                     "realized", &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-+            mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mhu[i]), 0);
-+            object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr),
-+                                     port, &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-+            g_free(name);
-+            g_free(port);
++        if (i > 0) {
++            memory_region_add_subregion_overlap(&s->cpu_container[i], 0,
++                                                &s->container_alias[i - 1], -1);
++        } else {
++            memory_region_add_subregion_overlap(&s->cpu_container[i], 0,
++                                                &s->container, -1);
 +        }
-+    }
-+
-     object_property_set_bool(OBJECT(&s->apb_ppc0), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -681,6 +716,12 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(&s->container, 0x40001000, mr);
-     mr = sysbus_mmio_get_region(sbd_apb_ppc0, 2);
-     memory_region_add_subregion(&s->container, 0x40002000, mr);
-+    if (info->has_mhus) {
-+        mr = sysbus_mmio_get_region(sbd_apb_ppc0, 3);
-+        memory_region_add_subregion(&s->container, 0x40003000, mr);
-+        mr = sysbus_mmio_get_region(sbd_apb_ppc0, 4);
-+        memory_region_add_subregion(&s->container, 0x40004000, mr);
-+    }
-     for (i = 0; i < IOTS_APB_PPC0_NUM_PORTS; i++) {
-         qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_nonsec", i,
-                                     qdev_get_gpio_in_named(dev_apb_ppc0,
++        object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
++                                 "memory", &err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
 -- 
 2.20.1
