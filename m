@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37685)
+Received: from eggs.gnu.org ([209.51.188.92]:47566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1glgia-0003wm-Jp
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 16:02:54 -0500
+	(envelope-from <lersek@redhat.com>) id 1glhBc-0004y6-8U
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 16:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1glgiZ-00039Y-2l
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 16:02:52 -0500
-References: <20181221234750.23577-1-mreitz@redhat.com>
-	<20181221234750.23577-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <84e62d4a-bf74-ba1c-d802-e01de14d693c@redhat.com>
-Date: Mon, 21 Jan 2019 15:02:37 -0600
+	(envelope-from <lersek@redhat.com>) id 1glhBY-0005J4-Ki
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 16:32:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1glhBW-00056L-Eu
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 16:32:48 -0500
+References: <20190120071337.55595-1-liq3ea@163.com>
+	<20190120071337.55595-2-liq3ea@163.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <66f7e560-2e3e-0efc-6a80-9a44dff71324@redhat.com>
+Date: Mon, 21 Jan 2019 22:32:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181221234750.23577-4-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u9qU9l5B6nkc40DW1xasqnPI2S5iODaGj"
-Subject: Re: [Qemu-devel] [PATCH 3/3] iotests: Allow 147 to be run
- concurrently
+In-Reply-To: <20190120071337.55595-2-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
+ the fw_cfg file entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@163.com>, philmd@redhat.com, kraxel@redhat.com, thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, liq3ea@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u9qU9l5B6nkc40DW1xasqnPI2S5iODaGj
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <84e62d4a-bf74-ba1c-d802-e01de14d693c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] iotests: Allow 147 to be run
- concurrently
-References: <20181221234750.23577-1-mreitz@redhat.com>
- <20181221234750.23577-4-mreitz@redhat.com>
-In-Reply-To: <20181221234750.23577-4-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/21/18 5:47 PM, Max Reitz wrote:
-> To do this, we need to allow creating the NBD server on various ports
-> instead of a single one (which may not even work if you run just one
-> instance, because something entirely else might be using that port).
-
-Can you instead reuse the ideas from nbd_server_set_tcp_port() from
-qemu-iotests/common.nbd?
-
->=20
-> So we just pick a random port in [32768, 32768 + 1024) and try to creat=
-e
-> a server there.  If that fails, we just retry until something sticks.
-
-That has the advantage of checking whether a port is actually in use
-(using 'ss' - although it does limit the test to Linux-only; perhaps
-using socat instead of ss could make the test portable to non-Linux?)
-
->=20
-> For the IPv6 test, we need a different range, though (just above that
-> one).  This is because "localhost" resolves to both 127.0.0.1 and ::1.
-> This means that if you bind to it, it will bind to both, if possible, o=
-r
-> just one if the other is already in use.  Therefore, if the IPv6 test
-> has already taken [::1]:some_port and we then try to take
-> localhost:some_port, that will work -- only the second server will be
-> bound to 127.0.0.1:some_port alone and not [::1]:some_port in addition.=
-
-> So we have two different servers on the same port, one for IPv4 and one=
-
-> for IPv6.
->=20
-> But when we then try to connect to the server through
-> localhost:some_port, we will always end up at the IPv6 one (as long as
-> it is up), and this may not be the one we want.
->=20
-> Thus, we must make sure not to create an IPv6-only NBD server on the
-> same port as a normal "dual-stack" NBD server -- which is done by using=
-
-> distinct port ranges, as explained above.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 01/20/19 08:13, Li Qiang wrote:
+> This is useful to write qtest about fw_cfg file entry.
+> 
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
->  tests/qemu-iotests/147 | 98 +++++++++++++++++++++++++++++-------------=
+>  tests/libqos/fw_cfg.c | 33 +++++++++++++++++++++++++++++++++
+>  tests/libqos/fw_cfg.h |  2 ++
+>  2 files changed, 35 insertions(+)
+> 
+> diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+> index d0889d1e22..e2b0cae7cd 100644
+> --- a/tests/libqos/fw_cfg.c
+> +++ b/tests/libqos/fw_cfg.c
+> @@ -16,6 +16,7 @@
+>  #include "libqos/fw_cfg.h"
+>  #include "libqtest.h"
+>  #include "qemu/bswap.h"
+> +#include "standard-headers/linux/qemu_fw_cfg.h"
+>  
+>  void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+>  {
+> @@ -54,6 +55,38 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
+>      return le64_to_cpu(value);
+>  }
+>  
+> +size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
+> +                      void *data, size_t buflen)
+> +{
+> +    uint32_t count;
+> +    uint32_t i;
+> +    unsigned char *filesbuf = NULL;
+> +    uint32_t dsize;
 
->  1 file changed, 68 insertions(+), 30 deletions(-)
->=20
+dsize should be size_t
 
-> @@ -88,17 +92,29 @@ class QemuNBD(NBDBlockdevAddBase):
->          except OSError:
->              pass
-> =20
-> +    def _try_server_up(self, *args):
-> +        status, msg =3D qemu_nbd_pipe('-f', imgfmt, test_img, *args)
-> +        if status =3D=3D 0:
-> +            return True
-> +        if 'Address already in use' in msg:
-> +            return False
-> +        self.fail(msg)
+> +    struct fw_cfg_file *p;
 
-Do you actually need to attempt a qemu-nbd process, if you take my
-suggestion of using ss to probe for an unused port?  And if not, do we
-still need qemu_nbd_pipe() added earlier in the series?
+Please use a better variable name, such as "dir_entry" or similar.
 
+> +    size_t filesize = 0;
+> +
+> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
+> +    count = be32_to_cpu(count);
+> +    dsize = sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
 
-> -        address =3D { 'type': 'inet',
-> -                    'data': {
-> -                        'host': 'localhost',
-> -                        'port': str(NBD_PORT)
-> -                    } }
-> -        self._server_up(address, export_name)
-> +        while True:
-> +            nbd_port =3D random.randrange(NBD_PORT_START, NBD_PORT_END=
-)
+where does "struct fw_cfg_file" come from?
 
-common.nbd just iterates, instead of trying random ports.
+... more precisely: why use it over the "FWCfgFile" typedef? (applies to
+the declaration of "p" as well).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +    filesbuf = g_malloc0(dsize);
+> +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
+> +    p = (struct fw_cfg_file *)(filesbuf + sizeof(uint32_t));
+> +    for (i = 0; i < count; ++i, ++p) {
+> +        if (!strcmp(p->name, filename)) {
+> +            uint32_t len = be32_to_cpu(p->size);
+> +            uint16_t sel = be16_to_cpu(p->select);
+> +            filesize = len;
+> +            if (len > buflen) {
+> +                len = buflen;
+> +            }
+> +            qfw_cfg_get(fw_cfg, sel, data, len);
+> +            break;
+> +        }
+> +    }
+> +    g_free(filesbuf);
+> +    return filesize;
+> +}
+> +
+>  static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+>  {
+>      qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+> diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+> index 0353416af0..de73722e67 100644
+> --- a/tests/libqos/fw_cfg.h
+> +++ b/tests/libqos/fw_cfg.h
+> @@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
+>  uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
+>  uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+>  uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
+> +size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
+> +                      void *data, size_t buflen);
+>  
+>  QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
+>  QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
+> 
 
+Looks OK to me otherwise.
 
---u9qU9l5B6nkc40DW1xasqnPI2S5iODaGj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxGM20ACgkQp6FrSiUn
-Q2oY3Af/eY6w8+bGv1FxoOZrTAeO7c4bFJjo87OTpB7+jqPY5dAJFyBBnqsh8mmg
-kNKuGGt6D9OYYwzRUr7wvCLpHi65CgsmcGFGLmUzQvoEH+8zposD83GV5sciE5BH
-4mJaAG0sHtMNv3njmVQQ4rbGZsUFvQvoqQXfzdxsXUKPkhp5/VjL3nbPPUP0PwUd
-RGdz+pvu8efdKcS5qGa7d8cMzPVCZG3qnJAhT84n5gTgnK/8vYIP6vxJxN3VCCIB
-mp2uD0dzxz2VRZI7HfgF1+I74nf8MQ3K9brmDrD9hxiwZdCsxGyvDwLofwzipR7H
-8AT1JPwc2NEmpvMX6C0gEQpaFynLEQ==
-=now6
------END PGP SIGNATURE-----
-
---u9qU9l5B6nkc40DW1xasqnPI2S5iODaGj--
+Thanks,
+Laszlo
