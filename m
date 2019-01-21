@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43726)
+Received: from eggs.gnu.org ([209.51.188.92]:56636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glNAo-0004Qv-GE
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:10:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1glOka-0001cF-Vi
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 20:51:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glNAn-0003b3-L2
-	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 19:10:42 -0500
-References: <20190120055558.32984-1-liq3ea@163.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <858c1f7f-d48e-a946-309d-1a7afdaf4aca@redhat.com>
-Date: Mon, 21 Jan 2019 01:10:18 +0100
+	(envelope-from <no-reply@patchew.org>) id 1glOkZ-0007m6-T0
+	for qemu-devel@nongnu.org; Sun, 20 Jan 2019 20:51:44 -0500
+Resent-Message-Id: <E1glOkZ-0007m6-T0@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190115111007.27159-1-stefanha@redhat.com>
+Message-ID: <154803546492.5550.12597499001850601331@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <20190120055558.32984-1-liq3ea@163.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3iFt62yo2urRl3GZstvT1Uk0q49WKz5c0"
-Subject: Re: [Qemu-devel] [PATCH 0/3] nvme small fix
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 20 Jan 2019 17:51:06 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2] qcow2: include LUKS payload overhead
+ in qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, keith.busch@intel.com, kwolf@redhat.com, philmd@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: stefanha@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3iFt62yo2urRl3GZstvT1Uk0q49WKz5c0
-From: Max Reitz <mreitz@redhat.com>
-To: Li Qiang <liq3ea@163.com>, keith.busch@intel.com, kwolf@redhat.com,
- philmd@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <858c1f7f-d48e-a946-309d-1a7afdaf4aca@redhat.com>
-Subject: Re: [PATCH 0/3] nvme small fix
-References: <20190120055558.32984-1-liq3ea@163.com>
-In-Reply-To: <20190120055558.32984-1-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 20.01.19 06:55, Li Qiang wrote:
-> This patchset contains small fix.
->=20
-> Change since v2:
-> For patch 2:
-> 1. add nvme command
-> 2. check num_queues first
->=20
-> Change since v1:=20
->=20
-> 1. drop the patch of checking return value of msix_init_exclusive_bar
-> 2. return when nvme's num_queues configuration is 0
->=20
-> Li Qiang (3):
->   nvme: use TYPE_NVME instead of constant string
->   nvme: ensure the num_queues is not zero
->   nvme: use pci_dev directly in nvme_realize
->=20
->  hw/block/nvme.c | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
-
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---3iFt62yo2urRl3GZstvT1Uk0q49WKz5c0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxFDeoACgkQ9AfbAGHV
-z0C1uQf/WlvFJnbLEf8ShRrMLvQZ2Czk4JWqXDPRfwNxSPh73UFBjxri8WJnBbVF
-icbXpF+qc3bUgt8nNIGhDLE0zCH1TPeVCK+k27psimnA4onz8BpT1MlzqFpOFniP
-eRMZdxald0lALAAzTULUXwdcAq+Ef7/UaC0yKgQPrPTUnQpwUvKpCXm8qIkyw4gH
-9dE+LIXc5tCC5fHfrjVP70qX9HpjiUwx1i9RXPiPygl46z7hFd/TBjy5neMMJ9Xj
-DqaGQ6QoNfn1jgKsen8hOa8jn5XGL32unR0i5L7nAxLqAYrJ/V2F/2yiW6G49f0+
-5pX6oHDJo433fpk8C3MKBIXxRlezhw==
-=xCSS
------END PGP SIGNATURE-----
-
---3iFt62yo2urRl3GZstvT1Uk0q49WKz5c0--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTExMTAwNy4yNzE1
+OS0xLXN0ZWZhbmhhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgY3J5
+cHRvL3Bia2RmLW5ldHRsZS5vCiAgQ0MgICAgICBjcnlwdG8vaXZnZW4ubwovdG1wL3FlbXUtdGVz
+dC9zcmMvYmxvY2svc2hlZXBkb2cuYzogSW4gZnVuY3Rpb24gJ2ZpbmRfdmRpX25hbWUnOgovdG1w
+L3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzoxMjM5OjU6IGVycm9yOiAnc3RybmNweScg
+c3BlY2lmaWVkIGJvdW5kIDI1NiBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJp
+bmdvcC10cnVuY2F0aW9uXQogICAgIHN0cm5jcHkoYnVmICsgU0RfTUFYX1ZESV9MRU4sIHRhZywg
+U0RfTUFYX1ZESV9UQUdfTEVOKTsKICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBh
+cyBlcnJvcnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwMTE1MTExMDA3LjI3MTU5LTEtc3RlZmFuaGFAcmVkaGF0LmNvbS90ZXN0aW5n
+LmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
