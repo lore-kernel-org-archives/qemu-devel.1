@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39672)
+Received: from eggs.gnu.org ([209.51.188.92]:40388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gld8C-0003De-RR
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:13:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gldAq-0005S7-OY
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gld8A-00012V-SP
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:13:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47850)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gld8A-000118-H9
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:13:02 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2801488E6D
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 17:07:06 +0000 (UTC)
-From: Christophe Fergeau <cfergeau@redhat.com>
-Date: Mon, 21 Jan 2019 18:04:35 +0100
-Message-Id: <20190121170434.13592-1-cfergeau@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gldAq-0002sy-1o
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:15:48 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35269)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gldAp-0002sF-SH
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:15:47 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t200so11651878wmt.0
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:15:47 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 21 Jan 2019 17:15:42 +0000
+Message-Id: <20190121171543.32422-3-alex.bennee@linaro.org>
+In-Reply-To: <20190121171543.32422-1-alex.bennee@linaro.org>
+References: <20190121171543.32422-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5] log: Make glib logging go through QEMU
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH  2/3] tests/vm: add --build-target option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,217 +30,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kamil@netbsd.org, brad@comstyle.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-This commit adds a qemu_init_logging() helper which calls
-g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
-are handled similarly to other QEMU logs. This means they will get a
-timestamp if timestamps are enabled, and they will go through the
-monitor if one is configured.
-This commit also adds a call to qemu_init_logging() to the binaries
-installed by QEMU.
-glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
-glib default log handler.
+This allows us to invoke the build with a custom target (for the VMs
+that use the {target} format string specifier). Currently OpenBSD is
+still hardwired due to problems running check
 
-At the moment, this change will mostly impact SPICE logging if your
-spice version is >=3D 0.14.1. With older spice versions, this is not goin=
-g
-to work as expected, but will not have any ill effect, so this call is
-not conditional on the SPICE version.
-
-Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
-One more iteration of the patch as it hit CI failures
-(https://patchew.org/QEMU/20181214105642.673-1-cfergeau@redhat.com/ )
-Only difference from v4 is the addition of #include "qemu/error-report.h"
-in bsd-user and linux-user.
+ tests/vm/basevm.py | 3 +++
+ tests/vm/freebsd   | 2 +-
+ tests/vm/netbsd    | 3 +--
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-
- bsd-user/main.c             |  2 ++
- include/qemu/error-report.h |  2 ++
- linux-user/main.c           |  2 ++
- qemu-img.c                  |  1 +
- qemu-io.c                   |  1 +
- qemu-nbd.c                  |  1 +
- scsi/qemu-pr-helper.c       |  1 +
- util/qemu-error.c           | 47 +++++++++++++++++++++++++++++++++++++
- vl.c                        |  1 +
- 9 files changed, 58 insertions(+)
-
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 0d3156974c..0df5c853d3 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -24,6 +24,7 @@
- #include "qapi/error.h"
- #include "qemu.h"
- #include "qemu/config-file.h"
-+#include "qemu/error-report.h"
- #include "qemu/path.h"
- #include "qemu/help_option.h"
- #include "cpu.h"
-@@ -743,6 +744,7 @@ int main(int argc, char **argv)
-     if (argc <=3D 1)
-         usage();
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-index 0a8d9cc9ea..2852e9df2a 100644
---- a/include/qemu/error-report.h
-+++ b/include/qemu/error-report.h
-@@ -49,6 +49,8 @@ bool error_report_once_cond(bool *printed, const char *=
-fmt, ...)
- bool warn_report_once_cond(bool *printed, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
-=20
-+void qemu_init_logging(void);
-+
- /*
-  * Similar to error_report(), except it prints the message just once.
-  * Return true when it prints, false otherwise.
-diff --git a/linux-user/main.c b/linux-user/main.c
-index a0aba9cb1e..d9b3ffd1f4 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -27,6 +27,7 @@
- #include "qemu/path.h"
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
-+#include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
-@@ -600,6 +601,7 @@ int main(int argc, char **argv, char **envp)
-     int ret;
-     int execfd;
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-diff --git a/qemu-img.c b/qemu-img.c
-index ad04f59565..9214392565 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -4912,6 +4912,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     error_set_progname(argv[0]);
-     qemu_init_exec_dir(argv[0]);
-diff --git a/qemu-io.c b/qemu-io.c
-index 6df7731af4..ad38d12e68 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -524,6 +524,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     progname =3D g_path_get_basename(argv[0]);
-     qemu_init_exec_dir(argv[0]);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 51b55f2e06..274b22d445 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -581,6 +581,7 @@ int main(int argc, char **argv)
-     signal(SIGPIPE, SIG_IGN);
- #endif
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     error_set_progname(argv[0]);
-     qcrypto_init(&error_fatal);
-diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-index e7af637232..523f8b237c 100644
---- a/scsi/qemu-pr-helper.c
-+++ b/scsi/qemu-pr-helper.c
-@@ -895,6 +895,7 @@ int main(int argc, char **argv)
-=20
-     signal(SIGPIPE, SIG_IGN);
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-     module_call_init(MODULE_INIT_QOM);
-     qemu_add_opts(&qemu_trace_opts);
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index fcbe8a1f74..1118ed4695 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -345,3 +345,50 @@ bool warn_report_once_cond(bool *printed, const char=
- *fmt, ...)
-     va_end(ap);
-     return true;
- }
-+
-+static char *qemu_glog_domains;
-+
-+static void qemu_log_func(const gchar *log_domain,
-+                          GLogLevelFlags log_level,
-+                          const gchar *message,
-+                          gpointer user_data)
-+{
-+    switch (log_level & G_LOG_LEVEL_MASK) {
-+    case G_LOG_LEVEL_DEBUG:
-+        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable deb=
-ug
-+         * messages
-+         */
-+        if (qemu_glog_domains =3D=3D NULL) {
-+            break;
-+        }
-+        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
-+          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, log_doma=
-in))) {
-+            break;
-+        }
-+        /* Fall through */
-+    case G_LOG_LEVEL_INFO:
-+        /* Fall through */
-+    case G_LOG_LEVEL_MESSAGE:
-+        info_report("%s: %s", log_domain, message);
-+        break;
-+    case G_LOG_LEVEL_WARNING:
-+        warn_report("%s: %s", log_domain, message);
-+        break;
-+    case G_LOG_LEVEL_CRITICAL:
-+        /* Fall through */
-+    case G_LOG_LEVEL_ERROR:
-+        error_report("%s: %s", log_domain, message);
-+        break;
-+    }
-+}
-+
-+/*
-+ * Init QEMU logging subsystem. This sets up glib logging so libraries u=
-sing it
-+ * also print their logs through {info,warn,error}_report.
-+ */
-+void qemu_init_logging(void)
-+{
-+    g_log_set_default_handler(qemu_log_func, NULL);
-+    g_warn_if_fail(qemu_glog_domains =3D=3D NULL);
-+    qemu_glog_domains =3D g_strdup(g_getenv("G_MESSAGES_DEBUG"));
-+}
-diff --git a/vl.c b/vl.c
-index bc9fbec654..f03f20e060 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
-     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
-         =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-=20
-+    qemu_init_logging();
-     module_call_init(MODULE_INIT_TRACE);
-=20
-     qemu_init_cpu_list();
---=20
-2.20.1
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 5caf77d6b8..bdca6cb2fc 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -228,6 +228,8 @@ def parse_args(vmcls):
+                       help="build image")
+     parser.add_option("--build-qemu",
+                       help="build QEMU from source in guest")
++    parser.add_option("--build-target",
++                      help="QEMU build target", default="check")
+     parser.add_option("--interactive", "-I", action="store_true",
+                       help="Interactively run command")
+     parser.add_option("--snapshot", "-s", action="store_true",
+@@ -255,6 +257,7 @@ def main(vmcls):
+             cmd = [vm.BUILD_SCRIPT.format(
+                    configure_opts = " ".join(argv),
+                    jobs=args.jobs,
++                   target=args.build_target,
+                    verbose = "V=1" if args.verbose else "")]
+         else:
+             cmd = argv
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index a85c866c30..1d64c31b7c 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -25,7 +25,7 @@ class FreeBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/vtbd1;
+         ./configure {configure_opts};
+-        gmake --output-sync -j{jobs} check {verbose};
++        gmake --output-sync -j{jobs} {target} {verbose};
+     """
+ 
+     def build_image(self, img):
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index fac6a7ce51..a2c3d13af4 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -25,8 +25,7 @@ class NetBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/rld1a;
+         ./configure --python=python2.7 {configure_opts};
+-        gmake --output-sync -j{jobs} {verbose};
+-        gmake --output-sync -j{jobs} check {verbose};
++        gmake --output-sync -j{jobs} {target} {verbose};
+     """
+ 
+     def build_image(self, img):
+-- 
+2.17.1
