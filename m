@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49961)
+Received: from eggs.gnu.org ([209.51.188.92]:50874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glZrM-0001Hh-7C
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:29 -0500
+	(envelope-from <berrange@redhat.com>) id 1glZtq-0003vZ-BC
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:46:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1glZdv-00068N-TR
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:29:37 -0500
-From: Max Reitz <mreitz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1glZtp-0000fQ-78
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:46:02 -0500
+Date: Mon, 21 Jan 2019 13:45:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190121134544.GC3683@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20190115111007.27159-1-stefanha@redhat.com>
 	<20190115111007.27159-2-stefanha@redhat.com>
 	<7c29009e-2332-0901-3e00-8aa4c6b28796@redhat.com>
 	<5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
-Message-ID: <69a10091-4421-b621-5324-df063e630b04@redhat.com>
-Date: Mon, 21 Jan 2019 14:29:10 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp"
 Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: include LUKS payload overhead
  in qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
@@ -27,140 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <69a10091-4421-b621-5324-df063e630b04@redhat.com>
-Subject: Re: [PATCH 1/2] qcow2: include LUKS payload overhead in qemu-img
- measure
-References: <20190115111007.27159-1-stefanha@redhat.com>
- <20190115111007.27159-2-stefanha@redhat.com>
- <7c29009e-2332-0901-3e00-8aa4c6b28796@redhat.com>
- <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
-In-Reply-To: <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 21.01.19 14:15, Max Reitz wrote:
+On Mon, Jan 21, 2019 at 02:15:03PM +0100, Max Reitz wrote:
 > On 21.01.19 14:08, Max Reitz wrote:
->> On 15.01.19 12:10, Stefan Hajnoczi wrote:
->>> LUKS encryption reserves clusters for its own payload data.  The size=
- of
->>> this area must be included in the qemu-img measure calculation so tha=
-t
->>> we arrive at the correct minimum required image size.
->>>
->>> (Ab)use the qcrypto_block_create() API to determine the payload
->>> overhead.  We discard the payload data that qcrypto thinks will be
->>> written to the image.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> ---
->>>  block/qcow2.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++=
-+-
->>>  1 file changed, 50 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/qcow2.c b/block/qcow2.c
->>> index 4897abae5e..7ab93a5d2f 100644
->>> --- a/block/qcow2.c
->>> +++ b/block/qcow2.c
->>
->> [...]
->>
->>> @@ -4274,6 +4294,35 @@ static BlockMeasureInfo *qcow2_measure(QemuOpt=
-s *opts, BlockDriverState *in_bs,
->>>      has_backing_file =3D !!optstr;
->>>      g_free(optstr);
->>> =20
->>> +    optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
->>> +    has_luks =3D optstr && strcmp(optstr, "luks") =3D=3D 0;
->>> +    g_free(optstr);
->>> +
->>> +    if (has_luks) {
->>> +        QCryptoBlockCreateOptions cryptoopts =3D {
->>> +            .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
->>> +        };
->>> +        QCryptoBlock *crypto;
->>> +        size_t headerlen;
->>> +
->>> +        optstr =3D qemu_opt_get_del(opts, "encrypt.key-secret");
->>> +        cryptoopts.u.luks.has_key_secret =3D !!optstr;
->>> +        cryptoopts.u.luks.key_secret =3D optstr;
->>
->> I wonder if you couldn't just make some secret up here (if the user
->> doesn't specify anything).  Its content shouldn't matter, right?
->=20
-> And now I wonder whether other options may not have actual influence on=
-
+> > On 15.01.19 12:10, Stefan Hajnoczi wrote:
+> >> LUKS encryption reserves clusters for its own payload data.  The size of
+> >> this area must be included in the qemu-img measure calculation so that
+> >> we arrive at the correct minimum required image size.
+> >>
+> >> (Ab)use the qcrypto_block_create() API to determine the payload
+> >> overhead.  We discard the payload data that qcrypto thinks will be
+> >> written to the image.
+> >>
+> >> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >> ---
+> >>  block/qcow2.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 50 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/block/qcow2.c b/block/qcow2.c
+> >> index 4897abae5e..7ab93a5d2f 100644
+> >> --- a/block/qcow2.c
+> >> +++ b/block/qcow2.c
+> > 
+> > [...]
+> > 
+> >> @@ -4274,6 +4294,35 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+> >>      has_backing_file = !!optstr;
+> >>      g_free(optstr);
+> >>  
+> >> +    optstr = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
+> >> +    has_luks = optstr && strcmp(optstr, "luks") == 0;
+> >> +    g_free(optstr);
+> >> +
+> >> +    if (has_luks) {
+> >> +        QCryptoBlockCreateOptions cryptoopts = {
+> >> +            .format = Q_CRYPTO_BLOCK_FORMAT_LUKS,
+> >> +        };
+> >> +        QCryptoBlock *crypto;
+> >> +        size_t headerlen;
+> >> +
+> >> +        optstr = qemu_opt_get_del(opts, "encrypt.key-secret");
+> >> +        cryptoopts.u.luks.has_key_secret = !!optstr;
+> >> +        cryptoopts.u.luks.key_secret = optstr;
+> > 
+> > I wonder if you couldn't just make some secret up here (if the user
+> > doesn't specify anything).  Its content shouldn't matter, right?
+> 
+> And now I wonder whether other options may not have actual influence on
 > the crypto header size.  I suppose in theory the cipher algorithm may
-> cause a difference, although it's probably not enough to warrant anothe=
-r
+> cause a difference, although it's probably not enough to warrant another
 > cluster...
 
-I stand corrected:
+The LUKS header comprises three parts
 
-With aes-128:
+ - A field size initial header with general config properties
+ - A series of fixed size key slot headers, one per slot, fixed
+   at 8 slots in the code
+ - A series of regions of key material, one per slot.
 
-$ qemu-img create -f qcow2 --object secret,id=3Dsec0,data=3Dfoo \
-    -o
-encrypt.format=3Dluks,encrypt.key-secret=3Dsec0,encrypt.cipher-alg=3Daes-=
-128 \
-    foo.qcow2 64M
-Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encrypt.format=3Dluks=
+The last one is a problem - the size of the key slot regions is
+the number of anti-forensic stripes (4096) multipled by the size
+of the master key. The latter depends on the size of the cipher
+key. This is referred to as "splitkeylen" in the code creating
+this. The overall space reserved for headers is then determined
+by:
 
-encrypt.key-secret=3Dsec0 encrypt.cipher-alg=3Daes-128 cluster_size=3D655=
-36
-lazy_refcounts=3Doff refcount_bits=3D16
-$ qemu-img info foo.qcow2
-[...]
-disk size: 448K
-[...]
+    luks->header.payload_offset =
+        (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+         QCRYPTO_BLOCK_LUKS_SECTOR_SIZE) +
+        (ROUND_UP(DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE),
+                  (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
+                   QCRYPTO_BLOCK_LUKS_SECTOR_SIZE)) *
+         QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
 
+So for AES-128  key materials takes 0.5 MB, while for AES-256 key material
+takes 1 MB, so adding together you get 1052672 byte for header in AES-128
+and 2068480 bytes for AES-256, rounded up to qcow2 cluster size (whatever
+that is configured to be)
 
-With aes-256:
-
-$ qemu-img create -f qcow2 --object secret,id=3Dsec0,data=3Dfoo \
-    -o
-encrypt.format=3Dluks,encrypt.key-secret=3Dsec0,encrypt.cipher-alg=3Daes-=
-256 \
-    foo.qcow2 64MFormatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864
-Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encrypt.format=3Dluks=
-
-encrypt.key-secret=3Dsec0 encrypt.cipher-alg=3Daes-256 cluster_size=3D655=
-36
-lazy_refcounts=3Doff refcount_bits=3D16
-$ qemu-img info foo.qcow2
-[...]
-disk size: 540K
-[...]
-
-
-So it does make a difference and those options should be parsed as well.
-
-Max
-
-
---VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxFySYACgkQ9AfbAGHV
-z0Du3Af8CBUt2juKH828dXPIvnJMtZSU0xNtAFSpn3866ELSN2njFNWuxXWxXVu4
-oceIPo/pRmX9+6IzJVqXrxScK2cDPU1fOSRPydBF3/MeU2+3wklmf7UC3Cfui7sL
-qRQV9q4kY9054tWVaADd41uWeum0I70rRz7VsjVe4wwsAb2PJNf/vTIIAp0bl/3e
-LrqDYUIYNnxBzjJ/ThAYhbi9mzYT+AdyncOjfJKCmSxQiGda1QIxobFQtCkKlc5m
-Zb1joeHW1P5vftmYP7XhDR3Agycj8NPQH0mGDCJNjH9VyiZ/Li1WchSXEpSDtmU8
-b7agv88HeKq7mfDawzGmyw1wm5dUNw==
-=TDmh
------END PGP SIGNATURE-----
-
---VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
