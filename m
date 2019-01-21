@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40534)
+Received: from eggs.gnu.org ([209.51.188.92]:40942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glX3Y-0000gf-V5
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:54 -0500
+	(envelope-from <stefanha@gmail.com>) id 1glX5b-0002IG-7i
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:45:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glX3X-0002Va-NZ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:52 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40538)
+	(envelope-from <stefanha@gmail.com>) id 1glX5T-0004Mg-Jy
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:45:53 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glX3X-0002Ut-10
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:51 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id p4so22712191wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:43:50 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id
-	129sm85821195wmd.18.2019.01.21.02.43.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 21 Jan 2019 02:43:48 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 10:43:46 +0000
-Message-Id: <20190121104346.30821-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1glX5Q-0004Jh-Fu
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:45:49 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c14so22773080wrr.0
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:45:47 -0800 (PST)
+Date: Mon, 21 Jan 2019 10:45:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190121104545.GE30536@stefanha-x1.localdomain>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-2-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/48] target-arm queue
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="gMR3gsNFwZpnI/Ts"
+Content-Disposition: inline
+In-Reply-To: <20190118173103.4903-2-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] display: ensure qxl log_buf is a
+ nul terminated string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-v1->v2 changes: fix a clang warning about bitfields;
-drop a patch from Julia that I accidentally included
-(it will likely be in a future series).
 
-The following changes since commit a8d2b0685681e2f291faaa501efbbd76875f8ec8:
+--gMR3gsNFwZpnI/Ts
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190118' into staging (2019-01-18 16:56:15 +0000)
+On Fri, Jan 18, 2019 at 05:31:00PM +0000, Daniel P. Berrang=E9 wrote:
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index 8e9a65e75b..eefdf4baac 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -1763,7 +1763,8 @@ async_common:
+>          qxl_set_mode(d, val, 0);
+>          break;
+>      case QXL_IO_LOG:
+> -        trace_qxl_io_log(d->id, d->ram->log_buf);
+> +        d->ram->log_buf[sizeof(d->ram->log_buf) - 1] =3D '\0';
+> +        trace_qxl_io_log(d->id, (const char *)d->ram->log_buf);
 
-are available in the Git repository at:
+This is a PCI BAR shared with the guest?  Then NUL termination is
+subject to races with vcpu threads that modify log_buf[] while we access
+it.
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190121
+The safe way to do this is to copy in log_buf[] and then NUL-terminate
+the local copy.
 
-for you to fetch changes up to 0d4bfd7df809863b1f45fad35229fb9419527d06:
+--gMR3gsNFwZpnI/Ts
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  target/arm: Implement PMSWINC (2019-01-21 10:38:56 +0000)
+-----BEGIN PGP SIGNATURE-----
 
-----------------------------------------------------------------
-target-arm queue:
- * hw/char/stm32f2xx_usart: Do not update data register when device is disabled
- * hw/arm/virt-acpi-build: Set COHACC override flag in IORT SMMUv3 node
- * target/arm: Allow Aarch32 exception return to switch from Mon->Hyp
- * ftgmac100: implement the new MDIO interface on Aspeed SoC
- * implement the ARMv8.3-PAuth extension
- * improve emulation of the ARM PMU
+iQEcBAEBAgAGBQJcRaLZAAoJEJykq7OBq3PI9iYH/14hpWg2CFNxtv31923hwkEm
+AzRvupFD9lEe21xziqsvFnOB0RNfM8fJYE4+r4h6K0nOG9cNE+rQNO9bl0YNi9d+
+O1AMaRlIHqJybFpwD/1SGVeW9mjwc5vxFD6Zi2XZyd57cfOIiZfMJunptJM2QT3o
+aukl2DRB+GhjVquDsinrGCU0mUm910XzLssxikAyZV3PKbYUW9GJ9hpj1j/eXIx2
+I90iKn+7OwxKQwLQhT3pwZhbXu1dH3V91FcAML3zla6X7bIwLCl3QUnRtNOHuwOI
+tYoeH1E6QNZGxQl939I85Yc3hIX3WCFdtv2Wmq9C1gmt8+qzEpHaHgziw3guwvA=
+=eK+9
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Aaron Lindsay (13):
-      migration: Add post_save function to VMStateDescription
-      target/arm: Reorganize PMCCNTR accesses
-      target/arm: Swap PMU values before/after migrations
-      target/arm: Filter cycle counter based on PMCCFILTR_EL0
-      target/arm: Allow AArch32 access for PMCCFILTR
-      target/arm: Implement PMOVSSET
-      target/arm: Define FIELDs for ID_DFR0
-      target/arm: Make PMCEID[01]_EL0 64 bit registers, add PMCEID[23]
-      target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
-      target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
-      target/arm: PMU: Add instruction and cycle events
-      target/arm: PMU: Set PMCR.N to 4
-      target/arm: Implement PMSWINC
-
-Alexander Graf (1):
-      target/arm: Allow Aarch32 exception return to switch from Mon->Hyp
-
-Cédric Le Goater (1):
-      ftgmac100: implement the new MDIO interface on Aspeed SoC
-
-Eric Auger (1):
-      hw/arm/virt-acpi-build: Set COHACC override flag in IORT SMMUv3 node
-
-Philippe Mathieu-Daudé (1):
-      hw/char/stm32f2xx_usart: Do not update data register when device is disabled
-
-Richard Henderson (31):
-      target/arm: Add state for the ARMv8.3-PAuth extension
-      target/arm: Add SCTLR bits through ARMv8.5
-      target/arm: Add PAuth active bit to tbflags
-      target/arm: Introduce raise_exception_ra
-      target/arm: Add PAuth helpers
-      target/arm: Decode PAuth within system hint space
-      target/arm: Rearrange decode in disas_data_proc_1src
-      target/arm: Decode PAuth within disas_data_proc_1src
-      target/arm: Decode PAuth within disas_data_proc_2src
-      target/arm: Move helper_exception_return to helper-a64.c
-      target/arm: Add new_pc argument to helper_exception_return
-      target/arm: Rearrange decode in disas_uncond_b_reg
-      target/arm: Decode PAuth within disas_uncond_b_reg
-      target/arm: Decode Load/store register (pac)
-      target/arm: Move cpu_mmu_index out of line
-      target/arm: Introduce arm_mmu_idx
-      target/arm: Introduce arm_stage1_mmu_idx
-      target/arm: Create ARMVAParameters and helpers
-      target/arm: Merge TBFLAG_AA_TB{0, 1} to TBII
-      target/arm: Export aa64_va_parameters to internals.h
-      target/arm: Add aa64_va_parameters_both
-      target/arm: Decode TBID from TCR
-      target/arm: Reuse aa64_va_parameters for setting tbflags
-      target/arm: Implement pauth_strip
-      target/arm: Implement pauth_auth
-      target/arm: Implement pauth_addpac
-      target/arm: Implement pauth_computepac
-      target/arm: Add PAuth system registers
-      target/arm: Enable PAuth for -cpu max
-      target/arm: Enable PAuth for user-only
-      target/arm: Tidy TBI handling in gen_a64_set_pc
-
- target/arm/Makefile.objs    |    1 +
- include/hw/acpi/acpi-defs.h |    2 +
- include/migration/vmstate.h |    1 +
- target/arm/cpu.h            |  244 +++++----
- target/arm/helper-a64.h     |   14 +
- target/arm/helper.h         |    1 -
- target/arm/internals.h      |   77 +++
- target/arm/translate.h      |    5 +-
- hw/arm/virt-acpi-build.c    |    1 +
- hw/char/stm32f2xx_usart.c   |    3 +-
- hw/net/ftgmac100.c          |   80 ++-
- migration/vmstate.c         |   13 +-
- target/arm/cpu.c            |   19 +-
- target/arm/cpu64.c          |   68 ++-
- target/arm/helper-a64.c     |  155 ++++++
- target/arm/helper.c         | 1222 +++++++++++++++++++++++++++++++++----------
- target/arm/machine.c        |   24 +
- target/arm/op_helper.c      |  174 +-----
- target/arm/pauth_helper.c   |  497 ++++++++++++++++++
- target/arm/translate-a64.c  |  537 ++++++++++++++++---
- docs/devel/migration.rst    |    9 +-
- 21 files changed, 2515 insertions(+), 632 deletions(-)
- create mode 100644 target/arm/pauth_helper.c
+--gMR3gsNFwZpnI/Ts--
