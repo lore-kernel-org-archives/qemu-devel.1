@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45188)
+Received: from eggs.gnu.org ([209.51.188.92]:45261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRX-0006fa-UX
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:16:51 -0500
+	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRf-0006jt-02
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRT-0004Jx-FP
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:16:47 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:54419)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRT-0004JG-2s
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:16:54 -0500
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:42032)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRT-00043r-4K
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:16:43 -0500
+	(envelope-from <ysato@users.sourceforge.jp>) id 1glZRQ-000437-UG
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:16:42 -0500
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
-Date: Mon, 21 Jan 2019 22:15:59 +0900
-Message-Id: <20190121131602.55003-9-ysato@users.sourceforge.jp>
+Date: Mon, 21 Jan 2019 22:15:52 +0900
+Message-Id: <20190121131602.55003-2-ysato@users.sourceforge.jp>
 In-Reply-To: <20190121131602.55003-1-ysato@users.sourceforge.jp>
 References: <20190121131602.55003-1-ysato@users.sourceforge.jp>
-Subject: [Qemu-devel] [PATCH RFC 08/11] RX62N internal serical communication
- interface.
+Subject: [Qemu-devel] [PATCH RFC 01/11] TCG translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,364 +26,3610 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-This module supported only non FIFO type.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf?key=086621e01bd70347c18ea7f794aa9cc3
+This part only supported RXv1 instructions.
+Instruction manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01us0032ej0120_rxsm.pdf
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- hw/char/Makefile.objs         |   2 +-
- hw/char/renesas_sci.c         | 279 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/char/renesas_sci.h |  42 +++++++
- 3 files changed, 322 insertions(+), 1 deletion(-)
- create mode 100644 hw/char/renesas_sci.c
- create mode 100644 include/hw/char/renesas_sci.h
+ target/rx/helper.h    |   22 +
+ target/rx/op_helper.c |  548 +++++++++
+ target/rx/translate.c | 3003 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 3573 insertions(+)
+ create mode 100644 target/rx/helper.h
+ create mode 100644 target/rx/op_helper.c
+ create mode 100644 target/rx/translate.c
 
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index c4947d7ae7..68eae7b9a5 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -15,7 +15,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_uart.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
- obj-$(CONFIG_COLDFIRE) += mcf_uart.o
- obj-$(CONFIG_OMAP) += omap_uart.o
--obj-$(CONFIG_SH4) += sh_serial.o
-+obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
- obj-$(CONFIG_PSERIES) += spapr_vty.o
- obj-$(CONFIG_DIGIC) += digic-uart.o
- obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
-diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+diff --git a/target/rx/helper.h b/target/rx/helper.h
 new file mode 100644
-index 0000000000..88a9077aef
+index 0000000000..fe0bc838d3
 --- /dev/null
-+++ b/hw/char/renesas_sci.c
-@@ -0,0 +1,279 @@
++++ b/target/rx/helper.h
+@@ -0,0 +1,22 @@
++DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
++DEF_HELPER_1(raise_access_fault, noreturn, env)
++DEF_HELPER_1(raise_privilege_violation, noreturn, env)
++DEF_HELPER_1(wait, noreturn, env)
++DEF_HELPER_1(debug, noreturn, env)
++DEF_HELPER_2(rxint, noreturn, env, i32)
++DEF_HELPER_1(rxbrk, noreturn, env)
++DEF_HELPER_FLAGS_4(floatop, TCG_CALL_NO_WG, f32, env, i32, f32, f32)
++DEF_HELPER_2(to_fpsw, void, env, i32)
++DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
++DEF_HELPER_2(racw, void, env, i32)
++DEF_HELPER_1(update_psw, void, env)
++DEF_HELPER_1(psw_c, i32, env)
++DEF_HELPER_1(psw_s, i32, env)
++DEF_HELPER_1(psw_o, i32, env)
++DEF_HELPER_3(mvtc, void, env, i32, i32)
++DEF_HELPER_2(mvfc, i32, env, i32)
++DEF_HELPER_2(cond, i32, env, i32)
++DEF_HELPER_1(unpack_psw, void, env)
++
+diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+new file mode 100644
+index 0000000000..c9c87dc308
+--- /dev/null
++++ b/target/rx/op_helper.c
+@@ -0,0 +1,548 @@
 +/*
-+ * Renesas Serial Communication Interface
++ *  RX helper functions
 + *
-+ * Copyright (c) 2019 Yoshinori Sato
++ *  Copyright (c) 2018 Yoshinori Sato
 + *
-+ * This code is licensed under the GPL version 2.
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
 + *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
++
 +#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/char/renesas_sci.h"
-+#include "qemu/error-report.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++#include "fpu/softfloat.h"
 +
-+#define freq_to_ns(freq) (1000000000LL / freq)
-+
-+static int can_receive(void *opaque)
++static uint32_t psw_c(CPURXState *env)
 +{
-+    RSCIState *sci = RSCI(opaque);
-+    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++    int m = env->op_mode & 0x000f;
++    int c;
++    switch (m) {
++    case RX_PSW_OP_NONE:
++        return env->psw_c;
++    case RX_PSW_OP_ADD:
++        c = (env->op_r[m - 1] < env->op_a1[m - 1]);
++        break;
++    case RX_PSW_OP_SUB:
++    case RX_PSW_OP_STRING:
++        c = (env->op_r[m - 1] <= env->op_a1[m - 1]);
++        break;
++    case RX_PSW_OP_BTST:
++    case RX_PSW_OP_ROT:
++        c = (env->op_r[m - 1] != 0);
++        break;
++    case RX_PSW_OP_SHLL:
++    case RX_PSW_OP_SHAR:
++    case RX_PSW_OP_SHLR:
++        c = (env->op_a1[m - 1] != 0);
++        break;
++    case RX_PSW_OP_ABS:
++        c = (env->op_r[m - 1] == 0);
++        break;
++    default:
++        g_assert_not_reached();
++        return -1;
++    }
++    env->psw_c = c;
++    env->op_mode &= ~0x000f;
++    return c;
++}
++
++uint32_t helper_psw_c(CPURXState *env)
++{
++    return psw_c(env);
++}
++
++static uint32_t psw_z(CPURXState *env)
++{
++    int m = (env->op_mode >> 4) & 0x000f;
++    if (m == RX_PSW_OP_NONE)
++        return env->psw_z;
++    else {
++        env->psw_z = (env->op_r[m - 1] == 0);
++        env->op_mode &= ~0x00f0;
++        return env->psw_z;
++    }
++}
++
++static uint32_t psw_s(CPURXState *env)
++{
++    int m = (env->op_mode >> 8) & 0x000f;
++    int s;
++    switch (m) {
++    case RX_PSW_OP_NONE:
++        return env->psw_s;
++    case RX_PSW_OP_FCMP:
++        s = (env->op_r[m - 1] == 2);
++        break;
++    default:
++        s = ((env->op_r[m - 1] & 0x80000000UL) != 0);
++        break;
++    }
++    env->psw_s = s;
++    env->op_mode &= ~0x0f00;
++    return s;
++}
++
++uint32_t helper_psw_s(CPURXState *env)
++{
++    return psw_s(env);
++}
++
++static uint32_t psw_o(CPURXState *env)
++{
++    int m = (env->op_mode >> 12) & 0x000f;
++    int o;
++
++    switch (m) {
++    case RX_PSW_OP_NONE:
++        return env->psw_o;
++    case RX_PSW_OP_ABS:
++        o = (env->op_a1[m - 1] == 0x80000000UL);
++        break;
++    case RX_PSW_OP_ADD: {
++            uint32_t r1, r2;
++            r1 = ~(env->op_a1[m - 1] ^ env->op_a2[m - 1]);
++            r2 = (env->op_a1[m - 1] ^ env->op_r[m - 1]);
++            o = (r1 & r2) >> 31;
++            break;
++        }
++    case RX_PSW_OP_SUB: {
++            uint32_t r1, r2;
++            r1 = (env->op_a1[m - 1] ^ env->op_a2[m - 1]);
++            r2 = (env->op_a1[m - 1] ^ env->op_r[m - 1]);
++            o = (r1 & r2) >> 31;
++            break;
++    }
++    case RX_PSW_OP_DIV:
++        o = (env->op_a1[m - 1] == 0) ||
++            ((env->op_a1[m - 1] == -1) &&
++             (env->op_a2[m - 1] == 0x80000000UL));
++        break;
++    case RX_PSW_OP_SHLL:
++        o = ((env->op_a2[m - 1] & 0x80000000UL) ^
++             (env->op_r[m - 1] & 0x80000000UL)) != 0;
++        break;
++    case RX_PSW_OP_SHAR:
++        o = 0;
++        break;
++    default:
++        g_assert_not_reached();
++        return -1;
++    }
++    env->psw_o = o;
++    env->op_mode &= ~0xf000;
++    return o;
++}
++
++uint32_t helper_psw_o(CPURXState *env)
++{
++    return psw_o(env);
++}
++
++static uint32_t cond_psw_z(CPURXState *env, int set)
++{
++    return psw_z(env) ^ set;
++}
++
++static uint32_t cond_psw_c(CPURXState *env, int set)
++{
++    return psw_c(env) ^ set;
++}
++
++static uint32_t cond_psw_s(CPURXState *env, int set)
++{
++    return psw_s(env) ^ set;
++}
++
++static uint32_t cond_psw_o(CPURXState *env, int set)
++{
++    return psw_o(env) ^ set;
++}
++
++uint32_t helper_cond(CPURXState *env, uint32_t cond)
++{
++    uint32_t c, z, s, o;
++
++    switch (cond) {
++    case 0: /* z */
++    case 1: /* nz */
++        return cond_psw_z(env, cond);
++    case 2: /* c */
++    case 3: /* nc */
++        return cond_psw_c(env, cond - 2);
++    case 4: /* gtu (C&^Z) == 1 */
++    case 5: /* leu (C&^Z) == 0 */
++        c = psw_c(env);
++        z = psw_z(env);
++        return (c && !z) == (5 - cond);
++    case 6: /* pz (S == 0) */
++    case 7: /* n (S == 1) */
++        return cond_psw_s(env, 7 - cond);
++    case 8: /* ge (S^O)==0 */
++    case 9: /* lt (S^O)==1 */
++        s = psw_s(env);
++        o = psw_o(env);
++        return (s | o) == (cond - 8);
++    case 10: /* gt ((S^O)|Z)==0 */
++    case 11: /* le ((S^O)|Z)==1 */
++        s = psw_s(env);
++        o = psw_o(env);
++        z = psw_z(env);
++        return ((s ^ o) | z) == (cond - 10);
++    case 12: /* o */
++    case 13: /* no */
++        return cond_psw_o(env, 13 - cond);
++    case 14: /* always true */
++        return 1;
++    case 15:
 +        return 0;
-+    } else {
-+        return sci->scr & 0x10;
++    default:
++        g_assert_not_reached();
++        return -1;
 +    }
 +}
 +
-+static void receive(void *opaque, const uint8_t *buf, int size)
++uint32_t rx_get_psw_low(CPURXState *env)
 +{
-+    RSCIState *sci = RSCI(opaque);
-+    sci->rdr = buf[0];
-+    if (sci->ssr & 0x40 || size > 1) {
-+        sci->ssr |= 0x20;
-+        if (sci->scr & 0x40) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    } else {
-+        sci->ssr |= 0x40;
-+        sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
-+        if (sci->scr & 0x40) {
-+            qemu_set_irq(sci->irq[RXI], 1);
-+            qemu_set_irq(sci->irq[RXI], 0);
-+        }
-+    }
++    return (psw_o(env) << 3) |
++        (psw_s(env) << 2) |
++        (psw_z(env) << 1) |
++        (psw_c(env) << 0);
 +}
 +
-+static void send_byte(RSCIState *sci)
++void helper_update_psw(CPURXState *env)
 +{
-+    if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
-+    }
-+    timer_mod(sci->timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
-+    sci->ssr &= ~0x04;
-+    sci->ssr |= 0x80;
-+    qemu_set_irq(sci->irq[TEI], 0);
-+    if (sci->scr & 0x80) {
-+        qemu_set_irq(sci->irq[TXI], 1);
-+        qemu_set_irq(sci->irq[TXI], 0);
-+    }
-+}
-+
-+static void txend(void *opaque)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    if ((sci->ssr & 0x80) == 0) {
-+        send_byte(sci);
-+    } else {
-+        sci->ssr |= 0x04;
-+        if (sci->scr & 0x04) {
-+            qemu_set_irq(sci->irq[TEI], 1);
-+        }
-+    }
-+}
-+
-+static void update_trtime(RSCIState *sci)
-+{
-+    static const int div[] = {1, 4, 16, 64};
-+    int w;
-+
-+    w = (sci->smr & 0x40) ? 7 : 8;      /* CHR */
-+    w += (sci->smr >> 5) & 1;           /* PE */
-+    w += (sci->smr & 0x08) ? 2 : 1;     /* STOP */
-+    sci->trtime = w * freq_to_ns(sci->input_freq) *
-+        32 * div[sci->smr & 0x03] * sci->brr;
-+}
-+
-+static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    hwaddr offset = addr & 0x07;
-+    RSCIState *sci = RSCI(opaque);
-+    int error = 0;
-+
-+    switch (offset) {
-+    case 0: /* SMR */
-+        if ((sci->scr & 0x30) == 0) {
-+            sci->smr = val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case 1: /* BRR */
-+        if ((sci->scr & 0x30) == 0) {
-+            sci->brr = val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case 2: /* SCR */
-+        sci->scr = val;
-+        if (sci->scr & 0x20) {
-+            sci->ssr |= 0x84;
-+            qemu_set_irq(sci->irq[TXI], 1);
-+            qemu_set_irq(sci->irq[TXI], 0);
-+        }
-+        if ((sci->scr & 0x04) == 0) {
-+            qemu_set_irq(sci->irq[TEI], 0);
-+        }
-+        if ((sci->scr & 0x40) == 0) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case 3: /* TDR */
-+        sci->tdr = val;
-+        if (sci->ssr & 0x04) {
-+            send_byte(sci);
-+        } else{
-+            sci->ssr &= ~0x80;
-+        }
-+        break;
-+    case 4: /* SSR */
-+        sci->ssr &= ~0x38 | (val & 0x38);
-+        if (((sci->read_ssr & 0x38) ^ (sci->ssr & 0x38)) &&
-+            (sci->ssr & 0x38) == 0) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case 5: /* RDR */
-+        error = 1; break;
-+    case 6: /* SCMR */
-+        sci->scmr = val; break;
-+    case 7: /* SEMR */
-+        sci->semr = val; break;
-+    }
-+
-+    if (error) {
-+        error_report("rsci: unsupported write request to %08lx", addr);
-+    }
-+}
-+
-+static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset = addr & 0x07;
-+    RSCIState *sci = RSCI(opaque);
-+    int error = 0;
-+    switch (offset) {
-+    case 0: /* SMR */
-+        return sci->smr;
-+    case 1: /* BRR */
-+        return sci->brr;
-+    case 2: /* SCR */
-+        return sci->scr;
-+    case 3: /* TDR */
-+        return sci->tdr;
-+    case 4: /* SSR */
-+        sci->read_ssr = sci->ssr;
-+        return sci->ssr;
-+    case 5: /* RDR */
-+        sci->ssr &= ~0x40;
-+        return sci->rdr;
-+    case 6: /* SCMR */
-+        return sci->scmr;
-+    case 7: /* SEMR */
-+        return sci->semr;
-+    }
-+
-+    if (error) {
-+        error_report("rsci: unsupported write request to %08lx", addr);
-+    }
-+    return -1;
-+}
-+
-+static const MemoryRegionOps sci_ops = {
-+    .write = sci_write,
-+    .read  = sci_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void rsci_reset(DeviceState *dev)
-+{
-+    RSCIState *sci = RSCI(dev);
-+    sci->smr = sci->scr = 0x00;
-+    sci->brr = 0xff;
-+    sci->tdr = 0xff;
-+    sci->rdr = 0x00;
-+    sci->ssr = 0x84;
-+    sci->scmr = 0x00;
-+    sci->semr = 0x00;
-+    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void sci_event(void *opaque, int event)
-+{
-+    RSCIState *sci = RSCI(opaque);
-+    if (event == CHR_EVENT_BREAK) {
-+        sci->ssr |= 0x10;
-+        if (sci->scr & 0x40) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    }
-+}
-+
-+static void rsci_realize(DeviceState *dev, Error **errp)
-+{
-+    RSCIState *sci = RSCI(dev);
-+
-+    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
-+                             sci_event, NULL, sci, NULL, true);
-+}
-+
-+static void rsci_init(Object *obj)
-+{
-+    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-+    RSCIState *sci = RSCI(obj);
++    struct {
++        uint32_t *p;
++        uint32_t (*fn)(CPURXState *);
++    } const update_proc[] = {
++        {&env->psw_c, psw_c},
++        {&env->psw_z, psw_z},
++        {&env->psw_s, psw_s},
++        {&env->psw_o, psw_o},
++    };
 +    int i;
 +
-+    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
-+                          sci, "renesas-sci", 0x8);
-+    sysbus_init_mmio(d, &sci->memory);
-+
 +    for (i = 0; i < 4; i++) {
-+        sysbus_init_irq(d, &sci->irq[i]);
++        *(update_proc[i].p) = update_proc[i].fn(env);
 +    }
-+    sci->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
++    g_assert((env->op_mode & 0xffff) == 0);
 +}
 +
-+static const VMStateDescription vmstate_rcmt = {
-+    .name = "renesas-sci",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int index,
++                                                 uintptr_t retaddr)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = index;
++    cpu_loop_exit_restore(cs, retaddr);
++}
++
++void QEMU_NORETURN helper_raise_privilege_violation(CPURXState *env)
++{
++    raise_exception(env, 20, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_access_fault(CPURXState *env)
++{
++    raise_exception(env, 21, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_illegal_instruction(CPURXState *env)
++{
++    raise_exception(env, 23, GETPC());
++}
++
++void QEMU_NORETURN helper_wait(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->halted = 1;
++    env->in_sleep = 1;
++    raise_exception(env, EXCP_HLT, 0);
++}
++
++void QEMU_NORETURN helper_debug(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void QEMU_NORETURN helper_rxint(CPURXState *env, uint32_t vec)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->interrupt_request |= CPU_INTERRUPT_SOFT;
++    env->sirq = vec;
++    raise_exception(env, 0x100, 0);
++}
++
++void QEMU_NORETURN helper_rxbrk(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->interrupt_request |= CPU_INTERRUPT_SOFT;
++    env->sirq = 0;
++    raise_exception(env, 0x100, 0);
++}
++
++static void update_fpsw(CPURXState *env, uintptr_t retaddr)
++{
++    int xcpt, cause, enable;
++
++    xcpt = get_float_exception_flags(&env->fp_status);
++
++    /* Clear the cause entries */
++    env->fpsw &= ~FPSW_CAUSE_MASK;
++
++    if (unlikely(xcpt)) {
++        if (xcpt & float_flag_invalid) {
++            env->fpsw |= FPSW_CAUSE_V;
++        }
++        if (xcpt & float_flag_divbyzero) {
++            env->fpsw |= FPSW_CAUSE_Z;
++        }
++        if (xcpt & float_flag_overflow) {
++            env->fpsw |= FPSW_CAUSE_O;
++        }
++        if (xcpt & float_flag_underflow) {
++            env->fpsw |= FPSW_CAUSE_U;
++        }
++        if (xcpt & float_flag_inexact) {
++            env->fpsw |= FPSW_CAUSE_X;
++        }
++
++        /* Accumulate in flag entries */
++        env->fpsw |= (env->fpsw & FPSW_CAUSE_MASK)
++                      << (FPSW_FLAG_SHIFT - FPSW_CAUSE_SHIFT);
++        env->fpsw |= ((env->fpsw >> FPSW_FLAG_V) |
++                      (env->fpsw >> FPSW_FLAG_O) |
++                      (env->fpsw >> FPSW_FLAG_Z) |
++                      (env->fpsw >> FPSW_FLAG_U) |
++                      (env->fpsw >> FPSW_FLAG_X)) << FPSW_FLAG_S;
++
++        /* Generate an exception if enabled */
++        cause = (env->fpsw & FPSW_CAUSE_MASK) >> FPSW_CAUSE_SHIFT;
++        enable = (env->fpsw & FPSW_ENABLE_MASK) >> FPSW_ENABLE_SHIFT;
++        if (cause & enable) {
++            raise_exception(env, 21, retaddr);
++        }
 +    }
-+};
-+
-+static Property rsci_properties[] = {
-+    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
-+    DEFINE_PROP_CHR("chardev", RSCIState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rsci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = rsci_realize;
-+    dc->props = rsci_properties;
-+    dc->vmsd = &vmstate_rcmt;
-+    dc->reset = rsci_reset;
 +}
 +
-+static const TypeInfo rsci_info = {
-+    .name       = TYPE_RENESAS_SCI,
-+    .parent     = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RSCIState),
-+    .instance_init = rsci_init,
-+    .class_init = rsci_class_init,
-+};
-+
-+static void rsci_register_types(void)
++void helper_to_fpsw(CPURXState *env, uint32_t val)
 +{
-+    type_register_static(&rsci_info);
++    static const int roundmode[] = {
++        float_round_nearest_even,
++        float_round_to_zero,
++        float_round_up,
++        float_round_down,
++    };
++    env->fpsw = val & FPSW_MASK;
++    set_float_rounding_mode(roundmode[val & FPSW_RM_MASK],
++                            &env->fp_status);
++    set_flush_to_zero((val & FPSW_DN) != 0, &env->fp_status);
 +}
 +
-+type_init(rsci_register_types)
-diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
++typedef float32 (*floatfunc)(float32 f1, float32 f2, float_status *st);
++float32 helper_floatop(CPURXState *env, uint32_t op,
++                       float32 t0, float32 t1)
++{
++    static const floatfunc fop[] = {
++        float32_sub,
++        NULL,
++        float32_add,
++        float32_mul,
++        float32_div,
++    };
++    int st, xcpt;
++    if (op != 1) {
++        t0 = fop[op](t0, t1, &env->fp_status);
++        update_fpsw(env, GETPC());
++    } else {
++        st = float32_compare(t0, t1, &env->fp_status);
++        xcpt = get_float_exception_flags(&env->fp_status);
++        env->fpsw &= ~FPSW_CAUSE_MASK;
++
++        if (xcpt & float_flag_invalid) {
++            env->fpsw |= FPSW_CAUSE_V;
++            if (env->fpsw & FPSW_ENABLE_V) {
++                raise_exception(env, 21, GETPC());
++            }
++        }
++        switch (st) {
++        case float_relation_unordered:
++            return (float32)0;
++        case float_relation_equal:
++            return (float32)1;
++        case float_relation_less:
++            return (float32)2;
++        }
++    }
++    return t0;
++}
++
++uint32_t helper_ftoi(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret = float32_to_int32_round_to_zero(t0, &env->fp_status);
++    update_fpsw(env, GETPC());
++    return ret;
++}
++
++uint32_t helper_round(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret = float32_to_int32(t0, &env->fp_status);
++    update_fpsw(env, GETPC());
++    return ret;
++}
++
++float32 helper_itof(CPURXState *env, uint32_t t0)
++{
++    float32 ret;
++    ret = int32_to_float32(t0, &env->fp_status);
++    update_fpsw(env, GETPC());
++    return ret;
++}
++
++static uint32_t *cr_ptr(CPURXState *env, uint32_t cr)
++{
++    switch (cr) {
++    case 0:
++        return &env->psw;
++    case 2:
++        return &env->usp;
++    case 3:
++        return &env->fpsw;
++    case 8:
++        return &env->bpsw;
++    case 9:
++        return &env->bpc;
++    case 10:
++        return &env->isp;
++    case 11:
++        return &env->fintv;
++    case 12:
++        return &env->intb;
++    default:
++        return NULL;
++    }
++}
++
++void rx_cpu_pack_psw(CPURXState *env)
++{
++    helper_update_psw(env);
++    env->psw = (
++        (env->psw_ipl << 24) | (env->psw_pm << 20) |
++        (env->psw_u << 17) | (env->psw_i << 16) |
++        (env->psw_o << 3) | (env->psw_s << 2) |
++        (env->psw_z << 1) | (env->psw_c << 0));
++}
++
++void rx_cpu_unpack_psw(CPURXState *env, int all)
++{
++    if (env->psw_pm == 0) {
++        env->psw_ipl = (env->psw >> 24) & 15;
++        if (all) {
++            env->psw_pm = (env->psw >> 20) & 1;
++        }
++        env->psw_u =  (env->psw >> 17) & 1;
++        env->psw_i =  (env->psw >> 16) & 1;
++    }
++    env->psw_o =  (env->psw >> 3) & 1;
++    env->psw_s =  (env->psw >> 2) & 1;
++    env->psw_z =  (env->psw >> 1) & 1;
++    env->psw_c =  (env->psw >> 0) & 1;
++    env->op_mode = 0;
++}
++
++uint32_t helper_mvfc(CPURXState *env, uint32_t cr)
++{
++    uint32_t *crp = cr_ptr(env, cr);
++    if (crp != NULL) {
++        if (cr == 0) {
++            rx_cpu_pack_psw(env);
++        }
++        if ((cr == 2 && env->psw_u) || (cr == 10 && !env->psw_u)) {
++            return env->regs[0];
++        } else {
++            return *crp;
++        }
++    }
++    return 0;
++}
++
++void helper_mvtc(CPURXState *env, uint32_t cr, uint32_t val)
++{
++    uint32_t *crp = cr_ptr(env, cr);
++    if (crp != NULL) {
++        *crp = val;
++        if ((cr == 2 && env->psw_u) ||
++            (cr == 10 && !env->psw_u)) {
++            env->regs[0] = val;
++        }
++        if (cr == 0) {
++            rx_cpu_unpack_psw(env, 0);
++        }
++    }
++}
++
++void helper_unpack_psw(CPURXState *env)
++{
++    uint32_t prev_u;
++    prev_u = env->psw_u;
++    rx_cpu_unpack_psw(env, 1);
++    if (prev_u != env->psw_u) {
++        if (env->psw_u) {
++            env->isp = env->regs[0];
++            env->regs[0] = env->usp;
++        } else {
++            env->usp = env->regs[0];
++            env->regs[0] = env->isp;
++        }
++    }
++}
++
++void helper_racw(CPURXState *env, uint32_t shift)
++{
++    int64_t acc;
++    acc = env->acc_m;
++    acc = (acc << 32) | env->acc_l;
++    acc <<= shift;
++    acc += 0x0000000080000000LL;
++    if (acc > 0x00007FFF00000000LL) {
++        acc = 0x00007FFF00000000LL;
++    } else if (acc < 0xFFFF800000000000LL) {
++        acc = 0xFFFF800000000000LL;
++    } else {
++        acc &= 0xffffffff00000000;
++    }
++    env->acc_m = (acc >> 32);
++    env->acc_l = (acc & 0xffffffff);
++}
++
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    uint32_t address, physical, prot;
++
++    /* Linear mapping */
++    address = physical = addr & TARGET_PAGE_MASK;
++    prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE);
++}
+diff --git a/target/rx/translate.c b/target/rx/translate.c
 new file mode 100644
-index 0000000000..47e3e7a5d7
+index 0000000000..d3cc0389f2
 --- /dev/null
-+++ b/include/hw/char/renesas_sci.h
-@@ -0,0 +1,42 @@
++++ b/target/rx/translate.c
+@@ -0,0 +1,3003 @@
 +/*
-+ * Renesas Serial Communication Interface
++ *  RX translation
 + *
-+ * Copyright (c) 2018 Yoshinori Sato
++ *  Copyright (c) 2019 Yoshinori Sato
 + *
-+ * This code is licensed under the GPL version 2 or later.
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
 + *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include "chardev/char-fe.h"
-+#include "qemu/timer.h"
-+#include "hw/sysbus.h"
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "disas/disas.h"
++#include "exec/exec-all.h"
++#include "tcg-op.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "exec/helper-gen.h"
++#include "exec/translator.h"
++#include "trace-tcg.h"
++#include "exec/log.h"
 +
-+#define TYPE_RENESAS_SCI "renesas-sci"
-+#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
++typedef struct DisasContext {
++    DisasContextBase base;
++    uint32_t pc;
++} DisasContext;
 +
-+#define ERI 0
-+#define RXI 1
-+#define TXI 2
-+#define TEI 3
-+
++/* PSW condition operation */
 +typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion memory;
++    TCGv op_mode;
++    TCGv op_a1[13];
++    TCGv op_a2[13];
++    TCGv op_r[13];
++} CCOP;
++CCOP ccop;
 +
-+    uint8_t smr;
-+    uint8_t brr;
-+    uint8_t scr;
-+    uint8_t tdr;
-+    uint8_t ssr;
-+    uint8_t rdr;
-+    uint8_t scmr;
-+    uint8_t semr;
++/* Target-specific values for dc->base.is_jmp.  */
++#define DISAS_JUMP    DISAS_TARGET_0
 +
-+    uint8_t read_ssr;
-+    long long trtime;
-+    long long rx_next;
-+    QEMUTimer *timer;
-+    CharBackend chr;
-+    uint64_t input_freq;
-+    qemu_irq irq[4];
-+} RSCIState;
++/* global register indexes */
++static TCGv cpu_regs[16];
++static TCGv cpu_psw, cpu_psw_o, cpu_psw_s, cpu_psw_z, cpu_psw_c;
++static TCGv cpu_psw_i, cpu_psw_pm, cpu_psw_u, cpu_psw_ipl;
++static TCGv cpu_usp, cpu_fpsw, cpu_bpsw, cpu_bpc, cpu_isp;
++static TCGv cpu_fintv, cpu_intb, cpu_pc, cpu_acc_m, cpu_acc_l;
++
++
++#include "exec/gen-icount.h"
++
++void rx_cpu_dump_state(CPUState *cs, FILE *f,
++                           fprintf_function cpu_fprintf, int flags)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    int i;
++    uint32_t psw;
++
++    psw = rx_get_psw_low(env);
++    psw |= (env->psw_ipl << 24) | (env->psw_pm << 20) |
++        (env->psw_u << 17) | (env->psw_i << 16);
++    cpu_fprintf(f, "pc=0x%08x psw=0x%08x\n",
++                env->pc, psw);
++    for (i = 0; i < 16; i += 4) {
++        cpu_fprintf(f, "r%d=0x%08x r%d=0x%08x r%d=0x%08x r%d=0x%08x\n",
++                    i, env->regs[i], i + 1, env->regs[i + 1],
++                    i + 2, env->regs[i + 2], i + 3, env->regs[i + 3]);
++    }
++}
++
++static inline void gen_save_cpu_state(DisasContext *dc, bool save_pc)
++{
++    if (save_pc) {
++        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
++    }
++}
++
++static inline bool use_goto_tb(DisasContext *dc, target_ulong dest)
++{
++    if (unlikely(dc->base.singlestep_enabled)) {
++        return false;
++    } else {
++        return true;
++    }
++}
++
++static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
++{
++    if (use_goto_tb(dc, dest)) {
++        tcg_gen_goto_tb(n);
++        tcg_gen_movi_i32(cpu_pc, dest);
++        tcg_gen_exit_tb(dc->base.tb, n);
++    } else {
++        tcg_gen_movi_i32(cpu_pc, dest);
++        if (dc->base.singlestep_enabled) {
++            gen_helper_debug(cpu_env);
++        } else {
++            tcg_gen_lookup_and_goto_ptr();
++        }
++    }
++    dc->base.is_jmp = DISAS_NORETURN;
++}
++
++typedef void (*disas_proc)(CPURXState *env, DisasContext *dc,
++                           uint32_t insn);
++
++static uint32_t rx_load_simm(CPURXState *env, uint32_t addr,
++                             int sz, uint32_t *ret)
++{
++    int32_t tmp;
++    switch (sz) {
++    case 1:
++        *ret = cpu_ldsb_code(env, addr);
++        return addr + 1;
++    case 2:
++        *ret = cpu_ldsw_code(env, addr);
++        return addr + 2;
++    case 3:
++        tmp = cpu_ldsb_code(env, addr + 2) << 16;
++        tmp |= cpu_lduw_code(env, addr) & 0xffff;
++        *ret = tmp;
++        return addr + 3;
++    case 0:
++        *ret = cpu_ldl_code(env, addr);
++        return addr + 4;
++    default:
++        return addr;
++    }
++}
++
++#define SET_MODE_O(mode)                                                \
++    do {                                                                \
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, ~0xf000);          \
++        tcg_gen_ori_i32(ccop.op_mode, ccop.op_mode, mode << 12);        \
++    } while (0)
++
++#define SET_MODE_ZS(mode)                                               \
++    do {                                                                \
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, ~0x0ff0);          \
++        tcg_gen_ori_i32(ccop.op_mode, ccop.op_mode,                     \
++                        (mode << 8) | (mode << 4));                     \
++    } while (0)
++
++#define SET_MODE_ZSO(mode)                                              \
++    do {                                                                \
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, ~0xfff0);          \
++        tcg_gen_ori_i32(ccop.op_mode, ccop.op_mode,                     \
++                        (mode << 12) | (mode << 8) | (mode << 4));      \
++    } while (0)
++
++#define SET_MODE_CZ(mode)                                               \
++    do {                                                                \
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, ~0x00ff);          \
++        tcg_gen_ori_i32(ccop.op_mode, ccop.op_mode,                     \
++                        (mode << 4) | mode);                            \
++    } while (0)
++
++#define SET_MODE_CZSO(mode)                                             \
++    do {                                                                \
++        tcg_gen_movi_i32(ccop.op_mode,                                  \
++                         (mode << 12) | (mode << 8) |                   \
++                         (mode << 4) | mode);                           \
++    } while (0)
++
++#define SET_MODE_CZS(mode)                                              \
++    do {                                                                \
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, ~0x0fff);          \
++        tcg_gen_ori_i32(ccop.op_mode, ccop.op_mode,                     \
++                        (mode << 8) | (mode << 4) | mode);              \
++    } while (0)
++
++#define DEFINE_INSN(name) \
++    static void name(CPURXState *env, DisasContext *dc, uint32_t insn)
++
++#define RX_MEMORY_ST 0
++#define RX_MEMORY_LD 1
++#define RX_MEMORY_BYTE 0
++#define RX_MEMORY_WORD 1
++#define RX_MEMORY_LONG 2
++
++#define RX_OP_SUB 0
++#define RX_OP_CMP 1
++#define RX_OP_ADD 2
++#define RX_OP_SBB 3
++#define RX_OP_ADC 4
++#define RX_OP_MUL 3
++
++static void rx_gen_ldst(int size, int dir, TCGv reg, TCGv mem)
++{
++    static void (* const rw[])(TCGv ret, TCGv addr, int idx) = {
++        tcg_gen_qemu_st8, tcg_gen_qemu_ld8s,
++        tcg_gen_qemu_st16, tcg_gen_qemu_ld16s,
++        tcg_gen_qemu_st32, tcg_gen_qemu_ld32s,
++    };
++    rw[size * 2 + dir](reg, mem, 0);
++}
++
++/* mov.[bwl] rs,dsp:[rd] / mov.[bwl] dsp:[rs],rd */
++DEFINE_INSN(mov1_2)
++{
++    TCGv mem;
++    int r1, r2, dsp, dir, sz;
++
++    insn >>= 16;
++    sz = (insn >> 12) & 3;
++    dsp = ((insn >> 6) & 0x1e) | ((insn >> 3) & 1);
++    dsp <<= sz;
++    r2 = insn & 7;
++    r1 = (insn >> 4) & 7;
++    dir = (insn >> 11) & 1;
++
++    mem = tcg_temp_local_new();
++    tcg_gen_addi_i32(mem, cpu_regs[r1], dsp);
++    rx_gen_ldst(sz, dir, cpu_regs[r2], mem);
++    tcg_temp_free(mem);
++    dc->pc += 2;
++}
++
++/* mov.l #uimm:4,rd */
++DEFINE_INSN(mov3)
++{
++    uint32_t imm;
++    int rd;
++
++    imm = (insn >> 20) & 0x0f;
++    rd = (insn >> 16) & 15;
++    tcg_gen_movi_i32(cpu_regs[rd], imm);
++    dc->pc += 2;
++}
++
++/* mov.[bwl] #imm8,dsp:[rd] */
++DEFINE_INSN(mov4)
++{
++    uint32_t imm8;
++    TCGv src, dst;
++    int rd, sz, dsp;
++
++    sz = (insn >> 24) & 3;
++    rd = (insn >> 20) & 7;
++    dsp = ((insn >> 19) & 0x10) | ((insn >> 16) & 0x0f);
++    dsp <<= sz;
++    imm8 = (insn >> 8) & 0xff;
++
++    src = tcg_const_local_i32(imm8);
++    dst = tcg_temp_local_new();
++    tcg_gen_addi_i32(dst, cpu_regs[rd], dsp);
++    rx_gen_ldst(sz, RX_MEMORY_ST, src, dst);
++    tcg_temp_free(src);
++    tcg_temp_free(dst);
++    dc->pc += 3;
++}
++
++/* mov.l #uimm8,rd */
++DEFINE_INSN(mov5)
++{
++    uint32_t imm8;
++    int rd;
++
++    imm8 = (insn >> 8) & 0xff;
++    rd = (insn >> 16) & 15;
++    tcg_gen_movi_i32(cpu_regs[rd], imm8);
++    dc->pc += 3;
++}
++
++/* mov.l #imm,rd */
++DEFINE_INSN(mov6)
++{
++    uint32_t imm;
++    int rd, li;
++
++    rd = (insn >> 20) & 15;
++    li = (insn >> 18) & 3;
++
++    dc->pc = rx_load_simm(env, dc->pc + 2, li, &imm);
++    tcg_gen_movi_i32(cpu_regs[rd], imm);
++}
++
++/* mov.[bwl] rs,rd */
++DEFINE_INSN(mov7)
++{
++    int sz, rs, rd;
++
++    sz = (insn >> 28) & 3;
++    rs = (insn >> 20) & 15;
++    rd = (insn >> 16) & 15;
++
++    switch (sz) {
++    case 0:
++        tcg_gen_ext8s_i32(cpu_regs[rd], cpu_regs[rs]);
++        break;
++    case 1:
++        tcg_gen_ext16s_i32(cpu_regs[rd], cpu_regs[rs]);
++        break;
++    case 2:
++        tcg_gen_mov_i32(cpu_regs[rd], cpu_regs[rs]);
++        break;
++    }
++    dc->pc += 2;
++}
++
++static TCGv rx_index_addr(int id, int size, int offset, int reg,
++                          DisasContext *dc, CPURXState *env)
++{
++    TCGv addr;
++    uint32_t dsp;
++
++    addr = tcg_temp_local_new();
++    switch (id) {
++    case 0:
++        tcg_gen_mov_i32(addr, cpu_regs[reg]);
++        break;
++    case 1:
++        dsp = cpu_ldub_code(env, dc->base.pc_next + offset) << size;
++        tcg_gen_addi_i32(addr, cpu_regs[reg], dsp);
++        break;
++    case 2:
++        dsp = cpu_lduw_code(env, dc->base.pc_next + offset) << size;
++        tcg_gen_addi_i32(addr, cpu_regs[reg], dsp);
++        break;
++    }
++    return addr;
++}
++
++/* mov #imm, dsp:[rd] */
++DEFINE_INSN(mov8)
++{
++    uint32_t imm;
++    TCGv _imm, dst;
++    int id, rd, li, sz;
++
++    id = (insn >> 24) & 3;
++    rd = (insn >> 20) & 15;
++    li = (insn >> 18) & 3;
++    sz = (insn >> 16) & 3;
++
++    dst = rx_index_addr(id, sz, 2, rd, dc, env);
++    dc->pc = rx_load_simm(env, dc->pc + 2 + id, li, &imm);
++    _imm = tcg_const_local_i32(imm);
++    rx_gen_ldst(sz, RX_MEMORY_ST, _imm, dst);
++    tcg_temp_free(_imm);
++    tcg_temp_free(dst);
++}
++
++/* mov.[bwl] dsp:[rs],rd */
++DEFINE_INSN(mov9)
++{
++    int sz, id, rs, rd;
++    TCGv src;
++
++    sz = (insn >> 28) & 3;
++    id = (insn >> 24) & 3;
++    rs = (insn >> 20) & 15;
++    rd = (insn >> 16) & 15;
++
++    src = rx_index_addr(id, sz, 2, rs, dc, env);
++    rx_gen_ldst(sz, RX_MEMORY_LD, cpu_regs[rd], src);
++    tcg_temp_free(src);
++    dc->pc += 2 + id;
++}
++
++static TCGv rx_gen_regindex(int size, int ri, int rb)
++{
++    TCGv ret;
++
++    ret = tcg_temp_local_new();
++    tcg_gen_shli_i32(ret, cpu_regs[ri], size);
++    tcg_gen_add_i32(ret, ret, cpu_regs[rb]);
++    return ret;
++}
++
++/* mov.[bwl] [ri,rb],rd / mov.[bwl] rd,[ri,rb] */
++DEFINE_INSN(mov10_12)
++{
++    TCGv mem;
++    int sz, ri, rb, rn, dir;
++
++    dir = (insn >> 22) & 1;
++    sz = (insn >> 20) & 3;
++    ri = (insn >> 16) & 15;
++    rb = (insn >> 12) & 15;
++    rn = (insn >> 8) & 15;
++
++    mem = rx_gen_regindex(sz, ri, rb);
++    rx_gen_ldst(sz, dir, cpu_regs[rn], mem);
++    tcg_temp_free(mem);
++    dc->pc += 3;
++}
++
++/* mov.[bwl] rs,dsp:[rd] */
++DEFINE_INSN(mov11)
++{
++    int sz, id, rs, rd;
++    TCGv mem;
++
++    sz = (insn >> 28) & 3;
++    id = (insn >> 26) & 3;
++    rd = (insn >> 20) & 15;
++    rs = (insn >> 16) & 15;
++
++    mem = rx_index_addr(id, sz, 2, rd, dc, env);
++    rx_gen_ldst(sz, RX_MEMORY_ST, cpu_regs[rs], mem);
++    tcg_temp_free(mem);
++    dc->pc += 2 + id;
++}
++
++/* mov.[bwl] dsp:[rs],dsp:[rd] */
++DEFINE_INSN(mov13)
++{
++    int sz, rs, rd, ids, idd;
++    TCGv src, dst, val;
++
++    sz = (insn >> 28) & 3;
++    idd = (insn >> 26) & 3;
++    ids = (insn >> 24) & 3;
++    rs = (insn >> 20) & 15;
++    rd = (insn >> 16) & 15;
++
++    src = rx_index_addr(ids, sz, 2, rs, dc, env);
++    dst = rx_index_addr(idd, sz, 2 + ids, rd, dc, env);
++    val = tcg_temp_local_new();
++    rx_gen_ldst(sz, RX_MEMORY_LD, val, src);
++    rx_gen_ldst(sz, RX_MEMORY_ST, val, dst);
++    tcg_temp_free(src);
++    tcg_temp_free(dst);
++    tcg_temp_free(val);
++    dc->pc += 2 + ids + idd;
++}
++
++/* mov.[bwl] rs,[rd+] / mov.[bwl] rs,[-rd] */
++DEFINE_INSN(mov14)
++{
++    int rs, rd, ad, sz;
++    TCGv dst;
++
++    ad = (insn >> 18) & 3;
++    sz = (insn >> 16) & 3;
++    rd = (insn >> 12) & 15;
++    rs = (insn >> 8) & 15;
++
++    dst = tcg_temp_local_new();
++    tcg_gen_mov_i32(dst, cpu_regs[rd]);
++    if (ad == 1) {
++        tcg_gen_subi_i32(dst, dst, 1 << sz);
++    }
++    rx_gen_ldst(sz, RX_MEMORY_ST, cpu_regs[rs], dst);
++    if (ad == 0) {
++        tcg_gen_addi_i32(cpu_regs[rd], cpu_regs[rd], 1 << sz);
++    } else {
++        tcg_gen_mov_i32(cpu_regs[rd], dst);
++    }
++    tcg_temp_free(dst);
++    dc->pc += 3;
++}
++
++/* mov.[bwl] [rs+],rd / mov.[bwl] [-rs],rd */
++DEFINE_INSN(mov15)
++{
++    int rs, rd, ad, sz;
++
++    ad = (insn >> 18) & 3;
++    sz = (insn >> 16) & 3;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    if (ad == 3) {
++        tcg_gen_subi_i32(cpu_regs[rs], cpu_regs[rs], 1 << sz);
++    }
++    rx_gen_ldst(sz, RX_MEMORY_LD, cpu_regs[rd], cpu_regs[rs]);
++    if (ad == 2) {
++        tcg_gen_addi_i32(cpu_regs[rs], cpu_regs[rs], 1 << sz);
++    }
++    dc->pc += 3;
++}
++
++static void rx_gen_ldu(unsigned int sz, TCGv reg, TCGv addr)
++{
++    static void (* const rd[])(TCGv ret, TCGv addr, int idx) = {
++        tcg_gen_qemu_ld8u, tcg_gen_qemu_ld16u, tcg_gen_qemu_ld32u,
++    };
++    g_assert(sz < 3);
++    rd[sz](reg, addr, 0);
++}
++
++/* movu.[bw] dsp5:[rs],rd */
++DEFINE_INSN(movu1)
++{
++    int sz, dsp, rs, rd;
++    TCGv mem;
++
++    mem = tcg_temp_local_new();
++    sz = (insn >> 27) & 1;
++    dsp = ((insn >> 22) & 0x1e) | ((insn >> 19) & 1);
++    rs = (insn >> 20) & 7;
++    rd = (insn >> 16) & 7;
++
++    tcg_gen_addi_i32(mem, cpu_regs[rs], dsp << sz);
++    rx_gen_ldu(sz, cpu_regs[rd], mem);
++    tcg_temp_free(mem);
++    dc->pc += 2;
++}
++
++/* movu.[bw] rs,rd / movu.[bw] dsp:[rs],rd */
++DEFINE_INSN(movu2)
++{
++    int sz, id, rs, rd;
++    TCGv mem;
++    static void (* const ext[])(TCGv ret, TCGv arg) = {
++        tcg_gen_ext8u_i32, tcg_gen_ext16u_i32,
++    };
++
++    sz = (insn >> 26) & 1;
++    id = (insn >> 24) & 3;
++    rs = (insn >> 20) & 15;
++    rd = (insn >> 16) & 15;
++
++    if (id < 3) {
++        mem = rx_index_addr(id, sz, 2, rs, dc, env);
++        rx_gen_ldu(sz, cpu_regs[rd], mem);
++        tcg_temp_free(mem);
++        dc->pc += 2 + id;
++    } else {
++        ext[sz](cpu_regs[rd], cpu_regs[rs]);
++        dc->pc += 2;
++    }
++}
++
++/* movu.[bw] [ri,rb],rd */
++DEFINE_INSN(movu3)
++{
++    TCGv mem;
++    int sz, ri, rb, rd;
++
++    sz = (insn >> 20) & 1;
++    ri = (insn >> 16) & 15;
++    rb = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    mem = rx_gen_regindex(sz, ri, rb);
++    rx_gen_ldu(sz, cpu_regs[rd], mem);
++    tcg_temp_free(mem);
++    dc->pc += 3;
++}
++
++/* movu.[bw] [rs+],rd / movu.[bw] [-rs],rd */
++DEFINE_INSN(movu4)
++{
++    int rs, rd, ad, sz;
++
++    ad = (insn >> 18) & 3;
++    sz = (insn >> 16) & 1;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    if (ad == 3) {
++        tcg_gen_subi_i32(cpu_regs[rs], cpu_regs[rs], 1 << sz);
++    }
++    rx_gen_ldu(sz, cpu_regs[rd], cpu_regs[rs]);
++    if (ad == 2) {
++        tcg_gen_addi_i32(cpu_regs[rs], cpu_regs[rs], 1 << sz);
++    }
++    dc->pc += 3;
++}
++
++/* pop rd */
++DEFINE_INSN(pop)
++{
++    int rd;
++
++    rd = (insn >> 16) & 15;
++    tcg_gen_qemu_ld32u(cpu_regs[rd], cpu_regs[0], 0);
++    if (rd != 0) {
++        tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    }
++    dc->pc += 2;
++}
++
++/* popc rx */
++DEFINE_INSN(popc)
++{
++    TCGv cr, val;
++
++    cr = tcg_const_i32((insn >> 16) & 15);
++    val = tcg_temp_local_new();
++    tcg_gen_qemu_ld32u(val, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    gen_helper_mvtc(cpu_env, cr, val);
++    tcg_temp_free(cr);
++    tcg_temp_free(val);
++    dc->pc += 2;
++}
++
++/* popm rd-rd2 */
++DEFINE_INSN(popm)
++{
++    int rd, rd2, r;
++
++    rd = (insn >> 20) & 15;
++    rd2 = (insn >> 16) & 15;
++
++    for (r = rd; r <= rd2; r++) {
++        tcg_gen_qemu_ld32u(cpu_regs[r], cpu_regs[0], 0);
++        tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    }
++    dc->pc += 2;
++}
++
++/* push rs */
++DEFINE_INSN(push1)
++{
++    TCGv tmp;
++    int rs;
++
++    rs = (insn >> 16) & 15;
++    tmp = tcg_temp_local_new();
++    tcg_gen_mov_i32(tmp, cpu_regs[rs]);
++    tcg_gen_subi_i32(cpu_regs[0], cpu_regs[0], 4);
++    tcg_gen_qemu_st32(tmp, cpu_regs[0], 0);
++    tcg_temp_free(tmp);
++    dc->pc += 2;
++}
++
++/* push rs */
++DEFINE_INSN(push2)
++{
++    TCGv tmp, mem;
++    int id, sz, rs;
++
++    id = (insn >> 24) & 3;
++    rs = (insn >> 20) & 15;
++    sz = (insn >> 16) & 3;
++    tmp = tcg_temp_local_new();
++    mem = rx_index_addr(id, sz, 2, rs, dc, env);
++    rx_gen_ldst(sz, RX_MEMORY_LD, tmp, mem);
++    tcg_gen_subi_i32(cpu_regs[0], cpu_regs[0], 4);
++    tcg_gen_qemu_st32(tmp, cpu_regs[0], 0);
++    tcg_temp_free(tmp);
++    tcg_temp_free(mem);
++    dc->pc += 2 + id;
++}
++
++/* pushc rx */
++DEFINE_INSN(pushc)
++{
++    TCGv cr, val;
++
++    cr = tcg_const_i32((insn >> 16) & 15);
++    val = tcg_temp_local_new();
++    gen_helper_mvfc(val, cpu_env, cr);
++    tcg_gen_subi_i32(cpu_regs[0], cpu_regs[0], 4);
++    tcg_gen_qemu_st32(val, cpu_regs[0], 0);
++    tcg_temp_free(cr);
++    tcg_temp_free(val);
++    dc->pc += 2;
++}
++
++    /* pushm */
++DEFINE_INSN(pushm)
++{
++    int rs, rs2, r;
++
++    rs = (insn >> 20) & 15;
++    rs2 = (insn >> 16) & 15;
++
++    for (r = rs2; r >= rs; r--) {
++        tcg_gen_subi_i32(cpu_regs[0], cpu_regs[0], 4);
++        tcg_gen_qemu_st32(cpu_regs[r], cpu_regs[0], 0);
++    }
++    dc->pc += 2;
++}
++
++/* revl rs, rd */
++DEFINE_INSN(revl)
++{
++    int rs, rd;
++    TCGv t0, t1;
++
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    t0 = tcg_temp_local_new();
++    t1 = tcg_temp_local_new();
++    tcg_gen_rotri_i32(t0, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t1, t0, 0xff000000);
++    tcg_gen_shli_i32(t0, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t0, t0, 0x00ff0000);
++    tcg_gen_or_i32(t1, t1, t0);
++    tcg_gen_shri_i32(t0, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t0, t0, 0x0000ff00);
++    tcg_gen_or_i32(t1, t1, t0);
++    tcg_gen_rotli_i32(t0, cpu_regs[rs], 8);
++    tcg_gen_ext8u_i32(t0, t0);
++    tcg_gen_or_i32(cpu_regs[rd], t1, t0);
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    dc->pc += 3;
++}
++
++/* revw rs, rd */
++DEFINE_INSN(revw)
++{
++    int rs, rd;
++    TCGv t0, t1, t2;
++
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    t0 = tcg_temp_local_new();
++    t1 = tcg_temp_local_new();
++    t2 = tcg_temp_local_new();
++    tcg_gen_ext8u_i32(t0, cpu_regs[rs]);
++    tcg_gen_shli_i32(t0, t0, 8);
++    tcg_gen_shri_i32(t1, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t1, t1, 0x000000ff);
++    tcg_gen_or_i32(t2, t0, t1);
++    tcg_gen_shli_i32(t0, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t0, t0, 0xff000000);
++    tcg_gen_shri_i32(t1, cpu_regs[rs], 8);
++    tcg_gen_andi_i32(t1, t1, 0x00ff0000);
++    tcg_gen_or_i32(t0, t0, t1);
++    tcg_gen_or_i32(cpu_regs[rd], t2, t0);
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(t2);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(sccnd)
++{
++    int sz, id, rd;
++    TCGv result, cd;
++    TCGv mem;
++    sz = (insn >> 18) & 3;
++    id = (insn >> 16) & 3;
++    rd = (insn >> 12) & 15;
++    cd = tcg_const_local_i32((insn >> 8) & 15);
++    result = tcg_temp_local_new();
++
++    gen_helper_cond(result, cpu_env, cd);
++    if (id < 3) {
++        mem = rx_index_addr(sz, id, 3, rd, dc, env);
++        rx_gen_ldst(sz, RX_MEMORY_ST, result, mem);
++        tcg_temp_free(mem);
++        dc->pc += 3 + id;
++    } else {
++        tcg_gen_mov_i32(cpu_regs[rd], result);
++        dc->pc += 3;
++    }
++    tcg_temp_free(result);
++    tcg_temp_free(cd);
++}
++
++/* stz #imm,rd / stnz #imm,rd */
++DEFINE_INSN(stz)
++{
++    int rd, li;
++    uint32_t imm;
++    TCGv zero, _imm, cond, result;
++    li = (insn >> 18) & 3;
++    cond = tcg_const_local_i32((insn >> 12) & 1);
++    rd = (insn >> 8) & 15;
++    result = tcg_temp_local_new();
++    dc->pc = rx_load_simm(env, dc->pc + 3, li, &imm);
++    _imm = tcg_const_local_i32(imm);
++    gen_helper_cond(result, cpu_env, cond);
++    zero = tcg_const_local_i32(0);
++    tcg_gen_movcond_i32(TCG_COND_NE, cpu_regs[rd],
++                        result, zero, _imm, cpu_regs[rd]);
++    tcg_temp_free(zero);
++    tcg_temp_free(_imm);
++    tcg_temp_free(cond);
++    tcg_temp_free(result);
++}
++
++DEFINE_INSN(xchg1)
++{
++    int id, rs, rd;
++    TCGv tmp, mem;
++
++    id = (insn >> 16) & 3;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    tmp = tcg_temp_local_new();
++    if (id == 3) {
++        tcg_gen_mov_i32(tmp, cpu_regs[rs]);
++        tcg_gen_mov_i32(cpu_regs[rs], cpu_regs[rd]);
++        tcg_gen_mov_i32(cpu_regs[rd], tmp);
++        dc->pc += 3;
++    } else {
++        mem = rx_index_addr(id, RX_MEMORY_BYTE, 3, rs, dc, env);
++        rx_gen_ldu(RX_MEMORY_BYTE, tmp, mem);
++        rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, cpu_regs[rd], mem);
++        tcg_gen_mov_i32(cpu_regs[rd], tmp);
++        dc->pc += 3 + id;
++        tcg_temp_free(mem);
++    }
++    tcg_temp_free(tmp);
++}
++
++DEFINE_INSN(xchg2)
++{
++    int id, rs, rd, sz, mi;
++    TCGv tmp, mem;
++
++    mi = (insn >> 22) & 3;
++    id = (insn >> 16) & 3;
++    rs = (insn >> 4) & 15;
++    rd = insn & 15;
++    sz = (mi < 3) ? mi : RX_MEMORY_WORD;
++
++    tmp = tcg_temp_local_new();
++    mem = rx_index_addr(id, sz, 4, rs, dc, env);
++    if (mi == 3) {
++        rx_gen_ldu(RX_MEMORY_WORD, tmp, mem);
++    } else {
++        rx_gen_ldst(sz, RX_MEMORY_LD, tmp, mem);
++    }
++    rx_gen_ldst(sz, RX_MEMORY_ST, cpu_regs[rd], mem);
++    tcg_gen_mov_i32(cpu_regs[rd], tmp);
++    dc->pc += 4 + id;
++    tcg_temp_free(mem);
++    tcg_temp_free(tmp);
++}
++
++static void rx_gen_logic(int opr, TCGv ret, TCGv r1, TCGv r2)
++{
++    static void (*fn[])(TCGv ret, TCGv arg1, TCGv arg2) = {
++        tcg_gen_and_i32,
++        tcg_gen_or_i32,
++        tcg_gen_xor_i32,
++        tcg_gen_and_i32,
++    };
++    fn[opr](ccop.op_r[RX_PSW_OP_LOGIC], r1, r2);
++    SET_MODE_ZS(RX_PSW_OP_LOGIC);
++    if (opr < 3) {
++        tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_LOGIC]);
++    }
++}
++
++DEFINE_INSN(nop)
++{
++    dc->pc += 1;
++}
++
++static void rx_gen_logici(int opr, TCGv ret, TCGv r1, uint32_t imm)
++{
++    static void (*fn[])(TCGv ret, TCGv arg1, int arg2) = {
++        tcg_gen_andi_i32,
++        tcg_gen_ori_i32,
++        tcg_gen_xori_i32,
++        tcg_gen_andi_i32,
++    };
++    fn[opr](ccop.op_r[RX_PSW_OP_LOGIC], r1, imm);
++    SET_MODE_ZS(RX_PSW_OP_LOGIC);
++    if (opr < 3) {
++        tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_LOGIC]);
++    }
++}
++
++#define UIMM4OP(opmask,  operation_fn)                          \
++    do {                                                        \
++        int op, rd;                                             \
++        uint32_t imm;                                           \
++        op = (insn >> 24) & opmask;                             \
++        imm = (insn >> 20) & 15;                                \
++        rd = (insn >> 16) & 15;                                 \
++        operation_fn(op, cpu_regs[rd], cpu_regs[rd], imm);      \
++        dc->pc += 2;                                            \
++    } while (0)
++
++
++/* and #uimm:4,rd / or #uimm:4,rd */
++DEFINE_INSN(logic_op1)
++{
++    UIMM4OP(1, rx_gen_logici);
++}
++
++#define SIMMOP_S(operation_fn)                                          \
++    do {                                                                \
++        int op, rd, li;                                                 \
++        uint32_t imm;                                                   \
++        li = (insn >> 24) & 3;                                          \
++        op = (insn >> 20) & 1;                                          \
++        rd = (insn >> 16) & 15;                                         \
++        dc->pc = rx_load_simm(env, dc->pc + 2, li, &imm);     \
++        operation_fn;                                                   \
++    } while (0)
++
++#define SIMMOP_L(operation_fn)                                          \
++    do {                                                                \
++        int op, rd, li;                                                 \
++        uint32_t imm;                                                   \
++        li = (insn >> 18) & 3;                                          \
++        op = (insn >> 12) & 1;                                          \
++        rd = (insn >> 8) & 15;                                          \
++        dc->pc = rx_load_simm(env, dc->pc + 3, li, &imm);               \
++        operation_fn;                                                   \
++    } while (0)
++
++/* and #imm, rd / or #imm,rd / xor #imm,rd / tst #imm,rd */
++DEFINE_INSN(logic_op2)
++{
++    if ((insn & 0xfc000000) == 0x74000000) {
++        /* and / or */
++        SIMMOP_S(rx_gen_logici(op, cpu_regs[rd], cpu_regs[rd], imm));
++    } else if ((insn & 0x0000e000) == 0x0000c000) {
++        /* xor / tst */
++        SIMMOP_L(rx_gen_logici(3 - op, cpu_regs[rd], cpu_regs[rd], imm));
++    } else
++        g_assert_not_reached();
++
++}
++
++#define MEMOP1_S(opmask, operation_fn)                                  \
++    do {                                                                \
++        int op, id, rs, rd;                                             \
++        TCGv mem, val;                                                  \
++        op = (insn >> 26) & opmask;                                     \
++        id = (insn >> 24) & 3;                                          \
++        rs = (insn >> 20) & 15;                                         \
++        rd = (insn >> 16) & 15;                                         \
++        if (id == 3) {                                                  \
++            operation_fn(op, cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]); \
++            dc->pc += 2;                                                \
++        } else {                                                        \
++            mem = rx_index_addr(id, RX_MEMORY_BYTE, 2, rs, dc, env);    \
++            val = tcg_temp_local_new();                                 \
++            rx_gen_ldu(RX_MEMORY_BYTE, val, mem);                       \
++            operation_fn(op, cpu_regs[rd], cpu_regs[rd], val);          \
++            tcg_temp_free(mem);                                         \
++            tcg_temp_free(val);                                         \
++            dc->pc += 2 + id;                                           \
++        }                                                               \
++    } while (0)
++
++#define MEMOP1_L(operation_fn_reg, operation_fn_mem)                    \
++    do {                                                                \
++        int op, id, rs, rd;                                             \
++        TCGv mem, val;                                                  \
++        op = (insn >> 18) & 1;                                          \
++        id = (insn >> 16) & 3;                                          \
++        rs = (insn >> 12) & 15;                                         \
++        rd = (insn >> 8) & 15;                                          \
++        if (id == 3) {                                                  \
++            operation_fn_reg;                                           \
++            dc->pc += 3;                                                \
++        } else {                                                        \
++            mem = rx_index_addr(id, 1, 3, rs, dc, env);                 \
++            val = tcg_temp_local_new();                                 \
++            rx_gen_ldu(RX_MEMORY_BYTE, val, mem);                       \
++            operation_fn_mem;                                           \
++            tcg_temp_free(mem);                                         \
++            tcg_temp_free(val);                                         \
++            dc->pc += 3 + id;                                           \
++        }                                                               \
++    } while (0)
++
++#define MEMOP2_S(opmask, operation_fn)                          \
++    do {                                                        \
++        int op, mi, id, rs, rd, size;                           \
++        TCGv mem, val;                                          \
++        mi = (insn >> 22) & 3;                                  \
++        op = (insn >> 18) & opmask;                             \
++        id = (insn >> 16) & 3;                                  \
++        rs = (insn >> 12) & 15;                                 \
++        rd = (insn >> 8) & 15;                                  \
++        size = (mi == 3) ? RX_MEMORY_WORD : mi;                 \
++        mem = rx_index_addr(id, size, 3, rs, dc, env);          \
++        val = tcg_temp_local_new();                             \
++        if (mi != 3)                                            \
++            rx_gen_ldst(size, RX_MEMORY_LD, val, mem);          \
++        else                                                    \
++            rx_gen_ldu(RX_MEMORY_WORD, val, mem);               \
++        operation_fn(op, cpu_regs[rd], cpu_regs[rd], val);      \
++        tcg_temp_free(mem);                                     \
++        tcg_temp_free(val);                                     \
++        dc->pc += 3 + id;                                       \
++    } while (0)
++
++#define MEMOP2_L(operation_fn)                                  \
++    do {                                                        \
++        int op, mi, id, rs, rd, size;                           \
++        TCGv mem, val;                                          \
++        mi = (insn >> 22) & 3;                                  \
++        id = (insn >> 16) & 3;                                  \
++        op = (insn >> 8) & 1;                                   \
++        rs = (insn >> 4) & 15;                                  \
++        rd = insn & 15;                                         \
++        size = (mi == 3) ? RX_MEMORY_WORD : mi;                 \
++        mem = rx_index_addr(id, size, 4, rs, dc, env);          \
++        val = tcg_temp_local_new();                             \
++        if (mi != 3)                                            \
++            rx_gen_ldst(size, RX_MEMORY_LD, val, mem);          \
++        else                                                    \
++            rx_gen_ldu(RX_MEMORY_WORD, val, mem);               \
++        operation_fn;                                           \
++        tcg_temp_free(mem);                                     \
++        tcg_temp_free(val);                                     \
++        dc->pc += 4 + id;                                       \
++    } while (0)
++
++/* and rs, rd / or rs,rd / xor rs,rd / tst rs,rd */
++/* and [rs].ub, rd / or [rs].ub,rd / xor [rs].ub,rd / tst [rs].ub,rd */
++DEFINE_INSN(logic_op3)
++{
++
++    if ((insn & 0xff000000) == 0xfc000000) {
++        /* xor / tst */
++        MEMOP1_L(rx_gen_logic(3 - op, cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]),
++                 rx_gen_logic(3 - op, cpu_regs[rd], cpu_regs[rd], mem));
++    } else if ((insn & 0xf0000000) == 0x50000000) {
++        /* and / or */
++        MEMOP1_S(1, rx_gen_logic);
++    } else
++        g_assert_not_reached();
++}
++
++/* and [rs],rd / or [rs],rd / xor [rs],rd / tst [rs],rd */
++DEFINE_INSN(logic_op4)
++{
++    if ((insn & 0x00300000) == 0x00200000) {
++        /* xor / tst */
++        MEMOP2_L(rx_gen_logic(3 - op, cpu_regs[rd], cpu_regs[rd], val));
++    } else if ((insn & 0x00300000) == 0x00100000) {
++        MEMOP2_S(3, rx_gen_logic);
++    } else
++        g_assert_not_reached();
++}
++
++#define OP3(opmask, operation_fn)                                       \
++    do {                                                                \
++        int op, rs, rs2, rd;                                            \
++        op = (insn >> 20) & opmask;                                     \
++        rd = (insn >> 16) & 15;                                         \
++        rs = (insn >> 12) & 15;                                         \
++        rs2 = (insn >> 8) & 15;                                         \
++        operation_fn(op, cpu_regs[rd], cpu_regs[rs2], cpu_regs[rs]);    \
++        dc->pc += 3;                                                    \
++    } while (0)
++
++/* and rs,rs2,rd / or rs,rs2,rd */
++DEFINE_INSN(logic_op5)
++{
++    OP3(1, rx_gen_logic);
++}
++
++#define UPDATE_ALITH_CCOP(mode, arg1, arg2, ret)                   \
++    do {                                                                \
++        tcg_gen_mov_i32(ccop.op_a1[mode], arg1);                   \
++        tcg_gen_mov_i32(ccop.op_a2[mode], arg2);                   \
++        tcg_gen_mov_i32(ccop.op_r[mode], ret);                     \
++        SET_MODE_CZSO(mode);                                   \
++    } while (0)
++
++#define UPDATE_ALITHIMM_CCOP(mode, arg1, arg2, ret)                 \
++    do {                                                                \
++        tcg_gen_mov_i32(ccop.op_a1[mode], arg1);                   \
++        tcg_gen_movi_i32(ccop.op_a2[mode], arg2);                  \
++        tcg_gen_mov_i32(ccop.op_r[mode], ret);                     \
++        SET_MODE_CZSO(mode);                                   \
++    } while (0)
++
++static void rx_gen_sbb_i32(TCGv ret, TCGv arg1, TCGv arg2)
++{
++    TCGv invc;
++
++    invc = tcg_temp_local_new();
++    gen_helper_psw_c(invc, cpu_env);
++    tcg_gen_xori_i32(invc, invc, 1);
++    tcg_gen_sub_i32(ret, arg1, arg2);
++    tcg_gen_sub_i32(ret, ret, invc);
++    UPDATE_ALITH_CCOP(RX_PSW_OP_SUB, arg1, arg2, ret);
++    tcg_temp_free(invc);
++}
++
++static void rx_gen_adc_i32(TCGv ret, TCGv arg1, TCGv arg2)
++{
++    TCGv c;
++    c = tcg_temp_local_new();
++    gen_helper_psw_c(c, cpu_env);
++    tcg_gen_add_i32(ret, arg1, arg2);
++    tcg_gen_add_i32(ret, ret, c);
++    UPDATE_ALITH_CCOP(RX_PSW_OP_ADD, arg1, arg2, ret);
++    tcg_temp_free(c);
++}
++
++static void rx_gen_sbbi_i32(TCGv ret, TCGv arg1, int arg2)
++{
++    TCGv invc;
++
++    invc = tcg_temp_local_new();
++    gen_helper_psw_c(invc, cpu_env);
++    tcg_gen_xori_i32(invc, invc, 1);
++    tcg_gen_subi_i32(ret, arg1, arg2);
++    tcg_gen_sub_i32(ret, ret, invc);
++    UPDATE_ALITHIMM_CCOP(RX_PSW_OP_SUB, arg1, arg2, ret);
++    tcg_temp_free(invc);
++}
++
++static void rx_gen_adci_i32(TCGv ret, TCGv arg1, int arg2)
++{
++    TCGv c;
++    c = tcg_temp_local_new();
++    gen_helper_psw_c(c, cpu_env);
++    tcg_gen_addi_i32(ret, arg1, arg2);
++    tcg_gen_add_i32(ret, ret, c);
++    UPDATE_ALITHIMM_CCOP(RX_PSW_OP_ADD, arg1, arg2, ret);
++    tcg_temp_free(c);
++}
++
++static void rx_alith_op(int opr, TCGv ret, TCGv r1, TCGv r2)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1, TCGv arg2) = {
++        tcg_gen_sub_i32,
++        tcg_gen_sub_i32,
++        tcg_gen_add_i32,
++        rx_gen_sbb_i32,
++        rx_gen_adc_i32,
++    };
++    static const int opmodes[] = {RX_PSW_OP_SUB, RX_PSW_OP_SUB, RX_PSW_OP_ADD,
++                                  RX_PSW_OP_SUB, RX_PSW_OP_ADD};
++    int opmode = opmodes[opr];
++    fn[opr](ccop.op_r[opmode], r1, r2);
++    if (opr != RX_OP_CMP) {
++        tcg_gen_mov_i32(ret, ccop.op_r[opmode]);
++    }
++    tcg_gen_mov_i32(ccop.op_a1[opmode], r1);
++    tcg_gen_mov_i32(ccop.op_a2[opmode], r2);
++    SET_MODE_CZSO(opmode);
++}
++
++static void rx_alith_imm_op(int opr, TCGv ret, TCGv r1, uint32_t imm)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1, int arg2) = {
++        tcg_gen_subi_i32,
++        tcg_gen_subi_i32,
++        tcg_gen_addi_i32,
++        rx_gen_sbbi_i32,
++        rx_gen_adci_i32,
++    };
++    static const int opmodes[] = {RX_PSW_OP_SUB, RX_PSW_OP_SUB, RX_PSW_OP_ADD,
++                                  RX_PSW_OP_SUB, RX_PSW_OP_ADD};
++    int opmode = opmodes[opr];
++    fn[opr](ccop.op_r[opmode], r1, imm);
++    if (opr != RX_OP_CMP) {
++        tcg_gen_mov_i32(ret, ccop.op_r[opmode]);
++    }
++    tcg_gen_mov_i32(ccop.op_a1[opmode], r1);
++    tcg_gen_movi_i32(ccop.op_a2[opmode], imm);
++    SET_MODE_CZSO(opmode);
++}
++
++DEFINE_INSN(addsub1)
++{
++    UIMM4OP(3, rx_alith_imm_op);
++}
++
++DEFINE_INSN(addsub2)
++{
++    MEMOP1_S(3, rx_alith_op);
++}
++
++DEFINE_INSN(addsub3)
++{
++    MEMOP2_S(3, rx_alith_op);
++}
++
++DEFINE_INSN(add4)
++{
++    /* Can't use UIMM4OP */
++    int rs, rd, li;
++    uint32_t imm;
++    li = (insn >> 24) & 3;
++    rs = (insn >> 20) & 15;
++    rd = (insn >> 16) & 15;
++    dc->pc = rx_load_simm(env, dc->pc + 2, li, &imm);
++    rx_alith_imm_op(RX_OP_ADD, cpu_regs[rd], cpu_regs[rs], imm);
++}
++
++DEFINE_INSN(addsub5)
++{
++    OP3(3, rx_alith_op);
++}
++
++DEFINE_INSN(cmp2)
++{
++    int rd;
++    uint32_t imm;
++
++    rd = (insn >> 16) & 15;
++    imm = (insn >> 8) & 0xff;
++
++    rx_alith_imm_op(RX_OP_CMP, cpu_regs[rd], cpu_regs[rd], imm);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(cmp3)
++{
++    int li, rd;
++    uint32_t imm;
++
++    li = (insn >> 24) & 3;
++    rd = (insn >> 16) & 15;
++
++    dc->pc = rx_load_simm(env, dc->pc + 2, li, &imm);
++    rx_alith_imm_op(RX_OP_CMP, cpu_regs[rd], cpu_regs[rd], imm);
++}
++
++DEFINE_INSN(cmp4)
++{
++    MEMOP1_S(3, rx_alith_op);
++}
++
++DEFINE_INSN(cmp5)
++{
++    MEMOP2_S(3, rx_alith_op);
++}
++
++DEFINE_INSN(adc1)
++{
++    SIMMOP_L(rx_alith_imm_op(op = RX_OP_ADC, cpu_regs[rd], cpu_regs[rd], imm));
++}
++
++DEFINE_INSN(adc2sbb1)
++{
++    int op, rs, rd;
++
++    op = (insn >> 19) & 1;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++
++    rx_alith_op(RX_OP_SBB + op, cpu_regs[rd], cpu_regs[rs], cpu_regs[rd]);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(adc3sbb2)
++{
++    int op, id, rs, rd;
++    TCGv mem;
++    TCGv val;
++
++    val = tcg_temp_local_new();
++    id = (insn >> 16) & 3;
++    op = (insn >> 9) & 1;
++    rs = (insn >> 4) & 15;
++    rd = insn & 15;
++
++    mem = rx_index_addr(id, RX_MEMORY_LONG, 4, rs, dc, env);
++    rx_gen_ldst(RX_MEMORY_LONG, RX_MEMORY_LD, val, mem);
++
++    rx_alith_op(RX_OP_SBB + op, cpu_regs[rd], val, cpu_regs[rd]);
++    tcg_temp_free(mem);
++    tcg_temp_free(val);
++    dc->pc += 4 + id;
++}
++
++static void rx_gen_abs(TCGv ret, TCGv arg1)
++{
++    TCGLabel *l1 = gen_new_label();
++    TCGLabel *l2 = gen_new_label();
++
++    tcg_gen_brcondi_i32(TCG_COND_GE, arg1, 0, l1);
++    tcg_gen_neg_i32(ret, arg1);
++    tcg_gen_br(l2);
++    gen_set_label(l1);
++    tcg_gen_mov_i32(ret, arg1);
++    gen_set_label(l2);
++    tcg_gen_mov_i32(ccop.op_a1[RX_PSW_OP_ABS], arg1);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_ABS], ret);
++    SET_MODE_ZSO(RX_PSW_OP_ABS);
++}
++
++static void rx_gen_neg(TCGv ret, TCGv arg1)
++{
++    tcg_gen_neg_i32(ret, arg1);
++    tcg_gen_mov_i32(ccop.op_a1[RX_PSW_OP_ABS], arg1);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_ABS], ret);
++    SET_MODE_ZSO(RX_PSW_OP_ABS);
++}
++
++static void rx_gen_not(TCGv ret, TCGv arg1)
++{
++    tcg_gen_not_i32(ret, arg1);
++    tcg_gen_mov_i32(ccop.op_a1[RX_PSW_OP_LOGIC], arg1);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_LOGIC], ret);
++    SET_MODE_ZS(RX_PSW_OP_LOGIC);
++}
++
++DEFINE_INSN(absnegnot1)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1) = {
++        rx_gen_not,
++        rx_gen_neg,
++        rx_gen_abs,
++    };
++    int op, rd;
++    op = (insn >> 20) & 3;
++    rd = (insn >> 16) & 15;
++    fn[op](cpu_regs[rd], cpu_regs[rd]);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(absnegnot2)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1) = {
++        rx_gen_neg,
++        rx_gen_not,
++        rx_gen_abs,
++    };
++    int op, rs, rd;
++    op = ((insn >> 18) & 3) - 1;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++    if (op == -1) {
++        rx_alith_op(RX_OP_SBB, cpu_regs[rd], cpu_regs[rs], cpu_regs[rd]);
++    } else {
++        fn[op](cpu_regs[rd], cpu_regs[rs]);
++    }
++    dc->pc += 3;
++}
++
++static void rx_mul_imm_op(int op, TCGv ret, TCGv arg1, int arg2)
++{
++    tcg_gen_muli_i32(ret, arg1, arg2);
++}
++
++static void rx_mul_op(int op, TCGv ret, TCGv arg1, TCGv arg2)
++{
++    tcg_gen_mul_i32(ret, arg1, arg2);
++}
++
++DEFINE_INSN(mul1)
++{
++    UIMM4OP(3, rx_mul_imm_op);
++}
++
++DEFINE_INSN(mul2)
++{
++    SIMMOP_S(rx_mul_imm_op(op = RX_OP_MUL, cpu_regs[rd], cpu_regs[rd], imm));
++}
++
++DEFINE_INSN(mul3)
++{
++    MEMOP1_S(3, rx_mul_op);
++}
++
++DEFINE_INSN(mul4)
++{
++    MEMOP2_S(3, rx_mul_op);
++}
++
++DEFINE_INSN(mul5)
++{
++    OP3(3, rx_mul_op);
++}
++
++static void rx_div_imm_op(int op, TCGv ret, TCGv arg1, int arg2)
++{
++    static void (*fn[])(TCGv ret, TCGv arg1, TCGv arg2) = {
++        tcg_gen_div_i32, tcg_gen_divu_i32,
++    };
++    TCGv _arg2 = tcg_const_local_i32(arg2);
++    if (arg2) {
++        fn[op](ret, arg1, _arg2);
++        tcg_gen_mov_i32(ccop.op_a1[RX_PSW_OP_DIV], arg1);
++        tcg_gen_movi_i32(ccop.op_a2[RX_PSW_OP_DIV], arg2);
++        tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_DIV], ret);
++        SET_MODE_O(RX_PSW_OP_DIV);
++    }
++    tcg_temp_free(_arg2);
++}
++
++static void rx_div_op(int op, TCGv ret, TCGv arg1, TCGv arg2)
++{
++    static void (*fn[])(TCGv ret, TCGv arg1, TCGv arg2) = {
++        tcg_gen_div_i32, tcg_gen_divu_i32,
++    };
++    TCGLabel *l1 = gen_new_label();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, arg2, 0, l1);
++    fn[op](ret, arg1, arg2);
++    tcg_gen_mov_i32(ccop.op_a1[RX_PSW_OP_DIV], arg1);
++    tcg_gen_mov_i32(ccop.op_a2[RX_PSW_OP_DIV], arg2);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_DIV], ret);
++    SET_MODE_O(RX_PSW_OP_DIV);
++    gen_set_label(l1);
++}
++
++DEFINE_INSN(div1)
++{
++    int divop = (insn >> 12) & 1;
++    SIMMOP_L(rx_div_imm_op(op = divop, cpu_regs[rd], cpu_regs[rd], imm));
++}
++
++DEFINE_INSN(div2)
++{
++    MEMOP1_L(rx_div_op(op, cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]),
++             rx_div_op(op, cpu_regs[rd], cpu_regs[rd], val));
++}
++
++DEFINE_INSN(div3)
++{
++    MEMOP2_L(rx_div_op(op, cpu_regs[rd], cpu_regs[rd], val));
++}
++
++static void rx_emul_imm_op(int op, TCGv rl, TCGv rh, TCGv arg1, int arg2)
++{
++    static void (*fn[])(TCGv rl, TCGv rh, TCGv arg1, TCGv arg2) = {
++        tcg_gen_muls2_i32, tcg_gen_mulu2_i32,
++    };
++    TCGv _arg2 = tcg_const_local_i32(arg2);
++    fn[op](rl, rh, arg1, _arg2);
++    tcg_temp_free(_arg2);
++}
++
++static void rx_emul_op(int op, TCGv rl, TCGv rh, TCGv arg1, TCGv
++                       arg2)
++{
++    static void (* const fn[])(TCGv rl, TCGv rh, TCGv arg1, TCGv arg2) = {
++        tcg_gen_muls2_i32, tcg_gen_mulu2_i32,
++    };
++    fn[op](rl, rh, arg1, arg2);
++}
++
++DEFINE_INSN(emul1)
++{
++    SIMMOP_L(rx_emul_imm_op(op, cpu_regs[rd], cpu_regs[rd + 1],
++                            cpu_regs[rd], imm));
++}
++
++DEFINE_INSN(emul2)
++{
++    MEMOP1_L(rx_emul_op(op, cpu_regs[rd], cpu_regs[rd + 1],
++                        cpu_regs[rd], cpu_regs[rs]),
++             rx_emul_op(op, cpu_regs[rd], cpu_regs[rd + 1],
++                        cpu_regs[rd], val));
++}
++
++DEFINE_INSN(emul3)
++{
++    MEMOP2_L(rx_emul_op(op, cpu_regs[rd], cpu_regs[rd + 1],
++                        cpu_regs[rd], val));
++}
++
++static void rx_minmax_imm_op(int op, TCGv ret, TCGv arg1, int arg2)
++{
++    static const TCGCond cond[] = {TCG_COND_GT, TCG_COND_LT};
++    TCGv _arg2 = tcg_const_local_i32(arg2);
++    tcg_gen_movcond_i32(cond[op], ret, arg1, _arg2, arg1, _arg2);
++    tcg_temp_free(_arg2);
++}
++
++static void rx_minmax_op(int op, TCGv ret, TCGv arg1, TCGv arg2)
++{
++    static const TCGCond cond[] = {TCG_COND_GT, TCG_COND_LT};
++    tcg_gen_movcond_i32(cond[op], ret, arg1, arg2, arg1, arg2);
++}
++
++DEFINE_INSN(minmax1)
++{
++    SIMMOP_L(rx_minmax_imm_op(op, cpu_regs[rd], cpu_regs[rd], imm));
++}
++
++DEFINE_INSN(minmax2)
++{
++    MEMOP1_L(rx_minmax_op(op, cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]),
++             rx_minmax_op(op, cpu_regs[rd], cpu_regs[rd], mem));
++}
++
++DEFINE_INSN(minmax3)
++{
++    MEMOP2_L(rx_minmax_op(op, cpu_regs[rd], cpu_regs[rd], mem));
++}
++
++static void rx_shlri(TCGv ret, TCGv arg1, int arg2)
++{
++    if (arg2) {
++        tcg_gen_shri_i32(ccop.op_r[RX_PSW_OP_SHLR], arg1, arg2 - 1);
++        tcg_gen_andi_i32(ccop.op_a1[RX_PSW_OP_SHLR],
++                         ccop.op_r[RX_PSW_OP_SHLR], 0x00000001);
++        tcg_gen_shri_i32(ccop.op_r[RX_PSW_OP_SHLR],
++                         ccop.op_r[RX_PSW_OP_SHLR], 1);
++        tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_SHLR]);
++        SET_MODE_CZS(RX_PSW_OP_SHLR);
++    }
++}
++
++static void rx_shari(TCGv ret, TCGv arg1, int arg2)
++{
++    if (arg2) {
++        tcg_gen_sari_i32(ccop.op_r[RX_PSW_OP_SHAR], arg1, arg2 - 1);
++        tcg_gen_andi_i32(ccop.op_a1[RX_PSW_OP_SHAR],
++                         ccop.op_r[RX_PSW_OP_SHAR], 0x00000001);
++        tcg_gen_sari_i32(ccop.op_r[RX_PSW_OP_SHAR],
++                         ccop.op_r[RX_PSW_OP_SHAR], 1);
++        tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_SHAR]);
++        SET_MODE_CZSO(RX_PSW_OP_SHAR);
++    }
++}
++
++static void rx_shlli(TCGv ret, TCGv arg1, int arg2)
++{
++    if (arg2) {
++        tcg_gen_shri_i32(ccop.op_a1[RX_PSW_OP_SHLL], arg1, 32 - arg2);
++        tcg_gen_mov_i32(ccop.op_a2[RX_PSW_OP_SHLL], arg1);
++        tcg_gen_shli_i32(ret, arg1, arg2);
++        tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_SHLL], ret);
++        SET_MODE_CZSO(RX_PSW_OP_SHLL);
++    }
++}
++
++static void rx_shlr(TCGv ret, TCGv arg1, TCGv arg2)
++{
++    TCGv t0;
++    TCGLabel *l1;
++    t0 = tcg_temp_local_new();
++    l1 = gen_new_label();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, arg2, 0, l1);
++    tcg_gen_subi_i32(t0, arg2, 1);
++    tcg_gen_shr_i32(ccop.op_r[RX_PSW_OP_SHLR], arg1, t0);
++    tcg_gen_andi_i32(ccop.op_a1[RX_PSW_OP_SHLR],
++                     ccop.op_r[RX_PSW_OP_SHLR], 0x00000001);
++    tcg_gen_shri_i32(ccop.op_r[RX_PSW_OP_SHLR],
++                     ccop.op_r[RX_PSW_OP_SHLR], 1);
++    tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_SHLR]);
++    gen_set_label(l1);
++    tcg_temp_free(t0);
++}
++
++static void rx_shar(TCGv ret, TCGv arg1, TCGv arg2)
++{
++    TCGv t0;
++    TCGLabel *l1;
++    t0 = tcg_temp_local_new();
++    l1 = gen_new_label();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, arg2, 0, l1);
++    tcg_gen_subi_i32(t0, arg2, 1);
++    tcg_gen_sar_i32(ccop.op_r[RX_PSW_OP_SHAR], arg1, t0);
++    tcg_gen_andi_i32(ccop.op_a1[RX_PSW_OP_SHAR],
++                     ccop.op_r[RX_PSW_OP_SHAR], 0x00000001);
++    tcg_gen_sari_i32(ccop.op_r[RX_PSW_OP_SHAR],
++                     ccop.op_r[RX_PSW_OP_SHAR], 1);
++    tcg_gen_mov_i32(ret, ccop.op_r[RX_PSW_OP_SHAR]);
++    gen_set_label(l1);
++    tcg_temp_free(t0);
++}
++
++static void rx_shll(TCGv ret, TCGv arg1, TCGv arg2)
++{
++    TCGv t0;
++    TCGLabel *l1;
++    t0 = tcg_temp_local_new();
++    l1 = gen_new_label();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, arg2, 0, l1);
++    tcg_gen_movi_i32(t0, 32);
++    tcg_gen_sub_i32(t0, t0, arg2);
++    tcg_gen_shr_i32(ccop.op_a1[RX_PSW_OP_SHLL], arg1, t0);
++    tcg_gen_mov_i32(ccop.op_a2[RX_PSW_OP_SHLL], arg1);
++    tcg_gen_shl_i32(ret, arg1, arg2);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_SHLL], ret);
++    SET_MODE_CZSO(RX_PSW_OP_SHLL);
++    gen_set_label(l1);
++    tcg_temp_free(t0);
++}
++
++DEFINE_INSN(shift1)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1, int arg2) = {
++        rx_shlri, rx_shari, rx_shlli,
++    };
++    int op, imm, rd;
++    op = (insn >> 25) & 7;
++    imm = (insn >> 20) & 0x1f;
++    rd = (insn >> 16) & 15;
++    if (imm != 0) {
++        fn[op - 4](cpu_regs[rd], cpu_regs[rd], imm);
++    }
++    dc->pc += 2;
++}
++
++DEFINE_INSN(shift2)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1, TCGv arg2) = {
++        rx_shlr, rx_shar, rx_shll,
++    };
++    int op, rs, rd;
++    op = (insn >> 16) & 3;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++    fn[op](cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(shift3)
++{
++    static void (* const fn[])(TCGv ret, TCGv arg1, int arg2) = {
++        rx_shlri, rx_shari, rx_shlli,
++    };
++    int op, imm, rs, rd;
++    op = (insn >> 21) & 3;
++    imm = (insn >> 16) & 0x1f;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++    if (imm != 0) {
++        fn[op](cpu_regs[rd], cpu_regs[rs], imm);
++    }
++    dc->pc += 3;
++}
++
++DEFINE_INSN(roc)
++{
++    int dir, rd;
++    TCGv cin;
++
++    dir = (insn >> 20) & 1;
++    rd = (insn >> 16) & 15;
++    cin = tcg_temp_local_new();
++    gen_helper_psw_c(cin, cpu_env);
++    if (dir) {
++        tcg_gen_shri_i32(ccop.op_a1[RX_PSW_OP_SHLR], cpu_regs[rd], 31);
++        tcg_gen_shli_i32(cpu_regs[rd], cpu_regs[rd], 1);
++        tcg_gen_or_i32(cpu_regs[rd], cpu_regs[rd], cin);
++    } else {
++        tcg_gen_andi_i32(ccop.op_a1[RX_PSW_OP_SHLR], cpu_regs[rd], 0x00000001);
++        tcg_gen_shri_i32(cpu_regs[rd], cpu_regs[rd], 1);
++        tcg_gen_shli_i32(cin, cin, 31);
++        tcg_gen_or_i32(cpu_regs[rd], cpu_regs[rd], cin);
++    }
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_SHLR], cpu_regs[rd]);
++    SET_MODE_CZS(RX_PSW_OP_SHLR);
++    tcg_temp_free(cin);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rot1)
++{
++    int dir, imm, rd;
++    dir = (insn >> 17) & 1;
++    imm = (insn >> 12) & 31;
++    rd = (insn >> 8) & 15;
++    tcg_gen_movi_i32(ccop.op_a1[RX_PSW_OP_ROT], dir);
++    if (dir) {
++        tcg_gen_rotli_i32(cpu_regs[rd], cpu_regs[rd], imm);
++    } else {
++        tcg_gen_rotri_i32(cpu_regs[rd], cpu_regs[rd], imm);
++    }
++    tcg_gen_andi_i32(ccop.op_r[RX_PSW_OP_ROT], cpu_regs[rd], 0x00000001);
++    SET_MODE_CZS(RX_PSW_OP_ROT);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(rot2)
++{
++    int dir, rs, rd;
++    dir = (insn >> 17) & 1;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++    tcg_gen_movi_i32(ccop.op_a1[RX_PSW_OP_ROT], dir);
++    if (dir) {
++        tcg_gen_rotl_i32(cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]);
++    } else {
++        tcg_gen_rotr_i32(cpu_regs[rd], cpu_regs[rd], cpu_regs[rs]);
++    }
++    tcg_gen_andi_i32(ccop.op_r[RX_PSW_OP_ROT], cpu_regs[rd], 0x00000001);
++    SET_MODE_CZS(RX_PSW_OP_ROT);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(sat)
++{
++    int rd;
++    TCGv s, o, plus, minus, one;
++    TCGLabel *l1;
++
++    l1 = gen_new_label();
++    rd = (insn >> 16) & 15;
++    s = tcg_temp_local_new();
++    o = tcg_temp_local_new();
++    plus = tcg_const_local_i32(0x7fffffff);
++    minus = tcg_const_local_i32(0x80000000);
++    one = tcg_const_local_i32(1);
++    gen_helper_psw_s(s, cpu_env);
++    gen_helper_psw_o(o, cpu_env);
++    tcg_gen_brcondi_i32(TCG_COND_NE, o, 1, l1);
++    tcg_gen_movcond_i32(TCG_COND_EQ, cpu_regs[rd], s, one, plus, minus);
++    gen_set_label(l1);
++    tcg_temp_free(s);
++    tcg_temp_free(o);
++    tcg_temp_free(plus);
++    tcg_temp_free(minus);
++    tcg_temp_free(one);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(satr)
++{
++    TCGv s, o;
++    TCGLabel *l1, *l2;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++
++    s = tcg_temp_local_new();
++    o = tcg_temp_local_new();
++    gen_helper_psw_s(s, cpu_env);
++    gen_helper_psw_o(o, cpu_env);
++    tcg_gen_brcondi_i32(TCG_COND_NE, o, 1, l2);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, s, 1, l1);
++    tcg_gen_movi_i32(cpu_regs[6], 0x7fffffff);
++    tcg_gen_movi_i32(cpu_regs[5], 0xffffffff);
++    tcg_gen_movi_i32(cpu_regs[4], 0xffffffff);
++    tcg_gen_br(l2);
++    gen_set_label(l1);
++    tcg_gen_movi_i32(cpu_regs[6], 0x80000000);
++    tcg_gen_movi_i32(cpu_regs[5], 0x00000000);
++    tcg_gen_movi_i32(cpu_regs[4], 0x00000000);
++    gen_set_label(l2);
++    tcg_temp_free(s);
++    tcg_temp_free(o);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rmpa)
++{
++    int sz;
++    TCGLabel *l0, *l1, *l2, *l3;
++    TCGv t0, t1, t2, t3;
++
++    sz = (insn >> 16) & 3;
++    l0 = gen_new_label();
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    l3 = gen_new_label();
++    t0 = tcg_temp_local_new();
++    t1 = tcg_temp_local_new();
++    t2 = tcg_temp_local_new();
++    t3 = tcg_temp_local_new();
++    gen_set_label(l0);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[3], 0, l2);
++    rx_gen_ldst(sz, RX_MEMORY_LD, t0, cpu_regs[1]);
++    tcg_gen_addi_i32(cpu_regs[1], cpu_regs[1], 1 << sz);
++    tcg_gen_addi_i32(cpu_regs[2], cpu_regs[2], 1 << sz);
++    rx_gen_ldst(sz, RX_MEMORY_LD, t1, cpu_regs[2]);
++    tcg_gen_muls2_i32(t2, t3, t0, t1);
++    tcg_gen_add2_i32(t0, t1, cpu_regs[4], cpu_regs[5], t2, t3);
++    tcg_gen_brcond_i32(TCG_COND_GT, t1, cpu_regs[5], l1);
++    tcg_gen_brcond_i32(TCG_COND_GT, t0, cpu_regs[4], l1);
++    tcg_gen_addi_i32(cpu_regs[6], cpu_regs[6], 1);
++    gen_set_label(l1);
++    tcg_gen_subi_i32(cpu_regs[3], cpu_regs[3], 1);
++    tcg_gen_br(l0);
++    gen_set_label(l2);
++    tcg_gen_ext16s_i32(cpu_regs[6], cpu_regs[6]);
++    tcg_gen_shri_i32(cpu_psw_s, cpu_regs[6], 31);
++    tcg_gen_movi_i32(cpu_psw_o, 0);
++    tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, 0x00ff);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[6], 0, l3);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[6], -1, l3);
++    tcg_gen_movi_i32(cpu_psw_o, 1);
++    gen_set_label(l3);
++    tcg_temp_free(t3);
++    tcg_temp_free(t2);
++    tcg_temp_free(t1);
++    tcg_temp_free(t0);
++    dc->pc += 2;
++}
++
++static void bsetmem(TCGv mem, TCGv mask)
++{
++    TCGv val;
++    val = tcg_temp_local_new();
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    tcg_gen_or_i32(val, val, mask);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, val, mem);
++    tcg_temp_free(val);
++}
++
++static void bclrmem(TCGv mem, TCGv mask)
++{
++    TCGv val;
++    val = tcg_temp_local_new();
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    tcg_gen_not_i32(mask, mask);
++    tcg_gen_and_i32(val, val, mask);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, val, mem);
++    tcg_temp_free(val);
++}
++
++static void btstmem(TCGv mem, TCGv mask)
++{
++    TCGv val;
++    val = tcg_temp_local_new();
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    tcg_gen_and_i32(val, val, mask);
++    tcg_gen_setcondi_i32(TCG_COND_NE, ccop.op_r[RX_PSW_OP_BTST], val, 0);
++    SET_MODE_CZ(RX_PSW_OP_BTST);
++    tcg_temp_free(val);
++}
++
++static void bnotmem(TCGv mem, TCGv mask)
++{
++    TCGv val;
++    val = tcg_temp_local_new();
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    tcg_gen_xor_i32(val, val, mask);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, val, mem);
++    tcg_temp_free(val);
++}
++
++static void bsetreg(TCGv reg, TCGv mask)
++{
++    tcg_gen_or_i32(reg, reg, mask);
++}
++
++static void bclrreg(TCGv reg, TCGv mask)
++{
++    tcg_gen_not_i32(mask, mask);
++    tcg_gen_and_i32(reg, reg, mask);
++}
++
++static void btstreg(TCGv reg, TCGv mask)
++{
++    TCGv t0;
++    t0 = tcg_temp_local_new();
++    tcg_gen_and_i32(t0, reg, mask);
++    tcg_gen_setcondi_i32(TCG_COND_NE, ccop.op_r[RX_PSW_OP_BTST], t0, 0);
++    SET_MODE_CZ(RX_PSW_OP_BTST);
++    tcg_temp_free(t0);
++}
++
++static void bnotreg(TCGv reg, TCGv mask)
++{
++    tcg_gen_xor_i32(reg, reg, mask);
++}
++
++DEFINE_INSN(bop1)
++{
++    static void (* const fn[])(TCGv mem, TCGv mask) = {
++        bsetmem, bclrmem, btstmem,
++    };
++    int op, id, rd, imm;
++    TCGv mem, mask;
++    op = ((insn >> 25) & 6) | ((insn >> 19) & 1);
++    id = (insn >> 24) & 3;
++    rd = (insn >> 20) & 15;
++    imm = (insn >> 16) & 7;
++    mem = rx_index_addr(id, RX_MEMORY_BYTE, 2, rd, dc, env);
++    mask = tcg_const_local_i32(1 << imm);
++    fn[op](mem, mask);
++    tcg_temp_free(mem);
++    tcg_temp_free(mask);
++    dc->pc += 2 + id;
++}
++
++DEFINE_INSN(bop2)
++{
++    static void (*bmem[])(TCGv mem, TCGv mask) = {
++        bsetmem, bclrmem, btstmem, bnotmem,
++    };
++    static void (*breg[])(TCGv reg, TCGv mask) = {
++        bsetreg, bclrreg, btstreg, bnotreg,
++    };
++    int op, id, rd, rs;
++    TCGv mem, mask;
++    op = (insn >> 18) & 3;
++    id = (insn >> 16) & 3;
++    rd = (insn >> 12) & 15;
++    rs = (insn >> 8) & 15;
++
++    mask = tcg_temp_local_new();
++    tcg_gen_movi_i32(mask, 1);
++    tcg_gen_shl_i32(mask, mask, cpu_regs[rs]);
++    if (id < 3) {
++        mem = rx_index_addr(id, RX_MEMORY_BYTE, 2, rd, dc, env);
++        bmem[op](mem, mask);
++        tcg_temp_free(mem);
++        dc->pc += 3 + id;
++    } else {
++        breg[op](cpu_regs[rd], mask);
++        dc->pc += 3;
++    }
++    tcg_temp_free(mask);
++}
++
++DEFINE_INSN(bop3)
++{
++    static void (*fn[])(TCGv reg, TCGv mask) = {
++        bsetreg, bclrreg, btstreg,
++    };
++    int op, imm, rd;
++    TCGv mask;
++    op = (insn >> 25) & 3;
++    imm = (insn >> 20) & 31;
++    rd = (insn >> 16) & 15;
++    mask = tcg_const_local_i32(1 << imm);
++    fn[op](cpu_regs[rd], mask);
++    tcg_temp_free(mask);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(bnot1)
++{
++    int imm, id, rd;
++    TCGv mem, val;
++    imm = (insn >> 18) & 7;
++    id = (insn >> 16) & 3;
++    rd = (insn >> 12) & 15;
++    mem = rx_index_addr(id, RX_MEMORY_BYTE, 2, rd, dc, env);
++    val = tcg_temp_local_new();
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    tcg_gen_xori_i32(val, val, 1 << imm);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, val, mem);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(bmcnd1)
++{
++    int imm, id, rd;
++    TCGv mem, val, cd, result;
++    TCGLabel *l1, *l2;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    imm = (insn >> 18) & 7;
++    id = (insn >> 16) & 3;
++    rd = (insn >> 12) & 15;
++    cd = tcg_const_local_i32((insn >> 8) & 15);
++    val = tcg_temp_local_new();
++    result = tcg_temp_local_new();
++    mem = rx_index_addr(id, RX_MEMORY_BYTE, 2, rd, dc, env);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, val, mem);
++    if (((insn >> 8) & 15) == 15) {
++        /* special case bnot #imm, mem */
++        tcg_gen_xori_i32(val, val, 1 << imm);
++    } else {
++        gen_helper_cond(result, cpu_env, cd);
++        tcg_gen_brcondi_i32(TCG_COND_NE, result, 0, l1);
++        tcg_gen_andi_i32(val, val, ~(1 << imm));
++        tcg_gen_br(l2);
++        gen_set_label(l1);
++        tcg_gen_ori_i32(val, val, 1 << imm);
++        gen_set_label(l2);
++    }
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, val, mem);
++    tcg_temp_free(mem);
++    tcg_temp_free(val);
++    tcg_temp_free(cd);
++    tcg_temp_free(result);
++    dc->pc += 3 + id;
++}
++
++DEFINE_INSN(bmcnd2)
++{
++    int imm, rd;
++    TCGv cd, result;
++    TCGLabel *l1, *l2;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    imm = (insn >> 16) & 31;
++    cd = tcg_const_local_i32((insn >> 12) & 15);
++    rd = (insn >> 8) & 15;
++    if (((insn >> 12) & 15) == 15) {
++        /* special case bnot #imm, reg */
++        tcg_gen_xori_i32(cpu_regs[rd], cpu_regs[rd], 1 << imm);
++    } else {
++        result = tcg_temp_local_new();
++        gen_helper_cond(result, cpu_env, cd);
++        tcg_gen_brcondi_i32(TCG_COND_NE, result, 0, l1);
++        tcg_gen_andi_i32(cpu_regs[rd], cpu_regs[rd], ~(1 << imm));
++        tcg_gen_br(l2);
++        gen_set_label(l1);
++        tcg_gen_ori_i32(cpu_regs[rd], cpu_regs[rd], 1 << imm);
++        gen_set_label(l2);
++        tcg_temp_free(result);
++    }
++    tcg_temp_free(cd);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(scmpu)
++{
++    TCGLabel *l1, *l2;
++    TCGv t0, t1;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    t0 = tcg_temp_local_new();
++    t1 = tcg_temp_local_new();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[3], 0, l2);
++    gen_set_label(l1);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, t1, cpu_regs[2]);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, t0, cpu_regs[1]);
++    tcg_gen_addi_i32(cpu_regs[1], cpu_regs[1], 1);
++    tcg_gen_addi_i32(cpu_regs[2], cpu_regs[2], 1);
++    tcg_gen_subi_i32(cpu_regs[3], cpu_regs[3], 1);
++    tcg_gen_brcond_i32(TCG_COND_NE, t0, t1, l2);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, t0, 0, l2);
++    tcg_gen_brcondi_i32(TCG_COND_GTU, cpu_regs[3], 0, l1);
++    gen_set_label(l2);
++    tcg_gen_sub_i32(ccop.op_r[RX_PSW_OP_STRING], t0, t1);
++    SET_MODE_CZ(RX_PSW_OP_STRING);
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(smovbfu)
++{
++    TCGLabel *l1, *l2;
++    TCGv t0;
++    int dir, term;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    t0 = tcg_temp_local_new();
++    term = (insn >> 19) & 1;
++    dir = (insn >> 18) & 1;
++    gen_set_label(l1);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[3], 0, l2);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_LD, t0, cpu_regs[2]);
++    rx_gen_ldst(RX_MEMORY_BYTE, RX_MEMORY_ST, t0, cpu_regs[1]);
++    if (dir) {
++        tcg_gen_addi_i32(cpu_regs[1], cpu_regs[1], 1);
++        tcg_gen_addi_i32(cpu_regs[2], cpu_regs[2], 1);
++    } else {
++        tcg_gen_subi_i32(cpu_regs[1], cpu_regs[1], 1);
++        tcg_gen_subi_i32(cpu_regs[2], cpu_regs[2], 1);
++    }
++    tcg_gen_subi_i32(cpu_regs[3], cpu_regs[3], 1);
++    if (term == 0) {
++        tcg_gen_brcondi_i32(TCG_COND_EQ, t0, 0, l2);
++    }
++    tcg_gen_br(l1);
++    gen_set_label(l2);
++    tcg_temp_free(t0);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(sstr)
++{
++    int size;
++    TCGLabel *l1, *l2;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++
++    size = (insn >> 16) & 3;
++    gen_set_label(l1);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[3], 0, l2);
++    rx_gen_ldst(size, RX_MEMORY_ST, cpu_regs[2], cpu_regs[1]);
++    tcg_gen_addi_i32(cpu_regs[1], cpu_regs[1], 1 << size);
++    tcg_gen_subi_i32(cpu_regs[3], cpu_regs[3], 1);
++    tcg_gen_br(l1);
++    gen_set_label(l2);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(ssearch)
++{
++    int match, size;
++    TCGv t0;
++    TCGLabel *l1, *l2;
++    l1 = gen_new_label();
++    l2 = gen_new_label();
++    t0 = tcg_temp_local_new();
++    match = (insn >> 18) & 1;
++    size = (insn >> 16) & 3;
++    gen_set_label(l1);
++    rx_gen_ldu(size, t0, cpu_regs[1]);
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_regs[3], 0, l2);
++    tcg_gen_addi_i32(cpu_regs[1], cpu_regs[1], 1 << size);
++    tcg_gen_subi_i32(cpu_regs[3], cpu_regs[3], 1);
++    tcg_gen_brcond_i32(match ? TCG_COND_EQ : TCG_COND_NE,
++                       t0, cpu_regs[2], l2);
++    tcg_gen_br(l1);
++    gen_set_label(l2);
++    tcg_gen_sub_i32(ccop.op_r[RX_PSW_OP_STRING], t0, cpu_regs[2]);
++    SET_MODE_CZ(RX_PSW_OP_STRING);
++    tcg_temp_free(t0);
++    dc->pc += 2;
++}
++
++static void bra_main(int dst, DisasContext *dc)
++{
++    tcg_gen_movi_i32(cpu_pc, dc->pc += dst);
++    dc->base.is_jmp = DISAS_JUMP;
++}
++
++DEFINE_INSN(bra1)
++{
++    unsigned int dst;
++    dst = (insn >> 24) & 7;
++    if (dst < 3) {
++        dst += 8;
++    }
++    bra_main(dst, dc);
++    dc->pc += 1;
++}
++
++DEFINE_INSN(bra2)
++{
++    char dst;
++    dst = (insn >> 16) & 255;
++    bra_main(dst, dc);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(bra3)
++{
++    short dst;
++    dst = (insn & 0xff00) | ((insn >> 16) & 0xff);
++    bra_main(dst, dc);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(bra4)
++{
++    unsigned short dstl;
++    char dsth;
++    dstl = (insn & 0xff00) | ((insn >> 16) & 0xff);
++    dsth = insn & 255;
++    bra_main((dsth << 16) | dstl, dc);
++    dc->pc += 4;
++}
++
++DEFINE_INSN(bra5)
++{
++    int rd;
++    rd = (insn >> 16) & 15;
++    tcg_gen_addi_i32(cpu_pc, cpu_regs[rd], dc->pc);
++    dc->base.is_jmp = DISAS_JUMP;
++}
++
++static void bcnd_main(int cd, int dst, int len, DisasContext *dc)
++{
++    TCGv zero, cond, result, t, f;
++    t = tcg_const_local_i32(dc->pc + dst);
++    f = tcg_const_local_i32(dc->pc + len);
++    result = tcg_temp_local_new();
++    cond = tcg_const_local_i32(cd);
++    zero = tcg_const_local_i32(0);
++    gen_helper_cond(result, cpu_env, cond);
++
++    tcg_gen_movcond_i32(TCG_COND_NE, cpu_pc,
++                        result, zero, t, f);
++    dc->base.is_jmp = DISAS_JUMP;
++    tcg_temp_free(t);
++    tcg_temp_free(f);
++    tcg_temp_free(zero);
++    tcg_temp_free(cond);
++    tcg_temp_free(result);
++    dc->pc += len;
++}
++
++DEFINE_INSN(bcnd1)
++{
++    int cd, dst;
++    cd = (insn >> 27) & 1;
++    dst = (insn >> 24) & 7;
++    if (dst < 3) {
++        dst += 8;
++    }
++    bcnd_main(cd, dst, 1, dc);
++}
++
++DEFINE_INSN(bcnd2)
++{
++    int cd;
++    char dst;
++    cd = (insn >> 24) & 15;
++    dst = (insn >> 16) & 255;
++    bcnd_main(cd, dst, 2, dc);
++}
++
++DEFINE_INSN(bcnd3)
++{
++    int cd;
++    short dst;
++    cd = (insn >> 24) & 1;
++    dst = (insn & 0xff00) | ((insn >> 16) & 0xff);
++    bcnd_main(cd, dst, 3, dc);
++}
++
++static void pc_save_stack(int len, DisasContext *dc)
++{
++    TCGv save_pc;
++    save_pc = tcg_const_local_i32(dc->pc + len);
++    tcg_gen_subi_i32(cpu_regs[0], cpu_regs[0], 4);
++    tcg_gen_qemu_st32(save_pc, cpu_regs[0], 0);
++    tcg_temp_free(save_pc);
++}
++
++DEFINE_INSN(bsr1)
++{
++    short dst;
++    pc_save_stack(3, dc);
++    dst = (insn & 0xff00) | ((insn >> 16) & 0xff);
++    bra_main(dst, dc);
++}
++
++DEFINE_INSN(bsr2)
++{
++    unsigned short dstl;
++    char dsth;
++    pc_save_stack(4, dc);
++    dstl = (insn & 0xff00) | ((insn >> 16) & 0xff);
++    dsth = insn & 255;
++    bra_main((dsth << 16) | dstl, dc);
++}
++
++DEFINE_INSN(bsr3)
++{
++    int rd;
++    rd = (insn >> 16) & 15;
++    pc_save_stack(2, dc);
++    tcg_gen_addi_i32(cpu_pc, cpu_regs[rd], dc->pc);
++    dc->base.is_jmp = DISAS_JUMP;
++}
++
++DEFINE_INSN(jmpjsr)
++{
++    int is_jsr, rd;
++    is_jsr = (insn >> 20) & 1;
++    rd = (insn >> 16) & 15;
++    if (is_jsr) {
++        pc_save_stack(2, dc);
++    }
++    tcg_gen_mov_i32(cpu_pc, cpu_regs[rd]);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rts)
++{
++    tcg_gen_qemu_ld32u(cpu_pc, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 1;
++}
++
++DEFINE_INSN(rtsd1)
++{
++    int src;
++    src = (insn >> 16) & 255;
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], src << 2);
++    tcg_gen_qemu_ld32u(cpu_pc, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rtsd2)
++{
++    int src, dst, dst2;
++    dst = (insn >> 20) & 15;
++    dst2 = (insn >> 16) & 15;
++    src = (insn >> 8) & 255;
++    src -= (dst2 - dst + 1);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], src << 2);
++    for (; dst <= dst2; dst++) {
++        tcg_gen_qemu_ld32u(cpu_regs[dst], cpu_regs[0], 0);
++        tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    }
++    tcg_gen_qemu_ld32u(cpu_pc, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 3;
++}
++
++DEFINE_INSN(rxbrk)
++{
++    tcg_gen_movi_i32(cpu_pc, dc->pc + 1);
++    gen_helper_rxbrk(cpu_env);
++    dc->base.is_jmp = DISAS_NORETURN;
++    dc->pc += 1;
++}
++
++DEFINE_INSN(rxint)
++{
++    int imm;
++    TCGv vec;
++    imm = (insn >> 8) & 0xff;
++    vec = tcg_const_local_i32(imm);
++    tcg_gen_movi_i32(cpu_pc, dc->pc + 3);
++    gen_helper_rxint(cpu_env, vec);
++    tcg_temp_free(vec);
++    dc->base.is_jmp = DISAS_NORETURN;
++    dc->pc += 3;
++}
++
++DEFINE_INSN(clrsetpsw)
++{
++    TCGv psw[] = {
++        cpu_psw_c, cpu_psw_z, cpu_psw_s, cpu_psw_o,
++        NULL, NULL, NULL, NULL,
++        cpu_psw_i, cpu_psw_u, NULL, NULL,
++        NULL, NULL, NULL, NULL
++    };
++    static const uint32_t opmask[] = {~0x000f, ~0x00f0, ~0x0f00, ~0xf000};
++    int mode, dst;
++    TCGLabel *l;
++
++    mode = (insn >> 20 & 1);
++    dst = (insn >> 16) & 15;
++    l = gen_new_label();
++    if (dst >= 8) {
++        tcg_gen_brcondi_i32(TCG_COND_NE, cpu_psw_pm, 0, l);
++    }
++    tcg_gen_movi_i32(psw[dst], (mode ? 0 : 1));
++    gen_set_label(l);
++    if (dst < 4) {
++        tcg_gen_andi_i32(ccop.op_mode, ccop.op_mode, opmask[dst]);
++    }
++    dc->pc += 2;
++}
++
++DEFINE_INSN(mvfc)
++{
++    int rd, cr;
++    TCGv _cr;
++    cr = (insn >> 12) & 15;
++    _cr = tcg_const_i32(cr);
++    rd = (insn >> 8) & 15;
++    if (cr == 1) {
++        tcg_gen_movi_i32(cpu_regs[rd], dc->pc);
++    } else {
++        gen_helper_mvfc(cpu_regs[rd], cpu_env, _cr);
++    }
++    tcg_temp_free(_cr);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(mvtc1)
++{
++    int li;
++    uint32_t imm;
++    TCGv cr, _imm;
++
++    li = (insn >> 18) & 3;
++    cr = tcg_const_i32((insn >> 8) & 15);
++    dc->pc = rx_load_simm(env, dc->pc + 3, li, &imm);
++    _imm = tcg_const_i32(imm);
++    gen_helper_mvtc(cpu_env, cr, _imm);
++    tcg_temp_free(cr);
++    tcg_temp_free(_imm);
++}
++
++DEFINE_INSN(mvtc2)
++{
++    int rs;
++    TCGv cr;
++    rs = (insn >> 12) & 15;
++    cr = tcg_const_i32((insn >> 8) & 15);
++    gen_helper_mvtc(cpu_env, cr, cpu_regs[rs]);
++    dc->pc += 3;
++    tcg_temp_free(cr);
++}
++
++static void check_previleged(void)
++{
++    TCGLabel *good;
++    good = gen_new_label();
++    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_psw_pm, 0, good);
++    gen_helper_raise_privilege_violation(cpu_env);
++    gen_set_label(good);
++}
++
++DEFINE_INSN(mvtipl)
++{
++    int ipl;
++    check_previleged();
++    ipl = (insn >> 8) & 15;
++    tcg_gen_movi_i32(cpu_psw_ipl, ipl);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(rte)
++{
++    check_previleged();
++    tcg_gen_qemu_ld32u(cpu_pc, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    tcg_gen_qemu_ld32u(cpu_psw, cpu_regs[0], 0);
++    tcg_gen_addi_i32(cpu_regs[0], cpu_regs[0], 4);
++    gen_helper_unpack_psw(cpu_env);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rtfi)
++{
++    check_previleged();
++    tcg_gen_mov_i32(cpu_pc, cpu_bpc);
++    tcg_gen_mov_i32(cpu_psw, cpu_bpsw);
++    gen_helper_unpack_psw(cpu_env);
++    dc->base.is_jmp = DISAS_JUMP;
++    dc->pc += 2;
++}
++
++DEFINE_INSN(rxwait)
++{
++    check_previleged();
++    tcg_gen_addi_i32(cpu_pc, cpu_pc, 2);
++    gen_helper_wait(cpu_env);
++    dc->pc += 2;
++}
++
++DEFINE_INSN(fimm)
++{
++    int op, rd, fop;
++    uint32_t imm;
++    TCGv _op, t0;
++
++    op = (insn >> 12) & 7;
++    rd = (insn >> 8) & 15;
++    dc->pc = rx_load_simm(env, dc->pc + 4, 3, &imm);
++    t0 = tcg_const_i32(imm);
++    _op = tcg_const_i32(op);
++    fop = (op != 1) ? RX_PSW_OP_FLOAT : RX_PSW_OP_FCMP;
++    gen_helper_floatop(ccop.op_r[fop], cpu_env, _op, cpu_regs[rd], t0);
++    if (op != 1) {
++        tcg_gen_mov_i32(cpu_regs[rd], ccop.op_r[RX_PSW_OP_FLOAT]);
++        SET_MODE_ZS(RX_PSW_OP_FLOAT);
++    } else
++        SET_MODE_ZSO(RX_PSW_OP_FCMP);
++    tcg_temp_free(t0);
++    tcg_temp_free(_op);
++}
++
++DEFINE_INSN(fmem)
++{
++    int op, id, rs, rd, fop;
++    TCGv _op, t1;
++
++    op = (insn >> 18) & 7;
++    id = (insn >> 16) & 3;
++    rs = (insn >> 8) & 15;
++    rd = (insn >> 8) & 15;
++
++    t1 = tcg_temp_local_new();
++    if (id < 3) {
++        TCGv t0;
++        t0 = rx_index_addr(id, 2, 3, rs, dc, env);
++        tcg_gen_qemu_ld32u(t1, t0, 0);
++        dc->pc += 3 + id;
++        tcg_temp_free(t0);
++    } else {
++        tcg_gen_mov_i32(t1, cpu_regs[rs]);
++        dc->pc += 3;
++    }
++    switch (op) {
++    case 0 ... 4:
++        _op = tcg_const_i32(op);
++        fop = (op != 1) ? RX_PSW_OP_FLOAT : RX_PSW_OP_FCMP;
++        gen_helper_floatop(ccop.op_r[fop], cpu_env,
++                           _op, cpu_regs[rd], t1);
++        if (op != 1) {
++            tcg_gen_mov_i32(cpu_regs[rd], ccop.op_r[RX_PSW_OP_FLOAT]);
++            SET_MODE_ZS(RX_PSW_OP_FLOAT);
++        } else
++            SET_MODE_ZSO(RX_PSW_OP_FCMP);
++        tcg_temp_free(_op);
++        break;
++    case 5:
++        gen_helper_ftoi(cpu_regs[rd], cpu_env, t1);
++        tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_FLOAT], cpu_regs[rd]);
++        SET_MODE_ZS(RX_PSW_OP_FLOAT);
++        break;
++    case 6:
++        gen_helper_round(cpu_regs[rd], cpu_env, t1);
++        tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_FLOAT], cpu_regs[rd]);
++        SET_MODE_ZS(RX_PSW_OP_FLOAT);
++        break;
++    }
++    tcg_temp_free(t1);
++}
++
++DEFINE_INSN(itof1)
++{
++    int id, rs, rd;
++    TCGv mem, t0;
++
++    id = (insn >> 16) & 3;
++    rs = (insn >> 12) & 15;
++    rd = (insn >> 8) & 15;
++    t0 = tcg_temp_local_new();
++    if (id < 3) {
++        mem = rx_index_addr(id, 2, 3, rs, dc, env);
++        rx_gen_ldu(RX_MEMORY_BYTE, t0, mem);
++        tcg_temp_free(mem);
++        dc->pc += 3 + id;
++    } else {
++        tcg_gen_mov_i32(t0, cpu_regs[rs]);
++        dc->pc += 3;
++    }
++    gen_helper_itof(cpu_regs[rd], cpu_env, t0);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_FLOAT], cpu_regs[rd]);
++    SET_MODE_ZS(RX_PSW_OP_FLOAT);
++}
++
++DEFINE_INSN(itof2)
++{
++    int id, rs, rd, sz, mi;
++    TCGv tmp, mem;
++
++    mi = (insn >> 22) & 3;
++    id = (insn >> 16) & 3;
++    rs = (insn >> 4) & 15;
++    rd = insn & 15;
++    sz = (mi < 3) ? mi : RX_MEMORY_WORD;
++
++    tmp = tcg_temp_local_new();
++    mem = rx_index_addr(id, sz, 4, rs, dc, env);
++    if (mi == 3) {
++        rx_gen_ldu(RX_MEMORY_WORD, tmp, mem);
++    } else {
++        rx_gen_ldst(sz, RX_MEMORY_LD, tmp, mem);
++    }
++    rx_gen_ldst(sz, RX_MEMORY_ST, cpu_regs[rd], mem);
++    gen_helper_itof(cpu_regs[rd], cpu_env, tmp);
++    tcg_gen_mov_i32(ccop.op_r[RX_PSW_OP_FLOAT], cpu_regs[rd]);
++    SET_MODE_ZS(RX_PSW_OP_FLOAT);
++    dc->pc += 4 + id;
++    tcg_temp_free(mem);
++    tcg_temp_free(tmp);
++}
++
++DEFINE_INSN(mulmacXX)
++{
++    int add, lo, rs, rs2;
++    TCGv t0, t1;
++
++    add = (insn >> 18) & 1;
++    lo = (insn >> 16) & 1;
++    rs = (insn >> 12) & 15;
++    rs2 = (insn >> 8) & 15;
++    t0 = tcg_temp_local_new();
++    t1 = tcg_temp_local_new();
++    if (lo) {
++        tcg_gen_ext16s_i32(t0, cpu_regs[rs]);
++        tcg_gen_ext16s_i32(t1, cpu_regs[rs2]);
++    } else {
++        tcg_gen_sari_i32(t0, cpu_regs[rs], 16);
++        tcg_gen_sari_i32(t1, cpu_regs[rs2], 16);
++    }
++    tcg_gen_mul_i32(t0, t0, t1);
++    tcg_gen_mov_i32(t1, t0);
++    tcg_gen_shli_i32(t0, t0, 16);
++    tcg_gen_sari_i32(t0, t1, 16);
++    if (add)
++        tcg_gen_add2_i32(cpu_acc_l, cpu_acc_m, cpu_acc_l, cpu_acc_m, t1, t0);
++    else {
++        tcg_gen_mov_i32(cpu_acc_l, t0);
++        tcg_gen_mov_i32(cpu_acc_m, t1);
++    }
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(mvfacXX)
++{
++    int md, rd;
++    TCGv t0;
++    md = (insn >> 12) & 3;
++    rd = (insn >> 8) & 15;
++    if (md == 0) {
++        tcg_gen_mov_i32(cpu_regs[rd], cpu_acc_m);
++    } else {
++        t0 = tcg_temp_local_new();
++        tcg_gen_shli_i32(cpu_regs[rd], cpu_acc_m, 16);
++        tcg_gen_shri_i32(t0, cpu_acc_l, 16);
++        tcg_gen_or_i32(cpu_regs[rd], cpu_regs[rd], t0);
++        tcg_temp_free(t0);
++    }
++    dc->pc += 3;
++}
++
++DEFINE_INSN(mvtacXX)
++{
++    int md, rs;
++    md = (insn >> 12) & 3;
++    rs = (insn >> 8) & 15;
++    if (md == 0) {
++        tcg_gen_mov_i32(cpu_acc_m, cpu_regs[rs]);
++    } else {
++        tcg_gen_mov_i32(cpu_acc_l, cpu_regs[rs]);
++    }
++    dc->pc += 3;
++}
++
++DEFINE_INSN(racw)
++{
++    TCGv shift;
++    shift = tcg_const_local_i32(((insn >> 12) & 1) + 1);
++    gen_helper_racw(cpu_env, shift);
++    dc->pc += 3;
++}
++
++DEFINE_INSN(op0620)
++{
++    static const disas_proc op[] = {
++        adc3sbb2, NULL, adc3sbb2, NULL,
++        minmax3, minmax3, emul3, emul3,
++        div3, div3, NULL, NULL,
++        logic_op4, logic_op4, NULL, NULL,
++        xchg2, itof2, NULL, NULL,
++        NULL, NULL, NULL, NULL,
++        NULL, NULL, NULL, NULL,
++        NULL, NULL, NULL, NULL,
++    };
++    if (op[(insn & 0x00001f00) >> 8]) {
++        op[(insn & 0x00001f00) >> 8](env, dc, insn);
++    } else {
++        gen_helper_raise_illegal_instruction(cpu_env);
++    }
++}
++
++DEFINE_INSN(opfd70)
++{
++    static const disas_proc op[] = {
++        NULL, NULL, adc1, NULL,
++        minmax1, minmax1, emul1, emul1,
++        div1, div1, NULL, NULL,
++        logic_op2, logic_op2, stz, stz,
++    };
++    if (op[(insn & 0x0000f000) >> 12]) {
++        op[(insn & 0x0000f000) >> 12](env, dc, insn);
++    } else {
++        gen_helper_raise_illegal_instruction(cpu_env);
++    }
++}
++
++static disas_proc optable[65536];
++
++#define OPTABLE(code, mask, proc) {code, mask, proc},
++static struct op {
++    uint16_t code;
++    uint16_t mask;
++    disas_proc proc;
++} oplist[] = {
++    OPTABLE(0x0620, 0xff3c, op0620)
++    OPTABLE(0xfd70, 0xfff3, opfd70)
++
++    OPTABLE(0x8000, 0xc800, mov1_2)
++    OPTABLE(0x8800, 0xc800, mov1_2)
++    OPTABLE(0x6600, 0xff00, mov3)
++    OPTABLE(0x3c00, 0xfc00, mov4)
++    OPTABLE(0x7540, 0xfff0, mov5)
++    OPTABLE(0xfb02, 0xff03, mov6)
++    OPTABLE(0xcf00, 0xcf00, mov7)
++    OPTABLE(0xf800, 0xfc00, mov8)
++    OPTABLE(0xcc00, 0xcc00, mov9)
++    OPTABLE(0xfe40, 0xffc0, mov10_12)
++    OPTABLE(0xc300, 0xc300, mov11)
++    OPTABLE(0xfe00, 0xffc0, mov10_12)
++    OPTABLE(0xc000, 0xc000, mov13)
++    OPTABLE(0xfd20, 0xfff8, mov14)
++    OPTABLE(0xfd28, 0xfff8, mov15)
++
++    OPTABLE(0xb000, 0xf000, movu1)
++    OPTABLE(0x5800, 0xf800, movu2)
++    OPTABLE(0xfec0, 0xffe0, movu3)
++    OPTABLE(0xfd30, 0xfff2, movu4)
++
++    OPTABLE(0x7eb0, 0xfff0, pop)
++    OPTABLE(0x7ee0, 0xfff0, popc)
++    OPTABLE(0x6f00, 0xff00, popm)
++
++    OPTABLE(0x7e80, 0xffc0, push1)
++    OPTABLE(0xf408, 0xfc0c, push2)
++    OPTABLE(0x7ec0, 0xfff0, pushc)
++    OPTABLE(0x6e00, 0xff00, pushm)
++
++    OPTABLE(0xfd67, 0xffff, revl)
++    OPTABLE(0xfd65, 0xffff, revw)
++
++    OPTABLE(0xfcd0, 0xfff0, sccnd)
++
++    OPTABLE(0xfc40, 0xffc0, xchg1)
++
++    OPTABLE(0x0300, 0xff00, nop)
++
++    /* and */
++    OPTABLE(0x6400, 0xff00, logic_op1)
++    OPTABLE(0x7420, 0xfcf0, logic_op2)
++    OPTABLE(0x5000, 0xfc00, logic_op3)
++    OPTABLE(0x0610, 0xff3c, logic_op4)
++    OPTABLE(0xff40, 0xfff0, logic_op5)
++    /* or */
++    OPTABLE(0x6500, 0xff00, logic_op1)
++    OPTABLE(0x7430, 0xfcf0, logic_op2)
++    OPTABLE(0x5400, 0xfc00, logic_op3)
++    OPTABLE(0x0614, 0xff3c, logic_op4)
++    OPTABLE(0xff50, 0xfff0, logic_op5)
++    /* xor */
++    OPTABLE(0xfc34, 0xfffc, logic_op3)
++    /* tst */
++    OPTABLE(0xfc30, 0xfffc, logic_op3)
++
++    OPTABLE(0x6200, 0xff00, addsub1)
++    OPTABLE(0x4800, 0xfc00, addsub2)
++    OPTABLE(0x0608, 0xff3c, addsub3)
++    OPTABLE(0x7000, 0xfc00, add4)
++    OPTABLE(0xff20, 0xfff0, addsub5)
++
++    OPTABLE(0x6000, 0xff00, addsub1)
++    OPTABLE(0x4000, 0xfc00, addsub2)
++    OPTABLE(0x0600, 0xff3c, addsub3)
++    OPTABLE(0xff00, 0xfff0, addsub5)
++
++    OPTABLE(0x6100, 0xff00, addsub1)
++    OPTABLE(0x7550, 0xfff0, cmp2)
++    OPTABLE(0x7400, 0xfcf0, cmp3)
++    OPTABLE(0x4400, 0xfc00, cmp4)
++    OPTABLE(0x0604, 0xff3c, cmp5)
++
++    OPTABLE(0xfc00, 0xfff4, adc2sbb1)
++
++    OPTABLE(0x7e00, 0xffc0, absnegnot1)
++    OPTABLE(0xfc03, 0xffc3, absnegnot2)
++
++    OPTABLE(0x6300, 0xff00, mul1)
++    OPTABLE(0x7410, 0xfcf0, mul2)
++    OPTABLE(0x4c00, 0xfc00, mul3)
++    OPTABLE(0x060c, 0xff3c, mul4)
++    OPTABLE(0xff30, 0xfff0, mul5)
++
++    OPTABLE(0xfc20, 0xfff8, div2)
++
++    OPTABLE(0xfc18, 0xfff8, emul2)
++
++    OPTABLE(0xfc10, 0xfff8, minmax2)
++
++    OPTABLE(0x6a00, 0xfe00, shift1)
++    OPTABLE(0xfd61, 0xffff, shift2)
++    OPTABLE(0xfda0, 0xffe0, shift3)
++    OPTABLE(0x6c00, 0xfe00, shift1)
++    OPTABLE(0xfd62, 0xffff, shift2)
++    OPTABLE(0xfdc0, 0xffe0, shift3)
++    OPTABLE(0x6800, 0xfe00, shift1)
++    OPTABLE(0xfd60, 0xffff, shift2)
++    OPTABLE(0xfd80, 0xffe0, shift3)
++
++    OPTABLE(0x7e40, 0xffe0, roc)
++    OPTABLE(0xfd6e, 0xfffe, rot1)
++    OPTABLE(0xfd66, 0xffff, rot2)
++    OPTABLE(0xfd6c, 0xfffe, rot1)
++    OPTABLE(0xfd64, 0xffff, rot2)
++
++    OPTABLE(0x7e30, 0xfff0, sat)
++    OPTABLE(0x7f93, 0xffff, satr)
++    OPTABLE(0x7f8c, 0xfffc, rmpa)
++
++    OPTABLE(0xf008, 0xfc08, bop1)
++    OPTABLE(0xfc64, 0xfffc, bop2)
++    OPTABLE(0x7a00, 0xfe00, bop3)
++    OPTABLE(0xfce0, 0xffe0, bnot1)
++    OPTABLE(0xfc6c, 0xfffc, bop2)
++    OPTABLE(0xf000, 0xfc08, bop1)
++    OPTABLE(0xfc60, 0xfffc, bop2)
++    OPTABLE(0x7800, 0xfe00, bop3)
++    OPTABLE(0xf400, 0xfc08, bop1)
++    OPTABLE(0xfc68, 0xfffc, bop2)
++    OPTABLE(0x7c00, 0xfe00, bop3)
++
++    OPTABLE(0xfce0, 0xffe0, bmcnd1)
++    OPTABLE(0xfde0, 0xffe0, bmcnd2)
++
++    OPTABLE(0x7f83, 0xffff, scmpu)
++    OPTABLE(0x7f8b, 0xffff, smovbfu)
++    OPTABLE(0x7f8f, 0xffff, smovbfu)
++    OPTABLE(0x7f87, 0xffff, smovbfu)
++    OPTABLE(0x7f88, 0xfffc, sstr)
++    OPTABLE(0x7f80, 0xfffc, ssearch)
++    OPTABLE(0x7f84, 0xfffc, ssearch)
++
++    OPTABLE(0x0800, 0xf800, bra1)
++    OPTABLE(0x2e00, 0xff00, bra2)
++    OPTABLE(0x3800, 0xff00, bra3)
++    OPTABLE(0x0400, 0xff00, bra4)
++    OPTABLE(0x7f40, 0xfff0, bra5)
++
++    OPTABLE(0x1000, 0xf000, bcnd1)
++    OPTABLE(0x2000, 0xf000, bcnd2)
++    OPTABLE(0x3a00, 0xfe00, bcnd3)
++
++    OPTABLE(0x3900, 0xff00, bsr1)
++    OPTABLE(0x0500, 0xff00, bsr2)
++    OPTABLE(0x7f50, 0xfff0, bsr3)
++
++    OPTABLE(0x7f00, 0xfff0, jmpjsr)
++    OPTABLE(0x7f10, 0xfff0, jmpjsr)
++
++    OPTABLE(0x0200, 0xff00, rts)
++    OPTABLE(0x6700, 0xff00, rtsd1)
++    OPTABLE(0x3f00, 0xff00, rtsd2)
++
++    OPTABLE(0x7fb0, 0xfff0, clrsetpsw)
++    OPTABLE(0x7fa0, 0xfff0, clrsetpsw)
++
++    OPTABLE(0xfd6a, 0xffff, mvfc)
++    OPTABLE(0xfd73, 0xfff3, mvtc1)
++    OPTABLE(0xfd68, 0xfff8, mvtc2)
++    OPTABLE(0x7570, 0xffff, mvtipl)
++
++    OPTABLE(0x0000, 0xff00, rxbrk)
++    OPTABLE(0x7560, 0xffff, rxint)
++
++    OPTABLE(0x7f95, 0xffff, rte)
++    OPTABLE(0x7f94, 0xffff, rtfi)
++    OPTABLE(0x7f96, 0xffff, rxwait)
++
++    OPTABLE(0xfd72, 0xffff, fimm)
++    OPTABLE(0xfc88, 0xfffc, fmem)
++    OPTABLE(0xfc84, 0xfffc, fmem)
++    OPTABLE(0xfc90, 0xfffc, fmem)
++    OPTABLE(0xfc8c, 0xfffc, fmem)
++    OPTABLE(0xfc80, 0xfffc, fmem)
++    OPTABLE(0xfc94, 0xfffc, fmem)
++    OPTABLE(0xfc98, 0xfffc, fmem)
++    OPTABLE(0xfc44, 0xfffc, itof1)
++
++    OPTABLE(0xfd04, 0xffff, mulmacXX)
++    OPTABLE(0xfd05, 0xffff, mulmacXX)
++    OPTABLE(0xfd00, 0xffff, mulmacXX)
++    OPTABLE(0xfd01, 0xffff, mulmacXX)
++    OPTABLE(0xfd1f, 0xffff, mvfacXX)
++    OPTABLE(0xfd17, 0xffff, mvtacXX)
++    OPTABLE(0xfd18, 0xffff, racw)
++};
++
++static int comp_mask(const void *p1, const void *p2)
++{
++    return ctpop32(((struct op *)p1)->mask)
++        - ctpop32(((struct op *)p2)->mask);
++}
++
++static void rx_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
++{
++}
++
++static void rx_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
++{
++}
++
++static void rx_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    tcg_gen_insn_start(dc->base.pc_next);
++}
++
++static bool rx_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
++                                    const CPUBreakpoint *bp)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    /* We have hit a breakpoint - make sure PC is up-to-date */
++    gen_save_cpu_state(dc, true);
++    gen_helper_debug(cpu_env);
++    dc->base.is_jmp = DISAS_NORETURN;
++    dc->base.pc_next += 1;
++    return true;
++}
++
++static void rx_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
++{
++    CPURXState *env = cs->env_ptr;
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    uint32_t insn = 0;
++    int i;
++
++    for (i = 0; i < 4; i++) {
++        insn <<= 8;
++        insn |= cpu_ldub_code(env, dc->base.pc_next + i);
++    }
++    dc->pc = dc->base.pc_next;
++    if (optable[insn >> 16]) {
++        optable[insn >> 16](env, dc, insn);
++        dc->base.pc_next = dc->pc;
++    } else {
++        gen_helper_raise_illegal_instruction(cpu_env);
++    }
++}
++
++static void rx_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++
++    switch (dc->base.is_jmp) {
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
++        gen_save_cpu_state(dc, false);
++        gen_goto_tb(dc, 0, dc->base.pc_next);
++        break;
++    case DISAS_JUMP:
++        if (dc->base.singlestep_enabled) {
++            gen_helper_update_psw(cpu_env);
++            gen_helper_debug(cpu_env);
++        } else
++            tcg_gen_lookup_and_goto_ptr();
++        break;
++    case DISAS_NORETURN:
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static void rx_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
++{
++    qemu_log("IN:\n");  /* , lookup_symbol(dcbase->pc_first)); */
++    log_target_disas(cs, dcbase->pc_first, dcbase->tb->size);
++}
++
++static const TranslatorOps rx_tr_ops = {
++    .init_disas_context = rx_tr_init_disas_context,
++    .tb_start           = rx_tr_tb_start,
++    .insn_start         = rx_tr_insn_start,
++    .breakpoint_check   = rx_tr_breakpoint_check,
++    .translate_insn     = rx_tr_translate_insn,
++    .tb_stop            = rx_tr_tb_stop,
++    .disas_log          = rx_tr_disas_log,
++};
++
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++{
++    DisasContext dc;
++
++    translator_loop(&rx_tr_ops, &dc.base, cs, tb);
++}
++
++void restore_state_to_opc(CPURXState *env, TranslationBlock *tb,
++                          target_ulong *data)
++{
++    env->pc = data[0];
++    env->psw = data[1];
++    rx_cpu_unpack_psw(env, 1);
++}
++
++#define ALLOC_REGISTER(sym, name) \
++    cpu_##sym = tcg_global_mem_new_i32(cpu_env, \
++                                       offsetof(CPURXState, sym), name)
++
++void rx_translate_init(void)
++{
++    int i, j;
++    struct op *p;
++    static const char * const regnames[16] = {
++        "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
++        "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"
++    };
++
++    for (i = 0; i < 16; i++) {
++        cpu_regs[i] = tcg_global_mem_new_i32(cpu_env,
++                                              offsetof(CPURXState, regs[i]),
++                                              regnames[i]);
++    }
++    for (i = 0; i < 12; i++) {
++        ccop.op_a1[i + 1] = tcg_global_mem_new_i32(cpu_env,
++                                               offsetof(CPURXState, op_a1[i]),
++                                               "");
++        ccop.op_a2[i + 1] = tcg_global_mem_new_i32(cpu_env,
++                                               offsetof(CPURXState, op_a2[i]),
++                                               "");
++        ccop.op_r[i + 1] = tcg_global_mem_new_i32(cpu_env,
++                                               offsetof(CPURXState, op_r[i]),
++                                               "");
++    }
++    ccop.op_mode = tcg_global_mem_new_i32(cpu_env,
++                                          offsetof(CPURXState, op_mode),
++                                          "");
++    ALLOC_REGISTER(pc, "PC");
++    ALLOC_REGISTER(psw, "PSW");
++    ALLOC_REGISTER(psw_o, "PSW(O)");
++    ALLOC_REGISTER(psw_s, "PSW(S)");
++    ALLOC_REGISTER(psw_z, "PSW(Z)");
++    ALLOC_REGISTER(psw_c, "PSW(C)");
++    ALLOC_REGISTER(psw_u, "PSW(U)");
++    ALLOC_REGISTER(psw_i, "PSW(I)");
++    ALLOC_REGISTER(psw_pm, "PSW(PM)");
++    ALLOC_REGISTER(psw_ipl, "PSW(IPL)");
++    ALLOC_REGISTER(usp, "USP");
++    ALLOC_REGISTER(fpsw, "FPSW");
++    ALLOC_REGISTER(bpsw, "BPSW");
++    ALLOC_REGISTER(bpc, "BPC");
++    ALLOC_REGISTER(isp, "ISP");
++    ALLOC_REGISTER(fintv, "FINTV");
++    ALLOC_REGISTER(intb, "INTB");
++    ALLOC_REGISTER(acc_m, "ACC-M");
++    ALLOC_REGISTER(acc_l, "ACC-L");
++
++    qsort(oplist, ARRAY_SIZE(oplist), sizeof(struct op), comp_mask);
++    for (p = oplist, i = 0; i < ARRAY_SIZE(oplist); p++, i++) {
++        for (j = 0; j < 0x10000; j++) {
++            if (p->code == (j & p->mask)) {
++                optable[j] = p->proc;
++            }
++        }
++    }
++}
 -- 
 2.11.0
