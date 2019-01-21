@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58320)
+Received: from eggs.gnu.org ([209.51.188.92]:58375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glgDJ-00015h-HB
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:30:34 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1glgDN-00019A-Bv
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glgDI-0006n1-Ol
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:30:33 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46235)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glgDH-0006k2-BQ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:30:32 -0500
-Received: by mail-wr1-f68.google.com with SMTP id l9so24825346wrt.13
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 12:30:30 -0800 (PST)
-References: <20190121185118.18550-1-peter.maydell@linaro.org>
-	<20190121185118.18550-3-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <679001ca-1217-5ffd-d9bc-54bff58ca3bc@redhat.com>
-Date: Mon, 21 Jan 2019 21:30:28 +0100
+	(envelope-from <ccarrara@redhat.com>) id 1glgDM-0006qO-3j
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:30:37 -0500
+Date: Mon, 21 Jan 2019 18:30:23 -0200
+From: Caio Carrara <ccarrara@redhat.com>
+Message-ID: <20190121203022.GK17671@localhost.localdomain>
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-13-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190121185118.18550-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/23] armv7m: Make cpu object a child of
- the armv7m container
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190117185628.21862-13-crosa@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 12/18] Boot Linux Console Test: add a test
+ for mips + malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On 1/21/19 7:50 PM, Peter Maydell wrote:
-> Rather than just creating the CPUs with object_new, make them child
-> objects of the armv7m container. This will allow the cluster code to
-> find the CPUs if an armv7m object is made a child of a cluster object.
-> object_new_with_props() will do the parenting for us.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Thu, Jan 17, 2019 at 01:56:22PM -0500, Cleber Rosa wrote:
+> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>=20
+> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
+> board and verify the serial is working.  Also, it relies on the serial
+> device set by the machine itself.
+>=20
+> If mips is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:mips" tags.
+>=20
+> Alternatively, this test can be run using:
+>=20
+>     $ avocado run -t arch:mips tests/acceptance
+>     $ avocado run -t machine:malta tests/acceptance
+>     $ avocado run -t endian:big tests/acceptance
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+
 > ---
->  hw/arm/armv7m.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index f9aa83d20ef..0f2c8e066cf 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -158,7 +158,12 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
->  
->      memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
->  
-> -    s->cpu = ARM_CPU(object_new(s->cpu_type));
-> +    s->cpu = ARM_CPU(object_new_with_props(s->cpu_type, OBJECT(s), "cpu",
-> +                                           &err, NULL));
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->  
->      object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
->                               &error_abort);
-> 
+>  .travis.yml                            |  2 +-
+>  scripts/qemu.py                        |  1 -
+>  tests/acceptance/boot_linux_console.py | 20 ++++++++++++++++++++
+>  3 files changed, 21 insertions(+), 2 deletions(-)
+>=20
+{...}
+>=20
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+--=20
+Caio Carrara
+Software Engineer, Virt Team - Red Hat
+ccarrara@redhat.com
