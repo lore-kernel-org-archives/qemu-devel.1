@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36007)
+Received: from eggs.gnu.org ([209.51.188.92]:36228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1glWeN-0002Oc-JQ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:17:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1glWfM-0002qP-D4
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1glWeM-0003UW-Rf
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:17:51 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1glWeM-0003U4-Lg
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:17:50 -0500
-Received: by mail-wm1-x343.google.com with SMTP id d15so10174115wmb.3
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:17:50 -0800 (PST)
-Date: Mon, 21 Jan 2019 10:17:47 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190121101747.GB30536@stefanha-x1.localdomain>
-References: <20190118120143.21631-1-sgarzare@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1glWfL-00041o-It
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:18:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glWfL-00041E-BF
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:18:51 -0500
+From: Thomas Huth <thuth@redhat.com>
+References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
+	<20190118144724.66914-1-emaste@freebsd.org>
+	<8def73c9-23e5-9f87-81d1-dda0c7e6f7d9@redhat.com>
+Message-ID: <242e057a-0c35-93b1-1249-93799cdf1196@redhat.com>
+Date: Mon, 21 Jan 2019 11:18:45 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZfOjI3PrQbgiZnxM"
-Content-Disposition: inline
-In-Reply-To: <20190118120143.21631-1-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] pvh: add new PVH option rom
+In-Reply-To: <8def73c9-23e5-9f87-81d1-dda0c7e6f7d9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>
+To: emaste@freebsd.org, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
+On 2019-01-21 10:13, Thomas Huth wrote:
+> On 2019-01-18 15:47, emaste@freebsd.org wrote:
+>> From: Ed Maste <emaste@freebsd.org>
+>>
+>> Signed-off-by: Ed Maste <emaste@freebsd.org>
+>> ---
+>> Changes since v2:
+>>   * remove fontconfig and freetype2, noted by Thomas Huth
+>>
+>> After this patch is applied someone with appropriate permissions will
+>> need to add the Cirrus-CI application in GitHub.
+>=20
+> Maybe even more important: It also works for forked repositories (once
+> you've enabled the Cirrus-CI application from the marketplace), so
+> people can use this to test their branches before sending PULL requests=
+,
+> e.g.:
+>=20
+>  https://cirrus-ci.com/github/huth/qemu
+>=20
+> Thus this sounds like a good idea to me.
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Tested-by: Thomas Huth <thuth@redhat.com>
 
---ZfOjI3PrQbgiZnxM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Actually, scratch that Tested-by: My build timed out after 1 hour:
 
-On Fri, Jan 18, 2019 at 01:01:38PM +0100, Stefano Garzarella wrote:
-> This patch series is based on "[PATCH v3 0/4] QEMU changes to do PVH boot=
-" and
-> provides a PVH option rom that can be used with SeaBIOS to boot uncompres=
-sed
-> kernel using the x86/HVM direct boot ABI.
->=20
-> Patches 1 and 2 are to prepare the PVH option rom, moving common function=
-s in
-> the new headers.  Patch 3 adds the new PVH option rom. Patch 4 uses it wh=
-en we
-> are booting an uncompressed kernel using the x86/HVM direct boot ABI. Pat=
-ch 5
-> adds the support of loading the initrd in the PVH option rom.
->=20
-> Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
+ https://cirrus-ci.com/task/5113243459649536
 
-The linuxboot_dma.bin option ROM went via Paolo's tree, so I guess he
-will merge this when he's happy, too.
+I think you need to split it up  / only build a subset of the targets
+with the --target-list of the configure script, to make sure that the
+task always finishes in < 1 h.
+Something similar is also done in .travis.yml already, and I am also had
+to split it up for my gitlab-ci.yml, see here:
 
-> Changes in v5:
-> - Patch 5: added R-b's
-> - Patch 3: updated .gitignore (by Liam)
->=20
-> Changes in v4:
-> - addressed comments by Paolo:
->   - Patch 2: linuxboot_dma.c: moved includes after the asm block to avoid
->     compiler error
->   - Patch 3: Makefile: fixed pvh.img rule
->=20
-> Changes in v3:
-> - added R-b's
-> - added Patch 5 to support initrd
-> - addressed comments by Eric and Liam:
->     - Patch 3: comments by Liam
->     - Patch 4: moved Based-on tag in the cover letter (by Eric)
-> - Patch 3: added pc-bios/pvh.bin binary in the commit
->=20
-> Changes in v2:
-> - addressed comments by Stefan and Eric:
->   - Patch 2: moved inludes on top of linuxboot_dma.c and add <stdint.h> in
->     optrom.h
->   - Patch 4: added check of pvh.bin in xen_load_linux()
-> - modified commit message of patch 2 to explain better the patch
->=20
-> Stefano Garzarella (5):
->   linuxboot_dma: remove duplicate definitions of FW_CFG
->   linuxboot_dma: move common functions in a new header
->   optionrom: add new PVH option rom
->   hw/i386/pc: use PVH option rom
->   optionrom/pvh: load initrd from fw_cfg
->=20
->  .gitignore                        |   4 +
->  Makefile                          |   2 +-
->  hw/i386/pc.c                      |   5 +
->  pc-bios/optionrom/Makefile        |   5 +-
->  pc-bios/optionrom/linuxboot_dma.c | 114 +++--------------
->  pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++
->  pc-bios/optionrom/optrom_fw_cfg.h |  92 ++++++++++++++
->  pc-bios/optionrom/pvh.S           | 200 ++++++++++++++++++++++++++++++
->  pc-bios/optionrom/pvh_main.c      | 133 ++++++++++++++++++++
->  pc-bios/pvh.bin                   | Bin 0 -> 1536 bytes
->  10 files changed, 568 insertions(+), 97 deletions(-)
->  create mode 100644 pc-bios/optionrom/optrom.h
->  create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
->  create mode 100644 pc-bios/optionrom/pvh.S
->  create mode 100644 pc-bios/optionrom/pvh_main.c
->  create mode 100644 pc-bios/pvh.bin
->=20
-> --=20
-> 2.20.1
->=20
->=20
+ https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00226.html
 
---ZfOjI3PrQbgiZnxM
-Content-Type: application/pgp-signature; name="signature.asc"
+Are you also sure that you can run with 8 CPUs here? ... I somehow doubt
+that, otherwise the build should not take more than 1 h, I think.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcRZxLAAoJEJykq7OBq3PIb2QH/RSG66EyXe3gys2Cd0wz978I
-beuJHg5HctDMuSv7rhEJu8ylp0YwEuCn2fqx4ikuvlYr+5BiFmMtNxqWMXGtNPy7
-4h7/VEL00CsYFuNOmFLrrZE50XxZkppip3DTUiK9oMBLJ2tJFMBLv+N8OtRIkCf9
-2WaKIFAQ0oBrlZ7duNqyslLOQUFs9ciNJ8QN3TGzXOc7ISSpT2WdHQhSSjZbTNw3
-I0yIPEdjW4J23C7Gy6Klwj6SyBqUPJVNaazlgfS3O4Cfv1rch9ZVD+sRr50rMDvU
-RtH5y68JURooqGWRokqTFkjal/QonQsW2GA3zzJ3suk+WnRpHzOrodPmnvQletk=
-=Q9vB
------END PGP SIGNATURE-----
-
---ZfOjI3PrQbgiZnxM--
+ Thomas
