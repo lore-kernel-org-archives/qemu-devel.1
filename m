@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39588)
+Received: from eggs.gnu.org ([209.51.188.92]:39642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1glSsP-0001e0-4o
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:16:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1glSsX-0001eH-Kp
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1glSo2-0004tk-9q
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:11:37 -0500
-Received: from mga11.intel.com ([192.55.52.93]:42259)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1glSo0-0004rK-1F
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:11:32 -0500
-Date: Mon, 21 Jan 2019 14:11:43 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190121061143.GB21562@tiger-server>
-References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
-	<be0aba0f61ea5c583ea696db4cc621d3886893de.1547624239.git.yi.z.zhang@linux.intel.com>
-	<20190116103615-mutt-send-email-mst@kernel.org>
+	(envelope-from <no-reply@patchew.org>) id 1glSkB-0002oG-ND
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:07:37 -0500
+Resent-Message-Id: <E1glSkB-0002oG-ND@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1glSk6-0002hi-8c
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:07:31 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190115193750.17234-1-farosas@linux.ibm.com>
+Message-ID: <154804991020.5550.10637299560200451310@2d3111e9616b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190116103615-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V9 6/6] docs: Added MAP_SYNC documentation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 20 Jan 2019 21:51:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] ppc/gdbstub: Expose SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: farosas@linux.ibm.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 2019-01-16 at 10:40:23 -0500, Michael S. Tsirkin wrote:
-> On Wed, Jan 16, 2019 at 04:11:16PM +0800, Zhang Yi wrote:
-> > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > ---
-> >  docs/nvdimm.txt | 21 ++++++++++++++++++++-
-> >  qemu-options.hx |  4 ++++
-> >  2 files changed, 24 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> > index 5f158a6..565ba73 100644
-> > --- a/docs/nvdimm.txt
-> > +++ b/docs/nvdimm.txt
-> > @@ -142,11 +142,30 @@ backend of vNVDIMM:
-> >  Guest Data Persistence
-> >  ----------------------
-> >  
-> > +vNVDIMM is designed and implemented to guarantee the guest data
-> > +persistence on the backends even on the host crash and power
-> 
-> in case of a host crash or a power failure
-> 
-> (be consistent)
-> 
-> > +failures. However, there are still some requirements and limitations
-> > +as explained below.
-> > +
-> >  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> > -currently the only one that can guarantee the guest write persistence
-> > +if MAP_SYNC is not supported by the host kernel and the backends,
-> > +the only backend that can guarantee the guest write persistence
-> >  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-> >  which all guest access do not involve any host-side kernel cache.
-> >  
-> > +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-> > +systems, QEMU can mmap(2) the backend with MAP_SYNC, which can ensure
-> 
-> which ensures
-> 
-> > +filesystem metadata consistent
-> 
-> consistency
-> 
-> > even after a system crash or power
-> 
-> a power
-> 
-> > +failure. Besides the host kernel support, enabling MAP_SYNC in QEMU
-> > +also requires:
-> > +
-> > + - the backend is a file supporting DAX, e.g., a file on an ext4 or
-> > +   xfs file system mounted with '-o dax',
-> > +
-> > + - 'share' option of memory-backend-file is 'on'.
-> 
-> why does share need to be on?
-According to mmap(2) man page, 
-MAP_SYNC is available only with the MAP_SHARED_VALIDATE map‐ping type.
-I will add this to documentation, Thanks.
-> 
-> > +
-> > + - 'pmem' option of memory-backend-file is 'on'
-> > +
-> >  When using other types of backends, it's suggested to set 'unarmed'
-> >  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
-> >  guest NVDIMM region mapping structure.  This unarmed flag indicates
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 08f8516..545cb8a 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
-> >  If @option{pmem} is set to 'on', QEMU will take necessary operations to
-> >  guarantee the persistence of its own writes to @option{mem-path}
-> >  (e.g. in vNVDIMM label emulation and live migration).
-> > +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
-> > +the file metadata is in sync to @option{mem-path} even on the host crash
-> > +and power failures. MAP_SYNC requires supports from both the host kernel
-> 
-> requires support
-> 
-> > +(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
-> >  
-> >  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
-> >  
-> > -- 
-> > 2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE5Mzc1MC4xNzIz
+NC0xLWZhcm9zYXNAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
+ZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBo
+dy9hY3BpL3ZtZ2VuaWQubwogIENDICAgICAgaHcvYWNwaS9hY3BpX2ludGVyZmFjZS5vCi90bXAv
+cWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOiBJbiBmdW5jdGlvbiAnZmluZF92ZGlfbmFt
+ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOjEyMzk6NTogZXJyb3I6ICdz
+dHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgMjU2IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vy
+cm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgc3RybmNweShidWYgKyBTRF9NQVhfVkRJX0xF
+TiwgdGFnLCBTRF9NQVhfVkRJX1RBR19MRU4pOwogICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0
+cmVhdGVkIGFzIGVycm9ycwotLS0KbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KSW4gZnVuY3Rpb24gJ2FjcGlfdGFibGVfaW5zdGFsbCcsCiAgICBpbmxpbmVkIGZyb20g
+J2FjcGlfdGFibGVfYWRkJyBhdCAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6Mjk2
+OjU6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoxODQ6OTogZXJyb3I6ICdzdHJu
+Y3B5JyBzcGVjaWZpZWQgYm91bmQgNCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1z
+dHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9oZHItPnNpZywgaGRycy0+
+c2lnLCBzaXplb2YgZXh0X2hkci0+c2lnKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fj
+cGkvY29yZS5jOjIwMzo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA2IGVxdWFs
+cyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAg
+IHN0cm5jcHkoZXh0X2hkci0+b2VtX2lkLCBoZHJzLT5vZW1faWQsIHNpemVvZiBleHRfaGRyLT5v
+ZW1faWQpOwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6
+MjA3Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDggZXF1YWxzIGRlc3RpbmF0
+aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweShl
+eHRfaGRyLT5vZW1fdGFibGVfaWQsIGhkcnMtPm9lbV90YWJsZV9pZCwKICAgICAgICAgXn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAg
+ICAgICBzaXplb2YgZXh0X2hkci0+b2VtX3RhYmxlX2lkKTsKICAgICAgICAgICAgICAgICB+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3Jl
+LmM6MjE2Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDQgZXF1YWxzIGRlc3Rp
+bmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNw
+eShleHRfaGRyLT5hc2xfY29tcGlsZXJfaWQsIGhkcnMtPmFzbF9jb21waWxlcl9pZCwKICAgICAg
+ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn4KICAgICAgICAgICAgICAgICBzaXplb2YgZXh0X2hkci0+YXNsX2NvbXBpbGVyX2lkKTsKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
+MTE1MTkzNzUwLjE3MjM0LTEtZmFyb3Nhc0BsaW51eC5pYm0uY29tL3Rlc3RpbmcuZG9ja2VyLW1p
+bmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
