@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43706)
+Received: from eggs.gnu.org ([209.51.188.92]:44709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glXHD-0000QS-Ru
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:58:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1glXMQ-0001nA-Cd
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glXHD-0005c5-33
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:57:59 -0500
-Resent-Message-Id: <E1glXHD-0005c5-33@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21794)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glXHC-0005aB-RF
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:57:59 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190115143650.15725-1-jusual@mail.ru>
-Message-ID: <154804030872.5550.14318378720632467069@2d3111e9616b>
+	(envelope-from <alex.bennee@linaro.org>) id 1glXMP-0002hp-54
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:22 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1glXMM-0002c1-Lp
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:18 -0500
+Received: by mail-wm1-x342.google.com with SMTP id y139so10252078wmc.5
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 03:03:16 -0800 (PST)
+References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
+	<20190118144724.66914-1-emaste@freebsd.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190118144724.66914-1-emaste@freebsd.org>
+Date: Mon, 21 Jan 2019 11:03:14 +0000
+Message-ID: <87a7ju1de5.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 19:11:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +32,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, alistair@alistair23.me, jusual@mail.ru
+Cc: Ed Maste <emaste@freebsd.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE0MzY1MC4xNTcy
-NS0xLWp1c3VhbEBtYWlsLnJ1LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
-cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
-b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIFNI
-T1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIHFhcGkvcWFw
-aS1jb21tYW5kcy10cmFuc2FjdGlvbi5vCiAgQ0MgICAgICBxYXBpL3FhcGktY29tbWFuZHMtdWku
-bwovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzogSW4gZnVuY3Rpb24gJ2ZpbmRf
-dmRpX25hbWUnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzoxMjM5OjU6IGVy
-cm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDI1NiBlcXVhbHMgZGVzdGluYXRpb24gc2l6
-ZSBbLVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgIHN0cm5jcHkoYnVmICsgU0RfTUFY
-X1ZESV9MRU4sIHRhZywgU0RfTUFYX1ZESV9UQUdfTEVOKTsKICAgICBefn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3Mg
-YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE1MTQzNjUwLjE1NzI1LTEtanVzdWFsQG1haWwu
-cnUvdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+emaste@freebsd.org writes:
+
+> From: Ed Maste <emaste@freebsd.org>
+>
+> Signed-off-by: Ed Maste <emaste@freebsd.org>
+> ---
+> Changes since v2:
+>   * remove fontconfig and freetype2, noted by Thomas Huth
+>
+> After this patch is applied someone with appropriate permissions will
+> need to add the Cirrus-CI application in GitHub.
+
+I should be able to add CirrusCI to the QEMU project github when we
+merge. I see there is another revision coming in so I''ll wait for that
+before I queue it up.
+
+>  .cirrus.yml | 16 ++++++++++++++++
+>  MAINTAINERS |  8 ++++++++
+>  2 files changed, 24 insertions(+)
+>  create mode 100644 .cirrus.yml
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> new file mode 100644
+> index 0000000000..84d6f0519b
+> --- /dev/null
+> +++ b/.cirrus.yml
+> @@ -0,0 +1,16 @@
+> +freebsd_12_task:
+> +  freebsd_instance:
+> +    image: freebsd-12-0-release-amd64
+> +    cpu: 8
+> +    memory: 24G
+> +  env:
+> +    CIRRUS_CLONE_DEPTH: 1
+> +  install_script: pkg install -y
+> +    bison curl cyrus-sasl git glib gmake gnutls
+> +    nettle perl5 pixman pkgconf png usbredir
+> +  script:
+> +    - mkdir build
+> +    - cd build
+> +    - ../configure || { cat config.log; exit 1; }
+> +    - gmake -j8 V=3D1
+> +    - gmake -j8 V=3D1 check
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index af339b86db..f9da8c9cf0 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2483,6 +2483,14 @@ W: https://travis-ci.org/qemu/qemu
+>  W: https://app.shippable.com/github/qemu/qemu
+>  W: http://patchew.org/QEMU/
+>
+> +FreeBSD Hosted Continuous Integration
+> +M: Ed Maste <emaste@freebsd.org>
+> +M: Li-Wen Hsu <lwhsu@freebsd.org>
+> +L: qemu-devel@nongnu.org
+> +S: Maintained
+> +F: .cirrus.yml
+> +W: https://cirrus-ci.com/github/qemu/qemu
+> +
+>  Guest Test Compilation Support
+>  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+
+--
+Alex Benn=C3=A9e
