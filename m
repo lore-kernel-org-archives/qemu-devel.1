@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33626)
+Received: from eggs.gnu.org ([209.51.188.92]:35730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gleXZ-0002Rh-Ke
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:43:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glefN-0000oe-Em
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gleXX-0006dL-A7
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:43:21 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45993)
+	(envelope-from <peter.maydell@linaro.org>) id 1glefM-0002X5-Nh
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:25 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gleXX-0006ca-3R
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:43:19 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t6so24531371wrr.12
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:43:18 -0800 (PST)
+	id 1glefL-0002Uu-U8
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:24 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t6so24556097wrr.12
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:23 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 18:43:14 +0000
-Message-Id: <20190121184314.14311-1-peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 18:50:57 +0000
+Message-Id: <20190121185118.18550-3-peter.maydell@linaro.org>
+In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] xlnx-zynqmp: Don't create rpu-cluster if there
- are no RPUs
+Subject: [Qemu-devel] [PATCH 02/23] armv7m: Make cpu object a child of the
+ armv7m container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: patches@linaro.org
 
-If we aren't going to create any RPUs, then don't create the
-rpu-cluster unit. This allows us to add an assertion to the
-cluster object that it contains at least one CPU, which helps
-to avoid bugs in creating clusters and putting CPUs in them.
+Rather than just creating the CPUs with object_new, make them child
+objects of the armv7m container. This will allow the cluster code to
+find the CPUs if an armv7m object is made a child of a cluster object.
+object_new_with_props() will do the parenting for us.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-This is a preparatory patch that is necessary for the series
-"[PATCH v3 0/4] tcg: support heterogenous CPU clusters"
-(20190121152218.9592-1-peter.maydell@linaro.org)
-in order to avoid the xlnx-zcu102 board asserting if started with
-fewer than 5 CPUs.
+ hw/arm/armv7m.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- hw/arm/xlnx-zynqmp.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 370b0e44a38..16cba433cb7 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -178,6 +178,11 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
-     int i;
-     int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index f9aa83d20ef..0f2c8e066cf 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -158,7 +158,12 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
  
-+    if (num_rpus == 0) {
-+        /* Don't create rpu-cluster object if there's nothing to put in it */
+     memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
+ 
+-    s->cpu = ARM_CPU(object_new(s->cpu_type));
++    s->cpu = ARM_CPU(object_new_with_props(s->cpu_type, OBJECT(s), "cpu",
++                                           &err, NULL));
++    if (err != NULL) {
++        error_propagate(errp, err);
 +        return;
 +    }
-+
-     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
-                             sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
-                             &error_abort, NULL);
+ 
+     object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
+                              &error_abort);
 -- 
 2.20.1
