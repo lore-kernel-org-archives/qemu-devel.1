@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40204)
+Received: from eggs.gnu.org ([209.51.188.92]:40248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexH-0001kt-Fd
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:56 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexJ-0001mj-8m
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexC-0004GR-SQ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:51 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51943 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexI-0004Lf-Ib
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:57 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:50404 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1glexC-0004EG-LJ
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:50 -0500
+	id 1glexG-0003u9-Bd
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:56 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 21 Jan 2019 20:08:17 +0100
-Message-Id: <1548097698-28951-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 21 Jan 2019 20:08:13 +0100
+Message-Id: <1548097698-28951-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1548097698-28951-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1548097698-28951-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 5/6] target/mips: Extend gen_scwp()
- functionality to support EVA
+Subject: [Qemu-devel] [PATCH 1/6] target/mips: nanoMIPS: Remove duplicate
+ macro definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,34 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikal
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Extend gen_scwp() functionality to support EVA by adding an
-additional argument, and accordingly change related invocations.
+Several macros were defined twice, with identical values.
+Remove duplicates.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/mips/translate.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index b660235..e57b2be 100644
+index 057aaf9..fb2c42c 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -3708,7 +3708,7 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
+@@ -18433,16 +18433,6 @@ static inline int decode_gpr_gpr4_zero(int r)
  }
  
- static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
--                    uint32_t reg1, uint32_t reg2)
-+                    uint32_t reg1, uint32_t reg2, bool eva)
- {
-     TCGv taddr = tcg_temp_local_new();
-     TCGv lladdr = tcg_temp_local_new();
-@@ -3736,7 +3736,7 @@ static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
  
-     tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
-     tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
--                               ctx->mem_idx, MO_64);
-+                               eva ? MIPS_HFLAG_UM : ctx->mem_idx, MO_64);
-     if (reg1 != 0) {
-         tcg_gen_movi_tl(cpu_gpr[reg1], 1);
-     }
-@@ -21481,7 +21481,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         break;
-                     case NM_SCWP:
-                         check_xnp(ctx);
--                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-+                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5),
-+                                 false);
-                         break;
-                     }
-                     break;
-@@ -21585,7 +21586,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                         check_xnp(ctx);
-                         check_eva(ctx);
-                         check_cp0_enabled(ctx);
--                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
-+                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5),
-+                                 true);
-                         break;
-                     default:
-                         generate_exception_end(ctx, EXCP_RI);
+-/* extraction utilities */
+-
+-#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
+-#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
+-#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
+-#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
+-#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
+-#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
+-
+-
+ static void gen_adjust_sp(DisasContext *ctx, int u)
+ {
+     gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
 -- 
 2.7.4
