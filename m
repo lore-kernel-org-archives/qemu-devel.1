@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48583)
+Received: from eggs.gnu.org ([209.51.188.92]:52862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glTX6-0001xK-GW
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:58:09 -0500
+	(envelope-from <kraxel@redhat.com>) id 1glTtK-00053A-Ek
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glTX5-0001xs-KB
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:58:08 -0500
-Resent-Message-Id: <E1glTX5-0001xs-KB@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glTX5-0001vt-Dv
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:58:07 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1547574976-6372-1-git-send-email-pbonzini@redhat.com>
-Message-ID: <154804751970.5550.12879182002138353670@2d3111e9616b>
+	(envelope-from <kraxel@redhat.com>) id 1glTtJ-0005PQ-N8
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:21:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glTtJ-0005NM-7F
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:21:05 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AE2EC1F89
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 07:14:47 +0000 (UTC)
+Date: Mon, 21 Jan 2019 08:14:37 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190121071437.yp22hr7hczlr23ww@sirius.home.kraxel.org>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-2-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 21:12:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] tap: flush STDOUT on newline
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190118173103.4903-2-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] display: ensure qxl log_buf is a
+ nul terminated string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +34,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, thuth@redhat.com
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ3NTc0OTc2LTYzNzItMS1n
-aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
-bWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGRldmljZV90cmVlLm8KICBDQyAgICAgIHFhcGkvcWFwaS1jb21tYW5kcy5vCi90bXAv
-cWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOiBJbiBmdW5jdGlvbiAnZmluZF92ZGlfbmFt
-ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOjEyMzk6NTogZXJyb3I6ICdz
-dHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgMjU2IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vy
-cm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgc3RybmNweShidWYgKyBTRF9NQVhfVkRJX0xF
-TiwgdGFnLCBTRF9NQVhfVkRJX1RBR19MRU4pOwogICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0
-cmVhdGVkIGFzIGVycm9ycwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMTU0NzU3NDk3Ni02MzcyLTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlA
-cmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+>      case QXL_IO_LOG:
+> -        trace_qxl_io_log(d->id, d->ram->log_buf);
+> +        d->ram->log_buf[sizeof(d->ram->log_buf) - 1] = '\0';
+> +        trace_qxl_io_log(d->id, (const char *)d->ram->log_buf);
+>          if (d->guestdebug) {
+
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
