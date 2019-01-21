@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51678)
+Received: from eggs.gnu.org ([209.51.188.92]:51763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy7-0004Mb-2y
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:43 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy9-0004Pg-Sn
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy6-00049N-8S
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:43 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42787)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldy9-0004DV-1F
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:45 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44004)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gldy6-00048i-0k
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:42 -0500
-Received: by mail-wr1-x435.google.com with SMTP id q18so24433738wrx.9
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:41 -0800 (PST)
+	id 1gldy8-0004CB-RE
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:44 -0500
+Received: by mail-wr1-x432.google.com with SMTP id r10so24429110wrs.10
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:44 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Jan 2019 19:05:49 +0100
-Message-Id: <1548093980-43088-19-git-send-email-pbonzini@redhat.com>
+Date: Mon, 21 Jan 2019 19:05:52 +0100
+Message-Id: <1548093980-43088-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 References: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 18/49] tests/hexloader-test: Don't pass
- -nographic to the QEMU under test
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 21/49] configure: Add a proper check for
+ openpty() in libutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +32,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
 
-The hexloader test invokes QEMU with the -nographic argument. This
-is unnecessary, because the qtest_initf() function will pass it
--display none, which suffices to disable the graphical window.
-It also means that the QEMU process will make the stdin/stdout
-O_NONBLOCK. Since O_NONBLOCK is not per-file descriptor but per
-"file description", this non-blocking behaviour is then shared
-with any other process that's using the stdin/stdout of the
-'make check' run, including make itself. This can result in make
-falling over with "make: write error: stdout" because it got
-an unexpected EINTR trying to write output messages to the terminal.
-This is particularly noticable if running 'make check' in a loop with
-  while make check; do true; done
-(It does not affect single make check runs so much because the
-shell will remove the O_NONBLOCK status before it reads the
-terminal for interactive input.)
+On Linux (and maybe some BSDs), we require libutil for the openpty()
+function. However, this library is not available on some other systems, so
+we currently use a fragile if-statement in the configure script to check
+whether we need the library or not. Unfortunately, we also hard-coded a
+"-lutil" in the tests/Makefile.include file, so this breaks the build on
+Solaris, for example (see buglink below). To fix the issue, add the "-lutil"
+to "libs_tools" in the configure script instead, then this gets properly
+propagated to the tests, too.
+And while we're at it, also replace the fragile if-statement in the confi-
+gure script with a proper link-check for the availability of this function.
 
-Remove the unwanted -nographic argument.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20190104145018.16950-1-peter.maydell@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1777252
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/hexloader-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure              | 12 ++++++++++--
+ tests/Makefile.include |  4 ----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
-index 834ed52..8b7aa2d 100644
---- a/tests/hexloader-test.c
-+++ b/tests/hexloader-test.c
-@@ -23,7 +23,7 @@ static void hex_loader_test(void)
-     const unsigned int base_addr = 0x00010000;
+diff --git a/configure b/configure
+index 868614e..6a4d23c 100755
+--- a/configure
++++ b/configure
+@@ -4621,9 +4621,17 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+   libs_qga="$libs_qga -lrt"
+ fi
  
-     QTestState *s = qtest_initf(
--        "-M vexpress-a9 -nographic -device loader,file=tests/data/hex-loader/test.hex");
-+        "-M vexpress-a9 -device loader,file=tests/data/hex-loader/test.hex");
+-if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+-        "$haiku" != "yes" ; then
++# Check whether we need to link libutil for openpty()
++cat > $TMPC << EOF
++extern int openpty(int *am, int *as, char *name, void *termp, void *winp);
++int main(void) { return openpty(0, 0, 0, 0, 0); }
++EOF
++
++if ! compile_prog "" "" ; then
++  if compile_prog "" "-lutil" ; then
+     libs_softmmu="-lutil $libs_softmmu"
++    libs_tools="-lutil $libs_tools"
++  fi
+ fi
  
-     for (i = 0; i < 256; ++i) {
-         uint8_t val = qtest_readb(s, base_addr + i);
+ ##########################################
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 443ac4d..2fe2ab7 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -793,10 +793,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
+ 
+-ifeq ($(CONFIG_POSIX),y)
+-LIBS += -lutil
+-endif
+-
+ # QTest rules
+ 
+ TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
 -- 
 1.8.3.1
