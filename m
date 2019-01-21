@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38984)
+Received: from eggs.gnu.org ([209.51.188.92]:40172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glevW-000854-0H
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:06 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexB-0001gB-Rl
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glefT-0002dd-4k
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:32 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38971)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glefR-0002bJ-72
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:29 -0500
-Received: by mail-wm1-x342.google.com with SMTP id y8so11809649wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:27 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 18:51:00 +0000
-Message-Id: <20190121185118.18550-6-peter.maydell@linaro.org>
-In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
-References: <20190121185118.18550-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 05/23] hw/arm/iotkit: Refactor into abstract
- base class and subclass
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1glexB-0004EA-7B
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:49 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:50391 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1glexA-0003lU-5E
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:09:48 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 21 Jan 2019 20:08:12 +0100
+Message-Id: <1548097698-28951-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH 0/6] target/mips: Misc fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +22,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikalo@wavecomp.com
 
-The Arm SSE-200 Subsystem for Embedded is a revised and
-extended version of the older IoTKit SoC. Prepare for
-adding a model of it by refactoring the IoTKit code into
-an abstract base class which contains the functionality,
-driven by a class data block specific to each subclass.
-(This is the same approach used by the existing bcm283x
-SoC family implementation.)
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/iotkit.h | 22 +++++++++++++++++-----
- hw/arm/iotkit.c         | 34 +++++++++++++++++++++++++++++-----
- 2 files changed, 46 insertions(+), 10 deletions(-)
+A collection of misc fixes for MIPS.
 
-diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 9701738ec75..521d1f73757 100644
---- a/include/hw/arm/iotkit.h
-+++ b/include/hw/arm/iotkit.h
-@@ -74,15 +74,15 @@
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
- 
--#define TYPE_ARMSSE "iotkit"
-+#define TYPE_ARMSSE "arm-sse"
- #define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARMSSE)
- 
- /*
-- * For the moment TYPE_IOTKIT is a synonym for TYPE_ARMSSE (and the
-- * latter's underlying name is left as "iotkit"); in a later
-- * commit it will become a subclass of TYPE_ARMSSE.
-+ * These type names are for specific IoTKit subsystems; other than
-+ * instantiating them, code using these devices should always handle
-+ * them via the ARMSSE base class, so they have no IOTKIT() etc macros.
-  */
--#define TYPE_IOTKIT TYPE_ARMSSE
-+#define TYPE_IOTKIT "iotkit"
- 
- /* We have an IRQ splitter and an OR gate input for each external PPC
-  * and the 2 internal PPCs
-@@ -143,4 +143,16 @@ typedef struct ARMSSE {
-     uint32_t mainclk_frq;
- } ARMSSE;
- 
-+typedef struct ARMSSEInfo ARMSSEInfo;
-+
-+typedef struct ARMSSEClass {
-+    DeviceClass parent_class;
-+    const ARMSSEInfo *info;
-+} ARMSSEClass;
-+
-+#define ARMSSE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(ARMSSEClass, (klass), TYPE_ARMSSE)
-+#define ARMSSE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(ARMSSEClass, (obj), TYPE_ARMSSE)
-+
- #endif
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index 9360053184e..d5b172933c3 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -18,6 +18,16 @@
- #include "hw/arm/iotkit.h"
- #include "hw/arm/arm.h"
- 
-+struct ARMSSEInfo {
-+    const char *name;
-+};
-+
-+static const ARMSSEInfo armsse_variants[] = {
-+    {
-+        .name = TYPE_IOTKIT,
-+    },
-+};
-+
- /* Clock frequency in HZ of the 32KHz "slow clock" */
- #define S32KCLK (32 * 1000)
- 
-@@ -732,29 +742,43 @@ static void iotkit_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
-+    ARMSSEClass *asc = ARMSSE_CLASS(klass);
- 
-     dc->realize = iotkit_realize;
-     dc->vmsd = &iotkit_vmstate;
-     dc->props = iotkit_properties;
-     dc->reset = iotkit_reset;
-     iic->check = iotkit_idau_check;
-+    asc->info = data;
- }
- 
--static const TypeInfo iotkit_info = {
-+static const TypeInfo armsse_info = {
-     .name = TYPE_ARMSSE,
-     .parent = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(ARMSSE),
-     .instance_init = iotkit_init,
--    .class_init = iotkit_class_init,
-+    .abstract = true,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_IDAU_INTERFACE },
-         { }
-     }
- };
- 
--static void iotkit_register_types(void)
-+static void armsse_register_types(void)
- {
--    type_register_static(&iotkit_info);
-+    int i;
-+
-+    type_register_static(&armsse_info);
-+
-+    for (i = 0; i < ARRAY_SIZE(armsse_variants); i++) {
-+        TypeInfo ti = {
-+            .name = armsse_variants[i].name,
-+            .parent = TYPE_ARMSSE,
-+            .class_init = iotkit_class_init,
-+            .class_data = (void *)&armsse_variants[i],
-+        };
-+        type_register(&ti);
-+    }
- }
- 
--type_init(iotkit_register_types);
-+type_init(armsse_register_types);
+Aleksandar Markovic (6):
+  target/mips: nanoMIPS: Remove duplicate macro definitions
+  target/mips: nanoMIPS: Remove an unused macro
+  target/mips: nanoMIPS: Rename macros for extracting 3-bit GPR codes
+  target/mips: Correct the second argument type of cpu_supports_isa()
+  target/mips: Extend gen_scwp() functionality to support EVA
+  disas: nanoMIPS: Amend DSP instructions related comments
+
+ disas/nanomips.cpp      | 119 ++++++++++++++++++++++++++++++------------------
+ target/mips/cpu.h       |   2 +-
+ target/mips/translate.c |  49 ++++++++------------
+ 3 files changed, 96 insertions(+), 74 deletions(-)
+
 -- 
-2.20.1
+2.7.4
