@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51933)
+Received: from eggs.gnu.org ([209.51.188.92]:52481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glVbR-0002rt-4M
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:10:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1glVdN-0003hP-Ha
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:12:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glVbQ-0008Al-A4
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:10:45 -0500
-References: <20190118131456.32451-1-kbastian@mail.uni-paderborn.de>
-	<20190118131456.32451-27-kbastian@mail.uni-paderborn.de>
-	<235a7ee4-8f5e-1b2a-09fd-e4809c674065@linaro.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <5ad14b08-7db1-279a-a702-9ce2e981397e@mail.uni-paderborn.de>
-Date: Mon, 21 Jan 2019 10:10:19 +0100
+	(envelope-from <no-reply@patchew.org>) id 1glVdM-0001BZ-AQ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:12:45 -0500
+Resent-Message-Id: <E1glVdM-0001BZ-AQ@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190116041916.130523-1-aik@ozlabs.ru>
+Message-ID: <154806194518.5550.2343102451378897230@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <235a7ee4-8f5e-1b2a-09fd-e4809c674065@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-Subject: Re: [Qemu-devel] [PATCH v4 26/35] target/riscv: Remove shift and
- slt insn manual decoding
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 21 Jan 2019 01:12:26 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH qemu] spapr: Fix fdt warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com
-Cc: peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: aik@ozlabs.ru
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-
-On 1/20/19 2:43 AM, Richard Henderson wrote:
-> On 1/19/19 12:14 AM, Bastian Koppelmann wrote:
->> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->> Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
->> ---
->> v3 -> v4:
->>      - refactor tcg_gen_set_cond_tl(TCG_COND_LT,..) into gen_slt function
->>        and reuse gen_arith(..., &gen_slt) for all trans_slt functions.
->>      - Add missing sign extension to trans_srlw/sllw
->>      - Made rs2 == 0 a special case of srlw/sllw
-> Why?  It's not like it is a likely case, and it works without.
-
-
-Because you suggested it :) (see 
-https://patchwork.kernel.org/patch/10662699/). Maybe I misunderstood 
-your comment. If you like I can remove it in the respin.
-
-
-Cheers,
-
-Bastian
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNjA0MTkxNi4xMzA1
+MjMtMS1haWtAb3psYWJzLnJ1LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
+LW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
+cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
+b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIFNI
+T1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIGh3L2J0L2hj
+aS1jc3IubwogIENDICAgICAgaHcvY2hhci9pcG9jdGFsMjMyLm8KL3RtcC9xZW11LXRlc3Qvc3Jj
+L2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1bmN0aW9uICdmaW5kX3ZkaV9uYW1lJzoKL3RtcC9xZW11
+LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6MTIzOTo1OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNp
+ZmllZCBib3VuZCAyNTYgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3At
+dHJ1bmNhdGlvbl0KICAgICBzdHJuY3B5KGJ1ZiArIFNEX01BWF9WRElfTEVOLCB0YWcsIFNEX01B
+WF9WRElfVEFHX0xFTik7CiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJy
+b3JzCi0tLQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpJbiBmdW5j
+dGlvbiAnYWNwaV90YWJsZV9pbnN0YWxsJywKICAgIGlubGluZWQgZnJvbSAnYWNwaV90YWJsZV9h
+ZGQnIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoyOTY6NToKL3RtcC9xZW11
+LXRlc3Qvc3JjL2h3L2FjcGkvY29yZS5jOjE4NDo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmll
+ZCBib3VuZCA0IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5j
+YXRpb25dCiAgICAgICAgIHN0cm5jcHkoZXh0X2hkci0+c2lnLCBoZHJzLT5zaWcsIHNpemVvZiBl
+eHRfaGRyLT5zaWcpOwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6MjAz
+Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDYgZXF1YWxzIGRlc3RpbmF0aW9u
+IHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweShleHRf
+aGRyLT5vZW1faWQsIGhkcnMtPm9lbV9pZCwgc2l6ZW9mIGV4dF9oZHItPm9lbV9pZCk7CiAgICAg
+ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoyMDc6OTogZXJyb3I6
+ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgOCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdl
+cnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9oZHItPm9lbV90
+YWJsZV9pZCwgaGRycy0+b2VtX3RhYmxlX2lkLAogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgIHNpemVvZiBl
+eHRfaGRyLT5vZW1fdGFibGVfaWQpOwogICAgICAgICAgICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoyMTY6OTogZXJy
+b3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgNCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBb
+LVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9oZHItPmFz
+bF9jb21waWxlcl9pZCwgaGRycy0+YXNsX2NvbXBpbGVyX2lkLAogICAgICAgICBefn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAg
+ICAgICAgIHNpemVvZiBleHRfaGRyLT5hc2xfY29tcGlsZXJfaWQpOwotLS0KY2MxOiBhbGwgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9z
+cmMvcnVsZXMubWFrOjY5OiBody9hY3BpL2NvcmUub10gRXJyb3IgMQovdG1wL3FlbXUtdGVzdC9z
+cmMvaHcvYWNwaS9hbWwtYnVpbGQuYzogSW4gZnVuY3Rpb24gJ2J1aWxkX2hlYWRlcic6Ci90bXAv
+cWVtdS10ZXN0L3NyYy9ody9hY3BpL2FtbC1idWlsZC5jOjE1MzU6OTogZXJyb3I6ICdzdHJuY3B5
+JyBzcGVjaWZpZWQgYm91bmQgNiBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJp
+bmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KChjaGFyICopaC0+b2VtX2lkLCBvZW1f
+aWQsIHNpemVvZiBoLT5vZW1faWQpOwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2Ft
+bC1idWlsZC5jOjE1NDE6OTogZXJyb3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgOCBlcXVh
+bHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAg
+ICBzdHJuY3B5KChjaGFyICopaC0+b2VtX3RhYmxlX2lkLCBvZW1fdGFibGVfaWQsIHNpemVvZiho
+LT5vZW1fdGFibGVfaWQpKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2Fybmlu
+Z3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE2MDQxOTE2LjEzMDUyMy0xLWFpa0Bvemxh
+YnMucnUvdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
