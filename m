@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44709)
+Received: from eggs.gnu.org ([209.51.188.92]:44903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1glXMQ-0001nA-Cd
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1glXNI-0002DD-Du
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1glXMP-0002hp-54
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:22 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55403)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1glXMM-0002c1-Lp
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:03:18 -0500
-Received: by mail-wm1-x342.google.com with SMTP id y139so10252078wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 03:03:16 -0800 (PST)
-References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
-	<20190118144724.66914-1-emaste@freebsd.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190118144724.66914-1-emaste@freebsd.org>
-Date: Mon, 21 Jan 2019 11:03:14 +0000
-Message-ID: <87a7ju1de5.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
- FreeBSD
+	(envelope-from <cohuck@redhat.com>) id 1glXNG-0003SW-0a
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 06:04:16 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 21 Jan 2019 12:03:49 +0100
+Message-Id: <20190121110354.2247-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/5] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +18,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+
+[This is the Linux kernel part, git tree is available at
+https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-eagain-caps
+
+The companion QEMU patches are available at
+https://github.com/cohuck/qemu vfio-ccw-caps]
+
+Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+device. This tends to work well for the most common 'good path' scenarios;
+however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+clearing pending requests at the device is currently not supported.
+This may be a problem for e.g. error recovery.
+
+This patch series introduces capabilities (similar to what vfio-pci uses)
+and exposes a new async region for handling hsch/csch.
+
+New in v2 are two patches dealing with concurrency.
+
+Lightly tested (I can interact with a dasd as before, and reserve/release
+seems to work well.) Not sure if there is a better way to test this, ideas
+welcome.
+
+Changes v1->v2:
+- New patch 1: make it safe to use the cp accessors at any time; this
+  should avoid problems with unsolicited interrupt handling
+- New patch 2: handle concurrent accesses to the io region; the idea is
+  to return -EAGAIN to userspace more often (so it can simply retry)
+- also handle concurrent accesses to the async io region
+- change VFIO_REGION_TYPE_CCW
+- merge events for halt and clear to a single async event; this turned out
+  to make the code quite a bit simpler
+- probably some small changes I forgot to note down
 
 
-emaste@freebsd.org writes:
+Cornelia Huck (5):
+  vfio-ccw: make it safe to access channel programs
+  vfio-ccw: concurrent I/O handling
+  vfio-ccw: add capabilities chain
+  s390/cio: export hsch to modules
+  vfio-ccw: add handling for async channel instructions
 
-> From: Ed Maste <emaste@freebsd.org>
->
-> Signed-off-by: Ed Maste <emaste@freebsd.org>
-> ---
-> Changes since v2:
->   * remove fontconfig and freetype2, noted by Thomas Huth
->
-> After this patch is applied someone with appropriate permissions will
-> need to add the Cirrus-CI application in GitHub.
+ drivers/s390/cio/Makefile           |   3 +-
+ drivers/s390/cio/ioasm.c            |   1 +
+ drivers/s390/cio/vfio_ccw_async.c   |  91 ++++++++++++
+ drivers/s390/cio/vfio_ccw_cp.c      |   3 +
+ drivers/s390/cio/vfio_ccw_cp.h      |   2 +
+ drivers/s390/cio/vfio_ccw_drv.c     |  46 ++++--
+ drivers/s390/cio/vfio_ccw_fsm.c     | 122 +++++++++++++++-
+ drivers/s390/cio/vfio_ccw_ops.c     | 211 +++++++++++++++++++++++-----
+ drivers/s390/cio/vfio_ccw_private.h |  45 ++++++
+ include/uapi/linux/vfio.h           |   4 +
+ include/uapi/linux/vfio_ccw.h       |  12 ++
+ 11 files changed, 487 insertions(+), 53 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_async.c
 
-I should be able to add CirrusCI to the QEMU project github when we
-merge. I see there is another revision coming in so I''ll wait for that
-before I queue it up.
-
->  .cirrus.yml | 16 ++++++++++++++++
->  MAINTAINERS |  8 ++++++++
->  2 files changed, 24 insertions(+)
->  create mode 100644 .cirrus.yml
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> new file mode 100644
-> index 0000000000..84d6f0519b
-> --- /dev/null
-> +++ b/.cirrus.yml
-> @@ -0,0 +1,16 @@
-> +freebsd_12_task:
-> +  freebsd_instance:
-> +    image: freebsd-12-0-release-amd64
-> +    cpu: 8
-> +    memory: 24G
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script: pkg install -y
-> +    bison curl cyrus-sasl git glib gmake gnutls
-> +    nettle perl5 pixman pkgconf png usbredir
-> +  script:
-> +    - mkdir build
-> +    - cd build
-> +    - ../configure || { cat config.log; exit 1; }
-> +    - gmake -j8 V=3D1
-> +    - gmake -j8 V=3D1 check
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index af339b86db..f9da8c9cf0 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2483,6 +2483,14 @@ W: https://travis-ci.org/qemu/qemu
->  W: https://app.shippable.com/github/qemu/qemu
->  W: http://patchew.org/QEMU/
->
-> +FreeBSD Hosted Continuous Integration
-> +M: Ed Maste <emaste@freebsd.org>
-> +M: Li-Wen Hsu <lwhsu@freebsd.org>
-> +L: qemu-devel@nongnu.org
-> +S: Maintained
-> +F: .cirrus.yml
-> +W: https://cirrus-ci.com/github/qemu/qemu
-> +
->  Guest Test Compilation Support
->  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-
---
-Alex Benn=C3=A9e
+-- 
+2.17.2
