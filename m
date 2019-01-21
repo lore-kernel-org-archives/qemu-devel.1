@@ -1,25 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glSsX-0001eH-Kp
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:16:14 -0500
+	(envelope-from <tao3.xu@intel.com>) id 1glSsb-0001eH-J0
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:16:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glSkB-0002oG-ND
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:07:37 -0500
-Resent-Message-Id: <E1glSkB-0002oG-ND@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21702)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glSk6-0002hi-8c
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:07:31 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190115193750.17234-1-farosas@linux.ibm.com>
-Message-ID: <154804991020.5550.10637299560200451310@2d3111e9616b>
+	(envelope-from <tao3.xu@intel.com>) id 1glSge-0000gu-Kz
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:03:58 -0500
+Received: from mga06.intel.com ([134.134.136.31]:14015)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1glSge-0000d7-7z
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 01:03:56 -0500
+References: <20190111153451.14304-1-tao3.xu@intel.com>
+	<20190111153451.14304-5-tao3.xu@intel.com>
+	<859ba7db-4129-1f8b-f4e4-8609f2d3755d@redhat.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
+Date: Mon, 21 Jan 2019 14:03:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 21:51:51 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] ppc/gdbstub: Expose SPRs to GDB
+In-Reply-To: <859ba7db-4129-1f8b-f4e4-8609f2d3755d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 4/9] Extend the command-line to provide
+ memory latency and bandwidth information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +30,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: farosas@linux.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>, mst@redhat.com, imammedo@redhat.com
+Cc: ehabkost@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com, danmei.wei@intel.com, rth@twiddle.net
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNTE5Mzc1MC4xNzIz
-NC0xLWZhcm9zYXNAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
-Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
-bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
-ZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBo
-dy9hY3BpL3ZtZ2VuaWQubwogIENDICAgICAgaHcvYWNwaS9hY3BpX2ludGVyZmFjZS5vCi90bXAv
-cWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOiBJbiBmdW5jdGlvbiAnZmluZF92ZGlfbmFt
-ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOjEyMzk6NTogZXJyb3I6ICdz
-dHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgMjU2IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vy
-cm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgc3RybmNweShidWYgKyBTRF9NQVhfVkRJX0xF
-TiwgdGFnLCBTRF9NQVhfVkRJX1RBR19MRU4pOwogICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0
-cmVhdGVkIGFzIGVycm9ycwotLS0KbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
-cy4uLi4KSW4gZnVuY3Rpb24gJ2FjcGlfdGFibGVfaW5zdGFsbCcsCiAgICBpbmxpbmVkIGZyb20g
-J2FjcGlfdGFibGVfYWRkJyBhdCAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6Mjk2
-OjU6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoxODQ6OTogZXJyb3I6ICdzdHJu
-Y3B5JyBzcGVjaWZpZWQgYm91bmQgNCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1z
-dHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9oZHItPnNpZywgaGRycy0+
-c2lnLCBzaXplb2YgZXh0X2hkci0+c2lnKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fj
-cGkvY29yZS5jOjIwMzo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA2IGVxdWFs
-cyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAg
-IHN0cm5jcHkoZXh0X2hkci0+b2VtX2lkLCBoZHJzLT5vZW1faWQsIHNpemVvZiBleHRfaGRyLT5v
-ZW1faWQpOwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6
-MjA3Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDggZXF1YWxzIGRlc3RpbmF0
-aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweShl
-eHRfaGRyLT5vZW1fdGFibGVfaWQsIGhkcnMtPm9lbV90YWJsZV9pZCwKICAgICAgICAgXn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAg
-ICAgICBzaXplb2YgZXh0X2hkci0+b2VtX3RhYmxlX2lkKTsKICAgICAgICAgICAgICAgICB+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3Jl
-LmM6MjE2Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDQgZXF1YWxzIGRlc3Rp
-bmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNw
-eShleHRfaGRyLT5hc2xfY29tcGlsZXJfaWQsIGhkcnMtPmFzbF9jb21waWxlcl9pZCwKICAgICAg
-ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn4KICAgICAgICAgICAgICAgICBzaXplb2YgZXh0X2hkci0+YXNsX2NvbXBpbGVyX2lkKTsKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-MTE1MTkzNzUwLjE3MjM0LTEtZmFyb3Nhc0BsaW51eC5pYm0uY29tL3Rlc3RpbmcuZG9ja2VyLW1p
-bmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+On 1/15/2019 3:38 AM, Eric Blake wrote:
+> On 1/11/19 9:34 AM, Tao Xu wrote:
+>> From: Liu Jingqi <jingqi.liu@intel.com>
+>>
+>> Add -numa hmat-lb option to provide System Locality Latency and
+>> Bandwidth Information. These memory attributes help to build
+>> System Locality Latency and Bandwidth Information Structure(s)
+>> in ACPI Heterogeneous Memory Attribute Table (HMAT).
+>>
+>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>   numa.c          | 124 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>   qapi/misc.json  |  92 ++++++++++++++++++++++++++++++++++-
+>>   qemu-options.hx |  28 ++++++++++-
+>>   3 files changed, 241 insertions(+), 3 deletions(-)
+>> +++ b/qapi/misc.json
+>> @@ -2746,10 +2746,12 @@
+>>   #
+>>   # @cpu: property based CPU(s) to node mapping (Since: 2.10)
+>>   #
+>> +# @hmat-lb: memory latency and bandwidth information (Since: 2.13)
+> s/2.13/4.0/ (probably in multiple spots in your series) 
+Hi Eric,
+
+Thank you for your comments. The spell mistakes in patches 1/9 to 6/9
+have been corrected in patch 7/9. Because patches 1/9 to 6/9 are jingqi's
+initial V1 patchesand7/9 to 9/9 are the changes compared withV1.
+
+About s/2.13/4.0/,do you mean ACPI HMAT will not be merged before QEMU
+4.0?
+
+In addition, do you have any other comments about these patches?
+Thank you very much!
+
+Tao
+>> +##
+>> +# @HmatLBMemoryHierarchy:
+>> +#
+>> +# The memory hierarchy in the System Locality Latency
+>> +# and Bandwidth Information Structure of HMAT
+>> +#
+>> +# @memory: the structure represents the memory performance
+>> +#
+>> +# @last-level: last level memory of memory side cached memory
+>> +#
+>> +# @1st-level: first level memory of memory side cached memory
+>> +#
+>> +# @2nd-level: second level memory of memory side cached memory
+>> +#
+>> +# @3rd-level: third level memory of memory side cached memory
+> Let's spell these first-level, second-level, third-level (rather than
+> adding even more spots where we have enums with leading digits)
+>
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'HmatLBMemoryHierarchy',
+>> +  'data': [ 'memory', 'last-level', '1st-level',
+>> +            '2nd-level', '3rd-level' ] }
+>> +
+>> +##
+>> +# @HmatLBDataType:
+>> +#
+>> +# Data type in the System Locality Latency
+>> +# and Bandwidth Information Structure of HMAT
+>> +#
+>> +# @access-latency: access latency
+>> +#
+>> +# @read-latency: read latency
+>> +#
+>> +# @write-latency: write latency
+>> +#
+>> +# @access-bandwidth: access bandwitch
+>> +#
+> s/bandwitch/bandwidth/
+>
+>> +# @read-bandwidth: read bandwidth
+>> +#
+>> +# @write-bandwidth: write bandwidth
+> All 6 of these should probably list their units.
+>
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'HmatLBDataType',
+>> +  'data': [ 'access-latency', 'read-latency', 'write-latency',
+>> +            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
+>> +
+>> +##
+>> +# @NumaHmatLBOptions:
+>> +#
+>> +# Set the system locality latency and bandwidth information
+>> +# between Initiator and Target proximity Domains.
+>> +#
+>> +# @initiator: the Initiator Proximity Domain.
+>> +#
+>> +# @target: the Target Proximity Domain.
+>> +#
+>> +# @hierarchy: the Memory Hierarchy. Indicates the performance
+>> +#             of memory or side cache.
+>> +#
+>> +# @data-type: presents the type of data, access/read/write
+>> +#             latency or hit latency.
+>> +#
+>> +# @base-lat: the base unit for latency in nanoseconds.
+>> +#
+>> +# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
+>> +#
+>> +# @latency: the value of latency based on Base Unit from @initiator
+>> +#           to @target proximity domain.
+>> +#
+>> +# @bandwidth: the value of bandwidth based on Base Unit between
+>> +#             @initiator and @target proximity domain.
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'struct': 'NumaHmatLBOptions',
+>> +  'data': {
+>> +   'initiator': 'uint16',
+>> +   'target': 'uint16',
+>> +   'hierarchy': 'HmatLBMemoryHierarchy',
+>> +   'data-type': 'HmatLBDataType',
+>> +   '*base-lat': 'uint64',
+>> +   '*base-bw': 'uint64',
+>> +   '*latency': 'uint16',
+>> +   '*bandwidth': 'uint16' }}
+>> +
+>>   ##
+>>   # @HostMemPolicy:
+>>   #
+>
