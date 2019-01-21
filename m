@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45474)
+Received: from eggs.gnu.org ([209.51.188.92]:45512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gldVI-0002cN-89
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:36:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gldVW-0002lg-Pz
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gldVH-0005fX-7a
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:36:56 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50914)
+	(envelope-from <pbonzini@redhat.com>) id 1gldVV-00064P-WC
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:10 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38773)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gldVH-0005ea-1U
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:36:55 -0500
-Received: by mail-wm1-f66.google.com with SMTP id n190so11667289wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:36:54 -0800 (PST)
-Date: Mon, 21 Jan 2019 18:36:50 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190121173650.ydihxdyhheq7xcpq@steredhat>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gldVV-00063B-Oe
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:37:09 -0500
+Received: by mail-wr1-f68.google.com with SMTP id v13so24380916wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:37:09 -0800 (PST)
 References: <20190118120143.21631-1-sgarzare@redhat.com>
-	<20190118120143.21631-5-sgarzare@redhat.com>
-	<20190121170541.GN4136@habkost.net>
+	<20190118120143.21631-4-sgarzare@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <18a8918c-b4d6-1165-4064-d80c97316eec@redhat.com>
+Date: Mon, 21 Jan 2019 18:37:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190121170541.GN4136@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH v5 4/5] hw/i386/pc: use PVH option rom
+In-Reply-To: <20190118120143.21631-4-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/5] optionrom: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Liam Merwick <liam.merwick@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Hi Eduardo,
-
-On Mon, Jan 21, 2019 at 03:05:41PM -0200, Eduardo Habkost wrote:
-> On Fri, Jan 18, 2019 at 01:01:42PM +0100, Stefano Garzarella wrote:
-> > Use pvh.bin option rom when we are booting an uncompressed
-> > kernel using the x86/HVM direct boot ABI.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-> > ---
-> >  hw/i386/pc.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 9ed5063de8..2833b130ba 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1252,6 +1252,10 @@ static void load_linux(PCMachineState *pcms,
-> >                                   initrd_size);
-> >              }
-> >  
-> > +            option_rom[nb_option_roms].bootindex = 0;
-> > +            option_rom[nb_option_roms].name = "pvh.bin";
-> > +            nb_option_roms++;
-> > +
+On 18/01/19 13:01, Stefano Garzarella wrote:
+> The new pvh.bin option rom can be used with SeaBIOS to boot
+> uncompressed kernel using the x86/HVM direct boot ABI.
 > 
-> We still need to address Michael's comment from v2 about
-> machine-type compatibility:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg587489.html
-
-Thanks! (Michael sorry to miss it!)
-
+> pvh.S contains the entry point of the option rom. It runs
+> in real mode, loads the e820 table querying the BIOS, and
+> then it switches to 32bit protected mode and jumps to the
+> pvh_load_kernel() written in pvh_main.c.
+> pvh_load_kernel() loads the cmdline and kernel entry_point
+> using fw_cfg, then it looks for RSDP, fills the
+> hvm_start_info required by x86/HVM ABI, and finally jumps
+> to the kernel entry_point.
 > 
-> A question I've sent is quoted below:
-> 
-> | On Tue, Jan 15, 2019 at 01:57:22PM -0500, Michael S. Tsirkin wrote:
-> | > OK but this is guest visible so needs to be guarded by the
-> | > new machine type.
-> | 
-> | Aren't option ROMs treated like other firmware?  i.e.: guest
-> | visible, but copied during live migration and not considered part
-> | of guest ABI.
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
-I don't know the exact answer, but reading the wiki, I think Michael is right!
-(https://wiki.qemu.org/Features/Migration/Troubleshooting#ROMs)
+... and, for mingw:
 
-Maybe it is related for PVH feature in general, because if we try to
-migrate to a QEMU version that doesn't support PVH I'm not sure what is
-the behaviour.
+diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
+index d1b8b4b..a015e1b 100644
+--- a/pc-bios/optionrom/pvh_main.c
++++ b/pc-bios/optionrom/pvh_main.c
+@@ -43,7 +43,7 @@ struct pvh_e820_table {
+     struct hvm_memmap_table_entry table[E820_MAXENTRIES];
+ };
 
-I'll try to understand better!
+-struct pvh_e820_table pvh_e820 __attribute__ ((aligned));
++struct pvh_e820_table pvh_e820 asm("pvh_e820") __attribute__ ((aligned));
 
-Thanks,
-Stefano
+ static struct hvm_start_info start_info;
+ static struct hvm_modlist_entry ramdisk_mod;
+
+
+Paolo
