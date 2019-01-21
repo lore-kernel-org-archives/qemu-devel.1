@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39234)
+Received: from eggs.gnu.org ([209.51.188.92]:39509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glevQ-0008Da-Bs
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glevR-0008OH-Fz
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 14:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gleff-0002tn-Gb
+	(envelope-from <peter.maydell@linaro.org>) id 1gleff-0002u5-LZ
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:47 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33445)
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gleff-0002pQ-4D
+	id 1gleff-0002qf-2P
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:51:43 -0500
-Received: by mail-wm1-x342.google.com with SMTP id r24so6819069wmh.0
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:37 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id 96so24652761wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:51:39 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 18:51:09 +0000
-Message-Id: <20190121185118.18550-15-peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 18:51:11 +0000
+Message-Id: <20190121185118.18550-17-peter.maydell@linaro.org>
 In-Reply-To: <20190121185118.18550-1-peter.maydell@linaro.org>
 References: <20190121185118.18550-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 14/23] iotkit-sysinfo: Make SYS_VERSION and
- SYS_CONFIG configurable
+Subject: [Qemu-devel] [PATCH 16/23] hw/arm/armsse: Add unimplemented-device
+ stubs for PPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +32,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-The SYS_VERSION and SYS_CONFIG register values differ between the
-IoTKit and SSE-200. Make them configurable via QOM properties rather
-than hard-coded, and set them appropriately in the ARMSSE code that
-instantiates the IOTKIT_SYSINFO device.
+Add unimplemented-device stubs for the various Power Policy Unit
+devices that the SSE-200 has.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/iotkit-sysinfo.h |  6 ++++
- hw/arm/armsse.c                  | 51 ++++++++++++++++++++++++++++++++
- hw/misc/iotkit-sysinfo.c         | 15 ++++++++--
- 3 files changed, 70 insertions(+), 2 deletions(-)
+ include/hw/arm/armsse.h | 11 ++++++++
+ hw/arm/armsse.c         | 58 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/include/hw/misc/iotkit-sysinfo.h b/include/hw/misc/iotkit-sysinfo.h
-index 7b2e1a5e48b..d84eb203b90 100644
---- a/include/hw/misc/iotkit-sysinfo.h
-+++ b/include/hw/misc/iotkit-sysinfo.h
-@@ -14,6 +14,8 @@
-  * Arm IoTKit and documented in
-  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
-  * QEMU interface:
-+ *  + QOM property "SYS_VERSION": value to use for SYS_VERSION register
-+ *  + QOM property "SYS_CONFIG": value to use for SYS_CONFIG register
-  *  + sysbus MMIO region 0: the system information register bank
-  */
+diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
+index dbfcb280605..9855ec5f269 100644
+--- a/include/hw/arm/armsse.h
++++ b/include/hw/arm/armsse.h
+@@ -106,6 +106,16 @@
  
-@@ -32,6 +34,10 @@ typedef struct IoTKitSysInfo {
+ #define SSE_MAX_CPUS 2
  
-     /*< public >*/
-     MemoryRegion iomem;
++/* These define what each PPU in the ppu[] index is for */
++#define CPU0CORE_PPU 0
++#define CPU1CORE_PPU 1
++#define DBG_PPU 2
++#define RAM0_PPU 3
++#define RAM1_PPU 4
++#define RAM2_PPU 5
++#define RAM3_PPU 6
++#define NUM_PPUS 7
 +
-+    /* Properties */
-+    uint32_t sys_version;
-+    uint32_t sys_config;
- } IoTKitSysInfo;
+ typedef struct ARMSSE {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -139,6 +149,7 @@ typedef struct ARMSSE {
+     IoTKitSysCtl sysinfo;
  
- #endif
+     UnimplementedDeviceState mhu[2];
++    UnimplementedDeviceState ppu[NUM_PPUS];
+ 
+     /*
+      * 'container' holds all devices seen by all CPUs.
 diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 2eb4ea3bfe0..19cae77e770 100644
+index 1f3dc89c8e8..280ba5c78be 100644
 --- a/hw/arm/armsse.c
 +++ b/hw/arm/armsse.c
-@@ -18,10 +18,18 @@
- #include "hw/arm/armsse.h"
- #include "hw/arm/arm.h"
- 
-+/* Format of the System Information block SYS_CONFIG register */
-+typedef enum SysConfigFormat {
-+    IoTKitFormat,
-+    SSE200Format,
-+} SysConfigFormat;
-+
- struct ARMSSEInfo {
-     const char *name;
-     int sram_banks;
-     int num_cpus;
-+    uint32_t sys_version;
-+    SysConfigFormat sys_config_format;
+@@ -31,6 +31,7 @@ struct ARMSSEInfo {
+     uint32_t sys_version;
+     SysConfigFormat sys_config_format;
+     bool has_mhus;
++    bool has_ppus;
  };
  
  static const ARMSSEInfo armsse_variants[] = {
-@@ -29,9 +37,39 @@ static const ARMSSEInfo armsse_variants[] = {
-         .name = TYPE_IOTKIT,
-         .sram_banks = 1,
-         .num_cpus = 1,
-+        .sys_version = 0x41743,
-+        .sys_config_format = IoTKitFormat,
+@@ -41,6 +42,7 @@ static const ARMSSEInfo armsse_variants[] = {
+         .sys_version = 0x41743,
+         .sys_config_format = IoTKitFormat,
+         .has_mhus = false,
++        .has_ppus = false,
      },
  };
  
-+static uint32_t armsse_sys_config_value(ARMSSE *s, const ARMSSEInfo *info)
-+{
-+    /* Return the SYS_CONFIG value for this SSE */
-+    uint32_t sys_config;
+@@ -265,6 +267,29 @@ static void armsse_init(Object *obj)
+         sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
+                               TYPE_UNIMPLEMENTED_DEVICE);
+     }
++    if (info->has_ppus) {
++        for (i = 0; i < info->num_cpus; i++) {
++            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
++            int ppuidx = CPU0CORE_PPU + i;
 +
-+    switch (info->sys_config_format) {
-+    case IoTKitFormat:
-+        sys_config = 0;
-+        sys_config = deposit32(sys_config, 0, 4, info->sram_banks);
-+        sys_config = deposit32(sys_config, 4, 4, s->sram_addr_width - 12);
-+        break;
-+    case SSE200Format:
-+        sys_config = 0;
-+        sys_config = deposit32(sys_config, 0, 4, info->sram_banks);
-+        sys_config = deposit32(sys_config, 4, 5, s->sram_addr_width);
-+        sys_config = deposit32(sys_config, 24, 4, 2);
-+        if (info->num_cpus > 1) {
-+            sys_config = deposit32(sys_config, 10, 1, 1);
-+            sys_config = deposit32(sys_config, 20, 4, info->sram_banks - 1);
-+            sys_config = deposit32(sys_config, 28, 4, 2);
++            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
++                                  sizeof(s->ppu[ppuidx]),
++                                  TYPE_UNIMPLEMENTED_DEVICE);
++            g_free(name);
 +        }
-+        break;
-+    default:
-+        g_assert_not_reached();
++        sysbus_init_child_obj(obj, "DBG_PPU", &s->ppu[DBG_PPU],
++                              sizeof(s->ppu[DBG_PPU]),
++                              TYPE_UNIMPLEMENTED_DEVICE);
++        for (i = 0; i < info->sram_banks; i++) {
++            char *name = g_strdup_printf("RAM%d_PPU", i);
++            int ppuidx = RAM0_PPU + i;
++
++            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
++                                  sizeof(s->ppu[ppuidx]),
++                                  TYPE_UNIMPLEMENTED_DEVICE);
++            g_free(name);
++        }
 +    }
-+    return sys_config;
-+}
-+
- /* Clock frequency in HZ of the 32KHz "slow clock" */
- #define S32KCLK (32 * 1000)
- 
-@@ -726,6 +764,19 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                           qdev_get_gpio_in_named(dev_apb_ppc1,
-                                                  "cfg_sec_resp", 0));
- 
-+    object_property_set_int(OBJECT(&s->sysinfo), info->sys_version,
-+                            "SYS_VERSION", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    object_property_set_int(OBJECT(&s->sysinfo),
-+                            armsse_sys_config_value(s, info),
-+                            "SYS_CONFIG", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_bool(OBJECT(&s->sysinfo), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
-index 78955bc45f5..026ba942613 100644
---- a/hw/misc/iotkit-sysinfo.c
-+++ b/hw/misc/iotkit-sysinfo.c
-@@ -51,15 +51,16 @@ static const int sysinfo_id[] = {
- static uint64_t iotkit_sysinfo_read(void *opaque, hwaddr offset,
-                                     unsigned size)
- {
-+    IoTKitSysInfo *s = IOTKIT_SYSINFO(opaque);
-     uint64_t r;
- 
-     switch (offset) {
-     case A_SYS_VERSION:
--        r = 0x41743;
-+        r = s->sys_version;
-         break;
- 
-     case A_SYS_CONFIG:
--        r = 0x31;
-+        r = s->sys_config;
-         break;
-     case A_PID4 ... A_CID3:
-         r = sysinfo_id[(offset - A_PID4) / 4];
-@@ -94,6 +95,12 @@ static const MemoryRegionOps iotkit_sysinfo_ops = {
-     .valid.max_access_size = 4,
- };
- 
-+static Property iotkit_sysinfo_props[] = {
-+    DEFINE_PROP_UINT32("SYS_VERSION", IoTKitSysInfo, sys_version, 0),
-+    DEFINE_PROP_UINT32("SYS_CONFIG", IoTKitSysInfo, sys_config, 0),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
- static void iotkit_sysinfo_init(Object *obj)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-@@ -106,10 +113,14 @@ static void iotkit_sysinfo_init(Object *obj)
- 
- static void iotkit_sysinfo_class_init(ObjectClass *klass, void *data)
- {
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-     /*
-      * This device has no guest-modifiable state and so it
-      * does not need a reset function or VMState.
-      */
-+
-+    dc->props = iotkit_sysinfo_props;
+     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
+                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
+                             &error_abort, NULL);
+@@ -329,6 +354,17 @@ static qemu_irq armsse_get_common_irq_in(ARMSSE *s, int irqno)
+     }
  }
  
- static const TypeInfo iotkit_sysinfo_info = {
++static void map_ppu(ARMSSE *s, int ppuidx, const char *name, hwaddr addr)
++{
++    /* Map a PPU unimplemented device stub */
++    DeviceState *dev = DEVICE(&s->ppu[ppuidx]);
++
++    qdev_prop_set_string(dev, "name", name);
++    qdev_prop_set_uint64(dev, "size", 0x1000);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ppu[ppuidx]), 0, addr);
++}
++
+ static void armsse_realize(DeviceState *dev, Error **errp)
+ {
+     ARMSSE *s = ARMSSE(dev);
+@@ -833,6 +869,28 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x50021000);
+ 
++    if (info->has_ppus) {
++        /* CPUnCORE_PPU for each CPU */
++        for (i = 0; i < info->num_cpus; i++) {
++            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
++
++            map_ppu(s, CPU0CORE_PPU + i, name, 0x50023000 + i * 0x2000);
++            /*
++             * We don't support CPU debug so don't create the
++             * CPU0DEBUG_PPU at 0x50024000 and 0x50026000.
++             */
++            g_free(name);
++        }
++        map_ppu(s, DBG_PPU, "DBG_PPU", 0x50029000);
++
++        for (i = 0; i < info->sram_banks; i++) {
++            char *name = g_strdup_printf("RAM%d_PPU", i);
++
++            map_ppu(s, RAM0_PPU + i, name, 0x5002a000 + i * 0x1000);
++            g_free(name);
++        }
++    }
++
+     /* This OR gate wires together outputs from the secure watchdogs to NMI */
+     object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
+     if (err) {
 -- 
 2.20.1
