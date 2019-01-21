@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49978)
+Received: from eggs.gnu.org ([209.51.188.92]:49934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1glZqt-0001IB-Hi
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1glZqz-0001Gk-Cn
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1glZqs-0006vG-Qv
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:42:59 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 21 Jan 2019 14:42:49 +0100
-Message-Id: <20190121134249.16615-3-david@redhat.com>
-In-Reply-To: <20190121134249.16615-1-david@redhat.com>
-References: <20190121134249.16615-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] s390x/pci: Unplug remaining devices on
- pcihost reset
+	(envelope-from <thuth@redhat.com>) id 1glZk3-0002wf-Fo
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:36:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glZjz-0002tl-U6
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:35:53 -0500
+References: <20190121131602.55003-1-ysato@users.sourceforge.jp>
+	<20190121131602.55003-2-ysato@users.sourceforge.jp>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <937dc78e-beea-aa9c-ee35-e92023f74ad7@redhat.com>
+Date: Mon, 21 Jan 2019 14:35:43 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190121131602.55003-2-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 01/11] TCG translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-When resetting the guest we should unplug and remove all devices that
-are still pending. Otherwise the fresh guest will see devices that will
-suddenly vanish.
+On 2019-01-21 14:15, Yoshinori Sato wrote:
+> This part only supported RXv1 instructions.
+> Instruction manual.
+> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01us00=
+32ej0120_rxsm.pdf
+>=20
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+[...]
+> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+> new file mode 100644
+> index 0000000000..c9c87dc308
+> --- /dev/null
+> +++ b/target/rx/op_helper.c
+> @@ -0,0 +1,548 @@
+> +/*
+> + *  RX helper functions
+> + *
+> + *  Copyright (c) 2018 Yoshinori Sato
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
 
-Can be triggered e.g. via
-(hmp) device_add virtio-mouse-pci,id=test
-(hmp) stop
-(hmp) device_del test
-(hmp) system_reset
-(hmp) c
+ Hi,
 
-The device will vanish after roughly 5 minutes. With this patch, the
-device will vanish on reboot (S390_RESET_EXTERNAL and S390_RESET_REIPL,
-which reset the pcihost bridge via qemu_devices_reset()). If we want
-these devices to vanish directly on any reset (S390_RESET_MODIFIED_CLEAR
-and S390_RESET_LOAD_NORMAL), we have to modify s390_machine_reset(). But
-I have the feeling that this should not be done for all reset types.
+just a short meta comment for all the new files in your patch series:
+It's either
 
-This approach is similar to what's done for acpi PCI hotplug in
-acpi_pcihp_reset() -> acpi_pcihp_update() ->
-acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+ GNU *Library* General Public License, version 2
 
-s390_pci_generate_plug_event()'s will still be generated, I guess this
-is not an issue (same thing could happen right now if the timer expires
-just after reset).
+or
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-pci-bus.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ GNU Lesser General Public License, version *2.1*
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index bc17a8cf65..b70ae25533 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -1102,6 +1102,14 @@ static void s390_pcihost_reset(DeviceState *dev)
- {
-     S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
-     PCIBus *bus = s->parent_obj.bus;
-+    S390PCIBusDevice *pbdev, *next;
-+
-+    /* Unplug all pending devices that were requested to be released */
-+    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
-+        if (pbdev->release_timer) {
-+            s390_pcihost_timer_cb(pbdev);
-+        }
-+    }
- 
-     s->bus_no = 0;
-     pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);
--- 
-2.17.2
+I'd suggest to go with "Lesser" and "2.1".
+
+Apart from that, it might be a good idea to CC: some people who are
+familiar with TCG if you want to make sure to get some review (see the
+MAINTAINERS file for example).
+
+ Thanks,
+  Thomas
+
+
+PS: Seems like we've got this "Lesser" vs. "Library" wrong in a couple
+of other source files in QEMU ... I'll try to come up with a patch to
+fix this in the files that we've already got in the repo.
