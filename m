@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54410)
+Received: from eggs.gnu.org ([209.51.188.92]:56775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glc4y-00073p-Q3
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:05:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glcE3-0000yr-GA
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glc4x-0002py-Ft
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:05:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1glc4x-0002k0-6d
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:05:39 -0500
-Date: Mon, 21 Jan 2019 16:05:24 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190121160524.GC2083@work-vm>
-References: <e5021228-184b-cc1b-7aba-3bba795127a6@msgid.tls.msk.ru>
-	<20190114105132.GA2524@work-vm>
-	<20190114115205.GD6837@linux.fritz.box>
-	<20190118155703.GF2146@work-vm>
-	<20190121155553.GD5638@linux.fritz.box>
+	(envelope-from <peter.maydell@linaro.org>) id 1glcE1-0001mm-LF
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:15:03 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1glcE1-0001jC-GQ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:15:01 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x23so14966635oix.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 08:14:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190121155553.GD5638@linux.fritz.box>
-Subject: Re: [Qemu-devel] 3.1: second invocation of migrate crashes qemu
+References: <CAGGekkuc+-tvp5RJP7CM+Jy_hJF7eiRHZ96132sb=hPPCappKg@mail.gmail.com>
+In-Reply-To: <CAGGekkuc+-tvp5RJP7CM+Jy_hJF7eiRHZ96132sb=hPPCappKg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 16:14:44 +0000
+Message-ID: <CAFEAcA_W8t3go-QptcEEUenWMVqGNGxsD+SJmgELTTgVktmbPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target/arm: v8m: Ensure IDAU is
+ respected if SAU is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>, quintela@redhat.com, qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Roth <code@stacksmashing.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 18.01.2019 um 16:57 hat Dr. David Alan Gilbert geschrieben:
-> > * Kevin Wolf (kwolf@redhat.com) wrote:
-> > > Am 14.01.2019 um 11:51 hat Dr. David Alan Gilbert geschrieben:
-> > > > * Michael Tokarev (mjt@tls.msk.ru) wrote:
-> > > > > $ qemu-system-x86_64 -monitor stdio -hda foo.img
-> > > > > QEMU 3.1.0 monitor - type 'help' for more information
-> > > > > (qemu) stop
-> > > > > (qemu) migrate "exec:cat >/dev/null"
-> > > > > (qemu) migrate "exec:cat >/dev/null"
-> > > > > qemu-system-x86_64: /build/qemu/qemu-3.1/block.c:4647: bdrv_inactivate_recurse: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed.
-> > > > > Aborted
-> > > > 
-> > > > And on head as well;  it only happens if the 1st migrate is succesful;
-> > > > if it got cancelled the 2nd one works, so it's not too bad.
-> > > > 
-> > > > I suspect the problem here is all around locking/ownership - the block
-> > > > devices get shutdown at the end of migration since the assumption is
-> > > > that the other end has them open now and we had better release them.
-> > > 
-> > > Yes, only "cont" gets control back to the source VM.
-> > > 
-> > > I think we really should limit the possible monitor commands in the
-> > > postmigrate status, and possibly provide a way to get back to the
-> > > regular paused state (which means getting back control of the resources)
-> > > without resuming the VM first.
-> > 
-> > This error is a little interesting if you'd done something like:
-> > 
-> > 
-> >      src:
-> >          stop
-> >          migrate
-> > 
-> >      dst:
-> >          <kill qemu for some reason>
-> >          start a new qemu
-> > 
-> >      src:
-> >          migrate
-> > 
-> > Now that used to work (safely) - note we've not started
-> > a VM succesfully anywhere else.
-> > 
-> > Now the source refuses to let that happen - with a rather
-> > nasty abort.
-> 
-> Essentially it's another effect of the problem that migration has always
-> lacked a proper model of ownership transfer. And it's still treating
-> this as a block layer problem rather than making it a core concept of
-> migration as it should.
-> 
-> We can stack another one-off fix on top, and get back control of the
-> block devices automatically on a second 'migrate'. But it feels like a
-> hack and not like VMs had a properly designed and respected state
-> machine.
+On Sun, 20 Jan 2019 at 14:51, Thomas Roth <code@stacksmashing.net> wrote:
+>
+> The current behavior of v8m_security_lookup in helper.c only checks whether the
+> IDAU specifies a higher security if the SAU is enabled. If SAU.ALLNS is set to
+> 1, this will lead to addresses being treated as non-secure, even though the
+> IDAU indicates that they must be secure.
+>
+> This patch changes the behavior to also check the IDAU if the SAU is currently
+> disabled.
+>
+> Signed-off-by: Thomas Roth <code@stacksmashing.net>
 
-Hmm; I don't like to get back to this argument because I think
-we've got a perfectly servicable model that's implemented at higher
-levels outside qemu, and the real problem is the block layer added
-new assumptions about the semantics without checking they were really
-true.
-qemu only has the view from a single host; it takes the higher level
-view from something like libvirt to have the view across multiple hosts
-to understand who has the ownership when.
+Oops, yes. In the v8M Arm ARM the pseudocode function for this
+is SecurityCheck(), and we should indeed not ignore the IDAU for
+the SAU disabled path.
 
-Dave
+Applied to target-arm.next, thanks. (I'll tweak the commit message
+to add the Arm ARM reference and make the block comment follow
+our current coding style, since we're moving it anyway.)
 
-> Kevin
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
