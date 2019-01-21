@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41195)
+Received: from eggs.gnu.org ([209.51.188.92]:41224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glX6Z-0002l7-Rh
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:47:00 -0500
+	(envelope-from <stefanha@gmail.com>) id 1glX6g-0002pt-30
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glX6X-0005Dh-Fe
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:46:59 -0500
-Resent-Message-Id: <E1glX6X-0005Dh-Fe@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glX6X-0005CE-9m
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:46:57 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190116101049.8929-1-kraxel@redhat.com>
-Message-ID: <154806668362.5550.5892390758705065310@2d3111e9616b>
+	(envelope-from <stefanha@gmail.com>) id 1glX6f-0005Ji-Dt
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:47:06 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1glX6f-0005Ie-6i
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:47:05 -0500
+Received: by mail-wm1-x332.google.com with SMTP id b11so10293571wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:47:05 -0800 (PST)
+Date: Mon, 21 Jan 2019 10:47:02 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190121104702.GF30536@stefanha-x1.localdomain>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-3-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 21 Jan 2019 02:31:24 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] vnc: detect and optimize pageflips
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jkO+KyKz7TfD21mV"
+Content-Disposition: inline
+In-Reply-To: <20190118173103.4903-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] trace: enforce that every
+ trace-events file has a final newline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNjEwMTA0OS44OTI5
-LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
-U0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgaHcvY29y
-ZS9wdGltZXIubwogIENDICAgICAgaHcvY29yZS9zeXNidXMubwovdG1wL3FlbXUtdGVzdC9zcmMv
-YmxvY2svc2hlZXBkb2cuYzogSW4gZnVuY3Rpb24gJ2ZpbmRfdmRpX25hbWUnOgovdG1wL3FlbXUt
-dGVzdC9zcmMvYmxvY2svc2hlZXBkb2cuYzoxMjM5OjU6IGVycm9yOiAnc3RybmNweScgc3BlY2lm
-aWVkIGJvdW5kIDI1NiBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10
-cnVuY2F0aW9uXQogICAgIHN0cm5jcHkoYnVmICsgU0RfTUFYX1ZESV9MRU4sIHRhZywgU0RfTUFY
-X1ZESV9UQUdfTEVOKTsKICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJv
-cnMKLS0tCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCkluIGZ1bmN0
-aW9uICdhY3BpX3RhYmxlX2luc3RhbGwnLAogICAgaW5saW5lZCBmcm9tICdhY3BpX3RhYmxlX2Fk
-ZCcgYXQgL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY29yZS5jOjI5Njo1OgovdG1wL3FlbXUt
-dGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6MTg0Ojk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVk
-IGJvdW5kIDQgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNh
-dGlvbl0KICAgICAgICAgc3RybmNweShleHRfaGRyLT5zaWcsIGhkcnMtPnNpZywgc2l6ZW9mIGV4
-dF9oZHItPnNpZyk7CiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoyMDM6
-OTogZXJyb3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgNiBlcXVhbHMgZGVzdGluYXRpb24g
-c2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9o
-ZHItPm9lbV9pZCwgaGRycy0+b2VtX2lkLCBzaXplb2YgZXh0X2hkci0+b2VtX2lkKTsKICAgICAg
-ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY29yZS5jOjIwNzo5OiBlcnJvcjog
-J3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA4IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vy
-cm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAgIHN0cm5jcHkoZXh0X2hkci0+b2VtX3Rh
-YmxlX2lkLCBoZHJzLT5vZW1fdGFibGVfaWQsCiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgc2l6ZW9mIGV4
-dF9oZHItPm9lbV90YWJsZV9pZCk7CiAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY29yZS5jOjIxNjo5OiBlcnJv
-cjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA0IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFst
-V2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAgIHN0cm5jcHkoZXh0X2hkci0+YXNs
-X2NvbXBpbGVyX2lkLCBoZHJzLT5hc2xfY29tcGlsZXJfaWQsCiAgICAgICAgIF5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAg
-ICAgICAgc2l6ZW9mIGV4dF9oZHItPmFzbF9jb21waWxlcl9pZCk7Ci0tLQpjYzE6IGFsbCB3YXJu
-aW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3Ny
-Yy9ydWxlcy5tYWs6Njk6IGh3L2FjcGkvY29yZS5vXSBFcnJvciAxCi90bXAvcWVtdS10ZXN0L3Ny
-Yy9ody9hY3BpL2FtbC1idWlsZC5jOiBJbiBmdW5jdGlvbiAnYnVpbGRfaGVhZGVyJzoKL3RtcC9x
-ZW11LXRlc3Qvc3JjL2h3L2FjcGkvYW1sLWJ1aWxkLmM6MTUzNTo5OiBlcnJvcjogJ3N0cm5jcHkn
-IHNwZWNpZmllZCBib3VuZCA2IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmlu
-Z29wLXRydW5jYXRpb25dCiAgICAgICAgIHN0cm5jcHkoKGNoYXIgKiloLT5vZW1faWQsIG9lbV9p
-ZCwgc2l6ZW9mIGgtPm9lbV9pZCk7CiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvYW1s
-LWJ1aWxkLmM6MTU0MTo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA4IGVxdWFs
-cyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgICAg
-IHN0cm5jcHkoKGNoYXIgKiloLT5vZW1fdGFibGVfaWQsIG9lbV90YWJsZV9pZCwgc2l6ZW9mKGgt
-Pm9lbV90YWJsZV9pZCkpOwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5n
-cyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
-aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMTYxMDEwNDkuODkyOS0xLWtyYXhlbEByZWRo
-YXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+--jkO+KyKz7TfD21mV
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 18, 2019 at 05:31:01PM +0000, Daniel P. Berrang=E9 wrote:
+> When generating the trace-events-all file, the build system simply
+> concatenates all the individual trace-events files. If any one of those
+> files does not have a final newline, the printf format string will have
+> the contents of the first line of the next file appended to it, which is
+> usually a '#' comment.
+>=20
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> ---
+>  hw/gpio/trace-events          | 2 +-
+>  scripts/tracetool/__init__.py | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--jkO+KyKz7TfD21mV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcRaMmAAoJEJykq7OBq3PI8dIIAIS2qonVx5RIBjHDJuzEQA65
+uegstgKWsdxD4148l2IB6AL7YTjP319bTWAe95eWi/R8GJfkHZhqP5BCl1gqf3jB
+tHio8oyzsWjpjD2GEgyk29mhlbp0rKT3+nY8Mf0D0ged43vpXcOz9UXOc7uqV/iS
+MxPMILW2oDqKt+MWf7ackyjb1qMNT3Il2dHpUDCvaDoMw7JH2/5JQgXwSjIvtCqA
+xGWSIub86O6DU4BiSigUeHiG82OXzshypdEMRQfFkvfGGXBMJnWg842wko7rjm8r
+0sznlGGEuq6Jy4qC5t21iUZsXdkZMZ7lRqg5ODjC2CHKQ4zIsn40etQRtnINmb0=
+=AR1y
+-----END PGP SIGNATURE-----
+
+--jkO+KyKz7TfD21mV--
