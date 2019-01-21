@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57566)
+Received: from eggs.gnu.org ([209.51.188.92]:58714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glYIF-0002Xt-DG
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 07:03:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1glYMe-0005b5-2I
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 07:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1glYIE-0000AL-GF
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 07:03:07 -0500
-Date: Mon, 21 Jan 2019 12:02:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190121120252.GB2083@work-vm>
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-5-david@redhat.com>
-	<7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
-	<d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1glYMc-0003wz-27
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 07:07:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glYMa-0003rC-2G
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 07:07:36 -0500
+References: <20190117161640.5496-1-jusual@mail.ru>
+	<20190117161640.5496-2-jusual@mail.ru>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <34db0deb-0f97-0441-9e64-53957e4b870b@redhat.com>
+Date: Mon, 21 Jan 2019 13:07:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
+In-Reply-To: <20190117161640.5496-2-jusual@mail.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] tests/libqtest: Introduce
+ qtest_init_with_serial()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-* David Hildenbrand (david@redhat.com) wrote:
-> On 16.01.19 15:46, Eric Blake wrote:
-> > On 1/16/19 5:35 AM, David Hildenbrand wrote:
-> >> From: Pankaj Gupta <pagupta@redhat.com>
-> >>
-> >> This is the current protoype of virtio-pmem. Support will require
-> >> machine changes for the architectures that will support it, so it will
-> >> not yet be compiled.
-> >>
-> >> TODO:
-> >> - Use separate struct for tracking requests internally
-> >> - Move request/response structs to linux headers
-> >> - Factor out linux header sync
-> >> - Drop debug printfs
-> >>
-> >> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> >> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
-> >>   split up patches, unplug handler ]
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> > 
-> >> +++ b/qapi/misc.json
-> >> @@ -2949,6 +2949,29 @@
-> >>            }
-> >>  }
-> >>  
-> >> +##
-> >> +# @VirtioPMEMDeviceInfo:
-> >> +#
-> >> +# VirtioPMEM state information
-> >> +#
-> >> +# @id: device's ID
-> >> +#
-> >> +# @memaddr: physical address in memory, where device is mapped
-> >> +#
-> >> +# @size: size of memory that the device provides
-> >> +#
-> >> +# @memdev: memory backend linked with device
-> >> +#
-> >> +# Since: 3.1
-> > 
-> > Now 4.0
-> > 
-> >> +##
-> >> +{ 'struct': 'VirtioPMEMDeviceInfo',
-> >> +  'data': { '*id': 'str',
-> >> +            'memaddr': 'size',
-> >> +            'size': 'size',
-> >> +            'memdev': 'str'
-> >> +          }
-> >> +}
-> >> +
-> >>  ##
-> >>  # @MemoryDeviceInfo:
-> >>  #
-> >> @@ -2958,7 +2981,8 @@
-> >>  ##
-> >>  { 'union': 'MemoryDeviceInfo',
-> > 
-> > Does this union need a documentation update that virtio-pmem was added
-> > in 4.0?
-> 
-> Seems like:
-> 
-> ##
-> # @MemoryDeviceInfo:
-> #
-> # Union containing information about a memory device
-> #
-> # @dimm: Information about a pc-dimm device.
-> #
-> # @nvdimm: Information about a nvdimm device. (since 2.12)
-> #
-> # @virtio-pmem: Information about a virtio-pmem device. (since 4.0)
-> #
-> # Since: 2.1
-> ##
-> 
-> Does not work.
-> 
-> In file included from /home/dhildenb/git/qemu/qapi/qapi-schema.json:97:
-> /home/dhildenb/git/qemu/qapi/misc.json:2975: The following documented
-> members are not in the declaration: dimm, nvdimm, virtio-pmem
-> 
-> Any idea how to document this correctly?
+On 2019-01-17 17:16, Julia Suvorova wrote:
+> Run qtest with a socket that connects QEMU chardev and test code.
+>=20
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  tests/libqtest.c | 26 ++++++++++++++++++++++++++
+>  tests/libqtest.h | 11 +++++++++++
+>  2 files changed, 37 insertions(+)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 55750dd68d..3a015cfe13 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -315,6 +315,32 @@ QTestState *qtest_initf(const char *fmt, ...)
+>      return s;
+>  }
+> =20
+> +QTestState *qtest_init_with_serial(const char *extra_args, int *sock_f=
+d)
+> +{
+> +    int sock_fd_init;
+> +    char *sock_path, sock_dir[] =3D "/tmp/qtest-serial-XXXXXX";
+> +    QTestState *qts;
+> +
+> +    g_assert(mkdtemp(sock_dir));
 
-No I don't, but looking at other Union's they only ever seem to document
-the base members, not the data members, for example see CpuInfo.
+We normally don't do it in QEMU, but still, it theoretically possible to
+turn of g_assert() by defining G_DISABLE_ASSER, so the content should be
+free of side effects. See also the doc of g_assert() here:
 
-Dave
+ https://developer.gnome.org/glib/unstable/glib-Testing.html#g-assert
 
-> -- 
-> 
-> Thanks,
-> 
-> David / dhildenb
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thus could you please rewrite this as:
+
+    ptr =3D mkdtemp(sock_dir);
+    g_assert(ptr !=3D NULL);
+
+?
+
+> +    sock_path =3D g_strdup_printf("%s/sock", sock_dir);
+> +
+> +    sock_fd_init =3D init_socket(sock_path);
+> +
+> +    qts =3D qtest_initf("-chardev socket,id=3Ds0,path=3D%s,nowait "
+
+Daniel just posted a patch that will disallow "nowait" without "server":
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03334.html
+
+So I think you've got to drop the "nowait" here.
+
+> +                      "-serial chardev:s0 %s",
+> +                      sock_path, extra_args);
+> +
+> +    *sock_fd =3D socket_accept(sock_fd_init);
+> +
+> +    unlink(sock_path);
+> +    g_free(sock_path);
+> +    rmdir(sock_dir);
+> +
+> +    g_assert(*sock_fd >=3D 0);
+> +
+> +    return qts;
+> +}
+> +
+>  void qtest_quit(QTestState *s)
+>  {
+>      g_hook_destroy_link(&abrt_hooks, g_hook_find_data(&abrt_hooks, TRU=
+E, s));
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 7ea94139b0..5937f91912 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -62,6 +62,17 @@ QTestState *qtest_init(const char *extra_args);
+>   */
+>  QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
+> =20
+> +/**
+> + * qtest_init_with_serial:
+> + * @extra_args: other arguments to pass to QEMU.  CAUTION: these
+> + * arguments are subject to word splitting and shell evaluation.
+> + * @sock_fd: pointer to store the socket file descriptor for
+> + * connection with serial.
+> + *
+> + * Returns: #QTestState instance.
+> + */
+> +QTestState *qtest_init_with_serial(const char *extra_args, int *sock_f=
+d);
+> +
+>  /**
+>   * qtest_quit:
+>   * @s: #QTestState instance to operate on.
+>=20
+
+ Thomas
