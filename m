@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40070)
+Received: from eggs.gnu.org ([209.51.188.92]:40534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glX1z-0007sB-Ry
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glX3Y-0000gf-V5
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glX1z-0001Xi-5G
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:15 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37289)
+	(envelope-from <peter.maydell@linaro.org>) id 1glX3X-0002Va-NZ
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:52 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40538)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glX1y-0001XI-Vg
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:42:15 -0500
-Received: by mail-wr1-f68.google.com with SMTP id s12so22725684wrt.4
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:42:14 -0800 (PST)
-References: <20190118183603.24757-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <07b9dbc7-e48d-adf7-d9cc-dc64de89e9d0@redhat.com>
-Date: Mon, 21 Jan 2019 11:42:12 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1glX3X-0002Ut-10
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:43:51 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id p4so22712191wrt.7
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:43:50 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	129sm85821195wmd.18.2019.01.21.02.43.47 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+	Mon, 21 Jan 2019 02:43:48 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 10:43:46 +0000
+Message-Id: <20190121104346.30821-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190118183603.24757-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/virtio/virtio-balloon: zero-initialize
- the virtio_balloon_config struct
+Subject: [Qemu-devel] [PULL v2 00/48] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +32,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 1/18/19 7:36 PM, Peter Maydell wrote:
-> In virtio_balloon_get_config() we initialize a struct virtio_balloon_config
-> which we then copy to guest memory. However, the local variable is not
-> zero initialized. This works OK at the moment because we initialize
-> all the fields in it; however an upcoming kernel header change will
-> add some new fields. If we don't zero out the whole struct then we
-> will start leaking a small amount of the contents of QEMU's stack
-> to the guest as soon as we update linux-headers/ to a set of headers
-> that includes the new fields.
+v1->v2 changes: fix a clang warning about bitfields;
+drop a patch from Julia that I accidentally included
+(it will likely be in a future series).
 
-Is it worth Cc'ing qemu-stable@?
+The following changes since commit a8d2b0685681e2f291faaa501efbbd76875f8ec8:
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190118' into staging (2019-01-18 16:56:15 +0000)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+are available in the Git repository at:
 
-> ---
-> It looks like none of the other virtio devices have this bug.
-> Tested with "make check" only.
-> As the commit message notes, must go in before our next headers update.
-> ---
->  hw/virtio/virtio-balloon.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 1728e4f83af..a12677d4d5b 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -311,7 +311,7 @@ out:
->  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
->  {
->      VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-> -    struct virtio_balloon_config config;
-> +    struct virtio_balloon_config config = {};
->  
->      config.num_pages = cpu_to_le32(dev->num_pages);
->      config.actual = cpu_to_le32(dev->actual);
-> 
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190121
+
+for you to fetch changes up to 0d4bfd7df809863b1f45fad35229fb9419527d06:
+
+  target/arm: Implement PMSWINC (2019-01-21 10:38:56 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * hw/char/stm32f2xx_usart: Do not update data register when device is disabled
+ * hw/arm/virt-acpi-build: Set COHACC override flag in IORT SMMUv3 node
+ * target/arm: Allow Aarch32 exception return to switch from Mon->Hyp
+ * ftgmac100: implement the new MDIO interface on Aspeed SoC
+ * implement the ARMv8.3-PAuth extension
+ * improve emulation of the ARM PMU
+
+----------------------------------------------------------------
+Aaron Lindsay (13):
+      migration: Add post_save function to VMStateDescription
+      target/arm: Reorganize PMCCNTR accesses
+      target/arm: Swap PMU values before/after migrations
+      target/arm: Filter cycle counter based on PMCCFILTR_EL0
+      target/arm: Allow AArch32 access for PMCCFILTR
+      target/arm: Implement PMOVSSET
+      target/arm: Define FIELDs for ID_DFR0
+      target/arm: Make PMCEID[01]_EL0 64 bit registers, add PMCEID[23]
+      target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
+      target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
+      target/arm: PMU: Add instruction and cycle events
+      target/arm: PMU: Set PMCR.N to 4
+      target/arm: Implement PMSWINC
+
+Alexander Graf (1):
+      target/arm: Allow Aarch32 exception return to switch from Mon->Hyp
+
+Cédric Le Goater (1):
+      ftgmac100: implement the new MDIO interface on Aspeed SoC
+
+Eric Auger (1):
+      hw/arm/virt-acpi-build: Set COHACC override flag in IORT SMMUv3 node
+
+Philippe Mathieu-Daudé (1):
+      hw/char/stm32f2xx_usart: Do not update data register when device is disabled
+
+Richard Henderson (31):
+      target/arm: Add state for the ARMv8.3-PAuth extension
+      target/arm: Add SCTLR bits through ARMv8.5
+      target/arm: Add PAuth active bit to tbflags
+      target/arm: Introduce raise_exception_ra
+      target/arm: Add PAuth helpers
+      target/arm: Decode PAuth within system hint space
+      target/arm: Rearrange decode in disas_data_proc_1src
+      target/arm: Decode PAuth within disas_data_proc_1src
+      target/arm: Decode PAuth within disas_data_proc_2src
+      target/arm: Move helper_exception_return to helper-a64.c
+      target/arm: Add new_pc argument to helper_exception_return
+      target/arm: Rearrange decode in disas_uncond_b_reg
+      target/arm: Decode PAuth within disas_uncond_b_reg
+      target/arm: Decode Load/store register (pac)
+      target/arm: Move cpu_mmu_index out of line
+      target/arm: Introduce arm_mmu_idx
+      target/arm: Introduce arm_stage1_mmu_idx
+      target/arm: Create ARMVAParameters and helpers
+      target/arm: Merge TBFLAG_AA_TB{0, 1} to TBII
+      target/arm: Export aa64_va_parameters to internals.h
+      target/arm: Add aa64_va_parameters_both
+      target/arm: Decode TBID from TCR
+      target/arm: Reuse aa64_va_parameters for setting tbflags
+      target/arm: Implement pauth_strip
+      target/arm: Implement pauth_auth
+      target/arm: Implement pauth_addpac
+      target/arm: Implement pauth_computepac
+      target/arm: Add PAuth system registers
+      target/arm: Enable PAuth for -cpu max
+      target/arm: Enable PAuth for user-only
+      target/arm: Tidy TBI handling in gen_a64_set_pc
+
+ target/arm/Makefile.objs    |    1 +
+ include/hw/acpi/acpi-defs.h |    2 +
+ include/migration/vmstate.h |    1 +
+ target/arm/cpu.h            |  244 +++++----
+ target/arm/helper-a64.h     |   14 +
+ target/arm/helper.h         |    1 -
+ target/arm/internals.h      |   77 +++
+ target/arm/translate.h      |    5 +-
+ hw/arm/virt-acpi-build.c    |    1 +
+ hw/char/stm32f2xx_usart.c   |    3 +-
+ hw/net/ftgmac100.c          |   80 ++-
+ migration/vmstate.c         |   13 +-
+ target/arm/cpu.c            |   19 +-
+ target/arm/cpu64.c          |   68 ++-
+ target/arm/helper-a64.c     |  155 ++++++
+ target/arm/helper.c         | 1222 +++++++++++++++++++++++++++++++++----------
+ target/arm/machine.c        |   24 +
+ target/arm/op_helper.c      |  174 +-----
+ target/arm/pauth_helper.c   |  497 ++++++++++++++++++
+ target/arm/translate-a64.c  |  537 ++++++++++++++++---
+ docs/devel/migration.rst    |    9 +-
+ 21 files changed, 2515 insertions(+), 632 deletions(-)
+ create mode 100644 target/arm/pauth_helper.c
