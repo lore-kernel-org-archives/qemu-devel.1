@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57925)
+Received: from eggs.gnu.org ([209.51.188.92]:33300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glcK5-0004Bx-3Q
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:21:18 -0500
+	(envelope-from <carpeddiem@gmail.com>) id 1glchC-0000Ao-IU
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glcK4-0006Ko-92
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:21:17 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38263)
+	(envelope-from <carpeddiem@gmail.com>) id 1glcTH-0006m7-2f
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:30:48 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:40737)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glcK4-0006Jc-3b
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:21:16 -0500
-Received: by mail-ot1-x343.google.com with SMTP id e12so21003952otl.5
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 08:21:15 -0800 (PST)
+	(Exim 4.71) (envelope-from <carpeddiem@gmail.com>)
+	id 1glcTF-0006hx-1s
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 11:30:45 -0500
+Received: by mail-it1-f195.google.com with SMTP id h193so15966624ita.5
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 08:30:36 -0800 (PST)
 MIME-Version: 1.0
-References: <20190110094020.18354-1-stefanha@redhat.com>
-In-Reply-To: <20190110094020.18354-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 Jan 2019 16:21:03 +0000
-Message-ID: <CAFEAcA8bz7ViuZeZqCBZHy49=dbYxW7Q04MbuVKapEfT5K56ug@mail.gmail.com>
+References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
+	<20190118144724.66914-1-emaste@freebsd.org>
+	<8def73c9-23e5-9f87-81d1-dda0c7e6f7d9@redhat.com>
+	<242e057a-0c35-93b1-1249-93799cdf1196@redhat.com>
+	<CAPyFy2BLuGCYx0-GUdy5w8HD0u3hkvH3DGmCV+9OKYjtkr6rew@mail.gmail.com>
+In-Reply-To: <CAPyFy2BLuGCYx0-GUdy5w8HD0u3hkvH3DGmCV+9OKYjtkr6rew@mail.gmail.com>
+From: Ed Maste <emaste@freebsd.org>
+Date: Mon, 21 Jan 2019 11:30:23 -0500
+Message-ID: <CAPyFy2DNJvE4GbXxtzFJe8bPiXQm+bOmp+D_zVSCtaJML18vzw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] arm: Stub out NRF51 TWI
- magnetometer/accelerometer detection
+Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 10 Jan 2019 at 09:40, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Mon, 21 Jan 2019 at 10:16, Ed Maste <emaste@freebsd.org> wrote:
 >
-> v2:
->  * Move stub code into a separate device [Peter]
->  * Instantiate stub from microbit board instead of nRF51 SoC since this i=
-s
->    microbit-specific.  Other boards using the nRF51 wouldn't necessarily =
-want
->    to see these TWI/I2C devices.
->  * Add test case
->
-> This series stubs out the microbit's TWI/I2C devices so the microbit-dal
-> firmware boots successfully.  The accelerometer and magnetometer are prob=
-ed at
-> startup.  If they are not found the firmware panics.
->
-> Stefan Hajnoczi (1):
->   tests/microbit-test: add TWI stub device test
->
-> Steffen G=C3=B6rtz (1):
->   arm: Stub out NRF51 TWI magnetometer/accelerometer detection
->
->  hw/i2c/Makefile.objs          |   1 +
->  include/hw/arm/nrf51.h        |   2 +
->  include/hw/arm/nrf51_soc.h    |   1 +
->  include/hw/i2c/microbit_i2c.h |  42 +++++++++++
->  hw/arm/microbit.c             |  15 ++++
->  hw/i2c/microbit_i2c.c         | 127 ++++++++++++++++++++++++++++++++++
->  tests/microbit-test.c         |  44 ++++++++++++
->  7 files changed, 232 insertions(+)
->  create mode 100644 include/hw/i2c/microbit_i2c.h
->  create mode 100644 hw/i2c/microbit_i2c.c
+> To confirm, I have another build running now with
+> echo "Running with hw.ncpu=$(sysctl -n hw.ncpu)"
+> added.
 
-Applied to target-arm.next, thanks. Can you provide a
-MAINTAINERS file update for the new files, please?
-(You can send that separately or stick it in another
-nrf51 series if you're sending one.)
+Confirmed - https://cirrus-ci.com/build/5768962257190912:
+Running with hw.ncpu=8
 
-thanks
--- PMM
+If there is some sort of hanging test issue I could try wrapping it in
+timeout and outputting ps and other info upon failure.
