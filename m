@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51958)
+Received: from eggs.gnu.org ([209.51.188.92]:51982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyN-0004cv-Rj
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:01 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyP-0004cz-I5
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyN-0004Si-55
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:59 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:40731)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gldyO-0004UF-PW
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:01 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:36524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gldyM-0004Rr-UG
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:06:59 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id f188so11667327wmf.5
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:06:58 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	133sm56197732wme.9.2019.01.21.10.06.56 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 21 Jan 2019 10:06:57 -0800 (PST)
+	id 1gldyO-0004Te-Ip
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 13:07:00 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id u4so24489209wrp.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 10:07:00 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Jan 2019 19:06:06 +0100
-Message-Id: <1548093980-43088-36-git-send-email-pbonzini@redhat.com>
+Date: Mon, 21 Jan 2019 19:06:08 +0100
+Message-Id: <1548093980-43088-38-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
 References: <1548093980-43088-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 35/49] target-i386: hvf: remove MPX support
+Subject: [Qemu-devel] [PULL 37/49] contrib/elf2dmp: use GLib in ELF
+ processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +29,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-MPX support is being phased out by Intel and actually I am not sure that
-OS X has ever enabled it in XCR0.  Drop it from the Hypervisor.framework
-acceleration.
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
+Replace POSIX mmap with GLib g_mapped_file_new in ELF processing module
+to make elf2dmp cross-platform.
+
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-3-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf/x86_cpuid.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+ contrib/elf2dmp/qemu_elf.c | 27 ++++++++-------------------
+ contrib/elf2dmp/qemu_elf.h |  2 +-
+ 2 files changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/target/i386/hvf/x86_cpuid.c b/target/i386/hvf/x86_cpuid.c
-index 9874a46..4d957fe 100644
---- a/target/i386/hvf/x86_cpuid.c
-+++ b/target/i386/hvf/x86_cpuid.c
-@@ -38,16 +38,6 @@ static uint64_t xgetbv(uint32_t xcr)
-     return (((uint64_t)edx) << 32) | eax;
- }
+diff --git a/contrib/elf2dmp/qemu_elf.c b/contrib/elf2dmp/qemu_elf.c
+index e9c0d25..0db7816 100644
+--- a/contrib/elf2dmp/qemu_elf.c
++++ b/contrib/elf2dmp/qemu_elf.c
+@@ -120,25 +120,17 @@ static void exit_states(QEMU_Elf *qe)
  
--static bool vmx_mpx_supported()
--{
--    uint64_t cap_exit, cap_entry;
--
--    hv_vmx_read_capability(HV_VMX_CAP_ENTRY, &cap_entry);
--    hv_vmx_read_capability(HV_VMX_CAP_EXIT, &cap_exit);
--
--    return ((cap_exit & (1 << 23)) && (cap_entry & (1 << 16)));
--}
--
- uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                  int reg)
+ int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
  {
-@@ -92,11 +82,8 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                     CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-                     CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_SHA_NI |
-                     CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL |
--                    CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_MPX;
-+                    CPUID_7_0_EBX_INVPCID;
++    GError *gerr = NULL;
+     int err = 0;
+-    struct stat st;
  
--            if (!vmx_mpx_supported()) {
--                ebx &= ~CPUID_7_0_EBX_MPX;
--            }
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             if (!(cap & CPU_BASED2_INVPCID)) {
-                 ebx &= ~CPUID_7_0_EBX_INVPCID;
-@@ -119,9 +106,6 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                   XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK |
-                                   XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK);
-             eax &= supp_xcr0;
--            if (!vmx_mpx_supported()) {
--                eax &= ~(XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK);
--            }
-         } else if (idx == 1) {
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             eax &= CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1;
+-    qe->fd = open(filename, O_RDONLY, 0);
+-    if (qe->fd == -1) {
+-        eprintf("Failed to open ELF dump file \'%s\'\n", filename);
++    qe->gmf = g_mapped_file_new(filename, TRUE, &gerr);
++    if (gerr) {
++        eprintf("Failed to map ELF dump file \'%s\'\n", filename);
+         return 1;
+     }
+ 
+-    fstat(qe->fd, &st);
+-    qe->size = st.st_size;
+-
+-    qe->map = mmap(NULL, qe->size, PROT_READ | PROT_WRITE,
+-            MAP_PRIVATE, qe->fd, 0);
+-    if (qe->map == MAP_FAILED) {
+-        eprintf("Failed to map ELF file\n");
+-        err = 1;
+-        goto out_fd;
+-    }
++    qe->map = g_mapped_file_get_contents(qe->gmf);
++    qe->size = g_mapped_file_get_length(qe->gmf);
+ 
+     if (init_states(qe)) {
+         eprintf("Failed to extract QEMU CPU states\n");
+@@ -149,9 +141,7 @@ int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
+     return 0;
+ 
+ out_unmap:
+-    munmap(qe->map, qe->size);
+-out_fd:
+-    close(qe->fd);
++    g_mapped_file_unref(qe->gmf);
+ 
+     return err;
+ }
+@@ -159,6 +149,5 @@ out_fd:
+ void QEMU_Elf_exit(QEMU_Elf *qe)
+ {
+     exit_states(qe);
+-    munmap(qe->map, qe->size);
+-    close(qe->fd);
++    g_mapped_file_unref(qe->gmf);
+ }
+diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
+index da70aff..2a79638 100644
+--- a/contrib/elf2dmp/qemu_elf.h
++++ b/contrib/elf2dmp/qemu_elf.h
+@@ -33,7 +33,7 @@ typedef struct QEMUCPUState {
+ int is_system(QEMUCPUState *s);
+ 
+ typedef struct QEMU_Elf {
+-    int fd;
++    GMappedFile *gmf;
+     size_t size;
+     void *map;
+     QEMUCPUState **state;
 -- 
 1.8.3.1
