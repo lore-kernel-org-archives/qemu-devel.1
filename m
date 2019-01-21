@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33945)
+Received: from eggs.gnu.org ([209.51.188.92]:39859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1glhr7-0001P8-6j
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:15:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliNi-00018r-0v
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1glhr6-0006aI-I2
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:15:45 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 21 Jan 2019 22:15:39 +0000
-Message-ID: <BN6PR2201MB1251E38EAEAFC4A8C0B13D31C69F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20190117185628.21862-1-crosa@redhat.com>
-In-Reply-To: <20190117185628.21862-1-crosa@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gliNd-0004yP-J5
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gliNb-0004sv-Cg
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EDDBD3680B
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 22:49:09 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-117-44.phx2.redhat.com [10.3.117.44])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B25D560123
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 22:49:09 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:46 -0600
+Message-Id: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 00/18] Acceptance Tests: target
- architecture support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/21] NBD patches through 2019-01-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-devel@nongnu.org
 
-> From: Cleber Rosa <crosa@redhat.com>
+The following changes since commit 166609e6070fab3424510ac7292ecb585f8b80=
+fb:
 
->   class My(Test):
->       def test_nx_cpu_flag(self):
->           """
->           :avocado: tags=3Darch:x86_64
->           """
->           test_code()
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-january=
+-17-2019-v2' into staging (2019-01-21 17:53:28 +0000)
 
-> The value of the "arch" key, in this case, "x86_64" will be used when
-> selecting the QEMU binary to use in the test.  At the same time, if
-> "x86_64-softmmu" is not a built target, the test will be filtered out
-> by "make check-acceptance"[3].
+are available in the Git repository at:
 
-I think, the term "arch" is a little problematic in QEMU parlance. IMHO,
-"target" should be used instead. ("arch" is used in Linux kernel community)
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-01-21
 
-The overall structure of the "tags" should be a little different. My
-suggestion:
+for you to fetch changes up to ddd09448fd833d646952c769ae9ce3d39bee989f:
 
-"target"
-"isa" (instruction set architecture, determeines how the kernel and rootfs =
-are built)
-"cpu"
-"machine"
+  iotests: Enhance 223, 233 to cover 'qemu-nbd --list' (2019-01-21 15:49:=
+52 -0600)
 
-This would allow clear view what a particular acceptance test tests, and wi=
-ll
-enforce consistency and clarity in the test organization across the board.
+----------------------------------------------------------------
+nbd patches for 2019-01-21
 
-That said, I am very excited about this series.
+Add 'qemu-nbd --list' for probing a remote NBD server's advertisements.
 
-Regards,
-Aleksandar
+- Eric Blake: 0/21 nbd: add qemu-nbd --list
+
+----------------------------------------------------------------
+Eric Blake (21):
+      iotests: Make 233 output more reliable
+      maint: Allow for EXAMPLES in texi2pod
+      qemu-nbd: Enhance man page
+      qemu-nbd: Sanity check partition bounds
+      nbd/server: Hoist length check to qmp_nbd_server_add
+      nbd/server: Favor [u]int64_t over off_t
+      qemu-nbd: Avoid strtol open-coding
+      nbd/client: Refactor nbd_receive_list()
+      nbd/client: Move export name into NBDExportInfo
+      nbd/client: Change signature of nbd_negotiate_simple_meta_context()
+      nbd/client: Split out nbd_send_meta_query()
+      nbd/client: Split out nbd_receive_one_meta_context()
+      nbd/client: Refactor return of nbd_receive_negotiate()
+      nbd/client: Split handshake into two functions
+      nbd/client: Pull out oldstyle size determination
+      nbd/client: Refactor nbd_opt_go() to support NBD_OPT_INFO
+      nbd/client: Add nbd_receive_export_list()
+      nbd/client: Add meta contexts to nbd_receive_export_list()
+      qemu-nbd: Add --list option
+      nbd/client: Work around 3.0 bug for listing meta contexts
+      iotests: Enhance 223, 233 to cover 'qemu-nbd --list'
+
+ qemu-nbd.texi              | 119 +++++--
+ Makefile                   |   2 +
+ include/block/nbd.h        |  31 +-
+ block/nbd-client.c         |   9 +-
+ blockdev-nbd.c             |  10 +-
+ nbd/client.c               | 775 ++++++++++++++++++++++++++++++++-------=
+------
+ nbd/server.c               |  24 +-
+ qemu-nbd.c                 | 224 ++++++++++---
+ nbd/trace-events           |  17 +-
+ scripts/texi2pod.pl        |   2 +-
+ tests/qemu-iotests/223     |   2 +
+ tests/qemu-iotests/223.out |  20 ++
+ tests/qemu-iotests/233     |  30 +-
+ tests/qemu-iotests/233.out |  19 +-
+ 14 files changed, 945 insertions(+), 339 deletions(-)
+
+--=20
+2.20.1
