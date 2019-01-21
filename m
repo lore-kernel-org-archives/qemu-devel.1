@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59852)
+Received: from eggs.gnu.org ([209.51.188.92]:34640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1glWE9-0005nt-6D
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1glWXl-0000PP-Ny
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1glWE8-0004P7-CW
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52858)
+	(envelope-from <peter.maydell@linaro.org>) id 1glWXj-0007BR-TP
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:11:01 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40345)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1glWE8-0004Mq-6G
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:50:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1glWE4-0002Tb-84
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:50:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5CC102E80D7
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:50:39 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1glWXg-00079S-3t
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 05:10:58 -0500
+Received: by mail-ot1-x341.google.com with SMTP id s5so20053258oth.7
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 02:10:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Jan 2019 09:41:24 -0000
-From: Martin Liska <mliska@suse.cz>
-Reply-To: Bug 1801073 <1801073@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154107832062.28716.3850477436321808708.malonedeb@soybean.canonical.com>
-Message-Id: <154806368418.1312.9404758182083241030.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1801073] Re: util/zbin.c:390:37: error: absolute
- value function 'abs' given an argument of type 'long int' but has parameter
- of type 'int' which may cause truncation of value [-Werror=absolute-value]
+References: <20190108223129.5570-1-richard.henderson@linaro.org>
+	<20190108223129.5570-2-richard.henderson@linaro.org>
+In-Reply-To: <20190108223129.5570-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 10:10:41 +0000
+Message-ID: <CAFEAcA9tMa5HuS001EdE3rTa=_OhjUNfn5NSdXd2uMpxnQiG0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 01/31] target/arm: Add state for the
+ ARMv8.3-PAuth extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Thank you, I contacted IPXE folks.
+On Tue, 8 Jan 2019 at 22:31, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Add storage space for the 5 encryption keys.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ----
+> v2: Remove pointless double migration.
+>     Use a struct to make it clear which half is which.
+> ---
+>  target/arm/cpu.h | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 6f606eb97b..8b891bbc30 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -201,11 +201,16 @@ typedef struct ARMVectorReg {
+>      uint64_t d[2 * ARM_MAX_VQ] QEMU_ALIGNED(16);
+>  } ARMVectorReg;
+>
+> -/* In AArch32 mode, predicate registers do not exist at all.  */
+>  #ifdef TARGET_AARCH64
+> +/* In AArch32 mode, predicate registers do not exist at all.  */
+>  typedef struct ARMPredicateReg {
+>      uint64_t p[2 * ARM_MAX_VQ / 8] QEMU_ALIGNED(16);
+>  } ARMPredicateReg;
+> +
+> +/* In AArch32 mode, PAC keys do not exist at all.  */
+> +typedef struct ARMPACKey {
+> +    uint64_t lo, hi;
+> +} ARMPACKey;
+>  #endif
+>
+>
+> @@ -605,6 +610,14 @@ typedef struct CPUARMState {
+>          uint32_t cregs[16];
+>      } iwmmxt;
+>
+> +#ifdef TARGET_AARCH64
+> +    ARMPACKey apia_key;
+> +    ARMPACKey apib_key;
+> +    ARMPACKey apda_key;
+> +    ARMPACKey apdb_key;
+> +    ARMPACKey apga_key;
+> +#endif
+> +
+>  #if defined(CONFIG_USER_ONLY)
+>      /* For usermode syscall translation.  */
+>      int eabi;
+> @@ -3264,6 +3277,21 @@ static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
+>      return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
+>  }
+>
+> +static inline bool isar_feature_aa64_pauth(const ARMISARegisters *id)
+> +{
+> +    /*
+> +     * Note that while QEMU will only implement the architected algorithm
+> +     * QARMA, and thus APA+GPA, the host cpu for kvm may use implementation
+> +     * defined algorithms, and thus API+GPI, and this predicate controls
+> +     * migration of the 128-bit keys.
+> +     */
+> +    return (id->id_aa64isar1 &
+> +            (FIELD_DP64(0, ID_AA64ISAR1, APA, -1) |
+> +             FIELD_DP64(0, ID_AA64ISAR1, API, -1) |
+> +             FIELD_DP64(0, ID_AA64ISAR1, GPA, -1) |
+> +             FIELD_DP64(0, ID_AA64ISAR1, GPI, -1))) != 0;
+> +}
 
--- =
+Hi Richard -- clang doesn't like the -1s here:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1801073
+In file included from /home/petmay01/linaro/qemu-for-merges/disas.c:7:
+/home/petmay01/linaro/qemu-for-merges/target/arm/cpu.h:3295:47: error:
+implicit truncation from 'int
+' to bitfield changes value from -1 to 15
+[-Werror,-Wbitfield-constant-conversion]
+            (FIELD_DP64(0, ID_AA64ISAR1, APA, -1) |
+                                              ^~
+/home/petmay01/linaro/qemu-for-merges/include/hw/registerfields.h:63:18:
+note: expanded from macro '
+FIELD_DP64'
+    } v = { .v = val };                                                   \
+                 ^~~
 
-Title:
-  util/zbin.c:390:37: error: absolute value function 'abs' given an
-  argument of type 'long int' but has parameter of type 'int' which may
-  cause truncation of value [-Werror=3Dabsolute-value]
+I'm going to change these to 0xf, which hopefully will be
+sufficient to placate it.
 
-Status in QEMU:
-  New
-
-Bug description:
-  For qemu-3.0.0 I see with GCC 9 compiler a new warning:
-
-  $ make -j1 -C roms pxerom VERBOSE=3D1 V=3D1
-  make: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms'
-  make -C ipxe/src CONFIG=3Dqemu \
-  	PACKAGING_TIMESTAMP=3D1534273834 \
-  	CROSS_COMPILE=3D \
-  	bin/8086100e.rom bin/808610d3.rom bin/80861209.rom bin/10500940.rom bin/=
-10222000.rom bin/10ec8139.rom bin/1af41000.rom bin/15ad07b0.rom
-  make[1]: Entering directory '/home/abuild/rpmbuild/BUILD/qemu-3.0.0/roms/=
-ipxe/src'
-  gcc  -Wall -W -Wformat-nonliteral -O2 -g -Werror util/zbin.c -llzma -o ut=
-il/zbin
-  util/zbin.c: In function 'process_zinfo_add':
-  util/zbin.c:390:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    390 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:398:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    398 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ), size,
-        |                                     ^~~
-  util/zbin.c:419:37: error: absolute value function 'abs' given an argumen=
-t of type 'long int' but has parameter of type 'int' which may cause trunca=
-tion of value [-Werror=3Dabsolute-value]
-    419 |      ( ( addend < 0 ) ? "-" : "" ), abs ( addend ),
-        |                                     ^~~
-  cc1: all warnings being treated as errors
-  make[1]: *** [Makefile.housekeeping:1368: util/zbin] Error 1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1801073/+subscriptions
+thanks
+-- PMM
