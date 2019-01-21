@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33977)
+Received: from eggs.gnu.org ([209.51.188.92]:41275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glUbK-0004hH-JS
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:06:35 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1glUp2-0001Ak-3R
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1glUPe-0000jq-QU
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:54:31 -0500
-Resent-Message-Id: <E1glUPe-0000jq-QU@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21848)
+	(envelope-from <liam.merwick@oracle.com>) id 1glUp1-0002Ng-8I
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:44 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:46876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1glUPe-0000hp-Ds
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 02:54:30 -0500
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190116010106.27626-1-jsnow@redhat.com>
-Message-ID: <154805723903.5550.18349469177184195707@2d3111e9616b>
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1glUp0-0001YF-Vx
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 03:20:43 -0500
+References: <154803791641.5550.15254007790773130906@2d3111e9616b>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <7979bbc2-2713-4043-291b-79b7132634c0@oracle.com>
+Date: Mon, 21 Jan 2019 08:19:03 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 20 Jan 2019 23:54:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/8] Bitmaps patches
+In-Reply-To: <154803791641.5550.15254007790773130906@2d3111e9616b>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] QEMU changes to do PVH boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, ehabkost@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, stefanha@redhat.com, xen-devel@lists.xenproject.org, pbonzini@redhat.com, boris.ostrovsky@oracle.com, rth@twiddle.net, sgarzare@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNjAxMDEwNi4yNzYy
-Ni0xLWpzbm93QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
-U0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgY3J5cHRv
-L2Jsb2NrLm8KICBDQyAgICAgIGNyeXB0by9ibG9jay1xY293Lm8KL3RtcC9xZW11LXRlc3Qvc3Jj
-L2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1bmN0aW9uICdmaW5kX3ZkaV9uYW1lJzoKL3RtcC9xZW11
-LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6MTIzOTo1OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNp
-ZmllZCBib3VuZCAyNTYgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3At
-dHJ1bmNhdGlvbl0KICAgICBzdHJuY3B5KGJ1ZiArIFNEX01BWF9WRElfTEVOLCB0YWcsIFNEX01B
-WF9WRElfVEFHX0xFTik7CiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJy
-b3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE5MDExNjAxMDEwNi4yNzYyNi0xLWpzbm93QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXIt
-bWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 21/01/2019 02:31, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/1547554687-12687-1-git-send-email=
+-liam.merwick@oracle.com/
+...>
+>    CC      dma-helpers.o
+>    CC      vl.o
+> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
+> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified =
+bound 256 equals destination size [-Werror=3Dstringop-truncation]
+>       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+>=20
+
+
+Given the PVH patch series was posted 5 days ago and the following=20
+change was committed 3 days ago, I'm assuming this is not related to the=20
+PVH changes (which do not touch this file).
+
+commit 97b583f46c435aaa40942ca73739d79190776b7f
+Author: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Date:   Thu Jan 3 09:56:35 2019 +0100
+
+     block/sheepdog: Use QEMU_NONSTRING for non NUL-terminated arrays
+
+Regards,
+Liam
+
+
+>=20
+> The full log is available at
+> http://patchew.org/logs/1547554687-12687-1-git-send-email-liam.merwick@=
+oracle.com/testing.docker-mingw@fedora/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+>=20
