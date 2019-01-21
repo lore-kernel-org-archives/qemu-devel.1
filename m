@@ -1,24 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1glZr5-0001Hh-0t
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1glZrM-0001Hh-7C
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1glZgC-0000RD-Jp
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:31:57 -0500
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-5-david@redhat.com>
-	<7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
-	<d816bd88-1f59-e698-7819-2cb72c820706@redhat.com>
-	<20190121120252.GB2083@work-vm>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5c645aaa-6521-fcc6-1fef-adefe11e5ea9@redhat.com>
-Date: Mon, 21 Jan 2019 14:31:48 +0100
+	(envelope-from <mreitz@redhat.com>) id 1glZdv-00068N-TR
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 08:29:37 -0500
+From: Max Reitz <mreitz@redhat.com>
+References: <20190115111007.27159-1-stefanha@redhat.com>
+	<20190115111007.27159-2-stefanha@redhat.com>
+	<7c29009e-2332-0901-3e00-8aa4c6b28796@redhat.com>
+	<5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
+Message-ID: <69a10091-4421-b621-5324-df063e630b04@redhat.com>
+Date: Mon, 21 Jan 2019 14:29:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190121120252.GB2083@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
+In-Reply-To: <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp"
+Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: include LUKS payload overhead
+ in qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-On 21.01.19 13:02, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> On 16.01.19 15:46, Eric Blake wrote:
->>> On 1/16/19 5:35 AM, David Hildenbrand wrote:
->>>> From: Pankaj Gupta <pagupta@redhat.com>
->>>>
->>>> This is the current protoype of virtio-pmem. Support will require
->>>> machine changes for the architectures that will support it, so it will
->>>> not yet be compiled.
->>>>
->>>> TODO:
->>>> - Use separate struct for tracking requests internally
->>>> - Move request/response structs to linux headers
->>>> - Factor out linux header sync
->>>> - Drop debug printfs
->>>>
->>>> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
->>>> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
->>>>   split up patches, unplug handler ]
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp
+From: Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <69a10091-4421-b621-5324-df063e630b04@redhat.com>
+Subject: Re: [PATCH 1/2] qcow2: include LUKS payload overhead in qemu-img
+ measure
+References: <20190115111007.27159-1-stefanha@redhat.com>
+ <20190115111007.27159-2-stefanha@redhat.com>
+ <7c29009e-2332-0901-3e00-8aa4c6b28796@redhat.com>
+ <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
+In-Reply-To: <5786786a-1389-81a3-2c9a-fbeca0be10a9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 21.01.19 14:15, Max Reitz wrote:
+> On 21.01.19 14:08, Max Reitz wrote:
+>> On 15.01.19 12:10, Stefan Hajnoczi wrote:
+>>> LUKS encryption reserves clusters for its own payload data.  The size=
+ of
+>>> this area must be included in the qemu-img measure calculation so tha=
+t
+>>> we arrive at the correct minimum required image size.
 >>>
->>>> +++ b/qapi/misc.json
->>>> @@ -2949,6 +2949,29 @@
->>>>            }
->>>>  }
->>>>  
->>>> +##
->>>> +# @VirtioPMEMDeviceInfo:
->>>> +#
->>>> +# VirtioPMEM state information
->>>> +#
->>>> +# @id: device's ID
->>>> +#
->>>> +# @memaddr: physical address in memory, where device is mapped
->>>> +#
->>>> +# @size: size of memory that the device provides
->>>> +#
->>>> +# @memdev: memory backend linked with device
->>>> +#
->>>> +# Since: 3.1
+>>> (Ab)use the qcrypto_block_create() API to determine the payload
+>>> overhead.  We discard the payload data that qcrypto thinks will be
+>>> written to the image.
 >>>
->>> Now 4.0
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
+>>>  block/qcow2.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++=
++-
+>>>  1 file changed, 50 insertions(+), 1 deletion(-)
 >>>
->>>> +##
->>>> +{ 'struct': 'VirtioPMEMDeviceInfo',
->>>> +  'data': { '*id': 'str',
->>>> +            'memaddr': 'size',
->>>> +            'size': 'size',
->>>> +            'memdev': 'str'
->>>> +          }
->>>> +}
->>>> +
->>>>  ##
->>>>  # @MemoryDeviceInfo:
->>>>  #
->>>> @@ -2958,7 +2981,8 @@
->>>>  ##
->>>>  { 'union': 'MemoryDeviceInfo',
->>>
->>> Does this union need a documentation update that virtio-pmem was added
->>> in 4.0?
+>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>> index 4897abae5e..7ab93a5d2f 100644
+>>> --- a/block/qcow2.c
+>>> +++ b/block/qcow2.c
 >>
->> Seems like:
+>> [...]
 >>
->> ##
->> # @MemoryDeviceInfo:
->> #
->> # Union containing information about a memory device
->> #
->> # @dimm: Information about a pc-dimm device.
->> #
->> # @nvdimm: Information about a nvdimm device. (since 2.12)
->> #
->> # @virtio-pmem: Information about a virtio-pmem device. (since 4.0)
->> #
->> # Since: 2.1
->> ##
+>>> @@ -4274,6 +4294,35 @@ static BlockMeasureInfo *qcow2_measure(QemuOpt=
+s *opts, BlockDriverState *in_bs,
+>>>      has_backing_file =3D !!optstr;
+>>>      g_free(optstr);
+>>> =20
+>>> +    optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
+>>> +    has_luks =3D optstr && strcmp(optstr, "luks") =3D=3D 0;
+>>> +    g_free(optstr);
+>>> +
+>>> +    if (has_luks) {
+>>> +        QCryptoBlockCreateOptions cryptoopts =3D {
+>>> +            .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
+>>> +        };
+>>> +        QCryptoBlock *crypto;
+>>> +        size_t headerlen;
+>>> +
+>>> +        optstr =3D qemu_opt_get_del(opts, "encrypt.key-secret");
+>>> +        cryptoopts.u.luks.has_key_secret =3D !!optstr;
+>>> +        cryptoopts.u.luks.key_secret =3D optstr;
 >>
->> Does not work.
->>
->> In file included from /home/dhildenb/git/qemu/qapi/qapi-schema.json:97:
->> /home/dhildenb/git/qemu/qapi/misc.json:2975: The following documented
->> members are not in the declaration: dimm, nvdimm, virtio-pmem
->>
->> Any idea how to document this correctly?
-> 
-> No I don't, but looking at other Union's they only ever seem to document
-> the base members, not the data members, for example see CpuInfo.
-> 
+>> I wonder if you couldn't just make some secret up here (if the user
+>> doesn't specify anything).  Its content shouldn't matter, right?
+>=20
+> And now I wonder whether other options may not have actual influence on=
 
-Yes, that's also what I noticed. Guess I'll simply change that to
+> the crypto header size.  I suppose in theory the cipher algorithm may
+> cause a difference, although it's probably not enough to warrant anothe=
+r
+> cluster...
 
-"nvdimm is included since 2.12. virtio-pmem is included since 4.0."
+I stand corrected:
 
-Unless Eric has another idea.
+With aes-128:
 
-Thanks!
+$ qemu-img create -f qcow2 --object secret,id=3Dsec0,data=3Dfoo \
+    -o
+encrypt.format=3Dluks,encrypt.key-secret=3Dsec0,encrypt.cipher-alg=3Daes-=
+128 \
+    foo.qcow2 64M
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encrypt.format=3Dluks=
 
-> Dave
-> 
->> -- 
->>
->> Thanks,
->>
->> David / dhildenb
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+encrypt.key-secret=3Dsec0 encrypt.cipher-alg=3Daes-128 cluster_size=3D655=
+36
+lazy_refcounts=3Doff refcount_bits=3D16
+$ qemu-img info foo.qcow2
+[...]
+disk size: 448K
+[...]
 
 
--- 
+With aes-256:
 
-Thanks,
+$ qemu-img create -f qcow2 --object secret,id=3Dsec0,data=3Dfoo \
+    -o
+encrypt.format=3Dluks,encrypt.key-secret=3Dsec0,encrypt.cipher-alg=3Daes-=
+256 \
+    foo.qcow2 64MFormatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864
+Formatting 'foo.qcow2', fmt=3Dqcow2 size=3D67108864 encrypt.format=3Dluks=
 
-David / dhildenb
+encrypt.key-secret=3Dsec0 encrypt.cipher-alg=3Daes-256 cluster_size=3D655=
+36
+lazy_refcounts=3Doff refcount_bits=3D16
+$ qemu-img info foo.qcow2
+[...]
+disk size: 540K
+[...]
+
+
+So it does make a difference and those options should be parsed as well.
+
+Max
+
+
+--VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxFySYACgkQ9AfbAGHV
+z0Du3Af8CBUt2juKH828dXPIvnJMtZSU0xNtAFSpn3866ELSN2njFNWuxXWxXVu4
+oceIPo/pRmX9+6IzJVqXrxScK2cDPU1fOSRPydBF3/MeU2+3wklmf7UC3Cfui7sL
+qRQV9q4kY9054tWVaADd41uWeum0I70rRz7VsjVe4wwsAb2PJNf/vTIIAp0bl/3e
+LrqDYUIYNnxBzjJ/ThAYhbi9mzYT+AdyncOjfJKCmSxQiGda1QIxobFQtCkKlc5m
+Zb1joeHW1P5vftmYP7XhDR3Agycj8NPQH0mGDCJNjH9VyiZ/Li1WchSXEpSDtmU8
+b7agv88HeKq7mfDawzGmyw1wm5dUNw==
+=TDmh
+-----END PGP SIGNATURE-----
+
+--VNVXtRM2e4v7bwHbOynlRP1SgFHKvEvZp--
