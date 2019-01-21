@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39931)
+Received: from eggs.gnu.org ([209.51.188.92]:39930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNp-0001Fa-VQ
+	(envelope-from <eblake@redhat.com>) id 1gliNp-0001FZ-VN
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNn-00054I-C2
+	(envelope-from <eblake@redhat.com>) id 1gliNn-00054V-PR
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:32 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:48:50 -0600
-Message-Id: <20190121224907.26634-5-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:51 -0600
+Message-Id: <20190121224907.26634-6-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/21] qemu-nbd: Sanity check partition bounds
+Subject: [Qemu-devel] [PULL 05/21] nbd/server: Hoist length check to
+ qmp_nbd_server_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +23,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Richard W . M . Jones" <rjones@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-When the user requests a partition, we were using data read
-from the disk as disk offsets without a bounds check. We got
-lucky that even when computed offsets are out-of-bounds,
-blk_pread() will gracefully catch the error later (so I don't
-think a malicious image can crash or exploit qemu-nbd, and am
-not treating this as a security flaw), but it's better to
-flag the problem up front than to risk permanent EIO death of
-the block device down the road.  The new bounds check adds
-an assertion that will never fail, but rather exists to help
-the compiler see that adding two positive 41-bit values
-(given MBR constraints) can't overflow 64-bit off_t.
+We only had two callers to nbd_export_new; qemu-nbd.c always
+passed a valid offset/length pair (because it already checked
+the file length, to ensure that offset was in bounds), while
+blockdev-nbd.c always passed 0/-1.  Then nbd_export_new reduces
+the size to a multiple of BDRV_SECTOR_SIZE (can only happen
+when offset is not sector-aligned, since bdrv_getlength()
+currently rounds up) (someday, it would be nice to have
+byte-accurate lengths - but not today).
 
-Using off_t to represent a partition length is a bit of a
-misnomer; a later patch will update to saner types, but it
-is left separate in case the bounds check needs to be
-backported in isolation.
-
-Also, note that the partition code blindly overwrites any
-non-zero offset passed in by the user; so for now, make the
--o/-P combo an error for less confusion.  In the future, we
-may let -o and -P work together (selecting a subset of a
-partition); so it is okay that an explicit '-o 0' behaves
-no differently from omitting -o.
-
-This can be tested with nbdkit:
-$ echo hi > file
-$ nbdkit -fv --filter=3Dtruncate partitioning file truncate=3D64k
-
-Pre-patch:
-$ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809 &
-$ qemu-io -f raw nbd://localhost:10810
-qemu-io> r -v 0 1
-Disconnect client, due to: Failed to send reply: reading from file failed=
-: Input/output error
-Connection closed
-read failed: Input/output error
-qemu-io> q
-[1]+  Done                    qemu-nbd -p 10810 -P 1 -f raw nbd://localho=
-st:10809
-
-Post-patch:
-$ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809
-qemu-nbd: Discovered partition 1 at offset 1048576 size 512, but size exc=
-eeds file length 65536
+However, I'm finding it easier to work with the code if we are
+consistent on having both callers pass in a valid length, and
+just assert that things are sane in nbd_export_new, meaning
+that no negative values were passed, and that offset+size does
+not exceed 63 bits (as that really is a fundamental limit to
+later operations, whether we use off_t or uint64_t).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190117193658.16413-6-eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Message-Id: <20190117193658.16413-5-eblake@redhat.com>
 ---
- qemu-nbd.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ blockdev-nbd.c | 10 +++++++++-
+ nbd/server.c   | 10 +++-------
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 51b55f2e066..5c90c5e55f7 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -1013,12 +1013,32 @@ int main(int argc, char **argv)
-     fd_size -=3D dev_offset;
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index c76d5416b90..d73ac1b026a 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -146,6 +146,7 @@ void qmp_nbd_server_add(const char *device, bool has_=
+name, const char *name,
+     BlockDriverState *bs =3D NULL;
+     BlockBackend *on_eject_blk;
+     NBDExport *exp;
++    int64_t len;
 
-     if (partition !=3D -1) {
--        ret =3D find_partition(blk, partition, &dev_offset, &fd_size);
-+        off_t limit;
-+
-+        if (dev_offset) {
-+            error_report("Cannot request partition and offset together")=
-;
-+            exit(EXIT_FAILURE);
-+        }
-+        ret =3D find_partition(blk, partition, &dev_offset, &limit);
-         if (ret < 0) {
-             error_report("Could not find partition %d: %s", partition,
-                          strerror(-ret));
-             exit(EXIT_FAILURE);
-         }
-+        /*
-+         * MBR partition limits are (32-bit << 9); this assert lets
-+         * the compiler know that we have two positive values that
-+         * can't overflow 64 bits.
-+         */
-+        assert(dev_offset >=3D 0 && dev_offset + limit >=3D dev_offset);
-+        if (dev_offset + limit > fd_size) {
-+            error_report("Discovered partition %d at offset %lld size %l=
-ld, "
-+                         "but size exceeds file length %lld", partition,
-+                         (long long int) dev_offset, (long long int) lim=
-it,
-+                         (long long int) fd_size);
-+            exit(EXIT_FAILURE);
-+        }
-+        fd_size =3D limit;
+     if (!nbd_server) {
+         error_setg(errp, "NBD server not running");
+@@ -168,6 +169,13 @@ void qmp_nbd_server_add(const char *device, bool has=
+_name, const char *name,
+         return;
      }
 
-     export =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
++    len =3D bdrv_getlength(bs);
++    if (len < 0) {
++        error_setg_errno(errp, -len,
++                         "Failed to determine the NBD export's length");
++        return;
++    }
++
+     if (!has_writable) {
+         writable =3D false;
+     }
+@@ -175,7 +183,7 @@ void qmp_nbd_server_add(const char *device, bool has_=
+name, const char *name,
+         writable =3D false;
+     }
+
+-    exp =3D nbd_export_new(bs, 0, -1, name, NULL, bitmap,
++    exp =3D nbd_export_new(bs, 0, len, name, NULL, bitmap,
+                          writable ? 0 : NBD_FLAG_READ_ONLY,
+                          NULL, false, on_eject_blk, errp);
+     if (!exp) {
+diff --git a/nbd/server.c b/nbd/server.c
+index 6b136019f82..51ee8094e02 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1495,17 +1495,13 @@ NBDExport *nbd_export_new(BlockDriverState *bs, o=
+ff_t dev_offset, off_t size,
+     exp->refcount =3D 1;
+     QTAILQ_INIT(&exp->clients);
+     exp->blk =3D blk;
++    assert(dev_offset >=3D 0 && dev_offset <=3D INT64_MAX);
+     exp->dev_offset =3D dev_offset;
+     exp->name =3D g_strdup(name);
+     exp->description =3D g_strdup(description);
+     exp->nbdflags =3D nbdflags;
+-    exp->size =3D size < 0 ? blk_getlength(blk) : size;
+-    if (exp->size < 0) {
+-        error_setg_errno(errp, -exp->size,
+-                         "Failed to determine the NBD export's length");
+-        goto fail;
+-    }
+-    exp->size -=3D exp->size % BDRV_SECTOR_SIZE;
++    assert(size >=3D 0 && size <=3D INT64_MAX - dev_offset);
++    exp->size =3D QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
+
+     if (bitmap) {
+         BdrvDirtyBitmap *bm =3D NULL;
 --=20
 2.20.1
