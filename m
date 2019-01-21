@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56579)
+Received: from eggs.gnu.org ([209.51.188.92]:56806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glg6R-0003Vw-U3
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:23:29 -0500
+	(envelope-from <mst@redhat.com>) id 1glg7c-0004QC-J7
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glg6Q-00029M-5A
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:23:27 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glg6M-00026d-4P
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:23:22 -0500
-Received: by mail-wm1-f65.google.com with SMTP id p6so12058419wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 12:23:19 -0800 (PST)
-References: <1548097698-28951-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1548097698-28951-5-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ec573511-8d0d-b2ed-1b50-ea3b0aad0d2c@redhat.com>
-Date: Mon, 21 Jan 2019 21:23:16 +0100
+	(envelope-from <mst@redhat.com>) id 1glg7V-0002oZ-6V
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:24:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1glg7O-0002gI-CB
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 15:24:29 -0500
+Date: Mon, 21 Jan 2019 15:24:17 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190121152158-mutt-send-email-mst@kernel.org>
+References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
+	<c253d77e9366ae0992341978dd1287efa213611b.1547624239.git.yi.z.zhang@linux.intel.com>
+	<20190116105336-mutt-send-email-mst@kernel.org>
+	<20190121063556.GA21693@tiger-server>
 MIME-Version: 1.0
-In-Reply-To: <1548097698-28951-5-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] target/mips: Correct the second
- argument type of cpu_supports_isa()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190121063556.GA21693@tiger-server>
+Subject: Re: [Qemu-devel] [PATCH V9 2/6] memory: use sparse feature define
+ RAM_FLAG.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: smarkovic@wavecomp.com, arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On 1/21/19 8:08 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> "insn_flags" bitfield was expanded from 32-bit to 64-bit at one moment.
+On Mon, Jan 21, 2019 at 02:35:57PM +0800, Yi Zhang wrote:
+> On 2019-01-16 at 10:55:33 -0500, Michael S. Tsirkin wrote:
+> > On Wed, Jan 16, 2019 at 04:10:29PM +0800, Zhang Yi wrote:
+> > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > OK so if you apply this patch, do you get
+> > any sparse warning at all?
+> Didn't get any sparse warning.
 
-"at one moment" -> "in f9c9cd63e3"
 
-> However, this was not reflected at the second argument of the function
-> cpu_supports_isa(). By chance, this did not create a wrong behavior,
-> since the second argument was always with the left-most half zero, but
-> it is still a bug waiting to happen. correct by changint the type of
-> the second argument to be 64-bit always.
+The reason I find it strange is because you then go on
+to assign these flags to an untagged unint32_t.
 
-Oops.
+Did you forget to configure with sparse enabled maybe?
 
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  target/mips/cpu.h       | 2 +-
->  target/mips/translate.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 03c03fd..fd22bd5 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -1011,7 +1011,7 @@ int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
->  #define CPU_RESOLVING_TYPE TYPE_MIPS_CPU
->  
->  bool cpu_supports_cps_smp(const char *cpu_type);
-> -bool cpu_supports_isa(const char *cpu_type, unsigned int isa);
-> +bool cpu_supports_isa(const char *cpu_type, uint64_t isa);
->  void cpu_set_exception_base(int vp_index, target_ulong address);
->  
->  /* mips_int.c */
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index ceaa582..b660235 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -29803,7 +29803,7 @@ bool cpu_supports_cps_smp(const char *cpu_type)
->      return (mcc->cpu_def->CP0_Config3 & (1 << CP0C3_CMGCR)) != 0;
->  }
->  
-> -bool cpu_supports_isa(const char *cpu_type, unsigned int isa)
-> +bool cpu_supports_isa(const char *cpu_type, uint64_t isa)
->  {
->      const MIPSCPUClass *mcc = MIPS_CPU_CLASS(object_class_by_name(cpu_type));
->      return (mcc->cpu_def->insn_flags & isa) != 0;
-> 
+> > 
+> > If not how come?
+> > 
+> > And we need to ask patchew maintainers to 
+> > 
+> > Overall I'd suggest that since you no longer need
+> > a new RAM flag, split this effort out and finish
+> > MAP_SYNC work first.
+> Ok, Will
+> > 
+> > 
+> > > ---
+> > >  include/exec/memory.h | 12 ++++++------
+> > >  include/qemu/osdep.h  |  9 +++++++++
+> > >  2 files changed, 15 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > > index 667466b..03824d9 100644
+> > > --- a/include/exec/memory.h
+> > > +++ b/include/exec/memory.h
+> > > @@ -104,27 +104,27 @@ struct IOMMUNotifier {
+> > >  typedef struct IOMMUNotifier IOMMUNotifier;
+> > >  
+> > >  /* RAM is pre-allocated and passed into qemu_ram_alloc_from_ptr */
+> > > -#define RAM_PREALLOC   (1 << 0)
+> > > +#define RAM_PREALLOC ((QEMU_FORCE QemuMmapFlags) (1 << 0))
+> > >  
+> > >  /* RAM is mmap-ed with MAP_SHARED */
+> > > -#define RAM_SHARED     (1 << 1)
+> > > +#define RAM_SHARED ((QEMU_FORCE QemuMmapFlags) (1 << 1))
+> > >  
+> > >  /* Only a portion of RAM (used_length) is actually used, and migrated.
+> > >   * This used_length size can change across reboots.
+> > >   */
+> > > -#define RAM_RESIZEABLE (1 << 2)
+> > > +#define RAM_RESIZEABLE ((QEMU_FORCE QemuMmapFlags) (1 << 2))
+> > >  
+> > >  /* UFFDIO_ZEROPAGE is available on this RAMBlock to atomically
+> > >   * zero the page and wake waiting processes.
+> > >   * (Set during postcopy)
+> > >   */
+> > > -#define RAM_UF_ZEROPAGE (1 << 3)
+> > > +#define RAM_UF_ZEROPAGE ((QEMU_FORCE QemuMmapFlags) (1 << 3))
+> > >  
+> > >  /* RAM can be migrated */
+> > > -#define RAM_MIGRATABLE (1 << 4)
+> > > +#define RAM_MIGRATABLE ((QEMU_FORCE QemuMmapFlags) (1 << 4))
+> > >  
+> > >  /* RAM is a persistent kind memory */
+> > > -#define RAM_PMEM (1 << 5)
+> > > +#define RAM_PMEM ((QEMU_FORCE QemuMmapFlags) (1 << 5))
+> > >  
+> > >  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+> > >                                         IOMMUNotifierFlag flags,
+> > > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> > > index 3bf48bc..457d24e 100644
+> > > --- a/include/qemu/osdep.h
+> > > +++ b/include/qemu/osdep.h
+> > > @@ -185,6 +185,15 @@ extern int daemon(int, int);
+> > >  #define ESHUTDOWN 4099
+> > >  #endif
+> > >  
+> > > +#ifdef __CHECKER__
+> > > +#define QEMU_BITWISE __attribute__((bitwise))
+> > > +#define QEMU_FORCE   __attribute__((force))
+> > > +#else
+> > > +#define QEMU_BITWISE
+> > > +#define QEMU_FORCE
+> > > +#endif
+> > > +
+> > > +typedef unsigned QEMU_BITWISE QemuMmapFlags;
+> > >  /* time_t may be either 32 or 64 bits depending on the host OS, and
+> > >   * can be either signed or unsigned, so we can't just hardcode a
+> > >   * specific maximum value. This is not a C preprocessor constant,
+> > > -- 
+> > > 2.7.4
