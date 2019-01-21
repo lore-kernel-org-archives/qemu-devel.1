@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42482)
+Received: from eggs.gnu.org ([209.51.188.92]:42615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
-	id 1gldIc-00032M-0h
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gldJB-0003Vo-2M
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:24:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
-	id 1gldIa-0007LF-2L
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:49 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:56425)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=917ecb37e=anthony.perard@citrix.com>)
-	id 1gldIY-0007C8-FA
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:23:47 -0500
-Date: Mon, 21 Jan 2019 17:23:25 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20190121172324.GM1271@perard.uk.xensource.com>
-References: <20181026101016.28584-1-olaf@aepfle.de>
-	<20190121161635.GL1271@perard.uk.xensource.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gldJ9-0007iF-Ga
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:24:24 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gldJ9-0007hZ-BH
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 12:24:23 -0500
+Received: by mail-oi1-x244.google.com with SMTP id t204so15123557oie.7
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 09:24:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190121161635.GL1271@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [PATCH v1] xen: preserve COMPAT in CFLAGS
+References: <20190115143650.15725-1-jusual@mail.ru>
+	<CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
+	<797be79d-7ffc-222a-6acd-b01ff7269a63@mail.ru>
+	<20190117101309.GA27840@stefanha-x1.localdomain>
+	<960bbd92-a160-a65c-22c7-9e899dc3fa78@mail.ru>
+	<CAFEAcA8vWOiXS7iM8heAG5wV1u8Dh_295NbWiqcXCmar9ePuPQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA8vWOiXS7iM8heAG5wV1u8Dh_295NbWiqcXCmar9ePuPQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Jan 2019 17:24:10 +0000
+Message-ID: <CAFEAcA8=LMzbjFZh0tc5mRT8O2Kr3xKhk3xPgGZ_b53qp8qUvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Alistair Francis <alistair23@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On Mon, Jan 21, 2019 at 04:16:35PM +0000, Anthony PERARD wrote:
-> As for https://lists.xenproject.org/archives/html/xen-devel/2018-10/msg01950.html
-> It appear that the same QEMU 2.9.1 is used, but QEMU isn't supposed to
-> use the function xc_map_foreign_bulk when built against Xen 4.12. That
-> function is only supposed to be used when building against Xen 4.6 and
-> earlier.  QEMU 2.9.1 knows about Xen up to 4.8, it should have used
-> xenforeignmemory_map directly. So, this is probably an issue with
-> ./configure.
+On Thu, 17 Jan 2019 at 19:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Thu, 17 Jan 2019 at 10:58, Julia Suvorova <jusual@mail.ru> wrote:
+> >
+> > On 17.01.2019 13:13, Stefan Hajnoczi wrote:
+> > > generic_loader_reset() calls cpu_reset(s->cpu) followed by
+> > > CPUClass->set_pc(s->cpu, s->addr).
+> > >
+> > > ARM's arm_cpu_set_pc() doesn't special-case the Thumb bit (that's only
+> > > done in arm_cpu_reset()) so we end up with an invalid PC for Thumb mode
+> > > addresses.
+> > >
+> > > Maybe the following arm_cpu_reset() code should be moved to
+> > > arm_cpu_set_pc():
+> > >
+> > >    env->regs[15] = initial_pc & ~1;
+> > >    env->thumb = initial_pc & 1;
+> > >
+> > > Then arm_cpu_reset() can call arm_cpu_set_pc() instead of duplicating
+> > > this code.
+> >
+> > No, set_pc() is called in cpu_tb_exec() to restore the PC value and
+> > therefore should not be changed.
+>
+> The set_pc hook is also called for the gdbstub 'c' and 's' packets
+> if they supply an address. I am not sure what the correct behaviour
+> there is (it might be tricky to find out or test, because the
+> 'c' and 's' packets are deprecated in favour of vCont which doesn't
+> allow the address argument at all, and recent gdb neither emits
+> 'c addr' nor supports it in its gdbserver implementation).
 
-You may want to backport that patch:
-https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg05074.html
-That should help with building older version of QEMU against Xen 4.12
-and newer.
+I asked Linaro's gdb developer, and they thought that the gdb
+'c addr' behaviour ought to be "look at bit 0 and switch to
+Thumb or Arm mode accordingly".
 
--- 
-Anthony PERARD
+thanks
+-- PMM
