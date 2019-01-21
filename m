@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40340)
+Received: from eggs.gnu.org ([209.51.188.92]:40333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO8-0001Rv-E8
+	(envelope-from <eblake@redhat.com>) id 1gliO8-0001Rq-C5
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO6-0005J1-Qk
+	(envelope-from <eblake@redhat.com>) id 1gliO6-0005IX-FI
 	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:52 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:48:52 -0600
-Message-Id: <20190121224907.26634-7-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:49:00 -0600
+Message-Id: <20190121224907.26634-15-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/21] nbd/server: Favor [u]int64_t over off_t
+Subject: [Qemu-devel] [PULL 14/21] nbd/client: Split handshake into two
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,199 +23,271 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Although our compile-time environment is set up so that we always
-support long files with 64-bit off_t, we have no guarantee whether
-off_t is the same type as int64_t.  This requires casts when
-printing values, and prevents us from directly using qemu_strtoi64()
-(which will be done in the next patch). Let's just flip to uint64_t
-where possible, and stick to int64_t for detecting failure of
-blk_getlength(); we also keep the assertions added in the previous
-patch that the resulting values fit in 63 bits.  The overflow check
-in nbd_co_receive_request() was already sane (request->from is
-validated to fit in 63 bits, and request->len is 32 bits, so the
-addition can't overflow 64 bits), but rewrite it in a form easier
-to recognize as a typical overflow check.
+An upcoming patch will add the ability for qemu-nbd to list
+the services provided by an NBD server.  Share the common
+code of the TLS handshake by splitting the initial exchange
+into a separate function, leaving only the export handling
+in the original function.  Functionally, there should be no
+change in behavior in this patch, although some of the code
+motion may be difficult to follow due to indentation changes
+(view with 'git diff -w' for a smaller changeset).
 
-Rename the variable 'description' to keep line lengths reasonable.
+I considered an enum for the return code coordinating state
+between the two functions, but in the end just settled with
+ample comments.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190117193658.16413-7-eblake@redhat.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20190117193658.16413-15-eblake@redhat.com>
 ---
- include/block/nbd.h |  4 ++--
- nbd/server.c        | 18 +++++++++---------
- qemu-nbd.c          | 29 +++++++++++------------------
- 3 files changed, 22 insertions(+), 29 deletions(-)
+ nbd/client.c     | 145 +++++++++++++++++++++++++++++++----------------
+ nbd/trace-events |   2 +-
+ 2 files changed, 96 insertions(+), 51 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 1971b557896..24be9570bb4 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -294,8 +294,8 @@ int nbd_errno_to_system_errno(int err);
- typedef struct NBDExport NBDExport;
- typedef struct NBDClient NBDClient;
-
--NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
-size,
--                          const char *name, const char *description,
-+NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-+                          uint64_t size, const char *name, const char *d=
-esc,
-                           const char *bitmap, uint16_t nbdflags,
-                           void (*close)(NBDExport *), bool writethrough,
-                           BlockBackend *on_eject_blk, Error **errp);
-diff --git a/nbd/server.c b/nbd/server.c
-index 51ee8094e02..cb0d5634fa1 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -77,8 +77,8 @@ struct NBDExport {
-     BlockBackend *blk;
-     char *name;
-     char *description;
--    off_t dev_offset;
--    off_t size;
-+    uint64_t dev_offset;
-+    uint64_t size;
-     uint16_t nbdflags;
-     QTAILQ_HEAD(, NBDClient) clients;
-     QTAILQ_ENTRY(NBDExport) next;
-@@ -1455,8 +1455,8 @@ static void nbd_eject_notifier(Notifier *n, void *d=
-ata)
-     nbd_export_close(exp);
+diff --git a/nbd/client.c b/nbd/client.c
+index 9028fd09397..77cc12356f2 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -809,22 +809,26 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
+nnel *ioc,
+     return received;
  }
 
--NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
-size,
--                          const char *name, const char *description,
-+NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-+                          uint64_t size, const char *name, const char *d=
-esc,
-                           const char *bitmap, uint16_t nbdflags,
-                           void (*close)(NBDExport *), bool writethrough,
-                           BlockBackend *on_eject_blk, Error **errp)
-@@ -1495,12 +1495,12 @@ NBDExport *nbd_export_new(BlockDriverState *bs, o=
-ff_t dev_offset, off_t size,
-     exp->refcount =3D 1;
-     QTAILQ_INIT(&exp->clients);
-     exp->blk =3D blk;
--    assert(dev_offset >=3D 0 && dev_offset <=3D INT64_MAX);
-+    assert(dev_offset <=3D INT64_MAX);
-     exp->dev_offset =3D dev_offset;
-     exp->name =3D g_strdup(name);
--    exp->description =3D g_strdup(description);
-+    exp->description =3D g_strdup(desc);
-     exp->nbdflags =3D nbdflags;
--    assert(size >=3D 0 && size <=3D INT64_MAX - dev_offset);
-+    assert(size <=3D INT64_MAX - dev_offset);
-     exp->size =3D QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
-
-     if (bitmap) {
-@@ -2130,10 +2130,10 @@ static int nbd_co_receive_request(NBDRequestData =
-*req, NBDRequest *request,
-         return -EROFS;
-     }
-     if (request->from > client->exp->size ||
--        request->from + request->len > client->exp->size) {
-+        request->len > client->exp->size - request->from) {
-         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %"=
- PRIu32
-                    ", Size: %" PRIu64, request->from, request->len,
--                   (uint64_t)client->exp->size);
-+                   client->exp->size);
-         return (request->type =3D=3D NBD_CMD_WRITE ||
-                 request->type =3D=3D NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -=
-EINVAL;
-     }
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 5c90c5e55f7..598caa656b2 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -176,7 +176,7 @@ static void read_partition(uint8_t *p, struct partiti=
-on_record *r)
- }
-
- static int find_partition(BlockBackend *blk, int partition,
--                          off_t *offset, off_t *size)
-+                          uint64_t *offset, uint64_t *size)
+-int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+-                          const char *hostname, QIOChannel **outioc,
+-                          NBDExportInfo *info, Error **errp)
++/*
++ * nbd_start_negotiate:
++ * Start the handshake to the server.  After a positive return, the serv=
+er
++ * is ready to accept additional NBD_OPT requests.
++ * Returns: negative errno: failure talking to server
++ *          0: server is oldstyle, client must still parse export size
++ *          1: server is newstyle, but can only accept EXPORT_NAME
++ *          2: server is newstyle, but lacks structured replies
++ *          3: server is newstyle and set up for structured replies
++ */
++static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscred=
+s,
++                               const char *hostname, QIOChannel **outioc=
+,
++                               bool structured_reply, bool *zeroes,
++                               Error **errp)
  {
-     struct partition_record mbr[4];
-     uint8_t data[MBR_SIZE];
-@@ -500,14 +500,14 @@ int main(int argc, char **argv)
- {
-     BlockBackend *blk;
-     BlockDriverState *bs;
--    off_t dev_offset =3D 0;
-+    uint64_t dev_offset =3D 0;
-     uint16_t nbdflags =3D 0;
-     bool disconnect =3D false;
-     const char *bindto =3D NULL;
-     const char *port =3D NULL;
-     char *sockpath =3D NULL;
-     char *device =3D NULL;
--    off_t fd_size;
-+    int64_t fd_size;
-     QemuOpts *sn_opts =3D NULL;
-     const char *sn_id_or_name =3D NULL;
-     const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:";
-@@ -665,10 +665,6 @@ int main(int argc, char **argv)
-                 error_report("Invalid offset `%s'", optarg);
-                 exit(EXIT_FAILURE);
+     uint64_t magic;
+-    bool zeroes =3D true;
+-    bool structured_reply =3D info->structured_reply;
+-    bool base_allocation =3D info->base_allocation;
+
+-    trace_nbd_receive_negotiate(tlscreds, hostname ? hostname : "<null>"=
+);
+-
+-    assert(info->name);
+-    trace_nbd_receive_negotiate_name(info->name);
+-    info->structured_reply =3D false;
+-    info->base_allocation =3D false;
++    trace_nbd_start_negotiate(tlscreds, hostname ? hostname : "<null>");
+
++    *zeroes =3D true;
+     if (outioc) {
+         *outioc =3D NULL;
+     }
+@@ -868,7 +872,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
+             clientflags |=3D NBD_FLAG_C_FIXED_NEWSTYLE;
+         }
+         if (globalflags & NBD_FLAG_NO_ZEROES) {
+-            zeroes =3D false;
++            *zeroes =3D false;
+             clientflags |=3D NBD_FLAG_C_NO_ZEROES;
+         }
+         /* client requested flags */
+@@ -890,7 +894,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLS=
+Creds *tlscreds,
              }
--            if (dev_offset < 0) {
--                error_report("Offset must be positive `%s'", optarg);
--                exit(EXIT_FAILURE);
--            }
-             break;
-         case 'l':
-             if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
-@@ -1005,15 +1001,14 @@ int main(int argc, char **argv)
-     }
+         }
+         if (fixedNewStyle) {
+-            int result;
++            int result =3D 0;
 
-     if (dev_offset >=3D fd_size) {
--        error_report("Offset (%lld) has to be smaller than the image siz=
-e "
--                     "(%lld)",
--                     (long long int)dev_offset, (long long int)fd_size);
-+        error_report("Offset (%" PRIu64 ") has to be smaller than the im=
-age "
-+                     "size (%" PRId64 ")", dev_offset, fd_size);
-         exit(EXIT_FAILURE);
-     }
-     fd_size -=3D dev_offset;
-
-     if (partition !=3D -1) {
--        off_t limit;
-+        uint64_t limit;
-
-         if (dev_offset) {
-             error_report("Cannot request partition and offset together")=
+             if (structured_reply) {
+                 result =3D nbd_request_simple_option(ioc,
+@@ -899,39 +903,85 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+                 if (result < 0) {
+                     return -EINVAL;
+                 }
+-                info->structured_reply =3D result =3D=3D 1;
+             }
++            return 2 + result;
++        } else {
++            return 1;
++        }
++    } else if (magic =3D=3D NBD_CLIENT_MAGIC) {
++        if (tlscreds) {
++            error_setg(errp, "Server does not support STARTTLS");
++            return -EINVAL;
++        }
++        return 0;
++    } else {
++        error_setg(errp, "Bad server magic received: 0x%" PRIx64, magic)=
 ;
-@@ -1027,15 +1022,13 @@ int main(int argc, char **argv)
++        return -EINVAL;
++    }
++}
+
+-            if (info->structured_reply && base_allocation) {
+-                result =3D nbd_negotiate_simple_meta_context(ioc, info, =
+errp);
+-                if (result < 0) {
+-                    return -EINVAL;
+-                }
+-                info->base_allocation =3D result =3D=3D 1;
+-            }
++/*
++ * nbd_receive_negotiate:
++ * Connect to server, complete negotiation, and move into transmission p=
+hase.
++ * Returns: negative errno: failure talking to server
++ *          0: server is connected
++ */
++int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++                          const char *hostname, QIOChannel **outioc,
++                          NBDExportInfo *info, Error **errp)
++{
++    int result;
++    bool zeroes;
++    bool base_allocation =3D info->base_allocation;
++    uint32_t oldflags;
++
++    assert(info->name);
++    trace_nbd_receive_negotiate_name(info->name);
++
++    result =3D nbd_start_negotiate(ioc, tlscreds, hostname, outioc,
++                                 info->structured_reply, &zeroes, errp);
++
++    info->structured_reply =3D false;
++    info->base_allocation =3D false;
++    if (tlscreds && *outioc) {
++        ioc =3D *outioc;
++    }
+
+-            /* Try NBD_OPT_GO first - if it works, we are done (it
+-             * also gives us a good message if the server requires
+-             * TLS).  If it is not available, fall back to
+-             * NBD_OPT_LIST for nicer error messages about a missing
+-             * export, then use NBD_OPT_EXPORT_NAME.  */
+-            result =3D nbd_opt_go(ioc, info, errp);
++    switch (result) {
++    case 3: /* newstyle, with structured replies */
++        info->structured_reply =3D true;
++        if (base_allocation) {
++            result =3D nbd_negotiate_simple_meta_context(ioc, info, errp=
+);
+             if (result < 0) {
+                 return -EINVAL;
+             }
+-            if (result > 0) {
+-                return 0;
+-            }
+-            /* Check our desired export is present in the
+-             * server export list. Since NBD_OPT_EXPORT_NAME
+-             * cannot return an error message, running this
+-             * query gives us better error reporting if the
+-             * export name is not available.
+-             */
+-            if (nbd_receive_query_exports(ioc, info->name, errp) < 0) {
+-                return -EINVAL;
+-            }
++            info->base_allocation =3D result =3D=3D 1;
          }
-         /*
-          * MBR partition limits are (32-bit << 9); this assert lets
--         * the compiler know that we have two positive values that
--         * can't overflow 64 bits.
-+         * the compiler know that we can't overflow 64 bits.
-          */
--        assert(dev_offset >=3D 0 && dev_offset + limit >=3D dev_offset);
-+        assert(dev_offset + limit >=3D dev_offset);
-         if (dev_offset + limit > fd_size) {
--            error_report("Discovered partition %d at offset %lld size %l=
-ld, "
--                         "but size exceeds file length %lld", partition,
--                         (long long int) dev_offset, (long long int) lim=
-it,
--                         (long long int) fd_size);
-+            error_report("Discovered partition %d at offset %" PRIu64
-+                         " size %" PRIu64 ", but size exceeds file lengt=
-h %"
-+                         PRId64, partition, dev_offset, limit, fd_size);
-             exit(EXIT_FAILURE);
++        /* fall through */
++    case 2: /* newstyle, try OPT_GO */
++        /* Try NBD_OPT_GO first - if it works, we are done (it
++         * also gives us a good message if the server requires
++         * TLS).  If it is not available, fall back to
++         * NBD_OPT_LIST for nicer error messages about a missing
++         * export, then use NBD_OPT_EXPORT_NAME.  */
++        result =3D nbd_opt_go(ioc, info, errp);
++        if (result < 0) {
++            return -EINVAL;
++        }
++        if (result > 0) {
++            return 0;
++        }
++        /* Check our desired export is present in the
++         * server export list. Since NBD_OPT_EXPORT_NAME
++         * cannot return an error message, running this
++         * query gives us better error reporting if the
++         * export name is not available.
++         */
++        if (nbd_receive_query_exports(ioc, info->name, errp) < 0) {
++            return -EINVAL;
++        }
++        /* fall through */
++    case 1: /* newstyle, but limited to EXPORT_NAME */
+         /* write the export name request */
+         if (nbd_send_option_request(ioc, NBD_OPT_EXPORT_NAME, -1, info->=
+name,
+                                     errp) < 0) {
+@@ -950,17 +1000,12 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCrypto=
+TLSCreds *tlscreds,
+             return -EINVAL;
          }
-         fd_size =3D limit;
+         info->flags =3D be16_to_cpu(info->flags);
+-    } else if (magic =3D=3D NBD_CLIENT_MAGIC) {
+-        uint32_t oldflags;
+-
++        break;
++    case 0: /* oldstyle, parse length and flags */
+         if (*info->name) {
+             error_setg(errp, "Server does not support non-empty export n=
+ames");
+             return -EINVAL;
+         }
+-        if (tlscreds) {
+-            error_setg(errp, "Server does not support STARTTLS");
+-            return -EINVAL;
+-        }
+
+         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+             error_prepend(errp, "Failed to read export length: ");
+@@ -978,9 +1023,9 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTL=
+SCreds *tlscreds,
+             return -EINVAL;
+         }
+         info->flags =3D oldflags;
+-    } else {
+-        error_setg(errp, "Bad server magic received: 0x%" PRIx64, magic)=
+;
+-        return -EINVAL;
++        break;
++    default:
++        return result;
+     }
+
+     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+diff --git a/nbd/trace-events b/nbd/trace-events
+index b4802c1570e..663d11687ab 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -14,7 +14,7 @@ nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+ nbd_opt_meta_request(const char *optname, const char *context, const cha=
+r *export) "Requesting %s %s for export %s"
+ nbd_opt_meta_reply(const char *optname, const char *context, uint32_t id=
+) "Received %s mapping of %s to id %" PRIu32
+-nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving n=
+egotiation tlscreds=3D%p hostname=3D%s"
++nbd_start_negotiate(void *tlscreds, const char *hostname) "Receiving neg=
+otiation tlscreds=3D%p hostname=3D%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+ nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags a=
+re 0x%" PRIx32
+ nbd_receive_negotiate_name(const char *name) "Requesting NBD export name=
+ '%s'"
 --=20
 2.20.1
