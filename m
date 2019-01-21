@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40312)
+Received: from eggs.gnu.org ([209.51.188.92]:40224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO7-0001RQ-V1
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO3-0001P7-T4
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliO6-0005J4-RK
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliO1-0005FY-Qm
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:47 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:49:06 -0600
-Message-Id: <20190121224907.26634-21-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:53 -0600
+Message-Id: <20190121224907.26634-8-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/21] nbd/client: Work around 3.0 bug for
- listing meta contexts
+Subject: [Qemu-devel] [PULL 07/21] qemu-nbd: Avoid strtol open-coding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +22,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Richard W . M . Jones" <rjones@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Commit 3d068aff forgot to advertise available qemu: contexts
-when the client requests a list with 0 queries. Furthermore,
-3.0 shipped with a qemu-img hack of x-dirty-bitmap (commit
-216ee365) that _silently_ acts as though the entire image is
-clean if a requested bitmap is not present.  Both bugs have
-been recently fixed, so that a modern qemu server gives full
-context output right away, and the client refuses a
-connection if a requested x-dirty-bitmap was not found.
+Our copy-and-pasted open-coding of strtol handling forgot to
+handle overflow conditions.  Use qemu_strto*() instead.
 
-Still, it is likely that there will be users that have to
-work with a mix of old and new qemu versions, depending on
-which features get backported where, at which point being
-able to rely on 'qemu-img --list' output to know for sure
-whether a given NBD export has the desired dirty bitmap is
-much nicer than blindly connecting and risking that the
-entire image may appear clean.  We can make our --list code
-smart enough to work around buggy servers by tracking
-whether we've seen any qemu: replies in the original 0-query
-list; if not, repeat with a single query on "qemu:" (which
-may still have no replies, but then we know for sure we
-didn't trip up on the server bug).
+In the case of --partition, since we insist on a user-supplied
+partition to be non-zero, we can use 0 rather than -1 for our
+initial value to distinguish when a partition is not being
+served, for slightly more optimal code.
+
+The error messages for out-of-bounds values are less specific,
+but should not be a terrible loss in quality.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20190117193658.16413-21-eblake@redhat.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Message-Id: <20190117193658.16413-8-eblake@redhat.com>
 ---
- nbd/client.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ qemu-nbd.c | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 798b82f205a..8a083c2f42c 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -21,6 +21,7 @@
- #include "qapi/error.h"
- #include "trace.h"
- #include "nbd-internal.h"
-+#include "qemu/cutils.h"
-
- /* Definitions for opaque data types */
-
-@@ -828,6 +829,8 @@ static int nbd_list_meta_contexts(QIOChannel *ioc,
-                                   Error **errp)
- {
-     int ret;
-+    int seen_any =3D false;
-+    int seen_qemu =3D false;
-
-     if (nbd_send_meta_query(ioc, NBD_OPT_LIST_META_CONTEXT,
-                             info->name, NULL, errp) < 0) {
-@@ -839,9 +842,25 @@ static int nbd_list_meta_contexts(QIOChannel *ioc,
-
-         ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_LIST_META_CONT=
-EXT,
-                                            &context, NULL, errp);
-+        if (ret =3D=3D 0 && seen_any && !seen_qemu) {
-+            /*
-+             * Work around qemu 3.0 bug: the server forgot to send
-+             * "qemu:" replies to 0 queries. If we saw at least one
-+             * reply (probably base:allocation), but none of them were
-+             * qemu:, then run a more specific query to make sure.
-+             */
-+            seen_qemu =3D true;
-+            if (nbd_send_meta_query(ioc, NBD_OPT_LIST_META_CONTEXT,
-+                                    info->name, "qemu:", errp) < 0) {
-+                return -1;
-+            }
-+            continue;
-+        }
-         if (ret <=3D 0) {
-             return ret;
-         }
-+        seen_any =3D true;
-+        seen_qemu |=3D strstart(context, "qemu:", NULL);
-         info->contexts =3D g_renew(char *, info->contexts, ++info->n_con=
-texts);
-         info->contexts[info->n_contexts - 1] =3D context;
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 598caa656b2..efca0e44a90 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -546,9 +546,8 @@ int main(int argc, char **argv)
+     };
+     int ch;
+     int opt_ind =3D 0;
+-    char *end;
+     int flags =3D BDRV_O_RDWR;
+-    int partition =3D -1;
++    int partition =3D 0;
+     int ret =3D 0;
+     bool seen_cache =3D false;
+     bool seen_discard =3D false;
+@@ -660,9 +659,8 @@ int main(int argc, char **argv)
+             port =3D optarg;
+             break;
+         case 'o':
+-                dev_offset =3D strtoll (optarg, &end, 0);
+-            if (*end) {
+-                error_report("Invalid offset `%s'", optarg);
++            if (qemu_strtou64(optarg, NULL, 0, &dev_offset) < 0) {
++                error_report("Invalid offset '%s'", optarg);
+                 exit(EXIT_FAILURE);
+             }
+             break;
+@@ -684,13 +682,9 @@ int main(int argc, char **argv)
+             flags &=3D ~BDRV_O_RDWR;
+             break;
+         case 'P':
+-            partition =3D strtol(optarg, &end, 0);
+-            if (*end) {
+-                error_report("Invalid partition `%s'", optarg);
+-                exit(EXIT_FAILURE);
+-            }
+-            if (partition < 1 || partition > 8) {
+-                error_report("Invalid partition %d", partition);
++            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
++                partition < 1 || partition > 8) {
++                error_report("Invalid partition '%s'", optarg);
+                 exit(EXIT_FAILURE);
+             }
+             break;
+@@ -711,15 +705,11 @@ int main(int argc, char **argv)
+             device =3D optarg;
+             break;
+         case 'e':
+-            shared =3D strtol(optarg, &end, 0);
+-            if (*end) {
++            if (qemu_strtoi(optarg, NULL, 0, &shared) < 0 ||
++                shared < 1) {
+                 error_report("Invalid shared device number '%s'", optarg=
+);
+                 exit(EXIT_FAILURE);
+             }
+-            if (shared < 1) {
+-                error_report("Shared device number must be greater than =
+0");
+-                exit(EXIT_FAILURE);
+-            }
+             break;
+         case 'f':
+             fmt =3D optarg;
+@@ -1007,7 +997,7 @@ int main(int argc, char **argv)
      }
+     fd_size -=3D dev_offset;
+
+-    if (partition !=3D -1) {
++    if (partition) {
+         uint64_t limit;
+
+         if (dev_offset) {
 --=20
 2.20.1
