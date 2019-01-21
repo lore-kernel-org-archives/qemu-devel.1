@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52637)
+Received: from eggs.gnu.org ([209.51.188.92]:53878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glVeE-0004Db-97
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:13:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1glViF-0006WC-3W
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:17:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glVeC-0001eQ-2A
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:13:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glVdy-0001Xm-Dg
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:13:28 -0500
-References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
-	<20190118144724.66914-1-emaste@freebsd.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8def73c9-23e5-9f87-81d1-dda0c7e6f7d9@redhat.com>
-Date: Mon, 21 Jan 2019 10:13:13 +0100
+	(envelope-from <no-reply@patchew.org>) id 1glViE-0004D6-60
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:17:47 -0500
+Resent-Message-Id: <E1glViE-0004D6-60@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1glViD-0004BU-VX
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 04:17:46 -0500
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190116030815.27273-1-peterx@redhat.com>
+Message-ID: <154805952549.5550.9154893774048296420@2d3111e9616b>
 MIME-Version: 1.0
-In-Reply-To: <20190118144724.66914-1-emaste@freebsd.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
- FreeBSD
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 21 Jan 2019 00:32:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] intel_iommu: misc fixes for error
+ exposed after error_report_once()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: emaste@freebsd.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: peterx@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com, eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com
 
-On 2019-01-18 15:47, emaste@freebsd.org wrote:
-> From: Ed Maste <emaste@freebsd.org>
->=20
-> Signed-off-by: Ed Maste <emaste@freebsd.org>
-> ---
-> Changes since v2:
->   * remove fontconfig and freetype2, noted by Thomas Huth
->=20
-> After this patch is applied someone with appropriate permissions will
-> need to add the Cirrus-CI application in GitHub.
-
-Maybe even more important: It also works for forked repositories (once
-you've enabled the Cirrus-CI application from the marketplace), so
-people can use this to test their branches before sending PULL requests,
-e.g.:
-
- https://cirrus-ci.com/github/huth/qemu
-
-Thus this sounds like a good idea to me.
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-
->  .cirrus.yml | 16 ++++++++++++++++
->  MAINTAINERS |  8 ++++++++
->  2 files changed, 24 insertions(+)
->  create mode 100644 .cirrus.yml
->=20
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> new file mode 100644
-> index 0000000000..84d6f0519b
-> --- /dev/null
-> +++ b/.cirrus.yml
-> @@ -0,0 +1,16 @@
-> +freebsd_12_task:
-> +  freebsd_instance:
-> +    image: freebsd-12-0-release-amd64
-> +    cpu: 8
-> +    memory: 24G
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script: pkg install -y
-> +    bison curl cyrus-sasl git glib gmake gnutls
-> +    nettle perl5 pixman pkgconf png usbredir
-> +  script:
-> +    - mkdir build
-> +    - cd build
-> +    - ../configure || { cat config.log; exit 1; }
-> +    - gmake -j8 V=3D1
-> +    - gmake -j8 V=3D1 check
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index af339b86db..f9da8c9cf0 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2483,6 +2483,14 @@ W: https://travis-ci.org/qemu/qemu
->  W: https://app.shippable.com/github/qemu/qemu
->  W: http://patchew.org/QEMU/
-> =20
-> +FreeBSD Hosted Continuous Integration
-> +M: Ed Maste <emaste@freebsd.org>
-> +M: Li-Wen Hsu <lwhsu@freebsd.org>
-> +L: qemu-devel@nongnu.org
-> +S: Maintained
-> +F: .cirrus.yml
-> +W: https://cirrus-ci.com/github/qemu/qemu
-> +
->  Guest Test Compilation Support
->  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNjAzMDgxNS4yNzI3
+My0xLXBldGVyeEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIGh3L2Js
+b2NrL3BmbGFzaF9jZmkwMS5vCkluIGZ1bmN0aW9uICdhY3BpX3RhYmxlX2luc3RhbGwnLAogICAg
+aW5saW5lZCBmcm9tICdhY3BpX3RhYmxlX2FkZCcgYXQgL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fj
+cGkvY29yZS5jOjI5Njo1OgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jb3JlLmM6MTg0Ojk6
+IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDQgZXF1YWxzIGRlc3RpbmF0aW9uIHNp
+emUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweShleHRfaGRy
+LT5zaWcsIGhkcnMtPnNpZywgc2l6ZW9mIGV4dF9oZHItPnNpZyk7CiAgICAgICAgIF5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10
+ZXN0L3NyYy9ody9hY3BpL2NvcmUuYzoyMDM6OTogZXJyb3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQg
+Ym91bmQgNiBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10cnVuY2F0
+aW9uXQogICAgICAgICBzdHJuY3B5KGV4dF9oZHItPm9lbV9pZCwgaGRycy0+b2VtX2lkLCBzaXpl
+b2YgZXh0X2hkci0+b2VtX2lkKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3
+L2FjcGkvY29yZS5jOjIwNzo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA4IGVx
+dWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAg
+ICAgIHN0cm5jcHkoZXh0X2hkci0+b2VtX3RhYmxlX2lkLCBoZHJzLT5vZW1fdGFibGVfaWQsCiAg
+ICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+CiAgICAgICAgICAgICAgICAgc2l6ZW9mIGV4dF9oZHItPm9lbV90YWJsZV9pZCk7CiAgICAgICAg
+ICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3Jj
+L2h3L2FjcGkvY29yZS5jOjIxNjo5OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCA0
+IGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAg
+ICAgICAgIHN0cm5jcHkoZXh0X2hkci0+YXNsX2NvbXBpbGVyX2lkLCBoZHJzLT5hc2xfY29tcGls
+ZXJfaWQsCiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgc2l6ZW9mIGV4dF9oZHItPmFzbF9jb21w
+aWxlcl9pZCk7Ci0tLQptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6
+IGh3L2FjcGkvY29yZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
+IGpvYnMuLi4uCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOiBJbiBmdW5jdGlv
+biAnZmluZF92ZGlfbmFtZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9zaGVlcGRvZy5jOjEy
+Mzk6NTogZXJyb3I6ICdzdHJuY3B5JyBzcGVjaWZpZWQgYm91bmQgMjU2IGVxdWFscyBkZXN0aW5h
+dGlvbiBzaXplIFstV2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgICAgc3RybmNweShidWYg
+KyBTRF9NQVhfVkRJX0xFTiwgdGFnLCBTRF9NQVhfVkRJX1RBR19MRU4pOwogICAgIF5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0
+L3NyYy9ydWxlcy5tYWs6Njk6IGJsb2NrL3NoZWVwZG9nLm9dIEVycm9yIDEKL3RtcC9xZW11LXRl
+c3Qvc3JjL2h3L2FjcGkvYW1sLWJ1aWxkLmM6IEluIGZ1bmN0aW9uICdidWlsZF9oZWFkZXInOgov
+dG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9hbWwtYnVpbGQuYzoxNTM1Ojk6IGVycm9yOiAnc3Ry
+bmNweScgc3BlY2lmaWVkIGJvdW5kIDYgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9
+c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICAgICAgc3RybmNweSgoY2hhciAqKWgtPm9lbV9pZCwg
+b2VtX2lkLCBzaXplb2YgaC0+b2VtX2lkKTsKICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNw
+aS9hbWwtYnVpbGQuYzoxNTQxOjk6IGVycm9yOiAnc3RybmNweScgc3BlY2lmaWVkIGJvdW5kIDgg
+ZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAg
+ICAgICAgc3RybmNweSgoY2hhciAqKWgtPm9lbV90YWJsZV9pZCwgb2VtX3RhYmxlX2lkLCBzaXpl
+b2YoaC0+b2VtX3RhYmxlX2lkKSk7CiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdh
+cm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDExNjAzMDgxNS4yNzI3My0xLXBldGVy
+eEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
