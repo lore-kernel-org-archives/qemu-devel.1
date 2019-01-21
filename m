@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39894)
+Received: from eggs.gnu.org ([209.51.188.92]:39934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNl-0001BO-ET
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliNq-0001Fb-08
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gliNj-00051n-Ai
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1gliNl-00053e-Rx
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 17:49:32 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 21 Jan 2019 16:48:47 -0600
-Message-Id: <20190121224907.26634-2-eblake@redhat.com>
+Date: Mon, 21 Jan 2019 16:48:49 -0600
+Message-Id: <20190121224907.26634-4-eblake@redhat.com>
 In-Reply-To: <20190121224907.26634-1-eblake@redhat.com>
 References: <20190121224907.26634-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/21] iotests: Make 233 output more reliable
+Subject: [Qemu-devel] [PULL 03/21] qemu-nbd: Enhance man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +22,190 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-We have a race between the nbd server and the client both trying
-to report errors at once which can make the test sometimes fail
-if the output lines swap order under load.  Break the race by
-collecting server messages into a file and then replaying that
-at the end of the test.
-
-We may yet want to fix the server to not output ANYTHING for a
-client action except when -v was used (to avoid malicious clients
-from being able to DoS a server by filling up its logs), but that
-is saved for a future patch.
+Document some useful qemu-nbd command lines. Mention some restrictions
+on particular options, like -p being only for MBR images, or -c/-d
+being Linux-only.  Update some text given the recent change to no
+longer serve oldstyle protocol (missed in commit 7f7dfe2a).  Also,
+consistently use trailing '.' in describing options.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-CC: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190117193658.16413-2-eblake@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Message-Id: <20190117193658.16413-4-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/233     | 11 ++++++++---
- tests/qemu-iotests/233.out |  4 +++-
- 2 files changed, 11 insertions(+), 4 deletions(-)
+ qemu-nbd.texi | 94 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 75 insertions(+), 19 deletions(-)
 
-diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-index 1814efe3333..ab15c777370 100755
---- a/tests/qemu-iotests/233
-+++ b/tests/qemu-iotests/233
-@@ -2,7 +2,7 @@
- #
- # Test NBD TLS certificate / authorization integration
- #
--# Copyright (C) 2018 Red Hat, Inc.
-+# Copyright (C) 2018-2019 Red Hat, Inc.
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
-@@ -30,6 +30,7 @@ _cleanup()
- {
-     nbd_server_stop
-     _cleanup_test_img
-+    rm -f "$TEST_DIR/server.log"
-     tls_x509_cleanup
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-@@ -66,7 +67,7 @@ $QEMU_IO -c 'w -P 0x11 1m 1m' "$TEST_IMG" | _filter_qem=
-u_io
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 96b1546006a..f218291bf30 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -10,11 +10,17 @@
 
- echo
- echo "=3D=3D check TLS client to plain server fails =3D=3D"
--nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG"
-+nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG" 2> "$TEST_DIR/server.=
-log"
+ Export a QEMU disk image using the NBD protocol.
 
- $QEMU_IMG info --image-opts \
-     --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
-d=3Dtls0 \
-@@ -81,7 +82,7 @@ echo "=3D=3D check plain client to TLS server fails =3D=
-=3D"
- nbd_server_start_tcp_socket \
-     --object tls-creds-x509,dir=3D${tls_dir}/server1,endpoint=3Dserver,i=
-d=3Dtls0,verify-peer=3Dyes \
-     --tls-creds tls0 \
--    -f $IMGFMT "$TEST_IMG"
-+    -f $IMGFMT "$TEST_IMG" 2>> "$TEST_DIR/server.log"
-
- $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_port=
-/PORT/g"
-
-@@ -109,6 +110,10 @@ $QEMU_IO -c 'r -P 0x11 1m 1m' -c 'w -P 0x22 1m 1m' -=
--image-opts \
-
- $QEMU_IO -f $IMGFMT -r -U -c 'r -P 0x22 1m 1m' "$TEST_IMG" | _filter_qem=
-u_io
-
-+echo
-+echo "=3D=3D final server log =3D=3D"
-+cat "$TEST_DIR/server.log"
++Other uses:
++@itemize
++@item
++Bind a /dev/nbdX block device to a QEMU server (on Linux).
++@end itemize
 +
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
-index 5f416721b03..2199d8a8b32 100644
---- a/tests/qemu-iotests/233.out
-+++ b/tests/qemu-iotests/233.out
-@@ -27,7 +27,6 @@ virtual size: 64M (67108864 bytes)
- disk size: unavailable
+ @c man end
 
- =3D=3D check TLS with different CA fails =3D=3D
--qemu-nbd: option negotiation failed: Verify failed: No certificate was f=
-ound.
- qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,tls-=
-creds=3Dtls0': The certificate hasn't got a known issuer
+ @c man begin OPTIONS
+ @var{filename} is a disk image filename, or a set of block
+-driver options if @var{--image-opts} is specified.
++driver options if @option{--image-opts} is specified.
 
- =3D=3D perform I/O over TLS =3D=3D
-@@ -37,4 +36,7 @@ wrote 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- read 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ @var{dev} is an NBD device.
+
+@@ -27,24 +33,25 @@ supported. The common object types that it makes sens=
+e to define are the
+ keys, and the @code{tls-creds} object, which is used to supply TLS
+ credentials for the qemu-nbd server.
+ @item -p, --port=3D@var{port}
+-The TCP port to listen on (default @samp{10809})
++The TCP port to listen on (default @samp{10809}).
+ @item -o, --offset=3D@var{offset}
+-The offset into the image
++The offset into the image.
+ @item -b, --bind=3D@var{iface}
+-The interface to bind to (default @samp{0.0.0.0})
++The interface to bind to (default @samp{0.0.0.0}).
+ @item -k, --socket=3D@var{path}
+-Use a unix socket with path @var{path}
++Use a unix socket with path @var{path}.
+ @item --image-opts
+ Treat @var{filename} as a set of image options, instead of a plain
+ filename. If this flag is specified, the @var{-f} flag should
+ not be used, instead the '@code{format=3D}' option should be set.
+ @item -f, --format=3D@var{fmt}
+ Force the use of the block driver for format @var{fmt} instead of
+-auto-detecting
++auto-detecting.
+ @item -r, --read-only
+-Export the disk as read-only
++Export the disk as read-only.
+ @item -P, --partition=3D@var{num}
+-Only expose partition @var{num}
++Only expose MBR partition @var{num}.  Understands physical partitions
++1-4 and logical partitions 5-8.
+ @item -B, --bitmap=3D@var{name}
+ If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
+ that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
+@@ -52,7 +59,7 @@ accessible through NBD_OPT_SET_META_CONTEXT.
+ @item -s, --snapshot
+ Use @var{filename} as an external snapshot, create a temporary
+ file with backing_file=3D@var{filename}, redirect the write to
+-the temporary one
++the temporary one.
+ @item -l, --load-snapshot=3D@var{snapshot_param}
+ Load an internal snapshot inside @var{filename} and export it
+ as an read-only device, @var{snapshot_param} format is
+@@ -76,19 +83,20 @@ driver-specific optimized zero write commands.  @var{=
+detect-zeroes} is one of
+ converts a zero write to an unmap operation and can only be used if
+ @var{discard} is set to @samp{unmap}.  The default is @samp{off}.
+ @item -c, --connect=3D@var{dev}
+-Connect @var{filename} to NBD device @var{dev}
++Connect @var{filename} to NBD device @var{dev} (Linux only).
+ @item -d, --disconnect
+-Disconnect the device @var{dev}
++Disconnect the device @var{dev} (Linux only).
+ @item -e, --shared=3D@var{num}
+-Allow up to @var{num} clients to share the device (default @samp{1})
++Allow up to @var{num} clients to share the device (default
++@samp{1}). Safe for readers, but for now, consistency is not
++guaranteed between multiple writers.
+ @item -t, --persistent
+-Don't exit on the last connection
++Don't exit on the last connection.
+ @item -x, --export-name=3D@var{name}
+-Set the NBD volume export name. This switches the server to use
+-the new style NBD protocol negotiation
++Set the NBD volume export name (default of a zero-length string).
+ @item -D, --description=3D@var{description}
+ Set the NBD volume export description, as a human-readable
+-string. Requires the use of @option{-x}
++string.
+ @item --tls-creds=3DID
+ Enable mandatory TLS encryption for the server by setting the ID
+ of the TLS credentials object previously created with the --object
+@@ -96,11 +104,11 @@ option.
+ @item --fork
+ Fork off the server process and exit the parent once the server is runni=
+ng.
+ @item -v, --verbose
+-Display extra debugging information
++Display extra debugging information.
+ @item -h, --help
+-Display this help and exit
++Display this help and exit.
+ @item -V, --version
+-Display version information and exit
++Display version information and exit.
+ @item -T, --trace [[enable=3D]@var{pattern}][,events=3D@var{file}][,file=
+=3D@var{file}]
+ @findex --trace
+ @include qemu-option-trace.texi
+@@ -108,6 +116,54 @@ Display version information and exit
+
+ @c man end
+
++@c man begin EXAMPLES
++Start a server listening on port 10809 that exposes only the
++guest-visible contents of a qcow2 file, with no TLS encryption, and
++with the default export name (an empty string). The command is
++one-shot, and will block until the first successful client
++disconnects:
 +
-+=3D=3D final server log =3D=3D
-+qemu-nbd: option negotiation failed: Verify failed: No certificate was f=
-ound.
- *** done
++@example
++qemu-nbd -f qcow2 file.qcow2
++@end example
++
++Start a long-running server listening with encryption on port 10810,
++and require clients to have a correct X.509 certificate to connect to
++a 1 megabyte subset of a raw file, using the export name 'subset':
++
++@example
++qemu-nbd \
++  --object tls-creds-x509,id=3Dtls0,endpoint=3Dserver,dir=3D/path/to/qem=
+utls \
++  --tls-creds tls0 -t -x subset -p 10810 \
++  --image-opts driver=3Draw,offset=3D1M,size=3D1M,file.driver=3Dfile,fil=
+e.filename=3Dfile.raw
++@end example
++
++Serve a read-only copy of just the first MBR partition of a guest
++image over a Unix socket with as many as 5 simultaneous readers, with
++a persistent process forked as a daemon:
++
++@example
++qemu-nbd --fork --persistent --shared=3D5 --socket=3D/path/to/sock \
++  --partition=3D1 --read-only --format=3Dqcow2 file.qcow2
++@end example
++
++Expose the guest-visible contents of a qcow2 file via a block device
++/dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
++partitions found within), then disconnect the device when done.
++Access to bind qemu-nbd to an /dev/nbd device generally requires root
++privileges, and may also require the execution of @code{modprobe nbd}
++to enable the kernel NBD client module.  @emph{CAUTION}: Do not use
++this method to mount filesystems from an untrusted guest image - a
++malicious guest may have prepared the image to attempt to trigger
++kernel bugs in partition probing or file system mounting.
++
++@example
++qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
++qemu-nbd -d /dev/nbd0
++@end example
++
++@c man end
++
+ @ignore
+
+ @setfilename qemu-nbd
 --=20
 2.20.1
