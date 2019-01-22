@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45373)
+Received: from eggs.gnu.org ([209.51.188.92]:46544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1o9-0007pl-7h
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:34:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1o9-00004v-E5
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:34:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1bz-0006GR-7m
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:21:29 -0500
-Date: Tue, 22 Jan 2019 14:23:11 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190122142311.5c7d3947.cohuck@redhat.com>
-In-Reply-To: <58639d62-019a-2d87-37e4-10523947e721@redhat.com>
-References: <20190122094143.8857-1-david@redhat.com>
-	<cd0a559f-6a44-20b9-39ad-4368d08f79af@redhat.com>
-	<d31d1ba2-579a-eaa1-1e41-0745fd0291b9@redhat.com>
-	<20190122141301.5f69a9b0.cohuck@redhat.com>
-	<58639d62-019a-2d87-37e4-10523947e721@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1ba-0005dE-U0
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:21:03 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44811)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm1ba-0005Mr-9r
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:21:02 -0500
+Received: by mail-ot1-x341.google.com with SMTP id f18so24672636otl.11
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:20:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+References: <20190122190503.13627-1-philmd@redhat.com>
+In-Reply-To: <20190122190503.13627-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 19:20:35 +0000
+Message-ID: <CAFEAcA-iZHdf6DqrNyUS7yEQmV=VNzWgF7HbHrLaZ5C8EL_0dA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Let SDL support be optional on
+ OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <fam@euphon.net>
 
-On Tue, 22 Jan 2019 14:20:27 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Tue, 22 Jan 2019 at 19:05, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Currently if we try to build QEMU on OpenBSD with SDL disabled, we get:
+>
+>   $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7 --disable-sdl
+>
+>   ERROR: sdl not found or disabled, can not use sdl audio driver
+>
+> Since SDL is not a requirement for OpenBSD, let it be optional (we remove
+> it from $audio_drv_list but it stays available in $audio_possible_drivers=
+).
+> If no audio backends are available, QEMU falls back to the null driver.
 
-> On 22.01.19 14:13, Cornelia Huck wrote:
-> > On Tue, 22 Jan 2019 11:06:46 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 22.01.19 10:50, Thomas Huth wrote:  
-> >>> On 2019-01-22 10:41, David Hildenbrand wrote:    
-> >>>> We decided to always create the PCI host bridge, even if 'zpci' is not
-> >>>> enabled (due to migration compatibility).    
-> >>>
-> >>> Couldn't we disable the host bridge for newer machine types, and just
-> >>> create it on the old ones for migration compatibility?    
-> > 
-> > I very dimly remember some problems with that approach.
-> >   
-> >>
-> >> I think we can with a compat property. However I somewhat dislike that
-> >> the error/warning will then be "no bus" vs. "zpci CPU feature not
-> >> enabled". Somebody who has no idea about that will think he somehow has
-> >> to create a PCI bus on the QEMU comandline.  
-> > 
-> > Agreed, "zpci cpu feature not enabled" gives a much better clue.
-> >   
-> >>
-> >> ... however
-> >>  
-> >>>     
-> >>>> This however right now allows
-> >>>> to add zPCI/PCI devices to a VM although the guest will never actually see
-> >>>> them, confusing people that are using a simple CPU model that has no
-> >>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
-> >>>>
-> >>>> Let's check for 'zpci' and at least print a warning that this will not
-> >>>> work as expected. We could also bail out, however that might break
-> >>>> existing QEMU commandlines.
-> >>>>
-> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>>> ---
-> >>>>  hw/s390x/s390-pci-bus.c | 5 +++++
-> >>>>  1 file changed, 5 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >>>> index b86a8bdcd4..e7d4f49611 100644
-> >>>> --- a/hw/s390x/s390-pci-bus.c
-> >>>> +++ b/hw/s390x/s390-pci-bus.c
-> >>>> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >>>>  {
-> >>>>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-> >>>>  
-> >>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> >>>> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
-> >>>> +                    " The guest will not be able to see/use these devices.");
-> >>>> +    }    
-> >>>
-> >>> I think it would be better to bail out. The hotplug clearly can not work
-> >>> in this case, and the warn report might go unnoticed, so blocking the
-> >>> hotplug process is likely better to get the attention of the user.    
-> >>
-> >> ... we could also create the bus but bail out here in case the compat
-> >> property strikes (a.k.a. new QEMO machine type).  
-> > 
-> > Now you confused me... why should failing be based on a compat property?
-> >   
-> 
-> Otherwise, a QEMU comandline that used to work (which could be created
-> by libvirt) would now fail. Are we ok with that?
-> 
+> --- a/configure
+> +++ b/configure
+> @@ -828,7 +828,7 @@ NetBSD)
+>  OpenBSD)
+>    bsd=3D"yes"
+>    make=3D"${MAKE-gmake}"
+> -  audio_drv_list=3D"sdl"
+> +  audio_drv_list=3D""
+>    audio_possible_drivers=3D"sdl"
+>    HOST_VARIANT_DIR=3D"openbsd"
+>    supported_os=3D"yes"
 
-I think we should not fail at all in that case, then. Or only for
-hotplug, not for coldplug.
+This will mean that configure will by default not enable
+a real audio backend, even if we do have sdl.
+
+Looking at the logic, "audio_possible_drivers" is only
+used for printing the help message. The thing that drives
+which audio drivers to test with is "audio_drv_list",
+and the expectation is that you put things on that only
+if it's possible to build with them. (For instance
+we only add 'dsound' for mingw if the dsound.h header is
+present, and so on.)
+
+So we need to do one of:
+ (1) only put "sdl" into audio_drv_list if SDL is
+     available (this probably doesn't work as we haven't
+     probed for SDL at the point where we initialize it)
+ (2) have the sdl probe delete "sdl" from audio_drv_list
+     if the probe fails
+ (3) some more complicated restructuring :-)
+     (eg rather than having audio_drv_list be set to an
+     initial list based on the host OS, just have a full
+     list of drivers, insist that each has a proper probe
+     routine, and use whichever ones we can successfully
+     probe)
+
+thanks
+-- PMM
