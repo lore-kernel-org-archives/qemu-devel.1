@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48181)
+Received: from eggs.gnu.org ([209.51.188.92]:48419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gm167-0005Wr-3w
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:32 -0500
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1gm16M-0005jZ-BQ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gm15j-000640-80
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44494)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gm15i-000612-Ua
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:07 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 22 Jan 2019 17:31:11 +0000
-Message-Id: <20190122173111.29821-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] migration/rdma: unegister fd handler
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1gm16I-0006Ow-65
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1gm16F-0006A2-SA
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:48:41 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0MF5AOB047823
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:06:08 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q658q8ucs-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:06:08 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Tue, 22 Jan 2019 15:06:06 -0000
+From: bala24@linux.vnet.ibm.com
+Date: Tue, 22 Jan 2019 20:35:42 +0530
+Message-Id: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/1] migration: calculate expected_downtime
+ considering redirtied ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, jemmy858585@gmail.com, quintela@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au, dgilbert@redhat.com, peterx@redhat.com, Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
 
-Unregister the fd handler before we destroy the channel,
-otherwise we've got a race where we might land in the
-fd handler just as we're closing the device.
+Based on the discussion with Dave and David Gibson earlier with respect
+to expected_downtime calculation, 
 
-(The race is quite data dependent, you just have to have
-the right set of devices for it to trigger).
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg02418.html
 
-Corresponds to RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D16666=
-01
+got suggestions that the calculation is of not accurate and we need to
+consider the ram that gets redirtied during the time when we would have
+actually transferred ram in the current iteration.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/rdma.c | 1 +
- 1 file changed, 1 insertion(+)
+so I have came up with a calculation by considering the ram that could
+get redirtied during the current iteration at the time we would have
+transferred the remaining ram in current iteration. By this way,
+the total ram to be transferred will be remaining ram + redirtied ram
+and dividing with bandwidth would yield us better expected_downtime
+value.
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 9b2e7e10aa..54a3c11540 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2321,6 +2321,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-         rdma->connected =3D false;
-     }
-=20
-+    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
-     g_free(rdma->dest_blocks);
-     rdma->dest_blocks =3D NULL;
-=20
---=20
-2.20.1
+Please help to review and suggest about this approach.
+
+Balamuruhan S (1):
+  migration: calculate expected_downtime considering redirtied ram
+
+ migration/migration.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+-- 
+2.14.5
