@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33285)
+Received: from eggs.gnu.org ([209.51.188.92]:34135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsaw-0002s6-9p
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:43:47 -0500
+	(envelope-from <berrange@redhat.com>) id 1glsej-0005zV-GW
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:47:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsau-0004tJ-Ak
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:43:46 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40438)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glsaq-0004ni-Io
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:43:42 -0500
-Received: by mail-wr1-f67.google.com with SMTP id p4so26500713wrt.7
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:43:37 -0800 (PST)
-References: <20190121184314.14311-1-peter.maydell@linaro.org>
-	<383fd07d-9c2a-a7b2-5b88-f9a411c8b91a@redhat.com>
-	<CAFEAcA9G7CuZ3wSO9YLs-OH4m1zQ7s73yWp8rwsDBSyUZokyGg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0941b5d5-b399-7306-6779-7c82e53e08c1@redhat.com>
-Date: Tue, 22 Jan 2019 10:43:35 +0100
+	(envelope-from <berrange@redhat.com>) id 1glsei-0000EW-LF
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:47:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1glsei-0008SN-Es
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:47:40 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16CCEC058CAD
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 09:47:28 +0000 (UTC)
+Date: Tue, 22 Jan 2019 09:47:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190122094720.GC13143@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190122092814.14919-1-kraxel@redhat.com>
+	<20190122092814.14919-2-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9G7CuZ3wSO9YLs-OH4m1zQ7s73yWp8rwsDBSyUZokyGg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] xlnx-zynqmp: Don't create rpu-cluster if
- there are no RPUs
+Content-Disposition: inline
+In-Reply-To: <20190122092814.14919-2-kraxel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v3 1/8] kbd-state: add keyboard state
+ tracker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, Luc Michel <luc.michel@greensocs.com>, "patches@linaro.org" <patches@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 1/22/19 10:28 AM, Peter Maydell wrote:
-> On Mon, 21 Jan 2019 at 20:12, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> Hi Peter,
->>
->> On 1/21/19 7:43 PM, Peter Maydell wrote:
->>> If we aren't going to create any RPUs, then don't create the
->>> rpu-cluster unit. This allows us to add an assertion to the
->>> cluster object that it contains at least one CPU, which helps
->>> to avoid bugs in creating clusters and putting CPUs in them.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>> ---
->>> This is a preparatory patch that is necessary for the series
->>> "[PATCH v3 0/4] tcg: support heterogenous CPU clusters"
->>> (20190121152218.9592-1-peter.maydell@linaro.org)
->>> in order to avoid the xlnx-zcu102 board asserting if started with
->>> fewer than 5 CPUs.
->>>
->>>  hw/arm/xlnx-zynqmp.c | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
->>> index 370b0e44a38..16cba433cb7 100644
->>> --- a/hw/arm/xlnx-zynqmp.c
->>> +++ b/hw/arm/xlnx-zynqmp.c
->>> @@ -178,6 +178,11 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
->>>      int i;
->>>      int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
->>
->> Not related to this patch, but this check seems dangerous, i.e. using
->> "-smp 2" we get num_rpus=-2 which luckyly doesn't enter the for() loop.
->>
->>>
->>> +    if (num_rpus == 0) {
->>
->> With the current codebase, you'd have to check for "num_rpus <= 0", ...
-> 
-> Oops, nice catch.
-> 
->> What about this instead?
->>
->> -- >8 --
->> @@ -451,10 +451,12 @@ static void xlnx_zynqmp_realize(DeviceState *dev,
->> Error **errp)
->>                      "RPUs just use -smp 6.");
->>      }
->>
->> -    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
->> -    if (err) {
->> -        error_propagate(errp, err);
->> -        return;
->> +    if (smp_cpus > XLNX_ZYNQMP_NUM_APU_CPUS) {
->> +        xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
->> +        if (err) {
->> +            error_propagate(errp, err);
->> +            return;
->> +        }
->>      }
-> 
-> Yeah, that would work too. I think I would just go for
-> using "if (num_rpus <= 0)" in the function, though.
+On Tue, Jan 22, 2019 at 10:28:07AM +0100, Gerd Hoffmann wrote:
+> Now that most user interfaces are using QKeyCodes it is easier to have
+> common keyboard code useable by all user interfaces.
+>=20
+> This patch adds helper code to track the state of all keyboard keys,
+> using a bitmap indexed by QKeyCode.  Modifier state is tracked too,
+> as separate bitmap.  That makes checking modifier state easier.
+> Likewise we can easily apply special handling for capslock & numlock
+> (toggles on keypress) and ctrl + shift (we have two keys for that).
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/kbd-state.h |  96 +++++++++++++++++++++++++++++++++++++
+>  ui/kbd-state.c         | 125 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  ui/Makefile.objs       |   2 +-
+>  3 files changed, 222 insertions(+), 1 deletion(-)
+>  create mode 100644 include/ui/kbd-state.h
+>  create mode 100644 ui/kbd-state.c
+>=20
+> diff --git a/include/ui/kbd-state.h b/include/ui/kbd-state.h
+> new file mode 100644
+> index 0000000000..277198f169
+> --- /dev/null
+> +++ b/include/ui/kbd-state.h
+> @@ -0,0 +1,96 @@
 
-OK, whichever patch you prefer, you can add:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Missing license boilerplate header, and same in the .c file.
+
+> +#ifndef QEMU_UI_KBD_STATE_H
+> +#define QEMU_UI_KBD_STATE_H 1
+
+With license header added
+
+ Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+=20
 
 Regards,
-
-Phil.
-
-> 
-> thanks
-> -- PMM
-> 
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
