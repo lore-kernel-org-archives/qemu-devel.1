@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46385)
+Received: from eggs.gnu.org ([209.51.188.92]:46738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm14p-0004X2-KN
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm159-0004lz-Rp
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm14k-0005F0-Mc
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:11 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34107)
+	(envelope-from <peter.maydell@linaro.org>) id 1gm14m-0005Iw-EA
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:18 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37254)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm14i-00059j-Lg
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:04 -0500
-Received: by mail-oi1-x241.google.com with SMTP id r62so18341429oie.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:46:57 -0800 (PST)
-MIME-Version: 1.0
-References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
-	<1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
-In-Reply-To: <1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
+	id 1gm14l-0004jY-PO
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:08 -0500
+Received: by mail-wr1-x442.google.com with SMTP id s12so28626985wrt.4
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:46:19 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 11:41:57 +0000
-Message-ID: <CAFEAcA8WF1nKfgQWZ11GgMzgLxOtGwoJS9zyeFQkm5ii5GLrpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] hw/arm: Add arm SBSA reference
- machine, skeleton part
+Date: Tue, 22 Jan 2019 18:18:21 +0000
+Message-Id: <20190122181822.1505-2-peter.maydell@linaro.org>
+In-Reply-To: <20190122181822.1505-1-peter.maydell@linaro.org>
+References: <20190122181822.1505-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/2] slirp: Avoid marking naturally packed
+ structs as QEMU_PACKED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,177 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, 7 Dec 2018 at 09:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->
-> For the Aarch64, there is one machine 'virt', it is primarily meant to
-> run on KVM and execute virtualization workloads, but we need an
-> environment as faithful as possible to physical hardware, for supporting
-> firmware and OS development for pysical Aarch64 machines.
->
-> This patch introduces new machine type 'sbsa-ref' with main features:
->  - Based on 'virt' machine type.
->  - Re-designed memory map.
->  - CPU type cortex-a57.
->  - EL2 and EL3 are enabled.
->  - GIC version 3.
->  - System bus AHCI controller.
->  - System bus XHCI controller(TBD).
->  - CDROM and hard disc on AHCI bus.
->  - E1000E ethernet card on PCIE bus.
->  - VGA display adaptor on PCIE bus.
->  - No virtio deivces.
->  - No fw_cfg device.
->  - No ACPI table supplied.
->  - Only minimal device tree nodes.
->
-> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
-> it should supply ACPI tables to load OS, the minimal device tree nodes
-> supplied from this platform are only to pass the dynamic info reflecting
-> command line input to firmware, not for loading OS.
->
-> To make the review easier, this task is split into two patches, the
-> fundamental sceleton part and the peripheral devices part, this patch is
-> the first part.
+Various ipv6 structs in the slirp headers are marked QEMU_PACKED,
+but they are actually naturally aligned and will have no padding
+in them. Instead of marking them with the 'packed' attribute,
+assert at compile time that they are the size we expect. This
+allows us to take the address of fields within the structs
+without risking undefined behaviour, and suppresses clang
+-Waddress-of-packed-member warnings.
 
-Firstly, apologies for this having sat on my to-review queue for
-so long...
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ slirp/ip6.h      | 12 ++++++++++--
+ slirp/ip6_icmp.h | 20 +++++++++++++++-----
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
->  hw/arm/Makefile.objs  |   2 +-
->  hw/arm/sbsa-ref.c     | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/arm/virt.h |   1 +
->  3 files changed, 279 insertions(+), 1 deletion(-)
->  create mode 100644 hw/arm/sbsa-ref.c
->
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index d51fcec..a8895eb 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -obj-y += boot.o virt.o sysbus-fdt.o
-> +obj-y += boot.o virt.o sbsa-ref.o sysbus-fdt.o
->  obj-$(CONFIG_ACPI) += virt-acpi-build.o
->  obj-$(CONFIG_DIGIC) += digic_boards.o
->  obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> new file mode 100644
-> index 0000000..1d6252b
-> --- /dev/null
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -0,0 +1,277 @@
-> +/*
-> + * ARM SBSA Reference Platform emulation
-> + *
-> + * Copyright (c) 2018 Linaro Limited
-> + * Written by Hongbo Zhang <hongbo.zhang@linaro.org>
-> + *
-> + * Based on hw/arm/virt.c
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/arm/arm.h"
-> +#include "hw/arm/virt.h"
-
-This isn't the virt board, so I think it would be better if it did
-not include the virt.h header or use structures/classes that are
-private to the virt board. It should be its own thing.
-
-> +#include "hw/devices.h"
-> +#include "net/net.h"
-> +#include "sysemu/device_tree.h"
-> +#include "sysemu/numa.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/loader.h"
-> +#include "exec/address-spaces.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/pci-host/gpex.h"
-> +#include "hw/arm/sysbus-fdt.h"
-> +#include "hw/arm/fdt.h"
-> +#include "hw/intc/arm_gic.h"
-> +#include "hw/intc/arm_gicv3_common.h"
-> +#include "kvm_arm.h"
-> +#include "hw/ide/internal.h"
-> +#include "hw/ide/ahci_internal.h"
-> +#include "qemu/units.h"
-> +
-> +#define NUM_IRQS 256
-> +
-> +#define RAMLIMIT_GB 8192
-> +#define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
-> +
-> +static const MemMapEntry sbsa_ref_memmap[] = {
-> +    /* 512M boot ROM */
-> +    [VIRT_FLASH] =              {          0, 0x20000000 },
-> +    /* 512M secure memery */
-
-"memory"
-
-> +    [VIRT_SECURE_MEM] =         { 0x20000000, 0x20000000 },
-> +    [VIRT_CPUPERIPHS] =         { 0x40000000, 0x00080000 },
-> +    /* GIC distributor and CPU interface expansion spaces reserved */
-> +    [VIRT_GIC_DIST] =           { 0x40000000, 0x00010000 },
-> +    [VIRT_GIC_CPU] =            { 0x40040000, 0x00010000 },
-
-If they're just reserved you don't really need to list them here,
-as they're covered by the VIRT_CPUPERIPHS space anyway. (You
-don't list the VIRT_GIC_HYP registers or VIRT_GIC_VCPU.)
-
-> +    /* 64M redistributor space allows up to 512 CPUs */
-> +    [VIRT_GIC_REDIST] =         { 0x40080000, 0x04000000 },
-> +    /* Space here reserved for redistributor and vCPU/HYP expansion */
-> +    [VIRT_UART] =               { 0x60000000, 0x00001000 },
-> +    [VIRT_RTC] =                { 0x60010000, 0x00001000 },
-> +    [VIRT_GPIO] =               { 0x60020000, 0x00001000 },
-> +    [VIRT_SECURE_UART] =        { 0x60030000, 0x00001000 },
-> +    [VIRT_SMMU] =               { 0x60040000, 0x00020000 },
-> +    /* Space here reserved for more SMMUs */
-> +    [VIRT_AHCI] =               { 0x60100000, 0x00010000 },
-> +    /* Space here reserved for other devices */
-> +    [VIRT_PCIE_PIO] =           { 0x7fff0000, 0x00010000 },
-> +    /* 256M PCIE ECAM space */
-> +    [VIRT_PCIE_ECAM] =          { 0x80000000, 0x10000000 },
-
-Comment says 256M but the size field says it's larger...
-
-> +    /* ~1TB for PCIE MMIO (4GB to 1024GB boundary) */
-> +    [VIRT_PCIE_MMIO] =          { 0x100000000ULL, 0xFF00000000ULL },
-> +    [VIRT_MEM] =                { 0x10000000000ULL, RAMLIMIT_BYTES },
-> +};
-> +
-> +static const int sbsa_ref_irqmap[] = {
-> +    [VIRT_UART] = 1,
-> +    [VIRT_RTC] = 2,
-> +    [VIRT_PCIE] = 3, /* ... to 6 */
-> +    [VIRT_GPIO] = 7,
-> +    [VIRT_SECURE_UART] = 8,
-> +    [VIRT_AHCI] = 9,
-> +};
-> +
-> +static void sbsa_ref_init(MachineState *machine)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(machine);
-
-As noted above, I think it would be better to be your own
-subclass of MachineState, rather than being a subclass of
-the virt board. Is there anything that becomes particularly
-awkward if you do it that way?
-
-thanks
--- PMM
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 14e9c787357..1e3e329ce6a 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -133,7 +133,7 @@ struct ip6 {
+     uint8_t     ip_nh;               /* next header */
+     uint8_t     ip_hl;               /* hop limit */
+     struct in6_addr ip_src, ip_dst;  /* source and dest address */
+-} QEMU_PACKED;
++};
+ 
+ /*
+  * IPv6 pseudo-header used by upper-layer protocols
+@@ -145,7 +145,15 @@ struct ip6_pseudohdr {
+     uint16_t    ih_zero_hi;       /* zero */
+     uint8_t     ih_zero_lo;       /* zero */
+     uint8_t     ih_nh;            /* next header */
+-} QEMU_PACKED;
++};
+ 
++/*
++ * We don't want to mark these ip6 structs as packed as they are naturally
++ * correctly aligned; instead assert that there is no stray padding.
++ * If we marked the struct as packed then we would be unable to take
++ * the address of any of the fields in it.
++ */
++QEMU_BUILD_BUG_ON(sizeof(struct ip6) != 40);
++QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) != 40);
+ 
+ #endif
+diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+index 32b0914055a..2ad2b75e676 100644
+--- a/slirp/ip6_icmp.h
++++ b/slirp/ip6_icmp.h
+@@ -48,12 +48,16 @@ struct ndp_ra {     /* Router Advertisement Message */
+     uint16_t lifetime;      /* Router Lifetime */
+     uint32_t reach_time;    /* Reachable Time */
+     uint32_t retrans_time;  /* Retrans Timer */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) != 12);
+ 
+ struct ndp_ns {     /* Neighbor Solicitation Message */
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) != 20);
+ 
+ struct ndp_na {     /* Neighbor Advertisement Message */
+ #if G_BYTE_ORDER == G_BIG_ENDIAN
+@@ -72,13 +76,17 @@ struct ndp_na {     /* Neighbor Advertisement Message */
+         reserved_lo:24;
+ #endif
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) != 20);
+ 
+ struct ndp_redirect {
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+     struct in6_addr dest;   /* Destination Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) != 36);
+ 
+ /*
+  * Structure of an icmpv6 header.
+@@ -103,7 +111,9 @@ struct icmp6 {
+ #define icmp6_nns icmp6_body.ndp_ns
+ #define icmp6_nna icmp6_body.ndp_na
+ #define icmp6_redirect icmp6_body.ndp_redirect
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct icmp6) != 40);
+ 
+ #define ICMP6_MINLEN    4
+ #define ICMP6_ERROR_MINLEN  8
+-- 
+2.20.1
