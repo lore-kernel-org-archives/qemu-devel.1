@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39002)
+Received: from eggs.gnu.org ([209.51.188.92]:46527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm44C-0006st-G6
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:58:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1gm4VN-000313-Bx
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:26:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm44B-0002K6-JP
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:58:44 -0500
-References: <20190122121926.25554-1-kwolf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gm4Ty-00070v-1m
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:25:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:3743)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gm4Tx-0006zM-PG
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:25:22 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0ECFAA0C2B
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 22:25:20 +0000 (UTC)
+References: <20190122144103.18310-1-pagupta@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0fd0b346-2b04-a936-682c-dc9e21d1cb2b@redhat.com>
-Date: Tue, 22 Jan 2019 15:58:19 -0600
+Message-ID: <d1d15efe-8653-8e47-acf5-b8839f84db19@redhat.com>
+Date: Tue, 22 Jan 2019 16:25:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190122121926.25554-1-kwolf@redhat.com>
+In-Reply-To: <20190122144103.18310-1-pagupta@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="TR9Xf4IOPgZi0hMlvCRZWQlKH6OI8bmHk"
-Subject: Re: [Qemu-devel] [PATCH] block: Apply auto-read-only for
- ro-whitelist drivers
+	boundary="MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI"
+Subject: Re: [Qemu-devel] [PATCH] chardev: Avoid adding duplicate chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, xiaohli@redhat.com, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TR9Xf4IOPgZi0hMlvCRZWQlKH6OI8bmHk
+--MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <0fd0b346-2b04-a936-682c-dc9e21d1cb2b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Apply auto-read-only for ro-whitelist
- drivers
-References: <20190122121926.25554-1-kwolf@redhat.com>
-In-Reply-To: <20190122121926.25554-1-kwolf@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, xiaohli@redhat.com, pbonzini@redhat.com
+Message-ID: <d1d15efe-8653-8e47-acf5-b8839f84db19@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] chardev: Avoid adding duplicate chardev
+References: <20190122144103.18310-1-pagupta@redhat.com>
+In-Reply-To: <20190122144103.18310-1-pagupta@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/22/19 6:19 AM, Kevin Wolf wrote:
-> If QEMU was configured with a driver in --block-drv-ro-whitelist, tryin=
-g
-> to use that driver read-write resulted in an error message even if
-> auto-read-only=3Don was set.
->=20
-> Consider auto-read-only=3Don for the whitelist checking and use it to
-> automatically degrade to read-only for block drivers on the read-only
-> whitelist.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+On 1/22/19 8:41 AM, Pankaj Gupta wrote:
+> Hotplugging existing char chardev with qmp, dereferences(removes)=20
+> existing chardev. This patch avoids adding a chardev if a chardev=20
+> with same id exists.
 >=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> +++ b/chardev/char.c
+> @@ -985,6 +985,12 @@ ChardevReturn *qmp_chardev_add(const char *id, Cha=
+rdevBackend *backend,
+>      ChardevReturn *ret;
+>      Chardev *chr;
+> =20
+> +    chr =3D qemu_chr_find(id);
+> +    if (chr) {
+> +        error_setg(errp, "Chardev '%s' already exist", id);
+
+s/exist/exists/
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -64,21 +72,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---TR9Xf4IOPgZi0hMlvCRZWQlKH6OI8bmHk
+--MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHkfsACgkQp6FrSiUn
-Q2oiJQgAoWC8z+Rlt++b5rXKD/cUBg/Ob90EA1tJCkJkJyjnoHctV0UsBlbIPvUL
-BeHvZFcXS12lI3zRVQULJwwYvUMYE3W70MkFtlQG5I3qV67tBcBqr5QqoINayb9G
-figtueeA/50euwINwkhf7grc1/vUvcNzcYCLZj416B3crc1cFTnbSnKHlx213FC9
-OLFf78Q0vFnv63+/kblzSsYdIqr/P/CwNMkuR6TTpmxUpUpFVn8KSsvmM1/z3GV/
-KYyMCQpASGQVJPHBJa8Nw10EzA6QUwLKMqo6jFW4na04ebuaCn74MGXDJpmX9lHL
-II64vQBBU04LoO2WQCJue6rj0opxeA==
-=zXc6
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHmE4ACgkQp6FrSiUn
+Q2oN+QgAgV0W41o2MsyKEnpAUBwITyeOL/3dARDxhTgdm1CrjW2xa8CDwP87F6dA
+z2CMQe3of4rQKR95UuTifke4M9zTZ84bmBWBInjTpa+Yjam0kpHTw+KHvpUfDwMH
+eQZ8SktnVtIghAgu1XCil8ptIxT5yDepwpKIvSJvyU/wSJUaveMqRrMA5f6SaO3R
+iCFMNBBUVkCpoHFqKMPvsLUC4ZythoG19UUSPoE0OTlq58vdIoIr6hUXWRPWTjYY
+Rq445RbBFUUJ3QuwewyKZXJgOugmUIR55PP/7pn/r96tWaaDEiadwc20vULpRQAX
+A845U11bGbhldBFNUL4z5vs+vPkvGQ==
+=gwbJ
 -----END PGP SIGNATURE-----
 
---TR9Xf4IOPgZi0hMlvCRZWQlKH6OI8bmHk--
+--MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI--
