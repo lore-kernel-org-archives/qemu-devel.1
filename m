@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56134)
+Received: from eggs.gnu.org ([209.51.188.92]:56892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gm1GG-0005xs-50
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:59:05 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gm1HG-000711-1T
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gm1GD-0003b9-6z
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:59:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gm1GC-0003Yp-T1
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:58:57 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 22 Jan 2019 16:29:24 +0000
-Message-Id: <20190122162924.26491-1-stefanha@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gm1HF-0004IO-0a
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:01 -0500
+Date: Tue, 22 Jan 2019 14:01:10 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190122140110.47cf348b.cohuck@redhat.com>
+In-Reply-To: <20190122125133.1191-1-david@redhat.com>
+References: <20190122125133.1191-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: update microbit ARM board files
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/pci: PCI bridge plugging fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +22,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, contrib@steffen-goertz.de, jusual@mail.ru, joel@jms.id.au, jim@groklearning.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>
 
-New source files were added without corresponding ./MAINTAINERS file
-entries.  Let's get things up to date.
+On Tue, 22 Jan 2019 13:51:31 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-This also includes the I2C/TWI stub which Peter has merged into his
-target-arm.next tree but isn't in qemu.git/master yet.
----
- MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> Hotplugging of PCI bridges is right now pretty much broken. Coldplugging
+> and hotplugging will assign wrong primary bus numbers in some scenarios.
+> 
+> I base my knowledge on how this is supposed to work on
+> http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+> 
+> I did a couple of tests, building whole hierarchies of bridges, both
+> hot and coldplugged. "info pci" as well as the Linux guests showed
+> what I was expecting.
+> 
+> David Hildenbrand (2):
+>   s390x/pci: Fix primary bus number for PCI bridges
+>   s390x/pci: Fix hotplugging of PCI bridges
+> 
+>  hw/s390x/s390-pci-bus.c | 41 +++++++++++++++++++++++++++--------------
+>  1 file changed, 27 insertions(+), 14 deletions(-)
+> 
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index af339b86db..e3cb67e81d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -833,7 +833,19 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/nrf51_soc.c
- F: hw/arm/microbit.c
-+F: hw/char/nrf51_uart.c
-+F: hw/gpio/nrf51_gpio.c
-+F: hw/i2c/microbit_i2c.c
-+F: hw/misc/nrf51_rng.c
-+F: hw/timer/nrf51_timer.c
- F: include/hw/arm/nrf51_soc.h
-+F: include/hw/arm/nrf51.h
-+F: include/hw/char/nrf51_uart.h
-+F: include/hw/gpio/nrf51_gpio.h
-+F: include/hw/i2c/microbit_i2c.h
-+F: include/hw/misc/nrf51_rng.h
-+F: include/hw/timer/nrf51_timer.h
-+F: tests/microbit-test.c
-=20
- CRIS Machines
- -------------
---=20
-2.20.1
+I'll leave the actual review of this to folks familiar with how zPCI is
+supposed to work :)
+
+Does the guest actually see anything of this? Consistency is good, and
+not crashing even better, but I think all of the topology is invisible
+on the guest side anyway...
