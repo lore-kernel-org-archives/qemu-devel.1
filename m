@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56031)
+Received: from eggs.gnu.org ([209.51.188.92]:56134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gm1GE-0005vG-5X
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:59:02 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gm1GG-0005xs-50
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gm1GC-0003ZS-Iv
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:58:58 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gm1G8-0003VV-SY
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:58:54 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f188so15290094wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:58:47 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-15-crosa@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190117185628.21862-15-crosa@redhat.com>
-Date: Tue, 22 Jan 2019 16:07:19 +0000
-Message-ID: <8736pk1xs8.fsf@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1gm1GD-0003b9-6z
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:59:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gm1GC-0003Yp-T1
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:58:57 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 22 Jan 2019 16:29:24 +0000
+Message-Id: <20190122162924.26491-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/18] Boot Linux Console Test: add a test
- for ppc64 + pseries
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: update microbit ARM board files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, contrib@steffen-goertz.de, jusual@mail.ru, joel@jms.id.au, jim@groklearning.com, Stefan Hajnoczi <stefanha@redhat.com>
 
+New source files were added without corresponding ./MAINTAINERS file
+entries.  Let's get things up to date.
 
-Cleber Rosa <crosa@redhat.com> writes:
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+This also includes the I2C/TWI stub which Peter has merged into his
+target-arm.next tree but isn't in qemu.git/master yet.
+---
+ MAINTAINERS | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-> Just like the previous tests, boots a Linux kernel on a ppc64 target
-> using the pseries machine.
-
-So running this on my rather slow SynQuacer I get:
-
- (04/16) /home/alex/lsrc/qemu.git/tests/acceptance/boot_linux_console.py:Bo=
-otLinuxConsole.test_ppc64_pseries: INTERRUPTED: Test reported status but di=
-d not finish\nRunner error occurred: Timeout reached\nOriginal status: ERRO=
-R\n{'name': '04-/home/alex/lsrc/qemu.git/tests/acceptance/boot_linux_consol=
-e.py:BootLinuxConsole.test_ppc64_pseries', 'logdir': '/home/alex/lsrc/qemu.=
-git/te... (60.93 s)
-
-which I'm guessing is a timeout occurring.
-
-I wonder if that means we should:
-
-  a) set timeouts longer for when running on TCG
-  or
-  b) split tests into TCG and KVM tests and select KVM tests on appropriate=
- HW
-
-The qemu.py code has (slightly flawed) logic for detecting KVM and
-passing --enable-kvm. Maybe we should be doing that here?
-
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  .travis.yml                            |  2 +-
->  scripts/qemu.py                        |  1 -
->  tests/acceptance/boot_linux_console.py | 19 +++++++++++++++++++
->  3 files changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 28648f7a61..54100eea5a 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -187,7 +187,7 @@ matrix:
->
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu"
-> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu"
->          - TEST_CMD=3D"make check-acceptance"
->        addons:
->          apt:
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index ef84b0f843..1531e28fc1 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -37,7 +37,6 @@ CONSOLE_DEV_TYPES =3D {
->      r'^clipper$': 'isa-serial',
->      r'^(pc.*|q35.*|isapc)$': 'isa-serial',
->      r'^(40p|powernv|prep)$': 'isa-serial',
-> -    r'^pseries.*': 'spapr-vty',
->      r'^s390-ccw-virtio.*': 'sclpconsole',
->      }
->
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 20b845fce1..f3ccd23a7a 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -119,3 +119,22 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_ppc64_pseries(self):
-> +        """
-> +        :avocado: tags=3Darch:ppc64
-> +        :avocado: tags=3Dmachine:pseries
-> +        """
-> +        kernel_url =3D ('http://mirrors.rit.edu/fedora/fedora-secondary/'
-> +                      'releases/29/Everything/ppc64le/os/ppc/ppc64/vmlin=
-uz')
-> +        kernel_hash =3D '3fe04abfc852b66653b8c3c897a59a689270bc77'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> +
-> +        self.vm.set_machine('pseries')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D 'console=3Dhvc0'
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
-> +        self.wait_for_console_pattern(console_pattern)
-
-
---
-Alex Benn=C3=A9e
+diff --git a/MAINTAINERS b/MAINTAINERS
+index af339b86db..e3cb67e81d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -833,7 +833,19 @@ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/arm/nrf51_soc.c
+ F: hw/arm/microbit.c
++F: hw/char/nrf51_uart.c
++F: hw/gpio/nrf51_gpio.c
++F: hw/i2c/microbit_i2c.c
++F: hw/misc/nrf51_rng.c
++F: hw/timer/nrf51_timer.c
+ F: include/hw/arm/nrf51_soc.h
++F: include/hw/arm/nrf51.h
++F: include/hw/char/nrf51_uart.h
++F: include/hw/gpio/nrf51_gpio.h
++F: include/hw/i2c/microbit_i2c.h
++F: include/hw/misc/nrf51_rng.h
++F: include/hw/timer/nrf51_timer.h
++F: tests/microbit-test.c
+=20
+ CRIS Machines
+ -------------
+--=20
+2.20.1
