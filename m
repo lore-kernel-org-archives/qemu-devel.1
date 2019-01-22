@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56892)
+Received: from eggs.gnu.org ([209.51.188.92]:57184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1HG-000711-1T
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1IB-0007ph-6q
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1HF-0004IO-0a
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:01 -0500
-Date: Tue, 22 Jan 2019 14:01:10 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190122140110.47cf348b.cohuck@redhat.com>
-In-Reply-To: <20190122125133.1191-1-david@redhat.com>
-References: <20190122125133.1191-1-david@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1IA-0004gQ-E4
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:59 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm1I8-0004av-HI
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:58 -0500
+Received: by mail-oi1-x242.google.com with SMTP id r62so18378550oie.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:00:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/pci: PCI bridge plugging fixes
+References: <20190110121736.23448-1-richard.henderson@linaro.org>
+	<20190110121736.23448-3-richard.henderson@linaro.org>
+In-Reply-To: <20190110121736.23448-3-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 12:08:11 +0000
+Message-ID: <CAFEAcA9OgDwc+E1-Xc_i1m5vREJnzke5tc6_o94+6wdy0cnCtg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 02/11] target/arm: Add PSTATE.BTYPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 22 Jan 2019 13:51:31 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, 10 Jan 2019 at 12:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Place this in its own field within ENV, as that will
+> make it easier to reset from within TCG generated code.
+>
+> With the change to pstate_read/write, exception entry
+> and return are automatically handled.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-> Hotplugging of PCI bridges is right now pretty much broken. Coldplugging
-> and hotplugging will assign wrong primary bus numbers in some scenarios.
-> 
-> I base my knowledge on how this is supposed to work on
-> http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
-> 
-> I did a couple of tests, building whole hierarchies of bridges, both
-> hot and coldplugged. "info pci" as well as the Linux guests showed
-> what I was expecting.
-> 
-> David Hildenbrand (2):
->   s390x/pci: Fix primary bus number for PCI bridges
->   s390x/pci: Fix hotplugging of PCI bridges
-> 
->  hw/s390x/s390-pci-bus.c | 41 +++++++++++++++++++++++++++--------------
->  1 file changed, 27 insertions(+), 14 deletions(-)
-> 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-I'll leave the actual review of this to folks familiar with how zPCI is
-supposed to work :)
-
-Does the guest actually see anything of this? Consistency is good, and
-not crashing even better, but I think all of the topology is invisible
-on the guest side anyway...
+thanks
+-- PMM
