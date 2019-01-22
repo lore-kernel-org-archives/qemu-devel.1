@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50857)
+Received: from eggs.gnu.org ([209.51.188.92]:50923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1wL-0008Pi-Vg
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:30 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wQ-0008TX-0y
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1wK-0001Ph-16
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:29 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wN-0001UH-W7
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:33 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 22 Jan 2019 17:53:22 +0200
-Message-Id: <fd8204fddd979714d15b993d38c893d201d3cb7b.1548171741.git.berto@igalia.com>
+Date: Tue, 22 Jan 2019 17:53:21 +0200
+Message-Id: <98776952d40d436b2741f6c141ae618bdf6f83a5.1548171741.git.berto@igalia.com>
 In-Reply-To: <cover.1548171741.git.berto@igalia.com>
 References: <cover.1548171741.git.berto@igalia.com>
 In-Reply-To: <cover.1548171741.git.berto@igalia.com>
 References: <cover.1548171741.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 2/3] scsi-disk: Acquire the AioContext in
- scsi_*_realize()
+Subject: [Qemu-devel] [PATCH 1/3] virtio-scsi: Move BlockBackend back to the
+ main AioContext on unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,156 +25,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This fixes a crash when attaching two disks with the same blockdev to
-a SCSI device that is using iothreads. Test case included.
+This fixes a crash when attaching a disk to a SCSI device using
+iothreads, then detaching it and reattaching it again. Test case
+included.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/scsi/scsi-disk.c        | 23 ++++++++++++++++++++---
- tests/qemu-iotests/240     | 18 ++++++++++++++++++
- tests/qemu-iotests/240.out | 16 ++++++++++++++++
- 3 files changed, 54 insertions(+), 3 deletions(-)
+ hw/scsi/virtio-scsi.c      |  6 ++++
+ tests/qemu-iotests/240     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/240.out | 18 ++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 114 insertions(+)
+ create mode 100755 tests/qemu-iotests/240
+ create mode 100644 tests/qemu-iotests/240.out
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 0e9027c8f3..b049026219 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2381,10 +2381,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
- static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
- {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    AioContext *ctx = NULL;
-     /* can happen for devices without drive. The error message for missing
-      * backend will be issued in scsi_realize
-      */
-     if (s->qdev.conf.blk) {
-+        ctx = blk_get_aio_context(s->qdev.conf.blk);
-+        aio_context_acquire(ctx);
-         blkconf_blocksizes(&s->qdev.conf);
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 3aa99717e2..e1f7b208c7 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -824,6 +824,12 @@ static void virtio_scsi_hotunplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         virtio_scsi_release(s);
      }
-     s->qdev.blocksize = s->qdev.conf.logical_block_size;
-@@ -2393,11 +2396,15 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-         s->product = g_strdup("QEMU HARDDISK");
-     }
-     scsi_realize(&s->qdev, errp);
-+    if (ctx) {
-+        aio_context_release(ctx);
+ 
++    if (s->ctx) {
++        virtio_scsi_acquire(s);
++        blk_set_aio_context(sd->conf.blk, qemu_get_aio_context());
++        virtio_scsi_release(s);
 +    }
- }
- 
- static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
- {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    AioContext *ctx;
-     int ret;
- 
-     if (!dev->conf.blk) {
-@@ -2408,6 +2415,8 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
-         assert(ret == 0);
-     }
- 
-+    ctx = blk_get_aio_context(dev->conf.blk);
-+    aio_context_acquire(ctx);
-     s->qdev.blocksize = 2048;
-     s->qdev.type = TYPE_ROM;
-     s->features |= 1 << SCSI_DISK_F_REMOVABLE;
-@@ -2415,6 +2424,7 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
-         s->product = g_strdup("QEMU CD-ROM");
-     }
-     scsi_realize(&s->qdev, errp);
-+    aio_context_release(ctx);
- }
- 
- static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
-@@ -2553,6 +2563,7 @@ static int get_device_type(SCSIDiskState *s)
- static void scsi_block_realize(SCSIDevice *dev, Error **errp)
- {
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-+    AioContext *ctx;
-     int sg_version;
-     int rc;
- 
-@@ -2567,6 +2578,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
-                           "be removed in a future version");
-     }
- 
-+    ctx = blk_get_aio_context(s->qdev.conf.blk);
-+    aio_context_acquire(ctx);
 +
-     /* check we are using a driver managing SG_IO (version 3 and after) */
-     rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
-     if (rc < 0) {
-@@ -2574,18 +2588,18 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
-         if (rc != -EPERM) {
-             error_append_hint(errp, "Is this a SCSI device?\n");
-         }
--        return;
-+        goto out;
-     }
-     if (sg_version < 30000) {
-         error_setg(errp, "scsi generic interface too old");
--        return;
-+        goto out;
-     }
- 
-     /* get device type from INQUIRY data */
-     rc = get_device_type(s);
-     if (rc < 0) {
-         error_setg(errp, "INQUIRY failed");
--        return;
-+        goto out;
-     }
- 
-     /* Make a guess for the block size, we'll fix it when the guest sends.
-@@ -2605,6 +2619,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
- 
-     scsi_realize(&s->qdev, errp);
-     scsi_generic_read_device_inquiry(&s->qdev);
-+
-+out:
-+    aio_context_release(ctx);
+     qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
  }
  
- typedef struct SCSIBlockReq {
 diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-index ead7ee08eb..5d499c9a00 100755
---- a/tests/qemu-iotests/240
+new file mode 100755
+index 0000000000..ead7ee08eb
+--- /dev/null
 +++ b/tests/qemu-iotests/240
-@@ -83,6 +83,24 @@ run_qemu <<EOF
- { "execute": "quit"}
- EOF
- 
+@@ -0,0 +1,89 @@
++#!/bin/bash
++#
++# Test hot plugging and unplugging with iothreads
++#
++# Copyright (C) 2019 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=berto@igalia.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt generic
++_supported_proto generic
++_supported_os Linux
++
++do_run_qemu()
++{
++    echo Testing: "$@"
++    $QEMU -nographic -qmp stdio -serial none "$@"
++    echo
++}
++
++# Remove QMP events from (pretty-printed) output. Doesn't handle
++# nested dicts correctly, but we don't get any of those in this test.
++_filter_qmp_events()
++{
++    tr '\n' '\t' | sed -e \
++	's/{\s*"timestamp":\s*{[^}]*},\s*"event":[^,}]*\(,\s*"data":\s*{[^}]*}\)\?\s*}\s*//g' \
++	| tr '\t' '\n'
++}
++
++run_qemu()
++{
++    do_run_qemu "$@" 2>&1 | _filter_qmp | _filter_qmp_events
++}
++
++case "$QEMU_DEFAULT_MACHINE" in
++  s390-ccw-virtio)
++      virtio_scsi=virtio-scsi-ccw
++      ;;
++  *)
++      virtio_scsi=virtio-scsi-pci
++      ;;
++esac
++
 +echo
-+echo === Attach two SCSI disks using the same block device and the same iothread ===
++echo === Unplug a SCSI disk and then plug it again ===
 +echo
 +
 +run_qemu <<EOF
 +{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true}}
++{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0"}}
 +{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
 +{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
 +{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0"}}
 +{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
-+{ "execute": "device_del", "arguments": {"id": "scsi-hd1"}}
++{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
 +{ "execute": "device_del", "arguments": {"id": "scsi0"}}
 +{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
 +{ "execute": "quit"}
 +EOF
 +
- # success, all done
- echo "*** done"
- rm -f $seq.full
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
 diff --git a/tests/qemu-iotests/240.out b/tests/qemu-iotests/240.out
-index 432d98111c..701cb5c7d2 100644
---- a/tests/qemu-iotests/240.out
+new file mode 100644
+index 0000000000..432d98111c
+--- /dev/null
 +++ b/tests/qemu-iotests/240.out
-@@ -15,4 +15,20 @@ QMP_VERSION
- {"return": {}}
- {"return": {}}
- {"return": {}}
+@@ -0,0 +1,18 @@
++QA output created by 240
 +
-+=== Attach two SCSI disks using the same block device and the same iothread ===
++=== Unplug a SCSI disk and then plug it again ===
 +
 +Testing:
 +QMP_VERSION
@@ -189,6 +174,15 @@ index 432d98111c..701cb5c7d2 100644
 +{"return": {}}
 +{"return": {}}
 +{"return": {}}
- *** done
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index f6b245917a..4671d7a733 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -234,3 +234,4 @@
+ 234 auto quick migration
+ 235 auto quick
+ 236 auto quick
++240 auto quick
 -- 
 2.11.0
