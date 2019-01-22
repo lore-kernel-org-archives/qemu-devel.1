@@ -1,17 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51247)
+Received: from eggs.gnu.org ([209.51.188.92]:51854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gm19J-0000Cc-SM
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:54 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gm1A3-0000iw-Pn
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:52:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gm19H-0008KE-JI
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:48 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 22 Jan 2019 13:51:33 +0100
-Message-Id: <20190122125133.1191-3-david@redhat.com>
-In-Reply-To: <20190122125133.1191-1-david@redhat.com>
-References: <20190122125133.1191-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
- bridges
+	(envelope-from <pasic@linux.ibm.com>) id 1gm1A2-0000Lo-4l
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:52:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55832
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gm1A1-0000Ii-Kq
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:52:34 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0MFJgpq067348
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:21:32 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q65jd8jq3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:21:32 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 22 Jan 2019 15:21:30 -0000
+Date: Tue, 22 Jan 2019 16:21:24 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190121110354.2247-5-cohuck@redhat.com>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-5-cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190122162124.43d08692@oc2783563651>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 4/5] s390/cio: export hsch
+ to modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +42,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-When hotplugging a PCI bridge right now to the root port, we resolve
-pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
-really only works right now when hotplugging to another bridge.
+On Mon, 21 Jan 2019 12:03:53 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Instead, we have to properly check if we are already at the root.
+> The vfio-ccw code will need this, and it matches treatment of ssch
+> and csch.
+> 
+> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Let's cleanup the code while at it a bit and factor out updating the
-subordiante bus number into a separate function. The check for
-"old_nr < nr" is right now not strictly necessary, but makes it more
-obvious what is actually going on.
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+;)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index b7c4613fde..9b5c5fff60 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     }
- }
- 
-+static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
-+{
-+    uint32_t old_nr;
-+
-+    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
-+    while (!pci_bus_is_root(pci_get_bus(dev))) {
-+        dev = pci_get_bus(dev)->parent_dev;
-+
-+        old_nr = pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1);
-+        if (old_nr < nr) {
-+            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
-+        }
-+    }
-+}
-+
- static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                               Error **errp)
- {
-@@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     S390PCIBusDevice *pbdev = NULL;
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
--        BusState *bus;
-         PCIBridge *pb = PCI_BRIDGE(dev);
--        PCIDevice *pdev = PCI_DEVICE(dev);
- 
-+        pdev = PCI_DEVICE(dev);
-         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
-         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
- 
--        bus = BUS(&pb->sec_bus);
--        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
-+        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
- 
-         if (dev->hotplugged) {
-             pci_default_write_config(pdev, PCI_PRIMARY_BUS,
-                                      pci_dev_bus_num(pdev), 1);
-             s->bus_no += 1;
-             pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
--            do {
--                pdev = pci_get_bus(pdev)->parent_dev;
--                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
--                                         s->bus_no, 1);
--            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
-+
-+            s390_pci_update_subordinate(pdev, s->bus_no);
-         }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         pdev = PCI_DEVICE(dev);
--- 
-2.17.2
+> ---
+>  drivers/s390/cio/ioasm.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/s390/cio/ioasm.c b/drivers/s390/cio/ioasm.c
+> index 14d328338ce2..08eb10283b18 100644
+> --- a/drivers/s390/cio/ioasm.c
+> +++ b/drivers/s390/cio/ioasm.c
+> @@ -233,6 +233,7 @@ int hsch(struct subchannel_id schid)
+>  
+>  	return ccode;
+>  }
+> +EXPORT_SYMBOL(hsch);
+>  
+>  static inline int __xsch(struct subchannel_id schid)
+>  {
