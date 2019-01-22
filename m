@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60104)
+Received: from eggs.gnu.org ([209.51.188.92]:60823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gm2O1-0007eL-W3
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm2Pg-0000z9-PM
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gm2O0-0005yq-6D
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:05 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:43813)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gm2Nz-0005qF-Ee
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:03 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 22 Jan 2019 15:10:40 -0500
-Message-Id: <20190122201042.26394-3-cota@braap.org>
-In-Reply-To: <20190122201042.26394-1-cota@braap.org>
-References: <20190122201042.26394-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 2/4] tests/fp/Makefile: do not use gcc-only -W
- flags
+	(envelope-from <peter.maydell@linaro.org>) id 1gm2Pf-0008D4-QC
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:48 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33639)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm2Pf-00085u-Ez
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:47 -0500
+Received: by mail-oi1-x243.google.com with SMTP id c206so18573737oib.0
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:12:37 -0800 (PST)
+MIME-Version: 1.0
+References: <20190110121736.23448-1-richard.henderson@linaro.org>
+	<20190110121736.23448-4-richard.henderson@linaro.org>
+In-Reply-To: <20190110121736.23448-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 12:57:23 +0000
+Message-ID: <CAFEAcA8bR9=CM1zPwe9LLZ0BQf-TokChM8_xb3NXgOGFhagLaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Add BT and BTYPE to
+ tb->flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The build of testfloat objects now completes with both
-gcc and clang.
+On Thu, 10 Jan 2019 at 12:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h           |  2 ++
+>  target/arm/translate.h     |  4 ++++
+>  target/arm/helper.c        | 22 +++++++++++++++-------
+>  target/arm/translate-a64.c |  2 ++
+>  4 files changed, 23 insertions(+), 7 deletions(-
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- tests/fp/Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tests/fp/Makefile b/tests/fp/Makefile
-index 5019dcdca0..5a35e7c210 100644
---- a/tests/fp/Makefile
-+++ b/tests/fp/Makefile
-@@ -65,8 +65,7 @@ QEMU_CFLAGS += $(TF_OPTS)
- TF_CFLAGS :=
- TF_CFLAGS += -Wno-strict-prototypes
- TF_CFLAGS += -Wno-unknown-pragmas
--TF_CFLAGS += -Wno-discarded-qualifiers
--TF_CFLAGS += -Wno-maybe-uninitialized
-+TF_CFLAGS += -Wno-uninitialized
- TF_CFLAGS += -Wno-missing-prototypes
- TF_CFLAGS += -Wno-return-type
- TF_CFLAGS += -Wno-unused-function
--- 
-2.17.1
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
