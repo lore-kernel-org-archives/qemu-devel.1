@@ -1,36 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52445)
+Received: from eggs.gnu.org ([209.51.188.92]:52962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm1Ad-00017h-Ep
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:53:12 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gm1Bw-0002LZ-Hb
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm1Ac-0000ji-RW
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:53:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49302
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gm1Ac-0000jX-Jg
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:53:10 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0MGxTWB132946
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:45 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q64sjxsev-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:27 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 22 Jan 2019 17:01:26 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Tue, 22 Jan 2019 15:01:12 -0200
-In-Reply-To: <20190122170112.8706-1-farosas@linux.ibm.com>
-References: <20190122170112.8706-1-farosas@linux.ibm.com>
-Message-Id: <20190122170112.8706-4-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 3/3] target/ppc: Enable reporting of SPRs to
- GDB
+	(envelope-from <balaton@eik.bme.hu>) id 1gm1Bu-00019F-DJ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:32 -0500
+Message-Id: <c323f08c59b9931310c5d92503d370f77ce3a557.1548160772.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1548160772.git.balaton@eik.bme.hu>
+References: <cover.1548160772.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Tue, 22 Jan 2019 13:39:32 +0100
+Subject: [Qemu-devel] [PATCH 3/3] ide/via: Implement and use native PCI IDE
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +20,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>
 
-This allows reading and writing of SPRs via GDB:
+The device was initialised in ISA compatibility mode and native PCI
+IDE mode was not implemented but no clents are known to need ISA mode
+but to the contrary, most clients that want to switch to and use
+device in native PCI IDE mode. Therefore implement native PCI mode and
+switch default to that.
 
-(gdb) p/x $srr1
-$1 = 0x8000000002803033
-
-(gdb) p/x $pvr
-$2 = 0x4b0201
-(gdb) set $pvr=0x4b0000
-(gdb) p/x $pvr
-$3 = 0x4b0000
-
-They can also be shown as a group:
-(gdb) info reg spr
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- target/ppc/translate_init.inc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/ide/via.c | 52 ++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 38 insertions(+), 14 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index f29ac3558a..cba0303be2 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10531,7 +10531,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
- #endif
+diff --git a/hw/ide/via.c b/hw/ide/via.c
+index c6e43a8812..ac9385228c 100644
+--- a/hw/ide/via.c
++++ b/hw/ide/via.c
+@@ -32,15 +32,6 @@
+ #include "hw/ide/pci.h"
+ #include "trace.h"
  
-     cc->gdb_num_core_regs = 71;
+-static const struct {
+-    int iobase;
+-    int iobase2;
+-    int isairq;
+-} port_info[] = {
+-    {0x1f0, 0x3f6, 14},
+-    {0x170, 0x376, 15},
+-};
 -
-+#ifndef CONFIG_USER_ONLY
-+    cc->gdb_get_dynamic_xml = ppc_gdb_get_dynamic_xml;
-+#endif
- #ifdef USE_APPLE_GDB
-     cc->gdb_read_register = ppc_cpu_gdb_read_register_apple;
-     cc->gdb_write_register = ppc_cpu_gdb_write_register_apple;
+ static uint64_t bmdma_read(void *opaque, hwaddr addr,
+                            unsigned size)
+ {
+@@ -110,6 +101,23 @@ static void bmdma_setup_bar(PCIIDEState *d)
+     }
+ }
+ 
++static void via_ide_set_irq(void *opaque, int n, int level)
++{
++    PCIDevice *d = PCI_DEVICE(opaque);
++
++    if (level) {
++        d->config[0x70 + n * 8] |= 0x80;
++    } else {
++        d->config[0x70 + n * 8] &= ~0x80;
++    }
++
++    level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
++    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
++    if (n) {
++        qemu_set_irq(isa_get_irq(NULL, n), level);
++    }
++}
++
+ static void via_ide_reset(void *opaque)
+ {
+     PCIIDEState *d = opaque;
+@@ -121,7 +129,7 @@ static void via_ide_reset(void *opaque)
+         ide_bus_reset(&d->bus[i]);
+     }
+ 
+-    pci_set_word(pci_conf + PCI_COMMAND, PCI_COMMAND_WAIT);
++    pci_set_word(pci_conf + PCI_COMMAND, PCI_COMMAND_IO | PCI_COMMAND_WAIT);
+     pci_set_word(pci_conf + PCI_STATUS, PCI_STATUS_FAST_BACK |
+                  PCI_STATUS_DEVSEL_MEDIUM);
+ 
+@@ -158,10 +166,28 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
+     uint8_t *pci_conf = dev->config;
+     int i;
+ 
+-    pci_config_set_prog_interface(pci_conf, 0x8a); /* legacy ATA mode */
++    pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
+     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
++    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
+ 
+     qemu_register_reset(via_ide_reset, d);
++
++    memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_ops,
++                          &d->bus[0], "via-ide0-data", 8);
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &d->data_bar[0]);
++
++    memory_region_init_io(&d->cmd_bar[0], OBJECT(d), &pci_ide_cmd_le_ops,
++                          &d->bus[0], "via-ide0-cmd", 4);
++    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, &d->cmd_bar[0]);
++
++    memory_region_init_io(&d->data_bar[1], OBJECT(d), &pci_ide_data_le_ops,
++                          &d->bus[1], "via-ide1-data", 8);
++    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, &d->data_bar[1]);
++
++    memory_region_init_io(&d->cmd_bar[1], OBJECT(d), &pci_ide_cmd_le_ops,
++                          &d->bus[1], "via-ide1-cmd", 4);
++    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, &d->cmd_bar[1]);
++
+     bmdma_setup_bar(d);
+     pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, &d->bmdma_bar);
+ 
+@@ -169,9 +195,7 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
+ 
+     for (i = 0; i < 2; i++) {
+         ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(d), i, 2);
+-        ide_init_ioport(&d->bus[i], NULL, port_info[i].iobase,
+-                        port_info[i].iobase2);
+-        ide_init2(&d->bus[i], isa_get_irq(NULL, port_info[i].isairq));
++        ide_init2(&d->bus[i], qemu_allocate_irq(via_ide_set_irq, d, i));
+ 
+         bmdma_init(&d->bus[i], &d->bmdma[i], d);
+         d->bmdma[i].bus = &d->bus[i];
 -- 
-2.17.1
+2.13.7
