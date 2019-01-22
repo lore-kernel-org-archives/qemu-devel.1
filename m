@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34079)
+Received: from eggs.gnu.org ([209.51.188.92]:36238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1glu9t-00050g-03
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:23:57 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gluHM-0006uL-MY
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1glu9s-0006Uk-2b
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:23:56 -0500
-Date: Tue, 22 Jan 2019 11:18:21 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20190122111821.GA18917@redhat.com>
-References: <20190102140535.11512-1-cfergeau@redhat.com>
-	<20190102180158.GA6015@natto.ory.fergeau.eu>
-	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
-	<87o98sii5b.fsf@dusky.pond.sub.org>
+	(envelope-from <dovgaluk@ispras.ru>) id 1gluHJ-0004Qf-Oo
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:31:40 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:51002)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gluHA-0004Ke-VZ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:31:32 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <000601d4b222$323d0900$96b71b00$@ru>
+	<bf5401c8-20b3-6774-fd9e-56ffe25e7431@redhat.com>
+In-Reply-To: <bf5401c8-20b3-6774-fd9e-56ffe25e7431@redhat.com>
+Date: Tue, 22 Jan 2019 14:31:25 +0300
+Message-ID: <001701d4b246$02928a80$07b79f80$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o98sii5b.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] Bottom halves VS timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, qemu-stable@nongnu.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com
 
-On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 22/01/19 08:15, Pavel Dovgalyuk wrote:
+> > Scheduling new BH does not create a signal for the vCPU to suspend the
+> > execution and process the main loop events (in record/replay we
+> > synchronize these two threads).
 > 
-> > On 1/2/19 12:01 PM, Christophe Fergeau wrote:
-> >> Adding Markus to cc: list, I forgot to do it when sending the patch.
-> >
-> > Also worth backporting via qemu-stable, now in cc.
-> >
-> >> 
-> >> Christophe
-> >> 
-> >> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
-> >>> commit 8bca4613 added support for %% in json strings when interpolating,
-> >>> but in doing so, this broke handling of % when not interpolating as the
-> >>> '%' is skipped in both cases.
-> >>> This commit ensures we only try to handle %% when interpolating.
-> 
-> Impact?
-> 
-> If you're unable to assess, could you give us at least a reproducer?
+> I think the bug is that in rr mode it should do so and cause a cpu_exit.
 
-This affects the block/curl.c driver.  Here's a simple reproducer:
+Right. I combined adding cpu_exit (into our private version) and increasing
+an icount command-line parameter.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1668244#c3
+>  If replace these bottom halves with timers, other bottom halves from
+> the block layer may have the same issue; if you replace _all_ bottom
+> halves with timers you have performance issues because bottom halves try
+> very hard to avoid locks.
 
-Rich.
+I see.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+> Unfortunately this is getting really ugly...  Basically, rr is
+> reintroducing all the complications with iothread_requesting_mutex that
+> were removed with mtTCG.
+
+True. There are too many non-synchronized entities: bottom halves,
+worker threads, iothreads, timers...
+But RR is only possible when we have kind of synchronization objects for them.
+
+Pavel Dovgalyuk
