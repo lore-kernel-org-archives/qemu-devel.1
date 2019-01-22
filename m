@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36438)
+Received: from eggs.gnu.org ([209.51.188.92]:37323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gm1Tp-0000ax-Dr
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:13:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1VH-0001rP-Me
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gm1Tm-00045G-UJ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:13:01 -0500
-Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:40768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gm1Tm-0003e0-JZ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:12:58 -0500
-Received: from player770.ha.ovh.net (unknown [10.109.143.183])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BAAB920E47A
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 15:27:05 +0100 (CET)
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<154774536496.1208625.12823909967079119637.stgit@bahia.lan>
-	<f132cca0-c163-6791-75e0-25783578263a@kaod.org>
-	<20190122142748.6d9a6691@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6b9cb7a1-ff6a-6a8a-dde4-c72008b7f032@kaod.org>
-Date: Tue, 22 Jan 2019 15:26:45 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1V6-00057s-7g
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:14:24 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:46488)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm1V5-00055Z-Ik
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:14:20 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id w25so24653920otm.13
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:14:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190122142748.6d9a6691@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/19] spapr_xive: Cache device tree
- nodename in sPAPRXive
+References: <20190115143650.15725-1-jusual@mail.ru>
+	<CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
+	<797be79d-7ffc-222a-6acd-b01ff7269a63@mail.ru>
+	<20190117101309.GA27840@stefanha-x1.localdomain>
+	<960bbd92-a160-a65c-22c7-9e899dc3fa78@mail.ru>
+	<CAFEAcA8vWOiXS7iM8heAG5wV1u8Dh_295NbWiqcXCmar9ePuPQ@mail.gmail.com>
+	<CAFEAcA8=LMzbjFZh0tc5mRT8O2Kr3xKhk3xPgGZ_b53qp8qUvw@mail.gmail.com>
+	<d9316f47-a3fb-171c-bc06-c7f699df0400@mail.ru>
+In-Reply-To: <d9316f47-a3fb-171c-bc06-c7f699df0400@mail.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 14:58:30 +0000
+Message-ID: <CAFEAcA9wXu8UwBbNSmeDu4-tE36JpLQC6XkSNvttpwYnj6QRLA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +35,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Alistair Francis <alistair23@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On 1/22/19 2:27 PM, Greg Kurz wrote:
-> On Fri, 18 Jan 2019 14:38:31 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> On 1/17/19 6:16 PM, Greg Kurz wrote:
->>> PHB hotplug will need to know the name of the XIVE controller node. S=
-ince
->>> it is an invariant for the machine lifetime, compute it at realize an=
-d
->>> store it under the sPAPRXive structure. =20
->> Could you please gather all these changes [15-17] in one patch. It wou=
-ld=20
->> be easier to track.=20
->>
->=20
-> I'll do that in v4.
->=20
->>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>> ---
->>>  hw/intc/spapr_xive.c        |    9 ++++-----
->>>  include/hw/ppc/spapr_xive.h |    3 +++
->>>  2 files changed, 7 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->>> index e542ae59d7fd..9732c3d89c77 100644
->>> --- a/hw/intc/spapr_xive.c
->>> +++ b/hw/intc/spapr_xive.c
->>> @@ -316,6 +316,9 @@ static void spapr_xive_realize(DeviceState *dev, =
-Error **errp)
->>>      /* Map all regions */
->>>      spapr_xive_map_mmio(xive);
->>> =20
->>> +    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx=
-64,
->>> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT)); =20
->>
->> I would use a helper routine instead.
->> =20
->=20
-> Ok, I see your suggestion to put the name in a static. Well, it would w=
-ork
-> as long as we only have one interrupt controller around. It is the case=
- now
-> but could this change in the future ? If not then I'm perfectly fine wi=
-th
-> your suggestions, otherwise I guess the nodename should be under sPAPRX=
-ive.
+On Tue, 22 Jan 2019 at 13:59, Julia Suvorova <jusual@mail.ru> wrote:
+> On 21.01.2019 20:24, Peter Maydell wrote:
+> >> I think that probably what we ought to do is define that:
+> >>   * set_pc has the logic that does whatever is expected
+> >>     when the user sets the PC either by hand or when a
+> >>     ELF file is loaded
+> >>   * if that is not what is wanted in cpu_tb_exec() then
+> >>     the target must implement the synchronize_from_tb hook
+> >>     as well
+> >>
+> >> The trick here is figuring out whether we have a coherent
+> >> cross-architecture definition of what we want set_pc's
+> >> behaviour to be (or at least, if we are just baking in
+> >> "act like an ELF file" we should document that...
 
-Well, I am not sure it's worth extending SPAPRXive for a name that can=20
-be computed. Using a static is probably not a better solution.=20
+> I checked all architectures. The trick with synchronize_from_tb() is
+> made in mips and tricore. Others simply set "env->pc = value", some of
+> them implement the more complex synchronize_from_tb() for use in
+> cpu_tb_exec().
+>
+> I'm going to set "act like an ELF file" meaning to set_pc(), although I
+> cannot be sure that simply setting pc to a value always means it in
+> architectures other than these three.
+>
+> set_pc() is also called as cpu_set_pc() in the boot files, so we can
+> remove all additional checks from them.
+>
+> Is the definition update for set_pc() and cpu_set_pc() in
+> include/qom/cpu.h enough for documentation?
 
-Maybe return the node offset instead. See pnv_chip_isa_offset() in pnv.c=20
-for a similar issue.
+I think that is the documentation we ought to enhance to
+make sure it's clear what we mean by "set the PC" (ie
+"the same semantics as for setting execution to start at an
+ELF file entry point"). The docs of synchronize_from_tb
+are also a bit minimal.
 
-Thanks,
+How about this for some documentation text for cpu.h ?
 
-C.=20
+ @set_pc: Callback for setting the Program Counter register. This
+       should have the semantics used by the target architecture when
+       setting the PC from a source such as an ELF file entry point;
+       for example on Arm it will also set the Thumb mode bit based
+       on the least significant bit of the new PC value.
+       If the target behaviour here is anything other than "set
+       the PC register to the value passed in" then the target must
+       also implement the synchronize_from_tb hook.
 
->=20
->>>      qemu_register_reset(spapr_xive_reset, dev);
->>>  }
->>> =20
->>> @@ -1436,7 +1439,6 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uin=
-t32_t nr_servers, void *fdt)
->>>          cpu_to_be32(7),    /* start */
->>>          cpu_to_be32(0xf8), /* count */
->>>      };
->>> -    gchar *nodename;
->>> =20
->>>      /*
->>>       * The "ibm,plat-res-int-priorities" property defines the priori=
-ty
->>> @@ -1453,10 +1455,7 @@ int spapr_dt_xive(sPAPRMachineState *spapr, ui=
-nt32_t nr_servers, void *fdt)
->>>                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
->>>      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
->>> =20
->>> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
->>> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT));
->>> -    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
->>> -    g_free(nodename);
->>> +    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename)); =20
->>
->> and use the helper routine here.
->>
->>>      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"))=
-;
->>>      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
->>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.=
-h
->>> index 29dafead9ba0..deea34b03ee5 100644
->>> --- a/include/hw/ppc/spapr_xive.h
->>> +++ b/include/hw/ppc/spapr_xive.h
->>> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
->>>      XiveENDSource end_source;
->>>      hwaddr        end_base;
->>> =20
->>> +    /* DT */
->>> +    gchar *nodename; =20
->>
->> I don't think this is needed. See other patches for why.
->>
->> Thanks,
->>
->> C.
->> =20
->>>
->>>      /* Routing table */
->>>      XiveEAS       *eat;
->>>      uint32_t      nr_irqs;
->>>  =20
->>
->=20
+ @synchronize_from_tb: Callback for synchronizing state from a TCG
+       #TranslationBlock. This is called when we abandon execution
+       of a TB before starting it, and must set all parts of the CPU
+       state which the previous TB in the chain may not have updated.
+       This always includes at least the program counter; some targets
+       will need to do more. If this hook is not implemented then the
+       default is to call @set_pc(tb->pc).
+
+The code changes we need are:
+ * implement synchronize_from_tb for Arm (since TYPE_AARCH64_CPU
+   inherits from TYPE_ARM_CPU this means we either need to have
+   the code handle both AArch64 and AArch32, or else implement
+   separate versions of the hook for both)
+ * make set_pc for Arm have the set-thumb-mode behaviour
+ * remove now unnecessary code in target/arm/arm-powerctl.c that
+   sets thumb mode itself and clears out the low bit of the PC value
+ * ditto in hw/arm/boot.c
+
+thanks
+-- PMM
