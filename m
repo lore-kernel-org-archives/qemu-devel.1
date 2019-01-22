@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47002)
+Received: from eggs.gnu.org ([209.51.188.92]:45373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gm1oA-0000Hi-RE
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:34:05 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gm1o9-0007pl-7h
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:34:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gm1aJ-0003sy-4w
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:19:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gm1aH-0003dS-9I
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:19:43 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71EA7A7393
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 16:49:53 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 22 Jan 2019 16:49:39 +0000
-Message-Id: <20190122164940.29244-4-berrange@redhat.com>
-In-Reply-To: <20190122164940.29244-1-berrange@redhat.com>
-References: <20190122164940.29244-1-berrange@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gm1bz-0006GR-7m
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:21:29 -0500
+Date: Tue, 22 Jan 2019 14:23:11 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190122142311.5c7d3947.cohuck@redhat.com>
+In-Reply-To: <58639d62-019a-2d87-37e4-10523947e721@redhat.com>
+References: <20190122094143.8857-1-david@redhat.com>
+	<cd0a559f-6a44-20b9-39ad-4368d08f79af@redhat.com>
+	<d31d1ba2-579a-eaa1-1e41-0745fd0291b9@redhat.com>
+	<20190122141301.5f69a9b0.cohuck@redhat.com>
+	<58639d62-019a-2d87-37e4-10523947e721@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/4] trace: forbid use of %m in trace event
- format strings
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
+ without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-The '%m' format specifier instructs glibc's printf() implementation to
-insert the contents of strerror(errno). Since this is a glibc extension
-it should generally be avoided in QEMU due to need for portability to a
-variety of platforms.
+On Tue, 22 Jan 2019 14:20:27 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Even though vfio is Linux-only code that could otherwise use "%m", it
-must still be avoided in trace-events files because several of the
-backends do not use the format string and so this error information is
-invisible to them.
+> On 22.01.19 14:13, Cornelia Huck wrote:
+> > On Tue, 22 Jan 2019 11:06:46 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 22.01.19 10:50, Thomas Huth wrote:  
+> >>> On 2019-01-22 10:41, David Hildenbrand wrote:    
+> >>>> We decided to always create the PCI host bridge, even if 'zpci' is not
+> >>>> enabled (due to migration compatibility).    
+> >>>
+> >>> Couldn't we disable the host bridge for newer machine types, and just
+> >>> create it on the old ones for migration compatibility?    
+> > 
+> > I very dimly remember some problems with that approach.
+> >   
+> >>
+> >> I think we can with a compat property. However I somewhat dislike that
+> >> the error/warning will then be "no bus" vs. "zpci CPU feature not
+> >> enabled". Somebody who has no idea about that will think he somehow has
+> >> to create a PCI bus on the QEMU comandline.  
+> > 
+> > Agreed, "zpci cpu feature not enabled" gives a much better clue.
+> >   
+> >>
+> >> ... however
+> >>  
+> >>>     
+> >>>> This however right now allows
+> >>>> to add zPCI/PCI devices to a VM although the guest will never actually see
+> >>>> them, confusing people that are using a simple CPU model that has no
+> >>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+> >>>>
+> >>>> Let's check for 'zpci' and at least print a warning that this will not
+> >>>> work as expected. We could also bail out, however that might break
+> >>>> existing QEMU commandlines.
+> >>>>
+> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>> ---
+> >>>>  hw/s390x/s390-pci-bus.c | 5 +++++
+> >>>>  1 file changed, 5 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> >>>> index b86a8bdcd4..e7d4f49611 100644
+> >>>> --- a/hw/s390x/s390-pci-bus.c
+> >>>> +++ b/hw/s390x/s390-pci-bus.c
+> >>>> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >>>>  {
+> >>>>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+> >>>>  
+> >>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+> >>>> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
+> >>>> +                    " The guest will not be able to see/use these devices.");
+> >>>> +    }    
+> >>>
+> >>> I think it would be better to bail out. The hotplug clearly can not work
+> >>> in this case, and the warn report might go unnoticed, so blocking the
+> >>> hotplug process is likely better to get the attention of the user.    
+> >>
+> >> ... we could also create the bus but bail out here in case the compat
+> >> property strikes (a.k.a. new QEMO machine type).  
+> > 
+> > Now you confused me... why should failing be based on a compat property?
+> >   
+> 
+> Otherwise, a QEMU comandline that used to work (which could be created
+> by libvirt) would now fail. Are we ok with that?
+> 
 
-The errno string value should be given as an explicit trace argument
-instead, making it accessible to all backends. This also allows it to
-work correctly with future patches that use the format string with
-systemtap's simple printf code.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- hw/vfio/pci.c                 | 2 +-
- hw/vfio/trace-events          | 2 +-
- scripts/tracetool/__init__.py | 4 ++++
- 3 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c0cb1ec289..dd12f36391 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2581,7 +2581,7 @@ static void vfio_populate_device(VFIOPCIDevice *vde=
-v, Error **errp)
-     ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info=
-);
-     if (ret) {
-         /* This can fail for an old kernel or legacy PCI dev */
--        trace_vfio_populate_device_get_irq_info_failure();
-+        trace_vfio_populate_device_get_irq_info_failure(strerror(errno))=
-;
-     } else if (irq_info.count =3D=3D 1) {
-         vdev->pci_aer =3D true;
-     } else {
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index a85e8662ea..f41ca96160 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -37,7 +37,7 @@ vfio_pci_hot_reset_has_dep_devices(const char *name) "%=
-s: hot reset dependent de
- vfio_pci_hot_reset_dep_devices(int domain, int bus, int slot, int functi=
-on, int group_id) "\t%04x:%02x:%02x.%x group %d"
- vfio_pci_hot_reset_result(const char *name, const char *result) "%s hot =
-reset: %s"
- vfio_populate_device_config(const char *name, unsigned long size, unsign=
-ed long offset, unsigned long flags) "Device %s config:\n  size: 0x%lx, o=
-ffset: 0x%lx, flags: 0x%lx"
--vfio_populate_device_get_irq_info_failure(void) "VFIO_DEVICE_GET_IRQ_INF=
-O failure: %m"
-+vfio_populate_device_get_irq_info_failure(const char *errstr) "VFIO_DEVI=
-CE_GET_IRQ_INFO failure: %s"
- vfio_realize(const char *name, int group_id) " (%s) group %d"
- vfio_mdev(const char *name, bool is_mdev) " (%s) is_mdev %d"
- vfio_add_ext_cap_dropped(const char *name, uint16_t cap, uint16_t offset=
-) "%s 0x%x@0x%x"
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index 3478ac93ab..6fca674936 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -274,6 +274,10 @@ class Event(object):
-         props =3D groups["props"].split()
-         fmt =3D groups["fmt"]
-         fmt_trans =3D groups["fmt_trans"]
-+        if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
-+            raise ValueError("Event format '%m' is forbidden, pass the e=
-rror "
-+                             "as an explicit trace argument")
-+
-         if len(fmt_trans) > 0:
-             fmt =3D [fmt_trans, fmt]
-         args =3D Arguments.build(groups["args"])
---=20
-2.20.1
+I think we should not fail at all in that case, then. Or only for
+hotplug, not for coldplug.
