@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43828)
+Received: from eggs.gnu.org ([209.51.188.92]:44361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gm12c-0002Yn-Ge
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gm12s-0002pZ-0H
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gm12W-0003bj-4n
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:44:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59214)
+	(envelope-from <dgilbert@redhat.com>) id 1gm12o-0003wF-5E
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm12V-0003MC-P1
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:44:47 -0500
-Date: Tue, 22 Jan 2019 08:55:38 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190122085519-mutt-send-email-mst@kernel.org>
-References: <20190121181030.2112-1-philmd@redhat.com>
-	<76c2912b-8c50-d15f-f153-e80fa4b1be6e@redhat.com>
-	<5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-	<c52c29be-f285-2e5c-24ce-352c284e2b58@redhat.com>
-	<20190122000452-mutt-send-email-mst@kernel.org>
-	<407faf62-ad6e-c846-05aa-beafb3da0c14@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gm12l-0003ri-TZ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:05 -0500
+Date: Tue, 22 Jan 2019 18:08:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190122180828.GB2241@work-vm>
+References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
+	<20190110201124.GJ2589@work-vm>
+	<2578541547221793@myt5-68ad52a76c91.qloud-c.yandex.net>
+	<20190111200943.GJ2738@work-vm>
+	<3429361548079742@iva8-f16495710718.qloud-c.yandex.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <407faf62-ad6e-c846-05aa-beafb3da0c14@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: Fix VirtIONet typedef
- redefinition
+In-Reply-To: <3429361548079742@iva8-f16495710718.qloud-c.yandex.net>
+Subject: Re: [Qemu-devel] [PATCH 0/4] Add ignore-external migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Yuri Benditovich <yuri.benditovich@daynix.com>, Wei Xu <wexu@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>, "clg@kaod.org" <clg@kaod.org>, jiangshanlai@gmail.com
 
-On Tue, Jan 22, 2019 at 06:23:34AM +0100, Thomas Huth wrote:
-> On 2019-01-22 06:05, Michael S. Tsirkin wrote:
-> > On Tue, Jan 22, 2019 at 05:28:12AM +0100, Thomas Huth wrote:
-> >> On 2019-01-21 20:46, Philippe Mathieu-Daud=E9 wrote:
-> >>> On 1/21/19 8:22 PM, Eric Blake wrote:
-> >>>> On 1/21/19 12:10 PM, Philippe Mathieu-Daud=E9 wrote:
-> >>>>> Commit 2974e916df8 introduced the VirtioNetRscChain structure whi=
-ch
-> >>>>> refer to a VirtIONet, declared later, thus required VirtIONet typ=
-edef
-> >>>>> to be declarated forward.
-> >>>>
-> >>>> s/be declarated forward/use a forward declaration/
-> >>>
-> >>> Thanks Eric.
-> >>>
-> >>> Thomas, do you mind fixing this if you take this patch?
-> >>
-> >> No problem, just fixed it while picking up the patch.
-> >=20
-> > I'm not sure why it's going through that tree but sure go ahead.
->=20
-> Sorry, I certainly don't want to step on your toes here. I just need
-> this patch to fix compilation with "-std=3Dgnu99" which is required for
-> the patch in my PULL request that enables this compiler flag there:
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02695.html
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> Hi,
+> 
+> Just want to clarify your suggestions.
+> 
+> 1) migrate=off/share=on
+> 
+> I'm not sure that adding new flag 'migrate=off' is a good idea. I think that
+> share=on as you suggested at first is enough.
+> * It's a new flag which has sense only with share=on
+> * It seems to that the meaning of this flag isn't clear. migrate=off isn't
+>   RAM_MIGRATABLE, it's rather RAM_IGNORABLE. I.e. it means that we don't migrate
+>   such block only if the capability is enabled.
+> If you don't mind, I'll prefer share=on and ignore-shared capability.
 
-Oh. Your tree makes sense then.
+Yes, I'm OK with that, just check with Lai Jiangshan (cc'd) that it
+meets their requirement as well.
 
-> > Sent Reviewed-by tag.
->=20
-> Thanks a lot!
->=20
->  Thomas
+> 2) Keep RAM migration version
+> 
+> It's more complicated question. To validate GPAs for ignored blocks I have to
+> change the stream format. I can do this conditionally (if (cap_enabled) { ... })
+> but in this case, I want to make sure that the capability is enabled or disabled
+> on both source and target. Otherwise, there is an undefined behavior on the
+> target side (most likely some error during deserialization).
+> To fix that I can add a capability validation feature.
+> 
+> For example, add a new section to vmstate_configuration (not complete):
+> +static const VMStateDescription vmstate_capabilites = {
+> +    .name = "configuration/capabilities",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = vmstate_capabilites_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_V(caps_count, SaveState, 1),
+> +        VMSTATE_VARRAY_UINT32_ALLOC(capabilities, SaveState, caps_count, 1,
+> +                                    vmstate_info_bool, bool),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_configuration = {
+>      .name = "configuration",
+>      .version_id = 1,
+> @@ -404,6 +456,7 @@ static const VMStateDescription vmstate_configuration = {
+>      },
+>      .subsections = (const VMStateDescription*[]) {
+>          &vmstate_target_page_bits,
+> +        &vmstate_capabilites,
+>          NULL
+>      }
+>  };
+> 
+> It seems too complicated. If I should change the migration stream anyway, maybe
+> it's better to increment the version?
+> 
+> What do you think?
+
+Never break compatibility!
+
+There's three separate things here:
+  a) Skipping the shared blocks
+  b) Adding a check that skipped blocks actually match
+  c) Adding a check for matching capabilities
+
+Lets solve them separately.
+
+I think (a) we've discussed.
+(b) If you only enable the checking when your ignore-shared is enabled
+then it doesn't break any compatibility.  But watch out, if they're
+skipped for some other reason then you might not want to check them;
+for example some of the things Peter Maydell was talking about for ARM
+was that the block may or may not be present, so there's no requirement
+it's on the destination.
+
+(c) That's a nice to have; you'd have to create a list of capabilities
+you care about including; if they're only new capabilities then you
+can just enable the fields when any are set and it doesn't break old
+things; if you want to include some other capabilities then tie
+it to the machine type and it wont break old setups.
+
+Dave
+
+> Regards,
+> Yury
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
