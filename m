@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35269)
+Received: from eggs.gnu.org ([209.51.188.92]:35298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glshb-0008OS-3W
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:39 -0500
+	(envelope-from <philmd@redhat.com>) id 1glshf-0008Sf-75
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glsha-0003Ok-9t
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:39 -0500
-References: <20190122094143.8857-1-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cd0a559f-6a44-20b9-39ad-4368d08f79af@redhat.com>
-Date: Tue, 22 Jan 2019 10:50:31 +0100
+	(envelope-from <philmd@redhat.com>) id 1glshd-0003Sp-Et
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:43 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:32804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glshd-0003QP-9b
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:41 -0500
+Received: by mail-wr1-f67.google.com with SMTP id c14so26591982wrr.0
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:50:39 -0800 (PST)
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-3-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2bdb9bcc-e99f-e0d1-297d-50396571b364@redhat.com>
+Date: Tue, 22 Jan 2019 10:50:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190122094143.8857-1-david@redhat.com>
+In-Reply-To: <20190117185628.21862-3-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/18] Acceptance tests: show avocado test
+ execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On 2019-01-22 10:41, David Hildenbrand wrote:
-> We decided to always create the PCI host bridge, even if 'zpci' is not
-> enabled (due to migration compatibility).
-
-Couldn't we disable the host bridge for newer machine types, and just
-create it on the old ones for migration compatibility?
-
-> This however right now allows
-> to add zPCI/PCI devices to a VM although the guest will never actually see
-> them, confusing people that are using a simple CPU model that has no
-> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+On 1/17/19 7:56 PM, Cleber Rosa wrote:
+> The current version of the "check-acceptance" target will only show
+> one line for execution of all tests.  That's probably OK if the tests
+> to be run are quick enough and they're always the same.
 > 
-> Let's check for 'zpci' and at least print a warning that this will not
-> work as expected. We could also bail out, however that might break
-> existing QEMU commandlines.
+> But, there's already one test alone that takes on average ~5 seconds
+> to run, we intend to adapt the list of tests to match the user's build
+> environment (among other choices).
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Because of that, let's present the default Avocado UI by default.
+> Users can always choose a different output by setting the AVOCADO_SHOW
+> variable.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  hw/s390x/s390-pci-bus.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  .travis.yml            | 2 +-
+>  tests/Makefile.include | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index b86a8bdcd4..e7d4f49611 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+> diff --git a/.travis.yml b/.travis.yml
+> index 93fd0164a0..844d514afa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -188,7 +188,7 @@ matrix:
+>      # Acceptance (Functional) tests
+>      - env:
+>          - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
+> -        - TEST_CMD="make AVOCADO_SHOW=app check-acceptance"
+> +        - TEST_CMD="make check-acceptance"
+>        addons:
+>          apt:
+>            packages:
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f403a6571d..c73298740d 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -956,7 +956,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>  # Controls the output generated by Avocado when running tests.
+>  # Any number of command separated loggers are accepted.  For more
+>  # information please refer to "avocado --help".
+> -AVOCADO_SHOW=none
+> +AVOCADO_SHOW=app
 >  
-> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
-> +                    " The guest will not be able to see/use these devices.");
-> +    }
-
-I think it would be better to bail out. The hotplug clearly can not work
-in this case, and the warn report might go unnoticed, so blocking the
-hotplug process is likely better to get the attention of the user.
-
- Thomas
+>  PYTHON3 = $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_info >= (3, 0) else 0)')
+>  ifeq ($(PYTHON3), 1)
+> 
