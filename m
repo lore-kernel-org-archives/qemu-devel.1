@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33072)
+Received: from eggs.gnu.org ([209.51.188.92]:37370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glnj1-0003LO-61
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 23:31:47 -0500
+	(envelope-from <mst@redhat.com>) id 1gloEr-0007no-OD
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glnfr-0002UI-0U
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 23:28:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38454)
+	(envelope-from <mst@redhat.com>) id 1gloEq-0008B4-Uq
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:04:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51546)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glnfp-0002TO-NF
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 23:28:30 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gloEq-00088h-PV
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:04:40 -0500
+Date: Tue, 22 Jan 2019 00:04:27 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190122000421-mutt-send-email-mst@kernel.org>
 References: <20190121181030.2112-1-philmd@redhat.com>
-	<76c2912b-8c50-d15f-f153-e80fa4b1be6e@redhat.com>
-	<5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c52c29be-f285-2e5c-24ce-352c284e2b58@redhat.com>
-Date: Tue, 22 Jan 2019 05:28:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="jBbB7ICZL7nTmc9PkFS6U2Sty8NmSviMA"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190121181030.2112-1-philmd@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] virtio-net: Fix VirtIONet typedef
  redefinition
 List-Id: <qemu-devel.nongnu.org>
@@ -30,68 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>, Wei Xu <wexu@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Yuri Benditovich <yuri.benditovich@daynix.com>, Thomas Huth <thuth@redhat.com>, Wei Xu <wexu@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jBbB7ICZL7nTmc9PkFS6U2Sty8NmSviMA
-From: Thomas Huth <thuth@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Yuri Benditovich <yuri.benditovich@daynix.com>, Wei Xu <wexu@redhat.com>
-Message-ID: <c52c29be-f285-2e5c-24ce-352c284e2b58@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: Fix VirtIONet typedef
- redefinition
-References: <20190121181030.2112-1-philmd@redhat.com>
- <76c2912b-8c50-d15f-f153-e80fa4b1be6e@redhat.com>
- <5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-In-Reply-To: <5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2019-01-21 20:46, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/21/19 8:22 PM, Eric Blake wrote:
->> On 1/21/19 12:10 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Commit 2974e916df8 introduced the VirtioNetRscChain structure which
->>> refer to a VirtIONet, declared later, thus required VirtIONet typedef=
-
->>> to be declarated forward.
->>
->> s/be declarated forward/use a forward declaration/
+On Mon, Jan 21, 2019 at 07:10:30PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Commit 2974e916df8 introduced the VirtioNetRscChain structure which
+> refer to a VirtIONet, declared later, thus required VirtIONet typedef
+> to be declarated forward.
+> However, when compiling with Clang in -std=3Dgnu99 mode, this triggers
+> the following warning/error:
 >=20
-> Thanks Eric.
+>     CC      hw/net/virtio-net.o
+>   In file included from qemu/hw/net/virtio-net.c:22:
+>   include/hw/virtio/virtio-net.h:189:3: error: redefinition of typedef =
+'VirtIONet' is a C11 feature [-Werror,-Wtypedef-redefinition]
+>   } VirtIONet;
+>     ^
+>   include/hw/virtio/virtio-net.h:110:26: note: previous definition is h=
+ere
+>   typedef struct VirtIONet VirtIONet;
+>                            ^
+>   1 error generated.
+>   make: *** [rules.mak:69: hw/net/virtio-net.o] Error 1
 >=20
-> Thomas, do you mind fixing this if you take this patch?
+> Fix it by removing the duplicate typedef definition.
+>=20
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-No problem, just fixed it while picking up the patch.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
- Thanks,
-  Thomas
-
-
---jBbB7ICZL7nTmc9PkFS6U2Sty8NmSviMA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJcRpviAAoJEC7Z13T+cC21T0kP/RjrBUGRfMcJBszRIfxq+0zu
-9gijev+xoCEpxIXt1vPdWpVacLh/oxwjY+d4v1zc6LYQYgMagALP3RCIJYCOlxGH
-8NcfIOaHWHygB7QcpIKV94imCdbwx4BRjAueJ3KvSYUQHB2+0HCreDQ4dmyY7bFd
-w+2YGCuIKeGs2lnD83zotULEN8HBo+bJ5VOzgt6M3INozdNJNzfAjKY3ONhAlZZI
-u644HI7SN73HojpYF3z6n7EEm3/lz+hduXOBvQ96hWp6heUFP7yskLuTnHyhf1H5
-nDl+ZPlEmkRTZhOD9iListTN8dKtzybMQKv/HL6wIckDJcF6MjKq+wKbeoieSAI/
-43oqAeJB4zB/sFoZT5u5GItOrUOF/ZWTG36FjGC3Z9WL+YB0fi4d/bkbJ5ofmYIB
-Lma/9mgQVeeriTKu+YsIkxUB7xI6xRyZSewLt0neFh4gepfRhZNJSqiaHx0N4jv/
-rQcvdqvjQjmoN5S0sjoRUxJn7JkfvqDXxNtH7HElxOnsOCPxNYY9WNWCskFluMee
-TewMrBnGYLdlaWjqolBXTeIbufdAHP7NaFshUcujHy/JS8xwFIszKBsBGFvBb+2s
-iC6cxbpdDhxVj5F/rzdt/zcWBWKIyxBY2ZuRgdXAl+ZH1xVRPr488wSEr6Gw3j8p
-LKSFyq9G4FFNgbiMTPGU
-=3O7d
------END PGP SIGNATURE-----
-
---jBbB7ICZL7nTmc9PkFS6U2Sty8NmSviMA--
+> ---
+>  include/hw/virtio/virtio-net.h | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-=
+net.h
+> index c7ec1a755f..bd662752d2 100644
+> --- a/include/hw/virtio/virtio-net.h
+> +++ b/include/hw/virtio/virtio-net.h
+> @@ -106,7 +106,6 @@ typedef struct VirtioNetRscSeg {
+>      NetClientState *nc;
+>  } VirtioNetRscSeg;
+> =20
+> -struct VirtIONet;
+>  typedef struct VirtIONet VirtIONet;
+> =20
+>  /* Chain is divided by protocol(ipv4/v6) and NetClientInfo */
+> @@ -136,7 +135,7 @@ typedef struct VirtIONetQueue {
+>      struct VirtIONet *n;
+>  } VirtIONetQueue;
+> =20
+> -typedef struct VirtIONet {
+> +struct VirtIONet {
+>      VirtIODevice parent_obj;
+>      uint8_t mac[ETH_ALEN];
+>      uint16_t status;
+> @@ -186,7 +185,7 @@ typedef struct VirtIONet {
+>      int announce_counter;
+>      bool needs_vnet_hdr_swap;
+>      bool mtu_bypass_backend;
+> -} VirtIONet;
+> +};
+> =20
+>  void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
+>                                     const char *type);
+> --=20
+> 2.20.1
