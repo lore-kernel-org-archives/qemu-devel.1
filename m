@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45100)
+Received: from eggs.gnu.org ([209.51.188.92]:45144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1glp3u-0006e6-4v
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:57:28 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1glp4D-0006eZ-NC
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:57:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1glp2X-0003dV-GM
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:56:03 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2482 helo=huawei.com)
+	(envelope-from <mjt@tls.msk.ru>) id 1gloqJ-0004WF-GT
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:43:24 -0500
+Received: from isrv.corpit.ru ([86.62.121.231]:57265)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fangying1@huawei.com>)
-	id 1glp2W-0003a7-SA
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:56:01 -0500
-From: fangying <fangying1@huawei.com>
-Date: Tue, 22 Jan 2019 05:55:43 +0000
-Message-ID: <43E932EA88344C498D975E4FF00CF41E2DEA5413@dggeml529-mbx.china.huawei.com>
-Content-Language: zh-CN
+	(Exim 4.71) (envelope-from <mjt@tls.msk.ru>) id 1gloqJ-0004VR-1z
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:43:23 -0500
+References: <154800690066.11444.6761064786302350654.reportbug@deadeye.wl.decadent.org.uk>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <4caef357-e49b-2314-ee19-3ae31f8e4c30@msgid.tls.msk.ru>
+Date: Tue, 22 Jan 2019 08:43:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [RFC] Questions on the I/O performance of emulated
- host cdrom device
+In-Reply-To: <154800690066.11444.6761064786302350654.reportbug@deadeye.wl.decadent.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: ru-RU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Bug#919921: qemu-user Linux ELF loader fails to
+ handle pure BSS segments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,168 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "dengkai (A)" <dengkai1@huawei.com>, qemu-devel <qemu-devel@nongnu.org>, mreitz <mreitz@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>, 919921@bugs.debian.org
 
-SGksDQpJIGFtIG5vdCBpbnRlbmRlZCB0byBzZW5kIGEgcGF0Y2ggbm93LCBJIHVzZSB0aGUgoa5y
-ZWFkLW9ubHmhryBjb2RlIHNuaXBwZXQgdG8gcHJvdmUgdGhhdCB0aGUgSS9PIHBlcmZvcm1hbmNl
-DQpjYW4gaW5jcmVhc2UgZnJvbSAzMCUgdG8gODAlIGNvbXBhcmVkIHRvIGhvc3Qgc2lkZSBpZiB3
-ZSBkbyBub3QgY2FsbCBjZHJvbV9pc19pbnNlcnRlZCBoZXJlLiBPYnZpb3VzbHkgaXQgaXMgbm90
-DQpzdWl0YWJsZSB0byBza2lwIG92ZXIgY2hlY2tpbmcgY2Ryb20gZHJpdmUgc3RhdHVzLg0KDQpI
-b3dldmVyIEkgY2Fubm90IGNvbWUgdXAgd2l0aCBhIHByb3BlciBzb2x1dGlvbiByaWdodCBub3cu
-IEJ1dCBJIHRoaW5rIHRoZXJlIG1heSBiZSB0d28gYXBwcm9jaGVzLg0KT25lIHdheSB0aGF0IGNh
-biBjaGVjayBkcml2ZSBzdGF0dXMgZXF1YWwgdG8gaW9jdGwgQ0RST01fRFJJVkVfU1RBVFVTIGJ1
-dCBtdWNoIGZhc3Rlci4gVGhlIG90aGVyIHdheQ0KdGhhdCBsZXQgcWVtdSBjYXRjaCBkcml2ZSBz
-dGF0dXMgdmlhIGV2ZW50IHRyaWdnZXJlZCBtZWNoYW5pc20uDQoNClJlZ2FyZHMuDQoNCreivP7I
-yzogZmFuZ3lpbmcNCreiy83KsbzkOiAyMDE5xOox1MIyMsjVIDExOjI3DQrK1bz+yMs6IEpvaG4g
-U25vdyA8anNub3dAcmVkaGF0LmNvbT47IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+DQqz
-rcvNOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1YXdlaS5jb20+OyBkZW5na2FpIChB
-KSA8ZGVuZ2thaTFAaHVhd2VpLmNvbT47IHFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
-Zz47IG1yZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+DQrW98ziOiBSRTogW1FlbXUtZGV2ZWxdIFtS
-RkNdIFF1ZXN0aW9ucyBvbiB0aGUgSS9PIHBlcmZvcm1hbmNlIG9mIGVtdWxhdGVkIGhvc3QgY2Ry
-b20gZGV2aWNlDQoNCreivP7Iy6O6IEpvaG4gU25vdw0KytW8/sjLo7ogZmFuZ3lpbmc8ZmFuZ3lp
-bmcxQGh1YXdlaS5jb208bWFpbHRvOmZhbmd5aW5nMUBodWF3ZWkuY29tPj47S2V2aW4gV29sZjxr
-d29sZkByZWRoYXQuY29tPG1haWx0bzprd29sZkByZWRoYXQuY29tPj4NCrOty82juiBaaG91amlh
-biAoamF5KTxqaWFuamF5Lnpob3VAaHVhd2VpLmNvbTxtYWlsdG86amlhbmpheS56aG91QGh1YXdl
-aS5jb20+PjtkZW5na2FpIChBKTxkZW5na2FpMUBodWF3ZWkuY29tPG1haWx0bzpkZW5na2FpMUBo
-dWF3ZWkuY29tPj47cWVtdS1kZXZlbDxxZW11LWRldmVsQG5vbmdudS5vcmc8bWFpbHRvOnFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZz4+O21yZWl0ejxtcmVpdHpAcmVkaGF0LmNvbTxtYWlsdG86bXJlaXR6
-QHJlZGhhdC5jb20+Pg0K1vfM4qO6IFJlOiBbUWVtdS1kZXZlbF0gW1JGQ10gUXVlc3Rpb25zIG9u
-IHRoZSBJL08gcGVyZm9ybWFuY2Ugb2YgZW11bGF0ZWQgaG9zdCBjZHJvbSBkZXZpY2UNCsqxvOSj
-uiAyMDE5LTAxLTE5IDA2OjQzOjQzDQoNCg0KDQpPbiAxLzE1LzE5IDk6NDggUE0sIFlpbmcgRmFu
-ZyB3cm90ZToNCj4NCj4NCj4gT24gMjAxOS8xLzE2IDQ6MTUsIEpvaG4gU25vdyB3cm90ZToNCj4+
-DQo+Pg0KPj4gT24gMS84LzE5IDEwOjIwIFBNLCBZaW5nIEZhbmcgd3JvdGU6DQo+Pj4NCj4+Pg0K
-Pj4+IE9uIDIwMTkvMS84IDIwOjQ2LCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4+PiBBbSAyOS4xMi4y
-MDE4IHVtIDA3OjMzIGhhdCBZaW5nIEZhbmcgZ2VzY2hyaWViZW46DQo+Pj4+PiBIaS4NCj4+Pj4+
-IFJlY2VudGx5IG9uZSBvZiBvdXIgY3VzdG9tZXIgY29tcGxhaW5lZCBhYm91dCB0aGUgSS9PIHBl
-cmZvcm1hbmNlIG9mIFFFTVUgZW11bGF0ZWQgaG9zdCBjZHJvbSBkZXZpY2UuDQo+Pj4+PiBJIGRp
-ZCBzb21lIGludmVzdGlnYXRpb24gb24gaXQgYW5kIHRoZXJlIHdhcyBzdGlsbCBzb21lIHBvaW50
-IEkgY291bGQgbm90IGZpZ3VyZSBvdXQuIFNvIEkgaGFkIHRvIGFzayBmb3IgeW91ciBoZWxwLg0K
-Pj4+Pj4NCj4+Pj4+IEhlcmUgaXMgdGhlIGFwcGxpY2F0aW9uIHNjZW5hcmlvIHNldHVwIGJ5IG91
-ciBjdXN0b21lci4NCj4+Pj4+IGZpbGVuYW1lLmlzbyAgICAgICAgL2Rldi9zcjAgICAgICAgICAg
-IC9kZXYvY2Ryb20NCj4+Pj4+IHJlbW90ZSBjbGllbnQgICAgLS0+ICBob3N0KGNkZW11KSAgICAg
-IC0tPiAgTGludXggVk0NCj4+Pj4+ICgxKUEgcmVtb3RlIGNsaWVudCBtYXBzIGFuIGlzbyBmaWxl
-IHRvIHg4NiBob3N0IG1hY2hpbmUgdGhyb3VnaCBuZXR3b3JrIHVzaW5nIHRjcC4NCj4+Pj4+ICgy
-KVRoZSBjZGVtdSBkYWVtb24gdGhlbiBsb2FkIGl0IGFzIGEgbG9jYWwgdmlydHVhbCBjZHJvbSBk
-aXNrIGRyaXZlLg0KPj4+Pj4gKDMpQSBWTSBpcyBsYXVuY2hlZCB3aXRoIHRoZSB2aXJ0dWFsIGNk
-cm9tIGRpc2sgZHJpdmUgY29uZmlndXJlZC4NCj4+Pj4+IFRoZSBWTSBjYW4gbWFrZSB1c2Ugb2Yg
-dGhpcyB2aXJ0dWFsIGNkcm9tIHRvIGluc3RhbGwgYW4gT1MgaW4gdGhlIGlzbyBmaWxlLg0KPj4+
-Pj4NCj4+Pj4+IFRoZSBuZXR3b3JrIGJhbmR3aXRoIGJ0dyB0aGUgcmVtb3RlIGNsaWVudCBhbmQg
-aG9zdCBpcyAxMDBNYnBzLCB3ZSB0ZXN0IEkvTyBwZXJmIHVzaW5nOiBkZCBpZj0vZGV2L3NyMCBv
-Zj0vZGV2L251bGwgYnM9MzJLIGNvdW50PTEwMDAwMC4NCj4+Pj4+IEFuZCB3ZSBoYXZlDQo+Pj4+
-PiAoMSkgSS9PIHBlcmYgb2YgaG9zdCBzaWRlIC9kZXYvc3IwIGlzIDExTUIvczsNCj4+Pj4+ICgy
-KSBJL08gcGVyZiBvZiAvZGV2L2Nkcm9tIGluc2lkZSBWTSBpcyAzLjhNQi9zLg0KPj4+Pj4NCj4+
-Pj4+IEFzIHdlIGNhbiBzZWUsIEkvTyBwZXJmIG9mIGNkcm9tIGluc2lkZSB0aGUgVk0gaXMgYWJv
-dXQgMzQuNSUgY29tcGFyZWQgd2l0aCBob3N0IHNpZGUuDQo+Pj4+PiBGbGFtZUdyYXBoIGlzIHVz
-ZWQgdG8gZmluZCBvdXQgdGhlIGJvdHRsZW5lY2sgb2YgdGhpcyBvcGVyYXRpb24gYW5kIHdlIGZp
-bmQgb3V0IHRoYXQgdG9vIG11Y2ggdGltZSBpcyBvY2N1cGllZCBieSBjYWxsaW5nICpiZHJ2X2lz
-X2luc2VydGVkKi4NCj4+Pj4+IFRoZW4gd2UgZGlnIGludG8gdGhlIGNvZGUgYW5kIGZpZ3VyZSBv
-dXQgdGhhdCB0aGUgaW9jdGwgaW4gKmNkcm9tX2lzX2luc2VydGVkKiB0YWtlcyB0b28gbXVjaCB0
-aW1lLCBiZWNhdXNlIGl0IHRyaWdnZXJzIGlvX3NjaGR1bGVfdGltZW91dCBpbiBrZXJuZWwuDQo+
-Pj4+PiBJbiB0aGUgY29kZSBwYXRoIG9mIGVtdWxhdGVkIGNkcm9tIGRldmljZSwgZWFjaCBETUEg
-SS9PIHJlcXVlc3QgY29uc2lzdHMgb2Ygc2V2ZXJhbCAqYmRydl9pc19pbnNlcnRlZCosIHdoaWNo
-IGRlZ3JhZGVzIHRoZSBJL08gcGVyZm9ybWFuY2UgYnkgYWJvdXQgMzElIGluIG91ciB0ZXN0Lg0K
-Pj4+Pj4gc3RhdGljIGJvb2wgY2Ryb21faXNfaW5zZXJ0ZWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMp
-DQo+Pj4+PiB7DQo+Pj4+PiAgICAgQkRSVlJhd1N0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4+Pj4+
-ICAgICBpbnQgcmV0Ow0KPj4+Pj4NCj4+Pj4+ICAgICByZXQgPSBpb2N0bChzLT5mZCwgQ0RST01f
-RFJJVkVfU1RBVFVTLCBDRFNMX0NVUlJFTlQpOw0KPj4+Pj4gICAgIHJldHVybiByZXQgPT0gQ0RT
-X0RJU0NfT0s7DQo+Pj4+PiB9DQo+Pj4+PiBBIGZsYW1lZ3JhcGggc3ZnIGZpbGUgKGNkcm9tLnN2
-ZykgaXMgYXR0YWNoaWV2ZWQgaW4gdGhpcyBlbWFpbCB0byBzaG93IHRoZSBjb2RlIHRpbWluZyBw
-cm9maWxlIHdlJ3ZlIHRlc3RlZC4NCj4+Pj4+DQo+Pj4+PiBTbyBoZXJlIGlzIG15IHF1ZXN0aW9u
-Lg0KPj4+Pj4gKDEpIFdoeSBkbyB3ZSByZWd1bGFybHkgY2hlY2sgdGhlIHByZXNlbmNlIG9mIGEg
-Y2Ryb20gZGlzayBkcml2ZSBpbiB0aGUgY29kZSBwYXRoPyAgQ2FuIHdlIGRvIGl0IGFzeW5jaHJv
-bm91c2x5Pw0KPj4NCj4+IFRoZSBBVEFQSSBlbXVsYXRvciBuZWVkcyB0byBrbm93IGlmIGl0IGhh
-cyBzdG9yYWdlIHByZXNlbnQgdG8gY2Fycnkgb3V0DQo+PiB0aGUgcmVxdWVzdCBvciB0byBzaWdu
-YWwgYW4gZXJyb3IsIHNvIGl0IGNoZWNrcy4gSXQgbWlnaHQgYmUgdGhlIGNhc2UNCj4+IHRoYXQg
-dGhlIFZNIG9wZXJhdG9yIGZvcmNpYmx5IGRpc21vdW50ZWQgbmV0d29yayBzdG9yYWdlIHdpdGhv
-dXQNCj4+IGF3YXJlbmVzcyBmcm9tIHRoZSBndWVzdC4gKFRoaXMgaXMgYmFzaWNhbGx5IGVtdWxh
-dGlvbiBvZiB0aGUgY2FzZSB3aGVuDQo+PiBhIHVzZXIgbWVjaGFuaWNhbGx5IGZvcmNlcyBhIENE
-Uk9NIHRyYXkgb3Blbi4pDQo+Pg0KPj4gSSB3YXNuJ3QgYXdhcmUgdGhpcyBjaGVjayB3YXMgc28g
-c2xvdy4NCj4gSXQgaXMgZmFzdCBlbm91Z2ggaW4gbW9zdCBjYXNlLCBob3dldmVyIGl0IG1heSBi
-ZSBzbG93IGlmIHRoZSBjZHJvbSBkcml2ZSBpcyBhIHZpcnR1YWwgZHJpdmUgbWFwcGVkIGZyb20g
-cmVtb3RlIGNsaWVudC4NCj4gVGhpcyBpcyBzaG93ZWQgaW4gaHR0cHM6Ly9yYXcuZ2l0aHVidXNl
-cmNvbnRlbnQuY29tL2Zhbmd5aW5nL2Zhbmd5aW5nLmdpdGh1Yi5pby9tYXN0ZXIvOTRFMTE5RkEt
-OEJBMS00MUFCLUEyNkEtRkJEQzYzNUJDRDJDLnBuZw0KPiBUaGUgcmVhc29uIGlzIGlvY3RsKHMt
-PmZkLCBDRFJPTV9EUklWRV9TVEFUVVMsIENEU0xfQ1VSUkVOVCkgaW4gY2Ryb21faXNfaW5zZXJ0
-ZWQgdGFrZXMgbXVjaCB0aW1lIGluIHRoaXMgc2NlbmFyaW8uDQo+DQo+Pg0KPj4gTWF5YmUgd2Ug
-Y2FuIGp1c3QgY2FjaGUgYmxrX2lzX2luc2VydGVkIC0tIEkgZG9uJ3QgcmVtZW1iZXIgaWYgaXQn
-cw0KPj4gcG9zc2libGUgdG8gZWplY3QgbWVkaWEgd2l0aG91dCBhd2FyZW5lc3MgZnJvbSB0aGUg
-ZGV2aWNlIG1vZGVsLCBidXQgaWYNCj4+IHRoaXMgY2hlY2sgd2luZHMgdXAgYmVpbmcgc2xvdyBp
-biBzb21lIGNvbmZpZ3VyYXRpb25zIHdlIGNhbiBjYWNoZSBpdC4NCj4gVG8gY2FjaGUgbWVkaWEg
-c3RhdHVzIGlzIGEgZ29vZCBpZGVhIGhlcmUsIHdlIGNoZWNrIGJsa19pc19pbnNlcnRlZCBpbnN0
-ZWFkIGFuZCBtb2RpZnkgaXQgd2hlbiBtZWRpYSBzdGF0dXMgaXMgY2hhbmdlZC4NCj4+DQo+PiBU
-aGlzIHdvbid0IGhlbHAgdGhlIGJkcnZfY2hlY2tfYnl0ZV9yZXF1ZXN0IGNhbGxzLCB0aG91Z2gs
-IGp1c3Qgb25lcw0KPj4gZnJvbSB0aGUgZGV2aWNlIG1vZGVsLCBzZWUgYmVsb3cNCj4+DQo+Pj4+
-PiAoMikgQ2FuIHdlIGRyb3Agc29tZSBjaGVjayBwb2ludCBpbiB0aGUgY29kZSBwYXRoIHRvIGlt
-cHJvdmUgdGhlIHBlcmZvcm1hbmNlPw0KPj4+Pj4gVGhhbmtzLg0KPj4+Pg0KPj4+PiBJJ20gYWN0
-dWFsbHkgbm90IHN1cmUgd2h5IHNvIG1hbnkgcGxhY2VzIGNoZWNrIGl0LiBKdXN0IGxldHRpbmcg
-YW4gSS9PDQo+Pj4+IHJlcXVlc3QgZmFpbCBpZiB0aGUgQ0Qgd2FzIHJlbW92ZWQgd291bGQgcHJv
-YmFibHkgYmUgZWFzaWVyLg0KPj4+Pg0KPj4+IFlvdSBjYW4gc2VlIHRob3NlIGNoZWNrIHBvaW50
-cyBhcyBzaG93ZWQgaW4gdGhlIGF0dGFjaGVkIGZsYW1lZ3JhcGggZmlsZSBpbiB0aGlzIHRocmVh
-ZCAocmVuYW1lIGl0IHRvIGNkcm9tLnN2ZykuDQo+Pj4gSXQgaXMgY2FsbGVkIG1haW5seSBpbiBi
-ZHJ2X2NoZWNrX2J5dGVfcmVxdWVzdCBhbmQgaWRlX2F0YXBpX2NtZCwgYW5kIG9ubHkgdGhlIGhv
-c3RfY2Ryb20gYmFja2VuZCBpbXBsZW1lbnRzDQo+Pj4gaXQgdXNpbmcgY2Ryb21faXNfaW5zZXJ0
-ZWQuDQo+Pj4NCj4+DQo+PiBpbiBpZGVfYXRhcGlfY21kLCB0cnkgcmVwbGFjaW5nOg0KPj4NCj4+
-IGAhcy0+dHJheV9vcGVuICYmIGJsa19pc19pbnNlcnRlZChzLT5ibGspICYmIHMtPmNkcm9tX2No
-YW5nZWQpYA0KPj4NCj4+IHdpdGgNCj4+DQo+PiBgIXMtPnRyYXlfb3BlbiAmJiBzLT5jZHJvbV9j
-aGFuZ2VkICYmIGJsa19pc19pbnNlcnRlZChzLT5ibGspKWANCj4+DQo+PiB3aGljaCBzaG91bGQg
-aG9wZWZ1bGx5IHNob3J0LWNpcmN1aXQgY2FsbHMgdG8gYmxrX2lzX2luc2VydGVkIGlmDQo+PiBz
-LT5jZHJvbV9jaGFuZ2VkIGlzIGZhbHNlLCBidXQgaXQgZG9lc24ndCBkbyBtdWNoIHRvIGZpeCB0
-aGUgc3Vic2VxdWVudA0KPj4gY2FsbDoNCj4+DQo+PiBgICAgIGlmICgoY21kLT5mbGFncyAmIENI
-RUNLX1JFQURZKSAmJg0KPj4gICAgICAgICAoIW1lZGlhX3ByZXNlbnQocykgfHwgIWJsa19pc19p
-bnNlcnRlZChzLT5ibGspKSlgDQo+Pg0KPj4gd2hpY2ggaXMgdW5mb3J0dW5hdGVseSBnb2luZyB0
-byBjaGVjayBibGtfaXNfaW5zZXJ0ZWQgcXVpdGUgYSBsb3QNCj4+IGJlY2F1c2UgdGhlIHJlYWQg
-Y29tbWFuZHMgYXJlIHRhZ2dlZCBDSEVDS19SRUFEWS4uLg0KPiBZZXMgeW91IGFyZSByaWdodC4N
-Cj4+DQo+Pg0KPj4gQXMgYWxsdWRlZCB0byBhYm92ZSwgdG9vLCBJJ20gbm90IHN1cmUgd2hhdCBJ
-IGNhbiBkbyBhYm91dA0KPj4gYmRydl9jaGVja19ieXRlX3JlcXVlc3QgLS0gd2hhdCBoYXBwZW5z
-IGlmIHRoZSBpby5jIGhlbHBlcnMgZG9uJ3QNCj4+IGFjdHVhbGx5IGNoZWNrIHRoaXM/IFdpbGwg
-dGhleSBmYWlsIGdyYWNlZnVsbHk/DQo+Pg0KPj4gSSBndWVzcyB0aGVyZSdzIG9uZSB3YXkgdG8g
-ZmluZCBvdXQuDQo+DQo+IEkgZGlkIHNvbWUgdGVzdCBoZXJlLiBBcyB3ZSBjYW4gc2VlIG9ubHkg
-Y2Ryb20gYmRydiBpbXBsZW1lbnRzIGJkcnZfaXNfaW5zZXJ0ZWQsDQo+IHRoZW4gSSBza2lwIGNo
-ZWNrIHByZXNlbmNlIG9mIGNkcm9tIGRldmljZS4NCj4NCj4gSSB0ZXN0IEkvTyB1c2luZyBkZCBp
-Zj0vZGV2L3NyMCBvZj0vZGV2L251bGwgYnM9MzJLIGNvdW50PTEwMDANCj4gYW5kIG1hbnVhbGx5
-IGRpc2Nvbm5lY3QgdGhlIHJlbW90ZSBpc28gY2xpZW50IGZyb20gdGhlIGhvc3QgdG8gaW5qZWN0
-IGVycm9yLg0KPg0KPiBJIGZvdW5kIGl0IGZhaWxlZCBncmFjZWZ1bGx5IGFuZCBzZW5kIGFuIEkv
-TyBlcnJvciBldmVudC4NCj4gbW9uaXRvcl9xYXBpX2V2ZW50X2VtaXRbNDIzXXw6IHsidGltZXN0
-YW1wIjogeyJzZWNvbmRzIjogMTU0NzQ2NjA5OCwgIm1pY3Jvc2Vjb25kcyI6IDc0MDI2NX0sICJl
-dmVudCI6ICJCTE9DS19JT19FUlJPUiIsICJkYXRhIjoNCj4geyJkZXZpY2UiOiAiZHJpdmUtaWRl
-MC0wLTEiLCAibm9kZS1uYW1lIjogIiNibG9jazM2OSIsICJyZWFzb24iOiAiSW5wdXQvb3V0cHV0
-IGVycm9yIiwgIm9wZXJhdGlvbiI6ICJyZWFkIiwgImFjdGlvbiI6ICJyZXBvcnQifX0NCj4NCj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrLmMgYi9ibG9jay5jDQo+IGluZGV4IDQ1MTQ1YzUuLjUzNzFjZTIg
-MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrLmMNCj4gKysrIGIvYmxvY2suYw0KPiBAQCAtMzQ3OSw2ICsz
-NDc5LDExIEBAIGJvb2wgYmRydl9pc19pbnNlcnRlZChCbG9ja0RyaXZlclN0YXRlICpicykNCj4g
-ICAgICBpZiAoIWRydikgew0KPiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAgICAgfQ0KPiAr
-DQo+ICsgICAgaWYgKGJkcnZfaXNfcmVhZF9vbmx5KGJzKSkgew0KPiArICAgICAgIHJldHVybiB0
-cnVlOw0KPiArICAgIH0NCj4gKw0KPiAgICAgIGlmIChkcnYtPmJkcnZfaXNfaW5zZXJ0ZWQpIHsN
-Cj4gICAgICAgICAgcmV0dXJuIGRydi0+YmRydl9pc19pbnNlcnRlZChicyk7DQo+ICAgICAgfQ0K
-Pg0KPiBUaGFua3MuDQo+Pg0KPj4+PiBUbyB0cnkgb3V0IHdoZXRoZXIgdGhhdCB3b3VsZCBpbXBy
-b3ZlIHBlcmZvcm1hbmNlIHNpZ25pZmljYW50bHksIHlvdQ0KPj4+PiBjb3VsZCB0cnkgdG8gdXNl
-IHRoZSBob3N0X2RldmljZSBiYWNrZW5kIHJhdGhlciB0aGFuIHRoZSBob3N0X2Nkcm9tDQo+Pj4+
-IGJhY2tlbmQuIFRoYXQgb25lIGRvZXNuJ3QgaW1wbGVtZW50IC5iZHJ2X2lzX2luc2VydGVkLCBz
-byB0aGUgb3BlcmF0aW9uDQo+Pj4+IHdpbGwgYmUgY2hlYXAgKGp1c3QgcmV0dXJuIHRydWUgdW5j
-b25kaXRpb25hbGx5KS4NCj4+Pj4NCj4+PiBUaGUgcmVtb3RlIGNsaWVudCBtYXBzIGZpbGVuYW1l
-LmlzbyB0byBob3N0IHZpcnR1YWwgY2Ryb20gZHJpdmUuDQo+Pj4gV2UgdXNlIHhtbCBsaWtlDQo+
-Pj4gICAgIDxkaXNrIHR5cGU9J2Jsb2NrJyBkZXZpY2U9J2Nkcm9tJz4NCj4+PiAgICAgICA8ZHJp
-dmVyIG5hbWU9J3FlbXUnIHR5cGU9J3JhdycgY2FjaGU9J25vbmUnIGlvPSduYXRpdmUnLz4NCj4+
-PiAgICAgICA8c291cmNlIGRldj0nL2Rldi9zcjAnLz4NCj4+PiAgICAgICA8dGFyZ2V0IGRldj0n
-aGRiJyBidXM9J2lkZScvPg0KPj4+ICAgICAgIDxyZWFkb25seS8+DQo+Pj4gICAgICAgPGJvb3Qg
-b3JkZXI9JzInLz4NCj4+PiAgICAgICA8YWRkcmVzcyB0eXBlPSdkcml2ZScgY29udHJvbGxlcj0n
-MCcgYnVzPScwJyB0YXJnZXQ9JzAnIHVuaXQ9JzEnLz4NCj4+PiAgICAgPC9kaXNrPg0KPj4+IHRv
-IGF0dGFjaCB0aGUgdmlydHVhbCBjZHJvbSBkcml2ZSBpbnRvIGd1ZXN0IGFuZCBiYWNrZW5kIGJk
-cnYgaXMgaG9zdF9jZHJvbS4NCj4+PiBTb3JyeSBJIGRvIG5vdCBrbm93IGhvdyB0byB1c2UgdGhl
-IGhvc3RfZGV2aWNlIGJhY2tlbmQgaGVyZS4NCj4+Pg0KPj4+PiBZb3Ugd2lsbCBhbHNvIGxvc2Ug
-ZWplY3QvbG9jayBwYXNzdGhyb3VnaCB3aGVuIGRvaW5nIHNvLCBzbyB0aGlzIGlzIG5vdA0KPj4+
-PiB0aGUgZmluYWwgc29sdXRpb24sIGJ1dCBpZiBpdCBwcm92ZXMgdG8gYmUgYSBsb3QgZmFzdGVy
-LCB3ZSBjYW4gY2hlY2sNCj4+Pj4gd2hlcmUgYmRydl9pc19pbnNlcnRlZCgpIGNhbGxzIGFyZSBh
-Y3R1YWxseSBpbXBvcnRhbnQgKGlmIGFueXdoZXJlKSBhbmQNCj4+Pj4gaG9wZWZ1bGx5IHJlbW92
-ZSBzb21lIGV2ZW4gZm9yIHRoZSBob3N0X2Nkcm9tIGNhc2UuDQo+Pj4+DQo+Pj4gWW91IG1lYW4g
-aWYgd2UgZG8gbm90IGNoZWNrICpjZHJvbV9pc19pbnNlcnRlZCosIHdlIG1heSBsb3NlIGVqZWN0
-L2xvY2sgaGVyZSA/DQo+Pj4gSSB3b25kZXIgd2UgdXNlZCB0byBjaGVjayB0aGUgcHJlc2VuY2Ug
-b2YgdGhlIGNkcm9tIGRldmljZSBlYWNoIHRpbWUgaXQgaXMgdG91Y2hlZA0KPj4+IHRob3VnaCBJ
-IGFtIG5vdCBmYW1pbGlhciB3aXRoIHRoaXMgZmVhdHVyZS4NCj4+Pg0KPj4+PiBLZXZpbg0KPj4+
-Pg0KPj4+PiAuDQo+Pj4+DQo+Pj4NCj4+Pg0KPj4NCj4+DQo+Pg0KPg0KDQpEbyB5b3UgaW50ZW5k
-IHRvIHNlbmQgYSBwYXRjaCBhbG9uZz8gSSBkb3VidCBJJ2xsIGJlIGFibGUgdG8gcHJpb3JpdGl6
-ZQ0KdGhpcyBidXQgSSB3aWxsIGxvb2sgb3ZlciBhbnkgcGF0Y2hlcyB0aGF0IGdldCBzZW50LiBJ
-IGFtIGEgbGl0dGxlDQpza2VwdGljYWwgb2YgdGhlICJyZWFkX29ubHkiIG9wdGltaXphdGlvbiwg
-SSBtaWdodCBuZWVkIEtldmluJ3MgaW5wdXQgb24NCnRoYXQgb25lLCBidXQgYSBwYXRjaCB3b3Vs
-ZCBiZSBhIGdvb2QgcGxhY2UgZm9yIHRoYXQgZGlzY3Vzc2lvbi4NCg0KLS1qcw0K
+Forwarding to qemu-devel@
+http://bugs.debian.org/919921
+
+Thanks!
+
+20.01.2019 20:55, Ben Hutchings wrote:
+> Package: qemu-user
+> Version: 1:3.1+dfsg-2
+> Severity: normal
+> Tags: patch
+> 
+> I've been building and testing klibc across many architectures using
+> qemu-user, and I found that qemu-user fails to load a few programs on
+> a few architectures, reporting an EINVAL error code.  Here's the
+> "readelf -l" output for one such program:
+> 
+>      Elf file type is EXEC (Executable file)
+>      Entry point 0x10000100
+>      There are 5 program headers, starting at offset 52
+>      
+>      Program Headers:
+>        Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+>        PHDR           0x000034 0x10000034 0x10000034 0x000a0 0x000a0 R   0x4
+>        INTERP         0x0000d4 0x100000d4 0x100000d4 0x0002a 0x0002a R   0x1
+>            [Requesting program interpreter: /lib/klibc-R7FVdnsTBUFpWPgCV6FR07b-mf8.so]
+>        LOAD           0x000000 0x10000000 0x10000000 0x002f8 0x002f8 R E 0x10000
+>        LOAD           0x010000 0x10020000 0x10020000 0x00000 0x08000 RW  0x10000
+>        GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+>      
+>       Section to Segment mapping:
+>        Segment Sections...
+>         00
+>         01     .interp
+>         02     .interp .text .rodata .eh_frame
+>         03     .bss
+>         04
+> 
+> The unusual feature of this program, and all the others that failed,
+> is that there is a LOAD segment with a file-size of 0 (i.e.  only BSS,
+> no initialised data).  load_elf_image() will try to mmap() initialised
+> data for this section even though there is none and a length of 0 is
+> invalid.
+> 
+> The change that seems to fix this is to skip the mmap() in this case:
+> 
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2316,11 +2316,13 @@ static void load_elf_image(const char *i
+>               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
+>               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
+>   
+> -            error = target_mmap(vaddr_ps, vaddr_len,
+> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
+> -                                image_fd, eppnt->p_offset - vaddr_po);
+> -            if (error == -1) {
+> -                goto exit_perror;
+> +            if (vaddr_len != 0) {
+> +                error = target_mmap(vaddr_ps, vaddr_len,
+> +                                    elf_prot, MAP_PRIVATE | MAP_FIXED,
+> +                                    image_fd, eppnt->p_offset - vaddr_po);
+> +                if (error == -1) {
+> +                    goto exit_perror;
+> +                }
+>               }
+>   
+>               vaddr_ef = vaddr + eppnt->p_filesz;
+> --- END ---
+> 
+> -- System Information:
+> Debian Release: buster/sid
+>    APT prefers unstable-debug
+>    APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500, 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
+> Architecture: amd64 (x86_64)
+> Foreign Architectures: i386
+> 
+> Kernel: Linux 4.19.0-1-amd64 (SMP w/4 CPU cores)
+> Locale: LANG=en_GB.UTF-8, LC_CTYPE=en_GB.UTF-8 (charmap=UTF-8), LANGUAGE=en_GB.UTF-8 (charmap=UTF-8)
+> Shell: /bin/sh linked to /bin/dash
+> Init: systemd (via /run/systemd/system)
+> LSM: AppArmor: enabled
+> 
+> Versions of packages qemu-user depends on:
+> ii  libc6         2.28-3
+> ii  libcapstone3  3.0.5-3
+> ii  libgcc1       1:8.2.0-13
+> ii  libglib2.0-0  2.58.1-2
+> ii  libstdc++6    8.2.0-13
+> ii  zlib1g        1:1.2.11.dfsg-1
+> 
+> Versions of packages qemu-user recommends:
+> ii  qemu-user-static [qemu-user-binfmt]  1:3.1+dfsg-2
+> 
+> Versions of packages qemu-user suggests:
+> ii  sudo  1.8.26-2
+> 
+> -- no debconf information
+> 
