@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50668)
+Received: from eggs.gnu.org ([209.51.188.92]:50857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1vx-00083D-HH
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:06 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wL-0008Pi-Vg
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1vs-0000wQ-Uy
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:03 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wK-0001Ph-16
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:29 -0500
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190118101415.GC4530@dhcp-200-176.str.redhat.com>
-References: <cover.1547475602.git.berto@igalia.com>
-	<20190116135444.GA16898@stefanha-x1.localdomain>
-	<w51d0ov2z9h.fsf@maestria.local.igalia.com>
-	<20190118095652.GA21579@stefanha-x1.localdomain>
-	<20190118101415.GC4530@dhcp-200-176.str.redhat.com>
-Date: Tue, 22 Jan 2019 14:56:34 +0100
-Message-ID: <w51womwokx9.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during
- _realize()
+Date: Tue, 22 Jan 2019 17:53:22 +0200
+Message-Id: <fd8204fddd979714d15b993d38c893d201d3cb7b.1548171741.git.berto@igalia.com>
+In-Reply-To: <cover.1548171741.git.berto@igalia.com>
+References: <cover.1548171741.git.berto@igalia.com>
+In-Reply-To: <cover.1548171741.git.berto@igalia.com>
+References: <cover.1548171741.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 2/3] scsi-disk: Acquire the AioContext in
+ scsi_*_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +22,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri 18 Jan 2019 11:14:15 AM CET, Kevin Wolf wrote:
-> There are two ways to trigger the crash even without
-> x-blockdev-set-iothread:
->
-> * device_del, then device_add for a device with iothread (virtio-scsi;
->   may or may not exist with virtio-blk)
->   https://bugzilla.redhat.com/show_bug.cgi?id=1656276
->
-> * Simply attach two devices with iothread to the the same node
->   https://bugzilla.redhat.com/show_bug.cgi?id=1662508
+This fixes a crash when attaching two disks with the same blockdev to
+a SCSI device that is using iothreads. Test case included.
 
-While having a look at this I found another crash. Here's how to
-reproduce it (wait for the events after each system_reset):
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ hw/scsi/scsi-disk.c        | 23 ++++++++++++++++++++---
+ tests/qemu-iotests/240     | 18 ++++++++++++++++++
+ tests/qemu-iotests/240.out | 16 ++++++++++++++++
+ 3 files changed, 54 insertions(+), 3 deletions(-)
 
-   { "execute": "qmp_capabilities" }
-   { "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0"}}
-   { "execute": "device_add", "arguments": {"id": "vb0", "driver": "virtio-blk", "drive": "hd0"}}
-   { "execute": "system_reset"}
-
-   { "execute": "device_del", "arguments": {"id": "vb0"}}
-   { "execute": "system_reset"}
-
-   { "execute": "device_add", "arguments": {"id": "vb0", "driver": "virtio-blk", "drive": "hd0"}}
-   { "execute": "system_reset"}
-
-   { "execute": "device_del", "arguments": {"id": "vb0"}}
-   { "execute": "system_reset"}
-
-   { "execute": "device_add", "arguments": {"id": "vb0", "driver": "virtio-blk", "drive": "hd0"}}
-   { "execute": "system_reset"}
-
-kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on device
-Aborted
-
-git-bisect points to this commit:
-
-   commit 3ac7d43a6fbb5d4a3d01fc9a055c218030af3727
-   Author: Paolo Bonzini <pbonzini@redhat.com>
-   Date:   Wed Nov 28 17:28:45 2018 +0100
-
-       memory: update coalesced_range on transaction_commit
-
-       The e1000 driver calls memory_region_add_coalescing but
-       kvm_coalesce_mmio_region is never called for those regions.  The bug
-       dates back to the introduction of the memory region API; to fix it,
-       delete and re-add coalesced MMIO ranges when building the FlatViews.
-       
-       Because coalesced MMIO regions apply to all address spaces, the
-       has_coalesced_range flag has to be changed into an int.
-
-Berto
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0e9027c8f3..b049026219 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2381,10 +2381,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+ {
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
++    AioContext *ctx = NULL;
+     /* can happen for devices without drive. The error message for missing
+      * backend will be issued in scsi_realize
+      */
+     if (s->qdev.conf.blk) {
++        ctx = blk_get_aio_context(s->qdev.conf.blk);
++        aio_context_acquire(ctx);
+         blkconf_blocksizes(&s->qdev.conf);
+     }
+     s->qdev.blocksize = s->qdev.conf.logical_block_size;
+@@ -2393,11 +2396,15 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+         s->product = g_strdup("QEMU HARDDISK");
+     }
+     scsi_realize(&s->qdev, errp);
++    if (ctx) {
++        aio_context_release(ctx);
++    }
+ }
+ 
+ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+ {
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
++    AioContext *ctx;
+     int ret;
+ 
+     if (!dev->conf.blk) {
+@@ -2408,6 +2415,8 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+         assert(ret == 0);
+     }
+ 
++    ctx = blk_get_aio_context(dev->conf.blk);
++    aio_context_acquire(ctx);
+     s->qdev.blocksize = 2048;
+     s->qdev.type = TYPE_ROM;
+     s->features |= 1 << SCSI_DISK_F_REMOVABLE;
+@@ -2415,6 +2424,7 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+         s->product = g_strdup("QEMU CD-ROM");
+     }
+     scsi_realize(&s->qdev, errp);
++    aio_context_release(ctx);
+ }
+ 
+ static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
+@@ -2553,6 +2563,7 @@ static int get_device_type(SCSIDiskState *s)
+ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+ {
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
++    AioContext *ctx;
+     int sg_version;
+     int rc;
+ 
+@@ -2567,6 +2578,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+                           "be removed in a future version");
+     }
+ 
++    ctx = blk_get_aio_context(s->qdev.conf.blk);
++    aio_context_acquire(ctx);
++
+     /* check we are using a driver managing SG_IO (version 3 and after) */
+     rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
+     if (rc < 0) {
+@@ -2574,18 +2588,18 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+         if (rc != -EPERM) {
+             error_append_hint(errp, "Is this a SCSI device?\n");
+         }
+-        return;
++        goto out;
+     }
+     if (sg_version < 30000) {
+         error_setg(errp, "scsi generic interface too old");
+-        return;
++        goto out;
+     }
+ 
+     /* get device type from INQUIRY data */
+     rc = get_device_type(s);
+     if (rc < 0) {
+         error_setg(errp, "INQUIRY failed");
+-        return;
++        goto out;
+     }
+ 
+     /* Make a guess for the block size, we'll fix it when the guest sends.
+@@ -2605,6 +2619,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+ 
+     scsi_realize(&s->qdev, errp);
+     scsi_generic_read_device_inquiry(&s->qdev);
++
++out:
++    aio_context_release(ctx);
+ }
+ 
+ typedef struct SCSIBlockReq {
+diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
+index ead7ee08eb..5d499c9a00 100755
+--- a/tests/qemu-iotests/240
++++ b/tests/qemu-iotests/240
+@@ -83,6 +83,24 @@ run_qemu <<EOF
+ { "execute": "quit"}
+ EOF
+ 
++echo
++echo === Attach two SCSI disks using the same block device and the same iothread ===
++echo
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true}}
++{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
++{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
++{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
++{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi-hd1"}}
++{ "execute": "device_del", "arguments": {"id": "scsi0"}}
++{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
++{ "execute": "quit"}
++EOF
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/240.out b/tests/qemu-iotests/240.out
+index 432d98111c..701cb5c7d2 100644
+--- a/tests/qemu-iotests/240.out
++++ b/tests/qemu-iotests/240.out
+@@ -15,4 +15,20 @@ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++
++=== Attach two SCSI disks using the same block device and the same iothread ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
+ *** done
+-- 
+2.11.0
