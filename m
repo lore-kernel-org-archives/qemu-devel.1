@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54963)
+Received: from eggs.gnu.org ([209.51.188.92]:56123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gltkR-0003lJ-JI
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:57:40 -0500
+	(envelope-from <philmd@redhat.com>) id 1gltoQ-0004vV-97
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gltkQ-0003EC-8I
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:57:39 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43777)
+	(envelope-from <philmd@redhat.com>) id 1gltoK-0007EZ-9F
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:01:46 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gltkQ-00037o-1h
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:57:38 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r10so26741627wrs.10
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 02:57:27 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-14-crosa@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gltoI-000766-E9
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:01:40 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t27so26804789wra.6
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 03:01:17 -0800 (PST)
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
+	<20190121185118.18550-6-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
-Date: Tue, 22 Jan 2019 11:57:25 +0100
+Message-ID: <60356aab-3e21-bf0a-3829-d643e5e7fa56@redhat.com>
+Date: Tue, 22 Jan 2019 12:01:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190117185628.21862-14-crosa@redhat.com>
+In-Reply-To: <20190121185118.18550-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test
- for mips64el + malta
+Subject: Re: [Qemu-devel] [PATCH 05/23] hw/arm/iotkit: Refactor into
+ abstract base class and subclass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +31,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 1/17/19 7:56 PM, Cleber Rosa wrote:
-> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-> board and verify the serial is working.
+On 1/21/19 7:51 PM, Peter Maydell wrote:
+> The Arm SSE-200 Subsystem for Embedded is a revised and
+> extended version of the older IoTKit SoC. Prepare for
+> adding a model of it by refactoring the IoTKit code into
+> an abstract base class which contains the functionality,
+> driven by a class data block specific to each subclass.
+> (This is the same approach used by the existing bcm283x
+> SoC family implementation.)
 > 
-> If mips64el is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:mips" tags.
-> 
-> Alternatively, this test can be run using:
-> 
->     $ avocado run -t arch:mips64el tests/acceptance
->     $ avocado run -t machine:malta tests/acceptance
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  .travis.yml                            |  2 +-
->  tests/acceptance/boot_linux_console.py | 39 ++++++++++++++++++++++++++
->  2 files changed, 40 insertions(+), 1 deletion(-)
+>  include/hw/arm/iotkit.h | 22 +++++++++++++++++-----
+>  hw/arm/iotkit.c         | 34 +++++++++++++++++++++++++++++-----
+>  2 files changed, 46 insertions(+), 10 deletions(-)
 > 
-> diff --git a/.travis.yml b/.travis.yml
-> index 49f9016e6a..28648f7a61 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -187,7 +187,7 @@ matrix:
+> diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+> index 9701738ec75..521d1f73757 100644
+> --- a/include/hw/arm/iotkit.h
+> +++ b/include/hw/arm/iotkit.h
+> @@ -74,15 +74,15 @@
+>  #include "hw/or-irq.h"
+>  #include "hw/core/split-irq.h"
 >  
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu"
-> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu"
->          - TEST_CMD="make check-acceptance"
->        addons:
->          apt:
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 0678ec91d2..20b845fce1 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -9,8 +9,11 @@
->  # later.  See the COPYING file in the top-level directory.
+> -#define TYPE_ARMSSE "iotkit"
+> +#define TYPE_ARMSSE "arm-sse"
+>  #define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARMSSE)
 >  
->  import logging
-> +import os
+>  /*
+> - * For the moment TYPE_IOTKIT is a synonym for TYPE_ARMSSE (and the
+> - * latter's underlying name is left as "iotkit"); in a later
+> - * commit it will become a subclass of TYPE_ARMSSE.
+> + * These type names are for specific IoTKit subsystems; other than
+> + * instantiating them, code using these devices should always handle
+> + * them via the ARMSSE base class, so they have no IOTKIT() etc macros.
+>   */
+> -#define TYPE_IOTKIT TYPE_ARMSSE
+> +#define TYPE_IOTKIT "iotkit"
 >  
->  from avocado_qemu import Test
-> +from avocado.utils import process
-> +from avocado.utils import archive
+>  /* We have an IRQ splitter and an OR gate input for each external PPC
+>   * and the 2 internal PPCs
+> @@ -143,4 +143,16 @@ typedef struct ARMSSE {
+>      uint32_t mainclk_frq;
+>  } ARMSSE;
 >  
+> +typedef struct ARMSSEInfo ARMSSEInfo;
+> +
+> +typedef struct ARMSSEClass {
+> +    DeviceClass parent_class;
+> +    const ARMSSEInfo *info;
+> +} ARMSSEClass;
+> +
+> +#define ARMSSE_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(ARMSSEClass, (klass), TYPE_ARMSSE)
+> +#define ARMSSE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(ARMSSEClass, (obj), TYPE_ARMSSE)
+> +
+>  #endif
+> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+> index 9360053184e..d5b172933c3 100644
+> --- a/hw/arm/iotkit.c
+> +++ b/hw/arm/iotkit.c
+> @@ -18,6 +18,16 @@
+>  #include "hw/arm/iotkit.h"
+>  #include "hw/arm/arm.h"
 >  
->  class BootLinuxConsole(Test):
-> @@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
->          self.wait_for_console_pattern(console_pattern)
+> +struct ARMSSEInfo {
+> +    const char *name;
+> +};
 > +
-> +    def test_mips64el_malta(self):
-> +        """
-> +        This test requires the ar tool to extract "data.tar.gz" from
-> +        the Debian package.
+> +static const ARMSSEInfo armsse_variants[] = {
+> +    {
+> +        .name = TYPE_IOTKIT,
+> +    },
+> +};
 > +
-> +        The kernel can be rebuilt using this Debian kernel source [1] and
-> +        following the instructions on [2].
+>  /* Clock frequency in HZ of the 32KHz "slow clock" */
+>  #define S32KCLK (32 * 1000)
+>  
+> @@ -732,29 +742,43 @@ static void iotkit_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
+> +    ARMSSEClass *asc = ARMSSE_CLASS(klass);
+>  
+>      dc->realize = iotkit_realize;
+>      dc->vmsd = &iotkit_vmstate;
+>      dc->props = iotkit_properties;
+>      dc->reset = iotkit_reset;
+>      iic->check = iotkit_idau_check;
+> +    asc->info = data;
+>  }
+>  
+> -static const TypeInfo iotkit_info = {
+> +static const TypeInfo armsse_info = {
+>      .name = TYPE_ARMSSE,
+>      .parent = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(ARMSSE),
+>      .instance_init = iotkit_init,
+> -    .class_init = iotkit_class_init,
+> +    .abstract = true,
+>      .interfaces = (InterfaceInfo[]) {
+>          { TYPE_IDAU_INTERFACE },
+>          { }
+>      }
+>  };
+>  
+> -static void iotkit_register_types(void)
+> +static void armsse_register_types(void)
+>  {
+> -    type_register_static(&iotkit_info);
+> +    int i;
 > +
-> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
-> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/#linux-source-2.6.32_2.6.32-48
+> +    type_register_static(&armsse_info);
 > +
-> +        :avocado: tags=arch:mips64el
-> +        :avocado: tags=machine:malta
-> +        """
-> +        deb_url = ('http://snapshot.debian.org/archive/debian/20130217T032700Z/'
-> +                   'pool/main/l/linux-2.6/'
-> +                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb')
-> +        deb_hash = '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
-> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> +
-> +        cwd = os.getcwd()
-> +        os.chdir(self.workdir)
-> +        process.run("ar x %s data.tar.gz" % deb_path)
-> +        archive.extract("data.tar.gz", self.workdir)
-> +        os.chdir(cwd)
-> +        kernel_path = self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta'
-> +
-> +        self.vm.set_machine('malta')
-> +        self.vm.set_console()
-> +        kernel_command_line = 'console=ttyS0 printk.time=0'
-
-What about having a generic KERNEL_COMMON_COMMAND_LINE='printk.time=0 '
-then using
-  kernel_command_line = KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
-in each tests of this series?
-
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
-> +        self.wait_for_console_pattern(console_pattern)
+> +    for (i = 0; i < ARRAY_SIZE(armsse_variants); i++) {
+> +        TypeInfo ti = {
+> +            .name = armsse_variants[i].name,
+> +            .parent = TYPE_ARMSSE,
+> +            .class_init = iotkit_class_init,
+> +            .class_data = (void *)&armsse_variants[i],
+> +        };
+> +        type_register(&ti);
+> +    }
+>  }
+>  
+> -type_init(iotkit_register_types);
+> +type_init(armsse_register_types);
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
