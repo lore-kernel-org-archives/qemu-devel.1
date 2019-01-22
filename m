@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46116)
+Received: from eggs.gnu.org ([209.51.188.92]:46385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1gm14g-0004NB-Dw
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm14p-0004X2-KN
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1gm14e-0005BL-EY
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58550
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1gm14c-0004FL-BA
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:58 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0MF5i2d091377
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:06:31 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q63kq5kf5-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:06:29 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Tue, 22 Jan 2019 15:06:11 -0000
-From: bala24@linux.vnet.ibm.com
-Date: Tue, 22 Jan 2019 20:35:43 +0530
-In-Reply-To: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
-References: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
-Message-Id: <20190122150543.16889-2-bala24@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] migration: calculate expected_downtime
- considering redirtied ram
+	(envelope-from <peter.maydell@linaro.org>) id 1gm14k-0005F0-Mc
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:11 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm14i-00059j-Lg
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:04 -0500
+Received: by mail-oi1-x241.google.com with SMTP id r62so18341429oie.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:46:57 -0800 (PST)
+MIME-Version: 1.0
+References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
+	<1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
+In-Reply-To: <1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 11:41:57 +0000
+Message-ID: <CAFEAcA8WF1nKfgQWZ11GgMzgLxOtGwoJS9zyeFQkm5ii5GLrpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] hw/arm: Add arm SBSA reference
+ machine, skeleton part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,52 +30,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, dgilbert@redhat.com, peterx@redhat.com, Balamuruhan S <bala24@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
 
-From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+On Fri, 7 Dec 2018 at 09:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>
+> For the Aarch64, there is one machine 'virt', it is primarily meant to
+> run on KVM and execute virtualization workloads, but we need an
+> environment as faithful as possible to physical hardware, for supporting
+> firmware and OS development for pysical Aarch64 machines.
+>
+> This patch introduces new machine type 'sbsa-ref' with main features:
+>  - Based on 'virt' machine type.
+>  - Re-designed memory map.
+>  - CPU type cortex-a57.
+>  - EL2 and EL3 are enabled.
+>  - GIC version 3.
+>  - System bus AHCI controller.
+>  - System bus XHCI controller(TBD).
+>  - CDROM and hard disc on AHCI bus.
+>  - E1000E ethernet card on PCIE bus.
+>  - VGA display adaptor on PCIE bus.
+>  - No virtio deivces.
+>  - No fw_cfg device.
+>  - No ACPI table supplied.
+>  - Only minimal device tree nodes.
+>
+> Arm Trusted Firmware and UEFI porting to this are done accordingly, and
+> it should supply ACPI tables to load OS, the minimal device tree nodes
+> supplied from this platform are only to pass the dynamic info reflecting
+> command line input to firmware, not for loading OS.
+>
+> To make the review easier, this task is split into two patches, the
+> fundamental sceleton part and the peripheral devices part, this patch is
+> the first part.
 
-currently we calculate expected_downtime by time taken to transfer
-remaining ram, but during the time we had transferred remaining ram
-few pages of ram might be redirtied and we need to retransfer it,
-so it is better to consider them for calculating expected_downtime
-for getting more accurate values.
+Firstly, apologies for this having sat on my to-review queue for
+so long...
 
-Total ram to be transferred = remaining ram + (redirtied ram at the
-                                               time when the remaining
-                                               ram gets transferred)
+> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+> ---
+>  hw/arm/Makefile.objs  |   2 +-
+>  hw/arm/sbsa-ref.c     | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/virt.h |   1 +
+>  3 files changed, 279 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/arm/sbsa-ref.c
+>
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index d51fcec..a8895eb 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -obj-y += boot.o virt.o sysbus-fdt.o
+> +obj-y += boot.o virt.o sbsa-ref.o sysbus-fdt.o
+>  obj-$(CONFIG_ACPI) += virt-acpi-build.o
+>  obj-$(CONFIG_DIGIC) += digic_boards.o
+>  obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
+> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> new file mode 100644
+> index 0000000..1d6252b
+> --- /dev/null
+> +++ b/hw/arm/sbsa-ref.c
+> @@ -0,0 +1,277 @@
+> +/*
+> + * ARM SBSA Reference Platform emulation
+> + *
+> + * Copyright (c) 2018 Linaro Limited
+> + * Written by Hongbo Zhang <hongbo.zhang@linaro.org>
+> + *
+> + * Based on hw/arm/virt.c
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/arm/arm.h"
+> +#include "hw/arm/virt.h"
 
-redirtied ram = dirty_pages_rate * time taken to transfer remaining ram
+This isn't the virt board, so I think it would be better if it did
+not include the virt.h header or use structures/classes that are
+private to the virt board. It should be its own thing.
 
-redirtied ram = dirty_pages_rate * (remaining ram / bandwidth)
+> +#include "hw/devices.h"
+> +#include "net/net.h"
+> +#include "sysemu/device_tree.h"
+> +#include "sysemu/numa.h"
+> +#include "sysemu/sysemu.h"
+> +#include "hw/loader.h"
+> +#include "exec/address-spaces.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/pci-host/gpex.h"
+> +#include "hw/arm/sysbus-fdt.h"
+> +#include "hw/arm/fdt.h"
+> +#include "hw/intc/arm_gic.h"
+> +#include "hw/intc/arm_gicv3_common.h"
+> +#include "kvm_arm.h"
+> +#include "hw/ide/internal.h"
+> +#include "hw/ide/ahci_internal.h"
+> +#include "qemu/units.h"
+> +
+> +#define NUM_IRQS 256
+> +
+> +#define RAMLIMIT_GB 8192
+> +#define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
+> +
+> +static const MemMapEntry sbsa_ref_memmap[] = {
+> +    /* 512M boot ROM */
+> +    [VIRT_FLASH] =              {          0, 0x20000000 },
+> +    /* 512M secure memery */
 
-expected_downtime = (remaining ram + redirtied ram) / bandwidth
+"memory"
 
-Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
----
- migration/migration.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+> +    [VIRT_SECURE_MEM] =         { 0x20000000, 0x20000000 },
+> +    [VIRT_CPUPERIPHS] =         { 0x40000000, 0x00080000 },
+> +    /* GIC distributor and CPU interface expansion spaces reserved */
+> +    [VIRT_GIC_DIST] =           { 0x40000000, 0x00010000 },
+> +    [VIRT_GIC_CPU] =            { 0x40040000, 0x00010000 },
 
-diff --git a/migration/migration.c b/migration/migration.c
-index ffc4d9e556..dc38e9a380 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2903,7 +2903,13 @@ static void migration_update_counters(MigrationState *s,
-      * recalculate. 10000 is a small enough number for our purposes
-      */
-     if (ram_counters.dirty_pages_rate && transferred > 10000) {
--        s->expected_downtime = ram_counters.remaining / bandwidth;
-+        /* Time required to transfer remaining ram */
-+        remaining_ram_transfer_time = ram_counters.remaining / bandwidth
-+
-+        /* redirty of ram at the time remaining ram gets transferred*/
-+        newly_dirtied_ram = ram_counters.dirty_pages_rate * remaining_ram_transfer_time
-+
-+        s->expected_downtime = (ram_counters.remaining + newly_dirtied_ram) / bandwidth;
-     }
- 
-     qemu_file_reset_rate_limit(s->to_dst_file);
--- 
-2.14.5
+If they're just reserved you don't really need to list them here,
+as they're covered by the VIRT_CPUPERIPHS space anyway. (You
+don't list the VIRT_GIC_HYP registers or VIRT_GIC_VCPU.)
+
+> +    /* 64M redistributor space allows up to 512 CPUs */
+> +    [VIRT_GIC_REDIST] =         { 0x40080000, 0x04000000 },
+> +    /* Space here reserved for redistributor and vCPU/HYP expansion */
+> +    [VIRT_UART] =               { 0x60000000, 0x00001000 },
+> +    [VIRT_RTC] =                { 0x60010000, 0x00001000 },
+> +    [VIRT_GPIO] =               { 0x60020000, 0x00001000 },
+> +    [VIRT_SECURE_UART] =        { 0x60030000, 0x00001000 },
+> +    [VIRT_SMMU] =               { 0x60040000, 0x00020000 },
+> +    /* Space here reserved for more SMMUs */
+> +    [VIRT_AHCI] =               { 0x60100000, 0x00010000 },
+> +    /* Space here reserved for other devices */
+> +    [VIRT_PCIE_PIO] =           { 0x7fff0000, 0x00010000 },
+> +    /* 256M PCIE ECAM space */
+> +    [VIRT_PCIE_ECAM] =          { 0x80000000, 0x10000000 },
+
+Comment says 256M but the size field says it's larger...
+
+> +    /* ~1TB for PCIE MMIO (4GB to 1024GB boundary) */
+> +    [VIRT_PCIE_MMIO] =          { 0x100000000ULL, 0xFF00000000ULL },
+> +    [VIRT_MEM] =                { 0x10000000000ULL, RAMLIMIT_BYTES },
+> +};
+> +
+> +static const int sbsa_ref_irqmap[] = {
+> +    [VIRT_UART] = 1,
+> +    [VIRT_RTC] = 2,
+> +    [VIRT_PCIE] = 3, /* ... to 6 */
+> +    [VIRT_GPIO] = 7,
+> +    [VIRT_SECURE_UART] = 8,
+> +    [VIRT_AHCI] = 9,
+> +};
+> +
+> +static void sbsa_ref_init(MachineState *machine)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(machine);
+
+As noted above, I think it would be better to be your own
+subclass of MachineState, rather than being a subclass of
+the virt board. Is there anything that becomes particularly
+awkward if you do it that way?
+
+thanks
+-- PMM
