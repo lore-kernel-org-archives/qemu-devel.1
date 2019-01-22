@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34415)
+Received: from eggs.gnu.org ([209.51.188.92]:35269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glsfI-0006Ur-HC
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:48:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1glshb-0008OS-3W
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1glsfF-0000rm-KT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:48:15 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:32990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1glsfF-0000q1-6k
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:48:13 -0500
-Received: by mail-ot1-x343.google.com with SMTP id i20so23130353otl.0
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:48:12 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1glsha-0003Ok-9t
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:50:39 -0500
+References: <20190122094143.8857-1-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cd0a559f-6a44-20b9-39ad-4368d08f79af@redhat.com>
+Date: Tue, 22 Jan 2019 10:50:31 +0100
 MIME-Version: 1.0
-References: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-In-Reply-To: <20190119100315.23985-1-marcel.apfelbaum@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 09:48:01 +0000
-Message-ID: <CAFEAcA91sS7GSu=GcFmEe+=jKDw1BzZh24B8zq6g8nB+z0aZ=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH PULL 00/10] RDMA queue
+In-Reply-To: <20190122094143.8857-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
+ without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yuval Shaia <yuval.shaia@oracle.com>, kamalheib1@gmail.com, Li Qiang <liq3ea@163.com>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Sat, 19 Jan 2019 at 10:03, Marcel Apfelbaum
-<marcel.apfelbaum@gmail.com> wrote:
->
-> The following changes since commit a8d2b0685681e2f291faaa501efbbd76875f8ec8:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190118' into staging (2019-01-18 16:56:15 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/marcel-apf/qemu tags/rdma-pull-request
->
-> for you to fetch changes up to 0f645ba16c6b76ccf2076d38460aa998198893bc:
->
->   contrib/rdmacm-mux: fix clang compilation (2019-01-19 11:01:57 +0200)
->
-> ----------------------------------------------------------------
-> RDMA queue
->  * Clang compilation fix
->  * Coverity fix
->  * Various fixes for the pvrdma device
->
-> ----------------------------------------------------------------
+On 2019-01-22 10:41, David Hildenbrand wrote:
+> We decided to always create the PCI host bridge, even if 'zpci' is not
+> enabled (due to migration compatibility).
 
-Applied, thanks.
+Couldn't we disable the host bridge for newer machine types, and just
+create it on the old ones for migration compatibility?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+> This however right now allows
+> to add zPCI/PCI devices to a VM although the guest will never actually see
+> them, confusing people that are using a simple CPU model that has no
+> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+> 
+> Let's check for 'zpci' and at least print a warning that this will not
+> work as expected. We could also bail out, however that might break
+> existing QEMU commandlines.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index b86a8bdcd4..e7d4f49611 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  {
+>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>  
+> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
+> +                    " The guest will not be able to see/use these devices.");
+> +    }
 
--- PMM
+I think it would be better to bail out. The hotplug clearly can not work
+in this case, and the warn report might go unnoticed, so blocking the
+hotplug process is likely better to get the attention of the user.
+
+ Thomas
