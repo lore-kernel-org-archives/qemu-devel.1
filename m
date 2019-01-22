@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32798)
+Received: from eggs.gnu.org ([209.51.188.92]:33368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1glu5k-0003Dd-67
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:41 -0500
+	(envelope-from <rjones@redhat.com>) id 1glu7I-0004GS-GF
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1glu5j-0003HU-A3
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:40 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1glu5j-0003A4-2g
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:39 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b11so13743112wmj.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 03:19:32 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-3-crosa@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190117185628.21862-3-crosa@redhat.com>
-Date: Tue, 22 Jan 2019 11:19:30 +0000
-Message-ID: <874la10wjh.fsf@linaro.org>
+	(envelope-from <rjones@redhat.com>) id 1glu7G-0004PE-Go
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:21:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1glu7G-0004N1-99
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:21:14 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 04202A1F64
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:21:11 +0000 (UTC)
+Date: Tue, 22 Jan 2019 11:21:09 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20190122112109.GB18917@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/18] Acceptance tests: show avocado test
- execution by default
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190102140535.11512-1-cfergeau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-
-Cleber Rosa <crosa@redhat.com> writes:
-
-> The current version of the "check-acceptance" target will only show
-> one line for execution of all tests.  That's probably OK if the tests
-> to be run are quick enough and they're always the same.
->
-> But, there's already one test alone that takes on average ~5 seconds
-> to run, we intend to adapt the list of tests to match the user's build
-> environment (among other choices).
->
-> Because of that, let's present the default Avocado UI by default.
-> Users can always choose a different output by setting the AVOCADO_SHOW
-> variable.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+> commit 8bca4613 added support for %% in json strings when interpolating,
+> but in doing so, this broke handling of % when not interpolating as the
+> '%' is skipped in both cases.
+> This commit ensures we only try to handle %% when interpolating.
+> 
+> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
 > ---
->  .travis.yml            | 2 +-
->  tests/Makefile.include | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 93fd0164a0..844d514afa 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -188,7 +188,7 @@ matrix:
->      # Acceptance (Functional) tests
->      - env:
->          - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu"
-> -        - TEST_CMD=3D"make AVOCADO_SHOW=3Dapp check-acceptance"
-> +        - TEST_CMD=3D"make check-acceptance"
->        addons:
->          apt:
->            packages:
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index f403a6571d..c73298740d 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -956,7 +956,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
->  # Controls the output generated by Avocado when running tests.
->  # Any number of command separated loggers are accepted.  For more
->  # information please refer to "avocado --help".
-> -AVOCADO_SHOW=3Dnone
-> +AVOCADO_SHOW=3Dapp
->
->  PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_inf=
-o >=3D (3, 0) else 0)')
->  ifeq ($(PYTHON3), 1)
+>  qobject/json-parser.c | 10 ++++++----
+>  tests/check-qjson.c   |  5 +++++
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+> index 7a7ae9e8d1..d8eb210c0c 100644
+> --- a/qobject/json-parser.c
+> +++ b/qobject/json-parser.c
+> @@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+>              }
+>              break;
+>          case '%':
+> -            if (ctxt->ap && ptr[1] != '%') {
+> -                parse_error(ctxt, token, "can't interpolate into string");
+> -                goto out;
+> +            if (ctxt->ap) {
+> +                if (ptr[1] != '%') {
+> +                    parse_error(ctxt, token, "can't interpolate into string");
+> +                    goto out;
+> +                }
+> +                ptr++;
+>              }
+> -            ptr++;
+>              /* fall through */
+>          default:
+>              cp = mod_utf8_codepoint(ptr, 6, &end);
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index d876a7a96e..fa2afccb0a 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -175,6 +175,11 @@ static void utf8_string(void)
+>              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+>              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+>              "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
+> +        },
+> +            /* '%' character when not interpolating */
+> +        {
+> +            "100%",
+> +            "100%",
+>          },
+>          /* 2  Boundary condition test cases */
+>          /* 2.1  First possible sequence of a certain length */
 
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
 
---
-Alex Benn=C3=A9e
+as a fix for: https://bugzilla.redhat.com/show_bug.cgi?id=1668244#c3
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
