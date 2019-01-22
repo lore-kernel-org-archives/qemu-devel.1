@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33069)
+Received: from eggs.gnu.org ([209.51.188.92]:42686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1glqOQ-0002GN-RK
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:44 -0500
+	(envelope-from <laurent@vivier.eu>) id 1glrBg-0004Ox-Oa
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1glqOO-0006IX-Td
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:42 -0500
-Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:57596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1glqOO-0006Ei-JJ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:40 -0500
-Received: from player758.ha.ovh.net (unknown [10.109.143.109])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6856AE77E2
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 08:22:34 +0100 (CET)
-Date: Tue, 22 Jan 2019 08:22:11 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190122082211.29612675@bahia.lan>
-In-Reply-To: <7538b313-81b2-d036-ca12-5a2ad5ea8d2b@ozlabs.ru>
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<7538b313-81b2-d036-ca12-5a2ad5ea8d2b@ozlabs.ru>
+	(envelope-from <laurent@vivier.eu>) id 1glrBd-00082D-8I
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:36 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:34203)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1glrBc-000805-2X
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:32 -0500
+References: <154809778688.10764.12505763850198799463.reportbug@deadeye.wl.decadent.org.uk>
+	<16ee5e20-e61b-7242-7d80-39a06fb8fd4f@msgid.tls.msk.ru>
+	<d4f70494-732f-1013-291c-c56566d10c57@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <31f25a38-e22d-6e08-f0a5-2b8ed7c3dea8@vivier.eu>
+Date: Tue, 22 Jan 2019 09:13:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 00/19] spapr: Add support for PHB hotplug
+In-Reply-To: <d4f70494-732f-1013-291c-c56566d10c57@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Bug#920032: qemu-user uses wrong struct timeval on
+ sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,113 +30,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Ben Hutchings <ben@decadent.org.uk>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Michael Tokarev <mjt@tls.msk.ru>, 920032@bugs.debian.org
 
-On Tue, 22 Jan 2019 16:44:02 +1100
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On 22/01/2019 07:12, Thomas Huth wrote:
+>  Hi Ben,
+> 
+> could you please submit this as a proper patch to the qemu-devel mailing
+> list, with Signed-off-by line?
+> (see https://wiki.qemu.org/Contribute/SubmitAPatch for details)
+> 
+>  Thanks,
+>   Thomas
+> 
+> 
+> On 2019-01-22 06:42, Michael Tokarev wrote:
+>> Forwarding to qemu-devel@.
+>> http://bugs.debian.org/920032
+>>
+>> Thanks!
+>>
+>> 21.01.2019 22:09, Ben Hutchings wrote:
+>>> Package: qemu-user
+>>> Version: 1:3.1+dfsg-2
+>>> Severity: important
+>>> Tags: patch
+>>>
+>>> On sparc (only) Linux defines timeval::tv_usec with type int, not
+>>> long.  However qemu-user's definition of struct target_timeval uses
+>>> abi_long unconditionally.  This results in the syscall translation
+>>> layer effectively multiplying tv_usec by 2**32.  All sparc syscalls
+>>> passing non-zero values for this field fail with -EINVAL.  The
+>>> following patch seems to fix this.
+>>>
+>>> Ben.
+>>>
+>>> --- a/linux-user/syscall_defs.h
+>>> +++ b/linux-user/syscall_defs.h
+>>> @@ -210,7 +210,11 @@ struct target_linger {
+>>>     struct target_timeval {
+>>>       abi_long tv_sec;
+>>> +#if defined (TARGET_SPARC)
 
-> On 18/01/2019 04:14, Greg Kurz wrote:
-> > This allows to hotplug/unplug PHBs. I could successfully test:
-> > - using in-kernel XICS, emulated XICS and XIVE
-> > - using experimental in-kernel XIVE from Cedric
-> > - hotplug/unplug with e1000 device to validate LSIs
-> > - hotplug/unplug with virtio-net device to validate MSIs
-> > - some simple migration scenarios  
-> 
-> > 
-> > Change in v3:
-> > - reworked phandle related code some more
-> > - disintricate allocation/"type setting" of interrupts
-> > - identify LSIs at machine init
-> > 
-> > Changes in v2:
-> > - rebased on current ppc-for-4.0  
-> 
-> 
-> 
-> Is the tree available anywhere in git? It does not apply on today's
-> ppc-for-4.0 :-/
-> 
+According to the kernel definition, I think it should be:
 
-I'm currently working on v4. I'll push it to github when it's ready.
+#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
 
+See include/uapi/linux/time.h
+
+struct timeval {
+        __kernel_time_t         tv_sec;         /* seconds */
+        __kernel_suseconds_t    tv_usec;        /* microseconds */
+};
+
+and arch/sparc/include/uapi/asm/posix_types.h
+
+#if defined(__sparc__) && defined(__arch64__)
+...
+typedef int                    __kernel_suseconds_t;
+
+
+>>> +    abi_int tv_usec;
+>>> +#else
+>>>       abi_long tv_usec;
+>>> +#endif
+>>>   };
+>>>     struct target_timespec {
+>>> --- END ---
+>>>
+>>> -- System Information:
+>>> Debian Release: buster/sid
+>>>    APT prefers unstable-debug
+>>>    APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500,
+>>> 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
+>>> Architecture: amd64 (x86_64)
+>>> Foreign Architectures: i386
+>>>
+>>> Kernel: Linux 4.19.0-1-amd64 (SMP w/4 CPU cores)
+>>> Locale: LANG=en_GB.UTF-8, LC_CTYPE=en_GB.UTF-8 (charmap=UTF-8),
+>>> LANGUAGE=en_GB.UTF-8 (charmap=UTF-8)
+>>> Shell: /bin/sh linked to /bin/dash
+>>> Init: systemd (via /run/systemd/system)
+>>> LSM: AppArmor: enabled
+>>>
+>>> Versions of packages qemu-user depends on:
+>>> ii  libc6         2.28-3
+>>> ii  libcapstone3  3.0.5-3
+>>> ii  libgcc1       1:8.2.0-13
+>>> ii  libglib2.0-0  2.58.1-2
+>>> ii  libstdc++6    8.2.0-13
+>>> ii  zlib1g        1:1.2.11.dfsg-1
+>>>
+>>> Versions of packages qemu-user recommends:
+>>> ii  qemu-user-static [qemu-user-binfmt]  1:3.1+dfsg-2
+>>>
+>>> Versions of packages qemu-user suggests:
+>>> ii  sudo  1.8.26-2
+>>>
+>>> -- no debconf information
+>>>
+>>
 > 
-> 
-> 
-> > - added some preliminary cleanup
-> > - call unrealize from realize error path
-> > - advertise PHB hotplug in last patch
-> > - reworked phandle related code
-> > - sync LSIs to KVM
-> > 
-> > Please comment.
-> > 
-> > --
-> > Greg
-> > 
-> > ---
-> > 
-> > Greg Kurz (11):
-> >       spapr: Rename xics to intc in interrupt controller agnostic code
-> >       xics: Disintricate allocation and type setting of interrupts
-> >       spapr/xive: Don't set irq type in spapr_xive_irq_claim()
-> >       spapr: Set irq type in a dedicated function
-> >       spapr: Identify LSIs of all possible PHBs at machine init
-> >       spapr_pci: add PHB unrealize
-> >       spapr: Factor out setting of "phandle" DT property to sPAPR irq frontend
-> >       spapr_xive: Cache device tree nodename in sPAPRXive
-> >       spapr: Expose the name of the interrupt controller node
-> >       spapr_irq: Expose the phandle of the interrupt controller
-> >       spapr: add hotplug hooks for PHB hotplug
-> > 
-> > Michael Roth (6):
-> >       spapr: create DR connectors for PHBs
-> >       spapr_events: add support for phb hotplug events
-> >       qdev: pass an Object * to qbus_set_hotplug_handler()
-> >       spapr_pci: provide node start offset via spapr_populate_pci_dt()
-> >       spapr_pci: add ibm, my-drc-index property for PHB hotplug
-> >       spapr: enable PHB hotplug for default pseries machine type
-> > 
-> > Nathan Fontenot (1):
-> >       spapr: populate PHB DRC entries for root DT node
-> > 
-> > Thomas Huth (1):
-> >       ppc: Move spapr-related prototypes from xics.h into a seperate header file
-> > 
-> > 
-> >  hw/acpi/pcihp.c               |    2 -
-> >  hw/acpi/piix4.c               |    2 -
-> >  hw/char/virtio-serial-bus.c   |    2 -
-> >  hw/core/bus.c                 |   11 +--
-> >  hw/core/machine.c             |    4 +
-> >  hw/intc/spapr_xive.c          |   35 ++++-----
-> >  hw/intc/xics.c                |   28 ++++++-
-> >  hw/intc/xics_kvm.c            |    1 
-> >  hw/intc/xics_spapr.c          |   10 +--
-> >  hw/pci/pcie.c                 |    2 -
-> >  hw/pci/shpc.c                 |    2 -
-> >  hw/ppc/pnv_psi.c              |    1 
-> >  hw/ppc/spapr.c                |  163 +++++++++++++++++++++++++++++++++++++++--
-> >  hw/ppc/spapr_drc.c            |   18 +++++
-> >  hw/ppc/spapr_events.c         |    9 ++
-> >  hw/ppc/spapr_irq.c            |  129 +++++++++++++++++++++++++++-----
-> >  hw/ppc/spapr_pci.c            |  124 ++++++++++++++++++++++++-------
-> >  hw/ppc/spapr_vio.c            |    4 +
-> >  hw/s390x/css-bridge.c         |    2 -
-> >  hw/s390x/s390-pci-bus.c       |    6 +-
-> >  hw/scsi/virtio-scsi.c         |    2 -
-> >  hw/scsi/vmw_pvscsi.c          |    2 -
-> >  hw/usb/dev-smartcard-reader.c |    2 -
-> >  include/hw/pci-host/spapr.h   |   11 ++-
-> >  include/hw/ppc/spapr.h        |    4 +
-> >  include/hw/ppc/spapr_drc.h    |    8 ++
-> >  include/hw/ppc/spapr_irq.h    |   16 +++-
-> >  include/hw/ppc/spapr_xive.h   |   13 +++
-> >  include/hw/ppc/xics.h         |   15 ++--
-> >  include/hw/ppc/xics_spapr.h   |   43 +++++++++++
-> >  include/hw/qdev-core.h        |    3 -
-> >  31 files changed, 545 insertions(+), 129 deletions(-)
-> >  create mode 100644 include/hw/ppc/xics_spapr.h
-> >   
 > 
