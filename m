@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60823)
+Received: from eggs.gnu.org ([209.51.188.92]:37544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm2Pg-0000z9-PM
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:51 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gm2dR-0006Hm-10
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm2Pf-0008D4-QC
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:48 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33639)
+	(envelope-from <richard.henderson@linaro.org>) id 1gm2dO-000813-Tx
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:27:00 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm2Pf-00085u-Ez
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:12:47 -0500
-Received: by mail-oi1-x243.google.com with SMTP id c206so18573737oib.0
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:12:37 -0800 (PST)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gm2dL-0007yW-5W
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:26:56 -0500
+Received: by mail-pf1-x444.google.com with SMTP id w73so12309227pfk.10
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:26:54 -0800 (PST)
+References: <cover.1547166960.git.balaton@eik.bme.hu>
+	<86de9750-304d-dc0f-3c09-76667ad3c643@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e2c30f65-1d58-608e-0b1d-a8373a406cc3@linaro.org>
+Date: Tue, 22 Jan 2019 12:26:50 -0800
 MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-4-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 12:57:23 +0000
-Message-ID: <CAFEAcA8bR9=CM1zPwe9LLZ0BQf-TokChM8_xb3NXgOGFhagLaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Add BT and BTYPE to
- tb->flags
+In-Reply-To: <86de9750-304d-dc0f-3c09-76667ad3c643@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] Refactor common PCI IDE functions from
+ CMD646
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
-On Thu, 10 Jan 2019 at 12:17, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h           |  2 ++
->  target/arm/translate.h     |  4 ++++
->  target/arm/helper.c        | 22 +++++++++++++++-------
->  target/arm/translate-a64.c |  2 ++
->  4 files changed, 23 insertions(+), 7 deletions(-
+On 1/21/19 5:44 PM, John Snow wrote:
+>> BALATON Zoltan (5):
+>>   cmd646: Remove unused variable
+>>   cmd646: Remove IDEBus from CMD646BAR
+>>   cmd646: Move PCI IDE specific functions to ide/pci.c
+>>   ide: Get rid of CMD646BAR struct
+>>   sii3112: Remove duplicated code and use PCI IDE ops instead
+>>
+>>  hw/ide/cmd646.c      | 102 ++++++++-------------------------------------------
+>>  hw/ide/pci.c         |  65 ++++++++++++++++++++++++++++++++
+>>  hw/ide/sii3112.c     |  52 ++++----------------------
+>>  include/hw/ide/pci.h |  14 ++-----
+>>  4 files changed, 93 insertions(+), 140 deletions(-)
+>>
+> 
+> Richard, any strong feelings on this? I'm inclined to pull it this weekend.
+
+Please do.
 
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+r~
