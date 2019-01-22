@@ -1,31 +1,32 @@
 Received: from eggs.gnu.org ([209.51.188.92]:46320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gm1o3-0008QW-1E
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1gm1o0-0008QW-DE
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gm1dA-000865-1n
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:22:44 -0500
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:54139)
+	(envelope-from <eblake@redhat.com>) id 1gm1dW-0000Fd-5W
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:23:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gm1d1-0007h1-Dy
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:22:33 -0500
-Received: from player691.ha.ovh.net (unknown [10.109.159.224])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9C5391124B1
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 15:35:35 +0100 (CET)
-Date: Tue, 22 Jan 2019 15:35:14 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190122153514.35173a76@bahia.lan>
-In-Reply-To: <6b9cb7a1-ff6a-6a8a-dde4-c72008b7f032@kaod.org>
-References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
-	<154774536496.1208625.12823909967079119637.stgit@bahia.lan>
-	<f132cca0-c163-6791-75e0-25783578263a@kaod.org>
-	<20190122142748.6d9a6691@bahia.lan>
-	<6b9cb7a1-ff6a-6a8a-dde4-c72008b7f032@kaod.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gm1dV-0000Dw-Ql
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:23:02 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9365E7971A
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 16:53:01 +0000 (UTC)
+References: <20181219120904.17643-1-kraxel@redhat.com>
+	<20181219120904.17643-2-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c563bdda-601d-c362-049b-b8e3a933291b@redhat.com>
+Date: Tue, 22 Jan 2019 10:52:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/19] spapr_xive: Cache device tree
- nodename in sPAPRXive
+In-Reply-To: <20181219120904.17643-2-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="B7ASzrbM8aoQPnqrdPlLd7K6w6h46VNni"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] kbd-state: add keyboard state
+ tracker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +35,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 22 Jan 2019 15:26:45 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--B7ASzrbM8aoQPnqrdPlLd7K6w6h46VNni
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c563bdda-601d-c362-049b-b8e3a933291b@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] kbd-state: add keyboard state
+ tracker
+References: <20181219120904.17643-1-kraxel@redhat.com>
+ <20181219120904.17643-2-kraxel@redhat.com>
+In-Reply-To: <20181219120904.17643-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 1/22/19 2:27 PM, Greg Kurz wrote:
-> > On Fri, 18 Jan 2019 14:38:31 +0100
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >  =20
-> >> On 1/17/19 6:16 PM, Greg Kurz wrote: =20
-> >>> PHB hotplug will need to know the name of the XIVE controller node. S=
-ince
-> >>> it is an invariant for the machine lifetime, compute it at realize and
-> >>> store it under the sPAPRXive structure.   =20
-> >> Could you please gather all these changes [15-17] in one patch. It wou=
-ld=20
-> >> be easier to track.=20
-> >> =20
-> >=20
-> > I'll do that in v4.
-> >  =20
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>> ---
-> >>>  hw/intc/spapr_xive.c        |    9 ++++-----
-> >>>  include/hw/ppc/spapr_xive.h |    3 +++
-> >>>  2 files changed, 7 insertions(+), 5 deletions(-)
-> >>>
-> >>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >>> index e542ae59d7fd..9732c3d89c77 100644
-> >>> --- a/hw/intc/spapr_xive.c
-> >>> +++ b/hw/intc/spapr_xive.c
-> >>> @@ -316,6 +316,9 @@ static void spapr_xive_realize(DeviceState *dev, =
-Error **errp)
-> >>>      /* Map all regions */
-> >>>      spapr_xive_map_mmio(xive);
-> >>> =20
-> >>> +    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx=
-64,
-> >>> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT));   =20
-> >>
-> >> I would use a helper routine instead.
-> >>   =20
-> >=20
-> > Ok, I see your suggestion to put the name in a static. Well, it would w=
-ork
-> > as long as we only have one interrupt controller around. It is the case=
- now
-> > but could this change in the future ? If not then I'm perfectly fine wi=
-th
-> > your suggestions, otherwise I guess the nodename should be under sPAPRX=
-ive. =20
+On 12/19/18 6:08 AM, Gerd Hoffmann wrote:
+> Now that most user interfaces are using QKeyCodes it is easier to have
+> common keyboard code useable by all user interfaces.
 >=20
-> Well, I am not sure it's worth extending SPAPRXive for a name that can=20
-> be computed. Using a static is probably not a better solution.=20
+> This patch adds helper code to track the state of all keyboard keys,
+> using a bitmap indexed by QKeyCode.  Modifier state is tracked too,
+> as separate bitmap.  That makes checking modifier state easier.
+> Likewise we can easily apply special handling for capslock & numlock
+> (toggles on keypress) and ctrl + shift (we have two keys for that).
 >=20
-> Maybe return the node offset instead. See pnv_chip_isa_offset() in pnv.c=
-=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/ui/kbd-state.h |  32 +++++++++++++
+>  ui/kbd-state.c         | 125 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  ui/Makefile.objs       |   2 +-
+>  3 files changed, 158 insertions(+), 1 deletion(-)
+>  create mode 100644 include/ui/kbd-state.h
+>  create mode 100644 ui/kbd-state.c
+>=20
 
-We can't with pseries because SLOF can update the machine's fdt, which
-means the offset could be different from what it was when spapr_dt_xive()
-was last called.
+> +
+> +void kbd_state_key_event(KbdState *kbd, QKeyCode qcode, bool down)
+> +{
+> +    bool state =3D test_bit(qcode, kbd->keys);
+> +
+> +    if (state =3D=3D down) {
+> +        /*
+> +         * Filter out events which don't change the keyboard state.
+> +         *
+> +         * Most notably this allows to simply send along all key-up
+> +         * events, and this function will filter out everything where
+> +         * the corresponding key-down event wasn't send to the guest,
 
-> for a similar issue.
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> >  =20
-> >>>      qemu_register_reset(spapr_xive_reset, dev);
-> >>>  }
-> >>> =20
-> >>> @@ -1436,7 +1439,6 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uin=
-t32_t nr_servers, void *fdt)
-> >>>          cpu_to_be32(7),    /* start */
-> >>>          cpu_to_be32(0xf8), /* count */
-> >>>      };
-> >>> -    gchar *nodename;
-> >>> =20
-> >>>      /*
-> >>>       * The "ibm,plat-res-int-priorities" property defines the priori=
-ty
-> >>> @@ -1453,10 +1455,7 @@ int spapr_dt_xive(sPAPRMachineState *spapr, ui=
-nt32_t nr_servers, void *fdt)
-> >>>                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
-> >>>      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
-> >>> =20
-> >>> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
-> >>> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT));
-> >>> -    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
-> >>> -    g_free(nodename);
-> >>> +    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));   =20
-> >>
-> >> and use the helper routine here.
-> >> =20
-> >>>      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
-> >>>      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-> >>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >>> index 29dafead9ba0..deea34b03ee5 100644
-> >>> --- a/include/hw/ppc/spapr_xive.h
-> >>> +++ b/include/hw/ppc/spapr_xive.h
-> >>> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
-> >>>      XiveENDSource end_source;
-> >>>      hwaddr        end_base;
-> >>> =20
-> >>> +    /* DT */
-> >>> +    gchar *nodename;   =20
-> >>
-> >> I don't think this is needed. See other patches for why.
-> >>
-> >> Thanks,
-> >>
-> >> C.
-> >>   =20
-> >>>
-> >>>      /* Routing table */
-> >>>      XiveEAS       *eat;
-> >>>      uint32_t      nr_irqs;
-> >>>    =20
-> >> =20
-> >  =20
->=20
+s/send/sent/
+
+> +         * for example due to being a host hotkey.
+> +         */
+> +        return;
+
+> +void kbd_state_lift_all_keys(KbdState *kbd)
+> +{
+> +    int qcode;
+> +
+> +    for (qcode =3D 0; qcode < Q_KEY_CODE__MAX; qcode++) {
+> +        if (test_bit(qcode, kbd->keys)) {
+> +            kbd_state_key_event(kbd, qcode, false);
+
+Is there a more efficient iteration through the bitmap when looking for
+the next set bit, or is the map small enough that it doesn't matter?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--B7ASzrbM8aoQPnqrdPlLd7K6w6h46VNni
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHSl4ACgkQp6FrSiUn
+Q2oBvAf+LUY8ZdoIGRVIfNZsuDUQ8HBLGB0YIAxB6m/ZaJieYm3m1mzNfo7qlnnZ
+eCq1hGLvEb08Y7wFlogdjEtQ/Gct16En8bJIOmr/LvuwqyZfkjgRCOxSY5cdtNyW
+WZra75wjiPlVjjiFUpBT59tw6UcCo00ju07WZKScY8wHBKAPM2AzIcR/qurOkhfL
+h2RQ/cWRmW2MhI6dvo8LOHYywDFa1QJ49vcesWq/V9Yv/ATY3mtvp3Lzv3GZ9dIp
+NhyL7z13Po1/VMYpzh+XazMLNqqGAUX9CwY1GO91mE1QJVAjpVw0Mw4QIJPqQIZ6
+B6X0I5MVwojDCPRiB8ekYGWcqCI1Ew==
+=jyYU
+-----END PGP SIGNATURE-----
+
+--B7ASzrbM8aoQPnqrdPlLd7K6w6h46VNni--
