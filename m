@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41961)
+Received: from eggs.gnu.org ([209.51.188.92]:41941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm10x-0000sL-TJ
+	(envelope-from <eblake@redhat.com>) id 1gm10x-0000s7-M9
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm10q-0002XI-0a
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:09 -0500
-Date: Tue, 22 Jan 2019 18:26:17 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190122182617.23fab5e9.cohuck@redhat.com>
-In-Reply-To: <20190122134612.40a7745e@oc2783563651>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<20190121212018.4e377e59@oc2783563651>
-	<20190122112926.4ff54f9f.cohuck@redhat.com>
-	<20190122121737.49c3f900@oc2783563651>
-	<20190122125322.4bb04921.cohuck@redhat.com>
-	<20190122134612.40a7745e@oc2783563651>
+	(envelope-from <eblake@redhat.com>) id 1gm10p-0002Wf-Ft
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gm10o-0001ee-AP
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:02 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98DD9C7CA3
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 17:26:03 +0000 (UTC)
+References: <20190122164940.29244-1-berrange@redhat.com>
+	<20190122164940.29244-4-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <da007012-1ba8-878c-08dd-f682e579effc@redhat.com>
+Date: Tue, 22 Jan 2019 11:25:55 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+In-Reply-To: <20190122164940.29244-4-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WHlUin2XXkVhmsgCjmsEPPgI5aGVldDnA"
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] trace: forbid use of %m in trace
+ event format strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 22 Jan 2019 13:46:12 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WHlUin2XXkVhmsgCjmsEPPgI5aGVldDnA
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <da007012-1ba8-878c-08dd-f682e579effc@redhat.com>
+Subject: Re: [PATCH v3 3/4] trace: forbid use of %m in trace event format
+ strings
+References: <20190122164940.29244-1-berrange@redhat.com>
+ <20190122164940.29244-4-berrange@redhat.com>
+In-Reply-To: <20190122164940.29244-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, 22 Jan 2019 12:53:22 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Tue, 22 Jan 2019 12:17:37 +0100
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> > > On Tue, 22 Jan 2019 11:29:26 +0100
-> > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > >   
-> > > > On Mon, 21 Jan 2019 21:20:18 +0100
-> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> > > >     
-> > > > > On Mon, 21 Jan 2019 12:03:51 +0100
-> > > > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > > > >     
-> > > > > > Rework handling of multiple I/O requests to return -EAGAIN if
-> > > > > > we are already processing an I/O request. Introduce a mutex
-> > > > > > to disallow concurrent writes to the I/O region.
-> > > > > > 
-> > > > > > The expectation is that userspace simply retries the operation
-> > > > > > if it gets -EAGAIN.
-> > > > > > 
-> > > > > > We currently don't allow multiple ssch requests at the same
-> > > > > > time, as we don't have support for keeping channel programs
-> > > > > > around for more than one request.
-> > > > > > 
-> > > > > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > > > > ---      
-> > > > > 
-> > > > > [..]
-> > > > >     
-> > > > > >  static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-> > > > > > @@ -188,25 +192,30 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-> > > > > >  {
-> > > > > >  	struct vfio_ccw_private *private;
-> > > > > >  	struct ccw_io_region *region;
-> > > > > > +	int ret;
-> > > > > >  
-> > > > > >  	if (*ppos + count > sizeof(*region))
-> > > > > >  		return -EINVAL;
-> > > > > >  
-> > > > > >  	private = dev_get_drvdata(mdev_parent_dev(mdev));
-> > > > > > -	if (private->state != VFIO_CCW_STATE_IDLE)
-> > > > > > +	if (private->state == VFIO_CCW_STATE_NOT_OPER ||
-> > > > > > +	    private->state == VFIO_CCW_STATE_STANDBY)
-> > > > > >  		return -EACCES;
-> > > > > > +	if (!mutex_trylock(&private->io_mutex))
-> > > > > > +		return -EAGAIN;
-> > > > > >  
-> > > > > >  	region = private->io_region;
-> > > > > > -	if (copy_from_user((void *)region + *ppos, buf, count))
-> > > > > > -		return -EFAULT;
-> > > > > > +	if (copy_from_user((void *)region + *ppos, buf, count)) {      
-> > > > > 
-> > > > > This might race with vfio_ccw_sch_io_todo() on
-> > > > > private->io_region->irb_area, or?    
-> > > > 
-> > > > Ah yes, this should also take the mutex (should work because we're on a
-> > > > workqueue).
-> > > >     
-> > > 
-> > > I'm not sure that will do the trick (assumed I understood the
-> > > intention correctly). Let's say the things happen in this order:
-> > > 1) vfio_ccw_sch_io_todo() goes first, I guess updates
-> > > private->io_region->irb_area and releases the mutex.
-> > > 2) Then vfio_ccw_mdev_write() destroys the irb_area by zeriong it out,
-> > > and finally,
-> > > 3) userspace reads the destroyed irb_area using vfio_ccw_mdev_read().
-> > > 
-> > > Or am I misunderstanding something?   
-> > 
-> > You're not, but dealing with that race is outside the scope of this
-> > patch. If userspace submits a request and then tries to get the old
-> > data for a prior request, I suggest that userspace needs to fix their
-> > sequencing.
-> >   
-> 
-> I tend to disagree, because I think this would be a degradation compared
-> to what we have right now.
-> 
-> Let me explain. I guess the current idea is that the private->state !=
-> VFIO_CCW_STATE_IDLE check safeguards against this. Yes we lack proper
-> synchronization (atomic/interlocked access or locks) that would guarantee
-> that different thread observe state transitions as required -- no
-> splint brain. But if state were atomic the scenario I have in mind can
-> not happen, because we get the solicited interrupt in BUSY state (and
-> set IDLE in vfio_ccw_sch_io_todo()). 
+On 1/22/19 10:49 AM, Daniel P. Berrang=C3=A9 wrote:
+> The '%m' format specifier instructs glibc's printf() implementation to
+> insert the contents of strerror(errno). Since this is a glibc extension=
 
-This BUSY handling is broken for another case: If the guest requests
-intermediate interrupts, there may be more than one interrupt by the
-hardware -- and we still go out of BUSY state. (Freeing the cp is also
-broken in that case.) However, the Linux dasd driver does not seem to
-do that.
+> it should generally be avoided in QEMU due to need for portability to a=
 
-> Unsolicited interrupts are another
-> piece of cake -- I have no idea how may of those do we get.
+> variety of platforms.
 
-They at least don't have the "free the cp before we got final state"
-bug. But I think both are reasons to get away from "use the BUSY state
-to ensure the right sequence".
+Up to you if you want to mention that syslog() portably supports %m, but
+not all trace backends use syslog().
 
-> And because
-> of this the broken sequencing in userspace could actually be the kernels
-> fault.
+>=20
+> Even though vfio is Linux-only code that could otherwise use "%m", it
+> must still be avoided in trace-events files because several of the
+> backends do not use the format string and so this error information is
+> invisible to them.
+>=20
+> The errno string value should be given as an explicit trace argument
+> instead, making it accessible to all backends. This also allows it to
+> work correctly with future patches that use the format string with
+> systemtap's simple printf code.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  hw/vfio/pci.c                 | 2 +-
+>  hw/vfio/trace-events          | 2 +-
+>  scripts/tracetool/__init__.py | 4 ++++
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+>=20
 
-Here, I can't follow you at all :(
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--WHlUin2XXkVhmsgCjmsEPPgI5aGVldDnA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHUiMACgkQp6FrSiUn
+Q2piswgAjOO728DXZKgCJxUFeug0EfFO7m7r6sEgvrST7v7/GRaz7iBcS3NjAhuq
+YHw3duNwgqp9TO0qElPts3ef74VzeVGd91KNLPrIt2SNXUuXPLOnp415ASFawifg
+vC5U/Q8fU1aWH+XpOjjODeR1XgiC84cFJPNglS5Ut1zv/1LY0TmqSFXzgVhCoc/p
+yyHuK2a3eE6pylJT+3dUzjqYmVv/vD00u3q781VFfMk6GZCSclbwJTy6PztqtHnx
+B11rjJmL6IQepGyjrc+SLrJTCo7lSRH/OYzNntTDQ0/CqyGAP93GyUxuZUKtIsmp
+12hZcl5LePKsKaRm1CQQ/MMv4jFubQ==
+=GD6C
+-----END PGP SIGNATURE-----
+
+--WHlUin2XXkVhmsgCjmsEPPgI5aGVldDnA--
