@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41426)
+Received: from eggs.gnu.org ([209.51.188.92]:41942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm10R-0000P4-HE
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:42:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm10x-0000s8-MW
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm10O-0002Cz-EK
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:42:39 -0500
-Date: Tue, 22 Jan 2019 13:44:57 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190122134457.212a60f3.cohuck@redhat.com>
-In-Reply-To: <20190122094143.8857-1-david@redhat.com>
-References: <20190122094143.8857-1-david@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gm10o-0002Vp-PS
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:07 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43509)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm10n-0002T2-QD
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:43:02 -0500
+Received: by mail-wr1-x444.google.com with SMTP id r10so28552595wrs.10
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:43:00 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 18:18:20 +0000
+Message-Id: <20190122181822.1505-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/2] slirp: fix -Waddress-of-packed-member
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Tue, 22 Jan 2019 10:41:43 +0100
-David Hildenbrand <david@redhat.com> wrote:
+These patches fix the clang -Waddress-of-packed-member warnings
+in the slirp code. For slirp, the structs marked as packed
+are already naturally packed/aligned, so adding the 'packed'
+attribute doesn't change their layout but means the compiler
+has to assume they might be misaligned. Instead, for the structs
+which map to on-the-wire packet formats, we add build time
+assertions that they have the sizes we think they should.
 
-> We decided to always create the PCI host bridge, even if 'zpci' is not
-> enabled (due to migration compatibility). This however right now allows
-> to add zPCI/PCI devices to a VM although the guest will never actually see
-> them, confusing people that are using a simple CPU model that has no
-> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
-> 
-> Let's check for 'zpci' and at least print a warning that this will not
-> work as expected. We could also bail out, however that might break
-> existing QEMU commandlines.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index b86a8bdcd4..e7d4f49611 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->  
-> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
-> +                    " The guest will not be able to see/use these devices.");
-> +    }
-> +
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pdev = PCI_DEVICE(dev);
->  
+The 'struct ipq' and 'struct ipasfrag' aren't on-the-wire
+packet representations, so it's not clear why they were
+marked packed in the first place. (They contain host pointers
+and so have a size that depends on the host.) Here we just
+assert the only thing that's documented as a layout restriction:
+that struct ipq's frag_link and struct ipasfrag's ipf_link
+are at the same offset.
 
-That's hotplug only, isn't it? IIRC coldplugging already fails?
+Together, this fixes all the -Waddress-of-packed-member warnings
+in slirp, which I think was the only set remaining without
+patches at least being on-list. (Some of the block/ warning fixes
+are still working their way through the relevant trees.)
+
+thanks
+-- PMM
+
+Peter Maydell (2):
+  slirp: Avoid marking naturally packed structs as QEMU_PACKED
+  slirp: Don't mark struct ipq or struct ipasfrag as packed
+
+ slirp/ip.h       |  7 +++++--
+ slirp/ip6.h      | 12 ++++++++++--
+ slirp/ip6_icmp.h | 20 +++++++++++++++-----
+ 3 files changed, 30 insertions(+), 9 deletions(-)
+
+-- 
+2.20.1
