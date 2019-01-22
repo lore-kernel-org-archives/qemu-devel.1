@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60956)
+Received: from eggs.gnu.org ([209.51.188.92]:60968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1glsZ1-0001LI-B1
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:41:48 -0500
+	(envelope-from <david@redhat.com>) id 1glsZ2-0001M7-7p
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:41:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1glsZ0-0003bM-62
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:41:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1glsZ0-0003a8-0A
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:41:46 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B101DC057F99
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 09:41:43 +0000 (UTC)
-Date: Tue, 22 Jan 2019 09:41:39 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190122094139.GB13143@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181219120904.17643-1-kraxel@redhat.com>
-	<20181219120904.17643-6-kraxel@redhat.com>
-	<20181221111801.GI7439@redhat.com>
-	<20190122090036.p7hfsgezzokpovlh@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190122090036.p7hfsgezzokpovlh@sirius.home.kraxel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/7] kbd-state: use state tracker
- for vnc
+	(envelope-from <david@redhat.com>) id 1glsZ1-0003cH-GS
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:41:48 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 22 Jan 2019 10:41:43 +0100
+Message-Id: <20190122094143.8857-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
+ without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-On Tue, Jan 22, 2019 at 10:00:36AM +0100, Gerd Hoffmann wrote:
-> > > @@ -1859,30 +1828,25 @@ static void do_key_event(VncState *vs, int =
-down, int keycode, int sym)
-> > >             toggles capslock away from the VNC window.
-> > >          */
-> > >          int uppercase =3D !!(sym >=3D 'A' && sym <=3D 'Z');
-> > > -        int shift =3D !!(vs->modifiers_state[0x2a] | vs->modifiers=
-_state[0x36]);
-> > > -        int capslock =3D !!(vs->modifiers_state[0x3a]);
-> > > +        bool shift =3D kbd_state_modifier_get(vs->vd->kbd, KBD_MOD=
-_SHIFT);
-> > > +        bool capslock =3D kbd_state_modifier_get(vs->vd->kbd, KBD_=
-MOD_CAPSLOCK);
-> >=20
-> > This uses the modifier state
-> >=20
-> > In old code it would use the newly updated modifier state
-> >=20
-> > In new code it now uses the old modifier state.
->=20
-> Ordering doesn't matter.  This code doesn't run on modifier key events.
-> On letter keydown events it checks whenever shift and capslock state ar=
-e
-> consistent, and if not it generates a capslock keypress.
+We decided to always create the PCI host bridge, even if 'zpci' is not
+enabled (due to migration compatibility). This however right now allows
+to add zPCI/PCI devices to a VM although the guest will never actually see
+them, confusing people that are using a simple CPU model that has no
+'zpci' enabled - "Why isn't this working" (David Hildenbrand)
 
-Ok, then
+Let's check for 'zpci' and at least print a warning that this will not
+work as expected. We could also bail out, however that might break
+existing QEMU commandlines.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index b86a8bdcd4..e7d4f49611 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ {
+     S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+ 
++    if (!s390_has_feat(S390_FEAT_ZPCI)) {
++        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
++                    " The guest will not be able to see/use these devices.");
++    }
++
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pdev = PCI_DEVICE(dev);
+ 
+-- 
+2.17.2
