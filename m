@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35549)
+Received: from eggs.gnu.org ([209.51.188.92]:36224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsin-0000qg-3w
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:51:53 -0500
+	(envelope-from <kraxel@redhat.com>) id 1glskz-0002kA-3c
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsil-0004Xu-7N
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:51:53 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53288)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glsij-0004Az-AM
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:51:49 -0500
-Received: by mail-wm1-f67.google.com with SMTP id d15so13435696wmb.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:51:24 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-5-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8afeccf9-f093-e55d-f207-5592424ad6b2@redhat.com>
-Date: Tue, 22 Jan 2019 10:51:22 +0100
+	(envelope-from <kraxel@redhat.com>) id 1glskx-0006bJ-9M
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glskx-0006aJ-3O
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:07 -0500
+Date: Tue, 22 Jan 2019 10:54:04 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190122095404.nskppqj6doo3yquo@sirius.home.kraxel.org>
+References: <20190120041427.21602-1-relkochta@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190117185628.21862-5-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 04/18] Acceptance tests: fix doc reference
- to avocado_qemu directory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190120041427.21602-1-relkochta@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] input-linux: customizable grab toggle keys
+ v4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Ryan El Kochta <relkochta@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 1/17/19 7:56 PM, Cleber Rosa wrote:
-> The "this directory" reference is misleading and confusing, it's a
-> leftover from when this text was proposed in a README file inside
-> the "tests/acceptance/avocado_qemu" directory.
+On Sat, Jan 19, 2019 at 11:14:27PM -0500, Ryan El Kochta wrote:
+> This patch adds a new option to the input-linux object:
 > 
-> When that text was moved to the top level docs directory, the
-> reference was not updated.
+> grab-toggle=[key-combo]
 > 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> The key combination can be one of the following:
+> 
+> * ctrl-ctrl
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+left ctrl + right ctrl.
 
-> ---
->  docs/devel/testing.rst | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index 18e2c0868a..44c9b3ae74 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -590,8 +590,9 @@ Alternatively, follow the instructions on this link:
->  Overview
->  --------
->  
-> -This directory provides the ``avocado_qemu`` Python module, containing
-> -the ``avocado_qemu.Test`` class.  Here's a simple usage example:
-> +The ``tests/acceptance/avocado_qemu`` directory provides the
-> +``avocado_qemu`` Python module, containing the ``avocado_qemu.Test``
-> +class.  Here's a simple usage example:
->  
->  .. code::
->  
-> 
+> * alt-alt
+
+Same.
+
+> * meta-meta
+
+Same.
+
+> * ctrl-alt
+
+This is actually left ctrl + left alt (not any ctrl / alt) in the code.
+
+Ctrl+Alt+Key isn't that uncommon as hotkey, linux console switching uses
+Ctrl+Alt+Fn for example.  Also some GUI apps use Ctrl+Alt+Someletter for
+less frequently used functions when they run out of Ctrl+Someletter
+hotkeys.  I'd suggest to drop this one.
+
+> * scrolllock
+> * ctrl-scrolllock
+
+This likewise is actually left ctrl + scrolllock in the code.
+
+> * ctrl-backtick
+
+Not a good idea.  backtick has no fixed location, depends on the
+keyboard layout.
+
+So, the naming is a bit tricky here.  If only the left ctrl key actually
+works we should say so in the name and call it "lctrl-scrolllock".  Or
+leave the name and allow both ctrl keys.
+
+For the ctrl-ctrl (and simliar) hotkeys I think it doesn't matter much
+whenever we call them "ctrl-ctrl" or "lctrl-rctrl".  It is kida obvious
+that you need both the left and right one when you should press two
+control keys.  But I think it should be consistent with what we pick for
+ctrl-scrolllock.
+
+I think sticking with the current names and make both ctrl keys work
+with scrolllock is the better way.
+
+cheers,
+  Gerd
