@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60334)
+Received: from eggs.gnu.org ([209.51.188.92]:60764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsX0-00084K-HK
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:39:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1glsYC-0000fH-BV
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glsWy-00028t-Ty
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:39:42 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glsWy-00024H-JM
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:39:40 -0500
-Received: by mail-wr1-f65.google.com with SMTP id q18so26454534wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:39:33 -0800 (PST)
-References: <154800690066.11444.6761064786302350654.reportbug@deadeye.wl.decadent.org.uk>
-	<4caef357-e49b-2314-ee19-3ae31f8e4c30@msgid.tls.msk.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d78c26dc-727c-b58b-9536-a715aa44da77@redhat.com>
-Date: Tue, 22 Jan 2019 10:39:25 +0100
+	(envelope-from <thuth@redhat.com>) id 1glsY8-00039m-9e
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:40:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49234)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glsY7-00036D-4W
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:40:52 -0500
+References: <20190116191950.94110-1-emaste@freefall.freebsd.org>
+	<20190118144724.66914-1-emaste@freebsd.org>
+	<8def73c9-23e5-9f87-81d1-dda0c7e6f7d9@redhat.com>
+	<242e057a-0c35-93b1-1249-93799cdf1196@redhat.com>
+	<CAPyFy2BLuGCYx0-GUdy5w8HD0u3hkvH3DGmCV+9OKYjtkr6rew@mail.gmail.com>
+	<CAPyFy2DNJvE4GbXxtzFJe8bPiXQm+bOmp+D_zVSCtaJML18vzw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6272e5b7-477c-6a38-97cd-a16b94c209d5@redhat.com>
+Date: Tue, 22 Jan 2019 10:40:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <4caef357-e49b-2314-ee19-3ae31f8e4c30@msgid.tls.msk.ru>
+In-Reply-To: <CAPyFy2DNJvE4GbXxtzFJe8bPiXQm+bOmp+D_zVSCtaJML18vzw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Bug#919921: qemu-user Linux ELF loader fails to
- handle pure BSS segments
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,135 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>, 919921@bugs.debian.org, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Ben Hutchings <benh@debian.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Ed Maste <emaste@freebsd.org>
+Cc: Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Ben,
+On 2019-01-21 17:30, Ed Maste wrote:
+> On Mon, 21 Jan 2019 at 10:16, Ed Maste <emaste@freebsd.org> wrote:
+>>
+>> To confirm, I have another build running now with
+>> echo "Running with hw.ncpu=3D$(sysctl -n hw.ncpu)"
+>> added.
+>=20
+> Confirmed - https://cirrus-ci.com/build/5768962257190912:
+> Running with hw.ncpu=3D8
+>=20
+> If there is some sort of hanging test issue I could try wrapping it in
+> timeout and outputting ps and other info upon failure.
 
-On 1/22/19 6:43 AM, Michael Tokarev wrote:
-> Forwarding to qemu-devel@
-> http://bugs.debian.org/919921
-> 
-> Thanks!
-> 
-> 20.01.2019 20:55, Ben Hutchings wrote:
->> Package: qemu-user
->> Version: 1:3.1+dfsg-2
->> Severity: normal
->> Tags: patch
->>
->> I've been building and testing klibc across many architectures using
->> qemu-user, and I found that qemu-user fails to load a few programs on
->> a few architectures, reporting an EINVAL error code.  Here's the
->> "readelf -l" output for one such program:
->>
->>      Elf file type is EXEC (Executable file)
->>      Entry point 0x10000100
->>      There are 5 program headers, starting at offset 52
->>           Program Headers:
->>        Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz 
->> Flg Align
->>        PHDR           0x000034 0x10000034 0x10000034 0x000a0 0x000a0
->> R   0x4
->>        INTERP         0x0000d4 0x100000d4 0x100000d4 0x0002a 0x0002a
->> R   0x1
->>            [Requesting program interpreter:
->> /lib/klibc-R7FVdnsTBUFpWPgCV6FR07b-mf8.so]
->>        LOAD           0x000000 0x10000000 0x10000000 0x002f8 0x002f8 R
->> E 0x10000
->>        LOAD           0x010000 0x10020000 0x10020000 0x00000 0x08000
->> RW  0x10000
->>        GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000
->> RWE 0x10
->>            Section to Segment mapping:
->>        Segment Sections...
->>         00
->>         01     .interp
->>         02     .interp .text .rodata .eh_frame
->>         03     .bss
->>         04
->>
->> The unusual feature of this program, and all the others that failed,
->> is that there is a LOAD segment with a file-size of 0 (i.e.  only BSS,
->> no initialised data).  load_elf_image() will try to mmap() initialised
->> data for this section even though there is none and a length of 0 is
->> invalid.
->>
->> The change that seems to fix this is to skip the mmap() in this case:
->>
->> --- a/linux-user/elfload.c
->> +++ b/linux-user/elfload.c
->> @@ -2316,11 +2316,13 @@ static void load_elf_image(const char *i
->>               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
->>               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz +
->> vaddr_po);
->>   -            error = target_mmap(vaddr_ps, vaddr_len,
->> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
->> -                                image_fd, eppnt->p_offset - vaddr_po);
->> -            if (error == -1) {
->> -                goto exit_perror;
->> +            if (vaddr_len != 0) {
+Ok, I did some more tests today. First two runs were simply killed:
 
-This is probably not the good fix, since now your process doesn't have
-anything mapped to use his BSS :)
+ https://cirrus-ci.com/build/5478092878381056
+ https://cirrus-ci.com/build/5754149284085760
 
->> +                error = target_mmap(vaddr_ps, vaddr_len,
->> +                                    elf_prot, MAP_PRIVATE | MAP_FIXED,
->> +                                    image_fd, eppnt->p_offset -
->> vaddr_po);
->> +                if (error == -1) {
->> +                    goto exit_perror;
->> +                }
->>               }
->>                 vaddr_ef = vaddr + eppnt->p_filesz;
->> --- END ---
+Then I tried to decrease the amount of resources to 4 CPUs and 8G of
+RAM, but that timed out:
 
-What about this fix instead, using the segment memory size rather than
-the file size:
+ https://cirrus-ci.com/build/6003268728651776
 
--- >8 --
-@@ -2314,7 +2314,7 @@ static void load_elf_image(const char *image_name,
-int image_fd,
-             vaddr = load_bias + eppnt->p_vaddr;
-             vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr);
-             vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
--            vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
-+            vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_memsz + vaddr_po);
+Then I finally increased the CPUs back to 8 again, but stick with 8G of
+RAM, and that indeed finished in time successfully:
 
-             error = target_mmap(vaddr_ps, vaddr_len,
-                                 elf_prot, MAP_PRIVATE | MAP_FIXED,
----
+ https://cirrus-ci.com/build/6218565876187136
 
->>
->> -- System Information:
->> Debian Release: buster/sid
->>    APT prefers unstable-debug
->>    APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500,
->> 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
->> Architecture: amd64 (x86_64)
->> Foreign Architectures: i386
->>
->> Kernel: Linux 4.19.0-1-amd64 (SMP w/4 CPU cores)
->> Locale: LANG=en_GB.UTF-8, LC_CTYPE=en_GB.UTF-8 (charmap=UTF-8),
->> LANGUAGE=en_GB.UTF-8 (charmap=UTF-8)
->> Shell: /bin/sh linked to /bin/dash
->> Init: systemd (via /run/systemd/system)
->> LSM: AppArmor: enabled
->>
->> Versions of packages qemu-user depends on:
->> ii  libc6         2.28-3
->> ii  libcapstone3  3.0.5-3
->> ii  libgcc1       1:8.2.0-13
->> ii  libglib2.0-0  2.58.1-2
->> ii  libstdc++6    8.2.0-13
->> ii  zlib1g        1:1.2.11.dfsg-1
->>
->> Versions of packages qemu-user recommends:
->> ii  qemu-user-static [qemu-user-binfmt]  1:3.1+dfsg-2
->>
->> Versions of packages qemu-user suggests:
->> ii  sudo  1.8.26-2
->>
->> -- no debconf information
->>
-> 
+So yes, looks like 8 CPUs should work indeed, but I think you should
+decrease the amount of memory of the VM, to make sure that it does not
+get killed so easily. 8 GB of RAM should also be enough to compile QEMU,
+as far as I can tell.
+
+ Thomas
+
+
+PS: I also removed the V=3D1 in my tests since otherwise the log was way
+to verbose for my taste ... but that's likely really just a matter of tas=
+te.
