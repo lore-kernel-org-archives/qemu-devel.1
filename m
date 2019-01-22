@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38840)
+Received: from eggs.gnu.org ([209.51.188.92]:38843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gm1XU-0003sh-Hj
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:16:50 -0500
+	(envelope-from <lersek@redhat.com>) id 1gm1XU-0003sj-IT
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gm1XS-0007Fa-EC
+	(envelope-from <lersek@redhat.com>) id 1gm1XS-0007Fk-Gz
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:16:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45337)
+Received: from mx1.redhat.com ([209.132.183.28]:48124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gm1XS-0006dD-4i
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gm1XS-0007Ai-41
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:16:46 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD61A7BDB0
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 16:49:44 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 22 Jan 2019 16:49:36 +0000
-Message-Id: <20190122164940.29244-1-berrange@redhat.com>
+References: <20190120071337.55595-1-liq3ea@163.com>
+	<20190120071337.55595-3-liq3ea@163.com>
+	<2e1e9b39-ed96-452a-de4b-9b7337702a89@redhat.com>
+	<CAKXe6SJfThHvzuWKSqNDz79KcRfyzor16sFg1N8CxCFnaJPYTQ@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a7787e82-bef7-b508-a4c6-9a6917ceaf22@redhat.com>
+Date: Tue, 22 Jan 2019 13:10:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAKXe6SJfThHvzuWKSqNDz79KcRfyzor16sFg1N8CxCFnaJPYTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/4] trace: make systemtap easier to use for
- simple logging
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-This is a followup to
+On 01/22/19 02:28, Li Qiang wrote:
+> Laszlo Ersek <lersek@redhat.com> =E4=BA=8E2019=E5=B9=B41=E6=9C=8822=E6=97=
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:38=E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>> On 01/20/19 08:13, Li Qiang wrote:
+>>> Signed-off-by: Li Qiang <liq3ea@163.com>
+>>> ---
+>>>  tests/fw_cfg-test.c | 13 ++++++++++++-
+>>>  1 file changed, 12 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+>>> index 1c5103fe1c..c28e6c3fb5 100644
+>>> --- a/tests/fw_cfg-test.c
+>>> +++ b/tests/fw_cfg-test.c
+>>> @@ -99,6 +99,15 @@ static void test_fw_cfg_boot_menu(void)
+>>>      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), =3D=3D=
+,
+>> boot_menu);
+>>>  }
+>>>
+>>> +static void test_fw_cfg_reboot_timeout(void)
+>>> +{
+>>> +    uint32_t reboot_timeout;
+>>> +
+>>> +    qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+>>> +                     &reboot_timeout, sizeof(reboot_timeout));
+>>> +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
+>>> +}
+>>> +
+>>
+>> You don't check the return status of qfw_cfg_get_file(), before readin=
+g
+>> "reboot_timeout". If the qfw_cfg_get_file() fails (returning 0), then
+>> the comparison will refer to an indeterminate value. Also, it's
+>> theoretically possible for qfw_cfg_get_file() to overwrite only part o=
+f
+>> the "reboot_timeout" object.
+>>
+>>
+> Right. I will change in the next revision.
+>=20
+>=20
+>=20
+>> So I think we need the function to transfer exactly (sizeof
+>> reboot_timeout) bytes.
+>>
+>>
+> What does this mean? check the  return of 'qfw_cfg_get_file' if it is
+> sizeof(reboot_timeout)?
 
- v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg04173.html
- v2: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg04759.html
+Yes, that's what I meant.
 
-Changed in v3:
+>> BTW, this reminds me, qfw_cfg_get_file() seems to return the number of
+>> bytes that would be necessary for transferring the entire file. That
+>> looks like a good idea, but it should be documented. Please add some
+>> docs on top of qfw_cfg_get_file().
+>>
+>>
+> The docs like "return 0 means failed and non-zero means successful but
+> the caller need check the exactly size to avoid partially file size" ?
 
- - g_strndup the QXL log_buf before printing to avoid a race
-   with guest removing the nul terminator (Stefan)
- - Add filtering of PIDs with "-p PID" arg to qemu-trace-stap
- - Add a man page for qemu-trace-stap (Eric)
- - Remove examples in docs/devel/tracing.txt and just refer
-   people to the above man page.
- - Use strerror(errno) instead of raw errno in vfio traces (Eric/Alex)
- - Quote probe wildcards to be shell glob safe (Eric)
- - Mention explicitly that it is launched separately from QEMU (Eric)
+Yes. A bit more precisely, when the return value is nonzero, it means
+that some bytes have been transferred. If the fw_cfg file in question is
+smaller than the allocated & passed-in buffer, then the buffer has been
+populated only in part.
 
-Changed in v2:
+Vice versa, if the fw_cfg file in question is larger than the passed-in
+buffer, then the return value explains how much room would have been
+necessary in total. And, while the caller's buffer has been fully
+populated, it has received only a starting slice of the fw_cfg file.
 
- - Fix safety of QXL logging
- - Handle format specifier macros is a more reliable manner
- - Fix trace-events files missing newline
- - Remove use of %m formats
+In the comparison that follows qfw_cfg_get_file(), we want to be sure
+that the "reboot_timeout" integer object has been fully populated,
+*plus* that we aren't ignoring any trailing bytes from the fw_cfg file.
+Hence the strict equality on the size.
 
-Daniel P. Berrang=C3=A9 (4):
-  display: ensure qxl log_buf is a nul terminated string
-  trace: enforce that every trace-events file has a final newline
-  trace: forbid use of %m in trace event format strings
-  trace: add ability to do simple printf logging via systemtap
-
- MAINTAINERS                          |   1 +
- Makefile                             |  10 ++
- Makefile.target                      |  11 +-
- docs/devel/tracing.txt               |   4 +
- hw/display/qxl.c                     |  14 ++-
- hw/display/trace-events              |   2 +-
- hw/gpio/trace-events                 |   2 +-
- hw/vfio/pci.c                        |   2 +-
- hw/vfio/trace-events                 |   2 +-
- scripts/qemu-trace-stap              | 174 +++++++++++++++++++++++++++
- scripts/qemu-trace-stap.texi         | 139 +++++++++++++++++++++
- scripts/tracetool/__init__.py        |   6 +
- scripts/tracetool/format/log_stap.py | 127 +++++++++++++++++++
- 13 files changed, 485 insertions(+), 9 deletions(-)
- create mode 100755 scripts/qemu-trace-stap
- create mode 100644 scripts/qemu-trace-stap.texi
- create mode 100644 scripts/tracetool/format/log_stap.py
-
---=20
-2.20.1
+Thanks
+Laszlo
