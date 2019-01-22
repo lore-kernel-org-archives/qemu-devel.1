@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46820)
+Received: from eggs.gnu.org ([209.51.188.92]:46968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm15C-0004of-Mj
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:38 -0500
+	(envelope-from <mst@redhat.com>) id 1gm15K-0004tq-8E
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm14p-0005NV-Fq
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44486)
+	(envelope-from <mst@redhat.com>) id 1gm15I-0005cS-70
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gm14n-0004a5-9V
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:10 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 27B4889AC2
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 18:10:17 +0000 (UTC)
-References: <20190118173103.4903-1-berrange@redhat.com>
-	<20190118173103.4903-4-berrange@redhat.com>
-	<c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
-	<20190122143257.GR13143@redhat.com>
-	<c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
-	<20190122172333.GA13143@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
-Date: Tue, 22 Jan 2019 12:10:06 -0600
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm15H-0005MU-Rw
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:47:40 -0500
+Date: Tue, 22 Jan 2019 13:47:08 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190122134252-mutt-send-email-mst@kernel.org>
+References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
+	<64bea1ff5f80647cc4592ee94d399d647bdd9862.1547624239.git.yi.z.zhang@linux.intel.com>
+	<20190116104105-mutt-send-email-mst@kernel.org>
+	<20190118181147.GJ4136@habkost.net>
+	<20190121051535.GA21562@tiger-server>
+	<20190121144400.GM4136@habkost.net>
+	<20190122032124.GA30317@tiger-server>
+	<20190121222305-mutt-send-email-mst@kernel.org>
+	<CAPcyv4iMO1jxKakMOvePUwPx3GuLDSRf=H2HoqenPP-wGV+n_w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190122172333.GA13143@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="erhuOHA7Ww3KiA52jDxtXaceMV3lMft7O"
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
- event format strings
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4iMO1jxKakMOvePUwPx3GuLDSRf=H2HoqenPP-wGV+n_w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V9 4/6] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +35,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, yu.c.zhang@linux.intel.com, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---erhuOHA7Ww3KiA52jDxtXaceMV3lMft7O
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <9d0997e0-9019-c7c2-56d6-26c70f0d5c7e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
- event format strings
-References: <20190118173103.4903-1-berrange@redhat.com>
- <20190118173103.4903-4-berrange@redhat.com>
- <c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
- <20190122143257.GR13143@redhat.com>
- <c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
- <20190122172333.GA13143@redhat.com>
-In-Reply-To: <20190122172333.GA13143@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 22, 2019 at 09:33:37AM -0800, Dan Williams wrote:
+> On Mon, Jan 21, 2019 at 7:27 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> [..]
+> > > 2. The reset of cases:
+> > >       - we will never pass the MAP_SYNC to mmap2
+> >
+> > I don't see code probing for MAP_SYNC support. Did I miss it?
+> > But if all you want is to have old linux ignore MAP_SYNC,
+> > I think you got your wish automatically - just do not set
+> > MAP_SHARED_VALIDATE.
+> 
+> That will also cause new Linux to ignore MAP_SYNC.
 
-On 1/22/19 11:23 AM, Daniel P. Berrang=C3=A9 wrote:
+Oh you are right. I missed this point.
 
->=20
->>> On this point though, does anyone know of any platforms we support[1]=
-,
->>> or are likely to support in future, where 'strerror' is *not* thread
->>> safe ?
->>
->> I'm not coming up with one, and I think the problem is independent of
->> this series (if we DO have a problem, it's a series all its own to
->> eradicate the use of strerror() in favor of something safer, either
->> picking strerror_l() or dealing with the glibc vs. BSD differences in
->> strerror_r()).
->=20
-> Agree that its not really something for this series - this just
-> made me think of it again.
+And given that these patches do not seem to set MAP_SHARED_VALIDATE
+at all I conclude that even though thet set MAP_SYNC
+it actually has no effect at all.
 
-Shoot - FreeBSD strerror() is not threadsafe:
-https://github.com/freebsd/freebsd/blob/master/lib/libc/string/strerror.c=
-#L119
+So I wonder how they were tested.
+Would the contributors care to elaborate?
+That would be good info to put in the commit log message.
 
-char *
-strerror(int num)
-{
-	static char ebuf[NL_TEXTMAX];
-
-	if (strerror_r(num, ebuf, sizeof(ebuf)) !=3D 0)
-		errno =3D EINVAL;
-	return (ebuf);
-}
-
->=20
-> We went through the scrubbing in libvirt to use the sane, but still
-> tedious to call, variant of strerror_r() many years ago. With luck
-> though it is a worry that can be confined the dustbin of ancient
-> UNIX history....unless someone can point to evidence to the contrary ?
-
-libvirt has it easy - they let gnulib do all the work of futzing around
-with getting a working strerror() despite platform bugs and despite
-glibc's insistence on a non-POSIX signature if _GNU_SOURCE is defined.
-We'll have to do a bit more legwork.
-
-That said, I've added it to:
-https://wiki.qemu.org/Contribute/BiteSizedTasks#Error_checking
-
-if someone wants to do the grunt work.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---erhuOHA7Ww3KiA52jDxtXaceMV3lMft7O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHXH4ACgkQp6FrSiUn
-Q2r9Dwf+KWFCGGDeHfW1rjhKCWpToHoCSBdFyU2UVa5XmzU1ZDGuz8mhDUPS1vPe
-FMB+n15IZlB6ReswngWriEhf9igdcJgmaLLM2SWSvEH1XGAdLti+8gNBgw8mZyB/
-9cWLNC5c6uD78TBIYqpIW77AIMlBkyRwBDEZwPt5uqwzgLck4o3YD3LhK8467SoY
-X5X/PBIz/AaU3s2R2XlWuTbtZBhoHMsjRf6ciaVUeNeA2xhhL1T3f3cX/cbVezWw
-YPnpd1u/hzm1f3/17k+rz+e6u9UwqqYA/yod8KkFEKE1Li3EOepw2Acn/Pedd9RX
-KIWHS1jrfT2V2nAB+hx91wydKk3F1g==
-=J/TP
------END PGP SIGNATURE-----
-
---erhuOHA7Ww3KiA52jDxtXaceMV3lMft7O--
+-- 
+MST
