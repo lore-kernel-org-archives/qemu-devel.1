@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45144)
+Received: from eggs.gnu.org ([209.51.188.92]:45100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1glp4D-0006eZ-NC
+	(envelope-from <aik@ozlabs.ru>) id 1glp4D-0006e6-Mo
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:57:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1gloqJ-0004WF-GT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:43:24 -0500
-Received: from isrv.corpit.ru ([86.62.121.231]:57265)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mjt@tls.msk.ru>) id 1gloqJ-0004VR-1z
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:43:23 -0500
-References: <154800690066.11444.6761064786302350654.reportbug@deadeye.wl.decadent.org.uk>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <4caef357-e49b-2314-ee19-3ae31f8e4c30@msgid.tls.msk.ru>
-Date: Tue, 22 Jan 2019 08:43:21 +0300
+	(envelope-from <aik@ozlabs.ru>) id 1glor7-0004wd-1t
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:44:14 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1glor6-0004vo-KE
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:44:12 -0500
+Received: by mail-pf1-x441.google.com with SMTP id y126so11208929pfb.4
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 21:44:12 -0800 (PST)
+References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <7538b313-81b2-d036-ca12-5a2ad5ea8d2b@ozlabs.ru>
+Date: Tue, 22 Jan 2019 16:44:02 +1100
 MIME-Version: 1.0
-In-Reply-To: <154800690066.11444.6761064786302350654.reportbug@deadeye.wl.decadent.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: ru-RU
+In-Reply-To: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Bug#919921: qemu-user Linux ELF loader fails to
- handle pure BSS segments
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] spapr: Add support for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, 919921@bugs.debian.org
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-Forwarding to qemu-devel@
-http://bugs.debian.org/919921
 
-Thanks!
 
-20.01.2019 20:55, Ben Hutchings wrote:
-> Package: qemu-user
-> Version: 1:3.1+dfsg-2
-> Severity: normal
-> Tags: patch
+On 18/01/2019 04:14, Greg Kurz wrote:
+> This allows to hotplug/unplug PHBs. I could successfully test:
+> - using in-kernel XICS, emulated XICS and XIVE
+> - using experimental in-kernel XIVE from Cedric
+> - hotplug/unplug with e1000 device to validate LSIs
+> - hotplug/unplug with virtio-net device to validate MSIs
+> - some simple migration scenarios
+
 > 
-> I've been building and testing klibc across many architectures using
-> qemu-user, and I found that qemu-user fails to load a few programs on
-> a few architectures, reporting an EINVAL error code.  Here's the
-> "readelf -l" output for one such program:
+> Change in v3:
+> - reworked phandle related code some more
+> - disintricate allocation/"type setting" of interrupts
+> - identify LSIs at machine init
 > 
->      Elf file type is EXEC (Executable file)
->      Entry point 0x10000100
->      There are 5 program headers, starting at offset 52
->      
->      Program Headers:
->        Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
->        PHDR           0x000034 0x10000034 0x10000034 0x000a0 0x000a0 R   0x4
->        INTERP         0x0000d4 0x100000d4 0x100000d4 0x0002a 0x0002a R   0x1
->            [Requesting program interpreter: /lib/klibc-R7FVdnsTBUFpWPgCV6FR07b-mf8.so]
->        LOAD           0x000000 0x10000000 0x10000000 0x002f8 0x002f8 R E 0x10000
->        LOAD           0x010000 0x10020000 0x10020000 0x00000 0x08000 RW  0x10000
->        GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
->      
->       Section to Segment mapping:
->        Segment Sections...
->         00
->         01     .interp
->         02     .interp .text .rodata .eh_frame
->         03     .bss
->         04
+> Changes in v2:
+> - rebased on current ppc-for-4.0
+
+
+
+Is the tree available anywhere in git? It does not apply on today's
+ppc-for-4.0 :-/
+
+
+
+
+> - added some preliminary cleanup
+> - call unrealize from realize error path
+> - advertise PHB hotplug in last patch
+> - reworked phandle related code
+> - sync LSIs to KVM
 > 
-> The unusual feature of this program, and all the others that failed,
-> is that there is a LOAD segment with a file-size of 0 (i.e.  only BSS,
-> no initialised data).  load_elf_image() will try to mmap() initialised
-> data for this section even though there is none and a length of 0 is
-> invalid.
+> Please comment.
 > 
-> The change that seems to fix this is to skip the mmap() in this case:
+> --
+> Greg
 > 
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2316,11 +2316,13 @@ static void load_elf_image(const char *i
->               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
->               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
->   
-> -            error = target_mmap(vaddr_ps, vaddr_len,
-> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
-> -                                image_fd, eppnt->p_offset - vaddr_po);
-> -            if (error == -1) {
-> -                goto exit_perror;
-> +            if (vaddr_len != 0) {
-> +                error = target_mmap(vaddr_ps, vaddr_len,
-> +                                    elf_prot, MAP_PRIVATE | MAP_FIXED,
-> +                                    image_fd, eppnt->p_offset - vaddr_po);
-> +                if (error == -1) {
-> +                    goto exit_perror;
-> +                }
->               }
->   
->               vaddr_ef = vaddr + eppnt->p_filesz;
-> --- END ---
+> ---
 > 
-> -- System Information:
-> Debian Release: buster/sid
->    APT prefers unstable-debug
->    APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500, 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
-> Architecture: amd64 (x86_64)
-> Foreign Architectures: i386
+> Greg Kurz (11):
+>       spapr: Rename xics to intc in interrupt controller agnostic code
+>       xics: Disintricate allocation and type setting of interrupts
+>       spapr/xive: Don't set irq type in spapr_xive_irq_claim()
+>       spapr: Set irq type in a dedicated function
+>       spapr: Identify LSIs of all possible PHBs at machine init
+>       spapr_pci: add PHB unrealize
+>       spapr: Factor out setting of "phandle" DT property to sPAPR irq frontend
+>       spapr_xive: Cache device tree nodename in sPAPRXive
+>       spapr: Expose the name of the interrupt controller node
+>       spapr_irq: Expose the phandle of the interrupt controller
+>       spapr: add hotplug hooks for PHB hotplug
 > 
-> Kernel: Linux 4.19.0-1-amd64 (SMP w/4 CPU cores)
-> Locale: LANG=en_GB.UTF-8, LC_CTYPE=en_GB.UTF-8 (charmap=UTF-8), LANGUAGE=en_GB.UTF-8 (charmap=UTF-8)
-> Shell: /bin/sh linked to /bin/dash
-> Init: systemd (via /run/systemd/system)
-> LSM: AppArmor: enabled
+> Michael Roth (6):
+>       spapr: create DR connectors for PHBs
+>       spapr_events: add support for phb hotplug events
+>       qdev: pass an Object * to qbus_set_hotplug_handler()
+>       spapr_pci: provide node start offset via spapr_populate_pci_dt()
+>       spapr_pci: add ibm, my-drc-index property for PHB hotplug
+>       spapr: enable PHB hotplug for default pseries machine type
 > 
-> Versions of packages qemu-user depends on:
-> ii  libc6         2.28-3
-> ii  libcapstone3  3.0.5-3
-> ii  libgcc1       1:8.2.0-13
-> ii  libglib2.0-0  2.58.1-2
-> ii  libstdc++6    8.2.0-13
-> ii  zlib1g        1:1.2.11.dfsg-1
+> Nathan Fontenot (1):
+>       spapr: populate PHB DRC entries for root DT node
 > 
-> Versions of packages qemu-user recommends:
-> ii  qemu-user-static [qemu-user-binfmt]  1:3.1+dfsg-2
+> Thomas Huth (1):
+>       ppc: Move spapr-related prototypes from xics.h into a seperate header file
 > 
-> Versions of packages qemu-user suggests:
-> ii  sudo  1.8.26-2
 > 
-> -- no debconf information
+>  hw/acpi/pcihp.c               |    2 -
+>  hw/acpi/piix4.c               |    2 -
+>  hw/char/virtio-serial-bus.c   |    2 -
+>  hw/core/bus.c                 |   11 +--
+>  hw/core/machine.c             |    4 +
+>  hw/intc/spapr_xive.c          |   35 ++++-----
+>  hw/intc/xics.c                |   28 ++++++-
+>  hw/intc/xics_kvm.c            |    1 
+>  hw/intc/xics_spapr.c          |   10 +--
+>  hw/pci/pcie.c                 |    2 -
+>  hw/pci/shpc.c                 |    2 -
+>  hw/ppc/pnv_psi.c              |    1 
+>  hw/ppc/spapr.c                |  163 +++++++++++++++++++++++++++++++++++++++--
+>  hw/ppc/spapr_drc.c            |   18 +++++
+>  hw/ppc/spapr_events.c         |    9 ++
+>  hw/ppc/spapr_irq.c            |  129 +++++++++++++++++++++++++++-----
+>  hw/ppc/spapr_pci.c            |  124 ++++++++++++++++++++++++-------
+>  hw/ppc/spapr_vio.c            |    4 +
+>  hw/s390x/css-bridge.c         |    2 -
+>  hw/s390x/s390-pci-bus.c       |    6 +-
+>  hw/scsi/virtio-scsi.c         |    2 -
+>  hw/scsi/vmw_pvscsi.c          |    2 -
+>  hw/usb/dev-smartcard-reader.c |    2 -
+>  include/hw/pci-host/spapr.h   |   11 ++-
+>  include/hw/ppc/spapr.h        |    4 +
+>  include/hw/ppc/spapr_drc.h    |    8 ++
+>  include/hw/ppc/spapr_irq.h    |   16 +++-
+>  include/hw/ppc/spapr_xive.h   |   13 +++
+>  include/hw/ppc/xics.h         |   15 ++--
+>  include/hw/ppc/xics_spapr.h   |   43 +++++++++++
+>  include/hw/qdev-core.h        |    3 -
+>  31 files changed, 545 insertions(+), 129 deletions(-)
+>  create mode 100644 include/hw/ppc/xics_spapr.h
 > 
+
+-- 
+Alexey
