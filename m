@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60951)
+Received: from eggs.gnu.org ([209.51.188.92]:60932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gm3wQ-0007Sr-LS
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:50:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gm3wQ-0007SZ-Bh
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gm3wP-0008Fo-KK
+	(envelope-from <alex.bennee@linaro.org>) id 1gm3wP-0008Eu-25
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:50:42 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38101)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53089)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gm3wP-0007s8-Bk
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:50:41 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m22so81307wml.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 13:50:24 -0800 (PST)
+	id 1gm3wL-0007ph-70
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:50:37 -0500
+Received: by mail-wm1-x341.google.com with SMTP id m1so81910wml.2
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 13:50:23 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 22 Jan 2019 21:50:11 +0000
-Message-Id: <20190122215016.18697-7-alex.bennee@linaro.org>
+Date: Tue, 22 Jan 2019 21:50:12 +0000
+Message-Id: <20190122215016.18697-8-alex.bennee@linaro.org>
 In-Reply-To: <20190122215016.18697-1-alex.bennee@linaro.org>
 References: <20190122215016.18697-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 06/11] tests/fp/platform.h: include
- config-host.h
+Subject: [Qemu-devel] [PATCH v3 07/11] softfloat: enforce softfloat if the
+ host's FMA is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +35,79 @@ Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.benn
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-We get HOST_WORDS_BIGENDIAN from config-host.h, but the include
-is missing. Fix it.
+The added branch to the FMA ops is marked as unlikely and therefore
+its impact on performance (measured with fp-bench) is within noise range
+when measured on an Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
 
-This fixes `make check-softfloat' on big endian hosts.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/fp/platform.h | 1 +
- 1 file changed, 1 insertion(+)
+ fpu/softfloat.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/tests/fp/platform.h b/tests/fp/platform.h
-index f8c423dde3..c20ba70baa 100644
---- a/tests/fp/platform.h
-+++ b/tests/fp/platform.h
-@@ -29,6 +29,7 @@
-  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  */
-+#include "config-host.h"
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 59eac97d10..9132d7a0b0 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1542,6 +1542,8 @@ soft_f64_muladd(float64 a, float64 b, float64 c, int flags,
+     return float64_round_pack_canonical(pr, status);
+ }
  
- #ifndef HOST_WORDS_BIGENDIAN
- #define LITTLEENDIAN 1
++static bool force_soft_fma;
++
+ float32 QEMU_FLATTEN
+ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
+ {
+@@ -1562,6 +1564,11 @@ float32_muladd(float32 xa, float32 xb, float32 xc, int flags, float_status *s)
+     if (unlikely(!f32_is_zon3(ua, ub, uc))) {
+         goto soft;
+     }
++
++    if (unlikely(force_soft_fma)) {
++        goto soft;
++    }
++
+     /*
+      * When (a || b) == 0, there's no need to check for under/over flow,
+      * since we know the addend is (normal || 0) and the product is 0.
+@@ -1623,6 +1630,11 @@ float64_muladd(float64 xa, float64 xb, float64 xc, int flags, float_status *s)
+     if (unlikely(!f64_is_zon3(ua, ub, uc))) {
+         goto soft;
+     }
++
++    if (unlikely(force_soft_fma)) {
++        goto soft;
++    }
++
+     /*
+      * When (a || b) == 0, there's no need to check for under/over flow,
+      * since we know the addend is (normal || 0) and the product is 0.
+@@ -7974,3 +7986,24 @@ float128 float128_scalbn(float128 a, int n, float_status *status)
+                                          , status);
+ 
+ }
++
++static void __attribute__((constructor)) softfloat_init(void)
++{
++    union_float64 ua, ub, uc, ur;
++
++    if (QEMU_NO_HARDFLOAT) {
++        return;
++    }
++    /*
++     * Test that the host's FMA is not obviously broken. For example,
++     * glibc < 2.23 can perform an incorrect FMA on certain hosts; see
++     *   https://sourceware.org/bugzilla/show_bug.cgi?id=13304
++     */
++    ua.s = 0x0020000000000001ULL;
++    ub.s = 0x3ca0000000000000ULL;
++    uc.s = 0x0020000000000000ULL;
++    ur.h = fma(ua.h, ub.h, uc.h);
++    if (ur.s != 0x0020000000000001ULL) {
++        force_soft_fma = true;
++    }
++}
 -- 
 2.17.1
