@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58945)
+Received: from eggs.gnu.org ([209.51.188.92]:59106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsVs-00068S-JE
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:33 -0500
+	(envelope-from <kraxel@redhat.com>) id 1glsVw-0006AI-M1
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsNS-0004bg-Cg
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:29:52 -0500
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Tue, 22 Jan 2019 10:28:35 +0100
-Message-Id: <20190122092909.5341-2-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
-References: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 01/35] target/riscv: Move CPURISCVState
- pointer to DisasContext
+	(envelope-from <kraxel@redhat.com>) id 1glsM0-0003OS-Rb
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:28:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glsM0-0003MP-Lz
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:28:20 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 66A9C50452
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 09:28:19 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 22 Jan 2019 10:28:08 +0100
+Message-Id: <20190122092814.14919-3-kraxel@redhat.com>
+In-Reply-To: <20190122092814.14919-1-kraxel@redhat.com>
+References: <20190122092814.14919-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH v3 2/8] sdl2: remove sdl2_reset_keys()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-CPURISCVState is rarely used, so there is no need to pass it to every
-translate function. This paves the way for decodetree which only passes
-DisasContext to translate functions.
+No users left, dead code.
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/riscv/translate.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ include/ui/sdl2.h |  1 -
+ ui/sdl2-input.c   | 16 ----------------
+ 2 files changed, 17 deletions(-)
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 312bf298b3..c4a4d8115c 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -52,6 +52,7 @@ typedef struct DisasContext {
-        to any system register, which includes CSR_FRM, so we do not have
-        to reset this known value.  */
-     int frm;
-+    CPURISCVState *env;
- } DisasContext;
+diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
+index f43eecdbd6..fffbbfaee4 100644
+--- a/include/ui/sdl2.h
++++ b/include/ui/sdl2.h
+@@ -41,7 +41,6 @@ void sdl2_window_destroy(struct sdl2_console *scon);
+ void sdl2_window_resize(struct sdl2_console *scon);
+ void sdl2_poll_events(struct sdl2_console *scon);
  
- /* convert riscv funct3 to qemu memop for load/store */
-@@ -1797,19 +1798,19 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-     }
- }
+-void sdl2_reset_keys(struct sdl2_console *scon);
+ void sdl2_process_key(struct sdl2_console *scon,
+                       SDL_KeyboardEvent *ev);
  
--static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-+static void decode_opc(DisasContext *ctx)
+diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
+index 1378b63dd9..208266c6a5 100644
+--- a/ui/sdl2-input.c
++++ b/ui/sdl2-input.c
+@@ -32,22 +32,6 @@
+ 
+ static uint8_t modifiers_state[SDL_NUM_SCANCODES];
+ 
+-void sdl2_reset_keys(struct sdl2_console *scon)
+-{
+-    QemuConsole *con = scon ? scon->dcl.con : NULL;
+-    int i;
+-
+-    for (i = 0 ;
+-         i < SDL_NUM_SCANCODES && i < qemu_input_map_usb_to_qcode_len ;
+-         i++) {
+-        if (modifiers_state[i]) {
+-            int qcode = qemu_input_map_usb_to_qcode[i];
+-            qemu_input_event_send_key_qcode(con, qcode, false);
+-            modifiers_state[i] = 0;
+-        }
+-    }
+-}
+-
+ void sdl2_process_key(struct sdl2_console *scon,
+                       SDL_KeyboardEvent *ev)
  {
-     /* check for compressed insn */
-     if (extract32(ctx->opcode, 0, 2) != 3) {
--        if (!riscv_has_ext(env, RVC)) {
-+        if (!riscv_has_ext(ctx->env, RVC)) {
-             gen_exception_illegal(ctx);
-         } else {
-             ctx->pc_succ_insn = ctx->base.pc_next + 2;
--            decode_RV32_64C(env, ctx);
-+            decode_RV32_64C(ctx->env, ctx);
-         }
-     } else {
-         ctx->pc_succ_insn = ctx->base.pc_next + 4;
--        decode_RV32_64G(env, ctx);
-+        decode_RV32_64G(ctx->env, ctx);
-     }
- }
- 
-@@ -1854,10 +1855,10 @@ static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
- static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
--    CPURISCVState *env = cpu->env_ptr;
-+    ctx->env = cpu->env_ptr;
- 
--    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
--    decode_opc(env, ctx);
-+    ctx->opcode = cpu_ldl_code(ctx->env, ctx->base.pc_next);
-+    decode_opc(ctx);
-     ctx->base.pc_next = ctx->pc_succ_insn;
- 
-     if (ctx->base.is_jmp == DISAS_NEXT) {
 -- 
-2.20.1
+2.9.3
