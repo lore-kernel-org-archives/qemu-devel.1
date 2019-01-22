@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59068)
+Received: from eggs.gnu.org ([209.51.188.92]:60107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gm2Kr-0004gB-GW
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:07:50 -0500
+	(envelope-from <cota@braap.org>) id 1gm2O2-0007eQ-2p
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gm2Kq-00046a-Sm
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:07:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46382)
+	(envelope-from <cota@braap.org>) id 1gm2O0-0005yQ-2M
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:06 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:35379)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gm2Kq-00046C-Mt
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:07:48 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B504DC04BD46
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 20:07:47 +0000 (UTC)
-Date: Tue, 22 Jan 2019 20:07:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190122200740.GC2241@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] of apci_1_compatible in CPUHotplugFeatures
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gm2Nz-0005qH-Eg
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 15:11:03 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue, 22 Jan 2019 15:10:42 -0500
+Message-Id: <20190122201042.26394-5-cota@braap.org>
+In-Reply-To: <20190122201042.26394-1-cota@braap.org>
+References: <20190122201042.26394-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 4/4] tests/fp/platform.h: include config-host.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: imammedo@redhat.com, mst@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi,
-  I noticed that the acpi_1_compatible flag was misspelt as
-                     apci_1_compatible
+We get HOST_WORDS_BIGENDIAN from config-host.h, but the include
+is missing. Fix it.
 
-so have a trivial patch to fix that, but looking at it - are
-thre any cases where a[cp]i_1_compatible can possibly be false?
+This fixes `make check-softfloat' on big endian hosts.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ tests/fp/platform.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/fp/platform.h b/tests/fp/platform.h
+index f8c423dde3..c20ba70baa 100644
+--- a/tests/fp/platform.h
++++ b/tests/fp/platform.h
+@@ -29,6 +29,7 @@
+  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
++#include "config-host.h"
+ 
+ #ifndef HOST_WORDS_BIGENDIAN
+ #define LITTLEENDIAN 1
+-- 
+2.17.1
