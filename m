@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59106)
+Received: from eggs.gnu.org ([209.51.188.92]:60152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1glsW0-0006AI-GN
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:41 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1glsW9-0007DE-2B
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1glsKk-0002k7-3O
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:27:07 -0500
-Date: Tue, 22 Jan 2019 09:26:57 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190122092657.GA17452@stefanha-x1.localdomain>
-References: <20190110094020.18354-1-stefanha@redhat.com>
-	<CAFEAcA8bz7ViuZeZqCBZHy49=dbYxW7Q04MbuVKapEfT5K56ug@mail.gmail.com>
+	(envelope-from <sgarzare@redhat.com>) id 1glsW8-0001UX-D2
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:49 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1glsW8-0001U3-6u
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:48 -0500
+Received: by mail-wr1-f66.google.com with SMTP id t27so26494385wra.6
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:38:48 -0800 (PST)
+Date: Tue, 22 Jan 2019 10:38:43 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190122093843.ayg66u53w4s3fq6m@steredhat>
+References: <20190118120143.21631-1-sgarzare@redhat.com>
+	<20190118120143.21631-5-sgarzare@redhat.com>
+	<20190121170541.GN4136@habkost.net>
+	<20190121173650.ydihxdyhheq7xcpq@steredhat>
+	<e889e61c-f5fe-51cc-c703-45487efd4d3f@redhat.com>
+	<20190122092232.dij3zujx32w3n6wq@steredhat>
+	<21327094-fe12-df44-c23f-d001e75228db@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8bz7ViuZeZqCBZHy49=dbYxW7Q04MbuVKapEfT5K56ug@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] arm: Stub out NRF51 TWI
- magnetometer/accelerometer detection
+In-Reply-To: <21327094-fe12-df44-c23f-d001e75228db@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 4/5] hw/i386/pc: use PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Julia Suvorova <jusual@mail.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Liam Merwick <liam.merwick@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>
 
+On Tue, Jan 22, 2019 at 10:29:30AM +0100, Paolo Bonzini wrote:
+> On 22/01/19 10:22, Stefano Garzarella wrote:
+> > 
+> > I tried to migrate from a QEMU with PVH support to a QEMU without PVH,
+> > (both with the same pc-q35-4.0 machine) and the migration doesn't fail.
+> > 
+> > The guest, after the migration, works well, but when I tried to reboot,
+> > the guest stuck.
+> > 
+> > The "info ramblock" on both QEMU produce the same output:
+> >               Block Name    PSize              Offset               Used              Total
+> >                   pc.ram    4 KiB  0x0000000000000000 0x0000000020000000 0x0000000020000000
+> >     /rom@etc/acpi/tables    4 KiB  0x0000000020080000 0x0000000000020000 0x0000000000200000
+> >                  pc.bios    4 KiB  0x0000000020000000 0x0000000000040000 0x0000000000040000
+> >                   pc.rom    4 KiB  0x0000000020040000 0x0000000000020000 0x0000000000020000
+> >    /rom@etc/table-loader    4 KiB  0x0000000020280000 0x0000000000001000 0x0000000000001000
+> >       /rom@etc/acpi/rsdp    4 KiB  0x00000000202c0000 0x0000000000001000 0x0000000000001000
+> > 
+> > 
+> > The following patch solves the issue. (Thanks Michael!)
+> > Should I send the v6 of series or this patch alone for the review?
+> 
+> Send the patch alone, but there's no need to introduce 4.1 since the
+> feature will be included in 4.0.
 
---RnlQjJ0d97Da+TV1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Okay, I'll modify the patch.
 
-On Mon, Jan 21, 2019 at 04:21:03PM +0000, Peter Maydell wrote:
-> On Thu, 10 Jan 2019 at 09:40, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >
-> > v2:
-> >  * Move stub code into a separate device [Peter]
-> >  * Instantiate stub from microbit board instead of nRF51 SoC since this=
- is
-> >    microbit-specific.  Other boards using the nRF51 wouldn't necessaril=
-y want
-> >    to see these TWI/I2C devices.
-> >  * Add test case
-> >
-> > This series stubs out the microbit's TWI/I2C devices so the microbit-dal
-> > firmware boots successfully.  The accelerometer and magnetometer are pr=
-obed at
-> > startup.  If they are not found the firmware panics.
-> >
-> > Stefan Hajnoczi (1):
-> >   tests/microbit-test: add TWI stub device test
-> >
-> > Steffen G=F6rtz (1):
-> >   arm: Stub out NRF51 TWI magnetometer/accelerometer detection
-> >
-> >  hw/i2c/Makefile.objs          |   1 +
-> >  include/hw/arm/nrf51.h        |   2 +
-> >  include/hw/arm/nrf51_soc.h    |   1 +
-> >  include/hw/i2c/microbit_i2c.h |  42 +++++++++++
-> >  hw/arm/microbit.c             |  15 ++++
-> >  hw/i2c/microbit_i2c.c         | 127 ++++++++++++++++++++++++++++++++++
-> >  tests/microbit-test.c         |  44 ++++++++++++
-> >  7 files changed, 232 insertions(+)
-> >  create mode 100644 include/hw/i2c/microbit_i2c.h
-> >  create mode 100644 hw/i2c/microbit_i2c.c
->=20
-> Applied to target-arm.next, thanks. Can you provide a
-> MAINTAINERS file update for the new files, please?
-> (You can send that separately or stick it in another
-> nrf51 series if you're sending one.)
-
-Sure, will do.
-
-Stefan
-
---RnlQjJ0d97Da+TV1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcRuHhAAoJEJykq7OBq3PIoXYH/2kCnoguR7EO1X7TnB+GAArT
-BdAJYlGbXTLepUjO9IQ2Q8B4CMC2/jg9YopD9zJGJJJRFUckHCZkL6bHZDNloKfr
-y33j3g5g5estByYfYBz8X0zm1xbpd/3FF2KwRFDDbCg87cOGr7CLfRl1Pq92kn0F
-Lr0Wc3VSDtVBdLNSgBcAaicZL1CUOJtdrLCTtauQuedAUg61uPdjvqXT0b4impfT
-2LUXVZO/En5AgbGwxdk2q3vgNWXa5gxqKw9IzkGcJIoHBIbS6IKTsL7sAB+A1Oob
-ic+AYhPR7U8qZHI13DGEFLuIB6LyFkBMidVsvnP1PZAqsNM86sGFSMPmYnMMaFw=
-=jj9T
------END PGP SIGNATURE-----
-
---RnlQjJ0d97Da+TV1--
+Thanks,
+Stefano
