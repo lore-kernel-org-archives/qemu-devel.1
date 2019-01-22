@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51009)
+Received: from eggs.gnu.org ([209.51.188.92]:51247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm18q-0008Hz-TB
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:21 -0500
+	(envelope-from <david@redhat.com>) id 1gm19J-0000Cc-SM
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm18h-00088t-Sf
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:18 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40406
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gm18h-00088I-IJ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:11 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0MGx3xw119048
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:19 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q66p59jxw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:19 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 22 Jan 2019 17:01:18 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Tue, 22 Jan 2019 15:01:09 -0200
-Message-Id: <20190122170112.8706-1-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 0/3] ppc/gdbstub: Expose SPRs to GDB
+	(envelope-from <david@redhat.com>) id 1gm19H-0008KE-JI
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:51:48 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 22 Jan 2019 13:51:33 +0100
+Message-Id: <20190122125133.1191-3-david@redhat.com>
+In-Reply-To: <20190122125133.1191-1-david@redhat.com>
+References: <20190122125133.1191-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +21,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-This series implements the reading and writing of Special Purpose
-Registers in PPC's gdbstub.
+When hotplugging a PCI bridge right now to the root port, we resolve
+pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
+really only works right now when hotplugging to another bridge.
 
-How it works generally [1]:
+Instead, we have to properly check if we are already at the root.
 
-GDB asks for the target.xml file which contains the target description
-along with the list of available feature XMLs. GDB then asks for each
-of the XML files in sequence.
+Let's cleanup the code while at it a bit and factor out updating the
+subordiante bus number into a separate function. The check for
+"old_nr < nr" is right now not strictly necessary, but makes it more
+obvious what is actually going on.
 
-The XML files contain a list of registers descriptions:
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-  <reg name="msr" bitsize="64" type="uint64"/>
-
-When the user tries to access a register, GDB reads the XML file in
-sequence and sends QEMU the number of the register. This number is
-sequential across all feature files.
-
-The index provided by GDB must be converted by QEMU to match QEMU's
-internal representation.
-
-A set of callbacks are implemented to read/write the register.
-
-In this series:
-
-The first patch implements the dynamic generation of the power-spr.xml
-file. Making it dynamically facilitates converting the GDB index to an
-index useful for addressing the env->spr array.
-
-The second patch implements the gdb_{get,set}_spr_reg callbacks along
-with the convertion from GDB index to QEMU index.
-
-The third patch enables the functionality.
-
-https://sourceware.org/gdb/current/onlinedocs/gdb/Target-Descriptions.html
-
-v1 -> v2:
- - patch 1: explicitly store the gdb_id and add comment explaining why
-            we need it
- - patch 2: use gdb_id to find the correct env->spr array's index
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00648.html
-
-v2 -> v3:
- - patch 2: move gdb_register_coprocessor call from patch 3 so that
-            all patches build independently
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02939.html
-
-v3 -> v4:
- - patch 1: move gdb_spr_xml into PowerPCCPUClass so that it is
-            generated only once for all CPUs
-
- http://lists.nongnu.org/archive/html/qemu-ppc/2019-01/msg00357.html
-
-
-Fabiano Rosas (3):
-  target/ppc: Add SPRs XML generation code for gdbstub
-  target/ppc: Add GDB callbacks for SPRs
-  target/ppc: Enable reporting of SPRs to GDB
-
- target/ppc/cpu-qom.h            |  4 +++
- target/ppc/cpu.h                |  5 +++
- target/ppc/gdbstub.c            | 60 +++++++++++++++++++++++++++++++
- target/ppc/translate_init.inc.c | 62 +++++++++++++++++++++++++++++++--
- 4 files changed, 129 insertions(+), 2 deletions(-)
-
---
-2.17.1
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index b7c4613fde..9b5c5fff60 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     }
+ }
+ 
++static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
++{
++    uint32_t old_nr;
++
++    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
++    while (!pci_bus_is_root(pci_get_bus(dev))) {
++        dev = pci_get_bus(dev)->parent_dev;
++
++        old_nr = pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1);
++        if (old_nr < nr) {
++            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
++        }
++    }
++}
++
+ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                               Error **errp)
+ {
+@@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     S390PCIBusDevice *pbdev = NULL;
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+-        BusState *bus;
+         PCIBridge *pb = PCI_BRIDGE(dev);
+-        PCIDevice *pdev = PCI_DEVICE(dev);
+ 
++        pdev = PCI_DEVICE(dev);
+         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
+ 
+-        bus = BUS(&pb->sec_bus);
+-        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
++        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
+ 
+         if (dev->hotplugged) {
+             pci_default_write_config(pdev, PCI_PRIMARY_BUS,
+                                      pci_dev_bus_num(pdev), 1);
+             s->bus_no += 1;
+             pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
+-            do {
+-                pdev = pci_get_bus(pdev)->parent_dev;
+-                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
+-                                         s->bus_no, 1);
+-            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
++
++            s390_pci_update_subordinate(pdev, s->bus_no);
+         }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         pdev = PCI_DEVICE(dev);
+-- 
+2.17.2
