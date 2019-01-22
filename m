@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42686)
+Received: from eggs.gnu.org ([209.51.188.92]:43133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1glrBg-0004Ox-Oa
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1glrDj-0005Tl-95
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1glrBd-00082D-8I
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:36 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:34203)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1glrBc-000805-2X
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:13:32 -0500
-References: <154809778688.10764.12505763850198799463.reportbug@deadeye.wl.decadent.org.uk>
-	<16ee5e20-e61b-7242-7d80-39a06fb8fd4f@msgid.tls.msk.ru>
-	<d4f70494-732f-1013-291c-c56566d10c57@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <31f25a38-e22d-6e08-f0a5-2b8ed7c3dea8@vivier.eu>
-Date: Tue, 22 Jan 2019 09:13:02 +0100
-MIME-Version: 1.0
-In-Reply-To: <d4f70494-732f-1013-291c-c56566d10c57@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1glrDh-0000pr-Bd
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:15:42 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 22 Jan 2019 08:15:25 +0000
+Message-ID: <b2915d9a-90f1-a114-5d18-f2d69cc491b8@virtuozzo.com>
+References: <cover.1547739122.git.berto@igalia.com>
+	<23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
+In-Reply-To: <23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Bug#920032: qemu-user uses wrong struct timeval on
- sparc
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4DDE363086D5744682E59AE71AF1B0E6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 00/13] Add a 'x-blockdev-reopen' QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Ben Hutchings <ben@decadent.org.uk>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Michael Tokarev <mjt@tls.msk.ru>, 920032@bugs.debian.org
+To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 22/01/2019 07:12, Thomas Huth wrote:
->  Hi Ben,
-> 
-> could you please submit this as a proper patch to the qemu-devel mailing
-> list, with Signed-off-by line?
-> (see https://wiki.qemu.org/Contribute/SubmitAPatch for details)
-> 
->  Thanks,
->   Thomas
-> 
-> 
-> On 2019-01-22 06:42, Michael Tokarev wrote:
->> Forwarding to qemu-devel@.
->> http://bugs.debian.org/920032
->>
->> Thanks!
->>
->> 21.01.2019 22:09, Ben Hutchings wrote:
->>> Package: qemu-user
->>> Version: 1:3.1+dfsg-2
->>> Severity: important
->>> Tags: patch
->>>
->>> On sparc (only) Linux defines timeval::tv_usec with type int, not
->>> long.  However qemu-user's definition of struct target_timeval uses
->>> abi_long unconditionally.  This results in the syscall translation
->>> layer effectively multiplying tv_usec by 2**32.  All sparc syscalls
->>> passing non-zero values for this field fail with -EINVAL.  The
->>> following patch seems to fix this.
->>>
->>> Ben.
->>>
->>> --- a/linux-user/syscall_defs.h
->>> +++ b/linux-user/syscall_defs.h
->>> @@ -210,7 +210,11 @@ struct target_linger {
->>>     struct target_timeval {
->>>       abi_long tv_sec;
->>> +#if defined (TARGET_SPARC)
-
-According to the kernel definition, I think it should be:
-
-#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-
-See include/uapi/linux/time.h
-
-struct timeval {
-        __kernel_time_t         tv_sec;         /* seconds */
-        __kernel_suseconds_t    tv_usec;        /* microseconds */
-};
-
-and arch/sparc/include/uapi/asm/posix_types.h
-
-#if defined(__sparc__) && defined(__arch64__)
-...
-typedef int                    __kernel_suseconds_t;
-
-
->>> +    abi_int tv_usec;
->>> +#else
->>>       abi_long tv_usec;
->>> +#endif
->>>   };
->>>     struct target_timespec {
->>> --- END ---
->>>
->>> -- System Information:
->>> Debian Release: buster/sid
->>>    APT prefers unstable-debug
->>>    APT policy: (500, 'unstable-debug'), (500, 'stable-updates'), (500,
->>> 'unstable'), (500, 'testing'), (500, 'stable'), (1, 'experimental')
->>> Architecture: amd64 (x86_64)
->>> Foreign Architectures: i386
->>>
->>> Kernel: Linux 4.19.0-1-amd64 (SMP w/4 CPU cores)
->>> Locale: LANG=en_GB.UTF-8, LC_CTYPE=en_GB.UTF-8 (charmap=UTF-8),
->>> LANGUAGE=en_GB.UTF-8 (charmap=UTF-8)
->>> Shell: /bin/sh linked to /bin/dash
->>> Init: systemd (via /run/systemd/system)
->>> LSM: AppArmor: enabled
->>>
->>> Versions of packages qemu-user depends on:
->>> ii  libc6         2.28-3
->>> ii  libcapstone3  3.0.5-3
->>> ii  libgcc1       1:8.2.0-13
->>> ii  libglib2.0-0  2.58.1-2
->>> ii  libstdc++6    8.2.0-13
->>> ii  zlib1g        1:1.2.11.dfsg-1
->>>
->>> Versions of packages qemu-user recommends:
->>> ii  qemu-user-static [qemu-user-binfmt]  1:3.1+dfsg-2
->>>
->>> Versions of packages qemu-user suggests:
->>> ii  sudo  1.8.26-2
->>>
->>> -- no debconf information
->>>
->>
-> 
-> 
+MTcuMDEuMjAxOSAxODo1MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNy8xOSA5OjMzIEFN
+LCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4gDQo+Pg0KPj4gQ2hhbmdpbmcgb3B0aW9ucw0KPj4g
+PT09PT09PT09PT09PT09PQ0KPj4gVGhlIGdlbmVyYWwgaWRlYSBpcyBxdWl0ZSBzdHJhaWdodGZv
+cndhcmQsIGJ1dCB0aGUgZGV2aWwgaXMgaW4gdGhlDQo+PiBkZXRhaWxzLiBTaW5jZSB0aGlzIGNv
+bW1hbmQgdHJpZXMgdG8gbWltaWMgYmxvY2tkZXYtYWRkLCB0aGUgc3RhdGUgb2YNCj4+IHRoZSBi
+bG9jayBkZXZpY2UgYWZ0ZXIgYmVpbmcgcmVvcGVuZWQgc2hvdWxkIGdlbmVyYWxseSBiZSBlcXVp
+dmFsZW50DQo+PiB0byB0aGF0IG9mIGEgYmxvY2sgZGV2aWNlIGFkZGVkIHdpdGggdGhlIHNhbWUg
+c2V0IG9mIG9wdGlvbnMuDQo+Pg0KPj4gVGhlcmUgYXJlIHR3byBpbXBvcnRhbnQgdGhpbmdzIHdp
+dGggdGhpczoNCj4+DQo+PiAgICBhKSBTb21lIG9wdGlvbnMgY2Fubm90IGJlIGNoYW5nZWQgKG1v
+c3QgZHJpdmVycyBkb24ndCBhbGxvdyB0aGF0LCBpbg0KPj4gICAgICAgZmFjdCkuDQo+PiAgICBi
+KSBJZiBhbiBvcHRpb24gaXMgbWlzc2luZywgaXQgc2hvdWxkIGJlIHJlc2V0IHRvIGl0cyBkZWZh
+dWx0IHZhbHVlDQo+PiAgICAgICAocmF0aGVyIHRoYW4ga2VlcGluZyBpdHMgcHJldmlvdXMgdmFs
+dWUpLg0KPiANCj4gQ291bGQgd2UgdXNlIFFBUEkgYWx0ZXJuYXRlIHR5cGVzIHdoZXJlIHdlIGNv
+dWxkIHN0YXRlIHRoYXQ6DQo+IA0KPiAib3B0aW9uIjoibmV3IiAtIHNldCB0aGUgb3B0aW9uDQo+
+ICJvcHRpb24iOm51bGwgLSByZXNldCB0aGUgb3B0aW9uIHRvIGl0cyBkZWZhdWx0DQo+IG9taXQg
+b3B0aW9uIC0gbGVhdmUgdGhlIG9wdGlvbiB1bmNoYW5nZWQNCj4gDQo+IGJhc2ljYWxseSwgbWFr
+aW5nIGVhY2ggb2YgdGhlIG9wdGlvbnMgYW4gQWx0ZXJuYXRlIHdpdGggSlNPTiBudWxsLCBzbw0K
+PiB0aGF0IGEgcmVxdWVzdCB0byByZXNldCB0byB0aGUgZGVmYXVsdCBiZWNvbWVzIGFuIGV4cGxp
+Y2l0IGFjdGlvbj8NCg0KKzENCg0KU29ycnksIEkgbWlzc2VkIHRoZSBwcmV2aW91cyBkaXNjdXNz
+aW9uLiBXaGF0IGlzIHRoZSByZWFzb24gdG8gcmVzZXQgb3B0aW9uDQp0byBkZWZhdWx0IGlmIGl0
+IG1pc3NlZD8gSXQgbG9va3MgbW9yZSBjb21tb24gdG8gbm90IHRvdWNoIHRoaW5ncyB3aGljaCBh
+cmUNCm5vdCBhc2tlZCB0by4NCg0KQWxzbywgc2hvdWxkIHdlIGNvbnNpZGVyIGFuIG9wdGlvbiB3
+aGljaCBtYXkgYmUgY2hhbmdlZCBkdXJpbmcgbGlmZS1jeWNsZSBvZg0KYSBkZXZpY2Ugbm90IGJ5
+IHVzZXIgcmVxdWVzdCB0byBjaGFuZ2UgaXQ/IElmIHllcywgaXQgc2hvdWxkIGJlIHNhZmVyIHRv
+IG5vdA0KcmVzZXQgaXQuDQoNCj4gDQo+Pg0KPj4gRXhhbXBsZTogdGhlIGRlZmF1bHQgdmFsdWUg
+b2YgbDItY2FjaGUtc2l6ZSBpcyAxTUIuIElmIHdlIHNldCBhDQo+PiBkaWZmZXJlbnQgdmFsdWUg
+KDJNQikgb24gYmxvY2tkZXYtYWRkIGJ1dCB0aGVuIG9taXQgdGhlIG9wdGlvbiBpbg0KPj4geC1i
+bG9ja2Rldi1yZW9wZW4sIHRoZW4gaXQgc2hvdWxkIGJlIHJlc2V0IGJhY2sgdG8gMU1CLiBUaGUg
+Y3VycmVudA0KPj4gYmRydl9yZW9wZW4oKSBjb2RlIGtlZXBzIHRoZSBwcmV2aW91cyB2YWx1ZS4N
+Cj4+DQo+PiBUcnlpbmcgdG8gY2hhbmdlIGFuIG9wdGlvbiB0aGF0IGRvZXNuJ3QgYWxsb3cgaXQg
+aXMgYWxyZWFkeSBiZWluZw0KPj4gaGFuZGxlZCBieSB0aGUgY29kZS4gVGhlIGxvb3AgYXQgdGhl
+IGVuZCBvZiBiZHJ2X3Jlb3Blbl9wcmVwYXJlKCkNCj4+IGNoZWNrcyBhbGwgb3B0aW9ucyB0aGF0
+IHdlcmUgbm90IGhhbmRsZWQgYnkgdGhlIGJsb2NrIGRyaXZlciBhbmQgc2Vlcw0KPj4gaWYgYW55
+IG9mIHRoZW0gaGFzIGJlZW4gbW9kaWZpZWQuDQo+Pg0KPj4gSG93ZXZlciwgYXMgSSBleHBsYWlu
+ZWQgZWFybGllciBpbiAoYiksIG9taXR0aW5nIGFuIG9wdGlvbiBpcyBzdXBwb3NlZA0KPj4gdG8g
+cmVzZXQgaXQgdG8gaXRzIGRlZmF1bHQgdmFsdWUsIHNvIGl0J3MgYWxzbyBhIHdheSBvZiBjaGFu
+Z2luZw0KPj4gaXQuIElmIHRoZSBvcHRpb24gY2Fubm90IGJlIGNoYW5nZWQgdGhlbiB3ZSBzaG91
+bGQgZGV0ZWN0IGl0IGFuZA0KPj4gcmV0dXJuIGFuIGVycm9yLiBXaGF0IEknbSBkb2luZyBpbiB0
+aGlzIHNlcmllcyBpcyBtYWtpbmcgZXZlcnkgZHJpdmVyDQo+PiBwdWJsaXNoIGl0cyBsaXN0IG9m
+IHJ1bi10aW1lIG9wdGlvbnMsIGFuZCB3aGljaCBvbmVzIG9mIHRoZW0gY2FuIGJlDQo+PiBtb2Rp
+ZmllZC4NCj4+DQo+PiBCYWNraW5nIGZpbGVzDQo+PiA9PT09PT09PT09PT09DQo+PiBUaGlzIGNv
+bW1hbmQgYWxsb3dzIHJlY29uZmlndXJhdGlvbnMgaW4gdGhlIG5vZGUgZ3JhcGguIEN1cnJlbnRs
+eSBpdA0KPj4gb25seSBhbGxvd3MgY2hhbmdpbmcgYW4gaW1hZ2UncyBiYWNraW5nIGZpbGUsIGJ1
+dCBpdCBzaG91bGQgYmUNCj4+IHBvc3NpYmxlIHRvIGltcGxlbWVudCBzaW1pbGFyIGZ1bmN0aW9u
+YWxpdGllcyBpbiBkcml2ZXJzIHRoYXQgaGF2ZQ0KPj4gb3RoZXIgY2hpbGRyZW4sIGxpa2UgYmxr
+dmVyaWZ5IG9yIHF1b3J1bS4NCj4+DQo+PiBMZXQncyBhZGQgYW4gaW1hZ2Ugd2l0aCBpdHMgYmFj
+a2luZyBmaWxlIChoZDEgPC0gaGQwKSBsaWtlIHRoaXM6DQo+Pg0KPj4gICAgICB7ICJleGVjdXRl
+IjogImJsb2NrZGV2LWFkZCIsDQo+PiAgICAgICAgImFyZ3VtZW50cyI6IHsNCj4+ICAgICAgICAg
+ICAgImRyaXZlciI6ICJxY293MiIsDQo+PiAgICAgICAgICAgICJub2RlLW5hbWUiOiAiaGQwIiwN
+Cj4+ICAgICAgICAgICAgImZpbGUiOiB7DQo+PiAgICAgICAgICAgICAgICAiZHJpdmVyIjogImZp
+bGUiLA0KPj4gICAgICAgICAgICAgICAgImZpbGVuYW1lIjogImhkMC5xY293MiIsDQo+PiAgICAg
+ICAgICAgICAgICAibm9kZS1uYW1lIjogImhkMGYiDQo+PiAgICAgICAgICAgIH0sDQo+PiAgICAg
+ICAgICAgICJiYWNraW5nIjogew0KPj4gICAgICAgICAgICAgICAgImRyaXZlciI6ICJxY293MiIs
+DQo+PiAgICAgICAgICAgICAgICAibm9kZS1uYW1lIjogImhkMSIsDQo+PiAgICAgICAgICAgICAg
+ICAiZmlsZSI6IHsNCj4+ICAgICAgICAgICAgICAgICAgICAiZHJpdmVyIjogImZpbGUiLA0KPj4g
+ICAgICAgICAgICAgICAgICAgICJmaWxlbmFtZSI6ICJoZDEucWNvdzIiLA0KPj4gICAgICAgICAg
+ICAgICAgICAgICJub2RlLW5hbWUiOiAiaGQxZiINCj4+ICAgICAgICAgICAgICAgIH0NCj4+ICAg
+ICAgICAgICAgfQ0KPj4gICAgICAgICB9DQo+PiAgICAgIH0NCj4+DQo+PiBSZW1vdmluZyB0aGUg
+YmFja2luZyBmaWxlIGNhbiBiZSBkb25lIGJ5IHNpbXBseSBwYXNzaW5nIHRoZSBvcHRpb24gew0K
+Pj4gLi4uLCAiYmFja2luZyI6IG51bGwgfSB0byB4LWJsb2NrZGV2LXJlb3Blbi4NCj4+DQo+PiBS
+ZXBsYWNpbmcgaXQgaXMgbm90IHNvIHN0cmFpZ2h0Zm9yd2FyZC4gSWYgd2UgcGFzcyBzb21ldGhp
+bmcgbGlrZSB7DQo+PiAuLi4sICJiYWNraW5nIjogeyAiZHJpdmVyIjogImZvbyIgLi4uIH0gfSB0
+aGVuIHgtYmxvY2tkZXYtcmVvcGVuIHdpbGwNCj4+IGFzc3VtZSB0aGF0IHdlJ3JlIHRyeWluZyB0
+byBjaGFuZ2UgdGhlIG9wdGlvbnMgb2YgdGhlIGV4aXN0aW5nIGJhY2tpbmcNCj4+IGZpbGUgKGFu
+ZCBpdCB3aWxsIGZhaWwgaW4gbW9zdCBjYXNlcyBiZWNhdXNlIGl0J2xsIGxpa2VseSB0aGluayB0
+aGF0DQo+PiB3ZSdyZSB0cnlpbmcgdG8gY2hhbmdlIHRoZSBub2RlIG5hbWUsIGFtb25nIG90aGVy
+IG9wdGlvbnMpLg0KPj4NCj4+IFNvIEkgZGVjaWRlZCB0byB1c2UgYSByZWZlcmVuY2UgaW5zdGVh
+ZDogeyAuLi4sICJiYWNraW5nIjogImhkMiIgfSwNCj4+IHdoZXJlICJoZDIiIGlzIG9mIGFuIGV4
+aXN0aW5nIG5vZGUgdGhhdCBoYXMgYmVlbiBhZGRlZCBwcmV2aW91c2x5Lg0KPj4NCj4+IExlYXZp
+bmcgb3V0IHRoZSAiYmFja2luZyIgb3B0aW9uIGNhbiBiZSBhbWJpZ3VvdXMgb24gc29tZSBjYXNl
+cyAod2hhdA0KPj4gc2hvdWxkIGl0IGRvPyBrZWVwIHRoZSBjdXJyZW50IGJhY2tpbmcgZmlsZT8g
+b3BlbiB0aGUgZGVmYXVsdCBvbmUNCj4+IHNwZWNpZmllZCBpbiB0aGUgaW1hZ2UgZmlsZT8pIHNv
+IHgtYmxvY2tkZXYtcmVvcGVuIHJlcXVpcmVzIHRoYXQgdGhpcw0KPj4gb3B0aW9uIGlzIHByZXNl
+bnQuIEZvciBjb252ZW5pZW5jZSwgaWYgdGhlIEJEUyBkb2Vzbid0IGhhdmUgYSBiYWNraW5nDQo+
+PiBmaWxlIHRoZW4gd2UgYWxsb3cgbGVhdmluZyB0aGUgb3B0aW9uIG91dC4NCj4gDQo+IEhtbSAt
+IHRoYXQgbWFrZXMgbXkgcHJvcG9zYWwgb2YgIm9wdGlvbiI6bnVsbCBhcyBhbiBleHBsaWNpdCBy
+ZXF1ZXN0IHRvDQo+IHRoZSBkZWZhdWx0IGEgYml0IHRyaWNraWVyLCBpZiB3ZSBhcmUgYWxyZWFk
+eSB1c2luZyBudWxsIGZvciBhIGRpZmZlcmVudA0KPiBtZWFuaW5nIGZvciBiYWNraW5nIGZpbGVz
+Lg0KDQpBbmQgaGVyZTogaWYgd2UgYXJlIGdvaW5nIHRvIHJlc2V0IHRvIGRlZmF1bHQgZm9yIG5v
+dCBsaXN0ZWQgb3B0aW9ucywgdGhhbg0KanVzdCBub3QgbGlzdGluZyAiYmFja2luZyIgc2hvdWxk
+IHJlbW92ZSBpdCAoYXMgZGVmYXVsdCBpcyBudWxsLCBvYnZpb3VzbHkpLA0KYW5kIHdlIGRvbid0
+IG5lZWQgdGhpcyBzcGVjaWFsICJudWxsIiBwYXJhbWV0ZXIuDQoNCk1vcmVvdmVyLCBiYWNraW5n
+IGlzIGFuIGV4YW1wbGUgb2YgYW4gb3B0aW9uIEkgbWVudGlvbmVkLCBpdCBkZWZpbml0ZWx5IG1h
+eQ0KY2hhbmdlIGFmdGVyIGJsb2NrLXN0cmVhbSBmb3IgZXhhbXBsZSwgc28gcmVzZXR0aW5nIHRv
+IGRlZmF1bHQgaXMgdW5zYWZlLA0KYW5kIHVzZXIgd2lsbCBoYXZlIHRvIGNhcmVmdWxseSBzZXQg
+YmFja2luZyBvbiByZW9wZW4gKG5vdCB0aGEgYmFja2luZywgdGhhdA0Kd2FzIHVzZWQgd2l0aCBm
+aXJzdCBibG9ja2Rldi1hZGQsIGJ1dCBiYWNraW5nIHdoaWNoIHdlIGhhdmUgYWZ0ZXIgYmxvY2st
+c3RyZWFtKQ0KDQo+IA0KPj4NCj4+IEFzIHlvdSBjYW4gc2VlIGluIHRoZSBwYXRjaCBzZXJpZXMs
+IEkgd3JvdGUgYSByZWxhdGl2ZWx5IGxhcmdlIGFtb3VudA0KPj4gb2YgdGVzdHMgZm9yIG1hbnkg
+ZGlmZmVyZW50IHNjZW5hcmlvcywgaW5jbHVkaW5nIHNvbWUgdHJpY2t5IG9uZXMuDQo+Pg0KPj4g
+UGVyaGFwcyB0aGUgcGFydCB0aGF0IEknbSBzdGlsbCBub3QgY29udmluY2VkIGFib3V0IGlzIHRo
+ZSBvbmUgYWJvdXQNCj4+IGZyZWV6aW5nIGJhY2tpbmcgbGlua3MgdG8gcHJldmVudCB0aGVtIGZy
+b20gYmVpbmcgcmVtb3ZlZCwgYnV0IHRoZQ0KPj4gaW1wbGVtZW50YXRpb24gd2FzIHF1aXRlIHNp
+bXBsZSBzbyBJIGRlY2lkZWQgdG8gZ2l2ZSBpdCBhIGdvLiBBcw0KPj4geW91J2xsIHNlZSBpbiB0
+aGUgcGF0Y2hlcyBJIGNob3NlIHRvIHVzZSBhIGJvb2wgaW5zdGVhZCBvZiBhIGNvdW50ZXINCj4+
+IGJlY2F1c2UgSSBjb3VsZG4ndCB0aGluayBvZiBhIGNhc2Ugd2hlcmUgaXQgd291bGQgbWFrZSBz
+ZW5zZSB0byBoYXZlDQo+PiB0d28gdXNlcnMgZnJlZXppbmcgdGhlIHNhbWUgYmFja2luZyBsaW5r
+Lg0KPj4NCj4+IFRoYW5rcywNCj4+DQo+PiBCZXJ0bw0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVz
+dCByZWdhcmRzLA0KVmxhZGltaXINCg==
