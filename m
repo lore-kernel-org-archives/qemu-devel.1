@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44996)
+Received: from eggs.gnu.org ([209.51.188.92]:48372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gltCf-0000nt-Mq
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:22:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gltOc-0003C5-RH
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:35:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gltCe-0007Hi-Qs
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:22:45 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 22 Jan 2019 10:22:16 +0000
-Message-ID: <05bf4364-61b0-21de-768d-6c1ad2a06d63@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-	<20190108170655.29766-5-vsementsov@virtuozzo.com>
-	<bda00283-197d-4b1b-7be0-633a0410f87d@redhat.com>
-In-Reply-To: <bda00283-197d-4b1b-7be0-633a0410f87d@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7BC9ED0AFA628C48825B98198B69274E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gltOb-0000sE-OH
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:35:06 -0500
+Date: Tue, 22 Jan 2019 11:29:26 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190122112926.4ff54f9f.cohuck@redhat.com>
+In-Reply-To: <20190121212018.4e377e59@oc2783563651>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<20190121212018.4e377e59@oc2783563651>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 4/9] qcow2-threads:
- qcow2_co_do_compress: protect queuing by mutex
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-MTYuMDEuMjAxOSAyOjI5LCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPiBPbiAwOC8wMS8xOSAxODow
-NiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFNpZ25lZC1vZmYtYnk6
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
-Cj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi10aHJlYWRzLmMgfCAxMCArKysrKysrLS0tDQo+PiAg
-IDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+Pg0KPj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLXRocmVhZHMuYyBiL2Jsb2NrL3Fjb3cyLXRocmVhZHMu
-Yw0KPj4gaW5kZXggMjBiMjYxNjUyOS4uMTU2ZTA2NjdiZSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2Nr
-L3Fjb3cyLXRocmVhZHMuYw0KPj4gKysrIGIvYmxvY2svcWNvdzItdGhyZWFkcy5jDQo+PiBAQCAt
-MTU4LDE1ICsxNTgsMTkgQEAgcWNvdzJfY29fZG9fY29tcHJlc3MoQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMsIHZvaWQgKmRlc3QsIHNpemVfdCBkZXN0X3NpemUsDQo+PiAgICAgICAgICAgLmZ1bmMgPSBm
-dW5jLA0KPj4gICAgICAgfTsNCj4+ICAgDQo+PiArICAgIHFlbXVfY29fbXV0ZXhfbG9jaygmcy0+
-bG9jayk7DQo+PiAgICAgICB3aGlsZSAocy0+bmJfY29tcHJlc3NfdGhyZWFkcyA+PSBNQVhfQ09N
-UFJFU1NfVEhSRUFEUykgew0KPj4gLSAgICAgICAgcWVtdV9jb19xdWV1ZV93YWl0KCZzLT5jb21w
-cmVzc193YWl0X3F1ZXVlLCBOVUxMKTsNCj4+ICsgICAgICAgIHFlbXVfY29fcXVldWVfd2FpdCgm
-cy0+Y29tcHJlc3Nfd2FpdF9xdWV1ZSwgJnMtPmxvY2spOw0KPj4gICAgICAgfQ0KPj4gLQ0KPj4g
-ICAgICAgcy0+bmJfY29tcHJlc3NfdGhyZWFkcysrOw0KPj4gKyAgICBxZW11X2NvX211dGV4X3Vu
-bG9jaygmcy0+bG9jayk7DQo+PiArDQo+PiAgICAgICB0aHJlYWRfcG9vbF9zdWJtaXRfY28ocG9v
-bCwgcWNvdzJfY29tcHJlc3NfcG9vbF9mdW5jLCAmYXJnKTsNCj4+IC0gICAgcy0+bmJfY29tcHJl
-c3NfdGhyZWFkcy0tOw0KPj4gICANCj4+ICsgICAgcWVtdV9jb19tdXRleF9sb2NrKCZzLT5sb2Nr
-KTsNCj4+ICsgICAgcy0+bmJfY29tcHJlc3NfdGhyZWFkcy0tOw0KPj4gICAgICAgcWVtdV9jb19x
-dWV1ZV9uZXh0KCZzLT5jb21wcmVzc193YWl0X3F1ZXVlKTsNCj4+ICsgICAgcWVtdV9jb19tdXRl
-eF91bmxvY2soJnMtPmxvY2spOw0KPj4gICANCj4+ICAgICAgIHJldHVybiBhcmcucmV0Ow0KPj4g
-ICB9DQo+Pg0KPiANCj4gUmV2aWV3ZWQtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhh
-dC5jb20+DQo+IA0KPiBidXQsIHNvbWUgaW5mb3JtYXRpb24gd291bGQgYmUgbmljZSB0byBoYXZl
-IGluIHRoZSBjb21taXQgbWVzc2FnZS4NCg0KQ291bGQgeW91IHN1Z2dlc3Qgb25lPw0KDQpKdXN0
-LCAiVG8gbWFrZSBpdCB0aHJlYWQtc2FmZS4iPyBJIGRvbid0IGhhdmUgZ29vZCB1bmRlcnN0YW5k
-aW5nDQpvZiBtb3ZpbmcgZnJvbSAiQWlvQ29udGV4dCBsb2NrIHVzYWdlIiB0byBvdGhlciBsb2Nr
-cywgYXMgd2VsbCBhcw0KSSBkb24ndCBrbm93IGhvdyBCbG9ja0RyaXZlclN0YXRlIGlzIGdvaW5n
-IHRvIGJlIHVzZWQgaW4gcGFyYWxsZWwNCnRocmVhZHMsIGFuZCBob3cgbXVjaCBvZiBvdGhlciBj
-b2RlIGlzIGFscmVhZHkgcHJlcGFyZWQgdG8gd29yaw0KaW4gbXVsdGlwbGUtdGhyZWFkcyBlbnZp
-cm9ubWVudC4NCg0KSSBsb29rZWQgdGhyb3VnaCB5b3VyIGNvbW1pdCBtZXNzYWdlcyBvbiBwYXRj
-aGVzIHdoaWNoIGFkZGVkIHByb3RlY3Rpb24NCnRvIHNpbWlsYXIgcGxhY2VzIGFib3V0IGNvLXF1
-ZXVlcywgYnV0IGRpZG4ndCBmaW5kIGRldGFpbGVkIGRlc2NyaXB0aW9uLg0KDQo+IA0KPiBQYW9s
-bw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Mon, 21 Jan 2019 21:20:18 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Mon, 21 Jan 2019 12:03:51 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > Rework handling of multiple I/O requests to return -EAGAIN if
+> > we are already processing an I/O request. Introduce a mutex
+> > to disallow concurrent writes to the I/O region.
+> > 
+> > The expectation is that userspace simply retries the operation
+> > if it gets -EAGAIN.
+> > 
+> > We currently don't allow multiple ssch requests at the same
+> > time, as we don't have support for keeping channel programs
+> > around for more than one request.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---  
+> 
+> [..]
+> 
+> >  static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+> > @@ -188,25 +192,30 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+> >  {
+> >  	struct vfio_ccw_private *private;
+> >  	struct ccw_io_region *region;
+> > +	int ret;
+> >  
+> >  	if (*ppos + count > sizeof(*region))
+> >  		return -EINVAL;
+> >  
+> >  	private = dev_get_drvdata(mdev_parent_dev(mdev));
+> > -	if (private->state != VFIO_CCW_STATE_IDLE)
+> > +	if (private->state == VFIO_CCW_STATE_NOT_OPER ||
+> > +	    private->state == VFIO_CCW_STATE_STANDBY)
+> >  		return -EACCES;
+> > +	if (!mutex_trylock(&private->io_mutex))
+> > +		return -EAGAIN;
+> >  
+> >  	region = private->io_region;
+> > -	if (copy_from_user((void *)region + *ppos, buf, count))
+> > -		return -EFAULT;
+> > +	if (copy_from_user((void *)region + *ppos, buf, count)) {  
+> 
+> This might race with vfio_ccw_sch_io_todo() on
+> private->io_region->irb_area, or?
+
+Ah yes, this should also take the mutex (should work because we're on a
+workqueue).
+
+> 
+> > +		ret = -EFAULT;
+> > +		goto out_unlock;
+> > +	}
+> >  
+> >  	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_IO_REQ);
+> > -	if (region->ret_code != 0) {
+> > -		private->state = VFIO_CCW_STATE_IDLE;
+> > -		return region->ret_code;
+> > -	}
+> > +	ret = (region->ret_code != 0) ? region->ret_code : count;
+> >  
+> > -	return count;
+> > +out_unlock:
+> > +	mutex_unlock(&private->io_mutex);
+> > +	return ret;
+> >  }
+> >    
+> [..]
+> 
