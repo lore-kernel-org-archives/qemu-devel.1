@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55248)
+Received: from eggs.gnu.org ([209.51.188.92]:55890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm26M-0000EW-Ov
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:52:51 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gm29G-0002uO-NR
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm26K-0001eF-TR
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:52:50 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm26K-0001bW-Ic
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:52:48 -0500
-Received: by mail-ot1-x344.google.com with SMTP id n8so24803891otl.6
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:52:44 -0800 (PST)
+	(envelope-from <balaton@eik.bme.hu>) id 1gm29F-0003VR-K9
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:55:50 -0500
+Date: Tue, 22 Jan 2019 20:55:42 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <c323f08c59b9931310c5d92503d370f77ce3a557.1548160772.git.balaton@eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1901222053300.28152@zero.eik.bme.hu>
+References: <cover.1548160772.git.balaton@eik.bme.hu>
+	<c323f08c59b9931310c5d92503d370f77ce3a557.1548160772.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-6-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 13:50:53 +0000
-Message-ID: <CAFEAcA_j3HkMWjngXRhLNPZ3yqYrJgM+Kn2RnZJ8za-n33zSiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 05/11] target/arm: Default handling of
- BTYPE during translation
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH 3/3] ide/via: Implement and use native PCI
+ IDE mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,148 +23,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>
 
-On Thu, 10 Jan 2019 at 12:17, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The branch target exception for guarded pages has high priority,
-> and only 8 instructions are valid for that case.  Perform this
-> check before doing any other decode.
->
-> Clear BTYPE after all insns that neither set BTYPE nor exit via
-> exception (DISAS_NORETURN).
->
-> Not yet handled are insns that exit via DISAS_NORETURN for some
-> other reason, like direct branches.
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index 3d5e8bacac..f73939d7b4 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -71,8 +71,13 @@ typedef struct DisasContext {
->      bool pauth_active;
->      /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
->      bool bt;
-> -    /* A copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.  */
-> -    uint8_t btype;
-> +    /*
-> +     * >= 0, a copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.
-> +     *  < 0, set by the current instruction.
-> +     */
-> +    int8_t btype;
+On Tue, 22 Jan 2019, BALATON Zoltan wrote:
+> The device was initialised in ISA compatibility mode and native PCI
+> IDE mode was not implemented but no clents are known to need ISA mode
+> but to the contrary, most clients that want to switch to and use
+> device in native PCI IDE mode. Therefore implement native PCI mode and
+> switch default to that.
 
-You could have made this int8_t to start with...
+There are some typos in here so here's a fixed, reworded one:
 
-> +    /* True if this page is guarded.  */
-> +    bool guarded_page;
->      /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
->      int c15_cpar;
->      /* TCG op of the current insn_start.  */
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index ca2ae40701..68eb27089a 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -128,6 +128,16 @@ static inline int get_a64_user_mem_index(DisasContext *s)
->      return arm_to_core_mmu_idx(useridx);
->  }
+This device only implemented ISA compatibility mode and native PCI IDE 
+mode was missing but no clients actually need ISA mode but to the 
+contrary, they usually want to switch to and use device in native PCI IDE 
+mode. Therefore implement native PCI mode and switch default to that.
+
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+> hw/ide/via.c | 52 ++++++++++++++++++++++++++++++++++++++--------------
+> 1 file changed, 38 insertions(+), 14 deletions(-)
 >
-> +static void reset_btype(DisasContext *s)
+> diff --git a/hw/ide/via.c b/hw/ide/via.c
+> index c6e43a8812..ac9385228c 100644
+> --- a/hw/ide/via.c
+> +++ b/hw/ide/via.c
+> @@ -32,15 +32,6 @@
+> #include "hw/ide/pci.h"
+> #include "trace.h"
+>
+> -static const struct {
+> -    int iobase;
+> -    int iobase2;
+> -    int isairq;
+> -} port_info[] = {
+> -    {0x1f0, 0x3f6, 14},
+> -    {0x170, 0x376, 15},
+> -};
+> -
+> static uint64_t bmdma_read(void *opaque, hwaddr addr,
+>                            unsigned size)
+> {
+> @@ -110,6 +101,23 @@ static void bmdma_setup_bar(PCIIDEState *d)
+>     }
+> }
+>
+> +static void via_ide_set_irq(void *opaque, int n, int level)
 > +{
-> +    if (s->btype != 0) {
-> +        TCGv_i32 zero = tcg_const_i32(0);
-> +        tcg_gen_st_i32(zero, cpu_env, offsetof(CPUARMState, btype));
-> +        tcg_temp_free_i32(zero);
-> +        s->btype = 0;
+> +    PCIDevice *d = PCI_DEVICE(opaque);
+> +
+> +    if (level) {
+> +        d->config[0x70 + n * 8] |= 0x80;
+> +    } else {
+> +        d->config[0x70 + n * 8] &= ~0x80;
+> +    }
+> +
+> +    level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
+> +    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
+> +    if (n) {
+> +        qemu_set_irq(isa_get_irq(NULL, n), level);
 > +    }
 > +}
 > +
->  void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
->                              fprintf_function cpu_fprintf, int flags)
->  {
-> @@ -13716,6 +13726,90 @@ static void disas_data_proc_simd_fp(DisasContext *s, uint32_t insn)
->      }
->  }
+> static void via_ide_reset(void *opaque)
+> {
+>     PCIIDEState *d = opaque;
+> @@ -121,7 +129,7 @@ static void via_ide_reset(void *opaque)
+>         ide_bus_reset(&d->bus[i]);
+>     }
 >
-> +/**
-> + * is_guarded_page:
-> + * @env: The cpu environment
-> + * @s: The DisasContext
-> + *
-> + * Return true if the page is guarded.
-> + */
-> +static bool is_guarded_page(CPUARMState *env, DisasContext *s)
-> +{
-> +#ifdef CONFIG_USER_ONLY
-> +    return false;  /* FIXME */
-> +#else
-> +    uint64_t addr = s->base.pc_first;
-> +    int mmu_idx = arm_to_core_mmu_idx(s->mmu_idx);
-> +    unsigned int index = tlb_index(env, mmu_idx, addr);
-> +    CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
+> -    pci_set_word(pci_conf + PCI_COMMAND, PCI_COMMAND_WAIT);
+> +    pci_set_word(pci_conf + PCI_COMMAND, PCI_COMMAND_IO | PCI_COMMAND_WAIT);
+>     pci_set_word(pci_conf + PCI_STATUS, PCI_STATUS_FAST_BACK |
+>                  PCI_STATUS_DEVSEL_MEDIUM);
+>
+> @@ -158,10 +166,28 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
+>     uint8_t *pci_conf = dev->config;
+>     int i;
+>
+> -    pci_config_set_prog_interface(pci_conf, 0x8a); /* legacy ATA mode */
+> +    pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
+>     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
+> +    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
+>
+>     qemu_register_reset(via_ide_reset, d);
 > +
-> +    /*
-> +     * We test this immediately after reading an insn, which means
-> +     * that any normal page must be in the TLB.  The only exception
-> +     * would be for executing from flash or device memory, which
-> +     * does not retain the TLB entry.
-> +     *
-> +     * FIXME: Assume false for those, for now.  We could use
-> +     * arm_cpu_get_phys_page_attrs_debug to re-read the page
-> +     * table entry even for that case.
-> +     */
-> +    return (tlb_hit(entry->addr_code, addr) &&
-> +            env->iotlb[mmu_idx][index].attrs.guarded);
-> +#endif
-> +}
+> +    memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_ops,
+> +                          &d->bus[0], "via-ide0-data", 8);
+> +    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &d->data_bar[0]);
 > +
-> +/**
-> + * btype_destination_ok:
-> + * @insn: The instruction at the branch destination
-> + * @bt: SCTLR_ELx.BT
-> + * @btype: PSTATE.BTYPE, and is non-zero
-> + *
-> + * On a guarded page, there are a limited number of insns
-> + * that may be present at the branch target:
-> + *   - branch target identifiers,
-> + *   - paciasp, pacibsp,
-> + *   - BRK insn
-> + *   - HLT insn
-> + * Anything else causes a Branch Target Exception.
-> + *
-> + * Return true if the branch is compatible, false to raise BTITRAP.
-> + */
-> +static bool btype_destination_ok(uint32_t insn, bool bt, int btype)
-> +{
-> +    if ((insn & 0xfffff01fu) == 0xd503201fu) {
-> +        /* HINT space */
-> +        switch (extract32(insn, 5, 7)) {
-> +        case 031: /* PACIASP */
-> +        case 033: /* PACIBSP */
-
-Octal again...
-
-> +            /*
-> +             * If SCTLR_ELx.BT, then PACI*SP are not compatible
-> +             * with btype == 3.  Otherwise all btype are ok.
-> +             */
-> +            return !bt || btype != 3;
-> +        case 040: /* BTI */
-> +            /* Not compatible with any btype.  */
-> +            return false;
-> +        case 042: /* BTI c */
-> +            /* Not compatible with btype == 3 */
-> +            return btype != 3;
-> +        case 044: /* BTI j */
-> +            /* Not compatible with btype == 2 */
-> +            return btype != 2;
-> +        case 046: /* BTI jc */
-> +            /* Compatible with any btype.  */
-> +            return true;
-> +        }
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> +    memory_region_init_io(&d->cmd_bar[0], OBJECT(d), &pci_ide_cmd_le_ops,
+> +                          &d->bus[0], "via-ide0-cmd", 4);
+> +    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, &d->cmd_bar[0]);
+> +
+> +    memory_region_init_io(&d->data_bar[1], OBJECT(d), &pci_ide_data_le_ops,
+> +                          &d->bus[1], "via-ide1-data", 8);
+> +    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, &d->data_bar[1]);
+> +
+> +    memory_region_init_io(&d->cmd_bar[1], OBJECT(d), &pci_ide_cmd_le_ops,
+> +                          &d->bus[1], "via-ide1-cmd", 4);
+> +    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, &d->cmd_bar[1]);
+> +
+>     bmdma_setup_bar(d);
+>     pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, &d->bmdma_bar);
+>
+> @@ -169,9 +195,7 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
+>
+>     for (i = 0; i < 2; i++) {
+>         ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(d), i, 2);
+> -        ide_init_ioport(&d->bus[i], NULL, port_info[i].iobase,
+> -                        port_info[i].iobase2);
+> -        ide_init2(&d->bus[i], isa_get_irq(NULL, port_info[i].isairq));
+> +        ide_init2(&d->bus[i], qemu_allocate_irq(via_ide_set_irq, d, i));
+>
+>         bmdma_init(&d->bus[i], &d->bmdma[i], d);
+>         d->bmdma[i].bus = &d->bus[i];
+>
