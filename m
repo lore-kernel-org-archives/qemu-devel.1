@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53007)
+Received: from eggs.gnu.org ([209.51.188.92]:53177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gm1C2-0002SZ-GL
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:40 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gm1CA-0002Yh-4q
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gm1C0-0001BM-CI
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:38 -0500
-Message-Id: <47d854e0fa41dad6861107eac61327c247965566.1548160772.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1gm1C6-0001E9-Vn
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:54:45 -0500
+Message-Id: <2905ced862c8d2ad509d73152171ce2472d72605.1548160772.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1548160772.git.balaton@eik.bme.hu>
 References: <cover.1548160772.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Tue, 22 Jan 2019 13:39:32 +0100
-Subject: [Qemu-devel] [PATCH 1/3] ide/via: Remove vt82c686b_init_ports()
- function
+Subject: [Qemu-devel] [PATCH 2/3] ide/via: Rename functions to match device
+ name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: John Snow <jsnow@redhat.com>
 
-This function is only called once from vt82c686b_ide_realize() and its
-content is simple enough to not need a separate function but be
-included in realize directly (as done in other IDE models except PIIX
-currently).
+The device is called via-ide and the modelled IDE controller is not
+specific to 82C686B but is also usable independently. Therefore, change
+function name prefixes accordingly to match device name.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ide/via.c | 44 ++++++++++++++++++++------------------------
- 1 file changed, 20 insertions(+), 24 deletions(-)
+ hw/ide/via.c            | 15 +++++++--------
+ hw/mips/mips_fulong2e.c |  2 +-
+ include/hw/ide.h        |  2 +-
+ 3 files changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 987d99c5ec..46cac7b8d6 100644
+index 46cac7b8d6..c6e43a8812 100644
 --- a/hw/ide/via.c
 +++ b/hw/ide/via.c
-@@ -32,6 +32,15 @@
- #include "hw/ide/pci.h"
- #include "trace.h"
+@@ -110,7 +110,7 @@ static void bmdma_setup_bar(PCIIDEState *d)
+     }
+ }
  
-+static const struct {
-+    int iobase;
-+    int iobase2;
-+    int isairq;
-+} port_info[] = {
-+    {0x1f0, 0x3f6, 14},
-+    {0x170, 0x376, 15},
-+};
-+
- static uint64_t bmdma_read(void *opaque, hwaddr addr,
-                            unsigned size)
+-static void via_reset(void *opaque)
++static void via_ide_reset(void *opaque)
  {
-@@ -143,34 +152,12 @@ static void via_reset(void *opaque)
+     PCIIDEState *d = opaque;
+     PCIDevice *pd = PCI_DEVICE(d);
+@@ -152,8 +152,7 @@ static void via_reset(void *opaque)
      pci_set_long(pci_conf + 0xc0, 0x00020001);
  }
  
--static void vt82c686b_init_ports(PCIIDEState *d) {
--    static const struct {
--        int iobase;
--        int iobase2;
--        int isairq;
--    } port_info[] = {
--        {0x1f0, 0x3f6, 14},
--        {0x170, 0x376, 15},
--    };
--    int i;
--
--    for (i = 0; i < 2; i++) {
--        ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(d), i, 2);
--        ide_init_ioport(&d->bus[i], NULL, port_info[i].iobase,
--                        port_info[i].iobase2);
--        ide_init2(&d->bus[i], isa_get_irq(NULL, port_info[i].isairq));
--
--        bmdma_init(&d->bus[i], &d->bmdma[i], d);
--        d->bmdma[i].bus = &d->bus[i];
--        ide_register_restart_cb(&d->bus[i]);
--    }
--}
--
- /* via ide func */
- static void vt82c686b_ide_realize(PCIDevice *dev, Error **errp)
+-/* via ide func */
+-static void vt82c686b_ide_realize(PCIDevice *dev, Error **errp)
++static void via_ide_realize(PCIDevice *dev, Error **errp)
  {
      PCIIDEState *d = PCI_IDE(dev);
      uint8_t *pci_conf = dev->config;
-+    int i;
- 
+@@ -162,7 +161,7 @@ static void vt82c686b_ide_realize(PCIDevice *dev, Error **errp)
      pci_config_set_prog_interface(pci_conf, 0x8a); /* legacy ATA mode */
      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-@@ -181,7 +168,16 @@ static void vt82c686b_ide_realize(PCIDevice *dev, Error **errp)
  
-     vmstate_register(DEVICE(dev), 0, &vmstate_ide_pci, d);
+-    qemu_register_reset(via_reset, d);
++    qemu_register_reset(via_ide_reset, d);
+     bmdma_setup_bar(d);
+     pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, &d->bmdma_bar);
  
--    vt82c686b_init_ports(d);
-+    for (i = 0; i < 2; i++) {
-+        ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(d), i, 2);
-+        ide_init_ioport(&d->bus[i], NULL, port_info[i].iobase,
-+                        port_info[i].iobase2);
-+        ide_init2(&d->bus[i], isa_get_irq(NULL, port_info[i].isairq));
-+
-+        bmdma_init(&d->bus[i], &d->bmdma[i], d);
-+        d->bmdma[i].bus = &d->bus[i];
-+        ide_register_restart_cb(&d->bus[i]);
-+    }
+@@ -180,7 +179,7 @@ static void vt82c686b_ide_realize(PCIDevice *dev, Error **errp)
+     }
  }
  
- static void vt82c686b_ide_exitfn(PCIDevice *dev)
+-static void vt82c686b_ide_exitfn(PCIDevice *dev)
++static void via_ide_exitfn(PCIDevice *dev)
+ {
+     PCIIDEState *d = PCI_IDE(dev);
+     unsigned i;
+@@ -191,7 +190,7 @@ static void vt82c686b_ide_exitfn(PCIDevice *dev)
+     }
+ }
+ 
+-void vt82c686b_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
++void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
+ {
+     PCIDevice *dev;
+ 
+@@ -204,8 +203,8 @@ static void via_ide_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->realize = vt82c686b_ide_realize;
+-    k->exit = vt82c686b_ide_exitfn;
++    k->realize = via_ide_realize;
++    k->exit = via_ide_exitfn;
+     k->vendor_id = PCI_VENDOR_ID_VIA;
+     k->device_id = PCI_DEVICE_ID_VIA_IDE;
+     k->revision = 0x06;
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 2fbba32c48..42d09f6892 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -249,7 +249,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
+     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
+ 
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+-    vt82c686b_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
++    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
+ 
+     pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci");
+     pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci");
+diff --git a/include/hw/ide.h b/include/hw/ide.h
+index 3ae087c572..28d8a06439 100644
+--- a/include/hw/ide.h
++++ b/include/hw/ide.h
+@@ -18,7 +18,7 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
+-void vt82c686b_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
++void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ 
+ /* ide-mmio.c */
+ void mmio_ide_init_drives(DeviceState *dev, DriveInfo *hd0, DriveInfo *hd1);
 -- 
 2.13.7
