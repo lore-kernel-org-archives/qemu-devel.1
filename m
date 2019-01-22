@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40528)
+Received: from eggs.gnu.org ([209.51.188.92]:40590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm0zY-00083J-Hu
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:45 -0500
+	(envelope-from <berrange@redhat.com>) id 1gm0zc-00086X-4T
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gm0zX-0001l1-5B
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gm0zV-0001Pg-2g
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:43 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0MGwrLe104216
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:24 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q66uw8xmv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 12:01:24 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 22 Jan 2019 17:01:22 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Tue, 22 Jan 2019 15:01:11 -0200
-In-Reply-To: <20190122170112.8706-1-farosas@linux.ibm.com>
-References: <20190122170112.8706-1-farosas@linux.ibm.com>
-Message-Id: <20190122170112.8706-3-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] target/ppc: Add GDB callbacks for SPRs
+	(envelope-from <berrange@redhat.com>) id 1gm0zZ-0001mS-Cq
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60995)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gm0zZ-0001df-0m
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:41:45 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA84C46202
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 17:23:46 +0000 (UTC)
+Date: Tue, 22 Jan 2019 17:23:33 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190122172333.GA13143@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-4-berrange@redhat.com>
+	<c18e222d-ae68-968b-7738-edfa21c8ceef@redhat.com>
+	<20190122143257.GR13143@redhat.com>
+	<c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c06dd0a6-166f-a522-1f54-736519076432@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] trace: forbid use of %m in trace
+ event format strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,93 +39,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-These will be used to let GDB know about PPC's Special Purpose
-Registers (SPR).
+On Tue, Jan 22, 2019 at 11:19:42AM -0600, Eric Blake wrote:
+> On 1/22/19 8:32 AM, Daniel P. Berrang=C3=A9 wrote:
+>=20
+> >>> +++ b/hw/vfio/pci.c
+> >>> @@ -2581,7 +2581,7 @@ static void vfio_populate_device(VFIOPCIDevic=
+e *vdev, Error **errp)
+> >>>      ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &ir=
+q_info);
+> >>>      if (ret) {
+> >>>          /* This can fail for an old kernel or legacy PCI dev */
+> >>> -        trace_vfio_populate_device_get_irq_info_failure();
+> >>> +        trace_vfio_populate_device_get_irq_info_failure(errno);
+> >>
+> >> trace_vfio_populate_device_get_irq_info_failure(strerror(errno))
+> >=20
+> > The caveat is that 'strerror' is not required to be thread safe,
+> > however, given that this is Linux only code I guess we can assume
+> > the glibc impl which fortunately is thread safe.
+>=20
+> If we are going to worry about thread-safety of strerror(), we have a
+> LOT of code to scrub (we are using it rather liberally throughout the
+> code base).
 
-They take an index based on the order the registers appear in the XML
-file sent by QEMU to GDB. This index does not match the actual
-location of the registers in the env->spr array so the
-gdb_find_spr_idx function does that conversion.
+Yes, indeed we do and it was something that always worried me a little
+(as well as a few other non-reentrant APIs we used previously).
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+> > On this point though, does anyone know of any platforms we support[1]=
+,
+> > or are likely to support in future, where 'strerror' is *not* thread
+> > safe ?
+>=20
+> I'm not coming up with one, and I think the problem is independent of
+> this series (if we DO have a problem, it's a series all its own to
+> eradicate the use of strerror() in favor of something safer, either
+> picking strerror_l() or dealing with the glibc vs. BSD differences in
+> strerror_r()).
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 710064a25d..f29ac3558a 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -9487,6 +9487,55 @@ static bool avr_need_swap(CPUPPCState *env)
- #endif
- }
- 
-+#if !defined(CONFIG_USER_ONLY)
-+static int gdb_find_spr_idx(CPUPPCState *env, int n)
-+{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-+        ppc_spr_t *spr = &env->spr_cb[i];
-+
-+        if (spr->name && spr->gdb_id == n) {
-+            return i;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-+{
-+    int reg;
-+    int len;
-+
-+    reg = gdb_find_spr_idx(env, n);
-+    if (reg < 0) {
-+        return 0;
-+    }
-+
-+    len = TARGET_LONG_SIZE;
-+    stn_p(mem_buf, len, env->spr[reg]);
-+    ppc_maybe_bswap_register(env, mem_buf, len);
-+    return len;
-+}
-+
-+static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-+{
-+    int reg;
-+    int len;
-+
-+    reg = gdb_find_spr_idx(env, n);
-+    if (reg < 0) {
-+        return 0;
-+    }
-+
-+    len = TARGET_LONG_SIZE;
-+    ppc_maybe_bswap_register(env, mem_buf, len);
-+    env->spr[reg] = ldn_p(mem_buf, len);
-+
-+    return len;
-+}
-+#endif
-+
- static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 32) {
-@@ -9716,7 +9765,10 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
-         gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
-                                  32, "power-vsx.xml", 0);
-     }
--
-+#ifndef CONFIG_USER_ONLY
-+    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
-+                             pcc->gdb_num_sprs, "power-spr.xml", 0);
-+#endif
-     qemu_init_vcpu(cs);
- 
-     pcc->parent_realize(dev, errp);
--- 
-2.17.1
+Agree that its not really something for this series - this just
+made me think of it again.
+
+We went through the scrubbing in libvirt to use the sane, but still
+tedious to call, variant of strerror_r() many years ago. With luck
+though it is a worry that can be confined the dustbin of ancient
+UNIX history....unless someone can point to evidence to the contrary ?
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
