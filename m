@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50990)
+Received: from eggs.gnu.org ([209.51.188.92]:51049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1wR-0008VH-PA
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:36 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wT-0008WJ-39
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gm1wQ-0001XS-Gm
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:35 -0500
+	(envelope-from <berto@igalia.com>) id 1gm1wS-0001a2-6Y
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:42:37 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 22 Jan 2019 17:53:23 +0200
-Message-Id: <6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
-In-Reply-To: <cover.1548171741.git.berto@igalia.com>
-References: <cover.1548171741.git.berto@igalia.com>
-In-Reply-To: <cover.1548171741.git.berto@igalia.com>
-References: <cover.1548171741.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with different
- iothreads sharing a blockdev
+Date: Tue, 22 Jan 2019 17:53:20 +0200
+Message-Id: <cover.1548171741.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 0/3] iothread-related fixes for virtio-scsi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +20,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This patch forbids attaching a disk to a SCSI device if its using a
-different AioContext. Test case included.
+Hi,
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- hw/scsi/virtio-scsi.c      |  7 +++++++
- tests/qemu-iotests/240     | 22 ++++++++++++++++++++++
- tests/qemu-iotests/240.out | 20 ++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+here are three patches with iothread-related fixes for virtio-scsi,
+with their test cases.
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index e1f7b208c7..eb90288f47 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -791,9 +791,16 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     SCSIDevice *sd = SCSI_DEVICE(dev);
- 
-     if (s->ctx && !s->dataplane_fenced) {
-+        AioContext *ctx;
-         if (blk_op_is_blocked(sd->conf.blk, BLOCK_OP_TYPE_DATAPLANE, errp)) {
-             return;
-         }
-+        ctx = blk_get_aio_context(sd->conf.blk);
-+        if (ctx != s->ctx && ctx != qemu_get_aio_context()) {
-+            error_setg(errp, "Cannot attach a blockdev that is using "
-+                       "a different iothread");
-+            return;
-+        }
-         virtio_scsi_acquire(s);
-         blk_set_aio_context(sd->conf.blk, s->ctx);
-         virtio_scsi_release(s);
-diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-index 5d499c9a00..65cc3b39b1 100755
---- a/tests/qemu-iotests/240
-+++ b/tests/qemu-iotests/240
-@@ -101,6 +101,28 @@ run_qemu <<EOF
- { "execute": "quit"}
- EOF
- 
-+echo
-+echo === Attach two SCSI disks using the same block device but different iothreads ===
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true}}
-+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
-+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread1"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}", "iothread": "iothread0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi1", "driver": "${virtio_scsi}", "iothread": "iothread1"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi0.0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi1.0"}}
-+{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi-hd1", "driver": "scsi-hd", "drive": "hd0", "bus": "scsi1.0"}}
-+{ "execute": "device_del", "arguments": {"id": "scsi-hd1"}}
-+{ "execute": "device_del", "arguments": {"id": "scsi0"}}
-+{ "execute": "device_del", "arguments": {"id": "scsi1"}}
-+{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
-+{ "execute": "quit"}
-+EOF
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/240.out b/tests/qemu-iotests/240.out
-index 701cb5c7d2..d76392966c 100644
---- a/tests/qemu-iotests/240.out
-+++ b/tests/qemu-iotests/240.out
-@@ -31,4 +31,24 @@ QMP_VERSION
- {"return": {}}
- {"return": {}}
- {"return": {}}
-+
-+=== Attach two SCSI disks using the same block device but different iothreads ===
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"error": {"class": "GenericError", "desc": "Cannot attach a blockdev that is using a different iothread"}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
- *** done
+This series fixes the following bugs:
+
+   https://bugzilla.redhat.com/show_bug.cgi?id=1656276
+
+   https://bugzilla.redhat.com/show_bug.cgi?id=1662508
+
+I also wanted to do prepare a similar one for virtio-blk but I'm
+unsure about how to proceed, because I'm unable to detect during
+realize() that the blockdev is using a different iothread. This
+crashes QEMU:
+
+{ "execute": "qmp_capabilities" }
+{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0", "read-only": true}}
+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread1"}}
+{ "execute": "device_add", "arguments": {"id": "virtio-blk0", "driver": "virtio-blk", "iothread": "iothread0", "drive": "hd0"}}
+{ "execute": "system_reset"}
+  (wait for the events)
+{ "execute": "device_add", "arguments": {"id": "virtio-blk1", "driver": "virtio-blk", "iothread": "iothread1", "drive": "hd0"}}
+
+Regards,
+
+Berto
+
+Alberto Garcia (3):
+  virtio-scsi: Move BlockBackend back to the main AioContext on unplug
+  scsi-disk: Acquire the AioContext in scsi_*_realize()
+  virtio-scsi: Forbid devices with different iothreads sharing a
+    blockdev
+
+ hw/scsi/scsi-disk.c        |  23 ++++++--
+ hw/scsi/virtio-scsi.c      |  13 +++++
+ tests/qemu-iotests/240     | 129 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/240.out |  54 +++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 5 files changed, 217 insertions(+), 3 deletions(-)
+ create mode 100755 tests/qemu-iotests/240
+ create mode 100644 tests/qemu-iotests/240.out
+
 -- 
 2.11.0
