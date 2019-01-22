@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36224)
+Received: from eggs.gnu.org ([209.51.188.92]:36280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1glskz-0002kA-3c
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:09 -0500
+	(envelope-from <philmd@redhat.com>) id 1glsl4-0002mO-Jc
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1glskx-0006bJ-9M
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1glskx-0006aJ-3O
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:07 -0500
-Date: Tue, 22 Jan 2019 10:54:04 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190122095404.nskppqj6doo3yquo@sirius.home.kraxel.org>
-References: <20190120041427.21602-1-relkochta@gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1glsl2-0006hi-5Z
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:14 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39539)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glsl1-0006gh-VU
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:54:12 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t27so26552379wra.6
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 01:54:11 -0800 (PST)
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-6-crosa@redhat.com>
+	<20190118142830.GB24013@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ef455369-493b-2b8a-26ae-b4be3f820a0a@redhat.com>
+Date: Tue, 22 Jan 2019 10:54:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190120041427.21602-1-relkochta@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] input-linux: customizable grab toggle keys
- v4
+In-Reply-To: <20190118142830.GB24013@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 05/18] Acceptance tests: introduce arch
+ parameter and attribute
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +32,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ryan El Kochta <relkochta@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Sat, Jan 19, 2019 at 11:14:27PM -0500, Ryan El Kochta wrote:
-> This patch adds a new option to the input-linux object:
+On 1/18/19 3:28 PM, Caio Carrara wrote:
+> Hi, Cleber.
 > 
-> grab-toggle=[key-combo]
+> On Thu, Jan 17, 2019 at 01:56:15PM -0500, Cleber Rosa wrote:
+>> It's useful to define the architecture that should be used in
+>> situations such as:
+>>  * the intended target of the QEMU binary to be used on tests
+>>  * the architecture of code to be run within the QEMU binary, such
+>>    as a kernel image or a full blown guest OS image
+>>
+>> This commit introduces both a test parameter and a test instance
+>> attribute, that will contain such a value.
+>>
+>> Now, when the "arch" test parameter is given, it will influence the
+>> selection of the default QEMU binary, if one is not given explicitly
+>> by means of the "qemu_img" parameter.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  docs/devel/testing.rst                    | 18 ++++++++++++++++++
+>>  tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
+>>  2 files changed, 28 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+>> index 44c9b3ae74..60a16c5834 100644
+>> --- a/docs/devel/testing.rst
+>> +++ b/docs/devel/testing.rst
+>> @@ -689,6 +689,17 @@ vm
+>>  A QEMUMachine instance, initially configured according to the given
+>>  ``qemu_bin`` parameter.
+>>  
+>> +arch
+>> +~~~~
+>> +
+>> +The architecture that will be used on a number of different
+>> +scenarios.  For instance, when a QEMU binary is not explicitly given,
+>> +the one selected will depend on this attribute.
+>> +
+>> +The ``arch`` attribute will be set to the test parameter of the same
+>> +name, and if one is not given explicitly, it will default to the
+>> +system architecture (as given by ``uname``).
 > 
-> The key combination can be one of the following:
+> Would you think it's important to make explicit that it's the *host*
+> system architecture? Just like you did in the docstrings of
+> pick_default_qemu_bin().
+
+Agreed.
+
 > 
-> * ctrl-ctrl
+>> +
+>>  qemu_bin
+>>  ~~~~~~~~
+>>  
+>> @@ -711,6 +722,13 @@ like the following:
+>>  
+>>    PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
+>>  
+>> +arch
+>> +~~~~
+>> +
+>> +The architecture that will be used on a number of different scenarios.
+>> +This parameter has a direct relation with the ``arch`` attribute.  If
+>> +not given, it will default to None.
+>> +
+>>  qemu_bin
+>>  ~~~~~~~~
+>>  
+>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+>> index d8d5b48dac..7a38851753 100644
+>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>> @@ -23,16 +23,22 @@ def is_readable_executable_file(path):
+>>      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
+>>  
+>>  
+>> -def pick_default_qemu_bin():
+>> +def pick_default_qemu_bin(arch=None):
+>>      """
+>>      Picks the path of a QEMU binary, starting either in the current working
+>>      directory or in the source tree root directory.
+>>  
+>> +    :param arch: the arch to use when looking for a QEMU binary (the target
+>> +                 will match the arch given).  If None (the default) arch
+>> +                 will be the current host system arch (as given by
+>> +                 :func:`os.uname`).
 
-left ctrl + right ctrl.
+\o/ thanks :)
 
-> * alt-alt
+>> +    :type arch: str
+>>      :returns: the path to the default QEMU binary or None if one could not
+>>                be found
+>>      :rtype: str or None
+>>      """
+>> -    arch = os.uname()[4]
+>> +    if arch is None:
+>> +        arch = os.uname()[4]
+>>      qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
+>>                                            "qemu-system-%s" % arch)
+>>      if is_readable_executable_file(qemu_bin_relative_path):
+>> @@ -47,8 +53,9 @@ def pick_default_qemu_bin():
+>>  class Test(avocado.Test):
+>>      def setUp(self):
+>>          self.vm = None
+>> +        self.arch = self.params.get('arch')
+>>          self.qemu_bin = self.params.get('qemu_bin',
+>> -                                        default=pick_default_qemu_bin())
+>> +                                        default=pick_default_qemu_bin(self.arch))
+> 
+> Since it was used the named argument in function declaration I think
+> it's more consistent also use the argument name here in the function
+> call: `pick_default_qemu_bin(arch=self.arch)`
 
-Same.
+With Caio's comments addressed:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> * meta-meta
-
-Same.
-
-> * ctrl-alt
-
-This is actually left ctrl + left alt (not any ctrl / alt) in the code.
-
-Ctrl+Alt+Key isn't that uncommon as hotkey, linux console switching uses
-Ctrl+Alt+Fn for example.  Also some GUI apps use Ctrl+Alt+Someletter for
-less frequently used functions when they run out of Ctrl+Someletter
-hotkeys.  I'd suggest to drop this one.
-
-> * scrolllock
-> * ctrl-scrolllock
-
-This likewise is actually left ctrl + scrolllock in the code.
-
-> * ctrl-backtick
-
-Not a good idea.  backtick has no fixed location, depends on the
-keyboard layout.
-
-So, the naming is a bit tricky here.  If only the left ctrl key actually
-works we should say so in the name and call it "lctrl-scrolllock".  Or
-leave the name and allow both ctrl keys.
-
-For the ctrl-ctrl (and simliar) hotkeys I think it doesn't matter much
-whenever we call them "ctrl-ctrl" or "lctrl-rctrl".  It is kida obvious
-that you need both the left and right one when you should press two
-control keys.  But I think it should be consistent with what we pick for
-ctrl-scrolllock.
-
-I think sticking with the current names and make both ctrl keys work
-with scrolllock is the better way.
-
-cheers,
-  Gerd
+> 
+>>          if self.qemu_bin is None:
+>>              self.cancel("No QEMU binary defined or found in the source tree")
+>>          self.vm = QEMUMachine(self.qemu_bin)
+>> -- 
+>> 2.20.1
+>>
+> 
+> Thanks,
+> 
