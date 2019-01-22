@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42530)
+Received: from eggs.gnu.org ([209.51.188.92]:43082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1glokK-00043N-0B
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:12 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1glonp-0004x7-8r
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1glokJ-0007vA-9Q
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:11 -0500
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:36189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1glokJ-0007uQ-4k
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:11 -0500
-Received: by mail-vs1-xe43.google.com with SMTP id v205so14008100vsc.3
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 21:37:10 -0800 (PST)
+	(envelope-from <mjt@tls.msk.ru>) id 1glono-0002RI-Bn
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:40:49 -0500
+Received: from isrv.corpit.ru ([86.62.121.231]:43237)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mjt@tls.msk.ru>) id 1glono-0002Em-4g
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:40:48 -0500
+References: <20190121144841.24467-1-anthony.perard@citrix.com>
+	<CAFEAcA_ytAb-K-HB3wL5baMBDkY71ksBK8hsUSFxuUeqVDFyHQ@mail.gmail.com>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <804f8429-d3f6-dc1a-4980-fc5a44a6b3c5@msgid.tls.msk.ru>
+Date: Tue, 22 Jan 2019 08:40:32 +0300
 MIME-Version: 1.0
-References: <20190109082203.27142-1-arilou@gmail.com>
-	<CAJ+F1CK1Y4qyzJrebiU8wQdaJ6-JM_WEywsURmF4mB2Tk7UMOA@mail.gmail.com>
-	<c1b80e0b-f809-5b33-98d0-081dff2e79cb@redhat.com>
-In-Reply-To: <c1b80e0b-f809-5b33-98d0-081dff2e79cb@redhat.com>
-From: Jon Doron <arilou@gmail.com>
-Date: Tue, 22 Jan 2019 07:36:57 +0200
-Message-ID: <CAP7QCoich3_wvW6xnCfL3+nfRFJ6=JEMY4g28F+jRfkLqOs=Uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] dump: Set correct vaddr for ELF dump
+In-Reply-To: <CAFEAcA_ytAb-K-HB3wL5baMBDkY71ksBK8hsUSFxuUeqVDFyHQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: ru-RU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Don't add Xen's libs to LDFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-ping, so this means that the patch will be merged in?
+21.01.2019 18:17, Peter Maydell wrote:
+> On Mon, 21 Jan 2019 at 14:49, Anthony PERARD <anthony.perard@citrix.com> wrote:
+>>
+>> When Xen is detected via pkg-config, it isn't necessary to modify
+>> LDFLAGS as modifying libs_softmmu is enough.
+>>
+>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+>> ---
+>>   configure | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 12fd34f30b..98b270974d 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2355,7 +2355,6 @@ if test "$xen" != "no" ; then
+>>       fi
+>>       QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+>>       libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+>> -    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+>>     else
+>>
+>>       xen_libs="-lxenstore -lxenctrl -lxenguest"
+>> --
+>> Anthony PERARD
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> Cc'ing MJT, who first pointed out to me that this bug
+> was resulting in various binaries like the linux-user ones
+> getting linked against the Xen libs unnecessarily.
+
+Well, at that time I confirmed the patch fixes this issue, and this
+is the same change I come across too, and it is already used on Debian.
+So
+
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+Revieved-by: Michael Tokarev <mjt@tls.msk.ru>
 
 Thanks,
--- Jon.
 
-On Wed, Jan 9, 2019 at 12:38 PM Laszlo Ersek <lersek@redhat.com> wrote:
->
-> On 01/09/19 09:25, Marc-Andr=C3=A9 Lureau wrote:
-> > On Wed, Jan 9, 2019 at 12:22 PM Jon Doron <arilou@gmail.com> wrote:
-> >>
-> >> vaddr needs to be equal to the paddr since the dump file represents th=
-e
-> >> physical memory image.
-> >>
-> >> Without setting vaddr correctly, GDB would load all the different memo=
-ry
-> >> regions on top of each other to vaddr 0, thus making GDB showing the w=
-rong
-> >> memory data for a given address.
-> >>
-> >> Signed-off-by: Jon Doron <arilou@gmail.com>
-> >
-> > Tested-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Apparently the only change in v3, relative to v2, is cleaning up the
-> whitespace problem that was caught by Patchew.
->
-> Acked-by: Laszlo Ersek <lersek@redhat.com>
->
-> Thanks
-> Laszlo
->
-> >>  dump.c                       | 5 +++--
-> >>  scripts/dump-guest-memory.py | 1 +
-> >>  2 files changed, 4 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/dump.c b/dump.c
-> >> index 4ec94c5e25..de7f70f099 100644
-> >> --- a/dump.c
-> >> +++ b/dump.c
-> >> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryM=
-apping *memory_mapping,
-> >>      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
-> >>      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
-> >>      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
-> >> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
-> >> +    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr) ? : =
-phdr.p_paddr;
-> >>
-> >>      assert(memory_mapping->length >=3D filesz);
-> >>
-> >> @@ -216,7 +216,8 @@ static void write_elf32_load(DumpState *s, MemoryM=
-apping *memory_mapping,
-> >>      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
-> >>      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
-> >>      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
-> >> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
-> >> +    phdr.p_vaddr =3D
-> >> +        cpu_to_dump32(s, memory_mapping->virt_addr) ? : phdr.p_paddr;
-> >>
-> >>      assert(memory_mapping->length >=3D filesz);
-> >>
-> >> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.=
-py
-> >> index 198cd0fe40..2c587cbefc 100644
-> >> --- a/scripts/dump-guest-memory.py
-> >> +++ b/scripts/dump-guest-memory.py
-> >> @@ -163,6 +163,7 @@ class ELF(object):
-> >>          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
-> >>          phdr.p_type =3D p_type
-> >>          phdr.p_paddr =3D p_paddr
-> >> +        phdr.p_vaddr =3D p_paddr
-> >>          phdr.p_filesz =3D p_size
-> >>          phdr.p_memsz =3D p_size
-> >>          self.segments.append(phdr)
-> >> --
-> >> 2.19.2
-> >>
-> >>
-> >
-> >
-> I pre
+/mjt
