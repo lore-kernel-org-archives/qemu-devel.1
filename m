@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44698)
+Received: from eggs.gnu.org ([209.51.188.92]:44892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gm13e-0003WC-U0
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:01 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gm13j-0003Y0-FQ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gm13d-0004Ph-BE
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:58 -0500
-Received: from mx2.freebsd.org ([8.8.178.116]:51454)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <emaste@freebsd.org>) id 1gm13d-00048J-1F
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:57 -0500
-Received: from mx1.freebsd.org (mx1.freebsd.org [96.47.72.80])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(Client CN "mx1.freebsd.org",
-	Issuer "Let's Encrypt Authority X3" (verified OK))
-	by mx2.freebsd.org (Postfix) with ESMTPS id 8389E8F634
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 17:26:00 +0000 (UTC)
-	(envelope-from emaste@freebsd.org)
-From: emaste@freebsd.org
-Date: Tue, 22 Jan 2019 17:25:58 +0000
-Message-Id: <20190122172558.15096-1-emaste@freebsd.org>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gm13f-0004UX-Re
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:03 -0500
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:44164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1gm13e-0004Mt-Jm
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:59 -0500
+Received: by mail-pf1-x434.google.com with SMTP id u6so12177132pfh.11
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:45:55 -0800 (PST)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Tue, 22 Jan 2019 04:20:45 -0800
+Message-Id: <20190122122048.10845-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4] .cirrus.yml: basic compile and test for
- FreeBSD
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v1 0/3] Xilinx queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +27,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
 
-From: Ed Maste <emaste@freebsd.org>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Ed Maste <emaste@freebsd.org>
----
-Changes since v3:
-- 8G instead of 24G
-- remove V=3D1 from build (but leave on "gmake check")
+The following changes since commit e56b86bc7735dd076939fa33a76e1ee9d5907e47:
 
- .cirrus.yml | 16 ++++++++++++++++
- MAINTAINERS |  8 ++++++++
- 2 files changed, 24 insertions(+)
- create mode 100644 .cirrus.yml
+  Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' into staging (2019-01-21 19:19:47 +0000)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-new file mode 100644
-index 0000000000..303fe720d6
---- /dev/null
-+++ b/.cirrus.yml
-@@ -0,0 +1,16 @@
-+freebsd_12_task:
-+  freebsd_instance:
-+    image: freebsd-12-0-release-amd64
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    CIRRUS_CLONE_DEPTH: 1
-+  install_script: pkg install -y
-+    bison curl cyrus-sasl git glib gmake gnutls
-+    nettle perl5 pixman pkgconf png usbredir
-+  script:
-+    - mkdir build
-+    - cd build
-+    - ../configure || { cat config.log; exit 1; }
-+    - gmake -j8
-+    - gmake -j8 V=3D1 check
-diff --git a/MAINTAINERS b/MAINTAINERS
-index af339b86db..f9da8c9cf0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2483,6 +2483,14 @@ W: https://travis-ci.org/qemu/qemu
- W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
-=20
-+FreeBSD Hosted Continuous Integration
-+M: Ed Maste <emaste@freebsd.org>
-+M: Li-Wen Hsu <lwhsu@freebsd.org>
-+L: qemu-devel@nongnu.org
-+S: Maintained
-+F: .cirrus.yml
-+W: https://cirrus-ci.com/github/qemu/qemu
-+
- Guest Test Compilation Support
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
- R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
---=20
-2.20.1
+are available in the Git repository at:
+
+  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2019-01-22.for-upstream
+
+for you to fetch changes up to 2867a96ffb63fa363820e4b0110b96a06218068b:
+
+  target/microblaze: Add props enabling exceptions on failed bus accesses (2019-01-22 03:17:34 -0800)
+
+----------------------------------------------------------------
+Pullreq 2019-01-22
+
+----------------------------------------------------------------
+Edgar E. Iglesias (2):
+      hw/microblaze: s3adsp1800: Create an unimplemented GPIO area
+      target/microblaze: Add props enabling exceptions on failed bus accesses
+
+Peter Maydell (1):
+      target/microblaze: Switch to transaction_failed hook
+
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |  4 ++++
+ target/microblaze/cpu.c                  | 14 ++++++++++++--
+ target/microblaze/cpu.h                  |  9 ++++++---
+ target/microblaze/op_helper.c            | 22 ++++++++++++----------
+ 4 files changed, 34 insertions(+), 15 deletions(-)
+
+-- 
+2.19.1
