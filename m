@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59350)
+Received: from eggs.gnu.org ([209.51.188.92]:59106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsVk-0006M9-Se
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:25 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsVo-0006AI-Hg
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsNW-0004rI-LT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:29:55 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1glsNU-0004ii-B4
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 04:29:54 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Tue, 22 Jan 2019 10:28:41 +0100
-Message-Id: <20190122092909.5341-8-kbastian@mail.uni-paderborn.de>
+Date: Tue, 22 Jan 2019 10:28:38 +0100
+Message-Id: <20190122092909.5341-5-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
 References: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 07/35] target/riscv: Convert RVXI fence
- insns to decodetree
+Subject: [Qemu-devel] [PATCH v5 04/35] target/riscv: Convert RV32I
+ load/store insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
-Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+Cc: richard.henderson@linaro.org, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
-v4 -> v5:
-    - fixed rebase error
-
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvi.inc.c | 19 +++++++++++++++++++
- target/riscv/translate.c                | 12 ------------
- 3 files changed, 21 insertions(+), 12 deletions(-)
+ target/riscv/insn32.decode              | 10 ++++++
+ target/riscv/insn_trans/trans_rvi.inc.c | 48 +++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
 
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 1f5bf1f6f9..804b721ca5 100644
+index 81f56c16b4..076de873c4 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -82,3 +82,5 @@ srl      0000000 .....    ..... 101 ..... 0110011 @r
- sra      0100000 .....    ..... 101 ..... 0110011 @r
- or       0000000 .....    ..... 110 ..... 0110011 @r
- and      0000000 .....    ..... 111 ..... 0110011 @r
-+fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
-+fence_i  ---- ----   ----   ----- 001 ----- 0001111
+@@ -23,6 +23,7 @@
+ 
+ # immediates:
+ %imm_i    20:s12
++%imm_s    25:s7 7:5
+ %imm_b    31:s1 7:1 25:6 8:4     !function=ex_shift_1
+ %imm_j    31:s1 12:8 20:1 21:10  !function=ex_shift_1
+ %imm_u    12:s20                 !function=ex_shift_12
+@@ -33,6 +34,7 @@
+ # Formats 32:
+ @i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
+ @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
++@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
+ @u       ....................      ..... .......         imm=%imm_u          %rd
+ @j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+@@ -47,3 +49,11 @@ blt      ....... .....    ..... 100 ..... 1100011 @b
+ bge      ....... .....    ..... 101 ..... 1100011 @b
+ bltu     ....... .....    ..... 110 ..... 1100011 @b
+ bgeu     ....... .....    ..... 111 ..... 1100011 @b
++lb       ............     ..... 000 ..... 0000011 @i
++lh       ............     ..... 001 ..... 0000011 @i
++lw       ............     ..... 010 ..... 0000011 @i
++lbu      ............     ..... 100 ..... 0000011 @i
++lhu      ............     ..... 101 ..... 0000011 @i
++sb       .......  .....   ..... 000 ..... 0100011 @s
++sh       .......  .....   ..... 001 ..... 0100011 @s
++sw       .......  .....   ..... 010 ..... 0100011 @s
 diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index 01f751650a..b468a0ac0e 100644
+index 0347461ee6..f3b88ebb69 100644
 --- a/target/riscv/insn_trans/trans_rvi.inc.c
 +++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -318,3 +318,22 @@ static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
+@@ -82,3 +82,51 @@ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
+     gen_branch(ctx->env, ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
      return true;
  }
- #endif
 +
-+static bool trans_fence(DisasContext *ctx, arg_fence *a)
++static bool trans_lb(DisasContext *ctx, arg_lb *a)
 +{
-+    /* FENCE is a full memory barrier. */
-+    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
++    gen_load(ctx, OPC_RISC_LB, a->rd, a->rs1, a->imm);
 +    return true;
 +}
 +
-+static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
++static bool trans_lh(DisasContext *ctx, arg_lh *a)
 +{
-+    /*
-+     * FENCE_I is a no-op in QEMU,
-+     * however we need to end the translation block
-+     */
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-+    tcg_gen_exit_tb(NULL, 0);
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    gen_load(ctx, OPC_RISC_LH, a->rd, a->rs1, a->imm);
 +    return true;
 +}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index c16eba8ec8..9899f10be4 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -1750,18 +1750,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-         gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
-                      GET_RM(ctx->opcode));
-         break;
--    case OPC_RISC_FENCE:
--        if (ctx->opcode & 0x1000) {
--            /* FENCE_I is a no-op in QEMU,
--             * however we need to end the translation block */
--            tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
--            tcg_gen_exit_tb(NULL, 0);
--            ctx->base.is_jmp = DISAS_NORETURN;
--        } else {
--            /* FENCE is a full memory barrier. */
--            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--        }
--        break;
-     case OPC_RISC_SYSTEM:
-         gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-                    (ctx->opcode & 0xFFF00000) >> 20);
++
++static bool trans_lw(DisasContext *ctx, arg_lw *a)
++{
++    gen_load(ctx, OPC_RISC_LW, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lbu(DisasContext *ctx, arg_lbu *a)
++{
++    gen_load(ctx, OPC_RISC_LBU, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_lhu(DisasContext *ctx, arg_lhu *a)
++{
++    gen_load(ctx, OPC_RISC_LHU, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_sb(DisasContext *ctx, arg_sb *a)
++{
++    gen_store(ctx, OPC_RISC_SB, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_sh(DisasContext *ctx, arg_sh *a)
++{
++    gen_store(ctx, OPC_RISC_SH, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_sw(DisasContext *ctx, arg_sw *a)
++{
++    gen_store(ctx, OPC_RISC_SW, a->rs1, a->rs2, a->imm);
++    return true;
++}
 -- 
 2.20.1
