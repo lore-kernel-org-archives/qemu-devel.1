@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45164)
+Received: from eggs.gnu.org ([209.51.188.92]:46320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gm1o0-0007kw-Ct
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:55 -0500
+	(envelope-from <groug@kaod.org>) id 1gm1o3-0008QW-1E
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gm1dW-0000GE-CT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:23:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53624)
+	(envelope-from <groug@kaod.org>) id 1gm1dA-000865-1n
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:22:44 -0500
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:54139)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gm1dW-0000Dz-3x
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:23:02 -0500
-References: <20190109082203.27142-1-arilou@gmail.com>
-	<CAJ+F1CK1Y4qyzJrebiU8wQdaJ6-JM_WEywsURmF4mB2Tk7UMOA@mail.gmail.com>
-	<c1b80e0b-f809-5b33-98d0-081dff2e79cb@redhat.com>
-	<CAP7QCoich3_wvW6xnCfL3+nfRFJ6=JEMY4g28F+jRfkLqOs=Uw@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2e6f40fc-f77a-c071-db03-75f8fc0d5ae4@redhat.com>
-Date: Tue, 22 Jan 2019 13:15:53 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gm1d1-0007h1-Dy
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:22:33 -0500
+Received: from player691.ha.ovh.net (unknown [10.109.159.224])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9C5391124B1
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 15:35:35 +0100 (CET)
+Date: Tue, 22 Jan 2019 15:35:14 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190122153514.35173a76@bahia.lan>
+In-Reply-To: <6b9cb7a1-ff6a-6a8a-dde4-c72008b7f032@kaod.org>
+References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+	<154774536496.1208625.12823909967079119637.stgit@bahia.lan>
+	<f132cca0-c163-6791-75e0-25783578263a@kaod.org>
+	<20190122142748.6d9a6691@bahia.lan>
+	<6b9cb7a1-ff6a-6a8a-dde4-c72008b7f032@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <CAP7QCoich3_wvW6xnCfL3+nfRFJ6=JEMY4g28F+jRfkLqOs=Uw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] dump: Set correct vaddr for ELF dump
+Subject: Re: [Qemu-devel] [PATCH v3 15/19] spapr_xive: Cache device tree
+ nodename in sPAPRXive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +34,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Jon Doron <arilou@gmail.com>, QEMU <qemu-devel@nongnu.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On 01/22/19 06:36, Jon Doron wrote:
-> ping, so this means that the patch will be merged in?
+On Tue, 22 Jan 2019 15:26:45 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On 1/22/19 2:27 PM, Greg Kurz wrote:
+> > On Fri, 18 Jan 2019 14:38:31 +0100
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >  =20
+> >> On 1/17/19 6:16 PM, Greg Kurz wrote: =20
+> >>> PHB hotplug will need to know the name of the XIVE controller node. S=
+ince
+> >>> it is an invariant for the machine lifetime, compute it at realize and
+> >>> store it under the sPAPRXive structure.   =20
+> >> Could you please gather all these changes [15-17] in one patch. It wou=
+ld=20
+> >> be easier to track.=20
+> >> =20
+> >=20
+> > I'll do that in v4.
+> >  =20
+> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
+> >>> ---
+> >>>  hw/intc/spapr_xive.c        |    9 ++++-----
+> >>>  include/hw/ppc/spapr_xive.h |    3 +++
+> >>>  2 files changed, 7 insertions(+), 5 deletions(-)
+> >>>
+> >>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> >>> index e542ae59d7fd..9732c3d89c77 100644
+> >>> --- a/hw/intc/spapr_xive.c
+> >>> +++ b/hw/intc/spapr_xive.c
+> >>> @@ -316,6 +316,9 @@ static void spapr_xive_realize(DeviceState *dev, =
+Error **errp)
+> >>>      /* Map all regions */
+> >>>      spapr_xive_map_mmio(xive);
+> >>> =20
+> >>> +    xive->nodename =3D g_strdup_printf("interrupt-controller@%" PRIx=
+64,
+> >>> +                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
+ TM_SHIFT));   =20
+> >>
+> >> I would use a helper routine instead.
+> >>   =20
+> >=20
+> > Ok, I see your suggestion to put the name in a static. Well, it would w=
+ork
+> > as long as we only have one interrupt controller around. It is the case=
+ now
+> > but could this change in the future ? If not then I'm perfectly fine wi=
+th
+> > your suggestions, otherwise I guess the nodename should be under sPAPRX=
+ive. =20
+>=20
+> Well, I am not sure it's worth extending SPAPRXive for a name that can=20
+> be computed. Using a static is probably not a better solution.=20
+>=20
+> Maybe return the node offset instead. See pnv_chip_isa_offset() in pnv.c=
+=20
+
+We can't with pseries because SLOF can update the machine's fdt, which
+means the offset could be different from what it was when spapr_dt_xive()
+was last called.
+
+> for a similar issue.
 >=20
 > Thanks,
-> -- Jon.
-
-Marc-Andr=C3=A9, can you please confirm if you've queued this patch for a
-pull? (According to scripts/get_maintainer.pl, you are "supporter:Dump",
-for both files touched by this patch.)
-
-Apologies if I missed a message elsewhere in this thread, and I should
-know already.
-
-Thanks!
-Laszlo
-
 >=20
-> On Wed, Jan 9, 2019 at 12:38 PM Laszlo Ersek <lersek@redhat.com> wrote:
->>
->> On 01/09/19 09:25, Marc-Andr=C3=A9 Lureau wrote:
->>> On Wed, Jan 9, 2019 at 12:22 PM Jon Doron <arilou@gmail.com> wrote:
->>>>
->>>> vaddr needs to be equal to the paddr since the dump file represents =
-the
->>>> physical memory image.
->>>>
->>>> Without setting vaddr correctly, GDB would load all the different me=
-mory
->>>> regions on top of each other to vaddr 0, thus making GDB showing the=
- wrong
->>>> memory data for a given address.
->>>>
->>>> Signed-off-by: Jon Doron <arilou@gmail.com>
->>>
->>> Tested-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->> Apparently the only change in v3, relative to v2, is cleaning up the
->> whitespace problem that was caught by Patchew.
->>
->> Acked-by: Laszlo Ersek <lersek@redhat.com>
->>
->> Thanks
->> Laszlo
->>
->>>>  dump.c                       | 5 +++--
->>>>  scripts/dump-guest-memory.py | 1 +
->>>>  2 files changed, 4 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/dump.c b/dump.c
->>>> index 4ec94c5e25..de7f70f099 100644
->>>> --- a/dump.c
->>>> +++ b/dump.c
->>>> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, Memor=
-yMapping *memory_mapping,
->>>>      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
->>>>      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
->>>>      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
->>>> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
->>>> +    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr) ? =
-: phdr.p_paddr;
->>>>
->>>>      assert(memory_mapping->length >=3D filesz);
->>>>
->>>> @@ -216,7 +216,8 @@ static void write_elf32_load(DumpState *s, Memor=
-yMapping *memory_mapping,
->>>>      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
->>>>      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
->>>>      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
->>>> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
->>>> +    phdr.p_vaddr =3D
->>>> +        cpu_to_dump32(s, memory_mapping->virt_addr) ? : phdr.p_padd=
-r;
->>>>
->>>>      assert(memory_mapping->length >=3D filesz);
->>>>
->>>> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memor=
-y.py
->>>> index 198cd0fe40..2c587cbefc 100644
->>>> --- a/scripts/dump-guest-memory.py
->>>> +++ b/scripts/dump-guest-memory.py
->>>> @@ -163,6 +163,7 @@ class ELF(object):
->>>>          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
->>>>          phdr.p_type =3D p_type
->>>>          phdr.p_paddr =3D p_paddr
->>>> +        phdr.p_vaddr =3D p_paddr
->>>>          phdr.p_filesz =3D p_size
->>>>          phdr.p_memsz =3D p_size
->>>>          self.segments.append(phdr)
->>>> --
->>>> 2.19.2
->>>>
->>>>
->>>
->>>
->> I pre
+> C.=20
+>=20
+> >  =20
+> >>>      qemu_register_reset(spapr_xive_reset, dev);
+> >>>  }
+> >>> =20
+> >>> @@ -1436,7 +1439,6 @@ int spapr_dt_xive(sPAPRMachineState *spapr, uin=
+t32_t nr_servers, void *fdt)
+> >>>          cpu_to_be32(7),    /* start */
+> >>>          cpu_to_be32(0xf8), /* count */
+> >>>      };
+> >>> -    gchar *nodename;
+> >>> =20
+> >>>      /*
+> >>>       * The "ibm,plat-res-int-priorities" property defines the priori=
+ty
+> >>> @@ -1453,10 +1455,7 @@ int spapr_dt_xive(sPAPRMachineState *spapr, ui=
+nt32_t nr_servers, void *fdt)
+> >>>                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+> >>>      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+> >>> =20
+> >>> -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> >>> -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
+ TM_SHIFT));
+> >>> -    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+> >>> -    g_free(nodename);
+> >>> +    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));   =20
+> >>
+> >> and use the helper routine here.
+> >> =20
+> >>>      _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+> >>>      _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+> >>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> >>> index 29dafead9ba0..deea34b03ee5 100644
+> >>> --- a/include/hw/ppc/spapr_xive.h
+> >>> +++ b/include/hw/ppc/spapr_xive.h
+> >>> @@ -26,6 +26,9 @@ typedef struct sPAPRXive {
+> >>>      XiveENDSource end_source;
+> >>>      hwaddr        end_base;
+> >>> =20
+> >>> +    /* DT */
+> >>> +    gchar *nodename;   =20
+> >>
+> >> I don't think this is needed. See other patches for why.
+> >>
+> >> Thanks,
+> >>
+> >> C.
+> >>   =20
+> >>>
+> >>>      /* Routing table */
+> >>>      XiveEAS       *eat;
+> >>>      uint32_t      nr_irqs;
+> >>>    =20
+> >> =20
+> >  =20
+>=20
