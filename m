@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46581)
+Received: from eggs.gnu.org ([209.51.188.92]:46544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1glrU8-0000EY-SK
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1glrU7-0002hX-KM
+	(envelope-from <elohimes@gmail.com>) id 1glrU4-0000EU-UN
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:40 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37373)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <elohimes@gmail.com>) id 1glrTv-0002bK-Nc
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:34 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36021)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1glrU7-0002gn-DY
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:39 -0500
-Received: by mail-pl1-x642.google.com with SMTP id b5so11118049plr.4
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 00:32:39 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1glrTv-0002Zl-GY
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:27 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g9so11124594plo.3
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 00:32:24 -0800 (PST)
 From: elohimes@gmail.com
-Date: Tue, 22 Jan 2019 16:31:50 +0800
-Message-Id: <20190122083152.10705-5-xieyongji@baidu.com>
-In-Reply-To: <20190122083152.10705-1-xieyongji@baidu.com>
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v5 4/6] vhost-user-blk: Add support to get/set
- inflight buffer
+Date: Tue, 22 Jan 2019 16:31:46 +0800
+Message-Id: <20190122083152.10705-1-xieyongji@baidu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 0/6] vhost-user-blk: Add support for backend
+ reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +32,93 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-This patch adds support for vhost-user-blk device to get/set
-inflight buffer from/to backend.
+This patchset is aimed at supporting qemu to reconnect
+vhost-user-blk backend after vhost-user-blk backend crash or
+restart.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- hw/block/vhost-user-blk.c          | 26 ++++++++++++++++++++++++++
- include/hw/virtio/vhost-user-blk.h |  1 +
- 2 files changed, 27 insertions(+)
+The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+and VHOST_USER_SET_INFLIGHT_FD to support support transferring shared
+buffer between qemu and backend.
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index c3af28fad4..1f899ac1c0 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -126,6 +126,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
-     }
- 
-     s->dev.acked_features = vdev->guest_features;
-+
-+    ret = vhost_dev_set_inflight(&s->dev, s->inflight);
-+    if (ret < 0) {
-+        error_report("Error set inflight: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
-+
-     ret = vhost_dev_start(&s->dev, vdev);
-     if (ret < 0) {
-         error_report("Error starting vhost: %d", -ret);
-@@ -245,6 +252,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-     }
- }
- 
-+static void vhost_user_blk_reset(VirtIODevice *vdev)
-+{
-+    VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+
-+    vhost_dev_reset_inflight(s->inflight);
-+}
-+
- static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -285,6 +299,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-                          vhost_user_blk_handle_output);
-     }
- 
-+    s->inflight = g_new0(struct vhost_inflight, 1);
-+
-     s->dev.nvqs = s->num_queues;
-     s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
-     s->dev.vq_index = 0;
-@@ -311,12 +327,19 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-         s->blkcfg.num_queues = s->num_queues;
-     }
- 
-+    ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
-+    if (ret < 0) {
-+        error_setg(errp, "vhost-user-blk: get inflight failed");
-+        goto vhost_err;
-+    }
-+
-     return;
- 
- vhost_err:
-     vhost_dev_cleanup(&s->dev);
- virtio_err:
-     g_free(vqs);
-+    g_free(s->inflight);
-     virtio_cleanup(vdev);
- 
-     vhost_user_cleanup(user);
-@@ -332,7 +355,9 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
- 
-     vhost_user_blk_set_status(vdev, 0);
-     vhost_dev_cleanup(&s->dev);
-+    vhost_dev_free_inflight(s->inflight);
-     g_free(vqs);
-+    g_free(s->inflight);
-     virtio_cleanup(vdev);
- 
-     if (s->vhost_user) {
-@@ -382,6 +407,7 @@ static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
-     vdc->set_config = vhost_user_blk_set_config;
-     vdc->get_features = vhost_user_blk_get_features;
-     vdc->set_status = vhost_user_blk_set_status;
-+    vdc->reset = vhost_user_blk_reset;
- }
- 
- static const TypeInfo vhost_user_blk_info = {
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-index d52944aeeb..445516604a 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -36,6 +36,7 @@ typedef struct VHostUserBlk {
-     uint32_t queue_size;
-     uint32_t config_wce;
-     struct vhost_dev dev;
-+    struct vhost_inflight *inflight;
-     VhostUserState *vhost_user;
- } VHostUserBlk;
- 
+The patch 2,3 are the corresponding libvhost-user patches of
+patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
+and VHOST_USER_SET_INFLIGHT_FD.
+
+The patch 4 allows vhost-user-blk to use the two new messages
+to get/set inflight buffer from/to backend.
+
+The patch 5 supports vhost-user-blk to reconnect backend when
+connection closed.
+
+The patch 6 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
+to vhost-user-blk backend which is used to tell qemu that
+we support reconnecting now.
+
+This series is based on Daniel P. Berrangé's patchset:
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
+
+To use it, we could start qemu with:
+
+qemu-system-x86_64 \
+        -chardev socket,id=char0,path=/path/vhost.socket,reconnect=1, \
+        -device vhost-user-blk-pci,chardev=char0 \
+
+and start vhost-user-blk backend with:
+
+vhost-user-blk -b /path/file -s /path/vhost.socket
+
+Then we can restart vhost-user-blk at any time during VM running.
+
+V4 to V5:
+- Drop patch that enables "nowait" option on client sockets
+- Support resubmitting inflight I/O in order
+- Make inflight I/O tracking more robust
+- Remove align field and add queue size field in VhostUserInflight
+- Document more details in vhost-user.txt
+
+V3 to V4:
+- Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
+- Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
+  and VHOST_USER_SET_INFLIGHT_FD
+- Allocate inflight buffer in backend rather than in qemu
+- Document a recommended format for inflight buffer
+
+V2 to V3:
+- Using exisiting wait/nowait options to control connection on
+  client sockets instead of introducing "disconnected" option.
+- Support the case that vhost-user backend restart during initialzation
+  of vhost-user-blk device.
+
+V1 to V2:
+- Introduce "disconnected" option for chardev instead of reuse "wait"
+  option
+- Support the case that QEMU starts before vhost-user backend
+- Drop message VHOST_USER_SET_VRING_INFLIGHT
+- Introduce two new messages VHOST_USER_GET_SHM_SIZE
+  and VHOST_USER_SET_SHM_FD
+
+Xie Yongji (6):
+  vhost-user: Support transferring inflight buffer between qemu and
+    backend
+  libvhost-user: Introduce vu_queue_map_desc()
+  libvhost-user: Support tracking inflight I/O in shared memory
+  vhost-user-blk: Add support to get/set inflight buffer
+  vhost-user-blk: Add support to reconnect backend
+  contrib/vhost-user-blk: enable inflight I/O tracking
+
+ Makefile                                |   2 +-
+ contrib/libvhost-user/libvhost-user.c   | 402 ++++++++++++++++++++----
+ contrib/libvhost-user/libvhost-user.h   |  40 +++
+ contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
+ docs/interop/vhost-user.txt             | 101 ++++++
+ hw/block/vhost-user-blk.c               | 227 ++++++++++---
+ hw/virtio/vhost-user.c                  | 110 +++++++
+ hw/virtio/vhost.c                       | 105 +++++++
+ include/hw/virtio/vhost-backend.h       |  10 +
+ include/hw/virtio/vhost-user-blk.h      |   5 +
+ include/hw/virtio/vhost.h               |  19 ++
+ 11 files changed, 925 insertions(+), 99 deletions(-)
+
 -- 
 2.17.1
