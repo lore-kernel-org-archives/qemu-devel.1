@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59028)
+Received: from eggs.gnu.org ([209.51.188.92]:59053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glqGv-0006NA-Nc
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:14:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1glqH3-0006Rk-Ew
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:15:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1glqGs-0001oP-O6
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:14:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47796)
+	(envelope-from <thuth@redhat.com>) id 1glqH1-0001sI-I0
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:15:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60272)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glqGs-0001Rf-AE
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:14:54 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1glqGz-0001qp-RK
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:15:03 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 22 Jan 2019 08:08:35 +0100
-Message-Id: <1548140916-6923-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1548140916-6923-1-git-send-email-thuth@redhat.com>
-References: <1548140916-6923-1-git-send-email-thuth@redhat.com>
+Date: Tue, 22 Jan 2019 08:08:33 +0100
+Message-Id: <1548140916-6923-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v4 20/26] virtio-net: Fix VirtIONet typedef
- redefinition
+Subject: [Qemu-devel] [PULL v4 00/26] qtests, typedefs and gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +27,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Commit 2974e916df8 introduced the VirtioNetRscChain structure which
-refer to a VirtIONet, declared later, thus required VirtIONet typedef
-to use a forward declaration.
-However, when compiling with Clang in -std=3Dgnu99 mode, this triggers
-the following warning/error:
-
-    CC      hw/net/virtio-net.o
-  In file included from qemu/hw/net/virtio-net.c:22:
-  include/hw/virtio/virtio-net.h:189:3: error: redefinition of typedef 'V=
-irtIONet' is a C11 feature [-Werror,-Wtypedef-redefinition]
-  } VirtIONet;
-    ^
-  include/hw/virtio/virtio-net.h:110:26: note: previous definition is her=
-e
-  typedef struct VirtIONet VirtIONet;
-                           ^
-  1 error generated.
-  make: *** [rules.mak:69: hw/net/virtio-net.o] Error 1
-
-Fix it by removing the duplicate typedef definition.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/hw/virtio/virtio-net.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-ne=
-t.h
-index c7ec1a7..bd66275 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -106,7 +106,6 @@ typedef struct VirtioNetRscSeg {
-     NetClientState *nc;
- } VirtioNetRscSeg;
+ Hi Peter!
 =20
--struct VirtIONet;
- typedef struct VirtIONet VirtIONet;
-=20
- /* Chain is divided by protocol(ipv4/v6) and NetClientInfo */
-@@ -136,7 +135,7 @@ typedef struct VirtIONetQueue {
-     struct VirtIONet *n;
- } VirtIONetQueue;
-=20
--typedef struct VirtIONet {
-+struct VirtIONet {
-     VirtIODevice parent_obj;
-     uint8_t mac[ETH_ALEN];
-     uint16_t status;
-@@ -186,7 +185,7 @@ typedef struct VirtIONet {
-     int announce_counter;
-     bool needs_vnet_hdr_swap;
-     bool mtu_bypass_backend;
--} VirtIONet;
-+};
-=20
- void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
-                                    const char *type);
---=20
-1.8.3.1
+The following changes since commit 166609e6070fab3424510ac7292ecb585f8b80=
+fb:
+
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-january=
+-17-2019-v2' into staging (2019-01-21 17:53:28 +0000)
+
+are available in the git repository at:
+
+  https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-22
+
+for you to fetch changes up to f48a79da78eb605bb0977f930ca137e9b8bdede8:
+
+  tests: remove rule for nonexisting qdev-monitor-test (2019-01-22 06:26:=
+33 +0100)
+
+----------------------------------------------------------------
+- Use more CONFIG Makefile switches for qtests
+- Get rid of global_qtests in some more qtests
+- typedef cleanups
+- Fixes for compiling with Clang
+- Force C standard to gnu99
+- Don't use -nographic in qtests
+----------------------------------------------------------------
+
+Paolo Bonzini (1):
+      tests: remove rule for nonexisting qdev-monitor-test
+
+Peter Maydell (1):
+      tests/hexloader-test: Don't pass -nographic to the QEMU under test
+
+Philippe Mathieu-Daud=C3=A9 (13):
+      hw/input/ps2: Remove PS2State from "qemu/typedefs.h"
+      hw/pcmcia: Remove PCMCIACardState from "qemu/typedefs.h"
+      hw/ide/ahci: Remove AllwinnerAHCIState from "qemu/typedefs.h"
+      hw/i2c/smbus: Remove SMBusDevice from "qemu/typedefs.h"
+      hw/bt: Remove HCIInfo from "qemu/typedefs.h"
+      hw/char/serial: Remove SerialState from "qemu/typedefs.h"
+      hw/i386: Remove PCMachineClass from "qemu/typedefs.h"
+      audio: Remove AudioState from "qemu/typedefs.h"
+      ui/console: Remove QemuDmaBuf from "qemu/typedefs.h"
+      ui/console: Remove DisplayState/DisplaySurface from "qemu/typedefs.=
+h"
+      ui/console: Remove MouseTransformInfo from qemu/typedefs.h
+      ui/console: Remove PixelFormat from qemu/typedefs.h
+      virtio-net: Fix VirtIONet typedef redefinition
+
+Thomas Huth (11):
+      tests/Makefile: Use some more CONFIG switches for x86 tests
+      tests/Makefile: Use some more CONFIG switches for ppc tests
+      tests/endianesss: Make test independent of global_qtest
+      tests/boot-order: Make test independent of global_qtest
+      tests/pnv-xscom: Make test independent of global_qtest
+      ppc: Move spapr-related prototypes from xics.h into a seperate head=
+er file
+      ppc: Fix duplicated typedefs to be able to compile with Clang in gn=
+u99 mode
+      linux-user: Fix compilation with clang 3.4
+      block: Work-around a bug in libiscsi 1.9.0 when used in gnu99 mode
+      seccomp: Work-around GCC 4.x bug in gnu99 mode
+      configure: Force the C standard to gnu99
+
+ audio/audio_int.h              |   4 +-
+ block/iscsi.c                  |   2 +
+ configure                      |   5 +-
+ hw/intc/xics_kvm.c             |   1 +
+ hw/intc/xics_spapr.c           |   1 +
+ hw/ppc/spapr_irq.c             |   1 +
+ include/hw/arm/pxa.h           |   1 +
+ include/hw/char/serial.h       |   4 +-
+ include/hw/devices.h           |   1 +
+ include/hw/i2c/smbus.h         |   2 +
+ include/hw/i386/pc.h           |   4 +-
+ include/hw/ide/ahci.h          |   4 +-
+ include/hw/input/ps2.h         |   2 +
+ include/hw/pcmcia.h            |   4 +-
+ include/hw/ppc/spapr.h         |   5 +-
+ include/hw/ppc/spapr_xive.h    |   2 -
+ include/hw/ppc/xics.h          |   7 -
+ include/hw/ppc/xics_spapr.h    |  37 +++++
+ include/hw/virtio/virtio-net.h |   5 +-
+ include/qemu/compiler.h        |   4 +
+ include/qemu/typedefs.h        |  13 --
+ include/sysemu/bt.h            |   4 +-
+ include/ui/console.h           |  24 +--
+ include/ui/qemu-pixman.h       |  10 ++
+ linux-user/qemu.h              |   6 +-
+ qemu-seccomp.c                 |   3 +-
+ target/ppc/cpu.h               |   9 +-
+ tests/Makefile.include         |  23 ++-
+ tests/boot-order-test.c        |  59 ++++----
+ tests/endianness-test.c        | 329 +++++++++++++++++++++--------------=
+------
+ tests/hexloader-test.c         |   2 +-
+ tests/pnv-xscom-test.c         |  29 ++--
+ 32 files changed, 321 insertions(+), 286 deletions(-)
+ create mode 100644 include/hw/ppc/xics_spapr.h
+
+ v4:
+ - Rebased patches to current master (to fix conflict in the first patch)
+ - Added "virtio-net: Fix VirtIONet typedef redefinition" patch
+ - Added "tests: remove rule for nonexisting qdev-monitor-test"
