@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44892)
+Received: from eggs.gnu.org ([209.51.188.92]:44973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gm13j-0003Y0-FQ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm13m-0003ac-4y
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gm13f-0004UX-Re
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:03 -0500
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:44164)
+	(envelope-from <peter.maydell@linaro.org>) id 1gm13g-0004WE-TT
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:05 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45504)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1gm13e-0004Mt-Jm
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:45:59 -0500
-Received: by mail-pf1-x434.google.com with SMTP id u6so12177132pfh.11
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:45:55 -0800 (PST)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 22 Jan 2019 04:20:45 -0800
-Message-Id: <20190122122048.10845-1-edgar.iglesias@gmail.com>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gm13f-00047G-Js
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:46:00 -0500
+Received: by mail-oi1-x244.google.com with SMTP id y1so18257579oie.12
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:45:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v1 0/3] Xilinx queue
+References: <20190110121736.23448-1-richard.henderson@linaro.org>
+	<20190110121736.23448-2-richard.henderson@linaro.org>
+In-Reply-To: <20190110121736.23448-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Jan 2019 12:01:24 +0000
+Message-ID: <CAFEAcA9v8JMGg3=DE_vqOv87B+atNJr=4cPOtXWNqAGH0O37MQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 01/11] target/arm: Introduce
+ isar_feature_aa64_bti
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Thu, 10 Jan 2019 at 12:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Also create field definitions for id_aa64pfr1 from ARMv8.5.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 8512ca3552..fadb74d9a6 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1630,6 +1630,9 @@ FIELD(ID_AA64PFR0, GIC, 24, 4)
+>  FIELD(ID_AA64PFR0, RAS, 28, 4)
+>  FIELD(ID_AA64PFR0, SVE, 32, 4)
+>
+> +FIELD(ID_AA64PFR1, BT, 0, 4)
+> +FIELD(ID_AA64PFR1, SBSS, 4, 4)
 
-The following changes since commit e56b86bc7735dd076939fa33a76e1ee9d5907e47:
+You could add
+FIELD(ID_AA64PFR1, MTE, 8, 4)
+FIELD(ID_AA64PFR1, RAS_FRAC, 12, 4)
 
-  Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' into staging (2019-01-21 19:19:47 +0000)
+if you liked (from v8.5-MemTag and v8.4-RAS).
 
-are available in the Git repository at:
+> +
+>  FIELD(ID_AA64MMFR0, PARANGE, 0, 4)
+>  FIELD(ID_AA64MMFR0, ASIDBITS, 4, 4)
+>  FIELD(ID_AA64MMFR0, BIGEND, 8, 4)
+> @@ -3268,6 +3271,11 @@ static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
+>      return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
+>  }
+>
+> +static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+> +{
+> +    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
+> +}
+> +
+>  /*
+>   * Forward to the above feature tests given an ARMCPU pointer.
+>   */
+> --
+> 2.17.2
 
-  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2019-01-22.for-upstream
+Either way,
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-for you to fetch changes up to 2867a96ffb63fa363820e4b0110b96a06218068b:
-
-  target/microblaze: Add props enabling exceptions on failed bus accesses (2019-01-22 03:17:34 -0800)
-
-----------------------------------------------------------------
-Pullreq 2019-01-22
-
-----------------------------------------------------------------
-Edgar E. Iglesias (2):
-      hw/microblaze: s3adsp1800: Create an unimplemented GPIO area
-      target/microblaze: Add props enabling exceptions on failed bus accesses
-
-Peter Maydell (1):
-      target/microblaze: Switch to transaction_failed hook
-
- hw/microblaze/petalogix_s3adsp1800_mmu.c |  4 ++++
- target/microblaze/cpu.c                  | 14 ++++++++++++--
- target/microblaze/cpu.h                  |  9 ++++++---
- target/microblaze/op_helper.c            | 22 ++++++++++++----------
- 4 files changed, 34 insertions(+), 15 deletions(-)
-
--- 
-2.19.1
+thanks
+-- PMM
