@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43133)
+Received: from eggs.gnu.org ([209.51.188.92]:46581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1glrDj-0005Tl-95
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:15:44 -0500
+	(envelope-from <elohimes@gmail.com>) id 1glrU8-0000EY-SK
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1glrDh-0000pr-Bd
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:15:42 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 22 Jan 2019 08:15:25 +0000
-Message-ID: <b2915d9a-90f1-a114-5d18-f2d69cc491b8@virtuozzo.com>
-References: <cover.1547739122.git.berto@igalia.com>
-	<23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
-In-Reply-To: <23150df9-1a9d-d1ef-c624-64eb2425a8d5@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4DDE363086D5744682E59AE71AF1B0E6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 00/13] Add a 'x-blockdev-reopen' QMP command
+	(envelope-from <elohimes@gmail.com>) id 1glrU7-0002hX-KM
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:40 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1glrU7-0002gn-DY
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:39 -0500
+Received: by mail-pl1-x642.google.com with SMTP id b5so11118049plr.4
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 00:32:39 -0800 (PST)
+From: elohimes@gmail.com
+Date: Tue, 22 Jan 2019 16:31:50 +0800
+Message-Id: <20190122083152.10705-5-xieyongji@baidu.com>
+In-Reply-To: <20190122083152.10705-1-xieyongji@baidu.com>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+Subject: [Qemu-devel] [PATCH v5 4/6] vhost-user-blk: Add support to get/set
+ inflight buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +26,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: mst@redhat.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru
+Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-MTcuMDEuMjAxOSAxODo1MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNy8xOSA5OjMzIEFN
-LCBBbGJlcnRvIEdhcmNpYSB3cm90ZToNCj4gDQo+Pg0KPj4gQ2hhbmdpbmcgb3B0aW9ucw0KPj4g
-PT09PT09PT09PT09PT09PQ0KPj4gVGhlIGdlbmVyYWwgaWRlYSBpcyBxdWl0ZSBzdHJhaWdodGZv
-cndhcmQsIGJ1dCB0aGUgZGV2aWwgaXMgaW4gdGhlDQo+PiBkZXRhaWxzLiBTaW5jZSB0aGlzIGNv
-bW1hbmQgdHJpZXMgdG8gbWltaWMgYmxvY2tkZXYtYWRkLCB0aGUgc3RhdGUgb2YNCj4+IHRoZSBi
-bG9jayBkZXZpY2UgYWZ0ZXIgYmVpbmcgcmVvcGVuZWQgc2hvdWxkIGdlbmVyYWxseSBiZSBlcXVp
-dmFsZW50DQo+PiB0byB0aGF0IG9mIGEgYmxvY2sgZGV2aWNlIGFkZGVkIHdpdGggdGhlIHNhbWUg
-c2V0IG9mIG9wdGlvbnMuDQo+Pg0KPj4gVGhlcmUgYXJlIHR3byBpbXBvcnRhbnQgdGhpbmdzIHdp
-dGggdGhpczoNCj4+DQo+PiAgICBhKSBTb21lIG9wdGlvbnMgY2Fubm90IGJlIGNoYW5nZWQgKG1v
-c3QgZHJpdmVycyBkb24ndCBhbGxvdyB0aGF0LCBpbg0KPj4gICAgICAgZmFjdCkuDQo+PiAgICBi
-KSBJZiBhbiBvcHRpb24gaXMgbWlzc2luZywgaXQgc2hvdWxkIGJlIHJlc2V0IHRvIGl0cyBkZWZh
-dWx0IHZhbHVlDQo+PiAgICAgICAocmF0aGVyIHRoYW4ga2VlcGluZyBpdHMgcHJldmlvdXMgdmFs
-dWUpLg0KPiANCj4gQ291bGQgd2UgdXNlIFFBUEkgYWx0ZXJuYXRlIHR5cGVzIHdoZXJlIHdlIGNv
-dWxkIHN0YXRlIHRoYXQ6DQo+IA0KPiAib3B0aW9uIjoibmV3IiAtIHNldCB0aGUgb3B0aW9uDQo+
-ICJvcHRpb24iOm51bGwgLSByZXNldCB0aGUgb3B0aW9uIHRvIGl0cyBkZWZhdWx0DQo+IG9taXQg
-b3B0aW9uIC0gbGVhdmUgdGhlIG9wdGlvbiB1bmNoYW5nZWQNCj4gDQo+IGJhc2ljYWxseSwgbWFr
-aW5nIGVhY2ggb2YgdGhlIG9wdGlvbnMgYW4gQWx0ZXJuYXRlIHdpdGggSlNPTiBudWxsLCBzbw0K
-PiB0aGF0IGEgcmVxdWVzdCB0byByZXNldCB0byB0aGUgZGVmYXVsdCBiZWNvbWVzIGFuIGV4cGxp
-Y2l0IGFjdGlvbj8NCg0KKzENCg0KU29ycnksIEkgbWlzc2VkIHRoZSBwcmV2aW91cyBkaXNjdXNz
-aW9uLiBXaGF0IGlzIHRoZSByZWFzb24gdG8gcmVzZXQgb3B0aW9uDQp0byBkZWZhdWx0IGlmIGl0
-IG1pc3NlZD8gSXQgbG9va3MgbW9yZSBjb21tb24gdG8gbm90IHRvdWNoIHRoaW5ncyB3aGljaCBh
-cmUNCm5vdCBhc2tlZCB0by4NCg0KQWxzbywgc2hvdWxkIHdlIGNvbnNpZGVyIGFuIG9wdGlvbiB3
-aGljaCBtYXkgYmUgY2hhbmdlZCBkdXJpbmcgbGlmZS1jeWNsZSBvZg0KYSBkZXZpY2Ugbm90IGJ5
-IHVzZXIgcmVxdWVzdCB0byBjaGFuZ2UgaXQ/IElmIHllcywgaXQgc2hvdWxkIGJlIHNhZmVyIHRv
-IG5vdA0KcmVzZXQgaXQuDQoNCj4gDQo+Pg0KPj4gRXhhbXBsZTogdGhlIGRlZmF1bHQgdmFsdWUg
-b2YgbDItY2FjaGUtc2l6ZSBpcyAxTUIuIElmIHdlIHNldCBhDQo+PiBkaWZmZXJlbnQgdmFsdWUg
-KDJNQikgb24gYmxvY2tkZXYtYWRkIGJ1dCB0aGVuIG9taXQgdGhlIG9wdGlvbiBpbg0KPj4geC1i
-bG9ja2Rldi1yZW9wZW4sIHRoZW4gaXQgc2hvdWxkIGJlIHJlc2V0IGJhY2sgdG8gMU1CLiBUaGUg
-Y3VycmVudA0KPj4gYmRydl9yZW9wZW4oKSBjb2RlIGtlZXBzIHRoZSBwcmV2aW91cyB2YWx1ZS4N
-Cj4+DQo+PiBUcnlpbmcgdG8gY2hhbmdlIGFuIG9wdGlvbiB0aGF0IGRvZXNuJ3QgYWxsb3cgaXQg
-aXMgYWxyZWFkeSBiZWluZw0KPj4gaGFuZGxlZCBieSB0aGUgY29kZS4gVGhlIGxvb3AgYXQgdGhl
-IGVuZCBvZiBiZHJ2X3Jlb3Blbl9wcmVwYXJlKCkNCj4+IGNoZWNrcyBhbGwgb3B0aW9ucyB0aGF0
-IHdlcmUgbm90IGhhbmRsZWQgYnkgdGhlIGJsb2NrIGRyaXZlciBhbmQgc2Vlcw0KPj4gaWYgYW55
-IG9mIHRoZW0gaGFzIGJlZW4gbW9kaWZpZWQuDQo+Pg0KPj4gSG93ZXZlciwgYXMgSSBleHBsYWlu
-ZWQgZWFybGllciBpbiAoYiksIG9taXR0aW5nIGFuIG9wdGlvbiBpcyBzdXBwb3NlZA0KPj4gdG8g
-cmVzZXQgaXQgdG8gaXRzIGRlZmF1bHQgdmFsdWUsIHNvIGl0J3MgYWxzbyBhIHdheSBvZiBjaGFu
-Z2luZw0KPj4gaXQuIElmIHRoZSBvcHRpb24gY2Fubm90IGJlIGNoYW5nZWQgdGhlbiB3ZSBzaG91
-bGQgZGV0ZWN0IGl0IGFuZA0KPj4gcmV0dXJuIGFuIGVycm9yLiBXaGF0IEknbSBkb2luZyBpbiB0
-aGlzIHNlcmllcyBpcyBtYWtpbmcgZXZlcnkgZHJpdmVyDQo+PiBwdWJsaXNoIGl0cyBsaXN0IG9m
-IHJ1bi10aW1lIG9wdGlvbnMsIGFuZCB3aGljaCBvbmVzIG9mIHRoZW0gY2FuIGJlDQo+PiBtb2Rp
-ZmllZC4NCj4+DQo+PiBCYWNraW5nIGZpbGVzDQo+PiA9PT09PT09PT09PT09DQo+PiBUaGlzIGNv
-bW1hbmQgYWxsb3dzIHJlY29uZmlndXJhdGlvbnMgaW4gdGhlIG5vZGUgZ3JhcGguIEN1cnJlbnRs
-eSBpdA0KPj4gb25seSBhbGxvd3MgY2hhbmdpbmcgYW4gaW1hZ2UncyBiYWNraW5nIGZpbGUsIGJ1
-dCBpdCBzaG91bGQgYmUNCj4+IHBvc3NpYmxlIHRvIGltcGxlbWVudCBzaW1pbGFyIGZ1bmN0aW9u
-YWxpdGllcyBpbiBkcml2ZXJzIHRoYXQgaGF2ZQ0KPj4gb3RoZXIgY2hpbGRyZW4sIGxpa2UgYmxr
-dmVyaWZ5IG9yIHF1b3J1bS4NCj4+DQo+PiBMZXQncyBhZGQgYW4gaW1hZ2Ugd2l0aCBpdHMgYmFj
-a2luZyBmaWxlIChoZDEgPC0gaGQwKSBsaWtlIHRoaXM6DQo+Pg0KPj4gICAgICB7ICJleGVjdXRl
-IjogImJsb2NrZGV2LWFkZCIsDQo+PiAgICAgICAgImFyZ3VtZW50cyI6IHsNCj4+ICAgICAgICAg
-ICAgImRyaXZlciI6ICJxY293MiIsDQo+PiAgICAgICAgICAgICJub2RlLW5hbWUiOiAiaGQwIiwN
-Cj4+ICAgICAgICAgICAgImZpbGUiOiB7DQo+PiAgICAgICAgICAgICAgICAiZHJpdmVyIjogImZp
-bGUiLA0KPj4gICAgICAgICAgICAgICAgImZpbGVuYW1lIjogImhkMC5xY293MiIsDQo+PiAgICAg
-ICAgICAgICAgICAibm9kZS1uYW1lIjogImhkMGYiDQo+PiAgICAgICAgICAgIH0sDQo+PiAgICAg
-ICAgICAgICJiYWNraW5nIjogew0KPj4gICAgICAgICAgICAgICAgImRyaXZlciI6ICJxY293MiIs
-DQo+PiAgICAgICAgICAgICAgICAibm9kZS1uYW1lIjogImhkMSIsDQo+PiAgICAgICAgICAgICAg
-ICAiZmlsZSI6IHsNCj4+ICAgICAgICAgICAgICAgICAgICAiZHJpdmVyIjogImZpbGUiLA0KPj4g
-ICAgICAgICAgICAgICAgICAgICJmaWxlbmFtZSI6ICJoZDEucWNvdzIiLA0KPj4gICAgICAgICAg
-ICAgICAgICAgICJub2RlLW5hbWUiOiAiaGQxZiINCj4+ICAgICAgICAgICAgICAgIH0NCj4+ICAg
-ICAgICAgICAgfQ0KPj4gICAgICAgICB9DQo+PiAgICAgIH0NCj4+DQo+PiBSZW1vdmluZyB0aGUg
-YmFja2luZyBmaWxlIGNhbiBiZSBkb25lIGJ5IHNpbXBseSBwYXNzaW5nIHRoZSBvcHRpb24gew0K
-Pj4gLi4uLCAiYmFja2luZyI6IG51bGwgfSB0byB4LWJsb2NrZGV2LXJlb3Blbi4NCj4+DQo+PiBS
-ZXBsYWNpbmcgaXQgaXMgbm90IHNvIHN0cmFpZ2h0Zm9yd2FyZC4gSWYgd2UgcGFzcyBzb21ldGhp
-bmcgbGlrZSB7DQo+PiAuLi4sICJiYWNraW5nIjogeyAiZHJpdmVyIjogImZvbyIgLi4uIH0gfSB0
-aGVuIHgtYmxvY2tkZXYtcmVvcGVuIHdpbGwNCj4+IGFzc3VtZSB0aGF0IHdlJ3JlIHRyeWluZyB0
-byBjaGFuZ2UgdGhlIG9wdGlvbnMgb2YgdGhlIGV4aXN0aW5nIGJhY2tpbmcNCj4+IGZpbGUgKGFu
-ZCBpdCB3aWxsIGZhaWwgaW4gbW9zdCBjYXNlcyBiZWNhdXNlIGl0J2xsIGxpa2VseSB0aGluayB0
-aGF0DQo+PiB3ZSdyZSB0cnlpbmcgdG8gY2hhbmdlIHRoZSBub2RlIG5hbWUsIGFtb25nIG90aGVy
-IG9wdGlvbnMpLg0KPj4NCj4+IFNvIEkgZGVjaWRlZCB0byB1c2UgYSByZWZlcmVuY2UgaW5zdGVh
-ZDogeyAuLi4sICJiYWNraW5nIjogImhkMiIgfSwNCj4+IHdoZXJlICJoZDIiIGlzIG9mIGFuIGV4
-aXN0aW5nIG5vZGUgdGhhdCBoYXMgYmVlbiBhZGRlZCBwcmV2aW91c2x5Lg0KPj4NCj4+IExlYXZp
-bmcgb3V0IHRoZSAiYmFja2luZyIgb3B0aW9uIGNhbiBiZSBhbWJpZ3VvdXMgb24gc29tZSBjYXNl
-cyAod2hhdA0KPj4gc2hvdWxkIGl0IGRvPyBrZWVwIHRoZSBjdXJyZW50IGJhY2tpbmcgZmlsZT8g
-b3BlbiB0aGUgZGVmYXVsdCBvbmUNCj4+IHNwZWNpZmllZCBpbiB0aGUgaW1hZ2UgZmlsZT8pIHNv
-IHgtYmxvY2tkZXYtcmVvcGVuIHJlcXVpcmVzIHRoYXQgdGhpcw0KPj4gb3B0aW9uIGlzIHByZXNl
-bnQuIEZvciBjb252ZW5pZW5jZSwgaWYgdGhlIEJEUyBkb2Vzbid0IGhhdmUgYSBiYWNraW5nDQo+
-PiBmaWxlIHRoZW4gd2UgYWxsb3cgbGVhdmluZyB0aGUgb3B0aW9uIG91dC4NCj4gDQo+IEhtbSAt
-IHRoYXQgbWFrZXMgbXkgcHJvcG9zYWwgb2YgIm9wdGlvbiI6bnVsbCBhcyBhbiBleHBsaWNpdCBy
-ZXF1ZXN0IHRvDQo+IHRoZSBkZWZhdWx0IGEgYml0IHRyaWNraWVyLCBpZiB3ZSBhcmUgYWxyZWFk
-eSB1c2luZyBudWxsIGZvciBhIGRpZmZlcmVudA0KPiBtZWFuaW5nIGZvciBiYWNraW5nIGZpbGVz
-Lg0KDQpBbmQgaGVyZTogaWYgd2UgYXJlIGdvaW5nIHRvIHJlc2V0IHRvIGRlZmF1bHQgZm9yIG5v
-dCBsaXN0ZWQgb3B0aW9ucywgdGhhbg0KanVzdCBub3QgbGlzdGluZyAiYmFja2luZyIgc2hvdWxk
-IHJlbW92ZSBpdCAoYXMgZGVmYXVsdCBpcyBudWxsLCBvYnZpb3VzbHkpLA0KYW5kIHdlIGRvbid0
-IG5lZWQgdGhpcyBzcGVjaWFsICJudWxsIiBwYXJhbWV0ZXIuDQoNCk1vcmVvdmVyLCBiYWNraW5n
-IGlzIGFuIGV4YW1wbGUgb2YgYW4gb3B0aW9uIEkgbWVudGlvbmVkLCBpdCBkZWZpbml0ZWx5IG1h
-eQ0KY2hhbmdlIGFmdGVyIGJsb2NrLXN0cmVhbSBmb3IgZXhhbXBsZSwgc28gcmVzZXR0aW5nIHRv
-IGRlZmF1bHQgaXMgdW5zYWZlLA0KYW5kIHVzZXIgd2lsbCBoYXZlIHRvIGNhcmVmdWxseSBzZXQg
-YmFja2luZyBvbiByZW9wZW4gKG5vdCB0aGEgYmFja2luZywgdGhhdA0Kd2FzIHVzZWQgd2l0aCBm
-aXJzdCBibG9ja2Rldi1hZGQsIGJ1dCBiYWNraW5nIHdoaWNoIHdlIGhhdmUgYWZ0ZXIgYmxvY2st
-c3RyZWFtKQ0KDQo+IA0KPj4NCj4+IEFzIHlvdSBjYW4gc2VlIGluIHRoZSBwYXRjaCBzZXJpZXMs
-IEkgd3JvdGUgYSByZWxhdGl2ZWx5IGxhcmdlIGFtb3VudA0KPj4gb2YgdGVzdHMgZm9yIG1hbnkg
-ZGlmZmVyZW50IHNjZW5hcmlvcywgaW5jbHVkaW5nIHNvbWUgdHJpY2t5IG9uZXMuDQo+Pg0KPj4g
-UGVyaGFwcyB0aGUgcGFydCB0aGF0IEknbSBzdGlsbCBub3QgY29udmluY2VkIGFib3V0IGlzIHRo
-ZSBvbmUgYWJvdXQNCj4+IGZyZWV6aW5nIGJhY2tpbmcgbGlua3MgdG8gcHJldmVudCB0aGVtIGZy
-b20gYmVpbmcgcmVtb3ZlZCwgYnV0IHRoZQ0KPj4gaW1wbGVtZW50YXRpb24gd2FzIHF1aXRlIHNp
-bXBsZSBzbyBJIGRlY2lkZWQgdG8gZ2l2ZSBpdCBhIGdvLiBBcw0KPj4geW91J2xsIHNlZSBpbiB0
-aGUgcGF0Y2hlcyBJIGNob3NlIHRvIHVzZSBhIGJvb2wgaW5zdGVhZCBvZiBhIGNvdW50ZXINCj4+
-IGJlY2F1c2UgSSBjb3VsZG4ndCB0aGluayBvZiBhIGNhc2Ugd2hlcmUgaXQgd291bGQgbWFrZSBz
-ZW5zZSB0byBoYXZlDQo+PiB0d28gdXNlcnMgZnJlZXppbmcgdGhlIHNhbWUgYmFja2luZyBsaW5r
-Lg0KPj4NCj4+IFRoYW5rcywNCj4+DQo+PiBCZXJ0bw0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVz
-dCByZWdhcmRzLA0KVmxhZGltaXINCg==
+From: Xie Yongji <xieyongji@baidu.com>
+
+This patch adds support for vhost-user-blk device to get/set
+inflight buffer from/to backend.
+
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+---
+ hw/block/vhost-user-blk.c          | 26 ++++++++++++++++++++++++++
+ include/hw/virtio/vhost-user-blk.h |  1 +
+ 2 files changed, 27 insertions(+)
+
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index c3af28fad4..1f899ac1c0 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -126,6 +126,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
+     }
+ 
+     s->dev.acked_features = vdev->guest_features;
++
++    ret = vhost_dev_set_inflight(&s->dev, s->inflight);
++    if (ret < 0) {
++        error_report("Error set inflight: %d", -ret);
++        goto err_guest_notifiers;
++    }
++
+     ret = vhost_dev_start(&s->dev, vdev);
+     if (ret < 0) {
+         error_report("Error starting vhost: %d", -ret);
+@@ -245,6 +252,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+     }
+ }
+ 
++static void vhost_user_blk_reset(VirtIODevice *vdev)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++
++    vhost_dev_reset_inflight(s->inflight);
++}
++
+ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -285,6 +299,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+                          vhost_user_blk_handle_output);
+     }
+ 
++    s->inflight = g_new0(struct vhost_inflight, 1);
++
+     s->dev.nvqs = s->num_queues;
+     s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
+     s->dev.vq_index = 0;
+@@ -311,12 +327,19 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+         s->blkcfg.num_queues = s->num_queues;
+     }
+ 
++    ret = vhost_dev_get_inflight(&s->dev, s->queue_size, s->inflight);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: get inflight failed");
++        goto vhost_err;
++    }
++
+     return;
+ 
+ vhost_err:
+     vhost_dev_cleanup(&s->dev);
+ virtio_err:
+     g_free(vqs);
++    g_free(s->inflight);
+     virtio_cleanup(vdev);
+ 
+     vhost_user_cleanup(user);
+@@ -332,7 +355,9 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
+ 
+     vhost_user_blk_set_status(vdev, 0);
+     vhost_dev_cleanup(&s->dev);
++    vhost_dev_free_inflight(s->inflight);
+     g_free(vqs);
++    g_free(s->inflight);
+     virtio_cleanup(vdev);
+ 
+     if (s->vhost_user) {
+@@ -382,6 +407,7 @@ static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
+     vdc->set_config = vhost_user_blk_set_config;
+     vdc->get_features = vhost_user_blk_get_features;
+     vdc->set_status = vhost_user_blk_set_status;
++    vdc->reset = vhost_user_blk_reset;
+ }
+ 
+ static const TypeInfo vhost_user_blk_info = {
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+index d52944aeeb..445516604a 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -36,6 +36,7 @@ typedef struct VHostUserBlk {
+     uint32_t queue_size;
+     uint32_t config_wce;
+     struct vhost_dev dev;
++    struct vhost_inflight *inflight;
+     VhostUserState *vhost_user;
+ } VHostUserBlk;
+ 
+-- 
+2.17.1
