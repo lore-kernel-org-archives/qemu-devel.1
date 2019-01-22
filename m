@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60884)
+Received: from eggs.gnu.org ([209.51.188.92]:33069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1glqMg-0001OB-6u
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:20:55 -0500
+	(envelope-from <groug@kaod.org>) id 1glqOQ-0002GN-RK
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1glqMf-0004vq-47
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:20:54 -0500
-Received: from mga05.intel.com ([192.55.52.43]:40731)
+	(envelope-from <groug@kaod.org>) id 1glqOO-0006IX-Td
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:42 -0500
+Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:57596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1glqMe-0004sm-QB
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:20:53 -0500
-References: <CALm7yL1oob_T+--=iW-iOQfEzJjP7reX9KrozEL2c4mYyX51jA@mail.gmail.com>
-	<CAATJJ0JUJvur=R8zLOg++NhSomTosJuhqHzwcr-E=HvQgm2tZg@mail.gmail.com>
-From: Like Xu <like.xu@linux.intel.com>
-Message-ID: <7f730e14-1ab1-8e67-a2f2-13b9c628033b@linux.intel.com>
-Date: Tue, 22 Jan 2019 15:20:45 +0800
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1glqOO-0006Ei-JJ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 02:22:40 -0500
+Received: from player758.ha.ovh.net (unknown [10.109.143.109])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6856AE77E2
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 08:22:34 +0100 (CET)
+Date: Tue, 22 Jan 2019 08:22:11 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190122082211.29612675@bahia.lan>
+In-Reply-To: <7538b313-81b2-d036-ca12-5a2ad5ea8d2b@ozlabs.ru>
+References: <154774526588.1208625.11295698301887807297.stgit@bahia.lan>
+	<7538b313-81b2-d036-ca12-5a2ad5ea8d2b@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <CAATJJ0JUJvur=R8zLOg++NhSomTosJuhqHzwcr-E=HvQgm2tZg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Live migration from Qemu 2.12 hosts to Qemu 3.2
- hosts, with VMX flag enabled in the guest?
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] spapr: Add support for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On 2019/1/18 14:18, Christian Ehrhardt wrote:
-> On Fri, Jan 18, 2019 at 7:33 AM Mark Mielke <mark.mielke@gmail.com> wrote:
->>
->> Thank you for the work on nested virtualization. Having had live migrations
->> fail in the past when nested virtualization has been active, it is great to
->> see that clever people have been working on this problem!
->>
->> My question is about whether a migration path has been considered to allow
->> live migration from Qemu 2.12 hosts to Qemu 3.2 hosts, with VMX flag
->> enabled in the guest?
->>
->> Qemu 2.12 doesn't know about the new nested state available from newer
->> Linux kernels, and it might be used on a machine with an older kernel that
->> doesn't make the nested state available. If Qemu 3.2 is on an up-to-date
->> host with an up-to-date kernel that does support the nested state, I'd like
->> to ensure we have the ability to try the migrations.
->>
->> In the past, I've found that:
->>
->> 1) If the guest had used nested virtualization before, the migration often
->> fails. However, if we reboot the guest and do not use nested
->> virtualization, this simplifies to...
->> 2) If the guest has never used nested virtualization before, the migration
->> succeeds.
->>
->> I would like to leverage 2) as much as possible to migrate forwards to Qemu
->> 3.2 hosts (once it is available). I can normally enter the guest to see if
->> 1) is likely or not, and handle these ones specially. If only 20% of the
->> guests have ever used nested virtualization, then I would like the option
->> to safely migrate 80% of the guests using live migration, and handle the
->> 20% as exceptions.
->>
->> This is the 3.1 change log that got my attention:
->>
->>
->>     - x86 machines cannot be live-migrated if nested Intel virtualization is
->>     enabled. The next version of QEMU will be able to do live migration when
->>     nested virtualization is enabled, if supported by the kernel.
->>
->>
->> I believe this is the change it refers to:
->>
->> commit d98f26073bebddcd3da0ba1b86c3a34e840c0fb8
->> Author: Paolo Bonzini <pbonzini@redhat.com>
->> Date:   Wed Nov 14 10:38:13 2018 +0100
->>
->>      target/i386: kvm: add VMX migration blocker
->>
->>      Nested VMX does not support live migration yet.  Add a blocker
->>      until that is worked out.
->>
->>      Nested SVM only does not support it, but unfortunately it is
->>      enabled by default for -cpu host so we cannot really disable it.
->>
->>      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>
->>
->> This particular check seems very simplistic:
->>
->> +    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
->> +        error_setg(&vmx_mig_blocker,
->> +                   "Nested VMX virtualization does not support live
->> migration yet");
->> +        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
->> +        if (local_err) {
->> +            error_report_err(local_err);
->> +            error_free(vmx_mig_blocker);
->> +            return r;
->> +        }
->> +    }
->> +
->>
->> It fails if the flag is set, rather than if any nested virtualization has
->> been used before.
-> 
-> Hi Mark,
-> I was facing the same question just recently - thanks for bringing it up.
-> 
-> Even more emphasized as Ubuntu (for ease of use of nested
-> virtualization) will enable the VMX flag by default.
-> That made me end up with no guest being able to migrate at all, which
-> as you point out clearly was not the case - they would migrate fine.
-> In almost all use cases it would be just the VMX flag that was set,
-> but never used.
-> 
-> I haven't thought about it before your mail, but if there would be a
-> way to differentiate between "VMX available" and "VMX actually used"
-> that would be a much better check to set the blocker.
+On Tue, 22 Jan 2019 16:44:02 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-My concern is how could we understand or define "VMX actually used"
-for nested migration support?
+> On 18/01/2019 04:14, Greg Kurz wrote:
+> > This allows to hotplug/unplug PHBs. I could successfully test:
+> > - using in-kernel XICS, emulated XICS and XIVE
+> > - using experimental in-kernel XIVE from Cedric
+> > - hotplug/unplug with e1000 device to validate LSIs
+> > - hotplug/unplug with virtio-net device to validate MSIs
+> > - some simple migration scenarios  
+> 
+> > 
+> > Change in v3:
+> > - reworked phandle related code some more
+> > - disintricate allocation/"type setting" of interrupts
+> > - identify LSIs at machine init
+> > 
+> > Changes in v2:
+> > - rebased on current ppc-for-4.0  
+> 
+> 
+> 
+> Is the tree available anywhere in git? It does not apply on today's
+> ppc-for-4.0 :-/
+> 
+
+I'm currently working on v4. I'll push it to github when it's ready.
 
 > 
-> For now I reverted above patch with the migration blocker in Ubuntu to
-> get the situation temporarily resolved.
-> I considered it a downstream thing as it is mostly triggered by our
-> decision to make VMX available by default which was made years ago -
-> that is the reason I didn't bring it up here, but now that you brought
-> it up it is worth the discussion for sure.
-> 
-> Mid term I expect that migration will work for nested guests as well
-> which makes me able to drop that delta then.
-> 
->> I'm concerned I will end up with a requirement for *all* guests to be
->> restarted in order to migrate them to the new hosts, rather than just the
->> ones that would have a problem.
->>
->> Thoughts?
->>
->> Thanks!
->>
->> --
->> Mark Mielke <mark.mielke@gmail.com>
 > 
 > 
+> > - added some preliminary cleanup
+> > - call unrealize from realize error path
+> > - advertise PHB hotplug in last patch
+> > - reworked phandle related code
+> > - sync LSIs to KVM
+> > 
+> > Please comment.
+> > 
+> > --
+> > Greg
+> > 
+> > ---
+> > 
+> > Greg Kurz (11):
+> >       spapr: Rename xics to intc in interrupt controller agnostic code
+> >       xics: Disintricate allocation and type setting of interrupts
+> >       spapr/xive: Don't set irq type in spapr_xive_irq_claim()
+> >       spapr: Set irq type in a dedicated function
+> >       spapr: Identify LSIs of all possible PHBs at machine init
+> >       spapr_pci: add PHB unrealize
+> >       spapr: Factor out setting of "phandle" DT property to sPAPR irq frontend
+> >       spapr_xive: Cache device tree nodename in sPAPRXive
+> >       spapr: Expose the name of the interrupt controller node
+> >       spapr_irq: Expose the phandle of the interrupt controller
+> >       spapr: add hotplug hooks for PHB hotplug
+> > 
+> > Michael Roth (6):
+> >       spapr: create DR connectors for PHBs
+> >       spapr_events: add support for phb hotplug events
+> >       qdev: pass an Object * to qbus_set_hotplug_handler()
+> >       spapr_pci: provide node start offset via spapr_populate_pci_dt()
+> >       spapr_pci: add ibm, my-drc-index property for PHB hotplug
+> >       spapr: enable PHB hotplug for default pseries machine type
+> > 
+> > Nathan Fontenot (1):
+> >       spapr: populate PHB DRC entries for root DT node
+> > 
+> > Thomas Huth (1):
+> >       ppc: Move spapr-related prototypes from xics.h into a seperate header file
+> > 
+> > 
+> >  hw/acpi/pcihp.c               |    2 -
+> >  hw/acpi/piix4.c               |    2 -
+> >  hw/char/virtio-serial-bus.c   |    2 -
+> >  hw/core/bus.c                 |   11 +--
+> >  hw/core/machine.c             |    4 +
+> >  hw/intc/spapr_xive.c          |   35 ++++-----
+> >  hw/intc/xics.c                |   28 ++++++-
+> >  hw/intc/xics_kvm.c            |    1 
+> >  hw/intc/xics_spapr.c          |   10 +--
+> >  hw/pci/pcie.c                 |    2 -
+> >  hw/pci/shpc.c                 |    2 -
+> >  hw/ppc/pnv_psi.c              |    1 
+> >  hw/ppc/spapr.c                |  163 +++++++++++++++++++++++++++++++++++++++--
+> >  hw/ppc/spapr_drc.c            |   18 +++++
+> >  hw/ppc/spapr_events.c         |    9 ++
+> >  hw/ppc/spapr_irq.c            |  129 +++++++++++++++++++++++++++-----
+> >  hw/ppc/spapr_pci.c            |  124 ++++++++++++++++++++++++-------
+> >  hw/ppc/spapr_vio.c            |    4 +
+> >  hw/s390x/css-bridge.c         |    2 -
+> >  hw/s390x/s390-pci-bus.c       |    6 +-
+> >  hw/scsi/virtio-scsi.c         |    2 -
+> >  hw/scsi/vmw_pvscsi.c          |    2 -
+> >  hw/usb/dev-smartcard-reader.c |    2 -
+> >  include/hw/pci-host/spapr.h   |   11 ++-
+> >  include/hw/ppc/spapr.h        |    4 +
+> >  include/hw/ppc/spapr_drc.h    |    8 ++
+> >  include/hw/ppc/spapr_irq.h    |   16 +++-
+> >  include/hw/ppc/spapr_xive.h   |   13 +++
+> >  include/hw/ppc/xics.h         |   15 ++--
+> >  include/hw/ppc/xics_spapr.h   |   43 +++++++++++
+> >  include/hw/qdev-core.h        |    3 -
+> >  31 files changed, 545 insertions(+), 129 deletions(-)
+> >  create mode 100644 include/hw/ppc/xics_spapr.h
+> >   
 > 
