@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45024)
+Received: from eggs.gnu.org ([209.51.188.92]:44816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gm1nB-0007fN-Ng
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:05 -0500
+	(envelope-from <berrange@redhat.com>) id 1gm1nF-0007aN-Nw
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gm1lu-0005k5-2q
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:31:44 -0500
-Date: Tue, 22 Jan 2019 15:46:17 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190122144617.GA5220@localhost.localdomain>
-References: <1545149484-4929-1-git-send-email-thuth@redhat.com>
-	<25d1e73d-ca73-9cb4-d959-8353f49f36b7@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gm1ls-0005ga-QT
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:31:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gm1ls-0005T8-IQ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:31:40 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 373EF2D7ED
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 14:43:42 +0000 (UTC)
+Date: Tue, 22 Jan 2019 14:43:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190122144328.GU13143@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190118173103.4903-1-berrange@redhat.com>
+	<20190118173103.4903-3-berrange@redhat.com>
+	<7c67886c-2d80-76e3-8826-70c059ecddff@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <25d1e73d-ca73-9cb4-d959-8353f49f36b7@redhat.com>
-Subject: Re: [Qemu-devel] [QEMU PATCH] block: Remove blk_attach_dev_legacy()
- / legacy_dev code
+In-Reply-To: <7c67886c-2d80-76e3-8826-70c059ecddff@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] trace: enforce that every
+ trace-events file has a final newline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, paul.durrant@citrix.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 22.01.2019 um 15:19 hat Thomas Huth geschrieben:
-> On 2018-12-18 17:11, Thomas Huth wrote:
-> > The last user of blk_attach_dev_legacy() is the code in xen_disk.c.
-> > It passes a pointer to a XenBlkDev as second parameter. XenBlkDev
-> > is derived from XenDevice which in turn is derived from DeviceState
-> > since commit 3a6c9172ac5951e ("xen: create qdev for each backend device").
-> > Thus the code can also simply use blk_attach_dev() with a pointer
-> > to the DeviceState instead.
-> > So we can finally remove all code related to the "legacy_dev" flag, too,
-> > and turn the related "void *" in block-backend.c into "DeviceState *"
-> > to fix some of the remaining TODOs there.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Fri, Jan 18, 2019 at 11:42:14AM -0600, Eric Blake wrote:
+> On 1/18/19 11:31 AM, Daniel P. Berrang=C3=A9 wrote:
+> > When generating the trace-events-all file, the build system simply
+> > concatenates all the individual trace-events files. If any one of tho=
+se
+> > files does not have a final newline, the printf format string will ha=
+ve
+> > the contents of the first line of the next file appended to it, which=
+ is
+> > usually a '#' comment.
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > > ---
-> >  Note: I haven't tested the Xen code since I don't have a working Xen
-> >  installation at hand. I'd appreciate if someone could check it...
-> 
-> Ping?
+> >  hw/gpio/trace-events          | 2 +-
+> >  scripts/tracetool/__init__.py | 2 ++
+> >  2 files changed, 3 insertions(+), 1 deletion(-)
+> >=20
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Does checkpatch and/or patchew flag what are intended to be text files
+> but which lack a trailing newline?  If not, how hard would it be to get
+> them to do so?
 
-This needs a rebase. xen_disk.c doesn't even exist any more and
-blk_attach_dev_legacy() is really dead code now.
+it probably should check for missing newlines at end of file, but I'm
+going to let someone else tackle that due to time pressures on what
+was supposed to be a quick enhancement :-)
 
-The work on the Xen block device is the reason why I didn't merge this
-patch yet. I thought I had sent a reply to that effect, but it seems I
-hadn't. Sorry for that!
 
-Kevin
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
