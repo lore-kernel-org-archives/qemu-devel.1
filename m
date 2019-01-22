@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34172)
+Received: from eggs.gnu.org ([209.51.188.92]:34233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1Pw-0005lX-TY
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:09:03 -0500
+	(envelope-from <lersek@redhat.com>) id 1gm1Pz-0005oG-9E
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gm1Pv-0000xx-Pi
+	(envelope-from <lersek@redhat.com>) id 1gm1Px-00010I-0A
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:09:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gm1Pw-0000tN-I3
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:09:00 -0500
-Date: Tue, 22 Jan 2019 14:13:01 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190122141301.5f69a9b0.cohuck@redhat.com>
-In-Reply-To: <d31d1ba2-579a-eaa1-1e41-0745fd0291b9@redhat.com>
-References: <20190122094143.8857-1-david@redhat.com>
-	<cd0a559f-6a44-20b9-39ad-4368d08f79af@redhat.com>
-	<d31d1ba2-579a-eaa1-1e41-0745fd0291b9@redhat.com>
+References: <20190118223400.24311-1-lersek@redhat.com>
+	<20190118223400.24311-5-lersek@redhat.com>
+	<fd79f085-f3d8-dc06-9d43-9c4fcea69317@redhat.com>
+	<8d4dc6b0-d4d9-2919-194f-c27cb40699b3@redhat.com>
+	<CAFEAcA8uVAXMuwVk2ZLAP34Hk_tp9dvWjy06gauyohesOvCuNg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <5cc9c1e9-4fd7-27c4-46bc-2388148945c5@redhat.com>
+Date: Tue, 22 Jan 2019 13:02:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+In-Reply-To: <CAFEAcA8uVAXMuwVk2ZLAP34Hk_tp9dvWjy06gauyohesOvCuNg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/5] tests/uefi-test-tools: add build
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, 22 Jan 2019 11:06:46 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 01/21/19 20:30, Peter Maydell wrote:
+> On Mon, 21 Jan 2019 at 19:09, Laszlo Ersek <lersek@redhat.com> wrote:
+>> It wasn't clear to me whether and how multi-threaded builds were
+>> supposed to be used by maintainers, whenever they'd update
+>> "tests/data/uefi-boot-images/*".
+>>
+>> I saw that "make" was invoked everywhere as $(MAKE), but that didn't
+>> clarify any intent around "-j". So I didn't test "-j" at all, and in
+>> fact I wouldn't have expected it to work:
+>=20
+> The usual assumption with make is that "-jN" should work
+> and at least (if the thing being built can't actually
+> be parallelized usefully) be no worse than if you'd not
+> specified a -j option. We have occasionally had problems
+> with -jN in 'make check' (usually because several test cases
+> were trying to use the same temp filename or similar) but
+> we've treated them as bugs and squashed them.
+>=20
+>> The "build" base tool in edk2 implements part of the job with generate=
+d
+>> makefiles and invoking "make" itself, thus, despite .NOTPARALLEL, it
+>> likely inherits the outermost -j<N> setting -- and it doesn't expect s=
+uch.
+>>
+>> So the best I can offer here is to check $MAKEFLAGS in "build.sh", and
+>> exit with an early, explicit error if $MAKEFLAGS contains "-j", "-l", =
+or
+>> their long variants (--jobs, --load-average).
+>=20
+> Could you sanitize MAKEFLAGS in build.sh instead to remove the
+> parallelization options?
 
-> On 22.01.19 10:50, Thomas Huth wrote:
-> > On 2019-01-22 10:41, David Hildenbrand wrote:  
-> >> We decided to always create the PCI host bridge, even if 'zpci' is not
-> >> enabled (due to migration compatibility).  
-> > 
-> > Couldn't we disable the host bridge for newer machine types, and just
-> > create it on the old ones for migration compatibility?  
+I've looked into MAKEFLAGS in a bit more depth now; both the
+documentation and some debug prints. Manipulating MAKEFLAGS looks
+somewhat brittle.
 
-I very dimly remember some problems with that approach.
+So, I was about to suggest that I use the .NOTPARALLEL special target
+recommended by Phil, for the .efi binaries (which would ensure that no
+two instances of the "build" base tool run at the same time), *plus*
+that I submit a patch to edk2 so that the makefiles generated by the
+"build" tool also contain .NOTPARALLEL.
 
-> 
-> I think we can with a compat property. However I somewhat dislike that
-> the error/warning will then be "no bus" vs. "zpci CPU feature not
-> enabled". Somebody who has no idea about that will think he somehow has
-> to create a PCI bus on the QEMU comandline.
+(Because, to quote the make docs again, "If .NOTPARALLEL is mentioned as
+a target, then this invocation of make will be run serially, even if the
+=E2=80=98-j=E2=80=99 option is given. Any recursively invoked make comman=
+d will still
+run recipes in parallel (unless its makefile also contains this target)."=
+)
 
-Agreed, "zpci cpu feature not enabled" gives a much better clue.
+However: when I wanted to see the actual error from using .NOTPARALLEL
+*only* in "tests/uefi-test-tools/Makefile", and not in the
+build-generated makefiles, I failed to get any error. All the output
+images were built just fine.
 
-> 
-> ... however
-> 
-> >   
-> >> This however right now allows
-> >> to add zPCI/PCI devices to a VM although the guest will never actually see
-> >> them, confusing people that are using a simple CPU model that has no
-> >> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
-> >>
-> >> Let's check for 'zpci' and at least print a warning that this will not
-> >> work as expected. We could also bail out, however that might break
-> >> existing QEMU commandlines.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/s390x/s390-pci-bus.c | 5 +++++
-> >>  1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >> index b86a8bdcd4..e7d4f49611 100644
-> >> --- a/hw/s390x/s390-pci-bus.c
-> >> +++ b/hw/s390x/s390-pci-bus.c
-> >> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >>  {
-> >>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-> >>  
-> >> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> >> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
-> >> +                    " The guest will not be able to see/use these devices.");
-> >> +    }  
-> > 
-> > I think it would be better to bail out. The hotplug clearly can not work
-> > in this case, and the warn report might go unnoticed, so blocking the
-> > hotplug process is likely better to get the attention of the user.  
-> 
-> ... we could also create the bus but bail out here in case the compat
-> property strikes (a.k.a. new QEMO machine type).
+Phil: when you wrote that "The following patch didn't help" -- referring
+to .NOTPARALLEL, added only to "tests/uefi-test-tools/Makefile"-- , did
+you clean your tree first (with "make clean" or "git clean -ffdx")?
 
-Now you confused me... why should failing be based on a compat property?
+Because now I'm thinking that the *individual* makefiles generated by
+edk2's "build" base tool might actually compatible with "-j", and your
+testing of .NOTPARALLEL failed only because your build tree (for example
+the Conf/ subdir -- list it with "-A") was in a messy state from your
+previous -j4 attempt (where you didn't use .NOTPARALLEL at all).
+
+Thanks
+Laszlo
