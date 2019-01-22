@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51304)
+Received: from eggs.gnu.org ([209.51.188.92]:52672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1glmQz-0007iM-Of
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:09:06 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1glmcg-0000yz-Cb
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:21:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1glmQy-00007z-Il
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:09:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55982)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1glmcf-0006ip-LP
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:21:10 -0500
+Received: from mga05.intel.com ([192.55.52.43]:26320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1glmQy-00007d-A0
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:09:04 -0500
-Date: Mon, 21 Jan 2019 22:08:51 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190121220839-mutt-send-email-mst@kernel.org>
-References: <20190116030815.27273-1-peterx@redhat.com>
-	<154805952549.5550.9154893774048296420@2d3111e9616b>
-	<20190121093505.GA7669@xz-x1>
-	<2af1bd83-feca-5130-5375-45e7184aa802@ozlabs.ru>
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1glmcf-0006hs-CX
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 22:21:09 -0500
+Date: Tue, 22 Jan 2019 11:21:25 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20190122032124.GA30317@tiger-server>
+References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
+	<64bea1ff5f80647cc4592ee94d399d647bdd9862.1547624239.git.yi.z.zhang@linux.intel.com>
+	<20190116104105-mutt-send-email-mst@kernel.org>
+	<20190118181147.GJ4136@habkost.net>
+	<20190121051535.GA21562@tiger-server>
+	<20190121144400.GM4136@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2af1bd83-feca-5130-5375-45e7184aa802@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] intel_iommu: misc fixes for error
- exposed after error_report_once()
+In-Reply-To: <20190121144400.GM4136@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH V9 4/6] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, fam@euphon.net, jasowang@redhat.com, eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, pagupta@redhat.com, qemu-devel@nongnu.org, yu.c.zhang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com, xiaoguangrong.eric@gmail.com
 
-On Tue, Jan 22, 2019 at 01:57:50PM +1100, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 21/01/2019 20:35, Peter Xu wrote:
-> > On Mon, Jan 21, 2019 at 12:32:07AM -0800, no-reply@patchew.org wrote:
-> >> Patchew URL: https://patchew.org/QEMU/20190116030815.27273-1-peterx@redhat.com/
-> >>
-> >>
-> >>
-> >> Hi,
-> >>
-> >> This series failed the docker-mingw@fedora build test. Please find the testing commands and
-> >> their output below. If you have Docker installed, you can probably reproduce it
-> >> locally.
-> >>
-> >> === TEST SCRIPT BEGIN ===
-> >> #!/bin/bash
-> >> time make docker-test-mingw@fedora SHOW_ENV=1 J=14
-> >> === TEST SCRIPT END ===
-> >>
-> >>   CC      hw/block/pflash_cfi01.o
-> >> In function 'acpi_table_install',
-> >>     inlined from 'acpi_table_add' at /tmp/qemu-test/src/hw/acpi/core.c:296:5:
-> >> /tmp/qemu-test/src/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> /tmp/qemu-test/src/hw/acpi/core.c:203:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy(ext_hdr->oem_id, hdrs->oem_id, sizeof ext_hdr->oem_id);
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> /tmp/qemu-test/src/hw/acpi/core.c:207:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy(ext_hdr->oem_table_id, hdrs->oem_table_id,
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>                  sizeof ext_hdr->oem_table_id);
-> >>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> /tmp/qemu-test/src/hw/acpi/core.c:216:9: error: 'strncpy' specified bound 4 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy(ext_hdr->asl_compiler_id, hdrs->asl_compiler_id,
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>                  sizeof ext_hdr->asl_compiler_id);
-> >> ---
-> >> make: *** [/tmp/qemu-test/src/rules.mak:69: hw/acpi/core.o] Error 1
-> >> make: *** Waiting for unfinished jobs....
-> >> /tmp/qemu-test/src/block/sheepdog.c: In function 'find_vdi_name':
-> >> /tmp/qemu-test/src/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equals destination size [-Werror=stringop-truncation]
-> >>      strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-> >>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> cc1: all warnings being treated as errors
-> >> make: *** [/tmp/qemu-test/src/rules.mak:69: block/sheepdog.o] Error 1
-> >> /tmp/qemu-test/src/hw/acpi/aml-build.c: In function 'build_header':
-> >> /tmp/qemu-test/src/hw/acpi/aml-build.c:1535:9: error: 'strncpy' specified bound 6 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy((char *)h->oem_id, oem_id, sizeof h->oem_id);
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> /tmp/qemu-test/src/hw/acpi/aml-build.c:1541:9: error: 'strncpy' specified bound 8 equals destination size [-Werror=stringop-truncation]
-> >>          strncpy((char *)h->oem_table_id, oem_table_id, sizeof(h->oem_table_id));
-> >>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> cc1: all warnings being treated as errors
+On 2019-01-21 at 12:44:00 -0200, Eduardo Habkost wrote:
+> On Mon, Jan 21, 2019 at 01:15:36PM +0800, Yi Zhang wrote:
+> > On 2019-01-18 at 16:11:47 -0200, Eduardo Habkost wrote:
+> [...]
+> > > Anyway, I see a more fundamental problem in each version of this
+> > > patch: the semantics of the command-line options are not clearly
+> > > documented.
+> > > 
+> > > We have at least 3 different possible use cases we might need to
+> > > support:
+> > > 
+> > > 1) pmem=on, MAP_SYNC not desired
+> > > 2) pmem=on, MAP_SYNC desired but optional
 > > 
-> > I'm uncertain about these errors but it seems to be more likely to be
-> > caused by some configuration or compiler change instead of the series
-> > itself since this series never changed either acpi or sheepdog code.
-> > So I'll temporarily ignore them...
+> > Form V9, As Michael suggest, We removed the sync option, MAP_SYNC will
+> > force on while we set pmem=on. So we only have 2 user cases, Will update
+> > to user documentation.
+> > 1) pmem=on, MAP_SYNC not desired
+> > We will not pass the flag to mmap2
+> 
+> If this use case is supported, how the command-line should look
+> like to enable it?
 > 
 > 
-> I am getting these too and I do not touch the mentioned files and
-> folders ever.
+> > 2) pmem=on, MAP_SYNC desired
+> > We will pass the flag to mmap2
 > 
+> Same question as above: how the command-line should look like for
+> this use case?
+Sorry, I got some miss-understood of the MAP_SYNC desired.
+As we talk with Micheal:
+
+we give up on a bit of flexibility, and just say
+pmem=on forces MAP_SYNC. on a MAP_SYNC capable configrations(kernel+
+backend dax)
+
+Current user case is like below:
+
+ 1. pmem=on is set, shared=on is set, MAP_SYNC supported in linux kernel:
+        a: backend is a dax supporting file.
+	 - MAP_SYNC will active.
+	b: backedn is not a dax supporting file.
+	 - mmap will result in an EOPNOTSUPP error.
+
+2. The reset of cases:
+	- we will never pass the MAP_SYNC to mmap2
+
+> 
+> > 
+> > > 3) pmem=on, MAP_SYNC required, not optional
+> > > 
+> > > Which cases from the list above we need to support?
+> > > 
+> > > From the cases above, what's the expected semantics of "pmem=on"
+> > > with no extra options?
+> 
+> We still need to answer that question.
+> 
+> The current semantics of pmem=on (with no extra options) is (1).
+> It looks like we can't change it to (2) without breaking existing
+> configurations.  If you make existing configurations stop working
+> on hosts where they currently work, you need to explain why it's
+> OK to do that.
+> 
+> 
+> > > 
+> > > If these questions are not answered (in the commit message and
+> > > user documentation), we won't be able to review and discuss the
+> > > code.
+> > > 
+> > > 
+> [...]
 > 
 > 
 > -- 
-> Alexey
-
-
-You want 9cbb8eca1729eab1123847e37454975bb555008a I think.
-
--- 
-MST
+> Eduardo
+> 
