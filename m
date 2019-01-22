@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46527)
+Received: from eggs.gnu.org ([209.51.188.92]:46814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm4VN-000313-Bx
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:26:50 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4W5-0003Cu-Du
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gm4Ty-00070v-1m
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:25:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3743)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gm4Tx-0006zM-PG
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:25:22 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0ECFAA0C2B
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 22:25:20 +0000 (UTC)
-References: <20190122144103.18310-1-pagupta@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d1d15efe-8653-8e47-acf5-b8839f84db19@redhat.com>
-Date: Tue, 22 Jan 2019 16:25:18 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190122144103.18310-1-pagupta@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI"
-Subject: Re: [Qemu-devel] [PATCH] chardev: Avoid adding duplicate chardev
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4IK-0006jk-GM
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:21 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gm4IK-0006j0-8u
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:20 -0500
+Received: by mail-lj1-x244.google.com with SMTP id l15-v6so99574lja.9
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 14:13:20 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 22 Jan 2019 14:12:56 -0800
+Message-Id: <20190122221256.20883-3-jcmvbkbc@gmail.com>
+In-Reply-To: <20190122221256.20883-1-jcmvbkbc@gmail.com>
+References: <20190122221256.20883-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 2/2] hw/xtensa: xtfpga: use core frequency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, xiaohli@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI
-From: Eric Blake <eblake@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, xiaohli@redhat.com, pbonzini@redhat.com
-Message-ID: <d1d15efe-8653-8e47-acf5-b8839f84db19@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] chardev: Avoid adding duplicate chardev
-References: <20190122144103.18310-1-pagupta@redhat.com>
-In-Reply-To: <20190122144103.18310-1-pagupta@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+XTFPGA board FPGA peripheral exposes hard-coded 10MHz frequency
+regardless of the actual used core frequency. Expose actual core
+frequency instead.
 
-On 1/22/19 8:41 AM, Pankaj Gupta wrote:
-> Hotplugging existing char chardev with qmp, dereferences(removes)=20
-> existing chardev. This patch avoids adding a chardev if a chardev=20
-> with same id exists.
->=20
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ hw/xtensa/xtfpga.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-> +++ b/chardev/char.c
-> @@ -985,6 +985,12 @@ ChardevReturn *qmp_chardev_add(const char *id, Cha=
-rdevBackend *backend,
->      ChardevReturn *ret;
->      Chardev *chr;
-> =20
-> +    chr =3D qemu_chr_find(id);
-> +    if (chr) {
-> +        error_setg(errp, "Chardev '%s' already exist", id);
-
-s/exist/exists/
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHmE4ACgkQp6FrSiUn
-Q2oN+QgAgV0W41o2MsyKEnpAUBwITyeOL/3dARDxhTgdm1CrjW2xa8CDwP87F6dA
-z2CMQe3of4rQKR95UuTifke4M9zTZ84bmBWBInjTpa+Yjam0kpHTw+KHvpUfDwMH
-eQZ8SktnVtIghAgu1XCil8ptIxT5yDepwpKIvSJvyU/wSJUaveMqRrMA5f6SaO3R
-iCFMNBBUVkCpoHFqKMPvsLUC4ZythoG19UUSPoE0OTlq58vdIoIr6hUXWRPWTjYY
-Rq445RbBFUUJ3QuwewyKZXJgOugmUIR55PP/7pn/r96tWaaDEiadwc20vULpRQAX
-A845U11bGbhldBFNUL4z5vs+vPkvGQ==
-=gwbJ
------END PGP SIGNATURE-----
-
---MMs2ZQRggcvCjLcITS9TL2EbwcAriojhI--
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index d3afdfc247a7..7379b3fff427 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -61,6 +61,7 @@ typedef struct XtfpgaBoardDesc {
+ 
+ typedef struct XtfpgaFpgaState {
+     MemoryRegion iomem;
++    uint32_t freq;
+     uint32_t leds;
+     uint32_t switches;
+ } XtfpgaFpgaState;
+@@ -83,7 +84,7 @@ static uint64_t xtfpga_fpga_read(void *opaque, hwaddr addr,
+         return 0x09272011;
+ 
+     case 0x4: /*processor clock frequency, Hz*/
+-        return 10000000;
++        return s->freq;
+ 
+     case 0x8: /*LEDs (off = 0, on = 1)*/
+         return s->leds;
+@@ -119,13 +120,14 @@ static const MemoryRegionOps xtfpga_fpga_ops = {
+ };
+ 
+ static XtfpgaFpgaState *xtfpga_fpga_init(MemoryRegion *address_space,
+-        hwaddr base)
++                                         hwaddr base, uint32_t freq)
+ {
+     XtfpgaFpgaState *s = g_malloc(sizeof(XtfpgaFpgaState));
+ 
+     memory_region_init_io(&s->iomem, NULL, &xtfpga_fpga_ops, s,
+-            "xtfpga.fpga", 0x10000);
++                          "xtfpga.fpga", 0x10000);
+     memory_region_add_subregion(address_space, base, &s->iomem);
++    s->freq = freq;
+     xtfpga_fpga_reset(s);
+     qemu_register_reset(xtfpga_fpga_reset, s);
+     return s;
+@@ -231,6 +233,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     const char *dtb_filename = qemu_opt_get(machine_opts, "dtb");
+     const char *initrd_filename = qemu_opt_get(machine_opts, "initrd");
+     const unsigned system_io_size = 224 * MiB;
++    uint32_t freq = 10000000;
+     int n;
+ 
+     for (n = 0; n < smp_cpus; n++) {
+@@ -240,6 +243,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+         cenv = &cpu->env;
+         if (!env) {
+             env = cenv;
++            freq = env->config->clock_freq_khz * 1000;
+         }
+ 
+         cenv->sregs[PRID] = n;
+@@ -277,7 +281,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+                                  system_io, 0, system_io_size);
+         memory_region_add_subregion(system_memory, board->io[1], io);
+     }
+-    xtfpga_fpga_init(system_io, 0x0d020000);
++    xtfpga_fpga_init(system_io, 0x0d020000, freq);
+     if (nd_table[0].used) {
+         xtfpga_net_init(system_io, 0x0d030000, 0x0d030400, 0x0d800000,
+                 xtensa_get_extint(env, 1), nd_table);
+-- 
+2.11.0
