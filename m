@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43852)
+Received: from eggs.gnu.org ([209.51.188.92]:44996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glt9p-0006ka-Fc
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:19:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gltCf-0000nt-Mq
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:22:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1glt9o-0004TF-84
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:19:49 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1glt9n-0004Oa-S5
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:19:48 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y185so8190127wmd.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 02:19:47 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-14-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e05b1d30-1a44-171a-02f7-d77e182ab90c@redhat.com>
-Date: Tue, 22 Jan 2019 11:19:43 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190117185628.21862-14-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gltCe-0007Hi-Qs
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 05:22:45 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 22 Jan 2019 10:22:16 +0000
+Message-ID: <05bf4364-61b0-21de-768d-6c1ad2a06d63@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+	<20190108170655.29766-5-vsementsov@virtuozzo.com>
+	<bda00283-197d-4b1b-7be0-633a0410f87d@redhat.com>
+In-Reply-To: <bda00283-197d-4b1b-7be0-633a0410f87d@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test
- for mips64el + malta
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7BC9ED0AFA628C48825B98198B69274E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] qcow2-threads:
+ qcow2_co_do_compress: protect queuing by mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>
 
-Hi Cleber,
-
-On 1/17/19 7:56 PM, Cleber Rosa wrote:
-> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-> board and verify the serial is working.
-> 
-> If mips64el is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:mips" tags.
-> 
-> Alternatively, this test can be run using:
-> 
->     $ avocado run -t arch:mips64el tests/acceptance
->     $ avocado run -t machine:malta tests/acceptance
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  .travis.yml                            |  2 +-
->  tests/acceptance/boot_linux_console.py | 39 ++++++++++++++++++++++++++
->  2 files changed, 40 insertions(+), 1 deletion(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 49f9016e6a..28648f7a61 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -187,7 +187,7 @@ matrix:
->  
->      # Acceptance (Functional) tests
->      - env:
-> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu"
-> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu"
->          - TEST_CMD="make check-acceptance"
->        addons:
->          apt:
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 0678ec91d2..20b845fce1 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -9,8 +9,11 @@
->  # later.  See the COPYING file in the top-level directory.
->  
->  import logging
-> +import os
->  
->  from avocado_qemu import Test
-> +from avocado.utils import process
-> +from avocado.utils import archive
->  
->  
->  class BootLinuxConsole(Test):
-> @@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          console_pattern = 'Kernel command line: %s' % kernel_command_line
->          self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_mips64el_malta(self):
-> +        """
-> +        This test requires the ar tool to extract "data.tar.gz" from
-> +        the Debian package.
-> +
-> +        The kernel can be rebuilt using this Debian kernel source [1] and
-> +        following the instructions on [2].
-> +
-> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
-> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/#linux-source-2.6.32_2.6.32-48
-> +
-> +        :avocado: tags=arch:mips64el
-> +        :avocado: tags=machine:malta
-> +        """
-> +        deb_url = ('http://snapshot.debian.org/archive/debian/20130217T032700Z/'
-> +                   'pool/main/l/linux-2.6/'
-> +                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb')
-> +        deb_hash = '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
-> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> +
-
-Can you refactor this code ...
-
-> +        cwd = os.getcwd()
-> +        os.chdir(self.workdir)
-> +        process.run("ar x %s data.tar.gz" % deb_path)
-> +        archive.extract("data.tar.gz", self.workdir)
-> +        os.chdir(cwd)
-> +        kernel_path = self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta'
-
-... as an helper function?
-
-Can be follow-up patch, so:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +
-> +        self.vm.set_machine('malta')
-> +        self.vm.set_console()
-> +        kernel_command_line = 'console=ttyS0 printk.time=0'
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
-> +        self.wait_for_console_pattern(console_pattern)
-> 
+MTYuMDEuMjAxOSAyOjI5LCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPiBPbiAwOC8wMS8xOSAxODow
+NiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFNpZ25lZC1vZmYtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi10aHJlYWRzLmMgfCAxMCArKysrKysrLS0tDQo+PiAg
+IDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+Pg0KPj4g
+ZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLXRocmVhZHMuYyBiL2Jsb2NrL3Fjb3cyLXRocmVhZHMu
+Yw0KPj4gaW5kZXggMjBiMjYxNjUyOS4uMTU2ZTA2NjdiZSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2Nr
+L3Fjb3cyLXRocmVhZHMuYw0KPj4gKysrIGIvYmxvY2svcWNvdzItdGhyZWFkcy5jDQo+PiBAQCAt
+MTU4LDE1ICsxNTgsMTkgQEAgcWNvdzJfY29fZG9fY29tcHJlc3MoQmxvY2tEcml2ZXJTdGF0ZSAq
+YnMsIHZvaWQgKmRlc3QsIHNpemVfdCBkZXN0X3NpemUsDQo+PiAgICAgICAgICAgLmZ1bmMgPSBm
+dW5jLA0KPj4gICAgICAgfTsNCj4+ICAgDQo+PiArICAgIHFlbXVfY29fbXV0ZXhfbG9jaygmcy0+
+bG9jayk7DQo+PiAgICAgICB3aGlsZSAocy0+bmJfY29tcHJlc3NfdGhyZWFkcyA+PSBNQVhfQ09N
+UFJFU1NfVEhSRUFEUykgew0KPj4gLSAgICAgICAgcWVtdV9jb19xdWV1ZV93YWl0KCZzLT5jb21w
+cmVzc193YWl0X3F1ZXVlLCBOVUxMKTsNCj4+ICsgICAgICAgIHFlbXVfY29fcXVldWVfd2FpdCgm
+cy0+Y29tcHJlc3Nfd2FpdF9xdWV1ZSwgJnMtPmxvY2spOw0KPj4gICAgICAgfQ0KPj4gLQ0KPj4g
+ICAgICAgcy0+bmJfY29tcHJlc3NfdGhyZWFkcysrOw0KPj4gKyAgICBxZW11X2NvX211dGV4X3Vu
+bG9jaygmcy0+bG9jayk7DQo+PiArDQo+PiAgICAgICB0aHJlYWRfcG9vbF9zdWJtaXRfY28ocG9v
+bCwgcWNvdzJfY29tcHJlc3NfcG9vbF9mdW5jLCAmYXJnKTsNCj4+IC0gICAgcy0+bmJfY29tcHJl
+c3NfdGhyZWFkcy0tOw0KPj4gICANCj4+ICsgICAgcWVtdV9jb19tdXRleF9sb2NrKCZzLT5sb2Nr
+KTsNCj4+ICsgICAgcy0+bmJfY29tcHJlc3NfdGhyZWFkcy0tOw0KPj4gICAgICAgcWVtdV9jb19x
+dWV1ZV9uZXh0KCZzLT5jb21wcmVzc193YWl0X3F1ZXVlKTsNCj4+ICsgICAgcWVtdV9jb19tdXRl
+eF91bmxvY2soJnMtPmxvY2spOw0KPj4gICANCj4+ICAgICAgIHJldHVybiBhcmcucmV0Ow0KPj4g
+ICB9DQo+Pg0KPiANCj4gUmV2aWV3ZWQtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhh
+dC5jb20+DQo+IA0KPiBidXQsIHNvbWUgaW5mb3JtYXRpb24gd291bGQgYmUgbmljZSB0byBoYXZl
+IGluIHRoZSBjb21taXQgbWVzc2FnZS4NCg0KQ291bGQgeW91IHN1Z2dlc3Qgb25lPw0KDQpKdXN0
+LCAiVG8gbWFrZSBpdCB0aHJlYWQtc2FmZS4iPyBJIGRvbid0IGhhdmUgZ29vZCB1bmRlcnN0YW5k
+aW5nDQpvZiBtb3ZpbmcgZnJvbSAiQWlvQ29udGV4dCBsb2NrIHVzYWdlIiB0byBvdGhlciBsb2Nr
+cywgYXMgd2VsbCBhcw0KSSBkb24ndCBrbm93IGhvdyBCbG9ja0RyaXZlclN0YXRlIGlzIGdvaW5n
+IHRvIGJlIHVzZWQgaW4gcGFyYWxsZWwNCnRocmVhZHMsIGFuZCBob3cgbXVjaCBvZiBvdGhlciBj
+b2RlIGlzIGFscmVhZHkgcHJlcGFyZWQgdG8gd29yaw0KaW4gbXVsdGlwbGUtdGhyZWFkcyBlbnZp
+cm9ubWVudC4NCg0KSSBsb29rZWQgdGhyb3VnaCB5b3VyIGNvbW1pdCBtZXNzYWdlcyBvbiBwYXRj
+aGVzIHdoaWNoIGFkZGVkIHByb3RlY3Rpb24NCnRvIHNpbWlsYXIgcGxhY2VzIGFib3V0IGNvLXF1
+ZXVlcywgYnV0IGRpZG4ndCBmaW5kIGRldGFpbGVkIGRlc2NyaXB0aW9uLg0KDQo+IA0KPiBQYW9s
+bw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
