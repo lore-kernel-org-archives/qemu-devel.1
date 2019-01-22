@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45373)
+Received: from eggs.gnu.org ([209.51.188.92]:45236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm1nL-0007pl-TQ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1nK-0007mB-A2
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm1ix-0000hX-4s
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:28:39 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35434)
+	(envelope-from <peter.maydell@linaro.org>) id 1gm1jz-0002UM-CE
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:29:44 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39322)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm1iw-0000ft-VT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:28:39 -0500
-Received: by mail-oi1-x241.google.com with SMTP id v6so18429817oif.2
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:28:38 -0800 (PST)
+	id 1gm1jz-0002P0-3h
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:29:43 -0500
+Received: by mail-oi1-x242.google.com with SMTP id i6so18416321oia.6
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:29:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-10-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-10-richard.henderson@linaro.org>
+References: <20190110124951.15473-1-richard.henderson@linaro.org>
+	<20190110124951.15473-5-richard.henderson@linaro.org>
+In-Reply-To: <20190110124951.15473-5-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 15:30:13 +0000
-Message-ID: <CAFEAcA-PxLRviCkjpyOX6Vv32Z1voNsBHgRYxcGQVAHrepJNrQ@mail.gmail.com>
+Date: Tue, 22 Jan 2019 15:59:52 +0000
+Message-ID: <CAFEAcA_XQODwYmJGAMte2CJ_Qa5==uoTogUv4U2sTAeE_81QtA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 09/11] target/arm: Enable BTI for -cpu max
+Subject: Re: [Qemu-devel] [PATCH 4/4] target/arm: Enable TBI for user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +32,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 10 Jan 2019 at 12:18, Richard Henderson
+On Thu, 10 Jan 2019 at 12:50, Richard Henderson
 <richard.henderson@linaro.org> wrote:
+>
+> This has been enabled in the linux kernel since v3.11
+> (commit d50240a5f6cea, 2013-09-03,
+> "arm64: mm: permit use of tagged pointers at EL0").
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/cpu64.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  target/arm/cpu.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 713d2d5579..64fbe75eca 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -372,6 +372,10 @@ static void aarch64_max_initfn(Object *obj)
->          t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1);
->          cpu->isar.id_aa64pfr0 = t;
->
-> +        t = cpu->isar.id_aa64pfr1;
-> +        t = FIELD_DP64(t, ID_AA64PFR1, BT, 1);
-> +        cpu->isar.id_aa64pfr1 = t;
-> +
->          t = cpu->isar.id_aa64mmfr1;
->          t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
->          t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 14bc24a35a..5eff6995ee 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -174,6 +174,12 @@ static void arm_cpu_reset(CPUState *s)
+>          env->vfp.zcr_el[1] = cpu->sve_max_vq - 1;
+>          env->vfp.zcr_el[2] = env->vfp.zcr_el[1];
+>          env->vfp.zcr_el[3] = env->vfp.zcr_el[1];
+> +        /*
+> +         * Enable TBI0 and TBI1.  While the real kernel only enables TBI0,
+> +         * turning on both here will produce smaller code and otherwise
+> +         * make no difference to the user-level emulation.
+> +         */
+> +        env->cp15.tcr_el[1].raw_tcr = (3ULL << 37);
+>  #else
+>          /* Reset into the highest available EL */
+>          if (arm_feature(env, ARM_FEATURE_EL3)) {
 > --
+> 2.17.2
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
