@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49685)
+Received: from eggs.gnu.org ([209.51.188.92]:49732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gm17h-0007L7-OH
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:12 -0500
+	(envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
+	id 1gm17j-0007LV-Si
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gm17f-0007KA-WC
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:09 -0500
-References: <20190122094143.8857-1-david@redhat.com>
-	<20190122134457.212a60f3.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ae4f687e-ab41-fe9c-18be-ee678e3c9941@redhat.com>
-Date: Tue, 22 Jan 2019 13:52:34 +0100
+	(envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
+	id 1gm17i-0007OT-9E
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:11 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:13810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
+	id 1gm17h-0007Kh-Rd
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:10 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 22 Jan 2019 15:53:46 +0000
+Message-ID: <20190122155346.26388-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20190122134457.212a60f3.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] xen: fix xen-bus state model to allow
+ frontend re-connection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-On 22.01.19 13:44, Cornelia Huck wrote:
-> On Tue, 22 Jan 2019 10:41:43 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> We decided to always create the PCI host bridge, even if 'zpci' is not
->> enabled (due to migration compatibility). This however right now allows
->> to add zPCI/PCI devices to a VM although the guest will never actually see
->> them, confusing people that are using a simple CPU model that has no
->> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
->>
->> Let's check for 'zpci' and at least print a warning that this will not
->> work as expected. We could also bail out, however that might break
->> existing QEMU commandlines.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-pci-bus.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->> index b86a8bdcd4..e7d4f49611 100644
->> --- a/hw/s390x/s390-pci-bus.c
->> +++ b/hw/s390x/s390-pci-bus.c
->> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>  {
->>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->>  
->> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
->> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
->> +                    " The guest will not be able to see/use these devices.");
->> +    }
->> +
->>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->>          PCIDevice *pdev = PCI_DEVICE(dev);
->>  
-> 
-> That's hotplug only, isn't it? IIRC coldplugging already fails?
-> 
+There is a flaw in the xen-bus state model. To allow a frontend to re-
+connect the backend state of an online XenDevice is transitioned from
+Closed to InitWait, but this is currently done unilaterally which is
+incorrect. The backend state should remain Closed until the frontend state
+transitions to Initialising.
 
-No, applies also to coldplugging.
+This patch removes the automatic backend state transition from
+xen_device_backend_state_changed() and, instead, adds an extra check in
+xen_device_frontend_state_changed() to determine whether a frontend is
+trying to re-connect to a previously Closed XenDevice. Only if this is
+found to be the case is the backend state transitioned from Closed to
+InitWait. Note that this transition will be common amongst all XenDevice
+classes and hence xen_device_frontend_state_changed() returns immediately
+afterwards without calling into the XenDeviceClass frontend_changed()
+method.
 
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+
+v2:
+ - Fix xl block-detach
+---
+ hw/xen/xen-bus.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 3aeccec69c..49a725e8c7 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -547,20 +547,15 @@ static void xen_device_backend_changed(void *opaque)
+     }
+ 
+     /*
+-     * If a backend is still 'online' then its state should be cycled
+-     * back round to InitWait in order for a new frontend instance to
+-     * connect. This may happen when, for example, a frontend driver is
+-     * re-installed or updated.
+-     * If a backend is not 'online' then the device should be destroyed.
++     * If a backend is still 'online' then we should leave it alone but,
++     * if a backend is not 'online', then the device should be destroyed
++     * once the state is Closed.
+      */
+-    if (xendev->backend_online &&
+-        xendev->backend_state == XenbusStateClosed) {
+-        xen_device_backend_set_state(xendev, XenbusStateInitWait);
+-    } else if (!xendev->backend_online &&
+-               (xendev->backend_state == XenbusStateClosed ||
+-                xendev->backend_state == XenbusStateInitialising ||
+-                xendev->backend_state == XenbusStateInitWait ||
+-                xendev->backend_state == XenbusStateUnknown)) {
++    if (!xendev->backend_online &&
++        (xendev->backend_state == XenbusStateClosed ||
++         xendev->backend_state == XenbusStateInitialising ||
++         xendev->backend_state == XenbusStateInitWait ||
++         xendev->backend_state == XenbusStateUnknown)) {
+         Error *local_err = NULL;
+ 
+         if (!xen_backend_try_device_destroy(xendev, &local_err)) {
+@@ -715,6 +710,17 @@ static void xen_device_frontend_changed(void *opaque)
+ 
+     xen_device_frontend_set_state(xendev, state);
+ 
++    if (state == XenbusStateInitialising &&
++        xendev->backend_state == XenbusStateClosed &&
++        xendev->backend_online) {
++        /*
++         * The frontend is re-initializing so switch back to
++         * InitWait.
++         */
++        xen_device_backend_set_state(xendev, XenbusStateInitWait);
++        return;
++    }
++
+     if (xendev_class->frontend_changed) {
+         Error *local_err = NULL;
+ 
 -- 
-
-Thanks,
-
-David / dhildenb
+2.20.1.2.gb21ebb6
