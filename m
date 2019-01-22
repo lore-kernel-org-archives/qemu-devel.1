@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41296)
+Received: from eggs.gnu.org ([209.51.188.92]:42530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gloeL-0002dP-AT
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:31:02 -0500
+	(envelope-from <arilou@gmail.com>) id 1glokK-00043N-0B
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gloXV-0007At-Vs
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:23:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42046)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gloXT-00078N-0O
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:23:56 -0500
-References: <20190121181030.2112-1-philmd@redhat.com>
-	<76c2912b-8c50-d15f-f153-e80fa4b1be6e@redhat.com>
-	<5f27ba6f-f2e3-423f-54ee-0f6d6a0e1b48@redhat.com>
-	<c52c29be-f285-2e5c-24ce-352c284e2b58@redhat.com>
-	<20190122000452-mutt-send-email-mst@kernel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <407faf62-ad6e-c846-05aa-beafb3da0c14@redhat.com>
-Date: Tue, 22 Jan 2019 06:23:34 +0100
+	(envelope-from <arilou@gmail.com>) id 1glokJ-0007vA-9Q
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:11 -0500
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:36189)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1glokJ-0007uQ-4k
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 00:37:11 -0500
+Received: by mail-vs1-xe43.google.com with SMTP id v205so14008100vsc.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 21:37:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190122000452-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20190109082203.27142-1-arilou@gmail.com>
+	<CAJ+F1CK1Y4qyzJrebiU8wQdaJ6-JM_WEywsURmF4mB2Tk7UMOA@mail.gmail.com>
+	<c1b80e0b-f809-5b33-98d0-081dff2e79cb@redhat.com>
+In-Reply-To: <c1b80e0b-f809-5b33-98d0-081dff2e79cb@redhat.com>
+From: Jon Doron <arilou@gmail.com>
+Date: Tue, 22 Jan 2019 07:36:57 +0200
+Message-ID: <CAP7QCoich3_wvW6xnCfL3+nfRFJ6=JEMY4g28F+jRfkLqOs=Uw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: Fix VirtIONet typedef
- redefinition
+Subject: Re: [Qemu-devel] [PATCH v3] dump: Set correct vaddr for ELF dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Yuri Benditovich <yuri.benditovich@daynix.com>, Wei Xu <wexu@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>
 
-On 2019-01-22 06:05, Michael S. Tsirkin wrote:
-> On Tue, Jan 22, 2019 at 05:28:12AM +0100, Thomas Huth wrote:
->> On 2019-01-21 20:46, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 1/21/19 8:22 PM, Eric Blake wrote:
->>>> On 1/21/19 12:10 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> Commit 2974e916df8 introduced the VirtioNetRscChain structure which
->>>>> refer to a VirtIONet, declared later, thus required VirtIONet typed=
-ef
->>>>> to be declarated forward.
->>>>
->>>> s/be declarated forward/use a forward declaration/
->>>
->>> Thanks Eric.
->>>
->>> Thomas, do you mind fixing this if you take this patch?
->>
->> No problem, just fixed it while picking up the patch.
->=20
-> I'm not sure why it's going through that tree but sure go ahead.
+ping, so this means that the patch will be merged in?
 
-Sorry, I certainly don't want to step on your toes here. I just need
-this patch to fix compilation with "-std=3Dgnu99" which is required for
-the patch in my PULL request that enables this compiler flag there:
+Thanks,
+-- Jon.
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02695.html
-
-> Sent Reviewed-by tag.
-
-Thanks a lot!
-
- Thomas
+On Wed, Jan 9, 2019 at 12:38 PM Laszlo Ersek <lersek@redhat.com> wrote:
+>
+> On 01/09/19 09:25, Marc-Andr=C3=A9 Lureau wrote:
+> > On Wed, Jan 9, 2019 at 12:22 PM Jon Doron <arilou@gmail.com> wrote:
+> >>
+> >> vaddr needs to be equal to the paddr since the dump file represents th=
+e
+> >> physical memory image.
+> >>
+> >> Without setting vaddr correctly, GDB would load all the different memo=
+ry
+> >> regions on top of each other to vaddr 0, thus making GDB showing the w=
+rong
+> >> memory data for a given address.
+> >>
+> >> Signed-off-by: Jon Doron <arilou@gmail.com>
+> >
+> > Tested-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Apparently the only change in v3, relative to v2, is cleaning up the
+> whitespace problem that was caught by Patchew.
+>
+> Acked-by: Laszlo Ersek <lersek@redhat.com>
+>
+> Thanks
+> Laszlo
+>
+> >>  dump.c                       | 5 +++--
+> >>  scripts/dump-guest-memory.py | 1 +
+> >>  2 files changed, 4 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/dump.c b/dump.c
+> >> index 4ec94c5e25..de7f70f099 100644
+> >> --- a/dump.c
+> >> +++ b/dump.c
+> >> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryM=
+apping *memory_mapping,
+> >>      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
+> >>      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
+> >>      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
+> >> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
+> >> +    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr) ? : =
+phdr.p_paddr;
+> >>
+> >>      assert(memory_mapping->length >=3D filesz);
+> >>
+> >> @@ -216,7 +216,8 @@ static void write_elf32_load(DumpState *s, MemoryM=
+apping *memory_mapping,
+> >>      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
+> >>      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
+> >>      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
+> >> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
+> >> +    phdr.p_vaddr =3D
+> >> +        cpu_to_dump32(s, memory_mapping->virt_addr) ? : phdr.p_paddr;
+> >>
+> >>      assert(memory_mapping->length >=3D filesz);
+> >>
+> >> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.=
+py
+> >> index 198cd0fe40..2c587cbefc 100644
+> >> --- a/scripts/dump-guest-memory.py
+> >> +++ b/scripts/dump-guest-memory.py
+> >> @@ -163,6 +163,7 @@ class ELF(object):
+> >>          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
+> >>          phdr.p_type =3D p_type
+> >>          phdr.p_paddr =3D p_paddr
+> >> +        phdr.p_vaddr =3D p_paddr
+> >>          phdr.p_filesz =3D p_size
+> >>          phdr.p_memsz =3D p_size
+> >>          self.segments.append(phdr)
+> >> --
+> >> 2.19.2
+> >>
+> >>
+> >
+> >
+> I pre
