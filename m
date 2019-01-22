@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37703)
+Received: from eggs.gnu.org ([209.51.188.92]:38985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1glkl7-0000cs-6Q
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:21:46 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1glkrs-0001uL-CE
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1glkl6-0001v4-2Z
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:21:45 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42992)
+	(envelope-from <liq3ea@gmail.com>) id 1glkrr-0007C2-89
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:28:44 -0500
+Received: from mail-it1-x12f.google.com ([2607:f8b0:4864:20::12f]:54714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1glkl5-0001uL-Sx
-	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:21:44 -0500
-Received: by mail-io1-xd42.google.com with SMTP id x6so17852763ioa.9
-	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 17:21:43 -0800 (PST)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1glkrp-00079e-9R
+	for qemu-devel@nongnu.org; Mon, 21 Jan 2019 20:28:42 -0500
+Received: by mail-it1-x12f.google.com with SMTP id i145so19163197ita.4
+	for <qemu-devel@nongnu.org>; Mon, 21 Jan 2019 17:28:40 -0800 (PST)
 MIME-Version: 1.0
 References: <20190120071337.55595-1-liq3ea@163.com>
-	<20190120071337.55595-2-liq3ea@163.com>
-	<66f7e560-2e3e-0efc-6a80-9a44dff71324@redhat.com>
-In-Reply-To: <66f7e560-2e3e-0efc-6a80-9a44dff71324@redhat.com>
+	<20190120071337.55595-3-liq3ea@163.com>
+	<2e1e9b39-ed96-452a-de4b-9b7337702a89@redhat.com>
+In-Reply-To: <2e1e9b39-ed96-452a-de4b-9b7337702a89@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 22 Jan 2019 09:21:06 +0800
-Message-ID: <CAKXe6SLAxE1Qv3MX4=Crgju+ApRsiDKwY84KU5ZMH-f+aNBjmg@mail.gmail.com>
+Date: Tue, 22 Jan 2019 09:28:03 +0800
+Message-ID: <CAKXe6SJfThHvzuWKSqNDz79KcRfyzor16sFg1N8CxCFnaJPYTQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: fw_cfg: add a function to get
- the fw_cfg file entry
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: fw_cfg: add reboot_timeout test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,118 +35,92 @@ To: Laszlo Ersek <lersek@redhat.com>
 Cc: Li Qiang <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
 Laszlo Ersek <lersek@redhat.com> =E4=BA=8E2019=E5=B9=B41=E6=9C=8822=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:32=E5=86=99=E9=81=93=EF=BC=9A
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:38=E5=86=99=E9=81=93=EF=BC=9A
 
 > On 01/20/19 08:13, Li Qiang wrote:
-> > This is useful to write qtest about fw_cfg file entry.
-> >
 > > Signed-off-by: Li Qiang <liq3ea@163.com>
 > > ---
-> >  tests/libqos/fw_cfg.c | 33 +++++++++++++++++++++++++++++++++
-> >  tests/libqos/fw_cfg.h |  2 ++
-> >  2 files changed, 35 insertions(+)
+> >  tests/fw_cfg-test.c | 13 ++++++++++++-
+> >  1 file changed, 12 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-> > index d0889d1e22..e2b0cae7cd 100644
-> > --- a/tests/libqos/fw_cfg.c
-> > +++ b/tests/libqos/fw_cfg.c
-> > @@ -16,6 +16,7 @@
-> >  #include "libqos/fw_cfg.h"
-> >  #include "libqtest.h"
-> >  #include "qemu/bswap.h"
-> > +#include "standard-headers/linux/qemu_fw_cfg.h"
-> >
-> >  void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-> >  {
-> > @@ -54,6 +55,38 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t ke=
-y)
-> >      return le64_to_cpu(value);
+> > diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> > index 1c5103fe1c..c28e6c3fb5 100644
+> > --- a/tests/fw_cfg-test.c
+> > +++ b/tests/fw_cfg-test.c
+> > @@ -99,6 +99,15 @@ static void test_fw_cfg_boot_menu(void)
+> >      g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), =3D=3D,
+> boot_menu);
 > >  }
 > >
-> > +size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-> > +                      void *data, size_t buflen)
+> > +static void test_fw_cfg_reboot_timeout(void)
 > > +{
-> > +    uint32_t count;
-> > +    uint32_t i;
-> > +    unsigned char *filesbuf =3D NULL;
-> > +    uint32_t dsize;
->
-> dsize should be size_t
->
->
-OK.
-
-
-> > +    struct fw_cfg_file *p;
->
-> Please use a better variable name, such as "dir_entry" or similar.
->
->
-OK.
-
-
-> > +    size_t filesize =3D 0;
+> > +    uint32_t reboot_timeout;
 > > +
-> > +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-> > +    count =3D be32_to_cpu(count);
-> > +    dsize =3D sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
+> > +    qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
+> > +                     &reboot_timeout, sizeof(reboot_timeout));
+> > +    g_assert_cmpint(reboot_timeout, =3D=3D, 15);
+> > +}
+> > +
 >
-> where does "struct fw_cfg_file" come from?
+> You don't check the return status of qfw_cfg_get_file(), before reading
+> "reboot_timeout". If the qfw_cfg_get_file() fails (returning 0), then
+> the comparison will refer to an indeterminate value. Also, it's
+> theoretically possible for qfw_cfg_get_file() to overwrite only part of
+> the "reboot_timeout" object.
 >
 >
->From include/standard-headers/linux/qemu_fw_cfg.h
+Right. I will change in the next revision.
 
 
-> ... more precisely: why use it over the "FWCfgFile" typedef? (applies to
-> the declaration of "p" as well).
+
+> So I think we need the function to transfer exactly (sizeof
+> reboot_timeout) bytes.
 >
 >
-Ok, I think we should use include/hw/nvram/fw_cfg.h.
+What does this mean? check the  return of 'qfw_cfg_get_file' if it is
+sizeof(reboot_timeout)?
+
+
+
+> BTW, this reminds me, qfw_cfg_get_file() seems to return the number of
+> bytes that would be necessary for transferring the entire file. That
+> looks like a good idea, but it should be documented. Please add some
+> docs on top of qfw_cfg_get_file().
+>
+>
+The docs like "return 0 means failed and non-zero means successful but
+the caller need check the exactly size to avoid partially file size" ?
 
 Thanks,
 Li Qiang
 
 
-> > +    filesbuf =3D g_malloc0(dsize);
-> > +    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-> > +    p =3D (struct fw_cfg_file *)(filesbuf + sizeof(uint32_t));
-> > +    for (i =3D 0; i < count; ++i, ++p) {
-> > +        if (!strcmp(p->name, filename)) {
-> > +            uint32_t len =3D be32_to_cpu(p->size);
-> > +            uint16_t sel =3D be16_to_cpu(p->select);
-> > +            filesize =3D len;
-> > +            if (len > buflen) {
-> > +                len =3D buflen;
-> > +            }
-> > +            qfw_cfg_get(fw_cfg, sel, data, len);
-> > +            break;
-> > +        }
-> > +    }
-> > +    g_free(filesbuf);
-> > +    return filesize;
-> > +}
-> > +
-> >  static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+> >  int main(int argc, char **argv)
 > >  {
-> >      qtest_writew(fw_cfg->qts, fw_cfg->base, key);
-> > diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-> > index 0353416af0..de73722e67 100644
-> > --- a/tests/libqos/fw_cfg.h
-> > +++ b/tests/libqos/fw_cfg.h
-> > @@ -31,6 +31,8 @@ void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void
-> *data, size_t len);
-> >  uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
-> >  uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
-> >  uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-> > +size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-> > +                      void *data, size_t buflen);
+> >      QTestState *s;
+> > @@ -106,7 +115,8 @@ int main(int argc, char **argv)
 > >
-> >  QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
-> >  QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
+> >      g_test_init(&argc, &argv, NULL);
+> >
+> > -    s =3D qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+> > +    s =3D qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 "
+> > +                   "-boot reboot-timeout=3D15");
+> >
+> >      fw_cfg =3D pc_fw_cfg_init(s);
+> >
+> > @@ -125,6 +135,7 @@ int main(int argc, char **argv)
+> >      qtest_add_func("fw_cfg/max_cpus", test_fw_cfg_max_cpus);
+> >      qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+> >      qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+> > +    qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout=
+);
+> >
+> >      ret =3D g_test_run();
+> >
 > >
 >
-> Looks OK to me otherwise.
+> Looks OK otherwise.
 >
-> Thanks,
+> Thanks
 > Laszlo
 >
