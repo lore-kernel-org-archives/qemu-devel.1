@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60526)
+Received: from eggs.gnu.org ([209.51.188.92]:32798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1glu41-0002CR-6r
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:17:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1glu5k-0003Dd-67
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1glu3y-0001u2-T1
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:17:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36858
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1glu3y-0001rE-Ks
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:17:50 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0MBAAdH102135
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 06:17:46 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q61hrsuee-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 06:17:46 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 22 Jan 2019 11:17:44 -0000
-Date: Tue, 22 Jan 2019 12:17:37 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20190122112926.4ff54f9f.cohuck@redhat.com>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<20190121212018.4e377e59@oc2783563651>
-	<20190122112926.4ff54f9f.cohuck@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1glu5j-0003HU-A3
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:40 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1glu5j-0003A4-2g
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 06:19:39 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b11so13743112wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 03:19:32 -0800 (PST)
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-3-crosa@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190117185628.21862-3-crosa@redhat.com>
+Date: Tue, 22 Jan 2019 11:19:30 +0000
+Message-ID: <874la10wjh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190122121737.49c3f900@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/18] Acceptance tests: show avocado test
+ execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,73 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Tue, 22 Jan 2019 11:29:26 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Mon, 21 Jan 2019 21:20:18 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > On Mon, 21 Jan 2019 12:03:51 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> > 
-> > > Rework handling of multiple I/O requests to return -EAGAIN if
-> > > we are already processing an I/O request. Introduce a mutex
-> > > to disallow concurrent writes to the I/O region.
-> > > 
-> > > The expectation is that userspace simply retries the operation
-> > > if it gets -EAGAIN.
-> > > 
-> > > We currently don't allow multiple ssch requests at the same
-> > > time, as we don't have support for keeping channel programs
-> > > around for more than one request.
-> > > 
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > ---  
-> > 
-> > [..]
-> > 
-> > >  static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-> > > @@ -188,25 +192,30 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-> > >  {
-> > >  	struct vfio_ccw_private *private;
-> > >  	struct ccw_io_region *region;
-> > > +	int ret;
-> > >  
-> > >  	if (*ppos + count > sizeof(*region))
-> > >  		return -EINVAL;
-> > >  
-> > >  	private = dev_get_drvdata(mdev_parent_dev(mdev));
-> > > -	if (private->state != VFIO_CCW_STATE_IDLE)
-> > > +	if (private->state == VFIO_CCW_STATE_NOT_OPER ||
-> > > +	    private->state == VFIO_CCW_STATE_STANDBY)
-> > >  		return -EACCES;
-> > > +	if (!mutex_trylock(&private->io_mutex))
-> > > +		return -EAGAIN;
-> > >  
-> > >  	region = private->io_region;
-> > > -	if (copy_from_user((void *)region + *ppos, buf, count))
-> > > -		return -EFAULT;
-> > > +	if (copy_from_user((void *)region + *ppos, buf, count)) {  
-> > 
-> > This might race with vfio_ccw_sch_io_todo() on
-> > private->io_region->irb_area, or?
-> 
-> Ah yes, this should also take the mutex (should work because we're on a
-> workqueue).
-> 
+Cleber Rosa <crosa@redhat.com> writes:
 
-I'm not sure that will do the trick (assumed I understood the
-intention correctly). Let's say the things happen in this order:
-1) vfio_ccw_sch_io_todo() goes first, I guess updates
-private->io_region->irb_area and releases the mutex.
-2) Then vfio_ccw_mdev_write() destroys the irb_area by zeriong it out,
-and finally,
-3) userspace reads the destroyed irb_area using vfio_ccw_mdev_read().
+> The current version of the "check-acceptance" target will only show
+> one line for execution of all tests.  That's probably OK if the tests
+> to be run are quick enough and they're always the same.
+>
+> But, there's already one test alone that takes on average ~5 seconds
+> to run, we intend to adapt the list of tests to match the user's build
+> environment (among other choices).
+>
+> Because of that, let's present the default Avocado UI by default.
+> Users can always choose a different output by setting the AVOCADO_SHOW
+> variable.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
-Or am I misunderstanding something? 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Regards,
-Halil
+> ---
+>  .travis.yml            | 2 +-
+>  tests/Makefile.include | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 93fd0164a0..844d514afa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -188,7 +188,7 @@ matrix:
+>      # Acceptance (Functional) tests
+>      - env:
+>          - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu"
+> -        - TEST_CMD=3D"make AVOCADO_SHOW=3Dapp check-acceptance"
+> +        - TEST_CMD=3D"make check-acceptance"
+>        addons:
+>          apt:
+>            packages:
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f403a6571d..c73298740d 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -956,7 +956,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+>  # Controls the output generated by Avocado when running tests.
+>  # Any number of command separated loggers are accepted.  For more
+>  # information please refer to "avocado --help".
+> -AVOCADO_SHOW=3Dnone
+> +AVOCADO_SHOW=3Dapp
+>
+>  PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_inf=
+o >=3D (3, 0) else 0)')
+>  ifeq ($(PYTHON3), 1)
+
+
+--
+Alex Benn=C3=A9e
