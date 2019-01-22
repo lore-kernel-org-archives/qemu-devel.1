@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50080)
+Received: from eggs.gnu.org ([209.51.188.92]:50397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm189-0007jh-J1
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:38 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm18Q-0007x3-Uu
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm17z-0007c4-Tn
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:35 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38665)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm18O-0007q4-RO
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:54 -0500
+Received: from mail-lf1-x12e.google.com ([2a00:1450:4864:20::12e]:38364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm17n-0007W1-WB
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:21 -0500
-Received: by mail-ot1-x341.google.com with SMTP id e12so24618130otl.5
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:50:15 -0800 (PST)
-MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-9-richard.henderson@linaro.org>
-	<CAFEAcA9+8XBXDqL8JfTpS8q05XwaZ+Ck1nqAhTLsyN_=WCjXNA@mail.gmail.com>
-	<13b8c253-d3da-3bca-de83-ea9422d5f30f@linaro.org>
-In-Reply-To: <13b8c253-d3da-3bca-de83-ea9422d5f30f@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 16:57:49 +0000
-Message-ID: <CAFEAcA8rzNDhgqrzei7L3X=WbnZV-1jVUcob50orPmw8twjjpg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 08/11] target/arm: Add guarded_pages cpu
- property for user-only
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gm18M-0007ir-Pl
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:51 -0500
+Received: by mail-lf1-x12e.google.com with SMTP id a8so18885559lfk.5
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 10:50:44 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 22 Jan 2019 10:50:20 -0800
+Message-Id: <20190122185020.25086-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL 0/8] target/xtensa queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Tue, 22 Jan 2019 at 15:42, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 1/22/19 7:29 AM, Peter Maydell wrote:
-> > On Thu, 10 Jan 2019 at 12:18, Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >>
-> >> While waiting for a proper userland ABI, allow static test
-> >> cases to be written assuming that GP is set for all pages.
-> >>
-> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> >> ---
-> >>  target/arm/cpu.h           |  4 ++++
-> >>  target/arm/cpu64.c         | 18 ++++++++++++++++++
-> >>  target/arm/translate-a64.c |  8 +++++++-
-> >>  3 files changed, 29 insertions(+), 1 deletion(-)
-> >
-> > This is OK code-wise but I'm a bit wary of committing it
-> > because then we're stuck with the property forever even
-> > if it turns out to be irrelevant to whatever the userland
-> > ABI eventually is.
->
-> That's surely simply a matter of documentation.
-> "Don't rely on this property: it will go away."
+Hi Peter,
 
-Convention is that those should be prefixed with "x-".
+please pull the following batch of updates for target/xtensa:
 
-thanks
--- PMM
+The following changes since commit 32a1a94dd324d33578dca1dc96d7896a0244d768:
+
+  Update version for v3.1.0 release (2018-12-11 17:18:37 +0000)
+
+are available in the git repository at:
+
+  git://github.com/OSLL/qemu-xtensa.git tags/20190122-xtensa
+
+for you to fetch changes up to 9584116f94c75411998703b76cc6a6e9e7fd7a8b:
+
+  target/xtensa: move non-HELPER functions to helper.c (2019-01-13 23:36:31 -0800)
+
+----------------------------------------------------------------
+target/xtensa: zero overhead loops rework/helpers split
+
+- change xtensa zero overhead loops implementation to avoid invalidation
+  of TBs corresponding to previous loop body when a new loop is
+  encountered;
+- extract helper function groups from op_helper.c and move them into
+  separate source files: exc_helper.c (exception helpers), win_helper.c
+  (windowed registers helpers), fpu_helper.c (floating point helpers),
+  mmu_helper.c (memory management helpers) and dbg_helper.c (native debug
+  helpers).
+
+----------------------------------------------------------------
+Max Filippov (8):
+      target/xtensa: rework zero overhead loops implementation
+      target/xtensa: extract FPU helpers
+      target/xtensa: extract windowed registers helpers
+      target/xtensa: extract MMU helpers
+      target/xtensa: extract debug helpers
+      target/xtensa: extract interrupt and exception helpers
+      target/xtensa: drop dump_state helper
+      target/xtensa: move non-HELPER functions to helper.c
+
+ target/xtensa/Makefile.objs  |   5 +
+ target/xtensa/cpu.h          |  32 ++
+ target/xtensa/dbg_helper.c   | 129 +++++++
+ target/xtensa/exc_helper.c   | 258 +++++++++++++
+ target/xtensa/fpu_helper.c   | 166 ++++++++
+ target/xtensa/helper.c       | 635 ++----------------------------
+ target/xtensa/helper.h       |   3 -
+ target/xtensa/mmu_helper.c   | 818 +++++++++++++++++++++++++++++++++++++++
+ target/xtensa/op_helper.c    | 894 -------------------------------------------
+ target/xtensa/overlay_tool.h |   1 +
+ target/xtensa/translate.c    |  53 +--
+ target/xtensa/win_helper.c   | 222 +++++++++++
+ 12 files changed, 1685 insertions(+), 1531 deletions(-)
+ create mode 100644 target/xtensa/dbg_helper.c
+ create mode 100644 target/xtensa/exc_helper.c
+ create mode 100644 target/xtensa/fpu_helper.c
+ create mode 100644 target/xtensa/mmu_helper.c
+ create mode 100644 target/xtensa/win_helper.c
+
+-- 
+Thanks.
+-- Max
