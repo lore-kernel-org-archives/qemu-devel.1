@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57184)
+Received: from eggs.gnu.org ([209.51.188.92]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm1IB-0007ph-6q
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:01:00 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gm1IW-00089n-J6
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:01:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gm1IA-0004gQ-E4
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:59 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gm1I8-0004av-HI
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:00:58 -0500
-Received: by mail-oi1-x242.google.com with SMTP id r62so18378550oie.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 11:00:34 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1gm1IV-0004uU-SH
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:01:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gm1IV-0004tw-Mz
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 14:01:19 -0500
+Date: Tue, 22 Jan 2019 13:23:55 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190122152355.GR4136@habkost.net>
+References: <20190122121048.76469-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-3-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Jan 2019 12:08:11 +0000
-Message-ID: <CAFEAcA9OgDwc+E1-Xc_i1m5vREJnzke5tc6_o94+6wdy0cnCtg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 02/11] target/arm: Add PSTATE.BTYPE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190122121048.76469-1-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: enable PVH only for machine
+ type >= 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +27,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Liam Merwick <liam.merwick@oracle.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 10 Jan 2019 at 12:17, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Place this in its own field within ENV, as that will
-> make it easier to reset from within TCG generated code.
->
-> With the change to pstate_read/write, exception entry
-> and return are automatically handled.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Jan 22, 2019 at 01:10:48PM +0100, Stefano Garzarella wrote:
+> In order to avoid migration issues, we enable PVH only for
+> machine type >= 4.0
+> 
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-thanks
--- PMM
+-- 
+Eduardo
