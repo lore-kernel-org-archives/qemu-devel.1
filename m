@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46544)
+Received: from eggs.gnu.org ([209.51.188.92]:46563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1glrU4-0000EU-UN
+	(envelope-from <elohimes@gmail.com>) id 1glrU7-0000EW-A6
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1glrTv-0002bK-Nc
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:34 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36021)
+	(envelope-from <elohimes@gmail.com>) id 1glrU5-0002g6-IY
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:39 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1glrTv-0002Zl-GY
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:27 -0500
-Received: by mail-pl1-x644.google.com with SMTP id g9so11124594plo.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 00:32:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1glrU5-0002cz-Ap
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 03:32:37 -0500
+Received: by mail-pl1-x642.google.com with SMTP id 101so11102632pld.6
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 00:32:31 -0800 (PST)
 From: elohimes@gmail.com
-Date: Tue, 22 Jan 2019 16:31:46 +0800
-Message-Id: <20190122083152.10705-1-xieyongji@baidu.com>
+Date: Tue, 22 Jan 2019 16:31:48 +0800
+Message-Id: <20190122083152.10705-3-xieyongji@baidu.com>
+In-Reply-To: <20190122083152.10705-1-xieyongji@baidu.com>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 0/6] vhost-user-blk: Add support for backend
- reconnecting
+Subject: [Qemu-devel] [PATCH v5 2/6] libvhost-user: Introduce
+ vu_queue_map_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +34,140 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-This patchset is aimed at supporting qemu to reconnect
-vhost-user-blk backend after vhost-user-blk backend crash or
-restart.
+Introduce vu_queue_map_desc() which should be
+independent with vu_queue_pop();
 
-The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-and VHOST_USER_SET_INFLIGHT_FD to support support transferring shared
-buffer between qemu and backend.
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 88 ++++++++++++++++-----------
+ 1 file changed, 51 insertions(+), 37 deletions(-)
 
-The patch 2,3 are the corresponding libvhost-user patches of
-patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
-and VHOST_USER_SET_INFLIGHT_FD.
-
-The patch 4 allows vhost-user-blk to use the two new messages
-to get/set inflight buffer from/to backend.
-
-The patch 5 supports vhost-user-blk to reconnect backend when
-connection closed.
-
-The patch 6 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
-to vhost-user-blk backend which is used to tell qemu that
-we support reconnecting now.
-
-This series is based on Daniel P. Berrangé's patchset:
-
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
-
-To use it, we could start qemu with:
-
-qemu-system-x86_64 \
-        -chardev socket,id=char0,path=/path/vhost.socket,reconnect=1, \
-        -device vhost-user-blk-pci,chardev=char0 \
-
-and start vhost-user-blk backend with:
-
-vhost-user-blk -b /path/file -s /path/vhost.socket
-
-Then we can restart vhost-user-blk at any time during VM running.
-
-V4 to V5:
-- Drop patch that enables "nowait" option on client sockets
-- Support resubmitting inflight I/O in order
-- Make inflight I/O tracking more robust
-- Remove align field and add queue size field in VhostUserInflight
-- Document more details in vhost-user.txt
-
-V3 to V4:
-- Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
-- Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
-  and VHOST_USER_SET_INFLIGHT_FD
-- Allocate inflight buffer in backend rather than in qemu
-- Document a recommended format for inflight buffer
-
-V2 to V3:
-- Using exisiting wait/nowait options to control connection on
-  client sockets instead of introducing "disconnected" option.
-- Support the case that vhost-user backend restart during initialzation
-  of vhost-user-blk device.
-
-V1 to V2:
-- Introduce "disconnected" option for chardev instead of reuse "wait"
-  option
-- Support the case that QEMU starts before vhost-user backend
-- Drop message VHOST_USER_SET_VRING_INFLIGHT
-- Introduce two new messages VHOST_USER_GET_SHM_SIZE
-  and VHOST_USER_SET_SHM_FD
-
-Xie Yongji (6):
-  vhost-user: Support transferring inflight buffer between qemu and
-    backend
-  libvhost-user: Introduce vu_queue_map_desc()
-  libvhost-user: Support tracking inflight I/O in shared memory
-  vhost-user-blk: Add support to get/set inflight buffer
-  vhost-user-blk: Add support to reconnect backend
-  contrib/vhost-user-blk: enable inflight I/O tracking
-
- Makefile                                |   2 +-
- contrib/libvhost-user/libvhost-user.c   | 402 ++++++++++++++++++++----
- contrib/libvhost-user/libvhost-user.h   |  40 +++
- contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
- docs/interop/vhost-user.txt             | 101 ++++++
- hw/block/vhost-user-blk.c               | 227 ++++++++++---
- hw/virtio/vhost-user.c                  | 110 +++++++
- hw/virtio/vhost.c                       | 105 +++++++
- include/hw/virtio/vhost-backend.h       |  10 +
- include/hw/virtio/vhost-user-blk.h      |   5 +
- include/hw/virtio/vhost.h               |  19 ++
- 11 files changed, 925 insertions(+), 99 deletions(-)
-
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index a6b46cdc03..23bd52264c 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -1853,49 +1853,20 @@ virtqueue_alloc_element(size_t sz,
+     return elem;
+ }
+ 
+-void *
+-vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
++static void *
++vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
+ {
+-    unsigned int i, head, max, desc_len;
++    struct vring_desc *desc = vq->vring.desc;
+     uint64_t desc_addr, read_len;
++    unsigned int desc_len;
++    unsigned int max = vq->vring.num;
++    unsigned int i = idx;
+     VuVirtqElement *elem;
+-    unsigned out_num, in_num;
++    unsigned int out_num = 0, in_num = 0;
+     struct iovec iov[VIRTQUEUE_MAX_SIZE];
+     struct vring_desc desc_buf[VIRTQUEUE_MAX_SIZE];
+-    struct vring_desc *desc;
+     int rc;
+ 
+-    if (unlikely(dev->broken) ||
+-        unlikely(!vq->vring.avail)) {
+-        return NULL;
+-    }
+-
+-    if (vu_queue_empty(dev, vq)) {
+-        return NULL;
+-    }
+-    /* Needed after virtio_queue_empty(), see comment in
+-     * virtqueue_num_heads(). */
+-    smp_rmb();
+-
+-    /* When we start there are none of either input nor output. */
+-    out_num = in_num = 0;
+-
+-    max = vq->vring.num;
+-    if (vq->inuse >= vq->vring.num) {
+-        vu_panic(dev, "Virtqueue size exceeded");
+-        return NULL;
+-    }
+-
+-    if (!virtqueue_get_head(dev, vq, vq->last_avail_idx++, &head)) {
+-        return NULL;
+-    }
+-
+-    if (vu_has_feature(dev, VIRTIO_RING_F_EVENT_IDX)) {
+-        vring_set_avail_event(vq, vq->last_avail_idx);
+-    }
+-
+-    i = head;
+-    desc = vq->vring.desc;
+     if (desc[i].flags & VRING_DESC_F_INDIRECT) {
+         if (desc[i].len % sizeof(struct vring_desc)) {
+             vu_panic(dev, "Invalid size for indirect buffer table");
+@@ -1947,12 +1918,13 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+     } while (rc == VIRTQUEUE_READ_DESC_MORE);
+ 
+     if (rc == VIRTQUEUE_READ_DESC_ERROR) {
++        vu_panic(dev, "read descriptor error");
+         return NULL;
+     }
+ 
+     /* Now copy what we have collected and mapped */
+     elem = virtqueue_alloc_element(sz, out_num, in_num);
+-    elem->index = head;
++    elem->index = idx;
+     for (i = 0; i < out_num; i++) {
+         elem->out_sg[i] = iov[i];
+     }
+@@ -1960,6 +1932,48 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
+         elem->in_sg[i] = iov[out_num + i];
+     }
+ 
++    return elem;
++}
++
++void *
++vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
++{
++    unsigned int head;
++    VuVirtqElement *elem;
++
++    if (unlikely(dev->broken) ||
++        unlikely(!vq->vring.avail)) {
++        return NULL;
++    }
++
++    if (vu_queue_empty(dev, vq)) {
++        return NULL;
++    }
++    /*
++     * Needed after virtio_queue_empty(), see comment in
++     * virtqueue_num_heads().
++     */
++    smp_rmb();
++
++    if (vq->inuse >= vq->vring.num) {
++        vu_panic(dev, "Virtqueue size exceeded");
++        return NULL;
++    }
++
++    if (!virtqueue_get_head(dev, vq, vq->last_avail_idx++, &head)) {
++        return NULL;
++    }
++
++    if (vu_has_feature(dev, VIRTIO_RING_F_EVENT_IDX)) {
++        vring_set_avail_event(vq, vq->last_avail_idx);
++    }
++
++    elem = vu_queue_map_desc(dev, vq, head, sz);
++
++    if (!elem) {
++        return NULL;
++    }
++
+     vq->inuse++;
+ 
+     return elem;
 -- 
 2.17.1
