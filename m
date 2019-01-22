@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34705)
+Received: from eggs.gnu.org ([209.51.188.92]:35717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gm3zi-0002Am-0o
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:54:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1gm40q-0003UD-SY
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gm3ze-0003se-Rh
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:54:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1gm40n-0005k6-5Z
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 16:55:14 -0500
+References: <CAMAMwPB1GJNxsgcvZLHwHuLp-AjuWtnYCGOm6+U4DwdLsNrU8A@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e169e116-1ab3-692c-5320-eb4da9abb623@redhat.com>
+Date: Tue, 22 Jan 2019 15:54:54 -0600
 MIME-Version: 1.0
-References: <CAFyWVaai=5K7j8w+Abpk9jxGyKuo4v9w2BgmDbY=_29+Q++Jyw@mail.gmail.com>
-	<20181228220841.4896-1-jimw@sifive.com>
-In-Reply-To: <20181228220841.4896-1-jimw@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 22 Jan 2019 13:53:30 -0800
-Message-ID: <CAKmqyKPTnYpeyqjDR7=dcceGG7dbAc0nwVCTDMxiaJG5D=R6FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/5 v2] RISC-V: Add 64-bit gdb xml files.
+In-Reply-To: <CAMAMwPB1GJNxsgcvZLHwHuLp-AjuWtnYCGOm6+U4DwdLsNrU8A@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dyU0aTasuFcMQhEdy1tdebxD4uA2GPBFK"
+Subject: Re: [Qemu-devel] Incremental drive-backup with dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,403 +23,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jim Wilson <jimw@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: Bharadwaj Rayala <bharadwaj.rayala@rubrik.com>, qemu-discuss@nongnu.org, qemu-devel@nongnu.org
+Cc: kashyap.cv@gmail.com, Suman Swaroop <suman.swaroop@rubrik.com>, kchamart@redhat.com, John Snow <jsnow@redhat.com>
 
-On Fri, Dec 28, 2018 at 2:20 PM Jim Wilson <jimw@sifive.com> wrote:
->
-> Signed-off-by: Jim Wilson <jimw@sifive.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dyU0aTasuFcMQhEdy1tdebxD4uA2GPBFK
+From: Eric Blake <eblake@redhat.com>
+To: Bharadwaj Rayala <bharadwaj.rayala@rubrik.com>, qemu-discuss@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kashyap.cv@gmail.com, Suman Swaroop <suman.swaroop@rubrik.com>,
+ kchamart@redhat.com, John Snow <jsnow@redhat.com>
+Message-ID: <e169e116-1ab3-692c-5320-eb4da9abb623@redhat.com>
+Subject: Re: [Qemu-devel] Incremental drive-backup with dirty bitmaps
+References: <CAMAMwPB1GJNxsgcvZLHwHuLp-AjuWtnYCGOm6+U4DwdLsNrU8A@mail.gmail.com>
+In-Reply-To: <CAMAMwPB1GJNxsgcvZLHwHuLp-AjuWtnYCGOm6+U4DwdLsNrU8A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+On 1/22/19 1:29 PM, Bharadwaj Rayala wrote:
+> Hi,
+>=20
+> TL(Cant)R: I am trying to figure out a workflow for doing incremental
+> drive-backups using dirty-bitmaps. Feels qemu lacks some essential feat=
+ures
+> to achieve it.
+>=20
+> I am trying to build a backup workflow(program) using drive-backup alon=
+g
+> with dirty bitmaps to take backups of kvm vms. EIther pull/push model w=
+orks
+> for me. Since drive-backup push model is already implemented, I am
+> going forward with it. I am not able to figure out a few details and
+> couldn't find any documentation around it. Any help would be appreciate=
+d
+>=20
+> Context: I would like to take recoverable, consistent, incremental
+> backups of kvm vms, whose disks are backed either by qcow2 or raw image=
+s.
+> Lets say there is a vm:vm1 with drive1 backed by image chain( A <-- B )=
+=2E
+> This are the rough steps i would like to do.
+>=20
+> Method 1:
+> Backup:
+> 1. Perform a full backup using `drive-backup(drive1, sync=3Dfull, dest =
+=3D
+> /nfs/vm1/drive1)`. Use transaction to do `block-dirty-bitmap-add(drive1=
+,
+> bitmap1)`. Store the vm config seperately
+> 2. Perform an incremental backup using `drive-backup(drive1,
+> sync=3Dincremental, mode=3Dexisting, bitmap=3Dbitmap1, dest=3D/nfs/vm1/=
+drive1)`.
+> Store the vm config seperately
+> 3. Rinse and repeat.
+> Recovery(Just the latest backup, incremental not required):
+>     Copy the full qcow2 from nfs to host storage. Spawn a new vm with t=
+he
+> same vm config.
+> Temporary quick recovery:
+>     Create a new qcow2 layer on top of existing /nfs/vm1/drive1 on the =
+nfs
+> storage itself. Spawn a new vm with disk on nfs storage itself.
 
-Alistair
+Sounds like it should work; using qemu to push the backup out.
 
-> ---
->  configure                   |   1 +
->  gdb-xml/riscv-64bit-cpu.xml |  43 ++++++++
->  gdb-xml/riscv-64bit-csr.xml | 250 ++++++++++++++++++++++++++++++++++++++++++++
->  gdb-xml/riscv-64bit-fpu.xml |  52 +++++++++
->  4 files changed, 346 insertions(+)
->  create mode 100644 gdb-xml/riscv-64bit-cpu.xml
->  create mode 100644 gdb-xml/riscv-64bit-csr.xml
->  create mode 100644 gdb-xml/riscv-64bit-fpu.xml
->
-> diff --git a/configure b/configure
-> index 4e05eed..00b7495 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7215,6 +7215,7 @@ case "$target_name" in
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
->      target_compiler=$cross_cc_riscv64
->    ;;
->    sh4|sh4eb)
-> diff --git a/gdb-xml/riscv-64bit-cpu.xml b/gdb-xml/riscv-64bit-cpu.xml
-> new file mode 100644
-> index 0000000..f37d7f3
-> --- /dev/null
-> +++ b/gdb-xml/riscv-64bit-cpu.xml
-> @@ -0,0 +1,43 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2018 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.riscv.cpu">
-> +  <reg name="zero" bitsize="64" type="int"/>
-> +  <reg name="ra" bitsize="64" type="code_ptr"/>
-> +  <reg name="sp" bitsize="64" type="data_ptr"/>
-> +  <reg name="gp" bitsize="64" type="data_ptr"/>
-> +  <reg name="tp" bitsize="64" type="data_ptr"/>
-> +  <reg name="t0" bitsize="64" type="int"/>
-> +  <reg name="t1" bitsize="64" type="int"/>
-> +  <reg name="t2" bitsize="64" type="int"/>
-> +  <reg name="fp" bitsize="64" type="data_ptr"/>
-> +  <reg name="s1" bitsize="64" type="int"/>
-> +  <reg name="a0" bitsize="64" type="int"/>
-> +  <reg name="a1" bitsize="64" type="int"/>
-> +  <reg name="a2" bitsize="64" type="int"/>
-> +  <reg name="a3" bitsize="64" type="int"/>
-> +  <reg name="a4" bitsize="64" type="int"/>
-> +  <reg name="a5" bitsize="64" type="int"/>
-> +  <reg name="a6" bitsize="64" type="int"/>
-> +  <reg name="a7" bitsize="64" type="int"/>
-> +  <reg name="s2" bitsize="64" type="int"/>
-> +  <reg name="s3" bitsize="64" type="int"/>
-> +  <reg name="s4" bitsize="64" type="int"/>
-> +  <reg name="s5" bitsize="64" type="int"/>
-> +  <reg name="s6" bitsize="64" type="int"/>
-> +  <reg name="s7" bitsize="64" type="int"/>
-> +  <reg name="s8" bitsize="64" type="int"/>
-> +  <reg name="s9" bitsize="64" type="int"/>
-> +  <reg name="s10" bitsize="64" type="int"/>
-> +  <reg name="s11" bitsize="64" type="int"/>
-> +  <reg name="t3" bitsize="64" type="int"/>
-> +  <reg name="t4" bitsize="64" type="int"/>
-> +  <reg name="t5" bitsize="64" type="int"/>
-> +  <reg name="t6" bitsize="64" type="int"/>
-> +  <reg name="pc" bitsize="64" type="code_ptr"/>
-> +</feature>
-> diff --git a/gdb-xml/riscv-64bit-csr.xml b/gdb-xml/riscv-64bit-csr.xml
-> new file mode 100644
-> index 0000000..a3de834
-> --- /dev/null
-> +++ b/gdb-xml/riscv-64bit-csr.xml
-> @@ -0,0 +1,250 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2018 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.riscv.csr">
-> +  <reg name="ustatus" bitsize="64"/>
-> +  <reg name="uie" bitsize="64"/>
-> +  <reg name="utvec" bitsize="64"/>
-> +  <reg name="uscratch" bitsize="64"/>
-> +  <reg name="uepc" bitsize="64"/>
-> +  <reg name="ucause" bitsize="64"/>
-> +  <reg name="utval" bitsize="64"/>
-> +  <reg name="uip" bitsize="64"/>
-> +  <reg name="fflags" bitsize="64"/>
-> +  <reg name="frm" bitsize="64"/>
-> +  <reg name="fcsr" bitsize="64"/>
-> +  <reg name="cycle" bitsize="64"/>
-> +  <reg name="time" bitsize="64"/>
-> +  <reg name="instret" bitsize="64"/>
-> +  <reg name="hpmcounter3" bitsize="64"/>
-> +  <reg name="hpmcounter4" bitsize="64"/>
-> +  <reg name="hpmcounter5" bitsize="64"/>
-> +  <reg name="hpmcounter6" bitsize="64"/>
-> +  <reg name="hpmcounter7" bitsize="64"/>
-> +  <reg name="hpmcounter8" bitsize="64"/>
-> +  <reg name="hpmcounter9" bitsize="64"/>
-> +  <reg name="hpmcounter10" bitsize="64"/>
-> +  <reg name="hpmcounter11" bitsize="64"/>
-> +  <reg name="hpmcounter12" bitsize="64"/>
-> +  <reg name="hpmcounter13" bitsize="64"/>
-> +  <reg name="hpmcounter14" bitsize="64"/>
-> +  <reg name="hpmcounter15" bitsize="64"/>
-> +  <reg name="hpmcounter16" bitsize="64"/>
-> +  <reg name="hpmcounter17" bitsize="64"/>
-> +  <reg name="hpmcounter18" bitsize="64"/>
-> +  <reg name="hpmcounter19" bitsize="64"/>
-> +  <reg name="hpmcounter20" bitsize="64"/>
-> +  <reg name="hpmcounter21" bitsize="64"/>
-> +  <reg name="hpmcounter22" bitsize="64"/>
-> +  <reg name="hpmcounter23" bitsize="64"/>
-> +  <reg name="hpmcounter24" bitsize="64"/>
-> +  <reg name="hpmcounter25" bitsize="64"/>
-> +  <reg name="hpmcounter26" bitsize="64"/>
-> +  <reg name="hpmcounter27" bitsize="64"/>
-> +  <reg name="hpmcounter28" bitsize="64"/>
-> +  <reg name="hpmcounter29" bitsize="64"/>
-> +  <reg name="hpmcounter30" bitsize="64"/>
-> +  <reg name="hpmcounter31" bitsize="64"/>
-> +  <reg name="cycleh" bitsize="64"/>
-> +  <reg name="timeh" bitsize="64"/>
-> +  <reg name="instreth" bitsize="64"/>
-> +  <reg name="hpmcounter3h" bitsize="64"/>
-> +  <reg name="hpmcounter4h" bitsize="64"/>
-> +  <reg name="hpmcounter5h" bitsize="64"/>
-> +  <reg name="hpmcounter6h" bitsize="64"/>
-> +  <reg name="hpmcounter7h" bitsize="64"/>
-> +  <reg name="hpmcounter8h" bitsize="64"/>
-> +  <reg name="hpmcounter9h" bitsize="64"/>
-> +  <reg name="hpmcounter10h" bitsize="64"/>
-> +  <reg name="hpmcounter11h" bitsize="64"/>
-> +  <reg name="hpmcounter12h" bitsize="64"/>
-> +  <reg name="hpmcounter13h" bitsize="64"/>
-> +  <reg name="hpmcounter14h" bitsize="64"/>
-> +  <reg name="hpmcounter15h" bitsize="64"/>
-> +  <reg name="hpmcounter16h" bitsize="64"/>
-> +  <reg name="hpmcounter17h" bitsize="64"/>
-> +  <reg name="hpmcounter18h" bitsize="64"/>
-> +  <reg name="hpmcounter19h" bitsize="64"/>
-> +  <reg name="hpmcounter20h" bitsize="64"/>
-> +  <reg name="hpmcounter21h" bitsize="64"/>
-> +  <reg name="hpmcounter22h" bitsize="64"/>
-> +  <reg name="hpmcounter23h" bitsize="64"/>
-> +  <reg name="hpmcounter24h" bitsize="64"/>
-> +  <reg name="hpmcounter25h" bitsize="64"/>
-> +  <reg name="hpmcounter26h" bitsize="64"/>
-> +  <reg name="hpmcounter27h" bitsize="64"/>
-> +  <reg name="hpmcounter28h" bitsize="64"/>
-> +  <reg name="hpmcounter29h" bitsize="64"/>
-> +  <reg name="hpmcounter30h" bitsize="64"/>
-> +  <reg name="hpmcounter31h" bitsize="64"/>
-> +  <reg name="sstatus" bitsize="64"/>
-> +  <reg name="sedeleg" bitsize="64"/>
-> +  <reg name="sideleg" bitsize="64"/>
-> +  <reg name="sie" bitsize="64"/>
-> +  <reg name="stvec" bitsize="64"/>
-> +  <reg name="scounteren" bitsize="64"/>
-> +  <reg name="sscratch" bitsize="64"/>
-> +  <reg name="sepc" bitsize="64"/>
-> +  <reg name="scause" bitsize="64"/>
-> +  <reg name="stval" bitsize="64"/>
-> +  <reg name="sip" bitsize="64"/>
-> +  <reg name="satp" bitsize="64"/>
-> +  <reg name="mvendorid" bitsize="64"/>
-> +  <reg name="marchid" bitsize="64"/>
-> +  <reg name="mimpid" bitsize="64"/>
-> +  <reg name="mhartid" bitsize="64"/>
-> +  <reg name="mstatus" bitsize="64"/>
-> +  <reg name="misa" bitsize="64"/>
-> +  <reg name="medeleg" bitsize="64"/>
-> +  <reg name="mideleg" bitsize="64"/>
-> +  <reg name="mie" bitsize="64"/>
-> +  <reg name="mtvec" bitsize="64"/>
-> +  <reg name="mcounteren" bitsize="64"/>
-> +  <reg name="mscratch" bitsize="64"/>
-> +  <reg name="mepc" bitsize="64"/>
-> +  <reg name="mcause" bitsize="64"/>
-> +  <reg name="mtval" bitsize="64"/>
-> +  <reg name="mip" bitsize="64"/>
-> +  <reg name="pmpcfg0" bitsize="64"/>
-> +  <reg name="pmpcfg1" bitsize="64"/>
-> +  <reg name="pmpcfg2" bitsize="64"/>
-> +  <reg name="pmpcfg3" bitsize="64"/>
-> +  <reg name="pmpaddr0" bitsize="64"/>
-> +  <reg name="pmpaddr1" bitsize="64"/>
-> +  <reg name="pmpaddr2" bitsize="64"/>
-> +  <reg name="pmpaddr3" bitsize="64"/>
-> +  <reg name="pmpaddr4" bitsize="64"/>
-> +  <reg name="pmpaddr5" bitsize="64"/>
-> +  <reg name="pmpaddr6" bitsize="64"/>
-> +  <reg name="pmpaddr7" bitsize="64"/>
-> +  <reg name="pmpaddr8" bitsize="64"/>
-> +  <reg name="pmpaddr9" bitsize="64"/>
-> +  <reg name="pmpaddr10" bitsize="64"/>
-> +  <reg name="pmpaddr11" bitsize="64"/>
-> +  <reg name="pmpaddr12" bitsize="64"/>
-> +  <reg name="pmpaddr13" bitsize="64"/>
-> +  <reg name="pmpaddr14" bitsize="64"/>
-> +  <reg name="pmpaddr15" bitsize="64"/>
-> +  <reg name="mcycle" bitsize="64"/>
-> +  <reg name="minstret" bitsize="64"/>
-> +  <reg name="mhpmcounter3" bitsize="64"/>
-> +  <reg name="mhpmcounter4" bitsize="64"/>
-> +  <reg name="mhpmcounter5" bitsize="64"/>
-> +  <reg name="mhpmcounter6" bitsize="64"/>
-> +  <reg name="mhpmcounter7" bitsize="64"/>
-> +  <reg name="mhpmcounter8" bitsize="64"/>
-> +  <reg name="mhpmcounter9" bitsize="64"/>
-> +  <reg name="mhpmcounter10" bitsize="64"/>
-> +  <reg name="mhpmcounter11" bitsize="64"/>
-> +  <reg name="mhpmcounter12" bitsize="64"/>
-> +  <reg name="mhpmcounter13" bitsize="64"/>
-> +  <reg name="mhpmcounter14" bitsize="64"/>
-> +  <reg name="mhpmcounter15" bitsize="64"/>
-> +  <reg name="mhpmcounter16" bitsize="64"/>
-> +  <reg name="mhpmcounter17" bitsize="64"/>
-> +  <reg name="mhpmcounter18" bitsize="64"/>
-> +  <reg name="mhpmcounter19" bitsize="64"/>
-> +  <reg name="mhpmcounter20" bitsize="64"/>
-> +  <reg name="mhpmcounter21" bitsize="64"/>
-> +  <reg name="mhpmcounter22" bitsize="64"/>
-> +  <reg name="mhpmcounter23" bitsize="64"/>
-> +  <reg name="mhpmcounter24" bitsize="64"/>
-> +  <reg name="mhpmcounter25" bitsize="64"/>
-> +  <reg name="mhpmcounter26" bitsize="64"/>
-> +  <reg name="mhpmcounter27" bitsize="64"/>
-> +  <reg name="mhpmcounter28" bitsize="64"/>
-> +  <reg name="mhpmcounter29" bitsize="64"/>
-> +  <reg name="mhpmcounter30" bitsize="64"/>
-> +  <reg name="mhpmcounter31" bitsize="64"/>
-> +  <reg name="mcycleh" bitsize="64"/>
-> +  <reg name="minstreth" bitsize="64"/>
-> +  <reg name="mhpmcounter3h" bitsize="64"/>
-> +  <reg name="mhpmcounter4h" bitsize="64"/>
-> +  <reg name="mhpmcounter5h" bitsize="64"/>
-> +  <reg name="mhpmcounter6h" bitsize="64"/>
-> +  <reg name="mhpmcounter7h" bitsize="64"/>
-> +  <reg name="mhpmcounter8h" bitsize="64"/>
-> +  <reg name="mhpmcounter9h" bitsize="64"/>
-> +  <reg name="mhpmcounter10h" bitsize="64"/>
-> +  <reg name="mhpmcounter11h" bitsize="64"/>
-> +  <reg name="mhpmcounter12h" bitsize="64"/>
-> +  <reg name="mhpmcounter13h" bitsize="64"/>
-> +  <reg name="mhpmcounter14h" bitsize="64"/>
-> +  <reg name="mhpmcounter15h" bitsize="64"/>
-> +  <reg name="mhpmcounter16h" bitsize="64"/>
-> +  <reg name="mhpmcounter17h" bitsize="64"/>
-> +  <reg name="mhpmcounter18h" bitsize="64"/>
-> +  <reg name="mhpmcounter19h" bitsize="64"/>
-> +  <reg name="mhpmcounter20h" bitsize="64"/>
-> +  <reg name="mhpmcounter21h" bitsize="64"/>
-> +  <reg name="mhpmcounter22h" bitsize="64"/>
-> +  <reg name="mhpmcounter23h" bitsize="64"/>
-> +  <reg name="mhpmcounter24h" bitsize="64"/>
-> +  <reg name="mhpmcounter25h" bitsize="64"/>
-> +  <reg name="mhpmcounter26h" bitsize="64"/>
-> +  <reg name="mhpmcounter27h" bitsize="64"/>
-> +  <reg name="mhpmcounter28h" bitsize="64"/>
-> +  <reg name="mhpmcounter29h" bitsize="64"/>
-> +  <reg name="mhpmcounter30h" bitsize="64"/>
-> +  <reg name="mhpmcounter31h" bitsize="64"/>
-> +  <reg name="mhpmevent3" bitsize="64"/>
-> +  <reg name="mhpmevent4" bitsize="64"/>
-> +  <reg name="mhpmevent5" bitsize="64"/>
-> +  <reg name="mhpmevent6" bitsize="64"/>
-> +  <reg name="mhpmevent7" bitsize="64"/>
-> +  <reg name="mhpmevent8" bitsize="64"/>
-> +  <reg name="mhpmevent9" bitsize="64"/>
-> +  <reg name="mhpmevent10" bitsize="64"/>
-> +  <reg name="mhpmevent11" bitsize="64"/>
-> +  <reg name="mhpmevent12" bitsize="64"/>
-> +  <reg name="mhpmevent13" bitsize="64"/>
-> +  <reg name="mhpmevent14" bitsize="64"/>
-> +  <reg name="mhpmevent15" bitsize="64"/>
-> +  <reg name="mhpmevent16" bitsize="64"/>
-> +  <reg name="mhpmevent17" bitsize="64"/>
-> +  <reg name="mhpmevent18" bitsize="64"/>
-> +  <reg name="mhpmevent19" bitsize="64"/>
-> +  <reg name="mhpmevent20" bitsize="64"/>
-> +  <reg name="mhpmevent21" bitsize="64"/>
-> +  <reg name="mhpmevent22" bitsize="64"/>
-> +  <reg name="mhpmevent23" bitsize="64"/>
-> +  <reg name="mhpmevent24" bitsize="64"/>
-> +  <reg name="mhpmevent25" bitsize="64"/>
-> +  <reg name="mhpmevent26" bitsize="64"/>
-> +  <reg name="mhpmevent27" bitsize="64"/>
-> +  <reg name="mhpmevent28" bitsize="64"/>
-> +  <reg name="mhpmevent29" bitsize="64"/>
-> +  <reg name="mhpmevent30" bitsize="64"/>
-> +  <reg name="mhpmevent31" bitsize="64"/>
-> +  <reg name="tselect" bitsize="64"/>
-> +  <reg name="tdata1" bitsize="64"/>
-> +  <reg name="tdata2" bitsize="64"/>
-> +  <reg name="tdata3" bitsize="64"/>
-> +  <reg name="dcsr" bitsize="64"/>
-> +  <reg name="dpc" bitsize="64"/>
-> +  <reg name="dscratch" bitsize="64"/>
-> +  <reg name="hstatus" bitsize="64"/>
-> +  <reg name="hedeleg" bitsize="64"/>
-> +  <reg name="hideleg" bitsize="64"/>
-> +  <reg name="hie" bitsize="64"/>
-> +  <reg name="htvec" bitsize="64"/>
-> +  <reg name="hscratch" bitsize="64"/>
-> +  <reg name="hepc" bitsize="64"/>
-> +  <reg name="hcause" bitsize="64"/>
-> +  <reg name="hbadaddr" bitsize="64"/>
-> +  <reg name="hip" bitsize="64"/>
-> +  <reg name="mbase" bitsize="64"/>
-> +  <reg name="mbound" bitsize="64"/>
-> +  <reg name="mibase" bitsize="64"/>
-> +  <reg name="mibound" bitsize="64"/>
-> +  <reg name="mdbase" bitsize="64"/>
-> +  <reg name="mdbound" bitsize="64"/>
-> +  <reg name="mucounteren" bitsize="64"/>
-> +  <reg name="mscounteren" bitsize="64"/>
-> +  <reg name="mhcounteren" bitsize="64"/>
-> +</feature>
-> diff --git a/gdb-xml/riscv-64bit-fpu.xml b/gdb-xml/riscv-64bit-fpu.xml
-> new file mode 100644
-> index 0000000..fb24b72
-> --- /dev/null
-> +++ b/gdb-xml/riscv-64bit-fpu.xml
-> @@ -0,0 +1,52 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2018 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.riscv.fpu">
-> +
-> +  <union id="riscv_double">
-> +    <field name="float" type="ieee_single"/>
-> +    <field name="double" type="ieee_double"/>
-> +  </union>
-> +
-> +  <reg name="ft0" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft1" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft2" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft3" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft4" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft5" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft6" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft7" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs0" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs1" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa0" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa1" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa2" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa3" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa4" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa5" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa6" bitsize="64" type="riscv_double"/>
-> +  <reg name="fa7" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs2" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs3" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs4" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs5" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs6" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs7" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs8" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs9" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs10" bitsize="64" type="riscv_double"/>
-> +  <reg name="fs11" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft8" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft9" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft10" bitsize="64" type="riscv_double"/>
-> +  <reg name="ft11" bitsize="64" type="riscv_double"/>
-> +
-> +  <reg name="fflags" bitsize="32" type="int"/>
-> +  <reg name="frm" bitsize="32" type="int"/>
-> +  <reg name="fcsr" bitsize="32" type="int"/>
-> +</feature>
-> --
-> 2.7.4
->
->
+> were
+> Issues i face:
+> 1. Does the drive-backup stall for the whole time the block job is in
+> progress. This is a strict no for me. I didnot find any documentation
+> regarding it but a powerpoint presentation(from kaskyapc) mentioning it=
+=2E
+> (Assuming yes!)
+
+The drive-backup is running in parallel to the guest.  I'm not sure what
+stalls you are seeing - but as qemu is doing all the work, it DOES have
+to service both guest requests and the work to copy out the backup;
+also, if you have known-inefficient lseek() situations, there may be
+cases where qemu is doing a lousy job (there's work underway on the list
+to improve qemu's caching of lseek() data).
+
+> 2. Is the backup consistent? Are the drive file-systems quiesced on bac=
+kup?
+> (Assuming no!)
+
+If you want the file systems quiesced on backup, then merely bracket
+your transaction that kicks off the drive-backup inside guest-agent
+commands that freeze and thaw the disk.  So, consistency is not default
+(because it requires trusting the guest), but is possible.
+
+>=20
+> To achieve both of the above, one hack i could think of was to take a
+> snapshot and read from the snapshot.
+>=20
+> Method 2:
+> 1. Perform a full backup using `drive-backup(drive1, sync=3Dfull, dest =
+=3D
+> /nfs/vm1/drive1)`. Use transaction to do `block-dirty-bitmap-add(drive1=
+,
+> bitmap1)`. Store the vm config seperately
+> 2. Perform the incremental backup by
+>      a. add bitmap2 to drive1 `block-dirty-bitmap-add(drive1, bitmap2)`=
+=2E
+>      b. Take a vm snapshot with drive1(exclude memory, quiesce). The dr=
+ive1
+> image chain is now A<--B<--C.
+>      c. Take incremental using bitmap1 but using data from node B.
+> `drive-backup(*#nodeB*, sync=3Dincremental, mode=3Dexisting, bitmap=3Db=
+itmap1,
+> dest=3D/nfs/vm1/drive1)`
+>      d. Delete bitmap1 `block-dirty-bitmap-delete(drive1, bitmap1)`
+>      e. Delete vm snapshot on drive1. The drive1 image chain is now A <=
+--B.
+>      f. bitmap2 now tracks the changes from incrementa 1 to incremental=
+ 2.
+>=20
+> Drawbacks with this method would be(had it worked) that incremental bac=
+kups
+> would contain dirty blocks that are a superset of the actual blocks tha=
+t
+> are changed between the snapshot and the last snapshot.(Incremental x w=
+ould
+> contain blocks that have changed when incremental x-1 backup was in
+> progress). But there are no correctness issues.
+>=20
+>=20
+> *I cannot do this because drive-backup doesnot allow bitmap and node th=
+at
+> the bitmap is attached to, to be different. :( *
+
+It might, as long as the bitmap is found on the backing chain (I'm a bit
+fuzzier on that case, but KNOW that for pull-mode backups, my libvirt
+code is definitely relying on being able to access the bitmap from the
+backing file of the BDS being exported over NBD).
+
+> Some other issues i was facing that i worked around:
+> 1. Lets say i have to backup a vm with 2 disks(both at a fixed point in=
+
+> time, either both fail or both pass). To atomically do a bitmap-add and=
+
+> drive-backup(sync=3Dfull) i can use transcations. To achieve a backup a=
+t a
+> fixed point in time, i can use transaction with multiple drive-backups.=
+ To
+> either fail the whole backup or succeed(when multiple drives are presen=
+t),
+> i can use completion-mode =3D grouped. But then i cant combine them as =
+its
+> not supported. i.e, do a
+>     Transaction{drive-backup(drive1), dirty-bitmap-add(drive1,
+> bitmap1),drive-backup(drive2), dirty-bitmap-add(drive2, bitmap1),
+> completion-mode=3Dgrouped}.
+
+What error message are you getting?  I'm not surprised if
+completion-mode=3Dgrouped isn't playing nicely with bitmaps in
+transactions, although that should be something that we should fix.
+
+>  Workaround: Create bitmaps first, then take full. Effect: Incrementals=
+
+> would be a small superset of actual changed blocks.
+> 2. Why do I need to dismiss old jobs to start a new job on node. I want=
+ to
+> retain the block-job end state for a day before i clear them. So i set
+> auto-dismiss to false. This doesnot allow new jobs to run unless the ol=
+d
+> job is dismissed even if state=3Dconcluded.
+
+Yes, there is probably more work needed to make parallel jobs do what
+people want.
+
+>  Workaround: no workaround, store the end-job-status somewhere else.
+> 3. Is there a way pre 2.12 to achieve auto-finalise =3D false in a
+> transaction. Can I somehow add a dummy block job, that will only finish=
+
+> when i want to finalise the actual 2 disks block jobs? My backup workfl=
+ow
+> needs to run on env's pre 2.12.
+
+Ouch - backups pre-2.12 have issues.  If I had not read this paragraph,
+my recommendation would be to stick to 3.1 and use pull-mode backups
+(where you use NBD to learn which portions of the image were dirtied,
+and pull those portions of the disk over NBD rather than qemu pushing
+them); I even have a working demo of preliminary libvirt code driving
+that which I presented at last year's KVM Forum.
+
+>  Workaround: Couldnot achieve this. So if an incremental fails after bl=
+ock
+> jobs succeed before i can ensure success(have to do some metadata
+> operations on my side), i retry with sync=3Dfull mode.
+>=20
+>=20
+> *So what is the recommeded way of taking backups with incremental bitma=
+ps
+> ? *
+> Thanks you for taking time to read through this.
+>=20
+> Best,
+> Bharadwaj.
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--dyU0aTasuFcMQhEdy1tdebxD4uA2GPBFK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxHkS4ACgkQp6FrSiUn
+Q2o1NAf+M0jKR3hSJfU2Y3APR1eOBkalt1hbZpq0BfdVrpzElKpBtGMxSsT+OGGp
+87xWDajh9oa3lzqsUF1OyrGftiSd+Ni6EzIh0IQxspD9FIjBcFWtSZh8aZFCGSMF
+ve9DLny4tDngeifm+nTIPIDqqWLWl21vXVuJkn6VUr0kZcYS13QbaenbY3fz3EZt
+R4Ei3R0PHAf+Jk9U492cEPmUzwItnMbM4n1XFBSxyXHGjBWGCqMCDt5Ow6Zfg2uB
+3+kOdg6r7OFIZLOW1OsX50+t2CzhUMZAw8ZjGfHT2n7WI3dbPJ0A8etqJuwy+zOa
+IRwJv20Wad5RDg8mhAUPUyuSml394g==
+=jJEo
+-----END PGP SIGNATURE-----
+
+--dyU0aTasuFcMQhEdy1tdebxD4uA2GPBFK--
