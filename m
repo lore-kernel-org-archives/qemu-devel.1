@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46527)
+Received: from eggs.gnu.org ([209.51.188.92]:46777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4W7-000313-D2
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:27:36 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4W8-0003C7-L7
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4II-0006iT-1T
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:18 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:41791)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gm4IG-0006hO-5R
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:16 -0500
+Received: from mail-lj1-x231.google.com ([2a00:1450:4864:20::231]:44047)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gm4IH-0006hs-Qw
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:17 -0500
-Received: by mail-lf1-x141.google.com with SMTP id c16so85836lfj.8
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 14:13:17 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gm4IF-0006g9-Uz
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 17:13:16 -0500
+Received: by mail-lj1-x231.google.com with SMTP id k19-v6so88171lji.11
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 14:13:15 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 22 Jan 2019 14:12:55 -0800
-Message-Id: <20190122221256.20883-2-jcmvbkbc@gmail.com>
-In-Reply-To: <20190122221256.20883-1-jcmvbkbc@gmail.com>
-References: <20190122221256.20883-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/2] hw/xtensa: xtfpga: fix bootloader
- placement in SMP
+Date: Tue, 22 Jan 2019 14:12:54 -0800
+Message-Id: <20190122221256.20883-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/2] hw/xtensa: xtfpga board improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +26,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Use BSP reset PC as a place for the mini-bootloader because in SMP
-configurations APs and BSP may have different boot addresses.
-This fixes SMP linux uImage boot on xtfpga boards.
+Hello,
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- hw/xtensa/xtfpga.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+this series adds two improvements for the XTFPGA board:
+- use BSP core reset vector to place mini bootloader, because AP
+  cores may have different reset vector address;
+- expose actual core frequency in the FPGA register instead of the
+  fixed 10MHz value.
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 21094319a659..d3afdfc247a7 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -234,10 +234,15 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-     int n;
- 
-     for (n = 0; n < smp_cpus; n++) {
-+        CPUXtensaState *cenv = NULL;
-+
-         cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
--        env = &cpu->env;
-+        cenv = &cpu->env;
-+        if (!env) {
-+            env = cenv;
-+        }
- 
--        env->sregs[PRID] = n;
-+        cenv->sregs[PRID] = n;
-         qemu_register_reset(xtfpga_reset, cpu);
-         /* Need MMU initialized prior to ELF loading,
-          * so that ELF gets loaded into virtual addresses
+Max Filippov (2):
+  hw/xtensa: xtfpga: fix bootloader placement in SMP
+  hw/xtensa: xtfpga: use core frequency
+
+ hw/xtensa/xtfpga.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
 -- 
 2.11.0
