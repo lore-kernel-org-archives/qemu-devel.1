@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49732)
+Received: from eggs.gnu.org ([209.51.188.92]:49684)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
-	id 1gm17j-0007LV-Si
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:13 -0500
+	id 1gm17h-0007L2-O8
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
-	id 1gm17i-0007OT-9E
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:11 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:13810)
+	id 1gm17f-0007K4-W3
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:09 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:13794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=9187e18d5=Paul.Durrant@citrix.com>)
-	id 1gm17h-0007Kh-Rd
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:10 -0500
+	id 1gm17d-0007EA-TX
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 13:50:07 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Tue, 22 Jan 2019 15:53:46 +0000
-Message-ID: <20190122155346.26388-1-paul.durrant@citrix.com>
+Date: Tue, 22 Jan 2019 14:40:28 +0000
+Message-ID: <20190122144028.11518-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] xen: fix xen-bus state model to allow
- frontend re-connection
+Subject: [Qemu-devel] [PATCH] xen: fix xen-bus state model to allow frontend
+ re-connection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,18 +51,15 @@ Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
-
-v2:
- - Fix xl block-detach
 ---
- hw/xen/xen-bus.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ hw/xen/xen-bus.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
 diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 3aeccec69c..49a725e8c7 100644
+index 3aeccec69c..1b31a1dc50 100644
 --- a/hw/xen/xen-bus.c
 +++ b/hw/xen/xen-bus.c
-@@ -547,20 +547,15 @@ static void xen_device_backend_changed(void *opaque)
+@@ -547,20 +547,12 @@ static void xen_device_backend_changed(void *opaque)
      }
  
      /*
@@ -76,22 +73,18 @@ index 3aeccec69c..49a725e8c7 100644
 +     * once the state is Closed.
       */
 -    if (xendev->backend_online &&
--        xendev->backend_state == XenbusStateClosed) {
++    if (!xendev->backend_online &&
+         xendev->backend_state == XenbusStateClosed) {
 -        xen_device_backend_set_state(xendev, XenbusStateInitWait);
 -    } else if (!xendev->backend_online &&
 -               (xendev->backend_state == XenbusStateClosed ||
 -                xendev->backend_state == XenbusStateInitialising ||
 -                xendev->backend_state == XenbusStateInitWait ||
 -                xendev->backend_state == XenbusStateUnknown)) {
-+    if (!xendev->backend_online &&
-+        (xendev->backend_state == XenbusStateClosed ||
-+         xendev->backend_state == XenbusStateInitialising ||
-+         xendev->backend_state == XenbusStateInitWait ||
-+         xendev->backend_state == XenbusStateUnknown)) {
          Error *local_err = NULL;
  
          if (!xen_backend_try_device_destroy(xendev, &local_err)) {
-@@ -715,6 +710,17 @@ static void xen_device_frontend_changed(void *opaque)
+@@ -715,6 +707,17 @@ static void xen_device_frontend_changed(void *opaque)
  
      xen_device_frontend_set_state(xendev, state);
  
