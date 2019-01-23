@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52850)
+Received: from eggs.gnu.org ([209.51.188.92]:52823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gmIWR-0001yE-Kk
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIWW-0001y4-0q
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gmIRS-0001fx-Fz
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:19:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIUg-0003QX-8c
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:23:08 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 23 Jan 2019 13:22:58 +0000
+Message-ID: <76562236-6535-a064-e8ed-6c2c2e285ac5@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-2-vsementsov@virtuozzo.com>
-	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-	<5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
-	<29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
-	<9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
-	<352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
-	<7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d1251978-6677-c022-d6f1-353717600ea5@redhat.com>
-Date: Wed, 23 Jan 2019 14:19:26 +0100
+	<20181229122027.42245-6-vsementsov@virtuozzo.com>
+	<a4565e50-b670-333e-a3db-72ff5a42b776@redhat.com>
+	<084ff0b6-1de8-1c17-f085-97a8b1aeb8b5@virtuozzo.com>
+	<fab4d292-ea59-5e1f-ec43-486abc455e7c@redhat.com>
+In-Reply-To: <fab4d292-ea59-5e1f-ec43-486abc455e7c@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E55CD8BED86E91418B45E6D7E22162B3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PctbajD6vvt68iTBFeQOTrCDKY3403cID"
-Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
+Subject: Re: [Qemu-devel] [PATCH v5 05/11] iotests: allow resume_drive by
+ node name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,153 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PctbajD6vvt68iTBFeQOTrCDKY3403cID
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com"
- <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>
-Message-ID: <d1251978-6677-c022-d6f1-353717600ea5@redhat.com>
-Subject: Re: [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
- <20181229122027.42245-2-vsementsov@virtuozzo.com>
- <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
- <5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
- <29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
- <9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
- <352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
- <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 23.01.19 09:20, Vladimir Sementsov-Ogievskiy wrote:
-> 16.01.2019 16:05, Max Reitz wrote:
->> On 14.01.19 15:48, Vladimir Sementsov-Ogievskiy wrote:
->>> 14.01.2019 17:13, Max Reitz wrote:
->>>> On 14.01.19 15:01, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 14.01.2019 16:10, Max Reitz wrote:
->>>>>> On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> Simplify backup_incremental_init_copy_bitmap using the function
->>>>>>> bdrv_dirty_bitmap_next_dirty_area.
->>>>>>>
->>>>>>> Note: move to job->len instead of bitmap size: it should not matt=
-er but
->>>>>>> less code.
->>>>>>>
->>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
-=2Ecom>
->>>>>>> ---
->>>>>>>     block/backup.c | 40 ++++++++++++----------------------------
->>>>>>>     1 file changed, 12 insertions(+), 28 deletions(-)
->>>>>>
->>>>>> Overall: What is this function even supposed to do?  To me, it loo=
-ks
->>>>>> like it marks all areas in job->copy_bitmap dirty that are dirty i=
-n
->>>>>> job->sync_bitmap.
->>>>>>
->>>>>> If so, wouldn't just replacing this by hbitmap_merge() simplify th=
-ings
->>>>>> further?
->>>>>>
->>>>>>> diff --git a/block/backup.c b/block/backup.c
->>>>>>> index 435414e964..fbe7ce19e1 100644
->>>>>>> --- a/block/backup.c
->>>>>>> +++ b/block/backup.c
->>>>>>> @@ -406,43 +406,27 @@ static int coroutine_fn backup_run_incremen=
-tal(BackupBlockJob *job)
->>>>>>
->>>>>> [...]
->>>>>>
->>>>>>> +    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
->>>>>>> +                                             &offset, &bytes))
->>>>>>> +    {
->>>>>>> +        uint64_t cluster =3D offset / job->cluster_size;
->>>>>>> +        uint64_t last_cluster =3D (offset + bytes) / job->cluste=
-r_size;
->>>>>>>    =20
->>>>>>> -        next_cluster =3D DIV_ROUND_UP(offset, job->cluster_size)=
-;
->>>>>>> -        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cl=
-uster);
->>>>>>> -        if (next_cluster >=3D end) {
->>>>>>> +        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cl=
-uster + 1);
->>>>>>
->>>>>> Why the +1?  Shouldn't the division for last_cluster round up inst=
-ead?
->>>>>>
->>>>>>> +
->>>>>>> +        offset =3D (last_cluster + 1) * job->cluster_size;
->>>>>>
->>>>>> Same here.
->>>>>
->>>>> last cluster is not "end", but it's last dirty cluster. so number o=
-f dirty clusters is last_cluster - cluster + 1, and next offset is calcul=
-ated through +1 too.
->>>>>
->>>>> If I round up division result, I'll get last for most cases, but "e=
-nd" (next after the last), for the case when offset % job->cluster_size =3D=
-=3D 0, so, how to use it?
->>>>
->>>> Doesn't bdrv_dirty_bitmap_next_dirty_area() return a range [offset,
->>>> offset + bytes), i.e. where "offset + bytes" is the first clean offs=
-et?
->>>
->>> oops, you are right. then I need
->>> uint64_t last_cluster =3D (offset + bytes - 1) / job->cluster_size;
->>
->> That, or you just use a rounding up division and rename it from
->> last_cluster to end_cluster or first_clean_cluster or something (and
->> subsequently drop the +1s).
->=20
-> This will not work, as ((offset + bytes) / job->cluster_size) is not fi=
-rst clean cluster
-> or end cluster. It's a cluster, where is first clean bit located, but i=
-t may have dirty
-> bits too (or, may not).
->=20
-> So, to rewrite based on end_cluster, it should be calculated as
->=20
-> (offset + bytes - 1) / job->cluster_size + 1
-
-That's why I asked "Shouldn't the division for last_cluster round up
-instead?"
-
-Max
-
-> and, I'm going to do so, one "+1" instead of two, and, may be, a bit mo=
-re understandable.
->=20
-
-
-
---PctbajD6vvt68iTBFeQOTrCDKY3403cID
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxIad4ACgkQ9AfbAGHV
-z0CNigf8CyPYsSueAmoTu4onzOy3y/u4x++BZ6rGLXIvE1koTgs/auz0ypOr43/x
-FGt6phrLkNTZNCzzu88yEdheReLrynZShW1AQdn9aDJVu2QJ88107iO9l8xlWozw
-B6XWzO4q1hCbex3NNDFhQ1tcuOKdC3Y2wE6mZiU8c8m21EYD9QdrbrtFCO4k3cze
-qgapS/wzgoageRlzoRvuCWzAN7eVL048JFpBBQAkBsq/O1wBxJVNnIwTo3q3kRzX
-wbvpFePYQJBOXLeuhy3/zq33jCZl12rqdD614uot18rKyDE3vvToLnZVDE5So90p
-/3QRTb+TRa3JqWo1QbFtrPzFC+7xCQ==
-=G3wp
------END PGP SIGNATURE-----
-
---PctbajD6vvt68iTBFeQOTrCDKY3403cID--
+MTYuMDEuMjAxOSAxNjoxMSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4wMS4xOSAxNzowNiwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDE0LjAxLjIwMTkgMTc6NDYs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyOS4xMi4xOCAxMzoyMCwgVmxhZGltaXIgU2VtZW50
+c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gQWZ0ZXIgbm9kZSBncmFwaCBjaGFuZ2VzLCB3ZSBt
+YXkgbm90IGJlIGFibGUgdG8gcmVzdW1lX2RyaXZlIGJ5IGRldmljZQ0KPj4+PiBuYW1lIChiYWNr
+aW5nIGZpbGVzIGFyZSBub3QgcmVjdXJzaXZlbHkgc2VhcmNoZWQpLiBTbywgbGV0cyBhbGxvdyB0
+bw0KPj4+PiByZXN1bWUgYnkgbm9kZS1uYW1lLiBTZXQgY29uc3RhbnQgbmFtZSBmb3IgYnJlYWtw
+b2ludHMsIHRvIGF2b2lkDQo+Pj4+IGludHJvZHVjaW5nIGV4dHJhIHBhcmFtZXRlcnMuDQo+Pj4N
+Cj4+PiBIbSwgSSBkb24ndCBxdWl0ZSB1bmRlcnN0YW5kIHRoaXMgcmVhc29uLiAgSXMgdGhpcyBz
+byB5b3UgY2FuIGNyZWF0ZQ0KPj4+IGJyZWFrcG9pbnRzIG9uIG9uZSBub2RlICh3aGljaCBmYWxs
+cyB0aHJvdWdoIHRvIHRoZSBmaXJzdCBibGtkZWJ1ZyBub2RlKQ0KPj4+IGFuZCB0aGVuIHJlbW92
+ZSB0aGVtIGZyb20gYW5vdGhlciAoZmFsbGluZyB0aHJvdWdoIHRvIHRoZSBzYW1lIGJsa2RlYnVn
+DQo+Pj4gbm9kZSk/DQo+Pg0KPj4gYWRkL3JlbW92ZSBicmVha3BvaW50IGdvZXMgdGhyb3VnaCAt
+PmZpbGUgY2hpbGRyZW4sIGJ1dCBteSBmaWx0ZXIgbGlua3MNCj4+IGFjdGl2ZSBkaXNrIGFzIC0+
+YmFja2luZy4gU28sIGJlZm9yZSBibG9jay1qb2Igc3RhcnQgd2UgY2FuIGluc2VydCBicmVha3Bv
+aW50DQo+PiBieSBkZXZpY2UgbmFtZS4gQnV0IHRoZW4sIHdoZW4gZmlsdGVyIGluc2VydGVkLCB3
+ZSBjYW4ndCByZW1vdmUgYnJlYWtwb2ludCwNCj4+IGJlY2F1c2UgbXkgZmlsdGVyIGhpZGVzIGJs
+a2RlYnVnIHdpdGggYWN0aXZlIGRpc2sgdW5kZXIgLT5iYWNraW5nIGxpbmsuDQo+Pg0KPj4gTWF5
+YmUsIHJpZ2h0IHNvbHV0aW9uIHdvdWxkIGJlIHN1cHBvcnQgYmFja2luZyBsaW5rcyBpbiBiZHJ2
+X2RlYnVnX2JyZWFrcG9pbnQoKQ0KPj4gYW5kIGJkcnZfZGVidWdfcmVtb3ZlX2JyZWFrcG9pbnQo
+KSBmb3IgdGhlIGNhc2Ugd2hlbiB0aGVyZSBpcyBubyBmaWxlIGNoaWxkLg0KPj4NCj4+IEJ1dCBi
+ZWluZyB1bnN1cmUgYWJvdXQgcmlnaHQgYmVoYXZpb3IsIEkndmUgZGVjaWRlZCB0byBhZGp1c3Qg
+dGhlIHRlc3QuDQo+Pg0KPj4gV2hhdCBhYm91dCBqdXN0IGRvIGJvdGggIGFkZC9yZW1vdmUgYnJl
+YWtwb2ludCB0aHJvdWdoIGJsa2RlYnVnIG5vZGUtbmFtZSwgdG8NCj4+IG1ha2UgaXQgbGVzcyB3
+ZWlyZD8NCj4gDQo+IFllcywgSSB3YXMgbW9zdGx5IHdvbmRlcmluZyBhYm91dCB0aGUgInNldCBj
+b25zdGFudCBuYW1lIGZvcg0KPiBicmVha3BvaW50cyIuICBJdCBkb2Vzbid0IHNlZW0gbmVjZXNz
+YXJ5IHRvIG1lOw0KDQpJdCdzIGp1c3QgdG8gbm90IGNyZWF0ZSBleHRyYSBwYXJhbWV0ZXJzIG9y
+IHNvbWV0aGluZy4gQ3VycmVudCBjb2RlIGRvbid0IGFsbG93DQp0byBjcmVhdGUgc2V2ZXJhbCBi
+cmVha3BvaW50cyBpbiBvbmUgYmxrZGVidWcgYW55d2F5IChhcyBAZHJpdmUgaXMgdXNlZCBhcw0K
+YnJlYWtwb2ludCBuYW1lKSwgc28gdGhlcmUgaXMgbm8gcmVhc29uIGZvciBkaWZmZXJlbnQgbmFt
+ZXMgYXQgYWxsLg0KDQpJJ2xsIGltcHJvdmUgY29tbWl0IG1lc3NhZ2UgdG8gbWFrZSBpdCBjbGVh
+bi4NCg0KaWYgeW91IHVzZSBub2RlIG5hbWVzLA0KPiB5b3UgY291bGQgYWRkcmVzcyB0aGUgYmxr
+ZGVidWcgbm9kZSBkaXJlY3RseSwgSSB3b3VsZCB0aGluay4NCj4gDQo+IE1heA0KPiANCj4+PiBX
+b3VsZG4ndCBpdCBiZSBiZXR0ZXIgdG8gbGV0IHRoZSB1c2VyIHNwZWNpZnkgdGhlIGJyZWFrcG9p
+bnQgbmFtZT8NCj4+DQo+PiBpdCdzIG5vdCBuZWVkZWQgbm93LiB3aXRoIGN1cnJlbnQgbmFtaW5n
+IHdlIGNhbiBoYXZlIG9uZSBicmVhay1wb2ludCBpbiBkZXZpY2UsDQo+PiBzbyB3ZSBkb24ndCBu
+ZWVkIGRpZmZlcmVudCBuYW1lcy4NCj4+DQo+Pj4NCj4+PiBNYXgNCj4+Pg0KPj4+PiBTaWduZWQt
+b2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
+by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8
+IDkgKysrKystLS0tDQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDQg
+ZGVsZXRpb25zKC0pDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMv
+aW90ZXN0cy5weSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+Pj4+IGluZGV4IDc2
+ODc3YWQ1ODQuLmM5Nzc5ZjQzMmYgMTAwNjQ0DQo+Pj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0
+cy9pb3Rlc3RzLnB5DQo+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+
+Pj4+IEBAIC00MTUsMTEgKzQxNSwxMSBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RNYWNoaW5l
+KToNCj4+Pj4gICAgICAgICAgICAgICAgc2VsZi5wYXVzZV9kcml2ZShkcml2ZSwgIndyaXRlX2Fp
+byIpDQo+Pj4+ICAgICAgICAgICAgICAgIHJldHVybg0KPj4+PiAgICAgICAgICAgIHNlbGYucW1w
+KCdodW1hbi1tb25pdG9yLWNvbW1hbmQnLA0KPj4+PiAtICAgICAgICAgICAgICAgICAgICBjb21t
+YW5kX2xpbmU9J3FlbXUtaW8gJXMgImJyZWFrICVzIGJwXyVzIicgJSAoZHJpdmUsIGV2ZW50LCBk
+cml2ZSkpDQo+Pj4+ICsgICAgICAgICAgICAgICAgICAgIGNvbW1hbmRfbGluZT0ncWVtdS1pbyAl
+cyAiYnJlYWsgJXMgYnBfMCInICUgKGRyaXZlLCBldmVudCkpDQo+Pj4+ICAgIA0KPj4+PiAgICAg
+ICAgZGVmIHJlc3VtZV9kcml2ZShzZWxmLCBkcml2ZSk6DQo+Pj4+ICAgICAgICAgICAgc2VsZi5x
+bXAoJ2h1bWFuLW1vbml0b3ItY29tbWFuZCcsDQo+Pj4+IC0gICAgICAgICAgICAgICAgICAgIGNv
+bW1hbmRfbGluZT0ncWVtdS1pbyAlcyAicmVtb3ZlX2JyZWFrIGJwXyVzIicgJSAoZHJpdmUsIGRy
+aXZlKSkNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgY29tbWFuZF9saW5lPSdxZW11LWlvICVz
+ICJyZW1vdmVfYnJlYWsgYnBfMCInICUgKGRyaXZlKSkNCj4+Pj4gICAgDQo+Pj4+ICAgICAgICBk
+ZWYgaG1wX3FlbXVfaW8oc2VsZiwgZHJpdmUsIGNtZCk6DQo+Pj4+ICAgICAgICAgICAgJycnV3Jp
+dGUgdG8gYSBnaXZlbiBkcml2ZSB1c2luZyBhbiBITVAgY29tbWFuZCcnJw0KPj4+PiBAQCAtNTQz
+LDEzICs1NDMsMTQgQEAgY2xhc3MgUU1QVGVzdENhc2UodW5pdHRlc3QuVGVzdENhc2UpOg0KPj4+
+PiAgICAgICAgICAgIHNlbGYuYXNzZXJ0RXF1YWwoc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3Qo
+anNvbi5sb2Fkcyhqc29uX2ZpbGVuYW1lWzU6XSkpLA0KPj4+PiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3QocmVmZXJlbmNlKSkNCj4+Pj4gICAg
+DQo+Pj4+IC0gICAgZGVmIGNhbmNlbF9hbmRfd2FpdChzZWxmLCBkcml2ZT0nZHJpdmUwJywgZm9y
+Y2U9RmFsc2UsIHJlc3VtZT1GYWxzZSk6DQo+Pj4+ICsgICAgZGVmIGNhbmNlbF9hbmRfd2FpdChz
+ZWxmLCBkcml2ZT0nZHJpdmUwJywgZm9yY2U9RmFsc2UsIHJlc3VtZT1GYWxzZSwNCj4+Pj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgIHJlc3VtZV9ub2RlPU5vbmUpOg0KPj4+PiAgICAgICAgICAg
+ICcnJ0NhbmNlbCBhIGJsb2NrIGpvYiBhbmQgd2FpdCBmb3IgaXQgdG8gZmluaXNoLCByZXR1cm5p
+bmcgdGhlIGV2ZW50JycnDQo+Pj4+ICAgICAgICAgICAgcmVzdWx0ID0gc2VsZi52bS5xbXAoJ2Js
+b2NrLWpvYi1jYW5jZWwnLCBkZXZpY2U9ZHJpdmUsIGZvcmNlPWZvcmNlKQ0KPj4+PiAgICAgICAg
+ICAgIHNlbGYuYXNzZXJ0X3FtcChyZXN1bHQsICdyZXR1cm4nLCB7fSkNCj4+Pj4gICAgDQo+Pj4+
+ICAgICAgICAgICAgaWYgcmVzdW1lOg0KPj4+PiAtICAgICAgICAgICAgc2VsZi52bS5yZXN1bWVf
+ZHJpdmUoZHJpdmUpDQo+Pj4+ICsgICAgICAgICAgICBzZWxmLnZtLnJlc3VtZV9kcml2ZShyZXN1
+bWVfbm9kZSBvciBkcml2ZSkNCj4+Pj4gICAgDQo+Pj4+ICAgICAgICAgICAgY2FuY2VsbGVkID0g
+RmFsc2UNCj4+Pj4gICAgICAgICAgICByZXN1bHQgPSBOb25lDQo+Pj4+DQo+Pj4NCj4+Pg0KPj4N
+Cj4+DQo+IA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
