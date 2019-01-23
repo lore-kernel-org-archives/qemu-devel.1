@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41051)
+Received: from eggs.gnu.org ([209.51.188.92]:41432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmKvg-0007Le-Ti
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:59:09 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gmKwv-0008Su-PC
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmKvf-0005d5-N5
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:59:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47332)
+	(envelope-from <alex.williamson@redhat.com>) id 1gmKwr-0006Is-Sb
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:00:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:22607)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gmKvf-0005cj-EX
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:59:03 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 23 Jan 2019 15:58:30 +0000
-Message-Id: <20190123155830.8459-10-dgilbert@redhat.com>
-In-Reply-To: <20190123155830.8459-1-dgilbert@redhat.com>
-References: <20190123155830.8459-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gmKwp-0006H0-Q0
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:00:17 -0500
+Date: Wed, 23 Jan 2019 09:00:06 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190123090006.049d0bc5@w520.home>
+In-Reply-To: <68d92f52-7bea-edf2-f876-c7df947588f6@redhat.com>
+References: <20190117210632.18567-1-eric.auger@redhat.com>
+	<20190117210632.18567-2-eric.auger@redhat.com>
+	<20190122125134.6726621d@w520.home>
+	<68d92f52-7bea-edf2-f876-c7df947588f6@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 9/9] migration: introduce pages-per-second
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio-pci: Introduce
+ vfio_set_event_handler helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +31,440 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, peterx@redhat.com, xiaoguangrong@tencent.com, marcandre.lureau@redhat.com, shirley17fei@gmail.com, lifei1214@126.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, aik@ozlabs.ru, cohuck@redhat.com
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Wed, 23 Jan 2019 16:28:50 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-It introduces a new statistic, pages-per-second, as bandwidth or mbps is
-not enough to measure the performance of posting pages out as we have
-compression, xbzrle, which can significantly reduce the amount of the
-data size, instead, pages-per-second is the one we want
+> Hi Alex,
+> 
+> On 1/22/19 8:51 PM, Alex Williamson wrote:
+> > On Thu, 17 Jan 2019 22:06:31 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> The code used to attach the eventfd handler for the ERR and
+> >> REQ irq indices can be factorized into a helper. In subsequent
+> >> patches we will extend this helper to support other irq indices.
+> >>
+> >> We test whether the notification is allowed outside of the helper:
+> >> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+> >> Depending on the returned value we set vdev->pci_aer and
+> >> vdev->req_enabled. An error handle is introduced for future usage
+> >> although not strictly useful here.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v1 -> v2:
+> >> - s/vfio_register_event_notifier/vfio_set_event_handler
+> >> - turned into a void function
+> >> - do the qemu_set_fd_handler(*pfd, NULL, NULL, vdev) and
+> >>   event_notifier_cleanup on VFIO_DEVICE_SET_IRQS failure
+> >>   as reported by Alexey
+> >> - reset err in vfio_realize as reported by Cornelia
+> >> - Text/comment fixes suggested by Cornelia
+> >> ---
+> >>  hw/vfio/pci.c | 296 ++++++++++++++++++++++----------------------------
+> >>  1 file changed, 132 insertions(+), 164 deletions(-)
+> >>
+> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >> index c0cb1ec289..3cae4c99ef 100644
+> >> --- a/hw/vfio/pci.c
+> >> +++ b/hw/vfio/pci.c
+> >> @@ -105,6 +105,96 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+> >>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+> >>  }
+> >>  
+> >> +/*
+> >> + * vfio_set_event_handler - setup/tear down eventfd
+> >> + * notification and handling for IRQ indices that span over
+> >> + * a single IRQ
+> >> + *
+> >> + * @vdev: VFIO device handle
+> >> + * @index: IRQ index the eventfd/handler is associated with
+> >> + * @enable: true means notifier chain needs to be set up
+> >> + * @handler: handler to attach if @enable is true  
+> > 
+> > Therefore @enable is redundant.  
+> agreed
+> >   
+> >> + * @errp: error handle
+> >> + */
+> >> +static void vfio_set_event_handler(VFIOPCIDevice *vdev,
+> >> +                                   int index,
+> >> +                                   bool enable,
+> >> +                                   void (*handler)(void *opaque),
+> >> +                                   Error **errp)
+> >> +{
+> >> +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+> >> +                                      .index = index };
+> >> +    struct vfio_irq_set *irq_set;
+> >> +    EventNotifier *notifier;
+> >> +    int argsz, ret = 0;
+> >> +    int32_t *pfd, fd;
+> >> +
+> >> +    switch (index) {
+> >> +    case VFIO_PCI_REQ_IRQ_INDEX:
+> >> +        notifier = &vdev->req_notifier;
+> >> +        break;
+> >> +    case VFIO_PCI_ERR_IRQ_INDEX:
+> >> +        notifier = &vdev->err_notifier;
+> >> +        break;  
+> > 
+> > This blows the abstraction of a helper that this seems to be trying to
+> > create, seems cleaner to pass @notifier.  
+> 
+> 
+> Not sure I really get the point eventually. Don't we have the following
+> indirection: irq index -> notifier.fd -> handler. When we want to use
+> this helper don't we simply want to associate an handler to a given IRQ
+> index without taking care of the notifier mechanics.
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-Message-Id: <20190111063732.10484-2-xiaoguangrong@tencent.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  With typo's Eric spotted fixed
----
- hmp.c                 |  2 ++
- migration/migration.c | 11 ++++++++++-
- migration/migration.h | 10 +++++++++-
- migration/ram.c       |  6 ++++++
- qapi/migration.json   |  5 ++++-
- 5 files changed, 31 insertions(+), 3 deletions(-)
+With that logic we could eliminate all the parameters and have the
+function infer everything.  I don't think that's how we build a good
+helper function though.  To me the function is wanting to set or clear
+a handler for an irq index, but it also needs the notifier to trigger
+to call that handler, so we simply need to pass that as another arg
+rather than inferring it from the index.
+ 
+> As discussed with Alexey, moving the notifier initialization outside of
+> this helper removes some code factorization.
 
-diff --git a/hmp.c b/hmp.c
-index 8da5fd8760..b2a2b1f84e 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -236,6 +236,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdic=
-t)
-                        info->ram->page_size >> 10);
-         monitor_printf(mon, "multifd bytes: %" PRIu64 " kbytes\n",
-                        info->ram->multifd_bytes >> 10);
-+        monitor_printf(mon, "pages-per-second: %" PRIu64 "\n",
-+                       info->ram->pages_per_second);
-=20
-         if (info->ram->dirty_pages_rate) {
-             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-diff --git a/migration/migration.c b/migration/migration.c
-index ded151b1bf..37e06b76dc 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -782,6 +782,7 @@ static void populate_ram_info(MigrationInfo *info, Mi=
-grationState *s)
-     info->ram->postcopy_requests =3D ram_counters.postcopy_requests;
-     info->ram->page_size =3D qemu_target_page_size();
-     info->ram->multifd_bytes =3D ram_counters.multifd_bytes;
-+    info->ram->pages_per_second =3D s->pages_per_second;
-=20
-     if (migrate_use_xbzrle()) {
-         info->has_xbzrle_cache =3D true;
-@@ -1565,6 +1566,7 @@ void migrate_init(MigrationState *s)
-     s->rp_state.from_dst_file =3D NULL;
-     s->rp_state.error =3D false;
-     s->mbps =3D 0.0;
-+    s->pages_per_second =3D 0.0;
-     s->downtime =3D 0;
-     s->expected_downtime =3D 0;
-     s->setup_time =3D 0;
-@@ -2883,7 +2885,7 @@ static void migration_calculate_complete(MigrationS=
-tate *s)
- static void migration_update_counters(MigrationState *s,
-                                       int64_t current_time)
- {
--    uint64_t transferred, time_spent;
-+    uint64_t transferred, transferred_pages, time_spent;
-     uint64_t current_bytes; /* bytes transferred since the beginning */
-     double bandwidth;
-=20
-@@ -2900,6 +2902,11 @@ static void migration_update_counters(MigrationSta=
-te *s,
-     s->mbps =3D (((double) transferred * 8.0) /
-                ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
-=20
-+    transferred_pages =3D ram_get_total_transferred_pages() -
-+                            s->iteration_initial_pages;
-+    s->pages_per_second =3D (double) transferred_pages /
-+                             (((double) time_spent / 1000.0));
-+
-     /*
-      * if we haven't sent anything, we don't want to
-      * recalculate. 10000 is a small enough number for our purposes
-@@ -2912,6 +2919,7 @@ static void migration_update_counters(MigrationStat=
-e *s,
-=20
-     s->iteration_start_time =3D current_time;
-     s->iteration_initial_bytes =3D current_bytes;
-+    s->iteration_initial_pages =3D ram_get_total_transferred_pages();
-=20
-     trace_migrate_transferred(transferred, time_spent,
-                               bandwidth, s->threshold_size);
-@@ -3316,6 +3324,7 @@ static void migration_instance_init(Object *obj)
-=20
-     ms->state =3D MIGRATION_STATUS_NONE;
-     ms->mbps =3D -1;
-+    ms->pages_per_second =3D -1;
-     qemu_sem_init(&ms->pause_sem, 0);
-     qemu_mutex_init(&ms->error_mutex);
-=20
-diff --git a/migration/migration.h b/migration/migration.h
-index 02b7304610..dcd05d9f87 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -126,7 +126,13 @@ struct MigrationState
-      */
-     QemuSemaphore rate_limit_sem;
-=20
--    /* bytes already send at the beggining of current interation */
-+    /* pages already send at the beginning of current iteration */
-+    uint64_t iteration_initial_pages;
-+
-+    /* pages transferred per second */
-+    double pages_per_second;
-+
-+    /* bytes already send at the beginning of current iteration */
-     uint64_t iteration_initial_bytes;
-     /* time at the start of current iteration */
-     int64_t iteration_start_time;
-@@ -271,6 +277,8 @@ bool migrate_use_block_incremental(void);
- int migrate_max_cpu_throttle(void);
- bool migrate_use_return_path(void);
-=20
-+uint64_t ram_get_total_transferred_pages(void);
-+
- bool migrate_use_compression(void);
- int migrate_compress_level(void);
- int migrate_compress_threads(void);
-diff --git a/migration/ram.c b/migration/ram.c
-index 43c2b442af..59191c1ed2 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1601,6 +1601,12 @@ uint64_t ram_pagesize_summary(void)
-     return summary;
- }
-=20
-+uint64_t ram_get_total_transferred_pages(void)
-+{
-+    return  ram_counters.normal + ram_counters.duplicate +
-+                compression_counters.pages + xbzrle_counters.pages;
-+}
-+
- static void migration_update_rates(RAMState *rs, int64_t end_time)
- {
-     uint64_t page_count =3D rs->target_page_count - rs->target_page_coun=
-t_prev;
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 31b589ec26..7a795ecc16 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -41,6 +41,9 @@
- #
- # @multifd-bytes: The number of bytes sent through multifd (since 3.0)
- #
-+# @pages-per-second: the number of memory pages transferred per second
-+#        (Since 4.0)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationStats',
-@@ -49,7 +52,7 @@
-            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-            'mbps' : 'number', 'dirty-sync-count' : 'int',
-            'postcopy-requests' : 'int', 'page-size' : 'int',
--           'multifd-bytes' : 'uint64' } }
-+           'multifd-bytes' : 'uint64', 'pages-per-second' : 'uint64' } }
-=20
- ##
- # @XBZRLECacheStats:
---=20
-2.20.1
+I don't see why passing the notifier implies this function cannot
+perform the init and cleanup of that notifier.
+
+> >> +    default:
+> >> +        g_assert_not_reached();
+> >> +    }
+> >> +
+> >> +    if (ioctl(vdev->vbasedev.fd,
+> >> +              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+> >> +        error_setg_errno(errp, errno, "No irq index %d available", index);
+> >> +        return;  
+> > 
+> > The implicit count, aka sub-index, is also problematic for the
+> > abstraction.  Can we tackle applying this to MSI/X to validate if this
+> > needs to go another step to allow the caller to specify index and
+> > sub-index?  
+> I mentioned the helper stands for IRQ indices with no sub-index. I am
+> afraid applying this to MSI/X would oblige use to revisit a bulk of code
+> without knowing whether it is interesting.
+
+I'm afraid that the helper shows some holes with INTx integration and
+I'm wondering if MSI/X integration would show us how to improve the
+helper.
+
+> >> +    }
+> >> +
+> >> +    if (enable) {
+> >> +        ret = event_notifier_init(notifier, 0);
+> >> +        if (ret) {
+> >> +            error_setg_errno(errp, -ret,
+> >> +                             "Unable to init event notifier for irq index %d",
+> >> +                             index);
+> >> +            return;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> >> +
+> >> +    irq_set = g_malloc0(argsz);
+> >> +    irq_set->argsz = argsz;
+> >> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> >> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> >> +    irq_set->index = index;
+> >> +    irq_set->start = 0;
+> >> +    irq_set->count = 1;
+> >> +    pfd = (int32_t *)&irq_set->data;
+> >> +
+> >> +    if (!notifier) {
+> >> +        error_setg(errp, "Notifier not initialized for irq index %d", index);
+> >> +        return;
+> >> +    }  
+> > 
+> > What is this supposed to check?  @notifier is not NULL initialized, the
+> > case statement will assert if it doesn't get set, and this doesn't
+> > actually test if it's properly initialized.  
+> The goal was to check the helper was not called on a valid IRQ index
+> with !enabled while the notifier was not properly initialized. But if we
+> trust the calling sites I can remove it.
+
+But this doesn't test if the notifier is initialized.  Seems you'd need
+to check if fd of the notifier is -1.
+
+> >   
+> >> +
+> >> +    fd = event_notifier_get_fd(notifier);
+> >> +
+> >> +    if (enable) {
+> >> +        qemu_set_fd_handler(fd, handler, NULL, vdev);
+> >> +        *pfd = fd;
+> >> +    } else {
+> >> +        *pfd = -1;
+> >> +    }
+> >> +
+> >> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> >> +    g_free(irq_set);
+> >> +
+> >> +    if (ret) {
+> >> +        error_setg_errno(errp, -ret,
+> >> +                         "Failed to %s eventfd signalling for index %d",
+> >> +                         enable ? "set up" : "tear down", index);
+> >> +    }
+> >> +    if (ret || !enable) {
+> >> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+> >> +        event_notifier_cleanup(notifier);
+> >> +    }
+> >> +}  
+> > 
+> > Suggest passing @notifier as a parameter and using @handler in place of
+> > @enable, more generic and more obvious calling convention.  
+> ok
+> >   
+> >> +
+> >>  static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+> >>  {
+> >>  #ifdef CONFIG_KVM
+> >> @@ -2621,86 +2711,6 @@ static void vfio_err_notifier_handler(void *opaque)
+> >>      vm_stop(RUN_STATE_INTERNAL_ERROR);
+> >>  }
+> >>  
+> >> -/*
+> >> - * Registers error notifier for devices supporting error recovery.
+> >> - * If we encounter a failure in this function, we report an error
+> >> - * and continue after disabling error recovery support for the
+> >> - * device.
+> >> - */
+> >> -static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+> >> -{
+> >> -    int ret;
+> >> -    int argsz;
+> >> -    struct vfio_irq_set *irq_set;
+> >> -    int32_t *pfd;
+> >> -
+> >> -    if (!vdev->pci_aer) {
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    if (event_notifier_init(&vdev->err_notifier, 0)) {
+> >> -        error_report("vfio: Unable to init event notifier for error detection");
+> >> -        vdev->pci_aer = false;
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> >> -
+> >> -    irq_set = g_malloc0(argsz);
+> >> -    irq_set->argsz = argsz;
+> >> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> >> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> >> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+> >> -    irq_set->start = 0;
+> >> -    irq_set->count = 1;
+> >> -    pfd = (int32_t *)&irq_set->data;
+> >> -
+> >> -    *pfd = event_notifier_get_fd(&vdev->err_notifier);
+> >> -    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
+> >> -
+> >> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> >> -    if (ret) {
+> >> -        error_report("vfio: Failed to set up error notification");
+> >> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> >> -        event_notifier_cleanup(&vdev->err_notifier);
+> >> -        vdev->pci_aer = false;
+> >> -    }
+> >> -    g_free(irq_set);
+> >> -}
+> >> -
+> >> -static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
+> >> -{
+> >> -    int argsz;
+> >> -    struct vfio_irq_set *irq_set;
+> >> -    int32_t *pfd;
+> >> -    int ret;
+> >> -
+> >> -    if (!vdev->pci_aer) {
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> >> -
+> >> -    irq_set = g_malloc0(argsz);
+> >> -    irq_set->argsz = argsz;
+> >> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> >> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> >> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+> >> -    irq_set->start = 0;
+> >> -    irq_set->count = 1;
+> >> -    pfd = (int32_t *)&irq_set->data;
+> >> -    *pfd = -1;
+> >> -
+> >> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> >> -    if (ret) {
+> >> -        error_report("vfio: Failed to de-assign error fd: %m");
+> >> -    }
+> >> -    g_free(irq_set);
+> >> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
+> >> -                        NULL, NULL, vdev);
+> >> -    event_notifier_cleanup(&vdev->err_notifier);
+> >> -}
+> >> -
+> >>  static void vfio_req_notifier_handler(void *opaque)
+> >>  {
+> >>      VFIOPCIDevice *vdev = opaque;
+> >> @@ -2716,86 +2726,6 @@ static void vfio_req_notifier_handler(void *opaque)
+> >>      }
+> >>  }
+> >>  
+> >> -static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+> >> -{
+> >> -    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+> >> -                                      .index = VFIO_PCI_REQ_IRQ_INDEX };
+> >> -    int argsz;
+> >> -    struct vfio_irq_set *irq_set;
+> >> -    int32_t *pfd;
+> >> -
+> >> -    if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    if (ioctl(vdev->vbasedev.fd,
+> >> -              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    if (event_notifier_init(&vdev->req_notifier, 0)) {
+> >> -        error_report("vfio: Unable to init event notifier for device request");
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> >> -
+> >> -    irq_set = g_malloc0(argsz);
+> >> -    irq_set->argsz = argsz;
+> >> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> >> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> >> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+> >> -    irq_set->start = 0;
+> >> -    irq_set->count = 1;
+> >> -    pfd = (int32_t *)&irq_set->data;
+> >> -
+> >> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
+> >> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
+> >> -
+> >> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> >> -        error_report("vfio: Failed to set up device request notification");
+> >> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> >> -        event_notifier_cleanup(&vdev->req_notifier);
+> >> -    } else {
+> >> -        vdev->req_enabled = true;
+> >> -    }
+> >> -
+> >> -    g_free(irq_set);
+> >> -}
+> >> -
+> >> -static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> >> -{
+> >> -    int argsz;
+> >> -    struct vfio_irq_set *irq_set;
+> >> -    int32_t *pfd;
+> >> -
+> >> -    if (!vdev->req_enabled) {
+> >> -        return;
+> >> -    }
+> >> -
+> >> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> >> -
+> >> -    irq_set = g_malloc0(argsz);
+> >> -    irq_set->argsz = argsz;
+> >> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> >> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> >> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+> >> -    irq_set->start = 0;
+> >> -    irq_set->count = 1;
+> >> -    pfd = (int32_t *)&irq_set->data;
+> >> -    *pfd = -1;
+> >> -
+> >> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> >> -        error_report("vfio: Failed to de-assign device request fd: %m");
+> >> -    }
+> >> -    g_free(irq_set);
+> >> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
+> >> -                        NULL, NULL, vdev);
+> >> -    event_notifier_cleanup(&vdev->req_notifier);
+> >> -
+> >> -    vdev->req_enabled = false;
+> >> -}
+> >> -
+> >>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >>  {
+> >>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> >> @@ -3069,8 +2999,33 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >>          goto out_teardown;
+> >>      }
+> >>  
+> >> -    vfio_register_err_notifier(vdev);
+> >> -    vfio_register_req_notifier(vdev);
+> >> +    if (vdev->pci_aer) {
+> >> +        Error *err = NULL;
+> >> +
+> >> +        /*
+> >> +         * Registers error notifier for devices supporting error recovery.
+> >> +         * If we encounter a failure during registration, we report an error
+> >> +         * and continue after disabling error recovery support for the
+> >> +         * device.
+> >> +         */
+> >> +        vfio_set_event_handler(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
+> >> +                               vfio_err_notifier_handler, &err);
+> >> +        if (err) {
+> >> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> >> +        }  
+> > 
+> > Why not just return -1 on error and zero on success so we can call as:
+> > 
+> >     if (vfio_set_event_handler(...)) {
+> >         warn_reportf_err()...
+> >     }  
+> The point is that if you have both the err and the returned value , it
+> is error prone as you expect both to be consistent (reported by Alexey).
+> You expect err to be set whenever you have a an error returned. The
+> calling site can call warn_reportf_err() whenever the function returns
+> an error and if somebody, later on, ignores to set the err on error
+> case, it will crash.
+> 
+> Reading again Markus' answer
+> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg402893.html), I
+> may put the returned value back and make sure my code is consistent ;-)
+
+It's not like C programmers aren't used to checking return values.  Not
+exactly analogous, but we check the return value of an ioctl() then
+look at errno.  So it feels like standard practice to return an error
+code on failure and try to only use void returns for functions that
+cannot fail.
+
+> >   
+> >> +        vdev->pci_aer = !err;  
+> > 
+> > We could also avoid this weirdness of this negation to get a bool.  
+> ok
+> >   
+> >> +    }  
+> > 
+> > It's not obvious how doing away with the register/unregister helpers
+> > and doing everything inline is an improvement.  Simple helpers calling
+> > common helpers seems better than inline sprawl calling common helpers.
+> > Thanks,  
+> 
+> On my side I noticed vfio_(un)register_err|req_notifier are mostly
+> identical at the exception of the irq index/notifier and enable logic.
+> As I am about to propose another single index IRQ, I am going to add 2
+> similar functions and I felt it was a pitty. Now it is not a big deal
+> and if you prefer to keep the code as it is I will simply add those.
+
+Simple helper functions are a good thing IMO, especially with the
+prospects of open coding two more setup and teardown sections further
+bloating the base function.  Thanks,
+
+Alex
