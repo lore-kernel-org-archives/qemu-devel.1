@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49882)
+Received: from eggs.gnu.org ([209.51.188.92]:50642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gmGK0-0004kl-Qc
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:03:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gmGLq-0005z7-Cf
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gmGJv-0007Xa-BP
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:03:52 -0500
-Date: Wed, 23 Jan 2019 12:03:37 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gmGLp-0000EK-Fk
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:05:46 -0500
+Date: Wed, 23 Jan 2019 12:05:39 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190123120337.72eb7637.cohuck@redhat.com>
-In-Reply-To: <20190121134249.16615-2-david@redhat.com>
+Message-ID: <20190123120539.3ca367f9.cohuck@redhat.com>
+In-Reply-To: <20190121134249.16615-3-david@redhat.com>
 References: <20190121134249.16615-1-david@redhat.com>
-	<20190121134249.16615-2-david@redhat.com>
+	<20190121134249.16615-3-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] s390x/pci: Introduce unplug
- requests and split unplug handler
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] s390x/pci: Unplug remaining devices
+ on pcihost reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +27,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 21 Jan 2019 14:42:48 +0100
+On Mon, 21 Jan 2019 14:42:49 +0100
 David Hildenbrand <david@redhat.com> wrote:
 
-> PCI on s390x is really weird and how it was modeled in QEMU might not have
-> been the right choice. Anyhow, right now it is the case that:
-> - Hotplugging a PCI device will silently create a zPCI device
->   (if none is provided)
-> - Hotunplugging a zPCI device will unplug the PCI device (if any)
-> - Hotunplugging a PCI device will unplug also the zPCI device
-> As far as I can see, we can no longer change this behavior. But we
-> should fix it.
+> When resetting the guest we should unplug and remove all devices that
+> are still pending. Otherwise the fresh guest will see devices that will
+> suddenly vanish.
 > 
-> Both device types are handled via a single hotplug handler call. This
-> is problematic for various reasons:
-> 1. Unplugging via the zPCI device allows to unplug PCI bridges as
->    checks are not performed - bad.
+> Can be triggered e.g. via
+> (hmp) device_add virtio-mouse-pci,id=test
+> (hmp) stop
+> (hmp) device_del test
+> (hmp) system_reset
+> (hmp) c
+> 
+> The device will vanish after roughly 5 minutes. With this patch, the
+> device will vanish on reboot (S390_RESET_EXTERNAL and S390_RESET_REIPL,
+> which reset the pcihost bridge via qemu_devices_reset()). If we want
+> these devices to vanish directly on any reset (S390_RESET_MODIFIED_CLEAR
+> and S390_RESET_LOAD_NORMAL), we have to modify s390_machine_reset(). But
+> I have the feeling that this should not be done for all reset types.
+> 
+> This approach is similar to what's done for acpi PCI hotplug in
+> acpi_pcihp_reset() -> acpi_pcihp_update() ->
+> acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+> 
+> s390_pci_generate_plug_event()'s will still be generated, I guess this
+> is not an issue (same thing could happen right now if the timer expires
+> just after reset).
 
-Maybe I'm confused here, but how can a zPCI device couple with a bridge?
+I'm wondering what the architecture says regarding those events -- can
+someone with access to the documentation comment?
+
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index bc17a8cf65..b70ae25533 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -1102,6 +1102,14 @@ static void s390_pcihost_reset(DeviceState *dev)
+>  {
+>      S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+>      PCIBus *bus = s->parent_obj.bus;
+> +    S390PCIBusDevice *pbdev, *next;
+> +
+> +    /* Unplug all pending devices that were requested to be released */
+> +    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
+> +        if (pbdev->release_timer) {
+> +            s390_pcihost_timer_cb(pbdev);
+> +        }
+> +    }
+>  
+>      s->bus_no = 0;
+>      pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);
