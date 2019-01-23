@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43212)
+Received: from eggs.gnu.org ([209.51.188.92]:43757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <relkochta@gmail.com>) id 1gmQNT-0002Pc-J2
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:48:08 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQOC-0002zK-Jm
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:48:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <relkochta@gmail.com>) id 1gmQM7-0000a7-An
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:46:44 -0500
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:37812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <relkochta@gmail.com>) id 1gmQM3-0000G7-TA
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:46:41 -0500
-Received: by mail-qk1-x744.google.com with SMTP id g125so2028705qke.4
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:46:31 -0800 (PST)
-From: Ryan El Kochta <relkochta@gmail.com>
-Date: Wed, 23 Jan 2019 16:45:54 -0500
-Message-Id: <20190123214555.12712-1-relkochta@gmail.com>
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQ8q-00052z-WA
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:33:04 -0500
+From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Date: Wed, 23 Jan 2019 21:32:35 +0000
+Message-ID: <20190123213227.17077-1-aaron@os.amperecomputing.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/1] input-linux: customizable grab toggle keys
- v5
+Subject: [Qemu-devel] [PATCH v11 0/2] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +21,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: Ryan El Kochta <relkochta@gmail.com>
+To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay OS <aaron@os.amperecomputing.com>
 
-This patch adds a new option to the input-linux object:
+Most of this patchset to implement the PMU has been merged already, but
+the interrupt-on-overflow behavior had some additional review comments.
+In addition to improving the overflow detection and bit-clearing logic,
+I split the previous patch [1] into two to (hopefully) make it more
+digestable.
 
-grab-toggle=[key-combo]
+There is also a separate bugfix for one of the the already-merged
+patches which I already sent out separately as "target/arm: Don't clear
+supported PMU events when initializing PMCEID1" [2].
 
-The key combination can be one of the following:
+[1] - https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02242.html
+[2] - https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05996.html
 
-* ctrl-ctrl
-* alt-alt
-* meta-meta
-* scrolllock
-* ctrl-scrolllock
+Aaron Lindsay (2):
+  target/arm: Send interrupts on PMU counter overflow
+  target/arm: Add a timer to predict PMU counter overflow
 
-The user can pick any of these key combinations. The VM's grab
-of the evdev device will be toggled when the key combination is
-pressed.
+ target/arm/cpu.c    |  12 ++++
+ target/arm/cpu.h    |  10 ++++
+ target/arm/helper.c | 133 ++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 143 insertions(+), 12 deletions(-)
 
-Any invalid setting will result in an error. No setting will
-result in the current default of ctrl-ctrl.
-
-The right and left ctrl key both work for Ctrl-Scrolllock.
-
-If scrolllock is selected as one of the grab-toggle keys, it
-will be entirely disabled and not passed to the guest at all.
-This is to prevent enabling it while attempting to leave or enter
-the VM. On the host, scrolllock can be disabled using xmodmap.
-
-First, find the modifier that Scroll_Lock is bound to:
-
-$ xmodmap -pm
-
-Then, remove Scroll_Lock from it, replacing modX with the modifier:
-
-$ xmodmap -e 'remove modX = Scroll_Lock'
-
-If Scroll_Lock is not bound to any modifier, it is already disabled.
-
-To save the changes, add them to your xinitrc.
-
-Ryan El Kochta (1):
-  input-linux: customizable grab toggle keys v5
-
- qapi/ui.json     | 10 ++++++++
- ui/input-linux.c | 66 +++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 73 insertions(+), 3 deletions(-)
-
--- 
+--=20
 2.20.1
