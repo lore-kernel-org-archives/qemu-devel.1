@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59975)
+Received: from eggs.gnu.org ([209.51.188.92]:60001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmKLb-0008Fj-M8
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:48 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmKLc-0008Gg-Rn
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmKLZ-0008G1-Bp
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53180)
+	(envelope-from <kraxel@redhat.com>) id 1gmKLb-0008H3-Lj
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmKLY-00087Q-8k
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:44 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmKLZ-000873-Bs
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:45 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Jan 2019 16:21:06 +0100
-Message-Id: <20190123152112.15757-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] audio: rework driver probing.
+Date: Wed, 23 Jan 2019 16:21:11 +0100
+Message-Id: <20190123152112.15757-6-kraxel@redhat.com>
+In-Reply-To: <20190123152112.15757-1-kraxel@redhat.com>
+References: <20190123152112.15757-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 5/6] audio: error message tweak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,20 +26,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+Only print a message about the failed driver initialization in case it
+was the driver explicitly requested by the user via QEMU_AUDIO_DRV=$drv.
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ audio/audio.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Gerd Hoffmann (6):
-  audio: use pkg-config
-  audio: allow optional audio drivers.
-  audio: use try-sdl for openbsd
-  audio: check for pulseaudio daemon pidfile
-  audio: error message tweak
-  audio: probe audio drivers by default
-
- configure       | 81 ++++++++++++++++++++++++++++++++-------------------------
- audio/audio.c   | 11 ++++----
- audio/paaudio.c | 13 +++++++++
- 3 files changed, 64 insertions(+), 41 deletions(-)
-
+diff --git a/audio/audio.c b/audio/audio.c
+index 1ace47f510..3e40ea9e5e 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -1762,7 +1762,7 @@ void AUD_help (void)
+         );
+ }
+ 
+-static int audio_driver_init (AudioState *s, struct audio_driver *drv)
++static int audio_driver_init (AudioState *s, struct audio_driver *drv, bool msg)
+ {
+     if (drv->options) {
+         audio_process_options (drv->name, drv->options);
+@@ -1776,7 +1776,8 @@ static int audio_driver_init (AudioState *s, struct audio_driver *drv)
+         return 0;
+     }
+     else {
+-        dolog ("Could not init `%s' audio driver\n", drv->name);
++        if (msg)
++            dolog ("Could not init `%s' audio driver\n", drv->name);
+         return -1;
+     }
+ }
+@@ -1901,7 +1902,7 @@ static void audio_init (void)
+     if (drvname) {
+         driver = audio_driver_lookup(drvname);
+         if (driver) {
+-            done = !audio_driver_init(s, driver);
++            done = !audio_driver_init(s, driver, true);
+         } else {
+             dolog ("Unknown audio driver `%s'\n", drvname);
+             dolog ("Run with -audio-help to list available drivers\n");
+@@ -1912,14 +1913,14 @@ static void audio_init (void)
+         for (i = 0; !done && i < ARRAY_SIZE(audio_prio_list); i++) {
+             driver = audio_driver_lookup(audio_prio_list[i]);
+             if (driver && driver->can_be_default) {
+-                done = !audio_driver_init(s, driver);
++                done = !audio_driver_init(s, driver, false);
+             }
+         }
+     }
+ 
+     if (!done) {
+         driver = audio_driver_lookup("none");
+-        done = !audio_driver_init(s, driver);
++        done = !audio_driver_init(s, driver, false);
+         assert(done);
+         dolog("warning: Using timer based audio emulation\n");
+     }
 -- 
 2.9.3
