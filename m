@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37984)
+Received: from eggs.gnu.org ([209.51.188.92]:38334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gmPyR-0005Ht-6Q
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:22:15 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gmPz6-0005sy-0J
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:22:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gmPjL-0003Ba-G3
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:06:41 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gmPjH-0002z2-Tu
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:06:36 -0500
-Received: by mail-pl1-x642.google.com with SMTP id e11so1764795plt.11
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:06:20 -0800 (PST)
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<20190123065618.3520-5-yang.zhong@intel.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <08e88cba-4ccc-1670-d170-3d1eb860d8af@linaro.org>
-Date: Wed, 23 Jan 2019 13:06:14 -0800
+	(envelope-from <alistair23@gmail.com>) id 1gmPz4-0001bI-Vp
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:22:55 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190123065618.3520-5-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v4 04/44] hw/arm/Makefile.objs:
- CONFIG_VIRT created for virt board
+References: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
+	<2153eec6-f25f-4e34-6423-01d76a14815c@linaro.org>
+	<66fd9695-c511-b068-7cf1-b529d9f44d9d@mail.uni-paderborn.de>
+In-Reply-To: <66fd9695-c511-b068-7cf1-b529d9f44d9d@mail.uni-paderborn.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 23 Jan 2019 13:22:19 -0800
+Message-ID: <CAKmqyKM8NKY5uzYezWbR5cxfpMpy=VFof3BrOhRaDZsbFHLrig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com, sameo@linux.intel.com
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 1/22/19 10:55 PM, Yang Zhong wrote:
-> make virt code configurable and the new CONFIG_VIRT definitions
-> added to the default-configs/arm-softmmu.mak to replace CONFIG_ACPI
-> in arm board.
-> 
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak | 1 +
->  hw/arm/Makefile.objs            | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+On Wed, Jan 23, 2019 at 1:15 AM Bastian Koppelmann
+<kbastian@mail.uni-paderborn.de> wrote:
+>
+>
+> On 1/22/19 10:38 PM, Richard Henderson wrote:
+> > On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
+> >> Hi,
+> >>
+> >> this patchset converts the RISC-V decoder to decodetree in four major steps:
+> >>
+> >> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
+> >>      Many of the gen_* functions are called by the decode functions for 16-bit
+> >>      and 32-bit functions. If we move translation code from the gen_*
+> >>      functions to the generated trans_* functions of decode-tree, we get a lot of
+> >>      duplication. Therefore, we mostly generate calls to the old gen_* function
+> >>      which are properly replaced after step 2).
+> >>
+> >>      Each of the trans_ functions are grouped into files corresponding to their
+> >>      ISA extension, e.g. addi which is in RV32I is translated in the file
+> >>      'trans_rvi.inc.c'.
+> >>
+> >> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
+> >>      All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+> >>      we convert the arguments in the 16 bit trans_ function to the arguments of
+> >>      the corresponding 32 bit instruction and call the 32 bit trans_ function.
+> >>
+> >> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
+> >>      this move all manual translation code into the trans_* instructions of
+> >>      decode tree, such that we can remove the old decode_* functions.
+> >>
+> >> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+> >>     by Richard. [Patch 31-35]
+> >>
+> >> full tree available at
+> >> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
+> >>
+> >> Cheers,
+> >> Bastian
+> >>
+> >> v4 -> v5:
+> >>      - fixed rebase error
+> >>      - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
+> >>      - removed extra sign extension of sraiw
+> >>      - removed rs2 == 0 special cases in sraw/srlw
+> > All looks good to me now.  Thanks for persevering.
+>
+>
+> Thanks for your great reviews. I'll do a final respin to fix the funky
+> indentations. Alistair do you want to pick up the series?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks, the series looks good :)
 
-r~
+Palmer is in charge of pull requests for RISC-V QEMU. So it will have
+to go through him.
+
+Alistair
+
+>
+> Cheers,
+>
+> Bastian
+>
+>
