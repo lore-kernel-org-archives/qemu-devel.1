@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33146)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmJ3a-0005YK-Tl
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:59:07 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:41520)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <r@hev.cc>)
+	id 1gmD39-0005YX-91
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:34:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmJ3a-0006cT-2m
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:59:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmJ3Z-0006c3-Sw
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:59:06 -0500
-Date: Wed, 23 Jan 2019 14:59:03 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190123135903.v2jjfpsp5pqitva4@sirius.home.kraxel.org>
-References: <20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-	<20190123101238.GD27270@redhat.com>
-	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-	<52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-	<20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
-	<da0587e0-44a2-a0f8-3df4-628973db42fd@gmx.com>
+	(envelope-from <r@hev.cc>) id 1gmD38-0001pK-Io
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:34:15 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44969)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <r@hev.cc>) id 1gmD38-0001od-7P
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:34:14 -0500
+Received: by mail-oi1-x241.google.com with SMTP id m6so1005736oig.11
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 23:34:12 -0800 (PST)
+From: Heiher <r@hev.cc>
+Date: Wed, 23 Jan 2019 15:34:02 +0800
+Message-Id: <20190123073402.28465-1-r@hev.cc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da0587e0-44a2-a0f8-3df4-628973db42fd@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH RFC v1] i386: hvf: Fix smp boot hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Heiher <r@hev.cc>
 
-  Hi,
+The machine that with hvf accelerator and smp sometimes boot hangs
+because all processors are executing instructions at startup,
+including early I/O emulations. We should just allow the bootstrap
+processor to initialize the machine and then to wake up slave
+processors by interrupt.
 
-> > What is the native sound interface for openbsd btw?  oss doesn't
-> > compile (missing sys/soundcard.h header).
-> 
-> OpenBSD uses sndio, a similar audio daemon to pulseaudio and it's
-> enforced for all [well integrated] audio applications.
+Signed-off-by: Heiher <r@hev.cc>
+---
+ target/i386/hvf/hvf.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Hmm.  Yet another audio daemon.  /me wonders why people keep reinventing
-the wheel.
-
-> SDL is an optional intermediate layer kept for practical/compatibility
-> purposes, but all software shall use sndio natively.
-
-Is pulseaudio supported?  The package is at least in the package
-collection.  If so, then we can choose between pulse and sdl as middle
-man, due to the lack of a sndio backend.  Which of the two should be
-preferred?
-
-cheers,
-  Gerd
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index e193022c03..0921fcba45 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -499,7 +499,6 @@ void hvf_reset_vcpu(CPUState *cpu) {
+     }
+ 
+     hv_vm_sync_tsc(0);
+-    cpu->halted = 0;
+     hv_vcpu_invalidate_tlb(cpu->hvf_fd);
+     hv_vcpu_flush(cpu->hvf_fd);
+ }
+@@ -582,8 +581,6 @@ int hvf_init_vcpu(CPUState *cpu)
+ 
+     wvmcs(cpu->hvf_fd, VMCS_TPR_THRESHOLD, 0);
+ 
+-    hvf_reset_vcpu(cpu);
+-
+     x86cpu = X86_CPU(cpu);
+     x86cpu->env.xsave_buf = qemu_memalign(4096, 4096);
+ 
+@@ -659,8 +656,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+     int ret = 0;
+     uint64_t rip = 0;
+ 
+-    cpu->halted = 0;
+-
+     if (hvf_process_events(cpu)) {
+         return EXCP_HLT;
+     }
+-- 
+2.20.1
