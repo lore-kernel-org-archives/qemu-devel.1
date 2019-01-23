@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58762)
+Received: from eggs.gnu.org ([209.51.188.92]:59203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmNHQ-0005VO-E9
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmNId-0006Zw-HH
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:30:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmNHH-0006Bv-8i
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:35 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:37360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gmNHB-00061Z-9l
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:27 -0500
-From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 23 Jan 2019 19:28:00 +0100
-Message-Id: <1062e3d54121ff3e19b5a4e821ae178c5387fd9a.1548266832.git-series.knut.omang@oracle.com>
-In-Reply-To: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
-References: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
+	(envelope-from <philmd@redhat.com>) id 1gmNIc-0007EK-MJ
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:30:55 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmNIc-0007D9-G7
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:30:54 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so440197wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:30:54 -0800 (PST)
+References: <20190122173111.29821-1-dgilbert@redhat.com>
+	<20190123114448.GB5771@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c3a45ef7-745c-5fc1-62a8-0e9060d5983e@redhat.com>
+Date: Wed, 23 Jan 2019 19:30:51 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/2] gen_pcie_root_port: Add ACS (Access
- Control Services) capability
+In-Reply-To: <20190123114448.GB5771@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration/rdma: unegister fd handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Elijah Shakkour <elijahs@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Knut Omang <knut.omang@oracle.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, jemmy858585@gmail.com, quintela@redhat.com, peterx@redhat.com
 
-Claiming ACS support allows passthrough of an emulated device
-(in a nested virt.setting) with VFIO without Alex Williamson's patch
-for the pcie_acs_override kernel parameter.
-A similar need appears on Windows with Hyper-V
+On 1/23/19 12:44 PM, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>
+>> Unregister the fd handler before we destroy the channel,
+>> otherwise we've got a race where we might land in the
+>> fd handler just as we're closing the device.
+>>
+>> (The race is quite data dependent, you just have to have
+>> the right set of devices for it to trigger).
+>>
+>> Corresponds to RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=1666601
+>>
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+> Queued
 
-Signed-off-by: Knut Omang <knut.omang@oracle.com>
----
- hw/pci-bridge/gen_pcie_root_port.c | 2 ++
- hw/pci-bridge/ioh3420.c            | 1 -
- hw/pci-bridge/pcie_root_port.c     | 3 +++
- include/hw/pci/pcie_port.h         | 1 +
- 4 files changed, 6 insertions(+), 1 deletion(-)
+Did you fixed the patch subject typo? "un(r)egister"
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index 9766edb..b5a5ecc 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -20,6 +20,7 @@
-         OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
- 
- #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
-+#define GEN_PCIE_ROOT_PORT_ACS_OFFSET           0x148
- #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
- 
- typedef struct GenPCIERootPort {
-@@ -149,6 +150,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
-     rpc->interrupts_init = gen_rp_interrupts_init;
-     rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-     rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
-+    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
- }
- 
- static const TypeInfo gen_rp_dev_info = {
-diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-index 81f2de6..2064939 100644
---- a/hw/pci-bridge/ioh3420.c
-+++ b/hw/pci-bridge/ioh3420.c
-@@ -71,7 +71,6 @@ static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
-     if (rc < 0) {
-         assert(rc == -ENOTSUP);
-     }
--
-     return rc;
- }
- 
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-index 34ad767..c33a493 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -106,6 +106,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
-     pcie_aer_root_init(d);
-     rp_aer_vector_update(d);
- 
-+    if (rpc->acs_offset) {
-+        pcie_acs_init(d, rpc->acs_offset, 0);
-+    }
-     return;
- 
- err:
-diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-index df242a0..09586f4 100644
---- a/include/hw/pci/pcie_port.h
-+++ b/include/hw/pci/pcie_port.h
-@@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
-     int exp_offset;
-     int aer_offset;
-     int ssvid_offset;
-+    int acs_offset;    /* If nonzero, optional ACS capability offset */
-     int ssid;
- } PCIERootPortClass;
- 
--- 
-git-series 0.9.1
+>> ---
+>>  migration/rdma.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/migration/rdma.c b/migration/rdma.c
+>> index 9b2e7e10aa..54a3c11540 100644
+>> --- a/migration/rdma.c
+>> +++ b/migration/rdma.c
+>> @@ -2321,6 +2321,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+>>          rdma->connected = false;
+>>      }
+>>  
+>> +    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
+>>      g_free(rdma->dest_blocks);
+>>      rdma->dest_blocks = NULL;
+>>  
+>> -- 
+>> 2.20.1
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
