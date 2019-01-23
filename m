@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55350)
+Received: from eggs.gnu.org ([209.51.188.92]:55944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gmLZ4-0007ZD-G3
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:39:47 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gmLaQ-0008Kx-9R
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gmLYv-0007kq-Ba
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:39:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gmLYu-0007cS-Qf
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:39:36 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20190122150543.16889-2-bala24@linux.vnet.ibm.com> (bala's
-	message of "Tue, 22 Jan 2019 20:35:43 +0530")
-References: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
-	<20190122150543.16889-2-bala24@linux.vnet.ibm.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 23 Jan 2019 17:35:03 +0100
-Message-ID: <875zuf9vt4.fsf@trasno.org>
+	(envelope-from <dgilbert@redhat.com>) id 1gmLaO-0000OK-FF
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:41:09 -0500
+Date: Wed, 23 Jan 2019 16:35:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190123163553.GD2193@work-vm>
+References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
+	<20190123110417.69e41c38@doriath>
+	<b6fd5a23-3afc-0ba2-2e24-b6d7d53c7fc2@redhat.com>
+	<20190123112420.0fe8fb0c@doriath>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/1] migration: calculate expected_downtime
- considering redirtied ram
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190123112420.0fe8fb0c@doriath>
+Subject: Re: [Qemu-devel] Aborts in iotest 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bala24@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, dgilbert@redhat.com, peterx@redhat.com
+To: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-bala24@linux.vnet.ibm.com wrote:
-> From: Balamuruhan S <bala24@linux.vnet.ibm.com>
->
-> currently we calculate expected_downtime by time taken to transfer
-> remaining ram, but during the time we had transferred remaining ram
-> few pages of ram might be redirtied and we need to retransfer it,
-> so it is better to consider them for calculating expected_downtime
-> for getting more accurate values.
->
-> Total ram to be transferred = remaining ram + (redirtied ram at the
->                                                time when the remaining
->                                                ram gets transferred)
->
-> redirtied ram = dirty_pages_rate * time taken to transfer remaining ram
->
-> redirtied ram = dirty_pages_rate * (remaining ram / bandwidth)
->
-> expected_downtime = (remaining ram + redirtied ram) / bandwidth
->
-> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> ---
->  migration/migration.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ffc4d9e556..dc38e9a380 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2903,7 +2903,13 @@ static void migration_update_counters(MigrationState *s,
->       * recalculate. 10000 is a small enough number for our purposes
->       */
->      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> -        s->expected_downtime = ram_counters.remaining / bandwidth;
-> +        /* Time required to transfer remaining ram */
-> +        remaining_ram_transfer_time = ram_counters.remaining / bandwidth
+* Luiz Capitulino (lcapitulino@redhat.com) wrote:
+> On Wed, 23 Jan 2019 17:12:35 +0100
+> Max Reitz <mreitz@redhat.com> wrote:
+> 
+> > On 23.01.19 17:04, Luiz Capitulino wrote:
+> > > On Wed, 23 Jan 2019 16:48:49 +0100
+> > > Max Reitz <mreitz@redhat.com> wrote:
+> > >   
+> > >> Hi,
+> > >>
+> > >> When running 169 in parallel (e.g. like so:
+> > >>
+> > >> $ while TEST_DIR=/tmp/t0 ./check -T -qcow2 169; do; done
+> > >> $ while TEST_DIR=/tmp/t1 ./check -T -qcow2 169; do; done
+> > >> $ while TEST_DIR=/tmp/t2 ./check -T -qcow2 169; do; done
+> > >> $ while TEST_DIR=/tmp/t3 ./check -T -qcow2 169; do; done
+> > >>
+> > >> in four different shells), I get aborts:  
+> > > 
+> > > OK, is this part of a test-suite that's also running migration
+> > > tests in parallel or in sequence? In other words, what does
+> > > iotests have to do with migration (sorry if this is stupid
+> > > question, but it's been years I don't do qemu).  
+> > 
+> > They run migration tests in sequence, but if you run multiple test
+> > instances in parallel, well, then they will be run in parallel.
+> > 
+> > The only reason I CC'd you was because you were so prominent in git
+> > blame. O:-)
+> 
+> Yeah, that's often the case with me :-)
+> 
+> > > When this happened in the past it meant some QEMU code skipped a
+> > > transition, but I can't tell what this has to do with iotests.  
+> > 
+> > Well, this iotest (which tests a migration configuration) sometimes
+> > apparently results in this invalid transition.  But that can't be just
+> > the test's fault, as qemu should handle that gracefully.
+> 
+> Does iotest run a guest or does it only executes parts of qemu
+> code? If it's the latter, then I'd guess the test code is missing
+> calling qemu code that sets the appropriate state between
+> running and postmigrate states.
+> 
+> > It's probably an issue in the migration code and not so much in vl.c, yes...
+> 
+> Yeah, I'll let the migration people jump in.
 
-missing semicolon
+Can we get a log of the qmp commands when it fails?
+A 'running->postmigrate' transition is a bit weird; you could get a
+something->postmigrate if you migrate a VM twice, and the source is
+already in postmigrate, so it tells the destination to go into
+postmigrate.   That's odd in itself, but not *that* odd.
+But then why is it going running->postmigrate?  That suggests
+the source is currently running when it receives an incoming migration,
+and that really shouldn't happen.
 
-> +
-> +        /* redirty of ram at the time remaining ram gets transferred*/
-> +        newly_dirtied_ram = ram_counters.dirty_pages_rate * remaining_ram_transfer_time
-
-the same.
-
-Declaration of the new variables is also missing.
-
-> +        s->expected_downtime = (ram_counters.remaining + newly_dirtied_ram) / bandwidth;
->      }
->  
->      qemu_file_reset_rate_limit(s->to_dst_file);
-
-About the numbers, I am not against it.  It is an heuristic.  Without
-numbers (and it is very load dependent) it is not clear that this one is
-going to be much worse/better than previous one (this should be a bit
-better, though).
-
-Thanks, Juan.
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
