@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49617)
+Received: from eggs.gnu.org ([209.51.188.92]:50181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDSt-0003ka-AZ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:55 -0500
+	(envelope-from <david@redhat.com>) id 1gmDUo-0005K5-5u
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDSr-0000Lt-9v
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmDSq-0000JY-VC
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:49 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Jan 2019 09:00:05 +0100
-Message-Id: <20190123080005.31078-5-kraxel@redhat.com>
-In-Reply-To: <20190123080005.31078-1-kraxel@redhat.com>
-References: <20190123080005.31078-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by default
+	(envelope-from <david@redhat.com>) id 1gmDUi-0001Di-3z
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:02:50 -0500
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122140110.47cf348b.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <cd8ed071-e68d-df12-62b7-4e9b6b932956@redhat.com>
+Date: Wed, 23 Jan 2019 09:02:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190122140110.47cf348b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/pci: PCI bridge plugging fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>
 
-Add the drivers listed in audio_possible_drivers to audio_drv_list,
-using the try-* variants.  That way the probable drivers are compiled by
-default if possible.
+On 22.01.19 14:01, Cornelia Huck wrote:
+> On Tue, 22 Jan 2019 13:51:31 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> Hotplugging of PCI bridges is right now pretty much broken. Coldpluggi=
+ng
+>> and hotplugging will assign wrong primary bus numbers in some scenario=
+s.
+>>
+>> I base my knowledge on how this is supposed to work on
+>> http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+>>
+>> I did a couple of tests, building whole hierarchies of bridges, both
+>> hot and coldplugged. "info pci" as well as the Linux guests showed
+>> what I was expecting.
+>>
+>> David Hildenbrand (2):
+>>   s390x/pci: Fix primary bus number for PCI bridges
+>>   s390x/pci: Fix hotplugging of PCI bridges
+>>
+>>  hw/s390x/s390-pci-bus.c | 41 +++++++++++++++++++++++++++-------------=
+-
+>>  1 file changed, 27 insertions(+), 14 deletions(-)
+>>
+>=20
+> I'll leave the actual review of this to folks familiar with how zPCI is
+> supposed to work :)
+>=20
+> Does the guest actually see anything of this? Consistency is good, and
+> not crashing even better, but I think all of the topology is invisible
+> on the guest side anyway...
+>=20
 
-This is RfC because we might look at the ordering.  On linux we probably
-want prefer alsa over oss.  Not sure about pulseaudio.  Most linux
-distros use pulse by default on desktops.  On servers it'll probably not
-be available.  Dunno how the situation looks like on the bsd family.
+I am no PCI expert, but I think the guest is able to read/write these
+numbers via the configuration space. As far as I can see, on x86 the
+BIOS builds the topology. On Power/s390x this job is delegated to
+firmware / QEMU.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- configure | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+There are quite some numbers in QEMU relying on these numbers to be
+correct: E.g. pci_secondary_bus_in_range()
 
-diff --git a/configure b/configure
-index bbadd83fea..26e7668028 100755
---- a/configure
-+++ b/configure
-@@ -790,13 +790,13 @@ MINGW32*)
- ;;
- GNU/kFreeBSD)
-   bsd="yes"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl try-pa"
-   audio_possible_drivers="oss sdl pa"
- ;;
- FreeBSD)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl try-pa"
-   audio_possible_drivers="oss sdl pa"
-   # needed for kinfo_getvmmap(3) in libutil.h
-   LIBS="-lutil $LIBS"
-@@ -809,14 +809,14 @@ FreeBSD)
- DragonFly)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl try-pa"
-   audio_possible_drivers="oss sdl pa"
-   HOST_VARIANT_DIR="dragonfly"
- ;;
- NetBSD)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl"
-   oss_lib="-lossaudio"
-   HOST_VARIANT_DIR="netbsd"
-@@ -841,7 +841,7 @@ Darwin)
-     LDFLAGS="-arch x86_64 $LDFLAGS"
-   fi
-   cocoa="yes"
--  audio_drv_list="coreaudio"
-+  audio_drv_list="coreaudio try-sdl"
-   audio_possible_drivers="coreaudio sdl"
-   LDFLAGS="-framework CoreFoundation -framework IOKit $LDFLAGS"
-   libs_softmmu="-F/System/Library/Frameworks -framework Cocoa -framework IOKit $libs_softmmu"
-@@ -857,7 +857,7 @@ SunOS)
-   install="${INSTALL-ginstall}"
-   smbd="${SMBD-/usr/sfw/sbin/smbd}"
-   if test -f /usr/include/sys/soundcard.h ; then
--    audio_drv_list="oss"
-+    audio_drv_list="oss try-sdl"
-   fi
-   audio_possible_drivers="oss sdl"
- # needed for CMSG_ macros in sys/socket.h
-@@ -875,7 +875,7 @@ Haiku)
-   LIBS="-lposix_error_mapper -lnetwork $LIBS"
- ;;
- Linux)
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-alsa try-sdl try-pa"
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-   linux_user="yes"
--- 
-2.9.3
+If the guest relies on the topology to be correct, things can go wrong.
+I have no idea how Linux guests actually use the topology.
+
+Also, the output of "info pci" will be wrong.
+
+Anyhow, this is the right thing to do, but I agree that Patch #1 might
+not be as critical as patch #2.
+
+--=20
+
+Thanks,
+
+David / dhildenb
