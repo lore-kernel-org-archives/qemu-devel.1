@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45329)
+Received: from eggs.gnu.org ([209.51.188.92]:45614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gmL9m-0001XF-SI
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:13:39 -0500
+	(envelope-from <lcapitulino@redhat.com>) id 1gmLAo-0002LF-No
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:14:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gmL9l-0005CB-ES
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:13:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gmL9l-00059e-4D
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:13:37 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20190118223400.24311-1-lersek@redhat.com>
-	<20190118223400.24311-5-lersek@redhat.com>
-	<fd79f085-f3d8-dc06-9d43-9c4fcea69317@redhat.com>
-	<8d4dc6b0-d4d9-2919-194f-c27cb40699b3@redhat.com>
-	<CAFEAcA8uVAXMuwVk2ZLAP34Hk_tp9dvWjy06gauyohesOvCuNg@mail.gmail.com>
-	<5cc9c1e9-4fd7-27c4-46bc-2388148945c5@redhat.com>
-Message-ID: <90bd9ea1-916e-f3ae-d4dc-f0f69b7400c2@redhat.com>
-Date: Wed, 23 Jan 2019 17:13:21 +0100
+	(envelope-from <lcapitulino@redhat.com>) id 1gmLAn-0005se-VN
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 11:14:42 -0500
+Date: Wed, 23 Jan 2019 11:04:17 -0500
+From: Luiz Capitulino <lcapitulino@redhat.com>
+Message-ID: <20190123110417.69e41c38@doriath>
+In-Reply-To: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
+References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5cc9c1e9-4fd7-27c4-46bc-2388148945c5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/5] tests/uefi-test-tools: add build
- scripts
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Aborts in iotest 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu devel list <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, dgilbert@redhat.com
 
-On 01/22/19 13:02, Laszlo Ersek wrote:
-> On 01/21/19 20:30, Peter Maydell wrote:
->> On Mon, 21 Jan 2019 at 19:09, Laszlo Ersek <lersek@redhat.com> wrote:
->>> It wasn't clear to me whether and how multi-threaded builds were
->>> supposed to be used by maintainers, whenever they'd update
->>> "tests/data/uefi-boot-images/*".
->>>
->>> I saw that "make" was invoked everywhere as $(MAKE), but that didn't
->>> clarify any intent around "-j". So I didn't test "-j" at all, and in
->>> fact I wouldn't have expected it to work:
->>
->> The usual assumption with make is that "-jN" should work
->> and at least (if the thing being built can't actually
->> be parallelized usefully) be no worse than if you'd not
->> specified a -j option. We have occasionally had problems
->> with -jN in 'make check' (usually because several test cases
->> were trying to use the same temp filename or similar) but
->> we've treated them as bugs and squashed them.
->>
->>> The "build" base tool in edk2 implements part of the job with generat=
-ed
->>> makefiles and invoking "make" itself, thus, despite .NOTPARALLEL, it
->>> likely inherits the outermost -j<N> setting -- and it doesn't expect =
-such.
->>>
->>> So the best I can offer here is to check $MAKEFLAGS in "build.sh", an=
-d
->>> exit with an early, explicit error if $MAKEFLAGS contains "-j", "-l",=
- or
->>> their long variants (--jobs, --load-average).
->>
->> Could you sanitize MAKEFLAGS in build.sh instead to remove the
->> parallelization options?
->=20
-> I've looked into MAKEFLAGS in a bit more depth now; both the
-> documentation and some debug prints. Manipulating MAKEFLAGS looks
-> somewhat brittle.
->=20
-> So, I was about to suggest that I use the .NOTPARALLEL special target
-> recommended by Phil, for the .efi binaries (which would ensure that no
-> two instances of the "build" base tool run at the same time), *plus*
-> that I submit a patch to edk2 so that the makefiles generated by the
-> "build" tool also contain .NOTPARALLEL.
->=20
-> (Because, to quote the make docs again, "If .NOTPARALLEL is mentioned a=
-s
-> a target, then this invocation of make will be run serially, even if th=
-e
-> =E2=80=98-j=E2=80=99 option is given. Any recursively invoked make comm=
-and will still
-> run recipes in parallel (unless its makefile also contains this target)=
-.")
->=20
-> However: when I wanted to see the actual error from using .NOTPARALLEL
-> *only* in "tests/uefi-test-tools/Makefile", and not in the
-> build-generated makefiles, I failed to get any error. All the output
-> images were built just fine.
->=20
-> Phil: when you wrote that "The following patch didn't help" -- referrin=
-g
-> to .NOTPARALLEL, added only to "tests/uefi-test-tools/Makefile"-- , did
-> you clean your tree first (with "make clean" or "git clean -ffdx")?
->=20
-> Because now I'm thinking that the *individual* makefiles generated by
-> edk2's "build" base tool might actually compatible with "-j", and your
-> testing of .NOTPARALLEL failed only because your build tree (for exampl=
-e
-> the Conf/ subdir -- list it with "-A") was in a messy state from your
-> previous -j4 attempt (where you didn't use .NOTPARALLEL at all).
+On Wed, 23 Jan 2019 16:48:49 +0100
+Max Reitz <mreitz@redhat.com> wrote:
 
-FWIW, I've asked
+> Hi,
+> 
+> When running 169 in parallel (e.g. like so:
+> 
+> $ while TEST_DIR=/tmp/t0 ./check -T -qcow2 169; do; done
+> $ while TEST_DIR=/tmp/t1 ./check -T -qcow2 169; do; done
+> $ while TEST_DIR=/tmp/t2 ./check -T -qcow2 169; do; done
+> $ while TEST_DIR=/tmp/t3 ./check -T -qcow2 169; do; done
+> 
+> in four different shells), I get aborts:
 
-- both on edk2-devel, about adding .NOTPARALLEL to the generated inner
-makefiles:
+OK, is this part of a test-suite that's also running migration
+tests in parallel or in sequence? In other words, what does
+iotests have to do with migration (sorry if this is stupid
+question, but it's been years I don't do qemu).
 
-  "parallelism in the module-level, generated GNUmakefile's"
-  https://lists.01.org/pipermail/edk2-devel/2019-January/035463.html
+More below.
 
-- and on help-make, about safely filtering the job-related options from
-MAKEFLAGS, between the outer and inner "make" processes:
+[...]
 
-  "filtering job options from MAKEFLAGS, manually"
-  http://lists.gnu.org/archive/html/help-make/2019-01/msg00003.html
+> The backtrace always goes like this:
+> 
+> (gdb) bt
+> #0  0x00007f0acf5cc53f in raise () at /lib64/libc.so.6
+> #1  0x00007f0acf5b6895 in abort () at /lib64/libc.so.6
+> #2  0x000055a46ebbb1a6 in runstate_set (new_state=RUN_STATE_POSTMIGRATE)
+> at vl.c:742
+> #3  0x000055a46ebbb1a6 in runstate_set
+> (new_state=new_state@entry=RUN_STATE_POSTMIGRATE) at vl.c:730
+> #4  0x000055a46ed39129 in migration_iteration_finish (s=0x55a4708be000)
+> at migration/migration.c:2972
+> #5  0x000055a46ed39129 in migration_thread
+> (opaque=opaque@entry=0x55a4708be000) at migration/migration.c:3130
+> #6  0x000055a46eea665a in qemu_thread_start (args=<optimized out>) at
+> util/qemu-thread-posix.c:502
+> 
+> 
+> #7  0x00007f0acf76258e in start_thread () at /lib64/libpthread.so.0
+> #8  0x00007f0acf6916a3 in clone () at /lib64/libc.so.6
+> (gdb) frame 2
+> #2  0x000055a46ebbb1a6 in runstate_set (new_state=RUN_STATE_POSTMIGRATE)
+> at vl.c:742
+> 742             abort();
+> (gdb) print current_run_state
+> $1 = RUN_STATE_RUNNING
+> 
+> 
+> Neither of migration or runstates are my strong suite, so I thought I'd
+> report it before diving into it.
 
-Thanks
-Laszlo
+So, the problem seems to be that qemu is going from running state to
+postmigrate state. IIRC, this is is an invalid state transition. The
+valid states to transition to depends if this guest is the source or
+target for migration.
+
+When this happened in the past it meant some QEMU code skipped a
+transition, but I can't tell what this has to do with iotests.
