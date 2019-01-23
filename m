@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38334)
+Received: from eggs.gnu.org ([209.51.188.92]:38508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gmPz6-0005sy-0J
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:22:57 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gmPzS-0006Ew-9E
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gmPz4-0001bI-Vp
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:22:55 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gmPzR-0001pe-IV
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:23:18 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 23 Jan 2019 21:22:29 +0000
+Message-Id: <20190123212234.32068-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
-	<2153eec6-f25f-4e34-6423-01d76a14815c@linaro.org>
-	<66fd9695-c511-b068-7cf1-b529d9f44d9d@mail.uni-paderborn.de>
-In-Reply-To: <66fd9695-c511-b068-7cf1-b529d9f44d9d@mail.uni-paderborn.de>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 23 Jan 2019 13:22:19 -0800
-Message-ID: <CAKmqyKM8NKY5uzYezWbR5cxfpMpy=VFof3BrOhRaDZsbFHLrig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
- decodetree
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/5] arm: microbit Non-Volatile Memory
+ Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +21,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Joel Stanley <joel@jms.id.au>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, jusual@mail.ru, Laurent Vivier <lvivier@redhat.com>, jim@groklearning.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Jan 23, 2019 at 1:15 AM Bastian Koppelmann
-<kbastian@mail.uni-paderborn.de> wrote:
->
->
-> On 1/22/19 10:38 PM, Richard Henderson wrote:
-> > On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
-> >> Hi,
-> >>
-> >> this patchset converts the RISC-V decoder to decodetree in four major steps:
-> >>
-> >> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
-> >>      Many of the gen_* functions are called by the decode functions for 16-bit
-> >>      and 32-bit functions. If we move translation code from the gen_*
-> >>      functions to the generated trans_* functions of decode-tree, we get a lot of
-> >>      duplication. Therefore, we mostly generate calls to the old gen_* function
-> >>      which are properly replaced after step 2).
-> >>
-> >>      Each of the trans_ functions are grouped into files corresponding to their
-> >>      ISA extension, e.g. addi which is in RV32I is translated in the file
-> >>      'trans_rvi.inc.c'.
-> >>
-> >> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
-> >>      All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
-> >>      we convert the arguments in the 16 bit trans_ function to the arguments of
-> >>      the corresponding 32 bit instruction and call the 32 bit trans_ function.
-> >>
-> >> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
-> >>      this move all manual translation code into the trans_* instructions of
-> >>      decode tree, such that we can remove the old decode_* functions.
-> >>
-> >> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
-> >>     by Richard. [Patch 31-35]
-> >>
-> >> full tree available at
-> >> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
-> >>
-> >> Cheers,
-> >> Bastian
-> >>
-> >> v4 -> v5:
-> >>      - fixed rebase error
-> >>      - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
-> >>      - removed extra sign extension of sraiw
-> >>      - removed rs2 == 0 special cases in sraw/srlw
-> > All looks good to me now.  Thanks for persevering.
->
->
-> Thanks for your great reviews. I'll do a final respin to fix the funky
-> indentations. Alistair do you want to pick up the series?
+v2:
+ * Add Patch 2 to call memory_region_flush_rom_device() from pflash devic=
+es
+   [Peter]
 
-Thanks, the series looks good :)
+This series adds the Non-Volatile Memory Controller, which controls acces=
+s to
+the User Information Control Registers (UICR), Factory Information Contro=
+l
+Registers (FICR), and flash memory.
 
-Palmer is in charge of pull requests for RISC-V QEMU. So it will have
-to go through him.
+This is the last piece of microbit work needed to make basic programs lik=
+e
+Micropython "Hello world" work under QEMU.
 
-Alistair
+Originally sent as part of Steffen's longer microbit device emulation ser=
+ies, I
+extracted this and deferred it until later because cleanups were necessar=
+y:
 
->
-> Cheers,
->
-> Bastian
->
->
+ * Use memory_region_flush_rom_device() to dirty/invalidate memory [Peter=
+]
+   ^--- Paolo: I CCed you on this new memory API
+ * Fix device-introspect-test segfault due to missing owner when initiali=
+zing
+   FICR and UICR memory regions [Peter]
+ * Fix off-by-one assertion checks [Peter]
+ * Fix missing whitespace at end of comment [Peter]
+ * Clear UICR on reset - we'd need a block device for true non-volatility
+   [Peter]
+
+Stefan Hajnoczi (2):
+  memory: add memory_region_flush_rom_device()
+  pflash: flush rom device memory region
+
+Steffen G=C3=B6rtz (3):
+  hw/nvram/nrf51_nvm: Add nRF51 non-volatile memories
+  arm: Instantiate NRF51 special NVM's and NVMC
+  tests/microbit-test: Add tests for nRF51 NVMC
+
+ hw/nvram/Makefile.objs       |   1 +
+ include/exec/memory.h        |  18 ++
+ include/hw/arm/nrf51_soc.h   |   2 +
+ include/hw/nvram/nrf51_nvm.h |  64 ++++++
+ exec.c                       |  12 ++
+ hw/arm/nrf51_soc.c           |  41 ++--
+ hw/block/pflash_cfi01.c      |   5 +
+ hw/block/pflash_cfi02.c      |   8 +
+ hw/nvram/nrf51_nvm.c         | 381 +++++++++++++++++++++++++++++++++++
+ tests/microbit-test.c        |  97 +++++++++
+ 10 files changed, 617 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/nvram/nrf51_nvm.h
+ create mode 100644 hw/nvram/nrf51_nvm.c
+
+--=20
+2.20.1
