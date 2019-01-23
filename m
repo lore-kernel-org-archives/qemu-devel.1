@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54215)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXO-00025G-3a
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:46 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:57992)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gmGir-0001PJ-Pw
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXL-0007ec-KR
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:56743 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gmGXK-0007cc-9K
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:39 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 23 Jan 2019 12:15:57 +0100
-Message-Id: <1548242160-16039-7-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 6/9] disas: nanoMIPS: Amend DSP instructions
- related comments
+	(envelope-from <n54@gmx.com>) id 1gmGiq-0004gz-Vn
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:29:33 -0500
+Received: from mout.gmx.net ([212.227.17.20]:58763)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmGiq-0004gh-MF
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:29:32 -0500
+References: <20190123080005.31078-1-kraxel@redhat.com>
+	<20190123080005.31078-5-kraxel@redhat.com>
+	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+	<20190123093657.GC27270@redhat.com>
+	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
+	<20190123101238.GD27270@redhat.com>
+	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
+	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+	<52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
+	<CAFEAcA9tD+AaTMDgUXO-XAfw8ftsip2n6Ew=GwVbPgMFzo01-Q@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <04d70037-0ea3-9d92-0e65-da32cb7388d5@gmx.com>
+Date: Wed, 23 Jan 2019 12:30:28 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9tD+AaTMDgUXO-XAfw8ftsip2n6Ew=GwVbPgMFzo01-Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="D1BpFIHNqS3gCBcwurfxOwD0UdZBF31aI"
+Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,420 +37,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D1BpFIHNqS3gCBcwurfxOwD0UdZBF31aI
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Brad Smith <brad@comstyle.com>
+Message-ID: <04d70037-0ea3-9d92-0e65-da32cb7388d5@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
+ default
+References: <20190123080005.31078-1-kraxel@redhat.com>
+ <20190123080005.31078-5-kraxel@redhat.com>
+ <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+ <20190123093657.GC27270@redhat.com>
+ <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
+ <20190123101238.GD27270@redhat.com>
+ <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
+ <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+ <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
+ <CAFEAcA9tD+AaTMDgUXO-XAfw8ftsip2n6Ew=GwVbPgMFzo01-Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA9tD+AaTMDgUXO-XAfw8ftsip2n6Ew=GwVbPgMFzo01-Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Amend some DSP instructions related comments.
+On 23.01.2019 12:16, Peter Maydell wrote:
+> On Wed, 23 Jan 2019 at 11:09, Kamil Rytarowski <n54@gmx.com> wrote:
+>>
+>> On 23.01.2019 11:59, Peter Maydell wrote:
+>>> On Wed, 23 Jan 2019 at 10:37, Kamil Rytarowski <n54@gmx.com> wrote:
+>>>> OSS is the portable UNIX audio backend. We could point some flaws in=
+ it,
+>>>> but it's a good enough for portable UNIX applications. The question =
+is
+>>>> what UNIX-like desktop OS does not implement it or removed it.
+>>>
+>>> If your desktop's native audio API is pulse, like Linux's often
+>>> is, then you want to use pulse directly, because the compat layers
+>>> are (or were last time I looked) not great, and typically add
+>>> in an extra thread and an extra layer of buffering, which means
+>>> more latency or more audio dropouts or both.
+>=20
+>> Pulseaudio uses OSS backend on NetBSD anyway and we keep an in-kernel
+>> mixer. So it adds nothing except additional intermediate layer.
+>=20
+> Yes, exactly -- if your native API is OSS, we should be using that.
+> It's the compat layers that are problematic, so we can't just use
+> a single portable API on all platforms.
+>=20
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- disas/nanomips.cpp | 119 +++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 75 insertions(+), 44 deletions(-)
+OSS is +/- native for NetBSD, it uses a different selection of ioctl(2)s
+and a thin compat layer in the kernel.
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 17f4c22..f90f1a9 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -1836,7 +1836,8 @@ std::string NMD::ABS_S(uint64 instruction)
- 
- 
- /*
-- * ABSQ_S.PH rt, rs - Find Absolute Value of Two Fractional Halfwords
-+ * [DSP] ABSQ_S.PH rt, rs - Find absolute value of two fractional halfwords
-+ *         with 16-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -1857,7 +1858,8 @@ std::string NMD::ABSQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ABSQ_S.QB rt, rs - Find Absolute Value of Four Fractional Byte Values
-+ * [DSP] ABSQ_S.QB rt, rs - Find absolute value of four fractional byte values
-+ *         with 8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -1878,7 +1880,8 @@ std::string NMD::ABSQ_S_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] ABSQ_S.W rt, rs - Find absolute value of fractional word with 32-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2233,7 +2236,7 @@ std::string NMD::ADDIUPC_48_(uint64 instruction)
- 
- 
- /*
-- * ADDQ.PH rd, rt, rs - Add Fractional Halfword Vectors
-+ * [DSP] ADDQ.PH rd, rt, rs - Add fractional halfword vectors
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2257,7 +2260,8 @@ std::string NMD::ADDQ_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQ_S.PH rd, rt, rs - Add Fractional Halfword Vectors
-+ * [DSP] ADDQ_S.PH rd, rt, rs - Add fractional halfword vectors with 16-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2281,7 +2285,7 @@ std::string NMD::ADDQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQ_S.W rd, rt, rs - Add Fractional Words
-+ * [DSP] ADDQ_S.W rd, rt, rs - Add fractional words with 32-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2305,8 +2309,8 @@ std::string NMD::ADDQ_S_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH.PH rd, rt, rs - Add Fractional Halfword Vectors And Shift Right
-- *                       to Halve Results
-+ * [DSP] ADDQH.PH rd, rt, rs - Add fractional halfword vectors and shift
-+ *         right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2330,8 +2334,8 @@ std::string NMD::ADDQH_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.PH rd, rt, rs - Add Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] ADDQH_R.PH rd, rt, rs - Add fractional halfword vectors and shift
-+ *         right to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2355,7 +2359,8 @@ std::string NMD::ADDQH_R_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] ADDQH_R.W rd, rt, rs - Add fractional words and shift right to halve
-+ *         results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2379,7 +2384,8 @@ std::string NMD::ADDQH_R_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] ADDQH.W rd, rt, rs - Add fractional words and shift right to halve
-+ *         results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2403,7 +2409,7 @@ std::string NMD::ADDQH_W(uint64 instruction)
- 
- 
- /*
-- * ADDSC rd, rt, rs - Add Signed Word and Set Carry Bit
-+ * [DSP] ADDSC rd, rt, rs - Add two signed words and set carry bit
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2496,7 +2502,7 @@ std::string NMD::ADDU_4X4_(uint64 instruction)
- 
- 
- /*
-- * ADDU.PH rd, rt, rs - Unsigned Add Integer Halfwords
-+ * [DSP] ADDU.PH rd, rt, rs - Add two pairs of unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2544,7 +2550,8 @@ std::string NMD::ADDU_QB(uint64 instruction)
- 
- 
- /*
-- * ADDU_S.PH rd, rt, rs - Unsigned Add Integer Halfwords
-+ * [DSP] ADDU_S.PH rd, rt, rs - Add two pairs of unsigned halfwords with 16-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -7848,7 +7855,7 @@ std::string NMD::INS(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] INSV - Insert bit field variable
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9698,7 +9705,8 @@ std::string NMD::LWXS_32_(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MADD ac, rs, rt - Multiply two words and add to the specified
-+ *         accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9770,7 +9778,8 @@ std::string NMD::MADDF_S(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MADDU ac, rs, rt - Multiply two unsigned words and add to the
-+ *         specified accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9794,7 +9803,8 @@ std::string NMD::MADDU_DSP_(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_S.W.PHL ac, rs, rt - Multiply the left-most single vector
-+ *         fractional halfword elements with accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9818,7 +9828,8 @@ std::string NMD::MAQ_S_W_PHL(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_S.W.PHR ac, rs, rt - Multiply the right-most single vector
-+ *         fractional halfword elements with accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9842,7 +9853,8 @@ std::string NMD::MAQ_S_W_PHR(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_SA.W.PHL ac, rs, rt - Multiply the left-most single vector
-+ *         fractional halfword elements with saturating accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9866,7 +9878,8 @@ std::string NMD::MAQ_SA_W_PHL(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_SA.W.PHR ac, rs, rt - Multiply the right-most single vector
-+ *         fractional halfword elements with saturating accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11722,7 +11735,8 @@ std::string NMD::ORI(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PACKRL.PH rd, rs, rt - Pack a word using the right halfword from one
-+ *         source register and left halfword from another source register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11764,7 +11778,8 @@ std::string NMD::PAUSE(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PICK.PH rd, rs, rt - Pick a vector of halfwords based on condition
-+ *         code bits
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11788,7 +11803,8 @@ std::string NMD::PICK_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PICK.QB rd, rs, rt - Pick a vector of byte values based on condition
-+ *         code bits
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11812,7 +11828,8 @@ std::string NMD::PICK_QB(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQ.W.PHL rt, rs - Expand the precision of the left-most element
-+ *         of a paired halfword
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11834,7 +11851,8 @@ std::string NMD::PRECEQ_W_PHL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQ.W.PHR rt, rs - Expand the precision of the right-most element
-+ *         of a paired halfword
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11856,7 +11874,8 @@ std::string NMD::PRECEQ_W_PHR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBLA rt, rs - Expand the precision of the two
-+ *         left-alternate elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11878,7 +11897,8 @@ std::string NMD::PRECEQU_PH_QBLA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBL rt, rs - Expand the precision of the two left-most
-+ *         elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11900,7 +11920,8 @@ std::string NMD::PRECEQU_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBRA rt, rs - Expand the precision of the two
-+ *         right-alternate elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11922,7 +11943,8 @@ std::string NMD::PRECEQU_PH_QBRA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBR rt, rs - Expand the precision of the two right-most
-+ *         elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11944,7 +11966,9 @@ std::string NMD::PRECEQU_PH_QBR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBLA rt, rs - Expand the precision of the two
-+ *         left-alternate elements of a quad byte vector to four unsigned
-+ *         halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11966,7 +11990,8 @@ std::string NMD::PRECEU_PH_QBLA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBL rt, rs - Expand the precision of the two left-most
-+ *         elements of a quad byte vector to form unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11988,7 +12013,9 @@ std::string NMD::PRECEU_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBRA rt, rs - Expand the precision of the two
-+ *         right-alternate elements of a quad byte vector to form four
-+ *         unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12010,7 +12037,8 @@ std::string NMD::PRECEU_PH_QBRA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBR rt, rs - Expand the precision of the two right-most
-+ *         elements of a quad byte vector to form unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15202,7 +15230,7 @@ std::string NMD::SUBU_32_(uint64 instruction)
- 
- 
- /*
-- * SUBU.PH rd, rs, rt - Subtract Unsigned Integer Halfwords
-+ * [DSP] SUBU.PH rd, rs, rt - Subtract unsigned unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15226,7 +15254,7 @@ std::string NMD::SUBU_PH(uint64 instruction)
- 
- 
- /*
-- * SUBU.QB rd, rs, rt - Subtract Unsigned Quad Byte Vector
-+ * [DSP] SUBU.QB rd, rs, rt - Subtract unsigned quad byte vectors
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15250,7 +15278,8 @@ std::string NMD::SUBU_QB(uint64 instruction)
- 
- 
- /*
-- * SUBU_S.PH rd, rs, rt - Subtract Unsigned Integer Halfwords (saturating)
-+ * [DSP] SUBU_S.PH rd, rs, rt - Subtract unsigned unsigned halfwords with
-+ *         8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15274,7 +15303,8 @@ std::string NMD::SUBU_S_PH(uint64 instruction)
- 
- 
- /*
-- * SUBU_S.QB rd, rs, rt - Subtract Unsigned Quad Byte Vector (saturating)
-+ * [DSP] SUBU_S.QB rd, rs, rt - Subtract unsigned quad byte vectors with
-+ *         8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15298,8 +15328,8 @@ std::string NMD::SUBU_S_QB(uint64 instruction)
- 
- 
- /*
-- * SUBUH.QB rd, rs, rt - Subtract Unsigned Bytes And Right Shift to Halve
-- *                         Results
-+ * [DSP] SUBUH.QB rd, rs, rt - Subtract unsigned bytes and right shift
-+ *         to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15323,8 +15353,8 @@ std::string NMD::SUBUH_QB(uint64 instruction)
- 
- 
- /*
-- * SUBUH_R.QB rd, rs, rt - Subtract Unsigned Bytes And Right Shift to Halve
-- *                           Results (rounding)
-+ * [DSP] SUBUH_R.QB rd, rs, rt - Subtract unsigned bytes and right shift
-+ *         to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -16412,7 +16442,8 @@ std::string NMD::WAIT(uint64 instruction)
- 
- 
- /*
-- * WRDSP rt, mask - Write Fields to DSPControl Register from a GPR
-+ * [DSP] WRDSP rt, mask - Write selected fields from a GPR to the DSPControl
-+ *         register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
--- 
-2.7.4
+Maintaining a backend support for SunOS API (our current native audio)
+does not win us at this point anything and it makes things worse as
+there would be a need for more code to maintain. In my opinion it's
+better to not add support for it in 3rd party software and look for
+moving forward into sound subsystem on par with more modern solutions.
+Until we will get there, the right thing is to use OSS.
+
+>> For non-professional audio purposes OSS is good enough for such
+>> applications.
+>=20
+> QEMU has to care about the buffering that compat layers add,
+> because guest programs tend to work on the assumption that they're
+> talking directly to the hardware and extra buffering trips them up.
+>=20
+> thanks
+> -- PMM
+>=20
+
+Correct, we don't want a stack of unwanted software like pulseaudio.
+
+
+--D1BpFIHNqS3gCBcwurfxOwD0UdZBF31aI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIUFQMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsx8cQAKKpXidCHd3CppC9bioFCabAIc6+g1g5JKIE6S+R
+NamgzT6GIRdnXo96ihspYSStTdEy8kSeu0vyqJzYLumj9ZMdT/G5fOgpsaweotHH
+8HKi3Az8X+unzME5KOYfpEUheJPdRNCbOBznX8F5EkVj+1hF+80wlhlIoBp3nBOi
+unjGzvJMTyttFS6g3XIVJ0RogwZiGA1pjOypLKlPD3Xn3DTKLcDF+vNozuZN/D6g
+iuA+A5HHhFw512XCafXmiGCCRfOaNjrTGiJoC7RfSx6pOCLeIELgShOpmPHF+fE2
+zXW61h+QhPiOjQidCzwGZowHLmVysJ80xfzYto/Uw0G9QW6Tp16NlRRM3fE04M9o
+VQ7grzndJVmxkqvNwsKF8BZXBerynOdRAKp/RYfQk/drCys1g7bBa9sWymeBbwbi
+vrlK6WC51UmLSHqcdmYNTjJ1KesmpS0BrfO5YhhtPtoiViF6Z+84VlzQa7ag74x2
+p5LSw4GowiEjjP5X5AuveyZzkpir7WSGW0jhVaVrCUrdXgRXvXLP+YxkI0iDnFy6
+C0FI09MOlP7F9zzm3QrhfmQsxbPUalFbVMbRqYmW9/Rwfvu6qovr3WPuKdKtNTSv
+iciZSI35c6ibx1Xtusm7SwOasZjcePsiGSJnhr1cHl4oH+S12ZjeO+jWCOGF+psu
+srmG
+=MSns
+-----END PGP SIGNATURE-----
+
+--D1BpFIHNqS3gCBcwurfxOwD0UdZBF31aI--
