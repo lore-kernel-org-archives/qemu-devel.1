@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57555)
+Received: from eggs.gnu.org ([209.51.188.92]:58660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmNBv-0003M1-Fz
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:24:00 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmNGq-00058q-T1
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmNBu-0003ix-QO
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:23:59 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33856)
+	(envelope-from <philmd@redhat.com>) id 1gmNGp-0005n4-9e
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:04 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45279)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmNBu-0003hT-KM
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:23:58 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y185so514255wmd.1
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:23:57 -0800 (PST)
-References: <20190122162924.26491-1-stefanha@redhat.com>
-	<a60dbcd8-df39-ebe9-a86b-92bc468b8ec2@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmNGp-0005ln-0c
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:03 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t6so3634219wrr.12
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:29:01 -0800 (PST)
+References: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1548242160-16039-10-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <081eec1f-47d7-3fe0-0951-171383589e2f@redhat.com>
-Date: Wed, 23 Jan 2019 19:23:54 +0100
+Message-ID: <544d3c67-c766-6069-607b-97bf32cf40f6@redhat.com>
+Date: Wed, 23 Jan 2019 19:28:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <a60dbcd8-df39-ebe9-a86b-92bc468b8ec2@redhat.com>
+In-Reply-To: <1548242160-16039-10-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update microbit ARM board
- files
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] MAINTAINERS: Update MIPS sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, jusual@mail.ru, contrib@steffen-goertz.de, joel@jms.id.au
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
 
-On 1/23/19 7:19 AM, Thomas Huth wrote:
-> On 2019-01-22 17:29, Stefan Hajnoczi wrote:
->> New source files were added without corresponding ./MAINTAINERS file
->> entries.  Let's get things up to date.
->>
->> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> ---
->> This also includes the I2C/TWI stub which Peter has merged into his
->> target-arm.next tree but isn't in qemu.git/master yet.
->> ---
->>  MAINTAINERS | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index af339b86db..e3cb67e81d 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -833,7 +833,19 @@ L: qemu-arm@nongnu.org
->>  S: Maintained
->>  F: hw/arm/nrf51_soc.c
->>  F: hw/arm/microbit.c
->> +F: hw/char/nrf51_uart.c
->> +F: hw/gpio/nrf51_gpio.c
->> +F: hw/i2c/microbit_i2c.c
->> +F: hw/misc/nrf51_rng.c
->> +F: hw/timer/nrf51_timer.c
->>  F: include/hw/arm/nrf51_soc.h
->> +F: include/hw/arm/nrf51.h
->> +F: include/hw/char/nrf51_uart.h
->> +F: include/hw/gpio/nrf51_gpio.h
->> +F: include/hw/i2c/microbit_i2c.h
->> +F: include/hw/misc/nrf51_rng.h
->> +F: include/hw/timer/nrf51_timer.h
->> +F: tests/microbit-test.c
+On 1/23/19 12:16 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Looks like using wildcards would be easier here:
+> Remove Stefan Markovic as a reviewer for MIPS directories and
+> files, as he left Wave Computing.
 > 
-> F: hw/*/nrf51*.c
-> F: hw/*/microbit*.c
-> F: include/hw/*/nrf51*.h
-
-Agreed :)
-
-> ...
-> 
-> ?
-> 
-> Anyway:
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  MAINTAINERS | 9 ---------
+>  1 file changed, 9 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index af339b8..060db23 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -206,7 +206,6 @@ MIPS
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: target/mips/
+>  F: default-configs/*mips*
+> @@ -365,7 +364,6 @@ F: target/arm/kvm.c
+>  MIPS
+>  M: James Hogan <jhogan@kernel.org>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: target/mips/kvm.c
+>  
+> @@ -890,7 +888,6 @@ MIPS Machines
+>  Jazz
+>  M: Hervé Poussineau <hpoussin@reactos.org>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_jazz.c
+>  F: hw/display/jazz_led.c
+> @@ -899,14 +896,12 @@ F: hw/dma/rc4030.c
+>  Malta
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_malta.c
+>  
+>  Mipssim
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_mipssim.c
+>  F: hw/net/mipsnet.c
+> @@ -914,14 +909,12 @@ F: hw/net/mipsnet.c
+>  R4000
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_r4k.c
+>  
+>  Fulong 2E
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_fulong2e.c
+>  F: hw/isa/vt82c686.c
+> @@ -931,7 +924,6 @@ F: include/hw/isa/vt82c686.h
+>  Boston
+>  M: Paul Burton <pburton@wavecomp.com>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/core/loader-fit.c
+>  F: hw/mips/boston.c
+> @@ -2203,7 +2195,6 @@ F: disas/i386.c
+>  MIPS target
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> -R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: tcg/mips/
+>  F: disas/mips.c
+> 
