@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44650)
+Received: from eggs.gnu.org ([209.51.188.92]:46756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmQPq-0004VD-7g
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:50:35 -0500
+	(envelope-from <rjones@redhat.com>) id 1gmQUt-0008M9-Io
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmQPn-0005er-8e
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:50:34 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:37760)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmQPn-0005Os-0P
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:50:31 -0500
-Received: by mail-oi1-x229.google.com with SMTP id y23so3156554oia.4
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:50:21 -0800 (PST)
+	(envelope-from <rjones@redhat.com>) id 1gmQUs-0003qj-Ea
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:55:47 -0500
+Date: Wed, 23 Jan 2019 21:55:21 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20190123215521.GD12500@redhat.com>
+References: <20190123211953.28578-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <20190121141152.948-1-kraxel@redhat.com>
-In-Reply-To: <20190121141152.948-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 Jan 2019 21:50:08 +0000
-Message-ID: <CAFEAcA9O=pDeT+cC=61NNGUXpWO0G52_HQ8ej4QNt8wxEqR4cw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] Ui 20190121 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190123211953.28578-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Deprecate qemu-nbd --partition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +22,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, qemu-block@nongnu.org, thuth@redhat.com, "reviewer:Incompatible changes" <libvir-list@redhat.com>
 
-On Mon, 21 Jan 2019 at 14:15, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 681d61362d3f766a00806b89d6581869041f73cb:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-01-17 12:48:42 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20190121-pull-request
->
-> for you to fetch changes up to fbd57c754f32804a63295f70f271d1ef128ee590:
->
->   egl-helpers.h: do not depend on X11 Window type, use EGLNativeWindowType (2019-01-21 09:44:32 +0100)
->
-> ----------------------------------------------------------------
-> ui: highres logo for sdl and gtk, bugfixes for vnc and egl.
->
-> ----------------------------------------------------------------
+On Wed, Jan 23, 2019 at 03:19:53PM -0600, Eric Blake wrote:
+> The existing qemu-nbd --partition code claims to handle logical
+> partitions up to 8, since its introduction in 2008 (commit 7a5ca86).
+> However, the implementation is bogus (actual MBR logical partitions
+> form a sort of linked list, with one partition per extended table
+> entry, rather than four logical partitions in a single extended
+> table), making the code unlikely to work for anything beyond -P5 on
+> actual guest images. What's more, the code does not support GPT
+> partitions, which are becoming more popular, and maintaining device
+> subsetting in both NBD and the raw device is unnecessary maintenance
+> burden.  And nbdkit has just added code to properly handle an
+> arbitrary number of MBR partitions, along with its existing code
+> for handling GPT partitions.
+> 
+> Note that obtaining the offsets of a partition can be learned by
+> using 'qemu-nbd -c /dev/nbd0 file.qcow2 && sfdisk --dump /dev/nbd0',
+> but by the time you've done that, you might as well just mount
+> /dev/nbd0p1 that the kernel creates for you.
+> 
+> Start the clock on the deprecation cycle, with an example of how
+> to write device subsetting without using -P.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  qemu-deprecated.texi | 27 +++++++++++++++++++++++++++
+>  qemu-nbd.texi        |  6 ++++--
+>  qemu-nbd.c           |  2 ++
+>  3 files changed, 33 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 219206a836f..12f8b30943f 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -175,3 +175,30 @@ The above, converted to the current supported format:
+>  @subsubsection "irq": "" (since 3.0.0)
+> 
+>  The ``irq'' property is obsoleted.
+> +
+> +@section Related binaries
+> +
+> +@subsection qemu-nbd --partition (since 4.0.0)
+> +
+> +The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
+> +can only handle MBR partitions, and does not correctly handle logical
+> +partitions beyond partition 5.  If you know the relative position of
+> +the partition (perhaps by using @code{sfdisk} or similar, either in
+> +the guest or when mapping the entire device through /dev/nbd0 in the
+> +host), you can achieve the effect of exporting just that subset of the
+> +disk by use of the @option{--image-opts} option with a raw blockdev
+> +using the @code{offset} and @code{size} parameters layered on top of
+> +any other existing blockdev.
+> +
+> +For example, if partition 1 is 100MiB starting at 1MiB, the old command
+> +
+> +@example{qemu-nbd -P 1 -f qcow2 file.qcow2}
+> +
+> +can be rewritten as:
+> +
+> +@example{qemu-nbd --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.backing.driver=file,file.backing.filename=file.qcow2}
+> +
+> +Alternatively, the @code{nbdkit} project provides a more powerful
+> +partition filter on top of its nbd plugin, which can be used to select
+> +an arbitrary MBR or GPT partition on top of any other full-image NBD
+> +export.
 
-Applied, thanks.
+You might want to add the actual command here.  Unfortunately nbdkit
+cannot read qcow2 files meaning (as you note already) that you have to
+forward the connection through the nbdkit-nbd-plugin to qemu-nbd.
+This worked for me:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+  qemu-nbd -t -k /tmp/sock -f qcow2 file.qcow2 &
+  nbdkit -f --filter=partition nbd socket=/tmp/sock partition=1 &
 
--- PMM
+If you drop the requirement to demonstrate this with qcow2 then the
+command would be just this:
+
+  nbdkit --filter=partition file disk.raw partition=1
+
+> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+> index 386bece4680..d0c51828149 100644
+> --- a/qemu-nbd.texi
+> +++ b/qemu-nbd.texi
+> @@ -56,8 +56,10 @@ auto-detecting.
+>  @item -r, --read-only
+>  Export the disk as read-only.
+>  @item -P, --partition=@var{num}
+> -Only expose MBR partition @var{num}.  Understands physical partitions
+> -1-4 and logical partitions 5-8.
+> +Deprecated: Only expose MBR partition @var{num}.  Understands physical
+> +partitions 1-4 and logical partition 5. New code should instead use
+> +@option{--image-opts} with the raw driver wrapping a subset of the
+> +original image.
+>  @item -B, --bitmap=@var{name}
+>  If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
+>  that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index 1f7b2a03f5d..00c07fd27ea 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -787,6 +787,8 @@ int main(int argc, char **argv)
+>              flags &= ~BDRV_O_RDWR;
+>              break;
+>          case 'P':
+> +            warn_report("The '-P' option is deprecated; use --image-opts with "
+> +                        "a raw device wrapper for subset exports instead");
+>              if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
+>                  partition < 1 || partition > 8) {
+>                  error_report("Invalid partition '%s'", optarg);
+
+But this is basically fine, so:
+
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
