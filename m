@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45467)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1gmHuB-00071k-Tw
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:45:22 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:45296)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <no-reply@patchew.org>) id 1gmHuW-0006wx-Ui
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1gmHuA-0001o5-0I
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:45:19 -0500
-Received: from mout.gmx.net ([212.227.15.18]:43985)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmHu6-0001k4-7k
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:45:16 -0500
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-	<20190123101238.GD27270@redhat.com>
-	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-	<52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-	<20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <da0587e0-44a2-a0f8-3df4-628973db42fd@gmx.com>
-Date: Wed, 23 Jan 2019 13:45:58 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gmHm7-00055Z-3L
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:37:00 -0500
+Resent-Message-Id: <E1gmHm7-00055Z-3L@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21727)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gmHm6-00054y-SF
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:36:59 -0500
+Message-ID: <154824698623.21.15222267480644632585@ebba9967afc0>
+In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gEOF8QdlbrLeBFsj9V6HGYlWeE5bUZN7D"
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 23 Jan 2019 04:36:27 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,103 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
+To: eblake@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gEOF8QdlbrLeBFsj9V6HGYlWeE5bUZN7D
-From: Kamil Rytarowski <n54@gmx.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski
- <kamil@netbsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
-Message-ID: <da0587e0-44a2-a0f8-3df4-628973db42fd@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
-References: <20190123080005.31078-1-kraxel@redhat.com>
- <20190123080005.31078-5-kraxel@redhat.com>
- <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
- <20190123093657.GC27270@redhat.com>
- <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
- <20190123101238.GD27270@redhat.com>
- <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
- <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
- <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
- <20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
-In-Reply-To: <20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 23.01.2019 13:20, Gerd Hoffmann wrote:
->   Hi,
->=20
->> Pulseaudio uses OSS backend on NetBSD anyway and we keep an in-kernel
->> mixer. So it adds nothing except additional intermediate layer.
->>
->> For non-professional audio purposes OSS is good enough for such
->> applications.
->=20
-> What happens if pulseaudio is running and using the sound device?  Can
-> qemu open and use the device in parallel?  "in-kernel mixer" sounds lik=
-e
-> this is works and the kernel mixes the streams from all applications
-> before sending it to the sound device.  Or will qemu get a -EBUSY?
-
-Multiple applications can use the OSS/native kernel API device nodes
-concurrently and the in-kernel mixer will take care of mixing.
-
-This approach has some cons, but it's practical in the current state of
-affairs.
-
-As far as I'm aware FreeBSD uses a similar approach.
-
->=20
-> If parallel usage works we can default to oss I think.  Otherwise we
-> should try pulse first, and in case it is not available (daemon not
-> running) try oss next.
->=20
-> What about sdl?  Prefer oss over sdl I guess?  Or the other way around?=
-
->=20
-> What is the native sound interface for openbsd btw?  oss doesn't
-> compile (missing sys/soundcard.h header).
->=20
-
-OpenBSD uses sndio, a similar audio daemon to pulseaudio and it's
-enforced for all [well integrated] audio applications.
-
-SDL is an optional intermediate layer kept for practical/compatibility
-purposes, but all software shall use sndio natively.
-
-> cheers,
->   Gerd
->=20
->=20
-
-
-
---gEOF8QdlbrLeBFsj9V6HGYlWeE5bUZN7D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIYgYMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZs404P/02BPDWP+TMnbEDKbBEv0miMkxe+B9tNI4Wjifwn
-hIyMP+wMxS+D4yHV9+GPpriCNqPvDoqF1nIVYfWpJbbKxhLsJdoh8wUSJXTT9FN6
-OAPQRxMOSOUs6uHJ1d1Lnk/Qn25H+96GBJMxPp3tkfYaWfUnJA3/F9NGH0A2mcot
-qusZWpZtYuk4DS3cVnVGb2W4McRNhW1OwzsHzDYuTwO/ybhb1GMcA1pUG562W9lp
-6X5GruuiGX2hS2euH90JQIO11ZJJrIEHYmMdd0kPAIicmLX2dwf5uYCV+wD+k2ED
-42skKqGjtGb4EIEr3rxjcMI5XOabpkjMs0FPjPlbm4dhjMKkZctcvlyENN69iXhG
-0JuknHCFytScu/A+CM/zW8rBalBQbXTebbjRkPqGvGOin8nVCIL2QmQ5zr9PSYQu
-/uwz2N40VK9Pe+FE22KOQhqLbt2mryfE6PJbjGsPDfepCKnuYhQnAusWLlOYD9Ux
-4BTdHm6BQvaIR31xGO/za9dp7LfOR/3x2tPG01inzd3vdWU3cfEawT9qurQ5UdCT
-NCGfEd8WJXhed2gSxVy0mLRpQJAORptIreTNRec9bh9uXaNgGTt2dZY5Z7Bj53cf
-v7okOh0GTbY1zMe1ry6UefJ9QeV7eaPtqS5hiOp3UAgTqs6eDv1Dii4Puwj7X37C
-bQlE
-=+UUp
------END PGP SIGNATURE-----
-
---gEOF8QdlbrLeBFsj9V6HGYlWeE5bUZN7D--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMjE3NTgxMi4yNzA2
+OC0xLWVibGFrZUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIHFvbS9j
+b250YWluZXIubwogIENDICAgICAgcW9tL3FvbS1xb2JqZWN0Lm8KL3RtcC9xZW11LXRlc3Qvc3Jj
+L2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1bmN0aW9uICdmaW5kX3ZkaV9uYW1lJzoKL3RtcC9xZW11
+LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6MTIzOTo1OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNp
+ZmllZCBib3VuZCAyNTYgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3At
+dHJ1bmNhdGlvbl0KICAgICBzdHJuY3B5KGJ1ZiArIFNEX01BWF9WRElfTEVOLCB0YWcsIFNEX01B
+WF9WRElfVEFHX0xFTik7CiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJy
+b3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDE5MDExMjE3NTgxMi4yNzA2OC0xLWVibGFrZUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2Vy
+LW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
