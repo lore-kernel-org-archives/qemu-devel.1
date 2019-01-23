@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51072)
+Received: from eggs.gnu.org ([209.51.188.92]:53043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOln-0000ag-Vm
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:05:09 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gmOuB-0008ER-A9
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOln-0007ik-30
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:05:07 -0500
-From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-Date: Wed, 23 Jan 2019 20:04:57 +0000
-Message-ID: <20190123200459.GE5213@quinoa.localdomain>
-References: <20181211151945.29137-1-aaron@os.amperecomputing.com>
-	<CAFEAcA8Kvx9ATDgj5mOqcJGQf_T-Sw0ut5N6w3CBs9pBA4d1_A@mail.gmail.com>
-In-Reply-To: <CAFEAcA8Kvx9ATDgj5mOqcJGQf_T-Sw0ut5N6w3CBs9pBA4d1_A@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <F7333B513CCAB54798913EE8CEC62CDD@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gmOuA-0005Xv-Dy
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:13:47 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gmOu8-0005Eo-EJ
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:13:44 -0500
+Received: by mail-wr1-x443.google.com with SMTP id x10so3990586wrs.8
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 12:13:21 -0800 (PST)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
+	<82a755097c6aaa16363348599110f9af3bb07583.1547681517.git.DirtY.iCE.hu@gmail.com>
+	<20190117100334.vh3nbg4pjfwo4eye@sirius.home.kraxel.org>
+Message-ID: <23779539-c590-3910-7cf3-8e2de29ab9b9@gmail.com>
+Date: Wed, 23 Jan 2019 21:13:17 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 00/14] More fully implement ARM PMUv3
+In-Reply-To: <20190117100334.vh3nbg4pjfwo4eye@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 47/50] paaudio: channel-map option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Jan 18 14:13, Peter Maydell wrote:
-> On Tue, 11 Dec 2018 at 15:20, Aaron Lindsay
-> <aaron@os.amperecomputing.com> wrote:
-> >
-> > The ARM PMU implementation currently contains a basic cycle counter, bu=
-t
-> > it is often useful to gather counts of other events, filter them based
-> > on execution mode, and/or be notified on counter overflow. These patche=
-s
-> > flesh out the implementations of various PMU registers including
-> > PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to represent
-> > arbitrary counter types, implement mode filtering, send interrupts on
-> > counter overflow, and add instruction, cycle, and software increment
-> > events.
-> >
-> > Since v9 [1] I have made the following changes:
-> > * Added a clarifying comment about how the PMU timer's migration is
-> >   handled
-> > * Added a check against implementing PMCEID[23] if ID_DFR0.PerfMon =3D=
-=3D
-> >   0xf
-> > * Added TRACEFILT to the ID_DFR0 field definitions
-> >
-> > [1] - https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00805.ht=
-ml
-> >
->=20
-> Richard has made some comments on patch 14; since 1-13 have
-> all been reviewed now I'm going to apply those to target-arm.next.
+On 2019-01-17 11:03, Gerd Hoffmann wrote:
+> On Thu, Jan 17, 2019 at 12:37:20AM +0100, Kővágó, Zoltán wrote:
+>> Add an option to change the channel map used by pulseaudio.  If not
+>> specified, falls back to an OSS compatible channel map.
+>>
+>> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+>> ---
+>>  qapi/audio.json |  5 ++++-
+>>  audio/paaudio.c | 18 ++++++++++++++----
+>>  qemu-options.hx |  9 +++++++++
+>>  3 files changed, 27 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/qapi/audio.json b/qapi/audio.json
+>> index 7bcea6240f..86078039dc 100644
+>> --- a/qapi/audio.json
+>> +++ b/qapi/audio.json
+>> @@ -107,11 +107,14 @@
+>>  #
+>>  # @name: name of the sink/source to use
+>>  #
+>> +# @channel-map: channel map to use (default: OSS compatible map)
+>> +#
+>>  # Since: 4.0
+>>  ##
+>>  { 'struct': 'AudiodevPaPerDirectionOptions',
+>>    'data': {
+>> -    '*name': 'str' } }
+>> +    '*name':        'str',
+>> +    '*channel-map': 'str' } }
+> 
+> Ah, I see.  Thats why patch #1 creates a AudiodevPaPerDirectionOptions
+> struct with just one field ...
 
-Thanks.
+Yes, I was bitten by it too during a refactor, probably I should write a
+few words about it in the commit message.
 
-I also apologize - I just uncovered a bug I should've caught sooner, and
-sent out a fix to the list as:
+However, this is the exact reason I'd recommend nested structs instead
+of randomly flattening it when we can.  This way, if we later have to
+add an extra option, we don't end up in a problematic situation, since
+we can't easily change things like 'dev-in' to a structure without
+breaking backward compatibility.
 
-	Subject: [PATCH] target/arm: Don't clear supported PMU events when
-	initializing PMCEID1
-
--Aaron
+Regards,
+Zoltan
