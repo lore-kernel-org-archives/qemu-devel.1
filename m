@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46537)
+Received: from eggs.gnu.org ([209.51.188.92]:47147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmJkb-0005Y3-Og
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:43:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1gmJlj-0006S9-Hq
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:44:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmJka-0006d5-2Z
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:43:33 -0500
-Date: Wed, 23 Jan 2019 14:43:20 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190123144320.GJ27270@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181221234750.23577-1-mreitz@redhat.com>
-	<20181221234750.23577-4-mreitz@redhat.com>
-	<84e62d4a-bf74-ba1c-d802-e01de14d693c@redhat.com>
-	<3bf30595-c8fc-9058-3860-c4640718b33d@redhat.com>
-	<c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gmJli-0007PF-3b
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:44:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37687)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gmJlh-0007CL-DH
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:44:42 -0500
+References: <20190123120759.7162-1-jusual@mail.ru>
+	<20190123120759.7162-2-jusual@mail.ru> <87zhrrzc8l.fsf@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8f1c4cff-c186-9fc3-10ee-7f628882ef82@redhat.com>
+Date: Wed, 23 Jan 2019 08:44:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] iotests: Allow 147 to be run
- concurrently
+In-Reply-To: <87zhrrzc8l.fsf@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="x90p2ZbZ4woS7EQDh0s7OJcygA2K6dY6l"
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] tests/libqtest: Introduce
+ qtest_init_with_serial()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Julia Suvorova <jusual@mail.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>
 
-On Wed, Jan 23, 2019 at 08:33:41AM -0600, Eric Blake wrote:
-> On 1/23/19 7:12 AM, Max Reitz wrote:
-> > On 21.01.19 22:02, Eric Blake wrote:
-> >> On 12/21/18 5:47 PM, Max Reitz wrote:
-> >>> To do this, we need to allow creating the NBD server on various ports
-> >>> instead of a single one (which may not even work if you run just one
-> >>> instance, because something entirely else might be using that port).
-> >>
-> >> Can you instead reuse the ideas from nbd_server_set_tcp_port() from
-> >> qemu-iotests/common.nbd?
-> >>
-> >>>
-> >>> So we just pick a random port in [32768, 32768 + 1024) and try to create
-> >>> a server there.  If that fails, we just retry until something sticks.
-> >>
-> >> That has the advantage of checking whether a port is actually in use
-> >> (using 'ss' - although it does limit the test to Linux-only; perhaps
-> >> using socat instead of ss could make the test portable to non-Linux?)
-> > 
-> > But doesn't that give you race conditions?  That's the point of this
-> > series, so you can run multiple instances of 147 concurrently.
-> 
-> Hmm - that does imply that common.nbd's use of ss IS racy because it
-> checks in linear fashion and has a TOCTTOU window (affects at least
-> iotest 233). Your observation that random probes within a range are less
-> susceptible (although not immune) to the race is correct.
-> 
-> >> Do you actually need to attempt a qemu-nbd process, if you take my
-> >> suggestion of using ss to probe for an unused port?  And if not, do we
-> >> still need qemu_nbd_pipe() added earlier in the series?
-> >>
-> >>
-> >>> -        address = { 'type': 'inet',
-> >>> -                    'data': {
-> >>> -                        'host': 'localhost',
-> >>> -                        'port': str(NBD_PORT)
-> >>> -                    } }
-> >>> -        self._server_up(address, export_name)
-> >>> +        while True:
-> >>> +            nbd_port = random.randrange(NBD_PORT_START, NBD_PORT_END)
-> >>
-> >> common.nbd just iterates, instead of trying random ports.
-> > 
-> > I'm not sure which is better.  Iterating gives guaranteed termination,
-> > trying random ports means the first one you try will usually work.
-> 
-> Is there any other way we can make the test more robust, perhaps by
-> using socket activation (that is, pre-open the port prior to starting
-> qemu_nbd, so that our code for finding a free socket is more easily
-> reusable), or by using Unix sockets for test 147 (that test seems to be
-> using TCP sockets only as a means to get to the real feature under test,
-> and not as the actual thing being tested)?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--x90p2ZbZ4woS7EQDh0s7OJcygA2K6dY6l
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Julia Suvorova <jusual@mail.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jim Mussared <jim@groklearning.com>
+Message-ID: <8f1c4cff-c186-9fc3-10ee-7f628882ef82@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] tests/libqtest: Introduce
+ qtest_init_with_serial()
+References: <20190123120759.7162-1-jusual@mail.ru>
+ <20190123120759.7162-2-jusual@mail.ru> <87zhrrzc8l.fsf@linaro.org>
+In-Reply-To: <87zhrrzc8l.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The problem with using socket activation is that you then are not getting
-test coverage of the non-activation code paths which are quite significant
-things we really want to be testing.
+On 1/23/19 8:20 AM, Alex Benn=C3=A9e wrote:
+>=20
+> Julia Suvorova <jusual@mail.ru> writes:
+>=20
+>> Run qtest with a socket that connects QEMU chardev and test code.
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>=20
 
-I do wonder if there's a case to be made for having iotests run inside a
-container with private network namespace such that they then have a
-predictable environment.  You could then simply declare that if a test
-needs a TCP port, it should use  "port 9000 + $TEST_NUM". So every
-test can safely run in parallel.
+>> +QTestState *qtest_init_with_serial(const char *extra_args, int *sock_=
+fd)
+>> +{
+>> +    int sock_fd_init;
+>> +    char *sock_path, sock_dir[] =3D "/tmp/qtest-serial-XXXXXX";
+>> +    QTestState *qts;
+>> +
+>> +    g_assert_true(mkdtemp(sock_dir) !=3D NULL);
+>> +    sock_path =3D g_strdup_printf("%s/sock", sock_dir);
+>> +
+>> +    sock_fd_init =3D init_socket(sock_path);
+>> +
+>> +    qts =3D qtest_initf("-chardev socket,id=3Ds0,path=3D%s -serial ch=
+ardev:s0 %s",
+>> +                      sock_path, extra_args);
 
-If the entire test harness needs to be run multiple in parallel each
-run woudl be a separate container, and so again avoid clashing.
+EWWWW.  Please, let's not bake in this interface.  Relying on shell
+splitting is nasty.
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>>
+>> +/**
+>> + * qtest_init_with_serial:
+>> + * @extra_args: other arguments to pass to QEMU.  CAUTION: these
+>> + * arguments are subject to word splitting and shell evaluation.
+>> + * @sock_fd: pointer to store the socket file descriptor for
+>> + * connection with serial.
+>> + *
+>> + * Returns: #QTestState instance.
+>> + */
+>> +QTestState *qtest_init_with_serial(const char *extra_args, int *sock_=
+fd);
+
+I would MUCH rather see an interface that used varargs to pass extra
+arguments as a list/array of actual arguments, no shell splitting require=
+d.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--x90p2ZbZ4woS7EQDh0s7OJcygA2K6dY6l
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxIfbwACgkQp6FrSiUn
+Q2qQIAgAg3FtUsy7v28EBsQV+n9j2bt58Rp857lYPLuup3vibTYkQLLptS9SBKvt
+ccX5mCn59gcFn2DKAURwuOlSJVwUPd3ReSDITN1NA47PZF6OpjclA4iUvm9vahvh
+hexkVzw5jDWpOg30X+urhEULnULT1YuwNf000POBFlbo9w/LknMkHWNkYEtzpvqm
+o5hVUkZ9CrNIeEOLlNk1X5HVe+AfBmBn6bCN8L9M/TMVH0mL6n8oLEQNYiQZebi9
+ZNd9TbAhQSMsYBFMFnVAUnuGQcX9JEgtE+NhQGuDAm2o/jn2mf/yxn4ukF1JALJL
+wq/8cL72tMu3+8VcQ10++0lREFaLfg==
+=MhDZ
+-----END PGP SIGNATURE-----
+
+--x90p2ZbZ4woS7EQDh0s7OJcygA2K6dY6l--
