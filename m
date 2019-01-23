@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54118)
+Received: from eggs.gnu.org ([209.51.188.92]:54934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDms-0002FT-Gu
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:31 -0500
+	(envelope-from <david@redhat.com>) id 1gmDpp-0003T3-Jj
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDmr-0004aM-8z
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmDmp-0004Xc-FF
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:28 -0500
-Date: Wed, 23 Jan 2019 09:15:29 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190123081529.nft2b673rrdivymp@sirius.home.kraxel.org>
-References: <20190122205627.10182-1-relkochta@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190122205627.10182-1-relkochta@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] input-linux: customizable grab toggle keys
- v5
+	(envelope-from <david@redhat.com>) id 1gmDpn-0006SM-F4
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:24:33 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 23 Jan 2019 09:24:25 +0100
+Message-Id: <20190123082425.10643-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] spapr/pci: Fix primary bus number for PCI
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +18,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ryan El Kochta <relkochta@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-On Tue, Jan 22, 2019 at 03:56:27PM -0500, Ryan El Kochta wrote:
-> Here is an updated version of my previous patch. Ctrl-Alt has been
-> removed, as per your recommendation, and Ctrl-Scrolllock has been
-> changed so as to trigger when either ctrl key is pressed, for a
-> consistent naming scheme. I do agree that this is the best way forward.
-> 
-> Ctrl-Backtick is also gone.
-> 
-> I've tested these on a Windows and Linux guest and they all appear to
-> work fine.
+While looking at the s390x implementation, looks like spapr has a
+similar BUG when building the topology.
 
-Almost there.  Code is fine now, but the commit message describes the v4
--> v5 changes instead of describing the patch.  The v4 message was much
-better.
+The primary bus number corresponds always to the bus number of the
+bus the bridge is attached to.
 
-Can you grab the v4 commit message and adapt the text to the v5 code
-changes?
+Right now, if we have two bridges attached to the same bus (e.g. root
+bus) this is however not the case. The first bridge will have primary
+bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
 
-A better place to list the changes is the patch series cover letter
-(yes, you can send a cover letter with a single patch too).
+While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+Setting it temporarily to that value (as discussed e.g. in [1]), is
+only relevant for a running system that probes the buses. The value is
+effectively unused for us just doing a DFS.
 
-Some people use "git notes" + "git format-patch --notes" for changelog
-annotations.  That'll work too.
+[1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
 
-> Quick aside; I'm sorry if this e-mail isn't a reply to the old thread. I
-> haven't quite figured that one out yet :-)
+Note: Is hotplug of bridges supported? I can't find where the topology
+is fixed up when hotplugging a PCI bridge. (e.g. bus numbers assigned
+and PCI_SUBORDINATE_BUS of path to the root updated). But maybe we are
+excluding bridges or this is not necessary for some reason.
 
-Starting a new thread is perfectly fine and in fact the preferred way to
-send a new patch revision.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/ppc/spapr_pci.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index b74f2632ec..5cdc98513d 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2030,8 +2030,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+                                            void *opaque)
+ {
+     unsigned int *bus_no = opaque;
+-    unsigned int primary = *bus_no;
+-    unsigned int subordinate = 0xff;
+     PCIBus *sec_bus = NULL;
+ 
+     if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=
+@@ -2040,7 +2038,7 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+     }
+ 
+     (*bus_no)++;
+-    pci_default_write_config(pdev, PCI_PRIMARY_BUS, primary, 1);
++    pci_default_write_config(pdev, PCI_PRIMARY_BUS, pci_dev_bus_num(pdev), 1);
+     pci_default_write_config(pdev, PCI_SECONDARY_BUS, *bus_no, 1);
+     pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
+ 
+@@ -2049,7 +2047,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+         return;
+     }
+ 
+-    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, subordinate, 1);
+     pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+                         spapr_phb_pci_enumerate_bridge, bus_no);
+     pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
+-- 
+2.17.2
