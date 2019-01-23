@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59523)
+Received: from eggs.gnu.org ([209.51.188.92]:59522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gmCUj-0003Xi-7k
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:41 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gmCUj-0003Xh-7i
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gmCUf-0002QS-MA
+	(envelope-from <yang.zhong@intel.com>) id 1gmCUf-0002QU-MD
 	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:40 -0500
-Received: from mga18.intel.com ([134.134.136.126]:36924)
+Received: from mga18.intel.com ([134.134.136.126]:36921)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gmCUW-0002Nr-NB
+	id 1gmCUW-0002NF-NC
 	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:30 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Wed, 23 Jan 2019 14:55:36 +0800
-Message-Id: <20190123065618.3520-3-yang.zhong@intel.com>
+Date: Wed, 23 Jan 2019 14:55:35 +0800
+Message-Id: <20190123065618.3520-2-yang.zhong@intel.com>
 In-Reply-To: <20190123065618.3520-1-yang.zhong@intel.com>
 References: <20190123065618.3520-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v4 02/44] build: actually use CONFIG_PAM
+Subject: [Qemu-devel] [RFC PATCH v4 01/44] hw/pci-host/Makefile.objs: make
+ CONFIGS clear for PCI EXPRESS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +26,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com, yang.zhong@intel.com
+Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com, yang.zhong@intel.com, "Michael S . Tsirkin" <mst@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Change the CONFIGs for PCI EXPRESS and make module name more
+clear for code files.
 
-Do not link it unconditionally into all binaries.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 ---
- default-configs/i386-softmmu.mak | 1 +
- hw/pci-host/Makefile.objs        | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ default-configs/arm-softmmu.mak      | 4 ++--
+ default-configs/i386-softmmu.mak     | 2 +-
+ default-configs/mips64el-softmmu.mak | 2 +-
+ default-configs/pci.mak              | 2 +-
+ default-configs/riscv32-softmmu.mak  | 2 +-
+ default-configs/riscv64-softmmu.mak  | 2 +-
+ hw/net/Makefile.objs                 | 4 ++--
+ hw/pci-host/Makefile.objs            | 8 ++++----
+ 8 files changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 2420491aac..a978320da3 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -123,7 +123,7 @@ CONFIG_VERSATILE=y
+ CONFIG_VERSATILE_PCI=y
+ CONFIG_VERSATILE_I2C=y
+ 
+-CONFIG_PCI_GENERIC=y
++CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ CONFIG_VFIO_XGMAC=y
+ CONFIG_VFIO_AMD_XGBE=y
+ 
+@@ -154,7 +154,7 @@ CONFIG_GPIO_KEY=y
+ CONFIG_MSF2=y
+ CONFIG_FW_CFG_DMA=y
+ CONFIG_XILINX_AXI=y
+-CONFIG_PCI_DESIGNWARE=y
++CONFIG_PCI_EXPRESS_DESIGNWARE=y
+ 
+ CONFIG_STRONGARM=y
+ CONFIG_HIGHBANK=y
 diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 2f919df346..48da9968cc 100644
+index 64c998c4c8..2f919df346 100644
 --- a/default-configs/i386-softmmu.mak
 +++ b/default-configs/i386-softmmu.mak
-@@ -67,3 +67,4 @@ CONFIG_I2C=y
- CONFIG_SEV=$(CONFIG_KVM)
- CONFIG_VTD=y
- CONFIG_AMD_IOMMU=y
-+CONFIG_PAM=y
+@@ -47,7 +47,7 @@ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+ CONFIG_SGA=y
+ CONFIG_LPC_ICH9=y
+-CONFIG_PCI_Q35=y
++CONFIG_PCI_EXPRESS_Q35=y
+ CONFIG_APIC=y
+ CONFIG_IOAPIC=y
+ CONFIG_PVPANIC=y
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index c2ae313f47..9eb1208b58 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -12,4 +12,4 @@ CONFIG_JAZZ_LED=y
+ CONFIG_VT82C686=y
+ CONFIG_MIPS_BOSTON=y
+ CONFIG_FITLOADER=y
+-CONFIG_PCI_XILINX=y
++CONFIG_PCI_EXPRESS_XILINX=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 6c7be12779..83738cbb65 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -22,7 +22,7 @@ CONFIG_MEGASAS_SCSI_PCI=y
+ CONFIG_MPTSAS_SCSI_PCI=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_E1000_PCI=y
+-CONFIG_E1000E_PCI=y
++CONFIG_E1000E_PCI_EXPRESS=y
+ CONFIG_IDE_CORE=y
+ CONFIG_IDE_QDEV=y
+ CONFIG_IDE_PCI=y
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index c9c5971409..fbfd1d4e4b 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -8,7 +8,7 @@ CONFIG_VIRTIO_MMIO=y
+ 
+ CONFIG_CADENCE=y
+ 
+-CONFIG_PCI_GENERIC=y
++CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index c9c5971409..fbfd1d4e4b 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -8,7 +8,7 @@ CONFIG_VIRTIO_MMIO=y
+ 
+ CONFIG_CADENCE=y
+ 
+-CONFIG_PCI_GENERIC=y
++CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index fa461d4463..a43351aa04 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -7,8 +7,8 @@ common-obj-$(CONFIG_EEPRO100_PCI) += eepro100.o
+ common-obj-$(CONFIG_PCNET_PCI) += pcnet-pci.o
+ common-obj-$(CONFIG_PCNET_COMMON) += pcnet.o
+ common-obj-$(CONFIG_E1000_PCI) += e1000.o e1000x_common.o
+-common-obj-$(CONFIG_E1000E_PCI) += net_tx_pkt.o net_rx_pkt.o
+-common-obj-$(CONFIG_E1000E_PCI) += e1000e.o e1000e_core.o e1000x_common.o
++common-obj-$(CONFIG_E1000E_PCI_EXPRESS) += net_tx_pkt.o net_rx_pkt.o
++common-obj-$(CONFIG_E1000E_PCI_EXPRESS) += e1000e.o e1000e_core.o e1000x_common.o
+ common-obj-$(CONFIG_RTL8139_PCI) += rtl8139.o
+ common-obj-$(CONFIG_VMXNET3_PCI) += net_tx_pkt.o net_rx_pkt.o
+ common-obj-$(CONFIG_VMXNET3_PCI) += vmxnet3.o
 diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index 073d5124d1..a9cd3e022d 100644
+index 6d6597c065..073d5124d1 100644
 --- a/hw/pci-host/Makefile.objs
 +++ b/hw/pci-host/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += pam.o
-+common-obj-$(CONFIG_PAM) += pam.o
+@@ -14,8 +14,8 @@ common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
+ common-obj-$(CONFIG_PCI_SABRE) += sabre.o
+ common-obj-$(CONFIG_FULONG) += bonito.o
+ common-obj-$(CONFIG_PCI_PIIX) += piix.o
+-common-obj-$(CONFIG_PCI_Q35) += q35.o
+-common-obj-$(CONFIG_PCI_GENERIC) += gpex.o
+-common-obj-$(CONFIG_PCI_XILINX) += xilinx-pcie.o
++common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
++common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
++common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
  
- # PPC devices
- common-obj-$(CONFIG_PREP_PCI) += prep.o
+-common-obj-$(CONFIG_PCI_DESIGNWARE) += designware.o
++common-obj-$(CONFIG_PCI_EXPRESS_DESIGNWARE) += designware.o
 -- 
 2.17.1
