@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49494)
+Received: from eggs.gnu.org ([209.51.188.92]:49554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDSn-0003hE-OG
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:47 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmDSq-0003j0-QM
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmDSh-0000FS-IJ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12188)
+	(envelope-from <kraxel@redhat.com>) id 1gmDSo-0000It-JR
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:2401)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmDSf-0000Dd-G8
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:39 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmDSo-0000Gh-Cm
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:00:46 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Jan 2019 09:00:03 +0100
-Message-Id: <20190123080005.31078-3-kraxel@redhat.com>
+Date: Wed, 23 Jan 2019 09:00:04 +0100
+Message-Id: <20190123080005.31078-4-kraxel@redhat.com>
 In-Reply-To: <20190123080005.31078-1-kraxel@redhat.com>
 References: <20190123080005.31078-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/4] audio: allow optional audio drivers.
+Subject: [Qemu-devel] [PATCH 3/4] audio: use try-sdl and try-pa for openbsd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +26,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-For those audio drivers which can be probed (sdl, alsa, pulse) add a
-try-$name variants.  Unlike the variants without try- prefix they will
-not error out on probe failure, the driver will be dropped from the list
-instead.  Mainly useful for the audio_drv_list default values.
+Fixes the openbsd build failure with SDL disabled.
+Also enable pulseaudio support.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index bdb80f8cb1..6fef094f39 100755
+index 6fef094f39..bbadd83fea 100755
 --- a/configure
 +++ b/configure
-@@ -3300,22 +3300,36 @@ fi
- audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/,/ /g')
- for drv in $audio_drv_list; do
-     case $drv in
--    alsa)
-+    alsa | try-alsa)
-     if $pkg_config alsa --exists; then
-         alsa_libs=$($pkg_config alsa --libs)
-+        if test "$drv" = "try-alsa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa/alsa/')
-+        fi
-     else
--        error_exit "$drv check failed" \
--            "Make sure to have the $drv libs and headers installed."
-+        if test "$drv" = "try-alsa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa//')
-+        else
-+            error_exit "$drv check failed" \
-+                "Make sure to have the $drv libs and headers installed."
-+        fi
-     fi
-     ;;
- 
--    pa)
-+    pa | try-pa)
-     if $pkg_config libpulse --exists; then
-         pulse_libs=$($pkg_config libpulse --libs)
-         audio_pt_int="yes"
-+        if test "$drv" = "try-pa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa/pa/')
-+        fi
-     else
--        error_exit "$drv check failed" \
--            "Make sure to have the $drv libs and headers installed."
-+        if test "$drv" = "try-pa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa//')
-+        else
-+            error_exit "$drv check failed" \
-+                "Make sure to have the $drv libs and headers installed."
-+        fi
-     fi
-     ;;
- 
-@@ -3325,6 +3339,14 @@ for drv in $audio_drv_list; do
-     fi
-     ;;
- 
-+    try-sdl)
-+    if test "$sdl" = "no"; then
-+        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl//')
-+    else
-+        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl/sdl/')
-+    fi
-+    ;;
-+
-     coreaudio)
-       coreaudio_libs="-framework CoreAudio"
-     ;;
+@@ -825,8 +825,8 @@ NetBSD)
+ OpenBSD)
+   bsd="yes"
+   make="${MAKE-gmake}"
+-  audio_drv_list="sdl"
+-  audio_possible_drivers="sdl"
++  audio_drv_list="try-sdl try-pa"
++  audio_possible_drivers="sdl pa"
+   HOST_VARIANT_DIR="openbsd"
+   supported_os="yes"
+ ;;
 -- 
 2.9.3
