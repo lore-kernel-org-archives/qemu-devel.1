@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35420)
+Received: from eggs.gnu.org ([209.51.188.92]:43861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gmA1t-0003Do-4J
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:20:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gmAn3-0002XM-QR
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:09:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gm9kK-0003BU-OV
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:02:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46622)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm9kD-00038D-Hy
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:02:31 -0500
-Date: Tue, 22 Jan 2019 23:02:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190122230018-mutt-send-email-mst@kernel.org>
-References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-	<20190122220046-mutt-send-email-mst@kernel.org>
-	<20190123031007.GA41033@tiger-server>
+	(envelope-from <richard.henderson@linaro.org>) id 1gmAn3-0002Nh-3O
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:09:29 -0500
+Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:36931)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gmAn2-0002NM-K1
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:09:29 -0500
+Received: by mail-pg1-x534.google.com with SMTP id c25so505366pgb.4
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 21:09:27 -0800 (PST)
+References: <20190104223116.14037-1-richard.henderson@linaro.org>
+	<d52c8ae0-edee-ed9a-56b8-43cc1cf0208d@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <362de5ba-a678-aeed-6a5d-3a02844c2560@linaro.org>
+Date: Tue, 22 Jan 2019 21:09:22 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190123031007.GA41033@tiger-server>
-Subject: Re: [Qemu-devel] [PATCH V10 0/4] support MAP_SYNC for
- memory-backend-file
+In-Reply-To: <d52c8ae0-edee-ed9a-56b8-43cc1cf0208d@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] tcg vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>
 
-On Wed, Jan 23, 2019 at 11:10:07AM +0800, Yi Zhang wrote:
-> On 2019-01-22 at 22:01:58 -0500, Michael S. Tsirkin wrote:
-> > On Wed, Jan 23, 2019 at 10:59:27AM +0800, Zhang, Yi wrote:
-> > > From: "Zhang,Yi" <yi.z.zhang@linux.intel.com>
-> > > 
-> > > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
-> > > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
-> > > files on ext4/xfs file system mounted with '-o dax').
-> > > 
-> > > A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
-> > >     https://patchwork.kernel.org/patch/10028151/
-> > > 
-> > > In order to make sure that the file metadata is in sync after a fault 
-> > > while we are writing a shared DAX supporting backend files, this
-> > > patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
-> > > 
-> > > As the DAX vs DMA truncated issue was solved, we refined the code and
-> > > send out this feature for the v5 version.
-> > > 
-> > > We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
-> > > 'share=on' & 'pmem=on'. 
-> > > Or QEMU will not pass this flag to mmap(2)
-> > 
-> > How was this patch tested? Given the previous version apparently
-> > passed the combination of flags ignored by Linux,
-> > enquiring minds want to know.
-> Ah. Sorry, We Have missed the flag MAP_SHARED_VALIDATE in V9, V8 and previous
-> are tested.
+On 1/7/19 5:11 AM, Mark Cave-Ayland wrote:
+> #7  0x0000555555852e53 in expand_4_vec (vece=2, dofs=197872,
+> aofs=198288, bofs=197776, cofs=197792, oprsz=16, tysz=16,
+> type=TCG_TYPE_V128, write_aofs=true, fni=0x55555599182a
+> <gen_vaddsws_vec>) at
+> /home/hsp/src/qemu-altivec-55/tcg/tcg-op-gvec.c:903
+>         t0 = 0x1848
+>         t1 = 0x1880
+>         t2 = 0x18b8
+>         t3 = 0x18f0
+>         i = 0
+> #8  0x0000555555853cc4 in tcg_gen_gvec_4 (dofs=197872, aofs=198288,
+> bofs=197776, cofs=197792, oprsz=16, maxsz=16, g=0x5555562d33c0 <g>) at
+> /home/hsp/src/qemu-altivec-55/tcg/tcg-op-gvec.c:1211
+>         type = TCG_TYPE_V128
+>         some = 21845
+>         __PRETTY_FUNCTION__ = "tcg_gen_gvec_4"
+>         __func__ = "tcg_gen_gvec_4"
+> #9  0x0000555555991987 in gen_vaddsws (ctx=0x7fffe3ffe5f0) at
+> /home/hsp/src/qemu-altivec-55/target/ppc/translate/vmx-impl.inc.c:597
+>         g = {fni8 = 0x0, fni4 = 0x0, fniv = 0x55555599182a
+> <gen_vaddsws_vec>, fno = 0x5555559601a1 <gen_helper_vaddsws>, opc =
+> INDEX_op_add_vec, data = 0, vece = 2 '\002', prefer_i64 = false,
+> write_aofs = true}
+> 
+> 
+> Certainly according to patch 7 of the series only 8-bit and 16-bit accesses are
+> supported on i386 hosts, but shouldn't we be falling back to the previous
+> implementations rather than hitting an assert()?
 
-BTW I checked V8 and I don't see MAP_SHARED_VALIDATE there either.
-So all the testing seems suspect at this point -
-you want a test that fails all versions before V10.
+In here:
 
-> already fixed in the 2/4.
-> > 
-> > > Changes in V10:
-> > >  * 4/4: refine the document.
-> > >  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> > >  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
-> > >  * 2/4: Fix the wrong include header
-> > > 
-> > > Changes in V9:
-> > >  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > >  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
-> > >  since I don't have much knowledge about the sparse feature, @Micheal Could you 
-> > >  add some documentation/commit message on this patch? Thank you very much.
-> > >  * 3/6: from 2/5: Eduardo: updated the commit message. 
-> > >  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
-> > >  * 5/6: from 4/5: Eduardo: updated the commit message.
-> > >  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
-> > > 
-> > > Changes in v8:
-> > >  * Micheal: 3/5, remove the duplicated define in the os_dep.h
-> > >  * Micheal: 2/5, make type define safety.
-> > >  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
-> > >  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
-> > >    MAP_SYNC only worked with pmem=on.
-> > >  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
-> > >    all the flags in one parameter.
-> > > 
-> > > Changes in v7:
-> > >  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
-> > > 
-> > > Changes in v6:
-> > >  * Pankaj: 3/7 are squashed with 2/7
-> > >  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
-> > >  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
-> > >  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
-> > >  * Stefan, 5/7 Add missing "munmap"
-> > >  * Stefan, 2/7 refine the shared/flag.
-> > > 
-> > > Changes in v5:
-> > >  * Add patch 1 to fix a memory leak issue.
-> > >  * Refine the patch 4-6
-> > >  * Remove the patch 3 as we already change the parameter from "shared" to
-> > >    "flags"
-> > > 
-> > > Changes in v4:
-> > >  * Add patch 1-3 to switch some functions to a single 'flags'
-> > >    parameters. (Michael S. Tsirkin)
-> > >  * v3 patch 1-3 become v4 patch 4-6.
-> > >  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
-> > >    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
-> > >  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
-> > > 
-> > > Changes in v3:
-> > >  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
-> > >    cases, and add back the retry mechanism. MAP_SYNC will be ignored
-> > >    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
-> > >  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
-> > >    platforms in order to make qemu_ram_mmap() compile on those platforms.
-> > >  * Patch 2&3: include more information in error messages of
-> > >    memory-backend in hope to help user to identify the error.
-> > >    (Dr. David Alan Gilbert)
-> > >  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
-> > > 
-> > > Changes in v2:
-> > >  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
-> > >  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
-> > >    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
-> > >  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
-> > >    to osdep.h. (Michael S. Tsirkin)
-> > > 
-> > > Zhang Yi (4):
-> > >   util/mmap-alloc: switch 'shared' to 'flags' parameter
-> > >   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
-> > >   hostmem: add more information in error messages
-> > >   docs: Added MAP_SYNC documentation
-> > > 
-> > >  backends/hostmem-file.c   |  6 ++++--
-> > >  backends/hostmem.c        |  8 +++++---
-> > >  docs/nvdimm.txt           | 29 ++++++++++++++++++++++++++++-
-> > >  exec.c                    |  7 ++++---
-> > >  include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
-> > >  include/qemu/osdep.h      | 21 +++++++++++++++++++++
-> > >  qemu-options.hx           |  4 ++++
-> > >  util/mmap-alloc.c         | 15 +++++++++++----
-> > >  util/oslib-posix.c        |  9 ++++++++-
-> > >  9 files changed, 104 insertions(+), 15 deletions(-)
-> > > 
-> > > -- 
-> > > 2.7.4
+#define GEN_VXFORM_SAT(NAME, VECE, NORM, SAT, OPC2, OPC3)               \
+static void glue(glue(gen_, NAME), _vec)(unsigned vece, TCGv_vec t,     \
+                                         TCGv_vec sat, TCGv_vec a,      \
+                                         TCGv_vec b)                    \
+{                                                                       \
+    TCGv_vec x = tcg_temp_new_vec_matching(t);                          \
+    glue(glue(tcg_gen_, NORM), _vec)(VECE, x, a, b);                    \
+    glue(glue(tcg_gen_, SAT), _vec)(VECE, t, a, b);                     \
+    tcg_gen_cmp_vec(TCG_COND_NE, VECE, x, x, t);                        \
+    tcg_gen_or_vec(VECE, sat, sat, x);                                  \
+    tcg_temp_free_vec(x);                                               \
+}                                                                       \
+static void glue(gen_, NAME)(DisasContext *ctx)                         \
+{                                                                       \
+    static const GVecGen4 g = {                                         \
+        .fniv = glue(glue(gen_, NAME), _vec),                           \
+        .fno = glue(gen_helper_, NAME),                                 \
+        .opc = glue(glue(INDEX_op_, NORM), _vec),                       \
+
+s/NORM/SAT/, so that we query whether the saturated opcode is supported.  The
+normal arithmetic, cmp, and or opcodes are mandatory; we don't need to do
+anything with those.
+
+
+r~
