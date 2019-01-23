@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35709)
+Received: from eggs.gnu.org ([209.51.188.92]:38732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gmNbt-0007XB-8f
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:50:50 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gmNpZ-0001ca-G6
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gmNbs-0002vh-6X
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:50:49 -0500
-Date: Wed, 23 Jan 2019 16:50:43 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190123185043.GV4136@habkost.net>
-References: <20190116183358.30287-1-nshah@disroot.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1gmNpY-0002zz-GM
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:04:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gmNpW-0002wP-O5
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:04:56 -0500
+Date: Wed, 23 Jan 2019 12:04:38 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190123120438.2d47e352@w520.home>
+In-Reply-To: <1062e3d54121ff3e19b5a4e821ae178c5387fd9a.1548266832.git-series.knut.omang@oracle.com>
+References: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
+	<1062e3d54121ff3e19b5a4e821ae178c5387fd9a.1548266832.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190116183358.30287-1-nshah@disroot.org>
-Subject: Re: [Qemu-devel] [PATCH] device-crash-test: Convert to Python 3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] gen_pcie_root_port: Add ACS (Access
+ Control Services) capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nisarg Shah <nshah@disroot.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Knut Omang <knut.omang@oracle.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Elijah Shakkour <elijahs@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Thu, Jan 17, 2019 at 12:03:58AM +0530, Nisarg Shah wrote:
-> Apply 2to3 tool to scripts/device-crash-test.
-> Restrict whitelist entry stats in debug mode to be sorted only by "count", since Python 3 does
-> not implicitly support comparing dictionaries.
+On Wed, 23 Jan 2019 19:28:00 +0100
+Knut Omang <knut.omang@oracle.com> wrote:
 
-Thanks for the patch.  Comments below:
-
+> Claiming ACS support allows passthrough of an emulated device
+> (in a nested virt.setting) with VFIO without Alex Williamson's patch
+> for the pcie_acs_override kernel parameter.
+> A similar need appears on Windows with Hyper-V
 > 
-> Signed-off-by: Nisarg Shah <nshah@disroot.org>
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
 > ---
->  scripts/device-crash-test | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  hw/pci-bridge/gen_pcie_root_port.c | 2 ++
+>  hw/pci-bridge/ioh3420.c            | 1 -
+>  hw/pci-bridge/pcie_root_port.c     | 3 +++
+>  include/hw/pci/pcie_port.h         | 1 +
+>  4 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-> index e93a7c0c84..ecdc9828c2 100755
-> --- a/scripts/device-crash-test
-> +++ b/scripts/device-crash-test
-> @@ -23,7 +23,7 @@
->  Run QEMU with all combinations of -machine and -device types,
->  check for crashes and unexpected errors.
->  """
-> -from __future__ import print_function
-> +
-
-This breaks Python 2 support:
-
-$ python2 scripts/device-crash-test
-  File "scripts/device-crash-test", line 534
-    print("No QEMU binary found", file=sys.stderr)
-                                      ^
-SyntaxError: invalid syntax
-
-
+> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> index 9766edb..b5a5ecc 100644
+> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> @@ -20,6 +20,7 @@
+>          OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
 >  
->  import sys
->  import os
-> @@ -272,7 +272,7 @@ def qemuOptsEscape(s):
+>  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
+> +#define GEN_PCIE_ROOT_PORT_ACS_OFFSET           0x148
+
+Perhaps (GEN_PCIE_ROOT_PORT_AER_OFFSET + PCI_ERR_SIZEOF)
+
+>  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
 >  
->  def formatTestCase(t):
->      """Format test case info as "key=value key=value" for prettier logging output"""
-> -    return ' '.join('%s=%s' % (k, v) for k, v in t.items())
-> +    return ' '.join('%s=%s' % (k, v) for k, v in list(t.items()))
-
-Why is this necessary?
-
-
+>  typedef struct GenPCIERootPort {
+> @@ -149,6 +150,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+>      rpc->interrupts_init = gen_rp_interrupts_init;
+>      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
+>      rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
+> +    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
+>  }
 >  
+>  static const TypeInfo gen_rp_dev_info = {
+> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+> index 81f2de6..2064939 100644
+> --- a/hw/pci-bridge/ioh3420.c
+> +++ b/hw/pci-bridge/ioh3420.c
+> @@ -71,7 +71,6 @@ static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
+>      if (rc < 0) {
+>          assert(rc == -ENOTSUP);
+>      }
+> -
+
+Unrelated
+
+>      return rc;
+>  }
 >  
->  def qomListTypeNames(vm, **kwargs):
-> @@ -574,7 +574,8 @@ def main():
->          logger.info("Skipped %d test cases", skipped)
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 34ad767..c33a493 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -106,6 +106,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>      pcie_aer_root_init(d);
+>      rp_aer_vector_update(d);
 >  
->      if args.debug:
-> -        stats = sorted([(len(wl_stats.get(i, [])), wl) for i, wl in enumerate(ERROR_WHITELIST)])
-> +        stats = sorted([(len(wl_stats.get(i, [])), wl) for i, wl in
-> +                         enumerate(ERROR_WHITELIST)], key=lambda x: x[0])
-
-This seems to be the only change that is described in the commit
-message.  I'm applying this hunk after editing the commit message
-as shown below.
-
----
->From 9793d7e7874d944d115ab9ab933b02f8de793460 Mon Sep 17 00:00:00 2001
-From: Nisarg Shah <nshah@disroot.org>
-Date: Thu, 17 Jan 2019 00:03:58 +0530
-Subject: [PATCH] device-crash-test: Python 3 compatibility fix
-
-Restrict whitelist entry stats in debug mode to be sorted only by
-"count", since Python 3 does not implicitly support comparing
-dictionaries.
-
-Signed-off-by: Nisarg Shah <nshah@disroot.org>
-Message-Id: <20190116183358.30287-1-nshah@disroot.org>
-[ehabkost: removed 2 unnecessary hunks from patch]
-[ehabkost: edited commit message]
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/device-crash-test | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 483dafb2fc..2a13fa4f84 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -557,7 +557,8 @@ def main():
-         logger.info("Skipped %d test cases", skipped)
- 
-     if args.debug:
--        stats = sorted([(len(wl_stats.get(i, [])), wl) for i, wl in enumerate(ERROR_WHITELIST)])
-+        stats = sorted([(len(wl_stats.get(i, [])), wl) for i, wl in
-+                         enumerate(ERROR_WHITELIST)], key=lambda x: x[0])
-         for count, wl in stats:
-             dbg("whitelist entry stats: %d: %r", count, wl)
- 
--- 
-2.18.0.rc1.1.g3f1ff2140
-
--- 
-Eduardo
+> +    if (rpc->acs_offset) {
+> +        pcie_acs_init(d, rpc->acs_offset, 0);
+> +    }
+>      return;
+>  
+>  err:
+> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> index df242a0..09586f4 100644
+> --- a/include/hw/pci/pcie_port.h
+> +++ b/include/hw/pci/pcie_port.h
+> @@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
+>      int exp_offset;
+>      int aer_offset;
+>      int ssvid_offset;
+> +    int acs_offset;    /* If nonzero, optional ACS capability offset */
+>      int ssid;
+>  } PCIERootPortClass;
+>  
