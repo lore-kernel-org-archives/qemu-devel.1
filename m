@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35407)
+Received: from eggs.gnu.org ([209.51.188.92]:39269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmCkA-0007lg-Ft
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:14:40 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmCvm-000093-Ce
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:26:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmCk8-0002Zr-Ua
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:14:38 -0500
-Received: from mga07.intel.com ([134.134.136.100]:30956)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmCvi-0007eU-EE
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:26:37 -0500
+Received: from mga04.intel.com ([192.55.52.120]:4689)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gmCk7-0002Yl-EJ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:14:35 -0500
-Date: Wed, 23 Jan 2019 23:45:03 +0800
+	id 1gmCvg-0007dL-GS
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 02:26:34 -0500
+Date: Wed, 23 Jan 2019 23:57:01 +0800
 From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190123154502.GA3683@tiger-server>
+Message-ID: <20190123155700.GA3743@tiger-server>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 	<20190122220046-mutt-send-email-mst@kernel.org>
 	<20190123031007.GA41033@tiger-server>
-	<20190122224943-mutt-send-email-mst@kernel.org>
+	<20190122230018-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190122224943-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190122230018-mutt-send-email-mst@kernel.org>
 Subject: Re: [Qemu-devel] [PATCH V10 0/4] support MAP_SYNC for
  memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
@@ -34,7 +34,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On 2019-01-22 at 22:53:36 -0500, Michael S. Tsirkin wrote:
+On 2019-01-22 at 23:02:22 -0500, Michael S. Tsirkin wrote:
 > On Wed, Jan 23, 2019 at 11:10:07AM +0800, Yi Zhang wrote:
 > > On 2019-01-22 at 22:01:58 -0500, Michael S. Tsirkin wrote:
 > > > On Wed, Jan 23, 2019 at 10:59:27AM +0800, Zhang, Yi wrote:
@@ -57,16 +57,24 @@ On 2019-01-22 at 22:53:36 -0500, Michael S. Tsirkin wrote:
 > > > > We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
 > > > > 'share=on' & 'pmem=on'. 
 > > > > Or QEMU will not pass this flag to mmap(2)
+> > > 
 > > > How was this patch tested? Given the previous version apparently
 > > > passed the combination of flags ignored by Linux,
 > > > enquiring minds want to know.
 > > Ah. Sorry, We Have missed the flag MAP_SHARED_VALIDATE in V9, V8 and previous
-> > are tested. already fixed in the 2/4.
+> > are tested.
 > 
-> Could you please include the information: which configurations were
-> tested and how?
-Sure, updated it in cover letter and resend it.
+> BTW I checked V8 and I don't see MAP_SHARED_VALIDATE there either.
+> So all the testing seems suspect at this point -
+> you want a test that fails all versions before V10.
+
+Ah.. it is in V7, I fogot that after remove our own difination
+
+#define MAP_SYNC_FLAGS (MAP_SYNC | MAP_SHARED_VALIDATE)
+
+Sorry agin for that.
 > 
+> > already fixed in the 2/4.
 > > > 
 > > > > Changes in V10:
 > > > >  * 4/4: refine the document.
