@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51739)
+Received: from eggs.gnu.org ([209.51.188.92]:52494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmJvZ-0006JN-Qt
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:54:54 -0500
+	(envelope-from <berrange@redhat.com>) id 1gmJxZ-0007sZ-AM
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:56:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmJvY-00074o-Hc
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:54:53 -0500
-Resent-Message-Id: <E1gmJvY-00074o-Hc@eggs.gnu.org>
-Message-ID: <154825524292.21.4589691216699401444@ebba9967afc0>
-In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berrange@redhat.com>) id 1gmJxY-00006z-Fz
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:56:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46766)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gmJxY-00006S-A9
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:56:56 -0500
+Date: Wed, 23 Jan 2019 14:56:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190123145644.GK27270@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190123120759.7162-1-jusual@mail.ru>
+	<20190123120759.7162-2-jusual@mail.ru> <87zhrrzc8l.fsf@linaro.org>
+	<8f1c4cff-c186-9fc3-10ee-7f628882ef82@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 23 Jan 2019 06:54:04 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] qcow2: encryption threads
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8f1c4cff-c186-9fc3-10ee-7f628882ef82@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] tests/libqtest: Introduce
+ qtest_init_with_serial()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, berto@igalia.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Steffen =?utf-8?B?R8O2cnR6?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwODE3MDY1NS4yOTc2
-Ni0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
-ICBxYXBpL3FhcGktY29tbWFuZHMtY3J5cHRvLm8KICBDQyAgICAgIHFhcGkvcWFwaS1jb21tYW5k
-cy1pbnRyb3NwZWN0Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1
-bmN0aW9uICdmaW5kX3ZkaV9uYW1lJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9n
-LmM6MTIzOTo1OiBlcnJvcjogJ3N0cm5jcHknIHNwZWNpZmllZCBib3VuZCAyNTYgZXF1YWxzIGRl
-c3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICBzdHJuY3B5
-KGJ1ZiArIFNEX01BWF9WRElfTEVOLCB0YWcsIFNEX01BWF9WRElfVEFHX0xFTik7CiAgICAgXn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTog
-YWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
-YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDEwODE3MDY1NS4yOTc2Ni0x
-LXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Jan 23, 2019 at 08:44:12AM -0600, Eric Blake wrote:
+> On 1/23/19 8:20 AM, Alex Benn=C3=A9e wrote:
+> >=20
+> > Julia Suvorova <jusual@mail.ru> writes:
+> >=20
+> >> Run qtest with a socket that connects QEMU chardev and test code.
+> >>
+> >> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> >> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >=20
+> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> >=20
+>=20
+> >> +QTestState *qtest_init_with_serial(const char *extra_args, int *soc=
+k_fd)
+> >> +{
+> >> +    int sock_fd_init;
+> >> +    char *sock_path, sock_dir[] =3D "/tmp/qtest-serial-XXXXXX";
+> >> +    QTestState *qts;
+> >> +
+> >> +    g_assert_true(mkdtemp(sock_dir) !=3D NULL);
+> >> +    sock_path =3D g_strdup_printf("%s/sock", sock_dir);
+> >> +
+> >> +    sock_fd_init =3D init_socket(sock_path);
+> >> +
+> >> +    qts =3D qtest_initf("-chardev socket,id=3Ds0,path=3D%s -serial =
+chardev:s0 %s",
+> >> +                      sock_path, extra_args);
+>=20
+> EWWWW.  Please, let's not bake in this interface.  Relying on shell
+> splitting is nasty.
+
+qtest_initf() is long a standing interface that's relied on
+shell splitting for years :-( I agree we should fix that, but
+its a pre-existing problem that this patch doesn't make worse.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
