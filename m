@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59403)
+Received: from eggs.gnu.org ([209.51.188.92]:35420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gm9bl-0007gj-0F
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:46 -0500
+	(envelope-from <mst@redhat.com>) id 1gmA1t-0003Do-4J
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gm9bi-0005ly-LZ
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52772)
+	(envelope-from <mst@redhat.com>) id 1gm9kK-0003BU-OV
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:02:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm9bi-0005lP-D7
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:42 -0500
-Date: Tue, 22 Jan 2019 22:53:36 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm9kD-00038D-Hy
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 23:02:31 -0500
+Date: Tue, 22 Jan 2019 23:02:22 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190122224943-mutt-send-email-mst@kernel.org>
+Message-ID: <20190122230018-mutt-send-email-mst@kernel.org>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 	<20190122220046-mutt-send-email-mst@kernel.org>
 	<20190123031007.GA41033@tiger-server>
@@ -53,15 +53,18 @@ On Wed, Jan 23, 2019 at 11:10:07AM +0800, Yi Zhang wrote:
 > > > We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
 > > > 'share=on' & 'pmem=on'. 
 > > > Or QEMU will not pass this flag to mmap(2)
+> > 
 > > How was this patch tested? Given the previous version apparently
 > > passed the combination of flags ignored by Linux,
 > > enquiring minds want to know.
 > Ah. Sorry, We Have missed the flag MAP_SHARED_VALIDATE in V9, V8 and previous
-> are tested. already fixed in the 2/4.
+> are tested.
 
-Could you please include the information: which configurations were
-tested and how?
+BTW I checked V8 and I don't see MAP_SHARED_VALIDATE there either.
+So all the testing seems suspect at this point -
+you want a test that fails all versions before V10.
 
+> already fixed in the 2/4.
 > > 
 > > > Changes in V10:
 > > >  * 4/4: refine the document.
