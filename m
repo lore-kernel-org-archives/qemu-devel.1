@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36125)
+Received: from eggs.gnu.org ([209.51.188.92]:37100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gmFez-00063W-GC
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:21:31 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gmFiH-0000qp-G8
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:24:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gmFet-0001iv-CB
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:21:27 -0500
-Date: Wed, 23 Jan 2019 11:21:12 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190123112112.7822b237.cohuck@redhat.com>
-In-Reply-To: <20190122193346.4e23e018@oc2783563651>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<20190122193346.4e23e018@oc2783563651>
+	(envelope-from <eric.auger@redhat.com>) id 1gmFiF-0003SM-9w
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:24:53 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 23 Jan 2019 11:14:41 +0100
+Message-Id: <20190123101458.12478-2-eric.auger@redhat.com>
+In-Reply-To: <20190123101458.12478-1-eric.auger@redhat.com>
+References: <20190123101458.12478-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 01/18] update-linux-headers.sh: Copy new
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-On Tue, 22 Jan 2019 19:33:46 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-> On Mon, 21 Jan 2019 12:03:51 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > --- a/drivers/s390/cio/vfio_ccw_private.h
-> > +++ b/drivers/s390/cio/vfio_ccw_private.h
-> > @@ -28,6 +28,7 @@
-> >   * @mdev: pointer to the mediated device
-> >   * @nb: notifier for vfio events
-> >   * @io_region: MMIO region to input/output I/O arguments/results
-> > + * @io_mutex: protect against concurrent update of I/O structures  
-> 
-> We could be a bit more specific about what does this mutex guard.
-> Is it only io_region, or cp, irb and the new regions a well? ->state does
-> not seem to be covered, but should need some sort of synchronisation
-> too, or?
+Since Linux'es ab66dcc76d "powerpc: generate uapi header and system call
+table files" there are 2 new files: unistd_32.h and unistd_64.h. These
+files content is moved from unistd.h so now we have to copy new files
+as well, just like we already do for other architectures; this does it
+for MIPS as well.
 
-I'm not sure. IIRC Pierre had some ideas about locking in the fsm?
+Also, v5.0-rc2 moved vhost bits around in 4b86713236e4bd
+"vhost: split structs into a separate header file", add those too.
 
-> 
-> >   * @cp: channel program for the current I/O operation
-> >   * @irb: irb info received from interrupt
-> >   * @scsw: scsw info
-> > @@ -42,6 +43,7 @@ struct vfio_ccw_private {
-> >  	struct mdev_device	*mdev;
-> >  	struct notifier_block	nb;
-> >  	struct ccw_io_region	*io_region;
-> > +	struct mutex		io_mutex;
-> >  
-> >  	struct channel_program	cp;
-> >  	struct irb		irb;
-> > --   
-> 
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ scripts/update-linux-headers.sh | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-heade=
+rs.sh
+index 0a964fe240..1cd8bd57be 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -121,11 +121,20 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-=
+x86/"
+         cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/st=
+andard-headers/asm-$arch"
+     fi
++    if [ $arch =3D powerpc ]; then
++        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-=
+powerpc/"
++        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-=
+powerpc/"
++    fi
++    if [ $arch =3D mips ]; then
++        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm=
+-mips/"
++        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm=
+-mips/"
++        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm=
+-mips/"
++    fi
+ done
+=20
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h vhost_types.h \
+               psci.h psp-sev.h userfaultfd.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+--=20
+2.20.1
