@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46954)
+Received: from eggs.gnu.org ([209.51.188.92]:47802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmF4R-0002Ay-5V
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:49 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmF4R-0002IX-9r
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEon-0007vt-S2
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:27:39 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEoU-0007iU-Ue
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:27:17 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Wed, 23 Jan 2019 10:25:32 +0100
-Message-Id: <20190123092538.8004-30-kbastian@mail.uni-paderborn.de>
+Date: Wed, 23 Jan 2019 10:25:24 +0100
+Message-Id: <20190123092538.8004-22-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
 References: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 29/35] target/riscv: Remove gen_system()
+Subject: [Qemu-devel] [PATCH v6 21/35] target/riscv: Remove manual decoding
+ from gen_branch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +25,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
 Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-with all 16 bit insns moved to decodetree no path is falling back to
-gen_system(), so we can remove it.
+We now utilizes argument-sets of decodetree such that no manual
+decoding is necessary.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/translate.c | 31 -------------------------------
- 1 file changed, 31 deletions(-)
+ target/riscv/insn_trans/trans_rvi.inc.c | 46 +++++++++++++++++-------
+ target/riscv/translate.c                | 47 -------------------------
+ 2 files changed, 33 insertions(+), 60 deletions(-)
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index d0b0fca12b..0e37beb68e 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -427,32 +427,6 @@ static void gen_set_rm(DisasContext *ctx, int rm)
-     tcg_temp_free_i32(t0);
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
+index 3b3aff4803..0db1f79d20 100644
+--- a/target/riscv/insn_trans/trans_rvi.inc.c
++++ b/target/riscv/insn_trans/trans_rvi.inc.c
+@@ -72,41 +72,61 @@ static bool trans_jalr(DisasContext *ctx, arg_jalr *a)
+     return true;
  }
  
--static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
--                      int rd, int rs1, int csr)
+-static bool trans_beq(DisasContext *ctx, arg_beq *a)
++static bool gen_branch(DisasContext *ctx, arg_b *a, TCGCond cond)
+ {
+-    gen_branch(ctx->env, ctx, OPC_RISC_BEQ, a->rs1, a->rs2, a->imm);
++    TCGLabel *l = gen_new_label();
++    TCGv source1, source2;
++    source1 = tcg_temp_new();
++    source2 = tcg_temp_new();
++    gen_get_gpr(source1, a->rs1);
++    gen_get_gpr(source2, a->rs2);
++
++    tcg_gen_brcond_tl(cond, source1, source2, l);
++    gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
++    gen_set_label(l); /* branch taken */
++
++    if (!riscv_has_ext(ctx->env, RVC) && ((ctx->base.pc_next + a->imm) & 0x3)) {
++        /* misaligned */
++        gen_exception_inst_addr_mis(ctx);
++    } else {
++        gen_goto_tb(ctx, 0, ctx->base.pc_next + a->imm);
++    }
++    ctx->base.is_jmp = DISAS_NORETURN;
++
++    tcg_temp_free(source1);
++    tcg_temp_free(source2);
++
+     return true;
+ }
+ 
++static bool trans_beq(DisasContext *ctx, arg_beq *a)
++{
++    return gen_branch(ctx, a, TCG_COND_EQ);
++}
++
+ static bool trans_bne(DisasContext *ctx, arg_bne *a)
+ {
+-    gen_branch(ctx->env, ctx, OPC_RISC_BNE, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_branch(ctx, a, TCG_COND_NE);
+ }
+ 
+ static bool trans_blt(DisasContext *ctx, arg_blt *a)
+ {
+-    gen_branch(ctx->env, ctx, OPC_RISC_BLT, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_branch(ctx, a, TCG_COND_LT);
+ }
+ 
+ static bool trans_bge(DisasContext *ctx, arg_bge *a)
+ {
+-    gen_branch(ctx->env, ctx, OPC_RISC_BGE, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_branch(ctx, a, TCG_COND_GE);
+ }
+ 
+ static bool trans_bltu(DisasContext *ctx, arg_bltu *a)
+ {
+-    gen_branch(ctx->env, ctx, OPC_RISC_BLTU, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_branch(ctx, a, TCG_COND_LTU);
+ }
+ 
+ static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
+ {
+-
+-    gen_branch(ctx->env, ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
+-    return true;
++    return gen_branch(ctx, a, TCG_COND_GEU);
+ }
+ 
+ static bool trans_lb(DisasContext *ctx, arg_lb *a)
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 1f59b02c84..a0e96b94a9 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -489,53 +489,6 @@ static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
+     ctx->base.is_jmp = DISAS_NORETURN;
+ }
+ 
+-static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+-                       int rs1, int rs2, target_long bimm)
 -{
--    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+-    TCGLabel *l = gen_new_label();
+-    TCGv source1, source2;
+-    source1 = tcg_temp_new();
+-    source2 = tcg_temp_new();
+-    gen_get_gpr(source1, rs1);
+-    gen_get_gpr(source2, rs2);
 -
 -    switch (opc) {
--    case OPC_RISC_ECALL:
--        switch (csr) {
--        case 0x0: /* ECALL */
--            /* always generates U-level ECALL, fixed in do_interrupt handler */
--            generate_exception(ctx, RISCV_EXCP_U_ECALL);
--            tcg_gen_exit_tb(NULL, 0); /* no chaining */
--            ctx->base.is_jmp = DISAS_NORETURN;
--            break;
--        case 0x1: /* EBREAK */
--            generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
--            tcg_gen_exit_tb(NULL, 0); /* no chaining */
--            ctx->base.is_jmp = DISAS_NORETURN;
--            break;
--        default:
--            gen_exception_illegal(ctx);
--            break;
--        }
+-    case OPC_RISC_BEQ:
+-        tcg_gen_brcond_tl(TCG_COND_EQ, source1, source2, l);
 -        break;
+-    case OPC_RISC_BNE:
+-        tcg_gen_brcond_tl(TCG_COND_NE, source1, source2, l);
+-        break;
+-    case OPC_RISC_BLT:
+-        tcg_gen_brcond_tl(TCG_COND_LT, source1, source2, l);
+-        break;
+-    case OPC_RISC_BGE:
+-        tcg_gen_brcond_tl(TCG_COND_GE, source1, source2, l);
+-        break;
+-    case OPC_RISC_BLTU:
+-        tcg_gen_brcond_tl(TCG_COND_LTU, source1, source2, l);
+-        break;
+-    case OPC_RISC_BGEU:
+-        tcg_gen_brcond_tl(TCG_COND_GEU, source1, source2, l);
+-        break;
+-    default:
+-        gen_exception_illegal(ctx);
+-        return;
 -    }
+-    tcg_temp_free(source1);
+-    tcg_temp_free(source2);
+-
+-    gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
+-    gen_set_label(l); /* branch taken */
+-    if (!riscv_has_ext(env, RVC) && ((ctx->base.pc_next + bimm) & 0x3)) {
+-        /* misaligned */
+-        gen_exception_inst_addr_mis(ctx);
+-    } else {
+-        gen_goto_tb(ctx, 0, ctx->base.pc_next + bimm);
+-    }
+-    ctx->base.is_jmp = DISAS_NORETURN;
 -}
- 
- static void decode_RV32_64C0(DisasContext *ctx)
+-
+ static void gen_load(DisasContext *ctx, uint32_t opc, int rd, int rs1,
+         target_long imm)
  {
-@@ -628,7 +602,6 @@ bool decode_insn16(DisasContext *ctx, uint16_t insn);
- 
- static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
- {
--    int rs1, rd;
-     uint32_t op;
- 
-     /* We do not do misaligned address check here: the address should never be
-@@ -637,13 +610,9 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-      * perform the misaligned instruction fetch */
- 
-     op = MASK_OP_MAJOR(ctx->opcode);
--    rs1 = GET_RS1(ctx->opcode);
--    rd = GET_RD(ctx->opcode);
- 
-     switch (op) {
-     case OPC_RISC_SYSTEM:
--        gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
--                   (ctx->opcode & 0xFFF00000) >> 20);
-         break;
-     default:
-         gen_exception_illegal(ctx);
 -- 
 2.20.1
