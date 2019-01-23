@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36951)
+Received: from eggs.gnu.org ([209.51.188.92]:38024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gmKeK-0005cl-4G
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:41:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmKij-0008Ce-4M
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gmKeI-00043Y-Th
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:41:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35416)
+	(envelope-from <thuth@redhat.com>) id 1gmKih-0006Sc-1j
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gmKeI-00042o-Lh
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:41:06 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 23 Jan 2019 16:40:35 +0100
-Message-Id: <20190123154035.29425-1-eric.auger@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmKif-0006RT-QE
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:38 -0500
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-9-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7f3ade0c-781c-e18f-ec90-ee7ef8bb10d3@redhat.com>
+Date: Wed, 23 Jan 2019 16:45:30 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190123065618.3520-9-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4] hw/vfio/common: Refactor container
- initialization
+Subject: Re: [Qemu-devel] [RFC PATCH v4 08/44] hw/ppc/Makefile.objs: Build
+ all boards conditinally with CONFIG_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,210 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
-Cc: aik@ozlabs.ru, groug@kaod.org
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, pbonzini@redhat.com, sameo@linux.intel.com
 
-We introduce the vfio_init_container_type() helper.
-It computes the highest usable iommu type and then
-set the container and the iommu type.
+On 2019-01-23 07:55, Yang Zhong wrote:
+> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
+>=20
+> CONFIG_PPC405, CONFIG_PPC440, CONFIG_MAC_OLDWORLD, CONFIG_MAX_NEWWORLD
+> and CONFIG_VIRTEX configuration options created for
+> default-configs/ppc*-softmmu.mak.
+>=20
+> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/ppc-softmmu.mak |  7 ++++++-
+>  hw/ppc/Makefile.objs            | 12 ++++++------
+>  2 files changed, 12 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-soft=
+mmu.mak
+> index 23d871fb3e..7f80f0ccba 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -21,6 +21,10 @@ CONFIG_E500=3Dy
+>  CONFIG_OPENPIC_KVM=3D$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+>  CONFIG_PLATFORM_BUS=3Dy
+>  CONFIG_ETSEC=3Dy
+> +CONFIG_PPC405=3Dy
+> +CONFIG_PPC440=3Dy
+> +CONFIG_VIRTEX=3Dy
+> +
+>  # For Sam460ex
+>  CONFIG_SAM460EX=3Dy
+>  CONFIG_USB_EHCI_SYSBUS=3Dy
+> @@ -34,7 +38,6 @@ CONFIG_M41T80=3Dy
+>  CONFIG_VGA_CIRRUS=3Dy
+> =20
+>  # For Macs
+> -CONFIG_MAC=3Dy
+>  CONFIG_ESCC=3Dy
+>  CONFIG_MACIO=3Dy
+>  CONFIG_MACIO_GPIO=3Dy
+> @@ -50,6 +53,8 @@ CONFIG_GRACKLE_PCI=3Dy
+>  CONFIG_UNIN_PCI=3Dy
+>  CONFIG_DEC_PCI=3Dy
+>  CONFIG_IDE_MACIO=3Dy
+> +CONFIG_MAC_OLDWORLD=3Dy
+> +CONFIG_MAC_NEWWORLD=3Dy
+> =20
+>  # For PReP
+>  CONFIG_PREP=3Dy
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index 4e0c1c0941..2ce7973219 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -13,20 +13,20 @@ obj-y +=3D spapr_pci_vfio.o
+>  endif
+>  obj-$(CONFIG_PSERIES) +=3D spapr_rtas_ddw.o
+>  # PowerPC 4xx boards
+> -obj-y +=3D ppc4xx_devs.o ppc405_uc.o
 
-Its usage in vfio_connect_container() makes the code
-ready for addition of new iommu types.
+Could you please leave these two files above always enabled for now? I
+tried to make them configurable in the past already (see
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df8567a11fb63d62644d=
+fdf
+), but there are some dependencies from the generic code to functions in
+this file which have to be solved first...
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+With that fixed:
 
----
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-v3 -> v4:
-- Take into account Alex' suggestions. Only exception is
-  I kept v2 bool.
 
-v2 -> v3:
-- fix ret/errno
-
-v1 -> v2:
-- handle SPAPR case, s/ret/errno in error error_setg_errno,
-  fix ret value when vfio_iommu_get_type fails
-- removed Greg's R-b
-
-v1:
-- originally submitted in [RFC v2 00/28] vSMMUv3/pSMMUv3
-  2 stage VFIO integration
----
- hw/vfio/common.c | 117 +++++++++++++++++++++++++++++------------------
- 1 file changed, 72 insertions(+), 45 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 4262b80c44..eb209c776c 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1036,6 +1036,61 @@ static void vfio_put_address_space(VFIOAddressSpac=
-e *space)
-     }
- }
-=20
-+/*
-+ * vfio_get_iommu_type - selects the richest iommu_type (v2 first)
-+ */
-+static int vfio_get_iommu_type(VFIOContainer *container,
-+                               Error **errp)
-+{
-+    int iommu_types[] =3D { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
-+                          VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU =
-};
-+    int fd =3D container->fd;
-+    int i;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(iommu_types); i++) {
-+        if (ioctl(fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
-+            return iommu_types[i];
-+        }
-+    }
-+    error_setg(errp, "No available IOMMU models");
-+    return -EINVAL;
-+}
-+
-+static int vfio_init_container_type(VFIOContainer *container, int group_=
-fd,
-+                                    Error **errp)
-+{
-+    int iommu_type, ret;
-+
-+    iommu_type =3D vfio_get_iommu_type(container, errp);
-+    if (iommu_type < 0) {
-+        return iommu_type;
-+    }
-+
-+    ret =3D ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
-+    if (ret) {
-+        error_setg_errno(errp, errno, "Failed to set group container");
-+        return -errno;
-+    }
-+
-+    while (ioctl(container->fd, VFIO_SET_IOMMU, iommu_type)) {
-+        if (iommu_type =3D=3D VFIO_SPAPR_TCE_v2_IOMMU) {
-+            /*
-+             * On sPAPR, despite the IOMMU subdriver always advertises v=
-1 and
-+             * v2, the running platform may not support v2 and there is =
-no
-+             * way to guess it until an IOMMU group gets added to the co=
-ntainer.
-+             * So in case it fails with v2, try v1 as a fallback.
-+             */
-+            iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
-+            continue;
-+        }
-+        error_setg_errno(errp, errno, "Failed to set iommu for container=
-");
-+        return -errno;
-+    }
-+
-+    container->iommu_type =3D iommu_type;
-+    return 0;
-+}
-+
- static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-                                   Error **errp)
- {
-@@ -1101,26 +1156,18 @@ static int vfio_connect_container(VFIOGroup *grou=
-p, AddressSpace *as,
-     container->fd =3D fd;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
--    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
--        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
--        bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU=
-);
-+
-+    ret =3D vfio_init_container_type(container, group->fd, errp);
-+    if (ret) {
-+        goto free_container_exit;
-+    }
-+
-+    switch (container->iommu_type) {
-+    case VFIO_TYPE1v2_IOMMU:
-+    case VFIO_TYPE1_IOMMU:
-+    {
-         struct vfio_iommu_type1_info info;
-=20
--        ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
--        if (ret) {
--            error_setg_errno(errp, errno, "failed to set group container=
-");
--            ret =3D -errno;
--            goto free_container_exit;
--        }
--
--        container->iommu_type =3D v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_I=
-OMMU;
--        ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
--        if (ret) {
--            error_setg_errno(errp, errno, "failed to set iommu for conta=
-iner");
--            ret =3D -errno;
--            goto free_container_exit;
--        }
--
-         /*
-          * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
-          * IOVA whatsoever.  That's not actually true, but the current
-@@ -1137,30 +1184,13 @@ static int vfio_connect_container(VFIOGroup *grou=
-p, AddressSpace *as,
-         }
-         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
-         container->pgsizes =3D info.iova_pgsizes;
--    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
--               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU))=
- {
-+        break;
-+    }
-+    case VFIO_SPAPR_TCE_v2_IOMMU:
-+    case VFIO_SPAPR_TCE_IOMMU:
-+    {
-         struct vfio_iommu_spapr_tce_info info;
--        bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_=
-IOMMU);
--
--        ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
--        if (ret) {
--            error_setg_errno(errp, errno, "failed to set group container=
-");
--            ret =3D -errno;
--            goto free_container_exit;
--        }
--        container->iommu_type =3D
--            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
--        ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
--        if (ret) {
--            container->iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
--            v2 =3D false;
--            ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
--        }
--        if (ret) {
--            error_setg_errno(errp, errno, "failed to set iommu for conta=
-iner");
--            ret =3D -errno;
--            goto free_container_exit;
--        }
-+        bool v2 =3D container->iommu_type =3D=3D VFIO_SPAPR_TCE_v2_IOMMU=
-;
-=20
-         /*
-          * The host kernel code implementing VFIO_IOMMU_DISABLE is calle=
-d
-@@ -1222,10 +1252,7 @@ static int vfio_connect_container(VFIOGroup *group=
-, AddressSpace *as,
-                               info.dma32_window_size - 1,
-                               0x1000);
-         }
--    } else {
--        error_setg(errp, "No available IOMMU models");
--        ret =3D -EINVAL;
--        goto free_container_exit;
-+    }
-     }
-=20
-     vfio_kvm_device_add_group(group);
---=20
-2.20.1
+> -obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc405_boards.o
+> -obj-$(CONFIG_PPC4XX) +=3D ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
+> +obj-$(CONFIG_PPC405) +=3D ppc405_boards.o  ppc405_uc.o
+> +obj-$(CONFIG_PPC440) +=3D ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
+> +obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc4xx_devs.o
+>  obj-$(CONFIG_SAM460EX) +=3D sam460ex.o
+>  # PReP
+>  obj-$(CONFIG_PREP) +=3D prep.o
+>  obj-$(CONFIG_PREP) +=3D prep_systemio.o
+>  obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
+>  # OldWorld PowerMac
+> -obj-$(CONFIG_MAC) +=3D mac_oldworld.o
+> +obj-$(CONFIG_MAC_OLDWORLD) +=3D mac_oldworld.o
+>  # NewWorld PowerMac
+> -obj-$(CONFIG_MAC) +=3D mac_newworld.o
+> +obj-$(CONFIG_MAC_NEWWORLD) +=3D mac_newworld.o
+>  # e500
+>  obj-$(CONFIG_E500) +=3D e500.o mpc8544ds.o e500plat.o
+>  obj-$(CONFIG_E500) +=3D mpc8544_guts.o ppce500_spin.o
+>  # PowerPC 440 Xilinx ML507 reference board.
+> -obj-$(CONFIG_XILINX) +=3D virtex_ml507.o
+> +obj-$(CONFIG_VIRTEX) +=3D virtex_ml507.o
