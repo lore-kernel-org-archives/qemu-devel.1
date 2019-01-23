@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50104)
+Received: from eggs.gnu.org ([209.51.188.92]:50452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmJr3-0002gv-Mv
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gmJrn-0003KS-VB
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:51:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmJr1-0003H6-4W
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:13 -0500
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:38896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gmJr0-0003Ex-RW
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:10 -0500
-Received: by mail-wr1-f52.google.com with SMTP id v13so2782710wrw.5
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 06:50:09 -0800 (PST)
-References: <20190103153320.21687-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <975d05a9-57f1-4183-b84e-231265e3177e@redhat.com>
-Date: Wed, 23 Jan 2019 15:50:05 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gmJrm-00045p-Rl
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gmJrm-00043J-If
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:58 -0500
+Date: Wed, 23 Jan 2019 12:50:50 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190123145050.GU4136@habkost.net>
+References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
+	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190103153320.21687-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-web RFC] Add GSoC/Outreachy 2018
- retrospective blog post
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: jim@groklearning.com, Fam Zheng <famz@euphon.net>, airlied@redhat.com, Thomas Huth <thuth@redhat.com>, joel@jms.id.au, marcandre.lureau@redhat.com, kraxel@redhat.com
+To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On 03/01/19 16:33, Stefan Hajnoczi wrote:
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> Dear mentors,
-> Let's post an overview of what was achieved in GSoC/Outreachy 2018.  I
-> have populated a blog post with information available to me, but I'm
-> sure it can be improved to explain how the project went and the current
-> status.
+On Wed, Jan 23, 2019 at 11:00:02AM +0800, Zhang, Yi wrote:
+> From: Zhang Yi <yi.z.zhang@linux.intel.com>
 > 
-> Please let me know what should be changed, thanks!
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 > ---
->  _posts/2019-01-03-internships-wrapup.md | 61 +++++++++++++++++++++++++
->  1 file changed, 61 insertions(+)
->  create mode 100644 _posts/2019-01-03-internships-wrapup.md
+>  docs/nvdimm.txt | 29 ++++++++++++++++++++++++++++-
+>  qemu-options.hx |  4 ++++
+>  2 files changed, 32 insertions(+), 1 deletion(-)
 > 
-> diff --git a/_posts/2019-01-03-internships-wrapup.md b/_posts/2019-01-03-internships-wrapup.md
-> new file mode 100644
-> index 0000000..ec245e6
-> --- /dev/null
-> +++ b/_posts/2019-01-03-internships-wrapup.md
-> @@ -0,0 +1,61 @@
-> +---
-> +layout: post
-> +title:  "GSoC and Outreachy 2018 retrospective"
-> +date:   2019-01-03 07:50:00 +0100
-> +categories: [gsoc, outreachy, internships]
-> +---
-> +QEMU participates in open source internship programs including Google Summer of
-> +Code (GSoC) and Outreachy.  These full-time remote work opportunities allow
-> +talented new developers to get involved in our community.  This post highlights
-> +what our interns achieved in 2018.
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 5f158a6..166c395 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -142,11 +142,38 @@ backend of vNVDIMM:
+>  Guest Data Persistence
+>  ----------------------
+>  
+> +vNVDIMM is designed and implemented to guarantee the guest data
+> +persistence on the backends in case of host crash or a power failures.
+> +However, there are still some requirements and limitations
+> +as explained below.
 > +
-> +## micro:bit board emulation
+>  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> -currently the only one that can guarantee the guest write persistence
+> +if MAP_SYNC is not supported by the host kernel and the backends,
+> +the only backend that can guarantee the guest write persistence
+>  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+>  which all guest access do not involve any host-side kernel cache.
+>  
+> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
+> +systems, QEMU can mmap(2) the dax backend files with MAP_SYNC, which
+> +ensures filesystem metadata consistency in case of a host crash or a power
+> +failure. Enabling MAP_SYNC in QEMU requires below conditions
 > +
-> +Julia Suvorova (Outreachy) and Steffen Görtz (GSoC) tackled adding emulation
-> +support for the [micro:bit ARM board](https://microbit.org/).  Although QEMU
-> +already has plenty of ARM emulation code, the Cortex-M0 CPU used in the
-> +micro:bit was not yet implemented and the nRF51 system-on-chip was also
-> +missing.
-> +
-> +The goal of this project was to run micro:bit programs (usually created with
-> +the [MicroPython](https://python.microbit.org/v/1.1) or
-> +[Javascript/Blocks](https://makecode.microbit.org/) IDEs) with a core set of
-> +emulated devices, including the serial port, pushbuttons, and LEDs.
-> +
-> +QEMU 3.1 already shipped the groundwork for the new `qemu-system-arm -M
-> +microbit` machine type.  Enough functionality to run basic micro:bit programs
-> +is expected in the next QEMU release.
-> +
-> +## Patchew REST API improvements
-> +
-> +Shubham Jain (GSoC) created a REST API for the Patchew continuous integration
-> +system that is at the heart of QEMU's development process.  The previous API
-> +was not RESTful and exposed database schema internals.
+> + - 'pmem' option of memory-backend-file is 'on':
+> +   The backend is a file supporting DAX, e.g., a file on an ext4 or
+> +   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
+> +   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
+> +   error.
 
-The improvements to the REST API have been included into Patchew and are
-deployed on http://patchew.org/.  They are not in use yet, pending more
-work on authentication; this may be the topic of a future Summer of Code
-internship.
+Won't this break existing configurations that work today on QEMU
+3.1.0?  Why exactly it is OK to break compatibility here?
 
-> +## Qtest Driver Framework
 > +
-> +Emanuele Esposito (GSoC) enhanced QEMU's test infrastructure with an engine
-> +that starts tests with all variants of devices that they are capable of
-> +driving.
-> +
-> +This is a complicated task in QEMU since certain devices and busses are
-> +available in an architecture-specific way on each emulation target, making it
-> +hard to write test cases without lots of hardcoded dependencies - and to keep
-> +them up-to-date!
-> +
-> +The qgraph framework that Emanuele created eliminates the need to hardcode each
-> +variant into the test.
+> + - 'share' option of memory-backend-file is 'on':
+> +   MAP_SYNC flag available only with the MAP_SHARED_VALIDATE mapping type.
 
-Emanuele also converted several existing tests.  His framework was also
-presented at KVM Forum 2019 by Laurent Vivier, Emanuele's mentor,  and
-should be merged in 4.0.
+I don't understand what this paragraph means.
 
-Paolo
+> +
+> + - 'MAP_SYNC' is supported on linux kernel.(default opened since Linux 4.15)
+> +
+
+I don't understand why you are making the semantics of
+command-line options change depending on the host kernel.
+
+> +Otherwise, We will ignore the MAP_SYNC flag.
+> +
+
+See the questions I sent about supported use cases at
+<https://www.mail-archive.com/qemu-devel@nongnu.org/msg588822.html>.
+I still don't see those questions answered:
+
+] We have at least 3 different possible use cases we might need to
+] support:
+] 
+] 1) pmem=on, MAP_SYNC not desired
+] 2) pmem=on, MAP_SYNC desired but optional
+] 3) pmem=on, MAP_SYNC required, not optional
+] 
+] Which cases from the list above we need to support?
+] 
+] From the cases above, what's the expected semantics of "pmem=on"
+] with no extra options?
+
+It's not clear to me yet if you want to support use cases (1) and (2).
+
+Also, you seem to be choosing between use case (1) or (3) depending on
+the build environment instead of command-line options.  The
+meaning of command-line options must be predictable and
+unambiguous, and not depend on build time variables.
+
+
+> +For more details, please reference mmap(2) man page:
+> +http://man7.org/linux/man-pages/man2/mmap.2.html.
+> +
+>  When using other types of backends, it's suggested to set 'unarmed'
+>  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+>  guest NVDIMM region mapping structure.  This unarmed flag indicates
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08f8516..0cd41f4 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
+>  If @option{pmem} is set to 'on', QEMU will take necessary operations to
+>  guarantee the persistence of its own writes to @option{mem-path}
+>  (e.g. in vNVDIMM label emulation and live migration).
+> +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
+> +the file metadata is in sync to @option{mem-path} in case of host crash
+> +or a power failure. MAP_SYNC requires support from both the host kernel
+> +(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
+>  
+>  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+> -- 
+> 2.7.4
+> 
+
+-- 
+Eduardo
