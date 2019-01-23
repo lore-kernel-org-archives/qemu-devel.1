@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40726)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1gmFsp-0000rV-OE
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:35:48 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:41410)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1gmFun-0002Qq-3k
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1gmFsn-0001Es-HS
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:35:47 -0500
-Received: from mout.gmx.net ([212.227.17.20]:46817)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmFsn-00014Z-51
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:35:45 -0500
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-	<20190123101238.GD27270@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-Date: Wed, 23 Jan 2019 11:36:22 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gmFum-0002MJ-0M
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:37:49 -0500
+Date: Wed, 23 Jan 2019 11:37:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190123113718.6e2a0f3a.cohuck@redhat.com>
+In-Reply-To: <77fffbf2-f1c2-ad74-db3e-28fb8856fc1d@redhat.com>
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122125133.1191-2-david@redhat.com>
+	<533d81b9-5d85-d441-7900-c8bb10ee4b8a@redhat.com>
+	<77fffbf2-f1c2-ad74-db3e-28fb8856fc1d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190123101238.GD27270@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EYxyhvCiICUDUDYvCdA01GikqDC9tz4U6"
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] s390x/pci: Fix primary bus number
+ for PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EYxyhvCiICUDUDYvCdA01GikqDC9tz4U6
-From: Kamil Rytarowski <n54@gmx.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
-References: <20190123080005.31078-1-kraxel@redhat.com>
- <20190123080005.31078-5-kraxel@redhat.com>
- <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
- <20190123093657.GC27270@redhat.com>
- <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
- <20190123101238.GD27270@redhat.com>
-In-Reply-To: <20190123101238.GD27270@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 23 Jan 2019 11:32:48 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 23.01.2019 11:12, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jan 23, 2019 at 10:50:18AM +0100, Thomas Huth wrote:
->> On 2019-01-23 10:36, Daniel P. Berrang=C3=A9 wrote:
->>> On Wed, Jan 23, 2019 at 09:27:48AM +0100, Thomas Huth wrote:
->>>> On 2019-01-23 09:00, Gerd Hoffmann wrote:
->>>>>
->>>>> This is RfC because we might look at the ordering.  On linux we pro=
-bably
->>>>> want prefer alsa over oss.
->>>> Yes, please! I've run into the trap a couple of times already: OSS
->>>> headers were available, but these days the OSS compatibility kernel
->>>> modules are not loaded anymore by default. So you compile QEMU with =
-OSS
->>>> support and then wonder why you do not get any audio output at all..=
-=2E
->>>>
->>>> IMHO we should put OSS as last item in the list on Linux nowadays.
->>>
->>> Given our targetted platform list[1], are there even any platforms
->>> where we would *not* have alsa, but still have OSS ?  If not, then
->>> we could just drop the OSS driver entirely on the ground that it is
->>> obsolete.
->>
->> We likely could drop OSS on Linux, but it is still required on FreeBSD=
+> On 23.01.19 11:26, Thomas Huth wrote:
+> > On 2019-01-22 13:51, David Hildenbrand wrote:  
+> >> The primary bus number corresponds always to the bus number of the
+> >> bus the bridge is attached to.
+> >>
+> >> Right now, if we have two bridges attached to the same bus (e.g. root
+> >> bus) this is however not the case. Fix assignment.
+> >>
+> >> While at it
+> >> - Add a comment why we have to reassign durign every reset (which I  
+> > 
+> > s/durign/during/
+> >   
+> >>   found to be supprising)  
+> > 
+> > s/supprising/surprising/
+> >   
+> >> - Drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff. As we are
+> >>   setting it via a DFS and not via a BFS (as discussed e.g. in [1]), this
+> >>   is not necessary. The last number when we return is the highest
+> >>   number.  
+> > 
+> > I think that explanation is slightly wrong / misleading. It's not about
+> > DFS vs. BFS, it's about guest code vs. QEMU code. If you do a bridge
+> > setup from the guest side, you've got to set the subordinate bus number
+> > to 0xff to make sure that the bridge forwards all config space accesses
+> > to the attached devices while you're scanning the devices that are
+> > attached to the bridge.
+> > But this code is not running in the guest, it is running in QEMU, and so
+> > it can access the config space of the attached devices directly via
+> > pci_default_write_config() - the write do not need to pass the parent
+> > bridge in this case, and thus the subordinate bus number in the bridge
+> > is ignored for the config space write access.  
+> 
+> Indeed, I phrased that better in the spapr/pci patch I sent, What about
+> this:
+> 
+> "
+> The primary bus number corresponds always to the bus number of the
+> bus the bridge is attached to.
+> 
+> Right now, if we have two bridges attached to the same bus (e.g. root
+> bus) this is however not the case. The first bridge will have primary
+> bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
+> 
+> While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+> Setting it temporarily to that value (as discussed e.g. in [1]), is
+> only relevant for a running system that probes the buses. The value is
+> effectively unused for us just doing a DFS.
+> 
+> Also add a comment why we have to reassign during every reset (which I
+> found to be surprising.
+> 
+> Please note that hotplugging of bridges is in general still broken, will
+> be fixed next.
+> "
+> 
+> >   
+> >> Please note that hotplugging of bridges is in general still broken, will
+> >> be fixed next.
+> >>
+> >> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/s390x/s390-pci-bus.c | 13 ++++++++-----
+> >>  1 file changed, 8 insertions(+), 5 deletions(-)  
+> > 
+> > With the commit message fixed:  
+> 
+> @Conny can you fix up when applying if there are no other comments?
 
->> and NetBSD, isn't it? So unless we can drop it there, too, we can also=
+Sure, can do. Waiting for zpci maintainer ack :)
 
->> simply keep it as last option in the list on Linux as well.
->=20
-> Ah ok, I didn't realize that BSD implemneted the OSS subsystem too.
->=20
-> Regards,
-> Daniel
->=20
-
-OSS is the portable UNIX audio backend. We could point some flaws in it,
-but it's a good enough for portable UNIX applications. The question is
-what UNIX-like desktop OS does not implement it or removed it.
-
-
---EYxyhvCiICUDUDYvCdA01GikqDC9tz4U6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIQ6YMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZs7w0QAIEiaB9iVVQDSccA3gAgTZsSeCg9cPVcYK+sTWmO
-EW+Ew+Fc9tw0Ir63uyWrlFlbBCKibSefZ0K1PYf6DUJax2JpFy8HQKuy39nAStv2
-nSKzKlx4fK3nv6zaE4XjHNLBnr3e4XFO45mQpDkf8MJRK2IR4ipD7ZD9io6BqEG1
-U28VxOKqxzs+8EkHJDanRR5oGASi2Dd3Iz96sRsX08a5J5LOm1JT/n76HVL7FNnH
-9s4eO7dQ5P+UGqEtLFbyZUNIVbjt3RGyKYDf7ISy+1C/escPXPLgDW87Xu0ZiwC0
-ftwD6Jj3N0bk1xHAd0aFFa8TN4aVul2kQj/xwfBfaxHxI2Q8z62MIV1W/2o+0E+W
-zyyLgpI84rV1GqTGX525yezgv6tAeL5cqdxlcxINzN3NLOu6oO4BPVcxs3K0KDDf
-qEkIIk5Or/MiMzWKUFp9UaKhiE7l/Q2tmFgmqrBIO2Tw71EDktCj8YzGEhJOmNN0
-4oZcZWqPqy3VLQbS/zyLzPDKFry5Hr52o06yv0lYn79J30bl64Jidps0AjJCl+rT
-GW9lneCJYBXtXj+TrqSWY1sCte8R5n9jkaq3ooSj/0tU0Y5k/J10SmbaYRX1+3JC
-aGjDOtK2KJl+C4+ZNoK2und40SbzwxSsP+B/MYPspGLK+DIfSAO5zcYrKUsTAhbp
-jDyM
-=lzvt
------END PGP SIGNATURE-----
-
---EYxyhvCiICUDUDYvCdA01GikqDC9tz4U6--
+> 
+> > 
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >   
+> 
+> Thanks Thomas!
+> 
+> 
