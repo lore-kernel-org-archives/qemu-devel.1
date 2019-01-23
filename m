@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54837)
+Received: from eggs.gnu.org ([209.51.188.92]:54838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmC7O-00076E-Tk
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:34:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmC7P-00076F-HM
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:34:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmBtt-0004zi-Di
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42000)
+	(envelope-from <thuth@redhat.com>) id 1gmBtM-0004X3-8o
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmBtr-0004xo-GH
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:37 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CB6A80E7B
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 06:20:34 +0000 (UTC)
-Date: Wed, 23 Jan 2019 07:20:33 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190123062033.mmte7z4friinj7yf@sirius.home.kraxel.org>
-References: <20181219120904.17643-1-kraxel@redhat.com>
-	<20181219120904.17643-2-kraxel@redhat.com>
-	<c563bdda-601d-c362-049b-b8e3a933291b@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmBtL-0004Up-W1
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:04 -0500
+References: <20190122162924.26491-1-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a60dbcd8-df39-ebe9-a86b-92bc468b8ec2@redhat.com>
+Date: Wed, 23 Jan 2019 07:19:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c563bdda-601d-c362-049b-b8e3a933291b@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] kbd-state: add keyboard state
- tracker
+In-Reply-To: <20190122162924.26491-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update microbit ARM board
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, contrib@steffen-goertz.de, joel@jms.id.au, jusual@mail.ru
 
-> > +         * the corresponding key-down event wasn't send to the guest,
+On 2019-01-22 17:29, Stefan Hajnoczi wrote:
+> New source files were added without corresponding ./MAINTAINERS file
+> entries.  Let's get things up to date.
 > 
-> s/send/sent/
-
-Fixed.
-
-> > +void kbd_state_lift_all_keys(KbdState *kbd)
-> > +{
-> > +    int qcode;
-> > +
-> > +    for (qcode = 0; qcode < Q_KEY_CODE__MAX; qcode++) {
-> > +        if (test_bit(qcode, kbd->keys)) {
-> > +            kbd_state_key_event(kbd, qcode, false);
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> This also includes the I2C/TWI stub which Peter has merged into his
+> target-arm.next tree but isn't in qemu.git/master yet.
+> ---
+>  MAINTAINERS | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> Is there a more efficient iteration through the bitmap when looking for
-> the next set bit, or is the map small enough that it doesn't matter?
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index af339b86db..e3cb67e81d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -833,7 +833,19 @@ L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/arm/nrf51_soc.c
+>  F: hw/arm/microbit.c
+> +F: hw/char/nrf51_uart.c
+> +F: hw/gpio/nrf51_gpio.c
+> +F: hw/i2c/microbit_i2c.c
+> +F: hw/misc/nrf51_rng.c
+> +F: hw/timer/nrf51_timer.c
+>  F: include/hw/arm/nrf51_soc.h
+> +F: include/hw/arm/nrf51.h
+> +F: include/hw/char/nrf51_uart.h
+> +F: include/hw/gpio/nrf51_gpio.h
+> +F: include/hw/i2c/microbit_i2c.h
+> +F: include/hw/misc/nrf51_rng.h
+> +F: include/hw/timer/nrf51_timer.h
+> +F: tests/microbit-test.c
 
-It isn't that big (a bit over 100 I think), and the function isn't
-called often, so performance really shouldn't be a problem here.
+Looks like using wildcards would be easier here:
 
-cheers,
-  Gerd
+F: hw/*/nrf51*.c
+F: hw/*/microbit*.c
+F: include/hw/*/nrf51*.h
+...
+
+?
+
+Anyway:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
