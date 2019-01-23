@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44105)
+Received: from eggs.gnu.org ([209.51.188.92]:44364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmJe3-0000TC-91
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:36:48 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gmJem-000145-PV
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmJe2-0002qY-GU
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:36:47 -0500
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-2-vsementsov@virtuozzo.com>
-	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-	<5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
-	<29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
-	<9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
-	<352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
-	<7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6cf829bf-2848-b588-c832-1f6f3e037c3d@redhat.com>
-Date: Wed, 23 Jan 2019 08:36:20 -0600
+	(envelope-from <mreitz@redhat.com>) id 1gmJel-0003WI-R2
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:37:32 -0500
+References: <20181221234750.23577-1-mreitz@redhat.com>
+	<20181221234750.23577-4-mreitz@redhat.com>
+	<84e62d4a-bf74-ba1c-d802-e01de14d693c@redhat.com>
+	<3bf30595-c8fc-9058-3860-c4640718b33d@redhat.com>
+	<c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <99a1dcdf-2b53-3aff-da21-56e719dad4d9@redhat.com>
+Date: Wed, 23 Jan 2019 15:37:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+In-Reply-To: <c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Lw5bDW1ZP3ncyfCXEf21Qy7WNDXR45uqX"
-Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
+	boundary="9VmItbS3DXrcilG7kkusz7eOvRkD8u80c"
+Subject: Re: [Qemu-devel] [PATCH 3/3] iotests: Allow 147 to be run
+ concurrently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lw5bDW1ZP3ncyfCXEf21Qy7WNDXR45uqX
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com"
- <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
-Message-ID: <6cf829bf-2848-b588-c832-1f6f3e037c3d@redhat.com>
-Subject: Re: [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
- <20181229122027.42245-2-vsementsov@virtuozzo.com>
- <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
- <5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
- <29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
- <9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
- <352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
- <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+--9VmItbS3DXrcilG7kkusz7eOvRkD8u80c
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <99a1dcdf-2b53-3aff-da21-56e719dad4d9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] iotests: Allow 147 to be run
+ concurrently
+References: <20181221234750.23577-1-mreitz@redhat.com>
+ <20181221234750.23577-4-mreitz@redhat.com>
+ <84e62d4a-bf74-ba1c-d802-e01de14d693c@redhat.com>
+ <3bf30595-c8fc-9058-3860-c4640718b33d@redhat.com>
+ <c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
+In-Reply-To: <c63ab4a5-7e28-2a21-c16e-a114a6ce7358@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/23/19 2:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 23.01.19 15:33, Eric Blake wrote:
+> On 1/23/19 7:12 AM, Max Reitz wrote:
+>> On 21.01.19 22:02, Eric Blake wrote:
+>>> On 12/21/18 5:47 PM, Max Reitz wrote:
+>>>> To do this, we need to allow creating the NBD server on various port=
+s
+>>>> instead of a single one (which may not even work if you run just one=
 
->>>>>>> +        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cl=
-uster + 1);
->>>>>>
->>>>>> Why the +1?  Shouldn't the division for last_cluster round up inst=
-ead?
->>>>>>
->>>>>>> +
->>>>>>> +        offset =3D (last_cluster + 1) * job->cluster_size;
->>>>>>
->>>>>> Same here.
->>>>>
->>>>> last cluster is not "end", but it's last dirty cluster. so number o=
-f dirty clusters is last_cluster - cluster + 1, and next offset is calcul=
-ated through +1 too.
->>>>>
->>>>> If I round up division result, I'll get last for most cases, but "e=
-nd" (next after the last), for the case when offset % job->cluster_size =3D=
-=3D 0, so, how to use it?
->>>>
->>>> Doesn't bdrv_dirty_bitmap_next_dirty_area() return a range [offset,
->>>> offset + bytes), i.e. where "offset + bytes" is the first clean offs=
-et?
+>>>> instance, because something entirely else might be using that port).=
+
 >>>
->>> oops, you are right. then I need
->>> uint64_t last_cluster =3D (offset + bytes - 1) / job->cluster_size;
+>>> Can you instead reuse the ideas from nbd_server_set_tcp_port() from
+>>> qemu-iotests/common.nbd?
+>>>
+>>>>
+>>>> So we just pick a random port in [32768, 32768 + 1024) and try to cr=
+eate
+>>>> a server there.  If that fails, we just retry until something sticks=
+=2E
+>>>
+>>> That has the advantage of checking whether a port is actually in use
+>>> (using 'ss' - although it does limit the test to Linux-only; perhaps
+>>> using socat instead of ss could make the test portable to non-Linux?)=
+
 >>
->> That, or you just use a rounding up division and rename it from
->> last_cluster to end_cluster or first_clean_cluster or something (and
->> subsequently drop the +1s).
+>> But doesn't that give you race conditions?  That's the point of this
+>> series, so you can run multiple instances of 147 concurrently.
 >=20
-> This will not work, as ((offset + bytes) / job->cluster_size) is not fi=
-rst clean cluster
-> or end cluster. It's a cluster, where is first clean bit located, but i=
-t may have dirty
-> bits too (or, may not).
+> Hmm - that does imply that common.nbd's use of ss IS racy because it
+> checks in linear fashion and has a TOCTTOU window (affects at least
+> iotest 233). Your observation that random probes within a range are les=
+s
+> susceptible (although not immune) to the race is correct.
 >=20
-> So, to rewrite based on end_cluster, it should be calculated as
+>>> Do you actually need to attempt a qemu-nbd process, if you take my
+>>> suggestion of using ss to probe for an unused port?  And if not, do w=
+e
+>>> still need qemu_nbd_pipe() added earlier in the series?
+>>>
+>>>
+>>>> -        address =3D { 'type': 'inet',
+>>>> -                    'data': {
+>>>> -                        'host': 'localhost',
+>>>> -                        'port': str(NBD_PORT)
+>>>> -                    } }
+>>>> -        self._server_up(address, export_name)
+>>>> +        while True:
+>>>> +            nbd_port =3D random.randrange(NBD_PORT_START, NBD_PORT_=
+END)
+>>>
+>>> common.nbd just iterates, instead of trying random ports.
+>>
+>> I'm not sure which is better.  Iterating gives guaranteed termination,=
+
+>> trying random ports means the first one you try will usually work.
 >=20
-> (offset + bytes - 1) / job->cluster_size + 1
+> Is there any other way we can make the test more robust, perhaps by
+> using socket activation (that is, pre-open the port prior to starting
+> qemu_nbd, so that our code for finding a free socket is more easily
+> reusable), or by using Unix sockets for test 147 (that test seems to be=
+
+> using TCP sockets only as a means to get to the real feature under test=
+,
+> and not as the actual thing being tested)?
+
+147 needs TCP sockets because that interface is tested.
+
+Making the code reusable is not too high of a priority to me, as
+normally NBD tests should just use Unix sockets.  This test is just a
+special case.  But for this test, I can try to put the while loop into
+an own function (that gets fed an address object without data.port), as
+John has proposed.
+
+Max
+
+> Hmm, and you made me realize that socket activation is NOT documented i=
+n
+> 'man qemu-nbd'; I ought to fix that.
 >=20
-> and, I'm going to do so, one "+1" instead of two, and, may be, a bit mo=
-re understandable.
-
-Better is to use the macros in osdep.h, such as QEMU_ALIGN_UP/DOWN, to
-make the intent of the code easier to read than having to closely check
-which operation is being performed to see if it makes sense in context.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
 
---Lw5bDW1ZP3ncyfCXEf21Qy7WNDXR45uqX
+
+--9VmItbS3DXrcilG7kkusz7eOvRkD8u80c
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxIe+QACgkQp6FrSiUn
-Q2oZ5Qf+Ip1SvbZvtjMk/GuuTBg0jE92iwo4JcOI2W8q0SP9ubsYIqkXT3s0Mj3u
-nD43+5tWCf9kePm/F50N8X9lzFezo7DYN1mxlM6UfuK8IZJ2gE32Xxv1gdyCfXu1
-eRXXsp00GOe+DaQPxkb36nWzdfRCZABSHYV9jAoT4zjcxn5vXDi4nIRcE6srsISR
-a2Jf4yl137+UBEjzPUb0gu/knKrphlyBVJYhW0D9TruL5FWqTT+QqhkInFze1jNk
-FFRCmyEwxxIGkEzSeJl/1hrXf9cMHw8UAX2pXic1pnjYmqpz7J8T7O90k6GY2l++
-StGnfhcM61KYNnCy8elVC7YZCphzCA==
-=E4+5
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxIfBoACgkQ9AfbAGHV
+z0DOJQf+K2/Kk1d15zZP7q7c35mpruxINyCA2yzlVSobhKRXU4YFd0JQe+S91G70
+pfdYI3C/3mrlmJpDpKMJF66CqHgVZhxr8LB3/1mim458/XGW+KeMakPPRvewS8bg
+vuZbQWM/NKN5hrKSSuaXg92KKRlcbRCymE26RxuBRwFWGWjCF6ih5T8ogKHJVBQu
+lX4/Vms3cJxixMIGoM2uW+fzoulCt3UJng36joAsyekq4GrRSY494s1qAe7N3Fse
+XBqd5zZ6/xlXGaFpdQ5qWh3J50zE8ZQZhYfjDBYlFa8mpAB1L/lz0PWd1IHRncDj
+NK/xA0Gv1KjwJPYOux6LEzzLvEf6gg==
+=TKKb
 -----END PGP SIGNATURE-----
 
---Lw5bDW1ZP3ncyfCXEf21Qy7WNDXR45uqX--
+--9VmItbS3DXrcilG7kkusz7eOvRkD8u80c--
