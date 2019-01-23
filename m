@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54838)
+Received: from eggs.gnu.org ([209.51.188.92]:59523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmC7P-00076F-HM
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:34:38 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gmCUj-0003Xi-7k
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmBtM-0004X3-8o
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49468)
+	(envelope-from <yang.zhong@intel.com>) id 1gmCUf-0002QS-MA
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:40 -0500
+Received: from mga18.intel.com ([134.134.136.126]:36924)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmBtL-0004Up-W1
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:20:04 -0500
-References: <20190122162924.26491-1-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a60dbcd8-df39-ebe9-a86b-92bc468b8ec2@redhat.com>
-Date: Wed, 23 Jan 2019 07:19:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190122162924.26491-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update microbit ARM board
- files
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gmCUW-0002Nr-NB
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 01:58:30 -0500
+From: Yang Zhong <yang.zhong@intel.com>
+Date: Wed, 23 Jan 2019 14:55:36 +0800
+Message-Id: <20190123065618.3520-3-yang.zhong@intel.com>
+In-Reply-To: <20190123065618.3520-1-yang.zhong@intel.com>
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+Subject: [Qemu-devel] [RFC PATCH v4 02/44] build: actually use CONFIG_PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, contrib@steffen-goertz.de, joel@jms.id.au, jusual@mail.ru
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com, yang.zhong@intel.com
 
-On 2019-01-22 17:29, Stefan Hajnoczi wrote:
-> New source files were added without corresponding ./MAINTAINERS file
-> entries.  Let's get things up to date.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> This also includes the I2C/TWI stub which Peter has merged into his
-> target-arm.next tree but isn't in qemu.git/master yet.
-> ---
->  MAINTAINERS | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index af339b86db..e3cb67e81d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -833,7 +833,19 @@ L: qemu-arm@nongnu.org
->  S: Maintained
->  F: hw/arm/nrf51_soc.c
->  F: hw/arm/microbit.c
-> +F: hw/char/nrf51_uart.c
-> +F: hw/gpio/nrf51_gpio.c
-> +F: hw/i2c/microbit_i2c.c
-> +F: hw/misc/nrf51_rng.c
-> +F: hw/timer/nrf51_timer.c
->  F: include/hw/arm/nrf51_soc.h
-> +F: include/hw/arm/nrf51.h
-> +F: include/hw/char/nrf51_uart.h
-> +F: include/hw/gpio/nrf51_gpio.h
-> +F: include/hw/i2c/microbit_i2c.h
-> +F: include/hw/misc/nrf51_rng.h
-> +F: include/hw/timer/nrf51_timer.h
-> +F: tests/microbit-test.c
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Looks like using wildcards would be easier here:
+Do not link it unconditionally into all binaries.
 
-F: hw/*/nrf51*.c
-F: hw/*/microbit*.c
-F: include/hw/*/nrf51*.h
-...
-
-?
-
-Anyway:
-
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ default-configs/i386-softmmu.mak | 1 +
+ hw/pci-host/Makefile.objs        | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 2f919df346..48da9968cc 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -67,3 +67,4 @@ CONFIG_I2C=y
+ CONFIG_SEV=$(CONFIG_KVM)
+ CONFIG_VTD=y
+ CONFIG_AMD_IOMMU=y
++CONFIG_PAM=y
+diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+index 073d5124d1..a9cd3e022d 100644
+--- a/hw/pci-host/Makefile.objs
++++ b/hw/pci-host/Makefile.objs
+@@ -1,4 +1,4 @@
+-common-obj-y += pam.o
++common-obj-$(CONFIG_PAM) += pam.o
+ 
+ # PPC devices
+ common-obj-$(CONFIG_PREP_PCI) += prep.o
+-- 
+2.17.1
