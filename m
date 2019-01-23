@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54280)
+Received: from eggs.gnu.org ([209.51.188.92]:54956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gmK3H-00043N-Vh
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:02:53 -0500
+	(envelope-from <mst@redhat.com>) id 1gmK4X-0004xW-5E
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:04:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1gmK3A-0003TY-TZ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:02:51 -0500
-Received: from mail-eopbgr680049.outbound.protection.outlook.com
-	([40.107.68.49]:49443
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1gmK3A-0003KL-JS
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:02:44 -0500
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-Date: Wed, 23 Jan 2019 15:02:28 +0000
-Message-ID: <25dd3d83-dbf9-5b8d-59d4-79501fe03f3c@amd.com>
-References: <20190118093935.GA1142@beluga.usersys.redhat.com>
-	<65f933a2-f63c-962f-c503-43c7e84ab5e8@amd.com>
-	<20190123125506.GA2376@beluga.usersys.redhat.com>
-	<20190123131042.GF27270@redhat.com>
-	<20190123132212.GA20002@beluga.usersys.redhat.com>
-	<20190123132413.GG27270@redhat.com>
-	<20190123133301.GB20002@beluga.usersys.redhat.com>
-	<20190123133614.GH27270@redhat.com>
-In-Reply-To: <20190123133614.GH27270@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A4A1AE931FDC3E429792020B654C1945@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gmK4V-0004PU-Mx
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:04:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gmK4V-0004Nn-DL
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:04:07 -0500
+Date: Wed, 23 Jan 2019 10:04:01 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190123100252-mutt-send-email-mst@kernel.org>
+References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
+	<286542bc2f48b0dd6a657f363a8e933806cac92d.1548136274.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
- for capabilities
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286542bc2f48b0dd6a657f363a8e933806cac92d.1548136274.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V10 2/4] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,134 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Erik Skultety <eskultet@redhat.com>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dinechin@redhat.com" <dinechin@redhat.com>, "mkletzan@redhat.com" <mkletzan@redhat.com>
+To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-DQoNCk9uIDEvMjMvMTkgNzozNiBBTSwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24g
-V2VkLCBKYW4gMjMsIDIwMTkgYXQgMDI6MzM6MDFQTSArMDEwMCwgRXJpayBTa3VsdGV0eSB3cm90
-ZToNCj4+IE9uIFdlZCwgSmFuIDIzLCAyMDE5IGF0IDAxOjI0OjEzUE0gKzAwMDAsIERhbmllbCBQ
-LiBCZXJyYW5nw6kgd3JvdGU6DQo+Pj4gT24gV2VkLCBKYW4gMjMsIDIwMTkgYXQgMDI6MjI6MTJQ
-TSArMDEwMCwgRXJpayBTa3VsdGV0eSB3cm90ZToNCj4+Pj4gT24gV2VkLCBKYW4gMjMsIDIwMTkg
-YXQgMDE6MTA6NDJQTSArMDAwMCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4+Pj4+IE9u
-IFdlZCwgSmFuIDIzLCAyMDE5IGF0IDAxOjU1OjA2UE0gKzAxMDAsIEVyaWsgU2t1bHRldHkgd3Jv
-dGU6DQo+Pj4+Pj4gT24gRnJpLCBKYW4gMTgsIDIwMTkgYXQgMTI6NTE6NTBQTSArMDAwMCwgU2lu
-Z2gsIEJyaWplc2ggd3JvdGU6DQo+Pj4+Pj4+DQo+Pj4+Pj4+IE9uIDEvMTgvMTkgMzozOSBBTSwg
-RXJpayBTa3VsdGV0eSB3cm90ZToNCj4+Pj4+Pj4+IEhpLA0KPj4+Pj4+Pj4gdGhpcyBpcyBhIHN1
-bW1hcnkgb2YgYSBwcml2YXRlIGRpc2N1c3Npb24gSSd2ZSBoYWQgd2l0aCBndXlzIENDJ2Qgb24g
-dGhpcyBlbWFpbA0KPj4+Pj4+Pj4gYWJvdXQgZmluZGluZyBhIHNvbHV0aW9uIHRvIFsxXSAtIGJh
-c2ljYWxseSwgdGhlIGRlZmF1bHQgcGVybWlzc2lvbnMgb24NCj4+Pj4+Pj4+IC9kZXYvc2V2IChi
-ZWxvdykgbWFrZSBpdCBpbXBvc3NpYmxlIHRvIHF1ZXJ5IGZvciBTRVYgcGxhdGZvcm0gY2FwYWJp
-bGl0aWVzLA0KPj4+Pj4+Pj4gc2luY2UgYnkgZGVmYXVsdCB3ZSBydW4gUUVNVSBhcyBxZW11OnFl
-bXUgd2hlbiBwcm9iaW5nIGZvciBjYXBhYmlsaXRpZXMuIEl0J3MNCj4+Pj4+Pj4+IHdvcnRoIG5v
-dGluZyBpcyB0aGF0IHRoaXMgaXMgb25seSByZWxldmFudCB0byBwcm9iaW5nLCBzaW5jZSBmb3Ig
-YSBwcm9wZXIgUUVNVQ0KPj4+Pj4+Pj4gVk0gd2UgY3JlYXRlIGEgbW91bnQgbmFtZXNwYWNlIGZv
-ciB0aGUgcHJvY2VzcyBhbmQgY2hvd24gYWxsIHRoZSBub2RlcyAobmVlZHMgYQ0KPj4+Pj4+Pj4g
-U0VWIGZpeCB0aG91Z2gpLg0KPj4+Pj4+Pj4NCj4+Pj4+Pj4+ICMgbGwgL2Rldi9zZXYNCj4+Pj4+
-Pj4+IGNydy0tLS0tLS0uIDEgcm9vdCByb290DQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4gSSBzdWdnZXN0
-ZWQgZWl0aGVyIGZvcmNlIHJ1bm5pbmcgUUVNVSBhcyByb290IGZvciBwcm9iaW5nIChkZXNwaXRl
-IHRoZSBvYnZpb3VzDQo+Pj4+Pj4+PiBzZWN1cml0eSBpbXBsaWNhdGlvbnMpIG9yIHVzaW5nIG5h
-bWVzcGFjZXMgZm9yIHByb2JpbmcgdG9vLiBEYW4gYXJndWVkIHRoYXQNCj4+Pj4+Pj4+IHRoaXMg
-d291bGQgaGF2ZSBhIHNpZ25pZmljYW50IHBlcmYgaW1wYWN0IGFuZCBzdWdnZXN0ZWQgd2UgYXNr
-IHN5c3RlbWQgdG8gYWRkIGENCj4+Pj4+Pj4+IGdsb2JhbCB1ZGV2IHJ1bGUuDQo+Pj4+Pj4+Pg0K
-Pj4+Pj4+Pj4gSSBwcm9jZWVkZWQgd2l0aCBjbG9uaW5nIFsxXSB0byBzeXN0ZW1kIGFuZCBjcmVh
-dGluZyBhbiB1ZGV2IHJ1bGUgdGhhdCBJIHBsYW5uZWQNCj4+Pj4+Pj4+IG9uIHN1Ym1pdHRpbmcg
-dG8gc3lzdGVtZCB1cHN0cmVhbSAtIHRoZSBpbml0aWFsIGlkZWEgd2FzIHRvIG1pbWljIC9kZXYv
-a3ZtIGFuZA0KPj4+Pj4+Pj4gbWFrZSBpdCB3b3JsZCBhY2Nlc3NpYmxlIHRvIHdoaWNoIEJyaWpl
-c2ggZnJvbSBBTUQgZXhwcmVzc2VkIGEgY29uY2VybiB0aGF0DQo+Pj4+Pj4+PiByZWd1bGFyIHVz
-ZXJzIG1pZ2h0IGRlcGxldGUgdGhlIHJlc291cmNlcyAobGltaXQgb24gdGhlIG51bWJlciBvZiBn
-dWVzdHMNCj4+Pj4+Pj4+IGFsbG93ZWQgYnkgdGhlIHBsYXRmb3JtKS4NCj4+Pj4+Pj4NCj4+Pj4+
-Pj4NCj4+Pj4+Pj4gRHVyaW5nIHByaXZhdGUgZGlzY3Vzc2lvbiBJIGRpZG4ndCByZWFsaXplZCB0
-aGF0IHdlIGFyZSBkaXNjdXNzaW5nIGENCj4+Pj4+Pj4gcHJvYmUgaXNzdWUgaGVuY2UgdGhpbmdz
-IEkgaGF2ZSBzYWlkIGVhcmxpZXIgbWF5IG5vdCBiZSBhcHBsaWNhYmxlDQo+Pj4+Pj4+IGR1cmlu
-ZyB0aGUgcHJvYmUuIFRoZSAvZGV2L3NldiBpcyBtYW5hZ2VkIGJ5IHRoZSBDQ1AgKGFrYSBQU1Ap
-IGRyaXZlci4NCj4+Pj4+Pj4gVGhlIC9kZXYvc2V2IGlzIHVzZWQgZm9yIGNvbW11bmljYXRpbmcg
-d2l0aCB0aGUgU0VWIEZXIHJ1bm5pbmcgaW5zaWRlDQo+Pj4+Pj4+IHRoZSBQU1AuIFRoZSBTRVYg
-Rlcgb2ZmZXJzIHBsYXRmb3JtIGFuZCBndWVzdCBzcGVjaWZpYyBzZXJ2aWNlcy4gVGhlDQo+Pj4+
-Pj4+IGd1ZXN0IHNwZWNpZmljIHNlcnZpY2VzIGFyZSB1c2VkIGR1cmluZyB0aGUgZ3Vlc3QgbGF1
-bmNoLCB0aGVzZSBzZXJ2aWNlcw0KPj4+Pj4+PiBhcmUgYXZhaWxhYmxlIHRocm91Z2ggS1ZNIGRy
-aXZlciBvbmx5LiBXaGVyZWFzIHRoZSBwbGF0Zm9ybSBzZXJ2aWNlcyBjYW4NCj4+Pj4+Pj4gYmUg
-aW52b2tlZCBhdCBhbnl0aW1lLiBBIHR5cGljYWwgcGxhdGZvcm0gc3BlY2lmaWMgc2VydmljZXMg
-YXJlOg0KPj4+Pj4+Pg0KPj4+Pj4+PiAtIGltcG9ydGluZyBjZXJ0aWZpY2F0ZXMNCj4+Pj4+Pj4N
-Cj4+Pj4+Pj4gLSBleHBvcnRpbmcgY2VydGlmaWNhdGVzDQo+Pj4+Pj4+DQo+Pj4+Pj4+IC0gcXVl
-cnlpbmcgdGhlIFNFViBGVyB2ZXJzaW9uIGV0YyBldGMNCj4+Pj4+Pj4NCj4+Pj4+Pj4gSW4gY2Fz
-ZSBvZiB0aGUgcHJvYmUgd2UgYXJlIG5vdCBsYXVuY2ggU0VWIGd1ZXN0IGhlbmNlIHdlIHNob3Vs
-ZCBub3QgYmUNCj4+Pj4+Pj4gd29ycmllZCBhYm91dCBkZXBsZXRpbmcgdGhlIFNFViBBU0lEIHJl
-c291cmNlcy4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gSUlSQywgbGlidmlydCB1c2VzIFFFTVAgcXVlcnkt
-c2V2LWNhcGFiaWxpdGllcyB0byBwcm9iZSB0aGUgU0VWIHN1cHBvcnQuDQo+Pj4+Pj4+IFFFTVUg
-ZXhlY3V0ZXMgdGhlIGJlbG93IHNlcXVlbmNlIHRvIGNvbXBsZXRlIHRoZSByZXF1ZXN0Og0KPj4+
-Pj4+Pg0KPj4+Pj4+PiAxLiBFeHBvcnRzIHRoZSBwbGF0Zm9ybSBjZXJ0aWZpY2F0ZXPCoCAodGhp
-cyBpcyB3aGVuIC9kZXYvc2V2IGlzIGFjY2Vzc2VkKS4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gMi4gUmVh
-ZCB0aGUgaG9zdCBNU1IgdG8gZGV0ZXJtaW5lIHRoZSBDLWJpdCBhbmQgcmVkdWNlZCBwaHlzLWJp
-dCBwb3NpdGlvbg0KPj4+Pj4+Pg0KPj4+Pj4+PiBJIGRvbid0IHNlZSBhbnkgcmVhc29uIHdoeSB3
-ZSBjYW4ndCBnaXZlIHdvcmxkIGEgJ3JlYWQnIHBlcm1pc3Npb24gdG8NCj4+Pj4+Pj4gL2Rldi9z
-ZXYuIEFueW9uZSBzaG91bGQgYmUgYWJsZSB0byBleHBvcnQgdGhlIGNlcnRpZmljYXRlcyBhbmQg
-cXVlcnkNCj4+Pj4+Pg0KPj4+Pj4+IE9rYXksIG1ha2VzIHNlbnNlIHRvIG1lLiBUaGUgcHJvYmxl
-bSBJIHNlZSBpcyB0aGUgc2V2X3BsYXRmb3JtX2lvY3RsIGZ1bmN0aW9uDQo+Pj4+Pj4gaW4gUUVN
-VSB3aGljaCBtYWtlcyBhbiBfSU9XUiByZXF1ZXN0LCB0aGVyZWZvcmUgdGhlIGZpbGUgZGVzY3Jp
-cHRvciBiZWluZw0KPj4+Pj4+IG9wZW5lZCBpbiBzZXZfZ2V0X2NhcGFiaWxpdGllcyBpcyBPX1JE
-V1IuIE5vdywgSSBvbmx5IHVuZGVyc3RhbmQgaW9jdGwgZnJvbQ0KPj4+Pj4+IHdoYXQgSSd2ZSBy
-ZWFkIGluIHRoZSBtYW4gcGFnZSwgc28gSSBkb24ndCBxdWl0ZSB1bmRlcnN0YW5kIHRoZSBuZWVk
-IGZvciBJT1dSDQo+Pj4+Pj4gaGVyZSAtIGJ1dCBteSBob25lc3QgZ3Vlc3Mgd291bGQgYmUgdGhh
-dCBpdCdzIGJlY2F1c2UgdGhlIGNvbW1hbmRzIGxpa2UNCj4+Pj4+PiBTRVZfUERIX0NFUlRfRVhQ
-T1JUIG9yIFNFVl9QTEFURk9STV9TVEFUVVMgbmVlZCB0byBiZSBjb3BpZWQgZnJvbSB1c2Vyc3Bh
-Y2UgdG8NCj4+Pj4+PiBrZXJuZWwgdG8gaW5zdHJ1Y3Qga2VybmVsIHdoaWNoIHNlcnZpY2VzIHdl
-IHdhbnQsIGVyZ28gX0lPV1IsIGlzIHRoYXQgcmlnaHQ/DQo+Pj4+Pg0KPj4+Pj4gSSdtIG5vdCBz
-ZWVpbmcgYW55IHBlcm1pc3Npb25zIGNoZWNrcyBpbiB0aGUgc2V2X2lvY3RsKCkgZnVuY3Rpb24g
-aW4gdGhlDQo+Pj4+PiBrZXJuZWwsIHNvIElJVUMsIHRoYXQgbWVhbnMgYW55IHBlcm1pc3Npb25z
-IGFyZSBlbnRpcmVseSBiYXNlZCBvbiB3aGV0aGVyDQo+Pj4+PiB5b3UgY2FuIG9wZW4gdGhlIC9k
-ZXYvc2V2LCBvbmNlIG9wZW4geW91IGNhbiBydW4gYW55IGlvY3RsLiAgV2hhdCwgaWYgYW55dGhp
-bmcsDQo+Pj4+PiBlbmZvcmNlcyB3aGljaCBpb2N0bHMgeW91IGNhbiBydW4gd2hlbiB0aGUgZGV2
-aWNlIGlzIG9ubHkgT19SRE9OTFkgdnMgT19SRFdSID8NCj4+Pj4NCj4+Pj4gSSBkb24ndCBrbm93
-LCB0aGF0J3Mgd2h5IEknbSBhc2tpbmcsIGJlY2F1c2UgdGhlIG1hbnVhbCBkaWRuJ3QgbWFrZSBp
-dCBhbnkNCj4+Pj4gY2xlYXIgZm9yIG1lIHdoZXRoZXIgdGhlcmUncyBhIGNvbm5lY3Rpb24gYmV0
-d2VlbiB0aGUgZGV2aWNlIHBlcm1pc3Npb25zIGFuZA0KPj4+PiBpb2N0bHMgdGhhdCB5b3UncmUg
-YWxsb3dlZCB0byBydW4uDQo+Pj4+DQo+Pj4+Pg0KPj4+Pj4+IEluIGFueSBjYXNlLCBhIGZpeCBv
-ZiBzb21lIHNvcnQgbmVlZHMgdG8gbGFuZCBpbiBRRU1VIGZpcnN0LCBiZWNhdXNlIG5vIHVkZXYN
-Cj4+Pj4+PiBydWxlIHdvdWxkIGZpeCB0aGUgY3VycmVudCBzaXR1YXRpb24uIEFmdGVyd2FyZHMs
-IEkgZXhwZWN0IHRoYXQgaGF2aW5nIGEgcnVsZQ0KPj4+Pj4+IGxpa2UgdGhpczoNCj4+Pj4+Pg0K
-Pj4+Pj4+IEtFUk5FTD09InNldiIsIEdST1VQPSJrdm0iLCBNT0RFPSIwNjQ0Ig0KPj4+Pj4+DQo+
-Pj4+Pj4gYW5kIGEgc2VsaW51eCBwb2xpY3kgcnVsZSBhZGRpbmcgdGhlIGt2bV9kZXZpY2VfdCBs
-YWJlbCwgd2Ugc2hvdWxkIGJlIGZpbmUsIGRvDQo+Pj4+Pj4gd2UgYWdyZWUgb24gdGhhdD8NCj4+
-Pj4+DQo+Pj4+PiBCYXNlZCBvbiB3aGF0IEkgdGhpbmsgSSBzZWUgYWJvdmUsIHRoaXMgbG9va3Mg
-bGlrZSBhIGJhZCBpZGVhLg0KPj4+Pj4NCj4+Pj4+IEl0IHN0aWxsIGxvb2tzIGxpa2Ugd2UgY2Fu
-IHNvbHZlIHRoaXMgZW50aXJlbHkgaW4gbGlidmlydCBieSBqdXN0IGdpdmluZw0KPj4+Pj4gdGhl
-IGxpYnZpcnQgY2FwYWJpbGl0aWVzIHByb2JpbmcgY29kZSBDQVBfREFDX09WRVJSSURFLiBUaGlz
-IHdvdWxkIG1ha2UNCj4+Pj4+IGxpYnZpcnQgd29yayBmb3IgYWxsIGN1cnJlbnRseSByZWxlYXNl
-ZCBTRVYgc3VwcG9ydCBpbiBrZXJuZWwvcWVtdS4NCj4+Pj4NCj4+Pj4gU3VyZSB3ZSBjYW4sIGJ1
-dCB0aGF0IHdvdWxkIG1ha2UgbGlidmlydCB0aGUgb25seSBsZWdpdGltYXRlIHVzZXIgb2YgL2Rl
-di9zZXYNCj4+Pj4gYW5kIGV2ZXJ5dGhpbmcgZWxzZSB3b3VsZCByZXF1aXJlIHRoZSBhZG1pbiB0
-byBjaGFuZ2UgdGhlIHBlcm1pc3Npb25zDQo+Pj4+IGV4cGxpY2l0bHkgc28gdGhhdCBvdGhlciBh
-cHBzIGNvdWxkIGF0IGxlYXN0IHJldHJpZXZlIHRoZSBwbGF0Zm9ybSBpbmZvLCBpZg0KPj4+PiBp
-dCB3YXMgaW50ZW5kZWQgdG8gYmUgZm9yIHB1YmxpYyB1c2U/DQo+Pj4+IEFkZGl0aW9uYWxseSwg
-d2UnbGwgc3RpbGwgZ2V0IHNob3QgZG93biBieSBTRUxpbnV4IGJlY2F1c2Ugc3ZpcnRfdCB3b3Vs
-ZG4ndCBiZQ0KPj4+PiBhYmxlIHRvIGFjY2VzcyAvZGV2L3NldiBieSBkZWZhdWx0Lg0KPj4+DQo+
-Pj4gVGhhdCdzIHNlcGFyYXRlIGZvcm0gcHJvYmluZyBhbmQganVzdCBuZWVkcyBTRUxpbnV4IHBv
-bGljeSB0byBkZWZpbmUNCj4+PiBhIG5ldyAgc2V2X2RldmljZV90IHR5cGUgYW5kIGdyYW50IHN2
-aXJ0X3QgYWNjZXNzIHRvIGl0Lg0KPj4NCj4+IEkga25vdywgSSBtaXNyZWFkICJ3ZSBjYW4gc29s
-dmUgdGhpcyBlbnRpcmVseSBpbiBsaWJ2aXJ0IiB0aGVuLCBJIHRob3VnaHQgeW91DQo+PiB0aGUg
-U0VMaW51eCBwYXJ0IHdhcyBpbmNsdWRlZCBpbiB0aGUgc3RhdGVtZW50LCBteSBiYWQgdGhlbi4g
-U3RpbGwsIGJhY2sgdG8gdGhlDQo+PiBvcmlnaW5hbCBpc3N1ZSwgd2UgY291bGQgdGVjaG5pY2Fs
-bHkgZG8gYm90aCwgbGlidmlydCB3b3VsZCBoYXZlIHJ1biBxZW11IHdpdGgNCj4+IENBUF9EQUNf
-T1ZFUlJJREUgYW5kIHdlIGtlZXAgd29ya2luZyB3aXRoIGV2ZXJ5dGhpbmcncyBiZWVuIHJlbGVh
-c2VkIGZvcg0KPj4gU0VWIGluIGtlcm5lbC9xZW11IGFuZCBmb3IgZXZlcnlvbmUgZWxzZSwgc3lz
-dGVtZCBtaWdodCBhZGQgMDY0NCBmb3IgL2Rldi9zZXYsDQo+PiB0aGF0IHdheSwgZXZlcnlvbmUn
-cyBoYXBweSwgbm90IHRoYXQgSSdkIGJlIGEgZmFuIG9mIGxpYnZpcnQgb2Z0ZW4gaGF2aW5nDQo+
-PiB0byB3b3JrIGFyb3VuZCBzb21ldGhpbmcgYmVjYXVzZSBwcm9qZWN0cyB1bmRlcm5lYXRoIHdv
-dWxkbid0IGJhY2twb3J0IGZpeGVzIHRvDQo+PiBhbGwgdGhlIGRpc3Ryb3Mgd2Ugc3VwcG9ydCwg
-dGh1cyBsZWF2aW5nIHRoZSBkaXJ0eSB3b3JrIHRvIHVzLg0KPiANCj4gU2V0dGluZyAwNjQ0IGZv
-ciAvZGV2L3NldiBsb29rcyB1bnNhZmUgdG8gbWUgdW5sZXNzIHNvbWVvbmUgY2FuIHNob3cNCj4g
-d2hlcmUgdGhlIHBlcm1pc3Npb25zIGNoZWNrcyB0YWtlIHBsYWNlIGZvciB0aGUgbWFueSBpb2N0
-bHMgdGhhdA0KPiAvZGV2L3NldiBhbGxvd3MsIHN1Y2ggdGhhdCBvbmx5IFNFVl9QREhfQ0VSVF9F
-WFBPUlQgb3IgU0VWX1BMQVRGT1JNX1NUQVRVUw0KPiBpcyBhbGxvd2VkIHdoZW4gL2Rldi9zZXYg
-aXMgb3BlbmVkIGJ5IGEgdXNlciB3aG8gZG9lc24ndCBoYXZlIHdyaXRlDQo+IHBlcm1pc3Npb25z
-Lg0KPiANCg0KQWdyZWUgaXRzIG5vdCBzYWZlIHRvIGRvIDA2NDQuDQoNCkN1cnJlbnRseSwgYW55
-b25lIHdobyBoYXMgYWNjZXNzIHRvIC9kZXYvc2V2IChyZWFkIG9yIHdyaXRlKSB3aWxsIGJlDQph
-YmxlIHRvIGV4ZWN1dGUgU0VWIHBsYXRmb3JtIGNvbW1hbmQuIEluIG90aGVyIHdvcmRzIHRoZXJl
-IGlzIG5vDQpwZXJtaXNzaW9uIGNoZWNrIHBlciBjb21tYW5kIGJhc2lzLiBJIG11c3QgYWRtaXQg
-dGhhdCB3aGlsZSBkZXZlbG9waW5nDQp0aGUgZHJpdmVyIEkgd2FzIHVuZGVyIGFzc3VtcHRpb24g
-dGhhdCBvbmx5IHJvb3Qgd2lsbCBldmVyIGFjY2VzcyB0aGUNCi9kZXYvc2V2IGRldmljZSBoZW5j
-ZSBvdmVybG9va2VkIGl0LiBCdXQgbm93IGtub3dpbmcgdGhhdCBvdGhlcnMgbWF5DQphbHNvIG5l
-ZWQgdG8gYWNjZXNzIHRoZSAvZGV2L3NldiwgSSBjYW4gc3VibWl0IHBhdGNoIGluIGtlcm5lbCB0
-byBkbw0KcGVyIGNvbW1hbmQgYWNjZXNzIGNvbnRyb2wuDQoNClVudGlsIHRoZW4sIGNhbiB3ZSBm
-b2xsb3cgRGFuaWVsJ3MgcmVjb21tZW5kYXRpb24gdG8gZWxldmF0ZSBwcml2aWxlZ2UNCm9mIHRo
-ZSBwcm9iaW5nIGNvZGU/DQoNCi1CcmlqZXNoDQo=
+On Wed, Jan 23, 2019 at 10:59:45AM +0800, Zhang, Yi wrote:
+> From: Zhang Yi <yi.z.zhang@linux.intel.com>
+> 
+> When a file supporting DAX is used as vNVDIMM backend, mmap it with
+> MAP_SYNC flag in addition which can ensure file system metadata
+> synced in each guest writes to the backend file, without other QEMU
+> actions (e.g., periodic fsync() by QEMU).
+> 
+> Current, We have below different possible use cases:
+> 
+> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+>    a: backend is a dax supporting file.
+>     - MAP_SYNC will active.
+>    b: backend is not a dax supporting file.
+>     - mmap will result in an EOPNOTSUPP error.
+> 
+> 2. The rest of cases:
+>    - we will never pass the MAP_SYNC to mmap2
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  include/qemu/mmap-alloc.h |  1 +
+>  include/qemu/osdep.h      | 21 +++++++++++++++++++++
+>  util/mmap-alloc.c         |  7 ++++++-
+>  3 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 6fe6ed4..a95d91c 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+>   *  @flags: specifies additional properties of the mapping, which can be one or
+>   *          bit-or of following values
+>   *          - RAM_SHARED: mmap with MAP_SHARED flag
+> + *          - RAM_PMEM: mmap with MAP_SYNC flag
+>   *          Other bits are ignored.
+>   *
+>   * Return:
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 457d24e..3bcf155 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #  define QEMU_VMALLOC_ALIGN getpagesize()
+>  #endif
+>  
+> +/*
+> + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
+> + * 4.15, so they may not be defined when compiling on older kernels.
+> + */
+
+
+I commented on this part in v7. That's a wrong way to handle
+compatibility.
+
+> +#ifdef CONFIG_LINUX
+> +
+> +#include <linux/mman.h>
+> +
+> +#ifndef MAP_SYNC
+> +#define MAP_SYNC 0x0
+> +#endif
+> +
+> +#ifndef MAP_SHARED_VALIDATE
+> +#define MAP_SHARED_VALIDATE 0x0
+> +#endif
+> +
+
+
+
+
+> +#else  /* !CONFIG_LINUX */
+> +#define MAP_SYNC              0x0
+> +#define MAP_SHARED_VALIDATE   0x0
+> +#endif /* CONFIG_LINUX */
+> +
+>  #ifdef CONFIG_POSIX
+>  struct qemu_signalfd_siginfo {
+>      uint32_t ssi_signo;   /* Signal number */
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 8f0a740..a4ce9b5 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  #endif
+>      bool shared = flags & RAM_SHARED;
+> +    bool is_pmem = flags & RAM_PMEM;
+> +    int mmap_xflags = 0;
+>      size_t offset;
+>      void *ptr1;
+>  
+> @@ -109,12 +111,15 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      assert(is_power_of_2(align));
+>      /* Always align to host page size */
+>      assert(align >= getpagesize());
+> +    if (shared && is_pmem) {
+> +        mmap_xflags |= (MAP_SYNC | MAP_SHARED_VALIDATE);
+> +    }
+>  
+>      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
+>      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
+>                  MAP_FIXED |
+>                  (fd == -1 ? MAP_ANONYMOUS : 0) |
+> -                (shared ? MAP_SHARED : MAP_PRIVATE),
+> +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
+>                  fd, 0);
+>      if (ptr1 == MAP_FAILED) {
+>          munmap(ptr, total);
+> -- 
+> 2.7.4
