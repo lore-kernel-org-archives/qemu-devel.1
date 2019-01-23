@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52823)
+Received: from eggs.gnu.org ([209.51.188.92]:52850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmIWP-0001y4-FW
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gmIWR-0001yE-Kk
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmIWI-0004Ag-AA
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gmIWG-00044Z-QV
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:42 -0500
-Date: Wed, 23 Jan 2019 13:24:13 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190123132413.GG27270@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190118093935.GA1142@beluga.usersys.redhat.com>
-	<65f933a2-f63c-962f-c503-43c7e84ab5e8@amd.com>
-	<20190123125506.GA2376@beluga.usersys.redhat.com>
-	<20190123131042.GF27270@redhat.com>
-	<20190123132212.GA20002@beluga.usersys.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1gmIRS-0001fx-Fz
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:19:44 -0500
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-2-vsementsov@virtuozzo.com>
+	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
+	<5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
+	<29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
+	<9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
+	<352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
+	<7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d1251978-6677-c022-d6f1-353717600ea5@redhat.com>
+Date: Wed, 23 Jan 2019 14:19:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190123132212.GA20002@beluga.usersys.redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
- for capabilities
+In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PctbajD6vvt68iTBFeQOTrCDKY3403cID"
+Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,165 +31,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dinechin@redhat.com" <dinechin@redhat.com>, "mkletzan@redhat.com" <mkletzan@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On Wed, Jan 23, 2019 at 02:22:12PM +0100, Erik Skultety wrote:
-> On Wed, Jan 23, 2019 at 01:10:42PM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Wed, Jan 23, 2019 at 01:55:06PM +0100, Erik Skultety wrote:
-> > > On Fri, Jan 18, 2019 at 12:51:50PM +0000, Singh, Brijesh wrote:
-> > > >
-> > > > On 1/18/19 3:39 AM, Erik Skultety wrote:
-> > > > > Hi,
-> > > > > this is a summary of a private discussion I've had with guys CC=
-'d on this email
-> > > > > about finding a solution to [1] - basically, the default permis=
-sions on
-> > > > > /dev/sev (below) make it impossible to query for SEV platform c=
-apabilities,
-> > > > > since by default we run QEMU as qemu:qemu when probing for capa=
-bilities. It's
-> > > > > worth noting is that this is only relevant to probing, since fo=
-r a proper QEMU
-> > > > > VM we create a mount namespace for the process and chown all th=
-e nodes (needs a
-> > > > > SEV fix though).
-> > > > >
-> > > > > # ll /dev/sev
-> > > > > crw-------. 1 root root
-> > > > >
-> > > > > I suggested either force running QEMU as root for probing (desp=
-ite the obvious
-> > > > > security implications) or using namespaces for probing too. Dan=
- argued that
-> > > > > this would have a significant perf impact and suggested we ask =
-systemd to add a
-> > > > > global udev rule.
-> > > > >
-> > > > > I proceeded with cloning [1] to systemd and creating an udev ru=
-le that I planned
-> > > > > on submitting to systemd upstream - the initial idea was to mim=
-ic /dev/kvm and
-> > > > > make it world accessible to which Brijesh from AMD expressed a =
-concern that
-> > > > > regular users might deplete the resources (limit on the number =
-of guests
-> > > > > allowed by the platform).
-> > > >
-> > > >
-> > > > During private discussion I didn't realized that we are discussin=
-g a
-> > > > probe issue hence things I have said earlier may not be applicabl=
-e
-> > > > during the probe. The /dev/sev is managed by the CCP (aka PSP) dr=
-iver.
-> > > > The /dev/sev is used for communicating with the SEV FW running in=
-side
-> > > > the PSP. The SEV FW offers platform and guest specific services. =
-The
-> > > > guest specific services are used during the guest launch, these s=
-ervices
-> > > > are available through KVM driver only. Whereas the platform servi=
-ces can
-> > > > be invoked at anytime. A typical platform specific services are:
-> > > >
-> > > > - importing certificates
-> > > >
-> > > > - exporting certificates
-> > > >
-> > > > - querying the SEV FW version etc etc
-> > > >
-> > > > In case of the probe we are not launch SEV guest hence we should =
-not be
-> > > > worried about depleting the SEV ASID resources.
-> > > >
-> > > > IIRC, libvirt uses QEMP query-sev-capabilities to probe the SEV s=
-upport.
-> > > > QEMU executes the below sequence to complete the request:
-> > > >
-> > > > 1. Exports the platform certificates=C2=A0 (this is when /dev/sev=
- is accessed).
-> > > >
-> > > > 2. Read the host MSR to determine the C-bit and reduced phys-bit =
-position
-> > > >
-> > > > I don't see any reason why we can't give world a 'read' permissio=
-n to
-> > > > /dev/sev. Anyone should be able to export the certificates and qu=
-ery
-> > >
-> > > Okay, makes sense to me. The problem I see is the sev_platform_ioct=
-l function
-> > > in QEMU which makes an _IOWR request, therefore the file descriptor=
- being
-> > > opened in sev_get_capabilities is O_RDWR. Now, I only understand io=
-ctl from
-> > > what I've read in the man page, so I don't quite understand the nee=
-d for IOWR
-> > > here - but my honest guess would be that it's because the commands =
-like
-> > > SEV_PDH_CERT_EXPORT or SEV_PLATFORM_STATUS need to be copied from u=
-serspace to
-> > > kernel to instruct kernel which services we want, ergo _IOWR, is th=
-at right?
-> >
-> > I'm not seeing any permissions checks in the sev_ioctl() function in =
-the
-> > kernel, so IIUC, that means any permissions are entirely based on whe=
-ther
-> > you can open the /dev/sev, once open you can run any ioctl.  What, if=
- anything,
-> > enforces which ioctls you can run when the device is only O_RDONLY vs=
- O_RDWR ?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PctbajD6vvt68iTBFeQOTrCDKY3403cID
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>
+Message-ID: <d1251978-6677-c022-d6f1-353717600ea5@redhat.com>
+Subject: Re: [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-2-vsementsov@virtuozzo.com>
+ <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
+ <5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
+ <29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
+ <9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
+ <352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
+ <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+In-Reply-To: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 23.01.19 09:20, Vladimir Sementsov-Ogievskiy wrote:
+> 16.01.2019 16:05, Max Reitz wrote:
+>> On 14.01.19 15:48, Vladimir Sementsov-Ogievskiy wrote:
+>>> 14.01.2019 17:13, Max Reitz wrote:
+>>>> On 14.01.19 15:01, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 14.01.2019 16:10, Max Reitz wrote:
+>>>>>> On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>> Simplify backup_incremental_init_copy_bitmap using the function
+>>>>>>> bdrv_dirty_bitmap_next_dirty_area.
+>>>>>>>
+>>>>>>> Note: move to job->len instead of bitmap size: it should not matt=
+er but
+>>>>>>> less code.
+>>>>>>>
+>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
+=2Ecom>
+>>>>>>> ---
+>>>>>>>     block/backup.c | 40 ++++++++++++----------------------------
+>>>>>>>     1 file changed, 12 insertions(+), 28 deletions(-)
+>>>>>>
+>>>>>> Overall: What is this function even supposed to do?  To me, it loo=
+ks
+>>>>>> like it marks all areas in job->copy_bitmap dirty that are dirty i=
+n
+>>>>>> job->sync_bitmap.
+>>>>>>
+>>>>>> If so, wouldn't just replacing this by hbitmap_merge() simplify th=
+ings
+>>>>>> further?
+>>>>>>
+>>>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>>>> index 435414e964..fbe7ce19e1 100644
+>>>>>>> --- a/block/backup.c
+>>>>>>> +++ b/block/backup.c
+>>>>>>> @@ -406,43 +406,27 @@ static int coroutine_fn backup_run_incremen=
+tal(BackupBlockJob *job)
+>>>>>>
+>>>>>> [...]
+>>>>>>
+>>>>>>> +    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
+>>>>>>> +                                             &offset, &bytes))
+>>>>>>> +    {
+>>>>>>> +        uint64_t cluster =3D offset / job->cluster_size;
+>>>>>>> +        uint64_t last_cluster =3D (offset + bytes) / job->cluste=
+r_size;
+>>>>>>>    =20
+>>>>>>> -        next_cluster =3D DIV_ROUND_UP(offset, job->cluster_size)=
+;
+>>>>>>> -        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cl=
+uster);
+>>>>>>> -        if (next_cluster >=3D end) {
+>>>>>>> +        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cl=
+uster + 1);
+>>>>>>
+>>>>>> Why the +1?  Shouldn't the division for last_cluster round up inst=
+ead?
+>>>>>>
+>>>>>>> +
+>>>>>>> +        offset =3D (last_cluster + 1) * job->cluster_size;
+>>>>>>
+>>>>>> Same here.
+>>>>>
+>>>>> last cluster is not "end", but it's last dirty cluster. so number o=
+f dirty clusters is last_cluster - cluster + 1, and next offset is calcul=
+ated through +1 too.
+>>>>>
+>>>>> If I round up division result, I'll get last for most cases, but "e=
+nd" (next after the last), for the case when offset % job->cluster_size =3D=
+=3D 0, so, how to use it?
+>>>>
+>>>> Doesn't bdrv_dirty_bitmap_next_dirty_area() return a range [offset,
+>>>> offset + bytes), i.e. where "offset + bytes" is the first clean offs=
+et?
+>>>
+>>> oops, you are right. then I need
+>>> uint64_t last_cluster =3D (offset + bytes - 1) / job->cluster_size;
+>>
+>> That, or you just use a rounding up division and rename it from
+>> last_cluster to end_cluster or first_clean_cluster or something (and
+>> subsequently drop the +1s).
 >=20
-> I don't know, that's why I'm asking, because the manual didn't make it =
-any
-> clear for me whether there's a connection between the device permission=
-s and
-> ioctls that you're allowed to run.
+> This will not work, as ((offset + bytes) / job->cluster_size) is not fi=
+rst clean cluster
+> or end cluster. It's a cluster, where is first clean bit located, but i=
+t may have dirty
+> bits too (or, may not).
 >=20
-> >
-> > > In any case, a fix of some sort needs to land in QEMU first, becaus=
-e no udev
-> > > rule would fix the current situation. Afterwards, I expect that hav=
-ing a rule
-> > > like this:
-> > >
-> > > KERNEL=3D=3D"sev", GROUP=3D"kvm", MODE=3D"0644"
-> > >
-> > > and a selinux policy rule adding the kvm_device_t label, we should =
-be fine, do
-> > > we agree on that?
-> >
-> > Based on what I think I see above, this looks like a bad idea.
-> >
-> > It still looks like we can solve this entirely in libvirt by just giv=
-ing
-> > the libvirt capabilities probing code CAP_DAC_OVERRIDE. This would ma=
-ke
-> > libvirt work for all currently released SEV support in kernel/qemu.
+> So, to rewrite based on end_cluster, it should be calculated as
 >=20
-> Sure we can, but that would make libvirt the only legitimate user of /d=
-ev/sev
-> and everything else would require the admin to change the permissions
-> explicitly so that other apps could at least retrieve the platform info=
-, if
-> it was intended to be for public use?
-> Additionally, we'll still get shot down by SELinux because svirt_t woul=
-dn't be
-> able to access /dev/sev by default.
+> (offset + bytes - 1) / job->cluster_size + 1
 
-That's separate form probing and just needs SELinux policy to define
-a new  sev_device_t type and grant svirt_t access to it.
+That's why I asked "Shouldn't the division for last_cluster round up
+instead?"
+
+Max
+
+> and, I'm going to do so, one "+1" instead of two, and, may be, a bit mo=
+re understandable.
+>=20
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+
+--PctbajD6vvt68iTBFeQOTrCDKY3403cID
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxIad4ACgkQ9AfbAGHV
+z0CNigf8CyPYsSueAmoTu4onzOy3y/u4x++BZ6rGLXIvE1koTgs/auz0ypOr43/x
+FGt6phrLkNTZNCzzu88yEdheReLrynZShW1AQdn9aDJVu2QJ88107iO9l8xlWozw
+B6XWzO4q1hCbex3NNDFhQ1tcuOKdC3Y2wE6mZiU8c8m21EYD9QdrbrtFCO4k3cze
+qgapS/wzgoageRlzoRvuCWzAN7eVL048JFpBBQAkBsq/O1wBxJVNnIwTo3q3kRzX
+wbvpFePYQJBOXLeuhy3/zq33jCZl12rqdD614uot18rKyDE3vvToLnZVDE5So90p
+/3QRTb+TRa3JqWo1QbFtrPzFC+7xCQ==
+=G3wp
+-----END PGP SIGNATURE-----
+
+--PctbajD6vvt68iTBFeQOTrCDKY3403cID--
