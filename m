@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53706)
+Received: from eggs.gnu.org ([209.51.188.92]:54092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gmOwa-0001yj-2T
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:16:17 -0500
+	(envelope-from <juterry@microsoft.com>) id 1gmOyt-0003cT-6S
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:18:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gmOwY-0007w1-AD
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:16:15 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39265)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gmOwX-0007ql-OG
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:16:14 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t27so4003788wra.6
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 12:16:10 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
-	<da5485bb1a115b2cfd3a4484cb5f351c026ae4db.1547681517.git.DirtY.iCE.hu@gmail.com>
-	<20190117092212.ccv7zv4snnuanxtw@sirius.home.kraxel.org>
-Message-ID: <75f937a5-4ab7-fdf5-f14c-e1ec87226c4a@gmail.com>
-Date: Wed, 23 Jan 2019 21:16:07 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190117092212.ccv7zv4snnuanxtw@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <juterry@microsoft.com>) id 1gmOyr-0000jm-9l
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:18:39 -0500
+Received: from mail-eopbgr740097.outbound.protection.outlook.com
+	([40.107.74.97]:6112
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
+	id 1gmOyo-0000b0-KI
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:18:37 -0500
+From: "Justin Terry (VM)" <juterry@microsoft.com>
+Date: Wed, 23 Jan 2019 20:18:19 +0000
+Message-ID: <MW2PR2101MB1132DDAF249D8EF1E9205BA1B6990@MW2PR2101MB1132.namprd21.prod.outlook.com>
+References: <1521039163-138-1-git-send-email-juterry@microsoft.com>
+	<00e8dbed-6ada-d023-46b9-89881fcbfb1f@weilnetz.de>
+In-Reply-To: <00e8dbed-6ada-d023-46b9-89881fcbfb1f@weilnetz.de>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/50] audio: reduce glob_audio_state
- usage
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/3] WHPX introduce changes for Windows
+ Insider SDK 17110
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,430 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On 2019-01-17 10:22, Gerd Hoffmann wrote:
-> On Thu, Jan 17, 2019 at 12:36:48AM +0100, Kővágó, Zoltán wrote:
->> Remove glob_audio_state from functions, where possible without breaking
->> the API.  This means that most static functions in audio.c now take an
->> AudioState pointer instead of implicitly using glob_audio_state.  Also
->> included a pointer in SWVoice*, HWVoice* structs, so that functions
->> dealing them can know the audio state without having to pass it around
->> separately.
->>
->> This is required in order to support multiple simultaneous audio
->> backends (added in a later commit).
-> 
-> I think it makes sense to split the series into smaller pieces, here
-> would be a good place for the split (i.e. patches 1-14 which introduce
-> -audiodev will be the first batch, this patch starts the next batch).
-
-Alright, I think this series is pretty useless without at least the
-multiple simultaneous backends part, but if it's easier to review in
-smaller chunks, let's do it.
-
-> 
->>
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->> ---
->>  audio/audio_int.h      |  7 +++++
->>  audio/audio_template.h | 46 ++++++++++++++++----------------
->>  audio/audio.c          | 59 +++++++++++++++++++-----------------------
->>  3 files changed, 56 insertions(+), 56 deletions(-)
->>
->> diff --git a/audio/audio_int.h b/audio/audio_int.h
->> index 66214199f0..2a7556d113 100644
->> --- a/audio/audio_int.h
->> +++ b/audio/audio_int.h
->> @@ -52,6 +52,7 @@ struct audio_pcm_info {
->>  typedef struct SWVoiceCap SWVoiceCap;
->>  
->>  typedef struct HWVoiceOut {
->> +    AudioState *s;
->>      int enabled;
->>      int poll_mode;
->>      int pending_disable;
->> @@ -73,6 +74,7 @@ typedef struct HWVoiceOut {
->>  } HWVoiceOut;
->>  
->>  typedef struct HWVoiceIn {
->> +    AudioState *s;
->>      int enabled;
->>      int poll_mode;
->>      struct audio_pcm_info info;
->> @@ -94,6 +96,7 @@ typedef struct HWVoiceIn {
->>  
->>  struct SWVoiceOut {
->>      QEMUSoundCard *card;
->> +    AudioState *s;
->>      struct audio_pcm_info info;
->>      t_sample *conv;
->>      int64_t ratio;
->> @@ -111,6 +114,7 @@ struct SWVoiceOut {
->>  
->>  struct SWVoiceIn {
->>      QEMUSoundCard *card;
->> +    AudioState *s;
->>      int active;
->>      struct audio_pcm_info info;
->>      int64_t ratio;
->> @@ -188,6 +192,9 @@ struct AudioState {
->>      int nb_hw_voices_in;
->>      int vm_running;
->>      int64_t period_ticks;
->> +
->> +    bool timer_running;
->> +    uint64_t timer_last;
->>  };
->>  
->>  extern const struct mixeng_volume nominal_volume;
->> diff --git a/audio/audio_template.h b/audio/audio_template.h
->> index c1d7207abd..ccf6d810f7 100644
->> --- a/audio/audio_template.h
->> +++ b/audio/audio_template.h
->> @@ -36,9 +36,9 @@
->>  #define HWBUF hw->conv_buf
->>  #endif
->>  
->> -static void glue (audio_init_nb_voices_, TYPE) (struct audio_driver *drv)
->> +static void glue(audio_init_nb_voices_, TYPE)(AudioState *s,
->> +                                              struct audio_driver *drv)
->>  {
->> -    AudioState *s = &glob_audio_state;
->>      int max_voices = glue (drv->max_voices_, TYPE);
->>      int voice_size = glue (drv->voice_size_, TYPE);
->>  
->> @@ -183,8 +183,8 @@ static void glue (audio_pcm_hw_del_sw_, TYPE) (SW *sw)
->>  
->>  static void glue (audio_pcm_hw_gc_, TYPE) (HW **hwp)
->>  {
->> -    AudioState *s = &glob_audio_state;
->>      HW *hw = *hwp;
->> +    AudioState *s = hw->s;
->>  
->>      if (!hw->sw_head.lh_first) {
->>  #ifdef DAC
->> @@ -199,15 +199,14 @@ static void glue (audio_pcm_hw_gc_, TYPE) (HW **hwp)
->>      }
->>  }
->>  
->> -static HW *glue (audio_pcm_hw_find_any_, TYPE) (HW *hw)
->> +static HW *glue(audio_pcm_hw_find_any_, TYPE)(AudioState *s, HW *hw)
->>  {
->> -    AudioState *s = &glob_audio_state;
->>      return hw ? hw->entries.le_next : glue (s->hw_head_, TYPE).lh_first;
->>  }
->>  
->> -static HW *glue (audio_pcm_hw_find_any_enabled_, TYPE) (HW *hw)
->> +static HW *glue(audio_pcm_hw_find_any_enabled_, TYPE)(AudioState *s, HW *hw)
->>  {
->> -    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (hw))) {
->> +    while ((hw = glue(audio_pcm_hw_find_any_, TYPE)(s, hw))) {
->>          if (hw->enabled) {
->>              return hw;
->>          }
->> @@ -215,12 +214,10 @@ static HW *glue (audio_pcm_hw_find_any_enabled_, TYPE) (HW *hw)
->>      return NULL;
->>  }
->>  
->> -static HW *glue (audio_pcm_hw_find_specific_, TYPE) (
->> -    HW *hw,
->> -    struct audsettings *as
->> -    )
->> +static HW *glue(audio_pcm_hw_find_specific_, TYPE)(AudioState *s, HW *hw,
->> +                                                   struct audsettings *as)
->>  {
->> -    while ((hw = glue (audio_pcm_hw_find_any_, TYPE) (hw))) {
->> +    while ((hw = glue(audio_pcm_hw_find_any_, TYPE)(s, hw))) {
->>          if (audio_pcm_info_eq (&hw->info, as)) {
->>              return hw;
->>          }
->> @@ -228,10 +225,10 @@ static HW *glue (audio_pcm_hw_find_specific_, TYPE) (
->>      return NULL;
->>  }
->>  
->> -static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
->> +static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
->> +                                             struct audsettings *as)
->>  {
->>      HW *hw;
->> -    AudioState *s = &glob_audio_state;
->>      struct audio_driver *drv = s->drv;
->>  
->>      if (!glue (s->nb_hw_voices_, TYPE)) {
->> @@ -255,6 +252,7 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
->>          return NULL;
->>      }
->>  
->> +    hw->s = s;
->>      hw->pcm_ops = drv->pcm_ops;
->>      hw->ctl_caps = drv->ctl_caps;
->>  
->> @@ -299,33 +297,33 @@ static HW *glue (audio_pcm_hw_add_new_, TYPE) (struct audsettings *as)
->>      return NULL;
->>  }
->>  
->> -static HW *glue (audio_pcm_hw_add_, TYPE) (struct audsettings *as)
->> +static HW *glue(audio_pcm_hw_add_, TYPE)(AudioState *s, struct audsettings *as)
->>  {
->>      HW *hw;
->> -    AudioState *s = &glob_audio_state;
->>      AudiodevPerDirectionOptions *pdo = s->dev->TYPE;
->>  
->>      if (pdo->fixed_settings) {
->> -        hw = glue (audio_pcm_hw_add_new_, TYPE) (as);
->> +        hw = glue(audio_pcm_hw_add_new_, TYPE)(s, as);
->>          if (hw) {
->>              return hw;
->>          }
->>      }
->>  
->> -    hw = glue (audio_pcm_hw_find_specific_, TYPE) (NULL, as);
->> +    hw = glue(audio_pcm_hw_find_specific_, TYPE)(s, NULL, as);
->>      if (hw) {
->>          return hw;
->>      }
->>  
->> -    hw = glue (audio_pcm_hw_add_new_, TYPE) (as);
->> +    hw = glue(audio_pcm_hw_add_new_, TYPE)(s, as);
->>      if (hw) {
->>          return hw;
->>      }
->>  
->> -    return glue (audio_pcm_hw_find_any_, TYPE) (NULL);
->> +    return glue(audio_pcm_hw_find_any_, TYPE)(s, NULL);
->>  }
->>  
->> -static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
->> +static SW *glue(audio_pcm_create_voice_pair_, TYPE)(
->> +    AudioState *s,
->>      const char *sw_name,
->>      struct audsettings *as
->>      )
->> @@ -333,7 +331,6 @@ static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
->>      SW *sw;
->>      HW *hw;
->>      struct audsettings hw_as;
->> -    AudioState *s = &glob_audio_state;
->>      AudiodevPerDirectionOptions *pdo = s->dev->TYPE;
->>  
->>      if (pdo->fixed_settings) {
->> @@ -349,8 +346,9 @@ static SW *glue (audio_pcm_create_voice_pair_, TYPE) (
->>                 sw_name ? sw_name : "unknown", sizeof (*sw));
->>          goto err1;
->>      }
->> +    sw->s = s;
->>  
->> -    hw = glue (audio_pcm_hw_add_, TYPE) (&hw_as);
->> +    hw = glue(audio_pcm_hw_add_, TYPE)(s, &hw_as);
->>      if (!hw) {
->>          goto err2;
->>      }
->> @@ -447,7 +445,7 @@ SW *glue (AUD_open_, TYPE) (
->>          }
->>      }
->>      else {
->> -        sw = glue (audio_pcm_create_voice_pair_, TYPE) (name, as);
->> +        sw = glue(audio_pcm_create_voice_pair_, TYPE)(s, name, as);
->>          if (!sw) {
->>              dolog ("Failed to create voice `%s'\n", name);
->>              return NULL;
->> diff --git a/audio/audio.c b/audio/audio.c
->> index 77bd8386d0..ef8ce3b91d 100644
->> --- a/audio/audio.c
->> +++ b/audio/audio.c
->> @@ -397,12 +397,10 @@ static void noop_conv (struct st_sample *dst, const void *src, int samples)
->>      (void) samples;
->>  }
->>  
->> -static CaptureVoiceOut *audio_pcm_capture_find_specific (
->> -    struct audsettings *as
->> -    )
->> +static CaptureVoiceOut *audio_pcm_capture_find_specific(AudioState *s,
->> +                                                        struct audsettings *as)
->>  {
->>      CaptureVoiceOut *cap;
->> -    AudioState *s = &glob_audio_state;
->>  
->>      for (cap = s->cap_head.lh_first; cap; cap = cap->entries.le_next) {
->>          if (audio_pcm_info_eq (&cap->hw.info, as)) {
->> @@ -479,7 +477,7 @@ static void audio_detach_capture (HWVoiceOut *hw)
->>  
->>  static int audio_attach_capture (HWVoiceOut *hw)
->>  {
->> -    AudioState *s = &glob_audio_state;
->> +    AudioState *s = hw->s;
->>      CaptureVoiceOut *cap;
->>  
->>      audio_detach_capture (hw);
->> @@ -792,19 +790,15 @@ static void audio_pcm_print_info (const char *cap, struct audio_pcm_info *info)
->>  /*
->>   * Timer
->>   */
->> -
->> -static bool audio_timer_running;
->> -static uint64_t audio_timer_last;
->> -
->> -static int audio_is_timer_needed (void)
->> +static int audio_is_timer_needed(AudioState *s)
->>  {
->>      HWVoiceIn *hwi = NULL;
->>      HWVoiceOut *hwo = NULL;
->>  
->> -    while ((hwo = audio_pcm_hw_find_any_enabled_out (hwo))) {
->> +    while ((hwo = audio_pcm_hw_find_any_enabled_out(s, hwo))) {
->>          if (!hwo->poll_mode) return 1;
->>      }
->> -    while ((hwi = audio_pcm_hw_find_any_enabled_in (hwi))) {
->> +    while ((hwi = audio_pcm_hw_find_any_enabled_in(s, hwi))) {
->>          if (!hwi->poll_mode) return 1;
->>      }
->>      return 0;
->> @@ -812,18 +806,18 @@ static int audio_is_timer_needed (void)
->>  
->>  static void audio_reset_timer (AudioState *s)
->>  {
->> -    if (audio_is_timer_needed ()) {
->> +    if (audio_is_timer_needed(s)) {
->>          timer_mod_anticipate_ns(s->ts,
->>              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->period_ticks);
->> -        if (!audio_timer_running) {
->> -            audio_timer_running = true;
->> -            audio_timer_last = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->> +        if (!s->timer_running) {
->> +            s->timer_running = true;
->> +            s->timer_last = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->>              trace_audio_timer_start(s->period_ticks / SCALE_MS);
->>          }
->>      } else {
->>          timer_del(s->ts);
->> -        if (audio_timer_running) {
->> -            audio_timer_running = false;
->> +        if (s->timer_running) {
->> +            s->timer_running = false;
->>              trace_audio_timer_stop();
->>          }
->>      }
->> @@ -835,11 +829,11 @@ static void audio_timer (void *opaque)
->>      AudioState *s = opaque;
->>  
->>      now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->> -    diff = now - audio_timer_last;
->> +    diff = now - s->timer_last;
->>      if (diff > s->period_ticks * 3 / 2) {
->>          trace_audio_timer_delayed(diff / SCALE_MS);
->>      }
->> -    audio_timer_last = now;
->> +    s->timer_last = now;
->>  
->>      audio_run("timer");
->>      audio_reset_timer(s);
->> @@ -893,7 +887,7 @@ void AUD_set_active_out (SWVoiceOut *sw, int on)
->>  
->>      hw = sw->hw;
->>      if (sw->active != on) {
->> -        AudioState *s = &glob_audio_state;
->> +        AudioState *s = sw->s;
->>          SWVoiceOut *temp_sw;
->>          SWVoiceCap *sc;
->>  
->> @@ -940,7 +934,7 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
->>  
->>      hw = sw->hw;
->>      if (sw->active != on) {
->> -        AudioState *s = &glob_audio_state;
->> +        AudioState *s = sw->s;
->>          SWVoiceIn *temp_sw;
->>  
->>          if (on) {
->> @@ -1063,7 +1057,7 @@ static void audio_run_out (AudioState *s)
->>      HWVoiceOut *hw = NULL;
->>      SWVoiceOut *sw;
->>  
->> -    while ((hw = audio_pcm_hw_find_any_enabled_out (hw))) {
->> +    while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
->>          int played;
->>          int live, free, nb_live, cleanup_required, prev_rpos;
->>  
->> @@ -1168,7 +1162,7 @@ static void audio_run_in (AudioState *s)
->>  {
->>      HWVoiceIn *hw = NULL;
->>  
->> -    while ((hw = audio_pcm_hw_find_any_enabled_in (hw))) {
->> +    while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
->>          SWVoiceIn *sw;
->>          int captured = 0, min;
->>  
->> @@ -1274,8 +1268,8 @@ static int audio_driver_init(AudioState *s, struct audio_driver *drv,
->>      s->drv_opaque = drv->init(dev);
->>  
->>      if (s->drv_opaque) {
->> -        audio_init_nb_voices_out (drv);
->> -        audio_init_nb_voices_in (drv);
->> +        audio_init_nb_voices_out(s, drv);
->> +        audio_init_nb_voices_in(s, drv);
->>          s->drv = drv;
->>          return 0;
->>      }
->> @@ -1294,11 +1288,11 @@ static void audio_vm_change_state_handler (void *opaque, int running,
->>      int op = running ? VOICE_ENABLE : VOICE_DISABLE;
->>  
->>      s->vm_running = running;
->> -    while ((hwo = audio_pcm_hw_find_any_enabled_out (hwo))) {
->> +    while ((hwo = audio_pcm_hw_find_any_enabled_out(s, hwo))) {
->>          hwo->pcm_ops->ctl_out(hwo, op);
->>      }
->>  
->> -    while ((hwi = audio_pcm_hw_find_any_enabled_in (hwi))) {
->> +    while ((hwi = audio_pcm_hw_find_any_enabled_in(s, hwi))) {
->>          hwi->pcm_ops->ctl_in(hwi, op);
->>      }
->>      audio_reset_timer (s);
->> @@ -1318,7 +1312,7 @@ void audio_cleanup(void)
->>      HWVoiceIn *hwi, *hwin;
->>  
->>      is_cleaning_up = true;
->> -    QLIST_FOREACH_SAFE(hwo, &glob_audio_state.hw_head_out, entries, hwon) {
->> +    QLIST_FOREACH_SAFE(hwo, &s->hw_head_out, entries, hwon) {
->>          SWVoiceCap *sc;
->>  
->>          if (hwo->enabled) {
->> @@ -1337,7 +1331,7 @@ void audio_cleanup(void)
->>          QLIST_REMOVE(hwo, entries);
->>      }
->>  
->> -    QLIST_FOREACH_SAFE(hwi, &glob_audio_state.hw_head_in, entries, hwin) {
->> +    QLIST_FOREACH_SAFE(hwi, &s->hw_head_in, entries, hwin) {
->>          if (hwi->enabled) {
->>              hwi->pcm_ops->ctl_in (hwi, VOICE_DISABLE);
->>          }
->> @@ -1537,7 +1531,7 @@ CaptureVoiceOut *AUD_add_capture (
->>      cb->ops = *ops;
->>      cb->opaque = cb_opaque;
->>  
->> -    cap = audio_pcm_capture_find_specific (as);
->> +    cap = audio_pcm_capture_find_specific(s, as);
->>      if (cap) {
->>          QLIST_INSERT_HEAD (&cap->cb_head, cb, entries);
->>          return cap;
->> @@ -1554,6 +1548,7 @@ CaptureVoiceOut *AUD_add_capture (
->>          }
->>  
->>          hw = &cap->hw;
->> +        hw->s = s;
->>          QLIST_INIT (&hw->sw_head);
->>          QLIST_INIT (&cap->cb_head);
->>  
->> @@ -1586,7 +1581,7 @@ CaptureVoiceOut *AUD_add_capture (
->>          QLIST_INSERT_HEAD (&s->cap_head, cap, entries);
->>          QLIST_INSERT_HEAD (&cap->cb_head, cb, entries);
->>  
->> -        QLIST_FOREACH(hw, &glob_audio_state.hw_head_out, entries) {
->> +        QLIST_FOREACH(hw, &s->hw_head_out, entries) {
->>              audio_attach_capture (hw);
->>          }
->>          return cap;
->> -- 
->> 2.20.1
->>
+SGV5IFN0ZWZhbiwNCg0KTm90IHRyeWluZyB0byBpZ25vcmUgeW91IGhlcmUuIEkgaGF2ZSByZWFj
+aGVkIG91dCB0byBtZW1iZXJzIG9mIG1hbmFnZW1lbnQgb24gb3VyIHNpZGUgSSBqdXN0IGRvbuKA
+mXQgaGF2ZSBhbnkgcmVzcG9uc2VzIHlldCBvbiB3aGF0IHdlIGNhbiBkbyBoZXJlLiBXaWxsIHVw
+ZGF0ZSBhcyBJIGxlYXJuIG1vcmUuDQoNClRoYW5rcywNCkp1c3RpbiBUZXJyeQ0KDQo+IC0tLS0t
+T3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFN0ZWZhbiBXZWlsIDxzd0B3ZWlsbmV0ei5k
+ZT4NCj4gU2VudDogVGh1cnNkYXksIEphbnVhcnkgMTcsIDIwMTkgMTI6MzggUE0NCj4gVG86IEp1
+c3RpbiBUZXJyeSAoVk0pIDxqdXRlcnJ5QG1pY3Jvc29mdC5jb20+OyBxZW11LWRldmVsQG5vbmdu
+dS5vcmcNCj4gQ2M6IHBib256aW5pQHJlZGhhdC5jb207IGVoYWJrb3N0QHJlZGhhdC5jb207IHJ0
+aEB0d2lkZGxlLm5ldA0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIFdI
+UFggaW50cm9kdWNlIGNoYW5nZXMgZm9yDQo+IFdpbmRvd3MgSW5zaWRlciBTREsgMTcxMTANCj4g
+DQo+IEFtIDE0LjAzLjIwMTggdW0gMTU6NTIgc2NocmllYiBKdXN0aW4gVGVycnkgKFZNKSB2aWEg
+UWVtdS1kZXZlbDoNCj4gPiBUaGlzIGNoYW5nZSBzZXQgZml4ZXMgdHdvIGJyZWFraW5nIGNoYW5n
+ZXMgdGhhdCB3ZXJlIGludHJvZHVjZWQgaW4gdGhlDQo+ID4gV2luZG93cyBJbnNpZGVyIFNESyAx
+NzExMC4gRmlyc3QsIGEgY2hhbmdlIHRvIHRoZSBXSHZHZXRDYXBhYmlsaXR5DQo+ID4gZnVuY3Rp
+b24gZGVjbCB0byBpbmNsdWRlIHRoZSAnb3V0JyBXcml0dGVuU2l6ZUluQnl0ZXMuIFNlY29uZCwg
+Y2hhbmdlcw0KPiA+IHRvIHRoZSBXSHZTZXRQYXJ0aXRpb25Qcm9wZXJ0eSBmdW5jdGlvbiBkZWNs
+IGFuZA0KPiA+IFdIVl9QQVJUSVRJT05fUFJPUEVSVFkgc3RydWN0dXJlIHRvIGRpcmVjdGx5IHBh
+c3MgdGhlIFByb3BlcnR5Q29kZSBhdA0KPiBpbnZvY2F0aW9uLg0KPiA+DQo+ID4gTGFzdGx5LCBp
+dCBpbnRyb2R1Y2VzIGEgbWFqb3IgcGVyZm9ybWFuY2UgaW1wcm92ZW1lbnQgaW4NCj4gPiB3aHB4
+X3ZjcHVfcG9zdF9ydW4gdXNpbmcgdGhlIFZwQ29udGV4dCBleGl0IHN0cnVjdHVyZSByYXRoZXIg
+dGhhbg0KPiA+IGFub3RoZXIgcm91bmQgdHJpcCBjYWxsIHRvIFdIdkdldFZpcnR1YWxQcm9jZXNz
+b3JSZWdpc3RlcnMgdG8gc3luY2hyb25pemUNCj4gdnAgc3RhdGUuDQo+ID4NCj4gPiBRRU1VIGNv
+bXBpbGVkIGFnYWluc3QgdGhpcyBTREsgKDE3MTEwKykgaXMgZXhwZWN0ZWQgdG8gd29yayBvbiBh
+bGwNCj4gPiBXaW5kb3dzIEluc2lkZXIgQnVpbGRzICgxNzExNSspLg0KPiA+DQo+ID4gVGhhbmtz
+LA0KPiA+IEp1c3RpbiBUZXJyeQ0KPiANCj4gDQo+IEhpIEp1c3RpbiwNCj4gDQo+IGFzIGZhciBh
+cyBJIGtub3cgaXQgc3RpbGwgbm90IHBvc3NpYmxlIHRvIGNyb3NzIGJ1aWxkIGEgbGVnYWwgUUVN
+VSBmb3IgV2luZG93cw0KPiBvbiBhIExpbnV4IG1hY2hpbmUgZHVlIHRvIHRoZSBsaWNlbnNlIGxp
+bWl0YXRpb25zIG9mIHRoZSBTREsgd2hpY2ggaXMgbmVlZGVkLg0KPiBUaGUgaGVhZGVyIGZpbGVz
+IG5lZWRlZCBmb3IgdGhlIFFFTVUgYnVpbGQgYXJlICJBbGwgcmlnaHRzIHJlc2VydmVkIi4NCj4g
+DQo+IFBlb3BsZSBvZnRlbiBhc2sgbWUgdG8gYWRkIFdIUFggc3VwcG9ydCB0byB0aGUgUUVNVSBp
+bnN0YWxsZXIgZm9yDQo+IFdpbmRvd3MsIGJ1dCBJIGhhdmUgdG8gdGVsbCB0aGVtIHRoYXQgSSBj
+YW5ub3QgZG8gdGhhdCBjdXJyZW50bHkuDQo+IA0KPiBUaGlzIHByb2JsZW0gY291bGQgYmUgc29s
+dmVkIGlmIHRoZSBuZWNlc3NhcnkgaGVhZGVyIGZpbGVzIHdlcmUgYWRkZWQgdG8NCj4gUUVNVSB3
+aXRoIGEgcGVybWlzc2l2ZSBsaWNlbnNlIGJ5IHNvbWVvbmUgd2hvIGhhcyB0aGUgcmlnaHRzIHRv
+IGRvIHNvLg0KPiANCj4gQ291bGQgeW91IGFkZCBXaW5IdkVtdWxhdGlvbi5oIGFuZCBXaW5IdlBs
+YXRmb3JtLmggb3IgYW0gSSBhbGxvd2VkIHRvDQo+IG1ha2Ugc3VjaCBmaWxlcyBmcm9tIHRoZSBk
+b2N1bWVudGF0aW9uIGF0DQo+IGh0dHBzOi8vbmFtMDYuc2FmZWxpbmtzLnByb3RlY3Rpb24ub3V0
+bG9vay5jb20vP3VybD1odHRwcyUzQSUyRiUyRmRvY3MNCj4gLm1pY3Jvc29mdC5jb20lMkYmYW1w
+O2RhdGE9MDIlN0MwMSU3Q2p1dGVycnklNDBtaWNyb3NvZnQuY29tJTdDYWUNCj4gZDI1MzJjZDA1
+YjRmMmE1YTAyMDhkNjdjYmJhNThmJTdDNzJmOTg4YmY4NmYxNDFhZjkxYWIyZDdjZDAxMWRiNDcl
+DQo+IDdDMSU3QzAlN0M2MzY4MzM1NDI3MTk0NjY5MjEmYW1wO3NkYXRhPSUyRkE3S2preDVmbmpN
+Vm5xZXpkbXFpDQo+IHdnQ1pBRndvYU5lMm9DQSUyQlNkUGJ1byUzRCZhbXA7cmVzZXJ2ZWQ9MD8N
+Cj4gDQo+IFRoYW5rcywNCj4gU3RlZmFuIFdlaWwNCg==
