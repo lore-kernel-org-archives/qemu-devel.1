@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47189)
+Received: from eggs.gnu.org ([209.51.188.92]:49319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gm8o2-0003jG-2o
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:02:24 -0500
+	(envelope-from <sourav.jb1988@gmail.com>) id 1gm8tC-0007Cd-JV
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gm8o0-0001uj-Bc
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:02:21 -0500
-Received: from server54-2.web-hosting.com ([198.54.126.118]:38916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
-	id 1gm8nz-0001lt-WA
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:02:20 -0500
-Received: from [::1] (port=58636 helo=server54.web-hosting.com)
-	by server54.web-hosting.com with esmtpa (Exim 4.91)
-	(envelope-from <admin@grossmann-venter.com>) id 1gm8np-0007X2-D2
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:02:09 -0500
+	(envelope-from <sourav.jb1988@gmail.com>) id 1gm8tA-0006jm-La
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:07:42 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:40366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sourav.jb1988@gmail.com>)
+	id 1gm8t4-00061R-Hh
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:07:37 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id p4so652021wrt.7
+	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 19:07:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 22 Jan 2019 22:02:09 -0500
-From: liebrecht@grossmann-venter.com
-Message-ID: <720ebdfeb9506e0719481fc1913c9272@grossmann-venter.com>
-Subject: [Qemu-devel] networking
+From: ksourav <sourav.jb1988@gmail.com>
+Date: Wed, 23 Jan 2019 08:37:13 +0530
+Message-ID: <CAAJhNetR-8z37JuOmFDRuq3JfG_S03VDZkciqiKh_kieoqxQ1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] object owner argument of memory_region_init_ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +28,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The windows 7 guest on linux host had networking out of the box.
-It now lost it for some reason.
-The qemu string remained the same....
+Hi All,
 
-It now want to do DHCP and fails.
-It has an intel nic as nic device in device manager.
+I am trying to learn how qemu implements different soc.
+While reading the source code, I found that in some socs, object owner
+is passed as NULL to the routine memory_region_init_ram() (for example
+in nrf51 soc) and in some socs(for example in Allwinner A10) an
+object(non NULL) is passed to memory_region_initi_ram().
+When I checked docs/devel/memory.txt, I found below lines.
+"For regions that "have no owner" (NULL is passed at creation time), the
+machine object is actually used as the owner."
+Is the machine object refers to the actual board instance that will
+use the soc? For example microbit in case of nrf51 soc ?
+Is there any reason of not passing object as owner or in other words,
+when do we pass NULL or an object to memory_region_initi_ram() ?
 
-What i cant understand is how to dop a static network config in this 
-case.
-lets say my network is 192.168.1.x
-
-Do i give it a static ip say 192.168.1.33 ?
-The mask 255.255.255.0
-What must the default gateway be ?
-On my linux network this at 192.168.1.100
-
-Should I give an external e.g. google dns or is there a specific 
-internal DNS it needs to use ?
-
-thanks
-
-Why networking just broke I really cannot understand
+Thanks & Regards
+kumar sourav
