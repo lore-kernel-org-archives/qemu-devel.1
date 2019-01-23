@@ -1,18 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33772)
+Received: from eggs.gnu.org ([209.51.188.92]:39394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gmLta-0007TN-T4
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:00:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1gmMCl-0007H9-2L
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gmLtZ-0006Uq-7E
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:00:58 -0500
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <271482fe-741a-6a15-15fd-181d4e55a8c4@redhat.com>
-Date: Wed, 23 Jan 2019 18:00:49 +0100
+	(envelope-from <bounces@canonical.com>) id 1gmMCj-0006CS-OB
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:20:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51226)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gmMCh-00066w-SO
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:20:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gmMCa-0001Br-NS
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 17:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9110C2E80D1
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 17:20:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="q7J1XRd6HpBUT9SWtMqSS958W5chDoTXS"
-Subject: [Qemu-devel] Consistency of iotests 093 and 136
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Jan 2019 17:07:36 -0000
+From: Michele Schillaci <1813045@bugs.launchpad.net>
+Reply-To: Bug 1813045 <1813045@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154826325670.29740.8985180444326228276.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813045] [NEW] qemu-ga fsfreeze crashes the kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,85 +35,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---q7J1XRd6HpBUT9SWtMqSS958W5chDoTXS
-From: Max Reitz <mreitz@redhat.com>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alberto Garcia <berto@igalia.com>
-Message-ID: <271482fe-741a-6a15-15fd-181d4e55a8c4@redhat.com>
-Subject: Consistency of iotests 093 and 136
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-Hi,
+We use mainly Cloudlinux, Debian and Centos.
+We experienced many crashes on our qemu instances based on Cloudlinux durin=
+g a snapshot.
+The issue is not related to CloudLinux directly, but to Qemu agent, which d=
+oes not freeze the file system(s) correctly. What is actually happening:
 
-093 and 136 seem really flaky to me.  I can reproduce that by running:
+When VM backup is invoked, Qemu agent freezes the file systems, so no singl=
+e change will be made during the backup. But Qemu agent does not respect th=
+e loop* devices in freezing order (we have checked its sources), which lead=
+s to the next situation: =
 
-$ dd if=3D/dev/urandom of=3D/dev/null
-
-in as many shells as I have CPU cores, and then run the tests:
-
-$ while TEST_DIR=3D/tmp/t0 ./check -T -raw 93; do; done
-
-or
-
-$ while TEST_DIR=3D/tmp/t0 ./check -T -raw 136; do; done
-
-which usually fail after one or two iterations.
+1) freeze loopback fs
+              ---> send async reqs to loopback thread
+2) freeze main fs
+3) loopback thread wakes up and trying to write data to the main fs, which =
+is still frozen, and this finally leads to the hung task and kernel crash. =
 
 
-The exact failures vary, but for 093 it's usually something that ends wit=
-h:
+I believe this is the culprit:
 
-[...]
-    self.assertTrue(check_limit(params['iops'], rd_iops + wr_iops))
-AssertionError: False is not true
+/dev/loop0 /tmp ext3 rw,nosuid,noexec,relatime,data=3Dordered 0 0
+/dev/loop0 /var/tmp ext3 rw,nosuid,noexec,relatime,data=3Dordered 0 0
 
-Or:
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-[...]
-    self.assertTrue(check_limit(params['iops_rd'], rd_iops))
-AssertionError: False is not true
+-- =
 
-etc. -- so the 10 % error range doesn't seem to be enough, I'd say.  But
-will just increasing it solve the problem?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813045
+
+Title:
+  qemu-ga fsfreeze crashes the kernel
+
+Status in QEMU:
+  New
+
+Bug description:
+  We use mainly Cloudlinux, Debian and Centos.
+  We experienced many crashes on our qemu instances based on Cloudlinux dur=
+ing a snapshot.
+  The issue is not related to CloudLinux directly, but to Qemu agent, which=
+ does not freeze the file system(s) correctly. What is actually happening:
+
+  When VM backup is invoked, Qemu agent freezes the file systems, so no sin=
+gle change will be made during the backup. But Qemu agent does not respect =
+the loop* devices in freezing order (we have checked its sources), which le=
+ads to the next situation: =
+
+  1) freeze loopback fs
+                ---> send async reqs to loopback thread
+  2) freeze main fs
+  3) loopback thread wakes up and trying to write data to the main fs, whic=
+h is still frozen, and this finally leads to the hung task and kernel crash=
+. =
 
 
-And for 136 it's usually (always?):
+  I believe this is the culprit:
 
-[...]
-  File "136", line 278, in do_test_stats
-    self.check_values()
-  File "136", line 204, in check_values
-    self.assertLess(0, stats['idle_time_ns'])
-AssertionError: 0 not less than 0
+  /dev/loop0 /tmp ext3 rw,nosuid,noexec,relatime,data=3Dordered 0 0
+  /dev/loop0 /var/tmp ext3 rw,nosuid,noexec,relatime,data=3Dordered 0 0
 
-
-Any ideas on making these more reliable?
-
-
-Max
-
-
---q7J1XRd6HpBUT9SWtMqSS958W5chDoTXS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxIncEACgkQ9AfbAGHV
-z0CraAf+Ivty/yLCQRq4WM+PvY+j89L2ssQ4/csMC0CbUN6DNEawIS5DkArWA5QM
-U/XjxwY4FlCBe4Jl2QHpopm1IUX7F4oWY/F3kKP5iLmF3hFWT2WyvRXxm5R5ihnq
-aiEHNApev1bMSiR1iHO5kmFwJsdy0Rkquayd6rST2/H3m8muMStoqnvgjRQOc7gP
-ONDq+iD+DrC1Rh/9V7W6WinNQkwgE4Y3D0ymCNl1do7OqpvOum4awLid4Y9BhrOL
-iyFIAOeBYy3ADYEmUWziEzcVmbyQ/lZdFkm+Do3j70jl5T5SYZcdwD95IzqNMlYP
-2rIpohpC3lqoDKPrhfX/ungxuJzzVg==
-=3+Ab
------END PGP SIGNATURE-----
-
---q7J1XRd6HpBUT9SWtMqSS958W5chDoTXS--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813045/+subscriptions
