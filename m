@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37206)
+Received: from eggs.gnu.org ([209.51.188.92]:37890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmFiO-0000xT-K0
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:25:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmFk1-0002Qq-Bn
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmFiM-0003Xp-Nj
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:25:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmFiM-0003WP-Dr
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:24:58 -0500
-Date: Wed, 23 Jan 2019 11:24:52 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190123102452.x5iyl77ul52wayof@sirius.home.kraxel.org>
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1gmFjz-0004PE-Gj
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:26:40 -0500
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122125133.1191-2-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <533d81b9-5d85-d441-7900-c8bb10ee4b8a@redhat.com>
+Date: Wed, 23 Jan 2019 11:26:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+In-Reply-To: <20190122125133.1191-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] s390x/pci: Fix primary bus number
+ for PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jan 23, 2019 at 09:27:48AM +0100, Thomas Huth wrote:
-> On 2019-01-23 09:00, Gerd Hoffmann wrote:
-> > 
-> > This is RfC because we might look at the ordering.  On linux we probably
-> > want prefer alsa over oss.
-> Yes, please! I've run into the trap a couple of times already: OSS
-> headers were available, but these days the OSS compatibility kernel
-> modules are not loaded anymore by default. So you compile QEMU with OSS
-> support and then wonder why you do not get any audio output at all...
-> 
-> IMHO we should put OSS as last item in the list on Linux nowadays.
+On 2019-01-22 13:51, David Hildenbrand wrote:
+> The primary bus number corresponds always to the bus number of the
+> bus the bridge is attached to.
+>=20
+> Right now, if we have two bridges attached to the same bus (e.g. root
+> bus) this is however not the case. Fix assignment.
+>=20
+> While at it
+> - Add a comment why we have to reassign durign every reset (which I
 
-Tweaked the pulseaudio driver to check whenever the damon pidfile is
-present before trying to initialize.  With that in place we can move
-pulse to be first in the list, without having pulse throwing error
-messages when it can't connect the server.
+s/durign/during/
 
-So the linux ordering is this now:
+>   found to be supprising)
 
-	audio_drv_list="try-pa try-alsa try-sdl oss"
+s/supprising/surprising/
 
-Requests / suggestions for other guests?
+> - Drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff. As we are
+>   setting it via a DFS and not via a BFS (as discussed e.g. in [1]), th=
+is
+>   is not necessary. The last number when we return is the highest
+>   number.
 
-Probing pulseaudio first probably makes sense everywhere (when
-available).  Most BSDs have both sdl and oss, which one should be
-preferred here?
+I think that explanation is slightly wrong / misleading. It's not about
+DFS vs. BFS, it's about guest code vs. QEMU code. If you do a bridge
+setup from the guest side, you've got to set the subordinate bus number
+to 0xff to make sure that the bridge forwards all config space accesses
+to the attached devices while you're scanning the devices that are
+attached to the bridge.
+But this code is not running in the guest, it is running in QEMU, and so
+it can access the config space of the attached devices directly via
+pci_default_write_config() - the write do not need to pass the parent
+bridge in this case, and thus the subordinate bus number in the bridge
+is ignored for the config space write access.
 
-cheers,
-  Gerd
+> Please note that hotplugging of bridges is in general still broken, wil=
+l
+> be fixed next.
+>=20
+> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+
+With the commit message fixed:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
