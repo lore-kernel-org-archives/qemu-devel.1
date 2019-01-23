@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59284)
+Received: from eggs.gnu.org ([209.51.188.92]:33436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmGo1-0003HE-Ew
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:34:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gmGvP-00054i-Hr
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:42:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmGo0-0007E4-FR
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:34:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gmGo0-0007Df-6x
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:34:52 -0500
-Date: Wed, 23 Jan 2019 11:34:45 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190123113444.GA5771@work-vm>
-References: <20190113140849.38339-1-lifei1214@126.com>
-	<6aa36ba5-1784-b927-b75f-b56ec8d96d4c@gmail.com>
-	<c32370f9-41c0-49a2-920f-e7cc984237cd@redhat.com>
-	<20190116150022.GC2351@work-vm>
-	<2AC36351-1745-4C62-942A-BC1A37578D48@126.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gmGvM-0003Gr-9j
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:42:31 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gmGvH-0003Fg-P0
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:42:25 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id m1so1670179wml.2
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 03:42:22 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 23 Jan 2019 11:42:20 +0000
+Message-Id: <20190123114220.16972-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2AC36351-1745-4C62-942A-BC1A37578D48@126.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/5] fix some segmentation faults
- and migration issues
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/11] check-softfloat,
+ fp-bench and clang compile fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fei <lifei1214@126.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Fei Li <shirley17fei@gmail.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-* fei (lifei1214@126.com) wrote:
->=20
->=20
-> > =E5=9C=A8 2019=E5=B9=B41=E6=9C=8816=E6=97=A5=EF=BC=8C23:00=EF=BC=8CDr=
-. David Alan Gilbert <dgilbert@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
-> >=20
-> > * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> >>> On 1/16/19 5:50 AM, Fei Li wrote:
-> >>> Hi all,
-> >>>=20
-> >>> Kindly ping. :)
-> >>>=20
-> >>> As my v10 of qemu_thread_create partly rely on this patch series, I=
-'d
-> >>> like to know
-> >>> when will these 5 patches be merged, or I join them with v10 of
-> >>> qemu_thread_create
-> >>> and send together. Could anyone shed light on me? Thanks for the ad=
-vice
-> >>> in advance.
-> >>=20
-> >> This series would get merged quicker if you include the maintainers =
-:)
-> >>=20
-> >> $ ./scripts/get_maintainer.pl -f migration/*
-> >> Juan Quintela <quintela@redhat.com> (maintainer:Migration)
-> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Migration=
-)
-> >>=20
-> >> Doing that for you by responding to this mail.
-> >=20
-> > We can do it via migration now the set is complete.
-> >=20
-> > Dave
-> >=20
-> Thanks all! :)
+The following changes since commit 952bc8b3c2cbba78261923a1e8ca55cda261dee9:
 
-Queued for migration.
+  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-21' into staging (2019-01-22 17:56:21 +0000)
 
-Dave
+are available in the Git repository at:
 
-> Have a nice day
-> Fei
-> >>=20
-> >> Regards,
-> >>=20
-> >> Phil.
-> >>=20
-> >>>=20
-> >>>=20
-> >>> Have a nice day
-> >>> Fei
-> >>>> =E5=9C=A8 2019/1/13 =E4=B8=8B=E5=8D=8810:08, Fei Li =E5=86=99=E9=81=
-=93:
-> >>>> All these five patches have gotten the Reviewed-by: the first patc=
-h
-> >>>> is to fix one segmentation fault and the other four are to fix som=
-e
-> >>>> migration issues.
-> >>>>=20
-> >>>> To be more detail, they are extracted from previous
-> >>>> "[PATCH for-4.0 v9 16/16] qemu_thread_create: propagate errors to
-> >>>> callers to handle.", but actually these five patches are derivativ=
-e
-> >>>> and not relevant to the mentioned qemu_thread_create patch series.
-> >>>> Thus send them separately to make them be merged earlier.
-> >>>>=20
-> >>>> Fei Li (5):
-> >>>>    Fix segmentation fault when qemu_signal_init fails
-> >>>>    migration: fix the multifd code when receiving less channels
-> >>>>    migration: multifd_save_cleanup() can't fail, simplify
-> >>>>    migration: add more error handling for postcopy_ram_enable_noti=
-fy
-> >>>>    migration: unify error handling for process_incoming_migration_=
-co
-> >>>>=20
-> >>>>   migration/channel.c      | 11 ++++++-----
-> >>>>   migration/migration.c    | 40 +++++++++++++++++++++-------------=
-------
-> >>>>   migration/migration.h    |  2 +-
-> >>>>   migration/postcopy-ram.c |  1 +
-> >>>>   migration/ram.c          | 28 ++++++++++++++++++----------
-> >>>>   migration/ram.h          |  4 ++--
-> >>>>   migration/savevm.c       |  1 +
-> >>>>   util/main-loop.c         |  8 ++++----
-> >>>>   8 files changed, 54 insertions(+), 41 deletions(-)
-> >>>>=20
-> >>>=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
+  https://github.com/stsquad/qemu.git tags/pull-fpu-next-230119-2
+
+for you to fetch changes up to 7617010250822677348af2bd98f048be10e7f334:
+
+  tests/Makefile: add check-softfloat rule (2019-01-23 08:30:01 +0000)
+
+----------------------------------------------------------------
+Some more softfloat/fpu fixes
+
+   - make check-softfloat
+   - fixes for fp-bench
+   - workaround broken host fma
+   - compile fix for s390x/clang
+   - fixed for bigendian (v2)
+   - minor makefile tweaks (v2)
+
+----------------------------------------------------------------
+Alex Bennée (3):
+      tests/Makefile: add floating point tests
+      scripts/archive-source: include softfloat tests
+      tests/Makefile: add check-softfloat rule
+
+Emilio G. Cota (7):
+      fp-bench: fix update_random_ops
+      fp-bench: remove wrong exponent raise in fill_random
+      berkeley-testfloat-3: pull changes
+      tests/fp/Makefile: do not use gcc-only -W flags
+      fp-test: fix signature of slow_clear_flags and qemu_clear_flags
+      tests/fp/platform.h: include config-host.h
+      softfloat: enforce softfloat if the host's FMA is broken
+
+Thomas Huth (1):
+      include/fpu/softfloat: Fix compilation with Clang on s390x
+
+ fpu/softfloat.c                |  33 ++++++++++
+ include/fpu/softfloat-macros.h |   2 +-
+ scripts/archive-source.sh      |   2 +-
+ tests/Makefile.include         | 137 ++++++++++++++++++++++++++++++++++++++++-
+ tests/fp/Makefile              |   3 +-
+ tests/fp/berkeley-testfloat-3  |   2 +-
+ tests/fp/fp-bench.c            |  15 ++---
+ tests/fp/fp-test.c             |   4 +-
+ tests/fp/platform.h            |   1 +
+ 9 files changed, 183 insertions(+), 16 deletions(-)
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.17.1
