@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41428)
+Received: from eggs.gnu.org ([209.51.188.92]:41642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmNzO-0005Ji-GE
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:07 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gmO0B-0005r6-Aq
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmNzN-0001KV-Kb
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:06 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:50506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gmNzN-0001Jo-BY
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:05 -0500
-Message-ID: <ece0262cacd5e1f5bb25f58f9abdf4a3788ee0fd.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Wed, 23 Jan 2019 20:14:56 +0100
-In-Reply-To: <20190123120438.2d47e352@w520.home>
-References: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
-	<1062e3d54121ff3e19b5a4e821ae178c5387fd9a.1548266832.git-series.knut.omang@oracle.com>
-	<20190123120438.2d47e352@w520.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] gen_pcie_root_port: Add ACS (Access
- Control Services) capability
+	(envelope-from <ehabkost@redhat.com>) id 1gmO0A-0001lq-Ec
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45246)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gmO0A-0001kq-5q
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:15:54 -0500
+Date: Wed, 23 Jan 2019 17:15:50 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190123191550.GX4136@habkost.net>
+References: <20181227024304.12182-1-tao3.xu@intel.com>
+	<20181227024304.12182-3-tao3.xu@intel.com>
+	<20190114183545.GB28115@habkost.net>
+	<ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] i386: Add some MSR based features on
+ Cascadelake-Server CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Elijah Shakkour <elijahs@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Tao Xu <tao3.xu@intel.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, robert.hu@linux.intel.com, thomas.lendacky@amd.com
 
-On Wed, 2019-01-23 at 12:04 -0700, Alex Williamson wrote:
-> On Wed, 23 Jan 2019 19:28:00 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > Claiming ACS support allows passthrough of an emulated device
-> > (in a nested virt.setting) with VFIO without Alex Williamson's patch
-> > for the pcie_acs_override kernel parameter.
-> > A similar need appears on Windows with Hyper-V
+On Mon, Jan 21, 2019 at 05:29:32PM +0800, Tao Xu wrote:
+> On 1/15/2019 2:35 AM, Eduardo Habkost wrote:
+> > Sorry, we do have a problem here:
 > > 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >  hw/pci-bridge/gen_pcie_root_port.c | 2 ++
-> >  hw/pci-bridge/ioh3420.c            | 1 -
-> >  hw/pci-bridge/pcie_root_port.c     | 3 +++
-> >  include/hw/pci/pcie_port.h         | 1 +
-> >  4 files changed, 6 insertions(+), 1 deletion(-)
+> > On Thu, Dec 27, 2018 at 10:43:04AM +0800, Tao Xu wrote:
+> > [...]
+> > >   #define PC_COMPAT_3_0 \
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index 09706ad51a..5296c73cd5 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -2499,7 +2499,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> > >               CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+> > >               CPUID_7_0_ECX_AVX512VNNI,
+> > >           .features[FEAT_7_0_EDX] =
+> > > -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> > > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
+> > > +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
 > > 
-> > diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> > index 9766edb..b5a5ecc 100644
-> > --- a/hw/pci-bridge/gen_pcie_root_port.c
-> > +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> > @@ -20,6 +20,7 @@
-> >          OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
-> >  
-> >  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
-> > +#define GEN_PCIE_ROOT_PORT_ACS_OFFSET           0x148
+> > CPUID_7_0_EDX_ARCH_CAPABILITIES is still set on
+> > unmigratable_flags.  We need to make it migratable before adding
+> > it by default to a named CPU model.
+> > 
+> Hi Eduardo,
 > 
-> Perhaps (GEN_PCIE_ROOT_PORT_AER_OFFSET + PCI_ERR_SIZEOF)
-> 
-> >  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-> >  
-> >  typedef struct GenPCIERootPort {
-> > @@ -149,6 +150,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
-> >      rpc->interrupts_init = gen_rp_interrupts_init;
-> >      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> >      rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
-> > +    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
-> >  }
-> >  
-> >  static const TypeInfo gen_rp_dev_info = {
-> > diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-> > index 81f2de6..2064939 100644
-> > --- a/hw/pci-bridge/ioh3420.c
-> > +++ b/hw/pci-bridge/ioh3420.c
-> > @@ -71,7 +71,6 @@ static int ioh3420_interrupts_init(PCIDevice *d, Error **errp)
-> >      if (rc < 0) {
-> >          assert(rc == -ENOTSUP);
-> >      }
-> > -
-> 
-> Unrelated
+> Do you mean I need to remove CPUID_7_0_EDX_ARCH_CAPABILITIES
+> from .migratable_flags? Or CPUID_7_0_EDX_ARCH_CAPABILITIES can not
+> support migration now?
 
-Oops, will fix, thanks.
+We need to remove it from .unmigratable_flags, but only after
+confirm it is really migration-safe.  To make it migration-safe,
+the MSR value seen by the guest must have a predictable value
+that is 100% independent from host hardware or host software
+version.
 
-Knut 
+This is easy to ensure if MSR_IA32_ARCH_CAPABILITIES is in
+KVM_GET_MSR_INDEX_LIST (meaning QEMU can actually configure the
+MSR value seen by the guest).  If MSR_IA32_ARCH_CAPABILITIES is
+not on KVM_GET_MSR_INDEX_LIST, arch-capabilities must not be
+returned by x86_cpu_get_supported_feature_word() when
+migratable_only is true.
+
 
 > 
-> >      return rc;
-> >  }
-> >  
-> > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > index 34ad767..c33a493 100644
-> > --- a/hw/pci-bridge/pcie_root_port.c
-> > +++ b/hw/pci-bridge/pcie_root_port.c
-> > @@ -106,6 +106,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
-> >      pcie_aer_root_init(d);
-> >      rp_aer_vector_update(d);
-> >  
-> > +    if (rpc->acs_offset) {
-> > +        pcie_acs_init(d, rpc->acs_offset, 0);
-> > +    }
-> >      return;
-> >  
-> >  err:
-> > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > index df242a0..09586f4 100644
-> > --- a/include/hw/pci/pcie_port.h
-> > +++ b/include/hw/pci/pcie_port.h
-> > @@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
-> >      int exp_offset;
-> >      int aer_offset;
-> >      int ssvid_offset;
-> > +    int acs_offset;    /* If nonzero, optional ACS capability offset */
-> >      int ssid;
-> >  } PCIERootPortClass;
-> >  
+> > Also, why are you setting this only on Cascadelake-Server and not
+> > on all the other Intel CPUs?
+> > 
+> Thank you for your notice. I reviewed the git log of KVM.
+> "MSR_IA32_ARCH_CAPABILITIES is emulated in kvm, there is no dependency on
+> hardware support for this feature". So do you mean we should also add
+> features based on ARCH_CAPABILITIES in former CPU(such as skylake)?
+
+It doesn't depend on host hardware features, but it does depend
+on host KVM code added in Linux v4.17, which makes this more
+tricky.
+
+We don't want a QEMU upgrade to make an existing VM configuration
+to stop running under Linux v4.16.  This will probably require
+versioned CPU models[1] to work well.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08422.html
+
 > 
+> > I'm queueing only patch 1/2 until we sort this out.
+> > 
+> 
+> 
+
+-- 
+Eduardo
