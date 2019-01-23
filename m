@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42213)
+Received: from eggs.gnu.org ([209.51.188.92]:42249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmJZh-0005Qu-NG
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:32:20 -0500
+	(envelope-from <mst@redhat.com>) id 1gmJZm-0005Ry-Kn
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmJU6-0006Dd-0i
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:26:33 -0500
-References: <20190122125133.1191-1-david@redhat.com>
-	<20190122125133.1191-3-david@redhat.com>
-	<17de6f00-2c91-4654-cc8f-d07ef85c48de@redhat.com>
-	<29d0a220-e814-6b91-ae4e-835326e91fcb@redhat.com>
-	<afaed009-3831-db23-26c6-485d23e44b29@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9420629b-a788-d780-f9c9-b26d1e30a60d@redhat.com>
-Date: Wed, 23 Jan 2019 15:26:04 +0100
+	(envelope-from <mst@redhat.com>) id 1gmJRY-00052X-2h
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:23:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gmJRX-00052D-SX
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:23:52 -0500
+Date: Wed, 23 Jan 2019 09:23:49 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190123092224-mutt-send-email-mst@kernel.org>
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-30-yang.zhong@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <afaed009-3831-db23-26c6-485d23e44b29@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
- bridges
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190123065618.3520-30-yang.zhong@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 29/44] hw/pci/Makefile.objs: make
+ pcie configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,188 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerald Schaefer <gerald.schaefer@de.ibm.com>, linux-s390@vger.kernel.org, Sebastian Ott <sebott@linux.ibm.com>
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
 
-On 23.01.19 14:42, Thomas Huth wrote:
-> On 2019-01-23 12:42, David Hildenbrand wrote:
->> On 23.01.19 12:16, Thomas Huth wrote:
->>> On 2019-01-22 13:51, David Hildenbrand wrote:
->>>> When hotplugging a PCI bridge right now to the root port, we resolve
->>>> pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
->>>> really only works right now when hotplugging to another bridge.
->>>>
->>>> Instead, we have to properly check if we are already at the root.
->>>>
->>>> Let's cleanup the code while at it a bit and factor out updating the
->>>> subordiante bus number into a separate function. The check for
->>>> "old_nr < nr" is right now not strictly necessary, but makes it more
->>>> obvious what is actually going on.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
->>>>  1 file changed, 19 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->>>> index b7c4613fde..9b5c5fff60 100644
->>>> --- a/hw/s390x/s390-pci-bus.c
->>>> +++ b/hw/s390x/s390-pci-bus.c
->>>> @@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>      }
->>>>  }
->>>>  
->>>> +static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
->>>> +{
->>>> +    uint32_t old_nr;
->>>> +
->>>> +    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
->>>> +    while (!pci_bus_is_root(pci_get_bus(dev))) {
->>>> +        dev = pci_get_bus(dev)->parent_dev;
->>>> +
->>>> +        old_nr = pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1);
->>>> +        if (old_nr < nr) {
->>>> +            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
->>>> +        }
->>>> +    }
->>>> +}
->>>> +
->>>>  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>                                Error **errp)
->>>>  {
->>>> @@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>      S390PCIBusDevice *pbdev = NULL;
->>>>  
->>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
->>>> -        BusState *bus;
->>>>          PCIBridge *pb = PCI_BRIDGE(dev);
->>>> -        PCIDevice *pdev = PCI_DEVICE(dev);
->>>>  
->>>> +        pdev = PCI_DEVICE(dev);
->>>
->>> Why not keep the direct assignment?
->>
->> We have the same local variable in that function already. I'm just
->> reusing it.
+On Wed, Jan 23, 2019 at 02:56:03PM +0800, Yang Zhong wrote:
+> Make pcie splited from pci and make it configurable.
 > 
-> D'oh, right. Please disregard my comment.
-> 
->>>
->>>>          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
->>>>          pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
->>>>  
->>>> -        bus = BUS(&pb->sec_bus);
->>>> -        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
->>>> +        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
->>>>  
->>>>          if (dev->hotplugged) {
->>>>              pci_default_write_config(pdev, PCI_PRIMARY_BUS,
->>>>                                       pci_dev_bus_num(pdev), 1);
->>>>              s->bus_no += 1;
->>>>              pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
->>>> -            do {
->>>> -                pdev = pci_get_bus(pdev)->parent_dev;
->>>> -                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
->>>> -                                         s->bus_no, 1);
->>>> -            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
->>>> +
->>>> +            s390_pci_update_subordinate(pdev, s->bus_no);
->>>
->>>
->>> While your changes look OK at a first glance, and certainly fix the
->>> crash, I wonder whether this is the right thing to do here at all. Why
->>> does the hypervisor set up the all the bridge registers here? I'd rather
->>> expect that this is the job of the guest after it detects a hot-plugged
->>> device?
->>
->> I honestly have no idea who is responsible for that. I can see that
->> spapr does not seem to handle hotplugging the way s390x does. I was
->> hoping that Colin maybe know why we have to do that on s390x this way.
->> At least this patch does not change the behavior but only fixes it.
-> 
-> Right, you're patch certainly fixes a crash, and does not make it any
-> worse than it was before, so:
-> 
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/pci.mak | 1 +
+>  hw/pci/Kconfig          | 3 +++
+>  hw/pci/Makefile.objs    | 5 +++--
+>  3 files changed, 7 insertions(+), 2 deletions(-)
 > 
->>>
->>> Also I'm not sure whether the numbering is right in every case. Let's
->>> use the example from the URL that you've mentioned in the cover letter
->>> (http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html step 4):
->>>
->>> Assume that you hot-plug another bridge "5" to "Bridge 2". If I get the
->>> code right, the setup will now look like this:
->>
->> Yes, this is what I would expect! This implies that any bus in the
->> hierarchy lies between Sec and Sub. But that there might be multiple
->> candidates, which feels wrong as you correctly say.
->>
->>>
->>>                CPU
->>>                 |
->>>   --------------+-------------- Bus 0
->>>                 |
->>>                 |  Pri=0
->>>                BR1 Sec=1
->>>                 |  Sub=5
->>>                 |
->>>   ------+-------+----------+--- Bus 1
->>>         |                  |
->>>         |  Pri=1           |  Pri=1
->>>        BR3 Sec=3          BR2 Sec=2
->>>         |  Sub=4           |  Sub=5
->>>         |                  |
->>>   --+---+--- Bus 3       --+-+- Bus 2
->>>     |                        |
->>>     |  Pri=3                 |  Pri=2
->>>    BR4 Sec=4                BR5 Sec=5
->>>     |  Sub=4                 |  Sub=5
->>>     |                        |
->>>   --+---- Bus 4            --+-- Bus 5
->>>
->>> Requests to bus 3 and 4 are now also routed through to bus 2 and 5. That
->>> sounds wrong to me. Or is this how hot-plugging of PCI bridges is
->>> supposed to work??
->>>
->>
->> Learning more about PCI
->>
->> Quoting from [2]
->>
->> "PCIe enumeration is generally done twice. First, your BIOS (UEFI or
->> otherwise) will do it, to figure out who's present and how much memory
->> they need. This data can then be passed on to the host OS who can take
->> it as-is, but Linux and Windows often perform their own enumeration
->> procedure ..."
->>
->> "The custom software part comes in during this enumeration process and
->> that is you must reserve ahead of time PCI Bus numbers, and memory
->> segments for potential future devices -- this is sometimes called 'bus
->> padding'. This avoids the need to re-enumerate the bus in the future
->> which can often not be done without disruption to the system ..."
->>
->> So if I understand correctly, the BIOS/Firmware/QEMU only provides the
->> initial state. After that, the guest is responsible to manage it,
->> especially to manage hotplug.
->>
->> However, I wonder if it would also be up to BIOS/Firmware/QEMU to do
->> this bus padding or if it is completely on the OS side. And if
->> hotplugged devices simply have all 0's.
-> 
-> Anyway, the current behavior sounds pretty wrong to me. I am sure that
-> we can not simply traverse the bridge hierarchy up to the top and change
-> the subordinate bus setting everywhere without informing the guest about
-> that change. What if the guest OS has cached the values from the
-> bridges? It then might use the wrong value for future calculations...
+> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+> index f7b3690bbd..b17b456b1e 100644
+> --- a/default-configs/pci.mak
+> +++ b/default-configs/pci.mak
+> @@ -1,4 +1,5 @@
+>  CONFIG_PCI=y
+> +CONFIG_PCI_EXPRESS=y
+>  # For now, CONFIG_IDE_CORE requires ISA, so we enable it here
+>  CONFIG_ISA_BUS=y
+>  CONFIG_VIRTIO_PCI=y
+> diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
+> index d3d2205577..81533b9dc0 100644
+> --- a/hw/pci/Kconfig
+> +++ b/hw/pci/Kconfig
+> @@ -1,2 +1,5 @@
+>  config PCI
+>      bool
+> +
+> +config PCI_EXPRESS
+> +    bool
 
-Yes, it also sounds wrong to me. Maybe this is what Firmware manages on
-s390x - maybe they reserve bus numbers. Or maybe hotplug has to really
-be handled by the guests. Only IBM people can clarify that.
+Hmm this allows PCIE without PCI.
+Should PCI_EXPRESS select PCI?
 
-Thanks!
+It's selected itself so can't depend on PCI.
 
--- 
 
-Thanks,
-
-David / dhildenb
+> diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+> index 9f905e6344..d30eb32cbb 100644
+> --- a/hw/pci/Makefile.objs
+> +++ b/hw/pci/Makefile.objs
+> @@ -2,8 +2,9 @@ common-obj-$(CONFIG_PCI) += pci.o pci_bridge.o
+>  common-obj-$(CONFIG_PCI) += msix.o msi.o
+>  common-obj-$(CONFIG_PCI) += shpc.o
+>  common-obj-$(CONFIG_PCI) += slotid_cap.o
+> -common-obj-$(CONFIG_PCI) += pci_host.o pcie_host.o
+> -common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
+> +common-obj-$(CONFIG_PCI) += pci_host.o
+> +common-obj-$(CONFIG_PCI_EXPRESS) += pcie.o pcie_aer.o
+> +common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
+>  
+>  common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+>  common-obj-$(CONFIG_ALL) += pci-stub.o
+> -- 
+> 2.17.1
