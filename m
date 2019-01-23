@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50011)
+Received: from eggs.gnu.org ([209.51.188.92]:49944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gmOjm-0007CI-T0
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:03:04 -0500
+	(envelope-from <david@redhat.com>) id 1gmOjp-00079o-Jn
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gmOdJ-0002d6-Lo
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:56:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gmOdD-0002Xg-R4
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:56:17 -0500
-Date: Wed, 23 Jan 2019 12:56:08 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190123125608.439c31da@w520.home>
-In-Reply-To: <f2428ca469285f98f823edf2d270ba3ff52d4582.camel@oracle.com>
-References: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
-	<b6e8edb21e6cc5f616383cb733c2d5f75d89953e.1548266832.git-series.knut.omang@oracle.com>
-	<20190123120422.36273dd1@w520.home>
-	<f2428ca469285f98f823edf2d270ba3ff52d4582.camel@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] pcie: Add a simple PCIe ACS (Access
- Control Services) helper function
+	(envelope-from <david@redhat.com>) id 1gmOcn-0002Lx-E8
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:55:50 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 23 Jan 2019 20:55:21 +0100
+Message-Id: <20190123195527.29575-4-david@redhat.com>
+In-Reply-To: <20190123195527.29575-1-david@redhat.com>
+References: <20190123195527.29575-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH RFCv2 3/9] qdev: Provide
+ qdev_get_bus_hotplug_handler()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,117 +20,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Knut Omang <knut.omang@oracle.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, qemu-devel@nongnu.org, Tal Attaly <talat@mellanox.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On Wed, 23 Jan 2019 20:46:14 +0100
-Knut Omang <knut.omang@oracle.com> wrote:
+Let's use a wrapper instead of looking it up manually. This function can
+than be reused when we explicitly want to have the bus hotplug handler
+(e.g. when the bus hotplug handler was overwritten by the machine
+hotplug handler).
 
-> On Wed, 2019-01-23 at 12:04 -0700, Alex Williamson wrote:
-> > On Wed, 23 Jan 2019 19:27:59 +0100
-> > Knut Omang <knut.omang@oracle.com> wrote:
-> >   
-> > > Add a helper function to add PCIe capability for Access Control Services (ACS)
-> > > ACS support in the associated root port is a prerequisite to be able to do useful
-> > > passthrough with VFIO without Alex Williamson's pcie_acs_override kernel patch.  
-> > 
-> > Define "useful".  We can certainly still assign single function PFs to
-> > an L2 guest, or multi-function so long as all the functions are
-> > assigned.  I won't deny that it's problematic, but it's a virtual
-> > topology that can be adjusted, so I think this is overstating things a
-> > bit.
-> >   
-> > > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > > ---
-> > >  hw/pci/pcie.c              | 14 ++++++++++++++
-> > >  include/hw/pci/pcie.h      |  1 +
-> > >  include/hw/pci/pcie_regs.h |  4 ++++
-> > >  3 files changed, 19 insertions(+)
-> > > 
-> > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> > > index 230478f..18feff5 100644
-> > > --- a/hw/pci/pcie.c
-> > > +++ b/hw/pci/pcie.c
-> > > @@ -906,3 +906,17 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
-> > >  
-> > >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
-> > >  }
-> > > +
-> > > +/* Add an ACS (Access Control Services) capability */
-> > > +void pcie_acs_init(PCIDevice *dev, uint16_t offset, uint8_t egress_ctrl_vec_sz)
-> > > +{
-> > > +    int ectrl_words = (egress_ctrl_vec_sz + 31) & ~31;
-> > > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER,
-> > > +                        offset, PCI_ACS_SIZEOF + ectrl_words);  
-> > 
-> > The egress control vector is only valid if the egress control
-> > capability is enabled, which is not set below, so this just seems to
-> > waste config space and introduces a meaningless function arg.  
-> 
-> I think my intention way back when I implemented this was to provide it as a skeleton
-> for further detailing later, I use it with ectrl_words = 0 in the root port.
-> 
-> > > +    pci_set_word(dev->config + offset + PCI_ACS_CAP,
-> > > +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);  
-> > 
-> > Some of these bits are only valid for downstream ports, it would
-> > violate the spec to set them on and endpoint.  
-> 
-> I must admit I haven't really dived deep here - I just set the cap bits that one of my
-> servers sets for it's root ports - this is the one I used as model:
-> 
-> 00:02.0 PCI bridge: Intel Corporation 5520/5500/X58 I/O Hub PCI Express Root Port 1 (rev
-> 22) (prog-if 00 [Normal decode])
-> 00:02.0 0604: 8086:3409 (rev 22)
-> 
-> > > +    pci_set_word(dev->config + offset + PCI_ACS_CTRL,
-> > > +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);  
-> > 
-> > The default values of the control register bits is zero, so we
-> > shouldn't be setting it here and we should have a reset hook to clear
-> > it.  
-> 
-> I agree - I'll implement it,
-> thanks!
-> 
-> Knut
-> 
-> >   
-> > > +    /* Make CTRL register writable */
-> > > +    memset(dev->wmask + offset + PCI_ACS_CTRL, 0xff, 2);
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/core/qdev.c         | 10 +++++++++-
+ include/hw/qdev-core.h |  1 +
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-While you're at it, it doesn't make sense to set unimplemented control
-bits as writable, this should match the bits set in the capabilities
-register.  Thanks,
-
-Alex
-
-> > > +}
-> > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > > index 5b82a0d..c2da148 100644
-> > > --- a/include/hw/pci/pcie.h
-> > > +++ b/include/hw/pci/pcie.h
-> > > @@ -129,6 +129,7 @@ void pcie_add_capability(PCIDevice *dev,
-> > >  void pcie_sync_bridge_lnk(PCIDevice *dev);
-> > >  
-> > >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> > > +void pcie_acs_init(PCIDevice *dev, uint16_t offset, uint8_t egress_ctrl_vec_sz);
-> > >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
-> > >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
-> > >  
-> > > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
-> > > index ad4e780..5e7409c 100644
-> > > --- a/include/hw/pci/pcie_regs.h
-> > > +++ b/include/hw/pci/pcie_regs.h
-> > > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
-> > >                                           PCI_ERR_COR_INTERNAL |         \
-> > >                                           PCI_ERR_COR_HL_OVERFLOW)
-> > >  
-> > > +/* ACS */
-> > > +#define PCI_ACS_VER			0x2
-> > > +#define PCI_ACS_SIZEOF                  8
-> > > +
-> > >  #endif /* QEMU_PCIE_REGS_H */  
-> >   
-> 
-> 
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 7ad45c0bd6..e2207d77a4 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+     return NULL;
+ }
+ 
++HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
++{
++    if (dev->parent_bus) {
++        return dev->parent_bus->hotplug_handler;
++    }
++    return NULL;
++}
++
+ HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+ {
+     HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+ 
+     if (hotplug_ctrl == NULL && dev->parent_bus) {
+-        hotplug_ctrl = dev->parent_bus->hotplug_handler;
++        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
+     }
+     return hotplug_ctrl;
+ }
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 9081fb0030..cb0ec63c2d 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -280,6 +280,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
+ void qdev_init_nofail(DeviceState *dev);
+ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+                                  int required_for_version);
++HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+ /**
+  * qdev_get_hotplug_handler: Get handler responsible for device wiring
+-- 
+2.17.2
