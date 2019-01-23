@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46344)
+Received: from eggs.gnu.org ([209.51.188.92]:46390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lb-00023q-8u
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:53 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lc-00023t-5Q
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000Cl-BD
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:51 -0500
-Received: from mga07.intel.com ([134.134.136.100]:14705)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000Bk-82
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:52 -0500
+Received: from mga04.intel.com ([192.55.52.120]:51915)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gm8lJ-0008IL-Kb
+	id 1gm8l3-0007y8-D6
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:47 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Wed, 23 Jan 2019 10:59:53 +0800
-Message-Id: <5db91f1f6d25bcb040208e1228e4035c7bae79ce.1548136274.git.yi.z.zhang@linux.intel.com>
+Date: Wed, 23 Jan 2019 10:59:37 +0800
+Message-Id: <b1c0ccd8b18467b6df33e90c8606b184ed866251.1548136274.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V10 3/4] hostmem: add more information in error
- messages
+Subject: [Qemu-devel] [PATCH V10 1/4] util/mmap-alloc: switch 'shared' to
+ 'flags' parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +30,144 @@ Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang 
 
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-When there are multiple memory backends in use, including the object type
-name and the property name in the error message can help users to locate
-the error.
+As more flag parameters besides the existing 'shared' are going to be
+added to qemu_ram_mmap() and qemu_ram_alloc_from_{file,fd}(), let's
+switch 'shared' to a 'flags' parameter in advance, so as to ease the
+further additions.
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- backends/hostmem-file.c | 6 ++++--
- backends/hostmem.c      | 8 +++++---
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ exec.c                    |  7 ++++---
+ include/qemu/mmap-alloc.h | 19 ++++++++++++++++++-
+ util/mmap-alloc.c         |  8 +++++---
+ util/oslib-posix.c        |  9 ++++++++-
+ 4 files changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index e640749..0dd7a90 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -82,7 +82,8 @@ static void set_mem_path(Object *o, const char *str, Error **errp)
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(errp, "cannot change property value");
-+        error_setg(errp, "cannot change property 'mem-path' of %s",
-+                   object_get_typename(o));
-         return;
-     }
-     g_free(fb->mem_path);
-@@ -120,7 +121,8 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
-     uint64_t val;
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property value");
-+        error_setg(&local_err, "cannot change property '%s' of %s",
-+                   name, object_get_typename(o));
-         goto out;
+diff --git a/exec.c b/exec.c
+index bb6170d..e92a7da 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1810,6 +1810,7 @@ static void *file_ram_alloc(RAMBlock *block,
+                             ram_addr_t memory,
+                             int fd,
+                             bool truncate,
++                            uint32_t flags,
+                             Error **errp)
+ {
+     void *area;
+@@ -1859,8 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
+         perror("ftruncate");
      }
  
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 1a89342..e2bcf9f 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -47,7 +47,8 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-     uint64_t value;
+-    area = qemu_ram_mmap(fd, memory, block->mr->align,
+-                         block->flags & RAM_SHARED);
++    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
+     if (area == MAP_FAILED) {
+         error_setg_errno(errp, errno,
+                          "unable to map backing store for guest RAM");
+@@ -2279,7 +2279,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->used_length = size;
+     new_block->max_length = size;
+     new_block->flags = ram_flags;
+-    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
++    new_block->host = file_ram_alloc(new_block, size, fd, !file_size,
++            ram_flags, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+         return NULL;
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index 50385e3..6fe6ed4 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -7,7 +7,24 @@ size_t qemu_fd_getpagesize(int fd);
  
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property value");
-+        error_setg(&local_err, "cannot change property %s of %s ",
-+                   name, object_get_typename(obj));
-         goto out;
-     }
+ size_t qemu_mempath_getpagesize(const char *mem_path);
  
-@@ -56,8 +57,9 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-         goto out;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
--                   PRIu64 "'", object_get_typename(obj), name, value);
-+        error_setg(&local_err,
-+                   "property '%s' of %s doesn't take value '%" PRIu64 "'",
-+                   name, object_get_typename(obj), value);
-         goto out;
-     }
-     backend->size = value;
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
++/**
++ * qemu_ram_mmap: mmap the specified file or device.
++ *
++ * Parameters:
++ *  @fd: the file or the device to mmap
++ *  @size: the number of bytes to be mmaped
++ *  @align: if not zero, specify the alignment of the starting mapping address;
++ *          otherwise, the alignment in use will be determined by QEMU.
++ *  @flags: specifies additional properties of the mapping, which can be one or
++ *          bit-or of following values
++ *          - RAM_SHARED: mmap with MAP_SHARED flag
++ *          Other bits are ignored.
++ *
++ * Return:
++ *  On success, return a pointer to the mapped area.
++ *  On failure, return MAP_FAILED.
++ */
++void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags);
+ 
+ void qemu_ram_munmap(void *ptr, size_t size);
+ 
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index fd329ec..8f0a740 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/mmap-alloc.h"
+ #include "qemu/host-utils.h"
++#include "exec/memory.h"
+ 
+ #define HUGETLBFS_MAGIC       0x958458f6
+ 
+@@ -75,7 +76,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+     return getpagesize();
+ }
+ 
+-void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
++void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+ {
+     /*
+      * Note: this always allocates at least one extra page of virtual address
+@@ -92,11 +93,12 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+      * anonymous memory is OK.
+      */
+     int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
+-    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+-    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
++    int mmap_flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
++    void *ptr = mmap(0, total, PROT_NONE, mmap_flags | MAP_PRIVATE, anonfd, 0);
+ #else
+     void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+ #endif
++    bool shared = flags & RAM_SHARED;
+     size_t offset;
+     void *ptr1;
+ 
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index fbd0dc8..75a0171 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -54,6 +54,7 @@
+ #endif
+ 
+ #include "qemu/mmap-alloc.h"
++#include "exec/memory.h"
+ 
+ #ifdef CONFIG_DEBUG_STACK_USAGE
+ #include "qemu/error-report.h"
+@@ -203,7 +204,13 @@ void *qemu_memalign(size_t alignment, size_t size)
+ void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+ {
+     size_t align = QEMU_VMALLOC_ALIGN;
+-    void *ptr = qemu_ram_mmap(-1, size, align, shared);
++    uint32_t flags = 0;
++    void *ptr;
++
++    if (shared) {
++        flags = RAM_SHARED;
++    }
++    ptr = qemu_ram_mmap(-1, size, align, flags);
+ 
+     if (ptr == MAP_FAILED) {
+         return NULL;
 -- 
 2.7.4
