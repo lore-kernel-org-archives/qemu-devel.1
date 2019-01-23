@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52850)
+Received: from eggs.gnu.org ([209.51.188.92]:54871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIWv-0001yE-MH
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:25:22 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gmIcU-0007Dg-Rr
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIIo-000550-Mv
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:10:48 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 Jan 2019 13:10:32 +0000
-Message-ID: <2436ebfb-9b1c-b88f-3512-5187f34cdf69@virtuozzo.com>
-References: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1548244464-633186-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7E02B34353D33C4D837DB6337591839B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pasic@linux.ibm.com>) id 1gmIcT-0007oZ-29
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:31:06 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53898
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gmIcS-0007o3-8i
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:31:04 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0NDUSHw094379
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 08:31:03 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q6r0hkcjj-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 08:31:03 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 23 Jan 2019 13:30:57 -0000
+Date: Wed, 23 Jan 2019 14:30:51 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190123112112.7822b237.cohuck@redhat.com>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<20190122193346.4e23e018@oc2783563651>
+	<20190123112112.7822b237.cohuck@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] Stream block job involves
- copy-on-read filter
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190123143051.2610e590@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +43,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, qemu-s390x@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-MjMuMDEuMjAxOSAxNDo1NCwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSBjb3B5LW9u
-LXJlYWQgZmlsdGVyIGRyaXZlciBpcyBhcHBsaWVkIHRvIGJsb2NrLXN0cmVhbSBvcGVyYXRpb25z
-Lg0KPiBUaGUgJ3Rlc3Rfc3RyZWFtX3BhcmFsbGVsJyBpbiB0aGUgZmlsZSB0ZXN0cy9xZW11LWlv
-dGVzdHMvMDMwIHJ1bnMNCj4gam9icyB0aGF0IHVzZSBub2RlcyBmb3Igc3RyZWFtaW5nIGluIHBh
-cmFsbGVsIHRocm91Z2ggdGhlIGJhY2tpbmcgY2hhaW4uDQo+IFdlJ3ZlIGdvdCBmaWx0ZXJzIGJl
-aW5nIGluc2VydGVkIHRvIGFuZCByZW1vdmVkIGZyb20gdGhlIGJhY2tpbmcgY2hhaW4NCj4gd2hp
-bGUgam9icyBhcmUgcnVubmluZy4gQXMgYSByZXN1bHQsIGEgZmlsdGVyIG5vZGUgbWF5IGJlIHBh
-c3NlZCBhcyB0aGUNCj4gJ2Jhc2UnIHBhcmFtZXRlciB0byB0aGUgc3RyZWFtX3N0YXJ0KCkgZnVu
-Y3Rpb24gd2hlbiB0aGUgYmFzZSBub2RlIG5hbWUNCj4gaXMgbm90IHNwZWNpZmllZCAodGhlIGJh
-c2Ugbm9kZSBpcyBpZGVudGlmaWVkIGJ5IGl0cyBmaWxlIG5hbWUgd2hpY2ggaXMNCj4gdGhlIHNh
-bWUgdG8gdGhlIHJlbGF0ZWQgZmlsdGVyIG5vZGUpLg0KPiBBbm90aGVyIGlzc3VlIGlzIHRoYXQg
-YSBmdW5jdGlvbiBrZWVwcyB0aGUgcG9pbnRlciB0byB0aGUgZmlsdGVyIEJEUw0KPiBvYmplY3Qg
-dGhhdCBjYW4gYmUgcmVwbGFjZWQgYW5kIGRlbGV0ZWQgYWZ0ZXIgdGhlIGNvLXJvdXRpbmUgc3dp
-dGNoLg0KPiBGb3IgZXhhbXBsZSwgdGhlIGZ1bmN0aW9uIGJhY2tpbmdfYnMoKSByZXR1cm5zIHRo
-ZSBwb2ludGVyIHRvIHRoZQ0KPiBiYWNraW5nIEJEUyBhbmQgdGhlIEJEUyByZWZlcmVuY2UgY291
-bnRlciBpcyBub3QgaW5jcmVtZW50ZWQuDQo+IEEgc29sdXRpb24gKG9yIHdvcmthcm91bmQpIG1h
-ZGUgd2l0aCB0aGUgZ2l2ZW4gcGF0Y2ggZm9yIGJsb2NrLXN0cmVhbQ0KPiBqb2IgaGVscHMgdG8g
-cGFzcyBhbGwgdGhlIGlvdGVzdHMgaW4gdGhlIGZpbGUgdGVzdHMvcWVtdS1pb3Rlc3RzLzAzMC4N
-Cj4gQW55IHBpZWNlIG9mIGFkdmljZSBob3cgdG8gYW1lbmQgdGhlIHNvbHV0aW9uIHdpbGwgYmUg
-YXBwcmVjaWF0ZWQuDQo+IEkgYW0gbG9va2luZyBmb3J3YXJkIHRvIGhlYXJpbmcgZnJvbSB5b3Uu
-DQoNCg0KU28sIGluIHNob3J0LCB3aGVuIGZpbHRlcnMgY29tZXMgdG8gbm9kZS1ncmFwaCwgd2Ug
-aGF2ZSB0d28gcHJvYmxlbXMgd2l0aCBzdHJlYW0gam9iOg0KDQoxLiBTZWFyY2hpbmcgbm9kZSBi
-eSBmaWxlbmFtZSB3b3JrcyBiYWQuIEl0IG1heSAoYW5kIEkgdGhpbmssIHNob3VsZCkgYmUgd29y
-a2Fyb3VuZGVkDQpieSB1c2luZyBub2RlLW5hbWVzIGFuZCBvbmx5IG5vZGUtbmFtZXMgdG8gc2Vs
-ZWN0IHRvcCBhbmQgYmFzZSBub2RlLi4NCkJ1dCBzaG91bGQgd2UsIGFuZCBob3cgdG8gc3VwcG9y
-dCBvbGQgc2NlbmFyaW9zIHdpdGggc2VsZWN0aW5nIG5vZGVzIGJ5IGZpbGVuYW1lcz8NCg0KMi4g
-ImJhc2UiIHdvcmtzIGJhZC4gQWN0dWFsbHksIGpvYiBkb24ndCBvd24gYmFzZSBub2RlLCBzbyBp
-dCdzIGlsbGVnYWwgdG8ga2VlcCBwb2ludGVyDQp0byBpdC4gQmFzZSBtYXkgY2hhbmdlIGR1cmlu
-ZyB0aGUgam9iLg0KU28gdGhlIGJlc3Qgb3B0aW9uLCB3b3VsZCBiZSB0byB1c2UgImJvdHRvbS1u
-b2RlIiBjb25jZXB0IGluc3RlYWQgb2YgImJhc2UiLiBJZiB3ZSBkb24ndCB3YW50IHRvDQpjaGFu
-Z2UgcW1wIGludGVyZmFjZSwgd2Ugc2hvdWxkIGNhbGN1bGF0ZSBib3R0b20tbm9kZSBmcm9tIGJh
-c2UgYXQgYmxvY2stam9iIGNyZWF0aW9uIHRpbWUsDQpiZWZvcmUgYW55IGNvbnRleHQgc3dpdGNo
-LCBhbmQga2VlcCBwb2ludGVyIHRvIGJvdHRvbS1ub2RlLCBpbnN0ZWFkIG9mIGJhc2UuDQpBbHNv
-LCB3ZSBzaG91bGQgcmV3cml0ZSBiZHJ2X2Jsb2NrX3N0YXR1cyB0byBzdXBwb3J0IGJvdHRvbV9u
-b2RlIGluc3RlYWQgb2YgYmFzZSwgYXMgYWdhaW4sDQppZiBjYWxsZXIgb3ducyBvbmx5IHRvcCBh
-bmQgaW50ZXJtZWRpYXRlIG5vZGVzLCBiYXNlIG1heSBjaGFuZ2UgZHVyaW5nIGJsb2NrX3N0YXR1
-cyBjYWxjdWxhdGlvbi4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, 23 Jan 2019 11:21:12 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Tue, 22 Jan 2019 19:33:46 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Mon, 21 Jan 2019 12:03:51 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> > 
+> > > --- a/drivers/s390/cio/vfio_ccw_private.h
+> > > +++ b/drivers/s390/cio/vfio_ccw_private.h
+> > > @@ -28,6 +28,7 @@
+> > >   * @mdev: pointer to the mediated device
+> > >   * @nb: notifier for vfio events
+> > >   * @io_region: MMIO region to input/output I/O arguments/results
+> > > + * @io_mutex: protect against concurrent update of I/O structures  
+> > 
+> > We could be a bit more specific about what does this mutex guard.
+> > Is it only io_region, or cp, irb and the new regions a well? ->state does
+> > not seem to be covered, but should need some sort of synchronisation
+> > too, or?
+> 
+> I'm not sure. IIRC Pierre had some ideas about locking in the fsm?
+> 
+
+Yes there was something. I usually do review by sanity checking the
+resulting code. IMHO the fsm stuff is broken now and differently broken
+after this series. If we don't want to fix what we are touching, maybe a
+pointing out ignored problems in patch descriptions and a
+minimal-invasive approach could help ease review.
+
+Regards,
+Halil
+
+> > 
+> > >   * @cp: channel program for the current I/O operation
+> > >   * @irb: irb info received from interrupt
+> > >   * @scsw: scsw info
+> > > @@ -42,6 +43,7 @@ struct vfio_ccw_private {
+> > >  	struct mdev_device	*mdev;
+> > >  	struct notifier_block	nb;
+> > >  	struct ccw_io_region	*io_region;
+> > > +	struct mutex		io_mutex;
+> > >  
+> > >  	struct channel_program	cp;
+> > >  	struct irb		irb;
+> > > --   
+> > 
+> 
+> 
