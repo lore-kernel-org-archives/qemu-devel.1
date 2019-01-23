@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54283)
+Received: from eggs.gnu.org ([209.51.188.92]:54255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXP-00026x-Su
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:46 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXP-000266-4V
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXO-0007gk-5P
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXN-0007gA-Vk
 	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:56786 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:56741 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gmGXM-0007dF-0O
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:41 -0500
+	id 1gmGXL-0007ca-W2
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:40 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 23 Jan 2019 12:16:00 +0100
-Message-Id: <1548242160-16039-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 23 Jan 2019 12:15:56 +0100
+Message-Id: <1548242160-16039-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 9/9] MAINTAINERS: Update MIPS sections
+Subject: [Qemu-devel] [PATCH v2 5/9] target/mips: Extend gen_scwp()
+ functionality to support EVA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +30,56 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Remove Stefan Markovic as a reviewer for MIPS directories and
-files, as he left Wave Computing.
+Extend gen_scwp() functionality to support EVA by adding an
+additional argument, modify internals of the function to handle
+new functionality, and accordingly change its invocations.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- MAINTAINERS | 9 ---------
- 1 file changed, 9 deletions(-)
+ target/mips/translate.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index af339b8..060db23 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -206,7 +206,6 @@ MIPS
- M: Aurelien Jarno <aurelien@aurel32.net>
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/
- F: default-configs/*mips*
-@@ -365,7 +364,6 @@ F: target/arm/kvm.c
- MIPS
- M: James Hogan <jhogan@kernel.org>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/kvm.c
-=20
-@@ -890,7 +888,6 @@ MIPS Machines
- Jazz
- M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_jazz.c
- F: hw/display/jazz_led.c
-@@ -899,14 +896,12 @@ F: hw/dma/rc4030.c
- Malta
- M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_malta.c
-=20
- Mipssim
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_mipssim.c
- F: hw/net/mipsnet.c
-@@ -914,14 +909,12 @@ F: hw/net/mipsnet.c
- R4000
- M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_r4k.c
-=20
- Fulong 2E
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
- F: hw/isa/vt82c686.c
-@@ -931,7 +924,6 @@ F: include/hw/isa/vt82c686.h
- Boston
- M: Paul Burton <pburton@wavecomp.com>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
-@@ -2203,7 +2195,6 @@ F: disas/i386.c
- MIPS target
- M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
--R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: tcg/mips/
- F: disas/mips.c
---=20
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index b362b03..aaf7dff 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -3714,7 +3714,7 @@ static void gen_st_cond (DisasContext *ctx, uint32_t opc, int rt,
+ }
+ 
+ static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
+-                    uint32_t reg1, uint32_t reg2)
++                    uint32_t reg1, uint32_t reg2, bool eva)
+ {
+     TCGv taddr = tcg_temp_local_new();
+     TCGv lladdr = tcg_temp_local_new();
+@@ -3742,7 +3742,7 @@ static void gen_scwp(DisasContext *ctx, uint32_t base, int16_t offset,
+ 
+     tcg_gen_ld_i64(llval, cpu_env, offsetof(CPUMIPSState, llval_wp));
+     tcg_gen_atomic_cmpxchg_i64(val, taddr, llval, tval,
+-                               ctx->mem_idx, MO_64);
++                               eva ? MIPS_HFLAG_UM : ctx->mem_idx, MO_64);
+     if (reg1 != 0) {
+         tcg_gen_movi_tl(cpu_gpr[reg1], 1);
+     }
+@@ -21550,7 +21550,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+                         break;
+                     case NM_SCWP:
+                         check_xnp(ctx);
+-                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
++                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5),
++                                 false);
+                         break;
+                     }
+                     break;
+@@ -21654,7 +21655,8 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+                         check_xnp(ctx);
+                         check_eva(ctx);
+                         check_cp0_enabled(ctx);
+-                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5));
++                        gen_scwp(ctx, rs, 0, rt, extract32(ctx->opcode, 3, 5),
++                                 true);
+                         break;
+                     default:
+                         generate_exception_end(ctx, EXCP_RI);
+-- 
 2.7.4
