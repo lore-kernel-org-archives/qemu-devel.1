@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53234)
+Received: from eggs.gnu.org ([209.51.188.92]:59403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gm933-00027G-Kb
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:17:54 -0500
+	(envelope-from <mst@redhat.com>) id 1gm9bl-0007gj-0F
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gm932-0003Rj-G8
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:17:53 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43040)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gm932-0003QQ-3S
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:17:52 -0500
-Received: by mail-pl1-x642.google.com with SMTP id gn14so384987plb.10
-	for <qemu-devel@nongnu.org>; Tue, 22 Jan 2019 19:17:51 -0800 (PST)
-References: <20190121131602.55003-1-ysato@users.sourceforge.jp>
-	<20190121131602.55003-2-ysato@users.sourceforge.jp>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5d885fe9-1fe8-86cc-be2d-e1f182ef13bf@linaro.org>
-Date: Tue, 22 Jan 2019 19:17:46 -0800
+	(envelope-from <mst@redhat.com>) id 1gm9bi-0005ly-LZ
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gm9bi-0005lP-D7
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 22:53:42 -0500
+Date: Tue, 22 Jan 2019 22:53:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190122224943-mutt-send-email-mst@kernel.org>
+References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
+	<20190122220046-mutt-send-email-mst@kernel.org>
+	<20190123031007.GA41033@tiger-server>
 MIME-Version: 1.0
-In-Reply-To: <20190121131602.55003-2-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 01/11] TCG translation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190123031007.GA41033@tiger-server>
+Subject: Re: [Qemu-devel] [PATCH V10 0/4] support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,227 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On 1/21/19 5:15 AM, Yoshinori Sato wrote:
-> +/* PSW condition operation */
-> +typedef struct {
-> +    TCGv op_mode;
-> +    TCGv op_a1[13];
-> +    TCGv op_a2[13];
-> +    TCGv op_r[13];
-> +} CCOP;
-> +CCOP ccop;
+On Wed, Jan 23, 2019 at 11:10:07AM +0800, Yi Zhang wrote:
+> On 2019-01-22 at 22:01:58 -0500, Michael S. Tsirkin wrote:
+> > On Wed, Jan 23, 2019 at 10:59:27AM +0800, Zhang, Yi wrote:
+> > > From: "Zhang,Yi" <yi.z.zhang@linux.intel.com>
+> > > 
+> > > Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+> > > guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+> > > files on ext4/xfs file system mounted with '-o dax').
+> > > 
+> > > A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+> > >     https://patchwork.kernel.org/patch/10028151/
+> > > 
+> > > In order to make sure that the file metadata is in sync after a fault 
+> > > while we are writing a shared DAX supporting backend files, this
+> > > patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+> > > 
+> > > As the DAX vs DMA truncated issue was solved, we refined the code and
+> > > send out this feature for the v5 version.
+> > > 
+> > > We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
+> > > 'share=on' & 'pmem=on'. 
+> > > Or QEMU will not pass this flag to mmap(2)
+> > How was this patch tested? Given the previous version apparently
+> > passed the combination of flags ignored by Linux,
+> > enquiring minds want to know.
+> Ah. Sorry, We Have missed the flag MAP_SHARED_VALIDATE in V9, V8 and previous
+> are tested. already fixed in the 2/4.
 
-Why does this have different array sizes than cpu.h?
+Could you please include the information: which configurations were
+tested and how?
 
-Indeed, why does this have array sizes at all?  I am confused by your method of
-flags generation.  This would be improved with comments, at least.  I suspect
-that this is overly complicated and should be simplified to a single set of
-variables, like target/i386 or target/s390x.
-
-But I wonder if it might be least complicated, at least to start, if you just
-explicitly compute each flag, like target/arm.
-
-Note that computation need not be expensive.  Indeed, the Z and S flags can
-generally be "computed" with a single move, if we define the representations as
-env->psw_z == 0 and env->psw_s < 0.
-
-> +DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
-> +DEF_HELPER_1(raise_access_fault, noreturn, env)
-> +DEF_HELPER_1(raise_privilege_violation, noreturn, env)
-> +DEF_HELPER_1(wait, noreturn, env)
-> +DEF_HELPER_1(debug, noreturn, env)
-> +DEF_HELPER_2(rxint, noreturn, env, i32)
-> +DEF_HELPER_1(rxbrk, noreturn, env)
-> +DEF_HELPER_FLAGS_4(floatop, TCG_CALL_NO_WG, f32, env, i32, f32, f32)
-> +DEF_HELPER_2(to_fpsw, void, env, i32)
-> +DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
-> +DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
-> +DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
-> +DEF_HELPER_2(racw, void, env, i32)
-> +DEF_HELPER_1(update_psw, void, env)
-> +DEF_HELPER_1(psw_c, i32, env)
-> +DEF_HELPER_1(psw_s, i32, env)
-> +DEF_HELPER_1(psw_o, i32, env)
-> +DEF_HELPER_3(mvtc, void, env, i32, i32)
-> +DEF_HELPER_2(mvfc, i32, env, i32)
-> +DEF_HELPER_2(cond, i32, env, i32)
-> +DEF_HELPER_1(unpack_psw, void, env)
-
-Should fill in the flags for all of the non-noreturn helpers.
-
-> +static uint32_t psw_z(CPURXState *env)
-> +{
-> +    int m = (env->op_mode >> 4) & 0x000f;
-> +    if (m == RX_PSW_OP_NONE)
-> +        return env->psw_z;
-
-./scripts/checkpatch.pl should have given a diagnostic for the lack of braces here.
-
-> +void helper_update_psw(CPURXState *env)
-> +{
-> +    struct {
-> +        uint32_t *p;
-> +        uint32_t (*fn)(CPURXState *);
-> +    } const update_proc[] = {
-> +        {&env->psw_c, psw_c},
-> +        {&env->psw_z, psw_z},
-> +        {&env->psw_s, psw_s},
-> +        {&env->psw_o, psw_o},
-> +    };
-> +    int i;
-> +
-> +    for (i = 0; i < 4; i++) {
-> +        *(update_proc[i].p) = update_proc[i].fn(env);
-> +    }
-> +    g_assert((env->op_mode & 0xffff) == 0);
-> +}
-
-All of the helpers already update the variables.  This should simplify to
-
-void helper_update_psw(CPURXState *env)
-{
-  psw_c(env);
-  psw_z(env);
-  psw_s(env);
-  psw_o(env);
-  assert(env->op_mode == 0);
-}
-
-> +void rx_cpu_pack_psw(CPURXState *env)
-> +{
-> +    helper_update_psw(env);
-> +    env->psw = (
-> +        (env->psw_ipl << 24) | (env->psw_pm << 20) |
-> +        (env->psw_u << 17) | (env->psw_i << 16) |
-> +        (env->psw_o << 3) | (env->psw_s << 2) |
-> +        (env->psw_z << 1) | (env->psw_c << 0));
-> +}
-
-I recommend this only return a value, and not modify state.  This is
-particularly important for debugging, where you would like to examine state
-without modifying anything.
-
-> +typedef float32 (*floatfunc)(float32 f1, float32 f2, float_status *st);
-> +float32 helper_floatop(CPURXState *env, uint32_t op,
-> +                       float32 t0, float32 t1)
-> +{
-> +    static const floatfunc fop[] = {
-> +        float32_sub,
-> +        NULL,
-> +        float32_add,
-> +        float32_mul,
-> +        float32_div,
-> +    };
-> +    int st, xcpt;
-> +    if (op != 1) {
-> +        t0 = fop[op](t0, t1, &env->fp_status);
-> +        update_fpsw(env, GETPC());
-> +    } else {
-
-I recommend that you split this into 5 different functions, one for each
-arithmetic operator and one for the comparison.
-
-> +        switch (st) {
-> +        case float_relation_unordered:
-> +            return (float32)0;
-> +        case float_relation_equal:
-> +            return (float32)1;
-> +        case float_relation_less:
-> +            return (float32)2;
-> +        }
-> +    }
-> +    return t0;
-> +}
-
-The comparison function should return uint32_t instead of values that are
-obviously not normal float32 values.
-
-> +void helper_racw(CPURXState *env, uint32_t shift)
-> +{
-> +    int64_t acc;
-> +    acc = env->acc_m;
-> +    acc = (acc << 32) | env->acc_l;
-
-I think that acc should be stored as (u)int64_t within env.
-
-> +    acc <<= shift;
-> +    acc += 0x0000000080000000LL;
-> +    if (acc > 0x00007FFF00000000LL) {
-> +        acc = 0x00007FFF00000000LL;
-> +    } else if (acc < 0xFFFF800000000000LL) {
-
-If you want a signed type, use a signed value: -0x800000000000LL.
-
-> +    psw = rx_get_psw_low(env);
-> +    psw |= (env->psw_ipl << 24) | (env->psw_pm << 20) |
-> +        (env->psw_u << 17) | (env->psw_i << 16);
-
-I think you should use your regular "get everything" helper.
-
-> +static void rx_gen_ldst(int size, int dir, TCGv reg, TCGv mem)
-> +{
-> +    static void (* const rw[])(TCGv ret, TCGv addr, int idx) = {
-> +        tcg_gen_qemu_st8, tcg_gen_qemu_ld8s,
-> +        tcg_gen_qemu_st16, tcg_gen_qemu_ld16s,
-> +        tcg_gen_qemu_st32, tcg_gen_qemu_ld32s,
-> +    };
-> +    rw[size * 2 + dir](reg, mem, 0);
-> +}
-
-Use tcg_gen_qemu_ld_i32 and tcg_gen_qemu_st_i32 instead:
-
-    if (dir) {
-        tcg_gen_qemu_ld_i32(reg, mem, 0, size | MO_SIGN | MO_TE);
-    } else {
-        tcg_gen_qemu_st_i32(reg, mem, 0, size | MO_TE);
-    }
-
-> +DEFINE_INSN(mov1_2)
-> +{
-> +    TCGv mem;
-> +    int r1, r2, dsp, dir, sz;
-> +
-> +    insn >>= 16;
-> +    sz = (insn >> 12) & 3;
-> +    dsp = ((insn >> 6) & 0x1e) | ((insn >> 3) & 1);
-> +    dsp <<= sz;
-> +    r2 = insn & 7;
-> +    r1 = (insn >> 4) & 7;
-> +    dir = (insn >> 11) & 1;
-> +
-> +    mem = tcg_temp_local_new();
-> +    tcg_gen_addi_i32(mem, cpu_regs[r1], dsp);
-> +    rx_gen_ldst(sz, dir, cpu_regs[r2], mem);
-> +    tcg_temp_free(mem);
-> +    dc->pc += 2;
-> +}
-
-Do not use tcg_temp_local_new() unless you need it to hold a value across a
-branch or label.  Use tcg_temp_new() instead.
-
-Likewise with tcg_const_local.
-
-> +static void rx_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-> +{
-> +    CPURXState *env = cs->env_ptr;
-> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-> +    uint32_t insn = 0;
-> +    int i;
-> +
-> +    for (i = 0; i < 4; i++) {
-> +        insn <<= 8;
-> +        insn |= cpu_ldub_code(env, dc->base.pc_next + i);
-> +    }
-
-You're reading 4 bytes when the insn may be only 1-2 bytes long?
-This could fail if a branch insn is placed near the end of memory.
-
-I wish Renesas has published a consolidated opcode map, because it is very hard
-to compare your decoding to the manual.  I am tempted to try to extend
-./scripts/decodetree.py to handle variable width instruction sets to see if we
-can make this process easier.
-
-
-r~
+> > 
+> > > Changes in V10:
+> > >  * 4/4: refine the document.
+> > >  * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >  * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
+> > >  * 2/4: Fix the wrong include header
+> > > 
+> > > Changes in V9:
+> > >  * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> > >  * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
+> > >  since I don't have much knowledge about the sparse feature, @Micheal Could you 
+> > >  add some documentation/commit message on this patch? Thank you very much.
+> > >  * 3/6: from 2/5: Eduardo: updated the commit message. 
+> > >  * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
+> > >  * 5/6: from 4/5: Eduardo: updated the commit message.
+> > >  * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
+> > > 
+> > > Changes in v8:
+> > >  * Micheal: 3/5, remove the duplicated define in the os_dep.h
+> > >  * Micheal: 2/5, make type define safety.
+> > >  * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+> > >  * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+> > >    MAP_SYNC only worked with pmem=on.
+> > >  * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
+> > >    all the flags in one parameter.
+> > > 
+> > > Changes in v7:
+> > >  * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+> > > 
+> > > Changes in v6:
+> > >  * Pankaj: 3/7 are squashed with 2/7
+> > >  * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+> > >  * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+> > >  * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+> > >  * Stefan, 5/7 Add missing "munmap"
+> > >  * Stefan, 2/7 refine the shared/flag.
+> > > 
+> > > Changes in v5:
+> > >  * Add patch 1 to fix a memory leak issue.
+> > >  * Refine the patch 4-6
+> > >  * Remove the patch 3 as we already change the parameter from "shared" to
+> > >    "flags"
+> > > 
+> > > Changes in v4:
+> > >  * Add patch 1-3 to switch some functions to a single 'flags'
+> > >    parameters. (Michael S. Tsirkin)
+> > >  * v3 patch 1-3 become v4 patch 4-6.
+> > >  * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+> > >    new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+> > >  * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+> > > 
+> > > Changes in v3:
+> > >  * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+> > >    cases, and add back the retry mechanism. MAP_SYNC will be ignored
+> > >    by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+> > >  * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+> > >    platforms in order to make qemu_ram_mmap() compile on those platforms.
+> > >  * Patch 2&3: include more information in error messages of
+> > >    memory-backend in hope to help user to identify the error.
+> > >    (Dr. David Alan Gilbert)
+> > >  * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+> > > 
+> > > Changes in v2:
+> > >  * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+> > >  * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+> > >    the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+> > >  * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+> > >    to osdep.h. (Michael S. Tsirkin)
+> > > 
+> > > Zhang Yi (4):
+> > >   util/mmap-alloc: switch 'shared' to 'flags' parameter
+> > >   util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+> > >   hostmem: add more information in error messages
+> > >   docs: Added MAP_SYNC documentation
+> > > 
+> > >  backends/hostmem-file.c   |  6 ++++--
+> > >  backends/hostmem.c        |  8 +++++---
+> > >  docs/nvdimm.txt           | 29 ++++++++++++++++++++++++++++-
+> > >  exec.c                    |  7 ++++---
+> > >  include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
+> > >  include/qemu/osdep.h      | 21 +++++++++++++++++++++
+> > >  qemu-options.hx           |  4 ++++
+> > >  util/mmap-alloc.c         | 15 +++++++++++----
+> > >  util/oslib-posix.c        |  9 ++++++++-
+> > >  9 files changed, 104 insertions(+), 15 deletions(-)
+> > > 
+> > > -- 
+> > > 2.7.4
