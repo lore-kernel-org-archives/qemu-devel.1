@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51496)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmGOl-0007hv-QC
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:08:48 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:51749)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gmGPi-0008LI-9O
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmGOj-00021m-9h
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:08:47 -0500
-References: <20190121134249.16615-1-david@redhat.com>
-	<20190121134249.16615-2-david@redhat.com>
-	<20190123120337.72eb7637.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4f9d9ece-a0c9-b8b8-568a-081e54c2e78a@redhat.com>
-Date: Wed, 23 Jan 2019 12:08:37 +0100
+	(envelope-from <n54@gmx.com>) id 1gmGPh-0002Wf-2v
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:45 -0500
+Received: from mout.gmx.net ([212.227.17.22]:34211)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmGPg-0002KM-Nx
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:45 -0500
+References: <20190123080005.31078-1-kraxel@redhat.com>
+	<20190123080005.31078-5-kraxel@redhat.com>
+	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+	<20190123093657.GC27270@redhat.com>
+	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
+	<20190123101238.GD27270@redhat.com>
+	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
+	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
+Date: Wed, 23 Jan 2019 12:10:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190123120337.72eb7637.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] s390x/pci: Introduce unplug
- requests and split unplug handler
+In-Reply-To: <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8"
+Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
 
-On 23.01.19 12:03, Cornelia Huck wrote:
-> On Mon, 21 Jan 2019 14:42:48 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> PCI on s390x is really weird and how it was modeled in QEMU might not have
->> been the right choice. Anyhow, right now it is the case that:
->> - Hotplugging a PCI device will silently create a zPCI device
->>   (if none is provided)
->> - Hotunplugging a zPCI device will unplug the PCI device (if any)
->> - Hotunplugging a PCI device will unplug also the zPCI device
->> As far as I can see, we can no longer change this behavior. But we
->> should fix it.
->>
->> Both device types are handled via a single hotplug handler call. This
->> is problematic for various reasons:
->> 1. Unplugging via the zPCI device allows to unplug PCI bridges as
->>    checks are not performed - bad.
-> 
-> Maybe I'm confused here, but how can a zPCI device couple with a bridge?
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
+Message-ID: <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
+ default
+References: <20190123080005.31078-1-kraxel@redhat.com>
+ <20190123080005.31078-5-kraxel@redhat.com>
+ <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+ <20190123093657.GC27270@redhat.com>
+ <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
+ <20190123101238.GD27270@redhat.com>
+ <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
+ <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+In-Reply-To: <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I was confused, bridges don't attach to a zPCI device. So this remark is
-invalid. Thanks!
+On 23.01.2019 11:59, Peter Maydell wrote:
+> On Wed, 23 Jan 2019 at 10:37, Kamil Rytarowski <n54@gmx.com> wrote:
+>> OSS is the portable UNIX audio backend. We could point some flaws in i=
+t,
+>> but it's a good enough for portable UNIX applications. The question is=
 
--- 
+>> what UNIX-like desktop OS does not implement it or removed it.
+>=20
+> If your desktop's native audio API is pulse, like Linux's often
+> is, then you want to use pulse directly, because the compat layers
+> are (or were last time I looked) not great, and typically add
+> in an extra thread and an extra layer of buffering, which means
+> more latency or more audio dropouts or both.
+>=20
+> thanks
+> -- PMM
+>=20
 
-Thanks,
+Pulseaudio uses OSS backend on NetBSD anyway and we keep an in-kernel
+mixer. So it adds nothing except additional intermediate layer.
 
-David / dhildenb
+For non-professional audio purposes OSS is good enough for such
+applications.
+
+
+--nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIS5MMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsug0QAKybE3crdovbt1TdW2i6DQUBT5RsMHZV30sR88d1
+XFg3axzhHf7s++I5AVbvfc2dYfbgtuTYpg6l2vtKIFGMNHk1wObVrEN/MLPLLQ5G
+GxwmsbOvyfqCV5XYpg/KrMEv+yj7/nC6XXK5ilkJnNa+MR5f0BSLDxo5W+4XgIdi
+QLBrwV7pD1dnsiwc4/Bc92leNSW7+mI2ktwkChQeNAFKy5Uu35k9IxwWCAShv3jN
+aqFnu85S+89atzr1fnKAVlves8N3I63cmbTeMfawdgchHkkiajeSp0Z1Ddg1l4fx
+2FSNZzSDLzzFWHt5NlHgMS0Ig0eH5xbArcXFEp/aV9eThPx6mrgr2plWuRYv/llc
+eOAJHDTww4arYtfe1qK8ooxLO0ZGbtznOaZJwmhWH2j/4UmCwAjOopHD7PYR+jvo
+ijbyGg1b/f6iaoTtT3Qcfh8JIp5AR2CnOEi5FRuWvs0GBsQst4QIjxqllGZdDLu9
+zO90IQ6LVOCM/08WEUiemH8BtFaiQImlzYXHQ+ETO1iQDuhMG63NZ8LjuPA3jmMk
+e2kMxAplPwOU6PsClnzsFAXR/6Fucp5U/QnnrfciLjgxrOeihNxE+uZPhve4eazw
+WJ64C7qYl6J94vNPm43DPkedMuYubGA1V7scp/inXepB8YYFLwYewXuPvwX0g3UC
+EMH9
+=qtr5
+-----END PGP SIGNATURE-----
+
+--nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8--
