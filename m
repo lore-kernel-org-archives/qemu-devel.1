@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38024)
+Received: from eggs.gnu.org ([209.51.188.92]:38540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmKij-0008Ce-4M
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:43 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gmKkn-00014d-4E
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmKih-0006Sc-1j
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmKif-0006RT-QE
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:45:38 -0500
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<20190123065618.3520-9-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7f3ade0c-781c-e18f-ec90-ee7ef8bb10d3@redhat.com>
-Date: Wed, 23 Jan 2019 16:45:30 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gmKkm-0007sL-An
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:47:49 -0500
+References: <cover.1548171741.git.berto@igalia.com>
+	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
+	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
+	<w518szbmmw9.fsf@maestria.local.igalia.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
+Date: Wed, 23 Jan 2019 16:47:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190123065618.3520-9-yang.zhong@intel.com>
+In-Reply-To: <w518szbmmw9.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v4 08/44] hw/ppc/Makefile.objs: Build
- all boards conditinally with CONFIG_*
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
+ different iothreads sharing a blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, pbonzini@redhat.com, sameo@linux.intel.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 2019-01-23 07:55, Yang Zhong wrote:
-> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
->=20
-> CONFIG_PPC405, CONFIG_PPC440, CONFIG_MAC_OLDWORLD, CONFIG_MAX_NEWWORLD
-> and CONFIG_VIRTEX configuration options created for
-> default-configs/ppc*-softmmu.mak.
->=20
-> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/ppc-softmmu.mak |  7 ++++++-
->  hw/ppc/Makefile.objs            | 12 ++++++------
->  2 files changed, 12 insertions(+), 7 deletions(-)
->=20
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-soft=
-mmu.mak
-> index 23d871fb3e..7f80f0ccba 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -21,6 +21,10 @@ CONFIG_E500=3Dy
->  CONFIG_OPENPIC_KVM=3D$(call land,$(CONFIG_E500),$(CONFIG_KVM))
->  CONFIG_PLATFORM_BUS=3Dy
->  CONFIG_ETSEC=3Dy
-> +CONFIG_PPC405=3Dy
-> +CONFIG_PPC440=3Dy
-> +CONFIG_VIRTEX=3Dy
-> +
->  # For Sam460ex
->  CONFIG_SAM460EX=3Dy
->  CONFIG_USB_EHCI_SYSBUS=3Dy
-> @@ -34,7 +38,6 @@ CONFIG_M41T80=3Dy
->  CONFIG_VGA_CIRRUS=3Dy
-> =20
->  # For Macs
-> -CONFIG_MAC=3Dy
->  CONFIG_ESCC=3Dy
->  CONFIG_MACIO=3Dy
->  CONFIG_MACIO_GPIO=3Dy
-> @@ -50,6 +53,8 @@ CONFIG_GRACKLE_PCI=3Dy
->  CONFIG_UNIN_PCI=3Dy
->  CONFIG_DEC_PCI=3Dy
->  CONFIG_IDE_MACIO=3Dy
-> +CONFIG_MAC_OLDWORLD=3Dy
-> +CONFIG_MAC_NEWWORLD=3Dy
-> =20
->  # For PReP
->  CONFIG_PREP=3Dy
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 4e0c1c0941..2ce7973219 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -13,20 +13,20 @@ obj-y +=3D spapr_pci_vfio.o
->  endif
->  obj-$(CONFIG_PSERIES) +=3D spapr_rtas_ddw.o
->  # PowerPC 4xx boards
-> -obj-y +=3D ppc4xx_devs.o ppc405_uc.o
+On 23/01/19 16:09, Alberto Garcia wrote:
+> On Wed 23 Jan 2019 10:46:54 AM CET, Paolo Bonzini wrote:
+>> On 22/01/19 16:53, Alberto Garcia wrote:
+>>> This patch forbids attaching a disk to a SCSI device if its using a
+>>> different AioContext. Test case included.
+>>>
+>>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>>
+>> Should this be handled in common code?  However, everything else looks
+>> good.  Thanks!
+> 
+> You mean a common function with the code below?
+> 
+>>> +        ctx = blk_get_aio_context(sd->conf.blk);
+>>> +        if (ctx != s->ctx && ctx != qemu_get_aio_context()) {
+>>> +            error_setg(errp, "Cannot attach a blockdev that is using "
+>>> +                       "a different iothread");
+>>> +            return;
+>>> +        }
+> 
+> Who else would be the user?
 
-Could you please leave these two files above always enabled for now? I
-tried to make them configurable in the past already (see
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Df8567a11fb63d62644d=
-fdf
-), but there are some dependencies from the generic code to functions in
-this file which have to be solved first...
+If it isn't, probably virtio-blk should be using too.
 
-With that fixed:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-
-> -obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc405_boards.o
-> -obj-$(CONFIG_PPC4XX) +=3D ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
-> +obj-$(CONFIG_PPC405) +=3D ppc405_boards.o  ppc405_uc.o
-> +obj-$(CONFIG_PPC440) +=3D ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
-> +obj-$(CONFIG_PPC4XX) +=3D ppc4xx_pci.o ppc4xx_devs.o
->  obj-$(CONFIG_SAM460EX) +=3D sam460ex.o
->  # PReP
->  obj-$(CONFIG_PREP) +=3D prep.o
->  obj-$(CONFIG_PREP) +=3D prep_systemio.o
->  obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
->  # OldWorld PowerMac
-> -obj-$(CONFIG_MAC) +=3D mac_oldworld.o
-> +obj-$(CONFIG_MAC_OLDWORLD) +=3D mac_oldworld.o
->  # NewWorld PowerMac
-> -obj-$(CONFIG_MAC) +=3D mac_newworld.o
-> +obj-$(CONFIG_MAC_NEWWORLD) +=3D mac_newworld.o
->  # e500
->  obj-$(CONFIG_E500) +=3D e500.o mpc8544ds.o e500plat.o
->  obj-$(CONFIG_E500) +=3D mpc8544_guts.o ppce500_spin.o
->  # PowerPC 440 Xilinx ML507 reference board.
-> -obj-$(CONFIG_XILINX) +=3D virtex_ml507.o
-> +obj-$(CONFIG_VIRTEX) +=3D virtex_ml507.o
+Paolo
