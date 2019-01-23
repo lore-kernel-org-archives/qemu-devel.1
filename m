@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46372)
+Received: from eggs.gnu.org ([209.51.188.92]:46344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lb-00023r-SG
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lb-00023q-8u
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000Cg-BB
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000Cl-BD
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:51 -0500
-Received: from mga02.intel.com ([134.134.136.20]:65322)
+Received: from mga07.intel.com ([134.134.136.100]:14705)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gm8lS-00006q-U8
+	id 1gm8lJ-0008IL-Kb
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:47 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Wed, 23 Jan 2019 11:00:02 +0800
-Message-Id: <78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
+Date: Wed, 23 Jan 2019 10:59:53 +0800
+Message-Id: <5db91f1f6d25bcb040208e1228e4035c7bae79ce.1548136274.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel]  [PATCH V10 4/4] docs: Added MAP_SYNC documentation
+Subject: [Qemu-devel] [PATCH V10 3/4] hostmem: add more information in error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +30,68 @@ Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang 
 
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- docs/nvdimm.txt | 29 ++++++++++++++++++++++++++++-
- qemu-options.hx |  4 ++++
- 2 files changed, 32 insertions(+), 1 deletion(-)
+When there are multiple memory backends in use, including the object type
+name and the property name in the error message can help users to locate
+the error.
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 5f158a6..166c395 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -142,11 +142,38 @@ backend of vNVDIMM:
- Guest Data Persistence
- ----------------------
+Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ backends/hostmem-file.c | 6 ++++--
+ backends/hostmem.c      | 8 +++++---
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index e640749..0dd7a90 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -82,7 +82,8 @@ static void set_mem_path(Object *o, const char *str, Error **errp)
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
  
-+vNVDIMM is designed and implemented to guarantee the guest data
-+persistence on the backends in case of host crash or a power failures.
-+However, there are still some requirements and limitations
-+as explained below.
-+
- Though QEMU supports multiple types of vNVDIMM backends on Linux,
--currently the only one that can guarantee the guest write persistence
-+if MAP_SYNC is not supported by the host kernel and the backends,
-+the only backend that can guarantee the guest write persistence
- is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
- which all guest access do not involve any host-side kernel cache.
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(errp, "cannot change property value");
++        error_setg(errp, "cannot change property 'mem-path' of %s",
++                   object_get_typename(o));
+         return;
+     }
+     g_free(fb->mem_path);
+@@ -120,7 +121,8 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+     uint64_t val;
  
-+mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-+systems, QEMU can mmap(2) the dax backend files with MAP_SYNC, which
-+ensures filesystem metadata consistency in case of a host crash or a power
-+failure. Enabling MAP_SYNC in QEMU requires below conditions
-+
-+ - 'pmem' option of memory-backend-file is 'on':
-+   The backend is a file supporting DAX, e.g., a file on an ext4 or
-+   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
-+   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
-+   error.
-+
-+ - 'share' option of memory-backend-file is 'on':
-+   MAP_SYNC flag available only with the MAP_SHARED_VALIDATE mapping type.
-+
-+ - 'MAP_SYNC' is supported on linux kernel.(default opened since Linux 4.15)
-+
-+Otherwise, We will ignore the MAP_SYNC flag.
-+
-+For more details, please reference mmap(2) man page:
-+http://man7.org/linux/man-pages/man2/mmap.2.html.
-+
- When using other types of backends, it's suggested to set 'unarmed'
- option of '-device nvdimm' to 'on', which sets the unarmed flag of the
- guest NVDIMM region mapping structure.  This unarmed flag indicates
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08f8516..0cd41f4 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
- If @option{pmem} is set to 'on', QEMU will take necessary operations to
- guarantee the persistence of its own writes to @option{mem-path}
- (e.g. in vNVDIMM label emulation and live migration).
-+Also, we will map the backend-file with MAP_SYNC flag, which can ensure
-+the file metadata is in sync to @option{mem-path} in case of host crash
-+or a power failure. MAP_SYNC requires support from both the host kernel
-+(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property value");
++        error_setg(&local_err, "cannot change property '%s' of %s",
++                   name, object_get_typename(o));
+         goto out;
+     }
  
- @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 1a89342..e2bcf9f 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -47,7 +47,8 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
+     uint64_t value;
  
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property value");
++        error_setg(&local_err, "cannot change property %s of %s ",
++                   name, object_get_typename(obj));
+         goto out;
+     }
+ 
+@@ -56,8 +57,9 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
+         goto out;
+     }
+     if (!value) {
+-        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
+-                   PRIu64 "'", object_get_typename(obj), name, value);
++        error_setg(&local_err,
++                   "property '%s' of %s doesn't take value '%" PRIu64 "'",
++                   name, object_get_typename(obj), value);
+         goto out;
+     }
+     backend->size = value;
 -- 
 2.7.4
