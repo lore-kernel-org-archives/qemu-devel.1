@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37024)
+Received: from eggs.gnu.org ([209.51.188.92]:38769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gm5qy-0002Fc-DV
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 18:53:13 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gm5yN-0003gx-NU
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 19:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gm5qx-0004h9-0o
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 18:53:12 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gm5yL-0006QU-Qg
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 19:00:51 -0500
 MIME-Version: 1.0
-References: <20190121154928.32065-1-clg@kaod.org>
-In-Reply-To: <20190121154928.32065-1-clg@kaod.org>
+References: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
+	<20190122092909.5341-13-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190122092909.5341-13-kbastian@mail.uni-paderborn.de>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 22 Jan 2019 15:52:41 -0800
-Message-ID: <CAKmqyKM4N=4dyH2Az9s0sct3s=8Jj15W6zJM0ea6r4yA28FkAg@mail.gmail.com>
+Date: Tue, 22 Jan 2019 16:00:04 -0800
+Message-ID: <CAKmqyKO3YaSO7RsXoy9Q48oUoX8Bi_hYU+Gf-HNfakQOpwq4UQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] aspeed/smc: snoop SPI transfers to fake
- dummy cycles
+Subject: Re: [Qemu-devel] [PATCH v5 12/35] target/riscv: Convert RV32F insns
+ to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,224 +23,442 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>
+To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Mon, Jan 21, 2019 at 7:50 AM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Tue, Jan 22, 2019 at 1:52 AM Bastian Koppelmann
+<kbastian@mail.uni-paderborn.de> wrote:
 >
-> The m25p80 models dummy cycles using byte transfers. This works well
-> when the transfers are initiated by the QEMU model of a SPI controller
-> but when these are initiated by the OS, it breaks emulation.
->
-> Snoop the SPI transfer to catch commands requiring dummy cycles and
-> replace them with byte transfers compatible with the m25p80 model.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
+>  target/riscv/insn32.decode              |  35 +++
+>  target/riscv/insn_trans/trans_rvf.inc.c | 334 ++++++++++++++++++++++++
+>  target/riscv/translate.c                |   1 +
+>  3 files changed, 370 insertions(+)
+>  create mode 100644 target/riscv/insn_trans/trans_rvf.inc.c
 >
->  I have had few hacks to work around this problem, Andrew also, but I
->  think that the model for the Xilinx Zynq SPI controller has an
->  elegant solution.
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index 00b9e2d9a5..e40836bf03 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -17,12 +17,14 @@
+>  # this program.  If not, see <http://www.gnu.org/licenses/>.
 >
->  Tested with on different Linux kernels (OpenBMC, 5.0.0-rcX) and
->  different Linux drivers doing fast read SPI transfers in User
->  mode. It would be good to give the patch a try on other proprietary
->  Firmwares using the USER command mode to access the flash.
+>  # Fields:
+> +%rs3       27:5
+>  %rs2       20:5
+>  %rs1       15:5
+>  %rd        7:5
 >
->  include/hw/ssi/aspeed_smc.h |   3 +
->  hw/ssi/aspeed_smc.c         | 115 +++++++++++++++++++++++++++++++++++-
->  2 files changed, 115 insertions(+), 3 deletions(-)
+>  %sh10    20:10
+>  %csr    20:12
+> +%rm     12:3
 >
-> diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-> index b8b2dfbec280..f3909440d53c 100644
-> --- a/include/hw/ssi/aspeed_smc.h
-> +++ b/include/hw/ssi/aspeed_smc.h
-> @@ -104,6 +104,9 @@ typedef struct AspeedSMCState {
->      AddressSpace dma_as;
+>  # immediates:
+>  %imm_i    20:s12
+> @@ -50,6 +52,11 @@
+>  @atom_ld ..... aq:1 rl:1 ..... ........ ..... ....... &atomic rs2=0     %rs1 %rd
+>  @atom_st ..... aq:1 rl:1 ..... ........ ..... ....... &atomic %rs2      %rs1 %rd
 >
->      AspeedSMCFlash *flashes;
+> +@r4_rm   ..... ..  ..... ..... ... ..... ....... %rs3 %rs2 %rs1 %rm %rd
+> +@r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
+> +@r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
+> +@r2      .......   ..... ..... ... ..... ....... %rs1 %rd
 > +
-> +    uint8_t snoop_index;
-> +    uint8_t snoop_dummies;
->  } AspeedSMCState;
->
->  #endif /* ASPEED_SMC_H */
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 0dc22e44cfd4..69683aca61b7 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -166,6 +166,9 @@
->  /* Flash opcodes. */
->  #define SPI_OP_READ       0x03    /* Read data bytes (low frequency) */
->
-> +#define SNOOP_OFF         0xFF
-> +#define SNOOP_START       0x0
+>  # *** RV32I Base Instruction Set ***
+>  lui      ....................       ..... 0110111 @u
+>  auipc    ....................       ..... 0010111 @u
+> @@ -119,3 +126,31 @@ amomin_w   10000 . . ..... ..... 010 ..... 0101111 @atom_st
+>  amomax_w   10100 . . ..... ..... 010 ..... 0101111 @atom_st
+>  amominu_w  11000 . . ..... ..... 010 ..... 0101111 @atom_st
+>  amomaxu_w  11100 . . ..... ..... 010 ..... 0101111 @atom_st
 > +
->  /*
->   * Default segments mapping addresses and size for each slave per
->   * controller. These can be changed when board is initialized with the
-> @@ -587,6 +590,101 @@ static uint64_t aspeed_smc_flash_read(void *opaque,=
- hwaddr addr, unsigned size)
->      return ret;
->  }
->
+> +# *** RV32F Standard Extension ***
+> +flw        ............   ..... 010 ..... 0000111 @i
+> +fsw        .......  ..... ..... 010 ..... 0100111 @s
+> +fmadd_s    ..... 00 ..... ..... ... ..... 1000011 @r4_rm
+> +fmsub_s    ..... 00 ..... ..... ... ..... 1000111 @r4_rm
+> +fnmsub_s   ..... 00 ..... ..... ... ..... 1001011 @r4_rm
+> +fnmadd_s   ..... 00 ..... ..... ... ..... 1001111 @r4_rm
+> +fadd_s     0000000  ..... ..... ... ..... 1010011 @r_rm
+> +fsub_s     0000100  ..... ..... ... ..... 1010011 @r_rm
+> +fmul_s     0001000  ..... ..... ... ..... 1010011 @r_rm
+> +fdiv_s     0001100  ..... ..... ... ..... 1010011 @r_rm
+> +fsqrt_s    0101100  00000 ..... ... ..... 1010011 @r2_rm
+> +fsgnj_s    0010000  ..... ..... 000 ..... 1010011 @r
+> +fsgnjn_s   0010000  ..... ..... 001 ..... 1010011 @r
+> +fsgnjx_s   0010000  ..... ..... 010 ..... 1010011 @r
+> +fmin_s     0010100  ..... ..... 000 ..... 1010011 @r
+> +fmax_s     0010100  ..... ..... 001 ..... 1010011 @r
+> +fcvt_w_s   1100000  00000 ..... ... ..... 1010011 @r2_rm
+> +fcvt_wu_s  1100000  00001 ..... ... ..... 1010011 @r2_rm
+> +fmv_x_w    1110000  00000 ..... 000 ..... 1010011 @r2
+> +feq_s      1010000  ..... ..... 010 ..... 1010011 @r
+> +flt_s      1010000  ..... ..... 001 ..... 1010011 @r
+> +fle_s      1010000  ..... ..... 000 ..... 1010011 @r
+> +fclass_s   1110000  00000 ..... 001 ..... 1010011 @r2
+> +fcvt_s_w   1101000  00000 ..... ... ..... 1010011 @r2_rm
+> +fcvt_s_wu  1101000  00001 ..... ... ..... 1010011 @r2_rm
+> +fmv_w_x    1111000  00000 ..... 000 ..... 1010011 @r2
+> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+> new file mode 100644
+> index 0000000000..b101593ac4
+> --- /dev/null
+> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
+> @@ -0,0 +1,334 @@
 > +/*
-> + * TODO (clg@kaod.org): stolen from xilinx_spips.c. Should move to a
-> + * common include header.
+> + * RISC-V translation routines for the RV64F Standard Extension.
+> + *
+> + * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
+> + * Copyright (c) 2018 Peer Adelt, peer.adelt@hni.uni-paderborn.de
+> + *                    Bastian Koppelmann, kbastian@mail.uni-paderborn.de
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
 > + */
-> +typedef enum {
-> +    READ =3D 0x3,         READ_4 =3D 0x13,
-> +    FAST_READ =3D 0xb,    FAST_READ_4 =3D 0x0c,
-> +    DOR =3D 0x3b,         DOR_4 =3D 0x3c,
-> +    QOR =3D 0x6b,         QOR_4 =3D 0x6c,
-> +    DIOR =3D 0xbb,        DIOR_4 =3D 0xbc,
-> +    QIOR =3D 0xeb,        QIOR_4 =3D 0xec,
 > +
-> +    PP =3D 0x2,           PP_4 =3D 0x12,
-> +    DPP =3D 0xa2,
-> +    QPP =3D 0x32,         QPP_4 =3D 0x34,
-> +} FlashCMD;
+> +#define REQUIRE_FPU do {\
+> +    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) \
+> +        return false;                       \
+> +} while (0)
 > +
-> +static int aspeed_smc_num_dummies(uint8_t command)
+> +static bool trans_flw(DisasContext *ctx, arg_flw *a)
 > +{
-> +    switch (command) { /* check for dummies */
-> +    case READ: /* no dummy bytes/cycles */
-> +    case PP:
-> +    case DPP:
-> +    case QPP:
-> +    case READ_4:
-> +    case PP_4:
-> +    case QPP_4:
-> +        return 0;
-> +    case FAST_READ:
-> +    case DOR:
-> +    case QOR:
-> +    case DOR_4:
-> +    case QOR_4:
-> +        return 1;
-> +    case DIOR:
-> +    case FAST_READ_4:
-> +    case DIOR_4:
-> +        return 2;
-> +    case QIOR:
-> +    case QIOR_4:
-> +        return 4;
-> +    default:
-> +        return -1;
-> +    }
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
+> +    REQUIRE_FPU;
+> +    tcg_gen_addi_tl(t0, t0, a->imm);
+> +
+> +    tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
+> +    /* RISC-V requires NaN-boxing of narrower width floating point values */
+> +    tcg_gen_ori_i64(cpu_fpr[a->rd], cpu_fpr[a->rd], 0xffffffff00000000ULL);
+> +
+> +    tcg_temp_free(t0);
+> +    return true;
 > +}
 > +
-> +static bool aspeed_smc_do_snoop(AspeedSMCFlash *fl,  uint64_t data,
-> +                                unsigned size)
+> +static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
 > +{
-> +    AspeedSMCState *s =3D fl->controller;
-> +    uint8_t addr_width =3D aspeed_smc_flash_is_4byte(fl) ? 4 : 3;
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
 > +
-> +    if (s->snoop_index =3D=3D SNOOP_OFF) {
-> +        return false; /* Do nothing */
+> +    REQUIRE_FPU;
+> +    tcg_gen_addi_tl(t0, t0, a->imm);
 > +
-> +    } else if (s->snoop_index =3D=3D SNOOP_START) {
-> +        uint8_t cmd =3D data & 0xff;
-> +        int ndummies =3D aspeed_smc_num_dummies(cmd);
+> +    tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
 > +
-> +        /*
-> +         * No dummy cycles are expected with the current command. Turn
-> +         * off snooping and let the transfer proceed normally.
-> +         */
-> +        if (ndummies <=3D 0) {
-> +            s->snoop_index =3D SNOOP_OFF;
-> +            return false;
-> +        }
-> +
-> +        s->snoop_dummies =3D ndummies * 8;
-> +
-> +    } else if (s->snoop_index >=3D addr_width + 1) {
-> +
-> +        /* The SPI transfer has reached the dummy cycles sequence */
-> +        for (; s->snoop_dummies; s->snoop_dummies--) {
-> +            ssi_transfer(s->spi, s->regs[R_DUMMY_DATA] & 0xff);
-> +        }
-> +
-> +        /* If no more dummy cycles are expected, turn off snooping */
-> +        if (!s->snoop_dummies) {
-> +            s->snoop_index =3D SNOOP_OFF;
-> +        } else {
-> +            s->snoop_index +=3D size;
-> +        }
-> +
-> +        /*
-> +         * Dummy cycles have been faked already. Ignore the current
-> +         * SPI transfer
-> +         */
-> +        return true;
-> +    }
-> +
-> +    s->snoop_index +=3D size;
-> +    return false;
+> +    tcg_temp_free(t0);
+> +    return true;
 > +}
 > +
->  static void aspeed_smc_flash_write(void *opaque, hwaddr addr, uint64_t d=
-ata,
->                                     unsigned size)
+> +static bool trans_fmadd_s(DisasContext *ctx, arg_fmadd_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fmsub_s(DisasContext *ctx, arg_fmsub_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                       cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fnmsub_s(DisasContext *ctx, arg_fnmsub_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fnmsub_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fnmadd_s(DisasContext *ctx, arg_fnmadd_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fnmadd_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                        cpu_fpr[a->rs2], cpu_fpr[a->rs3]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fadd_s(DisasContext *ctx, arg_fadd_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fadd_s(cpu_fpr[a->rd], cpu_env,
+> +                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fsub_s(DisasContext *ctx, arg_fsub_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fsub_s(cpu_fpr[a->rd], cpu_env,
+> +                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fmul_s(DisasContext *ctx, arg_fmul_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fmul_s(cpu_fpr[a->rd], cpu_env,
+> +                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fdiv_s(DisasContext *ctx, arg_fdiv_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fdiv_s(cpu_fpr[a->rd], cpu_env,
+> +                      cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fsqrt_s(DisasContext *ctx, arg_fsqrt_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fsqrt_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    if (a->rs1 == a->rs2) { /* FMOV */
+> +        tcg_gen_mov_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1]);
+> +    } else { /* FSGNJ */
+> +        tcg_gen_deposit_i64(cpu_fpr[a->rd], cpu_fpr[a->rs2], cpu_fpr[a->rs1],
+> +                            0, 31);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    if (a->rs1 == a->rs2) { /* FNEG */
+> +        tcg_gen_xori_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], INT32_MIN);
+> +    } else {
+> +        TCGv_i64 t0 = tcg_temp_new_i64();
+> +        tcg_gen_not_i64(t0, cpu_fpr[a->rs2]);
+> +        tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, cpu_fpr[a->rs1], 0, 31);
+> +        tcg_temp_free_i64(t0);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    if (a->rs1 == a->rs2) { /* FABS */
+> +        tcg_gen_andi_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], ~INT32_MIN);
+> +    } else {
+> +        TCGv_i64 t0 = tcg_temp_new_i64();
+> +        tcg_gen_andi_i64(t0, cpu_fpr[a->rs2], INT32_MIN);
+> +        tcg_gen_xor_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], t0);
+> +        tcg_temp_free_i64(t0);
+> +    }
+> +    return true;
+> +}
+> +
+> +static bool trans_fmin_s(DisasContext *ctx, arg_fmin_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_helper_fmin_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                      cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fmax_s(DisasContext *ctx, arg_fmax_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    gen_helper_fmax_s(cpu_fpr[a->rd], cpu_env, cpu_fpr[a->rs1],
+> +                      cpu_fpr[a->rs2]);
+> +    return true;
+> +}
+> +
+> +static bool trans_fcvt_w_s(DisasContext *ctx, arg_fcvt_w_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a->rs1]);
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_fcvt_wu_s(DisasContext *ctx, arg_fcvt_wu_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a->rs1]);
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_fmv_x_w(DisasContext *ctx, arg_fmv_x_w *a)
+> +{
+> +    /* NOTE: This was FMV.X.S in an earlier version of the ISA spec! */
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +
+> +#if defined(TARGET_RISCV64)
+> +    tcg_gen_ext32s_tl(t0, cpu_fpr[a->rs1]);
+> +#else
+> +    tcg_gen_extrl_i64_i32(t0, cpu_fpr[a->rs1]);
+> +#endif
+> +
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_feq_s(DisasContext *ctx, arg_feq_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_helper_feq_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +    return true;
+> +}
+> +
+> +static bool trans_flt_s(DisasContext *ctx, arg_flt_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_helper_flt_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +    return true;
+> +}
+> +
+> +static bool trans_fle_s(DisasContext *ctx, arg_fle_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_helper_fle_s(t0, cpu_env, cpu_fpr[a->rs1], cpu_fpr[a->rs2]);
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +    return true;
+> +}
+> +
+> +static bool trans_fclass_s(DisasContext *ctx, arg_fclass_s *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +
+> +    gen_helper_fclass_s(t0, cpu_fpr[a->rs1]);
+> +
+> +    gen_set_gpr(a->rd, t0);
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_fcvt_s_w(DisasContext *ctx, arg_fcvt_s_w *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fcvt_s_w(cpu_fpr[a->rd], cpu_env, t0);
+> +
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_fcvt_s_wu(DisasContext *ctx, arg_fcvt_s_wu *a)
+> +{
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
+> +
+> +    gen_set_rm(ctx, a->rm);
+> +    gen_helper_fcvt_s_wu(cpu_fpr[a->rd], cpu_env, t0);
+> +
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> +
+> +static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
+> +{
+> +    /* NOTE: This was FMV.S.X in an earlier version of the ISA spec! */
+> +    REQUIRE_FPU;
+> +
+> +    TCGv t0 = tcg_temp_new();
+> +    gen_get_gpr(t0, a->rs1);
+> +
+> +#if defined(TARGET_RISCV64)
+> +    tcg_gen_mov_i64(cpu_fpr[a->rd], t0);
+> +#else
+> +    tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
+> +#endif
+> +
+> +    tcg_temp_free(t0);
+> +
+> +    return true;
+> +}
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 944836dd7c..933ca9fb69 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -1514,6 +1514,7 @@ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+>  #include "insn_trans/trans_rvi.inc.c"
+>  #include "insn_trans/trans_rvm.inc.c"
+>  #include "insn_trans/trans_rva.inc.c"
+> +#include "insn_trans/trans_rvf.inc.c"
+>
+>  static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
 >  {
-> @@ -602,6 +700,10 @@ static void aspeed_smc_flash_write(void *opaque, hwa=
-ddr addr, uint64_t data,
->
->      switch (aspeed_smc_flash_mode(fl)) {
->      case CTRL_USERMODE:
-> +        if (aspeed_smc_do_snoop(fl, data, size)) {
-> +            break;
-> +        }
-> +
->          for (i =3D 0; i < size; i++) {
->              ssi_transfer(s->spi, (data >> (8 * i)) & 0xff);
->          }
-> @@ -634,7 +736,9 @@ static const MemoryRegionOps aspeed_smc_flash_ops =3D=
- {
->
->  static void aspeed_smc_flash_update_cs(AspeedSMCFlash *fl)
->  {
-> -    const AspeedSMCState *s =3D fl->controller;
-> +    AspeedSMCState *s =3D fl->controller;
-> +
-> +    s->snoop_index =3D aspeed_smc_is_ce_stop_active(fl) ? SNOOP_OFF : SN=
-OOP_START;
->
->      qemu_set_irq(s->cs_lines[fl->id], aspeed_smc_is_ce_stop_active(fl));
->  }
-> @@ -670,6 +774,9 @@ static void aspeed_smc_reset(DeviceState *d)
->      if (s->ctrl->segments =3D=3D aspeed_segments_fmc) {
->          s->regs[s->r_conf] |=3D (CONF_FLASH_TYPE_SPI << CONF_FLASH_TYPE0=
-);
->      }
-> +
-> +    s->snoop_index =3D SNOOP_OFF;
-> +    s->snoop_dummies =3D 0;
->  }
->
->  static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int =
-size)
-> @@ -1100,10 +1207,12 @@ static void aspeed_smc_realize(DeviceState *dev, =
-Error **errp)
->
->  static const VMStateDescription vmstate_aspeed_smc =3D {
->      .name =3D "aspeed.smc",
-> -    .version_id =3D 1,
-> -    .minimum_version_id =3D 1,
-> +    .version_id =3D 2,
-> +    .minimum_version_id =3D 2,
->      .fields =3D (VMStateField[]) {
->          VMSTATE_UINT32_ARRAY(regs, AspeedSMCState, ASPEED_SMC_R_MAX),
-> +        VMSTATE_UINT8(snoop_index, AspeedSMCState),
-> +        VMSTATE_UINT8(snoop_dummies, AspeedSMCState),
->          VMSTATE_END_OF_LIST()
->      }
->  };
 > --
 > 2.20.1
 >
