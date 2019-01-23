@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50452)
+Received: from eggs.gnu.org ([209.51.188.92]:50677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gmJrn-0003KS-VB
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:51:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmJsO-0003lO-Ib
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:51:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gmJrm-00045p-Rl
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gmJrm-00043J-If
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:50:58 -0500
-Date: Wed, 23 Jan 2019 12:50:50 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190123145050.GU4136@habkost.net>
-References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
+	(envelope-from <thuth@redhat.com>) id 1gmJsM-0004U5-G3
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:51:36 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 23 Jan 2019 15:51:23 +0100
+Message-Id: <1548255083-8190-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Don't talk about the LGPL if the file is
+ licensed under the GPL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +18,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On Wed, Jan 23, 2019 at 11:00:02AM +0800, Zhang, Yi wrote:
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> 
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  docs/nvdimm.txt | 29 ++++++++++++++++++++++++++++-
->  qemu-options.hx |  4 ++++
->  2 files changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 5f158a6..166c395 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -142,11 +142,38 @@ backend of vNVDIMM:
->  Guest Data Persistence
->  ----------------------
->  
-> +vNVDIMM is designed and implemented to guarantee the guest data
-> +persistence on the backends in case of host crash or a power failures.
-> +However, there are still some requirements and limitations
-> +as explained below.
-> +
->  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> -currently the only one that can guarantee the guest write persistence
-> +if MAP_SYNC is not supported by the host kernel and the backends,
-> +the only backend that can guarantee the guest write persistence
->  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
->  which all guest access do not involve any host-side kernel cache.
->  
-> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-> +systems, QEMU can mmap(2) the dax backend files with MAP_SYNC, which
-> +ensures filesystem metadata consistency in case of a host crash or a power
-> +failure. Enabling MAP_SYNC in QEMU requires below conditions
-> +
-> + - 'pmem' option of memory-backend-file is 'on':
-> +   The backend is a file supporting DAX, e.g., a file on an ext4 or
-> +   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
-> +   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
-> +   error.
+Some files claim that the code is licensed under the GPL, but then
+suddenly suggest that the user should have a look at the LGPL.
+That's of course non-sense, replace it with the correct GPL wording
+instead.
 
-Won't this break existing configurations that work today on QEMU
-3.1.0?  Why exactly it is OK to break compatibility here?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ crypto/afsplit.c           | 11 +++++------
+ include/crypto/afsplit.h   | 11 +++++------
+ include/hw/pci-host/gpex.h |  4 ++--
+ include/hw/pci-host/q35.h  |  4 ++--
+ include/qemu/range.h       | 11 +++++------
+ target/i386/hvf/hvf.c      |  6 +++---
+ util/range.c               | 11 +++++------
+ 7 files changed, 27 insertions(+), 31 deletions(-)
 
-> +
-> + - 'share' option of memory-backend-file is 'on':
-> +   MAP_SYNC flag available only with the MAP_SHARED_VALIDATE mapping type.
-
-I don't understand what this paragraph means.
-
-> +
-> + - 'MAP_SYNC' is supported on linux kernel.(default opened since Linux 4.15)
-> +
-
-I don't understand why you are making the semantics of
-command-line options change depending on the host kernel.
-
-> +Otherwise, We will ignore the MAP_SYNC flag.
-> +
-
-See the questions I sent about supported use cases at
-<https://www.mail-archive.com/qemu-devel@nongnu.org/msg588822.html>.
-I still don't see those questions answered:
-
-] We have at least 3 different possible use cases we might need to
-] support:
-] 
-] 1) pmem=on, MAP_SYNC not desired
-] 2) pmem=on, MAP_SYNC desired but optional
-] 3) pmem=on, MAP_SYNC required, not optional
-] 
-] Which cases from the list above we need to support?
-] 
-] From the cases above, what's the expected semantics of "pmem=on"
-] with no extra options?
-
-It's not clear to me yet if you want to support use cases (1) and (2).
-
-Also, you seem to be choosing between use case (1) or (3) depending on
-the build environment instead of command-line options.  The
-meaning of command-line options must be predictable and
-unambiguous, and not depend on build time variables.
-
-
-> +For more details, please reference mmap(2) man page:
-> +http://man7.org/linux/man-pages/man2/mmap.2.html.
-> +
->  When using other types of backends, it's suggested to set 'unarmed'
->  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
->  guest NVDIMM region mapping structure.  This unarmed flag indicates
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 08f8516..0cd41f4 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
->  If @option{pmem} is set to 'on', QEMU will take necessary operations to
->  guarantee the persistence of its own writes to @option{mem-path}
->  (e.g. in vNVDIMM label emulation and live migration).
-> +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
-> +the file metadata is in sync to @option{mem-path} in case of host crash
-> +or a power failure. MAP_SYNC requires support from both the host kernel
-> +(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
->  
->  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
->  
-> -- 
-> 2.7.4
-> 
-
+diff --git a/crypto/afsplit.c b/crypto/afsplit.c
+index 825e2cf..328d68c 100644
+--- a/crypto/afsplit.c
++++ b/crypto/afsplit.c
+@@ -8,19 +8,18 @@
+  * Copyright (C) 2004, Clemens Fruhwirth <clemens@endorphin.org>
+  * Copyright (C) 2009-2012, Red Hat, Inc. All rights reserved.
+  *
+- * This library is free software; you can redistribute it and/or
++ * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation; either version 2
+  * of the License, or (at your option) any later version.
+  *
+- * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * General Public License for more details.
+  *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #include "qemu/osdep.h"
+diff --git a/include/crypto/afsplit.h b/include/crypto/afsplit.h
+index 7dd21f0..4894d64 100644
+--- a/include/crypto/afsplit.h
++++ b/include/crypto/afsplit.h
+@@ -3,19 +3,18 @@
+  *
+  * Copyright (c) 2015-2016 Red Hat, Inc.
+  *
+- * This library is free software; you can redistribute it and/or
++ * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation; either version 2
+  * of the License, or (at your option) any later version.
+  *
+- * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * General Public License for more details.
+  *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef QCRYPTO_AFSPLIT_H
+diff --git a/include/hw/pci-host/gpex.h b/include/hw/pci-host/gpex.h
+index aef38b8..2af1c4a 100644
+--- a/include/hw/pci-host/gpex.h
++++ b/include/hw/pci-host/gpex.h
+@@ -13,8 +13,8 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #ifndef HW_GPEX_H
+diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+index 8f4ddde..5ed77fa 100644
+--- a/include/hw/pci-host/q35.h
++++ b/include/hw/pci-host/q35.h
+@@ -15,8 +15,8 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>
+  */
+ 
+ #ifndef HW_Q35_H
+diff --git a/include/qemu/range.h b/include/qemu/range.h
+index ba606c6..71b8b21 100644
+--- a/include/qemu/range.h
++++ b/include/qemu/range.h
+@@ -3,19 +3,18 @@
+  *
+  * Copyright (c) 2015-2016 Red Hat, Inc.
+  *
+- * This library is free software; you can redistribute it and/or
++ * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public
+  * License as published by the Free Software Foundation; either
+  * version 2 of the License, or (at your option) any later version.
+  *
+- * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * General Public License for more details.
+  *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #ifndef QEMU_RANGE_H
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index e193022..689b585 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -13,10 +13,10 @@
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
++ * General Public License for more details.
+  *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this program; if not, see <http://www.gnu.org/licenses/>.
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  *
+  * This file contain code under public domain from the hvdos project:
+  * https://github.com/mist64/hvdos
+diff --git a/util/range.c b/util/range.c
+index 416df7c..098d9d2 100644
+--- a/util/range.c
++++ b/util/range.c
+@@ -3,19 +3,18 @@
+  *
+  * Copyright (c) 2015-2016 Red Hat, Inc.
+  *
+- * This library is free software; you can redistribute it and/or
++ * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public
+  * License as published by the Free Software Foundation; either
+  * version 2 of the License, or (at your option) any later version.
+  *
+- * This library is distributed in the hope that it will be useful,
++ * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ * General Public License for more details.
+  *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+ #include "qemu/osdep.h"
 -- 
-Eduardo
+1.8.3.1
