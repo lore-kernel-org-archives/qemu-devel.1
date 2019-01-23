@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58634)
+Received: from eggs.gnu.org ([209.51.188.92]:60626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gmIvw-00071y-Ov
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:51:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1gmJ0M-0002hM-2U
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gmIlu-0004qc-9V
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:40:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35540)
+	(envelope-from <bounces@canonical.com>) id 1gmJ0I-000506-Dp
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:55:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gmIlu-0004qE-3H
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:40:50 -0500
+	id 1gmJ0G-0004xj-IH
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:55:42 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gmIlt-0007nr-CI
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:40:49 +0000
+	id 1gmJ0B-0001Vg-Vg
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:55:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 589242E8050
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:40:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EAE432E80C3
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:55:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Jan 2019 13:34:13 -0000
+Date: Wed, 23 Jan 2019 13:48:39 -0000
 From: Shahab Vahedi <shahab.vahedi@gmail.com>
 Reply-To: Bug 1813010 <1813010@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154824790547.2554.12417850699297619175.malonedeb@wampee.canonical.com>
-Message-Id: <154825045355.30126.2855472555606117525.malone@soybean.canonical.com>
+Message-Id: <154825131953.19879.15023242227898086159.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1813010] Re: Parallel builds fail (make -j >=2)
  when using --extra-cflags "--save-temps"
@@ -39,14 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-it seems like that "-save-temps" in "cflags" is the culprit. I removed
-it and it was possible to build with 8 instances:
+putting the temporary files in object dir works as well: -save-temps=3Dobj
 
-# removed "-save-temps" from the "cflags"
+# "-save-temps=3Dobj" from the "cflags"
 > ./qemu/configure --target-list=3Driscv64-softmmu --enable-debug --extra-c=
-flags=3D'-O0 -g3' --prefix=3D/install/riscv-qemu
+flags=3D'-O0 -g3 -save-temps=3Dobj' --prefix=3D/install/riscv-qemu
 
-# build without any problem
+# build again without any problem
 > make -j 8
 
 -- =
