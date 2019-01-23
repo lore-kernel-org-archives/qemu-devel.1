@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48747)
+Received: from eggs.gnu.org ([209.51.188.92]:49098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmBKB-0007QN-Cy
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:43:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmBMv-00004u-JK
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:46:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmBKA-0002Zg-Az
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:43:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51818)
+	(envelope-from <thuth@redhat.com>) id 1gmBMu-0004YV-V1
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:46:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmBK8-0002Wk-85
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:43:42 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4719A4E916
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 05:43:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmBMu-0004Xz-Mw
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 00:46:32 -0500
+References: <1544684731-18828-1-git-send-email-thuth@redhat.com>
+	<9be7ef6d-15b2-6e82-7beb-aeb287b50c3b@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-References: <1544790073-23049-1-git-send-email-thuth@redhat.com>
-Message-ID: <80f20efb-9b30-22ed-9d05-ba40788e0719@redhat.com>
-Date: Wed, 23 Jan 2019 06:43:36 +0100
+Message-ID: <cdb2688d-3495-bfe0-3cfe-0424d310f37c@redhat.com>
+Date: Wed, 23 Jan 2019 06:46:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <1544790073-23049-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <9be7ef6d-15b2-6e82-7beb-aeb287b50c3b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Remove deprecated -enable-hax option
+Subject: Re: [Qemu-devel] [PATCH] qemu-options: Remove deprecated
+ "-virtioconsole" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com
 
-On 2018-12-14 13:21, Thomas Huth wrote:
-> Our command line interface is really quite overcrowded, we should avoid
-> duplicated options that do the same thing in just a slightly different
-> way. "-accel hax" is shorter and more generic that "-enable-hax", so
-> there is really no real usage for the latter option. "-enable-hax" has
-> been deprecated since two releases, and nobody complained so far, so
-> it's time to remove this now.
+On 2018-12-13 14:18, Paolo Bonzini wrote:
+> On 13/12/18 08:05, Thomas Huth wrote:
+>> It's been deprecated since QEMU 3.0, and nobody complained so far, so
+>> it is time to remove this option now.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qemu-deprecated.texi |  5 -----
->  qemu-options.hx      | 11 -----------
->  vl.c                 |  5 -----
->  3 files changed, 21 deletions(-)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 5cc18b4..f3a1184 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -65,11 +65,6 @@ removed together with SDL 1.2 support.
->  The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
->  replacement since it is not needed anymore.
->  
-> -@subsection -enable-hax (since 3.0.0)
-> -
-> -The @option{-enable-hax} option has been replaced by @option{-accel hax}.
-> -Both options have been introduced in QEMU version 2.9.0.
-> -
->  @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
->  
->  The 'file' driver for drives is no longer appropriate for character or host
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 5330603..c4e9690 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
->  if KVM support is enabled when compiling.
->  ETEXI
->  
-> -DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
-> -    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
-> -STEXI
-> -@item -enable-hax
-> -@findex -enable-hax
-> -Enable HAX (Hardware-based Acceleration eXecution) support. This option
-> -is only available if HAX support is enabled when compiling. HAX is only
-> -applicable to MAC and Windows platform, and thus does not conflict with
-> -KVM. This option is deprecated, use @option{-accel hax} instead.
-> -ETEXI
-> -
->  DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
->      "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
->  DEF("xen-create", 0, QEMU_OPTION_xen_create,
-> diff --git a/vl.c b/vl.c
-> index 52881be..5093764 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3579,11 +3579,6 @@ int main(int argc, char **argv, char **envp)
->                  olist = qemu_find_opts("machine");
->                  qemu_opts_parse_noisily(olist, "accel=kvm", false);
->                  break;
-> -            case QEMU_OPTION_enable_hax:
-> -                warn_report("Option is deprecated, use '-accel hax' instead");
-> -                olist = qemu_find_opts("machine");
-> -                qemu_opts_parse_noisily(olist, "accel=hax", false);
-> -                break;
->              case QEMU_OPTION_M:
->              case QEMU_OPTION_machine:
->                  olist = qemu_find_opts("machine");
-> 
+> Queued (for the next pull request, not this one).
 
-Ping!
-
-Paolo, I think this counts as "main loop" patch ... could you take it
-through your tree?
+Ping? ... looks like this might have fallen through the cracks?
 
  Thomas
