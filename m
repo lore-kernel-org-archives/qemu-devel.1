@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48918)
+Received: from eggs.gnu.org ([209.51.188.92]:47663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmF46-0002ZH-2l
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:29 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmF4M-0002Hk-TJ
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmF3x-0002K1-8Q
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42680)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gmF3w-0001un-Li
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:12 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01D0380470
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 09:42:58 +0000 (UTC)
-References: <1544790073-23049-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c5c474b5-6f18-8609-741f-3b2cc244137c@redhat.com>
-Date: Wed, 23 Jan 2019 10:42:55 +0100
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEp5-000860-Sl
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:27:52 -0500
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Date: Wed, 23 Jan 2019 10:25:38 +0100
+Message-Id: <20190123092538.8004-36-kbastian@mail.uni-paderborn.de>
+In-Reply-To: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
+References: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
-In-Reply-To: <1544790073-23049-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Remove deprecated -enable-hax option
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 35/35] target/riscv: Remaining rvc insn
+ reuse 32 bit translators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +22,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
+Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-On 14/12/18 13:21, Thomas Huth wrote:
-> Our command line interface is really quite overcrowded, we should avoid
-> duplicated options that do the same thing in just a slightly different
-> way. "-accel hax" is shorter and more generic that "-enable-hax", so
-> there is really no real usage for the latter option. "-enable-hax" has
-> been deprecated since two releases, and nobody complained so far, so
-> it's time to remove this now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+only one translate functions of rvc needs to handle special cases. For
+the other rvc insns we can remove the extra layer of indirection.
 
-Queued, thanks.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+---
+ target/riscv/insn16.decode              | 37 +++++++++----------
+ target/riscv/insn_trans/trans_rvc.inc.c | 48 -------------------------
+ 2 files changed, 17 insertions(+), 68 deletions(-)
 
-Paolo
-
-> ---
->  qemu-deprecated.texi |  5 -----
->  qemu-options.hx      | 11 -----------
->  vl.c                 |  5 -----
->  3 files changed, 21 deletions(-)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 5cc18b4..f3a1184 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -65,11 +65,6 @@ removed together with SDL 1.2 support.
->  The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
->  replacement since it is not needed anymore.
->  
-> -@subsection -enable-hax (since 3.0.0)
-> -
-> -The @option{-enable-hax} option has been replaced by @option{-accel hax}.
-> -Both options have been introduced in QEMU version 2.9.0.
-> -
->  @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
->  
->  The 'file' driver for drives is no longer appropriate for character or host
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 5330603..c4e9690 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
->  if KVM support is enabled when compiling.
->  ETEXI
->  
-> -DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
-> -    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
-> -STEXI
-> -@item -enable-hax
-> -@findex -enable-hax
-> -Enable HAX (Hardware-based Acceleration eXecution) support. This option
-> -is only available if HAX support is enabled when compiling. HAX is only
-> -applicable to MAC and Windows platform, and thus does not conflict with
-> -KVM. This option is deprecated, use @option{-accel hax} instead.
-> -ETEXI
-> -
->  DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
->      "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
->  DEF("xen-create", 0, QEMU_OPTION_xen_create,
-> diff --git a/vl.c b/vl.c
-> index 52881be..5093764 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3579,11 +3579,6 @@ int main(int argc, char **argv, char **envp)
->                  olist = qemu_find_opts("machine");
->                  qemu_opts_parse_noisily(olist, "accel=kvm", false);
->                  break;
-> -            case QEMU_OPTION_enable_hax:
-> -                warn_report("Option is deprecated, use '-accel hax' instead");
-> -                olist = qemu_find_opts("machine");
-> -                qemu_opts_parse_noisily(olist, "accel=hax", false);
-> -                break;
->              case QEMU_OPTION_M:
->              case QEMU_OPTION_machine:
->                  olist = qemu_find_opts("machine");
-> 
+diff --git a/target/riscv/insn16.decode b/target/riscv/insn16.decode
+index 98dd672c7f..d88a0c78ab 100644
+--- a/target/riscv/insn16.decode
++++ b/target/riscv/insn16.decode
+@@ -46,19 +46,15 @@
+ &i         imm rs1 rd   !extern
+ &s         imm rs1 rs2  !extern
+ &j         imm rd       !extern
++&b         imm rs2 rs1  !extern
+ 
+ # Argument sets:
+ &ci        imm        rd
+ &ciw       nzuimm     rd
+ &cs_dw     uimm   rs1 rs2
+-&cb        imm    rs1
+ &cr               rd  rs2
+-&c_j       imm
+ &c_shift   shamt      rd
+ 
+-&c_ld      uimm  rd
+-&c_sd      uimm  rs2
+-
+ &c_addi16sp_lui  imm_lui imm_addi16sp rd
+ 
+ # Formats 16:
+@@ -70,20 +66,21 @@
+ @cs_2      ... ... ... .. ... .. &r      rd=%rs1_3 rs1=%rs1_3 rs2=%rs2_3
+ @cs_d      ... ... ... .. ... .. &s  imm=%uimm_cl_d  rs1=%rs1_3  rs2=%rs2_3
+ @cs_w      ... ... ... .. ... .. &s  imm=%uimm_cl_w  rs1=%rs1_3  rs2=%rs2_3
+-@cb        ... ... ... .. ... .. &cb     imm=%imm_cb      rs1=%rs1_3
+-@cj        ...    ........... .. &c_j    imm=%imm_cj
++@cb        ... ... ... .. ... .. &b  imm=%imm_cb  rs1=%rs1_3 rs2=0
++@cj        ...    ........... .. &j  imm=%imm_cj rd=0
+ 
+-@c_ld      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_ld  %rd
+-@c_lw      ... . .....  ..... .. &c_ld     uimm=%uimm_6bit_lw  %rd
+-@c_sd      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sd  rs2=%rs2_5
+-@c_sw      ... . .....  ..... .. &c_sd     uimm=%uimm_6bit_sw  rs2=%rs2_5
++@c_ld      ... . .....  ..... .. &i  imm=%uimm_6bit_ld  %rd rs1=2
++@c_lw      ... . .....  ..... .. &i  imm=%uimm_6bit_lw  %rd rs1=2
++@c_sd      ... . .....  ..... .. &s  imm=%uimm_6bit_sd  rs1=2 rs2=%rs2_5
++@c_sw      ... . .....  ..... .. &s  imm=%uimm_6bit_sw  rs1=2 rs2=%rs2_5
+ 
+ @c_addi16sp_lui ... .  ..... ..... .. &c_addi16sp_lui %imm_lui %imm_addi16sp %rd
+ 
+ @c_shift        ... . .. ... ..... .. &c_shift rd=%rs1_3 shamt=%nzuimm_6bit
+ @c_shift2       ... . .. ... ..... .. &c_shift rd=%rd    shamt=%nzuimm_6bit
+ 
+-@c_andi         ... . .. ... ..... .. &ci imm=%imm_ci rd=%rs1_3
++@c_andi         ... . .. ... ..... .. &i imm=%imm_ci rd=%rs1_3 rs1=%rs1_3
++
+ 
+ # *** RV64C Standard Extension (Quadrant 0) ***
+ c_addi4spn        000    ........ ... 00 @ciw
+@@ -98,20 +95,20 @@ c_li              010 .  .....  ..... 01 @ci
+ c_addi16sp_lui    011 .  .....  ..... 01 @c_addi16sp_lui # shares opc with C.LUI
+ c_srli            100 . 00 ...  ..... 01 @c_shift
+ c_srai            100 . 01 ...  ..... 01 @c_shift
+-c_andi            100 . 10 ...  ..... 01 @c_andi
++andi              100 . 10 ...  ..... 01 @c_andi
+ sub               100 0 11 ... 00 ... 01 @cs_2
+ xor               100 0 11 ... 01 ... 01 @cs_2
+ or                100 0 11 ... 10 ... 01 @cs_2
+ and               100 0 11 ... 11 ... 01 @cs_2
+-c_j               101     ........... 01 @cj
+-c_beqz            110  ... ...  ..... 01 @cb
+-c_bnez            111  ... ...  ..... 01 @cb
++jal               101     ........... 01 @cj # c_j
++beq               110  ... ...  ..... 01 @cb # c_beqz
++bne               111  ... ...  ..... 01 @cb # c_bnez
+ 
+ # *** RV64C Standard Extension (Quadrant 2) ***
+ c_slli            000 .  .....  ..... 10 @c_shift2
+-c_fldsp           001 .  .....  ..... 10 @c_ld
+-c_lwsp            010 .  .....  ..... 10 @c_lw
++fld               001 .  .....  ..... 10 @c_ld # fldsp
++lw                010 .  .....  ..... 10 @c_lw # lwsp
+ c_jr_mv           100 0  .....  ..... 10 @cr
+ c_ebreak_jalr_add 100 1  .....  ..... 10 @cr
+-c_fsdsp           101   ......  ..... 10 @c_sd
+-c_swsp            110 .  .....  ..... 10 @c_sw
++fsd               101   ......  ..... 10 @c_sd # fsdsp
++sw                110 .  .....  ..... 10 @c_sw # swsp
+diff --git a/target/riscv/insn_trans/trans_rvc.inc.c b/target/riscv/insn_trans/trans_rvc.inc.c
+index db9119ec9b..631e72c8b5 100644
+--- a/target/riscv/insn_trans/trans_rvc.inc.c
++++ b/target/riscv/insn_trans/trans_rvc.inc.c
+@@ -98,30 +98,6 @@ static bool trans_c_srai(DisasContext *ctx, arg_c_srai *a)
+     return trans_srai(ctx, &arg);
+ }
+ 
+-static bool trans_c_andi(DisasContext *ctx, arg_c_andi *a)
+-{
+-    arg_andi arg = { .rd = a->rd, .rs1 = a->rd, .imm = a->imm };
+-    return trans_andi(ctx, &arg);
+-}
+-
+-static bool trans_c_j(DisasContext *ctx, arg_c_j *a)
+-{
+-    arg_jal arg = { .rd = 0, .imm = a->imm };
+-    return trans_jal(ctx, &arg);
+-}
+-
+-static bool trans_c_beqz(DisasContext *ctx, arg_c_beqz *a)
+-{
+-    arg_beq arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
+-    return trans_beq(ctx, &arg);
+-}
+-
+-static bool trans_c_bnez(DisasContext *ctx, arg_c_bnez *a)
+-{
+-    arg_bne arg = { .rs1 = a->rs1, .rs2 = 0, .imm = a->imm };
+-    return trans_bne(ctx, &arg);
+-}
+-
+ static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a)
+ {
+     int shamt = a->shamt;
+@@ -138,18 +114,6 @@ static bool trans_c_slli(DisasContext *ctx, arg_c_slli *a)
+     return trans_slli(ctx, &arg);
+ }
+ 
+-static bool trans_c_fldsp(DisasContext *ctx, arg_c_fldsp *a)
+-{
+-    arg_fld arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
+-    return trans_fld(ctx, &arg);
+-}
+-
+-static bool trans_c_lwsp(DisasContext *ctx, arg_c_lwsp *a)
+-{
+-    arg_lw arg = { .rd = a->rd, .rs1 = 2, .imm = a->uimm };
+-    return trans_lw(ctx, &arg);
+-}
+-
+ static bool trans_c_jr_mv(DisasContext *ctx, arg_c_jr_mv *a)
+ {
+     if (a->rd != 0 && a->rs2 == 0) {
+@@ -183,15 +147,3 @@ static bool trans_c_ebreak_jalr_add(DisasContext *ctx, arg_c_ebreak_jalr_add *a)
+     }
+     return false;
+ }
+-
+-static bool trans_c_fsdsp(DisasContext *ctx, arg_c_fsdsp *a)
+-{
+-    arg_fsd arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
+-    return trans_fsd(ctx, &arg);
+-}
+-
+-static bool trans_c_swsp(DisasContext *ctx, arg_c_swsp *a)
+-{
+-    arg_sw arg = { .rs1 = 2, .rs2 = a->rs2, .imm = a->uimm };
+-    return trans_sw(ctx, &arg);
+-}
+-- 
+2.20.1
