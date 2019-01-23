@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58809)
+Received: from eggs.gnu.org ([209.51.188.92]:58808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIvf-0007Bq-Vv
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:50:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmIvn-0007Bo-Av
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:51:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIs4-0000Jc-Gc
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:47:13 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 Jan 2019 13:47:05 +0000
-Message-ID: <de348ec6-8944-1e6b-d639-ba4ccd0f305f@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-8-vsementsov@virtuozzo.com>
-	<5a822e18-6967-5059-bf21-6891aa701af4@redhat.com>
-	<4899ffae-b6f6-f2ac-1f91-83e73ca662cf@virtuozzo.com>
-	<f99365c9-2e64-386e-0c44-80e49c7c6500@redhat.com>
-In-Reply-To: <f99365c9-2e64-386e-0c44-80e49c7c6500@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4B764C774D3F8B4EBDD666A7EEDE41D9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gmIo2-000681-Jm
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:43:04 -0500
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122125133.1191-3-david@redhat.com>
+	<17de6f00-2c91-4654-cc8f-d07ef85c48de@redhat.com>
+	<29d0a220-e814-6b91-ae4e-835326e91fcb@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <afaed009-3831-db23-26c6-485d23e44b29@redhat.com>
+Date: Wed, 23 Jan 2019 14:42:50 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top
- filter driver
+In-Reply-To: <29d0a220-e814-6b91-ae4e-835326e91fcb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +27,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerald Schaefer <gerald.schaefer@de.ibm.com>, linux-s390@vger.kernel.org, Sebastian Ott <sebott@linux.ibm.com>
 
-MTguMDEuMjAxOSAxNTowNSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNy4wMS4xOSAxMzoxMywg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDE2LjAxLjIwMTkgMTk6MDIs
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyOS4xMi4xOCAxMzoyMCwgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gQmFja3VwLXRvcCBmaWx0ZXIgZG9lcyBjb3B5LWJl
-Zm9yZS13cml0ZSBvcGVyYXRpb24uIEl0IHNob3VsZCBiZQ0KPj4+PiBpbnNlcnRlZCBhYm92ZSBh
-Y3RpdmUgZGlzayBhbmQgaGFzIGEgdGFyZ2V0IG5vZGUgZm9yIENCVywgbGlrZSB0aGUNCj4+Pj4g
-Zm9sbG93aW5nOg0KPj4+Pg0KPj4+PiAgICAgICArLS0tLS0tLSsNCj4+Pj4gICAgICAgfCBHdWVz
-dCB8DQo+Pj4+ICAgICAgICstLS0rLS0tKw0KPj4+PiAgICAgICAgICAgfHIsdw0KPj4+PiAgICAg
-ICAgICAgdg0KPj4+PiAgICAgICArLS0tKy0tLS0tLS0tLS0tKyAgdGFyZ2V0ICAgKy0tLS0tLS0t
-LS0tLS0tLSsNCj4+Pj4gICAgICAgfCBiYWNrdXBfdG9wICAgIHwtLS0tLS0tLS0tPnwgdGFyZ2V0
-KHFjb3cyKSB8DQo+Pj4+ICAgICAgICstLS0rLS0tLS0tLS0tLS0rICAgQ0JXICAgICArLS0tKy0t
-LS0tLS0tLS0tKw0KPj4+PiAgICAgICAgICAgfA0KPj4+PiBiYWNraW5nIHxyLHcNCj4+Pj4gICAg
-ICAgICAgIHYNCj4+Pj4gICAgICAgKy0tLSstLS0tLS0tLS0rDQo+Pj4+ICAgICAgIHwgQWN0aXZl
-IGRpc2sgfA0KPj4+PiAgICAgICArLS0tLS0tLS0tLS0tLSsNCj4+Pj4NCj4+Pj4gVGhlIGRyaXZl
-ciB3aWxsIGJlIHVzZWQgaW4gYmFja3VwIGluc3RlYWQgb2Ygd3JpdGUtbm90aWZpZXJzLg0KPj4+
-Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2Vt
-ZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICBibG9jay9iYWNrdXAtdG9w
-LmggIHwgIDQzICsrKysrKysNCj4+Pj4gICAgYmxvY2svYmFja3VwLXRvcC5jICB8IDMwNiArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4+PiAgICBibG9jay9N
-YWtlZmlsZS5vYmpzIHwgICAyICsNCj4+Pj4gICAgMyBmaWxlcyBjaGFuZ2VkLCAzNTEgaW5zZXJ0
-aW9ucygrKQ0KPj4+PiAgICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svYmFja3VwLXRvcC5oDQo+
-Pj4+ICAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBibG9jay9iYWNrdXAtdG9wLmMNCj4+Pg0KPj4+IExv
-b2tzIGdvb2QgdG8gbWUgb3ZlcmFsbCwgY29tbWVudHMgYmVsb3c6DQo+Pj4NCj4+DQo+PiBbLi5d
-DQo+Pg0KPj4gICA+PiArc3RhdGljIGNvcm91dGluZV9mbiBpbnQgYmFja3VwX3RvcF9jYncoQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IG9mZnNldCwNCj4+ICAgPj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGJ5dGVzKQ0KPj4NCj4+IFsu
-Ll0NCj4+DQo+Pj4+ICsNCj4+Pj4gKyAgICAvKg0KPj4+PiArICAgICAqIEZlYXR1cmVzIHRvIGJl
-IGltcGxlbWVudGVkOg0KPj4+PiArICAgICAqIEYzLiBwYXJhbGxlbGl6ZSBjb3B5aW5nIGxvb3AN
-Cj4+Pj4gKyAgICAgKiBGNC4gZGV0ZWN0IHplcm9zDQo+Pj4NCj4+PiBJc24ndCB0aGVyZSBkZXRl
-Y3QtemVyb2VzIGZvciB0aGF0Pw0KPj4NCj4+IEhtbSBpbnRlcmVzdGluZyBub3RlLiBJJ3ZlIHBs
-YWNlZCBGNCBoZXJlLCBhcyB3ZSBkbyBoYXZlIGRldGVjdGluZyB6ZXJvcyBieSBoYW5kIGluDQo+
-PiBjdXJyZW50IGJhY2t1cCBjb2RlLiBTaG91bGQgd2UgZHJvcCBpdCBmcm9tIGJhY2t1cCwgb3Ig
-c3dpdGNoIHRvIGp1c3QgZW5hYmxpbmcNCj4+IGRldGVjdC16ZXJvcyBvbiB0YXJnZXQ/DQo+IA0K
-PiBPZmYgdGhlIHRvcCBvZiBteSBoZWFkIEkgZG9uJ3Qga25vdyBhIHJlYXNvbiB3aHkgd2Ugd291
-bGRuJ3QganVzdCBzZXQNCj4gZGV0ZWN0LXplcm9lcy4gIE1heWJlIGJlY2F1c2UgdGhlcmUgbWF5
-IGJlIG90aGVyIHdyaXRlcnMgdG8gdGFyZ2V0IHdoaWNoDQo+IHNob3VsZCBub3QgdXNlIHRoYXQg
-c2V0dGluZz8gIEJ1dCB0aGF0IHNjZW5hcmlvIGp1c3Qgc2VlbXMgd3JvbmcgdG8gbWUuDQo+IA0K
-Pj4+PiArICAgICAqIEY1LiB1c2UgYmxvY2tfc3RhdHVzID8NCj4+Pj4gKyAgICAgKiBGNi4gZG9u
-J3QgY29weSBjbHVzdGVycyB3aGljaCBhcmUgYWxyZWFkeSBjYWNoZWQgYnkgQ09SIFtzZWUgRjFd
-DQo+Pj4+ICsgICAgICogRjcuIGlmIHRhcmdldCBpcyByYW0tY2FjaGUgYW5kIGl0IGlzIGZ1bGws
-IHRoZXJlIHNob3VsZCBiZSBhIHBvc3NpYmlsaXR5DQo+Pj4+ICsgICAgICogICAgIHRvIGRyb3Ag
-bm90IG5lY2Vzc2FyeSBkYXRhIChjYWNoZWQgYnkgQ09SIFtzZWUgRjFdKSB0byBoYW5kbGUgQ0JX
-DQo+Pj4+ICsgICAgICogICAgIGZhc3QuDQo+Pj4NCj4+PiBBbm90aGVyIGlkZWE6IFJlYWQgYWxs
-IGRpcnR5IGRhdGEgZnJvbSBicy0+YmFja2luZyAoaW4gcGFyYWxsZWwsIG1vcmUgb3INCj4+PiBs
-ZXNzKSwgYW5kIHRoZW4gcGVyZm9ybSBhbGwgd3JpdGVzICh0byBicy0+YmFja2luZyBhbmQgcy0+
-dGFyZ2V0KSBpbg0KPj4+IHBhcmFsbGVsIGFzIHdlbGwuDQo+Pj4NCj4+PiAoU28gdGhlIHdyaXRl
-cyBkbyBub3QgaGF2ZSB0byB3YWl0IG9uIG9uZSBhbm90aGVyKQ0KPj4NCj4+IFllcywgd2UgY2Fu
-IGNvbnRpbnVlIGd1ZXN0IHdyaXRlIGFmdGVyIHJlYWQgcGFydCBvZiBDQlcsIGJ1dCB3ZSBjYW4n
-dCBkbyBpdCBhbHdheXMsDQo+PiBhcyB3ZSB3YW50IHRvIGxpbWl0IFJBTSB1c2FnZSB0byBzdG9y
-ZSBhbGwgdGhlc2UgaW4tZmxpZ2h0IHJlcXVlc3RzLg0KPiANCj4gQnV0IHRoaXMgY29kZSBoZXJl
-IGFscmVhZHkgYWxsb2NhdGVzIGEgYnVmZmVyIHRvIGNvdmVyIGFsbCBvZiB0aGUgYXJlYS4NCg0K
-WWVzLCBsaWtlIGN1cnJlbnQgYmFja3VwIGRvIG9uIHdyaXRlIG5vdGlmaWVyLiBZZXMsIHdlIGRv
-bid0IGhhdmUgZXhhY3QgUkFNLWxpbWl0LCBhbmQNCnBvc3NpYmx5IGl0IHNob3VsZCBiZSBmaXhl
-ZC4gQnV0IHdlIGhhdmUgYXQgbGVhc3QgZ3VhcmFudGVlLCB0aGF0IHdlIGRvbid0IGhhdmUgbW9y
-ZQ0KQ0JXIHJlcXVlc3RzIHRoYW4gZ3Vlc3QgaW4tZmxpZ2h0IHJlcXVlc3RzLiBBbmQgd2UgY2Fu
-IGhvcGUsIHRoYXQgaW4gYmFkIGNhc2Ugd2l0aCBzbG93DQpiYWNrdXAgdGFyZ2V0IGFuZCBoaWdo
-IGVub3VnaCB3cml0ZS1sb2FkIGluIGd1ZXN0LCBvdXIgYmFja3VwIHdpbGwgc2xvdyBkb3duIGd1
-ZXN0IHdyaXRlcywNCmFuZCBndWVzdCB3aWxsIG5vdCBjcmVhdGUgbW9yZSBhbmQgbW9yZSBwYXJh
-bGxlbCByZXF1ZXN0cywgdW50aWwgdGhlIG9sZGVyIG9uZXMgZmluaXNoZWQuDQpIbW0sIGFuZCBJ
-IHRoaW5rIHdlIGhhdmUgbGltaXQgZm9yIHBhcmFsbGVsIGd1ZXN0IHJlcXVlc3RzLg0KDQpCdXQg
-aWYgd2UgY29udGludWUgZ3Vlc3Qgd3JpdGUgYWZ0ZXIgb2xkIGRhdGEgcmVhZCBpbnRvIFJBTSBi
-dWZmZXIgd2l0aG91dCBhbnkgbGltaXQsIGl0DQp3aWxsIGxlYWQgdG8gdW5jb250cm9sbGVkIGdy
-b3d0aCBvZiBSQU0gdXNhZ2UuDQoNCj4gDQo+PiBBbmQgSSB0aGluaywNCj4+IGluIHNjaGVtZSB3
-aXRoIHJhbS1jYWNoZSwgcmFtLWNhY2hlIGl0c2VsZiBzaG91bGQgYmUgYWN0dWFsbHkgYSBraW5k
-IG9mIHN0b3JhZ2UNCj4+IGZvciBpbi1mbGlnaHQgcmVxdWVzdHMuIEFuZCBpbiB0aGlzIHRlcm1p
-bm9sb2d5LCBpZiByYW0tY2FjaGUgaXMgZnVsbCwgd2UgY2FuJ3QNCj4+IHByb2NlZWQgd2l0aCBn
-dWVzdCB3cml0ZS4gSXQncyB0aGUgc2FtZSBhcyB3ZSByZWFjaGVkIGxpbWl0IG9uIGluLWZsaWdo
-dCByZXF1ZXN0cw0KPj4gY291bnQuDQo+Pg0KPj4gWy4uXQ0KPj4NCj4+Pj4gKw0KPj4+PiArc3Rh
-dGljIGludCBjb3JvdXRpbmVfZm4gYmFja3VwX3RvcF9jb19wZGlzY2FyZChCbG9ja0RyaXZlclN0
-YXRlICpicywNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgaW50NjRfdCBvZmZzZXQsIGludCBieXRlcykNCj4+Pg0KPj4+IChJbmRlbnRhdGlv
-bikNCj4+DQo+PiBsb29rcyBsaWtlIGl0IHdhcyBhZnRlciByZW5hbWluZw0KPj4gZmxlZWNpbmdf
-aG9vaw0KPj4gdG8NCj4+IGJhY2t1cF90b3ANCj4+DQo+PiB3aWxsIGZpeCBhbGwNCj4gDQo+IEFo
-IDotKQ0KPiANCj4+IFsuLl0NCj4+DQo+Pj4+ICsNCj4+Pj4gK3N0YXRpYyBpbnQgY29yb3V0aW5l
-X2ZuIGJhY2t1cF90b3BfY29fZmx1c2goQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4+ICt7DQo+
-Pj4+ICsgICAgaWYgKCFicy0+YmFja2luZykgew0KPj4+PiArICAgICAgICByZXR1cm4gMDsNCj4+
-Pj4gKyAgICB9DQo+Pj4+ICsNCj4+Pj4gKyAgICByZXR1cm4gYmRydl9jb19mbHVzaChicy0+YmFj
-a2luZy0+YnMpOw0KPj4+DQo+Pj4gV2h5IG5vdCB0aGUgdGFyZ2V0IGFzIHdlbGw/DQo+Pg0KPj4g
-U2hvdWxkIHdlPyBJdCBtYXkgYmUgZ3Vlc3QgZmx1c2gsIHdoeSB0byBmbHVzaCBiYWNrdXAgdGFy
-Z2V0IG9uIGl0Pw0KPiANCj4gSG0uLi4gIFdlbGwsIHRoZSBjdXJyZW50IGJhY2t1cCBjb2RlIGRp
-ZG4ndCBmbHVzaCB0aGUgdGFyZ2V0LCBhbmQgdGhlDQo+IG1pcnJvciBmaWx0ZXIgZG9lc24ndCBl
-aXRoZXIuICBPSyB0aGVuLg0KPiANCj4gTWF4DQo+IA0KPj4gWy4uXQ0KPj4NCj4+Pj4gK3N0YXRp
-YyB2b2lkIGJhY2t1cF90b3BfY2hpbGRfcGVybShCbG9ja0RyaXZlclN0YXRlICpicywgQmRydkNo
-aWxkICpjLA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29u
-c3QgQmRydkNoaWxkUm9sZSAqcm9sZSwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIEJsb2NrUmVvcGVuUXVldWUgKnJlb3Blbl9xdWV1ZSwNCj4+Pj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IHBlcm0sIHVpbnQ2NF90
-IHNoYXJlZCwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVp
-bnQ2NF90ICpucGVybSwgdWludDY0X3QgKm5zaGFyZWQpDQo+Pj4NCj4+PiAoSW5kZW50YXRpb24p
-DQo+Pj4NCj4+Pj4gK3sNCj4+Pj4gKyAgICBiZHJ2X2ZpbHRlcl9kZWZhdWx0X3Blcm1zKGJzLCBj
-LCByb2xlLCByZW9wZW5fcXVldWUsIHBlcm0sIHNoYXJlZCwgbnBlcm0sDQo+Pj4+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBuc2hhcmVkKTsNCj4+Pj4gKw0KPj4+PiArICAgIGlmIChy
-b2xlID09ICZjaGlsZF9maWxlKSB7DQo+Pj4+ICsgICAgICAgIC8qDQo+Pj4+ICsgICAgICAgICAq
-IHNoYXJlIHdyaXRlIHRvIHRhcmdldCwgdG8gbm90IGludGVyZmVyZSBndWVzdCB3cml0ZXMgdG8g
-aXQncyBkaXNrDQo+Pj4NCj4+PiAqaW50ZXJmZXJlIHdpdGggZ3Vlc3Qgd3JpdGVzIHRvIGl0cyBk
-aXNrDQo+Pj4NCj4+Pj4gKyAgICAgICAgICogd2hpY2ggd2lsbCBiZSBpbiB0YXJnZXQgYmFja2lu
-ZyBjaGFpbg0KPj4+PiArICAgICAgICAgKi8NCj4+Pj4gKyAgICAgICAgKm5zaGFyZWQgPSAqbnNo
-YXJlZCB8IEJMS19QRVJNX1dSSVRFOw0KPj4+PiArICAgICAgICAqbnBlcm0gPSAqbnBlcm0gfCBC
-TEtfUEVSTV9XUklURTsNCj4+Pg0KPj4+IFdoeSBkbyB5b3UgbmVlZCB0byB0YWtlIHRoZSB3cml0
-ZSBwZXJtaXNzaW9uPyAgVGhpcyBmaWx0ZXIgZG9lcyBub3QNCj4+PiBwZXJmb3JtIGFueSB3cml0
-ZXMgdW5sZXNzIGl0IHJlY2VpdmVzIHdyaXRlcywgcmlnaHQ/ICAoU28NCj4+PiBiZHJ2X2ZpbHRl
-cl9kZWZhdWx0X3Blcm1zKCkgc2hvdWxkIHRha2UgY2FyZSBvZiB0aGlzLikNCj4+DQo+PiBZb3Vy
-IGNvbW1pdCBzaGVkIGEgYml0IG9mIGxpZ2h0IG9uIHBlcm1pc3Npb24gc3lzdGVtIGZvciBtZSkg
-T2ssIEknbGwgY2hlY2ssIGlmDQo+PiB0aGF0IHdvcmsgd2l0aG91dCBQRVJNX1dSSVRFIGhlcmUu
-DQo+Pg0KPj4+DQo+Pj4+ICsgICAgfSBlbHNlIHsNCj4+Pj4gKyAgICAgICAgKm5wZXJtID0gKm5w
-ZXJtIHwgQkxLX1BFUk1fQ09OU0lTVEVOVF9SRUFEOw0KPj4+PiArICAgIH0NCj4+Pj4gK30NCj4+
-Pj4gKw0KPj4NCj4+IFRoYW5rIHlvdSEgRm9yIG90aGVyIGNvbW1lbnRzOiBhcmdlZSBvciB3aWxs
-LXRyeQ0KPj4NCj4+DQo+IA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 2019-01-23 12:42, David Hildenbrand wrote:
+> On 23.01.19 12:16, Thomas Huth wrote:
+>> On 2019-01-22 13:51, David Hildenbrand wrote:
+>>> When hotplugging a PCI bridge right now to the root port, we resolve
+>>> pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotpluggi=
+ng
+>>> really only works right now when hotplugging to another bridge.
+>>>
+>>> Instead, we have to properly check if we are already at the root.
+>>>
+>>> Let's cleanup the code while at it a bit and factor out updating the
+>>> subordiante bus number into a separate function. The check for
+>>> "old_nr < nr" is right now not strictly necessary, but makes it more
+>>> obvious what is actually going on.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
+>>>  1 file changed, 19 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index b7c4613fde..9b5c5fff60 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler=
+ *hotplug_dev, DeviceState *dev,
+>>>      }
+>>>  }
+>>> =20
+>>> +static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
+>>> +{
+>>> +    uint32_t old_nr;
+>>> +
+>>> +    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
+>>> +    while (!pci_bus_is_root(pci_get_bus(dev))) {
+>>> +        dev =3D pci_get_bus(dev)->parent_dev;
+>>> +
+>>> +        old_nr =3D pci_default_read_config(dev, PCI_SUBORDINATE_BUS,=
+ 1);
+>>> +        if (old_nr < nr) {
+>>> +            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1=
+);
+>>> +        }
+>>> +    }
+>>> +}
+>>> +
+>>>  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceSta=
+te *dev,
+>>>                                Error **errp)
+>>>  {
+>>> @@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *h=
+otplug_dev, DeviceState *dev,
+>>>      S390PCIBusDevice *pbdev =3D NULL;
+>>> =20
+>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>>> -        BusState *bus;
+>>>          PCIBridge *pb =3D PCI_BRIDGE(dev);
+>>> -        PCIDevice *pdev =3D PCI_DEVICE(dev);
+>>> =20
+>>> +        pdev =3D PCI_DEVICE(dev);
+>>
+>> Why not keep the direct assignment?
+>=20
+> We have the same local variable in that function already. I'm just
+> reusing it.
+
+D'oh, right. Please disregard my comment.
+
+>>
+>>>          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+>>>          pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
+>>> =20
+>>> -        bus =3D BUS(&pb->sec_bus);
+>>> -        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
+>>> +        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp)=
+;
+>>> =20
+>>>          if (dev->hotplugged) {
+>>>              pci_default_write_config(pdev, PCI_PRIMARY_BUS,
+>>>                                       pci_dev_bus_num(pdev), 1);
+>>>              s->bus_no +=3D 1;
+>>>              pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus=
+_no, 1);
+>>> -            do {
+>>> -                pdev =3D pci_get_bus(pdev)->parent_dev;
+>>> -                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
+>>> -                                         s->bus_no, 1);
+>>> -            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
+>>> +
+>>> +            s390_pci_update_subordinate(pdev, s->bus_no);
+>>
+>>
+>> While your changes look OK at a first glance, and certainly fix the
+>> crash, I wonder whether this is the right thing to do here at all. Why
+>> does the hypervisor set up the all the bridge registers here? I'd rath=
+er
+>> expect that this is the job of the guest after it detects a hot-plugge=
+d
+>> device?
+>=20
+> I honestly have no idea who is responsible for that. I can see that
+> spapr does not seem to handle hotplugging the way s390x does. I was
+> hoping that Colin maybe know why we have to do that on s390x this way.
+> At least this patch does not change the behavior but only fixes it.
+
+Right, you're patch certainly fixes a crash, and does not make it any
+worse than it was before, so:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+>>
+>> Also I'm not sure whether the numbering is right in every case. Let's
+>> use the example from the URL that you've mentioned in the cover letter
+>> (http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html step=
+ 4):
+>>
+>> Assume that you hot-plug another bridge "5" to "Bridge 2". If I get th=
+e
+>> code right, the setup will now look like this:
+>=20
+> Yes, this is what I would expect! This implies that any bus in the
+> hierarchy lies between Sec and Sub. But that there might be multiple
+> candidates, which feels wrong as you correctly say.
+>=20
+>>
+>>                CPU
+>>                 |
+>>   --------------+-------------- Bus 0
+>>                 |
+>>                 |  Pri=3D0
+>>                BR1 Sec=3D1
+>>                 |  Sub=3D5
+>>                 |
+>>   ------+-------+----------+--- Bus 1
+>>         |                  |
+>>         |  Pri=3D1           |  Pri=3D1
+>>        BR3 Sec=3D3          BR2 Sec=3D2
+>>         |  Sub=3D4           |  Sub=3D5
+>>         |                  |
+>>   --+---+--- Bus 3       --+-+- Bus 2
+>>     |                        |
+>>     |  Pri=3D3                 |  Pri=3D2
+>>    BR4 Sec=3D4                BR5 Sec=3D5
+>>     |  Sub=3D4                 |  Sub=3D5
+>>     |                        |
+>>   --+---- Bus 4            --+-- Bus 5
+>>
+>> Requests to bus 3 and 4 are now also routed through to bus 2 and 5. Th=
+at
+>> sounds wrong to me. Or is this how hot-plugging of PCI bridges is
+>> supposed to work??
+>>
+>=20
+> Learning more about PCI
+>=20
+> Quoting from [2]
+>=20
+> "PCIe enumeration is generally done twice. First, your BIOS (UEFI or
+> otherwise) will do it, to figure out who's present and how much memory
+> they need. This data can then be passed on to the host OS who can take
+> it as-is, but Linux and Windows often perform their own enumeration
+> procedure ..."
+>=20
+> "The custom software part comes in during this enumeration process and
+> that is you must reserve ahead of time PCI Bus numbers, and memory
+> segments for potential future devices -- this is sometimes called 'bus
+> padding'. This avoids the need to re-enumerate the bus in the future
+> which can often not be done without disruption to the system ..."
+>=20
+> So if I understand correctly, the BIOS/Firmware/QEMU only provides the
+> initial state. After that, the guest is responsible to manage it,
+> especially to manage hotplug.
+>=20
+> However, I wonder if it would also be up to BIOS/Firmware/QEMU to do
+> this bus padding or if it is completely on the OS side. And if
+> hotplugged devices simply have all 0's.
+
+Anyway, the current behavior sounds pretty wrong to me. I am sure that
+we can not simply traverse the bridge hierarchy up to the top and change
+the subordinate bus setting everywhere without informing the guest about
+that change. What if the guest OS has cached the values from the
+bridges? It then might use the wrong value for future calculations...
+
+> What about special cases where hotplug happends after BIOS enumerated
+> but before the guest started?
+
+I can't comment on s390x, but IIRC, on POWER, there is a hotplug
+interrupt which keeps being pending until the guest OS has initialized
+it's interrupt handler. Then it is up to the guest OS to set up the PCI
+device, if I remember clearly.
+
+ Thomas
+
+
+> [2]
+> https://electronics.stackexchange.com/questions/208767/does-pcie-hotplu=
+g-actually-work-in-practice
+>=20
+>=20
