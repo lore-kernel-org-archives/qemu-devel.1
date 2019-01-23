@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46390)
+Received: from eggs.gnu.org ([209.51.188.92]:46379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lc-00023t-5Q
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:54 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lb-00023s-Tu
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000Bk-82
-	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:52 -0500
-Received: from mga04.intel.com ([192.55.52.120]:51915)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gm8lX-0000CL-AE
+	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:51 -0500
+Received: from mga03.intel.com ([134.134.136.65]:5264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gm8l3-0007y8-D6
+	id 1gm8lC-00086U-3y
 	for qemu-devel@nongnu.org; Tue, 22 Jan 2019 21:59:47 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Wed, 23 Jan 2019 10:59:37 +0800
-Message-Id: <b1c0ccd8b18467b6df33e90c8606b184ed866251.1548136274.git.yi.z.zhang@linux.intel.com>
+Date: Wed, 23 Jan 2019 10:59:45 +0800
+Message-Id: <286542bc2f48b0dd6a657f363a8e933806cac92d.1548136274.git.yi.z.zhang@linux.intel.com>
 In-Reply-To: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V10 1/4] util/mmap-alloc: switch 'shared' to
- 'flags' parameter
+Subject: [Qemu-devel] [PATCH V10 2/4] util/mmap-alloc: support MAP_SYNC in
+ qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +30,103 @@ Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang 
 
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
 
-As more flag parameters besides the existing 'shared' are going to be
-added to qemu_ram_mmap() and qemu_ram_alloc_from_{file,fd}(), let's
-switch 'shared' to a 'flags' parameter in advance, so as to ease the
-further additions.
+When a file supporting DAX is used as vNVDIMM backend, mmap it with
+MAP_SYNC flag in addition which can ensure file system metadata
+synced in each guest writes to the backend file, without other QEMU
+actions (e.g., periodic fsync() by QEMU).
+
+Current, We have below different possible use cases:
+
+1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+   a: backend is a dax supporting file.
+    - MAP_SYNC will active.
+   b: backend is not a dax supporting file.
+    - mmap will result in an EOPNOTSUPP error.
+
+2. The rest of cases:
+   - we will never pass the MAP_SYNC to mmap2
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 ---
- exec.c                    |  7 ++++---
- include/qemu/mmap-alloc.h | 19 ++++++++++++++++++-
- util/mmap-alloc.c         |  8 +++++---
- util/oslib-posix.c        |  9 ++++++++-
- 4 files changed, 35 insertions(+), 8 deletions(-)
+ include/qemu/mmap-alloc.h |  1 +
+ include/qemu/osdep.h      | 21 +++++++++++++++++++++
+ util/mmap-alloc.c         |  7 ++++++-
+ 3 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index bb6170d..e92a7da 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1810,6 +1810,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             ram_addr_t memory,
-                             int fd,
-                             bool truncate,
-+                            uint32_t flags,
-                             Error **errp)
- {
-     void *area;
-@@ -1859,8 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
-         perror("ftruncate");
-     }
- 
--    area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED);
-+    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-@@ -2279,7 +2279,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     new_block->used_length = size;
-     new_block->max_length = size;
-     new_block->flags = ram_flags;
--    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-+    new_block->host = file_ram_alloc(new_block, size, fd, !file_size,
-+            ram_flags, errp);
-     if (!new_block->host) {
-         g_free(new_block);
-         return NULL;
 diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index 50385e3..6fe6ed4 100644
+index 6fe6ed4..a95d91c 100644
 --- a/include/qemu/mmap-alloc.h
 +++ b/include/qemu/mmap-alloc.h
-@@ -7,7 +7,24 @@ size_t qemu_fd_getpagesize(int fd);
+@@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+  *  @flags: specifies additional properties of the mapping, which can be one or
+  *          bit-or of following values
+  *          - RAM_SHARED: mmap with MAP_SHARED flag
++ *          - RAM_PMEM: mmap with MAP_SYNC flag
+  *          Other bits are ignored.
+  *
+  * Return:
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 457d24e..3bcf155 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+ #  define QEMU_VMALLOC_ALIGN getpagesize()
+ #endif
  
- size_t qemu_mempath_getpagesize(const char *mem_path);
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
-+/**
-+ * qemu_ram_mmap: mmap the specified file or device.
-+ *
-+ * Parameters:
-+ *  @fd: the file or the device to mmap
-+ *  @size: the number of bytes to be mmaped
-+ *  @align: if not zero, specify the alignment of the starting mapping address;
-+ *          otherwise, the alignment in use will be determined by QEMU.
-+ *  @flags: specifies additional properties of the mapping, which can be one or
-+ *          bit-or of following values
-+ *          - RAM_SHARED: mmap with MAP_SHARED flag
-+ *          Other bits are ignored.
-+ *
-+ * Return:
-+ *  On success, return a pointer to the mapped area.
-+ *  On failure, return MAP_FAILED.
++/*
++ * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
++ * 4.15, so they may not be defined when compiling on older kernels.
 + */
-+void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags);
- 
- void qemu_ram_munmap(void *ptr, size_t size);
- 
++#ifdef CONFIG_LINUX
++
++#include <linux/mman.h>
++
++#ifndef MAP_SYNC
++#define MAP_SYNC 0x0
++#endif
++
++#ifndef MAP_SHARED_VALIDATE
++#define MAP_SHARED_VALIDATE 0x0
++#endif
++
++#else  /* !CONFIG_LINUX */
++#define MAP_SYNC              0x0
++#define MAP_SHARED_VALIDATE   0x0
++#endif /* CONFIG_LINUX */
++
+ #ifdef CONFIG_POSIX
+ struct qemu_signalfd_siginfo {
+     uint32_t ssi_signo;   /* Signal number */
 diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index fd329ec..8f0a740 100644
+index 8f0a740..a4ce9b5 100644
 --- a/util/mmap-alloc.c
 +++ b/util/mmap-alloc.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "qemu/mmap-alloc.h"
- #include "qemu/host-utils.h"
-+#include "exec/memory.h"
- 
- #define HUGETLBFS_MAGIC       0x958458f6
- 
-@@ -75,7 +76,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-     return getpagesize();
- }
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-+void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
- {
-     /*
-      * Note: this always allocates at least one extra page of virtual address
-@@ -92,11 +93,12 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-      * anonymous memory is OK.
-      */
-     int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
--    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
--    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
-+    int mmap_flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
-+    void *ptr = mmap(0, total, PROT_NONE, mmap_flags | MAP_PRIVATE, anonfd, 0);
- #else
+@@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
  #endif
-+    bool shared = flags & RAM_SHARED;
+     bool shared = flags & RAM_SHARED;
++    bool is_pmem = flags & RAM_PMEM;
++    int mmap_xflags = 0;
      size_t offset;
      void *ptr1;
  
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index fbd0dc8..75a0171 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -54,6 +54,7 @@
- #endif
- 
- #include "qemu/mmap-alloc.h"
-+#include "exec/memory.h"
- 
- #ifdef CONFIG_DEBUG_STACK_USAGE
- #include "qemu/error-report.h"
-@@ -203,7 +204,13 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared);
-+    uint32_t flags = 0;
-+    void *ptr;
-+
-+    if (shared) {
-+        flags = RAM_SHARED;
+@@ -109,12 +111,15 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+     assert(is_power_of_2(align));
+     /* Always align to host page size */
+     assert(align >= getpagesize());
++    if (shared && is_pmem) {
++        mmap_xflags |= (MAP_SYNC | MAP_SHARED_VALIDATE);
 +    }
-+    ptr = qemu_ram_mmap(-1, size, align, flags);
  
-     if (ptr == MAP_FAILED) {
-         return NULL;
+     offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
+     ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
+                 MAP_FIXED |
+                 (fd == -1 ? MAP_ANONYMOUS : 0) |
+-                (shared ? MAP_SHARED : MAP_PRIVATE),
++                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
+                 fd, 0);
+     if (ptr1 == MAP_FAILED) {
+         munmap(ptr, total);
 -- 
 2.7.4
