@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39897)
+Received: from eggs.gnu.org ([209.51.188.92]:40209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmFq0-0007Bb-Gw
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:32:53 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gmFqu-0007qQ-Be
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:33:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmFpz-0007g3-DM
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:32:52 -0500
-References: <20190122125133.1191-1-david@redhat.com>
-	<20190122125133.1191-2-david@redhat.com>
-	<533d81b9-5d85-d441-7900-c8bb10ee4b8a@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <77fffbf2-f1c2-ad74-db3e-28fb8856fc1d@redhat.com>
-Date: Wed, 23 Jan 2019 11:32:48 +0100
+	(envelope-from <stefanha@redhat.com>) id 1gmFqs-00087u-Pw
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:33:48 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 23 Jan 2019 10:33:23 +0000
+Message-Id: <20190123103323.4516-3-stefanha@redhat.com>
+In-Reply-To: <20190123103323.4516-1-stefanha@redhat.com>
+References: <20190123103323.4516-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <533d81b9-5d85-d441-7900-c8bb10ee4b8a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] s390x/pci: Fix primary bus number
- for PCI bridges
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/2] iotests: add LUKS payload overhead to
+ 178 qemu-img measure test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +23,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 23.01.19 11:26, Thomas Huth wrote:
-> On 2019-01-22 13:51, David Hildenbrand wrote:
->> The primary bus number corresponds always to the bus number of the
->> bus the bridge is attached to.
->>
->> Right now, if we have two bridges attached to the same bus (e.g. root
->> bus) this is however not the case. Fix assignment.
->>
->> While at it
->> - Add a comment why we have to reassign durign every reset (which I
-> 
-> s/durign/during/
-> 
->>   found to be supprising)
-> 
-> s/supprising/surprising/
-> 
->> - Drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff. As we are
->>   setting it via a DFS and not via a BFS (as discussed e.g. in [1]), this
->>   is not necessary. The last number when we return is the highest
->>   number.
-> 
-> I think that explanation is slightly wrong / misleading. It's not about
-> DFS vs. BFS, it's about guest code vs. QEMU code. If you do a bridge
-> setup from the guest side, you've got to set the subordinate bus number
-> to 0xff to make sure that the bridge forwards all config space accesses
-> to the attached devices while you're scanning the devices that are
-> attached to the bridge.
-> But this code is not running in the guest, it is running in QEMU, and so
-> it can access the config space of the attached devices directly via
-> pci_default_write_config() - the write do not need to pass the parent
-> bridge in this case, and thus the subordinate bus number in the bridge
-> is ignored for the config space write access.
+The previous patch includes the LUKS payload overhead into the qemu-img
+measure calculation for qcow2.  Update qemu-iotests 178 to exercise this
+new code path.
 
-Indeed, I phrased that better in the spapr/pci patch I sent, What about
-this:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/178           |  8 ++++++++
+ tests/qemu-iotests/178.out.qcow2 | 24 ++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-"
-The primary bus number corresponds always to the bus number of the
-bus the bridge is attached to.
-
-Right now, if we have two bridges attached to the same bus (e.g. root
-bus) this is however not the case. The first bridge will have primary
-bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
-
-While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
-Setting it temporarily to that value (as discussed e.g. in [1]), is
-only relevant for a running system that probes the buses. The value is
-effectively unused for us just doing a DFS.
-
-Also add a comment why we have to reassign during every reset (which I
-found to be surprising.
-
-Please note that hotplugging of bridges is in general still broken, will
-be fixed next.
-"
-
-> 
->> Please note that hotplugging of bridges is in general still broken, will
->> be fixed next.
->>
->> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-pci-bus.c | 13 ++++++++-----
->>  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> With the commit message fixed:
-
-@Conny can you fix up when applying if there are no other comments?
-
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-
-Thanks Thomas!
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+index 3f4b4a4564..23eb017ea1 100755
+--- a/tests/qemu-iotests/178
++++ b/tests/qemu-iotests/178
+@@ -142,6 +142,14 @@ for ofmt in human json; do
+             # The backing file doesn't need to exist :)
+             $QEMU_IMG measure --output=3D$ofmt -o backing_file=3Dx \
+                               -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++
++            echo
++            echo "=3D=3D $fmt input image and LUKS encryption =3D=3D"
++            echo
++            $QEMU_IMG measure --output=3D$ofmt \
++                              --object secret,id=3Dsec0,data=3Dbase \
++                              -o encrypt.format=3Dluks,encrypt.key-secre=
+t=3Dsec0 \
++                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
+         fi
+=20
+         echo
+diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.ou=
+t.qcow2
+index d42d4a4597..55a8dc926f 100644
+--- a/tests/qemu-iotests/178.out.qcow2
++++ b/tests/qemu-iotests/178.out.qcow2
+@@ -68,6 +68,11 @@ converted image file size in bytes: 458752
+ required size: 1074135040
+ fully allocated size: 1074135040
+=20
++=3D=3D qcow2 input image and LUKS encryption =3D=3D
++
++required size: 2686976
++fully allocated size: 1076232192
++
+ =3D=3D qcow2 input image and preallocation (human) =3D=3D
+=20
+ required size: 1074135040
+@@ -114,6 +119,11 @@ converted image file size in bytes: 524288
+ required size: 1074135040
+ fully allocated size: 1074135040
+=20
++=3D=3D raw input image and LUKS encryption =3D=3D
++
++required size: 2686976
++fully allocated size: 1076232192
++
+ =3D=3D raw input image and preallocation (human) =3D=3D
+=20
+ required size: 1074135040
+@@ -205,6 +215,13 @@ converted image file size in bytes: 458752
+     "fully-allocated": 1074135040
+ }
+=20
++=3D=3D qcow2 input image and LUKS encryption =3D=3D
++
++{
++    "required": 2686976,
++    "fully-allocated": 1076232192
++}
++
+ =3D=3D qcow2 input image and preallocation (json) =3D=3D
+=20
+ {
+@@ -263,6 +280,13 @@ converted image file size in bytes: 524288
+     "fully-allocated": 1074135040
+ }
+=20
++=3D=3D raw input image and LUKS encryption =3D=3D
++
++{
++    "required": 2686976,
++    "fully-allocated": 1076232192
++}
++
+ =3D=3D raw input image and preallocation (json) =3D=3D
+=20
+ {
+--=20
+2.20.1
