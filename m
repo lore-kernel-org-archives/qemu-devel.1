@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35051)
+Received: from eggs.gnu.org ([209.51.188.92]:35128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gmFaT-0002Hu-09
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:16:51 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gmFaX-0002MA-0K
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gmFaS-0007p7-1a
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:16:48 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gmFaW-0007sB-9e
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:16:52 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 23 Jan 2019 11:14:54 +0100
-Message-Id: <20190123101458.12478-15-eric.auger@redhat.com>
+Date: Wed, 23 Jan 2019 11:14:57 +0100
+Message-Id: <20190123101458.12478-18-eric.auger@redhat.com>
 In-Reply-To: <20190123101458.12478-1-eric.auger@redhat.com>
 References: <20190123101458.12478-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 14/18] hw/arm/virt: Allocate device_memory
+Subject: [Qemu-devel] [PATCH v5 17/18] hw/arm/boot: Expose the pmem nodes in
+ the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +25,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-The device memory region is located after the initial RAM.
-its start/size are 1GB aligned.
+In case of NV-DIMM slots, let's add /pmem DT nodes.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-
 ---
-v4 -> v5:
-- device memory set after the initial RAM
+ hw/arm/boot.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-v3 -> v4:
-- remove bootinfo.device_memory_start/device_memory_size
-- rename VIRT_HOTPLUG_MEM into VIRT_DEVICE_MEM
----
- hw/arm/virt.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index aad7e0f095..c74a622412 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -61,6 +61,7 @@
- #include "hw/arm/smmuv3.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
-+#include "hw/acpi/acpi.h"
-=20
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1255,6 +1256,37 @@ static void create_secure_ram(VirtMachineState *vm=
-s,
-     g_free(nodename);
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 15432bb895..8fbdc3ff00 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -454,6 +454,36 @@ out:
+     return ret;
  }
 =20
-+static void create_device_memory(VirtMachineState *vms, MemoryRegion *sy=
-smem)
++static int fdt_add_pmem_node(void *fdt, uint32_t acells, hwaddr mem_base=
+,
++                             uint32_t scells, hwaddr mem_len,
++                             int numa_node_id)
 +{
-+    MachineState *ms =3D MACHINE(vms);
-+    uint64_t device_memory_size =3D ms->maxram_size - ms->ram_size;
-+    uint64_t align =3D GiB;
++    char *nodename =3D NULL;
++    int ret;
 +
-+    if (!device_memory_size) {
-+        return;
++    nodename =3D g_strdup_printf("/pmem@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible", "pmem-region");
++    ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, m=
+em_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/reg\n", nodename);
++        goto out;
++    }
++    if (numa_node_id < 0) {
++        goto out;
 +    }
 +
-+    if (ms->ram_slots > ACPI_MAX_RAM_SLOTS) {
-+        error_report("unsupported number of memory slots: %"PRIu64,
-+                     ms->ram_slots);
-+        exit(EXIT_FAILURE);
++    ret =3D qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_no=
+de_id);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
 +    }
 +
-+    if (QEMU_ALIGN_UP(ms->maxram_size, align) !=3D ms->maxram_size) {
-+        error_report("maximum memory size must be aligned to multiple of=
- 0x%"
-+                     PRIx64, align);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    ms->device_memory =3D g_malloc0(sizeof(*ms->device_memory));
-+    ms->device_memory->base =3D QEMU_ALIGN_UP(GiB + ms->ram_size, GiB);
-+
-+    memory_region_init(&ms->device_memory->mr, OBJECT(vms),
-+                       "device-memory", device_memory_size);
-+    memory_region_add_subregion(sysmem, ms->device_memory->base,
-+                                &ms->device_memory->mr);
++out:
++    g_free(nodename);
++    return ret;
 +}
 +
- static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_si=
-ze)
+ static void fdt_add_psci_node(void *fdt)
  {
-     const VirtMachineState *board =3D container_of(binfo, VirtMachineSta=
-te,
-@@ -1542,6 +1574,10 @@ static void machvirt_init(MachineState *machine)
-                                          machine->ram_size);
-     memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram)=
-;
+     uint32_t cpu_suspend_fn;
+@@ -541,7 +571,8 @@ static int fdt_add_hotpluggable_memory_nodes(void *fd=
+t,
+         di =3D !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
 =20
-+    if (vms->extended_memmap) {
-+        create_device_memory(vms, sysmem);
-+    }
-+
-     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
-=20
-     create_gic(vms, pic);
+         if (is_nvdimm) {
+-            ret =3D -ENOENT; /* NV-DIMM not yet supported */
++            ret =3D fdt_add_pmem_node(fdt, acells, di->addr,
++                                    scells, di->size, di->node);
+         } else {
+             ret =3D fdt_add_memory_node(fdt, acells, di->addr,
+                                       scells, di->size, di->node);
 --=20
 2.20.1
