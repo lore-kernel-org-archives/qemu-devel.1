@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49944)
+Received: from eggs.gnu.org ([209.51.188.92]:50099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmOjS-00079o-Hu
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:02:43 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOje-0007Dd-DI
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gmObB-0001Cm-BX
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:54:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gmOb7-0000vL-Hr
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:54:06 -0500
-Date: Wed, 23 Jan 2019 19:53:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190123195345.GI2193@work-vm>
-References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
-	<20190111161515.GG2738@work-vm>
-	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
-	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
-	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
-	<64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOgd-0004Ui-Jl
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:59:48 -0500
+From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Date: Wed, 23 Jan 2019 19:59:36 +0000
+Message-ID: <20190123195814.29253-1-aaron@os.amperecomputing.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] test-filter-mirror hangs
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH] target/arm: Don't clear supported PMU events
+ when initializing PMCEID1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +22,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Chen <zhangckid@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay OS <aaron@os.amperecomputing.com>
 
-* Jason Wang (jasowang@redhat.com) wrote:
->=20
-> On 2019/1/22 =E4=B8=8A=E5=8D=882:56, Peter Maydell wrote:
-> > On Thu, 17 Jan 2019 at 09:46, Jason Wang <jasowang@redhat.com> wrote:
-> > >=20
-> > > On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
-> > > >=20
-> > > > On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
-> > > > <dgilbert@redhat.com <mailto:dgilbert@redhat.com>> wrote:
-> > > >=20
-> > > >      * Peter Maydell (peter.maydell@linaro.org
-> > > >      <mailto:peter.maydell@linaro.org>) wrote:
-> > > >      > Recently I've noticed that test-filter-mirror has been han=
-ging
-> > > >      > intermittently, typically when run on some other TCG archi=
-tecture.
-> > > >      > In the instance I've just looked at, this was with s390x g=
-uest on
-> > > >      > x86-64 host, though I've also seen it on other host archs =
-and
-> > > >      > perhaps with other guests.
-> > > >=20
-> > > >      Watch out to see if you really do see it for other guests;
-> > > >      it carefully avoids using virtio-net to avoid vhost; but on =
-s390x it
-> > > >      uses virtio-net-ccw - could that hit the vhost it was trying=
- to avoid?
-> > > >=20
-> > > >      > Below is a backtrace, though it seems to be pretty unhelpf=
-ul.
-> > > >      > Anybody got any theories ? Does the mirror test rely on di=
-rty
-> > > >      > memory bitmaps like the migration test (which also hangs
-> > > >      > occasionally with TCG due to some bug I'm sure we've inves=
-tigated
-> > > >      > in the past) ?
-> > > >=20
-> > > >      I don't think it relies on the CPU at all.
-> > > >   I have no idea about this currently, but Jason and I designed t=
-he
-> > > > test case.
-> > > > Add Jason: Have any comments about this ?
-> > >=20
-> > > I can't reproduce this locally with s390x-softmmu. It looks to me t=
-he
-> > > test should be independent to any kinds of emulation. It should pas=
-s
-> > > when mainloop work.
-> > I've just seen a hang with ppc64 guest on s390x host, so it is
-> > indeed not specific to s390x guest (and so not specific to
-> > virtio-net either, since the ppc64 guest setup uses e1000).
-> >=20
-> > thanks
-> > -- PMM
->=20
->=20
-> Finally reproduced locally after hundreds (sometimes thousands) times o=
-f
-> running.
->=20
-> Bisection points to OOB monitor[1].
->=20
-> It looks to me after OOB is used unconditionally we lose a barrier to m=
-ake
-> sure socket is connected before sending packets in test-filter-mirror.c=
-. Is
-> there any other similar and simple thing that we could do to kick the
-> mainloop?
+A bug was introduced during a respin of:
 
-Do you mean the:
+	commit 57a4a11b2b281bb548b419ca81bfafb214e4c77a
+	target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
 
-    /* send a qmp command to guarantee that 'connected' is setting to tru=
-e. */
-    qmp_discard_response(qts, "{ 'execute' : 'query-status'}");
+This patch introduced two calls to get_pmceid() during CPU
+initialization - one each for PMCEID0 and PMCEID1. In addition to
+building the register values, get_pmceid() clears an internal array
+mapping event numbers to their implementations (supported_event_map)
+before rebuilding it. This is an optimization since much of the logic is
+shared. However, since it was called twice, the contents of
+supported_event_map reflect only the events in PMCEID1 (the second call
+to get_pmceid()).
 
-why was that ever sufficient to know the socket was ready?
+Fix this bug by moving the initialization of PMCEID0 and PMCEID1 back
+into a single function call, and name it more appropriately since it is
+doing more than simply generating the contents of the PMCEID[01]
+registers.
 
-Dave
+Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+---
+ target/arm/cpu.c    |  3 +--
+ target/arm/cpu.h    | 11 +++++------
+ target/arm/helper.c | 27 ++++++++++++++++-----------
+ 3 files changed, 22 insertions(+), 19 deletions(-)
 
-> Thanks
->=20
-> [1]
->=20
-> commit 8258292e18c39480b64eba9f3551ab772ce29b5d (HEAD, refs/bisect/bad)
-> Author: Peter Xu <peterx@redhat.com>
-> Date:=C2=A0=C2=A0 Tue Oct 9 14:27:15 2018 +0800
->=20
-> =C2=A0=C2=A0=C2=A0 monitor: Remove "x-oob", offer capability "oob" unco=
-nditionally
->=20
-> =C2=A0=C2=A0=C2=A0 Out-of-band command execution was introduced in comm=
-it cf869d53172.
-> =C2=A0=C2=A0=C2=A0 Unfortunately, we ran into a regression, and had to =
-turn it into an
-> =C2=A0=C2=A0=C2=A0 experimental option for 2.12 (commit be933ffc23).
->=20
-> http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
->=20
-> =C2=A0=C2=A0=C2=A0 The regression has since been fixed (commit 951702f3=
-9c7 "monitor: bind
-> =C2=A0=C2=A0=C2=A0 dispatch bh to iohandler context").=C2=A0 A thorough=
- re-review of OOB
-> =C2=A0=C2=A0=C2=A0 commands led to a few more issues, which have also b=
-een addressed.
->=20
-> =C2=A0=C2=A0=C2=A0 This patch partly reverts be933ffc23 (monitor: new p=
-arameter "x-oob"),
-> =C2=A0=C2=A0=C2=A0 and makes QMP monitors again offer capability "oob" =
-whenever they can
-> =C2=A0=C2=A0=C2=A0 provide it, i.e. when the monitor's character device=
- is capable of
-> =C2=A0=C2=A0=C2=A0 running in an I/O thread.
->=20
-> =C2=A0=C2=A0=C2=A0 Some trivial touch-up in the test code is required t=
-o make sure qmp-test
-> =C2=A0=C2=A0=C2=A0 won't break.
->=20
-> =C2=A0=C2=A0=C2=A0 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> =C2=A0=C2=A0=C2=A0 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lurea=
-u@redhat.com>
-> =C2=A0=C2=A0=C2=A0 Signed-off-by: Peter Xu <peterx@redhat.com>
-> =C2=A0=C2=A0=C2=A0 Message-Id: <20181009062718.1914-4-peterx@redhat.com=
->
-> =C2=A0=C2=A0=C2=A0 [Conflict with "monitor: check if chardev can switch=
- gcontext for OOB"
-> =C2=A0=C2=A0=C2=A0 resolved, commit message updated]
-> =C2=A0=C2=A0=C2=A0 Signed-off-by: Markus Armbruster <armbru@redhat.com>
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 7e1f3dd637..d6da3f4fed 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1039,8 +1039,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error=
+ **errp)
+         unset_feature(env, ARM_FEATURE_PMU);
+     }
+     if (arm_feature(env, ARM_FEATURE_PMU)) {
+-        cpu->pmceid0 =3D get_pmceid(&cpu->env, 0);
+-        cpu->pmceid1 =3D get_pmceid(&cpu->env, 1);
++        pmu_init(cpu);
+=20
+         if (!kvm_enabled()) {
+             arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ff81db420d..b8161cb6d7 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1012,14 +1012,13 @@ void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
+ void pmu_post_el_change(ARMCPU *cpu, void *ignored);
+=20
+ /*
+- * get_pmceid
+- * @env: CPUARMState
+- * @which: which PMCEID register to return (0 or 1)
++ * pmu_init
++ * @cpu: ARMCPU
+  *
+- * Return the PMCEID[01]_EL0 register values corresponding to the counters
+- * which are supported given the current configuration
++ * Initialize the CPU's PMCEID[01]_EL0 registers and associated internal s=
+tate
++ * for the current configuration
+  */
+-uint64_t get_pmceid(CPUARMState *env, unsigned which);
++void pmu_init(ARMCPU *cpu);
+=20
+ /* SCTLR bit meanings. Several bits have been reused in newer
+  * versions of the architecture; in that case we define constants
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 92666e5208..31273fb8de 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1090,22 +1090,24 @@ static const pm_event pm_events[] =3D {
+ static uint16_t supported_event_map[MAX_EVENT_ID + 1];
+=20
+ /*
+- * Called upon initialization to build PMCEID0_EL0 or PMCEID1_EL0 (indicat=
+ed by
+- * 'which'). We also use it to build a map of ARM event numbers to indices=
+ in
+- * our pm_events array.
++ * Called upon CPU initialization to initialize PMCEID[01]_EL0 and build a=
+ map
++ * of ARM event numbers to indices in our pm_events array.
+  *
+  * Note: Events in the 0x40XX range are not currently supported.
+  */
+-uint64_t get_pmceid(CPUARMState *env, unsigned which)
++void pmu_init(ARMCPU *cpu)
+ {
+-    uint64_t pmceid =3D 0;
+     unsigned int i;
+=20
+-    assert(which <=3D 1);
+-
++    /*
++     * Empty supported_event_map and cpu->pmceid[01] before adding support=
+ed
++     * events to them
++     */
+     for (i =3D 0; i < ARRAY_SIZE(supported_event_map); i++) {
+         supported_event_map[i] =3D UNSUPPORTED_EVENT;
+     }
++    cpu->pmceid0 =3D 0;
++    cpu->pmceid1 =3D 0;
+=20
+     for (i =3D 0; i < ARRAY_SIZE(pm_events); i++) {
+         const pm_event *cnt =3D &pm_events[i];
+@@ -1113,13 +1115,16 @@ uint64_t get_pmceid(CPUARMState *env, unsigned whic=
+h)
+         /* We do not currently support events in the 0x40xx range */
+         assert(cnt->number <=3D 0x3f);
+=20
+-        if ((cnt->number & 0x20) =3D=3D (which << 6) &&
+-                cnt->supported(env)) {
+-            pmceid |=3D (1 << (cnt->number & 0x1f));
++        if (cnt->supported(&cpu->env)) {
+             supported_event_map[cnt->number] =3D i;
++            uint64_t event_mask =3D 1 << (cnt->number & 0x1f);
++            if (cnt->number & 0x20) {
++                cpu->pmceid1 |=3D event_mask;
++            } else {
++                cpu->pmceid0 |=3D event_mask;
++            }
+         }
+     }
+-    return pmceid;
+ }
+=20
+ /*
+--=20
+2.20.1
