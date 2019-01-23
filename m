@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47825)
+Received: from eggs.gnu.org ([209.51.188.92]:46247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmF3p-0002Im-By
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:08 -0500
+	(envelope-from <berrange@redhat.com>) id 1gmF3w-00026n-9d
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmEy4-0005Ee-GS
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:37:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47660)
+	(envelope-from <berrange@redhat.com>) id 1gmEv9-00036i-L8
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:34:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35612)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gmEy4-0005Al-Aj
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:37:08 -0500
-Date: Wed, 23 Jan 2019 09:36:57 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gmEv9-00034r-0d
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:34:07 -0500
+Date: Wed, 23 Jan 2019 09:33:54 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190123093657.GC27270@redhat.com>
+Message-ID: <20190123093354.GB27270@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
+References: <20190122190503.13627-1-philmd@redhat.com>
+	<CAFEAcA-iZHdf6DqrNyUS7yEQmV=VNzWgF7HbHrLaZ5C8EL_0dA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+In-Reply-To: <CAFEAcA-iZHdf6DqrNyUS7yEQmV=VNzWgF7HbHrLaZ5C8EL_0dA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Let SDL support be optional on
+ OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <fam@euphon.net>
 
-On Wed, Jan 23, 2019 at 09:27:48AM +0100, Thomas Huth wrote:
-> On 2019-01-23 09:00, Gerd Hoffmann wrote:
-> > 
-> > This is RfC because we might look at the ordering.  On linux we probably
-> > want prefer alsa over oss.
-> Yes, please! I've run into the trap a couple of times already: OSS
-> headers were available, but these days the OSS compatibility kernel
-> modules are not loaded anymore by default. So you compile QEMU with OSS
-> support and then wonder why you do not get any audio output at all...
-> 
-> IMHO we should put OSS as last item in the list on Linux nowadays.
+On Tue, Jan 22, 2019 at 07:20:35PM +0000, Peter Maydell wrote:
+> On Tue, 22 Jan 2019 at 19:05, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
+> >
+> > Currently if we try to build QEMU on OpenBSD with SDL disabled, we ge=
+t:
+> >
+> >   $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3D=
+python2.7 --disable-sdl
+> >
+> >   ERROR: sdl not found or disabled, can not use sdl audio driver
+> >
+> > Since SDL is not a requirement for OpenBSD, let it be optional (we re=
+move
+> > it from $audio_drv_list but it stays available in $audio_possible_dri=
+vers).
+> > If no audio backends are available, QEMU falls back to the null drive=
+r.
+>=20
+> > --- a/configure
+> > +++ b/configure
+> > @@ -828,7 +828,7 @@ NetBSD)
+> >  OpenBSD)
+> >    bsd=3D"yes"
+> >    make=3D"${MAKE-gmake}"
+> > -  audio_drv_list=3D"sdl"
+> > +  audio_drv_list=3D""
+> >    audio_possible_drivers=3D"sdl"
+> >    HOST_VARIANT_DIR=3D"openbsd"
+> >    supported_os=3D"yes"
+>=20
+> This will mean that configure will by default not enable
+> a real audio backend, even if we do have sdl.
+>=20
+> Looking at the logic, "audio_possible_drivers" is only
+> used for printing the help message. The thing that drives
+> which audio drivers to test with is "audio_drv_list",
+> and the expectation is that you put things on that only
+> if it's possible to build with them. (For instance
+> we only add 'dsound' for mingw if the dsound.h header is
+> present, and so on.)
+>=20
+> So we need to do one of:
+>  (1) only put "sdl" into audio_drv_list if SDL is
+>      available (this probably doesn't work as we haven't
+>      probed for SDL at the point where we initialize it)
+>  (2) have the sdl probe delete "sdl" from audio_drv_list
+>      if the probe fails
 
-Given our targetted platform list[1], are there even any platforms
-where we would *not* have alsa, but still have OSS ?  If not, then
-we could just drop the OSS driver entirely on the ground that it is
-obsolete.
+This one sounds reasonable to me.
+
+>  (3) some more complicated restructuring :-)
+>      (eg rather than having audio_drv_list be set to an
+>      initial list based on the host OS, just have a full
+>      list of drivers, insist that each has a proper probe
+>      routine, and use whichever ones we can successfully
+>      probe)
+
 
 Regards,
 Daniel
-
-[1] https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
