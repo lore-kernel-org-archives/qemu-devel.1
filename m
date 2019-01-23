@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53921)
+Received: from eggs.gnu.org ([209.51.188.92]:54118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmDlz-0001lI-Rg
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:20:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmDms-0002FT-Gu
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmDlx-00047G-2E
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:20:35 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 Jan 2019 08:20:21 +0000
-Message-ID: <7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-2-vsementsov@virtuozzo.com>
-	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-	<5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
-	<29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
-	<9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
-	<352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
-In-Reply-To: <352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5DA6FB0E9A603645B2E3A72E4A2DAA6F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kraxel@redhat.com>) id 1gmDmr-0004aM-8z
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmDmp-0004Xc-FF
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 03:21:28 -0500
+Date: Wed, 23 Jan 2019 09:15:29 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190123081529.nft2b673rrdivymp@sirius.home.kraxel.org>
+References: <20190122205627.10182-1-relkochta@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190122205627.10182-1-relkochta@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] input-linux: customizable grab toggle keys
+ v5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Ryan El Kochta <relkochta@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-MTYuMDEuMjAxOSAxNjowNSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4wMS4xOSAxNTo0OCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDE0LjAxLjIwMTkgMTc6MTMs
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAxNC4wMS4xOSAxNTowMSwgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMTQuMDEuMjAxOSAxNjoxMCwgTWF4IFJlaXR6IHdy
-b3RlOg0KPj4+Pj4gT24gMjkuMTIuMTggMTM6MjAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+Pj4+Pj4gU2ltcGxpZnkgYmFja3VwX2luY3JlbWVudGFsX2luaXRfY29weV9i
-aXRtYXAgdXNpbmcgdGhlIGZ1bmN0aW9uDQo+Pj4+Pj4gYmRydl9kaXJ0eV9iaXRtYXBfbmV4dF9k
-aXJ0eV9hcmVhLg0KPj4+Pj4+DQo+Pj4+Pj4gTm90ZTogbW92ZSB0byBqb2ItPmxlbiBpbnN0ZWFk
-IG9mIGJpdG1hcCBzaXplOiBpdCBzaG91bGQgbm90IG1hdHRlciBidXQNCj4+Pj4+PiBsZXNzIGNv
-ZGUuDQo+Pj4+Pj4NCj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
-ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4+Pj4gLS0tDQo+Pj4+Pj4gICAg
-IGJsb2NrL2JhY2t1cC5jIHwgNDAgKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KPj4+Pj4+ICAgICAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgMjggZGVs
-ZXRpb25zKC0pDQo+Pj4+Pg0KPj4+Pj4gT3ZlcmFsbDogV2hhdCBpcyB0aGlzIGZ1bmN0aW9uIGV2
-ZW4gc3VwcG9zZWQgdG8gZG8/ICBUbyBtZSwgaXQgbG9va3MNCj4+Pj4+IGxpa2UgaXQgbWFya3Mg
-YWxsIGFyZWFzIGluIGpvYi0+Y29weV9iaXRtYXAgZGlydHkgdGhhdCBhcmUgZGlydHkgaW4NCj4+
-Pj4+IGpvYi0+c3luY19iaXRtYXAuDQo+Pj4+Pg0KPj4+Pj4gSWYgc28sIHdvdWxkbid0IGp1c3Qg
-cmVwbGFjaW5nIHRoaXMgYnkgaGJpdG1hcF9tZXJnZSgpIHNpbXBsaWZ5IHRoaW5ncw0KPj4+Pj4g
-ZnVydGhlcj8NCj4+Pj4+DQo+Pj4+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2JhY2t1cC5jIGIvYmxv
-Y2svYmFja3VwLmMNCj4+Pj4+PiBpbmRleCA0MzU0MTRlOTY0Li5mYmU3Y2UxOWUxIDEwMDY0NA0K
-Pj4+Pj4+IC0tLSBhL2Jsb2NrL2JhY2t1cC5jDQo+Pj4+Pj4gKysrIGIvYmxvY2svYmFja3VwLmMN
-Cj4+Pj4+PiBAQCAtNDA2LDQzICs0MDYsMjcgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gYmFj
-a3VwX3J1bl9pbmNyZW1lbnRhbChCYWNrdXBCbG9ja0pvYiAqam9iKQ0KPj4+Pj4NCj4+Pj4+IFsu
-Li5dDQo+Pj4+Pg0KPj4+Pj4+ICsgICAgd2hpbGUgKGJkcnZfZGlydHlfYml0bWFwX25leHRfZGly
-dHlfYXJlYShqb2ItPnN5bmNfYml0bWFwLA0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAmb2Zmc2V0LCAmYnl0ZXMpKQ0KPj4+Pj4+ICsgICAgew0K
-Pj4+Pj4+ICsgICAgICAgIHVpbnQ2NF90IGNsdXN0ZXIgPSBvZmZzZXQgLyBqb2ItPmNsdXN0ZXJf
-c2l6ZTsNCj4+Pj4+PiArICAgICAgICB1aW50NjRfdCBsYXN0X2NsdXN0ZXIgPSAob2Zmc2V0ICsg
-Ynl0ZXMpIC8gam9iLT5jbHVzdGVyX3NpemU7DQo+Pj4+Pj4gICAgIA0KPj4+Pj4+IC0gICAgICAg
-IG5leHRfY2x1c3RlciA9IERJVl9ST1VORF9VUChvZmZzZXQsIGpvYi0+Y2x1c3Rlcl9zaXplKTsN
-Cj4+Pj4+PiAtICAgICAgICBoYml0bWFwX3NldChqb2ItPmNvcHlfYml0bWFwLCBjbHVzdGVyLCBu
-ZXh0X2NsdXN0ZXIgLSBjbHVzdGVyKTsNCj4+Pj4+PiAtICAgICAgICBpZiAobmV4dF9jbHVzdGVy
-ID49IGVuZCkgew0KPj4+Pj4+ICsgICAgICAgIGhiaXRtYXBfc2V0KGpvYi0+Y29weV9iaXRtYXAs
-IGNsdXN0ZXIsIGxhc3RfY2x1c3RlciAtIGNsdXN0ZXIgKyAxKTsNCj4+Pj4+DQo+Pj4+PiBXaHkg
-dGhlICsxPyAgU2hvdWxkbid0IHRoZSBkaXZpc2lvbiBmb3IgbGFzdF9jbHVzdGVyIHJvdW5kIHVw
-IGluc3RlYWQ/DQo+Pj4+Pg0KPj4+Pj4+ICsNCj4+Pj4+PiArICAgICAgICBvZmZzZXQgPSAobGFz
-dF9jbHVzdGVyICsgMSkgKiBqb2ItPmNsdXN0ZXJfc2l6ZTsNCj4+Pj4+DQo+Pj4+PiBTYW1lIGhl
-cmUuDQo+Pj4+DQo+Pj4+IGxhc3QgY2x1c3RlciBpcyBub3QgImVuZCIsIGJ1dCBpdCdzIGxhc3Qg
-ZGlydHkgY2x1c3Rlci4gc28gbnVtYmVyIG9mIGRpcnR5IGNsdXN0ZXJzIGlzIGxhc3RfY2x1c3Rl
-ciAtIGNsdXN0ZXIgKyAxLCBhbmQgbmV4dCBvZmZzZXQgaXMgY2FsY3VsYXRlZCB0aHJvdWdoICsx
-IHRvby4NCj4+Pj4NCj4+Pj4gSWYgSSByb3VuZCB1cCBkaXZpc2lvbiByZXN1bHQsIEknbGwgZ2V0
-IGxhc3QgZm9yIG1vc3QgY2FzZXMsIGJ1dCAiZW5kIiAobmV4dCBhZnRlciB0aGUgbGFzdCksIGZv
-ciB0aGUgY2FzZSB3aGVuIG9mZnNldCAlIGpvYi0+Y2x1c3Rlcl9zaXplID09IDAsIHNvLCBob3cg
-dG8gdXNlIGl0Pw0KPj4+DQo+Pj4gRG9lc24ndCBiZHJ2X2RpcnR5X2JpdG1hcF9uZXh0X2RpcnR5
-X2FyZWEoKSByZXR1cm4gYSByYW5nZSBbb2Zmc2V0LA0KPj4+IG9mZnNldCArIGJ5dGVzKSwgaS5l
-LiB3aGVyZSAib2Zmc2V0ICsgYnl0ZXMiIGlzIHRoZSBmaXJzdCBjbGVhbiBvZmZzZXQ/DQo+Pg0K
-Pj4gb29wcywgeW91IGFyZSByaWdodC4gdGhlbiBJIG5lZWQNCj4+IHVpbnQ2NF90IGxhc3RfY2x1
-c3RlciA9IChvZmZzZXQgKyBieXRlcyAtIDEpIC8gam9iLT5jbHVzdGVyX3NpemU7DQo+IA0KPiBU
-aGF0LCBvciB5b3UganVzdCB1c2UgYSByb3VuZGluZyB1cCBkaXZpc2lvbiBhbmQgcmVuYW1lIGl0
-IGZyb20NCj4gbGFzdF9jbHVzdGVyIHRvIGVuZF9jbHVzdGVyIG9yIGZpcnN0X2NsZWFuX2NsdXN0
-ZXIgb3Igc29tZXRoaW5nIChhbmQNCj4gc3Vic2VxdWVudGx5IGRyb3AgdGhlICsxcykuDQoNClRo
-aXMgd2lsbCBub3Qgd29yaywgYXMgKChvZmZzZXQgKyBieXRlcykgLyBqb2ItPmNsdXN0ZXJfc2l6
-ZSkgaXMgbm90IGZpcnN0IGNsZWFuIGNsdXN0ZXINCm9yIGVuZCBjbHVzdGVyLiBJdCdzIGEgY2x1
-c3Rlciwgd2hlcmUgaXMgZmlyc3QgY2xlYW4gYml0IGxvY2F0ZWQsIGJ1dCBpdCBtYXkgaGF2ZSBk
-aXJ0eQ0KYml0cyB0b28gKG9yLCBtYXkgbm90KS4NCg0KU28sIHRvIHJld3JpdGUgYmFzZWQgb24g
-ZW5kX2NsdXN0ZXIsIGl0IHNob3VsZCBiZSBjYWxjdWxhdGVkIGFzDQoNCihvZmZzZXQgKyBieXRl
-cyAtIDEpIC8gam9iLT5jbHVzdGVyX3NpemUgKyAxDQoNCmFuZCwgSSdtIGdvaW5nIHRvIGRvIHNv
-LCBvbmUgIisxIiBpbnN0ZWFkIG9mIHR3bywgYW5kLCBtYXkgYmUsIGEgYml0IG1vcmUgdW5kZXJz
-dGFuZGFibGUuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Tue, Jan 22, 2019 at 03:56:27PM -0500, Ryan El Kochta wrote:
+> Here is an updated version of my previous patch. Ctrl-Alt has been
+> removed, as per your recommendation, and Ctrl-Scrolllock has been
+> changed so as to trigger when either ctrl key is pressed, for a
+> consistent naming scheme. I do agree that this is the best way forward.
+> 
+> Ctrl-Backtick is also gone.
+> 
+> I've tested these on a Windows and Linux guest and they all appear to
+> work fine.
+
+Almost there.  Code is fine now, but the commit message describes the v4
+-> v5 changes instead of describing the patch.  The v4 message was much
+better.
+
+Can you grab the v4 commit message and adapt the text to the v5 code
+changes?
+
+A better place to list the changes is the patch series cover letter
+(yes, you can send a cover letter with a single patch too).
+
+Some people use "git notes" + "git format-patch --notes" for changelog
+annotations.  That'll work too.
+
+> Quick aside; I'm sorry if this e-mail isn't a reply to the old thread. I
+> haven't quite figured that one out yet :-)
+
+Starting a new thread is perfectly fine and in fact the preferred way to
+send a new patch revision.
+
+cheers,
+  Gerd
