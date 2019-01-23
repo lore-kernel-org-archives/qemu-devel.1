@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43481)
+Received: from eggs.gnu.org ([209.51.188.92]:43526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQOC-0002o2-JJ
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQOC-0002qO-J0
 	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:48:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQ8w-0005AR-Kz
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmQ8w-0005Ab-MM
 	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:33:08 -0500
 From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-Date: Wed, 23 Jan 2019 21:32:47 +0000
-Message-ID: <20190123213227.17077-2-aaron@os.amperecomputing.com>
+Date: Wed, 23 Jan 2019 21:32:50 +0000
+Message-ID: <20190123213227.17077-3-aaron@os.amperecomputing.com>
 References: <20190123213227.17077-1-aaron@os.amperecomputing.com>
 In-Reply-To: <20190123213227.17077-1-aaron@os.amperecomputing.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v11 1/2] target/arm: Send interrupts on PMU
+Subject: [Qemu-devel] [PATCH v11 2/2] target/arm: Add a timer to predict PMU
  counter overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,194 +27,234 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay OS <aaron@os.amperecomputing.com>
 
-Whenever we notice that a counter overflow has occurred, send an
-interrupt. This is made more reliable with the addition of a timer in a
-follow-on commit.
+Make PMU overflow interrupts more accurate by using a timer to predict
+when they will overflow rather than waiting for an event to occur which
+allows us to otherwise check them.
 
 Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
 ---
- target/arm/helper.c | 61 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 51 insertions(+), 10 deletions(-)
+ target/arm/cpu.c    | 12 ++++++++
+ target/arm/cpu.h    | 10 +++++++
+ target/arm/helper.c | 72 +++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 92 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 31273fb8de..df2f3dd42a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -977,6 +977,7 @@ static const ARMCPRegInfo v6_cp_reginfo[] =3D {
- /* Definitions for the PMU registers */
- #define PMCRN_MASK  0xf800
- #define PMCRN_SHIFT 11
-+#define PMCRLC  0x40
- #define PMCRDP  0x10
- #define PMCRD   0x8
- #define PMCRC   0x4
-@@ -1293,6 +1294,13 @@ static bool pmu_counter_enabled(CPUARMState *env, ui=
-nt8_t counter)
-     return enabled && !prohibited && !filtered;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index d6da3f4fed..8a9cd0900d 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -836,6 +836,13 @@ static void arm_cpu_finalizefn(Object *obj)
+         QLIST_REMOVE(hook, node);
+         g_free(hook);
+     }
++#ifndef CONFIG_USER_ONLY
++    if (cpu->pmu_timer) {
++        timer_del(cpu->pmu_timer);
++        timer_deinit(cpu->pmu_timer);
++        timer_free(cpu->pmu_timer);
++    }
++#endif
  }
 =20
-+static void pmu_update_irq(CPUARMState *env)
+ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+@@ -1045,6 +1052,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
+r **errp)
+             arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+             arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
+         }
++
++#ifndef CONFIG_USER_ONLY
++        cpu->pmu_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, arm_pmu_timer_=
+cb,
++                cpu);
++#endif
+     } else {
+         cpu->id_aa64dfr0 &=3D ~0xf00;
+         cpu->pmceid0 =3D 0;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b8161cb6d7..63934a200a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -746,6 +746,11 @@ struct ARMCPU {
+=20
+     /* Timers used by the generic (architected) timer */
+     QEMUTimer *gt_timer[NUM_GTIMERS];
++    /*
++     * Timer used by the PMU. Its state is restored after migration by
++     * pmu_op_finish() - it does not need other handling during migration
++     */
++    QEMUTimer *pmu_timer;
+     /* GPIO outputs for generic timer */
+     qemu_irq gt_timer_outputs[NUM_GTIMERS];
+     /* GPIO output for GICv3 maintenance interrupt signal */
+@@ -1005,6 +1010,11 @@ void pmccntr_op_finish(CPUARMState *env);
+ void pmu_op_start(CPUARMState *env);
+ void pmu_op_finish(CPUARMState *env);
+=20
++/*
++ * Called when a PMU counter is due to overflow
++ */
++void arm_pmu_timer_cb(void *opaque);
++
+ /**
+  * Functions to register as EL change hooks for PMU mode filtering
+  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index df2f3dd42a..9417b85130 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1021,6 +1021,13 @@ typedef struct pm_event {
+      * counters hold a difference from the return value from this function
+      */
+     uint64_t (*get_count)(CPUARMState *);
++    /*
++     * Return how many nanoseconds it will take (at a minimum) for count e=
+vents
++     * to occur. A negative value indicates the counter will never overflo=
+w, or
++     * that the counter has otherwise arranged for the overflow bit to be =
+set
++     * and the PMU interrupt to be raised on overflow.
++     */
++    int64_t (*ns_per_count)(uint64_t);
+ } pm_event;
+=20
+ static bool event_always_supported(CPUARMState *env)
+@@ -1037,6 +1044,11 @@ static uint64_t swinc_get_count(CPUARMState *env)
+     return 0;
+ }
+=20
++static int64_t swinc_ns_per(uint64_t ignored)
 +{
-+    ARMCPU *cpu =3D arm_env_get_cpu(env);
-+    qemu_set_irq(cpu->pmu_interrupt, (env->cp15.c9_pmcr & PMCRE) &&
-+            (env->cp15.c9_pminten & env->cp15.c9_pmovsr));
++    return -1;
 +}
 +
  /*
-  * Ensure c15_ccnt is the guest-visible count so that operations such as
-  * enabling/disabling the counter or filtering, modifying the count itself=
-,
-@@ -1310,7 +1318,16 @@ void pmccntr_op_start(CPUARMState *env)
-             eff_cycles /=3D 64;
-         }
-=20
--        env->cp15.c15_ccnt =3D eff_cycles - env->cp15.c15_ccnt_delta;
-+        uint64_t new_pmccntr =3D eff_cycles - env->cp15.c15_ccnt_delta;
-+
-+        uint64_t overflow_mask =3D env->cp15.c9_pmcr & PMCRLC ? \
-+                                 INT64_MIN : INT32_MIN;
-+        if (env->cp15.c15_ccnt & ~new_pmccntr & overflow_mask) {
-+            env->cp15.c9_pmovsr |=3D (1 << 31);
-+            pmu_update_irq(env);
-+        }
-+
-+        env->cp15.c15_ccnt =3D new_pmccntr;
-     }
-     env->cp15.c15_ccnt_delta =3D cycles;
+  * Return the underlying cycle count for the PMU cycle counters. If we're =
+in
+  * usermode, simply return 0.
+@@ -1052,6 +1064,11 @@ static uint64_t cycles_get_count(CPUARMState *env)
  }
-@@ -1345,8 +1362,13 @@ static void pmevcntr_op_start(CPUARMState *env, uint=
+=20
+ #ifndef CONFIG_USER_ONLY
++static int64_t cycles_ns_per(uint64_t cycles)
++{
++    return (ARM_CPU_FREQ / NANOSECONDS_PER_SECOND) * cycles;
++}
++
+ static bool instructions_supported(CPUARMState *env)
+ {
+     return use_icount =3D=3D 1 /* Precise instruction counting */;
+@@ -1061,21 +1078,29 @@ static uint64_t instructions_get_count(CPUARMState =
+*env)
+ {
+     return (uint64_t)cpu_get_icount_raw();
+ }
++
++static int64_t instructions_ns_per(uint64_t icount)
++{
++    return cpu_icount_to_ns((int64_t)icount);
++}
+ #endif
+=20
+ static const pm_event pm_events[] =3D {
+     { .number =3D 0x000, /* SW_INCR */
+       .supported =3D event_always_supported,
+       .get_count =3D swinc_get_count,
++      .ns_per_count =3D swinc_ns_per,
+     },
+ #ifndef CONFIG_USER_ONLY
+     { .number =3D 0x008, /* INST_RETIRED, Instruction architecturally exec=
+uted */
+       .supported =3D instructions_supported,
+       .get_count =3D instructions_get_count,
++      .ns_per_count =3D instructions_ns_per,
+     },
+     { .number =3D 0x011, /* CPU_CYCLES, Cycle */
+       .supported =3D event_always_supported,
+       .get_count =3D cycles_get_count,
++      .ns_per_count =3D cycles_ns_per,
+     }
+ #endif
+ };
+@@ -1340,13 +1365,27 @@ void pmccntr_op_start(CPUARMState *env)
+ void pmccntr_op_finish(CPUARMState *env)
+ {
+     if (pmu_counter_enabled(env, 31)) {
+-        uint64_t prev_cycles =3D env->cp15.c15_ccnt_delta;
++#ifndef CONFIG_USER_ONLY
++        /* Calculate when the counter will next overflow */
++        uint64_t remaining_cycles =3D -env->cp15.c15_ccnt;
++        if (!(env->cp15.c9_pmcr & PMCRLC)) {
++            remaining_cycles =3D (uint32_t)remaining_cycles;
++        }
++        int64_t overflow_in =3D cycles_ns_per(remaining_cycles);
++
++        if (overflow_in > 0) {
++            int64_t overflow_at =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) =
++
++                overflow_in;
++            ARMCPU *cpu =3D arm_env_get_cpu(env);
++            timer_mod_anticipate_ns(cpu->pmu_timer, overflow_at);
++        }
++#endif
+=20
++        uint64_t prev_cycles =3D env->cp15.c15_ccnt_delta;
+         if (env->cp15.c9_pmcr & PMCRD) {
+             /* Increment once every 64 processor clock cycles */
+             prev_cycles /=3D 64;
+         }
+-
+         env->cp15.c15_ccnt_delta =3D prev_cycles - env->cp15.c15_ccnt;
+     }
+ }
+@@ -1376,6 +1415,21 @@ static void pmevcntr_op_start(CPUARMState *env, uint=
 8_t counter)
-     }
-=20
+ static void pmevcntr_op_finish(CPUARMState *env, uint8_t counter)
+ {
      if (pmu_counter_enabled(env, counter)) {
--        env->cp15.c14_pmevcntr[counter] =3D
--            count - env->cp15.c14_pmevcntr_delta[counter];
-+        uint32_t new_pmevcntr =3D count - env->cp15.c14_pmevcntr_delta[cou=
-nter];
++#ifndef CONFIG_USER_ONLY
++        uint16_t event =3D env->cp15.c14_pmevtyper[counter] & PMXEVTYPER_E=
+VTCOUNT;
++        uint16_t event_idx =3D supported_event_map[event];
++        uint64_t delta =3D UINT32_MAX -
++            (uint32_t)env->cp15.c14_pmevcntr[counter] + 1;
++        int64_t overflow_in =3D pm_events[event_idx].ns_per_count(delta);
 +
-+        if (env->cp15.c14_pmevcntr[counter] & ~new_pmevcntr & INT32_MIN) {
-+            env->cp15.c9_pmovsr |=3D (1 << counter);
-+            pmu_update_irq(env);
++        if (overflow_in > 0) {
++            int64_t overflow_at =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) =
++
++                overflow_in;
++            ARMCPU *cpu =3D arm_env_get_cpu(env);
++            timer_mod_anticipate_ns(cpu->pmu_timer, overflow_at);
 +        }
-+        env->cp15.c14_pmevcntr[counter] =3D new_pmevcntr;
++#endif
++
+         env->cp15.c14_pmevcntr_delta[counter] -=3D
+             env->cp15.c14_pmevcntr[counter];
      }
-     env->cp15.c14_pmevcntr_delta[counter] =3D count;
- }
-@@ -1423,7 +1445,20 @@ static void pmswinc_write(CPUARMState *env, const AR=
-MCPRegInfo *ri,
-                 /* counter is SW_INCR */
-                 (env->cp15.c14_pmevtyper[i] & PMXEVTYPER_EVTCOUNT) =3D=3D =
-0x0) {
-             pmevcntr_op_start(env, i);
--            env->cp15.c14_pmevcntr[i]++;
-+
-+            /*
-+             * Detect if this write causes an overflow since we can't pred=
-ict
-+             * PMSWINC overflows like we can for other events
-+             */
-+            uint32_t new_pmswinc =3D env->cp15.c14_pmevcntr[i] + 1;
-+
-+            if (env->cp15.c14_pmevcntr[i] & ~new_pmswinc & INT32_MIN) {
-+                env->cp15.c9_pmovsr |=3D (1 << i);
-+                pmu_update_irq(env);
-+            }
-+
-+            env->cp15.c14_pmevcntr[i] =3D new_pmswinc;
-+
-             pmevcntr_op_finish(env, i);
-         }
-     }
-@@ -1508,6 +1543,7 @@ static void pmovsr_write(CPUARMState *env, const ARMC=
-PRegInfo *ri,
- {
-     value &=3D pmu_counter_mask(env);
-     env->cp15.c9_pmovsr &=3D ~value;
-+    pmu_update_irq(env);
+@@ -1409,6 +1463,20 @@ void pmu_post_el_change(ARMCPU *cpu, void *ignored)
+     pmu_op_finish(&cpu->env);
  }
 =20
- static void pmovsset_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1515,6 +1551,7 @@ static void pmovsset_write(CPUARMState *env, const AR=
-MCPRegInfo *ri,
++void arm_pmu_timer_cb(void *opaque)
++{
++    ARMCPU *cpu =3D opaque;
++
++    /*
++     * Update all the counter values based on the current underlying count=
+s,
++     * triggering interrupts to be raised, if necessary. pmu_op_finish() a=
+lso
++     * has the effect of setting the cpu->pmu_timer to the next earliest t=
+ime a
++     * counter may expire.
++     */
++    pmu_op_start(&cpu->env);
++    pmu_op_finish(&cpu->env);
++}
++
+ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                        uint64_t value)
  {
-     value &=3D pmu_counter_mask(env);
-     env->cp15.c9_pmovsr |=3D value;
-+    pmu_update_irq(env);
- }
-=20
- static void pmevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1701,6 +1738,7 @@ static void pmintenset_write(CPUARMState *env, const =
-ARMCPRegInfo *ri,
-     /* We have no event counters so only the C bit can be changed */
-     value &=3D pmu_counter_mask(env);
-     env->cp15.c9_pminten |=3D value;
-+    pmu_update_irq(env);
- }
-=20
- static void pmintenclr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1708,6 +1746,7 @@ static void pmintenclr_write(CPUARMState *env, const =
-ARMCPRegInfo *ri,
- {
-     value &=3D pmu_counter_mask(env);
-     env->cp15.c9_pminten &=3D ~value;
-+    pmu_update_irq(env);
- }
-=20
- static void vbar_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1846,7 +1885,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] =3D {
-       .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pmcnten),
-       .writefn =3D pmcntenclr_write },
-     { .name =3D "PMOVSR", .cp =3D 15, .crn =3D 9, .crm =3D 12, .opc1 =3D 0=
-, .opc2 =3D 3,
--      .access =3D PL0_RW,
-+      .access =3D PL0_RW, .type =3D ARM_CP_IO,
-       .fieldoffset =3D offsetoflow32(CPUARMState, cp15.c9_pmovsr),
-       .accessfn =3D pmreg_access,
-       .writefn =3D pmovsr_write,
-@@ -1854,16 +1893,18 @@ static const ARMCPRegInfo v7_cp_reginfo[] =3D {
-     { .name =3D "PMOVSCLR_EL0", .state =3D ARM_CP_STATE_AA64,
-       .opc0 =3D 3, .opc1 =3D 3, .crn =3D 9, .crm =3D 12, .opc2 =3D 3,
-       .access =3D PL0_RW, .accessfn =3D pmreg_access,
--      .type =3D ARM_CP_ALIAS,
-+      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
-       .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pmovsr),
-       .writefn =3D pmovsr_write,
-       .raw_writefn =3D raw_write },
-     { .name =3D "PMSWINC", .cp =3D 15, .crn =3D 9, .crm =3D 12, .opc1 =3D =
-0, .opc2 =3D 4,
--      .access =3D PL0_W, .accessfn =3D pmreg_access_swinc, .type =3D ARM_C=
-P_NO_RAW,
-+      .access =3D PL0_W, .accessfn =3D pmreg_access_swinc,
-+      .type =3D ARM_CP_NO_RAW | ARM_CP_IO,
-       .writefn =3D pmswinc_write },
-     { .name =3D "PMSWINC_EL0", .state =3D ARM_CP_STATE_AA64,
-       .opc0 =3D 3, .opc1 =3D 3, .crn =3D 9, .crm =3D 12, .opc2 =3D 4,
--      .access =3D PL0_W, .accessfn =3D pmreg_access_swinc, .type =3D ARM_C=
-P_NO_RAW,
-+      .access =3D PL0_W, .accessfn =3D pmreg_access_swinc,
-+      .type =3D ARM_CP_NO_RAW | ARM_CP_IO,
-       .writefn =3D pmswinc_write },
-     { .name =3D "PMSELR", .cp =3D 15, .crn =3D 9, .crm =3D 12, .opc1 =3D 0=
-, .opc2 =3D 5,
-       .access =3D PL0_RW, .type =3D ARM_CP_ALIAS,
-@@ -2050,14 +2091,14 @@ static const ARMCPRegInfo pmovsset_cp_reginfo[] =3D=
- {
-     /* PMOVSSET is not implemented in v7 before v7ve */
-     { .name =3D "PMOVSSET", .cp =3D 15, .opc1 =3D 0, .crn =3D 9, .crm =3D =
-14, .opc2 =3D 3,
-       .access =3D PL0_RW, .accessfn =3D pmreg_access,
--      .type =3D ARM_CP_ALIAS,
-+      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
-       .fieldoffset =3D offsetoflow32(CPUARMState, cp15.c9_pmovsr),
-       .writefn =3D pmovsset_write,
-       .raw_writefn =3D raw_write },
-     { .name =3D "PMOVSSET_EL0", .state =3D ARM_CP_STATE_AA64,
-       .opc0 =3D 3, .opc1 =3D 3, .crn =3D 9, .crm =3D 14, .opc2 =3D 3,
-       .access =3D PL0_RW, .accessfn =3D pmreg_access,
--      .type =3D ARM_CP_ALIAS,
-+      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
-       .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pmovsr),
-       .writefn =3D pmovsset_write,
-       .raw_writefn =3D raw_write },
 --=20
 2.20.1
