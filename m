@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46756)
+Received: from eggs.gnu.org ([209.51.188.92]:48444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gmQUt-0008M9-Io
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:55:48 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gmQYz-0001xE-N3
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:00:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gmQUs-0003qj-Ea
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:55:47 -0500
-Date: Wed, 23 Jan 2019 21:55:21 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20190123215521.GD12500@redhat.com>
-References: <20190123211953.28578-1-eblake@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1gmQYy-0000F6-PH
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:00:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190123211953.28578-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Deprecate qemu-nbd --partition
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-15-yang.zhong@intel.com>
+	<dcd4155e-0278-4fed-6808-84ed89bed65a@redhat.com>
+In-Reply-To: <dcd4155e-0278-4fed-6808-84ed89bed65a@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 23 Jan 2019 13:59:30 -0800
+Message-ID: <CAKmqyKNkAqqYhCCkzB_zZopG_KgZ6OjwVjWtWyxZTvPMMqqPPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v4 14/44] hw/riscv/Makefile.objs:
+ Create CONFIG_* for riscv boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, qemu-block@nongnu.org, thuth@redhat.com, "reviewer:Incompatible changes" <libvir-list@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Paolo Bonzini <pbonzini@redhat.com>, sameo@linux.intel.com
 
-On Wed, Jan 23, 2019 at 03:19:53PM -0600, Eric Blake wrote:
-> The existing qemu-nbd --partition code claims to handle logical
-> partitions up to 8, since its introduction in 2008 (commit 7a5ca86).
-> However, the implementation is bogus (actual MBR logical partitions
-> form a sort of linked list, with one partition per extended table
-> entry, rather than four logical partitions in a single extended
-> table), making the code unlikely to work for anything beyond -P5 on
-> actual guest images. What's more, the code does not support GPT
-> partitions, which are becoming more popular, and maintaining device
-> subsetting in both NBD and the raw device is unnecessary maintenance
-> burden.  And nbdkit has just added code to properly handle an
-> arbitrary number of MBR partitions, along with its existing code
-> for handling GPT partitions.
-> 
-> Note that obtaining the offsets of a partition can be learned by
-> using 'qemu-nbd -c /dev/nbd0 file.qcow2 && sfdisk --dump /dev/nbd0',
-> but by the time you've done that, you might as well just mount
-> /dev/nbd0p1 that the kernel creates for you.
-> 
-> Start the clock on the deprecation cycle, with an example of how
-> to write device subsetting without using -P.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qemu-deprecated.texi | 27 +++++++++++++++++++++++++++
->  qemu-nbd.texi        |  6 ++++--
->  qemu-nbd.c           |  2 ++
->  3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 219206a836f..12f8b30943f 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -175,3 +175,30 @@ The above, converted to the current supported format:
->  @subsubsection "irq": "" (since 3.0.0)
-> 
->  The ``irq'' property is obsoleted.
-> +
-> +@section Related binaries
-> +
-> +@subsection qemu-nbd --partition (since 4.0.0)
-> +
-> +The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
-> +can only handle MBR partitions, and does not correctly handle logical
-> +partitions beyond partition 5.  If you know the relative position of
-> +the partition (perhaps by using @code{sfdisk} or similar, either in
-> +the guest or when mapping the entire device through /dev/nbd0 in the
-> +host), you can achieve the effect of exporting just that subset of the
-> +disk by use of the @option{--image-opts} option with a raw blockdev
-> +using the @code{offset} and @code{size} parameters layered on top of
-> +any other existing blockdev.
-> +
-> +For example, if partition 1 is 100MiB starting at 1MiB, the old command
-> +
-> +@example{qemu-nbd -P 1 -f qcow2 file.qcow2}
-> +
-> +can be rewritten as:
-> +
-> +@example{qemu-nbd --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.backing.driver=file,file.backing.filename=file.qcow2}
-> +
-> +Alternatively, the @code{nbdkit} project provides a more powerful
-> +partition filter on top of its nbd plugin, which can be used to select
-> +an arbitrary MBR or GPT partition on top of any other full-image NBD
-> +export.
+On Wed, Jan 23, 2019 at 8:12 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 2019-01-23 07:55, Yang Zhong wrote:
+> > Add the new configs to default-configs/riscv*-sofmmu.mak.
+> >
+> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > ---
+> >  default-configs/riscv32-softmmu.mak |  7 +++++++
+> >  default-configs/riscv64-softmmu.mak |  7 +++++++
+> >  hw/riscv/Makefile.objs              | 22 +++++++++++-----------
+> >  3 files changed, 25 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> > index fbfd1d4e4b..65337166e1 100644
+> > --- a/default-configs/riscv32-softmmu.mak
+> > +++ b/default-configs/riscv32-softmmu.mak
+> > @@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+> >
+> >  CONFIG_VGA=y
+> >  CONFIG_VGA_PCI=y
+> > +
+> > +CONFIG_SPIKE=y
+> > +CONFIG_HART=y
+> > +CONFIG_SIFIVE_E=y
+> > +CONFIG_SIFIVE=y
+> > +CONFIG_SIFIVE_U=y
+> > +CONFIG_RISCV_VIRT=y
+> > diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> > index fbfd1d4e4b..65337166e1 100644
+> > --- a/default-configs/riscv64-softmmu.mak
+> > +++ b/default-configs/riscv64-softmmu.mak
+> > @@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+> >
+> >  CONFIG_VGA=y
+> >  CONFIG_VGA_PCI=y
+> > +
+> > +CONFIG_SPIKE=y
+> > +CONFIG_HART=y
+> > +CONFIG_SIFIVE_E=y
+> > +CONFIG_SIFIVE=y
+> > +CONFIG_SIFIVE_U=y
+> > +CONFIG_RISCV_VIRT=y
+> > diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> > index 1dde01d39d..79bfb3abf9 100644
+> > --- a/hw/riscv/Makefile.objs
+> > +++ b/hw/riscv/Makefile.objs
+> > @@ -1,11 +1,11 @@
+> > -obj-y += riscv_htif.o
+> > -obj-y += riscv_hart.o
+> > -obj-y += sifive_e.o
+> > -obj-y += sifive_clint.o
+> > -obj-y += sifive_prci.o
+> > -obj-y += sifive_plic.o
+> > -obj-y += sifive_test.o
+> > -obj-y += sifive_u.o
+> > -obj-y += sifive_uart.o
+> > -obj-y += spike.o
+> > -obj-y += virt.o
+> > +obj-$(CONFIG_SPIKE) += riscv_htif.o
+> > +obj-$(CONFIG_HART) += riscv_hart.o
+> > +obj-$(CONFIG_SIFIVE_E) += sifive_e.o
+> > +obj-$(CONFIG_SIFIVE) += sifive_clint.o
+> > +obj-$(CONFIG_SIFIVE) += sifive_prci.o
+> > +obj-$(CONFIG_SIFIVE) += sifive_plic.o
+> > +obj-$(CONFIG_SIFIVE) += sifive_test.o
+> > +obj-$(CONFIG_SIFIVE_U) += sifive_u.o
+> > +obj-$(CONFIG_SIFIVE) += sifive_uart.o
+> > +obj-$(CONFIG_SPIKE) += spike.o
+> > +obj-$(CONFIG_RISCV_VIRT) += virt.o
+>
+> Looks reasonable to me, so I dare to say:
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>
+> ... but I'm not an expert here, I hope some of the RISC-V maintainers
+> could chime in?
 
-You might want to add the actual command here.  Unfortunately nbdkit
-cannot read qcow2 files meaning (as you note already) that you have to
-forward the connection through the nbdkit-nbd-plugin to qemu-nbd.
-This worked for me:
+Looks right to me
 
-  qemu-nbd -t -k /tmp/sock -f qcow2 file.qcow2 &
-  nbdkit -f --filter=partition nbd socket=/tmp/sock partition=1 &
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-If you drop the requirement to demonstrate this with qcow2 then the
-command would be just this:
+Alistair
 
-  nbdkit --filter=partition file disk.raw partition=1
-
-> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
-> index 386bece4680..d0c51828149 100644
-> --- a/qemu-nbd.texi
-> +++ b/qemu-nbd.texi
-> @@ -56,8 +56,10 @@ auto-detecting.
->  @item -r, --read-only
->  Export the disk as read-only.
->  @item -P, --partition=@var{num}
-> -Only expose MBR partition @var{num}.  Understands physical partitions
-> -1-4 and logical partitions 5-8.
-> +Deprecated: Only expose MBR partition @var{num}.  Understands physical
-> +partitions 1-4 and logical partition 5. New code should instead use
-> +@option{--image-opts} with the raw driver wrapping a subset of the
-> +original image.
->  @item -B, --bitmap=@var{name}
->  If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
->  that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index 1f7b2a03f5d..00c07fd27ea 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -787,6 +787,8 @@ int main(int argc, char **argv)
->              flags &= ~BDRV_O_RDWR;
->              break;
->          case 'P':
-> +            warn_report("The '-P' option is deprecated; use --image-opts with "
-> +                        "a raw device wrapper for subset exports instead");
->              if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
->                  partition < 1 || partition > 8) {
->                  error_report("Invalid partition '%s'", optarg);
-
-But this is basically fine, so:
-
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+>
