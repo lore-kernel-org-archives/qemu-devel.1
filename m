@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51749)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1gmGPi-0008LI-9O
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:47 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:53981)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1gmGWc-0001hO-Nj
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:16:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1gmGPh-0002Wf-2v
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:45 -0500
-Received: from mout.gmx.net ([212.227.17.22]:34211)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmGPg-0002KM-Nx
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:09:45 -0500
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-	<20190123101238.GD27270@redhat.com>
-	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-Date: Wed, 23 Jan 2019 12:10:11 +0100
+	(envelope-from <thuth@redhat.com>) id 1gmGWb-00077i-F7
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:16:54 -0500
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122125133.1191-3-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <17de6f00-2c91-4654-cc8f-d07ef85c48de@redhat.com>
+Date: Wed, 23 Jan 2019 12:16:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8"
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+In-Reply-To: <20190122125133.1191-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8
-From: Kamil Rytarowski <n54@gmx.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
-Message-ID: <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
-References: <20190123080005.31078-1-kraxel@redhat.com>
- <20190123080005.31078-5-kraxel@redhat.com>
- <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
- <20190123093657.GC27270@redhat.com>
- <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
- <20190123101238.GD27270@redhat.com>
- <379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
- <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-In-Reply-To: <CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 23.01.2019 11:59, Peter Maydell wrote:
-> On Wed, 23 Jan 2019 at 10:37, Kamil Rytarowski <n54@gmx.com> wrote:
->> OSS is the portable UNIX audio backend. We could point some flaws in i=
-t,
->> but it's a good enough for portable UNIX applications. The question is=
-
->> what UNIX-like desktop OS does not implement it or removed it.
+On 2019-01-22 13:51, David Hildenbrand wrote:
+> When hotplugging a PCI bridge right now to the root port, we resolve
+> pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
+> really only works right now when hotplugging to another bridge.
 >=20
-> If your desktop's native audio API is pulse, like Linux's often
-> is, then you want to use pulse directly, because the compat layers
-> are (or were last time I looked) not great, and typically add
-> in an extra thread and an extra layer of buffering, which means
-> more latency or more audio dropouts or both.
+> Instead, we have to properly check if we are already at the root.
 >=20
-> thanks
-> -- PMM
+> Let's cleanup the code while at it a bit and factor out updating the
+> subordiante bus number into a separate function. The check for
+> "old_nr < nr" is right now not strictly necessary, but makes it more
+> obvious what is actually going on.
 >=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index b7c4613fde..9b5c5fff60 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *=
+hotplug_dev, DeviceState *dev,
+>      }
+>  }
+> =20
+> +static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
+> +{
+> +    uint32_t old_nr;
+> +
+> +    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
+> +    while (!pci_bus_is_root(pci_get_bus(dev))) {
+> +        dev =3D pci_get_bus(dev)->parent_dev;
+> +
+> +        old_nr =3D pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1=
+);
+> +        if (old_nr < nr) {
+> +            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
+> +        }
+> +    }
+> +}
+> +
+>  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState=
+ *dev,
+>                                Error **errp)
+>  {
+> @@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+>      S390PCIBusDevice *pbdev =3D NULL;
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+> -        BusState *bus;
+>          PCIBridge *pb =3D PCI_BRIDGE(dev);
+> -        PCIDevice *pdev =3D PCI_DEVICE(dev);
+> =20
+> +        pdev =3D PCI_DEVICE(dev);
 
-Pulseaudio uses OSS backend on NetBSD anyway and we keep an in-kernel
-mixer. So it adds nothing except additional intermediate layer.
+Why not keep the direct assignment?
 
-For non-professional audio purposes OSS is good enough for such
-applications.
+>          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+>          pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
+> =20
+> -        bus =3D BUS(&pb->sec_bus);
+> -        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
+> +        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
+> =20
+>          if (dev->hotplugged) {
+>              pci_default_write_config(pdev, PCI_PRIMARY_BUS,
+>                                       pci_dev_bus_num(pdev), 1);
+>              s->bus_no +=3D 1;
+>              pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_n=
+o, 1);
+> -            do {
+> -                pdev =3D pci_get_bus(pdev)->parent_dev;
+> -                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
+> -                                         s->bus_no, 1);
+> -            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
+> +
+> +            s390_pci_update_subordinate(pdev, s->bus_no);
 
 
---nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+While your changes look OK at a first glance, and certainly fix the
+crash, I wonder whether this is the right thing to do here at all. Why
+does the hypervisor set up the all the bridge registers here? I'd rather
+expect that this is the job of the guest after it detects a hot-plugged
+device?
 
------BEGIN PGP SIGNATURE-----
+Also I'm not sure whether the numbering is right in every case. Let's
+use the example from the URL that you've mentioned in the cover letter
+(http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html step 4)=
+:
 
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIS5MMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZsug0QAKybE3crdovbt1TdW2i6DQUBT5RsMHZV30sR88d1
-XFg3axzhHf7s++I5AVbvfc2dYfbgtuTYpg6l2vtKIFGMNHk1wObVrEN/MLPLLQ5G
-GxwmsbOvyfqCV5XYpg/KrMEv+yj7/nC6XXK5ilkJnNa+MR5f0BSLDxo5W+4XgIdi
-QLBrwV7pD1dnsiwc4/Bc92leNSW7+mI2ktwkChQeNAFKy5Uu35k9IxwWCAShv3jN
-aqFnu85S+89atzr1fnKAVlves8N3I63cmbTeMfawdgchHkkiajeSp0Z1Ddg1l4fx
-2FSNZzSDLzzFWHt5NlHgMS0Ig0eH5xbArcXFEp/aV9eThPx6mrgr2plWuRYv/llc
-eOAJHDTww4arYtfe1qK8ooxLO0ZGbtznOaZJwmhWH2j/4UmCwAjOopHD7PYR+jvo
-ijbyGg1b/f6iaoTtT3Qcfh8JIp5AR2CnOEi5FRuWvs0GBsQst4QIjxqllGZdDLu9
-zO90IQ6LVOCM/08WEUiemH8BtFaiQImlzYXHQ+ETO1iQDuhMG63NZ8LjuPA3jmMk
-e2kMxAplPwOU6PsClnzsFAXR/6Fucp5U/QnnrfciLjgxrOeihNxE+uZPhve4eazw
-WJ64C7qYl6J94vNPm43DPkedMuYubGA1V7scp/inXepB8YYFLwYewXuPvwX0g3UC
-EMH9
-=qtr5
------END PGP SIGNATURE-----
+Assume that you hot-plug another bridge "5" to "Bridge 2". If I get the
+code right, the setup will now look like this:
 
---nxrzrwIWgdauMCUrEnyFxbeE56JBSqhF8--
+               CPU
+                |
+  --------------+-------------- Bus 0
+                |
+                |  Pri=3D0
+               BR1 Sec=3D1
+                |  Sub=3D5
+                |
+  ------+-------+----------+--- Bus 1
+        |                  |
+        |  Pri=3D1           |  Pri=3D1
+       BR3 Sec=3D3          BR2 Sec=3D2
+        |  Sub=3D4           |  Sub=3D5
+        |                  |
+  --+---+--- Bus 3       --+-+- Bus 2
+    |                        |
+    |  Pri=3D3                 |  Pri=3D2
+   BR4 Sec=3D4                BR5 Sec=3D5
+    |  Sub=3D4                 |  Sub=3D5
+    |                        |
+  --+---- Bus 4            --+-- Bus 5
+
+Requests to bus 3 and 4 are now also routed through to bus 2 and 5. That
+sounds wrong to me. Or is this how hot-plugging of PCI bridges is
+supposed to work??
+
+ Thomas
