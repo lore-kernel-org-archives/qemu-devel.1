@@ -1,26 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:52823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIWW-0001y4-0q
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:56 -0500
+	(envelope-from <eskultet@redhat.com>) id 1gmIWX-0001y4-1d
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmIUg-0003QX-8c
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:23:08 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 Jan 2019 13:22:58 +0000
-Message-ID: <76562236-6535-a064-e8ed-6c2c2e285ac5@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-6-vsementsov@virtuozzo.com>
-	<a4565e50-b670-333e-a3db-72ff5a42b776@redhat.com>
-	<084ff0b6-1de8-1c17-f085-97a8b1aeb8b5@virtuozzo.com>
-	<fab4d292-ea59-5e1f-ec43-486abc455e7c@redhat.com>
-In-Reply-To: <fab4d292-ea59-5e1f-ec43-486abc455e7c@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E55CD8BED86E91418B45E6D7E22162B3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eskultet@redhat.com>) id 1gmIUF-0003E2-Tq
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:22:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gmIUF-00037a-JK
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:22:35 -0500
+Date: Wed, 23 Jan 2019 14:22:12 +0100
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20190123132212.GA20002@beluga.usersys.redhat.com>
+References: <20190118093935.GA1142@beluga.usersys.redhat.com>
+	<65f933a2-f63c-962f-c503-43c7e84ab5e8@amd.com>
+	<20190123125506.GA2376@beluga.usersys.redhat.com>
+	<20190123131042.GF27270@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 05/11] iotests: allow resume_drive by
- node name
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190123131042.GF27270@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
+ for capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +31,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dinechin@redhat.com" <dinechin@redhat.com>, "mkletzan@redhat.com" <mkletzan@redhat.com>
 
-MTYuMDEuMjAxOSAxNjoxMSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4wMS4xOSAxNzowNiwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDE0LjAxLjIwMTkgMTc6NDYs
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyOS4xMi4xOCAxMzoyMCwgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gQWZ0ZXIgbm9kZSBncmFwaCBjaGFuZ2VzLCB3ZSBt
-YXkgbm90IGJlIGFibGUgdG8gcmVzdW1lX2RyaXZlIGJ5IGRldmljZQ0KPj4+PiBuYW1lIChiYWNr
-aW5nIGZpbGVzIGFyZSBub3QgcmVjdXJzaXZlbHkgc2VhcmNoZWQpLiBTbywgbGV0cyBhbGxvdyB0
-bw0KPj4+PiByZXN1bWUgYnkgbm9kZS1uYW1lLiBTZXQgY29uc3RhbnQgbmFtZSBmb3IgYnJlYWtw
-b2ludHMsIHRvIGF2b2lkDQo+Pj4+IGludHJvZHVjaW5nIGV4dHJhIHBhcmFtZXRlcnMuDQo+Pj4N
-Cj4+PiBIbSwgSSBkb24ndCBxdWl0ZSB1bmRlcnN0YW5kIHRoaXMgcmVhc29uLiAgSXMgdGhpcyBz
-byB5b3UgY2FuIGNyZWF0ZQ0KPj4+IGJyZWFrcG9pbnRzIG9uIG9uZSBub2RlICh3aGljaCBmYWxs
-cyB0aHJvdWdoIHRvIHRoZSBmaXJzdCBibGtkZWJ1ZyBub2RlKQ0KPj4+IGFuZCB0aGVuIHJlbW92
-ZSB0aGVtIGZyb20gYW5vdGhlciAoZmFsbGluZyB0aHJvdWdoIHRvIHRoZSBzYW1lIGJsa2RlYnVn
-DQo+Pj4gbm9kZSk/DQo+Pg0KPj4gYWRkL3JlbW92ZSBicmVha3BvaW50IGdvZXMgdGhyb3VnaCAt
-PmZpbGUgY2hpbGRyZW4sIGJ1dCBteSBmaWx0ZXIgbGlua3MNCj4+IGFjdGl2ZSBkaXNrIGFzIC0+
-YmFja2luZy4gU28sIGJlZm9yZSBibG9jay1qb2Igc3RhcnQgd2UgY2FuIGluc2VydCBicmVha3Bv
-aW50DQo+PiBieSBkZXZpY2UgbmFtZS4gQnV0IHRoZW4sIHdoZW4gZmlsdGVyIGluc2VydGVkLCB3
-ZSBjYW4ndCByZW1vdmUgYnJlYWtwb2ludCwNCj4+IGJlY2F1c2UgbXkgZmlsdGVyIGhpZGVzIGJs
-a2RlYnVnIHdpdGggYWN0aXZlIGRpc2sgdW5kZXIgLT5iYWNraW5nIGxpbmsuDQo+Pg0KPj4gTWF5
-YmUsIHJpZ2h0IHNvbHV0aW9uIHdvdWxkIGJlIHN1cHBvcnQgYmFja2luZyBsaW5rcyBpbiBiZHJ2
-X2RlYnVnX2JyZWFrcG9pbnQoKQ0KPj4gYW5kIGJkcnZfZGVidWdfcmVtb3ZlX2JyZWFrcG9pbnQo
-KSBmb3IgdGhlIGNhc2Ugd2hlbiB0aGVyZSBpcyBubyBmaWxlIGNoaWxkLg0KPj4NCj4+IEJ1dCBi
-ZWluZyB1bnN1cmUgYWJvdXQgcmlnaHQgYmVoYXZpb3IsIEkndmUgZGVjaWRlZCB0byBhZGp1c3Qg
-dGhlIHRlc3QuDQo+Pg0KPj4gV2hhdCBhYm91dCBqdXN0IGRvIGJvdGggIGFkZC9yZW1vdmUgYnJl
-YWtwb2ludCB0aHJvdWdoIGJsa2RlYnVnIG5vZGUtbmFtZSwgdG8NCj4+IG1ha2UgaXQgbGVzcyB3
-ZWlyZD8NCj4gDQo+IFllcywgSSB3YXMgbW9zdGx5IHdvbmRlcmluZyBhYm91dCB0aGUgInNldCBj
-b25zdGFudCBuYW1lIGZvcg0KPiBicmVha3BvaW50cyIuICBJdCBkb2Vzbid0IHNlZW0gbmVjZXNz
-YXJ5IHRvIG1lOw0KDQpJdCdzIGp1c3QgdG8gbm90IGNyZWF0ZSBleHRyYSBwYXJhbWV0ZXJzIG9y
-IHNvbWV0aGluZy4gQ3VycmVudCBjb2RlIGRvbid0IGFsbG93DQp0byBjcmVhdGUgc2V2ZXJhbCBi
-cmVha3BvaW50cyBpbiBvbmUgYmxrZGVidWcgYW55d2F5IChhcyBAZHJpdmUgaXMgdXNlZCBhcw0K
-YnJlYWtwb2ludCBuYW1lKSwgc28gdGhlcmUgaXMgbm8gcmVhc29uIGZvciBkaWZmZXJlbnQgbmFt
-ZXMgYXQgYWxsLg0KDQpJJ2xsIGltcHJvdmUgY29tbWl0IG1lc3NhZ2UgdG8gbWFrZSBpdCBjbGVh
-bi4NCg0KaWYgeW91IHVzZSBub2RlIG5hbWVzLA0KPiB5b3UgY291bGQgYWRkcmVzcyB0aGUgYmxr
-ZGVidWcgbm9kZSBkaXJlY3RseSwgSSB3b3VsZCB0aGluay4NCj4gDQo+IE1heA0KPiANCj4+PiBX
-b3VsZG4ndCBpdCBiZSBiZXR0ZXIgdG8gbGV0IHRoZSB1c2VyIHNwZWNpZnkgdGhlIGJyZWFrcG9p
-bnQgbmFtZT8NCj4+DQo+PiBpdCdzIG5vdCBuZWVkZWQgbm93LiB3aXRoIGN1cnJlbnQgbmFtaW5n
-IHdlIGNhbiBoYXZlIG9uZSBicmVhay1wb2ludCBpbiBkZXZpY2UsDQo+PiBzbyB3ZSBkb24ndCBu
-ZWVkIGRpZmZlcmVudCBuYW1lcy4NCj4+DQo+Pj4NCj4+PiBNYXgNCj4+Pg0KPj4+PiBTaWduZWQt
-b2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
-by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8
-IDkgKysrKystLS0tDQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDQg
-ZGVsZXRpb25zKC0pDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMv
-aW90ZXN0cy5weSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+Pj4+IGluZGV4IDc2
-ODc3YWQ1ODQuLmM5Nzc5ZjQzMmYgMTAwNjQ0DQo+Pj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0
-cy9pb3Rlc3RzLnB5DQo+Pj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+
-Pj4+IEBAIC00MTUsMTEgKzQxNSwxMSBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RNYWNoaW5l
-KToNCj4+Pj4gICAgICAgICAgICAgICAgc2VsZi5wYXVzZV9kcml2ZShkcml2ZSwgIndyaXRlX2Fp
-byIpDQo+Pj4+ICAgICAgICAgICAgICAgIHJldHVybg0KPj4+PiAgICAgICAgICAgIHNlbGYucW1w
-KCdodW1hbi1tb25pdG9yLWNvbW1hbmQnLA0KPj4+PiAtICAgICAgICAgICAgICAgICAgICBjb21t
-YW5kX2xpbmU9J3FlbXUtaW8gJXMgImJyZWFrICVzIGJwXyVzIicgJSAoZHJpdmUsIGV2ZW50LCBk
-cml2ZSkpDQo+Pj4+ICsgICAgICAgICAgICAgICAgICAgIGNvbW1hbmRfbGluZT0ncWVtdS1pbyAl
-cyAiYnJlYWsgJXMgYnBfMCInICUgKGRyaXZlLCBldmVudCkpDQo+Pj4+ICAgIA0KPj4+PiAgICAg
-ICAgZGVmIHJlc3VtZV9kcml2ZShzZWxmLCBkcml2ZSk6DQo+Pj4+ICAgICAgICAgICAgc2VsZi5x
-bXAoJ2h1bWFuLW1vbml0b3ItY29tbWFuZCcsDQo+Pj4+IC0gICAgICAgICAgICAgICAgICAgIGNv
-bW1hbmRfbGluZT0ncWVtdS1pbyAlcyAicmVtb3ZlX2JyZWFrIGJwXyVzIicgJSAoZHJpdmUsIGRy
-aXZlKSkNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgY29tbWFuZF9saW5lPSdxZW11LWlvICVz
-ICJyZW1vdmVfYnJlYWsgYnBfMCInICUgKGRyaXZlKSkNCj4+Pj4gICAgDQo+Pj4+ICAgICAgICBk
-ZWYgaG1wX3FlbXVfaW8oc2VsZiwgZHJpdmUsIGNtZCk6DQo+Pj4+ICAgICAgICAgICAgJycnV3Jp
-dGUgdG8gYSBnaXZlbiBkcml2ZSB1c2luZyBhbiBITVAgY29tbWFuZCcnJw0KPj4+PiBAQCAtNTQz
-LDEzICs1NDMsMTQgQEAgY2xhc3MgUU1QVGVzdENhc2UodW5pdHRlc3QuVGVzdENhc2UpOg0KPj4+
-PiAgICAgICAgICAgIHNlbGYuYXNzZXJ0RXF1YWwoc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3Qo
-anNvbi5sb2Fkcyhqc29uX2ZpbGVuYW1lWzU6XSkpLA0KPj4+PiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3QocmVmZXJlbmNlKSkNCj4+Pj4gICAg
-DQo+Pj4+IC0gICAgZGVmIGNhbmNlbF9hbmRfd2FpdChzZWxmLCBkcml2ZT0nZHJpdmUwJywgZm9y
-Y2U9RmFsc2UsIHJlc3VtZT1GYWxzZSk6DQo+Pj4+ICsgICAgZGVmIGNhbmNlbF9hbmRfd2FpdChz
-ZWxmLCBkcml2ZT0nZHJpdmUwJywgZm9yY2U9RmFsc2UsIHJlc3VtZT1GYWxzZSwNCj4+Pj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgIHJlc3VtZV9ub2RlPU5vbmUpOg0KPj4+PiAgICAgICAgICAg
-ICcnJ0NhbmNlbCBhIGJsb2NrIGpvYiBhbmQgd2FpdCBmb3IgaXQgdG8gZmluaXNoLCByZXR1cm5p
-bmcgdGhlIGV2ZW50JycnDQo+Pj4+ICAgICAgICAgICAgcmVzdWx0ID0gc2VsZi52bS5xbXAoJ2Js
-b2NrLWpvYi1jYW5jZWwnLCBkZXZpY2U9ZHJpdmUsIGZvcmNlPWZvcmNlKQ0KPj4+PiAgICAgICAg
-ICAgIHNlbGYuYXNzZXJ0X3FtcChyZXN1bHQsICdyZXR1cm4nLCB7fSkNCj4+Pj4gICAgDQo+Pj4+
-ICAgICAgICAgICAgaWYgcmVzdW1lOg0KPj4+PiAtICAgICAgICAgICAgc2VsZi52bS5yZXN1bWVf
-ZHJpdmUoZHJpdmUpDQo+Pj4+ICsgICAgICAgICAgICBzZWxmLnZtLnJlc3VtZV9kcml2ZShyZXN1
-bWVfbm9kZSBvciBkcml2ZSkNCj4+Pj4gICAgDQo+Pj4+ICAgICAgICAgICAgY2FuY2VsbGVkID0g
-RmFsc2UNCj4+Pj4gICAgICAgICAgICByZXN1bHQgPSBOb25lDQo+Pj4+DQo+Pj4NCj4+Pg0KPj4N
-Cj4+DQo+IA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, Jan 23, 2019 at 01:10:42PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 23, 2019 at 01:55:06PM +0100, Erik Skultety wrote:
+> > On Fri, Jan 18, 2019 at 12:51:50PM +0000, Singh, Brijesh wrote:
+> > >
+> > > On 1/18/19 3:39 AM, Erik Skultety wrote:
+> > > > Hi,
+> > > > this is a summary of a private discussion I've had with guys CC'd=
+ on this email
+> > > > about finding a solution to [1] - basically, the default permissi=
+ons on
+> > > > /dev/sev (below) make it impossible to query for SEV platform cap=
+abilities,
+> > > > since by default we run QEMU as qemu:qemu when probing for capabi=
+lities. It's
+> > > > worth noting is that this is only relevant to probing, since for =
+a proper QEMU
+> > > > VM we create a mount namespace for the process and chown all the =
+nodes (needs a
+> > > > SEV fix though).
+> > > >
+> > > > # ll /dev/sev
+> > > > crw-------. 1 root root
+> > > >
+> > > > I suggested either force running QEMU as root for probing (despit=
+e the obvious
+> > > > security implications) or using namespaces for probing too. Dan a=
+rgued that
+> > > > this would have a significant perf impact and suggested we ask sy=
+stemd to add a
+> > > > global udev rule.
+> > > >
+> > > > I proceeded with cloning [1] to systemd and creating an udev rule=
+ that I planned
+> > > > on submitting to systemd upstream - the initial idea was to mimic=
+ /dev/kvm and
+> > > > make it world accessible to which Brijesh from AMD expressed a co=
+ncern that
+> > > > regular users might deplete the resources (limit on the number of=
+ guests
+> > > > allowed by the platform).
+> > >
+> > >
+> > > During private discussion I didn't realized that we are discussing =
+a
+> > > probe issue hence things I have said earlier may not be applicable
+> > > during the probe. The /dev/sev is managed by the CCP (aka PSP) driv=
+er.
+> > > The /dev/sev is used for communicating with the SEV FW running insi=
+de
+> > > the PSP. The SEV FW offers platform and guest specific services. Th=
+e
+> > > guest specific services are used during the guest launch, these ser=
+vices
+> > > are available through KVM driver only. Whereas the platform service=
+s can
+> > > be invoked at anytime. A typical platform specific services are:
+> > >
+> > > - importing certificates
+> > >
+> > > - exporting certificates
+> > >
+> > > - querying the SEV FW version etc etc
+> > >
+> > > In case of the probe we are not launch SEV guest hence we should no=
+t be
+> > > worried about depleting the SEV ASID resources.
+> > >
+> > > IIRC, libvirt uses QEMP query-sev-capabilities to probe the SEV sup=
+port.
+> > > QEMU executes the below sequence to complete the request:
+> > >
+> > > 1. Exports the platform certificates=C2=A0 (this is when /dev/sev i=
+s accessed).
+> > >
+> > > 2. Read the host MSR to determine the C-bit and reduced phys-bit po=
+sition
+> > >
+> > > I don't see any reason why we can't give world a 'read' permission =
+to
+> > > /dev/sev. Anyone should be able to export the certificates and quer=
+y
+> >
+> > Okay, makes sense to me. The problem I see is the sev_platform_ioctl =
+function
+> > in QEMU which makes an _IOWR request, therefore the file descriptor b=
+eing
+> > opened in sev_get_capabilities is O_RDWR. Now, I only understand ioct=
+l from
+> > what I've read in the man page, so I don't quite understand the need =
+for IOWR
+> > here - but my honest guess would be that it's because the commands li=
+ke
+> > SEV_PDH_CERT_EXPORT or SEV_PLATFORM_STATUS need to be copied from use=
+rspace to
+> > kernel to instruct kernel which services we want, ergo _IOWR, is that=
+ right?
+>
+> I'm not seeing any permissions checks in the sev_ioctl() function in th=
+e
+> kernel, so IIUC, that means any permissions are entirely based on wheth=
+er
+> you can open the /dev/sev, once open you can run any ioctl.  What, if a=
+nything,
+> enforces which ioctls you can run when the device is only O_RDONLY vs O=
+_RDWR ?
+
+I don't know, that's why I'm asking, because the manual didn't make it an=
+y
+clear for me whether there's a connection between the device permissions =
+and
+ioctls that you're allowed to run.
+
+>
+> > In any case, a fix of some sort needs to land in QEMU first, because =
+no udev
+> > rule would fix the current situation. Afterwards, I expect that havin=
+g a rule
+> > like this:
+> >
+> > KERNEL=3D=3D"sev", GROUP=3D"kvm", MODE=3D"0644"
+> >
+> > and a selinux policy rule adding the kvm_device_t label, we should be=
+ fine, do
+> > we agree on that?
+>
+> Based on what I think I see above, this looks like a bad idea.
+>
+> It still looks like we can solve this entirely in libvirt by just givin=
+g
+> the libvirt capabilities probing code CAP_DAC_OVERRIDE. This would make
+> libvirt work for all currently released SEV support in kernel/qemu.
+
+Sure we can, but that would make libvirt the only legitimate user of /dev=
+/sev
+and everything else would require the admin to change the permissions
+explicitly so that other apps could at least retrieve the platform info, =
+if
+it was intended to be for public use?
+Additionally, we'll still get shot down by SELinux because svirt_t wouldn=
+'t be
+able to access /dev/sev by default.
+
+Erik
