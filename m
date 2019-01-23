@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54065)
+Received: from eggs.gnu.org ([209.51.188.92]:54139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmGWr-0001p4-Ty
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:13 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXK-00022h-Vw
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmGWr-0007HI-5x
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:09 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmGWq-0007GP-W1
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:09 -0500
-Received: by mail-oi1-x244.google.com with SMTP id y23so1479782oia.4
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 03:17:08 -0800 (PST)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gmGXJ-0007co-KX
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:38 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53535 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gmGXI-0006wl-Qt
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 06:17:36 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Wed, 23 Jan 2019 12:15:52 +0100
+Message-Id: <1548242160-16039-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-	<20190123101238.GD27270@redhat.com>
-	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
-	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
-	<52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-In-Reply-To: <52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 Jan 2019 11:16:56 +0000
-Message-ID: <CAFEAcA9tD+AaTMDgUXO-XAfw8ftsip2n6Ew=GwVbPgMFzo01-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 1/9] target/mips: nanoMIPS: Remove duplicate
+ macro definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com
 
-On Wed, 23 Jan 2019 at 11:09, Kamil Rytarowski <n54@gmx.com> wrote:
->
-> On 23.01.2019 11:59, Peter Maydell wrote:
-> > On Wed, 23 Jan 2019 at 10:37, Kamil Rytarowski <n54@gmx.com> wrote:
-> >> OSS is the portable UNIX audio backend. We could point some flaws in it,
-> >> but it's a good enough for portable UNIX applications. The question is
-> >> what UNIX-like desktop OS does not implement it or removed it.
-> >
-> > If your desktop's native audio API is pulse, like Linux's often
-> > is, then you want to use pulse directly, because the compat layers
-> > are (or were last time I looked) not great, and typically add
-> > in an extra thread and an extra layer of buffering, which means
-> > more latency or more audio dropouts or both.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> Pulseaudio uses OSS backend on NetBSD anyway and we keep an in-kernel
-> mixer. So it adds nothing except additional intermediate layer.
+Several macros were defined twice, with identical values, so
+remove duplicates.
 
-Yes, exactly -- if your native API is OSS, we should be using that.
-It's the compat layers that are problematic, so we can't just use
-a single portable API on all platforms.
+Previously added in 80845edf37b.
 
-> For non-professional audio purposes OSS is good enough for such
-> applications.
+This reverts commit 6bfa9f4c9cf24d6cfaaa227722e9cdcca1ad6fe9.
 
-QEMU has to care about the buffering that compat layers add,
-because guest programs tend to work on the assumption that they're
-talking directly to the hardware and extra buffering trips them up.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-thanks
--- PMM
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index ab307c4..6002d1c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -18502,16 +18502,6 @@ static inline int decode_gpr_gpr4_zero(int r)
+ }
+=20
+=20
+-/* extraction utilities */
+-
+-#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
+-#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
+-#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
+-#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
+-#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
+-#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
+-
+-
+ static void gen_adjust_sp(DisasContext *ctx, int u)
+ {
+     gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
+--=20
+2.7.4
