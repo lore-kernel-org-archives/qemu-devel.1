@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49944)
+Received: from eggs.gnu.org ([209.51.188.92]:51072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmOjp-00079o-Jn
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:03:06 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOln-0000ag-Vm
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:05:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmOcn-0002Lx-E8
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:55:50 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 23 Jan 2019 20:55:21 +0100
-Message-Id: <20190123195527.29575-4-david@redhat.com>
-In-Reply-To: <20190123195527.29575-1-david@redhat.com>
-References: <20190123195527.29575-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFCv2 3/9] qdev: Provide
- qdev_get_bus_hotplug_handler()
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gmOln-0007ik-30
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 15:05:07 -0500
+From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Date: Wed, 23 Jan 2019 20:04:57 +0000
+Message-ID: <20190123200459.GE5213@quinoa.localdomain>
+References: <20181211151945.29137-1-aaron@os.amperecomputing.com>
+	<CAFEAcA8Kvx9ATDgj5mOqcJGQf_T-Sw0ut5N6w3CBs9pBA4d1_A@mail.gmail.com>
+In-Reply-To: <CAFEAcA8Kvx9ATDgj5mOqcJGQf_T-Sw0ut5N6w3CBs9pBA4d1_A@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F7333B513CCAB54798913EE8CEC62CDD@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v10 00/14] More fully implement ARM PMUv3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,59 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-Let's use a wrapper instead of looking it up manually. This function can
-than be reused when we explicitly want to have the bus hotplug handler
-(e.g. when the bus hotplug handler was overwritten by the machine
-hotplug handler).
+On Jan 18 14:13, Peter Maydell wrote:
+> On Tue, 11 Dec 2018 at 15:20, Aaron Lindsay
+> <aaron@os.amperecomputing.com> wrote:
+> >
+> > The ARM PMU implementation currently contains a basic cycle counter, bu=
+t
+> > it is often useful to gather counts of other events, filter them based
+> > on execution mode, and/or be notified on counter overflow. These patche=
+s
+> > flesh out the implementations of various PMU registers including
+> > PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to represent
+> > arbitrary counter types, implement mode filtering, send interrupts on
+> > counter overflow, and add instruction, cycle, and software increment
+> > events.
+> >
+> > Since v9 [1] I have made the following changes:
+> > * Added a clarifying comment about how the PMU timer's migration is
+> >   handled
+> > * Added a check against implementing PMCEID[23] if ID_DFR0.PerfMon =3D=
+=3D
+> >   0xf
+> > * Added TRACEFILT to the ID_DFR0 field definitions
+> >
+> > [1] - https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00805.ht=
+ml
+> >
+>=20
+> Richard has made some comments on patch 14; since 1-13 have
+> all been reviewed now I'm going to apply those to target-arm.next.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/core/qdev.c         | 10 +++++++++-
- include/hw/qdev-core.h |  1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+Thanks.
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 7ad45c0bd6..e2207d77a4 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
-     return NULL;
- }
- 
-+HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
-+{
-+    if (dev->parent_bus) {
-+        return dev->parent_bus->hotplug_handler;
-+    }
-+    return NULL;
-+}
-+
- HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
- {
-     HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
- 
-     if (hotplug_ctrl == NULL && dev->parent_bus) {
--        hotplug_ctrl = dev->parent_bus->hotplug_handler;
-+        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
-     }
-     return hotplug_ctrl;
- }
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 9081fb0030..cb0ec63c2d 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -280,6 +280,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
- void qdev_init_nofail(DeviceState *dev);
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
-+HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
- HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
- /**
-  * qdev_get_hotplug_handler: Get handler responsible for device wiring
--- 
-2.17.2
+I also apologize - I just uncovered a bug I should've caught sooner, and
+sent out a fix to the list as:
+
+	Subject: [PATCH] target/arm: Don't clear supported PMU events when
+	initializing PMCEID1
+
+-Aaron
