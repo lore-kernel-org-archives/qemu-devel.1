@@ -1,26 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:49005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gmID4-0005PG-7z
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:04:51 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gmIE3-0005PG-Ky
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gmI9t-0000bx-Rc
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:01:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53165)
+	(envelope-from <dgilbert@redhat.com>) id 1gmI0M-0003xE-T9
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:51:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:18283)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gmI9o-0000QO-ER
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 08:01:31 -0500
-Date: Wed, 23 Jan 2019 13:55:06 +0100
-From: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20190123125506.GA2376@beluga.usersys.redhat.com>
-References: <20190118093935.GA1142@beluga.usersys.redhat.com>
-	<65f933a2-f63c-962f-c503-43c7e84ab5e8@amd.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gmI0M-0003uL-Mr
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 07:51:42 -0500
+Date: Wed, 23 Jan 2019 12:51:20 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190123125111.GE5771@work-vm>
+References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
+	<20190111063732.10484-2-xiaoguangrong@tencent.com>
+	<fb4db77c-0cee-0f3b-d81a-0cc88d7f5406@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <65f933a2-f63c-962f-c503-43c7e84ab5e8@amd.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
- for capabilities
+In-Reply-To: <fb4db77c-0cee-0f3b-d81a-0cc88d7f5406@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: introduce
+ pages-per-second
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,115 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "berrange@redhat.com" <berrange@redhat.com>, "dinechin@redhat.com" <dinechin@redhat.com>, "mkletzan@redhat.com" <mkletzan@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, Jan 18, 2019 at 12:51:50PM +0000, Singh, Brijesh wrote:
->
-> On 1/18/19 3:39 AM, Erik Skultety wrote:
-> > Hi,
-> > this is a summary of a private discussion I've had with guys CC'd on =
-this email
-> > about finding a solution to [1] - basically, the default permissions =
-on
-> > /dev/sev (below) make it impossible to query for SEV platform capabil=
-ities,
-> > since by default we run QEMU as qemu:qemu when probing for capabiliti=
-es. It's
-> > worth noting is that this is only relevant to probing, since for a pr=
-oper QEMU
-> > VM we create a mount namespace for the process and chown all the node=
-s (needs a
-> > SEV fix though).
-> >
-> > # ll /dev/sev
-> > crw-------. 1 root root
-> >
-> > I suggested either force running QEMU as root for probing (despite th=
-e obvious
-> > security implications) or using namespaces for probing too. Dan argue=
-d that
-> > this would have a significant perf impact and suggested we ask system=
-d to add a
-> > global udev rule.
-> >
-> > I proceeded with cloning [1] to systemd and creating an udev rule tha=
-t I planned
-> > on submitting to systemd upstream - the initial idea was to mimic /de=
-v/kvm and
-> > make it world accessible to which Brijesh from AMD expressed a concer=
-n that
-> > regular users might deplete the resources (limit on the number of gue=
-sts
-> > allowed by the platform).
->
->
-> During private discussion I didn't realized that we are discussing a
-> probe issue hence things I have said earlier may not be applicable
-> during the probe. The /dev/sev is managed by the CCP (aka PSP) driver.
-> The /dev/sev is used for communicating with the SEV FW running inside
-> the PSP. The SEV FW offers platform and guest specific services. The
-> guest specific services are used during the guest launch, these service=
-s
-> are available through KVM driver only. Whereas the platform services ca=
-n
-> be invoked at anytime. A typical platform specific services are:
->
-> - importing certificates
->
-> - exporting certificates
->
-> - querying the SEV FW version etc etc
->
-> In case of the probe we are not launch SEV guest hence we should not be
-> worried about depleting the SEV ASID resources.
->
-> IIRC, libvirt uses QEMP query-sev-capabilities to probe the SEV support=
-.
-> QEMU executes the below sequence to complete the request:
->
-> 1. Exports the platform certificates=C2=A0 (this is when /dev/sev is ac=
-cessed).
->
-> 2. Read the host MSR to determine the C-bit and reduced phys-bit positi=
-on
->
-> I don't see any reason why we can't give world a 'read' permission to
-> /dev/sev. Anyone should be able to export the certificates and query
+* Eric Blake (eblake@redhat.com) wrote:
+> On 1/11/19 12:37 AM, guangrong.xiao@gmail.com wrote:
+> > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > 
+> > It introduces a new statistic, pages-per-second, as bandwidth or mbps is
+> > not enough to measure the performance of posting pages out as we have
+> > compression, xbzrle, which can significantly reduce the amount of the
+> > data size, instead, pages-per-second is the one we want
+> > 
+> > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > ---
+> >  hmp.c                 |  2 ++
 
-Okay, makes sense to me. The problem I see is the sev_platform_ioctl func=
-tion
-in QEMU which makes an _IOWR request, therefore the file descriptor being
-opened in sev_get_capabilities is O_RDWR. Now, I only understand ioctl fr=
-om
-what I've read in the man page, so I don't quite understand the need for =
-IOWR
-here - but my honest guess would be that it's because the commands like
-SEV_PDH_CERT_EXPORT or SEV_PLATFORM_STATUS need to be copied from userspa=
-ce to
-kernel to instruct kernel which services we want, ergo _IOWR, is that rig=
-ht?
-In any case, a fix of some sort needs to land in QEMU first, because no u=
-dev
-rule would fix the current situation. Afterwards, I expect that having a =
-rule
-like this:
+I've queued this 1/3 and fixed these typos during the merge.
 
-KERNEL=3D=3D"sev", GROUP=3D"kvm", MODE=3D"0644"
+Dave
 
-and a selinux policy rule adding the kvm_device_t label, we should be fin=
-e, do
-we agree on that?
+> 
+> > +++ b/migration/migration.h
+> > @@ -126,6 +126,12 @@ struct MigrationState
+> >       */
+> >      QemuSemaphore rate_limit_sem;
+> >  
+> > +    /* pages already send at the beggining of current interation */
+> 
+> beginning, iteration
+> 
+> > +    uint64_t iteration_initial_pages;
+> > +
+> > +    /* pages transferred per second */
+> > +    double pages_per_second;
+> > +
+> >      /* bytes already send at the beggining of current interation */
+> 
+> although you copied the existing typos
+> 
+> > +++ b/qapi/migration.json
+> > @@ -41,6 +41,9 @@
+> >  #
+> >  # @multifd-bytes: The number of bytes sent through multifd (since 3.0)
+> >  #
+> > +# @pages-per-second: the number of memory pages transferred per second
+> > +#        (Since 3.2)
+> > +#
+> 
+> 3.2 was last year; you'll need to update your series to use 4.0 on all
+> new stuff
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
-> status etc. I think the main issue is reading MSR -- which I believe is
-> putting a 'root' requirement. Am I missing something ?
->
->
-> > But since the limit is claimed to be around 4, Dan
->
->
-> FYI, the limit on EPYC is 15.
 
-Thanks for correction.
-
-Erik
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
