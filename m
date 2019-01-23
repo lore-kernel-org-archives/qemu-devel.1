@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40873)
+Received: from eggs.gnu.org ([209.51.188.92]:41288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmNwz-0004GM-Lo
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:12:38 -0500
+	(envelope-from <knut.omang@oracle.com>) id 1gmNyq-00053p-Oo
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:14:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmNwx-0007c7-Pv
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:12:37 -0500
-Resent-Message-Id: <E1gmNwx-0007c7-Pv@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21786)
+	(envelope-from <knut.omang@oracle.com>) id 1gmNyh-00010U-14
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:14:27 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:49424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gmNws-0007Y2-HO
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:12:31 -0500
-Message-ID: <154827072741.21.15238243883709698749@ebba9967afc0>
-In-Reply-To: <20190118122210.505-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 23 Jan 2019 11:12:08 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] audio: fix pc speaker init
+	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
+	id 1gmNyc-0000xw-Un
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 14:14:20 -0500
+Message-ID: <cc0e2d32eeeecbd4255c00a1476151c481f91c07.camel@oracle.com>
+From: Knut Omang <knut.omang@oracle.com>
+Date: Wed, 23 Jan 2019 20:14:07 +0100
+In-Reply-To: <20190123120422.36273dd1@w520.home>
+References: <cover.c7f64d9a8f7ff9259c785560765645151c85dc75.1548266832.git-series.knut.omang@oracle.com>
+	<b6e8edb21e6cc5f616383cb733c2d5f75d89953e.1548266832.git-series.knut.omang@oracle.com>
+	<20190123120422.36273dd1@w520.home>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] pcie: Add a simple PCIe ACS (Access
+ Control Services) helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tal Attaly <talat@mellanox.com>, Elijah Shakkour <elijahs@mellanox.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExODEyMjIxMC41MDUt
-MS1rcmF4ZWxAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAxMTgxMjIyMTAuNTA1LTEta3JheGVsQHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGF1ZGlvOiBmaXgg
-cGMgc3BlYWtlciBpbml0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphNzYyYjI4IGF1ZGlvOiBmaXgg
-cGMgc3BlYWtlciBpbml0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogc3BhY2UgcHJvaGli
-aXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM2Mzog
-RklMRTogaHcvYXVkaW8vcGNzcGsuYzoxNzU6CisgICAgICAgIGVycm9yX3NldGcgKGVycnAsICJJ
-bml0aWFsaXppbmcgYXVkaW8gdm9pY2UgZmFpbGVkIik7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM4NTogRklM
-RTogaHcvYXVkaW8vcGNzcGsuYzoyMjc6CisgICAgaXNhX2NyZWF0ZV9zaW1wbGUgKGJ1cywgVFlQ
-RV9QQ19TUEVBS0VSKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNzAgbGluZXMgY2hl
-Y2tlZAoKQ29tbWl0IGE3NjJiMjg4ZTMyOCAoYXVkaW86IGZpeCBwYyBzcGVha2VyIGluaXQpIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE4MTIyMjEwLjUwNS0xLWtyYXhlbEByZWRoYXQuY29t
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Wed, 2019-01-23 at 12:04 -0700, Alex Williamson wrote:
+> On Wed, 23 Jan 2019 19:27:59 +0100
+> Knut Omang <knut.omang@oracle.com> wrote:
+> 
+> > Add a helper function to add PCIe capability for Access Control Services (ACS)
+> > ACS support in the associated root port is a prerequisite to be able to do useful
+> > passthrough with VFIO without Alex Williamson's pcie_acs_override kernel patch.
+> 
+> Define "useful".  
+
+Hmm - just that without the patches, the root port itself 
+also gets assigned to the same group, which seemed problematic to me
+(without any further testing than just binding/unbinding to VFIO)
+
+Knut
+
+> We can certainly still assign single function PFs to
+> an L2 guest, or multi-function so long as all the functions are
+> assigned.  I won't deny that it's problematic, but it's a virtual
+> topology that can be adjusted, so I think this is overstating things a
+> bit.
+> 
+> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
+> > ---
+> >  hw/pci/pcie.c              | 14 ++++++++++++++
+> >  include/hw/pci/pcie.h      |  1 +
+> >  include/hw/pci/pcie_regs.h |  4 ++++
+> >  3 files changed, 19 insertions(+)
+> > 
+> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > index 230478f..18feff5 100644
+> > --- a/hw/pci/pcie.c
+> > +++ b/hw/pci/pcie.c
+> > @@ -906,3 +906,17 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+> >  
+> >      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
+> >  }
+> > +
+> > +/* Add an ACS (Access Control Services) capability */
+> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset, uint8_t egress_ctrl_vec_sz)
+> > +{
+> > +    int ectrl_words = (egress_ctrl_vec_sz + 31) & ~31;
+> > +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER,
+> > +                        offset, PCI_ACS_SIZEOF + ectrl_words);
+> 
+> The egress control vector is only valid if the egress control
+> capability is enabled, which is not set below, so this just seems to
+> waste config space and introduces a meaningless function arg.
+> 
+> > +    pci_set_word(dev->config + offset + PCI_ACS_CAP,
+> > +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
+> 
+> Some of these bits are only valid for downstream ports, it would
+> violate the spec to set them on and endpoint.
+> 
+> > +    pci_set_word(dev->config + offset + PCI_ACS_CTRL,
+> > +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
+> 
+> The default values of the control register bits is zero, so we
+> shouldn't be setting it here and we should have a reset hook to clear
+> it.
+> 
+> > +    /* Make CTRL register writable */
+> > +    memset(dev->wmask + offset + PCI_ACS_CTRL, 0xff, 2);
+> > +}
+> > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> > index 5b82a0d..c2da148 100644
+> > --- a/include/hw/pci/pcie.h
+> > +++ b/include/hw/pci/pcie.h
+> > @@ -129,6 +129,7 @@ void pcie_add_capability(PCIDevice *dev,
+> >  void pcie_sync_bridge_lnk(PCIDevice *dev);
+> >  
+> >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+> > +void pcie_acs_init(PCIDevice *dev, uint16_t offset, uint8_t egress_ctrl_vec_sz);
+> >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+> >  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+> >  
+> > diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> > index ad4e780..5e7409c 100644
+> > --- a/include/hw/pci/pcie_regs.h
+> > +++ b/include/hw/pci/pcie_regs.h
+> > @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
+> >                                           PCI_ERR_COR_INTERNAL |         \
+> >                                           PCI_ERR_COR_HL_OVERFLOW)
+> >  
+> > +/* ACS */
+> > +#define PCI_ACS_VER			0x2
+> > +#define PCI_ACS_SIZEOF                  8
+> > +
+> >  #endif /* QEMU_PCIE_REGS_H */
+> 
