@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40396)
+Received: from eggs.gnu.org ([209.51.188.92]:40427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEno-0008Uo-QW
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:26:33 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEnq-00005O-CB
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:26:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEnm-0007Kg-Us
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:26:32 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gmEno-0007LN-K0
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 04:26:33 -0500
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Wed, 23 Jan 2019 10:25:10 +0100
-Message-Id: <20190123092538.8004-8-kbastian@mail.uni-paderborn.de>
+Date: Wed, 23 Jan 2019 10:25:06 +0100
+Message-Id: <20190123092538.8004-4-kbastian@mail.uni-paderborn.de>
 In-Reply-To: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
 References: <20190123092538.8004-1-kbastian@mail.uni-paderborn.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 07/35] target/riscv: Convert RVXI fence
+Subject: [Qemu-devel] [PATCH v6 03/35] target/riscv: Convert RVXI branch
  insns to decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,74 +26,140 @@ To: sagark@eecs.berkeley.edu, palmer@sifive.com, kbastian@mail.uni-paderborn.de
 Cc: qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
 
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Peer Adelt <peer.adelt@hni.uni-paderborn.de>
 ---
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvi.inc.c | 19 +++++++++++++++++++
- target/riscv/translate.c                | 12 ------------
- 3 files changed, 21 insertions(+), 12 deletions(-)
+ target/riscv/insn32.decode              | 19 ++++++++++
+ target/riscv/insn_trans/trans_rvi.inc.c | 49 +++++++++++++++++++++++++
+ target/riscv/translate.c                | 12 +-----
+ 3 files changed, 69 insertions(+), 11 deletions(-)
 
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 1f5bf1f6f9..804b721ca5 100644
+index 44d4e922b6..81f56c16b4 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -82,3 +82,5 @@ srl      0000000 .....    ..... 101 ..... 0110011 @r
- sra      0100000 .....    ..... 101 ..... 0110011 @r
- or       0000000 .....    ..... 110 ..... 0110011 @r
- and      0000000 .....    ..... 111 ..... 0110011 @r
-+fence    ---- pred:4 succ:4 ----- 000 ----- 0001111
-+fence_i  ---- ----   ----   ----- 001 ----- 0001111
+@@ -17,14 +17,33 @@
+ # this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ # Fields:
++%rs2       20:5
++%rs1       15:5
+ %rd        7:5
+ 
+ # immediates:
++%imm_i    20:s12
++%imm_b    31:s1 7:1 25:6 8:4     !function=ex_shift_1
++%imm_j    31:s1 12:8 20:1 21:10  !function=ex_shift_1
+ %imm_u    12:s20                 !function=ex_shift_12
+ 
++# Argument sets:
++&b    imm rs2 rs1
++
+ # Formats 32:
++@i       ............    ..... ... ..... .......         imm=%imm_i     %rs1 %rd
++@b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
+ @u       ....................      ..... .......         imm=%imm_u          %rd
++@j       ....................      ..... .......         imm=%imm_j          %rd
+ 
+ # *** RV32I Base Instruction Set ***
+ lui      ....................       ..... 0110111 @u
+ auipc    ....................       ..... 0010111 @u
++jal      ....................       ..... 1101111 @j
++jalr     ............     ..... 000 ..... 1100111 @i
++beq      ....... .....    ..... 000 ..... 1100011 @b
++bne      ....... .....    ..... 001 ..... 1100011 @b
++blt      ....... .....    ..... 100 ..... 1100011 @b
++bge      ....... .....    ..... 101 ..... 1100011 @b
++bltu     ....... .....    ..... 110 ..... 1100011 @b
++bgeu     ....... .....    ..... 111 ..... 1100011 @b
 diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc.c
-index 01f751650a..b468a0ac0e 100644
+index 9885a8d275..0347461ee6 100644
 --- a/target/riscv/insn_trans/trans_rvi.inc.c
 +++ b/target/riscv/insn_trans/trans_rvi.inc.c
-@@ -318,3 +318,22 @@ static bool trans_sraw(DisasContext *ctx, arg_sraw *a)
+@@ -33,3 +33,52 @@ static bool trans_auipc(DisasContext *ctx, arg_auipc *a)
+     }
      return true;
  }
- #endif
 +
-+static bool trans_fence(DisasContext *ctx, arg_fence *a)
++static bool trans_jal(DisasContext *ctx, arg_jal *a)
 +{
-+    /* FENCE is a full memory barrier. */
-+    tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
++    gen_jal(ctx->env, ctx, a->rd, a->imm);
 +    return true;
 +}
 +
-+static bool trans_fence_i(DisasContext *ctx, arg_fence_i *a)
++static bool trans_jalr(DisasContext *ctx, arg_jalr *a)
 +{
-+    /*
-+     * FENCE_I is a no-op in QEMU,
-+     * however we need to end the translation block
-+     */
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-+    tcg_gen_exit_tb(NULL, 0);
-+    ctx->base.is_jmp = DISAS_NORETURN;
++    gen_jalr(ctx->env, ctx, OPC_RISC_JALR, a->rd, a->rs1, a->imm);
++    return true;
++}
++
++static bool trans_beq(DisasContext *ctx, arg_beq *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BEQ, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bne(DisasContext *ctx, arg_bne *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BNE, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_blt(DisasContext *ctx, arg_blt *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BLT, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bge(DisasContext *ctx, arg_bge *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BGE, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bltu(DisasContext *ctx, arg_bltu *a)
++{
++    gen_branch(ctx->env, ctx, OPC_RISC_BLTU, a->rs1, a->rs2, a->imm);
++    return true;
++}
++
++static bool trans_bgeu(DisasContext *ctx, arg_bgeu *a)
++{
++
++    gen_branch(ctx->env, ctx, OPC_RISC_BGEU, a->rs1, a->rs2, a->imm);
 +    return true;
 +}
 diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index c16eba8ec8..9899f10be4 100644
+index 99829a600d..b81297f23e 100644
 --- a/target/riscv/translate.c
 +++ b/target/riscv/translate.c
-@@ -1750,18 +1750,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-         gen_fp_arith(ctx, MASK_OP_FP_ARITH(ctx->opcode), rd, rs1, rs2,
-                      GET_RM(ctx->opcode));
-         break;
--    case OPC_RISC_FENCE:
--        if (ctx->opcode & 0x1000) {
--            /* FENCE_I is a no-op in QEMU,
--             * however we need to end the translation block */
--            tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
--            tcg_gen_exit_tb(NULL, 0);
--            ctx->base.is_jmp = DISAS_NORETURN;
--        } else {
--            /* FENCE is a full memory barrier. */
--            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--        }
+@@ -1682,6 +1682,7 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
+     {                                         \
+         return imm << amount;                 \
+     }
++EX_SH(1)
+ EX_SH(12)
+ 
+ bool decode_insn32(DisasContext *ctx, uint32_t insn);
+@@ -1710,17 +1711,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+     imm = GET_IMM(ctx->opcode);
+ 
+     switch (op) {
+-    case OPC_RISC_JAL:
+-        imm = GET_JAL_IMM(ctx->opcode);
+-        gen_jal(env, ctx, rd, imm);
 -        break;
-     case OPC_RISC_SYSTEM:
-         gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-                    (ctx->opcode & 0xFFF00000) >> 20);
+-    case OPC_RISC_JALR:
+-        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
+-        break;
+-    case OPC_RISC_BRANCH:
+-        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
+-                   GET_B_IMM(ctx->opcode));
+-        break;
+     case OPC_RISC_LOAD:
+         gen_load(ctx, MASK_OP_LOAD(ctx->opcode), rd, rs1, imm);
+         break;
 -- 
 2.20.1
