@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38735)
+Received: from eggs.gnu.org ([209.51.188.92]:43212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gmPzu-0006fd-VJ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:23:49 -0500
+	(envelope-from <relkochta@gmail.com>) id 1gmQNR-0002Pc-In
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:48:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gmPzu-0002BS-05
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:23:46 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 23 Jan 2019 21:22:33 +0000
-Message-Id: <20190123212234.32068-5-stefanha@redhat.com>
-In-Reply-To: <20190123212234.32068-1-stefanha@redhat.com>
-References: <20190123212234.32068-1-stefanha@redhat.com>
+	(envelope-from <relkochta@gmail.com>) id 1gmQMG-0000oL-QK
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:46:53 -0500
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:32832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <relkochta@gmail.com>) id 1gmQMG-0000nj-Mf
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 16:46:52 -0500
+Received: by mail-qt1-x844.google.com with SMTP id l11so4273198qtp.0
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 13:46:52 -0800 (PST)
+From: Ryan El Kochta <relkochta@gmail.com>
+Date: Wed, 23 Jan 2019 16:45:55 -0500
+Message-Id: <20190123214555.12712-2-relkochta@gmail.com>
+In-Reply-To: <20190123214555.12712-1-relkochta@gmail.com>
+References: <20190123214555.12712-1-relkochta@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/5] arm: Instantiate NRF51 special NVM's
- and NVMC
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/1] input-linux: customizable grab toggle keys
+ v5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +28,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Joel Stanley <joel@jms.id.au>, qemu-block@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, jusual@mail.ru, Laurent Vivier <lvivier@redhat.com>, jim@groklearning.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: Ryan El Kochta <relkochta@gmail.com>
 
-From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+The latest revision of the input-linux customizable grab toggle keys
+patch.
 
-Instantiates UICR, FICR, FLASH and NVMC in nRF51 SOC.
-
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Ryan El Kochta <relkochta@gmail.com>
 ---
- include/hw/arm/nrf51_soc.h |  2 ++
- hw/arm/nrf51_soc.c         | 41 +++++++++++++++++++++++++++-----------
- 2 files changed, 31 insertions(+), 12 deletions(-)
+ qapi/ui.json     | 10 ++++++++
+ ui/input-linux.c | 66 +++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 73 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index e06f0304b4..c8c91cf9ff 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -15,6 +15,7 @@
- #include "hw/char/nrf51_uart.h"
- #include "hw/misc/nrf51_rng.h"
- #include "hw/gpio/nrf51_gpio.h"
-+#include "hw/nvram/nrf51_nvm.h"
- #include "hw/timer/nrf51_timer.h"
-=20
- #define TYPE_NRF51_SOC "nrf51-soc"
-@@ -32,6 +33,7 @@ typedef struct NRF51State {
-=20
-     NRF51UARTState uart;
-     NRF51RNGState rng;
-+    NRF51NVMState nvm;
-     NRF51GPIOState gpio;
-     NRF51TimerState timer[NRF51_NUM_TIMERS];
-=20
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 1630c27594..b839daea8b 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -29,8 +29,10 @@
-  * are supported in the future, add a sub-class of NRF51SoC for
-  * the specific variants
-  */
--#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
--#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
-+#define NRF51822_FLASH_PAGES    256
-+#define NRF51822_SRAM_PAGES     16
-+#define NRF51822_FLASH_SIZE     (NRF51822_FLASH_PAGES * NRF51_PAGE_SIZE)
-+#define NRF51822_SRAM_SIZE      (NRF51822_SRAM_PAGES * NRF51_PAGE_SIZE)
-=20
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
-=20
-@@ -81,14 +83,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Er=
-ror **errp)
-=20
-     memory_region_add_subregion_overlap(&s->container, 0, s->board_memor=
-y, -1);
-=20
--    memory_region_init_rom(&s->flash, OBJECT(s), "nrf51.flash", s->flash=
-_size,
--            &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->fla=
-sh);
--
-     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &=
-err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -121,6 +115,29 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
-Error **errp)
-                        qdev_get_gpio_in(DEVICE(&s->cpu),
-                        BASE_TO_IRQ(NRF51_RNG_BASE)));
-=20
-+    /* UICR, FICR, NVMC, FLASH */
-+    object_property_set_uint(OBJECT(&s->nvm), s->flash_size, "flash-size=
-",
-+                             &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 5ad1324..7d9c4bd 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -1016,6 +1016,16 @@
+             '*head'  : 'int',
+             'events' : [ 'InputEvent' ] } }
+ 
++##
++# @GrabToggleKeys:
++#
++# Keys to toggle input-linux between host and guest.
++#
++# Since: 4.0
++#
++##
++{ 'enum': 'GrabToggleKeys',
++  'data': [ 'ctrl-ctrl', 'alt-alt', 'meta-meta', 'scrolllock', 'ctrl-scrolllock' ] }
+ 
+ ##
+ # @DisplayGTK:
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index 9720333..ba550dd 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -12,6 +12,8 @@
+ #include "sysemu/sysemu.h"
+ #include "ui/input.h"
+ #include "qom/object_interfaces.h"
++#include "sysemu/iothread.h"
++#include "block/aio.h"
+ 
+ #include <sys/ioctl.h>
+ #include "standard-headers/linux/input.h"
+@@ -63,6 +65,8 @@ struct InputLinux {
+     struct input_event event;
+     int         read_offset;
+ 
++    enum GrabToggleKeys grab_toggle;
 +
-+    object_property_set_bool(OBJECT(&s->nvm), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 0);
-+    memory_region_add_subregion_overlap(&s->container, NRF51_NVMC_BASE, =
-mr, 0);
-+    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 1);
-+    memory_region_add_subregion_overlap(&s->container, NRF51_FICR_BASE, =
-mr, 0);
-+    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 2);
-+    memory_region_add_subregion_overlap(&s->container, NRF51_UICR_BASE, =
-mr, 0);
-+    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 3);
-+    memory_region_add_subregion_overlap(&s->container, NRF51_FLASH_BASE,=
- mr, 0);
-+
-     /* GPIO */
-     object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
-     if (err) {
-@@ -158,8 +175,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
-rror **errp)
-=20
-     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-                                 NRF51_IOMEM_SIZE);
--    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
--                                NRF51_FICR_SIZE);
-     create_unimplemented_device("nrf51_soc.private",
-                                 NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
+     QTAILQ_ENTRY(InputLinux) next;
+ };
+ 
+@@ -98,6 +102,44 @@ static void input_linux_toggle_grab(InputLinux *il)
+     }
  }
-@@ -186,6 +201,8 @@ static void nrf51_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-                            TYPE_NRF51_RNG);
-=20
-+    sysbus_init_child_obj(obj, "nvm", &s->nvm, sizeof(s->nvm), TYPE_NRF5=
-1_NVM);
+ 
++static bool input_linux_check_toggle(InputLinux *il)
++{
++    switch (il->grab_toggle) {
++    case GRAB_TOGGLE_KEYS_CTRL_CTRL:
++        return il->keydown[KEY_LEFTCTRL] &&
++            il->keydown[KEY_RIGHTCTRL];
 +
-     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-                           TYPE_NRF51_GPIO);
-=20
---=20
++    case GRAB_TOGGLE_KEYS_ALT_ALT:
++        return il->keydown[KEY_LEFTALT] &&
++            il->keydown[KEY_RIGHTALT];
++
++    case GRAB_TOGGLE_KEYS_META_META:
++        return il->keydown[KEY_LEFTMETA] &&
++            il->keydown[KEY_RIGHTMETA];
++
++    case GRAB_TOGGLE_KEYS_SCROLLLOCK:
++        return il->keydown[KEY_SCROLLLOCK];
++
++    case GRAB_TOGGLE_KEYS_CTRL_SCROLLLOCK:
++        return (il->keydown[KEY_LEFTCTRL] ||
++                il->keydown[KEY_RIGHTCTRL]) &&
++            il->keydown[KEY_SCROLLLOCK];
++
++    case GRAB_TOGGLE_KEYS__MAX:
++        /* avoid gcc error */
++        break;
++    }
++    return false;
++}
++
++static bool input_linux_should_skip(InputLinux *il,
++                                    struct input_event *event)
++{
++    return (il->grab_toggle == GRAB_TOGGLE_KEYS_SCROLLLOCK ||
++            il->grab_toggle == GRAB_TOGGLE_KEYS_CTRL_SCROLLLOCK) &&
++            event->code == KEY_SCROLLLOCK;
++}
++
+ static void input_linux_handle_keyboard(InputLinux *il,
+                                         struct input_event *event)
+ {
+@@ -128,14 +170,13 @@ static void input_linux_handle_keyboard(InputLinux *il,
+         }
+ 
+         /* send event to guest when grab is active */
+-        if (il->grab_active) {
++        if (il->grab_active && !input_linux_should_skip(il, event)) {
+             int qcode = qemu_input_linux_to_qcode(event->code);
+             qemu_input_event_send_key_qcode(NULL, qcode, event->value);
+         }
+ 
+         /* hotkey -> record switch request ... */
+-        if (il->keydown[KEY_LEFTCTRL] &&
+-            il->keydown[KEY_RIGHTCTRL]) {
++        if (input_linux_check_toggle(il)) {
+             il->grab_request = true;
+         }
+ 
+@@ -410,6 +451,21 @@ static void input_linux_set_repeat(Object *obj, bool value,
+     il->repeat = value;
+ }
+ 
++static int input_linux_get_grab_toggle(Object *obj, Error **errp)
++{
++    InputLinux *il = INPUT_LINUX(obj);
++
++    return il->grab_toggle;
++}
++
++static void input_linux_set_grab_toggle(Object *obj, int value,
++                                       Error **errp)
++{
++    InputLinux *il = INPUT_LINUX(obj);
++
++    il->grab_toggle = value;
++}
++
+ static void input_linux_instance_init(Object *obj)
+ {
+     object_property_add_str(obj, "evdev",
+@@ -421,6 +477,10 @@ static void input_linux_instance_init(Object *obj)
+     object_property_add_bool(obj, "repeat",
+                              input_linux_get_repeat,
+                              input_linux_set_repeat, NULL);
++    object_property_add_enum(obj, "grab-toggle", "GrabToggleKeys",
++                             &GrabToggleKeys_lookup,
++                             input_linux_get_grab_toggle,
++                             input_linux_set_grab_toggle, NULL);
+ }
+ 
+ static void input_linux_class_init(ObjectClass *oc, void *data)
+-- 
 2.20.1
