@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60001)
+Received: from eggs.gnu.org ([209.51.188.92]:60179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmKLc-0008Gg-Rn
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmKLh-0008JC-Mk
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmKLb-0008H3-Lj
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56176)
+	(envelope-from <kraxel@redhat.com>) id 1gmKLe-0008K6-9g
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmKLZ-000873-Bs
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:45 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmKLe-00086F-0A
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:21:50 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Jan 2019 16:21:11 +0100
-Message-Id: <20190123152112.15757-6-kraxel@redhat.com>
+Date: Wed, 23 Jan 2019 16:21:10 +0100
+Message-Id: <20190123152112.15757-5-kraxel@redhat.com>
 In-Reply-To: <20190123152112.15757-1-kraxel@redhat.com>
 References: <20190123152112.15757-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] audio: error message tweak
+Subject: [Qemu-devel] [PATCH v2 4/6] audio: check for pulseaudio daemon
+ pidfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +27,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Only print a message about the failed driver initialization in case it
-was the driver explicitly requested by the user via QEMU_AUDIO_DRV=$drv.
+Check whenever the pulseaudio daemon pidfile is present before trying to
+initialize the pulseaudio backend.  Just return NULL if that is not the
+case, so qemu will check the next backend in line.
+
+In case the user explicitly configured a non-default pulseaudio server
+skip the check.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/audio.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ audio/paaudio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 1ace47f510..3e40ea9e5e 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1762,7 +1762,7 @@ void AUD_help (void)
-         );
- }
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 4c100bc318..3c5cae8851 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -814,6 +814,19 @@ static PAConf glob_conf = {
  
--static int audio_driver_init (AudioState *s, struct audio_driver *drv)
-+static int audio_driver_init (AudioState *s, struct audio_driver *drv, bool msg)
+ static void *qpa_audio_init (void)
  {
-     if (drv->options) {
-         audio_process_options (drv->name, drv->options);
-@@ -1776,7 +1776,8 @@ static int audio_driver_init (AudioState *s, struct audio_driver *drv)
-         return 0;
-     }
-     else {
--        dolog ("Could not init `%s' audio driver\n", drv->name);
-+        if (msg)
-+            dolog ("Could not init `%s' audio driver\n", drv->name);
-         return -1;
-     }
- }
-@@ -1901,7 +1902,7 @@ static void audio_init (void)
-     if (drvname) {
-         driver = audio_driver_lookup(drvname);
-         if (driver) {
--            done = !audio_driver_init(s, driver);
-+            done = !audio_driver_init(s, driver, true);
-         } else {
-             dolog ("Unknown audio driver `%s'\n", drvname);
-             dolog ("Run with -audio-help to list available drivers\n");
-@@ -1912,14 +1913,14 @@ static void audio_init (void)
-         for (i = 0; !done && i < ARRAY_SIZE(audio_prio_list); i++) {
-             driver = audio_driver_lookup(audio_prio_list[i]);
-             if (driver && driver->can_be_default) {
--                done = !audio_driver_init(s, driver);
-+                done = !audio_driver_init(s, driver, false);
-             }
-         }
-     }
- 
-     if (!done) {
-         driver = audio_driver_lookup("none");
--        done = !audio_driver_init(s, driver);
-+        done = !audio_driver_init(s, driver, false);
-         assert(done);
-         dolog("warning: Using timer based audio emulation\n");
-     }
++    if (glob_conf.server == NULL) {
++        char pidfile[64];
++        char *runtime;
++        struct stat st;
++
++        runtime = getenv("XDG_RUNTIME_DIR");
++        if (!runtime)
++            return NULL;
++        snprintf(pidfile, sizeof(pidfile), "%s/pulse/pid", runtime);
++        if (stat(pidfile, &st) != 0)
++            return NULL;
++    }
++
+     paaudio *g = g_malloc(sizeof(paaudio));
+     g->conf = glob_conf;
+     g->mainloop = NULL;
 -- 
 2.9.3
