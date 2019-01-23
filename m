@@ -1,21 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39143)
+Received: from eggs.gnu.org ([209.51.188.92]:39442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sourav.jb1988@gmail.com>) id 1gmKnf-0002ls-CF
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:50:48 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gmKos-0003T1-76
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sourav.jb1988@gmail.com>) id 1gmKne-0001G9-Ds
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:50:47 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gmKor-0001vr-Fe
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:52:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gmKor-0001ut-5a
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:52:01 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0NFoHRx009177
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:51:58 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q6u80g4gy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:51:57 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 23 Jan 2019 15:51:55 -0000
+Date: Wed, 23 Jan 2019 16:51:48 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190121110354.2247-6-cohuck@redhat.com>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-6-cohuck@redhat.com>
 MIME-Version: 1.0
-References: <CAAJhNetR-8z37JuOmFDRuq3JfG_S03VDZkciqiKh_kieoqxQ1g@mail.gmail.com>
-	<628a94ba-2202-6a15-865b-16d52653288d@redhat.com>
-	<CAFEAcA8jvRRpphFS7jvisU+f0SEvU1DOhrBxgKSRWEMkZV3eOw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8jvRRpphFS7jvisU+f0SEvU1DOhrBxgKSRWEMkZV3eOw@mail.gmail.com>
-From: ksourav <sourav.jb1988@gmail.com>
-Date: Wed, 23 Jan 2019 21:20:10 +0530
-Message-ID: <CAAJhNeta4fWX7y-ap-CSUhrHDGrZH_Xss6tyDa6=vn_uUJSk0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] object owner argument of
- memory_region_init_ram
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190123165148.55aba88b@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] vfio-ccw: add handling for async
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +41,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Thanks for the reply.
-Should I send patches for socs using NULL owner to qemu-trivial@nongnu.org ?
+On Mon, 21 Jan 2019 12:03:54 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-I have been reading qemu source code for soc and different device
-implementation for past few days to understand qemu internals.
-While I have a rough idea of qemu object model, I would like to have your input.
-If someone has to learn about qemu object model or soc implementation,
-what would be the correct way ?
-So far I have implemented a minimal platform device and experimented
-with it using linux driver on qemu. But I am wondering is there any
-other way of doing things to develop understanding.
+> Add a region to the vfio-ccw device that can be used to submit
+> asynchronous I/O instructions. ssch continues to be handled by the
+> existing I/O region; the new region handles hsch and csch.
+> 
+> Interrupt status continues to be reported through the same channels
+> as for ssch.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Thanks in Advance
+I had a look, and I don't have any new concerns.(New like not raised
+before.)
 
-On Wed, Jan 23, 2019 at 4:23 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Wed, 23 Jan 2019 at 06:10, Thomas Huth <thuth@redhat.com> wrote:
-> > On 2019-01-23 04:07, ksourav wrote:
-> > > I am trying to learn how qemu implements different soc.
-> > > While reading the source code, I found that in some socs, object owner
-> > > is passed as NULL to the routine memory_region_init_ram() (for example
-> > > in nrf51 soc) and in some socs(for example in Allwinner A10) an
-> > > object(non NULL) is passed to memory_region_initi_ram().
-> > > When I checked docs/devel/memory.txt, I found below lines.
-> > > "For regions that "have no owner" (NULL is passed at creation time), the
-> > > machine object is actually used as the owner."
-> > > Is the machine object refers to the actual board instance that will
-> > > use the soc? For example microbit in case of nrf51 soc ?
-> > > Is there any reason of not passing object as owner or in other words,
-> > > when do we pass NULL or an object to memory_region_initi_ram() ?
-> >
-> > I'm not an expert here, but when you look at the description of
-> > memory_region_init_ram() in include/exec/memory.h:
-> >
-> >  * @owner: the object that tracks the region's reference count (must be
-> >  *         TYPE_DEVICE or a subclass of TYPE_DEVICE, or NULL)
-> >
-> > So if you're calling memory_region_init_ram() from a device's
-> > instance_init() or realize() function, you should use the current device
-> > state as owner. But if you want to call the function from a
-> > MachineClass->init function instead already, you don't have a
-> > DeviceState* yet, so you have to use NULL there.
->
-> Yes. Also old-style boards which don't use MachineState directly
-> will pass a NULL owner, as will very old non-QOM devices, and
-> probably one or two devices with bugs. Don't copy those examples :-)
-> (the nrf51_soc you mention above is an example of a bug.)
->
-> The reason the owner matters here is so we clean things up correctly
-> when the device goes away. So for a machine model it doesn't matter
-> because the machine is never destroyed. For an SoC, that is also
-> typically never destroyed and so bugs where the owner was not set
-> easily go unnoticed. But there is a corner case where the user can
-> introspect an object, which causes a temporary copy to go through
-> instance_init, which can result in leaks if ownership is wrong.
->
-> We really need to make sure we have a good grasp of this kind of
-> thing and write it up somewhere (in particular the object life cycle,
-> what can or should be done in instance_init, how things need to
-> be parented to ensure there are no leaks, etc.)
->
-> thanks
-> -- PMM
+Regards,
+Halil
