@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40898)
+Received: from eggs.gnu.org ([209.51.188.92]:40931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gmRSR-0005s4-EZ
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:20 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gmRSj-00063J-Gk
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gmRSL-00049O-Lw
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:15 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:37950)
+	(envelope-from <richard.henderson@linaro.org>) id 1gmRSf-0004Gz-Ll
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:37 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gmRSL-00048E-7x
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:13 -0500
-Received: by mail-pf1-x442.google.com with SMTP id q1so1934850pfi.5
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 14:57:13 -0800 (PST)
+	id 1gmRST-0004Ah-66
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 17:57:26 -0500
+Received: by mail-pl1-x643.google.com with SMTP id w4so1920755plz.1
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 14:57:16 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 23 Jan 2019 14:56:55 -0800
-Message-Id: <20190123225705.28963-4-richard.henderson@linaro.org>
+Date: Wed, 23 Jan 2019 14:56:58 -0800
+Message-Id: <20190123225705.28963-7-richard.henderson@linaro.org>
 In-Reply-To: <20190123225705.28963-1-richard.henderson@linaro.org>
 References: <20190123225705.28963-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/13] tcg/i386: enable dynamic TLB sizing
+Subject: [Qemu-devel] [PATCH 06/13] tcg/sparc: enable dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,228 +29,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org, alex.bennee@linaro.org
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-As the following experiments show, this series is a net perf gain,
-particularly for memory-heavy workloads. Experiments are run on an
-Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
-
-1. System boot + shudown, debian aarch64:
-
-- Before (v3.1.0):
- Performance counter stats for './die.sh v3.1.0' (10 runs):
-
-       9019.797015      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    29,910,312,379      cycles                    #    3.316 GHz                      ( +-  0.14% )
-    54,699,252,014      instructions              #    1.83  insn per cycle           ( +-  0.08% )
-    10,061,951,686      branches                  # 1115.541 M/sec                    ( +-  0.08% )
-       172,966,530      branch-misses             #    1.72% of all branches          ( +-  0.07% )
-
-       9.084039051 seconds time elapsed                                          ( +-  0.23% )
-
-- After:
- Performance counter stats for './die.sh tlb-dyn-v5' (10 runs):
-
-       8624.084842      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    28,556,123,404      cycles                    #    3.311 GHz                      ( +-  0.13% )
-    51,755,089,512      instructions              #    1.81  insn per cycle           ( +-  0.05% )
-     9,526,513,946      branches                  # 1104.641 M/sec                    ( +-  0.05% )
-       166,578,509      branch-misses             #    1.75% of all branches          ( +-  0.19% )
-
-       8.680540350 seconds time elapsed                                          ( +-  0.24% )
-
-That is, a 4.4% perf increase.
-
-2. System boot + shutdown, ubuntu 18.04 x86_64:
-
-- Before (v3.1.0):
-      56100.574751      task-clock (msec)         #    1.016 CPUs utilized            ( +-  4.81% )
-   200,745,466,128      cycles                    #    3.578 GHz                      ( +-  5.24% )
-   431,949,100,608      instructions              #    2.15  insn per cycle           ( +-  5.65% )
-    77,502,383,330      branches                  # 1381.490 M/sec                    ( +-  6.18% )
-       844,681,191      branch-misses             #    1.09% of all branches          ( +-  3.82% )
-
-      55.221556378 seconds time elapsed                                          ( +-  5.01% )
-
-- After:
-      56603.419540      task-clock (msec)         #    1.019 CPUs utilized            ( +- 10.19% )
-   202,217,930,479      cycles                    #    3.573 GHz                      ( +- 10.69% )
-   439,336,291,626      instructions              #    2.17  insn per cycle           ( +- 14.14% )
-    80,538,357,447      branches                  # 1422.853 M/sec                    ( +- 16.09% )
-       776,321,622      branch-misses             #    0.96% of all branches          ( +-  3.77% )
-
-      55.549661409 seconds time elapsed                                          ( +- 10.44% )
-
-No improvement (within noise range). Note that for this workload,
-increasing the time window too much can lead to perf degradation,
-since it flushes the TLB *very* frequently.
-
-3. x86_64 SPEC06int:
-
-           x86_64-softmmu speedup vs. v3.1.0 for SPEC06int (test set)
-            Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-5.5 +------------------------------------------------------------------------+
-    |                   +-+                                                  |
-  5 |-+.................+-+...............................tlb-dyn-v5.......+-|
-    |                   * *                                                  |
-4.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  4 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-3.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  3 |-+......+-+*.......*.*................................................+-|
-    |        *  *       * *                                                  |
-2.5 |-+......*..*.......*.*.................................+-+*...........+-|
-    |        *  *       * *                                 *  *             |
-  2 |-+......*..*.......*.*.................................*..*...........+-|
-    |        *  *       * *                                 *  *  +-+        |
-1.5 |-+......*..*.......*.*.................................*..*.*+-+.*+-+.+-|
-    |        *  * *+-+  * *  +-+       *+-+  +-+       +-+  *  * *  * *  *   |
-  1 |++++-+*+*++*+*++*++*+*++*+*+++-+*+*+-++*+-++++-++++-+++*++*+*++*+*++*+++|
-    |   *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *   |
-0.5 +------------------------------------------------------------------------+
-  400.perlb401.bzip403.g429445.g456.hm462.libq464.h471.omn47483.xalancbgeomean
-  png: https://imgur.com/YRF90f7
-
-That is, a 1.51x average speedup over the baseline, with a max speedup
-of 5.17x.
-
-Here's a different look at the SPEC06int results, using KVM as the baseline:
-
-             x86_64-softmmu slowdown vs. KVM for SPEC06int (test set)
-             Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-25 +---------------------------------------------------------------------------+
-   |                   +-+                                        +-+          |
-   |                   * *                             +-+      v3.1.0         |
-   |                   * *                             +-+  tlb-dyn-v5         |
-   |                   * *                             * *        +-+          |
-20 |-+.................*.*.............................*.+-+......*.*........+-|
-   |                   * *                             * # #      * *          |
-   |        +-+        * *                             * # #      * *          |
-   |        * *        * *                             * # #      * *          |
-15 |-+......*.*........*.*.............................*.#.#......*.+-+......+-|
-   |        * *        * *                             * # #      * #|#        |
-   |        * *        * *        +-+                  * # #      * +-+        |
-   |        * *  +-+   * *        ++-+       +-+       * # #      * # # +-+    |
-   |        * *  +-+   * *        * ##       *|   +-+  * # #      * # # +-+    |
-10 |-+......*.*..*.+-+.*.*........*.##.......++-+.*.+-+*.#.#......*.#.#.*.*..+-|
-   |        * *  * +-+ * *        * ## +-+   *# # * # #* # # +-+  * # # * *    |
-   |        * *  * # # * *  +-+   * ## * +-+ *# # * # #* # # * *  * # # *+-+   |
-   |        * *  * # # * *  * +-+ * ## * # # *# # * # #* # # * *  * # # * ##   |
- 5 |-+......*.+-+*.#.#.*.*..*.#.#.*.##.*.#.#.*#.#.*.#.#*.#.#.*.*..*.#.#.*.##.+-|
-   |        * # #* # # * +-+* # # * ## * # # *# # * # #* # # * *  * # # * ##   |
-   |        * # #* # # * # #* # # * ## * # # *# # * # #* # # * +-+* # # * ##   |
-   |   ++-+ * # #* # # * # #* # # * ## * # # *# # * # #* # # * # #* # # * ##   |
-   |+++*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+*+#+#+*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+++|
- 0 +---------------------------------------------------------------------------+
- 400.perlbe401.bzi403.gc429445.go456.h462.libqu464.h471.omne4483.xalancbmgeomean
-  png: https://imgur.com/YzAMNEV
-
-After this series, we bring down the average SPEC06int slowdown vs KVM
-from 11.47x to 7.58x.
-
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <20190116170114.26802-4-cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 28 ++++++++++++++--------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ tcg/sparc/tcg-target.h     |  2 +-
+ tcg/sparc/tcg-target.inc.c | 82 +++++++++++++++++++++++---------------
+ 2 files changed, 51 insertions(+), 33 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 94aa4cef7c..eb40312e67 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -27,7 +27,7 @@
+diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
+index dc0a227890..6020a670c0 100644
+--- a/tcg/sparc/tcg-target.h
++++ b/tcg/sparc/tcg-target.h
+@@ -29,7 +29,7 @@
  
- #define TCG_TARGET_INSN_UNIT_SIZE  1
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 31
+ #define TCG_TARGET_INSN_UNIT_SIZE 4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 32
 -#define TCG_TARGET_IMPLEMENTS_DYN_TLB 0
 +#define TCG_TARGET_IMPLEMENTS_DYN_TLB 1
+ #define TCG_TARGET_NB_REGS 32
  
- #ifdef __x86_64__
- # define TCG_TARGET_REG_BITS  64
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index dbf8253718..4d84aea3a9 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -329,6 +329,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_ARITH_GvEv	(0x03)		/* ... plus (ARITH_FOO << 3) */
- #define OPC_ANDN        (0xf2 | P_EXT38)
- #define OPC_ADD_GvEv	(OPC_ARITH_GvEv | (ARITH_ADD << 3))
-+#define OPC_AND_GvEv    (OPC_ARITH_GvEv | (ARITH_AND << 3))
- #define OPC_BLENDPS     (0x0c | P_EXT3A | P_DATA16)
- #define OPC_BSF         (0xbc | P_EXT)
- #define OPC_BSR         (0xbd | P_EXT)
-@@ -1641,7 +1642,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         }
-         if (TCG_TYPE_PTR == TCG_TYPE_I64) {
-             hrexw = P_REXW;
--            if (TARGET_PAGE_BITS + CPU_TLB_BITS > 32) {
-+            if (TARGET_PAGE_BITS + CPU_TLB_DYN_MAX_BITS > 32) {
-                 tlbtype = TCG_TYPE_I64;
-                 tlbrexw = P_REXW;
-             }
-@@ -1649,6 +1650,15 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+ typedef enum {
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index 55144c437c..7a61839dc1 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -1074,54 +1074,72 @@ static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
+    The result of the TLB comparison is in %[ix]cc.  The sanitized address
+    is in the returned register, maybe %o0.  The TLB addend is in %o1.  */
+ 
++/* We expect tlb_mask to be before tlb_table.  */
++QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_table) <
++                  offsetof(CPUArchState, tlb_mask));
++
++/* We expect tlb_mask to be "near" tlb_table.  */
++QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_table) -
++                  offsetof(CPUArchState, tlb_mask) >= (1 << 13));
++
+ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addr, int mem_index,
+                                TCGMemOp opc, int which)
+ {
++    int mask_off = offsetof(CPUArchState, tlb_mask[mem_index]);
++    int table_off = offsetof(CPUArchState, tlb_table[mem_index]);
++    TCGReg base = TCG_AREG0;
+     const TCGReg r0 = TCG_REG_O0;
+     const TCGReg r1 = TCG_REG_O1;
+     const TCGReg r2 = TCG_REG_O2;
+     unsigned s_bits = opc & MO_SIZE;
+     unsigned a_bits = get_alignment_bits(opc);
+-    int tlb_ofs;
++    tcg_target_long compare_mask;
+ 
+-    /* Shift the page number down.  */
+-    tcg_out_arithi(s, r1, addr, TARGET_PAGE_BITS, SHIFT_SRL);
++    if (!check_fit_i32(table_off, 13)) {
++        int table_hi;
++
++        base = r1;
++        if (table_off <= 2 * 0xfff) {
++            table_hi = 0xfff;
++            tcg_out_arithi(s, base, TCG_AREG0, table_hi, ARITH_ADD);
++        } else {
++            table_hi = table_off & ~0x3ff;
++            tcg_out_sethi(s, base, table_hi);
++            tcg_out_arith(s, base, TCG_AREG0, base, ARITH_ADD);
++        }
++        mask_off -= table_hi;
++        table_off -= table_hi;
++        tcg_debug_assert(check_fit_i32(mask_off, 13));
++    }
++
++    /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
++    tcg_out_ld(s, TCG_TYPE_PTR, r0, base, mask_off);
++    tcg_out_ld(s, TCG_TYPE_PTR, r1, base, table_off);
++
++    /* Extract the page index, shifted into place for tlb index.  */
++    tcg_out_arithi(s, r2, addr, TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS,
++                   SHIFT_SRL);
++    tcg_out_arith(s, r2, r2, r0, ARITH_AND);
++
++    /* Add the tlb_table pointer, creating the CPUTLBEntry address into R2.  */
++    tcg_out_arith(s, r2, r2, r1, ARITH_ADD);
++
++    /* Load the tlb comparator and the addend.  */
++    tcg_out_ld(s, TCG_TYPE_TL, r0, r2, which);
++    tcg_out_ld(s, TCG_TYPE_PTR, r1, r2, offsetof(CPUTLBEntry, addend));
+ 
+     /* Mask out the page offset, except for the required alignment.
+        We don't support unaligned accesses.  */
+     if (a_bits < s_bits) {
+         a_bits = s_bits;
      }
- 
-     tcg_out_mov(s, tlbtype, r0, addrlo);
-+    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
-+                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
-+
-+    tcg_out_modrm_offset(s, OPC_AND_GvEv + trexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_mask[mem_index]));
-+
-+    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_table[mem_index]));
-+
-     /* If the required alignment is at least as large as the access, simply
-        copy the address and mask.  For lesser alignments, check that we don't
-        cross pages for the complete access.  */
-@@ -1658,20 +1668,10 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         tcg_out_modrm_offset(s, OPC_LEA + trexw, r1, addrlo, s_mask - a_mask);
+-    tcg_out_movi(s, TCG_TYPE_TL, TCG_REG_T1,
+-                 TARGET_PAGE_MASK | ((1 << a_bits) - 1));
+-
+-    /* Mask the tlb index.  */
+-    tcg_out_arithi(s, r1, r1, CPU_TLB_SIZE - 1, ARITH_AND);
+-    
+-    /* Mask page, part 2.  */
+-    tcg_out_arith(s, r0, addr, TCG_REG_T1, ARITH_AND);
+-
+-    /* Shift the tlb index into place.  */
+-    tcg_out_arithi(s, r1, r1, CPU_TLB_ENTRY_BITS, SHIFT_SLL);
+-
+-    /* Relative to the current ENV.  */
+-    tcg_out_arith(s, r1, TCG_AREG0, r1, ARITH_ADD);
+-
+-    /* Find a base address that can load both tlb comparator and addend.  */
+-    tlb_ofs = offsetof(CPUArchState, tlb_table[mem_index][0]);
+-    if (!check_fit_ptr(tlb_ofs + sizeof(CPUTLBEntry), 13)) {
+-        if (tlb_ofs & ~0x3ff) {
+-            tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_T1, tlb_ofs & ~0x3ff);
+-            tcg_out_arith(s, r1, r1, TCG_REG_T1, ARITH_ADD);
+-        }
+-        tlb_ofs &= 0x3ff;
++    compare_mask = (tcg_target_ulong)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
++    if (check_fit_tl(compare_mask, 13)) {
++        tcg_out_arithi(s, r2, addr, compare_mask, ARITH_AND);
++    } else {
++        tcg_out_movi(s, TCG_TYPE_TL, r2, compare_mask);
++        tcg_out_arith(s, r2, addr, r2, ARITH_AND);
      }
-     tlb_mask = (target_ulong)TARGET_PAGE_MASK | a_mask;
 -
--    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
--                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
+-    /* Load the tlb comparator and the addend.  */
+-    tcg_out_ld(s, TCG_TYPE_TL, r2, r1, tlb_ofs + which);
+-    tcg_out_ld(s, TCG_TYPE_PTR, r1, r1, tlb_ofs+offsetof(CPUTLBEntry, addend));
 -
-     tgen_arithi(s, ARITH_AND + trexw, r1, tlb_mask, 0);
--    tgen_arithi(s, ARITH_AND + tlbrexw, r0,
--                (CPU_TLB_SIZE - 1) << CPU_TLB_ENTRY_BITS, 0);
--
--    tcg_out_modrm_sib_offset(s, OPC_LEA + hrexw, r0, TCG_AREG0, r0, 0,
--                             offsetof(CPUArchState, tlb_table[mem_index][0])
--                             + which);
+-    /* subcc arg0, arg2, %g0 */
+     tcg_out_cmp(s, r0, r2, 0);
  
-     /* cmp 0(r0), r1 */
--    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, 0);
-+    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, which);
- 
-     /* Prepare for both the fast path add of the tlb addend, and the slow
-        path function argument setup.  */
-@@ -1684,7 +1684,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     if (TARGET_LONG_BITS > TCG_TARGET_REG_BITS) {
-         /* cmp 4(r0), addrhi */
--        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, 4);
-+        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, which + 4);
- 
-         /* jne slow_path */
-         tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
-@@ -1696,7 +1696,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     /* add addend(r0), r1 */
-     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
--                         offsetof(CPUTLBEntry, addend) - which);
-+                         offsetof(CPUTLBEntry, addend));
- }
- 
- /*
+     /* If the guest address must be zero-extended, do so now.  */
 -- 
 2.17.2
