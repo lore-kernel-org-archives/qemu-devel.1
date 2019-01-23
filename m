@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48186)
+Received: from eggs.gnu.org ([209.51.188.92]:48795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gmMco-0008Bw-T6
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:47:43 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gmMf3-0000vr-Ui
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:50:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gmMcn-000724-Ky
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:47:42 -0500
-References: <20181221234750.23577-1-mreitz@redhat.com>
-	<20181221234750.23577-4-mreitz@redhat.com>
-	<b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
-	<04d2a9e7-9cb8-74cf-0c0e-0c9d19940020@redhat.com>
-	<8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
-Date: Wed, 23 Jan 2019 12:47:06 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gmMf1-0008AR-Ut
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:50:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gmMez-00085t-Fh
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 12:49:58 -0500
+Date: Wed, 23 Jan 2019 17:49:48 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190123174948.GE8724@stefanha-x1.localdomain>
+References: <20190123120759.7162-1-jusual@mail.ru>
+	<20190123120759.7162-4-jusual@mail.ru>
 MIME-Version: 1.0
-In-Reply-To: <8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be
- run concurrently
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XuV1QlJbYrcVoo+x"
+Content-Disposition: inline
+In-Reply-To: <20190123120759.7162-4-jusual@mail.ru>
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] tests/microbit-test: Check nRF51
+ UART functionality
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
 
 
+--XuV1QlJbYrcVoo+x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 1/23/19 12:34 PM, Max Reitz wrote:
-> On 23.01.19 14:05, Max Reitz wrote:
->> On 21.01.19 21:50, John Snow wrote:
-> 
-> [...]
-> 
->>> I guess my only other observation is that we have a lot of "while True"
->>> loops now, is it worth creating some kind of helper that does the dirty
->>> work of finding a serviceable port or nah?
->>
->> Seems reasonable, I'll see how it looks.
-> 
-> If I do that, the diff stat looks to be 40+, 33-.  Is that worth it?
-> 
-> Max
-> 
+On Wed, Jan 23, 2019 at 03:07:59PM +0300, Julia Suvorova wrote:
+> Some functional tests for:
+>     Basic reception/transmittion
+>     Suspending
+>     INTEN* registers
+>=20
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  tests/microbit-test.c | 89 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 89 insertions(+)
 
-Instead of:
- 1 file changed, 68 insertions(+), 30 deletions(-)
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Or in addition to?
+--XuV1QlJbYrcVoo+x
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Use your own judg[e?]ment on it, I guess it's local to this one iotest
-for now anyway, so if it's not an obvious win just skip it.
+-----BEGIN PGP SIGNATURE-----
 
---js
+iQEcBAEBAgAGBQJcSKk8AAoJEJykq7OBq3PI5isH/1v+Twq8H6VynPSmjhziVzFb
+ZXjucvFXvCyvai8CDPVfxjZRey0QNU8zYLEYATY2CJqamClonqbuCf07Pj+l8ZaQ
+3LrR6NjrmwkklbUsGTaTujYWHDfh/pDQ4mhtVHw3OV8y3au5o4u58cMvzrJNpbNC
+KkgeAXBGl75Kh+0AKVAECHiSZWeoNqxWPQwXc0dHm+loFbmK7awmwcVLrpPbMDTd
+BPNPqhNtdpywUVR1ptvdG9j0qRtdJE8awbAxkZUTRLJri0DfiUMlTXLTuKP1qaO1
+ZgikSPtbIhwPdDUNcZxGSC/96hM34JBV2QTWHq9h27wEioHzVlDVaHRAjPIgeJM=
+=+9Lr
+-----END PGP SIGNATURE-----
+
+--XuV1QlJbYrcVoo+x--
