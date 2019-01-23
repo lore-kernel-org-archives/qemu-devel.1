@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36681)
+Received: from eggs.gnu.org ([209.51.188.92]:36735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmJDL-0004Pj-OB
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:09:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmJDT-0004XR-HJ
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmJDJ-000466-Vu
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:09:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmJDJ-00044J-Lr
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:09:17 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 23 Jan 2019 15:08:56 +0100
-Message-Id: <1548252536-6242-5-git-send-email-thuth@redhat.com>
+Date: Wed, 23 Jan 2019 15:08:55 +0100
+Message-Id: <1548252536-6242-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1548252536-6242-1-git-send-email-thuth@redhat.com>
 References: <1548252536-6242-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] tcg: Fix LGPL version number
+Subject: [Qemu-devel] [PATCH 3/4] target/tricore: Fix LGPL version number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +20,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
 It's either "GNU *Library* General Public version 2" or "GNU Lesser
 General Public version *2.1*", but there was no "version 2.0" of the
 "Lesser" library. So assume that version 2.1 is meant here.
 
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- accel/tcg/atomic_template.h  | 2 +-
- accel/tcg/cpu-exec-common.c  | 2 +-
- accel/tcg/cpu-exec.c         | 2 +-
- accel/tcg/cputlb.c           | 2 +-
- accel/tcg/softmmu_template.h | 2 +-
- accel/tcg/tcg-runtime-gvec.c | 2 +-
- accel/tcg/translate-all.c    | 2 +-
- accel/tcg/translate-all.h    | 2 +-
- accel/tcg/user-exec.c        | 2 +-
- tcg/tcg-gvec-desc.h          | 2 +-
- tcg/tcg-op-gvec.c            | 2 +-
- tcg/tcg-op-gvec.h            | 2 +-
- tcg/tcg-op-vec.c             | 2 +-
- 13 files changed, 13 insertions(+), 13 deletions(-)
+ target/tricore/cpu-qom.h         | 2 +-
+ target/tricore/cpu.c             | 2 +-
+ target/tricore/cpu.h             | 2 +-
+ target/tricore/fpu_helper.c      | 2 +-
+ target/tricore/helper.c          | 2 +-
+ target/tricore/helper.h          | 2 +-
+ target/tricore/op_helper.c       | 2 +-
+ target/tricore/translate.c       | 2 +-
+ target/tricore/tricore-defs.h    | 2 +-
+ target/tricore/tricore-opcodes.h | 2 +-
+ 10 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index efde12f..685602b 100644
---- a/accel/tcg/atomic_template.h
-+++ b/accel/tcg/atomic_template.h
-@@ -7,7 +7,7 @@
+diff --git a/target/tricore/cpu-qom.h b/target/tricore/cpu-qom.h
+index 6a69756..93c9d77 100644
+--- a/target/tricore/cpu-qom.h
++++ b/target/tricore/cpu-qom.h
+@@ -4,7 +4,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
@@ -57,10 +54,10 @@ index efde12f..685602b 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index 2988fde..462a1f1 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 2edaef1..e8d37e4 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -70,10 +67,10 @@ index 2988fde..462a1f1 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 870027d..60d87d5 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index c3665c6..00e69dc 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -83,10 +80,10 @@ index 870027d..60d87d5 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index af6bd8c..ec27f3d 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
+diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
+index 31df462..d8a6c0d 100644
+--- a/target/tricore/fpu_helper.c
++++ b/target/tricore/fpu_helper.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -96,11 +93,11 @@ index af6bd8c..ec27f3d 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
-index b0adea0..1fdd262 100644
---- a/accel/tcg/softmmu_template.h
-+++ b/accel/tcg/softmmu_template.h
-@@ -11,7 +11,7 @@
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index dad7eea..0769046 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -4,7 +4,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
@@ -109,10 +106,36 @@ index b0adea0..1fdd262 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-index 90340e5..09424e9 100644
---- a/accel/tcg/tcg-runtime-gvec.c
-+++ b/accel/tcg/tcg-runtime-gvec.c
+diff --git a/target/tricore/helper.h b/target/tricore/helper.h
+index e634d0c..f60e810 100644
+--- a/target/tricore/helper.h
++++ b/target/tricore/helper.h
+@@ -4,7 +4,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/tricore/op_helper.c b/target/tricore/op_helper.c
+index b57f353..ed9dc0c 100644
+--- a/target/tricore/op_helper.c
++++ b/target/tricore/op_helper.c
+@@ -4,7 +4,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index b5ab40d..14f0ddf 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -122,11 +145,11 @@ index 90340e5..09424e9 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8cb8c88..1773d7e 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -6,7 +6,7 @@
+diff --git a/target/tricore/tricore-defs.h b/target/tricore/tricore-defs.h
+index 40abfaa..e871aa1 100644
+--- a/target/tricore/tricore-defs.h
++++ b/target/tricore/tricore-defs.h
+@@ -4,7 +4,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
@@ -135,76 +158,11 @@ index 8cb8c88..1773d7e 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/translate-all.h b/accel/tcg/translate-all.h
-index 08e2f23..64f5fd9 100644
---- a/accel/tcg/translate-all.h
-+++ b/accel/tcg/translate-all.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 941295e..7741f5f 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/tcg/tcg-gvec-desc.h b/tcg/tcg-gvec-desc.h
-index 3b4c2d9..2dda7d6 100644
---- a/tcg/tcg-gvec-desc.h
-+++ b/tcg/tcg-gvec-desc.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 61c25f5..6d4207e 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index ff43a29..b8b9fee 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index cefba3d..0fbeaea 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -6,7 +6,7 @@
+diff --git a/target/tricore/tricore-opcodes.h b/target/tricore/tricore-opcodes.h
+index 2c3baab..40bc121 100644
+--- a/target/tricore/tricore-opcodes.h
++++ b/target/tricore/tricore-opcodes.h
+@@ -4,7 +4,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
