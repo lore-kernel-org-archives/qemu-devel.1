@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34563)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1gmFZQ-0001PY-BX
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:15:45 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:34623)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eric.auger@redhat.com>) id 1gmFZY-0001WZ-82
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1gmFZN-0007EN-CM
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:15:44 -0500
-Received: from mout.gmx.net ([212.227.17.21]:52863)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmFZM-0007Ad-73
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:15:40 -0500
-References: <20190123080005.31078-1-kraxel@redhat.com>
-	<20190123080005.31078-5-kraxel@redhat.com>
-	<484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
-	<20190123093657.GC27270@redhat.com>
-	<d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <89dd8fa4-c5f6-4362-55fa-115422b57b9a@gmx.com>
-Date: Wed, 23 Jan 2019 11:16:35 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1gmFZT-0007J9-W1
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 05:15:50 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 23 Jan 2019 11:14:47 +0100
+Message-Id: <20190123101458.12478-8-eric.auger@redhat.com>
+In-Reply-To: <20190123101458.12478-1-eric.auger@redhat.com>
+References: <20190123101458.12478-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="k3kzvBzWAWRzNTjinu7Dsvo4Ii7A8Ylxb"
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 07/18] kvm: add kvm_arm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +21,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---k3kzvBzWAWRzNTjinu7Dsvo4Ii7A8Ylxb
-From: Kamil Rytarowski <n54@gmx.com>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Daniel_P._Berrang=c3=a9?=
- <berrange@redhat.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <89dd8fa4-c5f6-4362-55fa-115422b57b9a@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
- default
-References: <20190123080005.31078-1-kraxel@redhat.com>
- <20190123080005.31078-5-kraxel@redhat.com>
- <484e921f-7cee-755d-12a9-02e8bf182fa4@redhat.com>
- <20190123093657.GC27270@redhat.com>
- <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-In-Reply-To: <d7c274a7-00ac-d767-69fc-238b88cfd61b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
+log of the maximum IPA size supported by KVM. This capability
+needs to be known to create the VM with a specific IPA max size
+(kvm_type passed along KVM_CREATE_VM ioctl.
 
-On 23.01.2019 10:50, Thomas Huth wrote:
-> On 2019-01-23 10:36, Daniel P. Berrang=C3=A9 wrote:
->> On Wed, Jan 23, 2019 at 09:27:48AM +0100, Thomas Huth wrote:
->>> On 2019-01-23 09:00, Gerd Hoffmann wrote:
->>>>
->>>> This is RfC because we might look at the ordering.  On linux we prob=
-ably
->>>> want prefer alsa over oss.
->>> Yes, please! I've run into the trap a couple of times already: OSS
->>> headers were available, but these days the OSS compatibility kernel
->>> modules are not loaded anymore by default. So you compile QEMU with O=
-SS
->>> support and then wonder why you do not get any audio output at all...=
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
->>>
->>> IMHO we should put OSS as last item in the list on Linux nowadays.
->>
->> Given our targetted platform list[1], are there even any platforms
->> where we would *not* have alsa, but still have OSS ?  If not, then
->> we could just drop the OSS driver entirely on the ground that it is
->> obsolete.
->=20
-> We likely could drop OSS on Linux, but it is still required on FreeBSD
-> and NetBSD, isn't it? So unless we can drop it there, too, we can also
-> simply keep it as last option in the list on Linux as well.
->=20
->  Thomas
->=20
+---
+v3 -> v4:
+- s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
+- check KVM_CAP_ARM_VM_IPA_SIZE extension
 
-NetBSD supports OSS compat without plans for abandoning it as it's a
-good enough solution for desktop applications. Porting to our native
-audio (SunOS) backend does not win much/anything as of now.
+v1 -> v2:
+- put this in ARM specific code
+---
+ target/arm/kvm.c     |  8 ++++++++
+ target/arm/kvm_arm.h | 16 ++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-
---k3kzvBzWAWRzNTjinu7Dsvo4Ii7A8Ylxb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxIPwMMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZswZkP/2oUm1Mg6rl/BOtnL8ELilrTbv8LppEDcGkKBNXp
-Bcd58T5tM4LrrMfMRZwbv6cnp3fMDCl5Qxurwb3MEmr4hoHCrQdBpVvpJMxX/pry
-ti9Jp/t97kLykOwlZc+E3BcG5jLdwN0mHvvo4jyNfw/uHOJGrz4qPg8T8+hSQXuL
-1ylUId5Inw2YN3iBVyPw3NfH6IAjDTzsMoDdOqkRqnW2mP91xNYVvZEvCrGILvBR
-jam5t7z7VdUmGnSjjToqKcRrYSNUGVJEGO4eRn7AGf1BLmJ+HO+jUqW4L8B1crak
-UQnm5XcP/vpK900h2gY2JtcQ81imF/QwmausHMGNnRLnHho7V8xI/V5j8pKqBvlu
-Km83jYxWBwh0wPSU/Z/5UheB0bvrth2+VGPK9sGZORBeaEpnD8hcuE90npkA99mA
-2YQ4PbW8f53fscrH8UP/UGrfmbi3bl/WIa+XACqO8wKuJwfKxFeVSabrfmWJReIU
-3vctJjkH7b53WpJc3kJB7TB2L5BoldxxMrkXoYwlW/mJfbID77PmqFwkSA5Antaa
-qyqKqWEvQTBpz+qJVT9IGnMZhWFUXWCFI+Bo/OYi36YYpOjCY/YNHFaP546m1dGu
-+DjNKPQGmNfPO5le3ZphV18w/CrMKiShLo3fFjyekgUcLTWmwoqtUznLesen6aNZ
-rNk0
-=N+LJ
------END PGP SIGNATURE-----
-
---k3kzvBzWAWRzNTjinu7Dsvo4Ii7A8Ylxb--
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index e00ccf9c98..877c588ef5 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -18,6 +18,7 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/kvm_int.h"
+ #include "kvm_arm.h"
+ #include "cpu.h"
+ #include "trace.h"
+@@ -162,6 +163,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     env->features =3D arm_host_cpu_features.features;
+ }
+=20
++int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++{
++    KVMState *s =3D KVM_STATE(ms->accelerator);
++
++    return kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
++}
++
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     /* For ARM interrupt delivery is always asynchronous,
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 6393455b1d..5969c41f83 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -207,6 +207,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
+s *ahcf);
+  */
+ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+=20
++/**
++ * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
++ * supported by KVM
++ *
++ * @ms: Machine state handle
++ *
++ * Return the max number of IPA bits or a negative value if
++ * the host kernel does not expose this value.
++ */
++int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
++
+ /**
+  * kvm_arm_sync_mpstate_to_kvm
+  * @cpu: ARMCPU
+@@ -239,6 +250,11 @@ static inline void kvm_arm_set_cpu_features_from_hos=
+t(ARMCPU *cpu)
+     cpu->host_cpu_probe_failed =3D true;
+ }
+=20
++static inline int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
++{
++    return -ENOENT;
++}
++
+ static inline int kvm_arm_vgic_probe(void)
+ {
+     return 0;
+--=20
+2.20.1
