@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33692)
+Received: from eggs.gnu.org ([209.51.188.92]:34202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmKQY-0003se-Gg
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:26:55 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gmKSb-0005Pz-LH
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:29:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gmKQX-0002tg-Kc
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:26:54 -0500
-Resent-Message-Id: <E1gmKQX-0002tg-Kc@eggs.gnu.org>
-Message-ID: <154825716585.21.2549834559352087143@ebba9967afc0>
-In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eric.auger@redhat.com>) id 1gmKSZ-0004QK-H8
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:29:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gmKSZ-0004PY-7B
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 10:28:59 -0500
+References: <20190117210632.18567-1-eric.auger@redhat.com>
+	<20190117210632.18567-2-eric.auger@redhat.com>
+	<20190122125134.6726621d@w520.home>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <68d92f52-7bea-edf2-f876-c7df947588f6@redhat.com>
+Date: Wed, 23 Jan 2019 16:28:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 23 Jan 2019 07:26:07 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 00/11] backup-top filter driver for
- backup
+In-Reply-To: <20190122125134.6726621d@w520.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio-pci: Introduce
+ vfio_set_event_handler helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +31,454 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vsementsov@virtuozzo.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.orgfam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, aik@ozlabs.ru, cohuck@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyOTEyMjAyNy40MjI0
-NS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
-ICBzY3NpL3ByLW1hbmFnZXItc3R1Yi5vCiAgQ0MgICAgICBibG9jay9jdXJsLm8KL3RtcC9xZW11
-LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1bmN0aW9uICdmaW5kX3ZkaV9uYW1lJzoK
-L3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6MTIzOTo1OiBlcnJvcjogJ3N0cm5j
-cHknIHNwZWNpZmllZCBib3VuZCAyNTYgZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9
-c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAgICBzdHJuY3B5KGJ1ZiArIFNEX01BWF9WRElfTEVOLCB0
-YWcsIFNEX01BWF9WRElfVEFHX0xFTik7CiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0
-ZWQgYXMgZXJyb3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE4MTIyOTEyMjAyNy40MjI0NS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
-bS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi Alex,
+
+On 1/22/19 8:51 PM, Alex Williamson wrote:
+> On Thu, 17 Jan 2019 22:06:31 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> The code used to attach the eventfd handler for the ERR and
+>> REQ irq indices can be factorized into a helper. In subsequent
+>> patches we will extend this helper to support other irq indices.
+>>
+>> We test whether the notification is allowed outside of the helper:
+>> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+>> Depending on the returned value we set vdev->pci_aer and
+>> vdev->req_enabled. An error handle is introduced for future usage
+>> although not strictly useful here.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - s/vfio_register_event_notifier/vfio_set_event_handler
+>> - turned into a void function
+>> - do the qemu_set_fd_handler(*pfd, NULL, NULL, vdev) and
+>>   event_notifier_cleanup on VFIO_DEVICE_SET_IRQS failure
+>>   as reported by Alexey
+>> - reset err in vfio_realize as reported by Cornelia
+>> - Text/comment fixes suggested by Cornelia
+>> ---
+>>  hw/vfio/pci.c | 296 ++++++++++++++++++++++----------------------------
+>>  1 file changed, 132 insertions(+), 164 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index c0cb1ec289..3cae4c99ef 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -105,6 +105,96 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+>>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+>>  }
+>>  
+>> +/*
+>> + * vfio_set_event_handler - setup/tear down eventfd
+>> + * notification and handling for IRQ indices that span over
+>> + * a single IRQ
+>> + *
+>> + * @vdev: VFIO device handle
+>> + * @index: IRQ index the eventfd/handler is associated with
+>> + * @enable: true means notifier chain needs to be set up
+>> + * @handler: handler to attach if @enable is true
+> 
+> Therefore @enable is redundant.
+agreed
+> 
+>> + * @errp: error handle
+>> + */
+>> +static void vfio_set_event_handler(VFIOPCIDevice *vdev,
+>> +                                   int index,
+>> +                                   bool enable,
+>> +                                   void (*handler)(void *opaque),
+>> +                                   Error **errp)
+>> +{
+>> +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+>> +                                      .index = index };
+>> +    struct vfio_irq_set *irq_set;
+>> +    EventNotifier *notifier;
+>> +    int argsz, ret = 0;
+>> +    int32_t *pfd, fd;
+>> +
+>> +    switch (index) {
+>> +    case VFIO_PCI_REQ_IRQ_INDEX:
+>> +        notifier = &vdev->req_notifier;
+>> +        break;
+>> +    case VFIO_PCI_ERR_IRQ_INDEX:
+>> +        notifier = &vdev->err_notifier;
+>> +        break;
+> 
+> This blows the abstraction of a helper that this seems to be trying to
+> create, seems cleaner to pass @notifier.
+
+
+Not sure I really get the point eventually. Don't we have the following
+indirection: irq index -> notifier.fd -> handler. When we want to use
+this helper don't we simply want to associate an handler to a given IRQ
+index without taking care of the notifier mechanics.
+
+As discussed with Alexey, moving the notifier initialization outside of
+this helper removes some code factorization.
+> 
+>> +    default:
+>> +        g_assert_not_reached();
+>> +    }
+>> +
+>> +    if (ioctl(vdev->vbasedev.fd,
+>> +              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+>> +        error_setg_errno(errp, errno, "No irq index %d available", index);
+>> +        return;
+> 
+> The implicit count, aka sub-index, is also problematic for the
+> abstraction.  Can we tackle applying this to MSI/X to validate if this
+> needs to go another step to allow the caller to specify index and
+> sub-index?
+I mentioned the helper stands for IRQ indices with no sub-index. I am
+afraid applying this to MSI/X would oblige use to revisit a bulk of code
+without knowing whether it is interesting.
+> 
+>> +    }
+>> +
+>> +    if (enable) {
+>> +        ret = event_notifier_init(notifier, 0);
+>> +        if (ret) {
+>> +            error_setg_errno(errp, -ret,
+>> +                             "Unable to init event notifier for irq index %d",
+>> +                             index);
+>> +            return;
+>> +        }
+>> +    }
+>> +
+>> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> +
+>> +    irq_set = g_malloc0(argsz);
+>> +    irq_set->argsz = argsz;
+>> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> +                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> +    irq_set->index = index;
+>> +    irq_set->start = 0;
+>> +    irq_set->count = 1;
+>> +    pfd = (int32_t *)&irq_set->data;
+>> +
+>> +    if (!notifier) {
+>> +        error_setg(errp, "Notifier not initialized for irq index %d", index);
+>> +        return;
+>> +    }
+> 
+> What is this supposed to check?  @notifier is not NULL initialized, the
+> case statement will assert if it doesn't get set, and this doesn't
+> actually test if it's properly initialized.
+The goal was to check the helper was not called on a valid IRQ index
+with !enabled while the notifier was not properly initialized. But if we
+trust the calling sites I can remove it.
+> 
+>> +
+>> +    fd = event_notifier_get_fd(notifier);
+>> +
+>> +    if (enable) {
+>> +        qemu_set_fd_handler(fd, handler, NULL, vdev);
+>> +        *pfd = fd;
+>> +    } else {
+>> +        *pfd = -1;
+>> +    }
+>> +
+>> +    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> +    g_free(irq_set);
+>> +
+>> +    if (ret) {
+>> +        error_setg_errno(errp, -ret,
+>> +                         "Failed to %s eventfd signalling for index %d",
+>> +                         enable ? "set up" : "tear down", index);
+>> +    }
+>> +    if (ret || !enable) {
+>> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+>> +        event_notifier_cleanup(notifier);
+>> +    }
+>> +}
+> 
+> Suggest passing @notifier as a parameter and using @handler in place of
+> @enable, more generic and more obvious calling convention.
+ok
+> 
+>> +
+>>  static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>>  {
+>>  #ifdef CONFIG_KVM
+>> @@ -2621,86 +2711,6 @@ static void vfio_err_notifier_handler(void *opaque)
+>>      vm_stop(RUN_STATE_INTERNAL_ERROR);
+>>  }
+>>  
+>> -/*
+>> - * Registers error notifier for devices supporting error recovery.
+>> - * If we encounter a failure in this function, we report an error
+>> - * and continue after disabling error recovery support for the
+>> - * device.
+>> - */
+>> -static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int ret;
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!vdev->pci_aer) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (event_notifier_init(&vdev->err_notifier, 0)) {
+>> -        error_report("vfio: Unable to init event notifier for error detection");
+>> -        vdev->pci_aer = false;
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -
+>> -    *pfd = event_notifier_get_fd(&vdev->err_notifier);
+>> -    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
+>> -
+>> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> -    if (ret) {
+>> -        error_report("vfio: Failed to set up error notification");
+>> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+>> -        event_notifier_cleanup(&vdev->err_notifier);
+>> -        vdev->pci_aer = false;
+>> -    }
+>> -    g_free(irq_set);
+>> -}
+>> -
+>> -static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -    int ret;
+>> -
+>> -    if (!vdev->pci_aer) {
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -    *pfd = -1;
+>> -
+>> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> -    if (ret) {
+>> -        error_report("vfio: Failed to de-assign error fd: %m");
+>> -    }
+>> -    g_free(irq_set);
+>> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
+>> -                        NULL, NULL, vdev);
+>> -    event_notifier_cleanup(&vdev->err_notifier);
+>> -}
+>> -
+>>  static void vfio_req_notifier_handler(void *opaque)
+>>  {
+>>      VFIOPCIDevice *vdev = opaque;
+>> @@ -2716,86 +2726,6 @@ static void vfio_req_notifier_handler(void *opaque)
+>>      }
+>>  }
+>>  
+>> -static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+>> -                                      .index = VFIO_PCI_REQ_IRQ_INDEX };
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd,
+>> -              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
+>> -        return;
+>> -    }
+>> -
+>> -    if (event_notifier_init(&vdev->req_notifier, 0)) {
+>> -        error_report("vfio: Unable to init event notifier for device request");
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -
+>> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
+>> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+>> -        error_report("vfio: Failed to set up device request notification");
+>> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+>> -        event_notifier_cleanup(&vdev->req_notifier);
+>> -    } else {
+>> -        vdev->req_enabled = true;
+>> -    }
+>> -
+>> -    g_free(irq_set);
+>> -}
+>> -
+>> -static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+>> -{
+>> -    int argsz;
+>> -    struct vfio_irq_set *irq_set;
+>> -    int32_t *pfd;
+>> -
+>> -    if (!vdev->req_enabled) {
+>> -        return;
+>> -    }
+>> -
+>> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+>> -
+>> -    irq_set = g_malloc0(argsz);
+>> -    irq_set->argsz = argsz;
+>> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+>> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+>> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+>> -    irq_set->start = 0;
+>> -    irq_set->count = 1;
+>> -    pfd = (int32_t *)&irq_set->data;
+>> -    *pfd = -1;
+>> -
+>> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+>> -        error_report("vfio: Failed to de-assign device request fd: %m");
+>> -    }
+>> -    g_free(irq_set);
+>> -    qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
+>> -                        NULL, NULL, vdev);
+>> -    event_notifier_cleanup(&vdev->req_notifier);
+>> -
+>> -    vdev->req_enabled = false;
+>> -}
+>> -
+>>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>  {
+>>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+>> @@ -3069,8 +2999,33 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>          goto out_teardown;
+>>      }
+>>  
+>> -    vfio_register_err_notifier(vdev);
+>> -    vfio_register_req_notifier(vdev);
+>> +    if (vdev->pci_aer) {
+>> +        Error *err = NULL;
+>> +
+>> +        /*
+>> +         * Registers error notifier for devices supporting error recovery.
+>> +         * If we encounter a failure during registration, we report an error
+>> +         * and continue after disabling error recovery support for the
+>> +         * device.
+>> +         */
+>> +        vfio_set_event_handler(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
+>> +                               vfio_err_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+> 
+> Why not just return -1 on error and zero on success so we can call as:
+> 
+>     if (vfio_set_event_handler(...)) {
+>         warn_reportf_err()...
+>     }
+The point is that if you have both the err and the returned value , it
+is error prone as you expect both to be consistent (reported by Alexey).
+You expect err to be set whenever you have a an error returned. The
+calling site can call warn_reportf_err() whenever the function returns
+an error and if somebody, later on, ignores to set the err on error
+case, it will crash.
+
+Reading again Markus' answer
+(https://www.mail-archive.com/qemu-devel@nongnu.org/msg402893.html), I
+may put the returned value back and make sure my code is consistent ;-)
+> 
+>> +        vdev->pci_aer = !err;
+> 
+> We could also avoid this weirdness of this negation to get a bool.
+ok
+> 
+>> +    }
+> 
+> It's not obvious how doing away with the register/unregister helpers
+> and doing everything inline is an improvement.  Simple helpers calling
+> common helpers seems better than inline sprawl calling common helpers.
+> Thanks,
+
+On my side I noticed vfio_(un)register_err|req_notifier are mostly
+identical at the exception of the irq index/notifier and enable logic.
+As I am about to propose another single index IRQ, I am going to add 2
+similar functions and I felt it was a pitty. Now it is not a big deal
+and if you prefer to keep the code as it is I will simply add those.
+
+Thanks
+
+Eric
+
+> 
+> Alex
+> 
+>> +
+>> +    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
+>> +        Error *err = NULL;
+>> +
+>> +        vfio_set_event_handler(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
+>> +                               vfio_req_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +        vdev->req_enabled = !err;
+>> +    }
+>>      vfio_setup_resetfn_quirk(vdev);
+>>  
+>>      return;
+>> @@ -3106,9 +3061,22 @@ static void vfio_instance_finalize(Object *obj)
+>>  static void vfio_exitfn(PCIDevice *pdev)
+>>  {
+>>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+>> +    Error *err = NULL;
+>>  
+>> -    vfio_unregister_req_notifier(vdev);
+>> -    vfio_unregister_err_notifier(vdev);
+>> +    if (vdev->req_enabled) {
+>> +        vfio_set_event_handler(vdev, VFIO_PCI_REQ_IRQ_INDEX,
+>> +                               false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>> +    if (vdev->pci_aer) {
+>> +        vfio_set_event_handler(vdev, VFIO_PCI_ERR_IRQ_INDEX,
+>> +                                     false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+>>      vfio_disable_interrupts(vdev);
+>>      if (vdev->intx.mmap_timer) {
+> 
