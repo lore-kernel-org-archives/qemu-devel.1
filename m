@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42134)
+Received: from eggs.gnu.org ([209.51.188.92]:42213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmJZg-0005Q9-Ot
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:32:17 -0500
+	(envelope-from <david@redhat.com>) id 1gmJZh-0005Qu-NG
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:32:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmJUj-0006UR-8l
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:27:10 -0500
-References: <20181221234750.23577-1-mreitz@redhat.com>
-	<20181221234750.23577-2-mreitz@redhat.com>
-	<fd55396f-47d6-2836-46c3-0c44c8248a8b@redhat.com>
-	<64732cb4-b586-2e38-b2b4-880359c56a3e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <72fbcfe7-7f65-9e5b-e5f8-4f119f93c5d0@redhat.com>
-Date: Wed, 23 Jan 2019 08:27:04 -0600
+	(envelope-from <david@redhat.com>) id 1gmJU6-0006Dd-0i
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 09:26:33 -0500
+References: <20190122125133.1191-1-david@redhat.com>
+	<20190122125133.1191-3-david@redhat.com>
+	<17de6f00-2c91-4654-cc8f-d07ef85c48de@redhat.com>
+	<29d0a220-e814-6b91-ae4e-835326e91fcb@redhat.com>
+	<afaed009-3831-db23-26c6-485d23e44b29@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9420629b-a788-d780-f9c9-b26d1e30a60d@redhat.com>
+Date: Wed, 23 Jan 2019 15:26:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <64732cb4-b586-2e38-b2b4-880359c56a3e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nNQxlQXXD3o5u62Df3iTHsTRRIRdBpwFx"
-Subject: Re: [Qemu-devel] [PATCH 1/3] iotests.py: Add qemu_nbd_pipe()
+In-Reply-To: <afaed009-3831-db23-26c6-485d23e44b29@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/pci: Fix hotplugging of PCI
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +28,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerald Schaefer <gerald.schaefer@de.ibm.com>, linux-s390@vger.kernel.org, Sebastian Ott <sebott@linux.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nNQxlQXXD3o5u62Df3iTHsTRRIRdBpwFx
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <72fbcfe7-7f65-9e5b-e5f8-4f119f93c5d0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] iotests.py: Add qemu_nbd_pipe()
-References: <20181221234750.23577-1-mreitz@redhat.com>
- <20181221234750.23577-2-mreitz@redhat.com>
- <fd55396f-47d6-2836-46c3-0c44c8248a8b@redhat.com>
- <64732cb4-b586-2e38-b2b4-880359c56a3e@redhat.com>
-In-Reply-To: <64732cb4-b586-2e38-b2b4-880359c56a3e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/23/19 7:06 AM, Max Reitz wrote:
-> On 21.01.19 21:55, Eric Blake wrote:
->> On 12/21/18 5:47 PM, Max Reitz wrote:
->>> In some cases, we may want to deal with qemu-nbd errors (e.g. by
->>> launching it in a different configuration until it no longer throws
->>> any).  In that case, we do not want its output ending up in the test
->>> output.
+On 23.01.19 14:42, Thomas Huth wrote:
+> On 2019-01-23 12:42, David Hildenbrand wrote:
+>> On 23.01.19 12:16, Thomas Huth wrote:
+>>> On 2019-01-22 13:51, David Hildenbrand wrote:
+>>>> When hotplugging a PCI bridge right now to the root port, we resolve
+>>>> pci_get_bus(pdev)->parent_dev, which results in a SEGFAULT. Hotplugging
+>>>> really only works right now when hotplugging to another bridge.
+>>>>
+>>>> Instead, we have to properly check if we are already at the root.
+>>>>
+>>>> Let's cleanup the code while at it a bit and factor out updating the
+>>>> subordiante bus number into a separate function. The check for
+>>>> "old_nr < nr" is right now not strictly necessary, but makes it more
+>>>> obvious what is actually going on.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  hw/s390x/s390-pci-bus.c | 28 +++++++++++++++++++---------
+>>>>  1 file changed, 19 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>> index b7c4613fde..9b5c5fff60 100644
+>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>> @@ -843,6 +843,21 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>      }
+>>>>  }
+>>>>  
+>>>> +static void s390_pci_update_subordinate(PCIDevice *dev, uint32_t nr)
+>>>> +{
+>>>> +    uint32_t old_nr;
+>>>> +
+>>>> +    pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
+>>>> +    while (!pci_bus_is_root(pci_get_bus(dev))) {
+>>>> +        dev = pci_get_bus(dev)->parent_dev;
+>>>> +
+>>>> +        old_nr = pci_default_read_config(dev, PCI_SUBORDINATE_BUS, 1);
+>>>> +        if (old_nr < nr) {
+>>>> +            pci_default_write_config(dev, PCI_SUBORDINATE_BUS, nr, 1);
+>>>> +        }
+>>>> +    }
+>>>> +}
+>>>> +
+>>>>  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>                                Error **errp)
+>>>>  {
+>>>> @@ -851,26 +866,21 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>      S390PCIBusDevice *pbdev = NULL;
+>>>>  
+>>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>>>> -        BusState *bus;
+>>>>          PCIBridge *pb = PCI_BRIDGE(dev);
+>>>> -        PCIDevice *pdev = PCI_DEVICE(dev);
+>>>>  
+>>>> +        pdev = PCI_DEVICE(dev);
 >>>
->>> It may still be useful for handling the error, though, so add a new
->>> function that works basically like qemu_nbd(), only that it returns t=
-he
->>> qemu-nbd output instead of making it end up in the log.  In contrast =
-to
->>> qemu_img_pipe(), it does still return the exit code as well, though,
+>>> Why not keep the direct assignment?
 >>
->> In contrast to qemu_nbd(),
->=20
-> But qemu_nbd() does return the exit code.  qemu_img_pipe() doesn't.
->=20
-
-Oh, I see where I got confused. I thought you were comparing the new
-code [qemu_nbd_pipe] to itself; not to the pre-existing qemu_img_pipe
-that is not touched by this patch, but which served as the model you
-copied after.
-
->>> because that is even more important for error handling.
+>> We have the same local variable in that function already. I'm just
+>> reusing it.
+> 
+> D'oh, right. Please disregard my comment.
+> 
 >>>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>>  tests/qemu-iotests/iotests.py | 14 ++++++++++++++
->>>  1 file changed, 14 insertions(+)
+>>>>          pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+>>>>          pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
+>>>>  
+>>>> -        bus = BUS(&pb->sec_bus);
+>>>> -        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
+>>>> +        qbus_set_hotplug_handler(BUS(&pb->sec_bus), DEVICE(s), errp);
+>>>>  
+>>>>          if (dev->hotplugged) {
+>>>>              pci_default_write_config(pdev, PCI_PRIMARY_BUS,
+>>>>                                       pci_dev_bus_num(pdev), 1);
+>>>>              s->bus_no += 1;
+>>>>              pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
+>>>> -            do {
+>>>> -                pdev = pci_get_bus(pdev)->parent_dev;
+>>>> -                pci_default_write_config(pdev, PCI_SUBORDINATE_BUS,
+>>>> -                                         s->bus_no, 1);
+>>>> -            } while (pci_get_bus(pdev) && pci_dev_bus_num(pdev));
+>>>> +
+>>>> +            s390_pci_update_subordinate(pdev, s->bus_no);
 >>>
+>>>
+>>> While your changes look OK at a first glance, and certainly fix the
+>>> crash, I wonder whether this is the right thing to do here at all. Why
+>>> does the hypervisor set up the all the bridge registers here? I'd rather
+>>> expect that this is the job of the guest after it detects a hot-plugged
+>>> device?
+>>
+>> I honestly have no idea who is responsible for that. I can see that
+>> spapr does not seem to handle hotplugging the way s390x does. I was
+>> hoping that Colin maybe know why we have to do that on s390x this way.
+>> At least this patch does not change the behavior but only fixes it.
+> 
+> Right, you're patch certainly fixes a crash, and does not make it any
+> worse than it was before, so:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+>>>
+>>> Also I'm not sure whether the numbering is right in every case. Let's
+>>> use the example from the URL that you've mentioned in the cover letter
+>>> (http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html step 4):
+>>>
+>>> Assume that you hot-plug another bridge "5" to "Bridge 2". If I get the
+>>> code right, the setup will now look like this:
+>>
+>> Yes, this is what I would expect! This implies that any bus in the
+>> hierarchy lies between Sec and Sub. But that there might be multiple
+>> candidates, which feels wrong as you correctly say.
+>>
+>>>
+>>>                CPU
+>>>                 |
+>>>   --------------+-------------- Bus 0
+>>>                 |
+>>>                 |  Pri=0
+>>>                BR1 Sec=1
+>>>                 |  Sub=5
+>>>                 |
+>>>   ------+-------+----------+--- Bus 1
+>>>         |                  |
+>>>         |  Pri=1           |  Pri=1
+>>>        BR3 Sec=3          BR2 Sec=2
+>>>         |  Sub=4           |  Sub=5
+>>>         |                  |
+>>>   --+---+--- Bus 3       --+-+- Bus 2
+>>>     |                        |
+>>>     |  Pri=3                 |  Pri=2
+>>>    BR4 Sec=4                BR5 Sec=5
+>>>     |  Sub=4                 |  Sub=5
+>>>     |                        |
+>>>   --+---- Bus 4            --+-- Bus 5
+>>>
+>>> Requests to bus 3 and 4 are now also routed through to bus 2 and 5. That
+>>> sounds wrong to me. Or is this how hot-plugging of PCI bridges is
+>>> supposed to work??
+>>>
+>>
+>> Learning more about PCI
+>>
+>> Quoting from [2]
+>>
+>> "PCIe enumeration is generally done twice. First, your BIOS (UEFI or
+>> otherwise) will do it, to figure out who's present and how much memory
+>> they need. This data can then be passed on to the host OS who can take
+>> it as-is, but Linux and Windows often perform their own enumeration
+>> procedure ..."
+>>
+>> "The custom software part comes in during this enumeration process and
+>> that is you must reserve ahead of time PCI Bus numbers, and memory
+>> segments for potential future devices -- this is sometimes called 'bus
+>> padding'. This avoids the need to re-enumerate the bus in the future
+>> which can often not be done without disruption to the system ..."
+>>
+>> So if I understand correctly, the BIOS/Firmware/QEMU only provides the
+>> initial state. After that, the guest is responsible to manage it,
+>> especially to manage hotplug.
+>>
+>> However, I wonder if it would also be up to BIOS/Firmware/QEMU to do
+>> this bus padding or if it is completely on the OS side. And if
+>> hotplugged devices simply have all 0's.
+> 
+> Anyway, the current behavior sounds pretty wrong to me. I am sure that
+> we can not simply traverse the bridge hierarchy up to the top and change
+> the subordinate bus setting everywhere without informing the guest about
+> that change. What if the guest OS has cached the values from the
+> bridges? It then might use the wrong value for future calculations...
 
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Thanks for reviewing!
+Yes, it also sounds wrong to me. Maybe this is what Firmware manages on
+s390x - maybe they reserve bus numbers. Or maybe hotplug has to really
+be handled by the guests. Only IBM people can clarify that.
 
-Although my questions on patch 3 call into question whether you even
-need this patch, if your only use of it was to find a free port.
+Thanks!
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+-- 
 
+Thanks,
 
---nNQxlQXXD3o5u62Df3iTHsTRRIRdBpwFx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxIebgACgkQp6FrSiUn
-Q2owhAf+LAjElR3QfGcjF0O8IDh5YH15/Oakvil+2vPVSUu/F7UFJYNNI1Xq4Eh6
-uWs+shBBibr8LN3OcZ2nSCUVcjBEhmkZsrcI+LkcjePW9gIkCcOtVlc2AGVCipj6
-S4iBUp27Sd07vjtGDrYsgmhrYjWGtdz47WQWmAd2d/VN8PZx51ASIH34/uCF7ioC
-6mAGmVEEnd/DAGwiE/MFoKffaarzfx3hnF2UW0dAR0pceJPzpxlwUMJuGQemzgcX
-dVN0dJRGiY9T3jqn705+r6TtbkuNBlfRzS1OZPWETFGCXH1f/MMtM6iXDFIOKLbn
-w9JKDoOZp4ZM9kntZzem3+dNI6PZ8A==
-=Ba85
------END PGP SIGNATURE-----
-
---nNQxlQXXD3o5u62Df3iTHsTRRIRdBpwFx--
+David / dhildenb
