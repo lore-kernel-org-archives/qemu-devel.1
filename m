@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58660)
+Received: from eggs.gnu.org ([209.51.188.92]:58693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmNGq-00058q-T1
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gmNH5-0005DA-LC
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmNGp-0005n4-9e
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:04 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45279)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmNGp-0005ln-0c
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:03 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t6so3634219wrr.12
-	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 10:29:01 -0800 (PST)
-References: <1548242160-16039-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1548242160-16039-10-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <544d3c67-c766-6069-607b-97bf32cf40f6@redhat.com>
-Date: Wed, 23 Jan 2019 19:28:59 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1gmNH3-0005xf-TA
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60174)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gmNH3-0005um-Mg
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 13:29:17 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6EBCC7C13
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 18:29:14 +0000 (UTC)
+Date: Wed, 23 Jan 2019 18:28:59 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190123182858.GG2193@work-vm>
+References: <20190122200740.GC2241@work-vm>
+	<20190122215941-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1548242160-16039-10-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] MAINTAINERS: Update MIPS sections
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190122215941-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] of apci_1_compatible in CPUHotplugFeatures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 
-On 1/23/19 12:16 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Tue, Jan 22, 2019 at 08:07:41PM +0000, Dr. David Alan Gilbert wrote:
+> > Hi,
+> >   I noticed that the acpi_1_compatible flag was misspelt as
+> >                      apci_1_compatible
+> > 
+> > so have a trivial patch to fix that, but looking at it - are
+> > thre any cases where a[cp]i_1_compatible can possibly be false?
+> > 
+> > Dave
 > 
-> Remove Stefan Markovic as a reviewer for MIPS directories and
-> files, as he left Wave Computing.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> legacy_cpu_hotplug so machine 2.6 and older - no?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+That doesn't seem to affect that flag by my reading;
+the only place I see legacy_cpu_hotplug checked is
+acpi-build.c:build_dsdt and we have:
 
-> ---
->  MAINTAINERS | 9 ---------
->  1 file changed, 9 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index af339b8..060db23 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -206,7 +206,6 @@ MIPS
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  M: Aleksandar Markovic <amarkovic@wavecomp.com>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: target/mips/
->  F: default-configs/*mips*
-> @@ -365,7 +364,6 @@ F: target/arm/kvm.c
->  MIPS
->  M: James Hogan <jhogan@kernel.org>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: target/mips/kvm.c
->  
-> @@ -890,7 +888,6 @@ MIPS Machines
->  Jazz
->  M: Hervé Poussineau <hpoussin@reactos.org>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: hw/mips/mips_jazz.c
->  F: hw/display/jazz_led.c
-> @@ -899,14 +896,12 @@ F: hw/dma/rc4030.c
->  Malta
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: hw/mips/mips_malta.c
->  
->  Mipssim
->  M: Aleksandar Markovic <amarkovic@wavecomp.com>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Odd Fixes
->  F: hw/mips/mips_mipssim.c
->  F: hw/net/mipsnet.c
-> @@ -914,14 +909,12 @@ F: hw/net/mipsnet.c
->  R4000
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: hw/mips/mips_r4k.c
->  
->  Fulong 2E
->  M: Aleksandar Markovic <amarkovic@wavecomp.com>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Odd Fixes
->  F: hw/mips/mips_fulong2e.c
->  F: hw/isa/vt82c686.c
-> @@ -931,7 +924,6 @@ F: include/hw/isa/vt82c686.h
->  Boston
->  M: Paul Burton <pburton@wavecomp.com>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: hw/core/loader-fit.c
->  F: hw/mips/boston.c
-> @@ -2203,7 +2195,6 @@ F: disas/i386.c
->  MIPS target
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  R: Aleksandar Rikalo <arikalo@wavecomp.com>
-> -R: Stefan Markovic <smarkovic@wavecomp.com>
->  S: Maintained
->  F: tcg/mips/
->  F: disas/mips.c
-> 
+    if (pcmc->legacy_cpu_hotplug) {
+        build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+    } else {
+        CPUHotplugFeatures opts = {
+            .acpi_1_compatible = true, .has_legacy_cphp = true
+        };
+        build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+                       "\\_SB.PCI0", "\\_GPE._E02");
+    }
+
+so the 'opts' field is only used in the non-legacy case.
+
+That's the only caller of build_cpus_aml, and I'm not seeing another
+user of CPUHotplugFeatures.
+
+Dave
+
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
