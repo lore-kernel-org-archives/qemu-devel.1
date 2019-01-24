@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34297)
+Received: from eggs.gnu.org ([209.51.188.92]:34319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gmihg-0003dR-CB
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:13 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gmihj-0003h4-V1
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gmihe-0008KL-Ji
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47068
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1gmihe-0008JE-BQ
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:10 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0OHGsl9067444
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 12:22:08 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q7g0ee1e7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 12:22:08 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 24 Jan 2019 17:22:08 -0000
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <alex.williamson@redhat.com>) id 1gmihj-0008NB-1n
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37560)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gmihi-0008Jz-PY
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:22:14 -0500
+Date: Thu, 24 Jan 2019 10:22:03 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190124102203.71754e00@w520.home>
+In-Reply-To: <e74a05e53fdb6d5b9a48e44ce51ea987ffb7e2bf.1548323393.git-series.knut.omang@oracle.com>
+References: <cover.4fe3faa2cc295ab1e178284b738e33b940ab9312.1548323393.git-series.knut.omang@oracle.com>
+	<e74a05e53fdb6d5b9a48e44ce51ea987ffb7e2bf.1548323393.git-series.knut.omang@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20190113100531.1346024-2-basil@daynix.com>
-References: <20190113100531.1346024-1-basil@daynix.com>
-	<20190113100531.1346024-2-basil@daynix.com>
-Date: Thu, 24 Jan 2019 10:44:25 -0600
-Message-Id: <154834826562.21382.15414554890276314999@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] qga-win: prevent crash when
- executing guest-file-read with large count
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] pcie: Add a simple PCIe ACS (Access
+ Control Services) helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,59 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Basil Salman <basil@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Bishara AbuHattoum <bishara@daynix.com>
+To: Knut Omang <knut.omang@oracle.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, Tal Attaly <talat@mellanox.com>
 
-Quoting Basil Salman (2019-01-13 04:05:28)
-> BZ: #1594054
-> guest-file-read command is currently implelmented to read from a
+On Thu, 24 Jan 2019 11:12:52 +0100
+Knut Omang <knut.omang@oracle.com> wrote:
 
-*implemented
-
-> file handle count number of bytes. when executed with a very large count =
-number
-> qemu-ga crashes.
-> after some digging turns out that qemu-ga crashes after trying to allocate
-> a buffer large enough to save the data read in it, the buffer was allocat=
-ed using
-> g_malloc0 which is not fail safe, and results a crash in case of failure.
-> g_malloc0 was replaced with g_try_malloc0() which returns NULL on failure,
-> A check was added for that case in order to prevent qemu-ga from crashing
-> and to send a response to the qemu-ga client accordingly.
-> =
-
-> Signed-off-by: Basil Salman <basil@daynix.com>
+> Add a helper function to add PCIe capability for Access Control Services (ACS)
+> ACS support in the associated root port is a prerequisite to be able to do
+> passthrough of individual functions of a device with VFIO
+> without Alex Williamson's pcie_acs_override kernel patch or similar
+> in the guest.
+> 
+> Signed-off-by: Knut Omang <knut.omang@oracle.com>
 > ---
->  qga/commands-win32.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> =
+>  hw/pci/pcie.c              | 21 +++++++++++++++++++++
+>  include/hw/pci/pcie.h      |  6 ++++++
+>  include/hw/pci/pcie_regs.h |  4 ++++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 230478f..5ab3d1d 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -742,6 +742,13 @@ bool pcie_cap_is_arifwd_enabled(const PCIDevice *dev)
+>          PCI_EXP_DEVCTL2_ARI;
+>  }
+>  
+> +/* Access Control Services (ACS)
+> + */
 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 62e1b51dfe..4260faa573 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -345,7 +345,13 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, b=
-ool has_count,
->      }
-> =
+Comment style
 
->      fh =3D gfh->fh;
-> -    buf =3D g_malloc0(count+1);
-> +    buf =3D g_try_malloc0(count + 1);
-> +    if (!buf) {
-> +        error_setg(errp,
-> +                   "failed to allocate sufficient memory"
-> +                   "to complete the requested service");
-> +        return read_data;
+> +void pcie_cap_acs_reset(PCIDevice *dev)
+> +{
+> +    pci_set_word(dev->config + dev->exp.acs_cap + PCI_ACS_CTRL, 0);
+> +}
+> +
+>  /**************************************************************************
+>   * pci express extended capability list management functions
+>   * uint16_t ext_cap_id (16 bit)
+> @@ -906,3 +913,17 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+>  
+>      pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
+>  }
+> +
+> +/* ACS (Access Control Services) */
+> +void pcie_acs_init(PCIDevice *dev, uint16_t offset)
+> +{
+> +    pcie_add_capability(dev, PCI_EXT_CAP_ID_ACS, PCI_ACS_VER,
+> +                        offset, PCI_ACS_SIZEOF);
+> +    dev->exp.acs_cap = offset;
+> +    pci_set_word(dev->config + offset + PCI_ACS_CAP,
+> +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
 
-return NULL might be a little clearer since that's what we do in the
-preceeding checks
+This is still only valid for downstream ports yet neither restricted
+nor commented do indicate that.  You could use an object_dynamic_cast
+to triggger an assert should someone use it for an invalid type of
+device, ex:
 
-> +    }
->      is_ok =3D ReadFile(fh, buf, count, &read_count, NULL);
->      if (!is_ok) {
->          error_setg_win32(errp, GetLastError(), "failed to read file");
-> -- =
+assert(object_dynamic_cast(OBJECT(dev), TYPE_PCIE_SLOT));
 
-> 2.17.2
->=20
+> +
+> +    pci_set_word(dev->config + offset + PCI_ACS_CTRL, 0);
+
+Suspect this is unnecessary given the reset callback.
+
+> +    pci_set_word(dev->wmask + offset + PCI_ACS_CTRL,
+> +                 PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
+> +}
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index 5b82a0d..4c40711 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -79,6 +79,9 @@ struct PCIExpressDevice {
+>  
+>      /* Offset of ATS capability in config space */
+>      uint16_t ats_cap;
+> +
+> +    /* ACS */
+> +    uint16_t acs_cap;
+>  };
+>  
+>  #define COMPAT_PROP_PCP "power_controller_present"
+> @@ -116,6 +119,8 @@ void pcie_cap_flr_init(PCIDevice *dev);
+>  void pcie_cap_flr_write_config(PCIDevice *dev,
+>                             uint32_t addr, uint32_t val, int len);
+>  
+> +void pcie_cap_acs_reset(PCIDevice *dev);
+> +
+>  /* ARI forwarding capability and control */
+>  void pcie_cap_arifwd_init(PCIDevice *dev);
+>  void pcie_cap_arifwd_reset(PCIDevice *dev);
+> @@ -129,6 +134,7 @@ void pcie_add_capability(PCIDevice *dev,
+>  void pcie_sync_bridge_lnk(PCIDevice *dev);
+>  
+>  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+> +void pcie_acs_init(PCIDevice *dev, uint16_t offset);
+>  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
+>  void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+>  
+> diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> index ad4e780..3fc9aca 100644
+> --- a/include/hw/pci/pcie_regs.h
+> +++ b/include/hw/pci/pcie_regs.h
+> @@ -175,4 +175,8 @@ typedef enum PCIExpLinkWidth {
+>                                           PCI_ERR_COR_INTERNAL |         \
+>                                           PCI_ERR_COR_HL_OVERFLOW)
+>  
+> +/* ACS */
+> +#define PCI_ACS_VER                     0x2
+
+There's no such version, even the PCIe 5.0 drafts only define version 1.
+
+> +#define PCI_ACS_SIZEOF                  8
+> +
+>  #endif /* QEMU_PCIE_REGS_H */
