@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36260)
+Received: from eggs.gnu.org ([209.51.188.92]:36480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmcAW-00052N-2K
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:23:34 -0500
+	(envelope-from <zub@linux.fjfi.cvut.cz>) id 1gmcBe-00067l-Q7
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmcAN-0005Rq-16
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:23:27 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 24 Jan 2019 10:23:13 +0000
-Message-ID: <49df4ecc-50c1-fd41-e6a3-87aadae5e4c8@virtuozzo.com>
-References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
-	<6325d205-774f-865b-1351-8a7e675bebf7@virtuozzo.com>
-	<ad03195b-04fb-3e87-25f3-b974d9971d57@virtuozzo.com>
-	<20190124101046.GB2404@work-vm>
-In-Reply-To: <20190124101046.GB2404@work-vm>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DA68D61F168BCD4495564843BE3B281F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <zub@linux.fjfi.cvut.cz>) id 1gmcBd-0007o8-5v
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:24:42 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:39232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zub@linux.fjfi.cvut.cz>)
+	id 1gmcBc-0007ky-7W
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:24:41 -0500
+Date: Thu, 24 Jan 2019 11:24:34 +0100 (CET)
+From: David Kozub <zub@linux.fjfi.cvut.cz>
+In-Reply-To: <0bf4c4ed-ba51-7723-66ea-43bb162691a8@redhat.com>
+Message-ID: <alpine.LRH.2.21.1901241039400.4050@linux.fjfi.cvut.cz>
+References: <alpine.LRH.2.21.1901051827350.16856@linux.fjfi.cvut.cz>
+	<20190107091618.GD27089@stefanha-x1.localdomain>
+	<e2e14237-32be-8e3d-242c-c19e98d04d60@redhat.com>
+	<alpine.LRH.2.21.1901172312550.8075@linux.fjfi.cvut.cz>
+	<aeb7e3b4-b776-1ee3-d4a0-d39c3e44ac31@redhat.com>
+	<alpine.LRH.2.21.1901210003120.12076@linux.fjfi.cvut.cz>
+	<0bf4c4ed-ba51-7723-66ea-43bb162691a8@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Aborts in iotest 169
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Emulation of TCG OPAL self-encrypting drive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,227 +33,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Luiz Capitulino <lcapitulino@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org
 
-MjQuMDEuMjAxOSAxMzoxMCwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90ZToNCj4gKiBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICh2c2VtZW50c292QHZpcnR1b3p6by5jb20pIHdyb3Rl
-Og0KPj4gMjQuMDEuMjAxOSAxMjoyOSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90
-ZToNCj4+PiAyMy4wMS4yMDE5IDE4OjQ4LCBNYXggUmVpdHogd3JvdGU6DQo+Pj4+IEhpLA0KPj4+
-Pg0KPj4+PiBXaGVuIHJ1bm5pbmcgMTY5IGluIHBhcmFsbGVsIChlLmcuIGxpa2Ugc286DQo+Pj4+
-DQo+Pj4+ICQgd2hpbGUgVEVTVF9ESVI9L3RtcC90MCAuL2NoZWNrIC1UIC1xY293MiAxNjk7IGRv
-OyBkb25lDQo+Pj4+ICQgd2hpbGUgVEVTVF9ESVI9L3RtcC90MSAuL2NoZWNrIC1UIC1xY293MiAx
-Njk7IGRvOyBkb25lDQo+Pj4+ICQgd2hpbGUgVEVTVF9ESVI9L3RtcC90MiAuL2NoZWNrIC1UIC1x
-Y293MiAxNjk7IGRvOyBkb25lDQo+Pj4+ICQgd2hpbGUgVEVTVF9ESVI9L3RtcC90MyAuL2NoZWNr
-IC1UIC1xY293MiAxNjk7IGRvOyBkb25lDQo+Pj4+DQo+Pj4+IGluIGZvdXIgZGlmZmVyZW50IHNo
-ZWxscyksIEkgZ2V0IGFib3J0czoNCj4+Pj4NCj4+Pj4gKE9mdGVuIEkgZ2V0IHNlZ2ZhdWx0cywg
-YnV0IHRoYXQncyBiZWNhdXNlIG9mDQo+Pj4+IGh0dHA6Ly9saXN0cy5ub25nbnUub3JnL2FyY2hp
-dmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTIvbXNnMDU1NzkuaHRtbCAtLQ0KPj4+PiBmZWVsIGZy
-ZWUgdG8gYXBwbHkgdGhlIGF0dGFjaGVkIHBhdGNoIHRvIG1ha2UgdGhlbSBnbyBhd2F5KQ0KPj4+
-Pg0KPj4+Pg0KPj4+PiBXQVJOSU5HOnFlbXU6cWVtdSByZWNlaXZlZCBzaWduYWwgNjoNCj4+Pj4g
-YnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzLy4uLy4uL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVt
-LXg4Nl82NA0KPj4+PiAtY2hhcmRldiBzb2NrZXQsaWQ9bW9uLHBhdGg9L3RtcC90MC90bXBiWDMw
-WFUvcWVtdWEtMjU3NDUtbW9uaXRvci5zb2NrDQo+Pj4+IC1tb24gY2hhcmRldj1tb24sbW9kZT1j
-b250cm9sIC1kaXNwbGF5IG5vbmUgLXZnYSBub25lIC1xdGVzdA0KPj4+PiB1bml4OnBhdGg9L3Rt
-cC90MC9xZW11YS0yNTc0NS1xdGVzdC5zb2NrIC1tYWNoaW5lIGFjY2VsPXF0ZXN0DQo+Pj4+IC1u
-b2RlZmF1bHRzIC1tYWNoaW5lIGFjY2VsPXF0ZXN0IC1kcml2ZQ0KPj4+PiBpZj12aXJ0aW8saWQ9
-ZHJpdmUwLGZpbGU9L3RtcC90MC9kaXNrX2EsZm9ybWF0PXFjb3cyLGNhY2hlPXdyaXRlYmFjaw0K
-Pj4+PiAuLi4uLi4uLi4uLi4uLi4uLkUuLg0KPj4+PiA9PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+Pj4+IEVSUk9S
-Og0KPj4+PiB0ZXN0X2RvX3Rlc3RfbWlncmF0aW9uX3Jlc3VtZV9zb3VyY2Vfbm90X3BlcnNpc3Rl
-bnRfX25vdF9taWdiaXRtYXANCj4+Pj4gKF9fbWFpbl9fLlRlc3REaXJ0eUJpdG1hcE1pZ3JhdGlv
-bikNCj4+Pj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4+PiBUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwg
-bGFzdCk6DQo+Pj4+ICDCoMKgIEZpbGUgIjE2OSIsIGxpbmUgMjA2LCBpbiA8bGFtYmRhPg0KPj4+
-PiAgwqDCoMKgwqAgc2V0YXR0cihrbGFzcywgJ3Rlc3RfJyArIG1ldGhvZCArIG5hbWUsIGxhbWJk
-YSBzZWxmOiBtYyhzZWxmKSkNCj4+Pj4gIMKgwqAgRmlsZSAiMTY5IiwgbGluZSAxMTMsIGluIGRv
-X3Rlc3RfbWlncmF0aW9uX3Jlc3VtZV9zb3VyY2UNCj4+Pj4gIMKgwqDCoMKgIHNlbGYuY2hlY2tf
-Yml0bWFwKHNlbGYudm1fYSwgc2hhMjU2KQ0KPj4+PiAgwqDCoCBGaWxlICIxNjkiLCBsaW5lIDcy
-LCBpbiBjaGVja19iaXRtYXANCj4+Pj4gIMKgwqDCoMKgIG5vZGU9J2RyaXZlMCcsIG5hbWU9J2Jp
-dG1hcDAnKQ0KPj4+PiAgwqDCoCBGaWxlICJ0ZXN0cy9xZW11LWlvdGVzdHMvLi4vLi4vc2NyaXB0
-cy9xZW11LnB5IiwgbGluZSAzNjksIGluIHFtcA0KPj4+PiAgwqDCoMKgwqAgcmV0dXJuIHNlbGYu
-X3FtcC5jbWQoY21kLCBhcmdzPXFtcF9hcmdzKQ0KPj4+PiAgwqDCoCBGaWxlICJ0ZXN0cy9xZW11
-LWlvdGVzdHMvLi4vLi4vc2NyaXB0cy9xbXAvcW1wLnB5IiwgbGluZSAxOTEsIGluIGNtZA0KPj4+
-PiAgwqDCoMKgwqAgcmV0dXJuIHNlbGYuY21kX29iaihxbXBfY21kKQ0KPj4+PiAgwqDCoCBGaWxl
-ICJ0ZXN0cy9xZW11LWlvdGVzdHMvLi4vLi4vc2NyaXB0cy9xbXAvcW1wLnB5IiwgbGluZSAxNzQs
-IGluIGNtZF9vYmoNCj4+Pj4gIMKgwqDCoMKgIHJlc3AgPSBzZWxmLl9fanNvbl9yZWFkKCkNCj4+
-Pj4gIMKgwqAgRmlsZSAidGVzdHMvcWVtdS1pb3Rlc3RzLy4uLy4uL3NjcmlwdHMvcW1wL3FtcC5w
-eSIsIGxpbmUgODIsIGluDQo+Pj4+IF9fanNvbl9yZWFkDQo+Pj4+ICDCoMKgwqDCoCBkYXRhID0g
-c2VsZi5fX3NvY2tmaWxlLnJlYWRsaW5lKCkNCj4+Pj4gIMKgwqAgRmlsZSAiL3Vzci9saWI2NC9w
-eXRob24yLjcvc29ja2V0LnB5IiwgbGluZSA0NTEsIGluIHJlYWRsaW5lDQo+Pj4+ICDCoMKgwqDC
-oCBkYXRhID0gc2VsZi5fc29jay5yZWN2KHNlbGYuX3JidWZzaXplKQ0KPj4+PiBlcnJvcjogW0Vy
-cm5vIDEwNF0gQ29ubmVjdGlvbiByZXNldCBieSBwZWVyDQo+Pj4+DQo+Pj4+IC0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0NCj4+Pj4gUmFuIDIwIHRlc3RzDQo+Pj4+DQo+Pj4+IEZBSUxFRCAoZXJyb3JzPTEpDQo+Pj4+
-DQo+Pj4+DQo+Pj4+IE9yOg0KPj4+Pg0KPj4+PiBXQVJOSU5HOnFlbXU6cWVtdSByZWNlaXZlZCBz
-aWduYWwgNjoNCj4+Pj4gYnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzLy4uLy4uL3g4Nl82NC1zb2Z0
-bW11L3FlbXUtc3lzdGVtLXg4Nl82NA0KPj4+PiAtY2hhcmRldiBzb2NrZXQsaWQ9bW9uLHBhdGg9
-L3RtcC90My90bXAwcGxsV0QvcWVtdWEtMzQ0NS1tb25pdG9yLnNvY2sNCj4+Pj4gLW1vbiBjaGFy
-ZGV2PW1vbixtb2RlPWNvbnRyb2wgLWRpc3BsYXkgbm9uZSAtdmdhIG5vbmUgLXF0ZXN0DQo+Pj4+
-IHVuaXg6cGF0aD0vdG1wL3QzL3FlbXVhLTM0NDUtcXRlc3Quc29jayAtbWFjaGluZSBhY2NlbD1x
-dGVzdCAtbm9kZWZhdWx0cw0KPj4+PiAtbWFjaGluZSBhY2NlbD1xdGVzdCAtZHJpdmUNCj4+Pj4g
-aWY9dmlydGlvLGlkPWRyaXZlMCxmaWxlPS90bXAvdDMvZGlza19hLGZvcm1hdD1xY293MixjYWNo
-ZT13cml0ZWJhY2sNCj4+Pj4gV0FSTklORzpxZW11OnFlbXUgcmVjZWl2ZWQgc2lnbmFsIDY6DQo+
-Pj4+IGJ1aWxkL3Rlc3RzL3FlbXUtaW90ZXN0cy8uLi8uLi94ODZfNjQtc29mdG1tdS9xZW11LXN5
-c3RlbS14ODZfNjQNCj4+Pj4gLWNoYXJkZXYgc29ja2V0LGlkPW1vbixwYXRoPS90bXAvdDMvdG1w
-MHBsbFdEL3FlbXVhLTM0NDUtbW9uaXRvci5zb2NrDQo+Pj4+IC1tb24gY2hhcmRldj1tb24sbW9k
-ZT1jb250cm9sIC1kaXNwbGF5IG5vbmUgLXZnYSBub25lIC1xdGVzdA0KPj4+PiB1bml4OnBhdGg9
-L3RtcC90My9xZW11YS0zNDQ1LXF0ZXN0LnNvY2sgLW1hY2hpbmUgYWNjZWw9cXRlc3QgLW5vZGVm
-YXVsdHMNCj4+Pj4gLW1hY2hpbmUgYWNjZWw9cXRlc3QgLWRyaXZlDQo+Pj4+IGlmPXZpcnRpbyxp
-ZD1kcml2ZTAsZmlsZT0vdG1wL3QzL2Rpc2tfYSxmb3JtYXQ9cWNvdzIsY2FjaGU9d3JpdGViYWNr
-DQo+Pj4+DQo+Pj4+IC4uLi4uLi4uLi4uLi4uLi4uLi5GDQo+Pj4+ID09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4+
-Pj4gRkFJTDogdGVzdF9kb190ZXN0X21pZ3JhdGlvbl9yZXN1bWVfc291cmNlX3BlcnNpc3RlbnRf
-X25vdF9taWdiaXRtYXANCj4+Pj4gKF9fbWFpbl9fLlRlc3REaXJ0eUJpdG1hcE1pZ3JhdGlvbikN
-Cj4+Pj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4+PiBUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFz
-dCk6DQo+Pj4+ICDCoMKgIEZpbGUgIjE2OSIsIGxpbmUgMjA2LCBpbiA8bGFtYmRhPg0KPj4+PiAg
-wqDCoMKgwqAgc2V0YXR0cihrbGFzcywgJ3Rlc3RfJyArIG1ldGhvZCArIG5hbWUsIGxhbWJkYSBz
-ZWxmOiBtYyhzZWxmKSkNCj4+Pj4gIMKgwqAgRmlsZSAiMTY5IiwgbGluZSAxMjUsIGluIGRvX3Rl
-c3RfbWlncmF0aW9uX3Jlc3VtZV9zb3VyY2UNCj4+Pj4gIMKgwqDCoMKgIHNlbGYuYXNzZXJ0RXF1
-YWwobG9nLCAnJykNCj4+Pj4gQXNzZXJ0aW9uRXJyb3I6ICJxZW11LXN5c3RlbS14ODZfNjQ6IGlu
-dmFsaWQgcnVuc3RhdGUgdHJhbnNpdGlvbjoNCj4+Pj4gJ3J1bm5pbmcnIC0+ICdwb3N0bWlncmF0
-ZSdcbiIgIT0gJycNCj4+Pj4NCj4+Pj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4+PiBSYW4gMjAgdGVzdHMN
-Cj4+Pj4NCj4+Pj4gRkFJTEVEIChmYWlsdXJlcz0xKQ0KPj4+Pg0KPj4+Pg0KPj4+PiBUaGUgYmFj
-a3RyYWNlIGFsd2F5cyBnb2VzIGxpa2UgdGhpczoNCj4+Pj4NCj4+Pj4gKGdkYikgYnQNCj4+Pj4g
-IzDCoCAweDAwMDA3ZjBhY2Y1Y2M1M2YgaW4gcmFpc2UgKCkgYXQgL2xpYjY0L2xpYmMuc28uNg0K
-Pj4+PiAjMcKgIDB4MDAwMDdmMGFjZjViNjg5NSBpbiBhYm9ydCAoKSBhdCAvbGliNjQvbGliYy5z
-by42DQo+Pj4+ICMywqAgMHgwMDAwNTVhNDZlYmJiMWE2IGluIHJ1bnN0YXRlX3NldCAobmV3X3N0
-YXRlPVJVTl9TVEFURV9QT1NUTUlHUkFURSkNCj4+Pj4gYXQgdmwuYzo3NDINCj4+Pj4gIzPCoCAw
-eDAwMDA1NWE0NmViYmIxYTYgaW4gcnVuc3RhdGVfc2V0DQo+Pj4+IChuZXdfc3RhdGU9bmV3X3N0
-YXRlQGVudHJ5PVJVTl9TVEFURV9QT1NUTUlHUkFURSkgYXQgdmwuYzo3MzANCj4+Pj4gIzTCoCAw
-eDAwMDA1NWE0NmVkMzkxMjkgaW4gbWlncmF0aW9uX2l0ZXJhdGlvbl9maW5pc2ggKHM9MHg1NWE0
-NzA4YmUwMDApDQo+Pj4+IGF0IG1pZ3JhdGlvbi9taWdyYXRpb24uYzoyOTcyDQo+Pj4+ICM1wqAg
-MHgwMDAwNTVhNDZlZDM5MTI5IGluIG1pZ3JhdGlvbl90aHJlYWQNCj4+Pj4gKG9wYXF1ZT1vcGFx
-dWVAZW50cnk9MHg1NWE0NzA4YmUwMDApIGF0IG1pZ3JhdGlvbi9taWdyYXRpb24uYzozMTMwDQo+
-Pj4+ICM2wqAgMHgwMDAwNTVhNDZlZWE2NjVhIGluIHFlbXVfdGhyZWFkX3N0YXJ0IChhcmdzPTxv
-cHRpbWl6ZWQgb3V0PikgYXQNCj4+Pj4gdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjUwMg0KPj4+
-Pg0KPj4+Pg0KPj4+PiAjN8KgIDB4MDAwMDdmMGFjZjc2MjU4ZSBpbiBzdGFydF90aHJlYWQgKCkg
-YXQgL2xpYjY0L2xpYnB0aHJlYWQuc28uMA0KPj4+PiAjOMKgIDB4MDAwMDdmMGFjZjY5MTZhMyBp
-biBjbG9uZSAoKSBhdCAvbGliNjQvbGliYy5zby42DQo+Pj4+IChnZGIpIGZyYW1lIDINCj4+Pj4g
-IzLCoCAweDAwMDA1NWE0NmViYmIxYTYgaW4gcnVuc3RhdGVfc2V0IChuZXdfc3RhdGU9UlVOX1NU
-QVRFX1BPU1RNSUdSQVRFKQ0KPj4+PiBhdCB2bC5jOjc0Mg0KPj4+PiA3NDLCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgYWJvcnQoKTsNCj4+Pj4gKGdkYikgcHJpbnQgY3VycmVudF9ydW5fc3RhdGUN
-Cj4+Pj4gJDEgPSBSVU5fU1RBVEVfUlVOTklORw0KPj4+Pg0KPj4+Pg0KPj4+PiBOZWl0aGVyIG9m
-IG1pZ3JhdGlvbiBvciBydW5zdGF0ZXMgYXJlIG15IHN0cm9uZyBzdWl0ZSwgc28gSSB0aG91Z2h0
-IEknZA0KPj4+PiByZXBvcnQgaXQgYmVmb3JlIGRpdmluZyBpbnRvIGl0Lg0KPj4+Pg0KPj4+PiBN
-YXgNCj4+Pj4NCj4+Pg0KPj4+IFsuLi5dDQo+Pj4gNDUwNTU2QDE1NDgzMjEwNzIuODg4OTc5Om1p
-Z3JhdGVfc2V0X3N0YXRlIG5ldyBzdGF0ZSBhY3RpdmUNCj4+PiA0NTA1NTZAMTU0ODMyMTA3Mi44
-ODkwMjI6bWlncmF0aW9uX3RocmVhZF9zZXR1cF9jb21wbGV0ZQ0KPj4+IDQ1MDU1NkAxNTQ4MzIx
-MDcyLjk4ODI3NTptaWdyYXRlX3RyYW5zZmVycmVkIHRyYW5zZmVycmVkIDk4NTI5OCB0aW1lX3Nw
-ZW50IDEwMCBiYW5kd2lkdGggOTg1MiBtYXhfc2l6ZSAyOTU1ODk0DQo+Pj4gNDUwNTU2QDE1NDgz
-MjEwNzIuOTg4MjgzOm1pZ3JhdGlvbl9iaXRtYXBfc3luY19zdGFydA0KPj4+IDQ1MDU1NkAxNTQ4
-MzIxMDcyLjk4ODI5MzptaWdyYXRpb25fYml0bWFwX3N5bmNfZW5kIGRpcnR5X3BhZ2VzIDMyODk4
-DQo+Pj4gNDUwNTU2QDE1NDgzMjEwNzIuOTg4NDk1Om1pZ3JhdGlvbl90aHJlYWRfbG93X3BlbmRp
-bmcgMjA0OA0KPj4+IG1pZ3JhdGlvbl9jb21wbGV0aW9uDQo+Pj4gNDUwNTU2QDE1NDgzMjEwNzIu
-OTg4NTQxOnJ1bnN0YXRlX3NldCBjdXJyZW50X3N0YXRlIDkgbmV3X3N0YXRlIDcNCj4+PiA0NTA1
-NTZAMTU0ODMyMTA3Mi45ODg3ODA6bWlncmF0aW9uX2JpdG1hcF9zeW5jX3N0YXJ0DQo+Pj4gNDUw
-NTU2QDE1NDgzMjEwNzIuOTg4NzkwOm1pZ3JhdGlvbl9iaXRtYXBfc3luY19lbmQgZGlydHlfcGFn
-ZXMgMzI4OTgNCj4+PiA0NTA1NTZAMTU0ODMyMTA3Mi45OTMxMTI6bWlncmF0ZV9nbG9iYWxfc3Rh
-dGVfcHJlX3NhdmUgc2F2ZWQgc3RhdGU6IHJ1bm5pbmcNCj4+PiBbMV0gNDUwNTU2QDE1NDgzMjEw
-NzIuOTkzMjM3Om1pZ3JhdGVfc2V0X3N0YXRlIG5ldyBzdGF0ZSBjb21wbGV0ZWQNCj4+PiA0NTA1
-NDlAMTU0ODMyMTA3Mi45OTM2Njg6aGFuZGxlX3FtcF9jb21tYW5kIG1vbiAweDU1YWViZWY5OTgz
-MCByZXE6IHsiZXhlY3V0ZSI6ICJ4LWRlYnVnLWJsb2NrLWRpcnR5LWJpdG1hcC1zaGEyNTYiLCAi
-YXJndW1lbnRzIjogeyJuYW1lIjogImJpdG1hcDAiLCAibm9kZSI6ICJkcml2ZTAifX0NCj4+PiA0
-NTA1NTZAMTU0ODMyMTA3Mi45OTM2OTc6bWlncmF0aW9uX3RocmVhZF9hZnRlcl9sb29wDQo+Pj4g
-WzJdIDQ1MDU0OUAxNTQ4MzIxMDcyLjk5MzkxNzpoYW5kbGVfcW1wX2NvbW1hbmQgbW9uIDB4NTVh
-ZWJlZjk5ODMwIHJlcTogeyJleGVjdXRlIjogImNvbnQifQ0KPj4+IDQ1MDQ3NkAxNTQ4MzIxMDcy
-Ljk5NDQ2MTpydW5zdGF0ZV9zZXQgY3VycmVudF9zdGF0ZSA3IG5ld19zdGF0ZSA5DQo+Pj4gcWVt
-dS1zeXN0ZW0teDg2XzY0OiBpbnZhbGlkIHJ1bnN0YXRlIHRyYW5zaXRpb246ICdydW5uaW5nJyAt
-PiAncG9zdG1pZ3JhdGUnDQo+Pj4NCj4+Pg0KPj4+IEFoYSwgc28sIGluIHRlc3Qgd2Ugd2FpdCBm
-b3IgTUlHUkFUSU9OIENPTVBMRVRFRCBbMV0gYW5kIHJ1biBxbXBfY29udCBbMl0gYW5kIGdvIHRv
-IFJVTk5JTkcuDQo+Pj4gdGhlbiBpbiBtaWdyYXRpb24gdGhyZWFkIHdlIGdvIHRvIG1pZ3JhdGlv
-bl9pdGVyYXRpb25fZmluaXNoKCkgYW5kIGZhaWwgdG8gZ28gdG8gUE9TVE1JR1JBVEUuDQo+Pj4g
-KG5vdGUsIHRoYXQgdGhpcyB0ZXN0Y2FzZSBpcyBhYm91dCByZXN1bWluZyBzb3VyY2UgYWZ0ZXIg
-bWlncmF0aW9uKQ0KPj4+DQo+Pj4gU28sIGZpeCBmb3IgdGVzdCBtYXkgYmUgYWRkaXRpb25hbGx5
-IHdhaXQgZm9yIFBPU1RNSUdSQVRFLCBub3Qgb25seSBmb3IgTUlHUkFUSU9OIENPTVBMRVRJT04u
-DQo+Pj4NCj4+PiBCdXQgaG93IHRvIGZpeCBRZW11IG5vdCB0byBjcmFzaD8gTWF5IGJlLCBmb3Ji
-aWQgc29tZSB0cmFuc2l0aW9ucyAoRklOSVNIX01JR1JBVEUgLT4gUlVOTklORyksDQo+Pj4gICDC
-oG9yIGF0IGxlYXN0IGVycm9yLW91dCBxbXBfY29udCBpZiBydW5zdGF0ZSBpc8KgIEZJTklTSF9N
-SUdSQVRFPw0KPj4+DQo+Pj4NCj4+Pg0KPj4NCj4+DQo+PiBPaywgdGhpcyBzZWVtcyB0byBmaXgg
-dGVzdCBmb3IgbWU6DQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8xNjkg
-Yi90ZXN0cy9xZW11LWlvdGVzdHMvMTY5DQo+PiBpbmRleCA1MjdhZWJkMGNiLi5kZDk4MTY4Yzhk
-IDEwMDc1NQ0KPj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzE2OQ0KPj4gKysrIGIvdGVzdHMv
-cWVtdS1pb3Rlc3RzLzE2OQ0KPj4gQEAgLTEwMiw2ICsxMDIsMTAgQEAgY2xhc3MgVGVzdERpcnR5
-Qml0bWFwTWlncmF0aW9uKGlvdGVzdHMuUU1QVGVzdENhc2UpOg0KPj4gICAgICAgICAgICAgICAg
-ZXZlbnQgPSBzZWxmLnZtX2EuZXZlbnRfd2FpdCgnTUlHUkFUSU9OJykNCj4+ICAgICAgICAgICAg
-ICAgIGlmIGV2ZW50WydkYXRhJ11bJ3N0YXR1cyddID09ICdjb21wbGV0ZWQnOg0KPj4gICAgICAg
-ICAgICAgICAgICAgIGJyZWFrDQo+PiArICAgICAgICB3aGlsZSBUcnVlOg0KPj4gKyAgICAgICAg
-ICAgIHJlc3VsdCA9IHNlbGYudm1fYS5xbXAoJ3F1ZXJ5LXN0YXR1cycpDQo+PiArICAgICAgICAg
-ICAgaWYgKHJlc3VsdFsncmV0dXJuJ11bJ3N0YXR1cyddID09ICdwb3N0bWlncmF0ZScpOg0KPj4g
-KyAgICAgICAgICAgICAgICBicmVhaw0KPiANCj4gSG1tOyBJIGNhbiBzZWUgdGhhdCBpdCBtaWdo
-dCBoZWxwOyBhbHRob3VnaCBJIHN0aWxsIGNhbid0IHF1aXRlIHNlZQ0KPiBob3cgdGhlIGJhZCB0
-cmFuc2l0aW9uIHRoYXQgd2FzIHJlcG9ydGVkIGNhbiBoYXZlIGhhcHBlbmVkLg0KPiANCg0KSXQg
-Y2FuIGJlIGFzc3VtZWQgZnJvbSBteSB0cmFjZSBhYm92ZToNCg0KMS4gbWlncmF0aW9uIHRocmVh
-ZCBkbyBtaWdyYXRpb05fY29tcGxldGlvbiBhbmQgZ29lcyB0byBSVU5fU1RBVEVfRklOSVNIX01J
-R1JBVEUgdGhyb3VnaCB2bV9zdG9wX2ZvcmNlX3N0YXRlKFJVTl9TVEFURV9GSU5JU0hfTUlHUkFU
-RSkNCjIuIG1pZ3JhdGlvbl9jb21wbGV0aW9uIGRvDQogICAgICAgICBtaWdyYXRlX3NldF9zdGF0
-ZSgmcy0+c3RhdGUsIGN1cnJlbnRfYWN0aXZlX3N0YXRlLA0KICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBNSUdSQVRJT05fU1RBVFVTX0NPTVBMRVRFRCk7DQogICAgYW5kIE1JR1JBVElPTiBD
-T01QTEVURUQgZXZlbnQgaXMgcmVwb3J0ZWQsIHNvDQozLiAxNjkgaW90ZXN0IGdldHMgZXZlbnQs
-IGFuZCB0aGluayB0aGF0IGFsbCBpcyBkb25lIGFib3V0IG1pZ3JhdGlvbi4gQW5kIGl0IGNhbGwg
-cW1wX2NvbnQNCjQuIHFtcF9jb250IGRvIHRyYW5zaXRpb24gZnJvbSBSVU5fU1RBVEVfRklOSVNI
-X01JR1JBVEUgdG8gUlVOX1NUQVRFX1JVTk5JTkcNCjUuIG1pZ3JhdGlvbiB0aHJlYWQgZ29lcyB0
-byBtaWdyYXRpb25faXRlcmF0aW9uX2ZpbmlzaCBhbmQgZG8gaW52YWxpZCB0cmFuc2l0aW9uDQoN
-Cg0KPiANCj4+ICAgICAgICAgICAgIyB0ZXN0IHRoYXQgYml0bWFwIGlzIHN0aWxsIGhlcmUNCj4+
-ICAgICAgICAgICAgcmVtb3ZlZCA9IChub3QgbWlncmF0ZV9iaXRtYXBzKSBhbmQgcGVyc2lzdGVu
-dA0KPj4NCj4+IC0NCj4+DQo+Pg0KPj4gQW5kIHRoaXMgaXMgdGhlIGZ1bGwgZGlmZiBvZiB0aGUg
-dGVzdCBJIHVzZWQsIHRvIHNraXAgY2hlY2tpbmcgbG9nIChhcyBJIGVuYWJsZWQgdHJhY2VzKSBh
-bmQgdG8gc2tpcCBhbGwgb3RoZXIgdGVzdC1jYXNlczoNCj4+DQo+PiAoaG1tLCB3ZSBkZWZpbml0
-ZWx5IG5lZWQgc2ltcGxlIHdheSB0byBydW4gb25lIHRlc3QgY2FzZSBmcm9tIHRlc3QsIHdpdGhv
-dXQgZWRpdGluZyBpdCkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzE2
-OSBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8xNjkNCj4+IGluZGV4IDUyN2FlYmQwY2IuLmRkOTgxNjhj
-OGQgMTAwNzU1DQo+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMTY5DQo+PiArKysgYi90ZXN0
-cy9xZW11LWlvdGVzdHMvMTY5DQo+PiBAQCAtMTAyLDYgKzEwMiwxMCBAQCBjbGFzcyBUZXN0RGly
-dHlCaXRtYXBNaWdyYXRpb24oaW90ZXN0cy5RTVBUZXN0Q2FzZSk6DQo+PiAgICAgICAgICAgICAg
-ICBldmVudCA9IHNlbGYudm1fYS5ldmVudF93YWl0KCdNSUdSQVRJT04nKQ0KPj4gICAgICAgICAg
-ICAgICAgaWYgZXZlbnRbJ2RhdGEnXVsnc3RhdHVzJ10gPT0gJ2NvbXBsZXRlZCc6DQo+PiAgICAg
-ICAgICAgICAgICAgICAgYnJlYWsNCj4+ICsgICAgICAgIHdoaWxlIFRydWU6DQo+PiArICAgICAg
-ICAgICAgcmVzdWx0ID0gc2VsZi52bV9hLnFtcCgncXVlcnktc3RhdHVzJykNCj4+ICsgICAgICAg
-ICAgICBpZiAocmVzdWx0WydyZXR1cm4nXVsnc3RhdHVzJ10gPT0gJ3Bvc3RtaWdyYXRlJyk6DQo+
-PiArICAgICAgICAgICAgICAgIGJyZWFrDQo+Pg0KPj4gICAgICAgICAgICAjIHRlc3QgdGhhdCBi
-aXRtYXAgaXMgc3RpbGwgaGVyZQ0KPj4gICAgICAgICAgICByZW1vdmVkID0gKG5vdCBtaWdyYXRl
-X2JpdG1hcHMpIGFuZCBwZXJzaXN0ZW50DQo+PiBAQCAtMTE3LDEyICsxMjEsMTIgQEAgY2xhc3Mg
-VGVzdERpcnR5Qml0bWFwTWlncmF0aW9uKGlvdGVzdHMuUU1QVGVzdENhc2UpOg0KPj4NCj4+ICAg
-ICAgICAgICAgIyBjYXRjaCAnQ291bGQgbm90IHJlb3BlbiBxY293MiBsYXllcjogQml0bWFwIGFs
-cmVhZHkgZXhpc3RzJw0KPj4gICAgICAgICAgICAjIHBvc3NpYmxlIGVycm9yDQo+PiAtICAgICAg
-ICBsb2cgPSBzZWxmLnZtX2EuZ2V0X2xvZygpDQo+PiAtICAgICAgICBsb2cgPSByZS5zdWIocide
-XFtJIFxkK1wuXGQrXF0gT1BFTkVEXG4nLCAnJywgbG9nKQ0KPj4gLSAgICAgICAgbG9nID0gcmUu
-c3ViKHInXih3cm90ZSAuKiBieXRlcyBhdCBvZmZzZXQgLipcbi4qS2lCLipvcHMuKnNlYy4qXG4p
-ezN9JywNCj4+IC0gICAgICAgICAgICAgICAgICAgICAnJywgbG9nKQ0KPj4gLSAgICAgICAgbG9n
-ID0gcmUuc3ViKHInXFtJIFwrXGQrXC5cZCtcXSBDTE9TRURcbj8kJywgJycsIGxvZykNCj4+IC0g
-ICAgICAgIHNlbGYuYXNzZXJ0RXF1YWwobG9nLCAnJykNCj4+ICsgICAgICAgICNsb2cgPSBzZWxm
-LnZtX2EuZ2V0X2xvZygpDQo+PiArICAgICAgICAjbG9nID0gcmUuc3ViKHInXlxbSSBcZCtcLlxk
-K1xdIE9QRU5FRFxuJywgJycsIGxvZykNCj4+ICsgICAgICAgICNsb2cgPSByZS5zdWIocideKHdy
-b3RlIC4qIGJ5dGVzIGF0IG9mZnNldCAuKlxuLipLaUIuKm9wcy4qc2VjLipcbil7M30nLA0KPj4g
-KyAgICAgICAgICAgICAgICAgICAgICMnJywgbG9nKQ0KPj4gKyAgICAgICAgI2xvZyA9IHJlLnN1
-YihyJ1xbSSBcK1xkK1wuXGQrXF0gQ0xPU0VEXG4/JCcsICcnLCBsb2cpDQo+PiArICAgICAgICAj
-c2VsZi5hc3NlcnRFcXVhbChsb2csICcnKQ0KPj4NCj4+ICAgICAgICAgICAgIyB0ZXN0IHRoYXQg
-Yml0bWFwIGlzIHN0aWxsIHBlcnNpc3RlbnQNCj4+ICAgICAgICAgICAgc2VsZi52bV9hLmxhdW5j
-aCgpDQo+PiBAQCAtMjExLDE0ICsyMTUsMTYgQEAgZm9yIGNtYiBpbiBsaXN0KGl0ZXJ0b29scy5w
-cm9kdWN0KChUcnVlLCBGYWxzZSksIHJlcGVhdD00KSk6DQo+PiAgICAgICAgbmFtZSArPSAnX29u
-bGluZScgaWYgY21iWzJdIGVsc2UgJ19vZmZsaW5lJw0KPj4gICAgICAgIG5hbWUgKz0gJ19zaGFy
-ZWQnIGlmIGNtYlszXSBlbHNlICdfbm9uc2hhcmVkJw0KPj4NCj4+IC0gICAgaW5qZWN0X3Rlc3Rf
-Y2FzZShUZXN0RGlydHlCaXRtYXBNaWdyYXRpb24sIG5hbWUsICdkb190ZXN0X21pZ3JhdGlvbics
-DQo+PiArICAgIGlmIEZhbHNlOg0KPj4gKyAgICAgICAgaW5qZWN0X3Rlc3RfY2FzZShUZXN0RGly
-dHlCaXRtYXBNaWdyYXRpb24sIG5hbWUsICdkb190ZXN0X21pZ3JhdGlvbicsDQo+PiAgICAgICAg
-ICAgICAgICAgICAgICAgICAqbGlzdChjbWIpKQ0KPj4NCj4+ICAgIGZvciBjbWIgaW4gbGlzdChp
-dGVydG9vbHMucHJvZHVjdCgoVHJ1ZSwgRmFsc2UpLCByZXBlYXQ9MikpOg0KPj4gICAgICAgIG5h
-bWUgPSAoJ18nIGlmIGNtYlswXSBlbHNlICdfbm90XycpICsgJ3BlcnNpc3RlbnRfJw0KPj4gICAg
-ICAgIG5hbWUgKz0gKCdfJyBpZiBjbWJbMV0gZWxzZSAnX25vdF8nKSArICdtaWdiaXRtYXAnDQo+
-Pg0KPj4gLSAgICBpbmplY3RfdGVzdF9jYXNlKFRlc3REaXJ0eUJpdG1hcE1pZ3JhdGlvbiwgbmFt
-ZSwNCj4+ICsgICAgaWYgbmFtZSA9PSAnX3BlcnNpc3RlbnRfX21pZ2JpdG1hcCc6DQo+PiArICAg
-ICAgICBpbmplY3RfdGVzdF9jYXNlKFRlc3REaXJ0eUJpdG1hcE1pZ3JhdGlvbiwgbmFtZSwNCj4+
-ICAgICAgICAgICAgICAgICAgICAgICAgICdkb190ZXN0X21pZ3JhdGlvbl9yZXN1bWVfc291cmNl
-JywgKmxpc3QoY21iKSkNCj4+DQo+PiAgICBpZiBfX25hbWVfXyA9PSAnX19tYWluX18nOg0KPj4g
-ZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8xNjkub3V0IGIvdGVzdHMvcWVtdS1pb3Rl
-c3RzLzE2OS5vdXQNCj4+IGluZGV4IDNhODkxNTk4MzMuLmFlMTIxM2U2ZjggMTAwNjQ0DQo+PiAt
-LS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMTY5Lm91dA0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rl
-c3RzLzE2OS5vdXQNCj4+IEBAIC0xLDUgKzEsNSBAQA0KPj4gLS4uLi4uLi4uLi4uLi4uLi4uLi4u
-DQo+PiArLg0KPj4gICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gLVJhbiAyMCB0ZXN0cw0KPj4gK1JhbiAx
-IHRlc3RzDQo+Pg0KPj4gICAgT0sNCj4+DQo+Pg0KPj4NCj4+IC0tIA0KPj4gQmVzdCByZWdhcmRz
-LA0KPj4gVmxhZGltaXINCj4gLS0NCj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRnaWxiZXJ0
-QHJlZGhhdC5jb20gLyBNYW5jaGVzdGVyLCBVSw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQo=
+On Wed, 23 Jan 2019, John Snow wrote:
+> On 1/23/19 5:39 PM, David Kozub wrote:
+>> On Thu, 17 Jan 2019, John Snow wrote:
+>
+>> I think SG_IO IOCTL allows one to send a single ATA command and the ca=
+ll
+>> blocks until the request is processed.
+>>
+>
+> The problem(?) with this is that you don't get to choose the ATA
+> command, exactly ... the way the SG_IO interface works for ATA is that
+> you choose a SCSI command and the linux driver translates it into ATA
+> for you, then issues that command.
+>
+> In this way, I don't think* you could do ATA passthrough exactly -- not
+> in the sense that you can have an emulated ATA device passing through
+> ATA commands to a real device.
+
+libata seems to support SCSI / ATA Translation, including ATA PASS THROUG=
+H=20
+(12) and ATA PASS THROUGH (16). Is this not sufficient? (The=20
+implementation can be seen in ata_scsi_pass_thru.)
+
+> ...but you could create an emulated SCSI disk and then pass those SCSI
+> commands to an ATA device -- achieving a *kind* of pass through, but I
+> don't know if that's helpful to your project. If so, I'd start looking
+> at the scsi disk sources instead of the ATA sources.
+
+Perhaps. Or maybe fogetting about pass-through and really just=20
+implementing OPAL in QEMU.
+
+>> I don't know if there are other mechanisms how to pass ATA commands fr=
+om
+>> userspace.
+>>
+>> If anybody reading this has more ideas/info on this topic, please let =
+me
+>> know.
+>>
+>> [1] http://sg.danny.cz/sg/sg_io.html
+>> [2]
+>> https://github.com/torvalds/linux/blob/30bac164aca750892b93eef350439a0=
+562a68647/drivers/ata/libata-scsi.c#L3138
+>>
+>>
+>>> I can give you maybe a brief overview of some of the obviously useful
+>>> choke points in QEMU, though...
+>>>
+>>> the ATA support in QEMU comes in a few different levels:
+>>>
+>>> (1) IDE/ATA/PATA disks use a register set and PIO to directly read an=
+d
+>>> write values to individual registers. You can see this interface in
+>>> hw/ide.core.c for ide_ioport_write, ide_status_read, and ide_cmd_writ=
+e.
+>>> When the drive is in a PIO data loop, you can read or write data to a
+>>> buffer by repeatedly writing to a certain register address, implement=
+ed
+>>> with ide_data_[read|write][w|l].
+>>>
+>>>
+>>> ide_exec_cmd serves as the "start processing" signal in QEMU, and use=
+s
+>>> the various registers manipulated in the above calls stored in `IDESt=
+ate
+>>> *s` to know which command to emulate. The arguments to ide_exec_cmd
+>>> aren't sufficient instruction alone. ide_exec_cmd is triggered whenev=
+er
+>>> the guest updates the command register.
+>>>
+>>> CDROM emulation actually does use SCSI packets. Generally the guest
+>>> sends the 0xA0 PACKET command to the drive and then the drive waits f=
+or
+>>> a SCSI CDB to arrive via PIO. When the packet has arrived in full,
+>>> ide_atapi_cmd() processes it. However, there are a few places in this
+>>> code where we dip into the ATA registers to formulate a reply, so the
+>>> logical split isn't perfect.
+>>>
+>>> (2) PCI IDE utilizes additional BMDMA features outside of those core
+>>> registers and are driven separately. It does not fully wrap the regis=
+ter
+>>> interface present.
+>>>
+>>> (3) SATA devices begin using FIS packets. They're a message format th=
+at
+>>> lets you send commands, update registers, read values, etc. They're t=
+he
+>>> basic interface unit at this level. Both NCQ and traditional ATA
+>>> commands are delivered using FIS Register Host-to-Device update packe=
+ts.
+>>> (The command, as always, is activated when the ATA device itself
+>>> receives an update to its command register.)
+>>>
+>>> QEMU doesn't have a clean separation for ATA and SATA emulation, so t=
+he
+>>> SATA device emulation actually happens at the interface layer in QEMU
+>>> instead, as a hack. See hw/ide/ahci.c and look for this blurb:
+>>>
+>>> ```
+>>> =C2=A0=C2=A0 /* Check for NCQ command */
+>>> =C2=A0=C2=A0 if (is_ncq(cmd_fis[2])) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0process_ncq_command(s, port, cmd_fis, slot);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> =C2=A0=C2=A0 }
+>>> ```
+>>>
+>>> This feels like maybe high level and useful enough to be able to
+>>> intercept for passthrough purposes, but I'm not sure how to handle
+>>> things like DMA routing or PIO access, which is still... technically
+>>> allowed at this layer, and might be used by early bootup routines.
+>>>
+>>> A problem is that QEMU does not really disentangle the concept of a
+>>> "SATA Device" and the "AHCI controller", so a lot of the FIS response=
+s
+>>> in QEMU go straight into the controller's buffer, and we'd have to sp=
+lit
+>>> all of that out.
+>>>
+>>> (4) the AHCI controller manages sending and receiving the FIS packets=
+.
+>>> You fill a buffer with the FIS packet to send and manipulate AHCI PCI
+>>> registers to send it off. FIS responses are buffered from the SATA
+>>> drives informing the controller of the new register values.
+>>>
+>>> the AHCI command buffers include space for guests to pre-write their
+>>> SCSI CDBs, and the controller handles sending both the outer ATA comm=
+and
+>>> and the inner ATAPI packet to the device.
+>>>
+>>> Again, in QEMU, we cheat a little and layers (3) and (4) are pretty w=
+ell
+>>> smooshed together. In general, the AHCI layer sends FIS packets back =
+and
+>>> forth from the SATA layer, which decomposes the FIS packets into
+>>> constituent register updates, which are sent into layer (1) for
+>>> processing. None of these layers are really truly strictly separated,
+>>> unfortunately.
+>>
+>> A naive question... which of these "details" (as in... was the command
+>> dispatched via PIO, or in a FIS packet) are needed for ATA pass-throug=
+h?
+>> The only mechanism I'm currently aware of, in Linux, lets us pass a
+>> single command, synchronously, and it doesn't let us tune much more.
+>> This sounds like a horrible thing for performance, but this might in
+>> itself be OK for the fiddling/debugging scenarios I'm after. But even
+>> ignoring performance, is this sufficient? I.e. to extract - through
+>> whatever means - a sequence of ATA commands (no matter how they were
+>> delivered from the guest), then sequentially execute them, and then
+>> deliver them to the guest in the appripriate way (depending on how the=
+y
+>> were received)?
+>>
+>
+> It depends at which level you want to intercept the command, because at
+> each phase the way the command looks is different.
+>
+> At the PIO level, the command is actually a series of writes to device
+> registers instead of looking like any kind of unified "command" that yo=
+u
+> could point to.
+
+I really need to read up on this. But at some point with PIO, QEMU figure=
+s=20
+out what to do with the disk (i.e. what to read/write). So QEMU could=20
+either create an ATA command for this, or maybe even end up doing ordinar=
+y=20
+read/write. But combining read/write via a block device with IOCTLs sound=
+s=20
+a bit dangerous.
+
+>
+> At the FIS level, it actually starts to resemble a coherent packet that
+> can be issued to the device. FIS packets are kind of like the SATA
+> analog to SCSI CDB packets.
+>
+> None of these are too useful for SG_IO, I think.
+>
+>>> Hope this helps even 1% instead of just being a useless info dump.
+>>
+>> Thank you for this "executive summary". It helps me find the relevant
+>> code in QEMU and the terms to google for, as I don't know much about t=
+his.
+>>
+>> Best regards,
+>> David
