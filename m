@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53323)
+Received: from eggs.gnu.org ([209.51.188.92]:56137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmjVY-0000VP-Le
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 13:13:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gmjkB-00040H-06
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 13:28:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmjVW-0003xu-Qx
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 13:13:44 -0500
-References: <20190102140535.11512-1-cfergeau@redhat.com>
-	<20190102180158.GA6015@natto.ory.fergeau.eu>
-	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
-	<87o98sii5b.fsf@dusky.pond.sub.org> <87munqieiv.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f16734e0-1ec3-15e7-5a06-7b2c804c80a9@redhat.com>
-Date: Thu, 24 Jan 2019 12:13:31 -0600
+	(envelope-from <ehabkost@redhat.com>) id 1gmjk9-0006SI-4I
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 13:28:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gmjk7-0006R5-Hp
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 13:28:48 -0500
+Date: Thu, 24 Jan 2019 16:28:39 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190124182839.GZ4136@habkost.net>
+References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
+	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
+	<20190123145050.GU4136@habkost.net>
+	<20190124112102.GA9821@tiger-server>
+	<20190124165926.GY4136@habkost.net>
+	<20190124123824-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87munqieiv.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3D2mFh5BTPnuzTcSbirLPosbvC5Yqptw1"
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124123824-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, "Richard W. M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3D2mFh5BTPnuzTcSbirLPosbvC5Yqptw1
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
- "Richard W. M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <f16734e0-1ec3-15e7-5a06-7b2c804c80a9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
-References: <20190102140535.11512-1-cfergeau@redhat.com>
- <20190102180158.GA6015@natto.ory.fergeau.eu>
- <4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
- <87o98sii5b.fsf@dusky.pond.sub.org> <87munqieiv.fsf@dusky.pond.sub.org>
-In-Reply-To: <87munqieiv.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 24, 2019 at 12:45:54PM -0500, Michael S. Tsirkin wrote:
+> On Thu, Jan 24, 2019 at 02:59:26PM -0200, Eduardo Habkost wrote:
+> > On Thu, Jan 24, 2019 at 07:21:03PM +0800, Yi Zhang wrote:
+> > > On 2019-01-23 at 12:50:50 -0200, Eduardo Habkost wrote:
+> > > > On Wed, Jan 23, 2019 at 11:00:02AM +0800, Zhang, Yi wrote:
+> > > > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > > > 
+> > > > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+[...]
+> > > > > + - 'pmem' option of memory-backend-file is 'on':
+> > > > > +   The backend is a file supporting DAX, e.g., a file on an ext4 or
+> > > > > +   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
+> > > > > +   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
+> > > > > +   error.
+> > > > 
+> > > > Won't this break existing configurations that work today on QEMU
+> > > > 3.1.0?  Why exactly it is OK to break compatibility here?
+> > > won't, pmem option default is off, if people who start VM don't know what
+> > > backend file is, it is suggested and *default to set pmem=off,
+> > > if people well know the backend file have dax capbility. it is suggest
+> > > to set pmem=on. 
+> > > 
+> > > For a special case that we use /dev/dax as backend, we already have a
+> > > patch to add MAP_SYNC falg mapiing from device dax mode.
+> > > see https://lkml.org/lkml/2018/4/22/524 
+> > > 
+> > > So, if people force set pmem=on, mapping a regular file, it will results
+> > > in an EOPNOTSUPP error. 
+> > 
+> > This is where compatibility is being broken, isn't it?  People
+> > currently using pmem=on on a regular file will start getting
+> > errors after a QEMU upgrade.  Existing VMs with pmem=on may stop
+> > booting.  Maybe this is OK, but we need to be able to explain why
+> > it is OK.
+> 
+> I think it's OK since pmem explicitly means "persistent":
+> 
+> The @option{pmem} option specifies whether the backing file specified
+> by @option{mem-path} is in host persistent memory that can be accessed
+> using the SNIA NVM programming model (e.g. Intel NVDIMM).
+> If @option{pmem} is set to 'on', QEMU will take necessary operations to
+> guarantee the persistence of its own writes to @option{mem-path}
+> (e.g. in vNVDIMM label emulation and live migration).
 
-On 1/24/19 3:35 AM, Markus Armbruster wrote:
-
->     To gauge the bug's impact, let's review non-interpolating users of =
-this
->     parser, i.e. code passing NULL context to json_message_parser_init(=
-):
->=20
->     * tests/check-qjson.c, tests/test-qobject-input-visitor.c,
->       tests/test-visitor-serialization.c
->=20
->       Plenty of tests, but we still failed to cover the buggy case.
->=20
->     * monitor.c: QMP input
->=20
->     * qga/main.c: QGA input
->=20
->     * qobject_from_json():
->=20
->       - qobject-input-visitor.c: JSON command line option arguments of
->         -display and -blockdev
->=20
->         Reproducer: -blockdev '{"%"}'
->=20
->       - block.c: JSON pseudo-filenames starting with "json:"
->=20
->         Reproducer: https://bugzilla.redhat.com/show_bug.cgi?id=3D16682=
-44#c3
->=20
->       - block/rbd.c: JSON key pairs
->=20
->         Pseudo-filenames starting with "rbd:".
->=20
-
-Missed curl as being impacted. You'd have to do a v2 pull request to
-mention it now...
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1668244
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+If it's OK, let's at least explicitly document that we are
+breaking compatibility in those cases.
 
 
---3D2mFh5BTPnuzTcSbirLPosbvC5Yqptw1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> > > 
+[...]
+> I think generally MAP_SYNC is required.
+> But for compatibility reasons we might need to support
+> !MAP_SYNC on old kernels even though it's risky.
 
------BEGIN PGP SIGNATURE-----
+What about making MAP_SYNC optional only on older machine-types?
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxKAEsACgkQp6FrSiUn
-Q2r5LAf9FbMvWnPHtHFnjwehJPAEyUXx5vc83/HELnumth4gRqXcCxB97CxUTSXP
-b1ZEZhFVSd+Rms8smL2hIiUubEj1QziDtQcqePkPXD8M04Zqg1mJnJPwmO/TQWJt
-C4ouk/z4a6NJlZZ4E9LoCHlzcGq8w4Yr/IjlccJ82qFNjFhk70vB72FkiwHxlpwj
-2s+fnUcAl+Au2uMjp94H7m+KxuylkgXZs5EihB6Ev33KTpdDYB6NrvVYM6fSWNZs
-qrBncXGChVQW+JqU1CvcT3PjujcIC1w0pVOW/sse0DGmZu4trmGDSR7E4CvdCC5o
-4AVykdz8KT1BYEyXkjuYB2RKoEKZ5A==
-=TkgS
------END PGP SIGNATURE-----
-
---3D2mFh5BTPnuzTcSbirLPosbvC5Yqptw1--
+-- 
+Eduardo
