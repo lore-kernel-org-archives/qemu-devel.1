@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35366)
+Received: from eggs.gnu.org ([209.51.188.92]:35620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmh9a-0002bL-PD
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:42:55 -0500
+	(envelope-from <arikalo@wavecomp.com>) id 1gmh9l-0002nR-Mi
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmh6e-0007dK-GN
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:39:53 -0500
-Date: Thu, 24 Jan 2019 16:39:45 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190124153945.GJ4601@localhost.localdomain>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190122185740.GC5220@localhost.localdomain>
-	<340bf08d-57ff-c6b3-13f4-b7c1b0a5e707@virtuozzo.com>
-	<02acf2a0-50d9-16d8-c2c4-3001a1d30b23@virtuozzo.com>
+	(envelope-from <arikalo@wavecomp.com>) id 1gmh4m-0005i4-Lh
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:37:58 -0500
+Received: from mail-eopbgr710096.outbound.protection.outlook.com
+	([40.107.71.96]:52194
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+	id 1gmh4i-0005cy-W0
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:37:54 -0500
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+Date: Thu, 24 Jan 2019 15:37:47 +0000
+Message-ID: <DM5PR22MB16585EFE36FC0584D37F3724D29A0@DM5PR22MB1658.namprd22.prod.outlook.com>
+References: <1548343154-8774-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1548343154-8774-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02acf2a0-50d9-16d8-c2c4-3001a1d30b23@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] tests: Reorganize MIPS TCG
+ directories and files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Am 24.01.2019 um 15:37 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 23.01.2019 15:04, Vladimir Sementsov-Ogievskiy wrote:
-> > 22.01.2019 21:57, Kevin Wolf wrote:
-> >> Am 11.01.2019 um 12:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>> 11.01.2019 13:41, Kevin Wolf wrote:
-> >>>> Am 10.01.2019 um 14:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>> drv_co_block_status digs bs->file for additional, more accurate search
-> >>>>> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-> >>>>>
-> >>>>> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-> >>>>> knows, where are holes and where is data. But every block_status
-> >>>>> request calls lseek additionally. Assume a big disk, full of
-> >>>>> data, in any iterative copying block job (or img convert) we'll call
-> >>>>> lseek(HOLE) on every iteration, and each of these lseeks will have to
-> >>>>> iterate through all metadata up to the end of file. It's obviously
-> >>>>> ineffective behavior. And for many scenarios we don't need this lseek
-> >>>>> at all.
-> >>>>>
-> >>>>> So, let's "5daa74a6ebc" by default, leaving an option to return
-> >>>>> previous behavior, which is needed for scenarios with preallocated
-> >>>>> images.
-> >>>>>
-> >>>>> Add iotest illustrating new option semantics.
-> >>>>>
-> >>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>>>
-> >>>> I still think that an option isn't a good solution and we should try use
-> >>>> some heuristics instead.
-> >>>
-> >>> Do you think that heuristics would be better than fair cache for lseek results?
-> >>
-> >> I just played a bit with this (qemu-img convert only), and how much
-> >> caching lseek() results helps depends completely on the image. As it
-> >> happened, my test image was the worst case where caching didn't buy us
-> >> much. Obviously, I can just as easily construct an image where it makes
-> >> a huge difference. I think that most real-world images should be able to
-> >> take good advantage of it, though, and it doesn't hurt, so maybe that's
-> >> a first thing that we can do in any case. It might not be the complete
-> >> solution, though.
-> > 
-> > Hmm, and one more idea from Den:
-> > 
-> > We can detect preallocated image, comparing allocated size of real file with
-> > number of non-zero qcow2 refcounts. So, real allocation is much less than
-> > allocation in qcow2 point of view, we'll enable lseeks, otherwise - not.
-> > 
-> 
-> Kevin, what do you think?
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Thursday, January 24, 2019 4:19 PM
+> To: qemu-devel@nongnu.org
+> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
+> Subject: [PATCH v4 0/3] tests: Reorganize MIPS TCG directories and files
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Reorganize MIPS TCG directories and files.
+>
+> Directories for DSP tests in system mode are deleted. They
+> introduce more complexity in test structure compared to the
+> value they add. Still, these tests may be moved somewhere
+> else, let's say in a new acceptance test that will boot
+> "mips64r2" virtual machine.
+>
+> All remaining test will are user mode tests, which will
+> simplify maintenance of mips tcg tests overall.
+>
+> The file movement is done using "git mv" command, so "git
+> blame" will still display the original information, regardless
+> of the new names and locations of involved files. Also, the
+> command "git config diff.renames true" was used to keep the
+> size of movement patches reasonable.
+>
+> v3->v4:
+>   - DSP ASE system mode tests given up
+>   - Makefiles provided for tests that remain
+>
+> v2->v3:
+>   - corrected missing "v2" that caused wrong message linking
+>     (the version is now "v3", of course)
+>
+> v1->v2:
+>   - used "git config diff.renames true" before sending
+>   - rebased to the latest code (included newly added r5900 tests)
+>
+>
+> Aleksandar Markovic (3):
+>   tests: tcg: mips: Move source files to new locations
+>   tests: tcg: mips: Add two new Makefiles
+>   tests: tcg: mips: Remove old directories
 
-I'm unsure. I think it requires scanning all refcount blocks in
-qcow2_open(), right? This could be slow on huge images. On the other
-hand, the first cluster allocation will probably do this anyway, so it
-might be reasonable enough.
+I too think that this will simplify the test dirs structure and
+maintenance. I cannot wait to see these directories populated with
+new tests for various MIPS ISAs and ASEs.
 
-How would you communicate this? Another block_status return flag that
-says "don't bother to ask the protocol layer" and which we would only
-set in qcow2 if the probing came to the conclusion that it's not
-preallocated?
+For all patches in this series:
 
-Kevin
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
