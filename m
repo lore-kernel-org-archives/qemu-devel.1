@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44812)
+Received: from eggs.gnu.org ([209.51.188.92]:44835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmeUB-0002tI-3r
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmeUF-0002xH-8Y
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmeUA-0002OJ-B4
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:51:59 -0500
-Received: from relay.sw.ru ([185.231.240.75]:37030)
+	(envelope-from <thuth@redhat.com>) id 1gmeUE-0002R0-H5
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1gmeUA-0002Lc-44
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:51:58 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 24 Jan 2019 15:51:54 +0300
-Message-Id: <20190124125154.474650-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] trace: improve runstate tracing
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmeUE-0002QU-8g
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:02 -0500
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-42-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fa45d1f5-4bc4-827a-321d-7df073c97861@redhat.com>
+Date: Thu, 24 Jan 2019 13:51:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190123065618.3520-42-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v4 41/44] virtio: make virtio
+ dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,65 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, stefanha@redhat.com
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
 
-Trace previous state, move tracepoint to runstate_set start (to cover
-all cases for debugging), add string representations of traced states.
+On 2019-01-23 07:56, Yang Zhong wrote:
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/i386-softmmu.mak  |  1 -
+>  default-configs/s390x-softmmu.mak |  1 -
+>  default-configs/virtio.mak        | 15 ---------------
+>  hw/9pfs/Kconfig                   |  2 ++
+>  hw/block/Kconfig                  |  2 ++
+>  hw/char/Kconfig                   |  2 ++
+>  hw/display/Kconfig                |  5 +++++
+>  hw/input/Kconfig                  |  2 ++
+>  hw/net/Kconfig                    |  2 ++
+>  hw/pci-host/Kconfig               |  2 ++
+>  hw/scsi/Kconfig                   |  1 +
+>  hw/virtio/Kconfig                 |  9 ++++++++-
+>  12 files changed, 26 insertions(+), 18 deletions(-)
+>  delete mode 100644 default-configs/virtio.mak
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- vl.c         | 7 +++++--
- trace-events | 4 ++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+This breaks compilation of aarch64 / arm as long as these targets are
+not fully converted yet:
 
-diff --git a/vl.c b/vl.c
-index bc9fbec654..9cf0fbe0b8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -731,6 +731,9 @@ void runstate_set(RunState new_state)
- {
-     assert(new_state < RUN_STATE__MAX);
- 
-+    trace_runstate_set(current_run_state, RunState_str(current_run_state),
-+                       new_state, RunState_str(current_run_state));
-+
-     if (current_run_state == new_state) {
-         return;
-     }
-@@ -741,7 +744,7 @@ void runstate_set(RunState new_state)
-                      RunState_str(new_state));
-         abort();
-     }
--    trace_runstate_set(new_state);
-+
-     current_run_state = new_state;
- }
- 
-@@ -1554,7 +1557,7 @@ void vm_state_notify(int running, RunState state)
- {
-     VMChangeStateEntry *e, *next;
- 
--    trace_vm_state_notify(running, state);
-+    trace_vm_state_notify(running, state, RunState_str(state));
- 
-     QLIST_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
-         e->cb(e->opaque, running, state);
-diff --git a/trace-events b/trace-events
-index 4fd2cb4b97..e66afc59e9 100644
---- a/trace-events
-+++ b/trace-events
-@@ -34,9 +34,9 @@ cpu_out(unsigned int addr, char size, unsigned int val) "addr 0x%x(%c) value %u"
- balloon_event(void *opaque, unsigned long addr) "opaque %p addr %lu"
- 
- # vl.c
--vm_state_notify(int running, int reason) "running %d reason %d"
-+vm_state_notify(int running, int reason, const char *reason_str) "running %d reason %d (%s)"
- load_file(const char *name, const char *path) "name %s location %s"
--runstate_set(int new_state) "new state %d"
-+runstate_set(int current_state, const char *current_state_str, int new_state, const char *new_state_str) "current_run_state %d (%s) new_state %d (%s)"
- system_wakeup_request(int reason) "reason=%d"
- qemu_system_shutdown_request(int reason) "reason=%d"
- qemu_system_powerdown_request(void) ""
--- 
-2.18.0
+Exception: contradiction between clauses when setting VIRTIO_MMIO
+make: *** No rule to make target `aarch64-softmmu/config-devices.mak',
+needed by `config-all-devices.mak'.  Stop.
+
+I think you temporarily have not to set CONFIG_VIRTIO=3Dy in
+default-configs/arm-softmmu.mak (and likely also in the riscv and s390x
+configs), until they are finally converted completely?
+
+ Thomas
