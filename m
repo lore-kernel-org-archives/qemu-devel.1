@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43751)
+Received: from eggs.gnu.org ([209.51.188.92]:44257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gmeQJ-0008Or-Bc
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:47:59 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gmeSG-000159-PL
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gmeQI-0008Bj-I8
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:47:59 -0500
-Received: from mel.act-europe.fr ([194.98.77.210]:34206
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1gmeQI-00088w-CC
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:47:58 -0500
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Thu, 24 Jan 2019 13:47:49 +0100
-Message-Id: <1548334069-9158-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH] gdbstub: shutdown guest when the target is
- killed
+	(envelope-from <laurent@vivier.eu>) id 1gmeSF-00011l-0P
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:50:00 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 24 Jan 2019 13:49:01 +0100
+Message-Id: <20190124124906.16653-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/5] Trivial patches patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +21,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, philmd@redhat.com, edgar.iglesias@xilinx.com, alistair.francis@wdc.com, luc.michel@greensocs.com, frederic.konrad@adacore.com
+Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Under MinGW when the target is killed no "W00" packet are received by GDB
-because gdbstub takes the "exit(0)" path. So replace the "exit(0)" call by
-a normal guest shutdown so the "W00" packet has a chance to be sent in
-"gdb_cleanup".
+The following changes since commit 6d809e7da943bb4b95b408fbf3d80d097c0f7d38:
 
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
- gdbstub.c | 5 +++++
- 1 file changed, 5 insertions(+)
+  Merge remote-tracking branch 'remotes/xtensa/tags/20190122-xtensa' into staging (2019-01-23 21:50:49 +0000)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index bfc7afb..c91a909 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1389,7 +1389,12 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     case 'k':
-         /* Kill the target */
-         error_report("QEMU: Terminated via GDBstub");
-+#ifdef CONFIG_USER_ONLY
-         exit(0);
-+#else
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+#endif
-+        break;
-     case 'D':
-         /* Detach packet */
-         pid = 1;
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu.git tags/trivial-patches-pull-request
+
+for you to fetch changes up to 285816d76f37c412f391fa14a2b28a35b7cb134e:
+
+  hw/i386/pc.c: fix one typo in function name (2019-01-24 13:34:20 +0100)
+
+----------------------------------------------------------------
+- Some typo and UTF-8 fixes
+- a ppc e6500 fix to remove duplicate SPR registering
+
+----------------------------------------------------------------
+
+Jon Diekema (1):
+  ppc: e6500 registers SPR 604 twice
+
+Philippe Mathieu-Daudé (3):
+  MAINTAINERS: Fix utf-8 mangling
+  contrib/gitdm: Fix a typo
+  virtio-net: Fix a typo
+
+Wei Yang (1):
+  hw/i386/pc.c: fix one typo in function name
+
+ MAINTAINERS                     | 2 +-
+ contrib/gitdm/filetypes.txt     | 2 +-
+ hw/i386/pc.c                    | 4 ++--
+ include/hw/virtio/virtio-net.h  | 2 +-
+ target/ppc/translate_init.inc.c | 8 --------
+ 5 files changed, 5 insertions(+), 13 deletions(-)
+
 -- 
-1.8.3.1
+2.20.1
