@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54415)
+Received: from eggs.gnu.org ([209.51.188.92]:54414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmew1-00067n-4l
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:20:45 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmew1-00067m-4f
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmevz-0007Th-4U
+	(envelope-from <kraxel@redhat.com>) id 1gmevz-0007Tz-7W
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:20:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52806)
+Received: from mx1.redhat.com ([209.132.183.28]:59846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmevx-0007Nr-4D
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:20:41 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmevx-0007Nq-6V
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:20:43 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 24 Jan 2019 14:20:20 +0100
-Message-Id: <20190124132020.13571-8-kraxel@redhat.com>
+Date: Thu, 24 Jan 2019 14:20:15 +0100
+Message-Id: <20190124132020.13571-3-kraxel@redhat.com>
 In-Reply-To: <20190124132020.13571-1-kraxel@redhat.com>
 References: <20190124132020.13571-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] audio: probe audio drivers by default
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/7] audio: use pkg-config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +29,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Add the drivers listed in audio_possible_drivers to audio_drv_list,
-using the try-* variants.  That way the probable drivers are compiled by
-default if possible.
-
-Additioal tweaks:
-  linux: reorder to: pa alsa sdl oss.
-  *bsd: drop pa.
+Use pkg-config to probe for alsa and pulseaudio.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20190124112055.547-7-kraxel@redhat.com
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 20190124112055.547-2-kraxel@redhat.com
 ---
- configure | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ configure | 39 +++++++++++++--------------------------
+ 1 file changed, 13 insertions(+), 26 deletions(-)
 
 diff --git a/configure b/configure
-index 1eff5946f6..b18281c61f 100755
+index 8f312ac3e2..5fcd0f4795 100755
 --- a/configure
 +++ b/configure
-@@ -794,13 +794,13 @@ MINGW32*)
- ;;
- GNU/kFreeBSD)
-   bsd="yes"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl pa"
- ;;
- FreeBSD)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl pa"
-   # needed for kinfo_getvmmap(3) in libutil.h
-   LIBS="-lutil $LIBS"
-@@ -813,14 +813,14 @@ FreeBSD)
- DragonFly)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl pa"
-   HOST_VARIANT_DIR="dragonfly"
- ;;
- NetBSD)
-   bsd="yes"
-   make="${MAKE-gmake}"
--  audio_drv_list="oss"
-+  audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl"
-   oss_lib="-lossaudio"
-   HOST_VARIANT_DIR="netbsd"
-@@ -845,7 +845,7 @@ Darwin)
-     LDFLAGS="-arch x86_64 $LDFLAGS"
-   fi
-   cocoa="yes"
--  audio_drv_list="coreaudio"
-+  audio_drv_list="coreaudio try-sdl"
-   audio_possible_drivers="coreaudio sdl"
-   LDFLAGS="-framework CoreFoundation -framework IOKit $LDFLAGS"
-   libs_softmmu="-F/System/Library/Frameworks -framework Cocoa -framework IOKit $libs_softmmu"
-@@ -861,7 +861,7 @@ SunOS)
-   install="${INSTALL-ginstall}"
-   smbd="${SMBD-/usr/sfw/sbin/smbd}"
-   if test -f /usr/include/sys/soundcard.h ; then
--    audio_drv_list="oss"
-+    audio_drv_list="oss try-sdl"
-   fi
-   audio_possible_drivers="oss sdl"
- # needed for CMSG_ macros in sys/socket.h
-@@ -879,7 +879,7 @@ Haiku)
-   LIBS="-lposix_error_mapper -lnetwork $LIBS"
- ;;
- Linux)
--  audio_drv_list="oss"
-+  audio_drv_list="try-pa try-alsa try-sdl oss"
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-   linux_user="yes"
--- 
+@@ -3342,39 +3342,26 @@ fi
+ ##########################################
+ # Sound support libraries probe
+=20
+-audio_drv_probe()
+-{
+-    drv=3D$1
+-    hdr=3D$2
+-    lib=3D$3
+-    exp=3D$4
+-    cfl=3D$5
+-        cat > $TMPC << EOF
+-#include <$hdr>
+-int main(void) { $exp }
+-EOF
+-    if compile_prog "$cfl" "$lib" ; then
+-        :
+-    else
+-        error_exit "$drv check failed" \
+-            "Make sure to have the $drv libs and headers installed."
+-    fi
+-}
+-
+ audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/,/ /g')
+ for drv in $audio_drv_list; do
+     case $drv in
+     alsa)
+-    audio_drv_probe $drv alsa/asoundlib.h -lasound \
+-        "return snd_pcm_close((snd_pcm_t *)0);"
+-    alsa_libs=3D"-lasound"
++    if $pkg_config alsa --exists; then
++        alsa_libs=3D$($pkg_config alsa --libs)
++    else
++        error_exit "$drv check failed" \
++            "Make sure to have the $drv libs and headers installed."
++    fi
+     ;;
+=20
+     pa)
+-    audio_drv_probe $drv pulse/pulseaudio.h "-lpulse" \
+-        "pa_context_set_source_output_volume(NULL, 0, NULL, NULL, NULL);=
+ return 0;"
+-    pulse_libs=3D"-lpulse"
+-    audio_pt_int=3D"yes"
++    if $pkg_config libpulse --exists; then
++        pulse_libs=3D$($pkg_config libpulse --libs)
++        audio_pt_int=3D"yes"
++    else
++        error_exit "$drv check failed" \
++            "Make sure to have the $drv libs and headers installed."
++    fi
+     ;;
+=20
+     sdl)
+--=20
 2.9.3
