@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44343)
+Received: from eggs.gnu.org ([209.51.188.92]:44812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gmeSK-00019M-0W
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:50:04 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmeUB-0002tI-3r
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gmeSI-00015f-MP
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:50:03 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 24 Jan 2019 13:49:04 +0100
-Message-Id: <20190124124906.16653-4-laurent@vivier.eu>
-In-Reply-To: <20190124124906.16653-1-laurent@vivier.eu>
-References: <20190124124906.16653-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/5] ppc: e6500 registers SPR 604 twice
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmeUA-0002OJ-B4
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:51:59 -0500
+Received: from relay.sw.ru ([185.231.240.75]:37030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1gmeUA-0002Lc-44
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:51:58 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 24 Jan 2019 15:51:54 +0300
+Message-Id: <20190124125154.474650-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] trace: improve runstate tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +23,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Jon Diekema <jon.diekema@ge.com>
+Cc: pbonzini@redhat.com, stefanha@redhat.com
 
-From: Jon Diekema <jon.diekema@ge.com>
+Trace previous state, move tracepoint to runstate_set start (to cover
+all cases for debugging), add string representations of traced states.
 
-When using the e6500 CPU, QEMU generates a fatal error after
-complaining about registering SPR 604 twice.
-
-Building and testing with commit
-9b2e891ec5ccdb4a7d583b77988848282606fdea shows the issue:
-
-qemu-system-ppc64 --version
-QEMU emulator version 3.1.50 (v3.1.0-456-g9b2e891ec5-dirty)
-Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
-
-qemu-system-ppc64 -M none -cpu e6500
-Error: Trying to register SPR 604 (25c) twice !
-
-Signed-off-by: Jon Diekema <jon.diekema@ge.com>
-Message-Id: <CALvuzg43uSodseEHjNaRcPFBKKPTY2mcppUbYgiLL=QO9RxX_Q@mail.gmail.com>
-[removed duplicated mail header in the commit message]
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- target/ppc/translate_init.inc.c | 8 --------
- 1 file changed, 8 deletions(-)
+ vl.c         | 7 +++++--
+ trace-events | 4 ++--
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ade06cc773..59e0b86762 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -4947,14 +4947,6 @@ static void init_proc_e500(CPUPPCState *env, int version)
-     }
+diff --git a/vl.c b/vl.c
+index bc9fbec654..9cf0fbe0b8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -731,6 +731,9 @@ void runstate_set(RunState new_state)
+ {
+     assert(new_state < RUN_STATE__MAX);
  
-     if (version == fsl_e6500) {
--        spr_register(env, SPR_BOOKE_SPRG8, "SPRG8",
--                     SPR_NOACCESS, SPR_NOACCESS,
--                     &spr_read_generic, &spr_write_generic,
--                     0x00000000);
--        spr_register(env, SPR_BOOKE_SPRG9, "SPRG9",
--                     SPR_NOACCESS, SPR_NOACCESS,
--                     &spr_read_generic, &spr_write_generic,
--                     0x00000000);
-         /* Thread identification */
-         spr_register(env, SPR_TIR, "TIR",
-                      SPR_NOACCESS, SPR_NOACCESS,
++    trace_runstate_set(current_run_state, RunState_str(current_run_state),
++                       new_state, RunState_str(current_run_state));
++
+     if (current_run_state == new_state) {
+         return;
+     }
+@@ -741,7 +744,7 @@ void runstate_set(RunState new_state)
+                      RunState_str(new_state));
+         abort();
+     }
+-    trace_runstate_set(new_state);
++
+     current_run_state = new_state;
+ }
+ 
+@@ -1554,7 +1557,7 @@ void vm_state_notify(int running, RunState state)
+ {
+     VMChangeStateEntry *e, *next;
+ 
+-    trace_vm_state_notify(running, state);
++    trace_vm_state_notify(running, state, RunState_str(state));
+ 
+     QLIST_FOREACH_SAFE(e, &vm_change_state_head, entries, next) {
+         e->cb(e->opaque, running, state);
+diff --git a/trace-events b/trace-events
+index 4fd2cb4b97..e66afc59e9 100644
+--- a/trace-events
++++ b/trace-events
+@@ -34,9 +34,9 @@ cpu_out(unsigned int addr, char size, unsigned int val) "addr 0x%x(%c) value %u"
+ balloon_event(void *opaque, unsigned long addr) "opaque %p addr %lu"
+ 
+ # vl.c
+-vm_state_notify(int running, int reason) "running %d reason %d"
++vm_state_notify(int running, int reason, const char *reason_str) "running %d reason %d (%s)"
+ load_file(const char *name, const char *path) "name %s location %s"
+-runstate_set(int new_state) "new state %d"
++runstate_set(int current_state, const char *current_state_str, int new_state, const char *new_state_str) "current_run_state %d (%s) new_state %d (%s)"
+ system_wakeup_request(int reason) "reason=%d"
+ qemu_system_shutdown_request(int reason) "reason=%d"
+ qemu_system_powerdown_request(void) ""
 -- 
-2.20.1
+2.18.0
