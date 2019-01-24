@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36952)
+Received: from eggs.gnu.org ([209.51.188.92]:36977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmTco-00046w-TU
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:11 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmTcr-00049Y-FO
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmTco-0000X4-5X
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45848)
+	(envelope-from <philmd@redhat.com>) id 1gmTcq-0000ac-NY
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmTco-0000WZ-0D
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:10 -0500
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmTcq-0000YF-I6
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:16:12 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 24 Jan 2019 02:15:52 +0100
-Message-Id: <20190124011554.25418-3-philmd@redhat.com>
+Date: Thu, 24 Jan 2019 02:15:53 +0100
+Message-Id: <20190124011554.25418-4-philmd@redhat.com>
 In-Reply-To: <20190124011554.25418-1-philmd@redhat.com>
 References: <20190124011554.25418-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/4] hw/display/milkymist-tmu2: Explicit the
- dependency to both X11 / OpenGL
+Subject: [Qemu-devel] [PATCH v2 3/4] configure: Let SDL support be optional
+ on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The TMU device requires both X11 and OpenGL.
+Currently if we try to build QEMU on OpenBSD with SDL disabled, we get:
 
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7 --disable-sdl
+
+  ERROR: sdl not found or disabled, can not use sdl audio driver
+
+Since SDL is not a requirement for OpenBSD, let it be optional.
+If it is not found, or the user explicitly disable it, remove it
+from the audio_drv_list.
+If no audio backends are available, QEMU will fall back to the
+null driver.
+Instead of displaying nothing when audio_drv_list ends up empty,
+display "none".
+
+This does not change the default behavior:
+
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7
+  SDL support       yes (1.2.15)
+  Audio drivers     sdl
+
+  WARNING: Use of SDL 1.2 is deprecated and will be removed in
+  WARNING: future releases. Please switch to using SDL 2.0
+
+  GEN     config-host.h
+  ...
+
+but allows to build without SDL:
+
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7 --disable-sdl
+  WARN: sdl not found or disabled, can not use sdl audio driver
+  SDL support       no
+  Audio drivers     none
+  GEN     config-host.h
+  ...
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- default-configs/lm32-softmmu.mak | 2 +-
- hw/display/Makefile.objs         | 4 ++--
- hw/lm32/milkymist-hw.h           | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ configure | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-soft=
-mmu.mak
-index 4889348a10..4049b23562 100644
---- a/default-configs/lm32-softmmu.mak
-+++ b/default-configs/lm32-softmmu.mak
-@@ -2,7 +2,7 @@
+diff --git a/configure b/configure
+index d50defceb7..fa444e9921 100755
+--- a/configure
++++ b/configure
+@@ -3379,7 +3379,8 @@ for drv in $audio_drv_list; do
 =20
- CONFIG_LM32=3Dy
- CONFIG_MILKYMIST=3Dy
--CONFIG_MILKYMIST_TMU2=3D$(CONFIG_OPENGL)
-+CONFIG_MILKYMIST_TMU2=3D$(call land,$(CONFIG_X11),$(CONFIG_OPENGL))
- CONFIG_FRAMEBUFFER=3Dy
- CONFIG_PTIMER=3Dy
- CONFIG_PFLASH_CFI01=3Dy
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 97acd5b6cb..079e702f25 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -29,8 +29,8 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
- common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
+     sdl)
+     if test "$sdl" =3D "no"; then
+-        error_exit "sdl not found or disabled, can not use sdl audio dri=
+ver"
++        echo "WARN: sdl not found or disabled, can not use sdl audio dri=
+ver"
++        audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/sdl *//g')
+     fi
+     ;;
 =20
- common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
--milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
--milkymist-tmu2.o-libs :=3D $(X11_LIBS)
-+milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS) $(OPENGL_CFLAGS)
-+milkymist-tmu2.o-libs :=3D $(X11_LIBS) $(OPENGL_LIBS)
+@@ -3408,6 +3409,9 @@ for drv in $audio_drv_list; do
+     ;;
+     esac
+ done
++if test -z "$audio_drv_list"; then
++    audio_drv_list=3D"none"
++fi
 =20
- obj-$(CONFIG_OMAP) +=3D omap_dss.o
- obj-$(CONFIG_OMAP) +=3D omap_lcdc.o
-diff --git a/hw/lm32/milkymist-hw.h b/hw/lm32/milkymist-hw.h
-index d3be0cfb3a..32c344ef9f 100644
---- a/hw/lm32/milkymist-hw.h
-+++ b/hw/lm32/milkymist-hw.h
-@@ -88,7 +88,7 @@ static inline DeviceState *milkymist_pfpu_create(hwaddr=
- base,
-     return dev;
- }
-=20
--#ifdef CONFIG_OPENGL
-+#if defined(CONFIG_X11) && defined(CONFIG_OPENGL)
- #include <X11/Xlib.h>
- #include <epoxy/gl.h>
- #include <epoxy/glx.h>
-@@ -103,7 +103,7 @@ static const int glx_fbconfig_attr[] =3D {
- static inline DeviceState *milkymist_tmu2_create(hwaddr base,
-         qemu_irq irq)
- {
--#ifdef CONFIG_OPENGL
-+#if defined(CONFIG_X11) && defined(CONFIG_OPENGL)
-     DeviceState *dev;
-     Display *d;
-     GLXFBConfig *configs;
+ ##########################################
+ # BrlAPI probe
 --=20
 2.20.1
