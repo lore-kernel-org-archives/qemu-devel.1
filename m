@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35133)
+Received: from eggs.gnu.org ([209.51.188.92]:35476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmZZv-0001aY-P5
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:37:38 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gmZaB-0001qW-Ub
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:37:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gmZYd-0007PK-Sp
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:36:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gmZYd-0007Mw-Kz
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:36:15 -0500
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<ab10ffce-c591-a08c-3ecf-145f1ef0cd07@redhat.com>
-	<alpine.BSF.2.21.9999.1901240336030.16385@zero.eik.bme.hu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d20eac18-c7f7-4c8b-579a-ec2f1db22342@redhat.com>
-Date: Thu, 24 Jan 2019 08:36:09 +0100
+	(envelope-from <aik@ozlabs.ru>) id 1gmZMW-0001Zz-R6
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:23:45 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37805)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmZMW-0001Gq-HP
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:23:44 -0500
+Received: by mail-pf1-x444.google.com with SMTP id y126so2564424pfb.4
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 23:23:39 -0800 (PST)
+References: <20190122170112.8706-1-farosas@linux.ibm.com>
+	<20190122170112.8706-4-farosas@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <d102e17e-eab4-ab77-f7ab-311fc04066c2@ozlabs.ru>
+Date: Thu, 24 Jan 2019 18:23:33 +1100
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901240336030.16385@zero.eik.bme.hu>
+In-Reply-To: <20190122170112.8706-4-farosas@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v4 00/44] Support Kconfig in QEMU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] target/ppc: Enable reporting of
+ SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, ehabkost@redhat.com, sameo@linux.intel.com
+To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, groug@kaod.org, david@gibson.dropbear.id.au
 
-On 24/01/19 03:38, BALATON Zoltan wrote:
->>
->> I started looking at this, and found two bugs in current code
->> (unreachable devices that shouldn't be there - SERIAL_ISA for ARM,
->> ACPI_NVDIMM for MIPS).=C2=A0 There are a few issues in that the script=
- is not
->=20
-> The ACPI_NVDIMM for MIPS is pulled in by CONFIG_VT82C686 which needs
-> ACPI which needs NVDIMM even though it's probably not used. At least I
-> think so, I haven't tested if it could be removed.
 
-Oh, you're right.
 
-The functions exported by hw/acpi/nvdimm.o are called by hw/i386/pc.c,
-hw/i386/pc_piix.c, hw/i386/pc_q35.c, hw/acpi/nvdimm.c, hw/acpi/piix4.c
-(piix4_device_plug_cb), hw/i386/acpi-build.c.  hw/acpi/piix4.c indeed is
-used by Malta.  I'll change it so that the symbol is selected by
-CONFIG_ACPI_X86.
+On 23/01/2019 04:01, Fabiano Rosas wrote:
+> This allows reading and writing of SPRs via GDB:
+> 
+> (gdb) p/x $srr1
+> $1 = 0x8000000002803033
+> 
+> (gdb) p/x $pvr
+> $2 = 0x4b0201
+> (gdb) set $pvr=0x4b0000
+> (gdb) p/x $pvr
+> $3 = 0x4b0000
+> 
+> They can also be shown as a group:
+> (gdb) info reg spr
 
-Maybe
+
+This does not make much sense as 3 patches, one would do it; otherwise
+if there is a problem with 1/3 or 2/3 - bisect will point to 3/3
+although it does not actually add new code but enables other bits.
+
+
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/translate_init.inc.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index f29ac3558a..cba0303be2 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10531,7 +10531,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+>  #endif
+>  
+>      cc->gdb_num_core_regs = 71;
+> -
+> +#ifndef CONFIG_USER_ONLY
+> +    cc->gdb_get_dynamic_xml = ppc_gdb_get_dynamic_xml;
+> +#endif
+>  #ifdef USE_APPLE_GDB
+>      cc->gdb_read_register = ppc_cpu_gdb_read_register_apple;
+>      cc->gdb_write_register = ppc_cpu_gdb_write_register_apple;
+> 
+
+-- 
+Alexey
