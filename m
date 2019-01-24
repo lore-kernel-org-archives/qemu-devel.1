@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35046)
+Received: from eggs.gnu.org ([209.51.188.92]:34923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmc84-0002nl-Mw
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmc86-0002dD-Py
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmc24-0005l9-Tc
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:14:50 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gmc22-0005RE-Uf
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:14:48 -0500
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 24 Jan 2019 11:12:51 +0100
-Message-Id: <cover.4fe3faa2cc295ab1e178284b738e33b940ab9312.1548323393.git-series.knut.omang@oracle.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gmc1S-0004bU-6W
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:14:10 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gmc1S-0004aa-1Z
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:14:10 -0500
+Received: by mail-oi1-x241.google.com with SMTP id j21so4375637oii.8
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 02:14:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/2] pcie: Add simple ACS "support" to the
- generic PCIe root port
+References: <20190124040457.2546-1-doug16k@gmail.com>
+In-Reply-To: <20190124040457.2546-1-doug16k@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Jan 2019 10:13:57 +0000
+Message-ID: <CAFEAcA9fVkGEMPUaSapn6YOV0DR_rS17pWKZHTxQz0aCM+et3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] gdbstub: Fix i386/x86_64 machine
+ description and add control registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, Tal Attaly <talat@mellanox.com>, Knut Omang <knut.omang@oracle.com>
+To: Doug Gale <doug16k@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-These two patches together implements a PCIe capability
-config space header for Access Control Services (ACS) for the
-new Qemu specific generic root port. ACS support in the
-associated root port is a prerequisite to be able to pass
-individual functions of a device populating the port through to
-an L2 guest from an unmodified kernel.
+On Thu, 24 Jan 2019 at 04:08, Doug Gale <doug16k@gmail.com> wrote:
+>
+> Signed-off-by: Doug Gale <doug16k@gmail.com>
+> ---
+>  configure                   |   4 +-
+>  gdb-xml/i386-32bit-core.xml |  65 -----------
+>  gdb-xml/i386-32bit-sse.xml  |  52 ---------
+>  gdb-xml/i386-32bit.xml      | 184 ++++++++++++++++++++++++++++++-
+>  gdb-xml/i386-64bit-core.xml |  73 -------------
+>  gdb-xml/i386-64bit-sse.xml  |  60 -----------
+>  gdb-xml/i386-64bit.xml      | 210 +++++++++++++++++++++++++++++++++++-
+>  target/i386/cpu.c           |   4 +-
+>  target/i386/gdbstub.c       | 186 +++++++++++++++++++++++++++++++-
+>  9 files changed, 573 insertions(+), 265 deletions(-)
+>  delete mode 100644 gdb-xml/i386-32bit-core.xml
+>  delete mode 100644 gdb-xml/i386-32bit-sse.xml
+>  delete mode 100644 gdb-xml/i386-64bit-core.xml
+>  delete mode 100644 gdb-xml/i386-64bit-sse.xml
 
-Without this, the IOMMU group the device belongs to will also
-include the root port itself, and all functions the device provides.
+Could you provide a commit message that explains what's
+wrong with the machine description we have (ie what bug
+or bugs this change is fixing) and why deleting half
+the xml files is the right way to fix it, please?
 
-It is necessary to support SR/IOV where the primary
-purpose is to be able to share out individual VFs to different
-guests, which will not be permitted by VFIO or the Windows Hyper-V equivalent
-unless ACS is supported by the root port.
+Does the "add control registers" part need to be in
+the same patch, or is it a separate feature which
+could be in its own patch ?
 
-These patches can also be found as part of an updated version of
-my SR/IOV emulation patch set at
-
-  https://github.com/knuto/qemu/tree/sriov_patches_v10
-
-Changes from v1:
-----------------
-Incorporated feedback from Alex Williamson:
-
-- Make commit messages reflect a more correct understanding of how this
-  affects VFIO operation.
-- Implemented the CTRL register properly (reset callback + making non-implemented
-  capabilities RO, default value 0)
-- removed the egress ctrl vector parameter to the init function
-- Fixed some whitespace issues
-
-Knut Omang (2):
-  pcie: Add a simple PCIe ACS (Access Control Services) helper function
-  gen_pcie_root_port: Add ACS (Access Control Services) capability
-
- hw/pci-bridge/gen_pcie_root_port.c |  2 ++
- hw/pci-bridge/pcie_root_port.c     |  4 ++++
- hw/pci/pcie.c                      | 21 +++++++++++++++++++++
- include/hw/pci/pcie.h              |  6 ++++++
- include/hw/pci/pcie_port.h         |  1 +
- include/hw/pci/pcie_regs.h         |  4 ++++
- 6 files changed, 38 insertions(+)
-
-base-commit: a8d2b0685681e2f291faaa501efbbd76875f8ec8
--- 
-git-series 0.9.1
+thanks
+-- PMM
