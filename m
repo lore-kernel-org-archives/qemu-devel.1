@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35620)
+Received: from eggs.gnu.org ([209.51.188.92]:35564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gmh9l-0002nR-Mi
+	(envelope-from <peter.maydell@linaro.org>) id 1gmh9h-0002jf-RX
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gmh4m-0005i4-Lh
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:37:58 -0500
-Received: from mail-eopbgr710096.outbound.protection.outlook.com
-	([40.107.71.96]:52194
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1gmh4i-0005cy-W0
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:37:54 -0500
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-Date: Thu, 24 Jan 2019 15:37:47 +0000
-Message-ID: <DM5PR22MB16585EFE36FC0584D37F3724D29A0@DM5PR22MB1658.namprd22.prod.outlook.com>
-References: <1548343154-8774-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1548343154-8774-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1gmh5f-0006UI-0o
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:38:52 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:42277)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gmh5b-0006Mv-9Y
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:38:49 -0500
+Received: by mail-ot1-x329.google.com with SMTP id v23so5579005otk.9
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 07:38:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] tests: Reorganize MIPS TCG
- directories and files
+References: <20190124102900.20079-1-stefanha@redhat.com>
+In-Reply-To: <20190124102900.20079-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Jan 2019 15:38:29 +0000
+Message-ID: <CAFEAcA8dp18AWVLVGyK5eVw_yKpkCs_FWLe0xa9N0weCgk4q3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Thursday, January 24, 2019 4:19 PM
-> To: qemu-devel@nongnu.org
-> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
-> Subject: [PATCH v4 0/3] tests: Reorganize MIPS TCG directories and files
+On Thu, 24 Jan 2019 at 10:29, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> The following changes since commit f6b06fcceef465de0cf2514c9f76fe0192896781:
 >
-> Reorganize MIPS TCG directories and files.
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-request' into staging (2019-01-23 17:57:47 +0000)
 >
-> Directories for DSP tests in system mode are deleted. They
-> introduce more complexity in test structure compared to the
-> value they add. Still, these tests may be moved somewhere
-> else, let's say in a new acceptance test that will boot
-> "mips64r2" virtual machine.
+> are available in the Git repository at:
 >
-> All remaining test will are user mode tests, which will
-> simplify maintenance of mips tcg tests overall.
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
 >
-> The file movement is done using "git mv" command, so "git
-> blame" will still display the original information, regardless
-> of the new names and locations of involved files. Also, the
-> command "git config diff.renames true" was used to keep the
-> size of movement patches reasonable.
+> for you to fetch changes up to 8595685986152334b1ec28c78cb0e5e855d56b54:
 >
-> v3->v4:
->   - DSP ASE system mode tests given up
->   - Makefiles provided for tests that remain
+>   qemu-coroutine-sleep: drop CoSleepCB (2019-01-24 10:05:16 +0000)
 >
-> v2->v3:
->   - corrected missing "v2" that caused wrong message linking
->     (the version is now "v3", of course)
+> ----------------------------------------------------------------
+> Pull request
 >
-> v1->v2:
->   - used "git config diff.renames true" before sending
->   - rebased to the latest code (included newly added r5900 tests)
+> Changelog: No user-visible changes.
 >
->
-> Aleksandar Markovic (3):
->   tests: tcg: mips: Move source files to new locations
->   tests: tcg: mips: Add two new Makefiles
->   tests: tcg: mips: Remove old directories
+> ----------------------------------------------------------------
 
-I too think that this will simplify the test dirs structure and
-maintenance. I cannot wait to see these directories populated with
-new tests for various MIPS ISAs and ASEs.
+Applied, thanks.
 
-For all patches in this series:
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+-- PMM
