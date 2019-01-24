@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40928)
+Received: from eggs.gnu.org ([209.51.188.92]:42950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gmeLJ-0005OU-PY
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:42:50 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gmeNF-0006mU-K0
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:44:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gmeI8-000238-Sk
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:39:36 -0500
-Date: Thu, 24 Jan 2019 13:39:20 +0100
+	(envelope-from <cfergeau@redhat.com>) id 1gmeND-0005yL-NV
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:44:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gmeNA-0005pX-Cm
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:44:44 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB7A37D0F6
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 12:44:32 +0000 (UTC)
+Date: Thu, 24 Jan 2019 13:44:28 +0100
 From: Christophe Fergeau <cfergeau@redhat.com>
-Message-ID: <20190124123920.GW30040@natto.ory.fergeau.eu>
-References: <20190102140535.11512-1-cfergeau@redhat.com>
-	<20190102180158.GA6015@natto.ory.fergeau.eu>
-	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
-	<87o98sii5b.fsf@dusky.pond.sub.org>
-	<87munqieiv.fsf@dusky.pond.sub.org>
+Message-ID: <20190124124428.GX30040@natto.ory.fergeau.eu>
+References: <20190121170434.13592-1-cfergeau@redhat.com>
+	<87d0omieea.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6ysXqiu0yoUmUNJB"
+	protocol="application/pgp-signature"; boundary="bgVZo3zXaTQrZhjg"
 Content-Disposition: inline
-In-Reply-To: <87munqieiv.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+In-Reply-To: <87d0omieea.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v5] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +35,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, "Richard W. M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 
---6ysXqiu0yoUmUNJB
-Content-Type: text/plain; charset=us-ascii
+--bgVZo3zXaTQrZhjg
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hey,
 
-On Thu, Jan 24, 2019 at 10:35:52AM +0100, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
+On Thu, Jan 24, 2019 at 10:38:37AM +0100, Markus Armbruster wrote:
+> Christophe Fergeau <cfergeau@redhat.com> writes:
 >=20
-> > Eric Blake <eblake@redhat.com> writes:
+> > This commit adds a qemu_init_logging() helper which calls
+> > g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+> > are handled similarly to other QEMU logs. This means they will get a
+> > timestamp if timestamps are enabled, and they will go through the
+> > monitor if one is configured.
+> > This commit also adds a call to qemu_init_logging() to the binaries
+> > installed by QEMU.
+> > glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
+> > glib default log handler.
 > >
-> >> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
-> >>> Adding Markus to cc: list, I forgot to do it when sending the patch.
-> >>
-> >> Also worth backporting via qemu-stable, now in cc.
-> >>
-> >>>=20
-> >>> Christophe
-> >>>=20
-> >>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
-> >>>> commit 8bca4613 added support for %% in json strings when interpolat=
-ing,
-> >>>> but in doing so, this broke handling of % when not interpolating as =
-the
-> >>>> '%' is skipped in both cases.
-> >>>> This commit ensures we only try to handle %% when interpolating.
+> > At the moment, this change will mostly impact SPICE logging if your
+> > spice version is >=3D 0.14.1. With older spice versions, this is not go=
+ing
+> > to work as expected, but will not have any ill effect, so this call is
+> > not conditional on the SPICE version.
 > >
-> > Impact?
-> >
-> > If you're unable to assess, could you give us at least a reproducer?
-> >
-> >>>> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> >>>> ---
-> >>>>  qobject/json-parser.c | 10 ++++++----
-> >>>>  tests/check-qjson.c   |  5 +++++
-> >>>>  2 files changed, 11 insertions(+), 4 deletions(-)
-> >>>>
-> >>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >
-> > Patch looks good to me, but I'd like us to improve the commit message.
+> > Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+> > Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 >=20
-> Let me try:
->=20
->     json: Fix % handling when not interpolating
->=20
->     Commit 8bca4613 added support for %% in json strings when interpolati=
-ng,
->     but in doing so broke handling of % when not interpolating.
->=20
->     When parse_string() is fed a string token containing '%', it skips the
->     '%' regardless of ctxt->ap, i.e. even it's not interpolating.  If the
->     '%' is the string's last character, it fails an assertion.  Else, it
->     "merely" swallows the '%'.
->=20
->     Fix parse_string() to handle '%' specially only when interpolating.
->=20
->     To gauge the bug's impact, let's review non-interpolating users of th=
-is
->     parser, i.e. code passing NULL context to json_message_parser_init():
->=20
->     * tests/check-qjson.c, tests/test-qobject-input-visitor.c,
->       tests/test-visitor-serialization.c
->=20
->       Plenty of tests, but we still failed to cover the buggy case.
->=20
->     * monitor.c: QMP input
->=20
->     * qga/main.c: QGA input
->=20
->     * qobject_from_json():
->=20
->       - qobject-input-visitor.c: JSON command line option arguments of
->         -display and -blockdev
->=20
->         Reproducer: -blockdev '{"%"}'
->=20
->       - block.c: JSON pseudo-filenames starting with "json:"
->=20
->         Reproducer: https://bugzilla.redhat.com/show_bug.cgi?id=3D1668244=
-#c3
->=20
->       - block/rbd.c: JSON key pairs
->=20
->         Pseudo-filenames starting with "rbd:".
->=20
->     Command line, QMP and QGA input are trusted.
->=20
->     Filenames are trusted when they come from command line, QMP or HMP.
->     They are untrusted when they come from from image file headers.
->     Example: QCOW2 backing file name.  Note that this is *not* the securi=
-ty
->     boundary between host and guest.  It's the boundary between host and =
-an
->     image file from an untrusted source.
->=20
->     Neither failing an assertion nor skipping a character in a filename of
->     your choice looks exploitable.  Note that we don't support compiling
->     with NDEBUG.
->=20
->     Fixes: 8bca4613e6cddd948895b8db3def05950463495b
->     Cc: qemu-stable@nongnu.org
->=20
-> Comments?
+> Do you expect this to go through my tree?
 
-This looks good to me, thanks for the expanded log!
+To be honest, I don't know through whose tree this should go.
+
+> Hint: if you do, cc'ing me tends to help ;)
+>=20
+> scripts/get_maintainer.pl can be your friend.
+
+I ran it, but it returned a few too many names given that it touches
+files in various subsystems, I was not sure I should cc: everyone.
+Now that I look again, at least "(supporter:Error reporting)" would have
+made sense.
+
+Thanks for noticing this patch without the cc: :)
 
 Christophe
 
---6ysXqiu0yoUmUNJB
+--bgVZo3zXaTQrZhjg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlxJsfcACgkQqdjCFCms
-bIJEqw/+J8cF525L97hspZ6U0qdBXmBGlrT2ViJcOt1kRN0qO1+b3NOkM/0BlP83
-AGOvWlNpczlofIvlK4fxz7GKO3KrSAvOlgXUdRpISczfKvHHhjCxUSI4Iiv8W8cc
-o3RdbIJ43M9DYKb+PgYbSSbuv7wyidutuPJAt+LkeYADmzORv7hZr/SGeVcnAckT
-+mvi0lXmnr2YvPrHUa6leBidbRG75ZLrviKuWfiQPGpoWc6ZygX7NvBvBhxZJ0ww
-pjVKocn9GtV+nDt/az0lnmWBKEBhZK/KvV1XDT+LSsSAKq6WHzUgIwAslifwl6tz
-NmFzBN/2I5Qq1k/peu6//0Bhe4EXjpyxG/fwkIiT0VQq5nK5sWlBOqg+iHJhgjiW
-INEl/5nCQLGNGT0EGBSzsiaSzcNrmzdI1RGF7Dilqb1Vdg8jgZc84/sqLuRDyJ4u
-tmGP1EGGjGRaTs3/A0qdvYHRdCoJGu7R54+OESbJH1s4ZDx+HUiFOA2kJ9ZwpHRv
-nxozrWVPs1JHZqkLnMRof1y+gMY7UesmShyHvksw1qu2BeKUTz01RxsSpASgWGbx
-ozys25jaTooopb3MDCVGrGuWsRlSEc5Lf0UunnZB6V3rlOytIDaxKgHU7VGAZD+q
-sHrw9EVMfkNveLtFVOlJ8H7vkD7CsyroK2P2OL77sA3ccAbRDNs=
-=ttpU
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlxJsywACgkQqdjCFCms
+bIJcFw//bakjNQjXuX6UM2EPOR3ZWiGsrF6pRUv33a6K9lxd83LEflBxpvjTkvLJ
+T9C/5YxvTVVmTjQRZBThnnhSXwQaS8hyWbA+jVpbbVXfqcCAbvWJ6WXudJKZYMr4
+hPXPb34OxZMUzTgAf5Kwvnze2zEJJdTq4AtcVe1D7NIXhJBAILZ0TlUkWGTNGyT6
+4OqjlJI+62+ZHvyGXyxeonewuN3fx5GP6UDLmYCQi9EDnbZj0ejT7ZGrTOVOADvV
+FSMdSqEFg6eHmYZmFQaurYdapIWjlgGBRDhqOCSku76ycfNqAPxDoTePHRVAw7IB
+BXxeV2v/sStkGu+VlqSYsFkPOV1ooYROo786nYfK869kPIlEsZN1RyQ+mNnlAcZS
+eO0UJHN2Bz5Zo/vppIu2BRQYq03sHEk01KRS6+/eVwp/GW+1O63kP44rr72OhkXJ
+S8XzpqdfbQ2UotnvZGWliprNwGhBzlmUSAJ+UuTXrAbv4gU2VZDYydQTy2feP/9a
+rAN3AHqWvC9RY5jX5W7s8tAsoFdUC+yO/IJoA7ydqx6BsALSNeZF0KW8XS8v+1fC
+Ul8pJhmJuUj/L2pbcSZm23X5no/yoQt0DNnvyNiDuSULPCDc7qnGfOkegk5Iv/H8
+BdzW+3WLvizsGcqmLHqqLbRw2P5DwzZJU7g0vtmvT1ts6+c0p18=
+=klRd
 -----END PGP SIGNATURE-----
 
---6ysXqiu0yoUmUNJB--
+--bgVZo3zXaTQrZhjg--
