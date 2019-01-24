@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39908)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmhMM-000434-8R
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:56:07 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:39942)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gmhMP-00045Y-8A
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:56:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gmhML-0004fe-41
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:56:06 -0500
-References: <20190124141731.21509-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f314a45b-72d4-bc00-07a4-1437c58d286a@redhat.com>
-Date: Thu, 24 Jan 2019 09:56:00 -0600
+	(envelope-from <n54@gmx.com>) id 1gmhMO-0004hs-9L
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:56:09 -0500
+Received: from mout.gmx.net ([212.227.15.15]:52443)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gmhMN-0004gB-VD
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:56:08 -0500
+References: <20170816072104.24420-1-famz@redhat.com>
+	<20170816072104.24420-9-famz@redhat.com>
+	<ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+Date: Thu, 24 Jan 2019 16:56:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190124141731.21509-1-kwolf@redhat.com>
+In-Reply-To: <ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="OxkFGKnnvAkzqoyhQ2KnIeTSt8jbYBkVc"
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+	boundary="iZDu4I677rPExy7EtKvLAsuS56vXkolnI"
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +29,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OxkFGKnnvAkzqoyhQ2KnIeTSt8jbYBkVc
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, mreitz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <f314a45b-72d4-bc00-07a4-1437c58d286a@redhat.com>
-Subject: Re: [PATCH] file-posix: Cache lseek result for data regions
-References: <20190124141731.21509-1-kwolf@redhat.com>
-In-Reply-To: <20190124141731.21509-1-kwolf@redhat.com>
+--iZDu4I677rPExy7EtKvLAsuS56vXkolnI
+From: Kamil Rytarowski <n54@gmx.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>,
+ stefanha@redhat.com
+Message-ID: <f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
+References: <20170816072104.24420-1-famz@redhat.com>
+ <20170816072104.24420-9-famz@redhat.com>
+ <ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+In-Reply-To: <ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/24/19 8:17 AM, Kevin Wolf wrote:
-> Depending on the exact image layout and the storage backend (tmpfs is
-> konwn to have very slow SEEK_HOLE/SEEK_DATA), caching lseek results can=
-
-> save us a lot of time e.g. during a mirror block job or qemu-img conver=
-t
-> with a fragmented source image (.bdrv_co_block_status on the protocol
-> layer can be called for every single cluster in the extreme case).
+On 24.01.2019 16:52, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 8/16/17 9:21 AM, Fam Zheng wrote:
+>> The image is prepared following instructions as in:
+>>
+>> https://wiki.qemu.org/Hosts/BSD
+>>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>> ---
+>>  tests/vm/openbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 45 insertions(+)
+>>  create mode 100755 tests/vm/openbsd
+>>
+>> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+>> new file mode 100755
+>> index 0000000000..d37ff83a59
+>> --- /dev/null
+>> +++ b/tests/vm/openbsd
+>> @@ -0,0 +1,45 @@
+>> +#!/usr/bin/env python
+>> +#
+>> +# OpenBSD VM image
+>> +#
+>> +# Copyright (C) 2017 Red Hat Inc.
+>> +#
+>> +# Authors:
+>> +#  Fam Zheng <famz@redhat.com>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2.  S=
+ee
+>> +# the COPYING file in the top-level directory.
+>> +#
+>> +
+>> +import os
+>> +import sys
+>> +import logging
+>> +import subprocess
+>> +import tempfile
+>> +import time
+>> +import basevm
+>> +
+>> +class OpenBSDVM(basevm.BaseVM):
+>> +    name =3D "openbsd"
+>> +    BUILD_SCRIPT =3D """
+>> +        set -e;
+>> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>> +        tar -xf /dev/rsd1c;
+>> +        ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --pyth=
+on=3Dpython2.7 {configure_opts};
+>> +        gmake -j{jobs};
+>> +        # XXX: "gmake check" seems to always hang or fail
+>> +        #gmake check;
 >=20
-> We may only cache data regions because of possible concurrent writers.
-> This means that we can later treat a recently punched hole as data, but=
-
-> this is safe. We can't cache holes because then we might treat recently=
-
-> written data as holes, which can cause corruption.
-
-gluster copies heavily from file-posix's implementation; should it also
-copy this cache of known-data?  Should NBD also cache known-data when
-NBD_CMD_BLOCK_STATUS is available?
-
+> OK, Now it makes more sense...
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/file-posix.c | 51 ++++++++++++++++++++++++++++++++++++++++++++--=
+> After spending various hours trying to fix various issues on OpenBSD, I=
 
->  1 file changed, 49 insertions(+), 2 deletions(-)
+> notice that we never ran tests on this OS.
+> The only binary I can run is qemu-img, the rest seems useless.
+> I'll summarize in a different thread.
 >=20
 
-> =20
-> +    /* Invalidate seek_data_cache if it overlaps */
-> +    sdc =3D &s->seek_data_cache;
-> +    if (sdc->valid && !(sdc->end < aiocb->aio_offset ||
-> +                        sdc->start > aiocb->aio_offset + aiocb->aio_nb=
-ytes))
-> +    {
-> +        sdc->valid =3D false;
-> +    }
+Is this W^X related?
 
-Worth a helper function for this repeated action?
+>> +    """
+>> +
+>> +    def build_image(self, img, rebuild=3DFalse):
+>> +        if os.path.exists(img) and not rebuild:
+>> +            return
+>> +        cimg =3D self._download_with_cache("http://download.patchew.o=
+rg/openbsd.img.xz")
+>> +        img_tmp_xz =3D img + ".tmp.xz"
+>> +        img_tmp =3D img + ".tmp"
+>> +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>> +        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>> +        subprocess.check_call(["mv", img_tmp, img])
+>> +
+>> +if __name__ =3D=3D "__main__":
+>> +    sys.exit(basevm.main(OpenBSDVM))
+>>
+>=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
 
---OxkFGKnnvAkzqoyhQ2KnIeTSt8jbYBkVc
+--iZDu4I677rPExy7EtKvLAsuS56vXkolnI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxJ4BAACgkQp6FrSiUn
-Q2rZWgf/eRpRtrvKUkr9ujPZY7qzlZKbXx13OyWS1hq5e/LmBZbmyeLlEkKb6A18
-7DjMsd/vaEAJGUwSokIWQYt2pWpIZ64tf92WjampVERmTTgyvxxBD0kX336/ZkED
-M5wH9iB5O9MxrmUQLonJBVLLEcDjMwi5wWAeLXWbB4HfJswMPJVqW0OOmqTSktCp
-An6ZYcweOiFxOsNnf2+sWEyYQRdc1Ow61YsxJwTzu3F16e25LASm49apASVc0IAv
-SawhGMad3dbzDsiJgHiEa2dNy9JW9R2wUrVpCJ2d7g0ARMfeRAfg6k9j4X5wIK4R
-ZDrkoO/zW84HkK6IOw9gZmlNfTcrkQ==
-=FTCd
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxJ4DoMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZs/+EP/2yftWtdcASEw14fK0gKD+f8Iw8s0uo1UY/q/L8i
+0AdikCBxeZXY1pGbQkXPsjsBuFHHv+IihSDPSGCegEGvPbl8L3Q6dUOh38491iWo
+USv7FTjvDWH3Oahobx0zXLIll1dC0D+vy69x5aoqrLnl3chxO3eVTDeWPO5c40pf
+NNrpsi9kHpNWe0MFWYwow2PI5qPmLACNp0uuYKKCG1ywtZhgboAPh+jB5Mb9lIgT
+KBfW7wHU6K8f1sA7eZjfyDbjFtbp6plVEnJ3S2n/6UwXIht81ZxN7pb/VbFdfY7i
++ofoHVYxBDp4aKkDheoYQi73IKw4Hqo6ohOI+4Pe5T+nsnhAyU7Vx+soVUInZNH9
+43tPmkaigD9H91TXjcJV8o28gsWRdRBqRxE5b4parc+BqfbtIXyPC/jejjLs1J2a
+fckFhmka0BY/s7M84W1abp0MFxrXlSmET+x+4k01sdCGDopfzJgDiVLX57hP/ot+
+UO3HTYDadQJVtWgeQwCSKWfzTYCBGdcF9q7cBDZIhUnVJEmBDBkoTYRAca7ApulC
+BXT56+PCded4jDM6YDW8RbEblLEdx7iapbdhxmjmK+t7CIlRCaQR9AEFbWBJ+UXZ
+ptvp1jMvjVBKqvWn5e8aRO7VZ5iEnDoP00mFmcUdWTL1a3O1LxpGRDeVDzYbFFpJ
+Uo5A
+=grnn
 -----END PGP SIGNATURE-----
 
---OxkFGKnnvAkzqoyhQ2KnIeTSt8jbYBkVc--
+--iZDu4I677rPExy7EtKvLAsuS56vXkolnI--
