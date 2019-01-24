@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48853)
+Received: from eggs.gnu.org ([209.51.188.92]:49579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmgAx-0005XT-IX
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:40:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gmgDP-0007ia-Ah
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmgAw-0007Il-Bb
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:40:15 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 24 Jan 2019 14:40:10 +0000
-Message-ID: <f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-In-Reply-To: <20190124141731.21509-1-kwolf@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F925FDCC4972ED4BB634BB552CAC6D83@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gmgDO-0001ZJ-Gj
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:47 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gmgDO-0001YG-Af
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:46 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z5so6720964wrt.11
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:42:45 -0800 (PST)
+References: <20181209193749.12277-1-cota@braap.org>
+	<20181209193749.12277-2-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181209193749.12277-2-cota@braap.org>
+Date: Thu, 24 Jan 2019 14:42:43 +0000
+Message-ID: <87sgxiyv4s.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 01/38] trace: expand mem_info:size_shift
+ to 3 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-MjQuMDEuMjAxOSAxNzoxNywgS2V2aW4gV29sZiB3cm90ZToNCj4gRGVwZW5kaW5nIG9uIHRoZSBl
-eGFjdCBpbWFnZSBsYXlvdXQgYW5kIHRoZSBzdG9yYWdlIGJhY2tlbmQgKHRtcGZzIGlzDQo+IGtv
-bnduIHRvIGhhdmUgdmVyeSBzbG93IFNFRUtfSE9MRS9TRUVLX0RBVEEpLCBjYWNoaW5nIGxzZWVr
-IHJlc3VsdHMgY2FuDQo+IHNhdmUgdXMgYSBsb3Qgb2YgdGltZSBlLmcuIGR1cmluZyBhIG1pcnJv
-ciBibG9jayBqb2Igb3IgcWVtdS1pbWcgY29udmVydA0KPiB3aXRoIGEgZnJhZ21lbnRlZCBzb3Vy
-Y2UgaW1hZ2UgKC5iZHJ2X2NvX2Jsb2NrX3N0YXR1cyBvbiB0aGUgcHJvdG9jb2wNCj4gbGF5ZXIg
-Y2FuIGJlIGNhbGxlZCBmb3IgZXZlcnkgc2luZ2xlIGNsdXN0ZXIgaW4gdGhlIGV4dHJlbWUgY2Fz
-ZSkuDQo+IA0KPiBXZSBtYXkgb25seSBjYWNoZSBkYXRhIHJlZ2lvbnMgYmVjYXVzZSBvZiBwb3Nz
-aWJsZSBjb25jdXJyZW50IHdyaXRlcnMuDQo+IFRoaXMgbWVhbnMgdGhhdCB3ZSBjYW4gbGF0ZXIg
-dHJlYXQgYSByZWNlbnRseSBwdW5jaGVkIGhvbGUgYXMgZGF0YSwgYnV0DQo+IHRoaXMgaXMgc2Fm
-ZS4gV2UgY2FuJ3QgY2FjaGUgaG9sZXMgYmVjYXVzZSB0aGVuIHdlIG1pZ2h0IHRyZWF0IHJlY2Vu
-dGx5DQo+IHdyaXR0ZW4gZGF0YSBhcyBob2xlcywgd2hpY2ggY2FuIGNhdXNlIGNvcnJ1cHRpb24u
-DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPiAt
-LS0NCj4gICBibG9jay9maWxlLXBvc2l4LmMgfCA1MSArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKy0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDQ5IGluc2VydGlvbnMo
-KyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svZmlsZS1wb3NpeC5j
-IGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+IGluZGV4IDhhZWU3YTNmYjguLjcyNzJjN2M5OWQgMTAw
-NjQ0DQo+IC0tLSBhL2Jsb2NrL2ZpbGUtcG9zaXguYw0KPiArKysgYi9ibG9jay9maWxlLXBvc2l4
-LmMNCj4gQEAgLTE2OCw2ICsxNjgsMTIgQEAgdHlwZWRlZiBzdHJ1Y3QgQkRSVlJhd1N0YXRlIHsN
-Cj4gICAgICAgYm9vbCBuZWVkc19hbGlnbm1lbnQ7DQo+ICAgICAgIGJvb2wgY2hlY2tfY2FjaGVf
-ZHJvcHBlZDsNCj4gICANCj4gKyAgICBzdHJ1Y3Qgc2Vla19kYXRhX2NhY2hlIHsNCj4gKyAgICAg
-ICAgYm9vbCAgICAgICAgdmFsaWQ7DQo+ICsgICAgICAgIHVpbnQ2NF90ICAgIHN0YXJ0Ow0KPiAr
-ICAgICAgICB1aW50NjRfdCAgICBlbmQ7DQo+ICsgICAgfSBzZWVrX2RhdGFfY2FjaGU7DQoNClNo
-b3VsZCB3ZSBoYXZlIHNvbWUgbXV0ZXgtbG9ja2luZyB0byBwcm90ZWN0IGl0Pw0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+Emilio G. Cota <cota@braap.org> writes:
+
+> This will allow us to trace 16B-long memory accesses.
+>
+> While at it, add some defines for the mem_info bits and simplify
+> trace_mem_get_info by making it a wrapper around trace_mem_build_info.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  trace-events | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/trace-events b/trace-events
+> index 4fd2cb4b97..9d65d472d2 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -151,7 +151,7 @@ vcpu guest_cpu_reset(void)
+>  # Access information can be parsed as:
+>  #
+>  # struct mem_info {
+> -#     uint8_t size_shift : 2; /* interpreted as "1 << size_shift" bytes =
+*/
+> +#     uint8_t size_shift : 3; /* interpreted as "1 << size_shift" bytes =
+*/
+>  #     bool    sign_extend: 1; /* sign-extended */
+>  #     uint8_t endianness : 1; /* 0: little, 1: big */
+>  #     bool    store      : 1; /* wheter it's a store operation */
+
+
+--
+Alex Benn=C3=A9e
