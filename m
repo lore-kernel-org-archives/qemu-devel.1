@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51612)
+Received: from eggs.gnu.org ([209.51.188.92]:51628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd4B-0001wy-OT
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:04 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmd4C-0001xE-Bm
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd4A-00051A-RM
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52912)
+	(envelope-from <kraxel@redhat.com>) id 1gmd4A-00050y-Mz
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd4A-00050K-Kz
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd4A-00050G-HL
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:02 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 24 Jan 2019 12:20:51 +0100
-Message-Id: <20190124112055.547-3-kraxel@redhat.com>
+Date: Thu, 24 Jan 2019 12:20:53 +0100
+Message-Id: <20190124112055.547-5-kraxel@redhat.com>
 In-Reply-To: <20190124112055.547-1-kraxel@redhat.com>
 References: <20190124112055.547-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/6] audio: allow optional audio drivers.
+Subject: [Qemu-devel] [PATCH v3 4/6] audio: check for pulseaudio daemon
+ pidfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +27,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-For those audio drivers which can be probed (sdl, alsa, pulse) add a
-try-$name variants.  Unlike the variants without try- prefix they will
-not error out on probe failure, the driver will be dropped from the list
-instead.  Mainly useful for the audio_drv_list default values.
+Check whenever the pulseaudio daemon pidfile is present before trying to
+initialize the pulseaudio backend.  Just return NULL if that is not the
+case, so qemu will check the next backend in line.
+
+In case the user explicitly configured a non-default pulseaudio server
+skip the check.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ audio/paaudio.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/configure b/configure
-index 5fcd0f4795..6a2aa3b533 100755
---- a/configure
-+++ b/configure
-@@ -3345,22 +3345,36 @@ fi
- audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/,/ /g')
- for drv in $audio_drv_list; do
-     case $drv in
--    alsa)
-+    alsa | try-alsa)
-     if $pkg_config alsa --exists; then
-         alsa_libs=$($pkg_config alsa --libs)
-+        if test "$drv" = "try-alsa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa/alsa/')
-+        fi
-     else
--        error_exit "$drv check failed" \
--            "Make sure to have the $drv libs and headers installed."
-+        if test "$drv" = "try-alsa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa//')
-+        else
-+            error_exit "$drv check failed" \
-+                "Make sure to have the $drv libs and headers installed."
-+        fi
-     fi
-     ;;
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 4c100bc318..6153b908da 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -814,6 +814,21 @@ static PAConf glob_conf = {
  
--    pa)
-+    pa | try-pa)
-     if $pkg_config libpulse --exists; then
-         pulse_libs=$($pkg_config libpulse --libs)
-         audio_pt_int="yes"
-+        if test "$drv" = "try-pa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa/pa/')
-+        fi
-     else
--        error_exit "$drv check failed" \
--            "Make sure to have the $drv libs and headers installed."
-+        if test "$drv" = "try-pa"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa//')
-+        else
-+            error_exit "$drv check failed" \
-+                "Make sure to have the $drv libs and headers installed."
-+        fi
-     fi
-     ;;
- 
-@@ -3370,6 +3384,14 @@ for drv in $audio_drv_list; do
-     fi
-     ;;
- 
-+    try-sdl)
-+    if test "$sdl" = "no"; then
-+        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl//')
-+    else
-+        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl/sdl/')
-+    fi
-+    ;;
+ static void *qpa_audio_init (void)
+ {
++    if (glob_conf.server == NULL) {
++        char pidfile[64];
++        char *runtime;
++        struct stat st;
 +
-     coreaudio)
-       coreaudio_libs="-framework CoreAudio"
-     ;;
++        runtime = getenv("XDG_RUNTIME_DIR");
++        if (!runtime) {
++            return NULL;
++        }
++        snprintf(pidfile, sizeof(pidfile), "%s/pulse/pid", runtime);
++        if (stat(pidfile, &st) != 0) {
++            return NULL;
++        }
++    }
++
+     paaudio *g = g_malloc(sizeof(paaudio));
+     g->conf = glob_conf;
+     g->mainloop = NULL;
 -- 
 2.9.3
