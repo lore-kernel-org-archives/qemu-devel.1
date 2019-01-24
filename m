@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42617)
+Received: from eggs.gnu.org ([209.51.188.92]:42659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gmfs3-0001KP-II
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmfs8-0001NA-9M
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gmfs1-0005qU-S4
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gmfs1-0005pd-MN
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gmfs0-0003jB-5S
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 27CF02E807B
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:20:40 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmfs7-0005uf-GD
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:48 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 24 Jan 2019 14:20:42 +0000
+Message-ID: <7eec9b2f-fbf8-51aa-3883-b692324995ec@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-2-vsementsov@virtuozzo.com>
+	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
+	<5accce39-2c94-ca4e-5afc-2fec242836a8@virtuozzo.com>
+	<29032c00-29cf-a8a4-d18e-fcaa7651636a@redhat.com>
+	<9767ccf8-6a00-88b0-e28a-3b8602580c2e@virtuozzo.com>
+	<352c85fb-fd1d-56e7-ace3-61553e8bbc94@redhat.com>
+	<7edf764f-0eef-a47d-48f2-70501f2697a5@virtuozzo.com>
+	<6cf829bf-2848-b588-c832-1f6f3e037c3d@redhat.com>
+In-Reply-To: <6cf829bf-2848-b588-c832-1f6f3e037c3d@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Jan 2019 14:09:58 -0000
-From: Thomas <1813165@bugs.launchpad.net>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <154833899874.19664.14897232674094543880.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
- emulation failure
+Content-ID: <BF8809ABA256694C83A6C5F33DF932DD@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,229 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-** Description changed:
-
-  Hello Devs.
-  =
-
-  Having problems getting VM to run with qemu 3.1.0.
-  =
-
-- 2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one.lordcritical.de
-+ 2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-- DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
-
-+ DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-  =
-
-  Someone has an idea whats going wrong here?
-  =
-
-  thanks and cheers
-  t.
-
-** Description changed:
-
-  Hello Devs.
-  =
-
-- Having problems getting VM to run with qemu 3.1.0.
-+ Having problems getting VM to run with qemu 3.1.0. I should mention it's
-+ a nested configuration.
-  =
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-  =
-
-  Someone has an idea whats going wrong here?
-  =
-
-  thanks and cheers
-  t.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
-
-Title:
-  KVM internal error. Suberror: 1 emulation failure
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs.
-
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-
-  Someone has an idea whats going wrong here?
-
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+MjMuMDEuMjAxOSAxNzozNiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8yMy8xOSAyOjIwIEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiANCj4+Pj4+Pj4+ICsgICAg
+ICAgIGhiaXRtYXBfc2V0KGpvYi0+Y29weV9iaXRtYXAsIGNsdXN0ZXIsIGxhc3RfY2x1c3RlciAt
+IGNsdXN0ZXIgKyAxKTsNCj4+Pj4+Pj4NCj4+Pj4+Pj4gV2h5IHRoZSArMT8gIFNob3VsZG4ndCB0
+aGUgZGl2aXNpb24gZm9yIGxhc3RfY2x1c3RlciByb3VuZCB1cCBpbnN0ZWFkPw0KPj4+Pj4+Pg0K
+Pj4+Pj4+Pj4gKw0KPj4+Pj4+Pj4gKyAgICAgICAgb2Zmc2V0ID0gKGxhc3RfY2x1c3RlciArIDEp
+ICogam9iLT5jbHVzdGVyX3NpemU7DQo+Pj4+Pj4+DQo+Pj4+Pj4+IFNhbWUgaGVyZS4NCj4+Pj4+
+Pg0KPj4+Pj4+IGxhc3QgY2x1c3RlciBpcyBub3QgImVuZCIsIGJ1dCBpdCdzIGxhc3QgZGlydHkg
+Y2x1c3Rlci4gc28gbnVtYmVyIG9mIGRpcnR5IGNsdXN0ZXJzIGlzIGxhc3RfY2x1c3RlciAtIGNs
+dXN0ZXIgKyAxLCBhbmQgbmV4dCBvZmZzZXQgaXMgY2FsY3VsYXRlZCB0aHJvdWdoICsxIHRvby4N
+Cj4+Pj4+Pg0KPj4+Pj4+IElmIEkgcm91bmQgdXAgZGl2aXNpb24gcmVzdWx0LCBJJ2xsIGdldCBs
+YXN0IGZvciBtb3N0IGNhc2VzLCBidXQgImVuZCIgKG5leHQgYWZ0ZXIgdGhlIGxhc3QpLCBmb3Ig
+dGhlIGNhc2Ugd2hlbiBvZmZzZXQgJSBqb2ItPmNsdXN0ZXJfc2l6ZSA9PSAwLCBzbywgaG93IHRv
+IHVzZSBpdD8NCj4+Pj4+DQo+Pj4+PiBEb2Vzbid0IGJkcnZfZGlydHlfYml0bWFwX25leHRfZGly
+dHlfYXJlYSgpIHJldHVybiBhIHJhbmdlIFtvZmZzZXQsDQo+Pj4+PiBvZmZzZXQgKyBieXRlcyks
+IGkuZS4gd2hlcmUgIm9mZnNldCArIGJ5dGVzIiBpcyB0aGUgZmlyc3QgY2xlYW4gb2Zmc2V0Pw0K
+Pj4+Pg0KPj4+PiBvb3BzLCB5b3UgYXJlIHJpZ2h0LiB0aGVuIEkgbmVlZA0KPj4+PiB1aW50NjRf
+dCBsYXN0X2NsdXN0ZXIgPSAob2Zmc2V0ICsgYnl0ZXMgLSAxKSAvIGpvYi0+Y2x1c3Rlcl9zaXpl
+Ow0KPj4+DQo+Pj4gVGhhdCwgb3IgeW91IGp1c3QgdXNlIGEgcm91bmRpbmcgdXAgZGl2aXNpb24g
+YW5kIHJlbmFtZSBpdCBmcm9tDQo+Pj4gbGFzdF9jbHVzdGVyIHRvIGVuZF9jbHVzdGVyIG9yIGZp
+cnN0X2NsZWFuX2NsdXN0ZXIgb3Igc29tZXRoaW5nIChhbmQNCj4+PiBzdWJzZXF1ZW50bHkgZHJv
+cCB0aGUgKzFzKS4NCj4+DQo+PiBUaGlzIHdpbGwgbm90IHdvcmssIGFzICgob2Zmc2V0ICsgYnl0
+ZXMpIC8gam9iLT5jbHVzdGVyX3NpemUpIGlzIG5vdCBmaXJzdCBjbGVhbiBjbHVzdGVyDQo+PiBv
+ciBlbmQgY2x1c3Rlci4gSXQncyBhIGNsdXN0ZXIsIHdoZXJlIGlzIGZpcnN0IGNsZWFuIGJpdCBs
+b2NhdGVkLCBidXQgaXQgbWF5IGhhdmUgZGlydHkNCj4+IGJpdHMgdG9vIChvciwgbWF5IG5vdCku
+DQo+Pg0KPj4gU28sIHRvIHJld3JpdGUgYmFzZWQgb24gZW5kX2NsdXN0ZXIsIGl0IHNob3VsZCBi
+ZSBjYWxjdWxhdGVkIGFzDQo+Pg0KPj4gKG9mZnNldCArIGJ5dGVzIC0gMSkgLyBqb2ItPmNsdXN0
+ZXJfc2l6ZSArIDENCj4+DQo+PiBhbmQsIEknbSBnb2luZyB0byBkbyBzbywgb25lICIrMSIgaW5z
+dGVhZCBvZiB0d28sIGFuZCwgbWF5IGJlLCBhIGJpdCBtb3JlIHVuZGVyc3RhbmRhYmxlLg0KPiAN
+Cj4gQmV0dGVyIGlzIHRvIHVzZSB0aGUgbWFjcm9zIGluIG9zZGVwLmgsIHN1Y2ggYXMgUUVNVV9B
+TElHTl9VUC9ET1dOLCB0bw0KPiBtYWtlIHRoZSBpbnRlbnQgb2YgdGhlIGNvZGUgZWFzaWVyIHRv
+IHJlYWQgdGhhbiBoYXZpbmcgdG8gY2xvc2VseSBjaGVjaw0KPiB3aGljaCBvcGVyYXRpb24gaXMg
+YmVpbmcgcGVyZm9ybWVkIHRvIHNlZSBpZiBpdCBtYWtlcyBzZW5zZSBpbiBjb250ZXh0Lg0KPiAN
+Cg0KWWVzLCB0aGFua3MuIEV4YWN0bHk6DQp1aW50NjRfdCBlbmRfY2x1c3RlciA9IERJVl9ST1VO
+RF9VUChvZmZzZXQgKyBieXRlcywgam9iLT5jbHVzdGVyX3NpemUpOw0KDQoNCi0tIA0KQmVzdCBy
+ZWdhcmRzLA0KVmxhZGltaXINCg==
