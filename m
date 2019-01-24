@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34923)
+Received: from eggs.gnu.org ([209.51.188.92]:35044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmc7x-0002dD-3q
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:20:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gmc7y-0002nj-A4
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:20:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmc3Z-0000Fy-9q
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:16:22 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gmc3Z-0000Cz-0i
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:16:21 -0500
-Received: by mail-wr1-x433.google.com with SMTP id v13so5800487wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 02:16:20 -0800 (PST)
-Date: Thu, 24 Jan 2019 10:16:18 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190124101618.GD4764@stefanha-x1.localdomain>
-References: <720ebdfeb9506e0719481fc1913c9272@grossmann-venter.com>
+	(envelope-from <kwolf@redhat.com>) id 1gmc3S-0008SH-6P
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:16:16 -0500
+Date: Thu, 24 Jan 2019 11:15:59 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190124101559.GC4601@localhost.localdomain>
+References: <3da8da19-72dc-8f5e-f2e1-820999994cb2@redhat.com>
+	<6325d205-774f-865b-1351-8a7e675bebf7@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AbQceqfdZEv+FvjW"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <720ebdfeb9506e0719481fc1913c9272@grossmann-venter.com>
-Subject: Re: [Qemu-devel] networking
+In-Reply-To: <6325d205-774f-865b-1351-8a7e675bebf7@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] Aborts in iotest 169
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +23,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liebrecht@grossmann-venter.com
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Luiz Capitulino <lcapitulino@redhat.com>, eblake@redhat.com, dgilbert@redhat.com
 
+Am 24.01.2019 um 10:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 23.01.2019 18:48, Max Reitz wrote:
+> > Hi,
+> > 
+> > When running 169 in parallel (e.g. like so:
+> > 
+> > $ while TEST_DIR=/tmp/t0 ./check -T -qcow2 169; do; done
+> > $ while TEST_DIR=/tmp/t1 ./check -T -qcow2 169; do; done
+> > $ while TEST_DIR=/tmp/t2 ./check -T -qcow2 169; do; done
+> > $ while TEST_DIR=/tmp/t3 ./check -T -qcow2 169; do; done
+> > 
+> > in four different shells), I get aborts:
+> > 
+> > (Often I get segfaults, but that's because of
+> > http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html --
+> > feel free to apply the attached patch to make them go away)
+> > 
+> > 
+> > WARNING:qemu:qemu received signal 6:
+> > build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
+> > -chardev socket,id=mon,path=/tmp/t0/tmpbX30XU/qemua-25745-monitor.sock
+> > -mon chardev=mon,mode=control -display none -vga none -qtest
+> > unix:path=/tmp/t0/qemua-25745-qtest.sock -machine accel=qtest
+> > -nodefaults -machine accel=qtest -drive
+> > if=virtio,id=drive0,file=/tmp/t0/disk_a,format=qcow2,cache=writeback
+> > .................E..
+> > ======================================================================
+> > ERROR:
+> > test_do_test_migration_resume_source_not_persistent__not_migbitmap
+> > (__main__.TestDirtyBitmapMigration)
+> > ----------------------------------------------------------------------
+> > Traceback (most recent call last):
+> >    File "169", line 206, in <lambda>
+> >      setattr(klass, 'test_' + method + name, lambda self: mc(self))
+> >    File "169", line 113, in do_test_migration_resume_source
+> >      self.check_bitmap(self.vm_a, sha256)
+> >    File "169", line 72, in check_bitmap
+> >      node='drive0', name='bitmap0')
+> >    File "tests/qemu-iotests/../../scripts/qemu.py", line 369, in qmp
+> >      return self._qmp.cmd(cmd, args=qmp_args)
+> >    File "tests/qemu-iotests/../../scripts/qmp/qmp.py", line 191, in cmd
+> >      return self.cmd_obj(qmp_cmd)
+> >    File "tests/qemu-iotests/../../scripts/qmp/qmp.py", line 174, in cmd_obj
+> >      resp = self.__json_read()
+> >    File "tests/qemu-iotests/../../scripts/qmp/qmp.py", line 82, in
+> > __json_read
+> >      data = self.__sockfile.readline()
+> >    File "/usr/lib64/python2.7/socket.py", line 451, in readline
+> >      data = self._sock.recv(self._rbufsize)
+> > error: [Errno 104] Connection reset by peer
+> > 
+> > ----------------------------------------------------------------------
+> > Ran 20 tests
+> > 
+> > FAILED (errors=1)
+> > 
+> > 
+> > Or:
+> > 
+> > WARNING:qemu:qemu received signal 6:
+> > build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
+> > -chardev socket,id=mon,path=/tmp/t3/tmp0pllWD/qemua-3445-monitor.sock
+> > -mon chardev=mon,mode=control -display none -vga none -qtest
+> > unix:path=/tmp/t3/qemua-3445-qtest.sock -machine accel=qtest -nodefaults
+> > -machine accel=qtest -drive
+> > if=virtio,id=drive0,file=/tmp/t3/disk_a,format=qcow2,cache=writeback
+> > WARNING:qemu:qemu received signal 6:
+> > build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
+> > -chardev socket,id=mon,path=/tmp/t3/tmp0pllWD/qemua-3445-monitor.sock
+> > -mon chardev=mon,mode=control -display none -vga none -qtest
+> > unix:path=/tmp/t3/qemua-3445-qtest.sock -machine accel=qtest -nodefaults
+> > -machine accel=qtest -drive
+> > if=virtio,id=drive0,file=/tmp/t3/disk_a,format=qcow2,cache=writeback
+> > 
+> > ...................F
+> > ======================================================================
+> > FAIL: test_do_test_migration_resume_source_persistent__not_migbitmap
+> > (__main__.TestDirtyBitmapMigration)
+> > ----------------------------------------------------------------------
+> > Traceback (most recent call last):
+> >    File "169", line 206, in <lambda>
+> >      setattr(klass, 'test_' + method + name, lambda self: mc(self))
+> >    File "169", line 125, in do_test_migration_resume_source
+> >      self.assertEqual(log, '')
+> > AssertionError: "qemu-system-x86_64: invalid runstate transition:
+> > 'running' -> 'postmigrate'\n" != ''
+> > 
+> > ----------------------------------------------------------------------
+> > Ran 20 tests
+> > 
+> > FAILED (failures=1)
+> > 
+> > 
+> > The backtrace always goes like this:
+> > 
+> > (gdb) bt
+> > #0  0x00007f0acf5cc53f in raise () at /lib64/libc.so.6
+> > #1  0x00007f0acf5b6895 in abort () at /lib64/libc.so.6
+> > #2  0x000055a46ebbb1a6 in runstate_set (new_state=RUN_STATE_POSTMIGRATE)
+> > at vl.c:742
+> > #3  0x000055a46ebbb1a6 in runstate_set
+> > (new_state=new_state@entry=RUN_STATE_POSTMIGRATE) at vl.c:730
+> > #4  0x000055a46ed39129 in migration_iteration_finish (s=0x55a4708be000)
+> > at migration/migration.c:2972
+> > #5  0x000055a46ed39129 in migration_thread
+> > (opaque=opaque@entry=0x55a4708be000) at migration/migration.c:3130
+> > #6  0x000055a46eea665a in qemu_thread_start (args=<optimized out>) at
+> > util/qemu-thread-posix.c:502
+> > 
+> > 
+> > #7  0x00007f0acf76258e in start_thread () at /lib64/libpthread.so.0
+> > #8  0x00007f0acf6916a3 in clone () at /lib64/libc.so.6
+> > (gdb) frame 2
+> > #2  0x000055a46ebbb1a6 in runstate_set (new_state=RUN_STATE_POSTMIGRATE)
+> > at vl.c:742
+> > 742             abort();
+> > (gdb) print current_run_state
+> > $1 = RUN_STATE_RUNNING
+> > 
+> > 
+> > Neither of migration or runstates are my strong suite, so I thought I'd
+> > report it before diving into it.
+> > 
+> > Max
+> > 
+> 
+> [...]
+> 450556@1548321072.888979:migrate_set_state new state active
+> 450556@1548321072.889022:migration_thread_setup_complete
+> 450556@1548321072.988275:migrate_transferred transferred 985298 time_spent 100 bandwidth 9852 max_size 2955894
+> 450556@1548321072.988283:migration_bitmap_sync_start
+> 450556@1548321072.988293:migration_bitmap_sync_end dirty_pages 32898
+> 450556@1548321072.988495:migration_thread_low_pending 2048
+> migration_completion
+> 450556@1548321072.988541:runstate_set current_state 9 new_state 7
+> 450556@1548321072.988780:migration_bitmap_sync_start
+> 450556@1548321072.988790:migration_bitmap_sync_end dirty_pages 32898
+> 450556@1548321072.993112:migrate_global_state_pre_save saved state: running
+> [1] 450556@1548321072.993237:migrate_set_state new state completed
+> 450549@1548321072.993668:handle_qmp_command mon 0x55aebef99830 req: {"execute": "x-debug-block-dirty-bitmap-sha256", "arguments": {"name": "bitmap0", "node": "drive0"}}
+> 450556@1548321072.993697:migration_thread_after_loop
+> [2] 450549@1548321072.993917:handle_qmp_command mon 0x55aebef99830 req: {"execute": "cont"}
+> 450476@1548321072.994461:runstate_set current_state 7 new_state 9
+> qemu-system-x86_64: invalid runstate transition: 'running' -> 'postmigrate'
+> 
+> 
+> Aha, so, in test we wait for MIGRATION COMPLETED [1] and run qmp_cont [2] and go to RUNNING.
+> then in migration thread we go to migration_iteration_finish() and fail to go to POSTMIGRATE.
+> (note, that this testcase is about resuming source after migration)
+> 
+> So, fix for test may be additionally wait for POSTMIGRATE, not only for MIGRATION COMPLETION.
+> 
+> But how to fix Qemu not to crash? May be, forbid some transitions (FINISH_MIGRATE -> RUNNING),
+>   or at least error-out qmp_cont if runstate is  FINISH_MIGRATE?
 
---AbQceqfdZEv+FvjW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+qmp_cont currently checks for RUN_STATE_INMIGRATE and gives it special
+treatment. As a quick hack, doing the same for RUN_STATE_FINISH_MIGRATE
+might fix the problem. A better simple fix would possibly include a
+whitelist of states where you can use 'cont' to avoid that the user
+messes with other internal states.
 
-On Tue, Jan 22, 2019 at 10:02:09PM -0500, liebrecht@grossmann-venter.com wr=
-ote:
-> The windows 7 guest on linux host had networking out of the box.
-> It now lost it for some reason.
-> The qemu string remained the same....
+However, like the problem that Dave reported a few days ago (migrating
+twice leads to a crash because we try to inactivate already inactive
+block devices), I think this is a symptom of a larger problem. We're
+not taking the state machine serious enough. One-off checks here and
+there are unlikely to ever fully solve the problem of running a command
+in a runstate in which it was never supposed to run.
 
-Please post your QEMU command-line.
+I wonder whether the QAPI schema should have a field 'run-states' for
+commands, and by default we would only include states where the VM has
+ownership of its resources (e.g. images are activated) and which are not
+temporary states that are automatically left, like finish-migrate.
 
-> It now want to do DHCP and fails.
-> It has an intel nic as nic device in device manager.
->=20
-> What i cant understand is how to dop a static network config in this case.
-> lets say my network is 192.168.1.x
->=20
-> Do i give it a static ip say 192.168.1.33 ?
-> The mask 255.255.255.0
-> What must the default gateway be ?
-> On my linux network this at 192.168.1.100
+Then the default for commands is to be rejected in "unusual" runstates
+where we're not expecting user intervention, and we must explicitly
+allow them if they are okay, in fact.
 
-The details of QEMU's default networking configuration ("slirp"
-userspace networking) is as follows:
+Instead of listing every obscure runstate, maybe we should really use
+categories of runstates instead:
 
-Subnet: 10.0.2.0/24
-Gateway: 10.0.2.2
+1. Running
+2. Paused, owns all resources (like disk images)
+3. Paused, doesn't own some resources (source VM after migration
+   completes, destination before migration completes)
+4. Paused temporarily for internal reasons (e.g. finish-migrate,
+   restore-vm, save-vm)
 
-Therefore statically assigning a 192.168.1.0/24 address will not work,
-you need to pick a 10.0.2.0/24 address and use 10.0.2.2 as the gateway.
+Most commands should be okay with 1 and 2, but possibly not 3, and
+almost never 4.
 
-If you are using tap networking then this does not apply.  Details of
-your host networking setup would be necessary in order to help you.
-
-> Should I give an external e.g. google dns or is there a specific internal
-> DNS it needs to use ?
->=20
-> thanks
->=20
-> Why networking just broke I really cannot understand
->=20
->=20
-
---AbQceqfdZEv+FvjW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcSZByAAoJEJykq7OBq3PIWcEIAMBDo35hzl12Zx36NYskRkXx
-5EaGbgQsBWjcdrhbaSZgeM3jG0YCM8m8I3tNnJaLJghuCEUlJGeegPxHe2MI868S
-kXKfzsYxK9k8JXpkwtGSEh4V18roj9wA4WHuibRT6yhM6XBqiYLgpm3VheJA5okB
-+ccVTpI7kAihJ7v++a/ZHEvhR9YRy9SDwRpJ4NjY5064LS6X+vwzw5mp+EAp4Y+f
-RSp4QdWk4DSexyBs7rmEr0JYZmUbrfSGUHcTEZXURX93c9FSyyJMOfDA9g1SYAZE
-5tu05Lpc+uCwTviB0/bjTw4GBu5BPTQ9AtAO8vLQ5x1NeK00kThB3CmGuslWP1Y=
-=hQtz
------END PGP SIGNATURE-----
-
---AbQceqfdZEv+FvjW--
+Kevin
