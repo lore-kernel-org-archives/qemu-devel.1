@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38995)
+Received: from eggs.gnu.org ([209.51.188.92]:43809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gmmZW-0000ax-Ey
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:30:03 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmn3K-0004Op-SX
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 17:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gmmZV-000196-MX
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:30:02 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmn0A-0006Xf-3T
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:57:35 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmn09-0006Rk-S0
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:57:33 -0500
+Received: by mail-wm1-f65.google.com with SMTP id a62so4802246wmh.4
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 13:57:21 -0800 (PST)
+References: <2b9ba958f8b317df83c37b348ad543fef2113528.1548351450.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fd5f51bd-92a6-f653-40aa-02956a2f921e@redhat.com>
+Date: Thu, 24 Jan 2019 22:57:19 +0100
 MIME-Version: 1.0
-References: <20190124140519.13838-1-clg@kaod.org>
-	<20190124140519.13838-4-clg@kaod.org>
-In-Reply-To: <20190124140519.13838-4-clg@kaod.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 24 Jan 2019 13:29:31 -0800
-Message-ID: <CAKmqyKN3xpBkB5C52RcQOvs-Ra8hmcUETP3FgGRyCntgtp_0Pg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] aspeed/smc: Add dummy data register
+In-Reply-To: <2b9ba958f8b317df83c37b348ad543fef2113528.1548351450.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] riscv: Ensure the kernel start
+ address is correctly cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Thu, Jan 24, 2019 at 6:06 AM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> The SMC controllers have a register containing the byte that will be
-> used as dummy output. It can be modified by software.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
+On 1/24/19 6:37 PM, Alistair Francis wrote:
+> Cast the kernel start address to the target bit length.
+> 
+> This ensures that we calculate the initrd offset to a valid address for
+> the architecture.
+> 
+> Steps to reproduce the original problem (reported by Alex):
+>   Build U-Boot for the virt machine for riscv32. Then run it with
+> 
+>     $ qemu-system-riscv32 -M virt -kernel u-boot -nographic -initrd <a file>
+> 
+>   You can find the initrd address with
+> 
+>     U-Boot# fdt addr $fdtcontroladdr
+>     U-Boot# fdt ls /chosen
+> 
+>   Then take a peek at that address:
+> 
+>     U-Boot# md.b <addr>
+> 
+>   and you will see that there is nothing there without this patch. The
+>   reason is that the binary was loaded to a negative address.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Suggested-by: Alexander Graf <agraf@suse.de>
+> Reported-by: Alexander Graf <agraf@suse.de>
 > ---
->  hw/ssi/aspeed_smc.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 6045ca11b969..9f3b6f4b4501 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -98,8 +98,8 @@
->  /* Misc Control Register #1 */
->  #define R_MISC_CTRL1      (0x50 / 4)
->
-> -/* Misc Control Register #2 */
-> -#define R_MISC_CTRL2      (0x54 / 4)
-> +/* SPI dummy cycle data */
-> +#define R_DUMMY_DATA      (0x54 / 4)
->
->  /* DMA Control/Status Register */
->  #define R_DMA_CTRL        (0x80 / 4)
-> @@ -529,7 +529,7 @@ static void aspeed_smc_flash_setup(AspeedSMCFlash *fl=
-, uint32_t addr)
->       */
->      if (aspeed_smc_flash_mode(fl) =3D=3D CTRL_FREADMODE) {
->          for (i =3D 0; i < aspeed_smc_flash_dummies(fl); i++) {
-> -            ssi_transfer(fl->controller->spi, 0xFF);
-> +            ssi_transfer(fl->controller->spi, s->regs[R_DUMMY_DATA] & 0x=
-ff);
->          }
->      }
->  }
-> @@ -664,6 +664,7 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
-addr, unsigned int size)
->          addr =3D=3D s->r_timings ||
->          addr =3D=3D s->r_ce_ctrl ||
->          addr =3D=3D R_INTR_CTRL ||
-> +        addr =3D=3D R_DUMMY_DATA ||
->          (addr >=3D R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slav=
-es) ||
->          (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves=
-)) {
->          return s->regs[addr];
-> @@ -697,6 +698,8 @@ static void aspeed_smc_write(void *opaque, hwaddr add=
-r, uint64_t data,
->          if (value !=3D s->regs[R_SEG_ADDR0 + cs]) {
->              aspeed_smc_flash_set_segment(s, cs, value);
->          }
-> +    } else if (addr =3D=3D R_DUMMY_DATA) {
-> +        s->regs[addr] =3D value & 0xff;
->      } else {
->          qemu_log_mask(LOG_UNIMP, "%s: not implemented: 0x%" HWADDR_PRIx =
-"\n",
->                        __func__, addr);
-> --
-> 2.20.1
->
->
+> v3:
+>  - Add steps to reproduce
+
+Thanks, this is useful to write an acceptance test.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> v2:
+>  - Remove old comment
+>  hw/riscv/sifive_e.c | 2 +-
+>  hw/riscv/sifive_u.c | 2 +-
+>  hw/riscv/spike.c    | 2 +-
+>  hw/riscv/virt.c     | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 5d9d65ff29..e5d7fc548e 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -74,7 +74,7 @@ static const struct MemmapEntry {
+>      [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 3bd3b67507..3b3acec377 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -65,7 +65,7 @@ static const struct MemmapEntry {
+>  
+>  #define GEM_REVISION        0x10070109
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index 268df04c3c..79cb4c1282 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -53,7 +53,7 @@ static const struct MemmapEntry {
+>      [SPIKE_DRAM] =     { 0x80000000,        0x0 },
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index e7f0716fb6..648462b18c 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -62,7 +62,7 @@ static const struct MemmapEntry {
+>      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> 
