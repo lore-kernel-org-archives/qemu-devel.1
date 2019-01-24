@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32801)
+Received: from eggs.gnu.org ([209.51.188.92]:33056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gmZHa-0006kr-0r
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:18:38 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gmZJ7-0007Qf-H3
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:20:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gmZHW-0007YN-A2
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:18:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60550)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gmZHS-0007FE-Io
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:18:33 -0500
-Date: Thu, 24 Jan 2019 15:18:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190124071822.GK18231@xz-x1>
-References: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
-	<20190122150543.16889-2-bala24@linux.vnet.ibm.com>
-	<875zuf9vt4.fsf@trasno.org>
+	(envelope-from <aik@ozlabs.ru>) id 1gmZJ5-0002B4-NP
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:20:13 -0500
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:52796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmZJ3-00024h-GP
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 02:20:09 -0500
+Received: by mail-it1-x141.google.com with SMTP id d11so3377396itf.2
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 23:20:09 -0800 (PST)
+References: <20190122170112.8706-1-farosas@linux.ibm.com>
+	<20190122170112.8706-3-farosas@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
+Date: Thu, 24 Jan 2019 18:20:02 +1100
 MIME-Version: 1.0
+In-Reply-To: <20190122170112.8706-3-farosas@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <875zuf9vt4.fsf@trasno.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] migration: calculate expected_downtime
- considering redirtied ram
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
+ callbacks for SPRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +31,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: bala24@linux.vnet.ibm.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, dgilbert@redhat.com
+To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, groug@kaod.org, david@gibson.dropbear.id.au, Richard Henderson <richard.henderson@linaro.org>
 
-On Wed, Jan 23, 2019 at 05:35:03PM +0100, Juan Quintela wrote:
-> bala24@linux.vnet.ibm.com wrote:
-> > From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> >
-> > currently we calculate expected_downtime by time taken to transfer
-> > remaining ram, but during the time we had transferred remaining ram
-> > few pages of ram might be redirtied and we need to retransfer it,
-> > so it is better to consider them for calculating expected_downtime
-> > for getting more accurate values.
-> >
-> > Total ram to be transferred = remaining ram + (redirtied ram at the
-> >                                                time when the remaining
-> >                                                ram gets transferred)
-> >
-> > redirtied ram = dirty_pages_rate * time taken to transfer remaining ram
-> >
-> > redirtied ram = dirty_pages_rate * (remaining ram / bandwidth)
-> >
-> > expected_downtime = (remaining ram + redirtied ram) / bandwidth
-> >
-> > Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> > ---
-> >  migration/migration.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index ffc4d9e556..dc38e9a380 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -2903,7 +2903,13 @@ static void migration_update_counters(MigrationState *s,
-> >       * recalculate. 10000 is a small enough number for our purposes
-> >       */
-> >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> > -        s->expected_downtime = ram_counters.remaining / bandwidth;
-> > +        /* Time required to transfer remaining ram */
-> > +        remaining_ram_transfer_time = ram_counters.remaining / bandwidth
-> 
-> missing semicolon
-> 
-> > +
-> > +        /* redirty of ram at the time remaining ram gets transferred*/
-> > +        newly_dirtied_ram = ram_counters.dirty_pages_rate * remaining_ram_transfer_time
-> 
-> the same.
-> 
-> Declaration of the new variables is also missing.
-> 
-> > +        s->expected_downtime = (ram_counters.remaining + newly_dirtied_ram) / bandwidth;
-> >      }
-> >  
-> >      qemu_file_reset_rate_limit(s->to_dst_file);
-> 
-> About the numbers, I am not against it.  It is an heuristic.  Without
-> numbers (and it is very load dependent) it is not clear that this one is
-> going to be much worse/better than previous one (this should be a bit
-> better, though).
 
-Actually I have had a question on how expected_downtime is defined and
-how it will be used by users.
 
-My understanding is that the expected_downtime is defined as: how long
-time the guest will be down if we stop the VM right now and migrate
-all the rest of pages.
+On 23/01/2019 04:01, Fabiano Rosas wrote:
+> These will be used to let GDB know about PPC's Special Purpose
+> Registers (SPR).
+> 
+> They take an index based on the order the registers appear in the XML
+> file sent by QEMU to GDB. This index does not match the actual
+> location of the registers in the env->spr array so the
+> gdb_find_spr_idx function does that conversion.
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index 710064a25d..f29ac3558a 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -9487,6 +9487,55 @@ static bool avr_need_swap(CPUPPCState *env)
+>  #endif
+>  }
+>  
+> +#if !defined(CONFIG_USER_ONLY)
+> +static int gdb_find_spr_idx(CPUPPCState *env, int n)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+> +        ppc_spr_t *spr = &env->spr_cb[i];
+> +
+> +        if (spr->name && spr->gdb_id == n) {
+> +            return i;
+> +        }
+> +    }
+> +    return -1;
+> +}
+> +
+> +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> +{
+> +    int reg;
+> +    int len;
+> +
+> +    reg = gdb_find_spr_idx(env, n);
+> +    if (reg < 0) {
+> +        return 0;
+> +    }
+> +
+> +    len = TARGET_LONG_SIZE;
+> +    stn_p(mem_buf, len, env->spr[reg]);
+> +    ppc_maybe_bswap_register(env, mem_buf, len);
 
-This definition makes sense in that it helps the customer to
-dynamically decide whether it's a good point to go into the last phase
-of migration.  Currently we should be able to achieve that by setting
-a very high target downtime.
 
-And if that definition is the thing we want, the current calculation
-seems exactly the number we want, since if we stop the VM right now
-then there won't be any more data to be dirtied as well.
+I am confused by this as it produces different results depending on the
+guest mode:
 
-Regards,
+(gdb) p $pvr
+$1 = 0x14c0000000000
+(gdb) c
+Continuing.
+Program received signal SIGINT, Interrupt.
+(gdb) p $pvr
+$2 = 0x4c0100
+
+
+First print is when I stopped the guest in the SLOF firmware (so it is
+big-endian) and then I continued and stopped gdb when the guest booted a
+little-endian system; the KVM host is little endian, the machine running
+gdb is LE too.
+
+QEMU monitor prints the same 0x4c0100 in both cases.
+
+I am adding the inventor of maybe_bswap_register() in cc: for
+assistance. Swapping happens:
+- once for BE: after stn_p()
+	*(unsigned long *)mem_buf is 0x14c0000000000
+- twice for LE.
+
+
+
+
+
+> +    return len;
+> +}
+> +
+> +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> +{
+> +    int reg;
+> +    int len;
+> +
+> +    reg = gdb_find_spr_idx(env, n);
+> +    if (reg < 0) {
+> +        return 0;
+> +    }
+> +
+> +    len = TARGET_LONG_SIZE;
+> +    ppc_maybe_bswap_register(env, mem_buf, len);
+> +    env->spr[reg] = ldn_p(mem_buf, len);
+> +
+> +    return len;
+> +}
+> +#endif
+> +
+>  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>  {
+>      if (n < 32) {
+> @@ -9716,7 +9765,10 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+>          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+>                                   32, "power-vsx.xml", 0);
+>      }
+> -
+> +#ifndef CONFIG_USER_ONLY
+> +    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
+> +                             pcc->gdb_num_sprs, "power-spr.xml", 0);
+> +#endif
+>      qemu_init_vcpu(cs);
+>  
+>      pcc->parent_realize(dev, errp);
+> 
 
 -- 
-Peter Xu
+Alexey
