@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60940)
+Received: from eggs.gnu.org ([209.51.188.92]:33072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gmicQ-0000pQ-Fp
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:16:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmidS-0001Qs-9V
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gmicP-0004Hs-MQ
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:16:46 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 24 Jan 2019 17:57:56 +0100
-Message-Id: <1548349076-350255-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] s390x: remove direct reference to mem_path
- global form s90x code
+	(envelope-from <philmd@redhat.com>) id 1gmidQ-0005ip-5r
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:17:50 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmidP-0005WR-Vh
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:17:48 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r10so7327251wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 09:17:24 -0800 (PST)
+References: <20190124162045.10474-1-sourav.jb1988@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <242af973-21e9-9753-7263-839d118c7be5@redhat.com>
+Date: Thu, 24 Jan 2019 18:17:22 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190124162045.10474-1-sourav.jb1988@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw: sd: set category of the sd memory card
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,89 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pasic@linux.ibm.com, cohuck@redhat.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org
+To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: thuth@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org
 
-I plan to deprecate -mem-path option and replace it with memory-backend,
-for that it's necessary to get rid of mem_path global variable.
-Do it for s390x case, replacing it with alternative way to enable
-1Mb hugepages capability.
+On 1/24/19 5:20 PM, kumar sourav wrote:
+> Sets the category of the sd memory card as DEVICE_CATEGORY_STORAGE.
+> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
+> 
+> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-PS:
-Original code nor the new one probably is not entirely correct when
-huge pages are enabled in case where mixed initial RAM and memory
-backends are used, backend's page size might not match initial RAM's
-so I'm not sure if enabling 1MB cap is correct in this case on s390
-(should it be the same for all RAM???).
-With new approach 1Mb cap is not enabled if the smallest page size
-is not 1Mb.
----
- target/s390x/kvm.c | 37 ++++++++++++++++---------------------
- 1 file changed, 16 insertions(+), 21 deletions(-)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 2ebf26a..22e868a 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -285,33 +285,28 @@ void kvm_s390_crypto_reset(void)
-     }
- }
- 
--static int kvm_s390_configure_mempath_backing(KVMState *s)
-+static int kvm_s390_configure_hugepage_backing(KVMState *s)
- {
--    size_t path_psize = qemu_mempath_getpagesize(mem_path);
-+    size_t psize = qemu_getrampagesize();
- 
--    if (path_psize == 4 * KiB) {
--        return 0;
--    }
--
--    if (!hpage_1m_allowed()) {
--        error_report("This QEMU machine does not support huge page "
--                     "mappings");
--        return -EINVAL;
--    }
-+    if (psize == 1 * MiB) {
-+        if (!hpage_1m_allowed()) {
-+            error_report("This QEMU machine does not support huge page "
-+                         "mappings");
-+            return -EINVAL;
-+        }
- 
--    if (path_psize != 1 * MiB) {
-+        if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-+            error_report("Memory backing with 1M pages was specified, "
-+                         "but KVM does not support this memory backing");
-+            return -EINVAL;
-+        }
-+        cap_hpage_1m = 1;
-+    } else if (psize == 2 * GiB) {
-         error_report("Memory backing with 2G pages was specified, "
-                      "but KVM does not support this memory backing");
-         return -EINVAL;
-     }
--
--    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
--        error_report("Memory backing with 1M pages was specified, "
--                     "but KVM does not support this memory backing");
--        return -EINVAL;
--    }
--
--    cap_hpage_1m = 1;
-     return 0;
- }
- 
-@@ -319,7 +314,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
- 
--    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-+    if (kvm_s390_configure_hugepage_backing(s)) {
-         return -EINVAL;
-     }
- 
--- 
-2.7.4
+> ---
+>  hw/sd/sd.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index d4356e9b73..aaab15f386 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -2121,6 +2121,7 @@ static void sd_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &sd_vmstate;
+>      dc->reset = sd_reset;
+>      dc->bus_type = TYPE_SD_BUS;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>  
+>      sc->set_voltage = sd_set_voltage;
+>      sc->get_dat_lines = sd_get_dat_lines;
+> 
