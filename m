@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58544)
+Received: from eggs.gnu.org ([209.51.188.92]:58494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmfFn-0005mN-Ke
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:41:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmfFs-0005kW-Dn
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmf0h-0002ko-Gt
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:25:36 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:34188)
+	(envelope-from <peter.maydell@linaro.org>) id 1gmezy-00028Z-1y
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:24:52 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmf0d-0002gl-KO
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:25:32 -0500
-Received: by mail-oi1-x236.google.com with SMTP id r62so4820693oie.1
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:25:30 -0800 (PST)
+	id 1gmezr-0001vS-UG
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:24:46 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 32so5149777ota.12
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:24:34 -0800 (PST)
 MIME-Version: 1.0
-References: <20190123183352.11025-1-stefanha@redhat.com>
-In-Reply-To: <20190123183352.11025-1-stefanha@redhat.com>
+References: <20190121154928.32065-1-clg@kaod.org>
+In-Reply-To: <20190121154928.32065-1-clg@kaod.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 Jan 2019 13:25:18 +0000
-Message-ID: <CAFEAcA8PaYpHLq9ZEwQES3a3RLKSdN3KD0YfxCwGtN8b3mrA2w@mail.gmail.com>
+Date: Thu, 24 Jan 2019 13:24:21 +0000
+Message-ID: <CAFEAcA-n-5GVpnKn_w03bJUR2Wxf=vCtyeXt1GK=PKEzvahTMg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] MAINTAINERS: update microbit ARM board
- files
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] aspeed/smc: snoop SPI transfers to fake
+ dummy cycles
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Francisco Iglesias <frasse.iglesias@gmail.com>
 
-On Wed, 23 Jan 2019 at 18:36, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Mon, 21 Jan 2019 at 15:49, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> New source files were added without corresponding ./MAINTAINERS file
-> entries.  Let's get things up to date.
+> The m25p80 models dummy cycles using byte transfers. This works well
+> when the transfers are initiated by the QEMU model of a SPI controller
+> but when these are initiated by the OS, it breaks emulation.
 >
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Snoop the SPI transfer to catch commands requiring dummy cycles and
+> replace them with byte transfers compatible with the m25p80 model.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
-> v2:
->  * Simplify using wildcard patterns [Thomas]
-> ---
->  MAINTAINERS | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
 
+This fails to compile:
 
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/ssi/aspeed_smc.c: In
+function =E2=80=98aspeed_smc_do_snoop=E2=80=99:
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/ssi/aspeed_smc.c:646:42:
+error: =E2=80=98R_DUMMY_DATA=E2=80=99 undeclared (first use in this functio=
+n)
+             ssi_transfer(s->spi, s->regs[R_DUMMY_DATA] & 0xff);
+                                          ^
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/ssi/aspeed_smc.c:646:42:
+note: each undeclared identifier is reported only once for each
+function it appears in
+/home/petmay01/linaro/qemu-from-laptop/qemu/rules.mak:69: recipe for
+target 'hw/ssi/aspeed_smc.o' failed
 
-Applied to target-arm.next, thanks.
+Is it dependent on some other patch ?
 
+thanks
 -- PMM
