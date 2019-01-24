@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39593)
+Received: from eggs.gnu.org ([209.51.188.92]:39946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=920fe819b=Alistair.Francis@wdc.com>)
-	id 1gmiwz-0003Er-0z
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:38:01 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gmixc-0003hF-Md
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:38:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=920fe819b=Alistair.Francis@wdc.com>)
-	id 1gmiwx-00024K-0y
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:38:00 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 24 Jan 2019 17:37:47 +0000
-Message-ID: <2b9ba958f8b317df83c37b348ad543fef2113528.1548351450.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gmixZ-0002W2-Fw
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:38:40 -0500
+References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
+	<e18d32e6-4c6f-1d42-7e90-ef9d84721524@tuxfamily.org>
+	<3d217d08-56c9-4bab-f897-9ebe67910168@vivier.eu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <e400f594-288d-38bb-2b15-4d7d50bfcf76@ilande.co.uk>
+Date: Thu, 24 Jan 2019 17:37:59 +0000
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v3 1/1] riscv: Ensure the kernel start address
- is correctly cast
+In-Reply-To: <3d217d08-56c9-4bab-f897-9ebe67910168@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-Cast the kernel start address to the target bit length.
+On 24/01/2019 17:15, Laurent Vivier wrote:
 
-This ensures that we calculate the initrd offset to a valid address for
-the architecture.
+> On 24/01/2019 18:02, Thomas Huth wrote:
+>> On 2018-11-02 16:22, Mark Cave-Ayland wrote:
+>>> (MCA: here's the latest version of the q800 patchset. I've hope that I've
+>>> addressed most of the comments, plus this will now boot into the Debian
+>>> installer correctly when applied to git master.
+>>
+>> Any update on this series? Why did it get stalled again?
+>>
+> 
+> I was thinking about this today.
+> 
+> Mark, perhaps you can send a rebased version of the series?
+> 
+> I think we need reviews for "esp: add pseudo-DMA as used by Macintosh".
 
-Steps to reproduce the original problem (reported by Alex):
-  Build U-Boot for the virt machine for riscv32. Then run it with
+I've just done a quick rebase and push of my latest branch to
+https://github.com/mcayland/qemu/tree/q800-dev-part1-mca and from what I can tell it
+still boots using the test command line in both graphic and -nographic mode.
 
-    $ qemu-system-riscv32 -M virt -kernel u-boot -nographic -initrd <a file=
->
+Unfortuantely I have a lot less time this dev cycle than normal, so I'm going to hand
+this back over to Laurent for now while I focus back on SPARC/PPC. From my notes the
+outstanding things to look at are:
 
-  You can find the initrd address with
 
-    U-Boot# fdt addr $fdtcontroladdr
-    U-Boot# fdt ls /chosen
+1) Do we mind some of the more verbose comments that were taken from the Linux
+headers in some of the files? (I can also see that updates to the comment checking in
+checkpatch.pl now cause the series to fail with style issues, so these will need to
+be touched up regardless)
 
-  Then take a peek at that address:
+2) Do we need to add migration support for the ESP pseudo-DMA?
 
-    U-Boot# md.b <addr>
+3) Is there a Linux test docker image available?
 
-  and you will see that there is nothing there without this patch. The
-  reason is that the binary was loaded to a negative address.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Suggested-by: Alexander Graf <agraf@suse.de>
-Reported-by: Alexander Graf <agraf@suse.de>
----
-v3:
- - Add steps to reproduce
-v2:
- - Remove old comment
- hw/riscv/sifive_e.c | 2 +-
- hw/riscv/sifive_u.c | 2 +-
- hw/riscv/spike.c    | 2 +-
- hw/riscv/virt.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+Other than these points I think the series is about good to go.
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 5d9d65ff29..e5d7fc548e 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -74,7 +74,7 @@ static const struct MemmapEntry {
-     [SIFIVE_E_DTIM] =3D     { 0x80000000,     0x4000 }
- };
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 3bd3b67507..3b3acec377 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -65,7 +65,7 @@ static const struct MemmapEntry {
-=20
- #define GEM_REVISION        0x10070109
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 268df04c3c..79cb4c1282 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -53,7 +53,7 @@ static const struct MemmapEntry {
-     [SPIKE_DRAM] =3D     { 0x80000000,        0x0 },
- };
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index e7f0716fb6..648462b18c 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -62,7 +62,7 @@ static const struct MemmapEntry {
-     [VIRT_PCIE_ECAM] =3D   { 0x30000000,    0x10000000 },
- };
-=20
--static uint64_t load_kernel(const char *kernel_filename)
-+static target_ulong load_kernel(const char *kernel_filename)
- {
-     uint64_t kernel_entry, kernel_high;
-=20
---=20
-2.19.1
+
+ATB,
+
+Mark.
