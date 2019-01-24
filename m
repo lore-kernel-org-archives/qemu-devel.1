@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47645)
+Received: from eggs.gnu.org ([209.51.188.92]:56292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmXoy-0005y5-Qt
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 00:45:01 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmYqF-0008OR-1w
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 01:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmXox-0005u7-Qt
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 00:45:00 -0500
-Received: from mga09.intel.com ([134.134.136.24]:20750)
+	(envelope-from <kraxel@redhat.com>) id 1gmYfE-0006e3-DJ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 01:39:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gmXox-0005ix-Fd
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 00:44:59 -0500
-Date: Thu, 24 Jan 2019 22:15:24 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190124141524.GB9821@tiger-server>
-References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-	<286542bc2f48b0dd6a657f363a8e933806cac92d.1548136274.git.yi.z.zhang@linux.intel.com>
-	<20190123100252-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmYfC-0006V5-E6
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 01:38:58 -0500
+Date: Thu, 24 Jan 2019 07:38:51 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190124063851.zhjlx5oigvri4r64@sirius.home.kraxel.org>
+References: <20190123101238.GD27270@redhat.com>
+	<379cce5d-71e1-b210-c0de-c0b8a478de3a@gmx.com>
+	<CAFEAcA-HOjPGz2U4wXJ_ujbUmHn1V2PohiL8wPkPz8iV6TPSig@mail.gmail.com>
+	<52937a07-9462-6910-610c-5b1ee5d2541a@gmx.com>
+	<20190123122015.uvyqe4vsxhhgugz7@sirius.home.kraxel.org>
+	<da0587e0-44a2-a0f8-3df4-628973db42fd@gmx.com>
+	<20190123135903.v2jjfpsp5pqitva4@sirius.home.kraxel.org>
+	<ddf0684d-37cb-1860-9b73-0b23bd5dbde6@comstyle.com>
+	<20190123151257.3bchv7msj754jyt2@sirius.home.kraxel.org>
+	<94b6e045-2348-b64b-048b-e585a236201c@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190123100252-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V10 2/4] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <94b6e045-2348-b64b-048b-e585a236201c@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] [RfC] audio: probe audio drivers by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 2019-01-23 at 10:04:01 -0500, Michael S. Tsirkin wrote:
-> On Wed, Jan 23, 2019 at 10:59:45AM +0800, Zhang, Yi wrote:
-> > From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > 
-> > When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> > MAP_SYNC flag in addition which can ensure file system metadata
-> > synced in each guest writes to the backend file, without other QEMU
-> > actions (e.g., periodic fsync() by QEMU).
-> > 
-> > Current, We have below different possible use cases:
-> > 
-> > 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-> >    a: backend is a dax supporting file.
-> >     - MAP_SYNC will active.
-> >    b: backend is not a dax supporting file.
-> >     - mmap will result in an EOPNOTSUPP error.
-> > 
-> > 2. The rest of cases:
-> >    - we will never pass the MAP_SYNC to mmap2
-> > 
-> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > ---
-> >  include/qemu/mmap-alloc.h |  1 +
-> >  include/qemu/osdep.h      | 21 +++++++++++++++++++++
-> >  util/mmap-alloc.c         |  7 ++++++-
-> >  3 files changed, 28 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-> > index 6fe6ed4..a95d91c 100644
-> > --- a/include/qemu/mmap-alloc.h
-> > +++ b/include/qemu/mmap-alloc.h
-> > @@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
-> >   *  @flags: specifies additional properties of the mapping, which can be one or
-> >   *          bit-or of following values
-> >   *          - RAM_SHARED: mmap with MAP_SHARED flag
-> > + *          - RAM_PMEM: mmap with MAP_SYNC flag
-> >   *          Other bits are ignored.
-> >   *
-> >   * Return:
-> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > index 457d24e..3bcf155 100644
-> > --- a/include/qemu/osdep.h
-> > +++ b/include/qemu/osdep.h
-> > @@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
-> >  #  define QEMU_VMALLOC_ALIGN getpagesize()
-> >  #endif
-> >  
-> > +/*
-> > + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
-> > + * 4.15, so they may not be defined when compiling on older kernels.
-> > + */
-> 
-> 
-> I commented on this part in v7. That's a wrong way to handle
-> compatibility.
-I'm a little confused that, you point me that should use 
-#include <linux/mman.h>
-here in v9, so what is best way to handle compatibility? 
-modify the update-linux-headers.sh and copy the mman.h to
-standard-headers/linux/?
-and #incldue standard-headers/linux/mman.h ?
+  Hi,
 
-but it still need fix the compatibility. if the MAP_SYNC not defined in
-the old kernel. Right?
-forgive me my poor understandings, I'm pazzled.
+> > https://xkcd.com/927/
 > 
-> > +#ifdef CONFIG_LINUX
-> > +
-> > +#include <linux/mman.h>
-> > +
-> > +#ifndef MAP_SYNC
-> > +#define MAP_SYNC 0x0
-> > +#endif
-> > +
-> > +#ifndef MAP_SHARED_VALIDATE
-> > +#define MAP_SHARED_VALIDATE 0x0
-> > +#endif
-> > +
+> There is a different context on BSD than on Linux. We can choose one
+> solution and switch to it literally all the software keeping everything
+> in a single ports tree.
 > 
+> This is what happened on OpenBSD.
 > 
-> 
-> 
-> > +#else  /* !CONFIG_LINUX */
-> > +#define MAP_SYNC              0x0
-> > +#define MAP_SHARED_VALIDATE   0x0
-> > +#endif /* CONFIG_LINUX */
-> > +
-> >  #ifdef CONFIG_POSIX
-> >  struct qemu_signalfd_siginfo {
-> >      uint32_t ssi_signo;   /* Signal number */
-> > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> > index 8f0a740..a4ce9b5 100644
-> > --- a/util/mmap-alloc.c
-> > +++ b/util/mmap-alloc.c
-> > @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
-> >      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-> >  #endif
-> >      bool shared = flags & RAM_SHARED;
-> > +    bool is_pmem = flags & RAM_PMEM;
-> > +    int mmap_xflags = 0;
-> >      size_t offset;
-> >      void *ptr1;
-> >  
-> > @@ -109,12 +111,15 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
-> >      assert(is_power_of_2(align));
-> >      /* Always align to host page size */
-> >      assert(align >= getpagesize());
-> > +    if (shared && is_pmem) {
-> > +        mmap_xflags |= (MAP_SYNC | MAP_SHARED_VALIDATE);
-> > +    }
-> >  
-> >      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-> >      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-> >                  MAP_FIXED |
-> >                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> > -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> > +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
-> >                  fd, 0);
-> >      if (ptr1 == MAP_FAILED) {
-> >          munmap(ptr, total);
-> > -- 
-> > 2.7.4
+> The result is that almost everything uses sndio, and pulseaudio is far
+> behind in adoption in any distro.
+
+I'm not going to join the sndio vs. pulse discussion.
+
+But from a maintenance point of view it sucks big time to have a bunch
+of ways to play sound, and everybody uses a different one so you have to
+maintain a backend for each of those methods.
+
+Maybe we should outsource that problem.  Write a gstreamer backend, then
+delete oss/alsa/sdl/pulse/whatever backends and let gstreamer handle
+that mess ...
+
+cheers,
+  Gerd
