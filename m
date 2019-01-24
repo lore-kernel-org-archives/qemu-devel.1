@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45298)
+Received: from eggs.gnu.org ([209.51.188.92]:45198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmhnO-0002f5-Gz
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:24:03 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmhnW-0002c9-9h
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:24:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmhhp-0000Y2-Le
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:18:18 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 24 Jan 2019 16:18:13 +0000
-Message-ID: <bcf01a3b-fea8-d170-416a-f04d78a63822@virtuozzo.com>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-In-Reply-To: <20190124141731.21509-1-kwolf@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C9A45F4B5684C445B22F1E761226668B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gmhej-0005yA-4c
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:15:08 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmheh-0005wV-VC
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:15:04 -0500
+Received: by mail-wm1-f67.google.com with SMTP id g67so3665370wmd.2
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 08:15:03 -0800 (PST)
+References: <20190124115448.30487-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8d194bb9-dd0d-7987-b965-dc778d942a34@redhat.com>
+Date: Thu, 24 Jan 2019 17:15:00 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+In-Reply-To: <20190124115448.30487-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] tests/vm: move images to
+ $HOME/.cache/qemu-vm/images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>
 
-MjQuMDEuMjAxOSAxNzoxNywgS2V2aW4gV29sZiB3cm90ZToNCj4gRGVwZW5kaW5nIG9uIHRoZSBl
-eGFjdCBpbWFnZSBsYXlvdXQgYW5kIHRoZSBzdG9yYWdlIGJhY2tlbmQgKHRtcGZzIGlzDQo+IGtv
-bnduIHRvIGhhdmUgdmVyeSBzbG93IFNFRUtfSE9MRS9TRUVLX0RBVEEpLCBjYWNoaW5nIGxzZWVr
-IHJlc3VsdHMgY2FuDQo+IHNhdmUgdXMgYSBsb3Qgb2YgdGltZSBlLmcuIGR1cmluZyBhIG1pcnJv
-ciBibG9jayBqb2Igb3IgcWVtdS1pbWcgY29udmVydA0KPiB3aXRoIGEgZnJhZ21lbnRlZCBzb3Vy
-Y2UgaW1hZ2UgKC5iZHJ2X2NvX2Jsb2NrX3N0YXR1cyBvbiB0aGUgcHJvdG9jb2wNCj4gbGF5ZXIg
-Y2FuIGJlIGNhbGxlZCBmb3IgZXZlcnkgc2luZ2xlIGNsdXN0ZXIgaW4gdGhlIGV4dHJlbWUgY2Fz
-ZSkuDQo+IA0KPiBXZSBtYXkgb25seSBjYWNoZSBkYXRhIHJlZ2lvbnMgYmVjYXVzZSBvZiBwb3Nz
-aWJsZSBjb25jdXJyZW50IHdyaXRlcnMuDQo+IFRoaXMgbWVhbnMgdGhhdCB3ZSBjYW4gbGF0ZXIg
-dHJlYXQgYSByZWNlbnRseSBwdW5jaGVkIGhvbGUgYXMgZGF0YSwgYnV0DQo+IHRoaXMgaXMgc2Fm
-ZS4gV2UgY2FuJ3QgY2FjaGUgaG9sZXMgYmVjYXVzZSB0aGVuIHdlIG1pZ2h0IHRyZWF0IHJlY2Vu
-dGx5DQo+IHdyaXR0ZW4gZGF0YSBhcyBob2xlcywgd2hpY2ggY2FuIGNhdXNlIGNvcnJ1cHRpb24u
-DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPiAt
-LS0NCj4gICBibG9jay9maWxlLXBvc2l4LmMgfCA1MSArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKy0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDQ5IGluc2VydGlvbnMo
-KyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svZmlsZS1wb3NpeC5j
-IGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+IGluZGV4IDhhZWU3YTNmYjguLjcyNzJjN2M5OWQgMTAw
-NjQ0DQo+IC0tLSBhL2Jsb2NrL2ZpbGUtcG9zaXguYw0KPiArKysgYi9ibG9jay9maWxlLXBvc2l4
-LmMNCj4gQEAgLTE2OCw2ICsxNjgsMTIgQEAgdHlwZWRlZiBzdHJ1Y3QgQkRSVlJhd1N0YXRlIHsN
-Cj4gICAgICAgYm9vbCBuZWVkc19hbGlnbm1lbnQ7DQo+ICAgICAgIGJvb2wgY2hlY2tfY2FjaGVf
-ZHJvcHBlZDsNCj4gICANCj4gKyAgICBzdHJ1Y3Qgc2Vla19kYXRhX2NhY2hlIHsNCj4gKyAgICAg
-ICAgYm9vbCAgICAgICAgdmFsaWQ7DQo+ICsgICAgICAgIHVpbnQ2NF90ICAgIHN0YXJ0Ow0KPiAr
-ICAgICAgICB1aW50NjRfdCAgICBlbmQ7DQo+ICsgICAgfSBzZWVrX2RhdGFfY2FjaGU7DQo+ICsN
-Cj4gICAgICAgUFJNYW5hZ2VyICpwcl9tZ3I7DQo+ICAgfSBCRFJWUmF3U3RhdGU7DQo+ICAgDQo+
-IEBAIC0xNTU1LDggKzE1NjEsMTcgQEAgc3RhdGljIGludCBoYW5kbGVfYWlvY2Jfd3JpdGVfemVy
-b2VzX3VubWFwKHZvaWQgKm9wYXF1ZSkNCj4gICB7DQo+ICAgICAgIFJhd1Bvc2l4QUlPRGF0YSAq
-YWlvY2IgPSBvcGFxdWU7DQo+ICAgICAgIEJEUlZSYXdTdGF0ZSAqcyBHX0dOVUNfVU5VU0VEID0g
-YWlvY2ItPmJzLT5vcGFxdWU7DQo+ICsgICAgc3RydWN0IHNlZWtfZGF0YV9jYWNoZSAqc2RjOw0K
-PiAgICAgICBpbnQgcmV0Ow0KPiAgIA0KPiArICAgIC8qIEludmFsaWRhdGUgc2Vla19kYXRhX2Nh
-Y2hlIGlmIGl0IG92ZXJsYXBzICovDQo+ICsgICAgc2RjID0gJnMtPnNlZWtfZGF0YV9jYWNoZTsN
-Cj4gKyAgICBpZiAoc2RjLT52YWxpZCAmJiAhKHNkYy0+ZW5kIDwgYWlvY2ItPmFpb19vZmZzZXQg
-fHwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIHNkYy0+c3RhcnQgPiBhaW9jYi0+YWlvX29m
-ZnNldCArIGFpb2NiLT5haW9fbmJ5dGVzKSkNCg0KdG8gYmUgcHJlc2l6ZTogPD0gYW5kID49DQoN
-Cj4gKyAgICB7DQo+ICsgICAgICAgIHNkYy0+dmFsaWQgPSBmYWxzZTsNCj4gKyAgICB9DQo+ICsN
-Cj4gICAgICAgLyogRmlyc3QgdHJ5IHRvIHdyaXRlIHplcm9zIGFuZCB1bm1hcCBhdCB0aGUgc2Ft
-ZSB0aW1lICovDQo+ICAgDQoNCg0KV2h5IG5vdCB0byBkcm9wIGNhY2hlIG9uIGhhbmRsZV9haW9j
-Yl93cml0ZV96ZXJvZXMoKT8gT3RoZXJ3aXNlLCB3ZSdsbCByZXR1cm4gREFUQQ0KZm9yIHRoZXNl
-IHJlZ2lvbnMgd2hpY2ggbWF5IHVuYWxsb2NhdGVkIHJlYWQtYXMtemVybywgaWYgSSdtIG5vdCBt
-aXN0YWtlbi4NCg0KDQo+ICAgI2lmZGVmIENPTkZJR19GQUxMT0NBVEVfUFVOQ0hfSE9MRQ0KPiBA
-QCAtMTYzNCwxMSArMTY0OSwyMCBAQCBzdGF0aWMgaW50IGhhbmRsZV9haW9jYl9kaXNjYXJkKHZv
-aWQgKm9wYXF1ZSkNCj4gICAgICAgUmF3UG9zaXhBSU9EYXRhICphaW9jYiA9IG9wYXF1ZTsNCj4g
-ICAgICAgaW50IHJldCA9IC1FT1BOT1RTVVBQOw0KPiAgICAgICBCRFJWUmF3U3RhdGUgKnMgPSBh
-aW9jYi0+YnMtPm9wYXF1ZTsNCj4gKyAgICBzdHJ1Y3Qgc2Vla19kYXRhX2NhY2hlICpzZGM7DQo+
-ICAgDQo+ICAgICAgIGlmICghcy0+aGFzX2Rpc2NhcmQpIHsNCj4gICAgICAgICAgIHJldHVybiAt
-RU5PVFNVUDsNCj4gICAgICAgfQ0KPiAgIA0KPiArICAgIC8qIEludmFsaWRhdGUgc2Vla19kYXRh
-X2NhY2hlIGlmIGl0IG92ZXJsYXBzICovDQo+ICsgICAgc2RjID0gJnMtPnNlZWtfZGF0YV9jYWNo
-ZTsNCj4gKyAgICBpZiAoc2RjLT52YWxpZCAmJiAhKHNkYy0+ZW5kIDwgYWlvY2ItPmFpb19vZmZz
-ZXQgfHwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIHNkYy0+c3RhcnQgPiBhaW9jYi0+YWlv
-X29mZnNldCArIGFpb2NiLT5haW9fbmJ5dGVzKSkNCg0KYW5kIDw9IGFuZCA+PQ0KDQphbmQgaWYg
-YWRkIHNhbWUgdG8gaGFuZGxlX2Fpb2NiX3dyaXRlX3plcm9lcygpLCB0aGVuIGl0IHdvcnRoIHRv
-IGNyZWF0ZSBoZWxwZXIgZnVuY3Rpb24NCnRvIGludmFsaWRhdGUgY2FjaGUuDQoNCj4gKyAgICB7
-DQo+ICsgICAgICAgIHNkYy0+dmFsaWQgPSBmYWxzZTsNCj4gKyAgICB9DQo+ICsNCj4gICAgICAg
-aWYgKGFpb2NiLT5haW9fdHlwZSAmIFFFTVVfQUlPX0JMS0RFVikgew0KPiAgICNpZmRlZiBCTEtE
-SVNDQVJEDQo+ICAgICAgICAgICBkbyB7DQo+IEBAIC0yNDI0LDYgKzI0NDgsOCBAQCBzdGF0aWMg
-aW50IGNvcm91dGluZV9mbiByYXdfY29fYmxvY2tfc3RhdHVzKEJsb2NrRHJpdmVyU3RhdGUgKmJz
-LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRf
-dCAqbWFwLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-QmxvY2tEcml2ZXJTdGF0ZSAqKmZpbGUpDQo+ICAgew0KPiArICAgIEJEUlZSYXdTdGF0ZSAqcyA9
-IGJzLT5vcGFxdWU7DQo+ICsgICAgc3RydWN0IHNlZWtfZGF0YV9jYWNoZSAqc2RjOw0KPiAgICAg
-ICBvZmZfdCBkYXRhID0gMCwgaG9sZSA9IDA7DQo+ICAgICAgIGludCByZXQ7DQo+ICAgDQo+IEBA
-IC0yNDM5LDYgKzI0NjUsMTQgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gcmF3X2NvX2Jsb2Nr
-X3N0YXR1cyhCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgICAgIHJldHVybiBCRFJWX0JM
-T0NLX0RBVEEgfCBCRFJWX0JMT0NLX09GRlNFVF9WQUxJRDsNCj4gICAgICAgfQ0KPiAgIA0KPiAr
-ICAgIHNkYyA9ICZzLT5zZWVrX2RhdGFfY2FjaGU7DQo+ICsgICAgaWYgKHNkYy0+dmFsaWQgJiYg
-c2RjLT5zdGFydCA8PSBvZmZzZXQgJiYgc2RjLT5lbmQgPiBvZmZzZXQpIHsNCj4gKyAgICAgICAg
-KnBudW0gPSBNSU4oYnl0ZXMsIHNkYy0+ZW5kIC0gb2Zmc2V0KTsNCj4gKyAgICAgICAgKm1hcCA9
-IG9mZnNldDsNCj4gKyAgICAgICAgKmZpbGUgPSBiczsNCj4gKyAgICAgICAgcmV0dXJuIEJEUlZf
-QkxPQ0tfREFUQSB8IEJEUlZfQkxPQ0tfT0ZGU0VUX1ZBTElEOw0KPiArICAgIH0NCj4gKw0KPiAg
-ICAgICByZXQgPSBmaW5kX2FsbG9jYXRpb24oYnMsIG9mZnNldCwgJmRhdGEsICZob2xlKTsNCj4g
-ICAgICAgaWYgKHJldCA9PSAtRU5YSU8pIHsNCj4gICAgICAgICAgIC8qIFRyYWlsaW5nIGhvbGUg
-Ki8NCj4gQEAgLTI0NTEsMTQgKzI0ODUsMjcgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gcmF3
-X2NvX2Jsb2NrX3N0YXR1cyhCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgfSBlbHNlIGlm
-IChkYXRhID09IG9mZnNldCkgew0KPiAgICAgICAgICAgLyogT24gYSBkYXRhIGV4dGVudCwgY29t
-cHV0ZSBieXRlcyB0byB0aGUgZW5kIG9mIHRoZSBleHRlbnQsDQo+ICAgICAgICAgICAgKiBwb3Nz
-aWJseSBpbmNsdWRpbmcgYSBwYXJ0aWFsIHNlY3RvciBhdCBFT0YuICovDQo+IC0gICAgICAgICpw
-bnVtID0gTUlOKGJ5dGVzLCBob2xlIC0gb2Zmc2V0KTsNCj4gKyAgICAgICAgKnBudW0gPSBob2xl
-IC0gb2Zmc2V0Ow0KDQpobW0sIHdoeT8gQXQgbGVhc3QgeW91IGRpZG4ndCBtZW50aW9uIGl0IGlu
-IGNvbW1pdC1tZXNzYWdlLi4NCg0KPiAgICAgICAgICAgcmV0ID0gQkRSVl9CTE9DS19EQVRBOw0K
-PiAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgLyogT24gYSBob2xlLCBjb21wdXRlIGJ5dGVz
-IHRvIHRoZSBiZWdpbm5pbmcgb2YgdGhlIG5leHQgZXh0ZW50LiAgKi8NCj4gICAgICAgICAgIGFz
-c2VydChob2xlID09IG9mZnNldCk7DQo+IC0gICAgICAgICpwbnVtID0gTUlOKGJ5dGVzLCBkYXRh
-IC0gb2Zmc2V0KTsNCj4gKyAgICAgICAgKnBudW0gPSBkYXRhIC0gb2Zmc2V0Ow0KPiAgICAgICAg
-ICAgcmV0ID0gQkRSVl9CTE9DS19aRVJPOw0KPiAgICAgICB9DQo+ICsNCj4gKyAgICAvKiBDYWNo
-aW5nIGFsbG9jYXRlZCByYW5nZXMgaXMgb2theSBldmVuIGlmIGFub3RoZXIgcHJvY2VzcyB3cml0
-ZXMgdG8gdGhlDQo+ICsgICAgICogc2FtZSBmaWxlIGJlY2F1c2Ugd2UgYWxsb3cgZGVjbGFyaW5n
-IHRoaW5ncyBhbGxvY2F0ZWQgZXZlbiBpZiB0aGVyZSBpcyBhDQo+ICsgICAgICogaG9sZS4gSG93
-ZXZlciwgd2UgY2Fubm90IGNhY2hlIGhvbGVzIHdpdGhvdXQgcmlza2luZyBjb3JydXB0aW9uLiAq
-Lw0KPiArICAgIGlmIChyZXQgPT0gQkRSVl9CTE9DS19EQVRBKSB7DQo+ICsgICAgICAgICpzZGMg
-PSAoc3RydWN0IHNlZWtfZGF0YV9jYWNoZSkgew0KPiArICAgICAgICAgICAgLnZhbGlkICA9IHRy
-dWUsDQo+ICsgICAgICAgICAgICAuc3RhcnQgID0gb2Zmc2V0LA0KPiArICAgICAgICAgICAgLmVu
-ZCAgICA9IG9mZnNldCArICpwbnVtLA0KPiArICAgICAgICB9Ow0KPiArICAgIH0NCj4gKw0KPiAr
-ICAgICpwbnVtID0gTUlOKCpwbnVtLCBieXRlcyk7DQo+ICAgICAgICptYXAgPSBvZmZzZXQ7DQo+
-ICAgICAgICpmaWxlID0gYnM7DQo+ICAgICAgIHJldHVybiByZXQgfCBCRFJWX0JMT0NLX09GRlNF
-VF9WQUxJRDsNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 1/24/19 12:54 PM, Gerd Hoffmann wrote:
+> It's easier to move around the images then, by replacing the
+> subdirectory with a symlink.  Allows to share the images between
+> multiple qemu checkouts for example.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+> 
+> Notes:
+>     v2: use $HOME/.cache/qemu-vm/images as location
+
+Thanks :)
+
+> 
+>  tests/vm/Makefile.include | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> index a98fb3027f..a58383d263 100644
+> --- a/tests/vm/Makefile.include
+> +++ b/tests/vm/Makefile.include
+> @@ -3,7 +3,8 @@
+>  .PHONY: vm-build-all vm-clean-all
+>  
+>  IMAGES := ubuntu.i386 freebsd netbsd openbsd centos
+> -IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
+> +IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
+> +IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
+>  
+>  .PRECIOUS: $(IMAGE_FILES)
+>  
+> @@ -24,9 +25,10 @@ vm-build-all: $(addprefix vm-build-, $(IMAGES))
+>  vm-clean-all:
+>  	rm -f $(IMAGE_FILES)
+>  
+> -tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
+> -		$(SRC_PATH)/tests/vm/basevm.py \
+> -		$(SRC_PATH)/tests/vm/Makefile.include
+> +$(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+> +			$(SRC_PATH)/tests/vm/basevm.py \
+> +			$(SRC_PATH)/tests/vm/Makefile.include
+> +	@mkdir -p $(IMAGES_DIR)
+>  	$(call quiet-command, \
+>  		$< \
+>  		$(if $(V)$(DEBUG), --debug) \
+> @@ -37,7 +39,7 @@ tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
+>  
+>  
+>  # Build in VM $(IMAGE)
+> -vm-build-%: tests/vm/%.img
+> +vm-build-%: $(IMAGES_DIR)/%.img
+>  	$(call quiet-command, \
+>  		$(SRC_PATH)/tests/vm/$* \
+>  		$(if $(V)$(DEBUG), --debug) \
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
