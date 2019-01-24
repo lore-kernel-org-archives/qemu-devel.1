@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51162)
+Received: from eggs.gnu.org ([209.51.188.92]:51614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd30-0001De-1T
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:51 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmd4B-0001wz-P0
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd2y-0003FV-Fv
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35342)
+	(envelope-from <kraxel@redhat.com>) id 1gmd4B-00051T-3K
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd2w-0002yA-FU
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:48 -0500
-Date: Thu, 24 Jan 2019 12:19:22 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd4A-00050U-RI
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:02 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190124111922.j2dduwjpm76con7w@sirius.home.kraxel.org>
-References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
-	<da5485bb1a115b2cfd3a4484cb5f351c026ae4db.1547681517.git.DirtY.iCE.hu@gmail.com>
-	<20190117092212.ccv7zv4snnuanxtw@sirius.home.kraxel.org>
-	<75f937a5-4ab7-fdf5-f14c-e1ec87226c4a@gmail.com>
-	<20190124074224.vuwxr6gith4txvmj@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124074224.vuwxr6gith4txvmj@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 15/50] audio: reduce glob_audio_state
- usage
+Date: Thu, 24 Jan 2019 12:20:49 +0100
+Message-Id: <20190124112055.547-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] audio: rework driver probing.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +21,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+v3:
+ * drop pa driver for *bsd.
+ * codestyle fixes.
 
-> So, I think with the first part the only open issue is whenever we go
-> with the nested types (i.e. patch #1 as-is) or not.  Given that the
-> one-element-structs added in that patch will get additional fields I
-> think the nesting makes sense.
+Gerd Hoffmann (6):
+  audio: use pkg-config
+  audio: allow optional audio drivers.
+  audio: use try-sdl for openbsd
+  audio: check for pulseaudio daemon pidfile
+  audio: error message tweak
+  audio: probe audio drivers by default
 
-Spoke too soon: scripts/checkpatch.pl flags a bunch of codestyle issues.
+ configure       | 81 ++++++++++++++++++++++++++++++++-------------------------
+ audio/audio.c   | 12 +++++----
+ audio/paaudio.c | 15 +++++++++++
+ 3 files changed, 67 insertions(+), 41 deletions(-)
 
-cheers,
-  Gerd
+-- 
+2.9.3
