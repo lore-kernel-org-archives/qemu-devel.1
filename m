@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36371)
+Received: from eggs.gnu.org ([209.51.188.92]:37146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gme2k-0007sB-Go
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gme51-0000pz-63
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gme2i-00027q-8r
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52389)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gme2g-00021n-Cx
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:34 -0500
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<20190123065618.3520-36-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <149c7475-ed07-ebc3-964c-5b1a7bbf797e@redhat.com>
-Date: Thu, 24 Jan 2019 13:23:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190123065618.3520-36-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v4 35/44] isa: express dependencies
- with kconfig
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gme50-0004mU-5O
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:25:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 24 Jan 2019 15:25:25 +0300
+Message-Id: <20190124122525.145968-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190124122525.145968-1-vsementsov@virtuozzo.com>
+References: <20190124122525.145968-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 2/2] iotest: fix 169: do not run qmp_cont in
+ RUN_STATE_FINISH_MIGRATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +20,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, lcapitulino@redhat.com, dgilbert@redhat.com
 
-On 2019-01-23 07:56, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/i386-softmmu.mak | 9 ---------
->  hw/audio/Kconfig                 | 2 ++
->  hw/block/Kconfig                 | 2 ++
->  hw/char/Kconfig                  | 6 ++++++
->  hw/display/Kconfig               | 3 +++
->  hw/i386/Kconfig                  | 1 +
->  hw/ide/Kconfig                   | 1 +
->  hw/input/Kconfig                 | 2 ++
->  hw/isa/Kconfig                   | 5 +++++
->  hw/misc/Kconfig                  | 4 ++++
->  hw/net/Kconfig                   | 3 +++
->  hw/watchdog/Kconfig              | 2 ++
->  12 files changed, 31 insertions(+), 9 deletions(-)
+qmp_cont fails if vm in RUN_STATE_FINISH_MIGRATE, so let's wait for
+final RUN_STATE_POSTMIGRATE. Also, while being here, check qmp_cont
+result.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/169 | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
+index 527aebd0cb..7e06cc1145 100755
+--- a/tests/qemu-iotests/169
++++ b/tests/qemu-iotests/169
+@@ -102,12 +102,17 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
+             event = self.vm_a.event_wait('MIGRATION')
+             if event['data']['status'] == 'completed':
+                 break
++        while True:
++            result = self.vm_a.qmp('query-status')
++            if (result['return']['status'] == 'postmigrate'):
++                break
+ 
+         # test that bitmap is still here
+         removed = (not migrate_bitmaps) and persistent
+         self.check_bitmap(self.vm_a, False if removed else sha256)
+ 
+-        self.vm_a.qmp('cont')
++        result = self.vm_a.qmp('cont')
++        self.assert_qmp(result, 'return', {})
+ 
+         # test that bitmap is still here after invalidation
+         self.check_bitmap(self.vm_a, sha256)
+-- 
+2.18.0
