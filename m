@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59018)
+Received: from eggs.gnu.org ([209.51.188.92]:34923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmbhW-0006nP-MO
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:53:35 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gmc7Z-0002dD-MR
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmbhV-0004X5-W3
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:53:34 -0500
-References: <20190123212234.32068-1-stefanha@redhat.com>
-	<20190123212234.32068-6-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8b7397c4-1e92-0e8f-b394-1d8f45141623@redhat.com>
-Date: Thu, 24 Jan 2019 10:53:16 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gmc6o-0006Ws-Ho
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:19:43 -0500
+Date: Thu, 24 Jan 2019 11:19:34 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190124111934.72e7f0f1.cohuck@redhat.com>
+In-Reply-To: <42264dd9-86d7-8994-8c25-bc688067725d@linux.ibm.com>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<20190122193346.4e23e018@oc2783563651>
+	<20190123112112.7822b237.cohuck@redhat.com>
+	<42264dd9-86d7-8994-8c25-bc688067725d@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190123212234.32068-6-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] tests/microbit-test: Add tests for
- nRF51 NVMC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Joel Stanley <joel@jms.id.au>, qemu-block@nongnu.org, qemu-arm@nongnu.org, jusual@mail.ru, Laurent Vivier <lvivier@redhat.com>, jim@groklearning.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, Richard Henderson <rth@twiddle.net>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On 2019-01-23 22:22, Stefan Hajnoczi wrote:
-> From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
->=20
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/microbit-test.c | 97 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 97 insertions(+)
->=20
-> diff --git a/tests/microbit-test.c b/tests/microbit-test.c
-> index 0c125535f6..d3edd38643 100644
-> --- a/tests/microbit-test.c
-> +++ b/tests/microbit-test.c
-> @@ -20,8 +20,104 @@
-> =20
->  #include "hw/arm/nrf51.h"
->  #include "hw/gpio/nrf51_gpio.h"
-> +#include "hw/nvram/nrf51_nvm.h"
->  #include "hw/timer/nrf51_timer.h"
-> =20
-> +#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
-> +
-> +static void fill_and_erase(hwaddr base, hwaddr size, uint32_t address_=
-reg)
-> +{
-> +    hwaddr i;
-> +
-> +    /* Erase Page */
-> +    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-> +    writel(NRF51_NVMC_BASE + address_reg, base);
-> +    writel(NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
+On Thu, 24 Jan 2019 11:08:02 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-I think you might have a conflict here with Julia's patch
-"tests/microbit-test: Make test independent of global_qtest". Could you
-please have a look (and e.g. include Julia's patches in your series)?
+> On 23/01/2019 11:21, Cornelia Huck wrote:
+> > On Tue, 22 Jan 2019 19:33:46 +0100
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> >> On Mon, 21 Jan 2019 12:03:51 +0100
+> >> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>  
+> >>> --- a/drivers/s390/cio/vfio_ccw_private.h
+> >>> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> >>> @@ -28,6 +28,7 @@
+> >>>    * @mdev: pointer to the mediated device
+> >>>    * @nb: notifier for vfio events
+> >>>    * @io_region: MMIO region to input/output I/O arguments/results
+> >>> + * @io_mutex: protect against concurrent update of I/O structures  
+> >>
+> >> We could be a bit more specific about what does this mutex guard.
+> >> Is it only io_region, or cp, irb and the new regions a well? ->state does
+> >> not seem to be covered, but should need some sort of synchronisation
+> >> too, or?  
+> > 
+> > I'm not sure. IIRC Pierre had some ideas about locking in the fsm?
+> >   
+> 
+> Yes I postponed this work to not collide with your patch series.
+> 
+> Do you think I should provide a new version of the FSM reworking series 
+> based on the last comment I got?
+> 
+> I would take into account that the asynchronous commands will come with 
+> your patch series and only provide the framework changes.
 
- Thanks,
-  Thomas
+This was more an answer to Halil's concerns around state
+synchronization. I would prefer to first get this series (or a
+variation) into decent shape, and then address state machine handling
+on top of that (when we know more about the transitions involved), just
+to avoid confusion.
+
+Does that sound reasonable?
