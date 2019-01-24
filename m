@@ -1,28 +1,45 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49545)
+Received: from eggs.gnu.org ([209.51.188.92]:50891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmcvP-0006Ef-IE
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:12:00 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gmd1a-0000QX-My
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmcvO-0001og-LU
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:11:59 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45788)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmcvO-0001mF-Es
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:11:58 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t6so5960917wrr.12
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 03:11:58 -0800 (PST)
-References: <20190123212234.32068-1-stefanha@redhat.com>
-	<20190123212234.32068-3-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f58f9085-c895-1fa5-9fae-afe4ac8de39a@redhat.com>
-Date: Thu, 24 Jan 2019 12:11:55 +0100
+	(envelope-from <pmorel@linux.ibm.com>) id 1gmd1X-0001jE-RZ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53124
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gmd1X-0001ik-L7
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:19 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0OB8s6x176983
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:18:18 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q7c4k0uap-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:18:18 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Thu, 24 Jan 2019 11:18:16 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<20190122193346.4e23e018@oc2783563651>
+	<20190123112112.7822b237.cohuck@redhat.com>
+	<42264dd9-86d7-8994-8c25-bc688067725d@linux.ibm.com>
+	<20190124111934.72e7f0f1.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 24 Jan 2019 12:18:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190123212234.32068-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190124111934.72e7f0f1.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] pflash: flush rom device memory
- region
+Message-Id: <639d520f-8a2a-3ffe-013a-26c172b712c0@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +48,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, jim@groklearning.com, Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jusual@mail.ru, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-Hi Stefan,
+On 24/01/2019 11:19, Cornelia Huck wrote:
+> On Thu, 24 Jan 2019 11:08:02 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>=20
+>> On 23/01/2019 11:21, Cornelia Huck wrote:
+>>> On Tue, 22 Jan 2019 19:33:46 +0100
+>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+>>>   =20
+>>>> On Mon, 21 Jan 2019 12:03:51 +0100
+>>>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>  =20
+>>>>> --- a/drivers/s390/cio/vfio_ccw_private.h
+>>>>> +++ b/drivers/s390/cio/vfio_ccw_private.h
+>>>>> @@ -28,6 +28,7 @@
+>>>>>     * @mdev: pointer to the mediated device
+>>>>>     * @nb: notifier for vfio events
+>>>>>     * @io_region: MMIO region to input/output I/O arguments/results
+>>>>> + * @io_mutex: protect against concurrent update of I/O structures
+>>>>
+>>>> We could be a bit more specific about what does this mutex guard.
+>>>> Is it only io_region, or cp, irb and the new regions a well? ->state=
+ does
+>>>> not seem to be covered, but should need some sort of synchronisation
+>>>> too, or?
+>>>
+>>> I'm not sure. IIRC Pierre had some ideas about locking in the fsm?
+>>>   =20
+>>
+>> Yes I postponed this work to not collide with your patch series.
+>>
+>> Do you think I should provide a new version of the FSM reworking serie=
+s
+>> based on the last comment I got?
+>>
+>> I would take into account that the asynchronous commands will come wit=
+h
+>> your patch series and only provide the framework changes.
+>=20
+> This was more an answer to Halil's concerns around state
+> synchronization. I would prefer to first get this series (or a
+> variation) into decent shape, and then address state machine handling
+> on top of that (when we know more about the transitions involved), just
+> to avoid confusion.
+>=20
+> Does that sound reasonable?
+>=20
 
-On 1/23/19 10:22 PM, Stefan Hajnoczi wrote:
-> pflash devices should mark the memory region dirty and invalidate TBs
-> after directly writing to the RAM backing the ROM device.
-> 
-> Note that pflash_cfi01_get_memory() is used by several machine types to
-> populate ROM contents directly.  Callers are untouched by this patch
-> because they only modify memory before the guest is started.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/block/pflash_cfi01.c | 5 +++++
->  hw/block/pflash_cfi02.c | 8 ++++++++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index bffb4c40e7..5301c11c18 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -446,6 +446,7 @@ static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
->          break;
->      }
->  
-> +    memory_region_flush_rom_device(&pfl->mem, offset, width);
->  }
->  
->  static void pflash_write(pflash_t *pfl, hwaddr offset,
-> @@ -482,6 +483,8 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(p + offset, 0xff, pfl->sector_len);
->                  pflash_update(pfl, offset, pfl->sector_len);
-> +                memory_region_flush_rom_device(&pfl->mem, offset,
-> +                                               pfl->sector_len);
->              } else {
->                  pfl->status |= 0x20; /* Block erase error */
->              }
-> @@ -763,6 +766,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
->              error_setg(errp, "failed to read the initial flash content");
->              return;
->          }
-> +
-> +        memory_region_flush_rom_device(&pfl->mem, 0, total_len);
+Absolutely, this was why I waited with my series. :)
 
-The device realize() is also executed before the guest is started, is
-this call really necessary?
 
->      }
->  
->      /* Default to devices being used at their maximum device width. This was
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 0f8b7b8c7b..d04572eca4 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -378,6 +378,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->                      pflash_update(pfl, offset, 4);
->                      break;
->                  }
-> +
-> +                memory_region_flush_rom_device(&pfl->orig_mem, offset, width);
->              }
->              pfl->status = 0x00 | ~(value & 0x80);
->              /* Let's pretend write is immediate */
-> @@ -426,6 +428,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(pfl->storage, 0xFF, pfl->chip_len);
->                  pflash_update(pfl, 0, pfl->chip_len);
-> +                memory_region_flush_rom_device(&pfl->orig_mem, 0,
-> +                                               pfl->chip_len);
->              }
->              pfl->status = 0x00;
->              /* Let's wait 5 seconds before chip erase is done */
-> @@ -441,6 +445,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(p + offset, 0xFF, pfl->sector_len);
->                  pflash_update(pfl, offset, pfl->sector_len);
-> +                memory_region_flush_rom_device(&pfl->orig_mem, offset,
-> +                                               pfl->sector_len);
->              }
->              pfl->status = 0x00;
->              /* Let's wait 1/2 second before sector erase is done */
-> @@ -590,6 +596,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
->              error_setg(errp, "failed to read the initial flash content");
->              return;
->          }
-> +
-> +        memory_region_flush_rom_device(&pfl->orig_mem, 0, chip_len);
-
-Ditto.
-
->      }
->  
->      pflash_setup_mappings(pfl);
-> 
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
