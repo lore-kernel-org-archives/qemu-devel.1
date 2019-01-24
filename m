@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35295)
+Received: from eggs.gnu.org ([209.51.188.92]:35300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmc8I-000320-BH
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmc8L-000324-N9
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmbvB-00081v-T5
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:07:42 -0500
-Date: Thu, 24 Jan 2019 10:07:36 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190124100736.GC4764@stefanha-x1.localdomain>
-References: <20190122121926.25554-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gmbuE-0006HD-MI
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:06:43 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:40911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gmbuE-0006Gf-Ho
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:06:42 -0500
+Received: by mail-ot1-x334.google.com with SMTP id s5so4723124oth.7
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 02:06:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
-Content-Disposition: inline
-In-Reply-To: <20190122121926.25554-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Apply auto-read-only for
- ro-whitelist drivers
+References: <CAFEAcA-yeQSbbhKXXJ0f961MJKC-v46DWgoaXcQUt64DZcdzqQ@mail.gmail.com>
+	<mhng-2bd91def-4148-4180-bdbe-0be851d575e5@palmer-si-x1c4>
+In-Reply-To: <mhng-2bd91def-4148-4180-bdbe-0be851d575e5@palmer-si-x1c4>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 Jan 2019 10:06:30 +0000
+Message-ID: <CAFEAcA8gH03WG_W-tp=ZC5HOoWRkpEDN_rdFm9Y6edxx-HztoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] RISC-V Updates for 3.2, Part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
+On Thu, 24 Jan 2019 at 02:53, Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Mon, 14 Jan 2019 04:40:06 PST (-0800), Peter Maydell wrote:
+> > Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> > for any user-visible changes.
+>
+> Thanks for the reminder :).  I have an account now so the update should be in
+> there, I'll try to remember to include it along with the PR next time.
 
---B4IIlcmfBL/1gGOG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reminder is what that text is for :-)  It's entirely part of my
+canned reply to pull requests, so you'll see it whether there's
+anything in your PR email about having updated the changelog or not...
 
-On Tue, Jan 22, 2019 at 01:19:26PM +0100, Kevin Wolf wrote:
-> If QEMU was configured with a driver in --block-drv-ro-whitelist, trying
-> to use that driver read-write resulted in an error message even if
-> auto-read-only=3Don was set.
->=20
-> Consider auto-read-only=3Don for the whitelist checking and use it to
-> automatically degrade to read-only for block drivers on the read-only
-> whitelist.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---B4IIlcmfBL/1gGOG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcSY5oAAoJEJykq7OBq3PI6TAH+gLqZsS1GuV4BnH6oI6cIVP7
-Odf7Dr+VFL3u2bsXaTFxVOtOeEt7+dfPncQpbuOjVnaJdbekQLF8EIgqQYGVe0HY
-yWabjbuAvFqFTh1ysNJJKaxGeNEekKLdOYVY1rT7FpL6iAQCwouHuAhGLYinIVUI
-qkvHfJbDTBfNZxbQ/FiKetrciuMzTPAk5ZSyOLLE6hYODw/YyTCkroQyZHgSz4nJ
-hKCbImdA9ryFvHkJkTOG3CyJ/yRRuxAPdu8j7J1CIQ7lfot0AKOIM70wKBN6Qfk9
-VFiqGOSeKaY0UeVinCoVcMgH+fNRhaRuSXeh8CfqDZNXuRpPmyOAWh+NCawlOpg=
-=p5QV
------END PGP SIGNATURE-----
-
---B4IIlcmfBL/1gGOG--
+thanks
+-- PMM
