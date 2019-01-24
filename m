@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35320)
+Received: from eggs.gnu.org ([209.51.188.92]:36279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmh9w-0002b7-JG
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:21 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gmhAM-0003Nb-3p
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmgz6-0000LL-Tz
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:32:06 -0500
-Date: Thu, 24 Jan 2019 16:31:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190124153153.GI4601@localhost.localdomain>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190122185740.GC5220@localhost.localdomain>
-	<4474e54a-1c60-a04b-e404-ad8e570edc1d@virtuozzo.com>
-	<20190123163303.GC5748@linux.fritz.box>
-	<62aa7f86-4ac7-0eeb-9e9d-30cb6ff229de@virtuozzo.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gmhAK-0002RN-5f
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:41 -0500
+Received: from mail-eopbgr770093.outbound.protection.outlook.com
+	([40.107.77.93]:36192
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gmhAI-0002NW-CS
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:43:40 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 24 Jan 2019 15:43:33 +0000
+Message-ID: <BN6PR2201MB1251E84161BB31CCFED9BA05C69A0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1543412590-29716-1-git-send-email-stefan.markovic@rt-rk.com>,
+	<1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
+In-Reply-To: <1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <62aa7f86-4ac7-0eeb-9e9d-30cb6ff229de@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Add nanoMIPS ISA information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "huth@tuxfamily.org" <huth@tuxfamily.org>, "hpoussin@reactos.org" <hpoussin@reactos.org>, Paul Burton <pburton@wavecomp.com>, "jhogan@kernel.org" <jhogan@kernel.org>
 
-Am 24.01.2019 um 15:36 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 23.01.2019 19:33, Kevin Wolf wrote:
-> > Am 23.01.2019 um 12:53 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> 22.01.2019 21:57, Kevin Wolf wrote:
-> >>> Am 11.01.2019 um 12:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>> 11.01.2019 13:41, Kevin Wolf wrote:
-> >>>>> Am 10.01.2019 um 14:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>>> drv_co_block_status digs bs->file for additional, more accurate search
-> >>>>>> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-> >>>>>>
-> >>>>>> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-> >>>>>> knows, where are holes and where is data. But every block_status
-> >>>>>> request calls lseek additionally. Assume a big disk, full of
-> >>>>>> data, in any iterative copying block job (or img convert) we'll call
-> >>>>>> lseek(HOLE) on every iteration, and each of these lseeks will have to
-> >>>>>> iterate through all metadata up to the end of file. It's obviously
-> >>>>>> ineffective behavior. And for many scenarios we don't need this lseek
-> >>>>>> at all.
-> >>>>>>
-> >>>>>> So, let's "5daa74a6ebc" by default, leaving an option to return
-> >>>>>> previous behavior, which is needed for scenarios with preallocated
-> >>>>>> images.
-> >>>>>>
-> >>>>>> Add iotest illustrating new option semantics.
-> >>>>>>
-> >>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>>>>
-> >>>>> I still think that an option isn't a good solution and we should try use
-> >>>>> some heuristics instead.
-> >>>>
-> >>>> Do you think that heuristics would be better than fair cache for lseek results?
-> >>>
-> >>> I just played a bit with this (qemu-img convert only), and how much
-> >>> caching lseek() results helps depends completely on the image. As it
-> >>> happened, my test image was the worst case where caching didn't buy us
-> >>> much. Obviously, I can just as easily construct an image where it makes
-> >>> a huge difference. I think that most real-world images should be able to
-> >>> take good advantage of it, though, and it doesn't hurt, so maybe that's
-> >>> a first thing that we can do in any case. It might not be the complete
-> >>> solution, though.
-> >>>
-> >>> Let me explain my test images: The case where all of this actually
-> >>> matters for qemu-img convert is fragmented qcow2 images. If your image
-> >>> isn't fragmented, we don't do lseek() a lot anyway because a single
-> >>> bdrv_block_status() call already gives you the information for the whole
-> >>> image. So I constructed a fragmented image, by writing to it backwards:
-> >>>
-> >>> ./qemu-img create -f qcow2 /tmp/test.qcow2 1G
-> >>> for i in $(seq 16384 -1 0); do
-> >>>       echo "write $((i * 65536)) 64k"
-> >>> done | ./qemu-io /tmp/test.qcow2
-> >>>
-> >>> It's not really surprising that caching the lseek() results doesn't help
-> >>> much there as we're moving backwards and lseek() only returns results
-> >>> about the things after the current position, not before the current
-> >>> position. So this is probably the worst case.
-> >>>
-> >>> So I constructed a second image, which is fragmented, too, but starts at
-> >>> the beginning of the image file:
-> >>>
-> >>> ./qemu-img create -f qcow2 /tmp/test_forward.qcow2 1G
-> >>> for i in $(seq 0 2 16384); do
-> >>>       echo "write $((i * 65536)) 64k"
-> >>> done | ./qemu-io /tmp/test_forward.qcow2
-> >>> for i in $(seq 1 2 16384); do
-> >>>       echo "write $((i * 65536)) 64k"
-> >>> done | ./qemu-io /tmp/test_forward.qcow2
-> >>>
-> >>> Here caching makes a huge difference:
-> >>>
-> >>>       time ./qemu-img convert -p -n $IMG null-co://
-> >>>
-> >>>                           uncached        cached
-> >>>       test.qcow2             ~145s         ~70s
-> >>>       test_forward.qcow2     ~110s        ~0.2s
-> >>
-> >> Unsure about your results, at least 0.2s means, that we benefit from
-> >> cached read, not lseek.
-> > 
-> > Yes, all reads are from the kernel page cache, this is on tmpfs.
-> > 
-> > I chose tmpfs for two reasons: I wanted to get expensive I/O out of the
-> > way so that the lseek() performance is even visible; and tmpfs was
-> > reported to perform especially bad for SEEK_DATA/HOLE (which my results
-> > confirm). So yes, this setup really makes the lseek() calls stand out
-> > much more than in the common case (which makes sense when you want to
-> > fix the overhead introduced by them).
-> 
-> Ok, missed this. On the other hand tmpfs is not a real production case..
+> From: Stefan Markovic <stefan.markovic@rt-rk.com>
+> Sent: Wednesday, November 28, 2018 2:43 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; Stefan Markovic; Petar Jovanovic; peter.maydell@=
+linaro.org; huth@tuxfamily.org; > hpoussin@reactos.org; Paul Burton; jhogan=
+@kernel.org
+> Subject: [PATCH 1/2] qemu-doc: Add nanoMIPS ISA information
+>=20
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>=20
+> Add nanoMIPS information in qemu-doc.texi with example of usage
+> included.
+>=20
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> ---
+>  qemu-doc.texi | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>=20
 
-Yes, I fully agree. But it was a simple case where I knew there is a
-problem.
+The text itself seems fine to me. If the problem with debug runs is
+fixed:
 
-I also have a bug report on XFS with an image that is very fragmented on
-the file system level. But I don't know how to produce such a file to
-run benchmarks on it.
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Kevin
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f7ad1df..6ef593d 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -1994,6 +1994,10 @@ Set the emulated machine type. The default is sun4=
+u.
+>  @section MIPS System emulator
+>  @cindex system emulation (MIPS)
+>=20
+> +@menu
+> +* nanoMIPS System emulator ::
+> +@end menu
+> +
+>  Four executables cover simulation of 32 and 64-bit MIPS systems in
+>  both endian options, @file{qemu-system-mips}, @file{qemu-system-mipsel}
+>  @file{qemu-system-mips64} and @file{qemu-system-mips64el}.
+> @@ -2085,6 +2089,31 @@ SCSI controller
+>  G364 framebuffer
+>  @end itemize
+>=20
+> +@node nanoMIPS System emulator
+> +@subsection nanoMIPS System emulator
+> +@cindex system emulation (nanoMIPS)
+> +
+> +Executable @file{qemu-system-mipsel} also covers simulation of
+> +32-bit nanoMIPS system in little endian mode:
+> +
+> +@itemize @minus
+> +@item
+> +nanoMIPS I7200 CPU
+> +@end itemize
+> +
+> +Example of @file{qemu-system-mipsel} usage for nanoMIPS is shown below:
+> +
+> +Download @code{<disk_image_file>} from @url{https://mipsdistros.mips.com=
+/LinuxDistro/nanomips/buildroot/index.html}.
+> +
+> +Download @code{<kernel_image_file>} from @url{https://mipsdistros.mips.c=
+om/LinuxDistro/nanomips/kernels/> v4.15.18-432-gb2eb9a8b07a1-20180627102142=
+/index.html}.
+> +
+> +Start system emulation of Malta board with nanoMIPS I7200 CPU:
+> +@example
+> +qemu-system-mipsel -cpu I7200 -kernel @code{<kernel_image_file>} \
+> +    -M malta -serial stdio -m @code{<memory_size>} -hda @code{<disk_imag=
+e_file>} \
+> +    -append "mem=3D256m@@0x0 rw console=3DttyS0 vga=3Dcirrus vesa=3D0x11=
+1 root=3D/dev/sda"
+> +@end example
+> +
+>=20
+>  @node ARM System emulator
+>  @section ARM System emulator
+> --
+> 1.9.1
