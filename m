@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45298)
+Received: from eggs.gnu.org ([209.51.188.92]:45577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmhnm-0002f5-In
+	(envelope-from <philmd@redhat.com>) id 1gmhnn-0003Fd-H1
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:24:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmhaT-0005iF-53
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:10:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gmhaS-0005AD-OC
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:10:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96D1C8764F
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 16:10:33 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190121170434.13592-1-cfergeau@redhat.com>
-Date: Thu, 24 Jan 2019 17:10:28 +0100
-In-Reply-To: <20190121170434.13592-1-cfergeau@redhat.com> (Christophe
-	Fergeau's message of "Mon, 21 Jan 2019 18:04:35 +0100")
-Message-ID: <87munqc9zf.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1gmhaQ-0005Uh-QZ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:10:40 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmhaK-0004Fk-J3
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:10:35 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t6so7044572wrr.12
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 08:10:23 -0800 (PST)
+References: <20170816072104.24420-1-famz@redhat.com>
+	<20170816072104.24420-9-famz@redhat.com>
+	<ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+	<f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4bf0c77e-ea8f-1813-a6a4-6ab6eb857cd0@redhat.com>
+Date: Thu, 24 Jan 2019 17:10:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] log: Make glib logging go through QEMU
+In-Reply-To: <f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iWA0QwkJbsRQIUiDZZw6qsd134W0q6pa5"
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,267 +32,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>, Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com
 
-Christophe Fergeau <cfergeau@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iWA0QwkJbsRQIUiDZZw6qsd134W0q6pa5
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>, Fam Zheng <fam@euphon.net>,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>,
+ stefanha@redhat.com
+Message-ID: <4bf0c77e-ea8f-1813-a6a4-6ab6eb857cd0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
+References: <20170816072104.24420-1-famz@redhat.com>
+ <20170816072104.24420-9-famz@redhat.com>
+ <ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+ <f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+In-Reply-To: <f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> This commit adds a qemu_init_logging() helper which calls
-> g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
-> are handled similarly to other QEMU logs. This means they will get a
-> timestamp if timestamps are enabled, and they will go through the
-> monitor if one is configured.
+On 1/24/19 4:56 PM, Kamil Rytarowski wrote:
+> On 24.01.2019 16:52, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 8/16/17 9:21 AM, Fam Zheng wrote:
+>>> The image is prepared following instructions as in:
+>>>
+>>> https://wiki.qemu.org/Hosts/BSD
+>>>
+>>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>> ---
+>>>  tests/vm/openbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 45 insertions(+)
+>>>  create mode 100755 tests/vm/openbsd
+>>>
+>>> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+>>> new file mode 100755
+>>> index 0000000000..d37ff83a59
+>>> --- /dev/null
+>>> +++ b/tests/vm/openbsd
+>>> @@ -0,0 +1,45 @@
+>>> +#!/usr/bin/env python
+>>> +#
+>>> +# OpenBSD VM image
+>>> +#
+>>> +# Copyright (C) 2017 Red Hat Inc.
+>>> +#
+>>> +# Authors:
+>>> +#  Fam Zheng <famz@redhat.com>
+>>> +#
+>>> +# This work is licensed under the terms of the GNU GPL, version 2.  =
+See
+>>> +# the COPYING file in the top-level directory.
+>>> +#
+>>> +
+>>> +import os
+>>> +import sys
+>>> +import logging
+>>> +import subprocess
+>>> +import tempfile
+>>> +import time
+>>> +import basevm
+>>> +
+>>> +class OpenBSDVM(basevm.BaseVM):
+>>> +    name =3D "openbsd"
+>>> +    BUILD_SCRIPT =3D """
+>>> +        set -e;
+>>> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>>> +        tar -xf /dev/rsd1c;
+>>> +        ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --pyt=
+hon=3Dpython2.7 {configure_opts};
+>>> +        gmake -j{jobs};
+>>> +        # XXX: "gmake check" seems to always hang or fail
+>>> +        #gmake check;
+>>
+>> OK, Now it makes more sense...
+>>
+>> After spending various hours trying to fix various issues on OpenBSD, =
+I
+>> notice that we never ran tests on this OS.
+>> The only binary I can run is qemu-img, the rest seems useless.
+>> I'll summarize in a different thread.
+>>
+>=20
+> Is this W^X related?
 
-s/monitor/HMP monitor/
+Part of it could be but I'm not sure.
 
-I see why one would like to extend the timestamp feature to GLib log
-messages.  Routing them through the HMP monitor is perhaps debatable.
-Cc: Dave in case he has an opinion.
+The 6.1 VM provided by Fam has /usr/local mounted with wxallowed, I
+tried building/running there and nothing changed, mmap() still returns
+ENOTSUP:
 
-> This commit also adds a call to qemu_init_logging() to the binaries
-> installed by QEMU.
-> glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
-> glib default log handler.
->
-> At the moment, this change will mostly impact SPICE logging if your
-> spice version is >=3D 0.14.1. With older spice versions, this is not going
-> to work as expected, but will not have any ill effect, so this call is
-> not conditional on the SPICE version.
->
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> One more iteration of the patch as it hit CI failures
-> (https://patchew.org/QEMU/20181214105642.673-1-cfergeau@redhat.com/ )
-> Only difference from v4 is the addition of #include "qemu/error-report.h"
-> in bsd-user and linux-user.
->
->
->  bsd-user/main.c             |  2 ++
->  include/qemu/error-report.h |  2 ++
->  linux-user/main.c           |  2 ++
->  qemu-img.c                  |  1 +
->  qemu-io.c                   |  1 +
->  qemu-nbd.c                  |  1 +
->  scsi/qemu-pr-helper.c       |  1 +
->  util/qemu-error.c           | 47 +++++++++++++++++++++++++++++++++++++
->  vl.c                        |  1 +
->  9 files changed, 58 insertions(+)
->
-> diff --git a/bsd-user/main.c b/bsd-user/main.c
-> index 0d3156974c..0df5c853d3 100644
-> --- a/bsd-user/main.c
-> +++ b/bsd-user/main.c
-> @@ -24,6 +24,7 @@
->  #include "qapi/error.h"
->  #include "qemu.h"
->  #include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/path.h"
->  #include "qemu/help_option.h"
->  #include "cpu.h"
-> @@ -743,6 +744,7 @@ int main(int argc, char **argv)
->      if (argc <=3D 1)
->          usage();
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      qemu_init_cpu_list();
->      module_call_init(MODULE_INIT_QOM);
-> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> index 0a8d9cc9ea..2852e9df2a 100644
-> --- a/include/qemu/error-report.h
-> +++ b/include/qemu/error-report.h
-> @@ -49,6 +49,8 @@ bool error_report_once_cond(bool *printed, const char *=
-fmt, ...)
->  bool warn_report_once_cond(bool *printed, const char *fmt, ...)
->      GCC_FMT_ATTR(2, 3);
->=20=20
-> +void qemu_init_logging(void);
-> +
->  /*
->   * Similar to error_report(), except it prints the message just once.
->   * Return true when it prints, false otherwise.
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index a0aba9cb1e..d9b3ffd1f4 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/path.h"
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
-> @@ -600,6 +601,7 @@ int main(int argc, char **argv, char **envp)
->      int ret;
->      int execfd;
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      qemu_init_cpu_list();
->      module_call_init(MODULE_INIT_QOM);
-> diff --git a/qemu-img.c b/qemu-img.c
-> index ad04f59565..9214392565 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -4912,6 +4912,7 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      error_set_progname(argv[0]);
->      qemu_init_exec_dir(argv[0]);
-> diff --git a/qemu-io.c b/qemu-io.c
-> index 6df7731af4..ad38d12e68 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -524,6 +524,7 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      progname =3D g_path_get_basename(argv[0]);
->      qemu_init_exec_dir(argv[0]);
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index 51b55f2e06..274b22d445 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -581,6 +581,7 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      error_set_progname(argv[0]);
->      qcrypto_init(&error_fatal);
-> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-> index e7af637232..523f8b237c 100644
-> --- a/scsi/qemu-pr-helper.c
-> +++ b/scsi/qemu-pr-helper.c
-> @@ -895,6 +895,7 @@ int main(int argc, char **argv)
->=20=20
->      signal(SIGPIPE, SIG_IGN);
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->      module_call_init(MODULE_INIT_QOM);
->      qemu_add_opts(&qemu_trace_opts);
-> diff --git a/util/qemu-error.c b/util/qemu-error.c
-> index fcbe8a1f74..1118ed4695 100644
-> --- a/util/qemu-error.c
-> +++ b/util/qemu-error.c
-> @@ -345,3 +345,50 @@ bool warn_report_once_cond(bool *printed, const char=
- *fmt, ...)
->      va_end(ap);
->      return true;
->  }
-> +
-> +static char *qemu_glog_domains;
-> +
-> +static void qemu_log_func(const gchar *log_domain,
-> +                          GLogLevelFlags log_level,
-> +                          const gchar *message,
-> +                          gpointer user_data)
-> +{
-> +    switch (log_level & G_LOG_LEVEL_MASK) {
-> +    case G_LOG_LEVEL_DEBUG:
-> +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable deb=
-ug
-> +         * messages
-> +         */
+(gdb) bt
+#0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input}:5
+#1  0x000017e3c15e5d7a in *_libc_mmap (addr=3DVariable "addr" is not
+available.
+) at /usr/local/lib/libc/sys/mmap.c:47
+#2  0x000017e17d9abc8b in alloc_code_gen_buffer () at
+/usr/local/qemu/accel/tcg/translate-all.c:1064
+#3  0x000017e17d9abd04 in code_gen_alloc (tb_size=3D0) at
+/usr/local/qemu/accel/tcg/translate-all.c:1112
+#4  0x000017e17d9abe81 in tcg_exec_init (tb_size=3D0) at
+/usr/local/qemu/accel/tcg/translate-all.c:1149
+#5  0x000017e17d9897e9 in tcg_init (ms=3D0x17e45e456800) at
+/usr/local/qemu/accel/tcg/tcg-all.c:66
+#6  0x000017e17d9891b8 in accel_init_machine (acc=3D0x17e3c3f50800,
+ms=3D0x17e45e456800) at /usr/local/qemu/accel/accel.c:63
+#7  0x000017e17d989312 in configure_accelerator (ms=3D0x17e45e456800,
+progname=3D0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at
+/usr/local/qemu/accel/accel.c:111
+#8  0x000017e17d9d8616 in main (argc=3D1, argv=3D0x7f7fffff06b8,
+envp=3D0x7f7fffff06c8) at vl.c:4325
 
-Wing both ends of the comment, please.
+Since the current script build into /var/tmp (which is symlinked to
+/tmp) I also mounted /tmp wxallowed using the following patch:
 
-> +        if (qemu_glog_domains =3D=3D NULL) {
-> +            break;
-> +        }
-> +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
-> +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, log_doma=
-in))) {
-> +            break;
-> +        }
-> +        /* Fall through */
-> +    case G_LOG_LEVEL_INFO:
-> +        /* Fall through */
+-- >8 --
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -39,6 +39,12 @@ class OpenBSDVM(basevm.BaseVM):
+         if os.path.exists(img):
+             os.rename(img_tmp, img)
++        self.boot(img)
++        self.wait_ssh()
++        self.ssh_root_check("sed -E -i 's_(/tmp\ ffs)\ ([^\ ]*)_\\1
+\\2,wxallowed_' /etc/fstab")
++        self.ssh_root_check("cat /etc/fstab")
++        self.ssh_root("halt -p")
++        self.wait()
+---
 
-g_log_default_handler() applies G_MESSAGES_DEBUG suppression logic to
-G_LOG_LEVEL_INFO messages, too.  Do you deviate intentionally?
+$ mount
+/dev/sd0a on / type ffs (local)
+/dev/sd0k on /home type ffs (local, nodev, nosuid)
+/dev/sd0d on /tmp type ffs (local, nodev, nosuid, wxallowed)
+/dev/sd0f on /usr type ffs (local, nodev)
+/dev/sd0g on /usr/X11R6 type ffs (local, nodev)
+/dev/sd0h on /usr/local type ffs (local, nodev, wxallowed)
+/dev/sd0j on /usr/obj type ffs (local, nodev, nosuid)
+/dev/sd0i on /usr/src type ffs (local, nodev, nosuid)
+/dev/sd0e on /var type ffs (local, nodev, nosuid)
 
-> +    case G_LOG_LEVEL_MESSAGE:
-> +        info_report("%s: %s", log_domain, message);
+Still no progress.
 
-@log_domain can be null.  You even check for that above.
+>=20
+>>> +    """
+>>> +
+>>> +    def build_image(self, img, rebuild=3DFalse):
+>>> +        if os.path.exists(img) and not rebuild:
+>>> +            return
+>>> +        cimg =3D self._download_with_cache("http://download.patchew.=
+org/openbsd.img.xz")
+>>> +        img_tmp_xz =3D img + ".tmp.xz"
+>>> +        img_tmp =3D img + ".tmp"
+>>> +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>>> +        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>>> +        subprocess.check_call(["mv", img_tmp, img])
+>>> +
+>>> +if __name__ =3D=3D "__main__":
+>>> +    sys.exit(basevm.main(OpenBSDVM))
+>>>
+>>
+>=20
+>=20
 
-> +        break;
-> +    case G_LOG_LEVEL_WARNING:
-> +        warn_report("%s: %s", log_domain, message);
-> +        break;
-> +    case G_LOG_LEVEL_CRITICAL:
-> +        /* Fall through */
-> +    case G_LOG_LEVEL_ERROR:
-> +        error_report("%s: %s", log_domain, message);
-> +        break;
 
-Sure we don't need to check for G_LOG_FLAG_RECURSION?
-g_log_default_handler() has a conditional for that...
+--iWA0QwkJbsRQIUiDZZw6qsd134W0q6pa5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Not sure it has anything for G_LOG_FLAG_FATAL; it's code is surprisingly
-complex.
+-----BEGIN PGP SIGNATURE-----
 
-> +    }
-> +}
-> +
-> +/*
-> + * Init QEMU logging subsystem. This sets up glib logging so libraries u=
-sing it
-> + * also print their logs through {info,warn,error}_report.
-> + */
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlxJ42sACgkQoqP9bt6t
+wN6hxBAAnsIQty95NIX6Jj3WlorD+S1xaXUYEKWdwNvXYFNlHfK3GXIqGzQJ6Jtq
+jDQMp7Tp/qEYqR6d6N6CUkXDuEQgJHgrzRZ3q7p91wVYBHR7B2GoGr7jg5xdO04G
+CbDY8Pi4vWUuPgPbxKbZbR9OgQf5F/iuXYPe7jPSdJ3h37j1Lmz7uMIRWCowm8x8
+wIzKx28JF21p87+cg8w5AwGh8PxleUVLKet2YwGma+QTChshgB3Vljv7pNefXAWx
+SpMt/X00MW7YsV6R+q+yr2T4HZtDP+/9Knz6efYHLLd46keeD9BFasNySyoUhhak
+TF3pZAaqDFF1qPH+YQGimYzM7idnDNLAeEBc/UYwwvgqCdnzvs82LWRWLZzp7jfN
+GdbBqDMIbPDHVnCBW6zsEC3N4ZsJgW8p47QZ0+37V/270UO9oN+w4sfHyYrVb+58
+gxJWCLpfkapvVP/14jrZW168sQN/QrTcuQgavSmvt0P2Iiq24xMosiNf5zpArUQe
+h6QDHjiHQaRuM7Izt4KkXaD/8yXRzuQvVyzfHAJwKKwWoKqOJUZiN8+Y1QhbxHpk
+O2XvQ9aBPMH/ui8l4Cmb3fOimHgxKC7rMcE9ZBzsBK8tGSexFEwodgVWLbCc6it4
+TdCvD5vE6D9PXKg4u1Z1HsKb7sqtoIPsCb3Eux4TsLYEUA4Tf9w=
+=0Svt
+-----END PGP SIGNATURE-----
 
-Format like the other function comments:
-
-   /*
-    * Init QEMU logging subsystem.
-    * This sets up glib logging so libraries using it also print their logs
-    * through error_report(), warn_report(), info_report().
-    */
-
-Braces expanded for better grepability.
-
-> +void qemu_init_logging(void)
-
-Naming is hard...  Yes, this "initializes logging" in a sense: it
-installs a GLib default log handler that routes GLib log messages
-through this module.  But that's detail; the callers don't care what
-this function does, all they care for is "must call early".  If this
-module ever grows a need to initialize something else before it gets
-used, we'll regret naming its initialization function
-qemu_init_logging().
-
-Hmm, it has already grown such a need: initializing @progname.
-error_set_progname() does it.  Asking a module's users to call *two*
-initializtion functions is not nice.
-
-Fuse the two into error_init(const char *argv0)?
-
-> +{
-> +    g_log_set_default_handler(qemu_log_func, NULL);
-> +    g_warn_if_fail(qemu_glog_domains =3D=3D NULL);
-> +    qemu_glog_domains =3D g_strdup(g_getenv("G_MESSAGES_DEBUG"));
-> +}
-> diff --git a/vl.c b/vl.c
-> index bc9fbec654..f03f20e060 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
->      QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
->          =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
->=20=20
-> +    qemu_init_logging();
->      module_call_init(MODULE_INIT_TRACE);
->=20=20
->      qemu_init_cpu_list();
+--iWA0QwkJbsRQIUiDZZw6qsd134W0q6pa5--
