@@ -1,31 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47946)
+Received: from eggs.gnu.org ([209.51.188.92]:47906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmg9W-0004IZ-Tr
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:38:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1gmg9W-0004Hp-1c
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmg9V-0004oQ-6R
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:38:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gmg9U-0004Tv-R7
+	(envelope-from <armbru@redhat.com>) id 1gmg9U-0004mS-7g
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:38:45 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CA50107AB
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:38:27 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-138.ams2.redhat.com
-	[10.36.116.138])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E8B6E10021B1
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:38:26 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 24 Jan 2019 15:38:21 +0100
-Message-Id: <20190124143825.25921-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/4] QAPI patches for 2019-01-24
+Date: Thu, 24 Jan 2019 15:38:25 +0100
+Message-Id: <20190124143825.25921-5-armbru@redhat.com>
+In-Reply-To: <20190124143825.25921-1-armbru@redhat.com>
+References: <20190124143825.25921-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL 4/4] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +20,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Christophe Fergeau <cfergeau@redhat.com>, qemu-stable@nongnu.org
 
-The following changes since commit f6b06fcceef465de0cf2514c9f76fe01928967=
-81:
+From: Christophe Fergeau <cfergeau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-requ=
-est' into staging (2019-01-23 17:57:47 +0000)
+Commit 8bca4613 added support for %% in json strings when interpolating,
+but in doing so broke handling of % when not interpolating.
 
-are available in the Git repository at:
+When parse_string() is fed a string token containing '%', it skips the
+'%' regardless of ctxt->ap, i.e. even it's not interpolating.  If the
+'%' is the string's last character, it fails an assertion.  Else, it
+"merely" swallows the '%'.
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-01-24
+Fix parse_string() to handle '%' specially only when interpolating.
 
-for you to fetch changes up to bbc0586ced6e9ffdfd29d89fcc917b3d90ac3938:
+To gauge the bug's impact, let's review non-interpolating users of this
+parser, i.e. code passing NULL context to json_message_parser_init():
 
-  json: Fix % handling when not interpolating (2019-01-24 15:20:59 +0100)
+* tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+  tests/test-visitor-serialization.c
 
-----------------------------------------------------------------
-QAPI patches for 2019-01-24
+  Plenty of tests, but we still failed to cover the buggy case.
 
-----------------------------------------------------------------
-Christophe Fergeau (1):
-      json: Fix % handling when not interpolating
+* monitor.c: QMP input
 
-Markus Armbruster (2):
-      qapi: Belatedly update docs for commit 9c2f56e9f9d
-      qapi: Eliminate indirection through qmp_event_get_func_emit()
+* qga/main.c: QGA input
 
-Wainer dos Santos Moschetta (1):
-      qmp: Add examples to qom list, get, and set commands
+* qobject_from_json():
 
- docs/devel/qapi-code-gen.txt | 12 +++---------
- include/qapi/qmp-event.h     |  6 ------
- monitor.c                    |  4 +---
- qapi/misc.json               | 36 ++++++++++++++++++++++++++++++++++++
- qapi/qmp-event.c             | 12 ------------
- qobject/json-parser.c        | 10 ++++++----
- scripts/qapi/events.py       | 24 ++++++++++++++----------
- stubs/monitor.c              |  5 +++++
- tests/Makefile.include       |  4 ++--
- tests/check-qjson.c          |  5 +++++
- tests/test-qmp-event.c       |  6 +-----
- 11 files changed, 73 insertions(+), 51 deletions(-)
+  - qobject-input-visitor.c: JSON command line option arguments of
+    -display and -blockdev
 
---=20
+    Reproducer: -blockdev '{"%"}'
+
+  - block.c: JSON pseudo-filenames starting with "json:"
+
+    Reproducer: https://bugzilla.redhat.com/show_bug.cgi?id=1668244#c3
+
+  - block/rbd.c: JSON key pairs
+
+    Pseudo-filenames starting with "rbd:".
+
+Command line, QMP and QGA input are trusted.
+
+Filenames are trusted when they come from command line, QMP or HMP.
+They are untrusted when they come from from image file headers.
+Example: QCOW2 backing file name.  Note that this is *not* the security
+boundary between host and guest.  It's the boundary between host and an
+image file from an untrusted source.
+
+Neither failing an assertion nor skipping a character in a filename of
+your choice looks exploitable.  Note that we don't support compiling
+with NDEBUG.
+
+Fixes: 8bca4613e6cddd948895b8db3def05950463495b
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+Message-Id: <20190102140535.11512-1-cfergeau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+[Commit message extended to discuss impact]
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qobject/json-parser.c | 10 ++++++----
+ tests/check-qjson.c   |  5 +++++
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 7a7ae9e8d1..d8eb210c0c 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+             }
+             break;
+         case '%':
+-            if (ctxt->ap && ptr[1] != '%') {
+-                parse_error(ctxt, token, "can't interpolate into string");
+-                goto out;
++            if (ctxt->ap) {
++                if (ptr[1] != '%') {
++                    parse_error(ctxt, token, "can't interpolate into string");
++                    goto out;
++                }
++                ptr++;
+             }
+-            ptr++;
+             /* fall through */
+         default:
+             cp = mod_utf8_codepoint(ptr, 6, &end);
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index d876a7a96e..fa2afccb0a 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -175,6 +175,11 @@ static void utf8_string(void)
+             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+             "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
++        },
++            /* '%' character when not interpolating */
++        {
++            "100%",
++            "100%",
+         },
+         /* 2  Boundary condition test cases */
+         /* 2.1  First possible sequence of a certain length */
+-- 
 2.17.2
