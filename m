@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58208)
+Received: from eggs.gnu.org ([209.51.188.92]:58493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmfFi-0005Ni-K0
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:41:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmfFl-0005kV-U8
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmf3K-0004ql-Gl
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:28:19 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:45904)
+	(envelope-from <peter.maydell@linaro.org>) id 1gmf1Q-0003QY-O9
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:26:22 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34477)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmf3K-0004qR-Bf
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:28:18 -0500
-Received: by mail-ot1-x331.google.com with SMTP id 32so5159944ota.12
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:28:18 -0800 (PST)
+	id 1gmf1P-0003P3-6P
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:26:20 -0500
+Received: by mail-ot1-x344.google.com with SMTP id t5so5225336otk.1
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:26:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20190123114220.16972-1-alex.bennee@linaro.org>
-In-Reply-To: <20190123114220.16972-1-alex.bennee@linaro.org>
+References: <20190123195814.29253-1-aaron@os.amperecomputing.com>
+In-Reply-To: <20190123195814.29253-1-aaron@os.amperecomputing.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 Jan 2019 13:28:06 +0000
-Message-ID: <CAFEAcA-8MDXBnDDMzz5gk1-=ErSM4BWNtTkHt2XcGz4NBdsBpw@mail.gmail.com>
+Date: Thu, 24 Jan 2019 13:26:06 +0000
+Message-ID: <CAFEAcA8F+YdjAMSEFTzmkfNi9dg1nYZXUpi_fKtxUHcaN48+Dw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat,
- fp-bench and clang compile fixes
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Don't clear supported PMU
+ events when initializing PMCEID1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On Wed, 23 Jan 2019 at 11:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+On Wed, 23 Jan 2019 at 19:59, Aaron Lindsay OS
+<aaron@os.amperecomputing.com> wrote:
 >
-> The following changes since commit 952bc8b3c2cbba78261923a1e8ca55cda261de=
-e9:
+> A bug was introduced during a respin of:
 >
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-21' i=
-nto staging (2019-01-22 17:56:21 +0000)
+>         commit 57a4a11b2b281bb548b419ca81bfafb214e4c77a
+>         target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
 >
-> are available in the Git repository at:
+> This patch introduced two calls to get_pmceid() during CPU
+> initialization - one each for PMCEID0 and PMCEID1. In addition to
+> building the register values, get_pmceid() clears an internal array
+> mapping event numbers to their implementations (supported_event_map)
+> before rebuilding it. This is an optimization since much of the logic is
+> shared. However, since it was called twice, the contents of
+> supported_event_map reflect only the events in PMCEID1 (the second call
+> to get_pmceid()).
 >
->   https://github.com/stsquad/qemu.git tags/pull-fpu-next-230119-2
+> Fix this bug by moving the initialization of PMCEID0 and PMCEID1 back
+> into a single function call, and name it more appropriately since it is
+> doing more than simply generating the contents of the PMCEID[01]
+> registers.
 >
-> for you to fetch changes up to 7617010250822677348af2bd98f048be10e7f334:
->
->   tests/Makefile: add check-softfloat rule (2019-01-23 08:30:01 +0000)
->
-> ----------------------------------------------------------------
-> Some more softfloat/fpu fixes
->
->    - make check-softfloat
->    - fixes for fp-bench
->    - workaround broken host fma
->    - compile fix for s390x/clang
->    - fixed for bigendian (v2)
->    - minor makefile tweaks (v2)
->
-> ----------------------------------------------------------------
+> Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
 
-Applied, thanks.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+
+Applied to target-arm.next, thanks.
 
 -- PMM
