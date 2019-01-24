@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52276)
+Received: from eggs.gnu.org ([209.51.188.92]:53569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmgLs-0006Th-Hz
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:51:33 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmgQm-00014S-Ji
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmgLq-0002GR-D0
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:51:32 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45175)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gmgLq-0002F8-4W
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:51:30 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t6so6737969wrr.12
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:51:29 -0800 (PST)
-References: <20181209193749.12277-1-cota@braap.org>
-	<20181209193749.12277-10-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181209193749.12277-10-cota@braap.org>
-Date: Thu, 24 Jan 2019 14:51:27 +0000
-Message-ID: <87o986yuq8.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gmgQk-0008Qq-L3
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:56:36 -0500
+References: <20190122094143.8857-1-david@redhat.com>
+	<20190122134457.212a60f3.cohuck@redhat.com>
+	<ae4f687e-ab41-fe9c-18be-ee678e3c9941@redhat.com>
+	<0fa341f4-0c37-f793-ee14-277e085d0159@de.ibm.com>
+	<98167131-5d68-269c-671a-1378aac9ac45@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9587a13b-0ee7-2436-bb71-4071e51f851f@redhat.com>
+Date: Thu, 24 Jan 2019 15:56:09 +0100
 MIME-Version: 1.0
+In-Reply-To: <98167131-5d68-269c-671a-1378aac9ac45@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 09/38] cputlb: introduce
- get_page_addr_code_hostp
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
+ without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
+On 2019-01-22 16:11, David Hildenbrand wrote:
+> On 22.01.19 16:03, Christian Borntraeger wrote:
+>>
+>>
+>> On 22.01.2019 13:52, David Hildenbrand wrote:
+>>> On 22.01.19 13:44, Cornelia Huck wrote:
+>>>> On Tue, 22 Jan 2019 10:41:43 +0100
+>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>
+>>>>> We decided to always create the PCI host bridge, even if 'zpci' is not
+>>>>> enabled (due to migration compatibility). This however right now allows
+>>>>> to add zPCI/PCI devices to a VM although the guest will never actually see
+>>>>> them, confusing people that are using a simple CPU model that has no
+>>>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+>>>>>
+>>>>> Let's check for 'zpci' and at least print a warning that this will not
+>>>>> work as expected. We could also bail out, however that might break
+>>>>> existing QEMU commandlines.
+>>>>>
+>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>  hw/s390x/s390-pci-bus.c | 5 +++++
+>>>>>  1 file changed, 5 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>> index b86a8bdcd4..e7d4f49611 100644
+>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>>  {
+>>>>>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>>>>>  
+>>>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+>>>>> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
+>>>>> +                    " The guest will not be able to see/use these devices.");
+>>>>> +    }
+>>>>> +
+>>>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>>>>>          PCIDevice *pdev = PCI_DEVICE(dev);
+>>>>>  
+>>>>
+>>>> That's hotplug only, isn't it? IIRC coldplugging already fails?
+>>>>
+>>>
+>>> No, applies also to coldplugging.
+>>
+>> Back then we made this a conscious decision, because removing the bridge triggered a
+>> lot of issues regarding migration. And the current behaviour actually is a good
+>> match to the real hardware, there are PCI devices in the system that can not be used
+>> by guests. I understand that this is kind of surprising, so I am fine with the warn_report
+>> but I do not want to have a hard error right now.
+> 
+> So you agree to this patch, unmodified, correct? Thanks!
 
-Emilio G. Cota <cota@braap.org> writes:
+FWIW, it's fine for me:
 
-> This will be used by plugins to get the host address
-> of instructions.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/exec/exec-all.h | 13 +++++++++++++
->  accel/tcg/cputlb.c      | 14 +++++++++++++-
->  2 files changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index 815e5b1e83..afcc01e0e3 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -22,6 +22,7 @@
->
->  #include "qemu-common.h"
->  #include "exec/tb-context.h"
-> +#include "exec/cpu_ldst.h"
->  #include "sysemu/cpus.h"
->
->  /* allow to see translation results - the slowdown should be negligible,=
- so we leave it */
-> @@ -487,12 +488,24 @@ static inline tb_page_addr_t get_page_addr_code(CPU=
-ArchState *env1, target_ulong
->  {
->      return addr;
->  }
-> +
-> +static inline tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env1,
-> +                                                      target_ulong addr,
-> +                                                      void **hostp)
-> +{
-> +    if (hostp) {
-> +        *hostp =3D g2h(addr);
-> +    }
-> +    return addr;
-> +}
->  #else
->  static inline void mmap_lock(void) {}
->  static inline void mmap_unlock(void) {}
->
->  /* cputlb.c */
->  tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr);
-> +tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env1, target_ulong=
- addr,
-> +                                        void **hostp);
->
-
-It's probably about time these helpers got proper doc headers. So I take
-it the host address of an instruction is where in host memory the code
-is or where in host memory the translation for that instruction is?
-
->  void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length=
-);
->  void tlb_set_dirty(CPUState *cpu, target_ulong vaddr);
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index e3582f2f1d..5c61908084 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1069,7 +1069,8 @@ static bool victim_tlb_hit(CPUArchState *env, size_=
-t mmu_idx, size_t index,
->   * is actually a ram_addr_t (in system mode; the user mode emulation
->   * version of this function returns a guest virtual address).
->   */
-> -tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
-> +tb_page_addr_t get_page_addr_code_hostp(CPUArchState *env, target_ulong =
-addr,
-> +                                        void **hostp)
->  {
->      uintptr_t mmu_idx =3D cpu_mmu_index(env, true);
->      uintptr_t index =3D tlb_index(env, mmu_idx, addr);
-> @@ -1092,13 +1093,24 @@ tb_page_addr_t get_page_addr_code(CPUArchState *e=
-nv, target_ulong addr)
->           *    than a target page, so we must redo the MMU check every in=
-sn
->           *  - TLB_MMIO: region is not backed by RAM
->           */
-> +        if (hostp) {
-> +            *hostp =3D NULL;
-> +        }
->          return -1;
->      }
->
->      p =3D (void *)((uintptr_t)addr + entry->addend);
-> +    if (hostp) {
-> +        *hostp =3D p;
-> +    }
->      return qemu_ram_addr_from_host_nofail(p);
->  }
->
-> +tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
-> +{
-> +    return get_page_addr_code_hostp(env, addr, NULL);
-> +}
-> +
->  /* Probe for whether the specified guest write access is permitted.
->   * If it is not permitted then an exception will be taken in the same
->   * way as if this were a real write access (and we will not return).
-
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Thomas Huth <thuth@redhat.com>
