@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47551)
+Received: from eggs.gnu.org ([209.51.188.92]:48263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gmeYy-0006mv-5V
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:57 -0500
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gmebv-0000Op-Kn
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gmeYx-0005hO-Ia
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:56 -0500
-Received: from mga06.intel.com ([134.134.136.31]:20544)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1gmeYx-0005be-AO
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:55 -0500
-From: Luwei Kang <luwei.kang@intel.com>
-Date: Thu, 24 Jan 2019 20:54:43 -0500
-Message-Id: <1548381283-16688-1-git-send-email-luwei.kang@intel.com>
-Subject: [Qemu-devel] [PATCH] i386: extended the cpuid level when Intel PT
- is enabled
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gmebu-0007xh-GU
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:59:59 -0500
+Received: from sonic311-21.consmr.mail.ne1.yahoo.com ([66.163.188.202]:36898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
+	id 1gmebu-0007wu-AJ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:59:58 -0500
+Date: Thu, 24 Jan 2019 12:59:54 +0000 (UTC)
+From: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>
+Message-ID: <70145779.391347.1548334794441@mail.yahoo.com>
+In-Reply-To: <20190123180804.GA1040@flamenco>
+References: <251451940.431966.1548259107629.ref@mail.yahoo.com>
+	<251451940.431966.1548259107629@mail.yahoo.com>
+	<20190123180804.GA1040@flamenco>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] m68k gdb has stopped single stepping correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Luwei Kang <luwei.kang@intel.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-Intel Processor Trace required CPUID[0x14] but the cpuid level
-is 0xd when create a kvm guest with e.g. "-cpu qemu64,+intel-pt".
+=20
 
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
----
- target/i386/cpu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+   > On Thursday, January 24, 2019, 3:08:07 AM GMT+9, Emilio G. Cota <cota@=
+braap.org> wrote: > > On Wed, Jan 23, 2019 at 15:58:27 +0000, Lucien Anti-S=
+pam via Qemu-devel wrote:> > Hi folks,
+> > I noticed that with 3.x release that the GDB options (-S -s) for certai=
+n CPU results in very weird stepping.Usually stops afer a few steps, whilst=
+ the stub continues responding the PC doesnt update, however,=C2=A0I have o=
+nly deeply looked at the m68k.
+> > In the case of the m68K the SR gets the trace bit set (T=3D10b), and th=
+e PC doesnt update.The m68k gdbstub, and main gdbstub seem mostly unchanged=
+.But it seems the INSN handling has changed greatly for the m68k.
+> > Does anyone have any ideas what happened?>> Can you please bisect to fi=
+nd at which point things start misbehaving?
+>=C2=A0
+> Thanks,
+>=C2=A0 Emilio
+Understood, I was hoping my original post might jog someone's memory about =
+the issue.=C2=A0=C2=A0
+Apparently not, so after some digging I found that it was introduced with t=
+he refactor to TranslatorOps, specifically two lines got dropped that updat=
+e the PC if single-stepping is being performed (=C2=A0commit 11ab74b01e0a8e=
+a4973eed89c6b90fa6e4fb9fb6 )
+Since its not valid to revert, shall I go ahead and submit a patch for thes=
+e two lines?
+Also I noticed a lack of gdb-stub tests, but there are cpu tests (eg.=C2=A0=
+check-qtest-m68k).=C2=A0 I was considering it might be interesting to write=
+ some basic network code to send / receive=C2=A0gdb packets to re-use these=
+ cpu tests for step, break-point, register update, and so on.
+I saw a gdb-python test but I felt this would need specific kernel \ gdb fo=
+r each cpu with is likely to end in a lot of problems getting right gdbs - =
+simple packet send/receive/check would be better?
+What do people think, what would be the right approach to this?
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 2f54125..da477b3 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
-         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
-         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
-+
-+        /* Intel Processor Trace requires CPUID[0x14] */
-+        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-+             kvm_enabled()) {
-+            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-+        }
-+
-         /* SVM requires CPUID[0x8000000A] */
-         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
--- 
-1.8.3.1
+Cheers,Luc
+
+ =20
