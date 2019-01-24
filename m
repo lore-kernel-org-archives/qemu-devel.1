@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40173)
+Received: from eggs.gnu.org ([209.51.188.92]:45312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmhNJ-0004m4-5y
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:57:05 -0500
+	(envelope-from <sourav.jb1988@gmail.com>) id 1gmhmx-0002gT-L4
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:23:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmhNI-0005Pz-Cj
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:57:05 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35533)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gmhNH-0005Ou-JF
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:57:04 -0500
-Received: by mail-wr1-x431.google.com with SMTP id 96so7056615wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 07:57:03 -0800 (PST)
-References: <20181209193749.12277-1-cota@braap.org>
-	<20181209193749.12277-7-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181209193749.12277-7-cota@braap.org>
-Date: Thu, 24 Jan 2019 15:57:00 +0000
-Message-ID: <87munqyroz.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 06/38] plugin: add core code
+	(envelope-from <sourav.jb1988@gmail.com>) id 1gmhkU-0002oE-Go
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 11:21:04 -0500
+From: kumar sourav <sourav.jb1988@gmail.com>
+Date: Thu, 24 Jan 2019 21:50:45 +0530
+Message-Id: <20190124162045.10474-1-sourav.jb1988@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw: sd: set category of the sd memory card
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +17,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+To: qemu-trivial@nongnu.org
+Cc: f4bug@amsat.org, qemu-devel@nongnu.org, thuth@redhat.com
 
+Sets the category of the sd memory card as DEVICE_CATEGORY_STORAGE.
+Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
 
-Emilio G. Cota <cota@braap.org> writes:
+Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+---
+ hw/sd/sd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> Some design requirements/goals:
-
-Also this commit breaks bisect-ability:
-
-
-  15:56:23 [alex@zen:~/l/q/qemu.git] (0138e1a5=E2=80=A6)|BISECTING 2 + head=
- -n 3 config.log
-  # QEMU configure log Thu Jan 24 15:19:36 GMT 2019
-  # Configured with: './configure' '--disable-tools' '--disable-docs' '--py=
-thon=3D/usr/bin/python3'
-  #
-  15:56:35 [alex@zen:~/l/q/qemu.git] (0138e1a5=E2=80=A6)|BISECTING + make
-          CHK version_gen.h
-    CC      qapi/qapi-visit-core.o
-  In file included from /home/alex/lsrc/qemu/qemu.git/include/qom/cpu.h:33:=
-0,
-                   from ./trace/control-internal.h:13,
-                   from ./trace/control.h:270,
-                   from qapi/trace.h:7,
-                   from qapi/qapi-visit-core.c:21:
-  /home/alex/lsrc/qemu/qemu.git/include/qemu/plugin.h:38:49: error: =E2=80=
-=98qemu_plugin_list=E2=80=99 defined as wrong kind of tag
-                                            struct qemu_plugin_list *head)
-                                                   ^~~~~~~~~~~~~~~~
-  /home/alex/lsrc/qemu/qemu.git/include/qemu/plugin.h:38:49: error: =E2=80=
-=98struct qemu_plugin_list=E2=80=99 declared inside parameter list will not=
- be visible outside of this definition or
-  declaration [-Werror]
-  /home/alex/lsrc/qemu/qemu.git/include/qemu/plugin.h:44:48: error: =E2=80=
-=98qemu_plugin_list=E2=80=99 defined as wrong kind of tag
-   static inline int qemu_plugin_load_list(struct qemu_plugin_list *head)
-                                                  ^~~~~~~~~~~~~~~~
-  /home/alex/lsrc/qemu/qemu.git/include/qemu/plugin.h:44:48: error: =E2=80=
-=98struct qemu_plugin_list=E2=80=99 declared inside parameter list will not=
- be visible outside of this definition or
-  declaration [-Werror]
-  cc1: all warnings being treated as errors
-  /home/alex/lsrc/qemu/qemu.git/rules.mak:69: recipe for target 'qapi/qapi-=
-visit-core.o' failed
-  make: *** [qapi/qapi-visit-core.o] Error 1
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index d4356e9b73..aaab15f386 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -2121,6 +2121,7 @@ static void sd_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &sd_vmstate;
+     dc->reset = sd_reset;
+     dc->bus_type = TYPE_SD_BUS;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+ 
+     sc->set_voltage = sd_set_voltage;
+     sc->get_dat_lines = sd_get_dat_lines;
+-- 
+2.17.1
