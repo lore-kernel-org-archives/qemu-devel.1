@@ -1,26 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmc8N-00035S-D5
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gmc8L-00035S-L5
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:21:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmbtO-0004JF-H9
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:05:52 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gmbtM-0003kU-HB
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:05:49 -0500
-Received: by mail-wm1-x342.google.com with SMTP id y139so2409700wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 02:05:35 -0800 (PST)
-Date: Thu, 24 Jan 2019 10:05:32 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190124100532.GB4764@stefanha-x1.localdomain>
-References: <20190122143113.20331-1-vsementsov@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1gmbuG-0006IH-AG
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 05:06:44 -0500
+Date: Thu, 24 Jan 2019 11:06:37 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190124110637.2e2e3c4c.cohuck@redhat.com>
+In-Reply-To: <20190123165148.55aba88b@oc2783563651>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-6-cohuck@redhat.com>
+	<20190123165148.55aba88b@oc2783563651>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
-In-Reply-To: <20190122143113.20331-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-coroutine-sleep: drop CoSleepCB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] vfio-ccw: add handling for async
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, stefanha@redhat.com
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
+On Wed, 23 Jan 2019 16:51:48 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, 21 Jan 2019 12:03:54 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > Add a region to the vfio-ccw device that can be used to submit
+> > asynchronous I/O instructions. ssch continues to be handled by the
+> > existing I/O region; the new region handles hsch and csch.
+> > 
+> > Interrupt status continues to be reported through the same channels
+> > as for ssch.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
+> 
+> I had a look, and I don't have any new concerns.(New like not raised
+> before.)
 
-On Tue, Jan 22, 2019 at 05:31:13PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Drop CoSleepCB structure. It's actually unused.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  util/qemu-coroutine-sleep.c | 27 ++++++++++-----------------
->  1 file changed, 10 insertions(+), 17 deletions(-)
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcSY3sAAoJEJykq7OBq3PI460H/isWe5o0jrpZu93CJ9IWZCDQ
-H4g556Z42TBR9aFcmqx6aMz9Rugt9QYJI58dG6Myy46JCeffgpGnsjCZK3aqpv3v
-G6hCVLRH3gmvjdt+nmZ+eHjrycb48mnrCo/UYj3kMi6GowApHh/kZa0THZa9EXvR
-Tvp/THoPUGU8SUtfqaavab5POlQbVZMd9oMVRHUV3M12BmNgeXF02aYbHQbgiwHI
-t2Pbhl8V0vMXSal/vGJLXOLBl45a7+dDEaCrc+YI0ygSwltBPMgISPRRpAVoFKHU
-zPLNNJ397lW9elRiNHiwozhdfP2UuQIC2pW+uZ2WBUiYVFZVJR0HNigKJsrMxwE=
-=y7NG
------END PGP SIGNATURE-----
-
---p4qYPpj5QlsIQJ0K--
+So, what was raised before that I did not address?
