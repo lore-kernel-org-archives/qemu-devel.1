@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56420)
+Received: from eggs.gnu.org ([209.51.188.92]:57343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmgeu-0000GN-Fs
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:11:13 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmgjU-0001TY-Dj
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmget-0007hS-NR
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:11:12 -0500
-Date: Thu, 24 Jan 2019 16:11:05 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190124151105.GH4601@localhost.localdomain>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
+	(envelope-from <kraxel@redhat.com>) id 1gmgjO-0003cc-Uz
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:15:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:22426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmgjO-0003bk-Op
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:15:50 -0500
+Date: Thu, 24 Jan 2019 16:15:47 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190124151547.unnnxez3z3wysjvc@sirius.home.kraxel.org>
+References: <ab7146dc-4b21-4193-8f3b-109723fbd877@me.com>
+	<1A3D7D5F-8D33-4917-B9E5-81B9E215FC43@me.com>
+	<20190124120752.prg7lqmrvnzlqsuc@sirius.home.kraxel.org>
+	<F7CD54FC-DD59-4224-8FE0-48296D4892CE@me.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+In-Reply-To: <F7CD54FC-DD59-4224-8FE0-48296D4892CE@me.com>
+Subject: Re: [Qemu-devel] [PATCH]gtk-egl: Blend cursor buffer within a
+ scaled viewport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Chen Zhang <tgfbeta@me.com>
+Cc: qemu-devel@nongnu.org
 
-Am 24.01.2019 um 15:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 24.01.2019 17:17, Kevin Wolf wrote:
-> > Depending on the exact image layout and the storage backend (tmpfs is
-> > konwn to have very slow SEEK_HOLE/SEEK_DATA), caching lseek results can
-> > save us a lot of time e.g. during a mirror block job or qemu-img convert
-> > with a fragmented source image (.bdrv_co_block_status on the protocol
-> > layer can be called for every single cluster in the extreme case).
-> > 
-> > We may only cache data regions because of possible concurrent writers.
-> > This means that we can later treat a recently punched hole as data, but
-> > this is safe. We can't cache holes because then we might treat recently
-> > written data as holes, which can cause corruption.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/file-posix.c | 51 ++++++++++++++++++++++++++++++++++++++++++++--
-> >   1 file changed, 49 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 8aee7a3fb8..7272c7c99d 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -168,6 +168,12 @@ typedef struct BDRVRawState {
-> >       bool needs_alignment;
-> >       bool check_cache_dropped;
-> >   
-> > +    struct seek_data_cache {
-> > +        bool        valid;
-> > +        uint64_t    start;
-> > +        uint64_t    end;
-> > +    } seek_data_cache;
+On Thu, Jan 24, 2019 at 10:11:24PM +0800, Chen Zhang wrote:
+> Hi,
 > 
-> Should we have some mutex-locking to protect it?
+> > On Jan 24, 2019, at 8:07 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > 
+> >> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+> >> index 3fc656a..63ffc2d 100644
+> >> --- a/include/ui/egl-helpers.h
+> >> +++ b/include/ui/egl-helpers.h
+> >> @@ -28,6 +28,8 @@ void egl_fb_read(void *dst, egl_fb *src);
+> >> void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip);
+> >> void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip,
+> >>                        int x, int y);
+> >> +void egl_texture_blend2(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool flip,
+> >> +                        int x, int y, int w, int h);
+> > 
+> > Why do you add egl_texture_blend2()?
+> > How about adding scale_{x,y} parameters to egl_texture_blend() instead?
+> It is valid to augment parameter list of egl_texture_blend(), however, there are 
+> two other callers: namely, spicy-display and egl-headless, neither of which
+> seems to scale any underlying viewports. In that case, default scales (1.0, 1.0) 
+> shall be provided.
 
-It is protected by the AioContext lock, like everything else in
-BDRVRawState.
+Yes, these callers can simply set scale_x and scale_y to 1.
 
-Kevin
+cheers,
+  Gerd
