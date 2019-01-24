@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39011)
+Received: from eggs.gnu.org ([209.51.188.92]:39323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmhIs-0001HA-9Q
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:52:31 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmhKM-0002D0-Hw
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmhIq-0001Jp-3N
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:52:30 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmhIo-0001C3-2P
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:52:27 -0500
-Received: by mail-wr1-f66.google.com with SMTP id q18so6993882wrx.9
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 07:52:16 -0800 (PST)
-References: <20170816072104.24420-1-famz@redhat.com>
-	<20170816072104.24420-9-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
-Date: Thu, 24 Jan 2019 16:52:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170816072104.24420-9-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gmhKL-0002uy-IB
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:54:02 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 24 Jan 2019 15:53:54 +0000
+Message-ID: <eda5083a-2ef4-4e12-71e6-69c779edcd6d@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
+	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
+	<20190122185740.GC5220@localhost.localdomain>
+	<340bf08d-57ff-c6b3-13f4-b7c1b0a5e707@virtuozzo.com>
+	<02acf2a0-50d9-16d8-c2c4-3001a1d30b23@virtuozzo.com>
+	<20190124153945.GJ4601@localhost.localdomain>
+In-Reply-To: <20190124153945.GJ4601@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <89013A5157D43E418B8114E1EC9DD477@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: berrange@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 8/16/17 9:21 AM, Fam Zheng wrote:
-> The image is prepared following instructions as in:
-> 
-> https://wiki.qemu.org/Hosts/BSD
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/vm/openbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
->  create mode 100755 tests/vm/openbsd
-> 
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> new file mode 100755
-> index 0000000000..d37ff83a59
-> --- /dev/null
-> +++ b/tests/vm/openbsd
-> @@ -0,0 +1,45 @@
-> +#!/usr/bin/env python
-> +#
-> +# OpenBSD VM image
-> +#
-> +# Copyright (C) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import logging
-> +import subprocess
-> +import tempfile
-> +import time
-> +import basevm
-> +
-> +class OpenBSDVM(basevm.BaseVM):
-> +    name = "openbsd"
-> +    BUILD_SCRIPT = """
-> +        set -e;
-> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-> +        tar -xf /dev/rsd1c;
-> +        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
-> +        gmake -j{jobs};
-> +        # XXX: "gmake check" seems to always hang or fail
-> +        #gmake check;
-
-OK, Now it makes more sense...
-
-After spending various hours trying to fix various issues on OpenBSD, I
-notice that we never ran tests on this OS.
-The only binary I can run is qemu-img, the rest seems useless.
-I'll summarize in a different thread.
-
-> +    """
-> +
-> +    def build_image(self, img, rebuild=False):
-> +        if os.path.exists(img) and not rebuild:
-> +            return
-> +        cimg = self._download_with_cache("http://download.patchew.org/openbsd.img.xz")
-> +        img_tmp_xz = img + ".tmp.xz"
-> +        img_tmp = img + ".tmp"
-> +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-> +        subprocess.check_call(["xz", "-df", img_tmp_xz])
-> +        subprocess.check_call(["mv", img_tmp, img])
-> +
-> +if __name__ == "__main__":
-> +    sys.exit(basevm.main(OpenBSDVM))
-> 
+MjQuMDEuMjAxOSAxODozOSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjQuMDEuMjAxOSB1bSAx
+NTozNyBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDIz
+LjAxLjIwMTkgMTU6MDQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4g
+MjIuMDEuMjAxOSAyMTo1NywgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4gQW0gMTEuMDEuMjAxOSB1
+bSAxMjo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+
+Pj4+IDExLjAxLjIwMTkgMTM6NDEsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+Pj4gQW0gMTAuMDEu
+MjAxOSB1bSAxNDoyMCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJl
+bjoNCj4+Pj4+Pj4gZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlv
+bmFsLCBtb3JlIGFjY3VyYXRlIHNlYXJjaA0KPj4+Pj4+PiBmb3IgaG9sZSBpbnNpZGUgcmVnaW9u
+LCByZXBvcnRlZCBhcyBEQVRBIGJ5IGJzIHNpbmNlIDVkYWE3NGE2ZWJjLg0KPj4+Pj4+Pg0KPj4+
+Pj4+PiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNr
+LiBBY3R1YWxseSwgcWNvdzINCj4+Pj4+Pj4ga25vd3MsIHdoZXJlIGFyZSBob2xlcyBhbmQgd2hl
+cmUgaXMgZGF0YS4gQnV0IGV2ZXJ5IGJsb2NrX3N0YXR1cw0KPj4+Pj4+PiByZXF1ZXN0IGNhbGxz
+IGxzZWVrIGFkZGl0aW9uYWxseS4gQXNzdW1lIGEgYmlnIGRpc2ssIGZ1bGwgb2YNCj4+Pj4+Pj4g
+ZGF0YSwgaW4gYW55IGl0ZXJhdGl2ZSBjb3B5aW5nIGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQp
+IHdlJ2xsIGNhbGwNCj4+Pj4+Pj4gbHNlZWsoSE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQg
+ZWFjaCBvZiB0aGVzZSBsc2Vla3Mgd2lsbCBoYXZlIHRvDQo+Pj4+Pj4+IGl0ZXJhdGUgdGhyb3Vn
+aCBhbGwgbWV0YWRhdGEgdXAgdG8gdGhlIGVuZCBvZiBmaWxlLiBJdCdzIG9idmlvdXNseQ0KPj4+
+Pj4+PiBpbmVmZmVjdGl2ZSBiZWhhdmlvci4gQW5kIGZvciBtYW55IHNjZW5hcmlvcyB3ZSBkb24n
+dCBuZWVkIHRoaXMgbHNlZWsNCj4+Pj4+Pj4gYXQgYWxsLg0KPj4+Pj4+Pg0KPj4+Pj4+PiBTbywg
+bGV0J3MgIjVkYWE3NGE2ZWJjIiBieSBkZWZhdWx0LCBsZWF2aW5nIGFuIG9wdGlvbiB0byByZXR1
+cm4NCj4+Pj4+Pj4gcHJldmlvdXMgYmVoYXZpb3IsIHdoaWNoIGlzIG5lZWRlZCBmb3Igc2NlbmFy
+aW9zIHdpdGggcHJlYWxsb2NhdGVkDQo+Pj4+Pj4+IGltYWdlcy4NCj4+Pj4+Pj4NCj4+Pj4+Pj4g
+QWRkIGlvdGVzdCBpbGx1c3RyYXRpbmcgbmV3IG9wdGlvbiBzZW1hbnRpY3MuDQo+Pj4+Pj4+DQo+
+Pj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1l
+bnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4+Pg0KPj4+Pj4+IEkgc3RpbGwgdGhpbmsgdGhhdCBh
+biBvcHRpb24gaXNuJ3QgYSBnb29kIHNvbHV0aW9uIGFuZCB3ZSBzaG91bGQgdHJ5IHVzZQ0KPj4+
+Pj4+IHNvbWUgaGV1cmlzdGljcyBpbnN0ZWFkLg0KPj4+Pj4NCj4+Pj4+IERvIHlvdSB0aGluayB0
+aGF0IGhldXJpc3RpY3Mgd291bGQgYmUgYmV0dGVyIHRoYW4gZmFpciBjYWNoZSBmb3IgbHNlZWsg
+cmVzdWx0cz8NCj4+Pj4NCj4+Pj4gSSBqdXN0IHBsYXllZCBhIGJpdCB3aXRoIHRoaXMgKHFlbXUt
+aW1nIGNvbnZlcnQgb25seSksIGFuZCBob3cgbXVjaA0KPj4+PiBjYWNoaW5nIGxzZWVrKCkgcmVz
+dWx0cyBoZWxwcyBkZXBlbmRzIGNvbXBsZXRlbHkgb24gdGhlIGltYWdlLiBBcyBpdA0KPj4+PiBo
+YXBwZW5lZCwgbXkgdGVzdCBpbWFnZSB3YXMgdGhlIHdvcnN0IGNhc2Ugd2hlcmUgY2FjaGluZyBk
+aWRuJ3QgYnV5IHVzDQo+Pj4+IG11Y2guIE9idmlvdXNseSwgSSBjYW4ganVzdCBhcyBlYXNpbHkg
+Y29uc3RydWN0IGFuIGltYWdlIHdoZXJlIGl0IG1ha2VzDQo+Pj4+IGEgaHVnZSBkaWZmZXJlbmNl
+LiBJIHRoaW5rIHRoYXQgbW9zdCByZWFsLXdvcmxkIGltYWdlcyBzaG91bGQgYmUgYWJsZSB0bw0K
+Pj4+PiB0YWtlIGdvb2QgYWR2YW50YWdlIG9mIGl0LCB0aG91Z2gsIGFuZCBpdCBkb2Vzbid0IGh1
+cnQsIHNvIG1heWJlIHRoYXQncw0KPj4+PiBhIGZpcnN0IHRoaW5nIHRoYXQgd2UgY2FuIGRvIGlu
+IGFueSBjYXNlLiBJdCBtaWdodCBub3QgYmUgdGhlIGNvbXBsZXRlDQo+Pj4+IHNvbHV0aW9uLCB0
+aG91Z2guDQo+Pj4NCj4+PiBIbW0sIGFuZCBvbmUgbW9yZSBpZGVhIGZyb20gRGVuOg0KPj4+DQo+
+Pj4gV2UgY2FuIGRldGVjdCBwcmVhbGxvY2F0ZWQgaW1hZ2UsIGNvbXBhcmluZyBhbGxvY2F0ZWQg
+c2l6ZSBvZiByZWFsIGZpbGUgd2l0aA0KPj4+IG51bWJlciBvZiBub24temVybyBxY293MiByZWZj
+b3VudHMuIFNvLCByZWFsIGFsbG9jYXRpb24gaXMgbXVjaCBsZXNzIHRoYW4NCj4+PiBhbGxvY2F0
+aW9uIGluIHFjb3cyIHBvaW50IG9mIHZpZXcsIHdlJ2xsIGVuYWJsZSBsc2Vla3MsIG90aGVyd2lz
+ZSAtIG5vdC4NCj4+Pg0KPj4NCj4+IEtldmluLCB3aGF0IGRvIHlvdSB0aGluaz8NCj4gDQo+IEkn
+bSB1bnN1cmUuIEkgdGhpbmsgaXQgcmVxdWlyZXMgc2Nhbm5pbmcgYWxsIHJlZmNvdW50IGJsb2Nr
+cyBpbg0KPiBxY293Ml9vcGVuKCksIHJpZ2h0PyBUaGlzIGNvdWxkIGJlIHNsb3cgb24gaHVnZSBp
+bWFnZXMuIE9uIHRoZSBvdGhlcg0KPiBoYW5kLCB0aGUgZmlyc3QgY2x1c3RlciBhbGxvY2F0aW9u
+IHdpbGwgcHJvYmFibHkgZG8gdGhpcyBhbnl3YXksIHNvIGl0DQo+IG1pZ2h0IGJlIHJlYXNvbmFi
+bGUgZW5vdWdoLg0KDQpTZWVtcyBsaWtlIGJldHRlciBpcyBkb2luZyBpdCBvbiBmaXJzdCBibG9j
+a19zdGF0dXMsIG5vdCBvbiBvcGVuLg0KDQo+IA0KPiBIb3cgd291bGQgeW91IGNvbW11bmljYXRl
+IHRoaXM/IEFub3RoZXIgYmxvY2tfc3RhdHVzIHJldHVybiBmbGFnIHRoYXQNCj4gc2F5cyAiZG9u
+J3QgYm90aGVyIHRvIGFzayB0aGUgcHJvdG9jb2wgbGF5ZXIiIGFuZCB3aGljaCB3ZSB3b3VsZCBv
+bmx5DQo+IHNldCBpbiBxY293MiBpZiB0aGUgcHJvYmluZyBjYW1lIHRvIHRoZSBjb25jbHVzaW9u
+IHRoYXQgaXQncyBub3QNCj4gcHJlYWxsb2NhdGVkPw0KDQpPciBib29sIGZsYWcgb24gQmxvY2tE
+cml2ZXJTdGF0ZS4NCg0KPiANCj4gS2V2aW4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
+bGFkaW1pcg0K
