@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39643)
+Received: from eggs.gnu.org ([209.51.188.92]:40334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gmTs1-00032V-Vd
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:31:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmTwh-0004FZ-Rs
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gmTs0-0000El-Dm
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:31:53 -0500
-Received: from st43p00im-zteg10061901.me.com ([17.58.63.168]:33366)
+	(envelope-from <philmd@redhat.com>) id 1gmTwh-0005b7-38
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1gmTs0-0000Di-6F
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:31:52 -0500
-From: Chen Zhang <tgfbeta@me.com>
-Date: Thu, 24 Jan 2019 01:31:45 GMT
-Message-id: <ab7146dc-4b21-4193-8f3b-109723fbd877@me.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmTwd-0005Kk-Fl
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:42 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 24 Jan 2019 02:36:25 +0100
+Message-Id: <20190124013625.27239-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-    charset=utf-8;
-    format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH]gtk-egl: Blend cursor buffer within a scaled
- viewport
+Subject: [Qemu-devel] [RFC PATCH] ui/egl: Silent '__HAIKU__ undefined'
+ warnings on OpenBSD 6.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +26,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-When a gtk-egl window (for gvt-g DMABuf) was=C2=A0zoomed, the cursor plane=
- buffer did not zoom covariantly, resulting in a=C2=A0mismatched cursor si=
-ze. In this patch, `egl_texture_blend()` is augmented with two extra param=
-eters to convey the size for a scaled viewport, as in `egl_texture_blend2(=
-)`.=C2=A0=0A=0ASigned-off-by: Chen Zhang <tgfbeta@me.com>=0A---=0Ainclude/=
-ui/egl-helpers.h | 2 ++=0Aui/egl-helpers.c | 18 ++++++++++++++++++=0Aui/gt=
-k-egl.c | 8 +++++---=0A3 files changed, 25 insertions(+), 3 deletions(-)=0A=
-=0Adiff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h=0Ainde=
-x 3fc656a..63ffc2d 100644=0A--- a/include/ui/egl-helpers.h=0A+++ b/include=
-/ui/egl-helpers.h=0A@@ -28,6 +28,8 @@ void egl_fb_read(void *dst, egl_fb *=
-src);=0Avoid egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src,=
- bool flip);=0Avoid egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_=
-fb *src, bool flip,=0Aint x, int y);=0A+void egl_texture_blend2(QemuGLShad=
-er *gls, egl_fb *dst, egl_fb *src, bool flip,=0A+ int x, int y, int w, int=
- h);=0A=0A#ifdef CONFIG_OPENGL_DMABUF=0A=0Adiff --git a/ui/egl-helpers.c b=
-/ui/egl-helpers.c=0Aindex 5e115b3..9dddee9 100644=0A--- a/ui/egl-helpers.c=
-=0A+++ b/ui/egl-helpers.c=0A@@ -137,6 +137,24 @@ void egl_texture_blend(Qe=
-muGLShader *gls, egl_fb *dst, egl_fb *src, bool flip,=0AglDisable(GL_BLEND=
-);=0A}=0A=0A+void egl_texture_blend2(QemuGLShader *gls, egl_fb *dst, egl_f=
-b *src, bool flip,=0A+ int x, int y, int w, int h)=0A+{=0A+ glBindFramebuf=
-fer(GL_FRAMEBUFFER_EXT, dst->framebuffer);=0A+ if (flip) {=0A+ glViewport(=
-x, y, w, h);=0A+ } else {=0A+ glViewport(x, dst->height - h - y,=0A+ w, h)=
-;=0A+ }=0A+ glEnable(GL_TEXTURE_2D);=0A+ glBindTexture(GL_TEXTURE_2D, src-=
->texture);=0A+ glEnable(GL_BLEND);=0A+ glBlendFunc(GL_SRC_ALPHA, GL_ONE_MI=
-NUS_SRC_ALPHA);=0A+ qemu_gl_run_texture_blit(gls, flip);=0A+ glDisable(GL_=
-BLEND);=0A+}=0A+=0A/* ----------------------------------------------------=
------------------- */=0A=0A#ifdef CONFIG_OPENGL_DMABUF=0Adiff --git a/ui/g=
-tk-egl.c b/ui/gtk-egl.c=0Aindex afd1714..afff0e1 100644=0A--- a/ui/gtk-egl=
-.c=0A+++ b/ui/gtk-egl.c=0A@@ -276,9 +276,11 @@ void gd_egl_scanout_flush(D=
-isplayChangeListener *dcl,=0Aif (vc->gfx.cursor_fb.texture) {=0Aegl_textur=
-e_blit(vc->gfx.gls, &vc->gfx.win_fb, &vc->gfx.guest_fb,=0Avc->gfx.y0_top);=
-=0A- egl_texture_blend(vc->gfx.gls, &vc->gfx.win_fb, &vc->gfx.cursor_fb,=0A=
-- vc->gfx.y0_top,=0A- vc->gfx.cursor_x, vc->gfx.cursor_y);=0A+ egl_texture=
-_blend2(vc->gfx.gls, &vc->gfx.win_fb, &vc->gfx.cursor_fb,=0A+ vc->gfx.y0_t=
-op,=0A+ vc->gfx.cursor_x, vc->gfx.cursor_y,=0A+ vc->gfx.scale_x * vc->gfx.=
-cursor_fb.width,=0A+ vc->gfx.scale_x * vc->gfx.cursor_fb.height);=0A} else=
- {=0Aegl_fb_blit(&vc->gfx.win_fb, &vc->gfx.guest_fb, !vc->gfx.y0_top);=0A}=
-=0A-- =0A2.7.4=0A
+OpenBSD display various warnings about the use of an undefined __HAIKU__:
+
+    CC      ui/egl-context.o
+  In file included from /usr/X11R6/include/epoxy/egl_generated.h:10:0,
+                   from /usr/X11R6/include/epoxy/egl.h:46,
+                   from include/ui/egl-helpers.h:5,
+                   from include/ui/egl-context.h:5,
+                   from ui/egl-context.c:3:
+  /usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not=
+ defined [-Wundef]
+   #elif __HAIKU__
+         ^
+  CC      ui/egl-helpers.o
+/usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not d=
+efined [-Wundef]
+  CC      ui/egl-headless.o
+/usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not d=
+efined [-Wundef]
+
+This is due to a old <epoxy/egl_generated.h>:
+
+     70 #if defined(_WIN32) || defined(__VC32__) && !defined(__CYGWIN__) =
+&& !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
+        ...
+    108 #elif defined(__unix__) || defined(__APPLE__)
+    128 #elif __HAIKU__
+    134 #else
+    135 #error "Platform not recognized"
+    136 #endif
+
+Kludge this by adding a check to ./configure: if this warning occurs,
+define __HAIKU__ from the CFLAGS.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+This is ugly, hopefully someone can come with a clever idea :)
+
+ configure | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/configure b/configure
+index 8f312ac3e2..7c7eee44da 100755
+--- a/configure
++++ b/configure
+@@ -4036,6 +4036,17 @@ EOF
+   if compile_prog "" "" ; then
+     opengl_dmabuf=3Dyes
+   fi
++  cat > $TMPC << EOF
++#include <epoxy/egl.h>
++int main(void) { return 0; }
++EOF
++  if test "$targetos" =3D "OpenBSD" ; then
++    if ! compile_prog "-Wundef -Werror" "" ; then
++      if compile_prog "-Wundef -Werror -D__HAIKU__=3D0" "" ; then
++        QEMU_CFLAGS=3D"$QEMU_CFLAGS -D__HAIKU__=3D0"
++      fi
++    fi
++  fi
+ fi
+=20
+ ##########################################
+--=20
+2.20.1
