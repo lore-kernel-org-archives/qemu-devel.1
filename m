@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33188)
+Received: from eggs.gnu.org ([209.51.188.92]:33632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gmfNL-0003xq-6j
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:49:00 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmfPV-0005e7-5a
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gmfNJ-00042f-5a
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:48:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gmfNI-00040S-Se
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:48:57 -0500
-Date: Thu, 24 Jan 2019 08:39:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190124082325-mutt-send-email-mst@kernel.org>
-References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-	<286542bc2f48b0dd6a657f363a8e933806cac92d.1548136274.git.yi.z.zhang@linux.intel.com>
-	<20190123100252-mutt-send-email-mst@kernel.org>
-	<20190124141524.GB9821@tiger-server>
+	(envelope-from <philmd@redhat.com>) id 1gmfPT-0005Eo-AQ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:51:13 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmfPT-0005EK-3j
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:51:11 -0500
+Received: by mail-wr1-f66.google.com with SMTP id r10so6526262wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:51:11 -0800 (PST)
+References: <20190124011554.25418-1-philmd@redhat.com>
+	<20190124011554.25418-4-philmd@redhat.com>
+	<20190124112336.oviomaisnaglg22e@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c047d5bf-2cfb-233d-07ca-dbd2effa850e@redhat.com>
+Date: Thu, 24 Jan 2019 14:51:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124141524.GB9821@tiger-server>
-Subject: Re: [Qemu-devel] [PATCH V10 2/4] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <20190124112336.oviomaisnaglg22e@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] configure: Let SDL support be
+ optional on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-On Thu, Jan 24, 2019 at 10:15:24PM +0800, Yi Zhang wrote:
-> On 2019-01-23 at 10:04:01 -0500, Michael S. Tsirkin wrote:
-> > On Wed, Jan 23, 2019 at 10:59:45AM +0800, Zhang, Yi wrote:
-> > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > 
-> > > When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> > > MAP_SYNC flag in addition which can ensure file system metadata
-> > > synced in each guest writes to the backend file, without other QEMU
-> > > actions (e.g., periodic fsync() by QEMU).
-> > > 
-> > > Current, We have below different possible use cases:
-> > > 
-> > > 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-> > >    a: backend is a dax supporting file.
-> > >     - MAP_SYNC will active.
-> > >    b: backend is not a dax supporting file.
-> > >     - mmap will result in an EOPNOTSUPP error.
-> > > 
-> > > 2. The rest of cases:
-> > >    - we will never pass the MAP_SYNC to mmap2
-> > > 
-> > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > ---
-> > >  include/qemu/mmap-alloc.h |  1 +
-> > >  include/qemu/osdep.h      | 21 +++++++++++++++++++++
-> > >  util/mmap-alloc.c         |  7 ++++++-
-> > >  3 files changed, 28 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-> > > index 6fe6ed4..a95d91c 100644
-> > > --- a/include/qemu/mmap-alloc.h
-> > > +++ b/include/qemu/mmap-alloc.h
-> > > @@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
-> > >   *  @flags: specifies additional properties of the mapping, which can be one or
-> > >   *          bit-or of following values
-> > >   *          - RAM_SHARED: mmap with MAP_SHARED flag
-> > > + *          - RAM_PMEM: mmap with MAP_SYNC flag
-> > >   *          Other bits are ignored.
-> > >   *
-> > >   * Return:
-> > > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > > index 457d24e..3bcf155 100644
-> > > --- a/include/qemu/osdep.h
-> > > +++ b/include/qemu/osdep.h
-> > > @@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
-> > >  #  define QEMU_VMALLOC_ALIGN getpagesize()
-> > >  #endif
-> > >  
-> > > +/*
-> > > + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
-> > > + * 4.15, so they may not be defined when compiling on older kernels.
-> > > + */
-> > 
-> > 
-> > I commented on this part in v7. That's a wrong way to handle
-> > compatibility.
-> I'm a little confused that, you point me that should use 
-> #include <linux/mman.h>
-> here in v9, so what is best way to handle compatibility? 
-> modify the update-linux-headers.sh and copy the mman.h to
-> standard-headers/linux/?
-> and #incldue standard-headers/linux/mman.h ?
+On 1/24/19 12:23 PM, Gerd Hoffmann wrote:
+>>      sdl)
+>>      if test "$sdl" = "no"; then
+>> -        error_exit "sdl not found or disabled, can not use sdl audio driver"
+>> +        echo "WARN: sdl not found or disabled, can not use sdl audio driver"
+>> +        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/sdl *//g')
+> 
+> Busy tackling that in a separate patch series (audio: rework driver
+> probing)
 
-In fact, asm/mman.h and asm-generic/mman-common.h - that's where
-these are defined.
+But we need the Milkymist TMU fixes to build without SDL,
+I still get this error when building the series you mentioned using
+--disable-sdl on OpenBSD:
 
-> but it still need fix the compatibility. if the MAP_SYNC not defined in
-> the old kernel. Right?
+    LINK    lm32-softmmu/qemu-system-lm32
+  hw/lm32/milkymist.o: In function `milkymist_tmu2_create':
+  hw/lm32/milkymist-hw.h:114: undefined reference to `XOpenDisplay'
+  hw/lm32/milkymist-hw.h:140: undefined reference to `XFree'
+  hw/lm32/milkymist-hw.h:141: undefined reference to `XCloseDisplay'
+  hw/lm32/milkymist-hw.h:130: undefined reference to `XCloseDisplay'
+  ../hw/display/milkymist-tmu2.o: In function `tmu2_glx_init':
+  hw/display/milkymist-tmu2.c:112: undefined reference to `XOpenDisplay'
+  hw/display/milkymist-tmu2.c:123: undefined reference to `XFree'
+  collect2: error: ld returned 1 exit status
+  gmake[1]: *** [Makefile:199: qemu-system-lm32] Error 1
 
-No. You need to check at runtime and handle the case where mmap fails.
-There's no guarantee that qemu binary will be rebuilt each time
-kernel changes.
+> 
+>>      fi
+>>      ;;
+>>  
+>> @@ -3408,6 +3409,9 @@ for drv in $audio_drv_list; do
+>>      ;;
+>>      esac
+>>  done
+>> +if test -z "$audio_drv_list"; then
+>> +    audio_drv_list="none"
+>> +fi
+> 
+> Not needed, "none" is used as fallback even without this.
 
+It is not needed indeed, but I find it clearer when looking at the
+./configure output, rather than having an empty list:
 
-> forgive me my poor understandings, I'm pazzled.
-> > 
-> > > +#ifdef CONFIG_LINUX
-> > > +
-> > > +#include <linux/mman.h>
-> > > +
-> > > +#ifndef MAP_SYNC
-> > > +#define MAP_SYNC 0x0
-> > > +#endif
-> > > +
-> > > +#ifndef MAP_SHARED_VALIDATE
-> > > +#define MAP_SHARED_VALIDATE 0x0
-> > > +#endif
-> > > +
-> > 
-> > 
-> > 
-> > 
-> > > +#else  /* !CONFIG_LINUX */
-> > > +#define MAP_SYNC              0x0
-> > > +#define MAP_SHARED_VALIDATE   0x0
-> > > +#endif /* CONFIG_LINUX */
-> > > +
-> > >  #ifdef CONFIG_POSIX
-> > >  struct qemu_signalfd_siginfo {
-> > >      uint32_t ssi_signo;   /* Signal number */
-> > > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> > > index 8f0a740..a4ce9b5 100644
-> > > --- a/util/mmap-alloc.c
-> > > +++ b/util/mmap-alloc.c
-> > > @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
-> > >      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-> > >  #endif
-> > >      bool shared = flags & RAM_SHARED;
-> > > +    bool is_pmem = flags & RAM_PMEM;
-> > > +    int mmap_xflags = 0;
-> > >      size_t offset;
-> > >      void *ptr1;
-> > >  
-> > > @@ -109,12 +111,15 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
-> > >      assert(is_power_of_2(align));
-> > >      /* Always align to host page size */
-> > >      assert(align >= getpagesize());
-> > > +    if (shared && is_pmem) {
-> > > +        mmap_xflags |= (MAP_SYNC | MAP_SHARED_VALIDATE);
-> > > +    }
-> > >  
-> > >      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-> > >      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-> > >                  MAP_FIXED |
-> > >                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> > > -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> > > +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
-> > >                  fd, 0);
-> > >      if (ptr1 == MAP_FAILED) {
-> > >          munmap(ptr, total);
-> > > -- 
-> > > 2.7.4
+  SDL support       no
+  Audio drivers
+  GEN     config-host.h
+
+vs:
+
+  SDL support       no
+  Audio drivers     none
+  GEN     config-host.h
+
+Maybe my error was to not clarify that this change is purely cosmetic.
+
+Your call anyway.
+
+> 
+> The other tree patches look fine to me, I'll go queue them up.
+
+Thanks! I'll wait for Michael Walle feedbacks before respining rebased
+on your work, also fixing "WARN".
+
+> 
+> cheers,
+>   Gerd
+> 
