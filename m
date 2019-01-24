@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51614)
+Received: from eggs.gnu.org ([209.51.188.92]:51612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd4B-0001wz-P0
+	(envelope-from <kraxel@redhat.com>) id 1gmd4B-0001wy-OT
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gmd4B-00051T-3K
+	(envelope-from <kraxel@redhat.com>) id 1gmd4A-00051A-RM
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49458)
+Received: from mx1.redhat.com ([209.132.183.28]:52912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd4A-00050U-RI
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd4A-00050K-Kz
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:21:02 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 24 Jan 2019 12:20:49 +0100
-Message-Id: <20190124112055.547-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/6] audio: rework driver probing.
+Date: Thu, 24 Jan 2019 12:20:51 +0100
+Message-Id: <20190124112055.547-3-kraxel@redhat.com>
+In-Reply-To: <20190124112055.547-1-kraxel@redhat.com>
+References: <20190124112055.547-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/6] audio: allow optional audio drivers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-v3:
- * drop pa driver for *bsd.
- * codestyle fixes.
+For those audio drivers which can be probed (sdl, alsa, pulse) add a
+try-$name variants.  Unlike the variants without try- prefix they will
+not error out on probe failure, the driver will be dropped from the list
+instead.  Mainly useful for the audio_drv_list default values.
 
-Gerd Hoffmann (6):
-  audio: use pkg-config
-  audio: allow optional audio drivers.
-  audio: use try-sdl for openbsd
-  audio: check for pulseaudio daemon pidfile
-  audio: error message tweak
-  audio: probe audio drivers by default
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
- configure       | 81 ++++++++++++++++++++++++++++++++-------------------------
- audio/audio.c   | 12 +++++----
- audio/paaudio.c | 15 +++++++++++
- 3 files changed, 67 insertions(+), 41 deletions(-)
-
+diff --git a/configure b/configure
+index 5fcd0f4795..6a2aa3b533 100755
+--- a/configure
++++ b/configure
+@@ -3345,22 +3345,36 @@ fi
+ audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/,/ /g')
+ for drv in $audio_drv_list; do
+     case $drv in
+-    alsa)
++    alsa | try-alsa)
+     if $pkg_config alsa --exists; then
+         alsa_libs=$($pkg_config alsa --libs)
++        if test "$drv" = "try-alsa"; then
++            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa/alsa/')
++        fi
+     else
+-        error_exit "$drv check failed" \
+-            "Make sure to have the $drv libs and headers installed."
++        if test "$drv" = "try-alsa"; then
++            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa//')
++        else
++            error_exit "$drv check failed" \
++                "Make sure to have the $drv libs and headers installed."
++        fi
+     fi
+     ;;
+ 
+-    pa)
++    pa | try-pa)
+     if $pkg_config libpulse --exists; then
+         pulse_libs=$($pkg_config libpulse --libs)
+         audio_pt_int="yes"
++        if test "$drv" = "try-pa"; then
++            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa/pa/')
++        fi
+     else
+-        error_exit "$drv check failed" \
+-            "Make sure to have the $drv libs and headers installed."
++        if test "$drv" = "try-pa"; then
++            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa//')
++        else
++            error_exit "$drv check failed" \
++                "Make sure to have the $drv libs and headers installed."
++        fi
+     fi
+     ;;
+ 
+@@ -3370,6 +3384,14 @@ for drv in $audio_drv_list; do
+     fi
+     ;;
+ 
++    try-sdl)
++    if test "$sdl" = "no"; then
++        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl//')
++    else
++        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-sdl/sdl/')
++    fi
++    ;;
++
+     coreaudio)
+       coreaudio_libs="-framework CoreAudio"
+     ;;
 -- 
 2.9.3
