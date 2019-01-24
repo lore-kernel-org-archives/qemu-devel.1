@@ -1,45 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50891)
+Received: from eggs.gnu.org ([209.51.188.92]:51162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gmd1a-0000QX-My
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:23 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gmd30-0001De-1T
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gmd1X-0001jE-RZ
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53124
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gmd1X-0001ik-L7
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:18:19 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0OB8s6x176983
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:18:18 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q7c4k0uap-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:18:18 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 24 Jan 2019 11:18:16 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<20190122193346.4e23e018@oc2783563651>
-	<20190123112112.7822b237.cohuck@redhat.com>
-	<42264dd9-86d7-8994-8c25-bc688067725d@linux.ibm.com>
-	<20190124111934.72e7f0f1.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 24 Jan 2019 12:18:11 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gmd2y-0003FV-Fv
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gmd2w-0002yA-FU
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:19:48 -0500
+Date: Thu, 24 Jan 2019 12:19:22 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190124111922.j2dduwjpm76con7w@sirius.home.kraxel.org>
+References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
+	<da5485bb1a115b2cfd3a4484cb5f351c026ae4db.1547681517.git.DirtY.iCE.hu@gmail.com>
+	<20190117092212.ccv7zv4snnuanxtw@sirius.home.kraxel.org>
+	<75f937a5-4ab7-fdf5-f14c-e1ec87226c4a@gmail.com>
+	<20190124074224.vuwxr6gith4txvmj@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190124111934.72e7f0f1.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <639d520f-8a2a-3ffe-013a-26c172b712c0@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124074224.vuwxr6gith4txvmj@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 15/50] audio: reduce glob_audio_state
+ usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,59 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 24/01/2019 11:19, Cornelia Huck wrote:
-> On Thu, 24 Jan 2019 11:08:02 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->=20
->> On 23/01/2019 11:21, Cornelia Huck wrote:
->>> On Tue, 22 Jan 2019 19:33:46 +0100
->>> Halil Pasic <pasic@linux.ibm.com> wrote:
->>>   =20
->>>> On Mon, 21 Jan 2019 12:03:51 +0100
->>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>  =20
->>>>> --- a/drivers/s390/cio/vfio_ccw_private.h
->>>>> +++ b/drivers/s390/cio/vfio_ccw_private.h
->>>>> @@ -28,6 +28,7 @@
->>>>>     * @mdev: pointer to the mediated device
->>>>>     * @nb: notifier for vfio events
->>>>>     * @io_region: MMIO region to input/output I/O arguments/results
->>>>> + * @io_mutex: protect against concurrent update of I/O structures
->>>>
->>>> We could be a bit more specific about what does this mutex guard.
->>>> Is it only io_region, or cp, irb and the new regions a well? ->state=
- does
->>>> not seem to be covered, but should need some sort of synchronisation
->>>> too, or?
->>>
->>> I'm not sure. IIRC Pierre had some ideas about locking in the fsm?
->>>   =20
->>
->> Yes I postponed this work to not collide with your patch series.
->>
->> Do you think I should provide a new version of the FSM reworking serie=
-s
->> based on the last comment I got?
->>
->> I would take into account that the asynchronous commands will come wit=
-h
->> your patch series and only provide the framework changes.
->=20
-> This was more an answer to Halil's concerns around state
-> synchronization. I would prefer to first get this series (or a
-> variation) into decent shape, and then address state machine handling
-> on top of that (when we know more about the transitions involved), just
-> to avoid confusion.
->=20
-> Does that sound reasonable?
->=20
+  Hi,
 
-Absolutely, this was why I waited with my series. :)
+> So, I think with the first part the only open issue is whenever we go
+> with the nested types (i.e. patch #1 as-is) or not.  Given that the
+> one-element-structs added in that patch will get additional fields I
+> think the nesting makes sense.
 
+Spoke too soon: scripts/checkpatch.pl flags a bunch of codestyle issues.
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+cheers,
+  Gerd
