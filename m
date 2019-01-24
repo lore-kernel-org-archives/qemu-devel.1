@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58428)
+Received: from eggs.gnu.org ([209.51.188.92]:58491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmfFX-0005hn-4N
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:40:55 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gmfFY-0005kU-Ao
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:40:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmfCx-0003na-38
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:38:15 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmfCw-0003hp-Qf
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:38:14 -0500
-Received: by mail-wr1-f65.google.com with SMTP id s12so6506293wrt.4
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 05:38:10 -0800 (PST)
-References: <20190124011554.25418-1-philmd@redhat.com>
-	<20190124011554.25418-4-philmd@redhat.com>
-	<CAFEAcA_TStmpdC0UH+_s5aqheh81_gwNsW07Nw0f0zbEcxXQZg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4776327f-fa7b-c562-9414-0b55b463df29@redhat.com>
-Date: Thu, 24 Jan 2019 14:38:08 +0100
+	(envelope-from <yang.zhong@intel.com>) id 1gmfBs-0002tW-IG
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:37:09 -0500
+Received: from mga06.intel.com ([134.134.136.31]:23569)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gmfBs-0002lV-8T
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 08:37:08 -0500
+Date: Thu, 24 Jan 2019 21:33:18 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190124133318.GA25633@yangzhon-Virtual>
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-42-yang.zhong@intel.com>
+	<fa45d1f5-4bc4-827a-321d-7df073c97861@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TStmpdC0UH+_s5aqheh81_gwNsW07Nw0f0zbEcxXQZg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] configure: Let SDL support be
- optional on OpenBSD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa45d1f5-4bc4-827a-321d-7df073c97861@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 41/44] virtio: make virtio
+ dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, sameo@linux.intel.com, yang.zhong@intel.com
 
-
-
-On 1/24/19 12:44 PM, Peter Maydell wrote:
-> On Thu, 24 Jan 2019 at 01:16, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> --- a/configure
->> +++ b/configure
->> @@ -3379,7 +3379,8 @@ for drv in $audio_drv_list; do
->>
->>      sdl)
->>      if test "$sdl" = "no"; then
->> -        error_exit "sdl not found or disabled, can not use sdl audio driver"
->> +        echo "WARN: sdl not found or disabled, can not use sdl audio driver"
->> +        audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/sdl *//g')
+On Thu, Jan 24, 2019 at 01:51:58PM +0100, Thomas Huth wrote:
+> On 2019-01-23 07:56, Yang Zhong wrote:
+> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  default-configs/i386-softmmu.mak  |  1 -
+> >  default-configs/s390x-softmmu.mak |  1 -
+> >  default-configs/virtio.mak        | 15 ---------------
+> >  hw/9pfs/Kconfig                   |  2 ++
+> >  hw/block/Kconfig                  |  2 ++
+> >  hw/char/Kconfig                   |  2 ++
+> >  hw/display/Kconfig                |  5 +++++
+> >  hw/input/Kconfig                  |  2 ++
+> >  hw/net/Kconfig                    |  2 ++
+> >  hw/pci-host/Kconfig               |  2 ++
+> >  hw/scsi/Kconfig                   |  1 +
+> >  hw/virtio/Kconfig                 |  9 ++++++++-
+> >  12 files changed, 26 insertions(+), 18 deletions(-)
+> >  delete mode 100644 default-configs/virtio.mak
 > 
-> "WARNING:" is what configure mostly uses (though sometimes
-> also "warning:" and in one case "WARN:")...
+> This breaks compilation of aarch64 / arm as long as these targets are
+> not fully converted yet:
+> 
+> Exception: contradiction between clauses when setting VIRTIO_MMIO
+> make: *** No rule to make target `aarch64-softmmu/config-devices.mak',
+> needed by `config-all-devices.mak'.  Stop.
+> 
+> I think you temporarily have not to set CONFIG_VIRTIO=y in
+> default-configs/arm-softmmu.mak (and likely also in the riscv and s390x
+> configs), until they are finally converted completely?
+>
+   Hello Thomas,
+   
+   We did not defaultly enable VIRTIO for all ARCHs, and oonly enable this 
+   from host bridge. CONFIG_VIRTIO=y is defined in pci.mak, which is not enabled
+   for all ARCHs.
 
-Indeed, which makes me wonder why I used "WARN".
+   ./hw/pci-host/Kconfig
+   config PCI_PIIX
+    bool
+    select PCI
+    select VIRTIO
 
-I'll fix, thanks.
-
-Phil.
+   config PCI_EXPRESS_Q35
+    bool
+    select PCI_EXPRESS
+    select PCI
+    select XIO3130
+    select IOH3420
+    select I82801B11
+    select VIRTIO 
+  
+    Yang
+   
+>  Thomas
