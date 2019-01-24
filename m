@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53438)
+Received: from eggs.gnu.org ([209.51.188.92]:53607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gmbIi-0004Jp-Bd
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:27:57 -0500
+	(envelope-from <kchamart@redhat.com>) id 1gmbIr-0004O8-Dc
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gmbD6-0002b1-HO
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:22:09 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gmbD6-0002Y7-9u
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:22:08 -0500
-Received: by mail-wr1-f66.google.com with SMTP id z5so5599794wrt.11
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 01:22:08 -0800 (PST)
-Date: Thu, 24 Jan 2019 10:22:03 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190124092203.kvp2tlr3oxyks2wx@steredhat>
-References: <20190124073626.20534-1-richardw.yang@linux.intel.com>
+	(envelope-from <kchamart@redhat.com>) id 1gmb82-0001dg-Ut
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 04:16:55 -0500
+Date: Thu, 24 Jan 2019 10:16:49 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20190124091649.GF23279@paraplu>
+References: <CAMAMwPB1GJNxsgcvZLHwHuLp-AjuWtnYCGOm6+U4DwdLsNrU8A@mail.gmail.com>
+	<e169e116-1ab3-692c-5320-eb4da9abb623@redhat.com>
+	<CAMAMwPBiy7MsZzmkOPZoh+KNHfpsfA+WcRA7ZfQa0457+au99w@mail.gmail.com>
+	<9aef3157-e49e-4b53-f0de-75593df06da9@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190124073626.20534-1-richardw.yang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc.c: fix one typo in function name
+In-Reply-To: <9aef3157-e49e-4b53-f0de-75593df06da9@redhat.com>
+Subject: Re: [Qemu-devel] Incremental drive-backup with dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: Bharadwaj Rayala <bharadwaj.rayala@rubrik.com>, qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>, Suman Swaroop <suman.swaroop@rubrik.com>, John Snow <jsnow@redhat.com>, qemu-discuss@nongnu.org
 
-CCing qemu-trivial@nongnu.org
+On Wed, Jan 23, 2019 at 01:09:41PM -0600, Eric Blake wrote:
+> On 1/23/19 12:08 PM, Bharadwaj Rayala wrote:
 
-On Thu, Jan 24, 2019 at 03:36:26PM +0800, Wei Yang wrote:
-> Rename pc_get_hotpug_handler to pc_get_hotplug_handler.
-> 
-> No functional change.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  hw/i386/pc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
+[...] # [Snip Eric's excellent exposition.]
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > What do you mean by issues? Do you mean any data/corruption bugs or lack of
+> > some nice functionality that we are talking here?
+> 
+> Lack of functionality.  In particular, the 4.0 commands
+> block-dirty-bitmap-{enable,merge,disable} (or their 3.1 counterparts
+> x-block-dirty-bitmap-*) are essential to the workflow of differential
+> backups (without being able to manage bitmaps yourself, you can only get
+> the weaker incremental backup, and that means qemu itself is clearing
+> the bitmap out of under your feet on success, and where you are having
+> to worry about completion-mode=grouped).
+> 
+> > 
+> > Thanks a lot Eric for spending your time in answering my queries. I dont
+> > know if you work with Kashyap Chamarthy, but your help and his blogs are
+> > lifesavers.
+> 
+> Yes, Kashyap is trying to build solutions on top of the building blocks
+> that I am working on, so we have collaborated several times on these
+> types of issues (he does a lot better at blog posts extracted from my
+> mailing list brain dumps).
+
+I haven't kept up with incremental backups lately, as I've been swamped
+with other work.  But two other documents that I can point to are these
+[1][2] in the QEMU tree.  And their HTML-rendered versions are
+here[3][4].  They're generated for 3.0.0; but these docs haven't changed
+much since then.
+
+Along with Eric's last year talk, also check out presentations from
+previous KVM Forums from other Block Layer maintainers.
+
+
+[1] https://git.qemu.org/?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
+[2] https://git.qemu.org/?p=qemu.git;a=blob;f=docs/interop/bitmaps.rst
+[3] https://kashyapc.fedorapeople.org/QEMU-Docs-v3.0.0/_build/html/docs/interop/live-block-operations.html
+[4] https://kashyapc.fedorapeople.org/QEMU-Docs-v3.0.0/_build/html/docs/interop/bitmaps.html
+
+
+-- 
+/kashyap
