@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58914)
+Received: from eggs.gnu.org ([209.51.188.92]:59342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmgpf-0003lE-M1
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:22:20 -0500
+	(envelope-from <armbru@redhat.com>) id 1gmgr7-0004fr-RR
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:23:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gmgpb-000077-Up
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:22:17 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 24 Jan 2019 15:22:05 +0000
-Message-ID: <093415a1-c31c-c727-583f-bf3176621336@virtuozzo.com>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
-	<20190124151105.GH4601@localhost.localdomain>
-In-Reply-To: <20190124151105.GH4601@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <95D888035C7FF54581DF7AAC638AFFD6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gmgr5-0002A3-9x
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:23:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gmgr5-00027z-1k
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 10:23:47 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A416181129
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 15:23:45 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190121170434.13592-1-cfergeau@redhat.com>
+	<87d0omieea.fsf@dusky.pond.sub.org>
+	<20190124124428.GX30040@natto.ory.fergeau.eu>
+Date: Thu, 24 Jan 2019 16:23:29 +0100
+In-Reply-To: <20190124124428.GX30040@natto.ory.fergeau.eu> (Christophe
+	Fergeau's message of "Thu, 24 Jan 2019 13:44:28 +0100")
+Message-ID: <871s52dqq6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-MjQuMDEuMjAxOSAxODoxMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjQuMDEuMjAxOSB1bSAx
-NTo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDI0
-LjAxLjIwMTkgMTc6MTcsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gRGVwZW5kaW5nIG9uIHRoZSBl
-eGFjdCBpbWFnZSBsYXlvdXQgYW5kIHRoZSBzdG9yYWdlIGJhY2tlbmQgKHRtcGZzIGlzDQo+Pj4g
-a29ud24gdG8gaGF2ZSB2ZXJ5IHNsb3cgU0VFS19IT0xFL1NFRUtfREFUQSksIGNhY2hpbmcgbHNl
-ZWsgcmVzdWx0cyBjYW4NCj4+PiBzYXZlIHVzIGEgbG90IG9mIHRpbWUgZS5nLiBkdXJpbmcgYSBt
-aXJyb3IgYmxvY2sgam9iIG9yIHFlbXUtaW1nIGNvbnZlcnQNCj4+PiB3aXRoIGEgZnJhZ21lbnRl
-ZCBzb3VyY2UgaW1hZ2UgKC5iZHJ2X2NvX2Jsb2NrX3N0YXR1cyBvbiB0aGUgcHJvdG9jb2wNCj4+
-PiBsYXllciBjYW4gYmUgY2FsbGVkIGZvciBldmVyeSBzaW5nbGUgY2x1c3RlciBpbiB0aGUgZXh0
-cmVtZSBjYXNlKS4NCj4+Pg0KPj4+IFdlIG1heSBvbmx5IGNhY2hlIGRhdGEgcmVnaW9ucyBiZWNh
-dXNlIG9mIHBvc3NpYmxlIGNvbmN1cnJlbnQgd3JpdGVycy4NCj4+PiBUaGlzIG1lYW5zIHRoYXQg
-d2UgY2FuIGxhdGVyIHRyZWF0IGEgcmVjZW50bHkgcHVuY2hlZCBob2xlIGFzIGRhdGEsIGJ1dA0K
-Pj4+IHRoaXMgaXMgc2FmZS4gV2UgY2FuJ3QgY2FjaGUgaG9sZXMgYmVjYXVzZSB0aGVuIHdlIG1p
-Z2h0IHRyZWF0IHJlY2VudGx5DQo+Pj4gd3JpdHRlbiBkYXRhIGFzIGhvbGVzLCB3aGljaCBjYW4g
-Y2F1c2UgY29ycnVwdGlvbi4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEtldmluIFdvbGYgPGt3
-b2xmQHJlZGhhdC5jb20+DQo+Pj4gLS0tDQo+Pj4gICAgYmxvY2svZmlsZS1wb3NpeC5jIHwgNTEg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPj4+ICAgIDEg
-ZmlsZSBjaGFuZ2VkLCA0OSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4+DQo+Pj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrL2ZpbGUtcG9zaXguYyBiL2Jsb2NrL2ZpbGUtcG9zaXguYw0KPj4+
-IGluZGV4IDhhZWU3YTNmYjguLjcyNzJjN2M5OWQgMTAwNjQ0DQo+Pj4gLS0tIGEvYmxvY2svZmls
-ZS1wb3NpeC5jDQo+Pj4gKysrIGIvYmxvY2svZmlsZS1wb3NpeC5jDQo+Pj4gQEAgLTE2OCw2ICsx
-NjgsMTIgQEAgdHlwZWRlZiBzdHJ1Y3QgQkRSVlJhd1N0YXRlIHsNCj4+PiAgICAgICAgYm9vbCBu
-ZWVkc19hbGlnbm1lbnQ7DQo+Pj4gICAgICAgIGJvb2wgY2hlY2tfY2FjaGVfZHJvcHBlZDsNCj4+
-PiAgICANCj4+PiArICAgIHN0cnVjdCBzZWVrX2RhdGFfY2FjaGUgew0KPj4+ICsgICAgICAgIGJv
-b2wgICAgICAgIHZhbGlkOw0KPj4+ICsgICAgICAgIHVpbnQ2NF90ICAgIHN0YXJ0Ow0KPj4+ICsg
-ICAgICAgIHVpbnQ2NF90ICAgIGVuZDsNCj4+PiArICAgIH0gc2Vla19kYXRhX2NhY2hlOw0KPj4N
-Cj4+IFNob3VsZCB3ZSBoYXZlIHNvbWUgbXV0ZXgtbG9ja2luZyB0byBwcm90ZWN0IGl0Pw0KPiAN
-Cj4gSXQgaXMgcHJvdGVjdGVkIGJ5IHRoZSBBaW9Db250ZXh0IGxvY2ssIGxpa2UgZXZlcnl0aGlu
-ZyBlbHNlIGluDQo+IEJEUlZSYXdTdGF0ZS4NCj4gDQoNClJlY2VudGx5IFBhb2xvIGFza2VkIG1l
-IG5vdCB0byBhZGQgbW9yZSB1c2VycyBvZiBBaW9Db250ZXh0IGxvY2suIFVuZm9ydHVuYXRlbHkN
-CkkgZG9uJ3QgdW5kZXJzdGFuZCB0aGUgd2hvbGUgcGljdHVyZSBhcm91bmQgaXQuLiBEb2Vzbid0
-IHRoaXMgYXBwbHkgaGVyZT8NCmh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVt
-dS1kZXZlbC8yMDE4LTEyL21zZzAzNDEwLmh0bWwNCg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
-VmxhZGltaXINCg==
+Christophe Fergeau <cfergeau@redhat.com> writes:
+
+> Hey,
+>
+> On Thu, Jan 24, 2019 at 10:38:37AM +0100, Markus Armbruster wrote:
+>> Christophe Fergeau <cfergeau@redhat.com> writes:
+>>=20
+>> > This commit adds a qemu_init_logging() helper which calls
+>> > g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+>> > are handled similarly to other QEMU logs. This means they will get a
+>> > timestamp if timestamps are enabled, and they will go through the
+>> > monitor if one is configured.
+>> > This commit also adds a call to qemu_init_logging() to the binaries
+>> > installed by QEMU.
+>> > glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
+>> > glib default log handler.
+>> >
+>> > At the moment, this change will mostly impact SPICE logging if your
+>> > spice version is >=3D 0.14.1. With older spice versions, this is not g=
+oing
+>> > to work as expected, but will not have any ill effect, so this call is
+>> > not conditional on the SPICE version.
+>> >
+>> > Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+>> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>=20
+>> Do you expect this to go through my tree?
+>
+> To be honest, I don't know through whose tree this should go.
+
+The bulk of the patch is in qemu-error.c, which suggests my tree.
+
+>> Hint: if you do, cc'ing me tends to help ;)
+>>=20
+>> scripts/get_maintainer.pl can be your friend.
+>
+> I ran it, but it returned a few too many names given that it touches
+> files in various subsystems, I was not sure I should cc: everyone.
+
+You were right to doubt.
+
+> Now that I look again, at least "(supporter:Error reporting)" would have
+> made sense.
+>
+> Thanks for noticing this patch without the cc: :)
+
+No problem :)
