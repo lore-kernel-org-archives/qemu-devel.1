@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40334)
+Received: from eggs.gnu.org ([209.51.188.92]:40946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmTwh-0004FZ-Rs
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:45 -0500
+	(envelope-from <philmd@redhat.com>) id 1gmU0u-0005Bh-DD
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gmTwh-0005b7-38
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmTwd-0005Kk-Fl
-	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:36:42 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 24 Jan 2019 02:36:25 +0100
-Message-Id: <20190124013625.27239-1-philmd@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gmU0t-0004D6-Iz
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:41:04 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gmU0t-00044I-Cb
+	for qemu-devel@nongnu.org; Wed, 23 Jan 2019 20:41:03 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t27so4709452wra.6
+	for <qemu-devel@nongnu.org>; Wed, 23 Jan 2019 17:41:03 -0800 (PST)
+References: <20190122190503.13627-1-philmd@redhat.com>
+	<CAFEAcA-iZHdf6DqrNyUS7yEQmV=VNzWgF7HbHrLaZ5C8EL_0dA@mail.gmail.com>
+	<20190123093354.GB27270@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <078e621a-21b6-845f-c664-b6b1609b06b4@redhat.com>
+Date: Thu, 24 Jan 2019 02:41:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH] ui/egl: Silent '__HAIKU__ undefined'
- warnings on OpenBSD 6.1
+In-Reply-To: <20190123093354.GB27270@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Let SDL support be optional on
+ OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <fam@euphon.net>
 
-OpenBSD display various warnings about the use of an undefined __HAIKU__:
+On 1/23/19 10:33 AM, Daniel P. Berrangé wrote:
+> On Tue, Jan 22, 2019 at 07:20:35PM +0000, Peter Maydell wrote:
+>> On Tue, 22 Jan 2019 at 19:05, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>>
+>>> Currently if we try to build QEMU on OpenBSD with SDL disabled, we get:
+>>>
+>>>   $ ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 --disable-sdl
+>>>
+>>>   ERROR: sdl not found or disabled, can not use sdl audio driver
+>>>
+>>> Since SDL is not a requirement for OpenBSD, let it be optional (we remove
+>>> it from $audio_drv_list but it stays available in $audio_possible_drivers).
+>>> If no audio backends are available, QEMU falls back to the null driver.
+>>
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -828,7 +828,7 @@ NetBSD)
+>>>  OpenBSD)
+>>>    bsd="yes"
+>>>    make="${MAKE-gmake}"
+>>> -  audio_drv_list="sdl"
+>>> +  audio_drv_list=""
+>>>    audio_possible_drivers="sdl"
+>>>    HOST_VARIANT_DIR="openbsd"
+>>>    supported_os="yes"
+>>
+>> This will mean that configure will by default not enable
+>> a real audio backend, even if we do have sdl.
+>>
+>> Looking at the logic, "audio_possible_drivers" is only
+>> used for printing the help message. The thing that drives
+>> which audio drivers to test with is "audio_drv_list",
+>> and the expectation is that you put things on that only
+>> if it's possible to build with them. (For instance
+>> we only add 'dsound' for mingw if the dsound.h header is
+>> present, and so on.)
 
-    CC      ui/egl-context.o
-  In file included from /usr/X11R6/include/epoxy/egl_generated.h:10:0,
-                   from /usr/X11R6/include/epoxy/egl.h:46,
-                   from include/ui/egl-helpers.h:5,
-                   from include/ui/egl-context.h:5,
-                   from ui/egl-context.c:3:
-  /usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not=
- defined [-Wundef]
-   #elif __HAIKU__
-         ^
-  CC      ui/egl-helpers.o
-/usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not d=
-efined [-Wundef]
-  CC      ui/egl-headless.o
-/usr/X11R6/include/EGL/eglplatform.h:128:7: warning: "__HAIKU__" is not d=
-efined [-Wundef]
+Yes sorry I missed that Peter :S
 
-This is due to a old <epoxy/egl_generated.h>:
+>> So we need to do one of:
+>>  (1) only put "sdl" into audio_drv_list if SDL is
+>>      available (this probably doesn't work as we haven't
+>>      probed for SDL at the point where we initialize it)
+>>  (2) have the sdl probe delete "sdl" from audio_drv_list
+>>      if the probe fails
+> 
+> This one sounds reasonable to me.
 
-     70 #if defined(_WIN32) || defined(__VC32__) && !defined(__CYGWIN__) =
-&& !defined(__SCITECH_SNAP__) /* Win32 and WinCE */
-        ...
-    108 #elif defined(__unix__) || defined(__APPLE__)
-    128 #elif __HAIKU__
-    134 #else
-    135 #error "Platform not recognized"
-    136 #endif
+I went this way, but encountered unexpected problems, which makes me
+wonder who really use OpenBSD... Anyway the discussion deserves another
+thread.
 
-Kludge this by adding a check to ./configure: if this warning occurs,
-define __HAIKU__ from the CFLAGS.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-This is ugly, hopefully someone can come with a clever idea :)
-
- configure | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/configure b/configure
-index 8f312ac3e2..7c7eee44da 100755
---- a/configure
-+++ b/configure
-@@ -4036,6 +4036,17 @@ EOF
-   if compile_prog "" "" ; then
-     opengl_dmabuf=3Dyes
-   fi
-+  cat > $TMPC << EOF
-+#include <epoxy/egl.h>
-+int main(void) { return 0; }
-+EOF
-+  if test "$targetos" =3D "OpenBSD" ; then
-+    if ! compile_prog "-Wundef -Werror" "" ; then
-+      if compile_prog "-Wundef -Werror -D__HAIKU__=3D0" "" ; then
-+        QEMU_CFLAGS=3D"$QEMU_CFLAGS -D__HAIKU__=3D0"
-+      fi
-+    fi
-+  fi
- fi
-=20
- ##########################################
---=20
-2.20.1
+>>  (3) some more complicated restructuring :-)
+>>      (eg rather than having audio_drv_list be set to an
+>>      initial list based on the host OS, just have a full
+>>      list of drivers, insist that each has a proper probe
+>>      routine, and use whichever ones we can successfully
+>>      probe)
+> 
+> 
+> Regards,
+> Daniel
+> 
