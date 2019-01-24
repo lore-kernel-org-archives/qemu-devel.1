@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34681)
+Received: from eggs.gnu.org ([209.51.188.92]:36141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gmijB-0004pM-Nw
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:23:47 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gmio4-0007aN-FB
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:28:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gmij9-0000oD-DP
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:23:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gmij9-0000hx-2z
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:23:43 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gmio3-0003dM-GC
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:28:48 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 24 Jan 2019 18:23:22 +0100
-Message-Id: <20190124172323.230296-2-sgarzare@redhat.com>
+Date: Thu, 24 Jan 2019 18:23:23 +0100
+Message-Id: <20190124172323.230296-3-sgarzare@redhat.com>
 In-Reply-To: <20190124172323.230296-1-sgarzare@redhat.com>
 References: <20190124172323.230296-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RFC 1/2] virtio-blk: add DISCARD and WRITE
- ZEROES features
+Subject: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +25,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-This patch adds the support of DISCARD and WRITE ZEROES commands,
-that have been introduced in the virtio-blk protocol to have
-better performance when using SSD backend.
+If the WRITE_ZEROES feature is enabled, we check this
+command in the test_basic().
 
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/block/virtio-blk.c | 79 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ tests/virtio-blk-test.c | 63 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index f208c6ddb9..8850957751 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -145,6 +145,25 @@ out:
-     aio_context_release(blk_get_aio_context(s->conf.conf.blk));
- }
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 04c608764b..8cabbcb85a 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -231,6 +231,69 @@ static void test_basic(QVirtioDevice *dev, QGuestAll=
+ocator *alloc,
 =20
-+static void virtio_blk_discard_wzeroes_complete(void *opaque, int ret)
-+{
-+    VirtIOBlockReq *req =3D opaque;
-+    VirtIOBlock *s =3D req->dev;
+     guest_free(alloc, req_addr);
+=20
++    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
++        struct virtio_blk_discard_write_zeroes *dwz_hdr;
++        void *expected;
 +
-+    aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
-+    if (ret) {
-+        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
-+            goto out;
-+        }
++        /*
++         * WRITE_ZEROES request on the same sector of previous test wher=
+e
++         * we wrote "TEST".
++         */
++        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
++        req.data =3D g_malloc0(512);
++        dwz_hdr =3D (struct virtio_blk_discard_write_zeroes *)req.data;
++        dwz_hdr->sector =3D 0;
++        dwz_hdr->num_sectors =3D 1;
++        dwz_hdr->flags =3D 0;
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, 512, false, true);
++        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 528);
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        guest_free(alloc, req_addr);
++
++        /* Read request to check if the sector contains all zeroes */
++        req.type =3D VIRTIO_BLK_T_IN;
++        req.ioprio =3D 1;
++        req.sector =3D 0;
++        req.data =3D g_malloc0(512);
++
++        req_addr =3D virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head =3D qvirtqueue_add(vq, req_addr, 16, false, true);
++        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
++        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
++
++        qvirtqueue_kick(dev, vq, free_head);
++
++        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status =3D readb(req_addr + 528);
++        g_assert_cmpint(status, =3D=3D, 0);
++
++        data =3D g_malloc(512);
++        expected =3D g_malloc0(512);
++        memread(req_addr + 16, data, 512);
++        g_assert_cmpmem(data, 512, expected, 512);
++        g_free(expected);
++        g_free(data);
++
++        guest_free(alloc, req_addr);
 +    }
 +
-+    virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
-+    virtio_blk_free_request(req);
-+
-+out:
-+    aio_context_release(blk_get_aio_context(s->conf.conf.blk));
-+}
-+
- #ifdef __linux__
-=20
- typedef struct {
-@@ -584,6 +603,56 @@ static int virtio_blk_handle_request(VirtIOBlockReq =
-*req, MultiReqBuffer *mrb)
-         virtio_blk_free_request(req);
-         break;
-     }
-+    /*
-+     * VIRTIO_BLK_T_DISCARD and VIRTIO_BLK_T_WRITE_ZEROES are defined wi=
-th
-+     * VIRTIO_BLK_T_OUT flag set. We masked this flag in the switch stat=
-ement,
-+     * so we must mask it for these requests, then we will check the typ=
-e.
-+     */
-+    case VIRTIO_BLK_T_DISCARD & ~VIRTIO_BLK_T_OUT:
-+    case VIRTIO_BLK_T_WRITE_ZEROES & ~VIRTIO_BLK_T_OUT:
-+    {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        uint64_t sector;
-+        int bytes;
-+
-+        if (unlikely(iov_to_buf(out_iov, out_num, 0, &dwz_hdr,
-+                                sizeof(dwz_hdr)) !=3D sizeof(dwz_hdr))) =
-{
-+            virtio_error(vdev, "virtio-blk discard/wzeroes header too sh=
-ort");
-+            return -1;
-+        }
-+
-+        sector =3D virtio_ldq_p(VIRTIO_DEVICE(req->dev), &dwz_hdr.sector=
-);
-+        bytes =3D virtio_ldl_p(VIRTIO_DEVICE(req->dev),
-+                             &dwz_hdr.num_sectors) << BDRV_SECTOR_BITS;
-+
-+        if (!virtio_blk_sect_range_ok(req->dev, sector, bytes)) {
-+            virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
-+            virtio_blk_free_request(req);
-+            return 0;
-+        }
-+
-+        if ((type & ~(VIRTIO_BLK_T_BARRIER)) =3D=3D VIRTIO_BLK_T_DISCARD=
-) {
-+            blk_aio_pdiscard(req->dev->blk, sector << BDRV_SECTOR_BITS, =
-bytes,
-+                             virtio_blk_discard_wzeroes_complete, req);
-+        } else if ((type & ~(VIRTIO_BLK_T_BARRIER)) =3D=3D
-+                   VIRTIO_BLK_T_WRITE_ZEROES) {
-+            int flags =3D 0;
-+
-+            if (virtio_ldl_p(VIRTIO_DEVICE(req->dev), &dwz_hdr.flags) &
-+                VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP) {
-+                flags |=3D BDRV_REQ_MAY_UNMAP;
-+            }
-+
-+            blk_aio_pwrite_zeroes(req->dev->blk, sector << BDRV_SECTOR_B=
-ITS,
-+                                  bytes, flags,
-+                                  virtio_blk_discard_wzeroes_complete, r=
-eq);
-+        } else { /* Unsupported if VIRTIO_BLK_T_OUT is not set */
-+            virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
-+            virtio_blk_free_request(req);
-+        }
-+
-+        break;
-+    }
-     default:
-         virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
-         virtio_blk_free_request(req);
-@@ -763,6 +832,14 @@ static void virtio_blk_update_config(VirtIODevice *v=
-dev, uint8_t *config)
-     blkcfg.alignment_offset =3D 0;
-     blkcfg.wce =3D blk_enable_write_cache(s->blk);
-     virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-+    virtio_stl_p(vdev, &blkcfg.max_discard_sectors, BDRV_REQUEST_MAX_SEC=
-TORS);
-+    virtio_stl_p(vdev, &blkcfg.max_discard_seg, 1);
-+    virtio_stl_p(vdev, &blkcfg.discard_sector_alignment,
-+                 blk_size >> BDRV_SECTOR_BITS);
-+    virtio_stl_p(vdev, &blkcfg.max_write_zeroes_sectors,
-+                 BDRV_REQUEST_MAX_SECTORS);
-+    virtio_stl_p(vdev, &blkcfg.max_write_zeroes_seg, 1);
-+    blkcfg.write_zeroes_may_unmap =3D 1;
-     memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
- }
-=20
-@@ -787,6 +864,8 @@ static uint64_t virtio_blk_get_features(VirtIODevice =
-*vdev, uint64_t features,
-     virtio_add_feature(&features, VIRTIO_BLK_F_GEOMETRY);
-     virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
-     virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
-+    virtio_add_feature(&features, VIRTIO_BLK_F_DISCARD);
-+    virtio_add_feature(&features, VIRTIO_BLK_F_WRITE_ZEROES);
-     if (virtio_has_feature(features, VIRTIO_F_VERSION_1)) {
-         if (s->conf.scsi) {
-             error_setg(errp, "Please set scsi=3Doff for virtio-blk devic=
-es in order to use virtio 1.0");
+     if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
+         /* Write and read with 2 descriptor layout */
+         /* Write request */
 --=20
 2.20.1
