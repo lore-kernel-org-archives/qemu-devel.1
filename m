@@ -1,16 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42074)
+Received: from eggs.gnu.org ([209.51.188.92]:42617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmfpY-0008DJ-6f
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:18:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1gmfs3-0001KP-II
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmfpS-0003jW-3Z
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:18:07 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 24 Jan 2019 15:17:31 +0100
-Message-Id: <20190124141731.21509-1-kwolf@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gmfs1-0005qU-S4
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gmfs1-0005pd-MN
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:20:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gmfs0-0003jB-5S
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 27CF02E807B
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 14:20:40 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data regions
+Date: Thu, 24 Jan 2019 14:09:58 -0000
+From: Thomas <1813165@bugs.launchpad.net>
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <154833899874.19664.14897232674094543880.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813165] Re: KVM internal error. Suberror: 1
+ emulation failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,144 +37,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Depending on the exact image layout and the storage backend (tmpfs is
-konwn to have very slow SEEK_HOLE/SEEK_DATA), caching lseek results can
-save us a lot of time e.g. during a mirror block job or qemu-img convert
-with a fragmented source image (.bdrv_co_block_status on the protocol
-layer can be called for every single cluster in the extreme case).
+** Description changed:
 
-We may only cache data regions because of possible concurrent writers.
-This means that we can later treat a recently punched hole as data, but
-this is safe. We can't cache holes because then we might treat recently
-written data as holes, which can cause corruption.
+  Hello Devs.
+  =
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 51 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 49 insertions(+), 2 deletions(-)
+  Having problems getting VM to run with qemu 3.1.0.
+  =
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 8aee7a3fb8..7272c7c99d 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -168,6 +168,12 @@ typedef struct BDRVRawState {
-     bool needs_alignment;
-     bool check_cache_dropped;
-=20
-+    struct seek_data_cache {
-+        bool        valid;
-+        uint64_t    start;
-+        uint64_t    end;
-+    } seek_data_cache;
-+
-     PRManager *pr_mgr;
- } BDRVRawState;
-=20
-@@ -1555,8 +1561,17 @@ static int handle_aiocb_write_zeroes_unmap(void *o=
-paque)
- {
-     RawPosixAIOData *aiocb =3D opaque;
-     BDRVRawState *s G_GNUC_UNUSED =3D aiocb->bs->opaque;
-+    struct seek_data_cache *sdc;
-     int ret;
-=20
-+    /* Invalidate seek_data_cache if it overlaps */
-+    sdc =3D &s->seek_data_cache;
-+    if (sdc->valid && !(sdc->end < aiocb->aio_offset ||
-+                        sdc->start > aiocb->aio_offset + aiocb->aio_nbyt=
-es))
-+    {
-+        sdc->valid =3D false;
-+    }
-+
-     /* First try to write zeros and unmap at the same time */
-=20
- #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-@@ -1634,11 +1649,20 @@ static int handle_aiocb_discard(void *opaque)
-     RawPosixAIOData *aiocb =3D opaque;
-     int ret =3D -EOPNOTSUPP;
-     BDRVRawState *s =3D aiocb->bs->opaque;
-+    struct seek_data_cache *sdc;
-=20
-     if (!s->has_discard) {
-         return -ENOTSUP;
-     }
-=20
-+    /* Invalidate seek_data_cache if it overlaps */
-+    sdc =3D &s->seek_data_cache;
-+    if (sdc->valid && !(sdc->end < aiocb->aio_offset ||
-+                        sdc->start > aiocb->aio_offset + aiocb->aio_nbyt=
-es))
-+    {
-+        sdc->valid =3D false;
-+    }
-+
-     if (aiocb->aio_type & QEMU_AIO_BLKDEV) {
- #ifdef BLKDISCARD
-         do {
-@@ -2424,6 +2448,8 @@ static int coroutine_fn raw_co_block_status(BlockDr=
-iverState *bs,
-                                             int64_t *map,
-                                             BlockDriverState **file)
- {
-+    BDRVRawState *s =3D bs->opaque;
-+    struct seek_data_cache *sdc;
-     off_t data =3D 0, hole =3D 0;
-     int ret;
-=20
-@@ -2439,6 +2465,14 @@ static int coroutine_fn raw_co_block_status(BlockD=
-riverState *bs,
-         return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-     }
-=20
-+    sdc =3D &s->seek_data_cache;
-+    if (sdc->valid && sdc->start <=3D offset && sdc->end > offset) {
-+        *pnum =3D MIN(bytes, sdc->end - offset);
-+        *map =3D offset;
-+        *file =3D bs;
-+        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
-+    }
-+
-     ret =3D find_allocation(bs, offset, &data, &hole);
-     if (ret =3D=3D -ENXIO) {
-         /* Trailing hole */
-@@ -2451,14 +2485,27 @@ static int coroutine_fn raw_co_block_status(Block=
-DriverState *bs,
-     } else if (data =3D=3D offset) {
-         /* On a data extent, compute bytes to the end of the extent,
-          * possibly including a partial sector at EOF. */
--        *pnum =3D MIN(bytes, hole - offset);
-+        *pnum =3D hole - offset;
-         ret =3D BDRV_BLOCK_DATA;
-     } else {
-         /* On a hole, compute bytes to the beginning of the next extent.=
-  */
-         assert(hole =3D=3D offset);
--        *pnum =3D MIN(bytes, data - offset);
-+        *pnum =3D data - offset;
-         ret =3D BDRV_BLOCK_ZERO;
-     }
-+
-+    /* Caching allocated ranges is okay even if another process writes t=
-o the
-+     * same file because we allow declaring things allocated even if the=
-re is a
-+     * hole. However, we cannot cache holes without risking corruption. =
-*/
-+    if (ret =3D=3D BDRV_BLOCK_DATA) {
-+        *sdc =3D (struct seek_data_cache) {
-+            .valid  =3D true,
-+            .start  =3D offset,
-+            .end    =3D offset + *pnum,
-+        };
-+    }
-+
-+    *pnum =3D MIN(*pnum, bytes);
-     *map =3D offset;
-     *file =3D bs;
-     return ret | BDRV_BLOCK_OFFSET_VALID;
---=20
-2.20.1
+- 2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one.lordcritical.de
++ 2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+- DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
++ DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+  =
+
+  Someone has an idea whats going wrong here?
+  =
+
+  thanks and cheers
+  t.
+
+** Description changed:
+
+  Hello Devs.
+  =
+
+- Having problems getting VM to run with qemu 3.1.0.
++ Having problems getting VM to run with qemu 3.1.0. I should mention it's
++ a nested configuration.
+  =
+
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+  =
+
+  Someone has an idea whats going wrong here?
+  =
+
+  thanks and cheers
+  t.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
+
+Title:
+  KVM internal error. Suberror: 1 emulation failure
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Devs.
+
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
+
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
