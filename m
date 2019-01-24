@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49579)
+Received: from eggs.gnu.org ([209.51.188.92]:49991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmgDP-0007ia-Ah
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:49 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gmgFA-0000lD-EZ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:44:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gmgDO-0001ZJ-Gj
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:47 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44232)
+	(envelope-from <alex.bennee@linaro.org>) id 1gmgF8-0003DS-BN
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:44:36 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45126)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gmgDO-0001YG-Af
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:42:46 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z5so6720964wrt.11
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:42:45 -0800 (PST)
+	id 1gmgF6-000349-AJ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:44:33 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so6710987wrr.12
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 06:44:25 -0800 (PST)
 References: <20181209193749.12277-1-cota@braap.org>
-	<20181209193749.12277-2-cota@braap.org>
+	<20181209193749.12277-4-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181209193749.12277-2-cota@braap.org>
-Date: Thu, 24 Jan 2019 14:42:43 +0000
-Message-ID: <87sgxiyv4s.fsf@linaro.org>
+In-reply-to: <20181209193749.12277-4-cota@braap.org>
+Date: Thu, 24 Jan 2019 14:44:22 +0000
+Message-ID: <87r2d2yv21.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 01/38] trace: expand mem_info:size_shift
- to 3 bits
+Subject: Re: [Qemu-devel] [RFC v2 03/38] cpu: introduce
+ cpu_in_exclusive_work_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +37,68 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Pav
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> This will allow us to trace 16B-long memory accesses.
->
-> While at it, add some defines for the mem_info bits and simplify
-> trace_mem_get_info by making it a wrapper around trace_mem_build_info.
->
+> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  include/qom/cpu.h | 13 +++++++++++++
+>  cpus-common.c     |  2 ++
+>  2 files changed, 15 insertions(+)
+>
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 772cc960fe..fab18089db 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -349,6 +349,7 @@ struct CPUState {
+>      bool thread_kicked;
+>      bool crash_occurred;
+>      bool exit_request;
+> +    bool in_exclusive_work_context;
+
+I'm not sure if I meant this or in_exclusive_context and push the flag
+into start/end_exclusive. But let's see how it shakes out:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> ---
->  trace-events | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+
+>      uint32_t cflags_next_tb;
+>      /* updates protected by BQL */
+>      uint32_t interrupt_request;
+> @@ -913,6 +914,18 @@ void async_run_on_cpu_no_bql(CPUState *cpu, run_on_c=
+pu_func func,
+>   */
+>  void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_c=
+pu_data data);
 >
-> diff --git a/trace-events b/trace-events
-> index 4fd2cb4b97..9d65d472d2 100644
-> --- a/trace-events
-> +++ b/trace-events
-> @@ -151,7 +151,7 @@ vcpu guest_cpu_reset(void)
->  # Access information can be parsed as:
->  #
->  # struct mem_info {
-> -#     uint8_t size_shift : 2; /* interpreted as "1 << size_shift" bytes =
-*/
-> +#     uint8_t size_shift : 3; /* interpreted as "1 << size_shift" bytes =
-*/
->  #     bool    sign_extend: 1; /* sign-extended */
->  #     uint8_t endianness : 1; /* 0: little, 1: big */
->  #     bool    store      : 1; /* wheter it's a store operation */
+> +/**
+> + * cpu_in_exclusive_work_context()
+> + * @cpu: The vCPU to check
+> + *
+> + * Returns true if @cpu is an exclusive work context, which has
+> + * previously been queued via async_safe_run_on_cpu().
+> + */
+> +static inline bool cpu_in_exclusive_work_context(const CPUState *cpu)
+> +{
+> +    return cpu->in_exclusive_work_context;
+> +}
+> +
+>  /**
+>   * qemu_get_cpu:
+>   * @index: The CPUState@cpu_index value of the CPU to obtain.
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 232cb12c46..d6ea42c80c 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -370,7 +370,9 @@ static void process_queued_cpu_work_locked(CPUState *=
+cpu)
+>                  qemu_mutex_unlock_iothread();
+>              }
+>              start_exclusive();
+> +            cpu->in_exclusive_work_context =3D true;
+>              wi->func(cpu, wi->data);
+> +            cpu->in_exclusive_work_context =3D false;
+>              end_exclusive();
+>              if (has_bql) {
+>                  qemu_mutex_lock_iothread();
 
 
 --
