@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59928)
+Received: from eggs.gnu.org ([209.51.188.92]:60776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gmiYU-0007cJ-Pl
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:12:43 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gmibq-0000YT-JE
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gmiYU-0000sF-0e
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:12:42 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gmibp-0003rv-Rj
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 12:16:10 -0500
+References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
+	<e18d32e6-4c6f-1d42-7e90-ef9d84721524@tuxfamily.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <3d217d08-56c9-4bab-f897-9ebe67910168@vivier.eu>
+Date: Thu, 24 Jan 2019 18:15:48 +0100
 MIME-Version: 1.0
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Thu, 24 Jan 2019 18:12:27 +0100
-Message-ID: <CABoDooOvD_GWJovXjDSQY640seOCn+zLQzxehSgUmYQss9H83Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] AArch64: some missed undefined instructions
+In-Reply-To: <e18d32e6-4c6f-1d42-7e90-ef9d84721524@tuxfamily.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,41 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <huth@tuxfamily.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 
-Hello,
+On 24/01/2019 18:02, Thomas Huth wrote:
+> On 2018-11-02 16:22, Mark Cave-Ayland wrote:
+>> (MCA: here's the latest version of the q800 patchset. I've hope that I've
+>> addressed most of the comments, plus this will now boot into the Debian
+>> installer correctly when applied to git master.
+> 
+> Any update on this series? Why did it get stalled again?
+> 
 
-I did exhaustive comparisons against latest binutils and found the
-following undefined instructions that QEMU fails to flag:
+I was thinking about this today.
 
-- in disas_b_exc_sys, before calling disas_system bits [23:22] should
-be checked to be 0
+Mark, perhaps you can send a rebased version of the series?
 
-- in disas_ldst_reg_imm9, PRFM is wrongly detected:  PRFM is for idx =
-0, not for is_unpriv, the rest being undefined
-
-- in disas_ldst_multiple_struct, if the instruction is not
-post-indexed, then bits [20:16] should be checked to be 0
-
-- in disas_ldst_single_struct, if the instruction is not post-indexed,
-then bits [20:16] should be checked to be 0;  also bit [31] should be
-0
-
-- in disas_add_sub_ext_reg, bits [23:22] should be checked to be 0
-
-- in disas_data_proc_1src, there's a missing default that would flag
-undefined instructions
-
-- in disas_fp_1src, disas_fp_2src, disas_fp_3src, and disas_fp_imm
-bits,  [31:29] should be checked to be 0
-
-- in disas_fp_imm, bits [9:5] should be checked to be 0
-
-- in disas_simd_indexed, SDOT and UDOT are not scalar instructions.
-
-That's all I found.  I hope I didn't make any transcription error :-)
+I think we need reviews for "esp: add pseudo-DMA as used by Macintosh".
 
 Thanks,
-
 Laurent
