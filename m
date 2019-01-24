@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33750)
+Received: from eggs.gnu.org ([209.51.188.92]:36371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmdrG-0001sy-VG
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:11:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1gme2k-0007sB-Go
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmddi-0002mS-Uk
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:57:47 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:36172)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmddi-0002kZ-OL
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 06:57:46 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id k98so4997562otk.3
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 03:57:46 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gme2i-00027q-8r
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52389)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gme2g-00021n-Cx
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:23:34 -0500
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-36-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <149c7475-ed07-ebc3-964c-5b1a7bbf797e@redhat.com>
+Date: Thu, 24 Jan 2019 13:23:27 +0100
 MIME-Version: 1.0
-References: <1548205322-36101-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1548205322-36101-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 Jan 2019 11:57:34 +0000
-Message-ID: <CAFEAcA9yfYBNdwhsVBqzw9SLoWEVjuahnDWJNPaUBVEtoG+jqw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/51] Misc patches for 2019-01-23
+In-Reply-To: <20190123065618.3520-36-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v4 35/44] isa: express dependencies
+ with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
 
-On Wed, 23 Jan 2019 at 01:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit cce871c504694cf1034adf525556e3ca3c7eebb6:
->
->   hw/block/xen: use proper format string for printing sectors (2019-01-21 14:45:49 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 3cf01054d896fa88ea0dd31c5abb605c2e68bb29:
->
->   docker: disable Xen on CentOS 7 (2019-01-23 01:40:47 +0100)
->
-> ----------------------------------------------------------------
-> * cpu-exec fixes (Emilio, Laurent)
-> * high address load for linuxboot (Zhijian)
-> * PVH support (Liam, Stefano)
-> * Linux header update (Paolo)
-> * enable vhost-net for all targets that have virtio-net (Paolo)
-> * vhost-user-test cleanups (Paolo)
-> * misc i386 changes (Paolo, Robert)
-> * hexloader-test change to avoid O_NONBLOCK on stdin (Peter)
-> * configure tweak for openpty (Thomas)
-> * elf2dmp port to Windows (Viktor)
+On 2019-01-23 07:56, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/i386-softmmu.mak | 9 ---------
+>  hw/audio/Kconfig                 | 2 ++
+>  hw/block/Kconfig                 | 2 ++
+>  hw/char/Kconfig                  | 6 ++++++
+>  hw/display/Kconfig               | 3 +++
+>  hw/i386/Kconfig                  | 1 +
+>  hw/ide/Kconfig                   | 1 +
+>  hw/input/Kconfig                 | 2 ++
+>  hw/isa/Kconfig                   | 5 +++++
+>  hw/misc/Kconfig                  | 4 ++++
+>  hw/net/Kconfig                   | 3 +++
+>  hw/watchdog/Kconfig              | 2 ++
+>  12 files changed, 31 insertions(+), 9 deletions(-)
 
-I get this intermittent failure in vhost-user-test on osx host:
-
-manooth$ QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386 ./tests/vhost-user-test
-/i386/vhost-user/migrate:
-(./tests/vhost-user-test:11590): GLib-WARNING **: 11:54:26.837:
-poll(2) failed due to: Bad file descriptor.
-Trace/BPT trap: 5
-
-Happens about one time in five when running the test manually.
-
-thanks
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
