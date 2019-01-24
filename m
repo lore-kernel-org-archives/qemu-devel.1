@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57480)
+Received: from eggs.gnu.org ([209.51.188.92]:38995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmltx-0005ji-1W
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 15:47:05 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gmmZW-0000ax-Ey
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <knut.omang@oracle.com>) id 1gmljl-0008Qr-Ou
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 15:36:34 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <knut.omang@oracle.com>)
-	id 1gmlji-0008Om-9B
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 15:36:32 -0500
-Message-ID: <145f1c9d17296d8050f04211c7e1a5b6275cae3f.camel@oracle.com>
-From: Knut Omang <knut.omang@oracle.com>
-Date: Thu, 24 Jan 2019 21:36:18 +0100
-In-Reply-To: <20190124103353.569de985@w520.home>
-References: <cover.4fe3faa2cc295ab1e178284b738e33b940ab9312.1548323393.git-series.knut.omang@oracle.com>
-	<b9ae6eabc2a87fb27e969c9d095263f4a097b740.1548323393.git-series.knut.omang@oracle.com>
-	<20190124103353.569de985@w520.home>
+	(envelope-from <alistair23@gmail.com>) id 1gmmZV-000196-MX
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 16:30:02 -0500
+MIME-Version: 1.0
+References: <20190124140519.13838-1-clg@kaod.org>
+	<20190124140519.13838-4-clg@kaod.org>
+In-Reply-To: <20190124140519.13838-4-clg@kaod.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 24 Jan 2019 13:29:31 -0800
+Message-ID: <CAKmqyKN3xpBkB5C52RcQOvs-Ra8hmcUETP3FgGRyCntgtp_0Pg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] gen_pcie_root_port: Add ACS (Access
- Control Services) capability
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] aspeed/smc: Add dummy data register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, Elijah Shakkour <elijahs@mellanox.com>, Tal Attaly <talat@mellanox.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>
 
-On Thu, 2019-01-24 at 10:33 -0700, Alex Williamson wrote:
-> On Thu, 24 Jan 2019 11:12:53 +0100
-> Knut Omang <knut.omang@oracle.com> wrote:
-> 
-> > Claim ACS support in the generic PCIe root port to allow
-> > passthrough of individual functions of a device to different
-> > guests (in a nested virt.setting) with VFIO.
-> > Without this patch, all functions of a device, such as all VFs of
-> > an SR/IOV device, will end up in the same IOMMU group.
-> > A similar situation occurs on Windows with Hyper-V.
-> > 
-> > In the single function device case, it also has a small cosmetic
-> > benefit in that the root port itself is not grouped with
-> > the device. VFIO handles that situation in that binding rules
-> > only apply to endpoints, so it does not limit passthrough in
-> > those cases.
-> > 
-> > Signed-off-by: Knut Omang <knut.omang@oracle.com>
-> > ---
-> >  hw/pci-bridge/gen_pcie_root_port.c | 2 ++
-> >  hw/pci-bridge/pcie_root_port.c     | 4 ++++
-> >  include/hw/pci/pcie_port.h         | 1 +
-> >  3 files changed, 7 insertions(+)
-> > 
-> > diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-> > index 9766edb..b5a5ecc 100644
-> > --- a/hw/pci-bridge/gen_pcie_root_port.c
-> > +++ b/hw/pci-bridge/gen_pcie_root_port.c
-> > @@ -20,6 +20,7 @@
-> >          OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
-> >  
-> >  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
-> > +#define GEN_PCIE_ROOT_PORT_ACS_OFFSET           0x148
-> 
-> So you prefer that everyone passing through here decode these to figure
-> out that ACS_OFFSET is (AER_OFFSET + ERR_SIZEOF) since my comment on v1
-> was ignored?
+On Thu, Jan 24, 2019 at 6:06 AM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> The SMC controllers have a register containing the byte that will be
+> used as dummy output. It can be modified by software.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Sorry, not at all - I managed to overlook your comment - will fix it,
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-> >  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
-> >  
-> >  typedef struct GenPCIERootPort {
-> > @@ -149,6 +150,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
-> >      rpc->interrupts_init = gen_rp_interrupts_init;
-> >      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
-> >      rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
-> > +    rpc->acs_offset = GEN_PCIE_ROOT_PORT_ACS_OFFSET;
-> >  }
-> >  
-> >  static const TypeInfo gen_rp_dev_info = {
-> > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
-> > index 34ad767..a0b4cf7 100644
-> > --- a/hw/pci-bridge/pcie_root_port.c
-> > +++ b/hw/pci-bridge/pcie_root_port.c
-> > @@ -47,6 +47,7 @@ static void rp_reset(DeviceState *qdev)
-> >      pcie_cap_deverr_reset(d);
-> >      pcie_cap_slot_reset(d);
-> >      pcie_cap_arifwd_reset(d);
-> > +    pcie_cap_acs_reset(d);
-> 
-> Only the generic root port initializes acs_offset to enable an ACS
-> capability, but all members of the device class call the reset function
-> which does no checking that an ACS capability exists.  We've just
-> corrupted config space for the device.
+Alistair
 
-Ouch! Not good at all, sorry!
-Will look at it (after a good night's sleep this time..)
-
-Thanks!
-Knut
-
-> >      pcie_aer_root_reset(d);
-> >      pci_bridge_reset(qdev);
-> >      pci_bridge_disable_base_limit(d);
-> > @@ -106,6 +107,9 @@ static void rp_realize(PCIDevice *d, Error **errp)
-> >      pcie_aer_root_init(d);
-> >      rp_aer_vector_update(d);
-> >  
-> > +    if (rpc->acs_offset) {
-> > +        pcie_acs_init(d, rpc->acs_offset);
-> > +    }
-> >      return;
-> >  
-> >  err:
-> > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> > index df242a0..09586f4 100644
-> > --- a/include/hw/pci/pcie_port.h
-> > +++ b/include/hw/pci/pcie_port.h
-> > @@ -78,6 +78,7 @@ typedef struct PCIERootPortClass {
-> >      int exp_offset;
-> >      int aer_offset;
-> >      int ssvid_offset;
-> > +    int acs_offset;    /* If nonzero, optional ACS capability offset */
-> >      int ssid;
-> >  } PCIERootPortClass;
-> >  
-> 
+> ---
+>  hw/ssi/aspeed_smc.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+> index 6045ca11b969..9f3b6f4b4501 100644
+> --- a/hw/ssi/aspeed_smc.c
+> +++ b/hw/ssi/aspeed_smc.c
+> @@ -98,8 +98,8 @@
+>  /* Misc Control Register #1 */
+>  #define R_MISC_CTRL1      (0x50 / 4)
+>
+> -/* Misc Control Register #2 */
+> -#define R_MISC_CTRL2      (0x54 / 4)
+> +/* SPI dummy cycle data */
+> +#define R_DUMMY_DATA      (0x54 / 4)
+>
+>  /* DMA Control/Status Register */
+>  #define R_DMA_CTRL        (0x80 / 4)
+> @@ -529,7 +529,7 @@ static void aspeed_smc_flash_setup(AspeedSMCFlash *fl=
+, uint32_t addr)
+>       */
+>      if (aspeed_smc_flash_mode(fl) =3D=3D CTRL_FREADMODE) {
+>          for (i =3D 0; i < aspeed_smc_flash_dummies(fl); i++) {
+> -            ssi_transfer(fl->controller->spi, 0xFF);
+> +            ssi_transfer(fl->controller->spi, s->regs[R_DUMMY_DATA] & 0x=
+ff);
+>          }
+>      }
+>  }
+> @@ -664,6 +664,7 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
+addr, unsigned int size)
+>          addr =3D=3D s->r_timings ||
+>          addr =3D=3D s->r_ce_ctrl ||
+>          addr =3D=3D R_INTR_CTRL ||
+> +        addr =3D=3D R_DUMMY_DATA ||
+>          (addr >=3D R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_slav=
+es) ||
+>          (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slaves=
+)) {
+>          return s->regs[addr];
+> @@ -697,6 +698,8 @@ static void aspeed_smc_write(void *opaque, hwaddr add=
+r, uint64_t data,
+>          if (value !=3D s->regs[R_SEG_ADDR0 + cs]) {
+>              aspeed_smc_flash_set_segment(s, cs, value);
+>          }
+> +    } else if (addr =3D=3D R_DUMMY_DATA) {
+> +        s->regs[addr] =3D value & 0xff;
+>      } else {
+>          qemu_log_mask(LOG_UNIMP, "%s: not implemented: 0x%" HWADDR_PRIx =
+"\n",
+>                        __func__, addr);
+> --
+> 2.20.1
+>
+>
