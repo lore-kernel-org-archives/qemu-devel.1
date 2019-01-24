@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38348)
+Received: from eggs.gnu.org ([209.51.188.92]:38470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gmfde-0006RH-6O
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:05:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmfdy-0006jM-UP
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:06:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gmfdd-0000Zc-Gg
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:05:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gmfdd-0000Ym-6I
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:05:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0OE59qX118845
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 09:05:47 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q7egk18fq-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 09:05:45 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Thu, 24 Jan 2019 14:05:31 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 24 Jan 2019 15:05:15 +0100
+	(envelope-from <thuth@redhat.com>) id 1gmfdt-0000ms-2u
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:06:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmfds-0000m0-QZ
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 09:06:05 -0500
+References: <20190123065618.3520-1-yang.zhong@intel.com>
+	<20190123065618.3520-27-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <50df8f61-e649-2fac-ab0b-72f9ef60bd39@redhat.com>
+Date: Thu, 24 Jan 2019 15:06:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190124140519.13838-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/4] aspeed/smc: add fast read support under
- User command mode.
+In-Reply-To: <20190123065618.3520-27-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v4 26/44] kconfig: introduce kconfig
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,33 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
 
-Hello,
+On 2019-01-23 07:56, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> The Kconfig files were generated mostly with this script:
+> 
+>   for i in `grep -ho CONFIG_[A-Z0-9_]* default-configs/* | sort -u`; do
+>     set fnord `git grep -lw $i -- 'hw/*/Makefile.objs' `
+>     shift
+>     if test $# = 1; then
+>       cat >> $(dirname $1)/Kconfig << EOF
+> config ${i#CONFIG_}
+>     bool
+> 
+> EOF
+>       git add $(dirname $1)/Kconfig
+>     else
+>       echo $i $*
+>     fi
+>   done
+>   sed -i '$d' hw/*/Kconfig
+>   for i in hw/*; do
+>     if test -d $i && ! test -f $i/Kconfig; then
+>       touch $i/Kconfig
+>       git add $i/Kconfig
+>     fi
+>   done
+> 
+> Whenever a symbol is referenced from multiple subdirectories, the
+> script prints the list of directories that reference the symbol.
+> These symbols have to be added manually to the Kconfig files.
+> 
+> Kconfig.host and hw/Kconfig were created manually.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+[...]
+> diff --git a/hw/cris/Kconfig b/hw/cris/Kconfig
+> new file mode 100644
+> index 0000000000..c2c26e5150
+> --- /dev/null
+> +++ b/hw/cris/Kconfig
+> @@ -0,0 +1,2 @@
+> +config AXIS
+> +    bool
 
-When in the User command mode, the Aspeed SMC controller driver
-performs the dummy cycles of a fast read command using byte transfers,
-that is ony byte for eight cycles. But, the QEMU m25p80 models one
-dummy cycle with one byte transfer.
+Please also add here:
 
-To restore the correct number of cycles, this series adds a function
-snooping the SPI transfers to catch commands requiring dummy cycles
-and replaces them with byte transfers compatible with the m25p80 model.
+config ETRAXFS
+    bool
 
-Thanks,
+> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> new file mode 100644
+> index 0000000000..1a3e8b0e02
+> --- /dev/null
+> +++ b/hw/riscv/Kconfig
+> @@ -0,0 +1,14 @@
+> +config HTIF
+> +    bool
+> +
+> +config HART
+> +    bool
+> +
+> +config SIFIVE
+> +    bool
+> +
+> +config SPIKE
+> +    bool
+> +
+> +config RISCV_VIRTIO
+> +    bool
 
-C.
+Please rename the RISCV_VIRTIO to RISCV_VIRT.
 
-C=C3=A9dric Le Goater (4):
-  aspeed/smc: fix default read value
-  aspeed/smc: define registers for all possible CS
-  aspeed/smc: Add dummy data register
-  aspeed/smc: snoop transfers to fake dummy cycles
+We also additionally need these two here:
 
- include/hw/ssi/aspeed_smc.h |   3 +
- hw/ssi/aspeed_smc.c         | 128 +++++++++++++++++++++++++++++++++---
- 2 files changed, 123 insertions(+), 8 deletions(-)
+config SIFIVE_E
+    bool
 
---=20
-2.20.1
+config SIFIVE_U
+    bool
+
+ Thanks,
+  Thomas
