@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36665)
+Received: from eggs.gnu.org ([209.51.188.92]:40211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn0eG-0002uW-0P
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gn0zg-0007PK-A0
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn0eF-0000MG-7s
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:51 -0500
-Received: from mail-wm1-f45.google.com ([209.85.128.45]:40462)
+	(envelope-from <peter.maydell@linaro.org>) id 1gn0wX-0000fS-2u
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:50:48 -0500
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:46941)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn0eF-0000M2-23
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:51 -0500
-Received: by mail-wm1-f45.google.com with SMTP id f188so6432808wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 04:31:50 -0800 (PST)
-References: <20190125094047.22276-1-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <773a9051-9cca-ac9b-99d0-4cdb46a13952@redhat.com>
-Date: Fri, 25 Jan 2019 13:31:48 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gn0wS-0000bP-UO
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:50:42 -0500
+Received: by mail-oi1-x232.google.com with SMTP id x202so7542140oif.13
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 04:50:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190125094047.22276-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] typo: apci->acpi
+References: <20190124143825.25921-1-armbru@redhat.com>
+In-Reply-To: <20190124143825.25921-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 12:30:18 +0000
+Message-ID: <CAFEAcA_U+781Tt_GgnP0fT8q8wH2=OaGJx6GKcpbjqbprm3m1w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] QAPI patches for 2019-01-24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
-Cc: qemu-trivial@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 1/25/19 10:40 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> apci_1_compatible should be acpi_1_compatible.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Thu, 24 Jan 2019 at 14:42, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit f6b06fcceef465de0cf2514c9f76fe0192896781:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-request' into staging (2019-01-23 17:57:47 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-01-24
+>
+> for you to fetch changes up to bbc0586ced6e9ffdfd29d89fcc917b3d90ac3938:
+>
+>   json: Fix % handling when not interpolating (2019-01-24 15:20:59 +0100)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2019-01-24
+>
+> ----------------------------------------------------------------
+> Christophe Fergeau (1):
+>       json: Fix % handling when not interpolating
+>
+> Markus Armbruster (2):
+>       qapi: Belatedly update docs for commit 9c2f56e9f9d
+>       qapi: Eliminate indirection through qmp_event_get_func_emit()
+>
+> Wainer dos Santos Moschetta (1):
+>       qmp: Add examples to qom list, get, and set commands
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Applied, thanks.
 
-> ---
->  hw/acpi/cpu.c         | 2 +-
->  hw/i386/acpi-build.c  | 2 +-
->  include/hw/acpi/cpu.h | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> index f10b190019..a0a43fe6b5 100644
-> --- a/hw/acpi/cpu.c
-> +++ b/hw/acpi/cpu.c
-> @@ -508,7 +508,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
->              GArray *madt_buf = g_array_new(0, 1, 1);
->              int arch_id = arch_ids->cpus[i].arch_id;
->  
-> -            if (opts.apci_1_compatible && arch_id < 255) {
-> +            if (opts.acpi_1_compatible && arch_id < 255) {
->                  dev = aml_processor(i, 0, 0, CPU_NAME_FMT, i);
->              } else {
->                  dev = aml_device(CPU_NAME_FMT, i);
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 2e21a31f82..d60603abd7 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1847,7 +1847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
->      } else {
->          CPUHotplugFeatures opts = {
-> -            .apci_1_compatible = true, .has_legacy_cphp = true
-> +            .acpi_1_compatible = true, .has_legacy_cphp = true
->          };
->          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
->                         "\\_SB.PCI0", "\\_GPE._E02");
-> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
-> index 89ce172941..62f0278ba2 100644
-> --- a/include/hw/acpi/cpu.h
-> +++ b/include/hw/acpi/cpu.h
-> @@ -48,7 +48,7 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
->                           CPUHotplugState *state, hwaddr base_addr);
->  
->  typedef struct CPUHotplugFeatures {
-> -    bool apci_1_compatible;
-> +    bool acpi_1_compatible;
->      bool has_legacy_cphp;
->  } CPUHotplugFeatures;
->  
-> 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
