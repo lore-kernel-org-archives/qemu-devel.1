@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42655)
+Received: from eggs.gnu.org ([209.51.188.92]:43571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gn3Y4-0002bf-Js
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:37:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1gn3cs-0004eV-BA
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:42:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gn3Y3-0005Dh-P7
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:37:40 -0500
-Date: Fri, 25 Jan 2019 15:37:14 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190125153714.GB305@stefanha-x1.localdomain>
-References: <20190123212234.32068-1-stefanha@redhat.com>
-	<20190123212234.32068-3-stefanha@redhat.com>
-	<f58f9085-c895-1fa5-9fae-afe4ac8de39a@redhat.com>
-	<20190125102842.GB28305@stefanha-x1.localdomain>
-	<CAFEAcA-Dy0B-qCdojx9j49vF_p7OcAyQAiXYMv-_EZq7CCgT1A@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1gn3cr-0000CU-AE
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:42:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gn3cr-0000A0-27
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:42:37 -0500
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-27-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <84d32e76-a6be-a1c6-5d03-2e17022649fd@redhat.com>
+Date: Fri, 25 Jan 2019 16:42:23 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8GpibOaaTibBMecb"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-Dy0B-qCdojx9j49vF_p7OcAyQAiXYMv-_EZq7CCgT1A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] pflash: flush rom device memory
- region
+In-Reply-To: <1548410831-19553-27-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 26/52] hw/i2c/Makefile.objs: Create new
+ CONFIG_* variables for EEPROM and ACPI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Julia Suvorova <jusual@mail.ru>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Magnus Damm <magnus.damm@gmail.com>
 
+On 2019-01-25 11:06, Paolo Bonzini wrote:
+> Create separate variables for these components, they are used in many boards
+> but not all.  This allows finer-grain selection of the included code with
+> default-configs/*.mak.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <20190123065618.3520-10-yang.zhong@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak         | 1 +
+>  default-configs/i386-softmmu.mak        | 2 ++
+>  default-configs/mips-softmmu-common.mak | 2 ++
+>  default-configs/ppc-softmmu.mak         | 1 +
+>  hw/i2c/Makefile.objs                    | 5 +++--
+>  5 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 68deb1c..caf7d7e 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -150,6 +150,7 @@ CONFIG_ACPI=y
+>  CONFIG_VIRT=y
+>  CONFIG_SMBIOS=y
+>  CONFIG_ASPEED_SOC=y
+> +CONFIG_SMBUS_EEPROM=y
+>  CONFIG_GPIO_KEY=y
+>  CONFIG_MSF2=y
+>  CONFIG_FW_CFG_DMA=y
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index 71c9f6f..15b6287 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -62,6 +62,8 @@ CONFIG_I82801B11=y
+>  CONFIG_SMBIOS=y
+>  CONFIG_PXB=y
+>  CONFIG_ACPI_VMGENID=y
+> +CONFIG_ACPI_SMBUS=y
+> +CONFIG_SMBUS_EEPROM=y
+>  CONFIG_FW_CFG_DMA=y
+>  CONFIG_I2C=y
+>  CONFIG_SEV=$(CONFIG_KVM)
+> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+> index 479fb4d..ded7498 100644
+> --- a/default-configs/mips-softmmu-common.mak
+> +++ b/default-configs/mips-softmmu-common.mak
+> @@ -39,3 +39,5 @@ CONFIG_I2C=y
+>  CONFIG_R4K=y
+>  CONFIG_MALTA=y
+>  CONFIG_MIPSSIM=y
+> +CONFIG_ACPI_SMBUS=y
+> +CONFIG_SMBUS_EEPROM=y
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+> index 7f80f0c..52acb7c 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -36,6 +36,7 @@ CONFIG_AT24C=y
+>  CONFIG_BITBANG_I2C=y
+>  CONFIG_M41T80=y
+>  CONFIG_VGA_CIRRUS=y
+> +CONFIG_SMBUS_EEPROM=y
+>  
+>  # For Macs
+>  CONFIG_ESCC=y
+> diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+> index 37cacde..61ac50a 100644
+> --- a/hw/i2c/Makefile.objs
+> +++ b/hw/i2c/Makefile.objs
+> @@ -1,8 +1,9 @@
+> -common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
+> +common-obj-$(CONFIG_I2C) += core.o smbus.o
+> +common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
+>  common-obj-$(CONFIG_DDC) += i2c-ddc.o
+>  common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
+>  common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
+> -common-obj-$(CONFIG_APM) += pm_smbus.o
+> +common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
+>  common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
+>  common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
+>  common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
 
---8GpibOaaTibBMecb
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+smbus_eeprom.o is now not linked into the sh4 executables anymore. But
+as far as I can see, this should be ok, since they don't use this device.
 
-On Fri, Jan 25, 2019 at 10:36:17AM +0000, Peter Maydell wrote:
-> On Fri, 25 Jan 2019 at 10:28, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> >
-> > On Thu, Jan 24, 2019 at 12:11:55PM +0100, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > > The device realize() is also executed before the guest is started, is
-> > > this call really necessary?
-> >
-> > My rationale was that machine init only happens before the guest is
-> > started while ->realize() is called by hotplug too.
->=20
-> Yes, but before realize the flash memory can't actually be
-> visible to the guest, so there's no need to invalidate anything.
->=20
-> > That said, can pflash devices be hotplugged?
->=20
-> I guess you could have one inside a hotplugged device in theory;
-> they can't be directly hotpluggged. (I bet that in practice
-> there are leaks though if you did do that, and we don't have
-> any devices that do so today.)
->=20
-> > If you guys prefer not flushing from pflash ->realize() then I'll drop
-> > it.
->=20
-> I think it makes more sense not to do a flush in the realize method.
-
-Okay, I'll resend this patch.
-
-Stefan
-
---8GpibOaaTibBMecb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcSy0qAAoJEJykq7OBq3PIKz8H/jOHIMRSb+Nz1Hy0qxPEA8Wu
-qg338TxsVVQgKLvcr6kMCDuV8MaCHrT29cODfBWocjAqyCR98ReizZfiennDvgjQ
-6ovAbvJPHPo+I4vNoNdxvtJJsyYYDJbkvk0c1dqPR1Cyb2S3ZitUBi4QVwcE9A9Z
-RqaYfvjOTHQxFTN0QWotTsiu9SyRpIblj0SdhyvTkhUlA3rYt42XnnGem3tV1BDL
-iTQ6OcD8kseUFLI3fJtlsDLstZGTZOoGB7//dz9RWHYDpWHVT289g7Lr7F+C2cPh
-UxuHOcxggGcJir1oF/Ay72N+nr1Co/h2JwTCeEaWrHnnJaOCnRaDLWM8/7aVLAo=
-=mBGV
------END PGP SIGNATURE-----
-
---8GpibOaaTibBMecb--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
