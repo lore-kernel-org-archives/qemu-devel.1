@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38448)
+Received: from eggs.gnu.org ([209.51.188.92]:40312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gn5Zd-0002W7-EY
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gn5kX-0006Fc-ET
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:58:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gn5Zc-0006qA-Fm
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:25 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 25 Jan 2019 18:46:53 +0100
-Message-Id: <20190125174653.4604-4-kwolf@redhat.com>
-In-Reply-To: <20190125174653.4604-1-kwolf@redhat.com>
-References: <20190125174653.4604-1-kwolf@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gn5kV-0008RJ-Dw
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:58:41 -0500
+Date: Fri, 25 Jan 2019 17:58:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190125175818.GG2695@work-vm>
+References: <20190123195527.29575-1-david@redhat.com>
+	<20190123195527.29575-8-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] scsi-disk: Deprecate device_id fallback to
- BlockBackend name
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190123195527.29575-8-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFCv2 7/9] hmp: Handle virtio-pmem when
+ printing memory device infos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,90 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-We should never have exposed BlockBackend names to the guest, it's a
-host detail. Deprecate this behaviour. Users who need to maintain the
-guest ABI can explicitly set the value with the device_id property.
+* David Hildenbrand (david@redhat.com) wrote:
+> Print the memory device info just like for PCDIMM/NVDIMM.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hmp.c | 27 +++++++++++++++------------
+>  1 file changed, 15 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 8da5fd8760..25c32e0810 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -2553,6 +2553,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+>      Error *err = NULL;
+>      MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
+>      MemoryDeviceInfoList *info;
+> +    VirtioPMEMDeviceInfo *vpi;
+>      MemoryDeviceInfo *value;
+>      PCDIMMDeviceInfo *di;
+>  
+> @@ -2562,19 +2563,9 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+>          if (value) {
+>              switch (value->type) {
+>              case MEMORY_DEVICE_INFO_KIND_DIMM:
+> -                di = value->u.dimm.data;
+> -                break;
+> -
+>              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
+> -                di = value->u.nvdimm.data;
+> -                break;
+> -
+> -            default:
+> -                di = NULL;
+> -                break;
+> -            }
+> -
+> -            if (di) {
+> +                di = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
+> +                     value->u.dimm.data : value->u.nvdimm.data;
+>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+>                                 MemoryDeviceInfoKind_str(value->type),
+>                                 di->id ? di->id : "");
+> @@ -2587,6 +2578,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+>                                 di->hotplugged ? "true" : "false");
+>                  monitor_printf(mon, "  hotpluggable: %s\n",
+>                                 di->hotpluggable ? "true" : "false");
+> +                break;
+> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
+> +                vpi = value->u.virtio_pmem.data;
+> +                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+> +                               MemoryDeviceInfoKind_str(value->type),
+> +                               vpi->id ? vpi->id : "");
+> +                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vpi->memaddr);
+> +                monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
+> +                monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
+> +                break;
+> +            default:
+> +                g_assert_not_reached();
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- hw/scsi/scsi-disk.c  |  5 +++++
- qemu-deprecated.texi | 22 +++++++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index e74e1e7c48..38f1fe2570 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2366,6 +2366,11 @@ static void scsi_realize(SCSIDevice *dev, Error **=
-errp)
-             const char *str =3D blk_name(s->qdev.conf.blk);
-             if (str && *str) {
-                 s->device_id =3D g_strdup(str);
-+                warn_report("Using the backend drive ID for the Device "
-+                            "Identification VPD page is deprecated. "
-+                            "Please specify the serial or device_id opti=
-ons "
-+                            "explicitly to avoid guest-visible changes i=
-n "
-+                            "future QEMU versions.");
-             }
-         }
-     }
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 219206a836..a426d8245d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -146,7 +146,7 @@ This machine type uses an unmaintained firmware, brok=
-en in lots of ways,
- and unable to start post-2004 operating systems. 40p machine type should=
- be
- used instead.
-=20
--@section Device options
-+@section Devices
-=20
- @subsection Block device options
-=20
-@@ -170,6 +170,26 @@ The above, converted to the current supported format=
-:
-=20
- @code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"=
-@}}
-=20
-+@subsection scsi-disk device identification (since 4.0.0)
-+
-+The Device Identification VPD page of ``scsi-disk'' devices contains a v=
-endor
-+specific designator that can be explicitly specified using the ``device_=
-id''
-+property since 4.0.0.
-+
-+If ``device_id'' is not given, the implementation falls back to reusing =
-any
-+specified serial number for this field. If the serial number is not give=
-n
-+either and ``drive=3DX'' was used where ``X'' is a drive ID, this drive =
-ID is
-+given to the guest instead. This is backend information that should not
-+to be exposed to guests.
-+
-+Therefore, this behaviour is deprecated and future versions will change =
-the
-+guest-visible behaviour (e.g. by leaving out the vendor specific designa=
-tor)
-+for the case that neither ``device_id'' nor a serial number are given, b=
-ut a
-+drive ID is used to create the device.
-+
-+If you need the guest-visible information to stay unchanged, add an expl=
-icit
-+``device_id'' option to your QEMU invocation.
-+
- @subsection vio-spapr-device device options
-=20
- @subsubsection "irq": "" (since 3.0.0)
---=20
-2.20.1
+Although I'd prefer if that assert was replaced by a print
+saying it was an unknown type.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>              }
+>          }
+>      }
+> -- 
+> 2.17.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
