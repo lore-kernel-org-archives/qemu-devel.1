@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58074)
+Received: from eggs.gnu.org ([209.51.188.92]:60974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gn2QP-0004RT-Ry
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:42 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gn2gO-0006yq-7H
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:42:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gn2QM-0006Ls-2c
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54310)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gn2QK-0006Id-8T
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gn2QH-0006Af-QL
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:25:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E1BD2E80D2
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:25:33 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gn2gN-00082g-4m
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:42:12 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 25 Jan 2019 14:36:54 +0000
+Message-ID: <7b035c42-73b3-1f32-abd6-41cb82096989@virtuozzo.com>
+References: <20190125142138.76710-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190125142138.76710-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Jan 2019 14:17:10 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-Reply-To: Bug 1813307 <1813307@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154842583020.19428.9970935732154630086.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813307] [NEW] util/path.c/follow_path() does not
- handle "/" well
+Content-ID: <FC8641771C2FC74ABF7BC2CBF5459C96@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] qcow2: avoid lseek on block_status if
+ possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Public bug reported:
-
-Hello,
-
-I noticed that qemu does not handle "/" very well in follow_path().
-
-Specifically, I was trying to run gdbserver under qemu, and it failed
-inside its implementation of __getcwd.
-
-Indeed it does something like
-  if (__lstat ("/", &st) < 0)
-.....
-and then loops from current dir toward the top using lstat("..")
-
-On qemu side, lstat forwards the request to follow_path() in util/path.c, a=
-nd when passed "/", it returns the path in QEMU_LD_PREFIX (which was the to=
-p of my sysroot).
-OTHT, the series of lstat("..") finally reaches the real device root becaus=
-e it's not recognized as "/" in follow_path(), so this is inconsistent and =
-__getcwd fails.
-
-I suppose there's a good reason for returning QEMU_LD_PREFIX when asking
-for "/", but why is it so?
-
-If there's no good reason, maybe the behaviour could be changed to map
-"/" to "/" ?
-
-Thanks
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813307
-
-Title:
-  util/path.c/follow_path() does not handle "/" well
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  I noticed that qemu does not handle "/" very well in follow_path().
-
-  Specifically, I was trying to run gdbserver under qemu, and it failed
-  inside its implementation of __getcwd.
-
-  Indeed it does something like
-    if (__lstat ("/", &st) < 0)
-  .....
-  and then loops from current dir toward the top using lstat("..")
-
-  On qemu side, lstat forwards the request to follow_path() in util/path.c,=
- and when passed "/", it returns the path in QEMU_LD_PREFIX (which was the =
-top of my sysroot).
-  OTHT, the series of lstat("..") finally reaches the real device root beca=
-use it's not recognized as "/" in follow_path(), so this is inconsistent an=
-d __getcwd fails.
-
-  I suppose there's a good reason for returning QEMU_LD_PREFIX when
-  asking for "/", but why is it so?
-
-  If there's no good reason, maybe the behaviour could be changed to map
-  "/" to "/" ?
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813307/+subscriptions
+MjUuMDEuMjAxOSAxNzoyMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+ZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFj
+Y3VyYXRlIHNlYXJjaA0KPiBmb3IgaG9sZSBpbnNpZGUgcmVnaW9uLCByZXBvcnRlZCBhcyBEQVRB
+IGJ5IGJzIHNpbmNlIDVkYWE3NGE2ZWJjLg0KPiANCj4gVGhpcyBhY2N1cmFjeSBpcyBub3QgZnJl
+ZTogYXNzdW1lIHdlIGhhdmUgcWNvdzIgZGlzay4gQWN0dWFsbHksIHFjb3cyDQo+IGtub3dzLCB3
+aGVyZSBhcmUgaG9sZXMgYW5kIHdoZXJlIGlzIGRhdGEuIEJ1dCBldmVyeSBibG9ja19zdGF0dXMN
+Cj4gcmVxdWVzdCBjYWxscyBsc2VlayBhZGRpdGlvbmFsbHkuIEFzc3VtZSBhIGJpZyBkaXNrLCBm
+dWxsIG9mDQo+IGRhdGEsIGluIGFueSBpdGVyYXRpdmUgY29weWluZyBibG9jayBqb2IgKG9yIGlt
+ZyBjb252ZXJ0KSB3ZSdsbCBjYWxsDQo+IGxzZWVrKEhPTEUpIG9uIGV2ZXJ5IGl0ZXJhdGlvbiwg
+YW5kIGVhY2ggb2YgdGhlc2UgbHNlZWtzIHdpbGwgaGF2ZSB0bw0KPiBpdGVyYXRlIHRocm91Z2gg
+YWxsIG1ldGFkYXRhIHVwIHRvIHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4gaW5l
+ZmZlY3RpdmUgYmVoYXZpb3IuIEFuZCBmb3IgbWFueSBzY2VuYXJpb3Mgd2UgZG9uJ3QgbmVlZCB0
+aGlzIGxzZWVrDQo+IGF0IGFsbC4NCj4gDQo+IEhvd2V2ZXIsIGxzZWVrIGlzIG5lZWRlZCB3aGVu
+IHdlIGhhdmUgbWV0YWRhdGEtcHJlYWxsb2NhdGVkIGltYWdlLg0KPiANCj4gU28sIGxldCdzIGRl
+dGVjdCBtZXRhZGF0YS1wcmVhbGxvY2F0aW9uIGNhc2UgYW5kIGRvbid0IGRpZyBxY293MidzDQo+
+IHByb3RvY29sIGZpbGUgaW4gb3RoZXIgY2FzZXMuDQo+IA0KPiBUaGUgaWRlYSBpcyB0byBjb21w
+YXJlIGFsbG9jYXRpb24gc2l6ZSBpbiBQT1Ygb2YgZmlsZXN5c3RlbSB3aXRoDQo+IGFsbG9jYXRp
+b25zIHNpemUgaW4gUE9WIG9mIFFjb3cyIChieSByZWZjb3VudHMpLiBJZiBhbGxvY2F0aW9uIGlu
+IGZzIGlzDQo+IHNpZ25pZmljYW50bHkgbG93ZXIsIGNvbnNpZGVyIGl0IGFzIG1ldGFkYXRhLXBy
+ZWFsbG9jYXRpb24gY2FzZS4NCj4gDQo+IFN1Z2dlc3RlZC1ieTogRGVuaXMgVi4gTHVuZXYgPGRl
+bkBvcGVudnoub3JnPg0KPiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+IC0tLQ0KPiANCj4gSGkhDQo+IA0KPiBT
+bywgdG8gY29udGludWUgdGFsayBhYm91dCBsc2Vlay9ubyBsc2VlayB3aGVuIHFjb3cyIGJsb2Nr
+X3N0YXR1cyByZXBvcnRzDQo+IERBVEEuDQo+IA0KPiBSZXN1bHRzIG9uIHRtcGZzOg0KPiBjYWNo
+ZWQgaXMgbHNlZWsgY2FjaGUgYnkgS2V2aW4NCj4gZGV0ZWN0IGlzIHRoaXMgcGF0Y2gNCj4gbm8g
+bHNlZWsgaXMganVzdCByZW1vdmUgYmxvY2tfc3RhdHVzIHF1ZXJ5IG9uIGJzLT5maWxlLT5icyBp
+bg0KPiAgICAgICAgICAgYmRydl9jb19ibG9ja19zdGF0dXMNCj4gDQo+ICAgICAgKy0tLS0tLS0t
+LS0tLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tKw0KPiAg
+ICAgIHwgICAgICAgICAgICAgICAgICAgICB8IG1hc3RlciB8IGNhY2hlZCB8IGRldGVjdCB8IG5v
+IGxzZWVrIHwNCj4gICAgICArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0t
+Ky0tLS0tLS0tKy0tLS0tLS0tLS0rDQo+ICAgICAgfCB0ZXN0LnFjb3cyICAgICAgICAgIHwgODAg
+ICAgIHwgNDAgICAgIHwgMC4xNjkgIHwgMC4xNjIgICAgfA0KPiAgICAgICstLS0tLS0tLS0tLS0t
+LS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLSsNCj4gICAgICB8
+IHRlc3RfZm9yd2FyZC5xY293MiAgfCA3OSAgICAgfCAwLjE3MSAgfCAwLjE2OSAgfCAwLjE2MyAg
+ICB8DQo+ICAgICAgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0t
+LS0tLSstLS0tLS0tLS0tKw0KPiAgICAgIHwgdGVzdF9wcmVhbGxvYy5xY293MiB8IDAuMDU0ICB8
+IDAuMDUzICB8IDAuMDU1ICB8IDAuMjYzICAgIHwNCj4gICAgICArLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0rDQoNCkZvcmdvdCB0byBz
+YXksIHRlc3RzIGJ5IEtldmluIGZyb20gYnJhbmNoDQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJj
+aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOS0wMS9tc2cwNTQ2My5odG1sDQoNCkhtbS4gRG9uJ3Qg
+d2UgaGF2ZSBzb21ldGhpbmcgbGlrZSB0ZXN0cy9xZW11LWlvdGVzdHMsIGJ1dCBmb3IgcGVyZm9y
+bWFuY2U/DQpTbywgYWxsIHRoZXNlIHNtYWxsIHByZXR0eSB0ZXN0cyB3ZSBoYXZlIGluIG1haWxp
+bmcgbGlzdCBtYXkgZ28gYXMgZ2l0IHBhdGNoZXM/DQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
