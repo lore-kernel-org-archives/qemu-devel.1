@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50718)
+Received: from eggs.gnu.org ([209.51.188.92]:50628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmxyb-0004Yx-PO
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:40:42 -0500
+	(envelope-from <david@redhat.com>) id 1gmxyc-0004Vn-NF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmxmt-000321-9I
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:28:38 -0500
-References: <20190123082425.10643-1-david@redhat.com>
-	<11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+	(envelope-from <david@redhat.com>) id 1gmxm6-0002iX-3s
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:27:47 -0500
+References: <1548349076-350255-1-git-send-email-imammedo@redhat.com>
+	<20190125102305.76f1bc71.cohuck@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <af5b995d-0db2-e64a-1e7b-de5a8b45b64d@redhat.com>
-Date: Fri, 25 Jan 2019 10:28:24 +0100
+Message-ID: <27d71937-59d0-436b-2888-1d9cce0e5cd8@redhat.com>
+Date: Fri, 25 Jan 2019 10:27:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+In-Reply-To: <20190125102305.76f1bc71.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] spapr/pci: Fix primary bus number for
- PCI bridges
+Subject: Re: [Qemu-devel] [PATCH] s390x: remove direct reference to mem_path
+ global form s90x code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, qemu-s390x@nongnu.org
 
-On 24.01.19 03:48, Alexey Kardashevskiy wrote:
+On 25.01.19 10:23, Cornelia Huck wrote:
+> On Thu, 24 Jan 2019 17:57:56 +0100
+> Igor Mammedov <imammedo@redhat.com> wrote:
 > 
+>> I plan to deprecate -mem-path option and replace it with memory-backend,
+>> for that it's necessary to get rid of mem_path global variable.
+>> Do it for s390x case, replacing it with alternative way to enable
+>> 1Mb hugepages capability.
 > 
-> On 23/01/2019 19:24, David Hildenbrand wrote:
->> While looking at the s390x implementation, looks like spapr has a
->> similar BUG when building the topology.
->>
->> The primary bus number corresponds always to the bus number of the
->> bus the bridge is attached to.
->>
->> Right now, if we have two bridges attached to the same bus (e.g. root
->> bus) this is however not the case. The first bridge will have primary
->> bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
->>
->> While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
->> Setting it temporarily to that value (as discussed e.g. in [1]), is
->> only relevant for a running system that probes the buses. The value is
->> effectively unused for us just doing a DFS.
+> Getting rid of accessing mem_path directly sounds good.
 > 
-> What is DFS?
+>>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>> PS:
+>> Original code nor the new one probably is not entirely correct when
+>> huge pages are enabled in case where mixed initial RAM and memory
+>> backends are used, backend's page size might not match initial RAM's
+>> so I'm not sure if enabling 1MB cap is correct in this case on s390
+>> (should it be the same for all RAM???).
+>> With new approach 1Mb cap is not enabled if the smallest page size
+>> is not 1Mb.
+>> ---
+>>  target/s390x/kvm.c | 37 ++++++++++++++++---------------------
+>>  1 file changed, 16 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index 2ebf26a..22e868a 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -285,33 +285,28 @@ void kvm_s390_crypto_reset(void)
+>>      }
+>>  }
+>>  
+>> -static int kvm_s390_configure_mempath_backing(KVMState *s)
+>> +static int kvm_s390_configure_hugepage_backing(KVMState *s)
+>>  {
+>> -    size_t path_psize = qemu_mempath_getpagesize(mem_path);
+>> +    size_t psize = qemu_getrampagesize();
+>>  
+>> -    if (path_psize == 4 * KiB) {
+>> -        return 0;
+>> -    }
+>> -
+>> -    if (!hpage_1m_allowed()) {
+>> -        error_report("This QEMU machine does not support huge page "
+>> -                     "mappings");
+>> -        return -EINVAL;
+>> -    }
+>> +    if (psize == 1 * MiB) {
+>> +        if (!hpage_1m_allowed()) {
+>> +            error_report("This QEMU machine does not support huge page "
+>> +                         "mappings");
+>> +            return -EINVAL;
+>> +        }
+>>  
+>> -    if (path_psize != 1 * MiB) {
+>> +        if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
+>> +            error_report("Memory backing with 1M pages was specified, "
+>> +                         "but KVM does not support this memory backing");
+>> +            return -EINVAL;
+>> +        }
+>> +        cap_hpage_1m = 1;
+>> +    } else if (psize == 2 * GiB) {
+>>          error_report("Memory backing with 2G pages was specified, "
+>>                       "but KVM does not support this memory backing");
+>>          return -EINVAL;
+>>      }
+>> -
+>> -    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
+>> -        error_report("Memory backing with 1M pages was specified, "
+>> -                     "but KVM does not support this memory backing");
+>> -        return -EINVAL;
+>> -    }
+>> -
+>> -    cap_hpage_1m = 1;
+>>      return 0;
+> 
+> Just to compare, the old code did:
+> - 4K pages -> all fine, do nothing
+> - 1MB pages not allowed -> get out, regardless of the actual huge page
+>   size
+> - 1MB pages -> try to enable, if possible
+> - all other sizes -> moan about 2G pages and get out
+> 
+> And the new code does:
+> - 1M pages -> get out if 1MB not allowed, otherwise try to enable
+> - 2G pages -> moan about 2G pages and get out
+> - all other sizes -> all fine, do nothing
+> 
+> So, now the user will:
+> - get a different error if they try to run with a 2G backing but
+>   hpage_1m_allowed is off (which does not sound like a problem to me)
+> - get the all-clear if they specified a hypothetical different page
+>   size, while the code always complained about 2G pages before
+> 
+> Are there any chances at all that there may Yet Another Size? If not,
+> this looks fine.
 
-Depth-first search :)
-
-> 
->>
->> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
->>
->> Note: Is hotplug of bridges supported? I can't find where the topology
->> is fixed up when hotplugging a PCI bridge. (e.g. bus numbers assigned
->> and PCI_SUBORDINATE_BUS of path to the root updated). But maybe we are
->> excluding bridges or this is not necessary for some reason.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> 
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> 
-
-Thanks!
-
+I think the next logical step is 1TB pages - unlikely for the next years ;)
 
 -- 
 
