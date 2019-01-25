@@ -1,27 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gn5Q8-0004fP-R0
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:37:37 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gn5Qi-0004fP-De
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gn5MR-0007fE-6b
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:33:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52472)
+	(envelope-from <cfergeau@redhat.com>) id 1gn5CJ-000245-MF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:23:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gn5MQ-0007f3-Ue
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:33:47 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-25-git-send-email-pbonzini@redhat.com>
-	<d9bb4dd8-e256-25cd-af38-92d70f71d237@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47b000c4-c974-fae4-0541-22be46cf96ff@redhat.com>
-Date: Fri, 25 Jan 2019 18:33:38 +0100
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gn5CH-00022n-MH
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:23:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 77D6C7F3F7
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 17:23:16 +0000 (UTC)
+From: Christophe Fergeau <cfergeau@redhat.com>
+Date: Fri, 25 Jan 2019 18:22:29 +0100
+Message-Id: <20190125172229.23025-2-cfergeau@redhat.com>
+In-Reply-To: <20190125172229.23025-1-cfergeau@redhat.com>
+References: <20190125172229.23025-1-cfergeau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d9bb4dd8-e256-25cd-af38-92d70f71d237@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 24/52] hw/openrisc/Makefile.objs: Create
- CONFIG_* for openrisc
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 2/2] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,14 +31,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, Jia Liu <proljc@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 25/01/19 16:35, Thomas Huth wrote:
-> <bikeshedding>
-> CONFIG_OR1K_SIM instead of CONFIG_OPENRISC ?
-> </bikeshedding>
+This commit adds a qemu_init_logging() helper which calls
+g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+are handled similarly to other QEMU logs. This means they will get a
+timestamp if timestamps are enabled, and they will go through the
+HMP monitor if one is configured.
+This commit also adds a call to qemu_init_logging() to the binaries
+installed by QEMU.
+glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
+glib default log handler.
 
-Sure, I just missed those two remarks.
+At the moment, this change will mostly impact SPICE logging if your
+spice version is >=3D 0.14.1. With older spice versions, this is not goin=
+g
+to work as expected, but will not have any ill effect, so this call is
+not conditional on the SPICE version.
 
-Paolo
+Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+---
+ bsd-user/main.c             |  2 ++
+ include/qemu/error-report.h |  3 ++-
+ linux-user/main.c           |  2 ++
+ qemu-img.c                  |  2 +-
+ qemu-io.c                   |  2 +-
+ qemu-nbd.c                  |  2 +-
+ scsi/qemu-pr-helper.c       |  1 +
+ util/qemu-error.c           | 48 ++++++++++++++++++++++++++++++++++++-
+ vl.c                        |  2 +-
+ 9 files changed, 58 insertions(+), 6 deletions(-)
+
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 0d3156974c..8fd8ae4127 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -24,6 +24,7 @@
+ #include "qapi/error.h"
+ #include "qemu.h"
+ #include "qemu/config-file.h"
++#include "qemu/error-report.h"
+ #include "qemu/path.h"
+ #include "qemu/help_option.h"
+ #include "cpu.h"
+@@ -743,6 +744,7 @@ int main(int argc, char **argv)
+     if (argc <=3D 1)
+         usage();
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index 0a8d9cc9ea..ce43c02314 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -34,7 +34,6 @@ void error_vprintf(const char *fmt, va_list ap) GCC_FMT=
+_ATTR(1, 0);
+ void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(=
+1, 0);
+ void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+-void error_set_progname(const char *argv0);
+=20
+ void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+ void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+@@ -49,6 +48,8 @@ bool error_report_once_cond(bool *printed, const char *=
+fmt, ...)
+ bool warn_report_once_cond(bool *printed, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
+=20
++void error_init(const char *argv0);
++
+ /*
+  * Similar to error_report(), except it prints the message just once.
+  * Return true when it prints, false otherwise.
+diff --git a/linux-user/main.c b/linux-user/main.c
+index a0aba9cb1e..f9efe9ff6e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -27,6 +27,7 @@
+ #include "qemu/path.h"
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
++#include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+@@ -600,6 +601,7 @@ int main(int argc, char **argv, char **envp)
+     int ret;
+     int execfd;
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+diff --git a/qemu-img.c b/qemu-img.c
+index ad04f59565..0af9cac244 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4912,8 +4912,8 @@ int main(int argc, char **argv)
+     signal(SIGPIPE, SIG_IGN);
+ #endif
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+-    error_set_progname(argv[0]);
+     qemu_init_exec_dir(argv[0]);
+=20
+     if (qemu_init_main_loop(&local_error)) {
+diff --git a/qemu-io.c b/qemu-io.c
+index 2c52ac0ade..8d5d5911cb 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -522,8 +522,8 @@ int main(int argc, char **argv)
+     signal(SIGPIPE, SIG_IGN);
+ #endif
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+-    error_set_progname(argv[0]);
+     qemu_init_exec_dir(argv[0]);
+=20
+     qcrypto_init(&error_fatal);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 1f7b2a03f5..39849f1692 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -685,8 +685,8 @@ int main(int argc, char **argv)
+     signal(SIGPIPE, SIG_IGN);
+ #endif
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+-    error_set_progname(argv[0]);
+     qcrypto_init(&error_fatal);
+=20
+     module_call_init(MODULE_INIT_QOM);
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index e7af637232..2541fbbd1b 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -895,6 +895,7 @@ int main(int argc, char **argv)
+=20
+     signal(SIGPIPE, SIG_IGN);
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+     module_call_init(MODULE_INIT_QOM);
+     qemu_add_opts(&qemu_trace_opts);
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index fcbe8a1f74..2684870683 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -142,7 +142,7 @@ static const char *progname;
+ /*
+  * Set the program name for error_print_loc().
+  */
+-void error_set_progname(const char *argv0)
++static void error_set_progname(const char *argv0)
+ {
+     const char *p =3D strrchr(argv0, '/');
+     progname =3D p ? p + 1 : argv0;
+@@ -345,3 +345,49 @@ bool warn_report_once_cond(bool *printed, const char=
+ *fmt, ...)
+     va_end(ap);
+     return true;
+ }
++
++static char *qemu_glog_domains;
++
++static void qemu_log_func(const gchar *log_domain,
++                          GLogLevelFlags log_level,
++                          const gchar *message,
++                          gpointer user_data)
++{
++    switch (log_level & G_LOG_LEVEL_MASK) {
++    case G_LOG_LEVEL_DEBUG:
++    case G_LOG_LEVEL_INFO:
++        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable deb=
+ug
++         * messages */
++        if (qemu_glog_domains =3D=3D NULL) {
++            break;
++        }
++        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
++          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, log_doma=
+in))) {
++            break;
++        }
++        /* Fall through */
++    case G_LOG_LEVEL_MESSAGE:
++        info_report("%s: %s", log_domain?:"", message);
++        break;
++    case G_LOG_LEVEL_WARNING:
++        warn_report("%s: %s", log_domain?:"", message);
++        break;
++    case G_LOG_LEVEL_CRITICAL:
++        /* Fall through */
++    case G_LOG_LEVEL_ERROR:
++        error_report("%s: %s", log_domain?:"", message);
++        break;
++    }
++}
++
++void error_init(const char *argv0)
++{
++    /* Set the program name for error_print_loc(). */
++    error_set_progname(argv0);
++
++    /* This sets up glib logging so libraries using it also print their =
+logs
++     * through error_report(), warn_report(), info_report(). */
++    g_log_set_default_handler(qemu_log_func, NULL);
++    g_warn_if_fail(qemu_glog_domains =3D=3D NULL);
++    qemu_glog_domains =3D g_strdup(g_getenv("G_MESSAGES_DEBUG"));
++}
+diff --git a/vl.c b/vl.c
+index bc9fbec654..bfef38c3a3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
+     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
+         =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+=20
++    error_init(argv[0]);
+     module_call_init(MODULE_INIT_TRACE);
+=20
+     qemu_init_cpu_list();
+@@ -3047,7 +3048,6 @@ int main(int argc, char **argv, char **envp)
+     qemu_mutex_lock_iothread();
+=20
+     atexit(qemu_run_exit_notifiers);
+-    error_set_progname(argv[0]);
+     qemu_init_exec_dir(argv[0]);
+=20
+     module_call_init(MODULE_INIT_QOM);
+--=20
+2.20.1
