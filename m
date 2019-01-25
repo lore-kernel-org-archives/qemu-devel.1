@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38108)
+Received: from eggs.gnu.org ([209.51.188.92]:38363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn7Am-0006A3-6Z
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:29:52 -0500
+	(envelope-from <mst@redhat.com>) id 1gn7B9-0006S5-8a
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn78X-0005YA-PU
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:27:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn78X-0005Xw-Jd
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:27:33 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 25 Jan 2019 20:27:16 +0100
-Message-Id: <20190125192719.15339-1-philmd@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gn6zT-0001eo-PP
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:18:14 -0500
+Date: Fri, 25 Jan 2019 14:18:04 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190125141719-mutt-send-email-mst@kernel.org>
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-3-sgarzare@redhat.com>
+	<5b3c3076-8f0e-c6a2-b6d1-707db2ae3a66@redhat.com>
+	<962ebaff-23ce-57ff-3387-9017c2ccd14a@redhat.com>
+	<20190125081615.2cevf7cy7bcnxqwh@steredhat>
+	<d4aa8b25-f0ad-1444-587c-3d90a8ddc74a@redhat.com>
+	<FF7FC980937D6342B9D289F5F3C7C2625B7AE168@SHSMSX103.ccr.corp.intel.com>
+	<f336b1a1-8809-61df-8299-e43b1175164d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/3] OpenBSD fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f336b1a1-8809-61df-8299-e43b1175164d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +30,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <fam@euphon.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Liu, Changpeng" <changpeng.liu@intel.com>, Stefano Garzarella <sgarzare@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Fixes I encountered while trying to run QEMU test suite on OpenBSD.
-More to come, but please review.
+On Fri, Jan 25, 2019 at 01:48:26PM +0100, Thomas Huth wrote:
+> On 2019-01-25 12:58, Liu, Changpeng wrote:
+> > 
+> > 
+> >> -----Original Message-----
+> >> From: Thomas Huth [mailto:thuth@redhat.com]
+> >> Sent: Friday, January 25, 2019 4:49 PM
+> >> To: Stefano Garzarella <sgarzare@redhat.com>; Michael S. Tsirkin
+> >> <mst@redhat.com>; Liu, Changpeng <changpeng.liu@intel.com>
+> >> Cc: qemu-devel@nongnu.org; Laurent Vivier <lvivier@redhat.com>; Kevin Wolf
+> >> <kwolf@redhat.com>; qemu-block@nongnu.org; Max Reitz
+> >> <mreitz@redhat.com>; Stefan Hajnoczi <stefanha@redhat.com>; Paolo Bonzini
+> >> <pbonzini@redhat.com>
+> >> Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+> >> WRITE_ZEROES command
+> >>
+> >> On 2019-01-25 09:16, Stefano Garzarella wrote:
+> >>> On Fri, Jan 25, 2019 at 07:07:35AM +0100, Thomas Huth wrote:
+> >>>> On 2019-01-25 07:01, Thomas Huth wrote:
+> >>>>> On 2019-01-24 18:23, Stefano Garzarella wrote:
+> >>>>>> If the WRITE_ZEROES feature is enabled, we check this
+> >>>>>> command in the test_basic().
+> >>>>>>
+> >>>>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >>>>>> ---
+> >>>>>>  tests/virtio-blk-test.c | 63 +++++++++++++++++++++++++++++++++++++++++
+> >>>>>>  1 file changed, 63 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> >>>>>> index 04c608764b..8cabbcb85a 100644
+> >>>>>> --- a/tests/virtio-blk-test.c
+> >>>>>> +++ b/tests/virtio-blk-test.c
+> >>>>>> @@ -231,6 +231,69 @@ static void test_basic(QVirtioDevice *dev,
+> >> QGuestAllocator *alloc,
+> >>>>>>
+> >>>>>>      guest_free(alloc, req_addr);
+> >>>>>>
+> >>>>>> +    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
+> >>>>>> +        struct virtio_blk_discard_write_zeroes *dwz_hdr;
+> >>>>>> +        void *expected;
+> >>>>>> +
+> >>>>>> +        /*
+> >>>>>> +         * WRITE_ZEROES request on the same sector of previous test where
+> >>>>>> +         * we wrote "TEST".
+> >>>>>> +         */
+> >>>>>> +        req.type = VIRTIO_BLK_T_WRITE_ZEROES;
+> >>>>>> +        req.data = g_malloc0(512);
+> >>>>>
+> >>>>> Wouldn't it be more interesting to do a memset(req.data, 0xaa, 512) or
+> >>>>> something similar here, to see whether zeroes or 0xaa is written?
+> >>>>
+> >>>> Ah, never mind, I thought req.data would be a sector buffer here, but
+> >>>> looking at the lines below, it apparently is something different.
+> >>>>
+> >>>> Why do you allocate 512 bytes here? I'd rather expect
+> >>>> g_malloc0(sizeof(struct virtio_blk_discard_write_zeroes)) here. ... and
+> >>>> then you could also use a local "struct virtio_blk_discard_write_zeroes
+> >>>> dwz_hdr" variable instead of a pointer, and drop the g_malloc0() completely?
+> >>>>
+> >>>
+> >>> Hi Thomas,
+> >>> it was my initial implementation, but on the first test I discovered
+> >>> that virtio_blk_request() has an assert on the data_size and it requires
+> >>> a multiple of 512 bytes.
+> >>> Then I looked at the virtio-spec #1, and it seems that data should be
+> >>> multiple of 512 bytes also if it contains the struct
+> >>> virtio_blk_discard_write_zeroes. (I'm not sure)
+> >>>
+> >>> Anyway I tried to allocate only the space for that struct, commented the
+> >>> assert and the test works well.
+> >>>
+> >>> How do you suggest to proceed?
+> >>
+> >> Wow, that's a tough question. Looking at the virtio spec, I agree with
+> >> you, it looks like struct virtio_blk_discard_write_zeroes should be
+> >> padded to 512 bytes here. But when I look at the Linux sources
+> >> (drivers/block/virtio_blk.c), I fail to see that they are doing the
+> >> padding there (but maybe I'm just too blind).
+> >>
+> >> Looking at the QEMU sources, it seems like it can deal with both and
+> >> always sets the status right behind the last byte:
+> >>
+> >>     req->in = (void *)in_iov[in_num - 1].iov_base
+> >>               + in_iov[in_num - 1].iov_len
+> >>               - sizeof(struct virtio_blk_inhdr);
+> >>
+> >> Anyway, I think the virtio spec should be clearer here to avoid bad
+> >> implementations in the future, so maybe Changpeng or Michael could
+> >> update the spec here a little bit?
+> > The data for Discard and Write Zeroes commands are struct virtio_blk_discard_write_zeroes
+> > aligned, that means you can pass 16 bytes aligned data, based on the segments number supported,
+> > this is also aligned with NVMe specification and  the SCSI specification.
+> 
+> Ok, thanks, so the "u8 data[][512];" is wrong in the virtio spec in this
+> case? See:
+> 
+>  https://github.com/oasis-tcs/virtio-spec/blob/master/content.tex#L3944
+> 
+> At least this should be mentioned in the description of the data field,
+> I think.
+> 
+>  Thomas
 
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (3):
-  configure: Disable W^X on OpenBSD
-  XXX oslib-posix: Ignore fcntl("/dev/null", F_SETFL, O_NONBLOCK)
-    failure
-  WIP tests/vm: Run tests on OpenBSD
-
- configure          | 11 +++++++++++
- tests/vm/openbsd   |  4 +---
- util/oslib-posix.c |  2 ++
- 3 files changed, 14 insertions(+), 3 deletions(-)
-
---=20
-2.20.1
+OK. Is it a multiple of 512 for all other operations?
