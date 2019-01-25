@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49954)
+Received: from eggs.gnu.org ([209.51.188.92]:52578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gnADM-0006oW-UP
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:44:46 -0500
+	(envelope-from <remi@remlab.net>) id 1gn9M8-0001Sj-Kp
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 16:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gnADL-0002nk-0E
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:44:44 -0500
-References: <20190121152218.9592-1-peter.maydell@linaro.org>
-	<20190121152218.9592-4-peter.maydell@linaro.org>
-From: Alistair <alistair23@gmail.com>
-Message-ID: <238b1d52-b0b4-6fbb-18be-d70bf9b1c4b4@gmail.com>
-Date: Fri, 25 Jan 2019 14:44:32 -0800
+	(envelope-from <remi@remlab.net>) id 1gn9M7-00035o-Ai
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 16:49:44 -0500
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Fri, 25 Jan 2019 23:49:25 +0200
+Message-Id: <20190125214926.3204-2-remi@remlab.net>
+In-Reply-To: <1648289.tQCHxfjYn9@basile.remlab.net>
+References: <1648289.tQCHxfjYn9@basile.remlab.net>
 MIME-Version: 1.0
-In-Reply-To: <20190121152218.9592-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] accel/tcg: Add cluster number to
- TCG TB hash
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/3] target/arm: actually enable PAuth in user
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +22,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+To: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 1/21/19 7:22 AM, Peter Maydell wrote:
-> Include the cluster number in the hash we use to look
-> up TBs. This is important because a TB that is valid
-> for one cluster at a given physical address and set
-> of CPU flags is not necessarily valid for another:
-> the two clusters may have different views of physical
-> memory, or may have different CPU features (eg FPU
-> present or absent).
-> 
-> We put the cluster number in the high 8 bits of the
-> TB cflags. This gives us up to 256 clusters, which should
-> be enough for anybody. If we ever need more, or need
-> more bits in cflags for other purposes, we could make
-> tb_hash_func() take more data (and expand qemu_xxhash7()
-> to qemu_xxhash8()).
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+From: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+This always enables IA, IB, DA and DB keys in user mode on the maximum
+CPU, in a manner that is consistent with the other CPUs. That is to say
+redefining the reset value of SCTLR_ELx registers.
 
-Alistair
+Without this patch, the PAC* and AUT* instructions have no effects
+(except PACGA of course).
 
-> ---
-> v1->v2: move the setting of the cluster index in
-> cf_mask in tb_htable_lookup() up to before we
-> set desc.cf_mask from it...
-> ---
->   include/exec/exec-all.h   | 4 +++-
->   accel/tcg/cpu-exec.c      | 3 +++
->   accel/tcg/translate-all.c | 3 +++
->   3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index 815e5b1e838..aa7b81aaf01 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -351,9 +351,11 @@ struct TranslationBlock {
->   #define CF_USE_ICOUNT  0x00020000
->   #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
->   #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
-> +#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
-> +#define CF_CLUSTER_SHIFT 24
->   /* cflags' mask for hashing/comparison */
->   #define CF_HASH_MASK   \
-> -    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
-> +    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL | CF_CLUSTER_MASK)
->   
->       /* Per-vCPU dynamic tracing state used to generate this TB */
->       uint32_t trace_vcpu_dstate;
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index 870027d4359..6c4a33262f5 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -325,6 +325,9 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
->       struct tb_desc desc;
->       uint32_t h;
->   
-> +    cf_mask &= ~CF_CLUSTER_MASK;
-> +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
-> +
->       desc.env = (CPUArchState *)cpu->env_ptr;
->       desc.cs_base = cs_base;
->       desc.flags = flags;
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 8cb8c8870e6..7364e8a071f 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1688,6 +1688,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->           cflags |= CF_NOCACHE | 1;
->       }
->   
-> +    cflags &= ~CF_CLUSTER_MASK;
-> +    cflags |= cpu->cluster_index << CF_CLUSTER_SHIFT;
-> +
->    buffer_overflow:
->       tb = tb_alloc(pc);
->       if (unlikely(!tb)) {
-> 
+Signed-off-by: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
+---
+ target/arm/cpu64.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index e9bc461c36..148c103ca4 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -413,8 +413,8 @@ static void aarch64_max_initfn(Object *obj)
+                                 (void *)&apdb_bit, &error_fatal);
+=20
+             /* Enable all PAC keys by default.  */
+-            cpu->env.cp15.sctlr_el[1] |=3D SCTLR_EnIA | SCTLR_EnIB;
+-            cpu->env.cp15.sctlr_el[1] |=3D SCTLR_EnDA | SCTLR_EnDB;
++            cpu->reset_sctlr |=3D SCTLR_EnIA | SCTLR_EnIB;
++            cpu->reset_sctlr |=3D SCTLR_EnDA | SCTLR_EnDB;
+         }
+ #endif
+=20
+--=20
+2.20.1
