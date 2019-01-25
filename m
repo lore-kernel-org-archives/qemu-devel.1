@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39098)
+Received: from eggs.gnu.org ([209.51.188.92]:40637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmyl5-00010i-Kg
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:30:50 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmyqr-0005pr-G5
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:36:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gmyl4-0008P5-Ga
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:30:47 -0500
-Date: Fri, 25 Jan 2019 11:30:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190125103015.GA9055@linux.fritz.box>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
-	<20190124151105.GH4601@localhost.localdomain>
-	<093415a1-c31c-c727-583f-bf3176621336@virtuozzo.com>
-	<20190124154248.GK4601@localhost.localdomain>
-	<3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gmyqq-00035t-HH
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:36:45 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gmyqq-00031E-AO
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:36:44 -0500
+Received: by mail-ot1-x342.google.com with SMTP id s13so8100050otq.4
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 02:36:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+References: <20190123212234.32068-1-stefanha@redhat.com>
+	<20190123212234.32068-3-stefanha@redhat.com>
+	<f58f9085-c895-1fa5-9fae-afe4ac8de39a@redhat.com>
+	<20190125102842.GB28305@stefanha-x1.localdomain>
+In-Reply-To: <20190125102842.GB28305@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 10:36:17 +0000
+Message-ID: <CAFEAcA-Dy0B-qCdojx9j49vF_p7OcAyQAiXYMv-_EZq7CCgT1A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] pflash: flush rom device memory
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Julia Suvorova <jusual@mail.ru>, Richard Henderson <rth@twiddle.net>
 
-Am 25.01.2019 um 11:10 hat Paolo Bonzini geschrieben:
-> On 24/01/19 16:42, Kevin Wolf wrote:
-> >> Recently Paolo asked me not to add more users of AioContext lock. Unfortunately
-> >> I don't understand the whole picture around it.. Doesn't this apply here?
-> >> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03410.html
-> > I don't know. Honestly I feel nobody except Paolo knows, because we
-> > don't know his patches yet.
-> 
-> This is true.  On the other hand, the AioContext lock is only used in
-> some special cases around block jobs and blk_set_aio_context, and in
-> general the block devices already should not have any dependencies
-> (unless they crept in without me noticing).
+On Fri, 25 Jan 2019 at 10:28, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Thu, Jan 24, 2019 at 12:11:55PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > The device realize() is also executed before the guest is started, is
+> > this call really necessary?
+>
+> My rationale was that machine init only happens before the guest is
+> started while ->realize() is called by hotplug too.
 
-It's also used in those cases where coroutines don't need locking, but
-threads would. Did you audit all of the drivers for such cases?
+Yes, but before realize the flash memory can't actually be
+visible to the guest, so there's no need to invalidate anything.
 
-> In particular...
-> 
-> > But raw doesn't have an s->lock yet, so I
-> > think removing the AioContext lock involves some work on it anyway and
-> > adding this doesn't really change the amount of work.
-> 
-> ... BDRVRawState doesn't have any data that changes after open, does it?
->  This is why it doesn't have an s->lock.
+> That said, can pflash devices be hotplugged?
 
-No important data anyway. We do things like setting s->has_write_zeroes
-= false after failure, but if we got a race and end up trying twice
-before disabling it, it doesn't really hurt either.
+I guess you could have one inside a hotplugged device in theory;
+they can't be directly hotpluggged. (I bet that in practice
+there are leaks though if you did do that, and we don't have
+any devices that do so today.)
 
-Then there is reopen, but that involves a drain anyway. And that's it
-probably.
+> If you guys prefer not flushing from pflash ->realize() then I'll drop
+> it.
 
-So do you think I should introduce a CoMutex for raw here? Or QemuMutex?
+I think it makes more sense not to do a flush in the realize method.
 
-Kevin
+thanks
+-- PMM
