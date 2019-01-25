@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35226)
+Received: from eggs.gnu.org ([209.51.188.92]:37658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmwWd-000413-Pt
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:07:44 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gmwq8-00075s-Dc
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:27:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmwSx-0001Yq-Rf
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:03:56 -0500
-References: <1548349076-350255-1-git-send-email-imammedo@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <3b4eef57-dc27-356e-5487-0b9b53a75cb1@redhat.com>
-Date: Fri, 25 Jan 2019 09:03:49 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gmwoV-0003nE-RP
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:26:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gmwoV-0003mI-La
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:26:11 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5AE377BDCA
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:26:10 +0000 (UTC)
+Date: Fri, 25 Jan 2019 09:26:05 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190125092605.2d40dce8@redhat.com>
+In-Reply-To: <20190123182858.GG2193@work-vm>
+References: <20190122200740.GC2241@work-vm>
+	<20190122215941-mutt-send-email-mst@kernel.org>
+	<20190123182858.GG2193@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1548349076-350255-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: remove direct reference to mem_path
- global form s90x code
+Subject: Re: [Qemu-devel] of apci_1_compatible in CPUHotplugFeatures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +34,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: pasic@linux.ibm.com, cohuck@redhat.com, borntraeger@de.ibm.com, rth@twiddle.net, qemu-s390x@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On 24.01.19 17:57, Igor Mammedov wrote:
-> I plan to deprecate -mem-path option and replace it with memory-backend,
-> for that it's necessary to get rid of mem_path global variable.
-> Do it for s390x case, replacing it with alternative way to enable
-> 1Mb hugepages capability.
+On Wed, 23 Jan 2019 18:28:59 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Tue, Jan 22, 2019 at 08:07:41PM +0000, Dr. David Alan Gilbert wrote:  
+> > > Hi,
+> > >   I noticed that the acpi_1_compatible flag was misspelt as
+> > >                      apci_1_compatible
+> > > 
+> > > so have a trivial patch to fix that,
+pls post it.
+
+> > > but looking at it - are
+> > > thre any cases where a[cp]i_1_compatible can possibly be false?
+ATM it's not possible, but I've wrote it with intent to reuse
+build_cpus_aml() in arm/virt board and there we shall use newer
+aml_device() instead of legacy aml_processor(), hence a feature flag
+to toggle behavior.
+
+
+> > > 
+> > > Dave  
+> > 
+> > legacy_cpu_hotplug so machine 2.6 and older - no?  
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> PS:
-> Original code nor the new one probably is not entirely correct when
-> huge pages are enabled in case where mixed initial RAM and memory
-> backends are used, backend's page size might not match initial RAM's
-> so I'm not sure if enabling 1MB cap is correct in this case on s390
-> (should it be the same for all RAM???).
-> With new approach 1Mb cap is not enabled if the smallest page size
-> is not 1Mb.
-
-There is no memory hotplug (DIMM/NVDIMM), so there really only is
-initial memory.
-
-> ---
->  target/s390x/kvm.c | 37 ++++++++++++++++---------------------
->  1 file changed, 16 insertions(+), 21 deletions(-)
+> That doesn't seem to affect that flag by my reading;
+> the only place I see legacy_cpu_hotplug checked is
+> acpi-build.c:build_dsdt and we have:
 > 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 2ebf26a..22e868a 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -285,33 +285,28 @@ void kvm_s390_crypto_reset(void)
->      }
->  }
->  
-> -static int kvm_s390_configure_mempath_backing(KVMState *s)
-> +static int kvm_s390_configure_hugepage_backing(KVMState *s)
->  {
-> -    size_t path_psize = qemu_mempath_getpagesize(mem_path);
-> +    size_t psize = qemu_getrampagesize();
->  
-> -    if (path_psize == 4 * KiB) {
-
-if you keep this (modified) check you have to do minimal changes in the
-code below. (e.g. not indent error messages)
-
-> -        return 0;
-> -    }
-> -> -    if (!hpage_1m_allowed()) {
-> -        error_report("This QEMU machine does not support huge page "
-> -                     "mappings");
-> -        return -EINVAL;
-> -    }
-> +    if (psize == 1 * MiB) {
-> +        if (!hpage_1m_allowed()) {
-> +            error_report("This QEMU machine does not support huge page "
-> +                         "mappings");
-> +            return -EINVAL;
-> +        }
->  
-> -    if (path_psize != 1 * MiB) {
-> +        if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-> +            error_report("Memory backing with 1M pages was specified, "
-> +                         "but KVM does not support this memory backing");
-> +            return -EINVAL;
-> +        }
-> +        cap_hpage_1m = 1;
-> +    } else if (psize == 2 * GiB) {
->          error_report("Memory backing with 2G pages was specified, "
->                       "but KVM does not support this memory backing");
->          return -EINVAL;
->      }
-> -
-> -    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
-> -        error_report("Memory backing with 1M pages was specified, "
-> -                     "but KVM does not support this memory backing");
-> -        return -EINVAL;
-> -    }
-> -
-> -    cap_hpage_1m = 1;
->      return 0;
->  }
->  
-> @@ -319,7 +314,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
->  
-> -    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-> +    if (kvm_s390_configure_hugepage_backing(s)) {
->          return -EINVAL;
->      }
->  
+>     if (pcmc->legacy_cpu_hotplug) {
+>         build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>     } else {
+>         CPUHotplugFeatures opts = {
+>             .acpi_1_compatible = true, .has_legacy_cphp = true
+>         };
+>         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+>                        "\\_SB.PCI0", "\\_GPE._E02");
+>     }
 > 
-
-Apart from that looks good to me.
-
--- 
-
-Thanks,
-
-David / dhildenb
+> so the 'opts' field is only used in the non-legacy case.
+> 
+> That's the only caller of build_cpus_aml, and I'm not seeing another
+> user of CPUHotplugFeatures.
+> 
+> Dave
+> 
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK  
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
