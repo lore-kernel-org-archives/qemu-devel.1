@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44835)
+Received: from eggs.gnu.org ([209.51.188.92]:47551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmeUF-0002xH-8Y
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:04 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1gmeYy-0006mv-5V
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gmeUE-0002R0-H5
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60510)
+	(envelope-from <luwei.kang@intel.com>) id 1gmeYx-0005hO-Ia
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:56 -0500
+Received: from mga06.intel.com ([134.134.136.31]:20544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gmeUE-0002QU-8g
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:52:02 -0500
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<20190123065618.3520-42-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fa45d1f5-4bc4-827a-321d-7df073c97861@redhat.com>
-Date: Thu, 24 Jan 2019 13:51:58 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190123065618.3520-42-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v4 41/44] virtio: make virtio
- dependencies with Kconfig
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1gmeYx-0005be-AO
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 07:56:55 -0500
+From: Luwei Kang <luwei.kang@intel.com>
+Date: Thu, 24 Jan 2019 20:54:43 -0500
+Message-Id: <1548381283-16688-1-git-send-email-luwei.kang@intel.com>
+Subject: [Qemu-devel] [PATCH] i386: extended the cpuid level when Intel PT
+ is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, Luwei Kang <luwei.kang@intel.com>
 
-On 2019-01-23 07:56, Yang Zhong wrote:
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  default-configs/i386-softmmu.mak  |  1 -
->  default-configs/s390x-softmmu.mak |  1 -
->  default-configs/virtio.mak        | 15 ---------------
->  hw/9pfs/Kconfig                   |  2 ++
->  hw/block/Kconfig                  |  2 ++
->  hw/char/Kconfig                   |  2 ++
->  hw/display/Kconfig                |  5 +++++
->  hw/input/Kconfig                  |  2 ++
->  hw/net/Kconfig                    |  2 ++
->  hw/pci-host/Kconfig               |  2 ++
->  hw/scsi/Kconfig                   |  1 +
->  hw/virtio/Kconfig                 |  9 ++++++++-
->  12 files changed, 26 insertions(+), 18 deletions(-)
->  delete mode 100644 default-configs/virtio.mak
+Intel Processor Trace required CPUID[0x14] but the cpuid level
+is 0xd when create a kvm guest with e.g. "-cpu qemu64,+intel-pt".
 
-This breaks compilation of aarch64 / arm as long as these targets are
-not fully converted yet:
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ target/i386/cpu.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Exception: contradiction between clauses when setting VIRTIO_MMIO
-make: *** No rule to make target `aarch64-softmmu/config-devices.mak',
-needed by `config-all-devices.mak'.  Stop.
-
-I think you temporarily have not to set CONFIG_VIRTIO=3Dy in
-default-configs/arm-softmmu.mak (and likely also in the riscv and s390x
-configs), until they are finally converted completely?
-
- Thomas
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 2f54125..da477b3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+         x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
++
++        /* Intel Processor Trace requires CPUID[0x14] */
++        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
++             kvm_enabled()) {
++            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
++        }
++
+         /* SVM requires CPUID[0x8000000A] */
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
+-- 
+1.8.3.1
