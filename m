@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56616)
+Received: from eggs.gnu.org ([209.51.188.92]:56628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gmzsF-00033t-E7
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:16 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gmzsI-00036m-5V
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gmzsE-0007Ki-CT
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:15 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43368)
+	(envelope-from <vkuznets@redhat.com>) id 1gmzsG-0007Py-7V
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:18 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:32949)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gmzsD-0007JW-SG
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:14 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r10so9925428wrs.10
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 03:42:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gmzsF-0007L2-Lz
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:42:16 -0500
+Received: by mail-wm1-f67.google.com with SMTP id r24so4609294wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 03:42:15 -0800 (PST)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Fri, 25 Jan 2019 12:41:53 +0100
-Message-Id: <20190125114155.32062-7-vkuznets@redhat.com>
+Date: Fri, 25 Jan 2019 12:41:54 +0100
+Message-Id: <20190125114155.32062-8-vkuznets@redhat.com>
 In-Reply-To: <20190125114155.32062-1-vkuznets@redhat.com>
 References: <20190125114155.32062-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH RFC 6/8] i386/kvm: hv-stimer requires hv-time
- and hv-synic
+Subject: [Qemu-devel] [PATCH RFC 7/8] i386/kvm: hv-tlbflush/ipi require
+ hv-vpindex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,8 +31,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-Synthetic timers operate in hv-time time and Windows won't use these
-without SynIC.
+The corresponding hypercalls require using VP indexes.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
@@ -40,18 +39,18 @@ Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
  1 file changed, 6 insertions(+)
 
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 674c5dc185..7461bf05dd 100644
+index 7461bf05dd..14d74ca9c7 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -1177,6 +1177,12 @@ static int hyperv_handle_properties(CPUState *cs,
-     if (cpu->hyperv_evmcs && !cpu->hyperv_vapic) {
-         r |= hv_report_missing_dep(cpu, "hv-evmcs", "hv-vapic");
+@@ -1183,6 +1183,12 @@ static int hyperv_handle_properties(CPUState *cs,
+     if (cpu->hyperv_stimer && !cpu->hyperv_time) {
+         r |= hv_report_missing_dep(cpu, "hv-stimer", "hv-time");
      }
-+    if (cpu->hyperv_stimer && !cpu->hyperv_synic) {
-+        r |= hv_report_missing_dep(cpu, "hv-stimer", "hv-synic");
++    if (cpu->hyperv_tlbflush && !cpu->hyperv_vpindex) {
++        r |= hv_report_missing_dep(cpu, "hv-tlbflush", "hv-vpindex");
 +    }
-+    if (cpu->hyperv_stimer && !cpu->hyperv_time) {
-+        r |= hv_report_missing_dep(cpu, "hv-stimer", "hv-time");
++    if (cpu->hyperv_ipi && !cpu->hyperv_vpindex) {
++        r |= hv_report_missing_dep(cpu, "hv-ipi", "hv-vpindex");
 +    }
  
      /* Not exposed by KVM but needed to make CPU hotplug in Windows work */
