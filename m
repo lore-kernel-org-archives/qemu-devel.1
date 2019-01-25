@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36014)
+Received: from eggs.gnu.org ([209.51.188.92]:36371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004QF-RN
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:24 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004fe-U5
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAPd-0005OT-Oq
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:26 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38664)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAPZ-0005Is-0b
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:21 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35164)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnAPd-0005Nm-J7
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:25 -0500
-Received: by mail-pl1-x642.google.com with SMTP id e5so5205419plb.5
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:25 -0800 (PST)
+	id 1gnAPY-0005Hc-PL
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:20 -0500
+Received: by mail-pf1-x443.google.com with SMTP id z9so5401640pfi.2
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:20 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 25 Jan 2019 14:57:13 -0800
-Message-Id: <20190125225714.10234-7-richard.henderson@linaro.org>
+Date: Fri, 25 Jan 2019 14:57:09 -0800
+Message-Id: <20190125225714.10234-3-richard.henderson@linaro.org>
 In-Reply-To: <20190125225714.10234-1-richard.henderson@linaro.org>
 References: <20190125225714.10234-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/6] linux-user: Implement PR_PAC_RESET_KEYS
+Subject: [Qemu-devel] [PATCH] target/arm: Fix validation of 32-bit address
+ spaces for aa32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +30,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+When tsz == 0, aarch32 selects the address space via exclusion,
+and there are no "top_bits" remaining that require validation.
+
+Fixes: ba97be9f4a4
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/target_syscall.h |  7 ++++++
- linux-user/syscall.c                | 33 +++++++++++++++++++++++++++++
- 2 files changed, 40 insertions(+)
+ target/arm/helper.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
-index 937fd7989e..b595e5da82 100644
---- a/linux-user/aarch64/target_syscall.h
-+++ b/linux-user/aarch64/target_syscall.h
-@@ -22,6 +22,13 @@ struct target_pt_regs {
- #define TARGET_PR_SVE_SET_VL  50
- #define TARGET_PR_SVE_GET_VL  51
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 92666e5208..e24689f767 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10447,7 +10447,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+     uint64_t ttbr;
+     hwaddr descaddr, indexmask, indexmask_grainsize;
+     uint32_t tableattrs;
+-    target_ulong page_size, top_bits;
++    target_ulong page_size;
+     uint32_t attrs;
+     int32_t stride;
+     int addrsize, inputsize;
+@@ -10487,12 +10487,19 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+      * We determined the region when collecting the parameters, but we
+      * have not yet validated that the address is valid for the region.
+      * Extract the top bits and verify that they all match select.
++     *
++     * For aa32, if inputsize == addrsize, then we have selected the
++     * region by exclusion in aa32_va_parameters and there is no more
++     * validation to do here.
+      */
+-    top_bits = sextract64(address, inputsize, addrsize - inputsize);
+-    if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
+-        /* In the gap between the two regions, this is a Translation fault */
+-        fault_type = ARMFault_Translation;
+-        goto do_fault;
++    if (inputsize < addrsize) {
++        target_ulong top_bits = sextract64(address, inputsize,
++                                           addrsize - inputsize);
++        if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
++            /* The gap between the two regions is a Translation fault */
++            fault_type = ARMFault_Translation;
++            goto do_fault;
++        }
+     }
  
-+#define TARGET_PR_PAC_RESET_KEYS 54
-+# define TARGET_PR_PAC_APIAKEY   (1 << 0)
-+# define TARGET_PR_PAC_APIBKEY   (1 << 1)
-+# define TARGET_PR_PAC_APDAKEY   (1 << 2)
-+# define TARGET_PR_PAC_APDBKEY   (1 << 3)
-+# define TARGET_PR_PAC_APGAKEY   (1 << 4)
-+
- void arm_init_pauth_key(ARMPACKey *key);
- 
- #endif /* AARCH64_TARGET_SYSCALL_H */
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b5786d4fc1..3e2949aa2f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9691,6 +9691,39 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 }
-             }
-             return ret;
-+        case TARGET_PR_PAC_RESET_KEYS:
-+            {
-+                CPUARMState *env = cpu_env;
-+                ARMCPU *cpu = arm_env_get_cpu(env);
-+
-+                if (cpu_isar_feature(aa64_pauth, cpu)) {
-+                    int all = (TARGET_PR_PAC_APIAKEY | TARGET_PR_PAC_APIBKEY |
-+                               TARGET_PR_PAC_APDAKEY | TARGET_PR_PAC_APDBKEY |
-+                               TARGET_PR_PAC_APGAKEY);
-+                    if (arg2 == 0) {
-+                        arg2 = all;
-+                    } else if (arg2 & ~all) {
-+                        return -TARGET_EINVAL;
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIAKEY) {
-+                        arm_init_pauth_key(&env->apia_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIBKEY) {
-+                        arm_init_pauth_key(&env->apib_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDAKEY) {
-+                        arm_init_pauth_key(&env->apda_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDBKEY) {
-+                        arm_init_pauth_key(&env->apdb_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APGAKEY) {
-+                        arm_init_pauth_key(&env->apga_key);
-+                    }
-+                    return 0;
-+                }
-+            }
-+            return -TARGET_EINVAL;
- #endif /* AARCH64 */
-         case PR_GET_SECCOMP:
-         case PR_SET_SECCOMP:
+     if (param.using64k) {
 -- 
-2.17.2
+2.17.1
