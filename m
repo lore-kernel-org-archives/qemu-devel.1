@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39851)
+Received: from eggs.gnu.org ([209.51.188.92]:42473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gn7HR-0002S1-Pc
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:36:46 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gn7aN-0006cL-6Y
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:56:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gn7HQ-0002bx-TO
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:36:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gn7HQ-0002aE-KN
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:36:44 -0500
-Date: Fri, 25 Jan 2019 14:36:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190125143247-mutt-send-email-mst@kernel.org>
-References: <20190115200252.25911-1-mst@redhat.com>
-	<20190115200252.25911-8-mst@redhat.com>
-	<690e996c-2ece-5b4b-956b-e5a50f22f975@redhat.com>
-	<b5a2251d-d992-47b8-012f-1257476752c8@comstyle.com>
+	(envelope-from <jsnow@redhat.com>) id 1gn7VK-0000uB-9N
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 14:51:07 -0500
+References: <cover.1548160772.git.balaton@eik.bme.hu>
+	<c323f08c59b9931310c5d92503d370f77ce3a557.1548160772.git.balaton@eik.bme.hu>
+	<1485cc74-b10e-bd62-3b42-9dfe9f587d1e@redhat.com>
+	<alpine.BSF.2.21.9999.1901240220470.16385@zero.eik.bme.hu>
+	<alpine.BSF.2.21.9999.1901251323200.23274@zero.eik.bme.hu>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d5d3b195-52eb-aad6-76db-0ed59890732f@redhat.com>
+Date: Fri, 25 Jan 2019 14:51:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <b5a2251d-d992-47b8-012f-1257476752c8@comstyle.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 07/49] util: check the return value of
- fcntl in qemu_set_{block, nonblock}
+In-Reply-To: <alpine.BSF.2.21.9999.1901251323200.23274@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] ide/via: Implement and use native PCI
+ IDE mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <n54@gmx.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, Jan 25, 2019 at 02:04:15PM -0500, Brad Smith wrote:
-> On 1/25/2019 1:53 PM, Philippe Mathieu-Daud=E9 wrote:
->=20
-> > Hi,
-> >=20
-> > On 1/15/19 9:04 PM, Michael S. Tsirkin wrote:
-> > > From: Li Qiang <liq3ea@163.com>
-> > >=20
-> > > Assert that the return value is not an error. This is like commit
-> > > 7e6478e7d4f for qemu_set_cloexec.
-> > >=20
-> > > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >   util/oslib-posix.c | 8 ++++++--
-> > >   1 file changed, 6 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > > index c1bee2a581..4ce1ba9ca4 100644
-> > > --- a/util/oslib-posix.c
-> > > +++ b/util/oslib-posix.c
-> > > @@ -233,14 +233,18 @@ void qemu_set_block(int fd)
-> > >   {
-> > >       int f;
-> > >       f =3D fcntl(fd, F_GETFL);
-> > > -    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> > > +    assert(f !=3D -1);
-> > > +    f =3D fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> > > +    assert(f !=3D -1);
-> > >   }
-> > >   void qemu_set_nonblock(int fd)
-> > >   {
-> > >       int f;
-> > >       f =3D fcntl(fd, F_GETFL);
-> > > -    fcntl(fd, F_SETFL, f | O_NONBLOCK);
-> > > +    assert(f !=3D -1);
-> > > +    f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
-> > > +    assert(f !=3D -1);
-> > This commit breaks OpenBSD, when trying to start QEMU I get:
-> > assertion "f !=3D -1" failed: file "util/oslib-posix.c", line 247,
-> > function "qemu_set_nonblock"
-> >=20
-> > Having a quick look at gdb, the last device opened is /dev/null, and
-> > when fcntl() fails we have errno =3D ENODEV.
-> >=20
-> >      19 ENODEV Operation not supported by device.
-> >      An attempt was made to apply an inappropriate function to a devi=
-ce,
-> >      for example, trying to read a write-only device such as a printe=
-r.
-> >=20
-> > Digging further I found a recent commit which could fix this problem:
-> > https://github.com/openbsd/src/commit/c2a35b387f9d3c
-> > "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, s=
-o
-> > the memory devices (/dev/null, /dev/zero, etc) need to permit them."
-> >=20
-> > Brad: Do you think this might be the fix? If so, any idea what is the
-> > first release to contain this fix? I don't know OpenBSD and can't fig=
-ure
-> > this out... Also, what would be the cleaner QEMU fix?
->=20
-> I don't know. But that commit was included with 6.3 or newer.
 
-I'm quite prepared to revert that - the value of spreading
-asserts around is marginal and if we don't set fd
-even on a real file to non-blocking qemu doesn't explode -
-it just hangs which isn't much worse than an assert.
 
-Let me know.
+On 1/25/19 7:25 AM, BALATON Zoltan wrote:
+> On Thu, 24 Jan 2019, BALATON Zoltan wrote:
+>> On Wed, 23 Jan 2019, John Snow wrote:
+>>> I guess this is technically an external change in behavior... I have no
+>>> real read on if this will break anything for anyone, or if anyone was
+>>> even using it.
+>>
+>> Currently nothing but the mips_fulong2e board seems to use this device
+>> and I don't think there's anything even on that board that would
+>> depend on (or would work with) legacy only IDE mode of this device but
+>> I could not find a test image to try. That board seems to be quite
+>> unfinished, I've tried to get it in better shape but haven't succeeded
+>> yet. So I don't think this change in the IDE device would break
+>> anything for anyone as it does not seem to be usable yet but I plan to
+>> use this IDE part in subsequent patches and PCI native mode works better.
+>>
+>>> Any thoughts on why it's okay to switch?
+>>
+>> As said above it's unlikely anyone would depend on it now and all
+>> drivers I know about prefer native mode anyway so likely it would work
+>> better after this change. If not and it turns out someone is using the
+>> current behaviour I can look at implementing switching between the two
+>> modes but that would be more difficult (the ISA ports would need to be
+>> mapped and unmapped based on bits in PCI_PROG_INTERFACE but there's no
+>> API to do this currently, ide/core.c only has ide_init_ioport to add
+>> mapping but not the counterpart to remove it; this could be
+>> implemented but unless found to be needed it probably does not worth
+>> it). So I suggest to switch based on that this is a quite unused part
+>> that's not likely to break anything and if it still found to break
+>> something I'll look at fixing it or it could be reverted, but I don't
+>> want to spend time now on something that's not actually used.
+> 
+> I'd appreciated if this could be included now based on the above as I
+> have some pathces in the works that will need this, unless there's a
+> strong reason to not apply it.
+> 
+> Thank you,
+> BALATON Zoltan
 
---=20
-MST
+I'll stage it. If anyone disagrees we can roll it back before release if
+we are breaking legacy behavior, but I really strongly suspect nobody is
+relying on this in any kind of production environment, so I'll take the
+risk to just merge the improvement.
+
+--js
