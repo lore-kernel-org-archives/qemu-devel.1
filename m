@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52195)
+Received: from eggs.gnu.org ([209.51.188.92]:52199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gn22A-0003c5-6p
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:00:40 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gn22A-0003c7-6u
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gn221-0000gc-VI
+	(envelope-from <alex.bennee@linaro.org>) id 1gn225-0000kZ-FF
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:00:37 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51953)
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:51583)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gn21x-0000Xy-U9
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:00:29 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so6892049wmj.1
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 06:00:23 -0800 (PST)
+	id 1gn224-0000fu-Jv
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:00:33 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id b11so6892410wmj.1
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 06:00:30 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 Jan 2019 14:00:07 +0000
-Message-Id: <20190125140017.6092-5-alex.bennee@linaro.org>
+Date: Fri, 25 Jan 2019 14:00:15 +0000
+Message-Id: <20190125140017.6092-13-alex.bennee@linaro.org>
 In-Reply-To: <20190125140017.6092-1-alex.bennee@linaro.org>
 References: <20190125140017.6092-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 04/14] archive-source.sh: Clone the
- submodules locally
+Subject: [Qemu-devel] [PATCH v1 12/14] tests/vm: add --build-target option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +30,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+This allows us to invoke the build with a custom target (for the VMs
+that use the {target} format string specifier). Currently OpenBSD is
+still hardwired due to problems running check.
 
-We cloned the QEMU repository from the local storage. Since the
-submodules are also available there, clone them too. This is
-quicker and reduce network use.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/archive-source.sh | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ tests/vm/basevm.py   | 3 +++
+ tests/vm/freebsd     | 2 +-
+ tests/vm/netbsd      | 2 +-
+ tests/vm/ubuntu.i386 | 2 +-
+ 4 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 6eed2a29bd..ce31be67b0 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -38,6 +38,10 @@ else
- fi
- git clone --shared . "$vroot_dir"
- test $? -ne 0 && error "failed to clone into '$vroot_dir'"
-+for sm in $submodules; do
-+    git clone --shared "$sm" "$vroot_dir/$sm"
-+    test $? -ne 0 && error "failed to clone submodule $sm"
-+done
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 5caf77d6b8..bdca6cb2fc 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -228,6 +228,8 @@ def parse_args(vmcls):
+                       help="build image")
+     parser.add_option("--build-qemu",
+                       help="build QEMU from source in guest")
++    parser.add_option("--build-target",
++                      help="QEMU build target", default="check")
+     parser.add_option("--interactive", "-I", action="store_true",
+                       help="Interactively run command")
+     parser.add_option("--snapshot", "-s", action="store_true",
+@@ -255,6 +257,7 @@ def main(vmcls):
+             cmd = [vm.BUILD_SCRIPT.format(
+                    configure_opts = " ".join(argv),
+                    jobs=args.jobs,
++                   target=args.build_target,
+                    verbose = "V=1" if args.verbose else "")]
+         else:
+             cmd = argv
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index a85c866c30..1d64c31b7c 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -25,7 +25,7 @@ class FreeBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/vtbd1;
+         ./configure {configure_opts};
+-        gmake --output-sync -j{jobs} check {verbose};
++        gmake --output-sync -j{jobs} {target} {verbose};
+     """
  
- cd "$vroot_dir"
- test $? -ne 0 && error "failed to change into '$vroot_dir'"
-@@ -45,11 +49,6 @@ test $? -ne 0 && error "failed to change into '$vroot_dir'"
- git checkout $HEAD
- test $? -ne 0 && error "failed to checkout $HEAD revision"
+     def build_image(self, img):
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index edea113bb5..a2c3d13af4 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -25,7 +25,7 @@ class NetBSDVM(basevm.BaseVM):
+         cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+         tar -xf /dev/rld1a;
+         ./configure --python=python2.7 {configure_opts};
+-        gmake --output-sync -j{jobs} check {verbose};
++        gmake --output-sync -j{jobs} {target} {verbose};
+     """
  
--for sm in $submodules; do
--    git submodule update --init $sm
--    test $? -ne 0 && error "failed to init submodule $sm"
--done
--
- if test -n "$submodules"; then
-     {
-         git ls-files || error "git ls-files failed"
+     def build_image(self, img):
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index 252e514859..a22d137e76 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -26,7 +26,7 @@ class UbuntuX86VM(basevm.BaseVM):
+         sudo chmod a+r /dev/vdb;
+         tar -xf /dev/vdb;
+         ./configure {configure_opts};
+-        make --output-sync check -j{jobs} {verbose};
++        make --output-sync {target} -j{jobs} {verbose};
+     """
+ 
+     def _gen_cloud_init_iso(self):
 -- 
 2.17.1
