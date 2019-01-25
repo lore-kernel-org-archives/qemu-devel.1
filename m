@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52536)
+Received: from eggs.gnu.org ([209.51.188.92]:53007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmroy-000467-Mq
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:06:21 -0500
+	(envelope-from <mst@redhat.com>) id 1gmrrJ-0005SD-Vo
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmrYl-0003bo-7s
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:49:36 -0500
-Received: from mga04.intel.com ([192.55.52.120]:17088)
+	(envelope-from <mst@redhat.com>) id 1gmrrI-0003P8-Mi
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:08:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gmrYj-0003PA-49
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:49:34 -0500
-Date: Fri, 25 Jan 2019 19:19:55 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190125111954.GA16915@tiger-server>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gmrrI-0003O2-8d
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:08:44 -0500
+Date: Thu, 24 Jan 2019 22:08:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190124220423-mutt-send-email-mst@kernel.org>
 References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
 	<20190123145050.GU4136@habkost.net>
@@ -23,7 +22,7 @@ References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
 	<20190124140522-mutt-send-email-mst@kernel.org>
 	<20190124191443.GB4136@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190124191443.GB4136@habkost.net>
 Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
@@ -36,9 +35,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, qemu-devel@nongnu.org, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On 2019-01-24 at 17:14:43 -0200, Eduardo Habkost wrote:
+On Thu, Jan 24, 2019 at 05:14:43PM -0200, Eduardo Habkost wrote:
 > On Thu, Jan 24, 2019 at 02:05:45PM -0500, Michael S. Tsirkin wrote:
 > > On Thu, Jan 24, 2019 at 04:28:39PM -0200, Eduardo Habkost wrote:
 > > > On Thu, Jan 24, 2019 at 12:45:54PM -0500, Michael S. Tsirkin wrote:
@@ -87,7 +86,6 @@ On 2019-01-24 at 17:14:43 -0200, Eduardo Habkost wrote:
 > > > 
 > > > If it's OK, let's at least explicitly document that we are
 > > > breaking compatibility in those cases.
-Yes, I will add more explanation in those broken cases.
 > > > 
 > > > 
 > > > > > > 
@@ -97,7 +95,6 @@ Yes, I will add more explanation in those broken cases.
 > > > > !MAP_SYNC on old kernels even though it's risky.
 > > > 
 > > > What about making MAP_SYNC optional only on older machine-types?
-Isn't Older Machine-type compatiable with new kernel? 
 > > 
 > > I don't think this makes sense. It's not a guest visible change,
 > > machine types are for that.
@@ -105,11 +102,9 @@ Isn't Older Machine-type compatiable with new kernel?
 > Losing data written to persistent memory is surely guest-visible
 > behavior.
 
-Guest always visit it is a persistent memory, but it is only a faked
-"persistent" front-end, the only way to guarantee the persistent is make the
-host back-end pmem=on, that is not a guest visible option.
+I think we need not be purists here. Most people don't lose power and
+then it's fine and compatible. People who want more robustness need to
+use more modern kernels, that is all.
 
-> 
 > -- 
 > Eduardo
-> 
