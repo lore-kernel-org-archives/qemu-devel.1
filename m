@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59951)
+Received: from eggs.gnu.org ([209.51.188.92]:60068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmyRh-0001t9-VN
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:10:46 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyRw-0002Ah-Sh
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gmyRg-0003uw-0E
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:10:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53392)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gmyRf-0003sY-OL
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:10:43 -0500
-Date: Fri, 25 Jan 2019 10:10:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190125101032.GA4498@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <003301d4b494$775585c0$66009140$@ru>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyRw-00045C-0H
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:11:00 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20190124141731.21509-1-kwolf@redhat.com>
+	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
+	<20190124151105.GH4601@localhost.localdomain>
+	<093415a1-c31c-c727-583f-bf3176621336@virtuozzo.com>
+	<20190124154248.GK4601@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
+Date: Fri, 25 Jan 2019 11:10:56 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190124154248.GK4601@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <003301d4b494$775585c0$66009140$@ru>
-Subject: Re: [Qemu-devel] Querying possible -cpu variants
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, =?utf-8?B?J9Ck0YPRgNGB0L7QstCwINCd0LDRgtCw0LvQuNGPJw==?= <Natalia.Fursova@ispras.ru>, mdroth@linux.vnet.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, Jan 25, 2019 at 12:58:04PM +0300, Pavel Dovgalyuk wrote:
-> Hello.
-> 
->  
-> 
-> We are making GUI for QEMU (which also should allow convenient record/replay command line
-> generation): https://github.com/ispras/qemu-gui
-> 
->  
-> 
-> To fill the combo box in CPU selection form we run QEMU with "-cpu help" command and parse its
-> output.
-> 
-> The format of this list depends on target. Therefore our parsing code does not look good (and also
-> may corrupt someday).
-> 
->  
-> 
-> Is there a better way of requesting this information?
-> 
->  
-> 
-> Or we should do one of the following:
-> 
-> 1.       Patch all targets and make the uniform "-cpu help" output format
+On 24/01/19 16:42, Kevin Wolf wrote:
+>> Recently Paolo asked me not to add more users of AioContext lock. Unfortunately
+>> I don't understand the whole picture around it.. Doesn't this apply here?
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03410.html
+> I don't know. Honestly I feel nobody except Paolo knows, because we
+> don't know his patches yet.
 
-Machine parsing of "help" output is not supported by the QEMU project.
-This must all be done via the QMP interfaces.
+This is true.  On the other hand, the AioContext lock is only used in
+some special cases around block jobs and blk_set_aio_context, and in
+general the block devices already should not have any dependencies
+(unless they crept in without me noticing).
 
-> 2.       Add QMP command for requesting this list.
+In particular...
 
-This already exists as the 'query-cpu-definitions' command
+> But raw doesn't have an s->lock yet, so I
+> think removing the AioContext lock involves some work on it anyway and
+> adding this doesn't really change the amount of work.
 
+... BDRVRawState doesn't have any data that changes after open, does it?
+ This is why it doesn't have an s->lock.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
