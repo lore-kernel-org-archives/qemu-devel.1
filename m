@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58975)
+Received: from eggs.gnu.org ([209.51.188.92]:59867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gn6S6-0005AD-Ah
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:43:43 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gn6XW-0006be-VA
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:49:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gn6S4-00059r-EF
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:43:42 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:42104)
+	(envelope-from <richard.henderson@linaro.org>) id 1gn6XV-0001m3-SF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:49:18 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41069)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gn6S4-00058C-98
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:43:40 -0500
-Received: by mail-oi1-x232.google.com with SMTP id w13so8374260oiw.9
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:43:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20190125140610.7810-1-ehabkost@redhat.com>
-In-Reply-To: <20190125140610.7810-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Jan 2019 18:43:27 +0000
-Message-ID: <CAFEAcA-SnzCxTwpa0LpKBpbv8sWZLEFW=ifKjNct8u2An-O1dw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Python 3 compatibility fixes
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gn6XV-0001l0-M0
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:49:17 -0500
+Received: by mail-pl1-x641.google.com with SMTP id u6so4945651plm.8
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:49:17 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 25 Jan 2019 10:49:13 -0800
+Message-Id: <20190125184913.5970-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Fix validation of 32-bit address
+ spaces for aa32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Fri, 25 Jan 2019 at 14:06, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 9dd0d8111fbb8015db75a38933aee1d45f9e64a3:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2019-01-24' into staging (2019-01-25 11:52:12 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 651514df88fd53d537b3b78a7548663cc0816b1b:
->
->   decodetree: re.fullmatch was added in 3.4 (2019-01-25 11:41:42 -0200)
->
-> ----------------------------------------------------------------
-> Python 3 compatibility fixes
->
-> ----------------------------------------------------------------
+When tsz == 0, aarch32 selects the address space via exclusion,
+and there are no "top_bits" remaining that require validation.
 
-Applied, thanks.
+Fixes: ba97be9f4a4
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 92666e5208..e24689f767 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10447,7 +10447,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+     uint64_t ttbr;
+     hwaddr descaddr, indexmask, indexmask_grainsize;
+     uint32_t tableattrs;
+-    target_ulong page_size, top_bits;
++    target_ulong page_size;
+     uint32_t attrs;
+     int32_t stride;
+     int addrsize, inputsize;
+@@ -10487,12 +10487,19 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+      * We determined the region when collecting the parameters, but we
+      * have not yet validated that the address is valid for the region.
+      * Extract the top bits and verify that they all match select.
++     *
++     * For aa32, if inputsize == addrsize, then we have selected the
++     * region by exclusion in aa32_va_parameters and there is no more
++     * validation to do here.
+      */
+-    top_bits = sextract64(address, inputsize, addrsize - inputsize);
+-    if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
+-        /* In the gap between the two regions, this is a Translation fault */
+-        fault_type = ARMFault_Translation;
+-        goto do_fault;
++    if (inputsize < addrsize) {
++        target_ulong top_bits = sextract64(address, inputsize,
++                                           addrsize - inputsize);
++        if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
++            /* The gap between the two regions is a Translation fault */
++            fault_type = ARMFault_Translation;
++            goto do_fault;
++        }
+     }
+ 
+     if (param.using64k) {
+-- 
+2.17.1
