@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59210)
+Received: from eggs.gnu.org ([209.51.188.92]:40680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gmsbU-0004ez-Gu
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:56:29 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gmtgd-0005IN-F3
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 00:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gmsbT-00020K-Fv
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:56:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34426)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gmsbT-0001zl-5t
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:56:27 -0500
-References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
-	<20190111161515.GG2738@work-vm>
-	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
-	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
-	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
-	<64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
-	<20190123195345.GI2193@work-vm>
-	<a0c711c1-17d4-9fbe-b78c-4cd4a2419633@redhat.com>
-	<877eeuidzp.fsf@dusky.pond.sub.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9cbb73bc-dbe2-4f5b-56e4-4c733811ed54@redhat.com>
-Date: Fri, 25 Jan 2019 11:56:18 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1gmtTj-0006NK-C8
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 23:52:35 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40283)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmtTc-0006Jq-24
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 23:52:28 -0500
+Received: by mail-pf1-x444.google.com with SMTP id i12so4146273pfo.7
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 20:52:21 -0800 (PST)
+References: <20190118140758.829-1-farosas@linux.ibm.com>
+	<20190118140758.829-8-farosas@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <1ffb003e-55a9-c845-be16-95f119ec41b3@ozlabs.ru>
+Date: Fri, 25 Jan 2019 15:52:13 +1100
 MIME-Version: 1.0
-In-Reply-To: <877eeuidzp.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190118140758.829-8-farosas@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] test-filter-mirror hangs
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v3 7/7] target/ppc: support single
+ stepping with KVM HV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +31,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-
-On 2019/1/24 =E4=B8=8B=E5=8D=885:47, Markus Armbruster wrote:
-> Please cc: me on QMP issues.
-
-
-Ok.
-
-
->
-> Jason Wang <jasowang@redhat.com> writes:
->
->> On 2019/1/24 =E4=B8=8A=E5=8D=883:53, Dr. David Alan Gilbert wrote:
->>> * Jason Wang (jasowang@redhat.com) wrote:
->>>> On 2019/1/22 =E4=B8=8A=E5=8D=882:56, Peter Maydell wrote:
->>>>> On Thu, 17 Jan 2019 at 09:46, Jason Wang<jasowang@redhat.com>  wrot=
-e:
->>>>>> On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
->>>>>>> On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
->>>>>>> <dgilbert@redhat.com  <mailto:dgilbert@redhat.com>> wrote:
->>>>>>>
->>>>>>>        * Peter Maydell (peter.maydell@linaro.org
->>>>>>>        <mailto:peter.maydell@linaro.org>) wrote:
->>>>>>>        > Recently I've noticed that test-filter-mirror has been h=
-anging
->>>>>>>        > intermittently, typically when run on some other TCG arc=
-hitecture.
->>>>>>>        > In the instance I've just looked at, this was with s390x=
- guest on
->>>>>>>        > x86-64 host, though I've also seen it on other host arch=
-s and
->>>>>>>        > perhaps with other guests.
->>>>>>>
->>>>>>>        Watch out to see if you really do see it for other guests;
->>>>>>>        it carefully avoids using virtio-net to avoid vhost; but o=
-n s390x it
->>>>>>>        uses virtio-net-ccw - could that hit the vhost it was tryi=
-ng to avoid?
->>>>>>>
->>>>>>>        > Below is a backtrace, though it seems to be pretty unhel=
-pful.
->>>>>>>        > Anybody got any theories ? Does the mirror test rely on =
-dirty
->>>>>>>        > memory bitmaps like the migration test (which also hangs
->>>>>>>        > occasionally with TCG due to some bug I'm sure we've inv=
-estigated
->>>>>>>        > in the past) ?
->>>>>>>
->>>>>>>        I don't think it relies on the CPU at all.
->>>>>>>     I have no idea about this currently, but Jason and I designed=
- the
->>>>>>> test case.
->>>>>>> Add Jason: Have any comments about this ?
->>>>>> I can't reproduce this locally with s390x-softmmu. It looks to me =
-the
->>>>>> test should be independent to any kinds of emulation. It should pa=
-ss
->>>>>> when mainloop work.
->>>>> I've just seen a hang with ppc64 guest on s390x host, so it is
->>>>> indeed not specific to s390x guest (and so not specific to
->>>>> virtio-net either, since the ppc64 guest setup uses e1000).
->>>>>
->>>>> thanks
->>>>> -- PMM
->>>> Finally reproduced locally after hundreds (sometimes thousands) time=
-s of
->>>> running.
->>>>
->>>> Bisection points to OOB monitor[1].
->>>>
->>>> It looks to me after OOB is used unconditionally we lose a barrier t=
-o make
->>>> sure socket is connected before sending packets in test-filter-mirro=
-r.c. Is
->>>> there any other similar and simple thing that we could do to kick th=
-e
->>>> mainloop?
->>> Do you mean the:
->>>
->>>       /* send a qmp command to guarantee that 'connected' is setting =
-to true. */
->>>       qmp_discard_response(qts, "{ 'execute' : 'query-status'}");
->>
->> Yes.
->>
->>
->>> why was that ever sufficient to know the socket was ready?
->>
->> It was suggested by Fam, I don't remember the details. Can we make
->> sure all pending events has been processed (UNIX socket was set to
->> connected) after query-status is returned with an non OOB monitor?
-> I'm afraid I lack context.  Which socket are you talking about?  The
-> test has at least the QMP socket, the send_sock[], and recv_sock.  What
-> exactly are you trying to accomplish?
-
-
-I mean recv_sock. If mirror tries to send a packet to it before its=20
-is_connected is set to true, packet will be dropped.
-
-
->
-> By the way, mkstemp(sock_path) followed by unix_connect(sock_path, NULL=
-)
-> looks rather fishy.  Why create a temporary file only to create a Unix
-> domain socket right over it?
-
-
-I vaguely remember passing fd created by unix domain socket doesn't work=20
-when the test is introduced. So my understanding is the author needs a=20
-way to create a unique file name which will be used b Unix domain socket=20
-at that time.
+To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, david@gibson.dropbear.id.au, cohuck@redhat.com
 
 
 
->   Why is ignoring errors a good idea?
+On 19/01/2019 01:07, Fabiano Rosas wrote:
+> The hardware singlestep mechanism in POWER works via a Trace Interrupt
+> (0xd00) that happens after any instruction executes, whenever MSR_SE =
+> 1 (PowerISA Section 6.5.15 - Trace Interrupt).
+> 
+> However, with kvm_hv, the Trace Interrupt happens inside the guest and
+> KVM has no visibility of it. Therefore, when the gdbstub uses the
+> KVM_SET_GUEST_DEBUG ioctl to enable singlestep, KVM simply ignores it.
+> 
+> This patch takes advantage of the Trace Interrupt to perform the step
+> inside the guest, but uses a breakpoint at the Trace Interrupt handler
+> to return control to KVM. The exit is treated by KVM as a regular
+> breakpoint and it returns to the host (and QEMU eventually).
+> 
+> Before signalling GDB, QEMU sets the Next Instruction Pointer to the
+> instruction following the one being stepped and restores the MSR,
+> SRR0, SRR1 values from before the step, effectively skipping the
+> interrupt handler execution and hiding the trace interrupt breakpoint
+> from GDB.
+> 
+> This approach works with both of GDB's 'scheduler-locking' options
+> (off, step).
+> 
+> Note:
+> 
+> - kvm_arch_set_singlestep happens after GDB asks for a single step,
+>   while the vcpus are stopped.
+> 
+> - kvm_handle_singlestep executes after the step, during the handling
+>   of the Emulation Assist Interrupt (breakpoint).
 
 
-I don't get, which error is missed, it checks the return value of both=20
-mkstemp() and unix_connect().
+Good job! Few comments below.
 
-Thanks
+
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/cpu.h |   5 ++
+>  target/ppc/kvm.c | 180 +++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 178 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 2185ef5e67..c7320c908e 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1157,6 +1157,11 @@ struct CPUPPCState {
+>      uint32_t tm_vscr;
+>      uint64_t tm_dscr;
+>      uint64_t tm_tar;
+> +
+> +    /* Used for software single step */
+> +    target_ulong sstep_msr;
+> +    target_ulong sstep_srr0;
+> +    target_ulong sstep_srr1;
+>  };
+>  
+>  #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index c27190d7fb..880597a4a6 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -1555,6 +1555,68 @@ void kvm_arch_remove_all_hw_breakpoints(void)
+>      nb_hw_breakpoint = nb_hw_watchpoint = 0;
+>  }
+>  
+> +void kvm_arch_set_singlestep(CPUState *cs, int enabled)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    target_ulong trace_handler_addr;
+> +    uint32_t insn;
+> +
+> +    if (enabled) {
+
+if (!enabled) {
+    return;
+}
+
+and reduce indent?
+
+
+> +        cpu_synchronize_state(cs);
+> +
+> +        /*
+> +         * Save the registers that will be affected by the single step
+> +         * mechanism. These will be restored after the step at
+> +         * kvm_handle_singlestep.
+> +         */
+> +        env->sstep_msr = env->msr;
+> +        env->sstep_srr0 = env->spr[SPR_SRR0];
+> +        env->sstep_srr1 = env->spr[SPR_SRR1];
+> +
+> +        cpu_memory_rw_debug(cs, env->nip, (uint8_t *)&insn, sizeof(insn), 0);
+> +
+> +        /*
+> +         * rfid overwrites MSR with SRR1. Check if it has the SE bit
+> +         * already set, meaning the guest is doing a single step
+> +         * itself and set the SRR1_SE bit instead of MSR_SE to trigger
+> +         * our own single step.
+> +         */
+> +        if (extract32(insn, 26, 6) == 19 && extract32(insn, 1, 10) == 18) {
+
+We could define "rfid" like XL(19,18):
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/xmon/ppc-opc.c#n4388
+
+
+> +            if ((env->spr[SPR_SRR1] >> MSR_SE) & 1) {
+> +                env->sstep_msr |= (1ULL << MSR_SE);
+> +            }
+> +
+> +            env->spr[SPR_SRR1] |= (1ULL << MSR_SE);
+> +        } else {
+> +            /*
+> +             * MSR_SE = 1 will cause a Trace Interrupt in the guest
+> +             * after the next instruction executes.
+> +             */
+> +            env->msr |= (1ULL << MSR_SE);
+> +        }
+> +
+> +        /*
+> +         * We set a breakpoint at the interrupt handler address so
+> +         * that the singlestep will be seen by KVM (this is treated by
+> +         * KVM like an ordinary breakpoint) and control is returned to
+> +         * QEMU.
+> +         */
+> +        trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
+> +
+> +        if (env->nip == trace_handler_addr) {
+> +            /*
+> +             * We are trying to step over the interrupt handler
+> +             * address itself; move the breakpoint to the next
+> +             * instruction.
+> +             */
+> +            trace_handler_addr += 4;
+> +        }
+> +
+> +        kvm_insert_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
+> +    }
+> +}
+> +
+>  void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
+>  {
+>      int n;
+> @@ -1594,6 +1656,93 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
+>      }
+>  }
+>  
+> +/* Revert any side-effects caused during single step */
+> +static void restore_singlestep_env(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    uint32_t insn;
+> +    int reg;
+> +    int spr;
+> +    int opcode;
+> +
+> +    cpu_memory_rw_debug(cs, env->spr[SPR_SRR0] - 4, (uint8_t *)&insn,
+> +                        sizeof(insn), 0);
+> +
+> +    env->spr[SPR_SRR0] = env->sstep_srr0;
+> +    env->spr[SPR_SRR1] = env->sstep_srr1;
+> +
+> +    if (extract32(insn, 26, 6) == 31) {
+
+if (extract32(insn, 26, 6) != 31) {
+    return;
+}
+
+and minus one level of indent?
+
+Also we could introduce get_op()/get_xop() and nice op definitions as in
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/kvm/book3s_emulate.c#n258
+
+
+> +        opcode = extract32(insn, 1, 10);
+> +        reg = extract32(insn, 21, 5);
+> +
+> +        switch (opcode) {
+> +        case 467:
+> +            /*
+> +             * mtspr: the guest altered the SRR, so do not use the
+> +             *        pre-step value.
+> +             */
+> +            spr = ((insn >> 16) & 0x1f) | ((insn >> 6) & 0x3e0);
+
+
+spr = SPR(insn); ?
+
+
+> +            if (spr == SPR_SRR0 || spr == SPR_SRR1) {
+> +                env->spr[spr] = env->gpr[reg];
+> +            }
+> +            break;
+> +        case 83:
+> +            /*
+> +             * msfmsr: clear MSR_SE bit to avoid the guest knowing
+
+s/msfmsr/mfmsr/
+
+
+> +             *         that it is being single-stepped.
+> +             */
+> +            env->gpr[reg] &= ~(1ULL << MSR_SE);
+> +            break;
+> +        }
+> +    }
+> +}
+> +
+> +static int kvm_handle_singlestep(CPUState *cs,
+> +                                 struct kvm_debug_exit_arch *arch_info)
+
+
+You only need address from arch_info, pass just that.
+
+
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    target_ulong trace_handler_addr;
+> +
+> +    if (kvm_has_guestdbg_singlestep()) {
+> +        return 1;
+> +    }
+> +
+> +    cpu_synchronize_state(cs);
+> +    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
+> +
+> +    if (arch_info->address == trace_handler_addr) {
+> +        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
+> +
+> +        if (env->sstep_msr & (1ULL << MSR_SE)) {
+> +            /*
+> +             * The guest expects the last instruction to have caused a
+> +             * single step, go back into the interrupt handler.
+> +             */
+> +            return 1;
+> +        }
+> +
+> +        env->nip = env->spr[SPR_SRR0];
+> +        /* Bits 33-36, 43-47 are set by the interrupt */
+> +        env->msr = env->spr[SPR_SRR1] & ~(1ULL << MSR_SE |
+> +                                          PPC_BITMASK(33, 36) |
+> +                                          PPC_BITMASK(43, 47));
+> +        restore_singlestep_env(cs);
+> +
+> +    } else if (arch_info->address == trace_handler_addr + 4) {
+> +        /*
+> +         * A step at trace_handler_addr would interfere with the
+> +         * singlestep mechanism itself, so we have previously
+> +         * displaced the breakpoint to the next instruction.
+> +         */
+> +        kvm_remove_breakpoint(cs, trace_handler_addr + 4, 4, GDB_BREAKPOINT_SW);
+> +        restore_singlestep_env(cs);
+> +    }
+> +
+> +    return 1;
+> +}
+> +
+>  static int kvm_handle_hw_breakpoint(CPUState *cs,
+>                                      struct kvm_debug_exit_arch *arch_info)
+>  {
+> @@ -1621,13 +1770,30 @@ static int kvm_handle_hw_breakpoint(CPUState *cs,
+>      return handle;
+>  }
+>  
+> -static int kvm_handle_singlestep(void)
+> +static int kvm_handle_sw_breakpoint(CPUState *cs,
+> +                                    struct kvm_debug_exit_arch *arch_info)
+>  {
+> -    return 1;
+> -}
+> +    target_ulong trace_handler_addr;
+>  
+> -static int kvm_handle_sw_breakpoint(void)
+> -{
+> +    if (kvm_has_guestdbg_singlestep()) {
+> +        return 1;
+> +    }
+> +
+> +    cpu_synchronize_state(cs);
+> +    trace_handler_addr = ppc_get_trace_int_handler_addr(cs);
+> +
+> +    if (arch_info->address == trace_handler_addr) {
+> +        CPU_FOREACH(cs) {
+> +            if (cs->singlestep_enabled) {
+> +                /*
+> +                 * We hit this breakpoint while another cpu is doing a
+> +                 * software single step. Go back into the guest to
+> +                 * give chance for the single step to finish.
+> +                 */
+> +                return 0;
+> +            }
+> +        }
+> +    }
+>      return 1;
+>  }
+>  
+> @@ -1638,7 +1804,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+>      struct kvm_debug_exit_arch *arch_info = &run->debug.arch;
+>  
+>      if (cs->singlestep_enabled) {
+> -        return kvm_handle_singlestep();
+> +        return kvm_handle_singlestep(cs, arch_info);
+>      }
+>  
+>      if (arch_info->status) {
+> @@ -1646,7 +1812,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
+>      }
+>  
+>      if (kvm_find_sw_breakpoint(cs, arch_info->address)) {
+> -        return kvm_handle_sw_breakpoint();
+> +        return kvm_handle_sw_breakpoint(cs, arch_info);
+>      }
+>  
+>      /*
+> 
+
+-- 
+Alexey
