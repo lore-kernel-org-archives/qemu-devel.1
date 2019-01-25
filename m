@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35566)
+Received: from eggs.gnu.org ([209.51.188.92]:36665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gn0aG-0008EI-Lk
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:27:45 -0500
+	(envelope-from <philmd@redhat.com>) id 1gn0eG-0002uW-0P
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gn0YU-0005q1-D1
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:25:55 -0500
-Date: Fri, 25 Jan 2019 13:25:41 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1901240220470.16385@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.21.9999.1901251323200.23274@zero.eik.bme.hu>
-References: <cover.1548160772.git.balaton@eik.bme.hu>
-	<c323f08c59b9931310c5d92503d370f77ce3a557.1548160772.git.balaton@eik.bme.hu>
-	<1485cc74-b10e-bd62-3b42-9dfe9f587d1e@redhat.com>
-	<alpine.BSF.2.21.9999.1901240220470.16385@zero.eik.bme.hu>
+	(envelope-from <philmd@redhat.com>) id 1gn0eF-0000MG-7s
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:51 -0500
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:40462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn0eF-0000M2-23
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:31:51 -0500
+Received: by mail-wm1-f45.google.com with SMTP id f188so6432808wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 04:31:50 -0800 (PST)
+References: <20190125094047.22276-1-dgilbert@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <773a9051-9cca-ac9b-99d0-4cdb46a13952@redhat.com>
+Date: Fri, 25 Jan 2019 13:31:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 3/3] ide/via: Implement and use native PCI
- IDE mode
+In-Reply-To: <20190125094047.22276-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] typo: apci->acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
+Cc: qemu-trivial@nongnu.org
 
-On Thu, 24 Jan 2019, BALATON Zoltan wrote:
-> On Wed, 23 Jan 2019, John Snow wrote:
->> I guess this is technically an external change in behavior... I have no
->> real read on if this will break anything for anyone, or if anyone was
->> even using it.
->
-> Currently nothing but the mips_fulong2e board seems to use this device and I 
-> don't think there's anything even on that board that would depend on (or 
-> would work with) legacy only IDE mode of this device but I could not find a 
-> test image to try. That board seems to be quite unfinished, I've tried to get 
-> it in better shape but haven't succeeded yet. So I don't think this change in 
-> the IDE device would break anything for anyone as it does not seem to be 
-> usable yet but I plan to use this IDE part in subsequent patches and PCI 
-> native mode works better.
->
->> Any thoughts on why it's okay to switch?
->
-> As said above it's unlikely anyone would depend on it now and all drivers I 
-> know about prefer native mode anyway so likely it would work better after 
-> this change. If not and it turns out someone is using the current behaviour I 
-> can look at implementing switching between the two modes but that would be 
-> more difficult (the ISA ports would need to be mapped and unmapped based on 
-> bits in PCI_PROG_INTERFACE but there's no API to do this currently, 
-> ide/core.c only has ide_init_ioport to add mapping but not the counterpart to 
-> remove it; this could be implemented but unless found to be needed it 
-> probably does not worth it). So I suggest to switch based on that this is a 
-> quite unused part that's not likely to break anything and if it still found 
-> to break something I'll look at fixing it or it could be reverted, but I 
-> don't want to spend time now on something that's not actually used.
+On 1/25/19 10:40 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> apci_1_compatible should be acpi_1_compatible.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-I'd appreciated if this could be included now based on the above as I have 
-some pathces in the works that will need this, unless there's a strong 
-reason to not apply it.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Thank you,
-BALATON Zoltan
+> ---
+>  hw/acpi/cpu.c         | 2 +-
+>  hw/i386/acpi-build.c  | 2 +-
+>  include/hw/acpi/cpu.h | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> index f10b190019..a0a43fe6b5 100644
+> --- a/hw/acpi/cpu.c
+> +++ b/hw/acpi/cpu.c
+> @@ -508,7 +508,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>              GArray *madt_buf = g_array_new(0, 1, 1);
+>              int arch_id = arch_ids->cpus[i].arch_id;
+>  
+> -            if (opts.apci_1_compatible && arch_id < 255) {
+> +            if (opts.acpi_1_compatible && arch_id < 255) {
+>                  dev = aml_processor(i, 0, 0, CPU_NAME_FMT, i);
+>              } else {
+>                  dev = aml_device(CPU_NAME_FMT, i);
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2e21a31f82..d60603abd7 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1847,7 +1847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+>          CPUHotplugFeatures opts = {
+> -            .apci_1_compatible = true, .has_legacy_cphp = true
+> +            .acpi_1_compatible = true, .has_legacy_cphp = true
+>          };
+>          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+>                         "\\_SB.PCI0", "\\_GPE._E02");
+> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
+> index 89ce172941..62f0278ba2 100644
+> --- a/include/hw/acpi/cpu.h
+> +++ b/include/hw/acpi/cpu.h
+> @@ -48,7 +48,7 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
+>                           CPUHotplugState *state, hwaddr base_addr);
+>  
+>  typedef struct CPUHotplugFeatures {
+> -    bool apci_1_compatible;
+> +    bool acpi_1_compatible;
+>      bool has_legacy_cphp;
+>  } CPUHotplugFeatures;
+>  
+> 
