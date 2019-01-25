@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36371)
+Received: from eggs.gnu.org ([209.51.188.92]:36023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004fe-U5
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004QH-Tk
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAPZ-0005Is-0b
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:21 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35164)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAPX-0005HB-SJ
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:20 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34248)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnAPY-0005Hc-PL
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:20 -0500
-Received: by mail-pf1-x443.google.com with SMTP id z9so5401640pfi.2
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:20 -0800 (PST)
+	id 1gnAPX-0005Fj-LZ
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:19 -0500
+Received: by mail-pg1-x543.google.com with SMTP id j10so4797609pga.1
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:19 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 25 Jan 2019 14:57:09 -0800
-Message-Id: <20190125225714.10234-3-richard.henderson@linaro.org>
+Date: Fri, 25 Jan 2019 14:57:08 -0800
+Message-Id: <20190125225714.10234-2-richard.henderson@linaro.org>
 In-Reply-To: <20190125225714.10234-1-richard.henderson@linaro.org>
 References: <20190125225714.10234-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/arm: Fix validation of 32-bit address
- spaces for aa32
+Subject: [Qemu-devel] [PATCH 1/6] target/arm: Always enable pac keys for
+ user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +30,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-When tsz == 0, aarch32 selects the address space via exclusion,
-and there are no "top_bits" remaining that require validation.
+Drop the pac properties.  This approach cannot work as written
+because the properties are applied before arm_cpu_reset, which
+zeros SCTLR_EL1 (amongst everything else).
 
-Fixes: ba97be9f4a4
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
+We can re-introduce the properties if they turn out to be useful.
+But since linux 5.0 enables all of the keys, they may not be.
+
+Fixes: 1ae9cfbd470
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ target/arm/cpu.c   |  3 +++
+ target/arm/cpu64.c | 60 ----------------------------------------------
+ 2 files changed, 3 insertions(+), 60 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 92666e5208..e24689f767 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10447,7 +10447,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-     uint64_t ttbr;
-     hwaddr descaddr, indexmask, indexmask_grainsize;
-     uint32_t tableattrs;
--    target_ulong page_size, top_bits;
-+    target_ulong page_size;
-     uint32_t attrs;
-     int32_t stride;
-     int addrsize, inputsize;
-@@ -10487,12 +10487,19 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-      * We determined the region when collecting the parameters, but we
-      * have not yet validated that the address is valid for the region.
-      * Extract the top bits and verify that they all match select.
-+     *
-+     * For aa32, if inputsize == addrsize, then we have selected the
-+     * region by exclusion in aa32_va_parameters and there is no more
-+     * validation to do here.
-      */
--    top_bits = sextract64(address, inputsize, addrsize - inputsize);
--    if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
--        /* In the gap between the two regions, this is a Translation fault */
--        fault_type = ARMFault_Translation;
--        goto do_fault;
-+    if (inputsize < addrsize) {
-+        target_ulong top_bits = sextract64(address, inputsize,
-+                                           addrsize - inputsize);
-+        if (-top_bits != param.select || (param.select && !ttbr1_valid)) {
-+            /* The gap between the two regions is a Translation fault */
-+            fault_type = ARMFault_Translation;
-+            goto do_fault;
-+        }
-     }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 7e1f3dd637..1e79b97a9c 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -162,6 +162,9 @@ static void arm_cpu_reset(CPUState *s)
+         env->pstate = PSTATE_MODE_EL0t;
+         /* Userspace expects access to DC ZVA, CTL_EL0 and the cache ops */
+         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
++        /* Enable all PAC keys.  */
++        env->cp15.sctlr_el[1] |= (SCTLR_EnIA | SCTLR_EnIB |
++                                  SCTLR_EnDA | SCTLR_EnDB);
+         /* Enable all PAC instructions */
+         env->cp15.hcr_el2 |= HCR_API;
+         env->cp15.scr_el3 |= SCR_API;
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index e9bc461c36..303d0ef075 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -281,38 +281,6 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
+     error_propagate(errp, err);
+ }
  
-     if (param.using64k) {
+-#ifdef CONFIG_USER_ONLY
+-static void cpu_max_get_packey(Object *obj, Visitor *v, const char *name,
+-                               void *opaque, Error **errp)
+-{
+-    ARMCPU *cpu = ARM_CPU(obj);
+-    const uint64_t *bit = opaque;
+-    bool enabled = (cpu->env.cp15.sctlr_el[1] & *bit) != 0;
+-
+-    visit_type_bool(v, name, &enabled, errp);
+-}
+-
+-static void cpu_max_set_packey(Object *obj, Visitor *v, const char *name,
+-                               void *opaque, Error **errp)
+-{
+-    ARMCPU *cpu = ARM_CPU(obj);
+-    Error *err = NULL;
+-    const uint64_t *bit = opaque;
+-    bool enabled;
+-
+-    visit_type_bool(v, name, &enabled, errp);
+-
+-    if (!err) {
+-        if (enabled) {
+-            cpu->env.cp15.sctlr_el[1] |= *bit;
+-        } else {
+-            cpu->env.cp15.sctlr_el[1] &= ~*bit;
+-        }
+-    }
+-    error_propagate(errp, err);
+-}
+-#endif
+-
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+  * otherwise, a CPU with as many features enabled as our emulation supports.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -388,34 +356,6 @@ static void aarch64_max_initfn(Object *obj)
+          */
+         cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+         cpu->dcz_blocksize = 7; /*  512 bytes */
+-
+-        /*
+-         * Note that Linux will enable enable all of the keys at once.
+-         * But doing it this way will allow experimentation beyond that.
+-         */
+-        {
+-            static const uint64_t apia_bit = SCTLR_EnIA;
+-            static const uint64_t apib_bit = SCTLR_EnIB;
+-            static const uint64_t apda_bit = SCTLR_EnDA;
+-            static const uint64_t apdb_bit = SCTLR_EnDB;
+-
+-            object_property_add(obj, "apia", "bool", cpu_max_get_packey,
+-                                cpu_max_set_packey, NULL,
+-                                (void *)&apia_bit, &error_fatal);
+-            object_property_add(obj, "apib", "bool", cpu_max_get_packey,
+-                                cpu_max_set_packey, NULL,
+-                                (void *)&apib_bit, &error_fatal);
+-            object_property_add(obj, "apda", "bool", cpu_max_get_packey,
+-                                cpu_max_set_packey, NULL,
+-                                (void *)&apda_bit, &error_fatal);
+-            object_property_add(obj, "apdb", "bool", cpu_max_get_packey,
+-                                cpu_max_set_packey, NULL,
+-                                (void *)&apdb_bit, &error_fatal);
+-
+-            /* Enable all PAC keys by default.  */
+-            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
+-            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
+-        }
+ #endif
+ 
+         cpu->sve_max_vq = ARM_MAX_VQ;
 -- 
-2.17.1
+2.17.2
