@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41902)
+Received: from eggs.gnu.org ([209.51.188.92]:49904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sourav.jb1988@gmail.com>) id 1gn5mO-0007Oj-06
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:00:40 -0500
+	(envelope-from <philmd@redhat.com>) id 1gn60R-0001r9-Uw
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sourav.jb1988@gmail.com>) id 1gn5mL-0001aU-V5
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:00:35 -0500
+	(envelope-from <philmd@redhat.com>) id 1gn60Q-0004uN-2y
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:07 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn60O-0004sg-3t
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:05 -0500
+Received: by mail-wr1-f65.google.com with SMTP id 96so11329934wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:15:02 -0800 (PST)
+References: <20170816072104.24420-1-famz@redhat.com>
+	<20170816072104.24420-9-famz@redhat.com>
+	<ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+	<f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+	<4bf0c77e-ea8f-1813-a6a4-6ab6eb857cd0@redhat.com>
+	<20190124165253.GT7953@redhat.com>
+	<509cf069-5d03-8e2e-fb3c-5828d32f38e1@comstyle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7b56e9a1-5844-3b36-2938-ef63985d54f4@redhat.com>
+Date: Fri, 25 Jan 2019 19:15:00 +0100
 MIME-Version: 1.0
-References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
-	<f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
-	<cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
-In-Reply-To: <cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
-From: ksourav <sourav.jb1988@gmail.com>
-Date: Fri, 25 Jan 2019 23:30:10 +0530
-Message-ID: <CAAJhNetypG8pwa0Vs-RV=QbBcWwev5QtPF9n3CvTQJuzbNxkhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw: input: set category of the i8042 device
+In-Reply-To: <509cf069-5d03-8e2e-fb3c-5828d32f38e1@comstyle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +35,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, pbonzini@redhat.com, QEMU Developers <qemu-devel@nongnu.org>, mst@redhat.com
+To: Brad Smith <brad@comstyle.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Kamil Rytarowski <n54@gmx.com>, Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com
 
-On Fri, Jan 25, 2019 at 10:14 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 1/25/19 4:24 PM, Thomas Huth wrote:
-> > On 2019-01-25 16:14, kumar sourav wrote:
-> >> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
-> >> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
-> >>
-> >> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
-> >> ---
-> >>  hw/input/pckbd.c | 1 +
->
-> It seems we have other potential cases:
->
-> $ git grep -L 'set_bit(DEVICE_CATEGORY_INPUT' hw/input/*c
-> hw/input/adb.c
-> hw/input/hid.c
-> hw/input/lm832x.c
-> hw/input/milkymist-softusb.c
-> hw/input/pckbd.c
-> hw/input/pl050.c
-> hw/input/ps2.c
-> hw/input/pxa2xx_keypad.c
-> hw/input/stellaris_input.c
-> hw/input/tsc2005.c
-> hw/input/tsc210x.c
-> hw/input/virtio-input-hid.c
-> hw/input/virtio-input-host.c
->
-> >>  1 file changed, 1 insertion(+)
-> >>
-> >> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-> >> index 3e66713b47..72e7d5f6cc 100644
-> >> --- a/hw/input/pckbd.c
-> >> +++ b/hw/input/pckbd.c
-> >> @@ -574,6 +574,7 @@ static void i8042_class_initfn(ObjectClass *klass,=
- void *data)
-> >>
-> >>      dc->realize =3D i8042_realizefn;
-> >>      dc->vmsd =3D &vmstate_kbd_isa;
-> >> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
-> >>  }
-> >>
-> >>  static const TypeInfo i8042_info =3D {
-> >>
-> >
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-Ok I will add device categories for these devices too. Should I send
-the changes in one patch for all these devices/files ?
-Or should I send it separately - one patch per device/file ?
+On 1/25/19 1:48 AM, Brad Smith wrote:
+> On 1/24/2019 11:52 AM, Daniel P. Berrangé wrote:
+> 
+>> On Thu, Jan 24, 2019 at 05:10:19PM +0100, Philippe Mathieu-Daudé wrote:
+>>> On 1/24/19 4:56 PM, Kamil Rytarowski wrote:
+>>>> On 24.01.2019 16:52, Philippe Mathieu-Daudé wrote:
+>>>>> On 8/16/17 9:21 AM, Fam Zheng wrote:
+>>>>>> The image is prepared following instructions as in:
+>>>>>>
+>>>>>> https://wiki.qemu.org/Hosts/BSD
+>>>>>>
+>>>>>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>>>>> ---
+>>>>>>   tests/vm/openbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>   1 file changed, 45 insertions(+)
+>>>>>>   create mode 100755 tests/vm/openbsd
+>>>>>>
+>>>>>> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+>>>>>> new file mode 100755
+>>>>>> index 0000000000..d37ff83a59
+>>>>>> --- /dev/null
+>>>>>> +++ b/tests/vm/openbsd
+>>>>>> @@ -0,0 +1,45 @@
+>>>>>> +#!/usr/bin/env python
+>>>>>> +#
+>>>>>> +# OpenBSD VM image
+>>>>>> +#
+>>>>>> +# Copyright (C) 2017 Red Hat Inc.
+>>>>>> +#
+>>>>>> +# Authors:
+>>>>>> +#  Fam Zheng <famz@redhat.com>
+>>>>>> +#
+>>>>>> +# This work is licensed under the terms of the GNU GPL, version
+>>>>>> 2.  See
+>>>>>> +# the COPYING file in the top-level directory.
+>>>>>> +#
+>>>>>> +
+>>>>>> +import os
+>>>>>> +import sys
+>>>>>> +import logging
+>>>>>> +import subprocess
+>>>>>> +import tempfile
+>>>>>> +import time
+>>>>>> +import basevm
+>>>>>> +
+>>>>>> +class OpenBSDVM(basevm.BaseVM):
+>>>>>> +    name = "openbsd"
+>>>>>> +    BUILD_SCRIPT = """
+>>>>>> +        set -e;
+>>>>>> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>>>>>> +        tar -xf /dev/rsd1c;
+>>>>>> +        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4
+>>>>>> --python=python2.7 {configure_opts};
+>>>>>> +        gmake -j{jobs};
+>>>>>> +        # XXX: "gmake check" seems to always hang or fail
+>>>>>> +        #gmake check;
+>>>>> OK, Now it makes more sense...
+>>>>>
+>>>>> After spending various hours trying to fix various issues on
+>>>>> OpenBSD, I
+>>>>> notice that we never ran tests on this OS.
+>>>>> The only binary I can run is qemu-img, the rest seems useless.
+>>>>> I'll summarize in a different thread.
+>>>>>
+>>>> Is this W^X related?
+>>> Part of it could be but I'm not sure.
+>>>
+>>> The 6.1 VM provided by Fam has /usr/local mounted with wxallowed, I
+>>> tried building/running there and nothing changed, mmap() still returns
+>>> ENOTSUP:
+>> ENOTSUP from mmap is certainly what you'd expect from the W^X  scenario
+>>
+>>    https://undeadly.org/cgi?action=article&sid=20160527203200
+>>
+>>   "W^X violations are no longer permitted by default.  A kernel log
+>> message
+>>    is generated, and mprotect/mmap return ENOTSUP.  If the sysctl(8) flag
+>>    kern.wxabort is set then a SIGABRT occurs instead, for gdb use or
+>> coredump
+>>    creation."
+> 
+> Yes, this policy change was introduced with 6.0.
+> 
+> Our ports tree has an option which results in the QEMU binaries being
+> linked with "-z wxneeded".
 
-Thanks & Regards
+I was preparing a draft about deprecating/removing OpenBSD support
+because it is broken/untested... For sure it is untested.
+/me feeling he lost 2 days...
