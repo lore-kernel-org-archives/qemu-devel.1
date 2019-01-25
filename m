@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44515)
+Received: from eggs.gnu.org ([209.51.188.92]:44816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gn7hc-00038W-Ix
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:03:50 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gn7if-0003qA-Jf
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:04:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gn7hb-0006p0-Qr
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:03:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gn7hb-0006oS-Jc
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:03:47 -0500
-Date: Fri, 25 Jan 2019 15:03:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190125150133-mutt-send-email-mst@kernel.org>
-References: <78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
-	<20190123145050.GU4136@habkost.net>
-	<20190124112102.GA9821@tiger-server>
-	<20190124165926.GY4136@habkost.net>
-	<20190124123824-mutt-send-email-mst@kernel.org>
-	<20190124182839.GZ4136@habkost.net>
-	<20190124140522-mutt-send-email-mst@kernel.org>
-	<20190124191443.GB4136@habkost.net>
-	<20190124220423-mutt-send-email-mst@kernel.org>
-	<20190125032653.GC4136@habkost.net>
+	(envelope-from <richard.henderson@linaro.org>) id 1gn7ie-0007Ob-Td
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:04:53 -0500
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:34895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gn7ie-0007MM-Lg
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:04:52 -0500
+Received: by mail-pf1-x430.google.com with SMTP id z9so5233240pfi.2
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 12:04:52 -0800 (PST)
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-21-git-send-email-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6888554c-6859-464f-181f-9813c303eec5@linaro.org>
+Date: Fri, 25 Jan 2019 12:04:48 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190125032653.GC4136@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
+In-Reply-To: <1548410831-19553-21-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 20/52] hw/alpha/Makefile.objs: Create
+ CONFIG_* for alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com, thuth@redhat.com
 
-On Fri, Jan 25, 2019 at 01:26:53AM -0200, Eduardo Habkost wrote:
-> > I think we need not be purists here. Most people don't lose power and
-> > then it's fine and compatible. People who want more robustness need to
-> > use more modern kernels, that is all.
+On 1/25/19 2:06 AM, Paolo Bonzini wrote:
+> From: Yang Zhong <yang.zhong@intel.com>
 > 
-> I don't think that's being purist.
-
-Right I thought that you want to prevent kernel running this
-on old kernels. Why it's nice to stay up to date this
-flag was not backported into stable kernels so many users
-can't really update.
-
-
-> I want to avoid hidden bugs
-
-
-Makes total sense, I posted a proposal.
-
-> if we ignore that MAP_SYNC failed for any unexpected reason.  If
-> we need to ignore errors in some cases, let's at least limit that
-> to cases where we absolutely have to.
+> Add the new configs to default-configs/alpha-sofmmu.mak.
 > 
-> But I would also be happy with just a warning.
-> 
-> -- 
-> Eduardo
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Message-Id: <20190123065618.3520-17-yang.zhong@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/alpha-softmmu.mak | 1 +
+>  hw/alpha/Makefile.objs            | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
