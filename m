@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40211)
+Received: from eggs.gnu.org ([209.51.188.92]:40147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn0zv-0007PK-U8
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1gn10I-0007Ns-Om
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn0r1-0006qs-AU
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:45:03 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43603)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn0r1-0006qa-3p
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:45:03 -0500
-Received: by mail-wr1-f67.google.com with SMTP id r10so10128046wrs.10
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 04:45:03 -0800 (PST)
-References: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fa3b6ce0-0fc4-7ee8-653b-5c0aecfa6d30@redhat.com>
-Date: Fri, 25 Jan 2019 13:45:00 +0100
+	(envelope-from <thuth@redhat.com>) id 1gn0n3-0004p8-1B
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:40:58 -0500
+References: <CAAJhNetR-8z37JuOmFDRuq3JfG_S03VDZkciqiKh_kieoqxQ1g@mail.gmail.com>
+	<628a94ba-2202-6a15-865b-16d52653288d@redhat.com>
+	<CAFEAcA8jvRRpphFS7jvisU+f0SEvU1DOhrBxgKSRWEMkZV3eOw@mail.gmail.com>
+	<CAAJhNeta4fWX7y-ap-CSUhrHDGrZH_Xss6tyDa6=vn_uUJSk0Q@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c7e75a05-d1ca-8a7d-5f90-19e4efa0e28f@redhat.com>
+Date: Fri, 25 Jan 2019 13:40:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <CAAJhNeta4fWX7y-ap-CSUhrHDGrZH_Xss6tyDa6=vn_uUJSk0Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] decodetree: re.fullmatch was added in 3.4
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] object owner argument of
+ memory_region_init_ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: ksourav <sourav.jb1988@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Cc'ing maintainers :P
+On 2019-01-23 16:50, ksourav wrote:
+> Thanks for the reply.
+> Should I send patches for socs using NULL owner to qemu-trivial@nongnu.=
+org ?
 
-$ ./scripts/get_maintainer.pl -f scripts/decodetree.py
-Eduardo Habkost <ehabkost@redhat.com> (odd fixer:Python scripts)
-Cleber Rosa <crosa@redhat.com> (odd fixer:Python scripts)
+Sure, but please also CC: qemu-arm@nongnu.org for ARM-related patches.
 
-On 1/25/19 11:03 AM, Paolo Bonzini wrote:
-> Python 3 versions earlier than 3.4 do not have it, use the
-> same workaround that is in place for 3.0.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> I have been reading qemu source code for soc and different device
+> implementation for past few days to understand qemu internals.
+> While I have a rough idea of qemu object model, I would like to have yo=
+ur input.
+> If someone has to learn about qemu object model or soc implementation,
+> what would be the correct way ?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+We certainly lack documentation here. Studying the available sources is
+likely the best thing you can do. There were also a couple of
+presentations about QOM and qdev during the various KVM Forums (see
+https://www.linux-kvm.org/page/KVM_Forum for example), but they are
+likely not quite up to date anymore.
 
-> ---
->  scripts/decodetree.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 0bc73b5..e342d27 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -204,7 +204,7 @@ def output(*args):
->          output_fd.write(a)
->  
->  
-> -if sys.version_info >= (3, 0):
-> +if sys.version_info >= (3, 4):
->      re_fullmatch = re.fullmatch
->  else:
->      def re_fullmatch(pat, str):
-> 
+ Thomas
