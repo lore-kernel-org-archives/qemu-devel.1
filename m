@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53785)
+Received: from eggs.gnu.org ([209.51.188.92]:54130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gn27w-0008LS-90
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:06:36 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gn28z-0000nH-PB
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gn27s-0003bY-TD
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:06:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gn27o-0003UE-U0
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:06:31 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 25 Jan 2019 12:06:08 -0200
-Message-Id: <20190125140610.7810-1-ehabkost@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gn28x-0004Yd-UD
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:07:41 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:47029)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gn28w-0004Q9-Gk
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:07:39 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l9so10385441wrt.13
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 06:07:30 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 25 Jan 2019 14:00:17 +0000
+Message-Id: <20190125140017.6092-15-alex.bennee@linaro.org>
+In-Reply-To: <20190125140017.6092-1-alex.bennee@linaro.org>
+References: <20190125140017.6092-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] Python 3 compatibility fixes
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 14/14] scripts/qemu.py: allow arches use KVM
+ for their 32bit cousins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-The following changes since commit 9dd0d8111fbb8015db75a38933aee1d45f9e64=
-a3:
+A lot of architectures can run their 32 bit cousins on KVM so the
+kvm_available function needs to be a little less restricting when
+deciding if KVM is available.
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2019-01-24'=
- into staging (2019-01-25 11:52:12 +0000)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ scripts/qemu.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
-
-for you to fetch changes up to 651514df88fd53d537b3b78a7548663cc0816b1b:
-
-  decodetree: re.fullmatch was added in 3.4 (2019-01-25 11:41:42 -0200)
-
-----------------------------------------------------------------
-Python 3 compatibility fixes
-
-----------------------------------------------------------------
-
-Nisarg Shah (1):
-  device-crash-test: Python 3 compatibility fix
-
-Paolo Bonzini (1):
-  decodetree: re.fullmatch was added in 3.4
-
- scripts/decodetree.py     | 2 +-
- scripts/device-crash-test | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
---=20
-2.18.0.rc1.1.g3f1ff2140
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 0a5e02eb56..2934ee12c5 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -25,9 +25,18 @@ import tempfile
+ 
+ LOG = logging.getLogger(__name__)
+ 
++# Mapping host architecture to any additional architectures it can
++# support which often includes its 32 bit cousin.
++ADDITIONAL_ARCHES = {
++    "x86_64" : "i386",
++    "aarch64" : "armhf"
++}
+ 
+ def kvm_available(target_arch=None):
+-    if target_arch and target_arch != os.uname()[4]:
++    host_arch = os.uname()[4]
++    if target_arch and target_arch != host_arch:
++        if target_arch == ADDITIONAL_ARCHES[host_arch]:
++            return True
+         return False
+     return os.access("/dev/kvm", os.R_OK | os.W_OK)
+ 
+-- 
+2.17.1
