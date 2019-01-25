@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36945)
+Received: from eggs.gnu.org ([209.51.188.92]:36949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gmqCm-0007vY-SB
+	(envelope-from <aik@ozlabs.ru>) id 1gmqCm-0007vZ-Su
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 20:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gmqCk-0005LZ-NS
+	(envelope-from <aik@ozlabs.ru>) id 1gmqCk-0005LN-K1
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 20:22:47 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41558)
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmqCk-0005Jt-8D
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmqCk-0005KE-8j
 	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 20:22:46 -0500
-Received: by mail-pf1-x444.google.com with SMTP id b7so3906253pfi.8
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 17:22:45 -0800 (PST)
+Received: by mail-pl1-x641.google.com with SMTP id 101so3738882pld.6
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 17:22:46 -0800 (PST)
 References: <20190118140758.829-1-farosas@linux.ibm.com>
-	<20190118140758.829-3-farosas@linux.ibm.com>
+	<20190118140758.829-2-farosas@linux.ibm.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <67f370d6-fc2f-141e-1813-ac14dbb60e10@ozlabs.ru>
-Date: Fri, 25 Jan 2019 12:22:34 +1100
+Message-ID: <df9a0457-b9fa-5a50-4ff9-0e37966139dd@ozlabs.ru>
+Date: Fri, 25 Jan 2019 12:22:38 +1100
 MIME-Version: 1.0
-In-Reply-To: <20190118140758.829-3-farosas@linux.ibm.com>
+In-Reply-To: <20190118140758.829-2-farosas@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 2/7] target/ppc: Add
- ppc_get_trace_int_handler_addr
+Subject: Re: [Qemu-devel] [RFC PATCH v3 1/7] target/ppc: Move exception
+ vector offset computation into a function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +37,70 @@ Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.pet
 
 
 On 19/01/2019 01:07, Fabiano Rosas wrote:
-> The upcoming single step functionality (KVM HV) needs to write to the
-> Trace Interrupt handler's address for its mechanism to work. The
-> address is calculated by applying an offset according to the value of
-> the Alternate Interrupt Location (AIL) bits in the LPCR register.
-> 
 > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 > ---
->  target/ppc/cpu.h         |  1 +
->  target/ppc/excp_helper.c | 12 ++++++++++++
->  2 files changed, 13 insertions(+)
+>  target/ppc/excp_helper.c | 31 ++++++++++++++++++++-----------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
 > 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 486abaf99b..2185ef5e67 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1256,6 +1256,7 @@ struct PPCVirtualHypervisorClass {
->      OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
->                       TYPE_PPC_VIRTUAL_HYPERVISOR)
->  
-> +target_ulong ppc_get_trace_int_handler_addr(CPUState *cs);
->  void ppc_cpu_do_interrupt(CPUState *cpu);
->  bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
->  void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
 > diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 337a3ef8bb..5d13d05c3b 100644
+> index 0ec7ae1ad4..337a3ef8bb 100644
 > --- a/target/ppc/excp_helper.c
 > +++ b/target/ppc/excp_helper.c
-> @@ -746,6 +746,18 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
->      check_tlb_flush(env, false);
+> @@ -65,6 +65,25 @@ static inline void dump_syscall(CPUPPCState *env)
+>                    ppc_dump_gpr(env, 6), env->nip);
 >  }
 >  
-> +target_ulong ppc_get_trace_int_handler_addr(CPUState *cs)
+> +static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
 > +{
-> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
-> +    CPUPPCState *env = &cpu->env;
-> +    int ail;
+> +    uint64_t offset;
+
+nit: uninitialized variable. It should not matter though as cpu_abort()
+has __attribute__ ((__noreturn__)) but still inaccurate imho.
+
+Other than that
+
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+
+
 > +
-> +    ail = (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SHIFT;
-> +    return env->excp_vectors[POWERPC_EXCP_TRACE] |
-> +        ppc_excp_vector_offset(cs, ail);
+> +    switch (ail) {
+> +    case AIL_0001_8000:
+> +        offset = 0x18000;
+> +        break;
+> +    case AIL_C000_0000_0000_4000:
+> +        offset = 0xc000000000004000ull;
+> +        break;
+> +    default:
+> +        cpu_abort(cs, "Invalid AIL combination %d\n", ail);
+> +        break;
+> +    }
+> +
+> +    return offset;
 > +}
 > +
-> +
-
-
-Extra empty line.
-
-The entire patch seems to belong to 7/7, it does not make sense on its
-own as the helper is not called by anyone and all the files which it is
-changing belong to target/ppc/.
-
-
->  void ppc_cpu_do_interrupt(CPUState *cs)
->  {
->      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>  /* Note that this function should be greatly optimized
+>   * when called with a constant excp, from ppc_hw_interrupt
+>   */
+> @@ -685,17 +704,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+>      /* Handle AIL */
+>      if (ail) {
+>          new_msr |= (1 << MSR_IR) | (1 << MSR_DR);
+> -        switch(ail) {
+> -        case AIL_0001_8000:
+> -            vector |= 0x18000;
+> -            break;
+> -        case AIL_C000_0000_0000_4000:
+> -            vector |= 0xc000000000004000ull;
+> -            break;
+> -        default:
+> -            cpu_abort(cs, "Invalid AIL combination %d\n", ail);
+> -            break;
+> -        }
+> +        vector |= ppc_excp_vector_offset(cs, ail);
+>      }
+>  
+>  #if defined(TARGET_PPC64)
 > 
 
 -- 
