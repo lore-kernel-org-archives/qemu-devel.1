@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37452)
+Received: from eggs.gnu.org ([209.51.188.92]:38346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gn5Uc-0008Hg-CY
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gn5ZT-0002Q6-NP
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gn5Ub-0003sQ-Ah
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:14 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:42827)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gn5Ua-0003rW-T0
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:13 -0500
-Received: by mail-oi1-x235.google.com with SMTP id w13so8235264oiw.9
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 09:42:12 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1gn5ZS-0006ja-KO
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:15 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 25 Jan 2019 18:46:50 +0100
+Message-Id: <20190125174653.4604-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Jan 2019 17:22:00 +0000
-Message-ID: <CAFEAcA-yAMQDNvTJF=EQCfqQB7BRYNVixESYd4tXxQuHLqYVYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/14] MIPS queue for January 25, 2019
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] scsi-disk: Device Identification fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +19,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-On Fri, 25 Jan 2019 at 13:31, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 8b7a3e1e5434b55d7710071b00af97c7086cab7a:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-24 15:04:47 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-january-25-2019
->
-> for you to fetch changes up to e5a5b1bb7cfa2da3762f947003cba6a16fa242a1:
->
->   docs/qemu-cpu-models: Add MIPS/nanoMIPS QEMU supported CPU models (2019-01-24 17:48:33 +0100)
->
-> ----------------------------------------------------------------
->
-> MIPS queue for January 25, 2019:
->
->   - reorganization of MIPS TCG tests directories and files
->   - documentation updates for MIPS
->   - enabling I6500 core support
->   - other misc MIPS fixes
->
-> ----------------------------------------------------------------
+The vendor specific designator in the Device Identification VPD page has
+two problems:
 
-Applied, thanks.
+1. It defaults to the BlockBackend name (-drive id=3D...), which everyone
+   expected to be a host detail that the guest never sees
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+2. With -blockdev based setups it defaults to an empty string; if this
+   default is used with more than one disk, the guest OS will interpret
+   this as a single multipath disk.
 
--- PMM
+We can address problem 2 immediately, and start running the deprecation
+clock for problem 1.
+
+Related bug reports:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1669446
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1668248
+
+Kevin Wolf (3):
+  scsi-disk: Don't use empty string as device id
+  scsi-disk: Add device_id property
+  scsi-disk: Deprecate device_id fallback to BlockBackend name
+
+ hw/scsi/scsi-disk.c  | 41 ++++++++++++++++++++++++++++-------------
+ qemu-deprecated.texi | 22 +++++++++++++++++++++-
+ 2 files changed, 49 insertions(+), 14 deletions(-)
+
+--=20
+2.20.1
