@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49819)
+Received: from eggs.gnu.org ([209.51.188.92]:49926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gn1u0-0006Kp-E2
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:52:13 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gn1uX-0006Oo-DZ
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gn1pR-0002KY-4O
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:47:31 -0500
-Received: from mail-eopbgr790114.outbound.protection.outlook.com
-	([40.107.79.114]:22144
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gn1pH-0002GZ-6U
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:47:21 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 25 Jan 2019 13:47:15 +0000
-Message-ID: <BN6PR2201MB1251D66A2A0112B2FCF5209FC69B0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <vkuznets@redhat.com>) id 1gn1oj-0001ql-P9
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:46:46 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gn1oj-0001qO-JX
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:46:45 -0500
+Received: by mail-wm1-f68.google.com with SMTP id d15so6839294wmb.3
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 05:46:45 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20190125124738.GB30730@rkaganb.sw.ru>
+References: <20190125114155.32062-1-vkuznets@redhat.com>
+	<20190125114155.32062-5-vkuznets@redhat.com>
+	<20190125124738.GB30730@rkaganb.sw.ru>
+Date: Fri, 25 Jan 2019 14:46:42 +0100
+Message-ID: <87bm44onnh.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 00/14] MIPS queue for January 25, 2019
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
+ pass-through mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Subject: [PULL 00/14] MIPS queue for January 25, 2019
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-Hello, Peter,
+> On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
+>> In many case we just want to give Windows guests all currently supported
+>> Hyper-V enlightenments and that's where this new mode may come handy. We
+>> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
+>
+> How is the compatibility ensured on migration between kernels reporting
+> different feature sets?
 
-There are 4 checkpatch warnings. Please ignore them, for these circumstance=
-s. Three are about the potential need for MAINTAINERS updates (but they are=
- not necessary, new files and directories will be covered by existing items=
- in MAINTAINERS file), and the fourth is about a comment format in test_dsp=
-_r2_dpaqx_s_w_ph.c (however, the point of the test reorganization is to mov=
-e the file as-is, I would like to restrict the patch only to moving files i=
-n case of test source files).
+AFAIU we don't change anything in this regard (or, my intention was to
+not change anything): hv-all is converted to the individual hv-*
+properties (hv_cpuid_check_and_set()) actually sets cpu->hyperv_* flags
+according to what's supported by kernel so when we migrate we will
+require all these features supported.
 
-Regards,
-Aleksandar=
+I'll look to see that my expectations actually match the reallity,
+thanks for the reminder!
+
+-- 
+Vitaly
