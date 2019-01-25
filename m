@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48046)
+Received: from eggs.gnu.org ([209.51.188.92]:50378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnBHW-0002JS-42
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:53:07 -0500
+	(envelope-from <palmer@sifive.com>) id 1gnBJO-0003Oq-0L
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnBHU-0003r3-6a
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:53:05 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38027)
+	(envelope-from <palmer@sifive.com>) id 1gnBJM-0005H6-K5
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:01 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37439)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnBHT-0003jr-MX
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:53:03 -0500
-Received: by mail-pf1-x443.google.com with SMTP id q1so5445430pfi.5
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 15:52:57 -0800 (PST)
-References: <20190121185118.18550-1-peter.maydell@linaro.org>
-	<20190121185118.18550-7-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0edb1c50-cb9e-5f0b-2f85-2a3e610a052b@linaro.org>
-Date: Fri, 25 Jan 2019 15:52:54 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190121185118.18550-7-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/23] hw/arm/iotkit: Rename 'iotkit' local
- variables and functions
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gnBJM-0005Eb-9o
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:00 -0500
+Received: by mail-pg1-x544.google.com with SMTP id c25so4835726pgb.4
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 15:54:59 -0800 (PST)
+Date: Fri, 25 Jan 2019 15:54:58 -0800 (PST)
+In-Reply-To: <2153eec6-f25f-4e34-6423-01d76a14815c@linaro.org>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-a089b75c-29ca-4a50-b64c-e86349ac6190@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: richard.henderson@linaro.org
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, sagark@eecs.berkeley.edu, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-On 1/21/19 10:51 AM, Peter Maydell wrote:
-> Rename various internal uses of 'iotkit' in hw/arm/iotkit.c to
-> 'armsse', for consistency. The remaining occurences are:
->  * related to the devices TYPE_IOTKIT_SYSCTL, TYPE_IOTKIT_SYSINFO,
->    etc, which this refactor is not touching
->  * references that apply specifically to the IoTKit (like
->    the lack of a private CPU region)
->  * the vmstate, which keeps its old "iotkit" name for
->    migration compatibility reasons
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/iotkit.c | 68 ++++++++++++++++++++++++-------------------------
->  1 file changed, 34 insertions(+), 34 deletions(-)
+On Tue, 22 Jan 2019 13:38:52 PST (-0800), richard.henderson@linaro.org wrote:
+> On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
+>> Hi,
+>>
+>> this patchset converts the RISC-V decoder to decodetree in four major steps:
+>>
+>> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
+>>     Many of the gen_* functions are called by the decode functions for 16-bit
+>>     and 32-bit functions. If we move translation code from the gen_*
+>>     functions to the generated trans_* functions of decode-tree, we get a lot of
+>>     duplication. Therefore, we mostly generate calls to the old gen_* function
+>>     which are properly replaced after step 2).
+>>
+>>     Each of the trans_ functions are grouped into files corresponding to their
+>>     ISA extension, e.g. addi which is in RV32I is translated in the file
+>>     'trans_rvi.inc.c'.
+>>
+>> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
+>>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+>>     we convert the arguments in the 16 bit trans_ function to the arguments of
+>>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
+>>
+>> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
+>>     this move all manual translation code into the trans_* instructions of
+>>     decode tree, such that we can remove the old decode_* functions.
+>>
+>> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+>>    by Richard. [Patch 31-35]
+>>
+>> full tree available at
+>> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
+>>
+>> Cheers,
+>> Bastian
+>>
+>> v4 -> v5:
+>>     - fixed rebase error
+>>     - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
+>>     - removed extra sign extension of sraiw
+>>     - removed rs2 == 0 special cases in sraw/srlw
+>
+> All looks good to me now.  Thanks for persevering.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks for reviewing this.
 
-
-r~
+Bastian: what sort of testing have you done here?  This is a pretty big change, 
+and while it's been fairly extensively reviewed I'm just generally paranoid.
