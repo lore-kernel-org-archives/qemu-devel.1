@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38112)
+Received: from eggs.gnu.org ([209.51.188.92]:38984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn3EK-0001JD-Ok
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:17:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gn3IF-0002rT-Oi
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:21:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn3EJ-0008AD-PV
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:17:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40696)
+	(envelope-from <pbonzini@redhat.com>) id 1gn3IE-00027C-T9
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:21:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gn3EJ-00089i-7I
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:17:15 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gn3IE-00026p-L6
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:21:18 -0500
 References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-14-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <33fa5dfc-23a4-aa40-1644-c5579870655f@redhat.com>
-Date: Fri, 25 Jan 2019 16:17:09 +0100
+	<1548410831-19553-2-git-send-email-pbonzini@redhat.com>
+	<df5457d4-d3c1-ff0d-3a01-a67057d8a574@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2873786a-8ecf-f421-5fd9-cde1908115ce@redhat.com>
+Date: Fri, 25 Jan 2019 16:21:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548410831-19553-14-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <df5457d4-d3c1-ff0d-3a01-a67057d8a574@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 13/52] hw/s390/Makefile.objs: Create new
- CONFIG_* variables for s390x boards and devices
+Subject: Re: [Qemu-devel] [PATCH 01/52] arm: disable CONFIG_SERIAL_ISA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: yang.zhong@intel.com
 
-On 2019-01-25 11:06, Paolo Bonzini wrote:
-> Make hw/s390x configurable and add new CONFIG_* to the default-configs/s390x*-softmmu.mak.
-> This will be used to enable/disable vfio-ccw.
+On 25/01/19 15:49, Thomas Huth wrote:
+> On 2019-01-25 11:06, Paolo Bonzini wrote:
+>> ARM does not have an ISA bus, this device should not be enabled.  Kconfig
+>> catches the contradiction because ARM does not define CONFIG_ISA_BUS.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20190123065618.3520-10-yang.zhong@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/s390x-softmmu.mak | 1 +
->  hw/s390x/Makefile.objs            | 2 ++
->  2 files changed, 3 insertions(+)
+> That description is a little bit wrong, since ARM includes pci.mak, and
+> pci.mak enables CONFIG_ISA_BUS=y for the IDE code.
+
+Right:
+
+ARM should not have an ISA bus, this device should not be enabled.
+Kconfig allows to clean up the dependencies and remove CONFIG_ISA_BUS=y
+from ARM, and then catches a contradiction between the hardcoded
+CONFIG_SERIAL_ISA=y and CONFIG_ISA_BUS=n.
+
+Paolo
+
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>> index 2420491..3c9351f 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -6,7 +6,6 @@ CONFIG_VGA=y
+>>  CONFIG_NAND=y
+>>  CONFIG_ECC=y
+>>  CONFIG_SERIAL=y
+>> -CONFIG_SERIAL_ISA=y
+>>  CONFIG_PTIMER=y
+>>  CONFIG_SD=y
+>>  CONFIG_MAX7310=y
 > 
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-> index 5eef375..8bb7e43 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
->  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
->  CONFIG_WDT_DIAG288=y
->  CONFIG_VFIO_AP=$(CONFIG_LINUX)
-> +CONFIG_S390_CCW_VIRTIO=y
-> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-> index ca68806..a884aae 100644
-> --- a/hw/s390x/Makefile.objs
-> +++ b/hw/s390x/Makefile.objs
-> @@ -1,3 +1,4 @@
-> +ifeq ($(CONFIG_S390_CCW_VIRTIO),y)
->  obj-y += s390-virtio-hcall.o
->  obj-y += sclp.o
->  obj-y += event-facility.o
-> @@ -33,3 +34,4 @@ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
->  obj-y += s390-ccw.o
->  obj-y += ap-device.o
->  obj-y += ap-bridge.o
-> +endif
-
-That won't really work, a lot of code in target/s390x still depends on
-the functions in these files here. I suggest to just disable the file
-that defines the machine initially, i.e.:
-
-obj-$(CONFIG_S390_CCW_VIRTIO) += s390-virtio-ccw.o
-
-We can still fine-tune this later.
-
- Thomas
+> Anyway, looking through the code and the description of commit
+> 1401c322c8d431fa750cff8276 I think you're right that CONFIG_SERIAL_ISA
+> is not required for ARM, so if you change the commit message a little bit:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
