@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46484)
+Received: from eggs.gnu.org ([209.51.188.92]:46454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aK-0002lq-LH
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:53 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aJ-0002YG-9g
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aJ-0002lD-OW
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:36395 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aH-0002Vu-As
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:51 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:35832 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gn1aI-0002WG-IO
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:51 -0500
+	id 1gn1aH-0002Uv-2M
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:49 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 25 Jan 2019 14:31:32 +0100
-Message-Id: <1548423098-31864-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 25 Jan 2019 14:31:25 +0100
+Message-Id: <1548423098-31864-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 08/14] target/mips: Add I6500 core configuration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/14] target/mips: nanoMIPS: Remove duplicate
+ macro definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +31,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@imgtec.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add I6500 core configuration. Note that this configuration is
-supported only on best-effort basis due to the lack of certain
-features in QEMU.
+Several macros were defined twice, with identical values, so
+remove duplicates.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Previously added in 80845edf37b.
+
+This reverts commit 6bfa9f4c9cf24d6cfaaa227722e9cdcca1ad6fe9.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate_init.inc.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ target/mips/translate.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index acab097..bf559af 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -722,6 +722,46 @@ const mips_def_t mips_defs[] =
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-+        .name = "I6500",
-+        .CP0_PRid = 0x1B000,
-+        .CP0_Config0 = MIPS_CONFIG0 | (0x2 << CP0C0_AR) | (0x2 << CP0C0_AT) |
-+                       (MMU_TYPE_R4000 << CP0C0_MT),
-+        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (15 << CP0C1_MMU) |
-+                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
-+                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
-+                       (0 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
-+        .CP0_Config2 = MIPS_CONFIG2,
-+        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) |
-+                       (1 << CP0C3_CMGCR) | (1 << CP0C3_MSAP) |
-+                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
-+                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
-+        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (3 << CP0C4_IE) |
-+                       (1 << CP0C4_AE) | (0xfc << CP0C4_KScrExist),
-+        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_XNP) | (1 << CP0C5_VP) |
-+                       (1 << CP0C5_LLB) | (1 << CP0C5_MRP),
-+        .CP0_Config5_rw_bitmask = (1 << CP0C5_MSAEn) | (1 << CP0C5_SBRI) |
-+                                  (1 << CP0C5_FRE) | (1 << CP0C5_UFE),
-+        .CP0_LLAddr_rw_bitmask = 0,
-+        .CP0_LLAddr_shift = 0,
-+        .SYNCI_Step = 64,
-+        .CCRes = 2,
-+        .CP0_Status_rw_bitmask = 0x30D8FFFF,
-+        .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
-+                         (1U << CP0PG_RIE),
-+        .CP0_PageGrain_rw_bitmask = (1 << CP0PG_ELPA),
-+        .CP0_EBaseWG_rw_bitmask = (1 << CP0EBase_WG),
-+        .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
-+                    (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
-+                    (1 << FCR0_S) | (0x03 << FCR0_PRID) | (0x0 << FCR0_REV),
-+        .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-+        .CP1_fcr31_rw_bitmask = 0x0103FFFF,
-+        .MSAIR = 0x03 << MSAIR_ProcID,
-+        .SEGBITS = 48,
-+        .PABITS = 48,
-+        .insn_flags = CPU_MIPS64R6 | ASE_MSA,
-+        .mmu_type = MMU_TYPE_R4000,
-+    },
-+    {
-         .name = "Loongson-2E",
-         .CP0_PRid = 0x6302,
-         /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
--- 
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index ab307c4..6002d1c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -18502,16 +18502,6 @@ static inline int decode_gpr_gpr4_zero(int r)
+ }
+=20
+=20
+-/* extraction utilities */
+-
+-#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
+-#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
+-#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
+-#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
+-#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
+-#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
+-
+-
+ static void gen_adjust_sp(DisasContext *ctx, int u)
+ {
+     gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
+--=20
 2.7.4
