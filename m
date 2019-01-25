@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53175)
+Received: from eggs.gnu.org ([209.51.188.92]:53267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4T3-0001kS-3j
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:36:33 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gn4TU-0001uv-Vr
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4T0-0001q5-IV
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:36:32 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn4Sw-0001oc-Bv
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:36:27 -0500
-Received: by mail-wr1-f66.google.com with SMTP id t27so10965859wra.6
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:36:26 -0800 (PST)
-References: <20190125155711.2351-1-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <837964ff-1cab-b5c0-9d27-56c317af58e0@redhat.com>
-Date: Fri, 25 Jan 2019 17:36:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190125155711.2351-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] pflash: flush rom device memory region
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gn4TU-00026d-3F
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:37:00 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:54862
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gn4TT-00023w-SS
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:37:00 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 25 Jan 2019 16:36:48 +0000
+Message-Id: <20190125163648.24468-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH] sun4m: pass initrd size to OpenBIOS via fw_cfg
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +24,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-On 1/25/19 4:57 PM, Stefan Hajnoczi wrote:
-> pflash devices should mark the memory region dirty and invalidate TBs
-> after directly writing to the RAM backing the ROM device.
-> 
-> Note that pflash_cfi01_get_memory() is used by several machine types to
-> populate ROM contents directly.  Callers are untouched by this patch
-> because they only modify memory before the guest is started.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+This is to enable OpenBIOS to claim the initrd memory as in-use before attempting
+to boot the kernel.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/sparc/sun4m.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-> ---
-> Based-on: <20190123212234.32068-1-stefanha@redhat.com>
-> 
-> Split from the original patch series.  Philippe asked me to drop the
-> flush calls in ->realize() since they are unnecessary.
-> 
-> Peter: Your ARM tree has the memory_region_flush_rom_device() patch that
-> this depends on, so it may be easiest for this to go via your tree.
-> 
->  hw/block/pflash_cfi01.c | 3 +++
->  hw/block/pflash_cfi02.c | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-> index bffb4c40e7..2f0b9c4c02 100644
-> --- a/hw/block/pflash_cfi01.c
-> +++ b/hw/block/pflash_cfi01.c
-> @@ -446,6 +446,7 @@ static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
->          break;
->      }
->  
-> +    memory_region_flush_rom_device(&pfl->mem, offset, width);
->  }
->  
->  static void pflash_write(pflash_t *pfl, hwaddr offset,
-> @@ -482,6 +483,8 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(p + offset, 0xff, pfl->sector_len);
->                  pflash_update(pfl, offset, pfl->sector_len);
-> +                memory_region_flush_rom_device(&pfl->mem, offset,
-> +                                               pfl->sector_len);
->              } else {
->                  pfl->status |= 0x20; /* Block erase error */
->              }
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 0f8b7b8c7b..47edce8dcf 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -378,6 +378,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->                      pflash_update(pfl, offset, 4);
->                      break;
->                  }
-> +
-> +                memory_region_flush_rom_device(&pfl->orig_mem, offset, width);
->              }
->              pfl->status = 0x00 | ~(value & 0x80);
->              /* Let's pretend write is immediate */
-> @@ -426,6 +428,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(pfl->storage, 0xFF, pfl->chip_len);
->                  pflash_update(pfl, 0, pfl->chip_len);
-> +                memory_region_flush_rom_device(&pfl->orig_mem, 0,
-> +                                               pfl->chip_len);
->              }
->              pfl->status = 0x00;
->              /* Let's wait 5 seconds before chip erase is done */
-> @@ -441,6 +445,8 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
->              if (!pfl->ro) {
->                  memset(p + offset, 0xFF, pfl->sector_len);
->                  pflash_update(pfl, offset, pfl->sector_len);
-> +                memory_region_flush_rom_device(&pfl->orig_mem, offset,
-> +                                               pfl->sector_len);
->              }
->              pfl->status = 0x00;
->              /* Let's wait 1/2 second before sector erase is done */
-> 
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 709ee37e08..1c9217315e 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -224,11 +224,12 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+ 
+ static unsigned long sun4m_load_kernel(const char *kernel_filename,
+                                        const char *initrd_filename,
+-                                       ram_addr_t RAM_size)
++                                       ram_addr_t RAM_size,
++                                       uint32_t *initrd_size)
+ {
+     int linux_boot;
+     unsigned int i;
+-    long initrd_size, kernel_size;
++    long kernel_size;
+     uint8_t *ptr;
+ 
+     linux_boot = (kernel_filename != NULL);
+@@ -258,23 +259,23 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
+         }
+ 
+         /* load initrd */
+-        initrd_size = 0;
++        *initrd_size = 0;
+         if (initrd_filename) {
+-            initrd_size = load_image_targphys(initrd_filename,
+-                                              INITRD_LOAD_ADDR,
+-                                              RAM_size - INITRD_LOAD_ADDR);
+-            if (initrd_size < 0) {
++            *initrd_size = load_image_targphys(initrd_filename,
++                                               INITRD_LOAD_ADDR,
++                                               RAM_size - INITRD_LOAD_ADDR);
++            if ((int)*initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+                 exit(1);
+             }
+         }
+-        if (initrd_size > 0) {
++        if (*initrd_size > 0) {
+             for (i = 0; i < 64 * TARGET_PAGE_SIZE; i += TARGET_PAGE_SIZE) {
+                 ptr = rom_ptr(KERNEL_LOAD_ADDR + i, 24);
+                 if (ptr && ldl_p(ptr) == 0x48647253) { /* HdrS */
+                     stl_p(ptr + 16, INITRD_LOAD_ADDR);
+-                    stl_p(ptr + 20, initrd_size);
++                    stl_p(ptr + 20, *initrd_size);
+                     break;
+                 }
+             }
+@@ -844,6 +845,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     qemu_irq *cpu_irqs[MAX_CPUS], slavio_irq[32], slavio_cpu_irq[MAX_CPUS];
+     qemu_irq fdc_tc;
+     unsigned long kernel_size;
++    uint32_t initrd_size;
+     DriveInfo *fd[MAX_FD];
+     FWCfgState *fw_cfg;
+     unsigned int num_vsimms;
+@@ -1022,9 +1024,10 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+         empty_slot_init(hwdef->bpp_base, 0x20);
+     }
+ 
++    initrd_size = 0;
+     kernel_size = sun4m_load_kernel(machine->kernel_filename,
+                                     machine->initrd_filename,
+-                                    machine->ram_size);
++                                    machine->ram_size, &initrd_size);
+ 
+     nvram_init(nvram, (uint8_t *)&nd_table[0].macaddr, machine->kernel_cmdline,
+                machine->boot_order, machine->ram_size, kernel_size,
+@@ -1067,7 +1070,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+         fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE, 0);
+     }
+     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, INITRD_LOAD_ADDR);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, 0); // not used
++    fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, machine->boot_order[0]);
+     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+ }
+-- 
+2.11.0
