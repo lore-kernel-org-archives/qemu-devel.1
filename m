@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50681)
+Received: from eggs.gnu.org ([209.51.188.92]:51052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gmzMo-0003BC-Cg
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:09:49 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gmzO0-00042c-41
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gmzMf-0004RV-TJ
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:09:41 -0500
-Received: from greensocs.com ([193.104.36.180]:34956)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gmzMX-0004N5-Th
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:09:33 -0500
-References: <633999897.454680.1548339941611.ref@mail.yahoo.com>
-	<633999897.454680.1548339941611@mail.yahoo.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <4a7775a2-c2ba-5c49-53e2-761915ae7766@greensocs.com>
-Date: Fri, 25 Jan 2019 12:09:13 +0100
+	(envelope-from <yang.zhong@intel.com>) id 1gmzNx-0005nv-Bv
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:11:00 -0500
+Received: from mga11.intel.com ([192.55.52.93]:21659)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gmzNw-0005WO-Sl
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 06:10:57 -0500
+Date: Fri, 25 Jan 2019 19:07:08 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190125110708.GB26929@yangzhon-Virtual>
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <633999897.454680.1548339941611@mail.yahoo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lO5KYQ5gs7LwHgHrTTuRrGkuq0E6YKzkM"
-Subject: Re: [Qemu-devel] gdb run / pause broken for some debuggers
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v5 00/52] Support Kconfig in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,138 +28,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, yang.zhong@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lO5KYQ5gs7LwHgHrTTuRrGkuq0E6YKzkM
-From: Luc Michel <luc.michel@greensocs.com>
-To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <4a7775a2-c2ba-5c49-53e2-761915ae7766@greensocs.com>
-Subject: Re: gdb run / pause broken for some debuggers
-References: <633999897.454680.1548339941611.ref@mail.yahoo.com>
- <633999897.454680.1548339941611@mail.yahoo.com>
-In-Reply-To: <633999897.454680.1548339941611@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jan 25, 2019 at 11:06:19AM +0100, Paolo Bonzini wrote:
+> (I'm only momentarily at the helm and will give control back to Yang after
+> this iteration.)
+> 
+> This is still RFC mostly because of the lack of documentation, and because
+> only x86 is fully converted, but it's converging.  Other targets still
+> enable embedded devices in default-configs/ instead of using "select"
+> directives.  For many targets, the conversion will be trivial because
+> they only support one board.  The complex ones are ARM, MIPS and PPC
+> of course.  s390 as usual is just different in some respects, but all
+> of its issues are sorted out already in this series and so it's just
+> yet another single-board target.
+> 
+> It supports defconfig (default-configs file chooses boards only)
+> and allnoconfig (default-configs file chooses devices too) and builds
+> all targets.  I haven't yet checked that the configuration is the same
+> before and after the conversion, but at least device-introspection-test
+> and other qtests all pass, which did catch some errors.
+> 
+> As mentioned in the previous versions, this is only a replacement
+> for default-configs, in order to simplify configuration and remove
+> the need to track dependencies between configuration symbols.  In
+> fact, even with the current incomplete conversion the diffstat
+> for default-configs is already
+> 
+>  31 files changed, 108 insertions(+), 241 deletions(-)
+> 
+> Devices can be disabled by adding for example
+> 
+>    CONFIG_HPET=n
+> 
+> to default-configs/i386-softmmu.mak.  If you prefer they can be
+> listed manually and "make allnoconfig" can be executed before
+> building.  This probably should become a configure option
+> "--without-default-devices" instead.
+> 
+> For the previous discussions on the Kconfig design, see
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02827.html
+> 
+> Patches 1-27 should probably be committed now, so please review!  Yang,
+> once they are reviewed you can extract them and post them to the
+> mailing list as non-RFC!
+  Thanks Paolo, you helped me address comments in v4 and i will do it.
 
-Hi,
+  Yang
 
-On 1/24/19 3:25 PM, Lucien Anti-Spam wrote:
-> Hi gdbstub maintainers (CC: Luc Michel as he wrote the patch that
-> probably caused this issue)
->=20
-> I have found an issue with IDA Pro when moving to QEMU3.x where
-> RUN/PAUSE has stopped working.
->=20
-> I am pretty sure its to do with this debugger sending no thread-id with=
-
-> the vCont packet action
-> That is that IDA Pro sends "vCont;c" (action=3Dc, thread-id=3Dnone).=C2=
-=A0=C2=A0
->=20
-> This is defined in the RSP document=C2=A0as "An action with
-> no=C2=A0thread-id=C2=A0matches all threads."
-> (https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#vCont-p=
-acket=C2=A0)
->=20
-> In=C2=A0commit=C2=A0e40e5204af8388e605df2325d9b562c05919350e, which=C2=A0=
-added
-> multiprocess support for vCont packets,=C2=A0the new code errors right =
-away
-> if it finds no ":" action\thread-id=C2=A0separator as shown below:
->=20
-> =C2=A0if (*p++ !=3D ':') {
-> =C2=A0 =C2=A0 =C2=A0res =3D -ENOTSUP;
-> ...
-Yes, I think you are right, we should fall into the GDB_ALL_PROCESSES
-case here.
-
->=20
-> The upper function calling gdb_handle_vcont when -EINVAL or -ERANGE wil=
-l
-> spit out an "E22" error message, but for -ENOTSUP=C2=A0 we do
-> goto-unknown_command label results in IDA Pro thinking the gdbstub is d=
-ead.
->=20
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 res =3D gdb_handle_vcont(s, p=
-);
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (res) {
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((res =3D=3D=
- -EINVAL) || (res =3D=3D -ERANGE)) {
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 p=
-ut_packet(s, "E22");
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ... else goto u=
-nknown_command:
->=20
-> Maybe we should extend this to add a "-ENOTSUP" clause so the "E22" is
-> also returned?
->=20
-> This "unknown_command:" branch should probably send a "E nn" packet
-> rather than just a blank "+" ack although here I do admit the spec is
-> very unclear but in most cases they do spec out "E nn" when some part o=
-f
-> the command turns to garbage.=C2=A0
->=20
-> ...
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 unknown_command:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* put empty packet */
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0buf[0] =3D '\0';
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0put_packet(s, buf);
-
-=46rom the spec:
-
-"For any command not supported by the stub, an empty response (=E2=80=98$=
-#00=E2=80=99)
-should be returned. That way it is possible to extend the protocol. A
-newer GDB can tell if a packet is supported based on that response."
-
-And looking into gdbserver GDB sources, they do the same thing:
-
-    default:
-      /* It is a request we don't understand.  Respond with an empty
-	 packet so that gdb knows that we don't support this
-	 request.  */
-      own_buf[0] =3D '\0';
-
-So this is probably IDA here which does not correctly handle this "not
-supported" response (which should not happen anyway).
-
-Cheers,
-Luc
-
->=20
->=20
->=20
-> If people more experienced in this agree I will go ahead and try at a
-> patch for both of these issues.
->=20
-> Cheers,
-> Luc
->=20
->=20
-
-
---lO5KYQ5gs7LwHgHrTTuRrGkuq0E6YKzkM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlxK7loACgkQd8knW3Qn
-Tr5SGQ//TdVB7rrK9oCbk+25Oa8Vo/NLBRoyK64m4yHigkR6pIV6cFKO2G3fkP+G
-MT1i0LU0K8eAu4ED/3qFzodh/2s1pLFNEHFvBbTJzHlKUpIbw3rdwVu46HHOfX3p
-qG4sju9n5vwj55EDqVPeaMBJY85TOWVeh0cXFcujYTcVIMZXw+Uh0LhiLbxGw/Ry
-PQmcM67qhePkibC/OvkPLSr3X977XsRWKAhT5Thp3WIo+MUxcbscnZLW4cOYYohi
-HrF5nrFkho9pkXIT/WA17K926RUtd9ITLDK/oDN1ixyfN2govLieNGiVJ7gOubUp
-DeQkVQJvcIw6r7HtadlM14kea0//r1miB4jlTyBTw4fcdY0+gHDhpVpbMwglXOvH
-ylhyhwaPaanCrf/v4QmLrYMUDZ99yceIx2R8I5rWhYBDSYPnCdaRnf8nPRdYFaXg
-tByAboxWcPbnmU+DZedImdP+jUrXnaJ4k9P0qZM1C3UiMKfLivTRyPmPuXD2V6gZ
-PzlwmDpqrpSvWSod59SxhZYwQfqVVUKtgCFMUVSd2ad41c/qBN8KRskiprbFzYg5
-/KLYIgFHHzbWytuxvo2c0L6Kl4SjdZKgIQp5kSsgIr2LoIVTkHvNgv9AArDlzAVI
-R58f5XnWo79AWxOx1xk6fmw85lX2NbUrnZsQTLuCc4lcl/sLjKw=
-=GGiZ
------END PGP SIGNATURE-----
-
---lO5KYQ5gs7LwHgHrTTuRrGkuq0E6YKzkM--
+> As to the rest, you're welcome to try them, post conversions for the
+> simple targets, suggest usability improvements, and whatever.  Thanks to
+> everyone for the work on the previous iterations.  It's great to see
+> the work on this GSoC project come back to life after five years!
+> 
+> v4->v5: new patches 1, 2, 3, 13, 26, 27, 47, 49, 50, 52
+> 	Removed CONFIG_TYPHOON (patch 20)
+> 	Removed CONFIG_DINO (patch 22)
+> 	ported minikconf to python 3
+> 	improved some minikconf error messages
+> 	added missing symbols in patch 32
+> 	added CONFIG_VHOST_USER and CONFIG_LINUX, made CONFIG_KVM per target (patch 33)
+> 	removed $(...) assignments from default-configs/ (patch 33)
+> 	moved allnoconfig patch earlier, removed allyesconfig/randconfig
+> 	add CONFIG_PCI_EXPRESS to non-x86 targets (patch 36)
+> 	added CONFIG_PCI_DEVICES in patch 37 to support s390x
+> 	virtio-mmio does not support vhost-user yet (patches 40 and 48)
+> 	fix PCSPK for platforms that lack an i8254 (patch 41)
+> 	add "select ISA_BUS" to I82378 and SUN4U (patch 41)
+> 	changed QXL/VTD/AMD_IOMMU from "select" to "default y if ..." (patch 42)
+> 	moved "select PAM" and "select ISA_BUS" from board to device (patch 42)
+> 	brought patch 44 up to date
+> 	fixed MILKYMIST_TMU2 to only apply to MILKYMIST (patch 45)
+> 	new config symbol VIRTIO_INPUT_HOST
+> 	fixed select/depends for virtio (patch 48)
+> 	moved some ACPI dependencies from board to devices (patch 51)
+> 
+> Paolo Bonzini (27):
+>   arm: disable CONFIG_SERIAL_ISA
+>   ide: split ioport registration to a separate file
+>   vfio: move conditional up to hw/Makefile.objs
+>   build: actually use CONFIG_PAM
+>   hw/i386/Makefile.objs: Build pc_piix* and pc_q35 boards
+>   hw/s390/Makefile.objs: Create new CONFIG_* variables for s390x boards and devices
+>   hw/i2c/Makefile.objs: Create new CONFIG_* variables for EEPROM and ACPI controller
+>   hw/vfio/Makefile.objs: Create new CONFIG_* variables for VFIO core and PCI
+>   minikconfig: add parser skeleton
+>   minikconfig: add AST
+>   minikconfig: add semantic analysis
+>   kconfig: introduce kconfig files
+>   build: switch to Kconfig
+>   minikconf: implement allnoconfig and defconfig
+>   ide: express dependencies with Kconfig
+>   build: convert pci.mak to Kconfig
+>   build: convert sound.mak to Kconfig
+>   build: convert usb.mak to Kconfig
+>   scsi: express dependencies with Kconfig
+>   isa: express dependencies with kconfig
+>   i386: express dependencies with Kconfig
+>   i2c: express dependencies with Kconfig
+>   ptimer: express dependencies with Kconfig
+>   vfio: express vfio dependencies with Kconfig
+>   tpm: express dependencies with Kconfig
+>   isa: express SuperIO dependencies with Kconfig
+>   kconfig: introduce CONFIG_TEST_DEVICES
+> 
+> Yang Zhong (17):
+>   hw/pci-host/Makefile.objs: make CONFIGS clear for PCI EXPRESS
+>   hw/arm/Makefile.objs: CONFIG_VIRT created for virt board
+>   hw/nios2/Makefile.objs: Conditionally build nios2
+>   hw/riscv/Makefile.objs: Create CONFIG_* for riscv boards
+>   hw/sparc64/Makefile.objs: Create CONFIG_* for sparc64
+>   hw/alpha/Makefile.objs: Create CONFIG_* for alpha
+>   hw/cris/Makefile.objs: Create CONFIG_* for cris
+>   hw/hppa/Makefile.objs: Create CONFIG_* for hppa
+>   hw/moxie/Makefile.objs: Conditionally build moxie
+>   hw/openrisc/Makefile.objs: Create CONFIG_* for openrisc
+>   hw/tricore/Makefile.objs: Create CONFIG_* for tricore
+>   hw/display: make edid configurable
+>   hw/pci/Makefile.objs: make pcie configurable
+>   display: express dependencies with kconfig
+>   hyperv: express dependencies with kconfig
+>   virtio: express virtio dependencies with Kconfig
+>   i386-softmmu.mak: remove all CONFIG_* except boards definitions
+> 
+> Ákos Kovács (8):
+>   hw/m68k/Makefile.objs: Conditionally build boards
+>   hw/microblaze/Makefile.objs: Create configs for petalogix and xilinx
+>     boards
+>   hw/mips/Makefile.objs: Create CONFIG_* for r4k, malta, mipssim boards
+>   hw/ppc/Makefile.objs: Build all boards conditinally with CONFIG_*
+>   hw/sh4/Makefile.objs: New CONFIG_* varibales created for sh4 boards
+>     and device
+>   hw/sparc/Makefile.objs: CONFIG_* for sun4m and leon3 created
+>   hw/lm32/Makefile.objs: Conditionally build lm32 and milkmyst
+>   hw/xtensa/Makefile.objs: Build xtensa_sim and xtensa_fpga
+>     conditionally
+> 
+>  Kconfig.host                            |  24 ++
+>  Makefile                                |  27 +-
+>  Makefile.target                         |   7 +-
+>  configure                               |   3 +
+>  default-configs/alpha-softmmu.mak       |  14 +-
+>  default-configs/arm-softmmu.mak         |  16 +-
+>  default-configs/cris-softmmu.mak        |   2 +-
+>  default-configs/hppa-softmmu.mak        |   6 +-
+>  default-configs/hyperv.mak              |   2 -
+>  default-configs/i386-softmmu.mak        |  77 +---
+>  default-configs/lm32-softmmu.mak        |   2 -
+>  default-configs/m68k-softmmu.mak        |   3 +-
+>  default-configs/microblaze-softmmu.mak  |   4 +-
+>  default-configs/mips-softmmu-common.mak |  13 +-
+>  default-configs/mips64el-softmmu.mak    |   3 +-
+>  default-configs/moxie-softmmu.mak       |   1 +
+>  default-configs/nios2-softmmu.mak       |   2 +-
+>  default-configs/or1k-softmmu.mak        |   1 +
+>  default-configs/pci.mak                 |  49 ---
+>  default-configs/ppc-softmmu.mak         |  28 +-
+>  default-configs/ppc64-softmmu.mak       |   5 -
+>  default-configs/riscv32-softmmu.mak     |  15 +-
+>  default-configs/riscv64-softmmu.mak     |  15 +-
+>  default-configs/s390x-softmmu.mak       |   9 +-
+>  default-configs/sh4-softmmu.mak         |  17 +-
+>  default-configs/sh4eb-softmmu.mak       |  15 +-
+>  default-configs/sound.mak               |   4 -
+>  default-configs/sparc-softmmu.mak       |   3 +-
+>  default-configs/sparc64-softmmu.mak     |   9 +-
+>  default-configs/tricore-softmmu.mak     |   1 +
+>  default-configs/unicore32-softmmu.mak   |   1 -
+>  default-configs/usb.mak                 |  11 -
+>  default-configs/virtio.mak              |  15 -
+>  default-configs/xtensa-softmmu.mak      |   3 +
+>  default-configs/xtensaeb-softmmu.mak    |   3 +
+>  docs/devel/build-system.txt             |   1 -
+>  hw/9pfs/Kconfig                         |   6 +
+>  hw/Kconfig                              |  73 ++++
+>  hw/Makefile.objs                        |   4 +-
+>  hw/acpi/Kconfig                         |  29 ++
+>  hw/adc/Kconfig                          |   2 +
+>  hw/alpha/Kconfig                        |   2 +
+>  hw/alpha/Makefile.objs                  |   2 +-
+>  hw/arm/Kconfig                          | 117 ++++++
+>  hw/arm/Makefile.objs                    |   3 +-
+>  hw/audio/Kconfig                        |  52 +++
+>  hw/block/Kconfig                        |  38 ++
+>  hw/bt/Kconfig                           |   2 +
+>  hw/char/Kconfig                         |  42 ++
+>  hw/core/Kconfig                         |  11 +
+>  hw/cpu/Kconfig                          |   8 +
+>  hw/cris/Kconfig                         |   6 +
+>  hw/cris/Makefile.objs                   |   2 +-
+>  hw/display/Kconfig                      | 107 +++++
+>  hw/display/Makefile.objs                |   4 +-
+>  hw/dma/Kconfig                          |  21 +
+>  hw/gpio/Kconfig                         |   9 +
+>  hw/hppa/Kconfig                         |   5 +
+>  hw/hppa/Makefile.objs                   |   2 +-
+>  hw/hyperv/Kconfig                       |   9 +
+>  hw/i2c/Kconfig                          |  27 ++
+>  hw/i2c/Makefile.objs                    |   7 +-
+>  hw/i386/Kconfig                         |  88 ++++
+>  hw/i386/Makefile.objs                   |   4 +-
+>  hw/ide/Kconfig                          |  54 +++
+>  hw/ide/Makefile.objs                    |   6 +-
+>  hw/ide/core.c                           |  25 --
+>  hw/ide/ioport.c                         |  67 ++++
+>  hw/input/Kconfig                        |  33 ++
+>  hw/intc/Kconfig                         |  59 +++
+>  hw/ipack/Kconfig                        |   4 +
+>  hw/ipmi/Kconfig                         |  22 +
+>  hw/isa/Kconfig                          |  53 +++
+>  hw/lm32/Kconfig                         |   7 +
+>  hw/lm32/Makefile.objs                   |   4 +-
+>  hw/m68k/Kconfig                         |  10 +
+>  hw/m68k/Makefile.objs                   |   4 +-
+>  hw/mem/Kconfig                          |  10 +
+>  hw/microblaze/Kconfig                   |   8 +
+>  hw/microblaze/Makefile.objs             |   6 +-
+>  hw/mips/Kconfig                         |  21 +
+>  hw/mips/Makefile.objs                   |   5 +-
+>  hw/misc/Kconfig                         | 112 ++++++
+>  hw/misc/macio/Kconfig                   |  11 +
+>  hw/moxie/Kconfig                        |   2 +
+>  hw/moxie/Makefile.objs                  |   2 +-
+>  hw/net/Kconfig                          | 122 ++++++
+>  hw/net/Makefile.objs                    |   4 +-
+>  hw/nios2/Kconfig                        |   5 +
+>  hw/nios2/Makefile.objs                  |   3 +-
+>  hw/nvram/Kconfig                        |   8 +
+>  hw/openrisc/Kconfig                     |   2 +
+>  hw/openrisc/Makefile.objs               |   2 +-
+>  hw/pci-bridge/Kconfig                   |  29 ++
+>  hw/pci-host/Kconfig                     |  49 +++
+>  hw/pci-host/Makefile.objs               |  10 +-
+>  hw/pci/Kconfig                          |   9 +
+>  hw/pci/Makefile.objs                    |   9 +-
+>  hw/pcmcia/Kconfig                       |   2 +
+>  hw/ppc/Kconfig                          |  60 +++
+>  hw/ppc/Makefile.objs                    |  11 +-
+>  hw/riscv/Kconfig                        |  19 +
+>  hw/riscv/Makefile.objs                  |  22 +-
+>  hw/s390x/Kconfig                        |   2 +
+>  hw/s390x/Makefile.objs                  |   2 +
+>  hw/scsi/Kconfig                         |  54 +++
+>  hw/scsi/Makefile.objs                   |   2 +-
+>  hw/sd/Kconfig                           |  14 +
+>  hw/sh4/Kconfig                          |  12 +
+>  hw/sh4/Makefile.objs                    |   4 +-
+>  hw/smbios/Kconfig                       |   2 +
+>  hw/sparc/Kconfig                        |  13 +
+>  hw/sparc/Makefile.objs                  |   4 +-
+>  hw/sparc64/Kconfig                      |   6 +
+>  hw/sparc64/Makefile.objs                |   6 +-
+>  hw/ssi/Kconfig                          |  14 +
+>  hw/timer/Kconfig                        |  63 +++
+>  hw/tpm/Kconfig                          |  27 ++
+>  hw/tricore/Kconfig                      |   2 +
+>  hw/tricore/Makefile.objs                |   2 +-
+>  hw/unicore32/Kconfig                    |   3 +
+>  hw/usb/Kconfig                          |  91 +++++
+>  hw/vfio/Kconfig                         |  36 ++
+>  hw/vfio/Makefile.objs                   |   9 +-
+>  hw/virtio/Kconfig                       |  27 ++
+>  hw/watchdog/Kconfig                     |  16 +
+>  hw/xtensa/Kconfig                       |   5 +
+>  hw/xtensa/Makefile.objs                 |   4 +-
+>  rules.mak                               |   2 +-
+>  scripts/make_device_config.sh           |  30 --
+>  scripts/minikconf.py                    | 687 ++++++++++++++++++++++++++++++++
+>  131 files changed, 2749 insertions(+), 374 deletions(-)
+>  create mode 100644 Kconfig.host
+>  delete mode 100644 default-configs/hyperv.mak
+>  delete mode 100644 default-configs/pci.mak
+>  delete mode 100644 default-configs/sound.mak
+>  delete mode 100644 default-configs/usb.mak
+>  delete mode 100644 default-configs/virtio.mak
+>  create mode 100644 hw/9pfs/Kconfig
+>  create mode 100644 hw/Kconfig
+>  create mode 100644 hw/acpi/Kconfig
+>  create mode 100644 hw/adc/Kconfig
+>  create mode 100644 hw/alpha/Kconfig
+>  create mode 100644 hw/arm/Kconfig
+>  create mode 100644 hw/audio/Kconfig
+>  create mode 100644 hw/block/Kconfig
+>  create mode 100644 hw/bt/Kconfig
+>  create mode 100644 hw/char/Kconfig
+>  create mode 100644 hw/core/Kconfig
+>  create mode 100644 hw/cpu/Kconfig
+>  create mode 100644 hw/cris/Kconfig
+>  create mode 100644 hw/display/Kconfig
+>  create mode 100644 hw/dma/Kconfig
+>  create mode 100644 hw/gpio/Kconfig
+>  create mode 100644 hw/hppa/Kconfig
+>  create mode 100644 hw/hyperv/Kconfig
+>  create mode 100644 hw/i2c/Kconfig
+>  create mode 100644 hw/i386/Kconfig
+>  create mode 100644 hw/ide/Kconfig
+>  create mode 100644 hw/ide/ioport.c
+>  create mode 100644 hw/input/Kconfig
+>  create mode 100644 hw/intc/Kconfig
+>  create mode 100644 hw/ipack/Kconfig
+>  create mode 100644 hw/ipmi/Kconfig
+>  create mode 100644 hw/isa/Kconfig
+>  create mode 100644 hw/lm32/Kconfig
+>  create mode 100644 hw/m68k/Kconfig
+>  create mode 100644 hw/mem/Kconfig
+>  create mode 100644 hw/microblaze/Kconfig
+>  create mode 100644 hw/mips/Kconfig
+>  create mode 100644 hw/misc/Kconfig
+>  create mode 100644 hw/misc/macio/Kconfig
+>  create mode 100644 hw/moxie/Kconfig
+>  create mode 100644 hw/net/Kconfig
+>  create mode 100644 hw/nios2/Kconfig
+>  create mode 100644 hw/nvram/Kconfig
+>  create mode 100644 hw/openrisc/Kconfig
+>  create mode 100644 hw/pci-bridge/Kconfig
+>  create mode 100644 hw/pci-host/Kconfig
+>  create mode 100644 hw/pci/Kconfig
+>  create mode 100644 hw/pcmcia/Kconfig
+>  create mode 100644 hw/ppc/Kconfig
+>  create mode 100644 hw/riscv/Kconfig
+>  create mode 100644 hw/s390x/Kconfig
+>  create mode 100644 hw/scsi/Kconfig
+>  create mode 100644 hw/sd/Kconfig
+>  create mode 100644 hw/sh4/Kconfig
+>  create mode 100644 hw/smbios/Kconfig
+>  create mode 100644 hw/sparc/Kconfig
+>  create mode 100644 hw/sparc64/Kconfig
+>  create mode 100644 hw/ssi/Kconfig
+>  create mode 100644 hw/timer/Kconfig
+>  create mode 100644 hw/tpm/Kconfig
+>  create mode 100644 hw/tricore/Kconfig
+>  create mode 100644 hw/unicore32/Kconfig
+>  create mode 100644 hw/usb/Kconfig
+>  create mode 100644 hw/vfio/Kconfig
+>  create mode 100644 hw/virtio/Kconfig
+>  create mode 100644 hw/watchdog/Kconfig
+>  create mode 100644 hw/xtensa/Kconfig
+>  delete mode 100644 scripts/make_device_config.sh
+>  create mode 100644 scripts/minikconf.py
+> 
+> -- 
+> 1.8.3.1
