@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38346)
+Received: from eggs.gnu.org ([209.51.188.92]:38375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gn5ZT-0002Q6-NP
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:16 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gn5ZV-0002Rc-RT
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gn5ZS-0006ja-KO
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gn5ZU-0006ke-V2
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:47:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 25 Jan 2019 18:46:50 +0100
-Message-Id: <20190125174653.4604-1-kwolf@redhat.com>
+Date: Fri, 25 Jan 2019 18:46:51 +0100
+Message-Id: <20190125174653.4604-2-kwolf@redhat.com>
+In-Reply-To: <20190125174653.4604-1-kwolf@redhat.com>
+References: <20190125174653.4604-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/3] scsi-disk: Device Identification fixes
+Subject: [Qemu-devel] [PATCH 1/3] scsi-disk: Don't use empty string as
+ device id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,31 +25,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-The vendor specific designator in the Device Identification VPD page has
-two problems:
+scsi-disk includes in the Device Identification VPD page, depending on
+configuration amongst others, a vendor specific designator that consists
+either of the serial number if given or the BlockBackend name (which is
+a host detail that better shouldn't have been leaked to the guest, but
+now we have to maintain it for compatibility).
 
-1. It defaults to the BlockBackend name (-drive id=3D...), which everyone
-   expected to be a host detail that the guest never sees
+With anonymous BlockBackends, i.e. scsi-disk devices constructed with
+drive=3D<node-name>, and no serial number explicitly specified, this ends
+up as an empty string. If this happens to more than one disk, we have
+accidentally signalled to the OS that this is a multipath setup, which
+is obviously not what was intended.
 
-2. With -blockdev based setups it defaults to an empty string; if this
-   default is used with more than one disk, the guest OS will interpret
-   this as a single multipath disk.
+Instead of using an empty string for the vendor specific designator,
+simply leave out that designator, which makes Linux detect such setups
+as separate disks again.
 
-We can address problem 2 immediately, and start running the deprecation
-clock for problem 1.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/scsi/scsi-disk.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-Related bug reports:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1669446
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1668248
-
-Kevin Wolf (3):
-  scsi-disk: Don't use empty string as device id
-  scsi-disk: Add device_id property
-  scsi-disk: Deprecate device_id fallback to BlockBackend name
-
- hw/scsi/scsi-disk.c  | 41 ++++++++++++++++++++++++++++-------------
- qemu-deprecated.texi | 22 +++++++++++++++++++++-
- 2 files changed, 49 insertions(+), 14 deletions(-)
-
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0e9027c8f3..93eef40b87 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -652,12 +652,14 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *=
+req, uint8_t *outbuf)
+         DPRINTF("Inquiry EVPD[Device identification] "
+                 "buffer size %zd\n", req->cmd.xfer);
+=20
+-        outbuf[buflen++] =3D 0x2; /* ASCII */
+-        outbuf[buflen++] =3D 0;   /* not officially assigned */
+-        outbuf[buflen++] =3D 0;   /* reserved */
+-        outbuf[buflen++] =3D id_len; /* length of data following */
+-        memcpy(outbuf + buflen, str, id_len);
+-        buflen +=3D id_len;
++        if (id_len) {
++            outbuf[buflen++] =3D 0x2; /* ASCII */
++            outbuf[buflen++] =3D 0;   /* not officially assigned */
++            outbuf[buflen++] =3D 0;   /* reserved */
++            outbuf[buflen++] =3D id_len; /* length of data following */
++            memcpy(outbuf + buflen, str, id_len);
++            buflen +=3D id_len;
++        }
+=20
+         if (s->qdev.wwn) {
+             outbuf[buflen++] =3D 0x1; /* Binary */
 --=20
 2.20.1
