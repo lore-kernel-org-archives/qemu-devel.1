@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46454)
+Received: from eggs.gnu.org ([209.51.188.92]:46464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aJ-0002lD-OW
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:52 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aK-0002lZ-5f
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aH-0002Vu-As
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:51 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:35832 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aI-0002Xa-Mp
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:52 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:36392 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gn1aH-0002Uv-2M
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:49 -0500
+	id 1gn1aI-0002W8-D7
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:50 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 25 Jan 2019 14:31:25 +0100
-Message-Id: <1548423098-31864-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 25 Jan 2019 14:31:33 +0100
+Message-Id: <1548423098-31864-10-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/14] target/mips: nanoMIPS: Remove duplicate
- macro definitions
+Subject: [Qemu-devel] [PULL 09/14] MAINTAINERS: Update MIPS sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +32,89 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Several macros were defined twice, with identical values, so
-remove duplicates.
-
-Previously added in 80845edf37b.
-
-This reverts commit 6bfa9f4c9cf24d6cfaaa227722e9cdcca1ad6fe9.
+Remove Stefan Markovic as a reviewer for MIPS directories and
+files, as he left Wave Computing.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ MAINTAINERS | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ab307c4..6002d1c 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -18502,16 +18502,6 @@ static inline int decode_gpr_gpr4_zero(int r)
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index af339b8..060db23 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -206,7 +206,6 @@ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
+ F: default-configs/*mips*
+@@ -365,7 +364,6 @@ F: target/arm/kvm.c
+ MIPS
+ M: James Hogan <jhogan@kernel.org>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/kvm.c
 =20
+@@ -890,7 +888,6 @@ MIPS Machines
+ Jazz
+ M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_jazz.c
+ F: hw/display/jazz_led.c
+@@ -899,14 +896,12 @@ F: hw/dma/rc4030.c
+ Malta
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_malta.c
 =20
--/* extraction utilities */
--
--#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
--#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
--#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
--#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
--#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
--#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
--
--
- static void gen_adjust_sp(DisasContext *ctx, int u)
- {
-     gen_op_addr_addi(ctx, cpu_gpr[29], cpu_gpr[29], u);
+ Mipssim
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -914,14 +909,12 @@ F: hw/net/mipsnet.c
+ R4000
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_r4k.c
+=20
+ Fulong 2E
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
+@@ -931,7 +924,6 @@ F: include/hw/isa/vt82c686.h
+ Boston
+ M: Paul Burton <pburton@wavecomp.com>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
+@@ -2203,7 +2195,6 @@ F: disas/i386.c
+ MIPS target
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ R: Aleksandar Rikalo <arikalo@wavecomp.com>
+-R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: tcg/mips/
+ F: disas/mips.c
 --=20
 2.7.4
