@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36347)
+Received: from eggs.gnu.org ([209.51.188.92]:37103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn37y-0004VL-ON
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:10:44 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gn3A7-0006Iw-6R
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:12:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn2rr-0005cd-46
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:54:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40390)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gn2rq-0005cL-KF
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:54:02 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-3-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8710ddae-0316-f020-de18-442e8a7fb324@redhat.com>
-Date: Fri, 25 Jan 2019 15:53:56 +0100
+	(envelope-from <stefanha@gmail.com>) id 1gn3A5-0006Jh-8a
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:12:55 -0500
+Date: Fri, 25 Jan 2019 15:12:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190125151245.GD28305@stefanha-x1.localdomain>
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-3-sgarzare@redhat.com>
+	<5b3c3076-8f0e-c6a2-b6d1-707db2ae3a66@redhat.com>
+	<962ebaff-23ce-57ff-3387-9017c2ccd14a@redhat.com>
+	<20190125081615.2cevf7cy7bcnxqwh@steredhat>
+	<d4aa8b25-f0ad-1444-587c-3d90a8ddc74a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1548410831-19553-3-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/52] ide: split ioport registration to a
- separate file
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hxkXGo8AKqTJ+9QI"
+Content-Disposition: inline
+In-Reply-To: <d4aa8b25-f0ad-1444-587c-3d90a8ddc74a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +29,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, John Snow <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, virtio-comment@lists.oasis-open.org
 
-On 2019-01-25 11:06, Paolo Bonzini wrote:
-> This is not needed on ARM, and brings in ISA bus code which is otherwise not
-> necessary.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/ide/Makefile.objs |  6 ++---
->  hw/ide/core.c        | 25 --------------------
->  hw/ide/ioport.c      | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 70 insertions(+), 28 deletions(-)
->  create mode 100644 hw/ide/ioport.c
-> 
-> diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-> index fc328ff..3f3edd10 100644
-> --- a/hw/ide/Makefile.objs
-> +++ b/hw/ide/Makefile.objs
-> @@ -1,12 +1,12 @@
->  common-obj-$(CONFIG_IDE_CORE) += core.o atapi.o
->  common-obj-$(CONFIG_IDE_QDEV) += qdev.o
-> -common-obj-$(CONFIG_IDE_PCI) += pci.o
-> -common-obj-$(CONFIG_IDE_ISA) += isa.o
-> +common-obj-$(CONFIG_IDE_PCI) += pci.o ioport.o
-> +common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
->  common-obj-$(CONFIG_IDE_PIIX) += piix.o
->  common-obj-$(CONFIG_IDE_CMD646) += cmd646.o
->  common-obj-$(CONFIG_IDE_MACIO) += macio.o
->  common-obj-$(CONFIG_IDE_MMIO) += mmio.o
-> -common-obj-$(CONFIG_IDE_VIA) += via.o
-> +common-obj-$(CONFIG_IDE_VIA) += via.o ioport.o
->  common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
->  common-obj-$(CONFIG_AHCI) += ahci.o
->  common-obj-$(CONFIG_AHCI) += ich.o
 
-Since the ioport code clearly depends on ISA, I think you could also
-simply do:
+--hxkXGo8AKqTJ+9QI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-common-obj-$(CONFIG_ISA_BUS) += ioport.o
+On Fri, Jan 25, 2019 at 09:49:03AM +0100, Thomas Huth wrote:
+> On 2019-01-25 09:16, Stefano Garzarella wrote:
+> > On Fri, Jan 25, 2019 at 07:07:35AM +0100, Thomas Huth wrote:
+> >> On 2019-01-25 07:01, Thomas Huth wrote:
+> >>> On 2019-01-24 18:23, Stefano Garzarella wrote:
+> >>>> If the WRITE_ZEROES feature is enabled, we check this
+> >>>> command in the test_basic().
+> >>>>
+> >>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >>>> ---
+> >>>>  tests/virtio-blk-test.c | 63 ++++++++++++++++++++++++++++++++++++++=
++++
+> >>>>  1 file changed, 63 insertions(+)
+> >>>>
+> >>>> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> >>>> index 04c608764b..8cabbcb85a 100644
+> >>>> --- a/tests/virtio-blk-test.c
+> >>>> +++ b/tests/virtio-blk-test.c
+> >>>> @@ -231,6 +231,69 @@ static void test_basic(QVirtioDevice *dev, QGue=
+stAllocator *alloc,
+> >>>> =20
+> >>>>      guest_free(alloc, req_addr);
+> >>>> =20
+> >>>> +    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
+> >>>> +        struct virtio_blk_discard_write_zeroes *dwz_hdr;
+> >>>> +        void *expected;
+> >>>> +
+> >>>> +        /*
+> >>>> +         * WRITE_ZEROES request on the same sector of previous test=
+ where
+> >>>> +         * we wrote "TEST".
+> >>>> +         */
+> >>>> +        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
+> >>>> +        req.data =3D g_malloc0(512);
+> >>>
+> >>> Wouldn't it be more interesting to do a memset(req.data, 0xaa, 512) or
+> >>> something similar here, to see whether zeroes or 0xaa is written?
+> >>
+> >> Ah, never mind, I thought req.data would be a sector buffer here, but
+> >> looking at the lines below, it apparently is something different.
+> >>
+> >> Why do you allocate 512 bytes here? I'd rather expect
+> >> g_malloc0(sizeof(struct virtio_blk_discard_write_zeroes)) here. ... and
+> >> then you could also use a local "struct virtio_blk_discard_write_zeroes
+> >> dwz_hdr" variable instead of a pointer, and drop the g_malloc0() compl=
+etely?
+> >>
+> >=20
+> > Hi Thomas,
+> > it was my initial implementation, but on the first test I discovered
+> > that virtio_blk_request() has an assert on the data_size and it requires
+> > a multiple of 512 bytes.
+> > Then I looked at the virtio-spec #1, and it seems that data should be
+> > multiple of 512 bytes also if it contains the struct
+> > virtio_blk_discard_write_zeroes. (I'm not sure)
+> >=20
+> > Anyway I tried to allocate only the space for that struct, commented the
+> > assert and the test works well.
+> >=20
+> > How do you suggest to proceed?
+>=20
+> Wow, that's a tough question. Looking at the virtio spec, I agree with
+> you, it looks like struct virtio_blk_discard_write_zeroes should be
+> padded to 512 bytes here. But when I look at the Linux sources
+> (drivers/block/virtio_blk.c), I fail to see that they are doing the
+> padding there (but maybe I'm just too blind).
 
-instead of adding it to three different lines here?
+The only evidence for "pad to 512 bytes" interpretation that I see in
+the spec is "u8 data[][512];".  Or have I missed something more
+explicit?
 
-Well, the linker should be smart enough to deal with multiple entries,
-so it's likely just a matter of taste.
+Based on the Linux guest driver code and the lack of more evidence in
+the spec, I'm pretty sure data[] doesn't need to be padded to 512 bytes
+for discard/write zero requests.
 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index c3d779d..8483200 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -2686,31 +2686,6 @@ void ide_exit(IDEState *s)
->      qemu_vfree(s->io_buffer);
->  }
->  
-> -static const MemoryRegionPortio ide_portio_list[] = {
-> -    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
-> -    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
-> -    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
-> -    PORTIO_END_OF_LIST(),
-> -};
-> -
-> -static const MemoryRegionPortio ide_portio2_list[] = {
-> -    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
-> -    PORTIO_END_OF_LIST(),
-> -};
-> -
-> -void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
-> -{
-> -    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
-> -       bridge has been setup properly to always register with ISA.  */
-> -    isa_register_portio_list(dev, &bus->portio_list,
-> -                             iobase, ide_portio_list, bus, "ide");
-> -
-> -    if (iobase2) {
-> -        isa_register_portio_list(dev, &bus->portio2_list,
-> -                                 iobase2, ide_portio2_list, bus, "ide");
-> -    }
-> -}
-> -
->  static bool is_identify_set(void *opaque, int version_id)
->  {
->      IDEState *s = opaque;
-> diff --git a/hw/ide/ioport.c b/hw/ide/ioport.c
-> new file mode 100644
-> index 0000000..b8f1b3f
-> --- /dev/null
-> +++ b/hw/ide/ioport.c
-> @@ -0,0 +1,67 @@
-> +/*
-> + * QEMU IDE disk and CD/DVD-ROM Emulator
-> + *
-> + * Copyright (c) 2003 Fabrice Bellard
-> + * Copyright (c) 2006 Openedhand Ltd.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/hw.h"
-> +#include "hw/isa/isa.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/timer.h"
-> +#include "sysemu/sysemu.h"
-> +#include "sysemu/blockdev.h"
-> +#include "sysemu/dma.h"
-> +#include "hw/block/block.h"
-> +#include "sysemu/block-backend.h"
-> +#include "qapi/error.h"
-> +#include "qemu/cutils.h"
-> +#include "sysemu/replay.h"
-> +
-> +#include "hw/ide/internal.h"
-> +#include "trace.h"
+> Looking at the QEMU sources, it seems like it can deal with both and
+> always sets the status right behind the last byte:
+>=20
+>     req->in =3D (void *)in_iov[in_num - 1].iov_base
+>               + in_iov[in_num - 1].iov_len
+>               - sizeof(struct virtio_blk_inhdr);
+>=20
+> Anyway, I think the virtio spec should be clearer here to avoid bad
+> implementations in the future, so maybe Changpeng or Michael could
+> update the spec here a little bit?
 
-Maybe shorten the #include list a little bit?
+Yep, good point.  VIRTIO 1.1 is available for public comments, so I've
+CCed the list.
 
-> +static const MemoryRegionPortio ide_portio_list[] = {
-> +    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
-> +    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
-> +    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
-> +    PORTIO_END_OF_LIST(),
-> +};
-> +
-> +static const MemoryRegionPortio ide_portio2_list[] = {
-> +    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
-> +    PORTIO_END_OF_LIST(),
-> +};
-> +
-> +void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
-> +{
-> +    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
-> +       bridge has been setup properly to always register with ISA.  */
-> +    isa_register_portio_list(dev, &bus->portio_list,
-> +                             iobase, ide_portio_list, bus, "ide");
-> +
-> +    if (iobase2) {
-> +        isa_register_portio_list(dev, &bus->portio2_list,
-> +                                 iobase2, ide_portio2_list, bus, "ide");
-> +    }
-> +}
+Stefan
 
-Anyway:
+>  Thomas
+>=20
+>=20
+> > [1](https://github.com/oasis-tcs/virtio-spec/blob/master/content.tex#L3=
+944)
+> >=20
+> >=20
+> > Thanks,
+> > Stefano
+> >=20
+>=20
+>=20
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+--hxkXGo8AKqTJ+9QI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcSydtAAoJEJykq7OBq3PI/MAH/3UK3HGmdDR1tFL/15Yv8yCY
+7AgFAcr/b3S+IknpHTzGMWyYTEUJ1TBUdY62u3EjdtvmYabyaGCWgueC+SanPRZ3
+73acBRMYnXg5sNtxOjAyc7+uWUn2d7F0SlNNYOOIPIRDeuc/BRRDdgHeHLexyNmH
+amqCrj1HsdT1Hu/VAYClqov5ojb0dAhtIXjYJoL4iYaF4fHayDIEynkc2ZHpYxhi
+XeF5uEcuIefuGHX8aEYKyDBQk1yrWJkSvEmC3j1xrT3+KapM40chm30iay7OkDWq
+VnRGGdAU/4H4OHka0Y4sgK0DNiwmWPci/6Mj/zXEpSgu0jvRJt18RA3utef/nNA=
+=dna4
+-----END PGP SIGNATURE-----
+
+--hxkXGo8AKqTJ+9QI--
