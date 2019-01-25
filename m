@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46416)
+Received: from eggs.gnu.org ([209.51.188.92]:46418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aI-0002kN-8y
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aI-0002kT-Ds
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aH-0002Vk-A3
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aH-0002Vp-AR
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:50 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:35980 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:35821 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gn1aH-0002V4-1y
+	id 1gn1aH-0002Uu-2Q
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:49 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 25 Jan 2019 14:31:28 +0100
-Message-Id: <1548423098-31864-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 25 Jan 2019 14:31:26 +0100
+Message-Id: <1548423098-31864-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/14] target/mips: Correct the second argument
- type of cpu_supports_isa()
+Subject: [Qemu-devel] [PULL 02/14] target/mips: nanoMIPS: Remove an unused
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +33,25 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-"insn_flags" bitfield was expanded from 32-bit to 64-bit in commit
-f9c9cd63e3. However, this was not reflected on the second argument
-of the function cpu_supports_isa(). By chance, this did not create
-some wrong behavior, since the left-most halves of all instances of
-the second argument are currently all zeros. However, this is still
-a bug waiting to happen. Correct this by changing the type of the
-second argument to be always 64-bit.
+Remove a macro that is never used.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       | 2 +-
- target/mips/translate.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/mips/translate.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index c4da7df..473d26d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -1173,7 +1173,7 @@ int cpu_mips_signal_handler(int host_signum, void *=
-pinfo, void *puc);
- #define CPU_RESOLVING_TYPE TYPE_MIPS_CPU
-=20
- bool cpu_supports_cps_smp(const char *cpu_type);
--bool cpu_supports_isa(const char *cpu_type, unsigned int isa);
-+bool cpu_supports_isa(const char *cpu_type, uint64_t isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-=20
- /* mips_int.c */
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 2140ecd..b362b03 100644
+index 6002d1c..06e7bc6 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -29883,7 +29883,7 @@ bool cpu_supports_cps_smp(const char *cpu_type)
-     return (mcc->cpu_def->CP0_Config3 & (1 << CP0C3_CMGCR)) !=3D 0;
- }
+@@ -18462,7 +18462,6 @@ enum {
 =20
--bool cpu_supports_isa(const char *cpu_type, unsigned int isa)
-+bool cpu_supports_isa(const char *cpu_type, uint64_t isa)
- {
-     const MIPSCPUClass *mcc =3D MIPS_CPU_CLASS(object_class_by_name(cpu_=
-type));
-     return (mcc->cpu_def->insn_flags & isa) !=3D 0;
+ #define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
+ #define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
+-#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
+ #define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
+ #define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
+ #define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
 --=20
 2.7.4
