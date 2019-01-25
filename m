@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49926)
+Received: from eggs.gnu.org ([209.51.188.92]:50150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gn1uX-0006Oo-DZ
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:52:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gn1us-0006oq-TV
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gn1oj-0001ql-P9
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:46:46 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gn1oj-0001qO-JX
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:46:45 -0500
-Received: by mail-wm1-f68.google.com with SMTP id d15so6839294wmb.3
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 05:46:45 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20190125124738.GB30730@rkaganb.sw.ru>
-References: <20190125114155.32062-1-vkuznets@redhat.com>
-	<20190125114155.32062-5-vkuznets@redhat.com>
-	<20190125124738.GB30730@rkaganb.sw.ru>
-Date: Fri, 25 Jan 2019 14:46:42 +0100
-Message-ID: <87bm44onnh.fsf@vitty.brq.redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gn1kz-0000FA-UQ
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:42:54 -0500
+Date: Fri, 25 Jan 2019 11:42:45 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190125134245.GD4136@habkost.net>
+References: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
+	<fa3b6ce0-0fc4-7ee8-653b-5c0aecfa6d30@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
- pass-through mode
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <fa3b6ce0-0fc4-7ee8-653b-5c0aecfa6d30@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] decodetree: re.fullmatch was added in 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+On Fri, Jan 25, 2019 at 01:45:00PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Cc'ing maintainers :P
+>=20
+> $ ./scripts/get_maintainer.pl -f scripts/decodetree.py
+> Eduardo Habkost <ehabkost@redhat.com> (odd fixer:Python scripts)
+> Cleber Rosa <crosa@redhat.com> (odd fixer:Python scripts)
+>=20
+> On 1/25/19 11:03 AM, Paolo Bonzini wrote:
+> > Python 3 versions earlier than 3.4 do not have it, use the
+> > same workaround that is in place for 3.0.
+> >=20
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-> On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
->> In many case we just want to give Windows guests all currently supported
->> Hyper-V enlightenments and that's where this new mode may come handy. We
->> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
->
-> How is the compatibility ensured on migration between kernels reporting
-> different feature sets?
+Queued, thanks!
 
-AFAIU we don't change anything in this regard (or, my intention was to
-not change anything): hv-all is converted to the individual hv-*
-properties (hv_cpuid_check_and_set()) actually sets cpu->hyperv_* flags
-according to what's supported by kernel so when we migrate we will
-require all these features supported.
-
-I'll look to see that my expectations actually match the reallity,
-thanks for the reminder!
-
--- 
-Vitaly
+--=20
+Eduardo
