@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55890)
+Received: from eggs.gnu.org ([209.51.188.92]:56652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gmyFY-000465-66
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:58:13 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyKn-0005Kn-6w
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:03:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gmyFW-00048s-Pp
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:58:12 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:35364)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gmyFW-00047A-D6
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:58:10 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-Date: Fri, 25 Jan 2019 12:58:04 +0300
-Message-ID: <003301d4b494$775585c0$66009140$@ru>
-MIME-Version: 1.0
-Content-Language: ru
-Content-Type: text/plain;
-	charset="koi8-r"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Querying possible -cpu variants
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyKl-0006oM-TE
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:03:37 -0500
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 25 Jan 2019 11:03:22 +0100
+Message-Id: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] decodetree: re.fullmatch was added in 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +19,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com, =?koi8-r?B?J+bV0tPP18Eg7sHUwczJ0Sc=?= <Natalia.Fursova@ispras.ru>
+Cc: qemu-trivial@nongnu.org
 
-Hello.
+Python 3 versions earlier than 3.4 do not have it, use the
+same workaround that is in place for 3.0.
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/decodetree.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 0bc73b5..e342d27 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -204,7 +204,7 @@ def output(*args):
+         output_fd.write(a)
  
-
-We are making GUI for QEMU (which also should allow convenient record/replay command line
-generation): https://github.com/ispras/qemu-gui
-
  
-
-To fill the combo box in CPU selection form we run QEMU with "-cpu help" command and parse its
-output.
-
-The format of this list depends on target. Therefore our parsing code does not look good (and also
-may corrupt someday).
-
- 
-
-Is there a better way of requesting this information?
-
- 
-
-Or we should do one of the following:
-
-1.       Patch all targets and make the uniform "-cpu help" output format
-
-2.       Add QMP command for requesting this list.
-
- 
-
-Pavel Dovgalyuk
-
- 
+-if sys.version_info >= (3, 0):
++if sys.version_info >= (3, 4):
+     re_fullmatch = re.fullmatch
+ else:
+     def re_fullmatch(pat, str):
+-- 
+1.8.3.1
