@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55533)
+Received: from eggs.gnu.org ([209.51.188.92]:57915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gms92-00081F-F5
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:27:05 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gmsRF-0002q7-WE
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gms91-0005eK-BP
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:27:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46550)
+	(envelope-from <jasowang@redhat.com>) id 1gmsRF-0005OP-3F
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:45:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gms91-0005cx-2f
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:27:03 -0500
-Date: Fri, 25 Jan 2019 01:26:53 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190125032653.GC4136@habkost.net>
-References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
-	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
-	<20190123145050.GU4136@habkost.net>
-	<20190124112102.GA9821@tiger-server>
-	<20190124165926.GY4136@habkost.net>
-	<20190124123824-mutt-send-email-mst@kernel.org>
-	<20190124182839.GZ4136@habkost.net>
-	<20190124140522-mutt-send-email-mst@kernel.org>
-	<20190124191443.GB4136@habkost.net>
-	<20190124220423-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gmsRE-0005O3-Qt
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:45:53 -0500
+References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
+	<20190111161515.GG2738@work-vm>
+	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
+	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
+	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
+	<64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
+	<20190123195345.GI2193@work-vm>
+	<a0c711c1-17d4-9fbe-b78c-4cd4a2419633@redhat.com>
+	<20190124091113.GA2101@work-vm>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <edf3323e-3f7c-ae59-2241-35ee63998fd5@redhat.com>
+Date: Fri, 25 Jan 2019 11:45:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124220423-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
+In-Reply-To: <20190124091113.GA2101@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] test-filter-mirror hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,85 +35,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jan 24, 2019 at 10:08:37PM -0500, Michael S. Tsirkin wrote:
-> On Thu, Jan 24, 2019 at 05:14:43PM -0200, Eduardo Habkost wrote:
-> > On Thu, Jan 24, 2019 at 02:05:45PM -0500, Michael S. Tsirkin wrote:
-> > > On Thu, Jan 24, 2019 at 04:28:39PM -0200, Eduardo Habkost wrote:
-> > > > On Thu, Jan 24, 2019 at 12:45:54PM -0500, Michael S. Tsirkin wrote:
-> > > > > On Thu, Jan 24, 2019 at 02:59:26PM -0200, Eduardo Habkost wrote:
-> > > > > > On Thu, Jan 24, 2019 at 07:21:03PM +0800, Yi Zhang wrote:
-> > > > > > > On 2019-01-23 at 12:50:50 -0200, Eduardo Habkost wrote:
-> > > > > > > > On Wed, Jan 23, 2019 at 11:00:02AM +0800, Zhang, Yi wrote:
-> > > > > > > > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > > > > > > > 
-> > > > > > > > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > > [...]
-> > > > > > > > > + - 'pmem' option of memory-backend-file is 'on':
-> > > > > > > > > +   The backend is a file supporting DAX, e.g., a file on an ext4 or
-> > > > > > > > > +   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
-> > > > > > > > > +   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
-> > > > > > > > > +   error.
-> > > > > > > > 
-> > > > > > > > Won't this break existing configurations that work today on QEMU
-> > > > > > > > 3.1.0?  Why exactly it is OK to break compatibility here?
-> > > > > > > won't, pmem option default is off, if people who start VM don't know what
-> > > > > > > backend file is, it is suggested and *default to set pmem=off,
-> > > > > > > if people well know the backend file have dax capbility. it is suggest
-> > > > > > > to set pmem=on. 
-> > > > > > > 
-> > > > > > > For a special case that we use /dev/dax as backend, we already have a
-> > > > > > > patch to add MAP_SYNC falg mapiing from device dax mode.
-> > > > > > > see https://lkml.org/lkml/2018/4/22/524 
-> > > > > > > 
-> > > > > > > So, if people force set pmem=on, mapping a regular file, it will results
-> > > > > > > in an EOPNOTSUPP error. 
-> > > > > > 
-> > > > > > This is where compatibility is being broken, isn't it?  People
-> > > > > > currently using pmem=on on a regular file will start getting
-> > > > > > errors after a QEMU upgrade.  Existing VMs with pmem=on may stop
-> > > > > > booting.  Maybe this is OK, but we need to be able to explain why
-> > > > > > it is OK.
-> > > > > 
-> > > > > I think it's OK since pmem explicitly means "persistent":
-> > > > > 
-> > > > > The @option{pmem} option specifies whether the backing file specified
-> > > > > by @option{mem-path} is in host persistent memory that can be accessed
-> > > > > using the SNIA NVM programming model (e.g. Intel NVDIMM).
-> > > > > If @option{pmem} is set to 'on', QEMU will take necessary operations to
-> > > > > guarantee the persistence of its own writes to @option{mem-path}
-> > > > > (e.g. in vNVDIMM label emulation and live migration).
-> > > > 
-> > > > If it's OK, let's at least explicitly document that we are
-> > > > breaking compatibility in those cases.
-> > > > 
-> > > > 
-> > > > > > > 
-> > > > [...]
-> > > > > I think generally MAP_SYNC is required.
-> > > > > But for compatibility reasons we might need to support
-> > > > > !MAP_SYNC on old kernels even though it's risky.
-> > > > 
-> > > > What about making MAP_SYNC optional only on older machine-types?
-> > > 
-> > > I don't think this makes sense. It's not a guest visible change,
-> > > machine types are for that.
-> > 
-> > Losing data written to persistent memory is surely guest-visible
-> > behavior.
-> 
-> I think we need not be purists here. Most people don't lose power and
-> then it's fine and compatible. People who want more robustness need to
-> use more modern kernels, that is all.
 
-I don't think that's being purist.  I want to avoid hidden bugs
-if we ignore that MAP_SYNC failed for any unexpected reason.  If
-we need to ignore errors in some cases, let's at least limit that
-to cases where we absolutely have to.
+On 2019/1/24 =E4=B8=8B=E5=8D=885:11, Dr. David Alan Gilbert wrote:
+> * Jason Wang (jasowang@redhat.com) wrote:
+>> On 2019/1/24 =E4=B8=8A=E5=8D=883:53, Dr. David Alan Gilbert wrote:
+>>> * Jason Wang (jasowang@redhat.com) wrote:
+>>>> On 2019/1/22 =E4=B8=8A=E5=8D=882:56, Peter Maydell wrote:
+>>>>> On Thu, 17 Jan 2019 at 09:46, Jason Wang<jasowang@redhat.com>  wrot=
+e:
+>>>>>> On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
+>>>>>>> On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
+>>>>>>> <dgilbert@redhat.com  <mailto:dgilbert@redhat.com>> wrote:
+>>>>>>>
+>>>>>>>        * Peter Maydell (peter.maydell@linaro.org
+>>>>>>>        <mailto:peter.maydell@linaro.org>) wrote:
+>>>>>>>        > Recently I've noticed that test-filter-mirror has been h=
+anging
+>>>>>>>        > intermittently, typically when run on some other TCG arc=
+hitecture.
+>>>>>>>        > In the instance I've just looked at, this was with s390x=
+ guest on
+>>>>>>>        > x86-64 host, though I've also seen it on other host arch=
+s and
+>>>>>>>        > perhaps with other guests.
+>>>>>>>
+>>>>>>>        Watch out to see if you really do see it for other guests;
+>>>>>>>        it carefully avoids using virtio-net to avoid vhost; but o=
+n s390x it
+>>>>>>>        uses virtio-net-ccw - could that hit the vhost it was tryi=
+ng to avoid?
+>>>>>>>
+>>>>>>>        > Below is a backtrace, though it seems to be pretty unhel=
+pful.
+>>>>>>>        > Anybody got any theories ? Does the mirror test rely on =
+dirty
+>>>>>>>        > memory bitmaps like the migration test (which also hangs
+>>>>>>>        > occasionally with TCG due to some bug I'm sure we've inv=
+estigated
+>>>>>>>        > in the past) ?
+>>>>>>>
+>>>>>>>        I don't think it relies on the CPU at all.
+>>>>>>>     I have no idea about this currently, but Jason and I designed=
+ the
+>>>>>>> test case.
+>>>>>>> Add Jason: Have any comments about this ?
+>>>>>> I can't reproduce this locally with s390x-softmmu. It looks to me =
+the
+>>>>>> test should be independent to any kinds of emulation. It should pa=
+ss
+>>>>>> when mainloop work.
+>>>>> I've just seen a hang with ppc64 guest on s390x host, so it is
+>>>>> indeed not specific to s390x guest (and so not specific to
+>>>>> virtio-net either, since the ppc64 guest setup uses e1000).
+>>>>>
+>>>>> thanks
+>>>>> -- PMM
+>>>> Finally reproduced locally after hundreds (sometimes thousands) time=
+s of
+>>>> running.
+>>>>
+>>>> Bisection points to OOB monitor[1].
+>>>>
+>>>> It looks to me after OOB is used unconditionally we lose a barrier t=
+o make
+>>>> sure socket is connected before sending packets in test-filter-mirro=
+r.c. Is
+>>>> there any other similar and simple thing that we could do to kick th=
+e
+>>>> mainloop?
+>>> Do you mean the:
+>>>
+>>>       /* send a qmp command to guarantee that 'connected' is setting =
+to true. */
+>>>       qmp_discard_response(qts, "{ 'execute' : 'query-status'}");
+>>
+>> Yes.
+>>
+>>
+>>> why was that ever sufficient to know the socket was ready?
+>>
+>> It was suggested by Fam, I don't remember the details. Can we make sur=
+e all
+>> pending events has been processed (UNIX socket was set to connected) a=
+fter
+>> query-status is returned with an non OOB monitor?
+> I'm not sure - it doesn't sound like a 'query-status' should ensure
+> anything else.
+> How about something like a 'query-chardev' - can that tell you what you
+> need and loop until it's ready?
+>
+> Dave
 
-But I would also be happy with just a warning.
 
--- 
-Eduardo
+That may work.
+
+Thanks
+
+
+>
+>> Thanks
+>>
+>>
+>>> Dave
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
