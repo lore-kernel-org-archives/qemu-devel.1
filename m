@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60974)
+Received: from eggs.gnu.org ([209.51.188.92]:33664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gn2gO-0006yq-7H
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:42:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1gn2nH-0008Kl-06
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:49:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gn2gN-00082g-4m
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:42:12 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 25 Jan 2019 14:36:54 +0000
-Message-ID: <7b035c42-73b3-1f32-abd6-41cb82096989@virtuozzo.com>
-References: <20190125142138.76710-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190125142138.76710-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FC8641771C2FC74ABF7BC2CBF5459C96@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gn2nE-0003gA-RU
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:49:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:29679)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gn2nE-0003fm-JF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:49:16 -0500
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-2-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <df5457d4-d3c1-ff0d-3a01-a67057d8a574@redhat.com>
+Date: Fri, 25 Jan 2019 15:49:13 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] qcow2: avoid lseek on block_status if
- possible
+In-Reply-To: <1548410831-19553-2-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/52] arm: disable CONFIG_SERIAL_ISA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com
 
-MjUuMDEuMjAxOSAxNzoyMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-ZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFj
-Y3VyYXRlIHNlYXJjaA0KPiBmb3IgaG9sZSBpbnNpZGUgcmVnaW9uLCByZXBvcnRlZCBhcyBEQVRB
-IGJ5IGJzIHNpbmNlIDVkYWE3NGE2ZWJjLg0KPiANCj4gVGhpcyBhY2N1cmFjeSBpcyBub3QgZnJl
-ZTogYXNzdW1lIHdlIGhhdmUgcWNvdzIgZGlzay4gQWN0dWFsbHksIHFjb3cyDQo+IGtub3dzLCB3
-aGVyZSBhcmUgaG9sZXMgYW5kIHdoZXJlIGlzIGRhdGEuIEJ1dCBldmVyeSBibG9ja19zdGF0dXMN
-Cj4gcmVxdWVzdCBjYWxscyBsc2VlayBhZGRpdGlvbmFsbHkuIEFzc3VtZSBhIGJpZyBkaXNrLCBm
-dWxsIG9mDQo+IGRhdGEsIGluIGFueSBpdGVyYXRpdmUgY29weWluZyBibG9jayBqb2IgKG9yIGlt
-ZyBjb252ZXJ0KSB3ZSdsbCBjYWxsDQo+IGxzZWVrKEhPTEUpIG9uIGV2ZXJ5IGl0ZXJhdGlvbiwg
-YW5kIGVhY2ggb2YgdGhlc2UgbHNlZWtzIHdpbGwgaGF2ZSB0bw0KPiBpdGVyYXRlIHRocm91Z2gg
-YWxsIG1ldGFkYXRhIHVwIHRvIHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4gaW5l
-ZmZlY3RpdmUgYmVoYXZpb3IuIEFuZCBmb3IgbWFueSBzY2VuYXJpb3Mgd2UgZG9uJ3QgbmVlZCB0
-aGlzIGxzZWVrDQo+IGF0IGFsbC4NCj4gDQo+IEhvd2V2ZXIsIGxzZWVrIGlzIG5lZWRlZCB3aGVu
-IHdlIGhhdmUgbWV0YWRhdGEtcHJlYWxsb2NhdGVkIGltYWdlLg0KPiANCj4gU28sIGxldCdzIGRl
-dGVjdCBtZXRhZGF0YS1wcmVhbGxvY2F0aW9uIGNhc2UgYW5kIGRvbid0IGRpZyBxY293MidzDQo+
-IHByb3RvY29sIGZpbGUgaW4gb3RoZXIgY2FzZXMuDQo+IA0KPiBUaGUgaWRlYSBpcyB0byBjb21w
-YXJlIGFsbG9jYXRpb24gc2l6ZSBpbiBQT1Ygb2YgZmlsZXN5c3RlbSB3aXRoDQo+IGFsbG9jYXRp
-b25zIHNpemUgaW4gUE9WIG9mIFFjb3cyIChieSByZWZjb3VudHMpLiBJZiBhbGxvY2F0aW9uIGlu
-IGZzIGlzDQo+IHNpZ25pZmljYW50bHkgbG93ZXIsIGNvbnNpZGVyIGl0IGFzIG1ldGFkYXRhLXBy
-ZWFsbG9jYXRpb24gY2FzZS4NCj4gDQo+IFN1Z2dlc3RlZC1ieTogRGVuaXMgVi4gTHVuZXYgPGRl
-bkBvcGVudnoub3JnPg0KPiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+IC0tLQ0KPiANCj4gSGkhDQo+IA0KPiBT
-bywgdG8gY29udGludWUgdGFsayBhYm91dCBsc2Vlay9ubyBsc2VlayB3aGVuIHFjb3cyIGJsb2Nr
-X3N0YXR1cyByZXBvcnRzDQo+IERBVEEuDQo+IA0KPiBSZXN1bHRzIG9uIHRtcGZzOg0KPiBjYWNo
-ZWQgaXMgbHNlZWsgY2FjaGUgYnkgS2V2aW4NCj4gZGV0ZWN0IGlzIHRoaXMgcGF0Y2gNCj4gbm8g
-bHNlZWsgaXMganVzdCByZW1vdmUgYmxvY2tfc3RhdHVzIHF1ZXJ5IG9uIGJzLT5maWxlLT5icyBp
-bg0KPiAgICAgICAgICAgYmRydl9jb19ibG9ja19zdGF0dXMNCj4gDQo+ICAgICAgKy0tLS0tLS0t
-LS0tLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tKw0KPiAg
-ICAgIHwgICAgICAgICAgICAgICAgICAgICB8IG1hc3RlciB8IGNhY2hlZCB8IGRldGVjdCB8IG5v
-IGxzZWVrIHwNCj4gICAgICArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0t
-Ky0tLS0tLS0tKy0tLS0tLS0tLS0rDQo+ICAgICAgfCB0ZXN0LnFjb3cyICAgICAgICAgIHwgODAg
-ICAgIHwgNDAgICAgIHwgMC4xNjkgIHwgMC4xNjIgICAgfA0KPiAgICAgICstLS0tLS0tLS0tLS0t
-LS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLSsNCj4gICAgICB8
-IHRlc3RfZm9yd2FyZC5xY293MiAgfCA3OSAgICAgfCAwLjE3MSAgfCAwLjE2OSAgfCAwLjE2MyAg
-ICB8DQo+ICAgICAgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0t
-LS0tLSstLS0tLS0tLS0tKw0KPiAgICAgIHwgdGVzdF9wcmVhbGxvYy5xY293MiB8IDAuMDU0ICB8
-IDAuMDUzICB8IDAuMDU1ICB8IDAuMjYzICAgIHwNCj4gICAgICArLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0rDQoNCkZvcmdvdCB0byBz
-YXksIHRlc3RzIGJ5IEtldmluIGZyb20gYnJhbmNoDQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJj
-aGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOS0wMS9tc2cwNTQ2My5odG1sDQoNCkhtbS4gRG9uJ3Qg
-d2UgaGF2ZSBzb21ldGhpbmcgbGlrZSB0ZXN0cy9xZW11LWlvdGVzdHMsIGJ1dCBmb3IgcGVyZm9y
-bWFuY2U/DQpTbywgYWxsIHRoZXNlIHNtYWxsIHByZXR0eSB0ZXN0cyB3ZSBoYXZlIGluIG1haWxp
-bmcgbGlzdCBtYXkgZ28gYXMgZ2l0IHBhdGNoZXM/DQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQo=
+On 2019-01-25 11:06, Paolo Bonzini wrote:
+> ARM does not have an ISA bus, this device should not be enabled.  Kconfig
+> catches the contradiction because ARM does not define CONFIG_ISA_BUS.
+
+That description is a little bit wrong, since ARM includes pci.mak, and
+pci.mak enables CONFIG_ISA_BUS=y for the IDE code.
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/arm-softmmu.mak | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 2420491..3c9351f 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -6,7 +6,6 @@ CONFIG_VGA=y
+>  CONFIG_NAND=y
+>  CONFIG_ECC=y
+>  CONFIG_SERIAL=y
+> -CONFIG_SERIAL_ISA=y
+>  CONFIG_PTIMER=y
+>  CONFIG_SD=y
+>  CONFIG_MAX7310=y
+
+Anyway, looking through the code and the description of commit
+1401c322c8d431fa750cff8276 I think you're right that CONFIG_SERIAL_ISA
+is not required for ARM, so if you change the commit message a little bit:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
