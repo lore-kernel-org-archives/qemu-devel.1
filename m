@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58437)
+Received: from eggs.gnu.org ([209.51.188.92]:58507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyP1-0007ut-Ij
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:08:02 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyP3-0007xN-Se
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyOz-00029S-NZ
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:59 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42342)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyP2-0002DP-Rw
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:08:01 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gmyOz-00028e-ER
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:57 -0500
-Received: by mail-wr1-x444.google.com with SMTP id q18so9614330wrx.9
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 02:07:57 -0800 (PST)
+	id 1gmyP2-0002Co-KF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:08:00 -0500
+Received: by mail-wr1-x444.google.com with SMTP id x10so9615122wrs.8
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 02:08:00 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 25 Jan 2019 11:07:02 +0100
-Message-Id: <1548410831-19553-44-git-send-email-pbonzini@redhat.com>
+Date: Fri, 25 Jan 2019 11:07:05 +0100
+Message-Id: <1548410831-19553-47-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
 References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 43/52] i2c: express dependencies with Kconfig
+Subject: [Qemu-devel] [PATCH 46/52] hyperv: express dependencies with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,219 +30,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: yang.zhong@intel.com, thuth@redhat.com
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+From: Yang Zhong <yang.zhong@intel.com>
+
+remove default-configs/hyperv.mak and make dependencies
+with Kconfig.
+
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190123065618.3520-38-yang.zhong@intel.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190123065618.3520-41-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/i386-softmmu.mak | 2 --
- hw/Makefile.objs                 | 2 +-
- hw/audio/Kconfig                 | 1 +
- hw/display/Kconfig               | 3 +++
- hw/gpio/Kconfig                  | 1 +
- hw/i2c/Kconfig                   | 6 ++++++
- hw/i386/Kconfig                  | 1 +
- hw/input/Kconfig                 | 1 +
- hw/isa/Kconfig                   | 1 +
- hw/misc/Kconfig                  | 4 ++++
- hw/timer/Kconfig                 | 3 +++
- 11 files changed, 22 insertions(+), 3 deletions(-)
+ default-configs/hyperv.mak       | 2 --
+ default-configs/i386-softmmu.mak | 1 -
+ hw/hyperv/Kconfig                | 4 ++++
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+ delete mode 100644 default-configs/hyperv.mak
 
+diff --git a/default-configs/hyperv.mak b/default-configs/hyperv.mak
+deleted file mode 100644
+index 5d0d9fd..0000000
+--- a/default-configs/hyperv.mak
++++ /dev/null
+@@ -1,2 +0,0 @@
+-CONFIG_HYPERV=$(CONFIG_KVM)
+-CONFIG_HYPERV_TESTDEV=y
 diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 9eb9a5e..4aa04e4 100644
+index 4aa04e4..42435d7 100644
 --- a/default-configs/i386-softmmu.mak
 +++ b/default-configs/i386-softmmu.mak
-@@ -22,8 +22,6 @@ CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
--CONFIG_SMBUS_EEPROM=y
--CONFIG_I2C=y
- CONFIG_PCI_DEVICES=y
+@@ -1,6 +1,5 @@
+ # Default configuration for i386-softmmu
  
- # Boards:
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index e2fcd6a..225f6cc 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -10,7 +10,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += display/
- devices-dirs-$(CONFIG_SOFTMMU) += dma/
- devices-dirs-$(CONFIG_SOFTMMU) += gpio/
- devices-dirs-$(CONFIG_HYPERV) += hyperv/
--devices-dirs-$(CONFIG_SOFTMMU) += i2c/
-+devices-dirs-$(CONFIG_I2C) += i2c/
- devices-dirs-$(CONFIG_SOFTMMU) += ide/
- devices-dirs-$(CONFIG_SOFTMMU) += input/
- devices-dirs-$(CONFIG_SOFTMMU) += intc/
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index 01aea55..e9c6fed 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -40,6 +40,7 @@ config PCSPK
+-include hyperv.mak
+ CONFIG_VMXNET3_PCI=y
+ CONFIG_VIRTIO_VGA=y
+ CONFIG_IPMI=y
+diff --git a/hw/hyperv/Kconfig b/hw/hyperv/Kconfig
+index be724b7..a178bac 100644
+--- a/hw/hyperv/Kconfig
++++ b/hw/hyperv/Kconfig
+@@ -1,5 +1,9 @@
+ config HYPERV
+     bool
++    default y if PC
++    depends on KVM
  
- config WM8750
+ config HYPERV_TESTDEV
      bool
-+    depends on I2C
- 
- config PL041
-     bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 64a5764..66044ca 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -24,9 +24,11 @@ config PL110
- 
- config SII9022
-     bool
-+    depends on I2C
- 
- config SSD0303
-     bool
-+    depends on I2C
- 
- config SSD0323
-     bool
-@@ -71,6 +73,7 @@ config MILKYMIST_TMU2
- 
- config SM501
-     bool
-+    depends on I2C
- 
- config TCX
-     bool
-diff --git a/hw/gpio/Kconfig b/hw/gpio/Kconfig
-index d0a4abf..9227cb5 100644
---- a/hw/gpio/Kconfig
-+++ b/hw/gpio/Kconfig
-@@ -1,5 +1,6 @@
- config MAX7310
-     bool
-+    depends on I2C
- 
- config PL061
-     bool
-diff --git a/hw/i2c/Kconfig b/hw/i2c/Kconfig
-index d6d4402..74c9328 100644
---- a/hw/i2c/Kconfig
-+++ b/hw/i2c/Kconfig
-@@ -3,18 +3,24 @@ config I2C
- 
- config SMBUS_EEPROM
-     bool
-+    depends on I2C
- 
- config DDC
-     bool
-+    depends on I2C
- 
- config VERSATILE_I2C
-     bool
-+    select I2C
- 
- config ACPI_SMBUS
-     bool
-+    select I2C
- 
- config BITBANG_I2C
-     bool
-+    select I2C
- 
- config IMX_I2C
-     bool
-+    select I2C
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 8814b7c..966c97c 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -27,6 +27,7 @@ config PC_ACPI
-     select ACPI_X86
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select SMBUS_EEPROM
-     depends on ACPI_SMBUS
- 
- config I440FX
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index bdb4237..ec014a9 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -3,6 +3,7 @@ config ADB
- 
- config LM832X
-     bool
-+    depends on I2C
- 
- config PCKBD
-     bool
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index 6f0812d..fcd87b4 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -19,6 +19,7 @@ config PIIX4
- config VT82C686
-     bool
-     select ISA_BUS
-+    select ACPI_SMBUS
- 
- config SMC37C669
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index ca051fb..0680d1e 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -7,9 +7,11 @@ config MAX111X
- 
- config TMP105
-     bool
-+    depends on I2C
- 
- config TMP421
-     bool
-+    depends on I2C
- 
- config ISA_DEBUG
-     bool
-@@ -34,6 +36,7 @@ config EDU
- 
- config PCA9552
-     bool
-+    depends on I2C
- 
- config PL310
-     bool
-@@ -100,3 +103,4 @@ config PVPANIC
- 
- config AUX
-     bool
-+    select I2C
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 7dbc121..e1a6e74 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -9,6 +9,7 @@ config A9_GTIMER
- 
- config DS1338
-     bool
-+    depends on I2C
- 
- config HPET
-     bool
-@@ -18,6 +19,7 @@ config I8254
- 
- config M41T80
-     bool
-+    depends on I2C
- 
- config M48T59
-     bool
-@@ -27,6 +29,7 @@ config PL031
- 
- config TWL92230
-     bool
-+    depends on I2C
- 
- config XLNX_ZYNQMP
-     bool
++    default y if PC
++    depends on HYPERV
 -- 
 1.8.3.1
