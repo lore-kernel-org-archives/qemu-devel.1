@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40147)
+Received: from eggs.gnu.org ([209.51.188.92]:40211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gn0zt-0007Ns-El
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1gn0zv-0007PK-U8
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gn0tj-000832-3z
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:47:51 -0500
-Received: from mail-bgr052101133058.outbound.protection.outlook.com
-	([52.101.133.58]:30025
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1gn0ti-00081W-Hc
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:47:51 -0500
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Fri, 25 Jan 2019 12:47:41 +0000
-Message-ID: <20190125124738.GB30730@rkaganb.sw.ru>
-References: <20190125114155.32062-1-vkuznets@redhat.com>
-	<20190125114155.32062-5-vkuznets@redhat.com>
-In-Reply-To: <20190125114155.32062-5-vkuznets@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <19BE3E419E3C2F48A3A21B74CC391CD3@eurprd08.prod.outlook.com>
+	(envelope-from <philmd@redhat.com>) id 1gn0r1-0006qs-AU
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:45:03 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn0r1-0006qa-3p
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:45:03 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r10so10128046wrs.10
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 04:45:03 -0800 (PST)
+References: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fa3b6ce0-0fc4-7ee8-653b-5c0aecfa6d30@redhat.com>
+Date: Fri, 25 Jan 2019 13:45:00 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
- pass-through mode
+In-Reply-To: <1548410602-16008-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] decodetree: re.fullmatch was added in 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,15 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
-> In many case we just want to give Windows guests all currently supported
-> Hyper-V enlightenments and that's where this new mode may come handy. We
-> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
+Cc'ing maintainers :P
 
-How is the compatibility ensured on migration between kernels reporting
-different feature sets?
+$ ./scripts/get_maintainer.pl -f scripts/decodetree.py
+Eduardo Habkost <ehabkost@redhat.com> (odd fixer:Python scripts)
+Cleber Rosa <crosa@redhat.com> (odd fixer:Python scripts)
 
-Roman.
+On 1/25/19 11:03 AM, Paolo Bonzini wrote:
+> Python 3 versions earlier than 3.4 do not have it, use the
+> same workaround that is in place for 3.0.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  scripts/decodetree.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+> index 0bc73b5..e342d27 100755
+> --- a/scripts/decodetree.py
+> +++ b/scripts/decodetree.py
+> @@ -204,7 +204,7 @@ def output(*args):
+>          output_fd.write(a)
+>  
+>  
+> -if sys.version_info >= (3, 0):
+> +if sys.version_info >= (3, 4):
+>      re_fullmatch = re.fullmatch
+>  else:
+>      def re_fullmatch(pat, str):
+> 
