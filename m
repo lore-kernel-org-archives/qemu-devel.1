@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51214)
+Received: from eggs.gnu.org ([209.51.188.92]:52422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn8BT-00043B-9B
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:34:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gn8Eo-00053J-2N
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn8BR-0000gB-8v
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:34:39 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 25 Jan 2019 21:34:02 +0100
-Message-Id: <20190125203402.18904-1-philmd@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gn8En-0003fn-Ai
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gn8El-0003bY-DU
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:05 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F5B1B0815
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 20:37:59 +0000 (UTC)
+References: <20190125172229.23025-1-cfergeau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f6a10395-fc93-cb19-6bfa-5ddc48e50ec7@redhat.com>
+Date: Fri, 25 Jan 2019 14:37:55 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH] ahci-test: Add dependency to qemu-img tool
+In-Reply-To: <20190125172229.23025-1-cfergeau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl"
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] qemu-io: Use error_[gs]et_progname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,62 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Since the ahci-test uses qemu-img, add a dependency to build it
-before using it.
-This fixes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl
+From: Eric Blake <eblake@redhat.com>
+To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <f6a10395-fc93-cb19-6bfa-5ddc48e50ec7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] qemu-io: Use error_[gs]et_progname()
+References: <20190125172229.23025-1-cfergeau@redhat.com>
+In-Reply-To: <20190125172229.23025-1-cfergeau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  $ gmake check-qtest V=3D1
-  QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3D=
-qemu-img tests/ahci-test
-  Failed to execute child process "/tmp/qemu-test.19tMRF/qemu-img" (No su=
-ch file or directory)
-  ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !err)
+On 1/25/19 11:22 AM, Christophe Fergeau wrote:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-RFC because while this dependency is valid, I don't think this is the
-clever way to solve this problem (which is, assuming the host
-distribution has the qemu-tools installed).
-I guess remember a thread about it (Eric, John?) where it was asked
-"What do we want to test, qemu-img or AHCI? Can we trust an unstable
-version of a tool to verify a device?"
+Don't forget the 0/2 cover letter for series :)
 
-Slighly related is when vm-tests expect qemu-img available:
-https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08415.html
+> qemu-io reimplements itself what
+> error_get_progname()/error_set_progname() already does.
+> This commit switches it to use this API from qemu-error.h
+>=20
+> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+> ---
+>  qemu-io.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+>=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  $ make vm-build-ubuntu.i386
-  Traceback (most recent call last):
-    File "source/qemu/tests/vm/basevm.py", line 236, in main
-      return vm.build_image(args.image)
-    File "tests/vm/ubuntu.i386", line 67, in build_image
-      subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
-  OSError: [Errno 2] No such file or directory
-  tests/vm/Makefile.include:23: recipe for target 'tests/vm/ubuntu.i386.i=
-mg' failed
-  make: *** [tests/vm/ubuntu.i386.img] Error 2
-
-A better fix would be checking those tools via ./configure...
----
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 19b4c0a696..5e03416c81 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -706,7 +706,7 @@ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $=
-(libqos-obj-y)
- tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
- tests/fdc-test$(EXESUF): tests/fdc-test.o
- tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc-obj-y)
--tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y)
-+tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-img$=
-(EXESUF)
- tests/ipmi-kcs-test$(EXESUF): tests/ipmi-kcs-test.o
- tests/ipmi-bt-test$(EXESUF): tests/ipmi-bt-test.o
- tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxLc6MACgkQp6FrSiUn
+Q2obWgf9Fh7YLDpU1U34MF3ucMsIanvuWp9YKqH7/Qzi9xes82wXW+r9jIXEeZ1D
+jh1GSbXJil+cp+N2ZAcZo6hLH+Td+HNCkOZOeVnMXUU4AWTE0dD60cCAcITzeNP1
++EmZKhUp4W6i6Ddliy77uJrevYm2Hw0Ina+jlBw6N0wHCvvQaMaqVnBt6d7MGIkb
+GvXCU5KR84ea+lfEJN1s9x+/C3C1iuH68kSBIyniYg0wdTw1WkIuvUBCpJzyrflE
+hfbl7cEy9qtZym6yZ6vZqXOK1SnF+0TzQP5cnNa0FuRXArzTZE6uCoZ05DBo5W7m
+gvCHv/cA3h8PxWGNGAXUIMid+RDwuA==
+=kfgE
+-----END PGP SIGNATURE-----
+
+--WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl--
