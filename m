@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36353)
+Received: from eggs.gnu.org ([209.51.188.92]:37452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gn5Ql-0004fP-7m
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:38:16 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gn5Uc-0008Hg-CY
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gn5CJ-00024D-PE
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:23:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47180)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gn5CJ-00023A-Jx
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:23:19 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2DD5413341
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 17:23:17 +0000 (UTC)
-From: Christophe Fergeau <cfergeau@redhat.com>
-Date: Fri, 25 Jan 2019 18:22:28 +0100
-Message-Id: <20190125172229.23025-1-cfergeau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gn5Ub-0003sQ-Ah
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:14 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:42827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gn5Ua-0003rW-T0
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:42:13 -0500
+Received: by mail-oi1-x235.google.com with SMTP id w13so8235264oiw.9
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 09:42:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 1/2] qemu-io: Use error_[gs]et_progname()
+References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 17:22:00 +0000
+Message-ID: <CAFEAcA-yAMQDNvTJF=EQCfqQB7BRYNVixESYd4tXxQuHLqYVYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/14] MIPS queue for January 25, 2019
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-qemu-io reimplements itself what
-error_get_progname()/error_set_progname() already does.
-This commit switches it to use this API from qemu-error.h
+On Fri, 25 Jan 2019 at 13:31, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit 8b7a3e1e5434b55d7710071b00af97c7086cab7a:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-24 15:04:47 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-january-25-2019
+>
+> for you to fetch changes up to e5a5b1bb7cfa2da3762f947003cba6a16fa242a1:
+>
+>   docs/qemu-cpu-models: Add MIPS/nanoMIPS QEMU supported CPU models (2019-01-24 17:48:33 +0100)
+>
+> ----------------------------------------------------------------
+>
+> MIPS queue for January 25, 2019:
+>
+>   - reorganization of MIPS TCG tests directories and files
+>   - documentation updates for MIPS
+>   - enabling I6500 core support
+>   - other misc MIPS fixes
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
----
- qemu-io.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+Applied, thanks.
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 6df7731af4..2c52ac0ade 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -34,8 +34,6 @@
-=20
- #define CMD_NOFILE_OK   0x01
-=20
--static char *progname;
--
- static BlockBackend *qemuio_blk;
- static bool quit_qemu_io;
-=20
-@@ -312,7 +310,7 @@ static char *get_prompt(void)
-     static char prompt[FILENAME_MAX + 2 /*"> "*/ + 1 /*"\0"*/ ];
-=20
-     if (!prompt[0]) {
--        snprintf(prompt, sizeof(prompt), "%s> ", progname);
-+        snprintf(prompt, sizeof(prompt), "%s> ", error_get_progname());
-     }
-=20
-     return prompt;
-@@ -525,7 +523,7 @@ int main(int argc, char **argv)
- #endif
-=20
-     module_call_init(MODULE_INIT_TRACE);
--    progname =3D g_path_get_basename(argv[0]);
-+    error_set_progname(argv[0]);
-     qemu_init_exec_dir(argv[0]);
-=20
-     qcrypto_init(&error_fatal);
-@@ -580,10 +578,10 @@ int main(int argc, char **argv)
-             break;
-         case 'V':
-             printf("%s version " QEMU_FULL_VERSION "\n"
--                   QEMU_COPYRIGHT "\n", progname);
-+                   QEMU_COPYRIGHT "\n", error_get_progname());
-             exit(0);
-         case 'h':
--            usage(progname);
-+            usage(error_get_progname());
-             exit(0);
-         case 'U':
-             force_share =3D true;
-@@ -600,13 +598,13 @@ int main(int argc, char **argv)
-             imageOpts =3D true;
-             break;
-         default:
--            usage(progname);
-+            usage(error_get_progname());
-             exit(1);
-         }
-     }
-=20
-     if ((argc - optind) > 1) {
--        usage(progname);
-+        usage(error_get_progname());
-         exit(1);
-     }
-=20
---=20
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
