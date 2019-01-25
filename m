@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55258)
+Received: from eggs.gnu.org ([209.51.188.92]:55562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4b8-0005Fc-Dt
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gn4cL-00063l-GU
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:46:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4b7-0006mV-Ik
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:54 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45739)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn4b7-0006l9-D6
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:53 -0500
-Received: by mail-wr1-f65.google.com with SMTP id t6so10953479wrr.12
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:44:52 -0800 (PST)
-References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
-	<f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
-Date: Fri, 25 Jan 2019 17:44:50 +0100
-MIME-Version: 1.0
-In-Reply-To: <f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw: input: set category of the i8042 device
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gn4cJ-0007Zu-Fn
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:46:09 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 25 Jan 2019 19:46:01 +0300
+Message-Id: <20190125164601.130556-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [RFC PATCH] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +17,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net, stefanha@redhat.com
 
-On 1/25/19 4:24 PM, Thomas Huth wrote:
-> On 2019-01-25 16:14, kumar sourav wrote:
->> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
->> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
->>
->> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
->> ---
->>  hw/input/pckbd.c | 1 +
+Hi all.
 
-It seems we have other potential cases:
+What about such a simple helper for a very often patter around
+qemu_iovec_init_external ?
 
-$ git grep -L 'set_bit(DEVICE_CATEGORY_INPUT' hw/input/*c
-hw/input/adb.c
-hw/input/hid.c
-hw/input/lm832x.c
-hw/input/milkymist-softusb.c
-hw/input/pckbd.c
-hw/input/pl050.c
-hw/input/ps2.c
-hw/input/pxa2xx_keypad.c
-hw/input/stellaris_input.c
-hw/input/tsc2005.c
-hw/input/tsc210x.c
-hw/input/virtio-input-hid.c
-hw/input/virtio-input-host.c
+If we like it, I'll update other callers of qemu_iovec_init_external.
 
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
->> index 3e66713b47..72e7d5f6cc 100644
->> --- a/hw/input/pckbd.c
->> +++ b/hw/input/pckbd.c
->> @@ -574,6 +574,7 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
->>  
->>      dc->realize = i8042_realizefn;
->>      dc->vmsd = &vmstate_kbd_isa;
->> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->>  }
->>  
->>  static const TypeInfo i8042_info = {
->>
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Possible interface change would be
+LOCAL_QIOV(lc, buf, len);
+instead of 
+LocalQiov lc = LOCAL_QIOV(lc, buf, len);
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+or, may be, someone has a better idea?
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/qemu/iov.h | 19 +++++++++++++++++++
+ block/io.c         |  9 ++-------
+ 2 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+index 5f433c7768..e0963d8ebe 100644
+--- a/include/qemu/iov.h
++++ b/include/qemu/iov.h
+@@ -137,6 +137,25 @@ typedef struct QEMUIOVector {
+     size_t size;
+ } QEMUIOVector;
+ 
++typedef struct LocalQiov {
++    QEMUIOVector qiov;
++    struct iovec iov;
++} LocalQiov;
++
++#define LOCAL_QIOV(self, buf, len)    \
++{                                     \
++    .qiov = {                         \
++        .iov = &self.iov,             \
++        .size = len,                  \
++        .niov = 1,                    \
++        .nalloc = -1                  \
++    },                                \
++    .iov = {                          \
++        .iov_base = (void *)(buf),    \
++        .iov_len = len                \
++    }                                 \
++}
++
+ void qemu_iovec_init(QEMUIOVector *qiov, int alloc_hint);
+ void qemu_iovec_init_external(QEMUIOVector *qiov, struct iovec *iov, int niov);
+ void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len);
+diff --git a/block/io.c b/block/io.c
+index bd9d688f8b..c7d7b199c1 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -949,18 +949,13 @@ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+ 
+ int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
+ {
+-    QEMUIOVector qiov;
+-    struct iovec iov = {
+-        .iov_base = (void *)buf,
+-        .iov_len = bytes,
+-    };
++    LocalQiov lq = LOCAL_QIOV(lq, buf, bytes);
+ 
+     if (bytes < 0) {
+         return -EINVAL;
+     }
+ 
+-    qemu_iovec_init_external(&qiov, &iov, 1);
+-    return bdrv_preadv(child, offset, &qiov);
++    return bdrv_preadv(child, offset, &lq.qiov);
+ }
+ 
+ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+-- 
+2.18.0
