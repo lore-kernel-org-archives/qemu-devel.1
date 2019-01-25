@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53825)
+Received: from eggs.gnu.org ([209.51.188.92]:58558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAux-0004RL-Go
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:29:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnB01-0005QN-Tz
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAuv-0002u7-JW
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:29:46 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34115)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAzw-0006Ts-78
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:34:57 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34961)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnAuu-0002lv-R1
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:29:45 -0500
-Received: by mail-pl1-x641.google.com with SMTP id w4so5245881plz.1
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 15:29:31 -0800 (PST)
+	id 1gnAzv-0006SI-Sv
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:34:56 -0500
+Received: by mail-pg1-x544.google.com with SMTP id s198so4825528pgs.2
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 15:34:55 -0800 (PST)
 References: <1648289.tQCHxfjYn9@basile.remlab.net>
-	<20190125214926.3204-1-remi@remlab.net>
+	<20190125214926.3204-2-remi@remlab.net>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <02a680e1-c20c-2ecb-2926-6250fddf9e76@linaro.org>
-Date: Fri, 25 Jan 2019 15:29:27 -0800
+Message-ID: <5a4b45fe-0ed1-ba58-c2ff-a8d3ad78e4a8@linaro.org>
+Date: Fri, 25 Jan 2019 15:34:51 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190125214926.3204-1-remi@remlab.net>
+In-Reply-To: <20190125214926.3204-2-remi@remlab.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/arm: fix AArch64 virtual
- address space size
+Subject: Re: [Qemu-devel] [PATCH 2/3] target/arm: actually enable PAuth in
+ user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,52 +38,38 @@ Cc: qemu-devel@nongnu.org
 On 1/25/19 1:49 PM, Rémi Denis-Courmont wrote:
 > From: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
 > 
-> Since QEMU does not support the ARMv8.2-LVA, Large Virtual Address,
-> extension (yet), the VA address space is signed 48-bits. User mode can
-> only handle the positive half of the address space, so that makes a
-> limit of 47 bits.
+> This always enables IA, IB, DA and DB keys in user mode on the maximum
+> CPU, in a manner that is consistent with the other CPUs. That is to say
+> redefining the reset value of SCTLR_ELx registers.
 > 
-> (With LVA, it would be 52 and 51 bits respectively.)
-> 
-> The incorrectly large address space conflicts with PAuth instructions,
-> which bits 48-54 and 56-63 for the pointer authentication code. This
-> also conflicts with (as yet unsupported by QEMU) data tagging and with
-> the ARMv8.5-MTE extension.
+> Without this patch, the PAC* and AUT* instructions have no effects
+> (except PACGA of course).
 > 
 > Signed-off-by: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
 > ---
->  target/arm/cpu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/arm/cpu64.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index ff81db420d..2ccd04b8f7 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2503,7 +2503,7 @@ bool write_cpustate_to_list(ARMCPU *cpu);
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index e9bc461c36..148c103ca4 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -413,8 +413,8 @@ static void aarch64_max_initfn(Object *obj)
+>                                  (void *)&apdb_bit, &error_fatal);
 >  
->  #if defined(TARGET_AARCH64)
->  #  define TARGET_PHYS_ADDR_SPACE_BITS 48
-> -#  define TARGET_VIRT_ADDR_SPACE_BITS 64
-> +#  define TARGET_VIRT_ADDR_SPACE_BITS 47
->  #else
->  #  define TARGET_PHYS_ADDR_SPACE_BITS 40
->  #  define TARGET_VIRT_ADDR_SPACE_BITS 32
-> 
+>              /* Enable all PAC keys by default.  */
+> -            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
+> -            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
+> +            cpu->reset_sctlr |= SCTLR_EnIA | SCTLR_EnIB;
+> +            cpu->reset_sctlr |= SCTLR_EnDA | SCTLR_EnDB;
 
+I just sent another patch for this:
+http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06737.html
 
-This doesn't really conflict, as this doesn't affect much besides the sizing of
-the PageDesc for page_find.
+This way is valid as well, but would also need to adjust the property callbacks
+to modify reset_sctlr as well.
 
-It's true adjusting this is worthwhile.  The current setting requires 7 levels
-(6 * 10 bits + 1 * 4 bits), whereas a 48-bit address space only requires 5
-levels (4 * 10 bits + 8 bits).  Even for LVA it will be (4 * 10 + 1 * 12 bits).
-
-This will both save memory and reduce the time required for TranlationBlock
-maintenance.
-
-Your choice of 47 is wrong.  This value is also used for system mode, and the
-kernel does use the negative half of the address space, so we need to have all
-48 bits here.
+Peter, do you have a preference?
 
 
 r~
