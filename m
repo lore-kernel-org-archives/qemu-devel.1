@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58424)
+Received: from eggs.gnu.org ([209.51.188.92]:58415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyP2-0007sQ-GW
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyP2-0007rB-K4
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyOu-00023c-OJ
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:54 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40513)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gmyOt-00021T-2V
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:53 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gmyOu-00022Z-HA
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:52 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f188so5997750wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 02:07:52 -0800 (PST)
+	id 1gmyOs-00020b-PC
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:07:50 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d15so6163696wmb.3
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 02:07:50 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 25 Jan 2019 11:06:57 +0100
-Message-Id: <1548410831-19553-39-git-send-email-pbonzini@redhat.com>
+Date: Fri, 25 Jan 2019 11:06:55 +0100
+Message-Id: <1548410831-19553-37-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
 References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 38/52] build: convert sound.mak to Kconfig
+Subject: [Qemu-devel] [PATCH 36/52] hw/pci/Makefile.objs: make pcie
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +29,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, thuth@redhat.com
+Cc: yang.zhong@intel.com, thuth@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-There is really nothing special in these devices; they are just
-ISA devices.  Instead of including them for each target,
-set CONFIG_ISA_BUS to true, and make the devices default to present
-whenever ISA is available.  More conversion of ISA devices will
-follow.
+From: Yang Zhong <yang.zhong@intel.com>
 
-Done with the following script:
+Make pcie splited from pci and make it configurable.
 
-  while read i; do
-     i=${i%=y}; i=${i#CONFIG_}
-     sed -i -e'/^config '$i'$/!b' -en \
-            -e'a\' -e'    default y\' -e'    depends on ISA_BUS' \
-          `grep -lw $i hw/*/Kconfig`
-  done < default-configs/sound.mak
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190123065618.3520-32-yang.zhong@intel.com>
+Message-Id: <20190123065618.3520-30-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/i386-softmmu.mak        | 2 +-
- default-configs/mips-softmmu-common.mak | 2 +-
- default-configs/ppc-softmmu.mak         | 2 +-
- default-configs/sound.mak               | 4 ----
- hw/audio/Kconfig                        | 8 ++++++++
- 5 files changed, 11 insertions(+), 7 deletions(-)
- delete mode 100644 default-configs/sound.mak
+ default-configs/arm-softmmu.mak      | 1 +
+ default-configs/i386-softmmu.mak     | 1 +
+ default-configs/mips64el-softmmu.mak | 1 +
+ default-configs/ppc-softmmu.mak      | 1 +
+ default-configs/riscv32-softmmu.mak  | 1 +
+ default-configs/riscv64-softmmu.mak  | 1 +
+ hw/pci/Kconfig                       | 4 ++++
+ hw/pci/Makefile.objs                 | 9 +++++++--
+ 8 files changed, 17 insertions(+), 2 deletions(-)
 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index b0995a0..59cf3d2 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -121,6 +121,7 @@ CONFIG_VERSATILE=y
+ CONFIG_VERSATILE_PCI=y
+ CONFIG_VERSATILE_I2C=y
+ 
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ CONFIG_VFIO_PLATFORM=y
+ CONFIG_VFIO_XGMAC=y
 diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index a139bd5..9eb9351 100644
+index 412c8c5..b5281d3 100644
 --- a/default-configs/i386-softmmu.mak
 +++ b/default-configs/i386-softmmu.mak
-@@ -2,7 +2,7 @@
- 
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
--include sound.mak
-+CONFIG_ISA_BUS=y
- include usb.mak
- include hyperv.mak
- CONFIG_VGA_ISA=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index 246af88..981ea2c 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -1,7 +1,7 @@
- # Common mips*-softmmu CONFIG defines
- 
--include sound.mak
- include usb.mak
-+CONFIG_ISA_BUS=y
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
- CONFIG_ESP=y
+@@ -44,6 +44,7 @@ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+ CONFIG_SGA=y
+ CONFIG_LPC_ICH9=y
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_Q35=y
+ CONFIG_APIC=y
+ CONFIG_IOAPIC=y
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index 9eb1208..c6ad4da 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -12,4 +12,5 @@ CONFIG_JAZZ_LED=y
+ CONFIG_VT82C686=y
+ CONFIG_MIPS_BOSTON=y
+ CONFIG_FITLOADER=y
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_XILINX=y
 diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 763184f..dba071a 100644
+index 90118cb..47e4177 100644
 --- a/default-configs/ppc-softmmu.mak
 +++ b/default-configs/ppc-softmmu.mak
-@@ -1,9 +1,9 @@
- # Default configuration for ppc-softmmu
+@@ -23,6 +23,7 @@ CONFIG_ETSEC=y
+ CONFIG_PPC405=y
+ CONFIG_PPC440=y
+ CONFIG_VIRTEX=y
++CONFIG_PCI_EXPRESS=y
  
--include sound.mak
- include usb.mak
- CONFIG_PCI=y
- CONFIG_PCI_DEVICES=y
-+CONFIG_ISA_BUS=y
+ # For Sam460ex
+ CONFIG_SAM460EX=y
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index 6533716..8c3a91a 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -8,6 +8,7 @@ CONFIG_VIRTIO_MMIO=y
  
- # For embedded PPCs:
- CONFIG_PPC4XX=y
-diff --git a/default-configs/sound.mak b/default-configs/sound.mak
-deleted file mode 100644
-index 4f22c34..0000000
---- a/default-configs/sound.mak
-+++ /dev/null
-@@ -1,4 +0,0 @@
--CONFIG_SB16=y
--CONFIG_ADLIB=y
--CONFIG_GUS=y
--CONFIG_CS4231A=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index aa5c82b..dedb513 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -1,5 +1,7 @@
- config SB16
+ CONFIG_CADENCE=y
+ 
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index 6533716..8c3a91a 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -8,6 +8,7 @@ CONFIG_VIRTIO_MMIO=y
+ 
+ CONFIG_CADENCE=y
+ 
++CONFIG_PCI_EXPRESS=y
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+ 
+ CONFIG_VGA=y
+diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
+index d3d2205..4ca2537 100644
+--- a/hw/pci/Kconfig
++++ b/hw/pci/Kconfig
+@@ -1,2 +1,6 @@
+ config PCI
      bool
-+    default y
-+    depends on ISA_BUS
++
++config PCI_EXPRESS
++    bool
++    select PCI
+diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+index 9f905e6..c78f2fb 100644
+--- a/hw/pci/Makefile.objs
++++ b/hw/pci/Makefile.objs
+@@ -2,8 +2,13 @@ common-obj-$(CONFIG_PCI) += pci.o pci_bridge.o
+ common-obj-$(CONFIG_PCI) += msix.o msi.o
+ common-obj-$(CONFIG_PCI) += shpc.o
+ common-obj-$(CONFIG_PCI) += slotid_cap.o
+-common-obj-$(CONFIG_PCI) += pci_host.o pcie_host.o
+-common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
++common-obj-$(CONFIG_PCI) += pci_host.o
++
++# The functions in these modules can be used by devices too.  Since we
++# allow plugging PCIe devices into PCI buses, include them even if
++# CONFIG_PCI_EXPRESS=n.
++common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o
++common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
  
- config ES1370
-     bool
-@@ -13,12 +15,18 @@ config AC97
- 
- config ADLIB
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config GUS
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config CS4231A
-     bool
-+    default y
-+    depends on ISA_BUS
- 
- config HDA
-     bool
+ common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+ common-obj-$(CONFIG_ALL) += pci-stub.o
 -- 
 1.8.3.1
