@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59563)
+Received: from eggs.gnu.org ([209.51.188.92]:59855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gmpcF-0007s8-GV
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:45:04 -0500
+	(envelope-from <palmer@sifive.com>) id 1gmpd1-00006z-SU
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:45:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gmpbw-000503-Eg
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:44:46 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40149)
+	(envelope-from <palmer@sifive.com>) id 1gmpUV-0000Cr-LD
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:37:04 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gmpbs-0004qo-Jf
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:44:42 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i12so3864007pfo.7
-	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 16:44:39 -0800 (PST)
-References: <20190124124906.16653-1-laurent@vivier.eu>
-	<20190124124906.16653-4-laurent@vivier.eu>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <f0694cd3-9d9d-8c40-d11f-022fc3b5c147@ozlabs.ru>
-Date: Fri, 25 Jan 2019 11:44:30 +1100
-MIME-Version: 1.0
-In-Reply-To: <20190124124906.16653-4-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 3/5] ppc: e6500 registers SPR 604
- twice
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gmpUV-0000C4-GB
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 19:37:03 -0500
+Received: by mail-pf1-x444.google.com with SMTP id b85so3867631pfc.3
+	for <qemu-devel@nongnu.org>; Thu, 24 Jan 2019 16:37:03 -0800 (PST)
+Date: Thu, 24 Jan 2019 16:37:01 -0800 (PST)
+In-Reply-To: <f7184f107ba99dab6b85da6916fc09663ffd3e21.1547510220.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-3c01575f-3b0a-4ee3-be42-260e5bb39956@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 8/8] RISC-V: Add misa runtime write
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Jon Diekema <jon.diekema@ge.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>
 
-
-
-On 24/01/2019 23:49, Laurent Vivier wrote:
-> From: Jon Diekema <jon.diekema@ge.com>
-> 
-> When using the e6500 CPU, QEMU generates a fatal error after
-> complaining about registering SPR 604 twice.
-> 
-> Building and testing with commit
-> 9b2e891ec5ccdb4a7d583b77988848282606fdea shows the issue:
-> 
-> qemu-system-ppc64 --version
-> QEMU emulator version 3.1.50 (v3.1.0-456-g9b2e891ec5-dirty)
-> Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
-> 
-> qemu-system-ppc64 -M none -cpu e6500
-> Error: Trying to register SPR 604 (25c) twice !
-> 
-> Signed-off-by: Jon Diekema <jon.diekema@ge.com>
-> Message-Id: <CALvuzg43uSodseEHjNaRcPFBKKPTY2mcppUbYgiLL=QO9RxX_Q@mail.gmail.com>
-> [removed duplicated mail header in the commit message]
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+On Mon, 14 Jan 2019 15:59:00 PST (-0800), Alistair Francis wrote:
+> From: Michael Clark <mjc@sifive.com>
+>
+> This patch adds support for writing misa. misa is validated based
+> on rules in the ISA specification. 'E' is mutually exclusive with
+> all other extensions. 'D' depends on 'F' so 'D' bit is dropped
+> if 'F' is not present. A conservative approach to consistency is
+> taken by flushing the translation cache on misa writes. misa_mask
+> is added to the CPU struct to store the original set of extensions.
+>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/ppc/translate_init.inc.c | 8 --------
->  1 file changed, 8 deletions(-)
-> 
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-> index ade06cc773..59e0b86762 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -4947,14 +4947,6 @@ static void init_proc_e500(CPUPPCState *env, int version)
->      }
+>  target/riscv/cpu.c      |  2 +-
+>  target/riscv/cpu.h      |  4 ++-
+>  target/riscv/cpu_bits.h | 11 +++++++++
+>  target/riscv/csr.c      | 54 ++++++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 68 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 28d7e5302f..cc3ddc0ae4 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -88,7 +88,7 @@ typedef struct RISCVCPUInfo {
 >  
->      if (version == fsl_e6500) {
-> -        spr_register(env, SPR_BOOKE_SPRG8, "SPRG8",
-> -                     SPR_NOACCESS, SPR_NOACCESS,
-> -                     &spr_read_generic, &spr_write_generic,
-> -                     0x00000000);
-> -        spr_register(env, SPR_BOOKE_SPRG9, "SPRG9",
-> -                     SPR_NOACCESS, SPR_NOACCESS,
-> -                     &spr_read_generic, &spr_write_generic,
-> -                     0x00000000);
+>  static void set_misa(CPURISCVState *env, target_ulong misa)
+>  {
+> -    env->misa = misa;
+> +    env->misa_mask = env->misa = misa;
+>  }
+>  
+>  static void set_versions(CPURISCVState *env, int user_ver, int priv_ver)
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index a97435bd7b..5c2aebf132 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -86,7 +86,8 @@
+>     so a cpu features bitfield is required, likewise for optional PMP support */
+>  enum {
+>      RISCV_FEATURE_MMU,
+> -    RISCV_FEATURE_PMP
+> +    RISCV_FEATURE_PMP,
+> +    RISCV_FEATURE_MISA
+>  };
+>  
+>  #define USER_VERSION_2_02_0 0x00020200
+> @@ -118,6 +119,7 @@ struct CPURISCVState {
+>      target_ulong user_ver;
+>      target_ulong priv_ver;
+>      target_ulong misa;
+> +    target_ulong misa_mask;
+>  
+>      uint32_t features;
+>  
+> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+> index 5439f4719e..7afcb2468d 100644
+> --- a/target/riscv/cpu_bits.h
+> +++ b/target/riscv/cpu_bits.h
+> @@ -311,10 +311,21 @@
+>  #define MSTATUS32_SD        0x80000000
+>  #define MSTATUS64_SD        0x8000000000000000ULL
+>  
+> +#define MISA32_MXL          0xC0000000
+> +#define MISA64_MXL          0xC000000000000000ULL
+> +
+> +#define MXL_RV32            1
+> +#define MXL_RV64            2
+> +#define MXL_RV128           3
+> +
+>  #if defined(TARGET_RISCV32)
+>  #define MSTATUS_SD MSTATUS32_SD
+> +#define MISA_MXL MISA32_MXL
+> +#define MXL_VAL MXL_RV32
+>  #elif defined(TARGET_RISCV64)
+>  #define MSTATUS_SD MSTATUS64_SD
+> +#define MISA_MXL MISA64_MXL
+> +#define MXL_VAL MXL_RV64
+>  #endif
+>  
+>  /* sstatus CSR bits */
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index e2bd374f09..e72fcf1265 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -332,6 +332,58 @@ static int read_misa(CPURISCVState *env, int csrno, target_ulong *val)
+>      return 0;
+>  }
+>  
+> +static int write_misa(CPURISCVState *env, int csrno, target_ulong val)
+> +{
+> +    if (!riscv_feature(env, RISCV_FEATURE_MISA)) {
+> +        /* drop write to misa */
+> +        return 0;
+> +    }
+> +
+> +    /* 'I' or 'E' must be present */
+> +    if (!(val & (RVI | RVE))) {
+> +        /* It is not, drop write to misa */
+> +        return 0;
+> +    }
+> +
+> +    /* 'E' excludes all other extensions */
+> +    if (val & RVE) {
+> +        /* when we support 'E' we can do "val = RVE;" however
+> +         * for now we just drop writes if 'E' is present.
+> +         */
+> +        return 0;
+> +    }
+> +
+> +    /* Mask extensions that are not supported by this hart */
+> +    val &= env->misa_mask;
+> +
+> +    /* Mask extensions that are not supported by QEMU */
+> +    val &= (RVI | RVE | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+> +
+> +    /* 'D' depends on 'F', so clear 'D' if 'F' is not present */
+> +    if ((val & RVD) && !(val & RVF)) {
+> +        val &= ~RVD;
+> +    }
+> +
+> +    /* Suppress 'C' if next instruction is not aligned
+> +     * TODO: this should check next_pc
+> +     */
+> +    if ((val & RVC) && (GETPC() & ~3) != 0) {
+> +        val &= ~RVC;
+> +    }
+> +
+> +    /* misa.MXL writes are not supported by QEMU */
+> +    val = (env->misa & MISA_MXL) | (val & ~MISA_MXL);
+> +
+> +    /* flush translation cache */
+> +    if (val != env->misa) {
+> +        tb_flush(CPU(riscv_env_get_cpu(env)));
+> +    }
+> +
+> +    env->misa = val;
+> +
+> +    return 0;
+> +}
+> +
+>  static int read_medeleg(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>      *val = env->medeleg;
+> @@ -810,7 +862,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+>  
+>      /* Machine Trap Setup */
+>      [CSR_MSTATUS] =             { any,  read_mstatus,     write_mstatus     },
+> -    [CSR_MISA] =                { any,  read_misa                           },
+> +    [CSR_MISA] =                { any,  read_misa,        write_misa        },
+>      [CSR_MIDELEG] =             { any,  read_mideleg,     write_mideleg     },
+>      [CSR_MEDELEG] =             { any,  read_medeleg,     write_medeleg     },
+>      [CSR_MIE] =                 { any,  read_mie,         write_mie         },
+> -- 
+> 2.19.1
 
-
-Out of curiosity - does every BookE board have these?
-
-
->          /* Thread identification */
->          spr_register(env, SPR_TIR, "TIR",
->                       SPR_NOACCESS, SPR_NOACCESS,
-> 
-
--- 
-Alexey
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
