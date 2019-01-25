@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36788)
+Received: from eggs.gnu.org ([209.51.188.92]:36814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAe4-0004rv-0G
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:22 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004sK-Si
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAPf-0005Pd-6C
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:31 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42761)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAPa-0005Kp-A5
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:23 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46741)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnAPe-0005Od-So
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:27 -0500
-Received: by mail-pl1-x641.google.com with SMTP id y1so5198329plp.9
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:26 -0800 (PST)
+	id 1gnAPa-0005JV-3w
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:22 -0500
+Received: by mail-pf1-x442.google.com with SMTP id c73so5375584pfe.13
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:22 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 25 Jan 2019 14:57:14 -0800
-Message-Id: <20190125225714.10234-8-richard.henderson@linaro.org>
+Date: Fri, 25 Jan 2019 14:57:10 -0800
+Message-Id: <20190125225714.10234-4-richard.henderson@linaro.org>
 In-Reply-To: <20190125225714.10234-1-richard.henderson@linaro.org>
 References: <20190125225714.10234-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 6/6] tests/tcg/aarch64: Add pauth smoke tests
+Subject: [Qemu-devel] [PATCH 2/6] aarch64-linux-user: Update HWCAP bits from
+ linux 5.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +32,28 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/tcg/aarch64/pauth-1.c       | 23 +++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.target |  7 ++++++-
- 2 files changed, 29 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/aarch64/pauth-1.c
+ linux-user/elfload.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/tests/tcg/aarch64/pauth-1.c b/tests/tcg/aarch64/pauth-1.c
-new file mode 100644
-index 0000000000..9bd8d28ede
---- /dev/null
-+++ b/tests/tcg/aarch64/pauth-1.c
-@@ -0,0 +1,23 @@
-+#include <assert.h>
-+#include <sys/prctl.h>
-+
-+asm(".arch armv8.4-a");
-+
-+#ifndef PR_PAC_RESET_KEYS
-+#define PR_PAC_RESET_KEYS  54
-+#define PR_PAC_APDAKEY     (1 << 2)
-+#endif
-+
-+int main()
-+{
-+    int x;
-+    void *p0 = &x, *p1, *p2;
-+
-+    asm volatile("pacdza %0" : "=r"(p1) : "0"(p0));
-+    prctl(PR_PAC_RESET_KEYS, PR_PAC_APDAKEY);
-+    asm volatile("pacdza %0" : "=r"(p2) : "0"(p0));
-+
-+    assert(p1 != p0);
-+    assert(p1 != p2);
-+    return 0;
-+}
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 08c45b8470..e80d07276c 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -8,10 +8,15 @@ VPATH 		+= $(AARCH64_SRC)
- # we don't build any of the ARM tests
- AARCH64_TESTS=$(filter-out $(ARM_TESTS), $(TESTS))
- AARCH64_TESTS+=fcvt
--TESTS:=$(AARCH64_TESTS)
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 4cff9e1a31..3c7a7c2836 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -560,6 +560,15 @@ enum {
+     ARM_HWCAP_A64_ASIMDDP       = 1 << 20,
+     ARM_HWCAP_A64_SHA512        = 1 << 21,
+     ARM_HWCAP_A64_SVE           = 1 << 22,
++    ARM_HWCAP_A64_ASIMDFHM      = 1 << 23,
++    ARM_HWCAP_A64_DIT           = 1 << 24,
++    ARM_HWCAP_A64_USCAT         = 1 << 25,
++    ARM_HWCAP_A64_ILRCPC        = 1 << 26,
++    ARM_HWCAP_A64_FLAGM         = 1 << 27,
++    ARM_HWCAP_A64_SSBS          = 1 << 28,
++    ARM_HWCAP_A64_SB            = 1 << 29,
++    ARM_HWCAP_A64_PACA          = 1 << 30,
++    ARM_HWCAP_A64_PACG          = 1UL << 31,
+ };
  
- fcvt: LDFLAGS+=-lm
- 
- run-fcvt: fcvt
- 	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
- 	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
-+
-+AARCH64_TESTS += pauth-1
-+pauth-%: CFLAGS += -O -g
-+run-pauth-%: QEMU += -cpu max
-+
-+TESTS:=$(AARCH64_TESTS)
+ #define ELF_HWCAP get_elf_hwcap()
 -- 
 2.17.2
