@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57318)
+Received: from eggs.gnu.org ([209.51.188.92]:58074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gn2Ms-0002Cb-P2
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:22:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1gn2QP-0004RT-Ry
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gn2Ms-0004LX-3L
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:22:02 -0500
-Date: Fri, 25 Jan 2019 15:21:54 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190125152154.05120461.cohuck@redhat.com>
-In-Reply-To: <20190125150101.3b61f0a1@oc2783563651>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
-	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
-	<20190125112437.2c06fac6.cohuck@redhat.com>
-	<20190125135835.2d59b511.cohuck@redhat.com>
-	<20190125150101.3b61f0a1@oc2783563651>
+	(envelope-from <bounces@canonical.com>) id 1gn2QM-0006Ls-2c
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gn2QK-0006Id-8T
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:25:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gn2QH-0006Af-QL
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:25:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8E1BD2E80D2
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:25:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 25 Jan 2019 14:17:10 -0000
+From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
+Reply-To: Bug 1813307 <1813307@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154842583020.19428.9970935732154630086.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813307] [NEW] util/path.c/follow_path() does not
+ handle "/" well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, 25 Jan 2019 15:01:01 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Public bug reported:
 
-> On Fri, 25 Jan 2019 13:58:35 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
+Hello,
 
-> > - We currently do not want the user space to submit another channel
-> >   program while the first one is still in flight. As submitting another
-> >   one is a valid request, however, we should allow this in the future
-> >   (once we have the code to handle that in place).  
-> 
-> I don't agree. There is at most one channel program processed by a
-> subchannel at any time. I would prefer an early error code if channel
-> programs are issued on top of each other (our virtual subchannel
-> is channel pending or FC start function bit set or similar).
+I noticed that qemu does not handle "/" very well in follow_path().
 
-You can submit a new request if the subchannel is pending with primary,
-but not with secondary state.
+Specifically, I was trying to run gdbserver under qemu, and it failed
+inside its implementation of __getcwd.
 
-Regardless of that, I think it is much easier to push as much as
-possible of sorting out of requests to the hardware.
+Indeed it does something like
+  if (__lstat ("/", &st) < 0)
+.....
+and then loops from current dir toward the top using lstat("..")
+
+On qemu side, lstat forwards the request to follow_path() in util/path.c, a=
+nd when passed "/", it returns the path in QEMU_LD_PREFIX (which was the to=
+p of my sysroot).
+OTHT, the series of lstat("..") finally reaches the real device root becaus=
+e it's not recognized as "/" in follow_path(), so this is inconsistent and =
+__getcwd fails.
+
+I suppose there's a good reason for returning QEMU_LD_PREFIX when asking
+for "/", but why is it so?
+
+If there's no good reason, maybe the behaviour could be changed to map
+"/" to "/" ?
+
+Thanks
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813307
+
+Title:
+  util/path.c/follow_path() does not handle "/" well
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I noticed that qemu does not handle "/" very well in follow_path().
+
+  Specifically, I was trying to run gdbserver under qemu, and it failed
+  inside its implementation of __getcwd.
+
+  Indeed it does something like
+    if (__lstat ("/", &st) < 0)
+  .....
+  and then loops from current dir toward the top using lstat("..")
+
+  On qemu side, lstat forwards the request to follow_path() in util/path.c,=
+ and when passed "/", it returns the path in QEMU_LD_PREFIX (which was the =
+top of my sysroot).
+  OTHT, the series of lstat("..") finally reaches the real device root beca=
+use it's not recognized as "/" in follow_path(), so this is inconsistent an=
+d __getcwd fails.
+
+  I suppose there's a good reason for returning QEMU_LD_PREFIX when
+  asking for "/", but why is it so?
+
+  If there's no good reason, maybe the behaviour could be changed to map
+  "/" to "/" ?
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813307/+subscriptions
