@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54283)
+Received: from eggs.gnu.org ([209.51.188.92]:54915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmyAY-0001lu-Lf
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:53:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gmyCI-0002y0-QF
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmyAX-0000zC-K3
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:53:02 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41991)
+	(envelope-from <peter.maydell@linaro.org>) id 1gmyCG-00026g-Vc
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:54:50 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:40355)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmyAV-0000tQ-Mk
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:53:01 -0500
-Received: by mail-oi1-x244.google.com with SMTP id w13so7226710oiw.9
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 01:52:59 -0800 (PST)
+	id 1gmyCF-00024B-36
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:54:48 -0500
+Received: by mail-ot1-x331.google.com with SMTP id s5so7983360oth.7
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 01:54:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20190124040457.2546-1-doug16k@gmail.com>
-	<CAFEAcA9fVkGEMPUaSapn6YOV0DR_rS17pWKZHTxQz0aCM+et3g@mail.gmail.com>
-	<CAEfK_460635_tXwDLoKGhMQ7smz0Gy2OVLBMQpU8GrhxA02ywA@mail.gmail.com>
-In-Reply-To: <CAEfK_460635_tXwDLoKGhMQ7smz0Gy2OVLBMQpU8GrhxA02ywA@mail.gmail.com>
+References: <20190124122614.16624-1-berrange@redhat.com>
+In-Reply-To: <20190124122614.16624-1-berrange@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Jan 2019 09:52:46 +0000
-Message-ID: <CAFEAcA9AhBLS4J+bsv_srq0qw1PXeUF346Y_J0cujgfH+tFOJg@mail.gmail.com>
+Date: Fri, 25 Jan 2019 09:54:33 +0000
+Message-ID: <CAFEAcA8pqWZrJPy8ru8XXu7U6tHyVW66bcn-xYHrOVE+TawDgg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: Fix i386/x86_64 machine
- description and add control registers
+Subject: Re: [Qemu-devel] [PULL 0/1] Qio next patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Gale <doug16k@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 24 Jan 2019 at 20:29, Doug Gale <doug16k@gmail.com> wrote:
-> The machine description we send is being (silently) thrown on the floor b=
-y GDB and GDB silently uses the default machine description.
+On Thu, 24 Jan 2019 at 12:26, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
 >
-> With current QEMU, if you debug gdb, and set debug_xml=3D1 and continue, =
-then attach to qemu gdbstub from the debugged gdb, you will see the xml par=
-se fail completely, and gdb will fall back to the default machine descripti=
-on, silently, and changes to our xml (in qemu source code) have no effect. =
-They might as well be empty.
+> The following changes since commit 6d809e7da943bb4b95b408fbf3d80d097c0f7d=
+38:
 >
-> The point of fixing the machine description was IDE's with GDB integratio=
-n will break on QEMU. The default machine description has fs_base, which fa=
-ils to be retrieved, whick breaks the whole register window (in qt-creator =
-at least, likely others). With my patch the register window works perfectly=
-.
+>   Merge remote-tracking branch 'remotes/xtensa/tags/20190122-xtensa' into=
+ staging (2019-01-23 21:50:49 +0000)
 >
-> I didn't delete anything, I removed the superfluous nesting of files by x=
-i:include and moved the description into a single xml file. I added fs_base=
-, gs_base, k_gs_base, cr0/2/3/4/6, efer.
+> are available in the Git repository at:
 >
-> Removing the nesting into xml includes fixes it because the xml parse fai=
-ls on <feature nested within <feature, so I solved it by removing unnecessa=
-ry include indirections and placed the data inline.
+>   https://github.com/berrange/qemu tags/qio-next-pull-request
+>
+> for you to fetch changes up to 73564c407caedf992a1c688b5fea776a8b56ba2a:
+>
+>   io: ensure UNIX client doesn't unlink server socket (2019-01-24 12:23:3=
+5 +0000)
+>
+> ----------------------------------------------------------------
+> Merge qio 2019/01/24
+>
+> Fixes accidental deletion of VNC server UNIX listener socket
+>
+> ----------------------------------------------------------------
 
 
-Thanks for this explanation -- the patch makes a lot more sense with it.
-I'm confused though -- the XML we ship is basically what gdb itself
-ships and uses internally:
-https://sourceware.org/git/gitweb.cgi?p=3Dbinutils-gdb.git;a=3Dblob;f=3Dgdb=
-/features/i386/i386.xml;h=3Dbeb1496d9773efcf0e0526dc540a5e206a2e21fc;hb=3DH=
-EAD
+Applied, thanks.
 
-and that uses xi:include to pull in the other files.
-So it seems odd that gdb can't parse the XML it is using
-itself internally. Maybe QEMU is doing something else wrong
-somewhere?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-thanks
 -- PMM
