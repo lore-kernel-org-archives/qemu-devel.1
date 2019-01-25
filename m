@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40264)
+Received: from eggs.gnu.org ([209.51.188.92]:40998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmx9Y-0002Hp-FR
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:47:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmxAs-0003gn-Lt
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:49:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmx6E-0005sj-VK
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:44:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gmx6B-0005rL-6u
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:44:29 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
-	<20190111161515.GG2738@work-vm>
-	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
-	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
-	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
-	<64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
-	<20190123195345.GI2193@work-vm>
-	<a0c711c1-17d4-9fbe-b78c-4cd4a2419633@redhat.com>
-	<877eeuidzp.fsf@dusky.pond.sub.org>
-	<9cbb73bc-dbe2-4f5b-56e4-4c733811ed54@redhat.com>
-	<87a7jptdla.fsf@dusky.pond.sub.org>
-	<c5c6c8cb-0cfd-323e-a291-f098ea4b8ec2@redhat.com>
-Date: Fri, 25 Jan 2019 09:44:16 +0100
-In-Reply-To: <c5c6c8cb-0cfd-323e-a291-f098ea4b8ec2@redhat.com> (Jason Wang's
-	message of "Fri, 25 Jan 2019 16:12:24 +0800")
-Message-ID: <87womtqg7z.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1gmxAr-0007jI-EJ
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 03:49:18 -0500
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-3-sgarzare@redhat.com>
+	<5b3c3076-8f0e-c6a2-b6d1-707db2ae3a66@redhat.com>
+	<962ebaff-23ce-57ff-3387-9017c2ccd14a@redhat.com>
+	<20190125081615.2cevf7cy7bcnxqwh@steredhat>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d4aa8b25-f0ad-1444-587c-3d90a8ddc74a@redhat.com>
+Date: Fri, 25 Jan 2019 09:49:03 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190125081615.2cevf7cy7bcnxqwh@steredhat>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] test-filter-mirror hangs
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,145 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Jason Wang <jasowang@redhat.com> writes:
-
-> On 2019/1/25 =E4=B8=8B=E5=8D=883:12, Markus Armbruster wrote:
->> Jason Wang <jasowang@redhat.com> writes:
->>
->>> On 2019/1/24 =E4=B8=8B=E5=8D=885:47, Markus Armbruster wrote:
->>>> Please cc: me on QMP issues.
->>>
->>> Ok.
->>>
->>>
->>>> Jason Wang <jasowang@redhat.com> writes:
+On 2019-01-25 09:16, Stefano Garzarella wrote:
+> On Fri, Jan 25, 2019 at 07:07:35AM +0100, Thomas Huth wrote:
+>> On 2019-01-25 07:01, Thomas Huth wrote:
+>>> On 2019-01-24 18:23, Stefano Garzarella wrote:
+>>>> If the WRITE_ZEROES feature is enabled, we check this
+>>>> command in the test_basic().
 >>>>
->>>>> On 2019/1/24 =E4=B8=8A=E5=8D=883:53, Dr. David Alan Gilbert wrote:
->>>>>> * Jason Wang (jasowang@redhat.com) wrote:
->>>>>>> On 2019/1/22 =E4=B8=8A=E5=8D=882:56, Peter Maydell wrote:
->>>>>>>> On Thu, 17 Jan 2019 at 09:46, Jason Wang<jasowang@redhat.com>  wro=
-te:
->>>>>>>>> On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
->>>>>>>>>> On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
->>>>>>>>>> <dgilbert@redhat.com  <mailto:dgilbert@redhat.com>> wrote:
->>>>>>>>>>
->>>>>>>>>>         * Peter Maydell (peter.maydell@linaro.org
->>>>>>>>>>         <mailto:peter.maydell@linaro.org>) wrote:
->>>>>>>>>>         > Recently I've noticed that test-filter-mirror has been=
- hanging
->>>>>>>>>>         > intermittently, typically when run on some other TCG a=
-rchitecture.
->>>>>>>>>>         > In the instance I've just looked at, this was with s39=
-0x guest on
->>>>>>>>>>         > x86-64 host, though I've also seen it on other host ar=
-chs and
->>>>>>>>>>         > perhaps with other guests.
->>>>>>>>>>
->>>>>>>>>>         Watch out to see if you really do see it for other guest=
-s;
->>>>>>>>>>         it carefully avoids using virtio-net to avoid vhost; but=
- on s390x it
->>>>>>>>>>         uses virtio-net-ccw - could that hit the vhost it was tr=
-ying to avoid?
->>>>>>>>>>
->>>>>>>>>>         > Below is a backtrace, though it seems to be pretty unh=
-elpful.
->>>>>>>>>>         > Anybody got any theories ? Does the mirror test rely o=
-n dirty
->>>>>>>>>>         > memory bitmaps like the migration test (which also han=
-gs
->>>>>>>>>>         > occasionally with TCG due to some bug I'm sure we've i=
-nvestigated
->>>>>>>>>>         > in the past) ?
->>>>>>>>>>
->>>>>>>>>>         I don't think it relies on the CPU at all.
->>>>>>>>>>      I have no idea about this currently, but Jason and I design=
-ed the
->>>>>>>>>> test case.
->>>>>>>>>> Add Jason: Have any comments about this ?
->>>>>>>>> I can't reproduce this locally with s390x-softmmu. It looks to me=
- the
->>>>>>>>> test should be independent to any kinds of emulation. It should p=
-ass
->>>>>>>>> when mainloop work.
->>>>>>>> I've just seen a hang with ppc64 guest on s390x host, so it is
->>>>>>>> indeed not specific to s390x guest (and so not specific to
->>>>>>>> virtio-net either, since the ppc64 guest setup uses e1000).
->>>>>>>>
->>>>>>>> thanks
->>>>>>>> -- PMM
->>>>>>> Finally reproduced locally after hundreds (sometimes thousands) tim=
-es of
->>>>>>> running.
->>>>>>>
->>>>>>> Bisection points to OOB monitor[1].
->>>>>>>
->>>>>>> It looks to me after OOB is used unconditionally we lose a barrier =
-to make
->>>>>>> sure socket is connected before sending packets in test-filter-mirr=
-or.c. Is
->>>>>>> there any other similar and simple thing that we could do to kick t=
-he
->>>>>>> mainloop?
->>>>>> Do you mean the:
->>>>>>
->>>>>>        /* send a qmp command to guarantee that 'connected' is settin=
-g to true. */
->>>>>>        qmp_discard_response(qts, "{ 'execute' : 'query-status'}");
->>>>> Yes.
->>>>>
->>>>>
->>>>>> why was that ever sufficient to know the socket was ready?
->>>>> It was suggested by Fam, I don't remember the details. Can we make
->>>>> sure all pending events has been processed (UNIX socket was set to
->>>>> connected) after query-status is returned with an non OOB monitor?
->>>> I'm afraid I lack context.  Which socket are you talking about?  The
->>>> test has at least the QMP socket, the send_sock[], and recv_sock.  What
->>>> exactly are you trying to accomplish?
+>>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>> ---
+>>>>  tests/virtio-blk-test.c | 63 ++++++++++++++++++++++++++++++++++++++=
++++
+>>>>  1 file changed, 63 insertions(+)
+>>>>
+>>>> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+>>>> index 04c608764b..8cabbcb85a 100644
+>>>> --- a/tests/virtio-blk-test.c
+>>>> +++ b/tests/virtio-blk-test.c
+>>>> @@ -231,6 +231,69 @@ static void test_basic(QVirtioDevice *dev, QGue=
+stAllocator *alloc,
+>>>> =20
+>>>>      guest_free(alloc, req_addr);
+>>>> =20
+>>>> +    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
+>>>> +        struct virtio_blk_discard_write_zeroes *dwz_hdr;
+>>>> +        void *expected;
+>>>> +
+>>>> +        /*
+>>>> +         * WRITE_ZEROES request on the same sector of previous test=
+ where
+>>>> +         * we wrote "TEST".
+>>>> +         */
+>>>> +        req.type =3D VIRTIO_BLK_T_WRITE_ZEROES;
+>>>> +        req.data =3D g_malloc0(512);
 >>>
->>> I mean recv_sock. If mirror tries to send a packet to it before its
->>> is_connected is set to true, packet will be dropped.
->> So the *socket* is connected (in the TCP sense),
->
->
-> UNIX domain socket actually in the case of this test.
+>>> Wouldn't it be more interesting to do a memset(req.data, 0xaa, 512) o=
+r
+>>> something similar here, to see whether zeroes or 0xaa is written?
+>>
+>> Ah, never mind, I thought req.data would be a sector buffer here, but
+>> looking at the lines below, it apparently is something different.
+>>
+>> Why do you allocate 512 bytes here? I'd rather expect
+>> g_malloc0(sizeof(struct virtio_blk_discard_write_zeroes)) here. ... an=
+d
+>> then you could also use a local "struct virtio_blk_discard_write_zeroe=
+s
+>> dwz_hdr" variable instead of a pointer, and drop the g_malloc0() compl=
+etely?
+>>
+>=20
+> Hi Thomas,
+> it was my initial implementation, but on the first test I discovered
+> that virtio_blk_request() has an assert on the data_size and it require=
+s
+> a multiple of 512 bytes.
+> Then I looked at the virtio-spec #1, and it seems that data should be
+> multiple of 512 bytes also if it contains the struct
+> virtio_blk_discard_write_zeroes. (I'm not sure)
+>=20
+> Anyway I tried to allocate only the space for that struct, commented th=
+e
+> assert and the test works well.
+>=20
+> How do you suggest to proceed?
 
-Yes.
+Wow, that's a tough question. Looking at the virtio spec, I agree with
+you, it looks like struct virtio_blk_discard_write_zeroes should be
+padded to 512 bytes here. But when I look at the Linux sources
+(drivers/block/virtio_blk.c), I fail to see that they are doing the
+padding there (but maybe I'm just too blind).
 
->> but something else
->> (whatever owns is_connected) is not.  Can you point me to where
->> is_connected is set to true?
->
->
-> Sorry, should be "connected". It was set in tcp_chr_connect(). So if
-> filter want to send a packet to socket chardev before
-> tcp_chr_connect() is called, the packet will be dropped silently by
-> tcp_chr_write(). This will fail this unit-test.
+Looking at the QEMU sources, it seems like it can deal with both and
+always sets the status right behind the last byte:
 
-Aha: the thing that isn't connected is the character device.
+    req->in =3D (void *)in_iov[in_num - 1].iov_base
+              + in_iov[in_num - 1].iov_len
+              - sizeof(struct virtio_blk_inhdr);
 
->>>> By the way, mkstemp(sock_path) followed by unix_connect(sock_path, NUL=
-L)
->>>> looks rather fishy.  Why create a temporary file only to create a Unix
->>>> domain socket right over it?
->>>
->>> I vaguely remember passing fd created by unix domain socket doesn't
->>> work when the test is introduced. So my understanding is the author
->>> needs a way to create a unique file name which will be used b Unix
->>> domain socket at that time.
->> We should really, really, really improve the test harness to run each
->> test program in its very own temporary directory.  Then tests can simply
->> create files with fixed names, and leave cleanup to the test harness.
->
->
-> Agree, but for this test, since passing fd works now. I tend to using
-> socketpair().
+Anyway, I think the virtio spec should be clearer here to avoid bad
+implementations in the future, so maybe Changpeng or Michael could
+update the spec here a little bit?
 
-Resources that don't require manual cleanup (such as file descriptors
-obtained with socketpair() or pipe()) are the best choice when they
-work.
+ Thomas
 
-[..]
+
+> [1](https://github.com/oasis-tcs/virtio-spec/blob/master/content.tex#L3=
+944)
+>=20
+>=20
+> Thanks,
+> Stefano
+>=20
