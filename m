@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52343)
+Received: from eggs.gnu.org ([209.51.188.92]:52536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gmrob-0003oo-G7
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:05:58 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmroy-000467-Mq
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 22:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gmrbY-0004wg-EU
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:52:29 -0500
-Received: from mga01.intel.com ([192.55.52.88]:34413)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gmrYl-0003bo-7s
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:49:36 -0500
+Received: from mga04.intel.com ([192.55.52.120]:17088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gmrbY-0004vT-5o
-	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:52:28 -0500
-Date: Fri, 25 Jan 2019 10:48:43 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190125024843.GA26929@yangzhon-Virtual>
-References: <20190123065618.3520-1-yang.zhong@intel.com>
-	<20190123065618.3520-30-yang.zhong@intel.com>
-	<20190123092224-mutt-send-email-mst@kernel.org>
-	<20190125021053.GA26802@yangzhon-Virtual>
-	<20190124214330-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gmrYj-0003PA-49
+	for qemu-devel@nongnu.org; Thu, 24 Jan 2019 21:49:34 -0500
+Date: Fri, 25 Jan 2019 19:19:55 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20190125111954.GA16915@tiger-server>
+References: <cover.1548136274.git.yi.z.zhang@linux.intel.com>
+	<78014185dc40dea43750eaa50ae093806e3dab66.1548136274.git.yi.z.zhang@linux.intel.com>
+	<20190123145050.GU4136@habkost.net>
+	<20190124112102.GA9821@tiger-server>
+	<20190124165926.GY4136@habkost.net>
+	<20190124123824-mutt-send-email-mst@kernel.org>
+	<20190124182839.GZ4136@habkost.net>
+	<20190124140522-mutt-send-email-mst@kernel.org>
+	<20190124191443.GB4136@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190124214330-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 29/44] hw/pci/Makefile.objs: make
- pcie configurable
+In-Reply-To: <20190124191443.GB4136@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH V10 4/4] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, sameo@linux.intel.com, yang.zhong@intel.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, pagupta@redhat.com, xiaoguangrong.eric@gmail.com, qemu-devel@nongnu.org, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, stefanha@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
 
-On Thu, Jan 24, 2019 at 09:43:44PM -0500, Michael S. Tsirkin wrote:
-> On Fri, Jan 25, 2019 at 10:10:53AM +0800, Yang Zhong wrote:
-> > On Wed, Jan 23, 2019 at 09:23:49AM -0500, Michael S. Tsirkin wrote:
-> > > On Wed, Jan 23, 2019 at 02:56:03PM +0800, Yang Zhong wrote:
-> > > > Make pcie splited from pci and make it configurable.
+On 2019-01-24 at 17:14:43 -0200, Eduardo Habkost wrote:
+> On Thu, Jan 24, 2019 at 02:05:45PM -0500, Michael S. Tsirkin wrote:
+> > On Thu, Jan 24, 2019 at 04:28:39PM -0200, Eduardo Habkost wrote:
+> > > On Thu, Jan 24, 2019 at 12:45:54PM -0500, Michael S. Tsirkin wrote:
+> > > > On Thu, Jan 24, 2019 at 02:59:26PM -0200, Eduardo Habkost wrote:
+> > > > > On Thu, Jan 24, 2019 at 07:21:03PM +0800, Yi Zhang wrote:
+> > > > > > On 2019-01-23 at 12:50:50 -0200, Eduardo Habkost wrote:
+> > > > > > > On Wed, Jan 23, 2019 at 11:00:02AM +0800, Zhang, Yi wrote:
+> > > > > > > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> > > [...]
+> > > > > > > > + - 'pmem' option of memory-backend-file is 'on':
+> > > > > > > > +   The backend is a file supporting DAX, e.g., a file on an ext4 or
+> > > > > > > > +   xfs file system mounted with '-o dax'. if your pmem=on ,but the backend is
+> > > > > > > > +   not a file supporting DAX, mapping with this flag results in an EOPNOTSUPP
+> > > > > > > > +   error.
+> > > > > > > 
+> > > > > > > Won't this break existing configurations that work today on QEMU
+> > > > > > > 3.1.0?  Why exactly it is OK to break compatibility here?
+> > > > > > won't, pmem option default is off, if people who start VM don't know what
+> > > > > > backend file is, it is suggested and *default to set pmem=off,
+> > > > > > if people well know the backend file have dax capbility. it is suggest
+> > > > > > to set pmem=on. 
+> > > > > > 
+> > > > > > For a special case that we use /dev/dax as backend, we already have a
+> > > > > > patch to add MAP_SYNC falg mapiing from device dax mode.
+> > > > > > see https://lkml.org/lkml/2018/4/22/524 
+> > > > > > 
+> > > > > > So, if people force set pmem=on, mapping a regular file, it will results
+> > > > > > in an EOPNOTSUPP error. 
+> > > > > 
+> > > > > This is where compatibility is being broken, isn't it?  People
+> > > > > currently using pmem=on on a regular file will start getting
+> > > > > errors after a QEMU upgrade.  Existing VMs with pmem=on may stop
+> > > > > booting.  Maybe this is OK, but we need to be able to explain why
+> > > > > it is OK.
 > > > > 
-> > > > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > > > ---
-> > > >  default-configs/pci.mak | 1 +
-> > > >  hw/pci/Kconfig          | 3 +++
-> > > >  hw/pci/Makefile.objs    | 5 +++--
-> > > >  3 files changed, 7 insertions(+), 2 deletions(-)
+> > > > I think it's OK since pmem explicitly means "persistent":
 > > > > 
-> > > > diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-> > > > index f7b3690bbd..b17b456b1e 100644
-> > > > --- a/default-configs/pci.mak
-> > > > +++ b/default-configs/pci.mak
-> > > > @@ -1,4 +1,5 @@
-> > > >  CONFIG_PCI=y
-> > > > +CONFIG_PCI_EXPRESS=y
-> > > >  # For now, CONFIG_IDE_CORE requires ISA, so we enable it here
-> > > >  CONFIG_ISA_BUS=y
-> > > >  CONFIG_VIRTIO_PCI=y
-> > > > diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
-> > > > index d3d2205577..81533b9dc0 100644
-> > > > --- a/hw/pci/Kconfig
-> > > > +++ b/hw/pci/Kconfig
-> > > > @@ -1,2 +1,5 @@
-> > > >  config PCI
-> > > >      bool
-> > > > +
-> > > > +config PCI_EXPRESS
-> > > > +    bool
+> > > > The @option{pmem} option specifies whether the backing file specified
+> > > > by @option{mem-path} is in host persistent memory that can be accessed
+> > > > using the SNIA NVM programming model (e.g. Intel NVDIMM).
+> > > > If @option{pmem} is set to 'on', QEMU will take necessary operations to
+> > > > guarantee the persistence of its own writes to @option{mem-path}
+> > > > (e.g. in vNVDIMM label emulation and live migration).
 > > > 
-> > > Hmm this allows PCIE without PCI.
-> > > Should PCI_EXPRESS select PCI?
+> > > If it's OK, let's at least explicitly document that we are
+> > > breaking compatibility in those cases.
+Yes, I will add more explanation in those broken cases.
 > > > 
-> > > It's selected itself so can't depend on PCI.
-> > >
-> >   Hello Michael,
+> > > 
+> > > > > > 
+> > > [...]
+> > > > I think generally MAP_SYNC is required.
+> > > > But for compatibility reasons we might need to support
+> > > > !MAP_SYNC on old kernels even though it's risky.
+> > > 
+> > > What about making MAP_SYNC optional only on older machine-types?
+Isn't Older Machine-type compatiable with new kernel? 
 > > 
-> >   I did this in patch 30 as below:
-> >   
-> >   diff --git a/hw/pci/Kconfig b/hw/pci/Kconfig
-> >   index 81533b9dc0..4ca2537980 100644
-> >   --- a/hw/pci/Kconfig
-> >   +++ b/hw/pci/Kconfig
-> >   @@ -3,3 +3,4 @@ config PCI
-> > 
-> >   config PCI_EXPRESS
-> >      bool
-> > +    select PCI
-> > 
-> >    Regards,
-> > 
-> >    Yang
+> > I don't think this makes sense. It's not a guest visible change,
+> > machine types are for that.
 > 
-> Maybe squash this into patch 29 then.
+> Losing data written to persistent memory is surely guest-visible
+> behavior.
+
+Guest always visit it is a persistent memory, but it is only a faked
+"persistent" front-end, the only way to guarantee the persistent is make the
+host back-end pmem=on, that is not a guest visible option.
+
 > 
-> > >
-  Okay, i will do it in next version, thanks Michael, Yang.
- 
-> > > > diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
-> > > > index 9f905e6344..d30eb32cbb 100644
-> > > > --- a/hw/pci/Makefile.objs
-> > > > +++ b/hw/pci/Makefile.objs
-> > > > @@ -2,8 +2,9 @@ common-obj-$(CONFIG_PCI) += pci.o pci_bridge.o
-> > > >  common-obj-$(CONFIG_PCI) += msix.o msi.o
-> > > >  common-obj-$(CONFIG_PCI) += shpc.o
-> > > >  common-obj-$(CONFIG_PCI) += slotid_cap.o
-> > > > -common-obj-$(CONFIG_PCI) += pci_host.o pcie_host.o
-> > > > -common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
-> > > > +common-obj-$(CONFIG_PCI) += pci_host.o
-> > > > +common-obj-$(CONFIG_PCI_EXPRESS) += pcie.o pcie_aer.o
-> > > > +common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
-> > > >  
-> > > >  common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
-> > > >  common-obj-$(CONFIG_ALL) += pci-stub.o
-> > > > -- 
-> > > > 2.17.1
+> -- 
+> Eduardo
+> 
