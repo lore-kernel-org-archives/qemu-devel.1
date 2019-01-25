@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43514)
+Received: from eggs.gnu.org ([209.51.188.92]:45505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gn1Et-0006fP-W0
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:09:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1gn1V0-0000x6-ME
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gn1Er-0000vw-V9
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:09:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43770
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gn1Ek-0000t8-H7
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:09:36 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0PD7KvR048606
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:09:27 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q8328857b-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:09:27 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 25 Jan 2019 13:09:24 -0000
-Date: Fri, 25 Jan 2019 14:09:18 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
-	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1gn1Ux-00088P-IG
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:26:21 -0500
+References: <20190124141731.21509-1-kwolf@redhat.com>
+	<bcf01a3b-fea8-d170-416a-f04d78a63822@virtuozzo.com>
+	<20190124163614.GM4601@localhost.localdomain>
+	<cbbd150b-9514-93ce-3b3a-3f85a963003d@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1fbe9140-e927-bd72-2b4e-8b1dbd58e010@redhat.com>
+Date: Fri, 25 Jan 2019 07:26:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20190125140918.64686aaf@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+In-Reply-To: <cbbd150b-9514-93ce-3b3a-3f85a963003d@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kb9wttZZMPm8YwbyDy59lxuapwukVfOe7"
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,66 +27,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu, 24 Jan 2019 21:37:44 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kb9wttZZMPm8YwbyDy59lxuapwukVfOe7
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Message-ID: <1fbe9140-e927-bd72-2b4e-8b1dbd58e010@redhat.com>
+Subject: Re: [PATCH] file-posix: Cache lseek result for data regions
+References: <20190124141731.21509-1-kwolf@redhat.com>
+ <bcf01a3b-fea8-d170-416a-f04d78a63822@virtuozzo.com>
+ <20190124163614.GM4601@localhost.localdomain>
+ <cbbd150b-9514-93ce-3b3a-3f85a963003d@virtuozzo.com>
+In-Reply-To: <cbbd150b-9514-93ce-3b3a-3f85a963003d@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> >> @@ -188,25 +192,30 @@ static ssize_t vfio_ccw_mdev_write(struct=20
-> >> mdev_device *mdev,
-> >> =C2=A0 {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct vfio_ccw_private *private;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct ccw_io_region *region;
-> >> +=C2=A0=C2=A0=C2=A0 int ret;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (*ppos + count > sizeof(*region))
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 private =3D dev_get_drvdata(mdev_parent=
-_dev(mdev));
-> >> -=C2=A0=C2=A0=C2=A0 if (private->state !=3D VFIO_CCW_STATE_IDLE)
-> >> +=C2=A0=C2=A0=C2=A0 if (private->state =3D=3D VFIO_CCW_STATE_NOT_OPER =
-||
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 private->state =3D=3D VFIO=
-_CCW_STATE_STANDBY)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EACCES;
-> >> +=C2=A0=C2=A0=C2=A0 if (!mutex_trylock(&private->io_mutex))
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EAGAIN; =20
-> >=20
-> > Ah, I see Halil's difficulty here.
-> >=20
-> > It is true there is a race condition today, and that this doesn't=20
-> > address it.=C2=A0 That's fine, add it to the todo list.=C2=A0 But even =
-with that,=20
-> > I don't see what the mutex is enforcing?=C2=A0 Two simultaneous SSCHs w=
-ill be=20
-> > serialized (one will get kicked out with a failed trylock() call), whil=
-e=20
-> > still leaving the window open between cc=3D0 on the SSCH and the=20
-> > subsequent interrupt.=C2=A0 In the latter case, a second SSCH will come=
-=20
-> > through here, do the copy_from_user below, and then jump to fsm_io_busy=
-=20
-> > to return EAGAIN.=C2=A0 Do we really want to stomp on io_region in that=
- case?=20
-> >  =C2=A0Why can't we simply return EAGAIN if state=3D=3DBUSY? =20
+On 1/25/19 3:13 AM, Vladimir Sementsov-Ogievskiy wrote:
+
 >=20
-> (Answering my own questions as I skim patch 5...)
+> before your patch:
+> ]# ./test
+> Formatting 'x', fmt=3Draw size=3D1048576
+> qemu-io> wrote 1048576/1048576 bytes at offset 0
+> 1 MiB, 1 ops; 0.0523 sec (19.093 MiB/sec and 19.0927 ops/sec)
+> qemu-io> [{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "=
+data": true, "offset": 0}]
+> qemu-io> handle_aiocb_write_zeroes
+> wrote 102400/102400 bytes at offset 102400
+> 100 KiB, 1 ops; 0.0165 sec (5.898 MiB/sec and 60.3974 ops/sec)
+> qemu-io> [{ "start": 0, "length": 102400, "depth": 0, "zero": false, "d=
+ata": true, "offset": 0},
+> { "start": 102400, "length": 102400, "depth": 0, "zero": true, "data": =
+false, "offset": 102400},
+> { "start": 204800, "length": 843776, "depth": 0, "zero": false, "data":=
+ true, "offset": 204800}]
+> qemu-io> handle_aiocb_write_zeroes_unmap
+> wrote 102400/102400 bytes at offset 512000
+> 100 KiB, 1 ops; 0.0001 sec (545.566 MiB/sec and 5586.5922 ops/sec)
+> qemu-io> [{ "start": 0, "length": 102400, "depth": 0, "zero": false, "d=
+ata": true, "offset": 0},
+> { "start": 102400, "length": 102400, "depth": 0, "zero": true, "data": =
+false, "offset": 102400},
+> { "start": 204800, "length": 307200, "depth": 0, "zero": false, "data":=
+ true, "offset": 204800},
+> { "start": 512000, "length": 102400, "depth": 0, "zero": true, "data": =
+false, "offset": 512000},
+> { "start": 614400, "length": 434176, "depth": 0, "zero": false, "data":=
+ true, "offset": 614400}]
+
+Your demonstration pre-patch shows that both 'write -z' and 'write -z
+-u' produced areas of the qcow2 image that were marked as known zeroes,
+and claim 'data':false meaning that those two areas are sparse (that is,
+it appears 'write -z' managed to unmap after all?)
+
 >=20
-> Because of course this series is for async handling, while I was looking=
-=20
-> specifically at the synchronous code that exists today.  I guess then my=
-=20
-> question just remains on how the mutex is adding protection in the sync=20
-> case, because that's still not apparent to me.  (Perhaps I missed it in=20
-> a reply to Halil; if so I apologize, there were a lot when I returned.)
+>=20
+>=20
+> after your patch:
+> # ./test
+> Formatting 'x', fmt=3Draw size=3D1048576
+> qemu-io> wrote 1048576/1048576 bytes at offset 0
+> 1 MiB, 1 ops; 0.0768 sec (13.019 MiB/sec and 13.0195 ops/sec)
+> qemu-io> [{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "=
+data": true, "offset": 0}]
+> qemu-io> handle_aiocb_write_zeroes
+> wrote 102400/102400 bytes at offset 102400
+> 100 KiB, 1 ops; 0.0166 sec (5.883 MiB/sec and 60.2410 ops/sec)
+> qemu-io> [{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "=
+data": true, "offset": 0}]
 
-Careful, at the end we have vfio_ccw_mdev_write_io_region() and the
-write callback for the capchain regions. We could return EAGAIN if
-state=3D=3DBUSY in the vfio_ccw_mdev_write_io_region() (but I would prefer a
-different error code -- see my other response).
+So here, the cache was not invalidated, so the 'write -z' area was
+temporarily reported as data...
 
-I answered your mutex question as well. Just a small addendum the mutex
-is not only for the cases the userspace acts sane (but also when it acts
-insane;).
+> qemu-io> handle_aiocb_write_zeroes_unmap
+> wrote 102400/102400 bytes at offset 512000
+> 100 KiB, 1 ops; 0.0002 sec (469.501 MiB/sec and 4807.6923 ops/sec)
+> qemu-io> [{ "start": 0, "length": 102400, "depth": 0, "zero": false, "d=
+ata": true, "offset": 0},
+> { "start": 102400, "length": 102400, "depth": 0, "zero": true, "data": =
+false, "offset": 102400},
+> { "start": 204800, "length": 307200, "depth": 0, "zero": false, "data":=
+ true, "offset": 204800},
+> { "start": 512000, "length": 102400, "depth": 0, "zero": true, "data": =
+false, "offset": 512000},
+> { "start": 614400, "length": 434176, "depth": 0, "zero": false, "data":=
+ true, "offset": 614400}]
 
-Halil
+but after the 'write -z -u' invalidated the cache, we once again see
+that the 'write -z' worked.
+
+>=20
+>=20
+> So, you've changed behavior of block_status after write_zeroes without =
+UNMAP for the worse.
+>=20
+> Hmm, should I prepare patch for qemu-io? qemu-img map is definitely bet=
+ter.
+
+qemu-io map is NOT asking the same information as qemu-img map (it's
+annoying - but BOTH pieces of information are useful, and there are some
+iotests that check both outputs to get a full picture of things).
+qemu-img asks as much information as possible about all layers, while
+qemu-io asks only abut the top layer.
+
+That said, qemu-io is NOT baked in stone; if you want to patch it AND
+fix the iotest fallout, I'm not opposed to that.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--kb9wttZZMPm8YwbyDy59lxuapwukVfOe7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxLDnIACgkQp6FrSiUn
+Q2obtAf9E2rF6AdAbeYuTFY2OJZgiyEbNJyJgJ0ftPioZykEp9tGjtgm6cj0nk4o
+Va2vSFhN4pj20aQx/QL4GeZMvWfix+tzUL6FmbgdOscF726SKzN4WUwkKGRgSkJy
+fBAXSIrLSL0A/Dy/TZAORdG2BwOqSmDMpYTzRCz/D09z6X3lHBNTpb9jBo22ZG39
+W4pZncTTT79TEEjf1JNJcPN7raWP5SvejW5OVKV/IIxlnAlYH/gWofnvep8Gi6r4
+bnOtDkjibGYzhOsSEWtx5ckQ4xHVjrkcSS3kEW0xIvyMNlx7UviaBGUUpr69temc
+PnIvWrdzsfr1TCjyvevgLuirOT/S6Q==
+=Zr9H
+-----END PGP SIGNATURE-----
+
+--kb9wttZZMPm8YwbyDy59lxuapwukVfOe7--
