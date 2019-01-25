@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56458)
+Received: from eggs.gnu.org ([209.51.188.92]:58312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=921b93e8d=anthony.perard@citrix.com>)
-	id 1gn6GX-0008Fg-8Z
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:31:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gn6Nm-00048T-IX
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:39:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=921b93e8d=anthony.perard@citrix.com>)
-	id 1gn6GW-0005lI-06
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:31:45 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:13847)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=921b93e8d=anthony.perard@citrix.com>)
-	id 1gn6GV-0005Ra-Mt
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:31:43 -0500
-Date: Fri, 25 Jan 2019 18:31:08 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20190125183108.GQ1271@perard.uk.xensource.com>
-References: <20190122155346.26388-1-paul.durrant@citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gn6Nk-0002Xv-KI
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:39:14 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gn6Nk-0002XB-4b
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:39:12 -0500
+Received: by mail-ot1-x343.google.com with SMTP id g16so5410995otg.11
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:39:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190122155346.26388-1-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2] xen: fix xen-bus state model to allow
- frontend re-connection
+References: <20170816072104.24420-1-famz@redhat.com>
+	<20170816072104.24420-9-famz@redhat.com>
+	<ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
+	<f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
+	<4bf0c77e-ea8f-1813-a6a4-6ab6eb857cd0@redhat.com>
+	<20190124165253.GT7953@redhat.com>
+	<509cf069-5d03-8e2e-fb3c-5828d32f38e1@comstyle.com>
+	<6e71d755-8dcd-5275-d635-f238271cf459@tuxfamily.org>
+	<1284f2c4-57ad-061a-c920-c21cd7e142d4@comstyle.com>
+In-Reply-To: <1284f2c4-57ad-061a-c920-c21cd7e142d4@comstyle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 18:38:59 +0000
+Message-ID: <CAFEAcA9iGqC7pfwNRuGe2nOniYTp_aEzwQLRoGpt_yCGqZT2=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Brad Smith <brad@comstyle.com>
+Cc: Thomas Huth <huth@tuxfamily.org>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Fam Zheng <fam@euphon.net>, QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <n54@gmx.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Tue, Jan 22, 2019 at 03:53:46PM +0000, Paul Durrant wrote:
-> There is a flaw in the xen-bus state model. To allow a frontend to re-
-> connect the backend state of an online XenDevice is transitioned from
-> Closed to InitWait, but this is currently done unilaterally which is
-> incorrect. The backend state should remain Closed until the frontend state
-> transitions to Initialising.
-> 
-> This patch removes the automatic backend state transition from
-> xen_device_backend_state_changed() and, instead, adds an extra check in
-> xen_device_frontend_state_changed() to determine whether a frontend is
-> trying to re-connect to a previously Closed XenDevice. Only if this is
-> found to be the case is the backend state transitioned from Closed to
-> InitWait. Note that this transition will be common amongst all XenDevice
-> classes and hence xen_device_frontend_state_changed() returns immediately
-> afterwards without calling into the XenDeviceClass frontend_changed()
-> method.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+On Fri, 25 Jan 2019 at 18:36, Brad Smith <brad@comstyle.com> wrote:
+>
+> On 1/25/2019 1:24 AM, Thomas Huth wrote:
+>
+> > On 2019-01-25 01:48, Brad Smith wrote:
+> >> Our ports tree has an option which results in the QEMU binaries being
+> >> linked with "-z wxneeded".
+> > Then it's maybe high time to send such changes upstream now ;-)
+>
+>
+> I have not considered submitting such a patch as it's just a workaround
+> for an
+> issue within QEMU. Everything else that we had as local patches or local
+> build
+> fiddling to build things properly has been integrated in some manner.
 
-I've tested OVMF with that patch, and states transitions looks better
-when transitionning from ovmf to linux.
-(Less Closed->InitWait->Closed..., and ovmf trying to win a race at
-reading the backend state at the right time).
+We'll happily take a patch that fixes the underlying issue properly
+if you'd prefer...
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-
-Thanks,
-
--- 
-Anthony PERARD
+thanks
+-- PMM
