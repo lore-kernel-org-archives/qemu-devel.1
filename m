@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52422)
+Received: from eggs.gnu.org ([209.51.188.92]:57734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gn8Eo-00053J-2N
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1gn8T0-0007bI-OP
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:52:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gn8En-0003fn-Ai
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gn8El-0003bY-DU
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:38:05 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F5B1B0815
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 20:37:59 +0000 (UTC)
-References: <20190125172229.23025-1-cfergeau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gn8Sz-0004TX-9R
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 15:52:46 -0500
+References: <20190125174653.4604-1-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f6a10395-fc93-cb19-6bfa-5ddc48e50ec7@redhat.com>
-Date: Fri, 25 Jan 2019 14:37:55 -0600
+Message-ID: <bb4ba98b-bbf9-fa61-b9f0-c56948a58bb9@redhat.com>
+Date: Fri, 25 Jan 2019 14:52:21 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190125172229.23025-1-cfergeau@redhat.com>
+In-Reply-To: <20190125174653.4604-1-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl"
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] qemu-io: Use error_[gs]et_progname()
+	boundary="wDEuDf2uhsJ2fzKnJGhMMVB89o46DHUpk"
+Subject: Re: [Qemu-devel] [PATCH 0/3] scsi-disk: Device Identification fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, berrange@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl
+--wDEuDf2uhsJ2fzKnJGhMMVB89o46DHUpk
 From: Eric Blake <eblake@redhat.com>
-To: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <f6a10395-fc93-cb19-6bfa-5ddc48e50ec7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] qemu-io: Use error_[gs]et_progname()
-References: <20190125172229.23025-1-cfergeau@redhat.com>
-In-Reply-To: <20190125172229.23025-1-cfergeau@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com,
+ berrange@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
+Message-ID: <bb4ba98b-bbf9-fa61-b9f0-c56948a58bb9@redhat.com>
+Subject: Re: [PATCH 0/3] scsi-disk: Device Identification fixes
+References: <20190125174653.4604-1-kwolf@redhat.com>
+In-Reply-To: <20190125174653.4604-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/25/19 11:22 AM, Christophe Fergeau wrote:
-
-Don't forget the 0/2 cover letter for series :)
-
-> qemu-io reimplements itself what
-> error_get_progname()/error_set_progname() already does.
-> This commit switches it to use this API from qemu-error.h
+On 1/25/19 11:46 AM, Kevin Wolf wrote:
+> The vendor specific designator in the Device Identification VPD page ha=
+s
+> two problems:
 >=20
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> ---
->  qemu-io.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+> 1. It defaults to the BlockBackend name (-drive id=3D...), which everyo=
+ne
+>    expected to be a host detail that the guest never sees
 >=20
+> 2. With -blockdev based setups it defaults to an empty string; if this
+>    default is used with more than one disk, the guest OS will interpret=
+
+>    this as a single multipath disk.
+>=20
+> We can address problem 2 immediately, and start running the deprecation=
+
+> clock for problem 1.
+>=20
+> Related bug reports:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1669446
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1668248
+>=20
+> Kevin Wolf (3):
+>   scsi-disk: Don't use empty string as device id
+>   scsi-disk: Add device_id property
+>   scsi-disk: Deprecate device_id fallback to BlockBackend name
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -70,21 +74,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl
+--wDEuDf2uhsJ2fzKnJGhMMVB89o46DHUpk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxLc6MACgkQp6FrSiUn
-Q2obWgf9Fh7YLDpU1U34MF3ucMsIanvuWp9YKqH7/Qzi9xes82wXW+r9jIXEeZ1D
-jh1GSbXJil+cp+N2ZAcZo6hLH+Td+HNCkOZOeVnMXUU4AWTE0dD60cCAcITzeNP1
-+EmZKhUp4W6i6Ddliy77uJrevYm2Hw0Ina+jlBw6N0wHCvvQaMaqVnBt6d7MGIkb
-GvXCU5KR84ea+lfEJN1s9x+/C3C1iuH68kSBIyniYg0wdTw1WkIuvUBCpJzyrflE
-hfbl7cEy9qtZym6yZ6vZqXOK1SnF+0TzQP5cnNa0FuRXArzTZE6uCoZ05DBo5W7m
-gvCHv/cA3h8PxWGNGAXUIMid+RDwuA==
-=kfgE
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxLdwUACgkQp6FrSiUn
+Q2rQXwf/SbpgTeyrcLnE5UzaZTGBPjWWNrxMi88FVYz/ykMIfYDMtqptKKbnNUbu
+kayf+QU+FSpuYSRrLIwWPWSgGjE+thr9P0TKS4pjhp1lskZzHzGgHVfkNxQra8Et
+8WKvjVZYFCHy0ZIJGtREBiw2V/oyFqNnouY8KD5ZTRja5M5lMn1RjR/bMPa2w1uo
+ufT0tbNFwqs+/bfbdRrQ2lQBUnALzuouNTrWWs9zElxd/D7QLetvVXRyRye5qyTk
+23X1dKbFL7TvNsy7ydMOuJOXR3jp6iqicjXyHEd7+OHwHznzX6NHhEX6SNNyOuJf
+Pv0CGu7M7HH8C0vGaV0cNqwQzKbwdg==
+=BdBE
 -----END PGP SIGNATURE-----
 
---WGdA82qvVB6eEQKg2mzDIcntXmdDhNNtl--
+--wDEuDf2uhsJ2fzKnJGhMMVB89o46DHUpk--
