@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46546)
+Received: from eggs.gnu.org ([209.51.188.92]:46519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aU-0002tu-Ru
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:32:04 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aQ-0002o1-6U
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:32:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aS-0002et-T9
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:32:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:36391 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gn1aH-0002Wb-R1
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:58 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:35998 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gn1aS-0002W7-Hh
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:32:00 -0500
+	id 1gn1aH-0002V6-4W
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 08:31:49 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 25 Jan 2019 14:31:30 +0100
-Message-Id: <1548423098-31864-7-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 06/14] disas: nanoMIPS: Amend DSP instructions
- related comments
+Date: Fri, 25 Jan 2019 14:31:24 +0100
+Message-Id: <1548423098-31864-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 00/14] MIPS queue for January 25, 2019
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,416 +27,1387 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Amend some DSP instructions related comments.
+The following changes since commit 8b7a3e1e5434b55d7710071b00af97c7086cab7a:
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- disas/nanomips.cpp | 119 +++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 75 insertions(+), 44 deletions(-)
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-24 15:04:47 +0000)
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 17f4c22..f90f1a9 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -1836,7 +1836,8 @@ std::string NMD::ABS_S(uint64 instruction)
- 
- 
- /*
-- * ABSQ_S.PH rt, rs - Find Absolute Value of Two Fractional Halfwords
-+ * [DSP] ABSQ_S.PH rt, rs - Find absolute value of two fractional halfwords
-+ *         with 16-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -1857,7 +1858,8 @@ std::string NMD::ABSQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ABSQ_S.QB rt, rs - Find Absolute Value of Four Fractional Byte Values
-+ * [DSP] ABSQ_S.QB rt, rs - Find absolute value of four fractional byte values
-+ *         with 8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -1878,7 +1880,8 @@ std::string NMD::ABSQ_S_QB(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] ABSQ_S.W rt, rs - Find absolute value of fractional word with 32-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2233,7 +2236,7 @@ std::string NMD::ADDIUPC_48_(uint64 instruction)
- 
- 
- /*
-- * ADDQ.PH rd, rt, rs - Add Fractional Halfword Vectors
-+ * [DSP] ADDQ.PH rd, rt, rs - Add fractional halfword vectors
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2257,7 +2260,8 @@ std::string NMD::ADDQ_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQ_S.PH rd, rt, rs - Add Fractional Halfword Vectors
-+ * [DSP] ADDQ_S.PH rd, rt, rs - Add fractional halfword vectors with 16-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2281,7 +2285,7 @@ std::string NMD::ADDQ_S_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQ_S.W rd, rt, rs - Add Fractional Words
-+ * [DSP] ADDQ_S.W rd, rt, rs - Add fractional words with 32-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2305,8 +2309,8 @@ std::string NMD::ADDQ_S_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH.PH rd, rt, rs - Add Fractional Halfword Vectors And Shift Right
-- *                       to Halve Results
-+ * [DSP] ADDQH.PH rd, rt, rs - Add fractional halfword vectors and shift
-+ *         right to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2330,8 +2334,8 @@ std::string NMD::ADDQH_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.PH rd, rt, rs - Add Fractional Halfword Vectors And Shift Right
-- *                         to Halve Results
-+ * [DSP] ADDQH_R.PH rd, rt, rs - Add fractional halfword vectors and shift
-+ *         right to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2355,7 +2359,8 @@ std::string NMD::ADDQH_R_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] ADDQH_R.W rd, rt, rs - Add fractional words and shift right to halve
-+ *         results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2379,7 +2384,8 @@ std::string NMD::ADDQH_R_W(uint64 instruction)
- 
- 
- /*
-- * ADDQH.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] ADDQH.W rd, rt, rs - Add fractional words and shift right to halve
-+ *         results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2403,7 +2409,7 @@ std::string NMD::ADDQH_W(uint64 instruction)
- 
- 
- /*
-- * ADDSC rd, rt, rs - Add Signed Word and Set Carry Bit
-+ * [DSP] ADDSC rd, rt, rs - Add two signed words and set carry bit
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2496,7 +2502,7 @@ std::string NMD::ADDU_4X4_(uint64 instruction)
- 
- 
- /*
-- * ADDU.PH rd, rt, rs - Unsigned Add Integer Halfwords
-+ * [DSP] ADDU.PH rd, rt, rs - Add two pairs of unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -2544,7 +2550,8 @@ std::string NMD::ADDU_QB(uint64 instruction)
- 
- 
- /*
-- * ADDU_S.PH rd, rt, rs - Unsigned Add Integer Halfwords
-+ * [DSP] ADDU_S.PH rd, rt, rs - Add two pairs of unsigned halfwords with 16-bit
-+ *         saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -7848,7 +7855,7 @@ std::string NMD::INS(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] INSV - Insert bit field variable
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9698,7 +9705,8 @@ std::string NMD::LWXS_32_(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MADD ac, rs, rt - Multiply two words and add to the specified
-+ *         accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9770,7 +9778,8 @@ std::string NMD::MADDF_S(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MADDU ac, rs, rt - Multiply two unsigned words and add to the
-+ *         specified accumulator
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9794,7 +9803,8 @@ std::string NMD::MADDU_DSP_(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_S.W.PHL ac, rs, rt - Multiply the left-most single vector
-+ *         fractional halfword elements with accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9818,7 +9828,8 @@ std::string NMD::MAQ_S_W_PHL(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_S.W.PHR ac, rs, rt - Multiply the right-most single vector
-+ *         fractional halfword elements with accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9842,7 +9853,8 @@ std::string NMD::MAQ_S_W_PHR(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_SA.W.PHL ac, rs, rt - Multiply the left-most single vector
-+ *         fractional halfword elements with saturating accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -9866,7 +9878,8 @@ std::string NMD::MAQ_SA_W_PHL(uint64 instruction)
- 
- 
- /*
-- *
-+ * [DSP] MAQ_SA.W.PHR ac, rs, rt - Multiply the right-most single vector
-+ *         fractional halfword elements with saturating accumulation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11722,7 +11735,8 @@ std::string NMD::ORI(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PACKRL.PH rd, rs, rt - Pack a word using the right halfword from one
-+ *         source register and left halfword from another source register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11764,7 +11778,8 @@ std::string NMD::PAUSE(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PICK.PH rd, rs, rt - Pick a vector of halfwords based on condition
-+ *         code bits
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11788,7 +11803,8 @@ std::string NMD::PICK_PH(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PICK.QB rd, rs, rt - Pick a vector of byte values based on condition
-+ *         code bits
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11812,7 +11828,8 @@ std::string NMD::PICK_QB(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQ.W.PHL rt, rs - Expand the precision of the left-most element
-+ *         of a paired halfword
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11834,7 +11851,8 @@ std::string NMD::PRECEQ_W_PHL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQ.W.PHR rt, rs - Expand the precision of the right-most element
-+ *         of a paired halfword
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11856,7 +11874,8 @@ std::string NMD::PRECEQ_W_PHR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBLA rt, rs - Expand the precision of the two
-+ *         left-alternate elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11878,7 +11897,8 @@ std::string NMD::PRECEQU_PH_QBLA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBL rt, rs - Expand the precision of the two left-most
-+ *         elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11900,7 +11920,8 @@ std::string NMD::PRECEQU_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBRA rt, rs - Expand the precision of the two
-+ *         right-alternate elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11922,7 +11943,8 @@ std::string NMD::PRECEQU_PH_QBRA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEQU.PH.QBR rt, rs - Expand the precision of the two right-most
-+ *         elements of a quad byte vector
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11944,7 +11966,9 @@ std::string NMD::PRECEQU_PH_QBR(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBLA rt, rs - Expand the precision of the two
-+ *         left-alternate elements of a quad byte vector to four unsigned
-+ *         halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11966,7 +11990,8 @@ std::string NMD::PRECEU_PH_QBLA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBL rt, rs - Expand the precision of the two left-most
-+ *         elements of a quad byte vector to form unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -11988,7 +12013,9 @@ std::string NMD::PRECEU_PH_QBL(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBRA rt, rs - Expand the precision of the two
-+ *         right-alternate elements of a quad byte vector to form four
-+ *         unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -12010,7 +12037,8 @@ std::string NMD::PRECEU_PH_QBRA(uint64 instruction)
- 
- 
- /*
-- * ADDQH_R.W rd, rt, rs - Add Fractional Words And Shift Right to Halve Results
-+ * [DSP] PRECEU.PH.QBR rt, rs - Expand the precision of the two right-most
-+ *         elements of a quad byte vector to form unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15202,7 +15230,7 @@ std::string NMD::SUBU_32_(uint64 instruction)
- 
- 
- /*
-- * SUBU.PH rd, rs, rt - Subtract Unsigned Integer Halfwords
-+ * [DSP] SUBU.PH rd, rs, rt - Subtract unsigned unsigned halfwords
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15226,7 +15254,7 @@ std::string NMD::SUBU_PH(uint64 instruction)
- 
- 
- /*
-- * SUBU.QB rd, rs, rt - Subtract Unsigned Quad Byte Vector
-+ * [DSP] SUBU.QB rd, rs, rt - Subtract unsigned quad byte vectors
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15250,7 +15278,8 @@ std::string NMD::SUBU_QB(uint64 instruction)
- 
- 
- /*
-- * SUBU_S.PH rd, rs, rt - Subtract Unsigned Integer Halfwords (saturating)
-+ * [DSP] SUBU_S.PH rd, rs, rt - Subtract unsigned unsigned halfwords with
-+ *         8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15274,7 +15303,8 @@ std::string NMD::SUBU_S_PH(uint64 instruction)
- 
- 
- /*
-- * SUBU_S.QB rd, rs, rt - Subtract Unsigned Quad Byte Vector (saturating)
-+ * [DSP] SUBU_S.QB rd, rs, rt - Subtract unsigned quad byte vectors with
-+ *         8-bit saturation
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15298,8 +15328,8 @@ std::string NMD::SUBU_S_QB(uint64 instruction)
- 
- 
- /*
-- * SUBUH.QB rd, rs, rt - Subtract Unsigned Bytes And Right Shift to Halve
-- *                         Results
-+ * [DSP] SUBUH.QB rd, rs, rt - Subtract unsigned bytes and right shift
-+ *         to halve results
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -15323,8 +15353,8 @@ std::string NMD::SUBUH_QB(uint64 instruction)
- 
- 
- /*
-- * SUBUH_R.QB rd, rs, rt - Subtract Unsigned Bytes And Right Shift to Halve
-- *                           Results (rounding)
-+ * [DSP] SUBUH_R.QB rd, rs, rt - Subtract unsigned bytes and right shift
-+ *         to halve results with rounding
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
-@@ -16412,7 +16442,8 @@ std::string NMD::WAIT(uint64 instruction)
- 
- 
- /*
-- * WRDSP rt, mask - Write Fields to DSPControl Register from a GPR
-+ * [DSP] WRDSP rt, mask - Write selected fields from a GPR to the DSPControl
-+ *         register
-  *
-  *   3         2         1
-  *  10987654321098765432109876543210
+are available in the git repository at:
+
+  https://github.com/AMarkovic/qemu tags/mips-queue-january-25-2019
+
+for you to fetch changes up to e5a5b1bb7cfa2da3762f947003cba6a16fa242a1:
+
+  docs/qemu-cpu-models: Add MIPS/nanoMIPS QEMU supported CPU models (2019-01-24 17:48:33 +0100)
+
+----------------------------------------------------------------
+
+MIPS queue for January 25, 2019:
+
+  - reorganization of MIPS TCG tests directories and files
+  - documentation updates for MIPS
+  - enabling I6500 core support
+  - other misc MIPS fixes
+
+----------------------------------------------------------------
+Aleksandar Markovic (10):
+  target/mips: nanoMIPS: Remove duplicate macro definitions
+  target/mips: nanoMIPS: Remove an unused macro
+  target/mips: nanoMIPS: Rename macros for extracting 3-bit-coded GPR
+    numbers
+  target/mips: Correct the second argument type of cpu_supports_isa()
+  target/mips: Extend gen_scwp() functionality to support EVA
+  disas: nanoMIPS: Amend DSP instructions related comments
+  MAINTAINERS: Update MIPS sections
+  tests: tcg: mips: Move source files to new locations
+  tests: tcg: mips: Add two new Makefiles
+  tests: tcg: mips: Remove old directories
+
+Stefan Markovic (3):
+  target/mips: nanoMIPS: Fix branch handling
+  qemu-doc: Add nanoMIPS ISA information
+  docs/qemu-cpu-models: Add MIPS/nanoMIPS QEMU supported CPU models
+
+Yongbok Kim (1):
+  target/mips: Add I6500 core configuration
+
+ MAINTAINERS                                        |   9 -
+ disas/nanomips.cpp                                 | 119 +++++---
+ docs/qemu-cpu-models.texi                          | 163 ++++++++++-
+ qemu-doc.texi                                      |  29 ++
+ target/mips/cpu.h                                  |   2 +-
+ target/mips/translate.c                            |  61 ++--
+ target/mips/translate_init.inc.c                   |  40 +++
+ tests/tcg/mips/mips32-dsp/Makefile                 | 136 ---------
+ tests/tcg/mips/mips32-dsp/absq_s_ph.c              |  31 ---
+ tests/tcg/mips/mips32-dsp/absq_s_w.c               |  37 ---
+ tests/tcg/mips/mips32-dsp/addq_ph.c                |  46 ----
+ tests/tcg/mips/mips32-dsp/addq_s_ph.c              |  69 -----
+ tests/tcg/mips/mips32-dsp/addq_s_w.c               |  44 ---
+ tests/tcg/mips/mips32-dsp/addsc.c                  |  33 ---
+ tests/tcg/mips/mips32-dsp/addu_qb.c                |  35 ---
+ tests/tcg/mips/mips32-dsp/addu_s_qb.c              |  35 ---
+ tests/tcg/mips/mips32-dsp/addwc.c                  |  49 ----
+ tests/tcg/mips/mips32-dsp/bitrev.c                 |  20 --
+ tests/tcg/mips/mips32-dsp/bposge32.c               |  44 ---
+ tests/tcg/mips/mips32-dsp/cmp_eq_ph.c              |  35 ---
+ tests/tcg/mips/mips32-dsp/cmp_le_ph.c              |  35 ---
+ tests/tcg/mips/mips32-dsp/cmp_lt_ph.c              |  35 ---
+ tests/tcg/mips/mips32-dsp/cmpgu_eq_qb.c            |  31 ---
+ tests/tcg/mips/mips32-dsp/cmpgu_le_qb.c            |  31 ---
+ tests/tcg/mips/mips32-dsp/cmpgu_lt_qb.c            |  31 ---
+ tests/tcg/mips/mips32-dsp/cmpu_eq_qb.c             |  35 ---
+ tests/tcg/mips/mips32-dsp/cmpu_le_qb.c             |  35 ---
+ tests/tcg/mips/mips32-dsp/cmpu_lt_qb.c             |  35 ---
+ tests/tcg/mips/mips32-dsp/dpaq_s_w_ph.c            |  31 ---
+ tests/tcg/mips/mips32-dsp/dpaq_sa_l_w.c            | 125 ---------
+ tests/tcg/mips/mips32-dsp/dpau_h_qbl.c             |  27 --
+ tests/tcg/mips/mips32-dsp/dpau_h_qbr.c             |  27 --
+ tests/tcg/mips/mips32-dsp/dpsq_s_w_ph.c            |  45 ---
+ tests/tcg/mips/mips32-dsp/dpsq_sa_l_w.c            |  55 ----
+ tests/tcg/mips/mips32-dsp/dpsu_h_qbl.c             |  27 --
+ tests/tcg/mips/mips32-dsp/dpsu_h_qbr.c             |  27 --
+ tests/tcg/mips/mips32-dsp/extp.c                   |  62 -----
+ tests/tcg/mips/mips32-dsp/extpdp.c                 |  64 -----
+ tests/tcg/mips/mips32-dsp/extpdpv.c                |  47 ----
+ tests/tcg/mips/mips32-dsp/extpv.c                  |  45 ---
+ tests/tcg/mips/mips32-dsp/extr_r_w.c               |  94 -------
+ tests/tcg/mips/mips32-dsp/extr_rs_w.c              | 117 --------
+ tests/tcg/mips/mips32-dsp/extr_s_h.c               |  86 ------
+ tests/tcg/mips/mips32-dsp/extr_w.c                 |  94 -------
+ tests/tcg/mips/mips32-dsp/extrv_r_w.c              |  79 ------
+ tests/tcg/mips/mips32-dsp/extrv_rs_w.c             |  77 ------
+ tests/tcg/mips/mips32-dsp/extrv_s_h.c              |  88 ------
+ tests/tcg/mips/mips32-dsp/extrv_w.c                |  80 ------
+ tests/tcg/mips/mips32-dsp/insv.c                   |  36 ---
+ tests/tcg/mips/mips32-dsp/lbux.c                   |  25 --
+ tests/tcg/mips/mips32-dsp/lhx.c                    |  25 --
+ tests/tcg/mips/mips32-dsp/lwx.c                    |  25 --
+ tests/tcg/mips/mips32-dsp/madd.c                   |  31 ---
+ tests/tcg/mips/mips32-dsp/maddu.c                  |  31 ---
+ tests/tcg/mips/mips32-dsp/main.c                   |   6 -
+ tests/tcg/mips/mips32-dsp/maq_s_w_phl.c            |  55 ----
+ tests/tcg/mips/mips32-dsp/maq_s_w_phr.c            |  55 ----
+ tests/tcg/mips/mips32-dsp/maq_sa_w_phl.c           |  55 ----
+ tests/tcg/mips/mips32-dsp/maq_sa_w_phr.c           |  55 ----
+ tests/tcg/mips/mips32-dsp/mfhi.c                   |  21 --
+ tests/tcg/mips/mips32-dsp/mflo.c                   |  21 --
+ tests/tcg/mips/mips32-dsp/modsub.c                 |  30 --
+ tests/tcg/mips/mips32-dsp/msub.c                   |  30 --
+ tests/tcg/mips/mips32-dsp/msubu.c                  |  30 --
+ tests/tcg/mips/mips32-dsp/mthi.c                   |  21 --
+ tests/tcg/mips/mips32-dsp/mthlip.c                 |  58 ----
+ tests/tcg/mips/mips32-dsp/mtlo.c                   |  21 --
+ tests/tcg/mips/mips32-dsp/muleq_s_w_phl.c          |  41 ---
+ tests/tcg/mips/mips32-dsp/muleq_s_w_phr.c          |  40 ---
+ tests/tcg/mips/mips32-dsp/muleu_s_ph_qbl.c         |  25 --
+ tests/tcg/mips/mips32-dsp/muleu_s_ph_qbr.c         |  25 --
+ tests/tcg/mips/mips32-dsp/mulq_rs_ph.c             |  42 ---
+ tests/tcg/mips/mips32-dsp/mult.c                   |  24 --
+ tests/tcg/mips/mips32-dsp/multu.c                  |  24 --
+ tests/tcg/mips/mips32-dsp/packrl_ph.c              |  21 --
+ tests/tcg/mips/mips32-dsp/pick_ph.c                |  49 ----
+ tests/tcg/mips/mips32-dsp/pick_qb.c                |  36 ---
+ tests/tcg/mips/mips32-dsp/preceq_w_phl.c           |  20 --
+ tests/tcg/mips/mips32-dsp/preceq_w_phr.c           |  20 --
+ tests/tcg/mips/mips32-dsp/precequ_ph_qbl.c         |  20 --
+ tests/tcg/mips/mips32-dsp/precequ_ph_qbla.c        |  20 --
+ tests/tcg/mips/mips32-dsp/precequ_ph_qbr.c         |  20 --
+ tests/tcg/mips/mips32-dsp/precequ_ph_qbra.c        |  20 --
+ tests/tcg/mips/mips32-dsp/preceu_ph_qbl.c          |  20 --
+ tests/tcg/mips/mips32-dsp/preceu_ph_qbla.c         |  20 --
+ tests/tcg/mips/mips32-dsp/preceu_ph_qbr.c          |  20 --
+ tests/tcg/mips/mips32-dsp/preceu_ph_qbra.c         |  20 --
+ tests/tcg/mips/mips32-dsp/precrq_ph_w.c            |  21 --
+ tests/tcg/mips/mips32-dsp/precrq_qb_ph.c           |  21 --
+ tests/tcg/mips/mips32-dsp/precrq_rs_ph_w.c         |  51 ----
+ tests/tcg/mips/mips32-dsp/precrqu_s_qb_ph.c        |  24 --
+ tests/tcg/mips/mips32-dsp/raddu_w_qb.c             |  20 --
+ tests/tcg/mips/mips32-dsp/rddsp.c                  |  46 ----
+ tests/tcg/mips/mips32-dsp/repl_ph.c                |  23 --
+ tests/tcg/mips/mips32-dsp/repl_qb.c                |  16 --
+ tests/tcg/mips/mips32-dsp/replv_ph.c               |  19 --
+ tests/tcg/mips/mips32-dsp/replv_qb.c               |  19 --
+ tests/tcg/mips/mips32-dsp/shilo.c                  |  45 ---
+ tests/tcg/mips/mips32-dsp/shilov.c                 |  49 ----
+ tests/tcg/mips/mips32-dsp/shll_ph.c                |  55 ----
+ tests/tcg/mips/mips32-dsp/shll_qb.c                |  55 ----
+ tests/tcg/mips/mips32-dsp/shll_s_ph.c              |  24 --
+ tests/tcg/mips/mips32-dsp/shll_s_w.c               |  52 ----
+ tests/tcg/mips/mips32-dsp/shllv_ph.c               |  40 ---
+ tests/tcg/mips/mips32-dsp/shllv_qb.c               |  38 ---
+ tests/tcg/mips/mips32-dsp/shllv_s_ph.c             |  40 ---
+ tests/tcg/mips/mips32-dsp/shllv_s_w.c              |  40 ---
+ tests/tcg/mips/mips32-dsp/shra_ph.c                |  30 --
+ tests/tcg/mips/mips32-dsp/shra_r_ph.c              |  30 --
+ tests/tcg/mips/mips32-dsp/shra_r_w.c               |  30 --
+ tests/tcg/mips/mips32-dsp/shrav_ph.c               |  32 ---
+ tests/tcg/mips/mips32-dsp/shrav_r_ph.c             |  32 ---
+ tests/tcg/mips/mips32-dsp/shrav_r_w.c              |  32 ---
+ tests/tcg/mips/mips32-dsp/shrl_qb.c                |  31 ---
+ tests/tcg/mips/mips32-dsp/shrlv_qb.c               |  32 ---
+ tests/tcg/mips/mips32-dsp/subq_ph.c                |  40 ---
+ tests/tcg/mips/mips32-dsp/subq_s_ph.c              |  58 ----
+ tests/tcg/mips/mips32-dsp/subq_s_w.c               |  74 -----
+ tests/tcg/mips/mips32-dsp/subu_qb.c                |  25 --
+ tests/tcg/mips/mips32-dsp/subu_s_qb.c              |  25 --
+ tests/tcg/mips/mips32-dsp/wrdsp.c                  |  46 ----
+ tests/tcg/mips/mips32-dspr2/Makefile               |  71 -----
+ tests/tcg/mips/mips32-dspr2/absq_s_qb.c            |  35 ---
+ tests/tcg/mips/mips32-dspr2/addqh_ph.c             |  30 --
+ tests/tcg/mips/mips32-dspr2/addqh_r_ph.c           |  30 --
+ tests/tcg/mips/mips32-dspr2/addqh_r_w.c            |  34 ---
+ tests/tcg/mips/mips32-dspr2/addqh_w.c              |  34 ---
+ tests/tcg/mips/mips32-dspr2/addu_ph.c              |  33 ---
+ tests/tcg/mips/mips32-dspr2/addu_s_ph.c            |  33 ---
+ tests/tcg/mips/mips32-dspr2/adduh_qb.c             |  30 --
+ tests/tcg/mips/mips32-dspr2/adduh_r_qb.c           |  30 --
+ tests/tcg/mips/mips32-dspr2/append.c               |  30 --
+ tests/tcg/mips/mips32-dspr2/balign.c               |  30 --
+ tests/tcg/mips/mips32-dspr2/cmpgdu_eq_qb.c         |  37 ---
+ tests/tcg/mips/mips32-dspr2/cmpgdu_le_qb.c         |  37 ---
+ tests/tcg/mips/mips32-dspr2/cmpgdu_lt_qb.c         |  37 ---
+ tests/tcg/mips/mips32-dspr2/dpa_w_ph.c             |  44 ---
+ tests/tcg/mips/mips32-dspr2/dpaqx_s_w_ph.c         |  79 ------
+ tests/tcg/mips/mips32-dspr2/dpaqx_sa_w_ph.c        |  57 ----
+ tests/tcg/mips/mips32-dspr2/dpax_w_ph.c            |  44 ---
+ tests/tcg/mips/mips32-dspr2/dps_w_ph.c             |  44 ---
+ tests/tcg/mips/mips32-dspr2/dpsqx_s_w_ph.c         |  54 ----
+ tests/tcg/mips/mips32-dspr2/dpsqx_sa_w_ph.c        |  53 ----
+ tests/tcg/mips/mips32-dspr2/dpsx_w_ph.c            |  27 --
+ tests/tcg/mips/mips32-dspr2/mul_ph.c               |  47 ----
+ tests/tcg/mips/mips32-dspr2/mul_s_ph.c             |  62 -----
+ tests/tcg/mips/mips32-dspr2/mulq_rs_w.c            |  36 ---
+ tests/tcg/mips/mips32-dspr2/mulq_s_ph.c            |  40 ---
+ tests/tcg/mips/mips32-dspr2/mulq_s_w.c             |  36 ---
+ tests/tcg/mips/mips32-dspr2/mulsa_w_ph.c           |  29 --
+ tests/tcg/mips/mips32-dspr2/mulsaq_s_w_ph.c        |  29 --
+ tests/tcg/mips/mips32-dspr2/precr_qb_ph.c          |  21 --
+ tests/tcg/mips/mips32-dspr2/precr_sra_ph_w.c       |  32 ---
+ tests/tcg/mips/mips32-dspr2/precr_sra_r_ph_w.c     |  32 ---
+ tests/tcg/mips/mips32-dspr2/prepend.c              |  30 --
+ tests/tcg/mips/mips32-dspr2/shra_qb.c              |  30 --
+ tests/tcg/mips/mips32-dspr2/shra_r_qb.c            |  30 --
+ tests/tcg/mips/mips32-dspr2/shrav_qb.c             |  32 ---
+ tests/tcg/mips/mips32-dspr2/shrav_r_qb.c           |  32 ---
+ tests/tcg/mips/mips32-dspr2/shrl_ph.c              |  20 --
+ tests/tcg/mips/mips32-dspr2/shrlv_ph.c             |  21 --
+ tests/tcg/mips/mips32-dspr2/subqh_ph.c             |  21 --
+ tests/tcg/mips/mips32-dspr2/subqh_r_ph.c           |  21 --
+ tests/tcg/mips/mips32-dspr2/subqh_r_w.c            |  21 --
+ tests/tcg/mips/mips32-dspr2/subqh_w.c              |  21 --
+ tests/tcg/mips/mips32-dspr2/subu_ph.c              |  40 ---
+ tests/tcg/mips/mips32-dspr2/subu_s_ph.c            |  25 --
+ tests/tcg/mips/mips32-dspr2/subuh_qb.c             |  21 --
+ tests/tcg/mips/mips32-dspr2/subuh_r_qb.c           |  32 ---
+ tests/tcg/mips/mips64-dsp/Makefile                 | 306 ---------------------
+ tests/tcg/mips/mips64-dsp/absq_s_ob.c              |  63 -----
+ tests/tcg/mips/mips64-dsp/absq_s_ph.c              |  37 ---
+ tests/tcg/mips/mips64-dsp/absq_s_pw.c              |  66 -----
+ tests/tcg/mips/mips64-dsp/absq_s_qh.c              |  40 ---
+ tests/tcg/mips/mips64-dsp/absq_s_w.c               |  48 ----
+ tests/tcg/mips/mips64-dsp/addq_ph.c                |  57 ----
+ tests/tcg/mips/mips64-dsp/addq_pw.c                |  46 ----
+ tests/tcg/mips/mips64-dsp/addq_qh.c                |  28 --
+ tests/tcg/mips/mips64-dsp/addq_s_ph.c              |  84 ------
+ tests/tcg/mips/mips64-dsp/addq_s_pw.c              |  45 ---
+ tests/tcg/mips/mips64-dsp/addq_s_qh.c              |  26 --
+ tests/tcg/mips/mips64-dsp/addq_s_w.c               |  48 ----
+ tests/tcg/mips/mips64-dsp/addsc.c                  |  39 ---
+ tests/tcg/mips/mips64-dsp/addu_ob.c                |  28 --
+ tests/tcg/mips/mips64-dsp/addu_qb.c                |  40 ---
+ tests/tcg/mips/mips64-dsp/addu_s_ob.c              |  27 --
+ tests/tcg/mips/mips64-dsp/addu_s_qb.c              |  40 ---
+ tests/tcg/mips/mips64-dsp/addwc.c                  |  59 ----
+ tests/tcg/mips/mips64-dsp/bitrev.c                 |  23 --
+ tests/tcg/mips/mips64-dsp/bposge32.c               |  50 ----
+ tests/tcg/mips/mips64-dsp/bposge64.c               |  50 ----
+ tests/tcg/mips/mips64-dsp/cmp_eq_ph.c              |  42 ---
+ tests/tcg/mips/mips64-dsp/cmp_eq_pw.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmp_eq_qh.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmp_le_ph.c              |  40 ---
+ tests/tcg/mips/mips64-dsp/cmp_le_pw.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmp_le_qh.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmp_lt_ph.c              |  41 ---
+ tests/tcg/mips/mips64-dsp/cmp_lt_pw.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmp_lt_qh.c              |  46 ----
+ tests/tcg/mips/mips64-dsp/cmpgu_eq_ob.c            |  40 ---
+ tests/tcg/mips/mips64-dsp/cmpgu_eq_qb.c            |  38 ---
+ tests/tcg/mips/mips64-dsp/cmpgu_le_ob.c            |  40 ---
+ tests/tcg/mips/mips64-dsp/cmpgu_le_qb.c            |  37 ---
+ tests/tcg/mips/mips64-dsp/cmpgu_lt_ob.c            |  40 ---
+ tests/tcg/mips/mips64-dsp/cmpgu_lt_qb.c            |  38 ---
+ tests/tcg/mips/mips64-dsp/cmpu_eq_ob.c             |  46 ----
+ tests/tcg/mips/mips64-dsp/cmpu_eq_qb.c             |  42 ---
+ tests/tcg/mips/mips64-dsp/cmpu_le_ob.c             |  44 ---
+ tests/tcg/mips/mips64-dsp/cmpu_le_qb.c             |  41 ---
+ tests/tcg/mips/mips64-dsp/cmpu_lt_ob.c             |  44 ---
+ tests/tcg/mips/mips64-dsp/cmpu_lt_qb.c             |  42 ---
+ tests/tcg/mips/mips64-dsp/dappend.c                |  37 ---
+ tests/tcg/mips/mips64-dsp/dextp.c                  |  54 ----
+ tests/tcg/mips/mips64-dsp/dextpdp.c                |  59 ----
+ tests/tcg/mips/mips64-dsp/dextpdpv.c               |  63 -----
+ tests/tcg/mips/mips64-dsp/dextpv.c                 |  58 ----
+ tests/tcg/mips/mips64-dsp/dextr_l.c                |  44 ---
+ tests/tcg/mips/mips64-dsp/dextr_r_l.c              |  54 ----
+ tests/tcg/mips/mips64-dsp/dextr_r_w.c              |  54 ----
+ tests/tcg/mips/mips64-dsp/dextr_rs_l.c             |  52 ----
+ tests/tcg/mips/mips64-dsp/dextr_rs_w.c             |  52 ----
+ tests/tcg/mips/mips64-dsp/dextr_s_h.c              |  73 -----
+ tests/tcg/mips/mips64-dsp/dextr_w.c                |  44 ---
+ tests/tcg/mips/mips64-dsp/dextrv_l.c               |  46 ----
+ tests/tcg/mips/mips64-dsp/dextrv_r_l.c             |  56 ----
+ tests/tcg/mips/mips64-dsp/dextrv_r_w.c             |  56 ----
+ tests/tcg/mips/mips64-dsp/dextrv_rs_l.c            |  54 ----
+ tests/tcg/mips/mips64-dsp/dextrv_rs_w.c            |  54 ----
+ tests/tcg/mips/mips64-dsp/dextrv_s_h.c             |  32 ---
+ tests/tcg/mips/mips64-dsp/dextrv_w.c               |  46 ----
+ tests/tcg/mips/mips64-dsp/dinsv.c                  |  26 --
+ tests/tcg/mips/mips64-dsp/dmadd.c                  |  57 ----
+ tests/tcg/mips/mips64-dsp/dmaddu.c                 |  56 ----
+ tests/tcg/mips/mips64-dsp/dmsub.c                  |  59 ----
+ tests/tcg/mips/mips64-dsp/dmsubu.c                 |  59 ----
+ tests/tcg/mips/mips64-dsp/dmthlip.c                |  41 ---
+ tests/tcg/mips/mips64-dsp/dpaq_s_w_ph.c            |  32 ---
+ tests/tcg/mips/mips64-dsp/dpaq_s_w_qh.c            |  57 ----
+ tests/tcg/mips/mips64-dsp/dpaq_sa_l_pw.c           |  88 ------
+ tests/tcg/mips/mips64-dsp/dpaq_sa_l_w.c            |  82 ------
+ tests/tcg/mips/mips64-dsp/dpau_h_obl.c             |  59 ----
+ tests/tcg/mips/mips64-dsp/dpau_h_obr.c             |  59 ----
+ tests/tcg/mips/mips64-dsp/dpau_h_qbl.c             |  29 --
+ tests/tcg/mips/mips64-dsp/dpau_h_qbr.c             |  29 --
+ tests/tcg/mips/mips64-dsp/dpsq_s_w_ph.c            |  51 ----
+ tests/tcg/mips/mips64-dsp/dpsq_s_w_qh.c            |  56 ----
+ tests/tcg/mips/mips64-dsp/dpsq_sa_l_pw.c           |  76 -----
+ tests/tcg/mips/mips64-dsp/dpsq_sa_l_w.c            |  59 ----
+ tests/tcg/mips/mips64-dsp/dpsu_h_obl.c             |  32 ---
+ tests/tcg/mips/mips64-dsp/dpsu_h_obr.c             |  32 ---
+ tests/tcg/mips/mips64-dsp/dpsu_h_qbl.c             |  29 --
+ tests/tcg/mips/mips64-dsp/dpsu_h_qbr.c             |  29 --
+ tests/tcg/mips/mips64-dsp/dshilo.c                 |  52 ----
+ tests/tcg/mips/mips64-dsp/dshilov.c                |  54 ----
+ tests/tcg/mips/mips64-dsp/extp.c                   |  50 ----
+ tests/tcg/mips/mips64-dsp/extpdp.c                 |  51 ----
+ tests/tcg/mips/mips64-dsp/extpdpv.c                |  52 ----
+ tests/tcg/mips/mips64-dsp/extpv.c                  |  51 ----
+ tests/tcg/mips/mips64-dsp/extr_r_w.c               |  53 ----
+ tests/tcg/mips/mips64-dsp/extr_rs_w.c              |  53 ----
+ tests/tcg/mips/mips64-dsp/extr_s_h.c               |  71 -----
+ tests/tcg/mips/mips64-dsp/extr_w.c                 |  53 ----
+ tests/tcg/mips/mips64-dsp/extrv_r_w.c              |  59 ----
+ tests/tcg/mips/mips64-dsp/extrv_rs_w.c             |  59 ----
+ tests/tcg/mips/mips64-dsp/extrv_s_h.c              |  79 ------
+ tests/tcg/mips/mips64-dsp/extrv_w.c                |  59 ----
+ tests/tcg/mips/mips64-dsp/head.S                   |  16 --
+ tests/tcg/mips/mips64-dsp/insv.c                   |  26 --
+ tests/tcg/mips/mips64-dsp/io.h                     |  22 --
+ tests/tcg/mips/mips64-dsp/lbux.c                   |  27 --
+ tests/tcg/mips/mips64-dsp/ldx.c                    |  27 --
+ tests/tcg/mips/mips64-dsp/lhx.c                    |  27 --
+ tests/tcg/mips/mips64-dsp/lwx.c                    |  27 --
+ tests/tcg/mips/mips64-dsp/madd.c                   |  33 ---
+ tests/tcg/mips/mips64-dsp/maddu.c                  |  33 ---
+ tests/tcg/mips/mips64-dsp/maq_s_l_pwl.c            |  56 ----
+ tests/tcg/mips/mips64-dsp/maq_s_l_pwr.c            |  56 ----
+ tests/tcg/mips/mips64-dsp/maq_s_w_phl.c            |  60 ----
+ tests/tcg/mips/mips64-dsp/maq_s_w_phr.c            |  60 ----
+ tests/tcg/mips/mips64-dsp/maq_s_w_qhll.c           |  62 -----
+ tests/tcg/mips/mips64-dsp/maq_s_w_qhlr.c           |  62 -----
+ tests/tcg/mips/mips64-dsp/maq_s_w_qhrl.c           |  63 -----
+ tests/tcg/mips/mips64-dsp/maq_s_w_qhrr.c           |  63 -----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_phl.c           |  60 ----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_phr.c           |  60 ----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_qhll.c          |  62 -----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_qhlr.c          |  64 -----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_qhrl.c          |  64 -----
+ tests/tcg/mips/mips64-dsp/maq_sa_w_qhrr.c          |  64 -----
+ tests/tcg/mips/mips64-dsp/mfhi.c                   |  24 --
+ tests/tcg/mips/mips64-dsp/mflo.c                   |  24 --
+ tests/tcg/mips/mips64-dsp/mips_boot.lds            |  31 ---
+ tests/tcg/mips/mips64-dsp/modsub.c                 |  37 ---
+ tests/tcg/mips/mips64-dsp/msub.c                   |  32 ---
+ tests/tcg/mips/mips64-dsp/msubu.c                  |  32 ---
+ tests/tcg/mips/mips64-dsp/mthi.c                   |  24 --
+ tests/tcg/mips/mips64-dsp/mthlip.c                 |  61 ----
+ tests/tcg/mips/mips64-dsp/mtlo.c                   |  22 --
+ tests/tcg/mips/mips64-dsp/muleq_s_pw_qhl.c         |  56 ----
+ tests/tcg/mips/mips64-dsp/muleq_s_pw_qhr.c         |  57 ----
+ tests/tcg/mips/mips64-dsp/muleq_s_w_phl.c          |  46 ----
+ tests/tcg/mips/mips64-dsp/muleq_s_w_phr.c          |  45 ---
+ tests/tcg/mips/mips64-dsp/muleu_s_ph_qbl.c         |  27 --
+ tests/tcg/mips/mips64-dsp/muleu_s_ph_qbr.c         |  27 --
+ tests/tcg/mips/mips64-dsp/muleu_s_qh_obl.c         |  30 --
+ tests/tcg/mips/mips64-dsp/muleu_s_qh_obr.c         |  31 ---
+ tests/tcg/mips/mips64-dsp/mulq_rs_ph.c             |  27 --
+ tests/tcg/mips/mips64-dsp/mulq_rs_qh.c             |  33 ---
+ tests/tcg/mips/mips64-dsp/mulsaq_s_l_pw.c          |  59 ----
+ tests/tcg/mips/mips64-dsp/mulsaq_s_w_qh.c          |  57 ----
+ tests/tcg/mips/mips64-dsp/mult.c                   |  26 --
+ tests/tcg/mips/mips64-dsp/multu.c                  |  26 --
+ tests/tcg/mips/mips64-dsp/packrl_ph.c              |  24 --
+ tests/tcg/mips/mips64-dsp/packrl_pw.c              |  24 --
+ tests/tcg/mips/mips64-dsp/pick_ob.c                |  66 -----
+ tests/tcg/mips/mips64-dsp/pick_ph.c                |  60 ----
+ tests/tcg/mips/mips64-dsp/pick_pw.c                |  48 ----
+ tests/tcg/mips/mips64-dsp/pick_qb.c                |  43 ---
+ tests/tcg/mips/mips64-dsp/pick_qh.c                |  48 ----
+ tests/tcg/mips/mips64-dsp/preceq_l_pwl.c           |  24 --
+ tests/tcg/mips/mips64-dsp/preceq_l_pwr.c           |  24 --
+ tests/tcg/mips/mips64-dsp/preceq_pw_qhl.c          |  21 --
+ tests/tcg/mips/mips64-dsp/preceq_pw_qhla.c         |  23 --
+ tests/tcg/mips/mips64-dsp/preceq_pw_qhr.c          |  21 --
+ tests/tcg/mips/mips64-dsp/preceq_pw_qhra.c         |  23 --
+ tests/tcg/mips/mips64-dsp/preceq_w_phl.c           |  23 --
+ tests/tcg/mips/mips64-dsp/preceq_w_phr.c           |  23 --
+ tests/tcg/mips/mips64-dsp/precequ_ph_qbl.c         |  23 --
+ tests/tcg/mips/mips64-dsp/precequ_ph_qbla.c        |  23 --
+ tests/tcg/mips/mips64-dsp/precequ_ph_qbr.c         |  23 --
+ tests/tcg/mips/mips64-dsp/precequ_ph_qbra.c        |  23 --
+ tests/tcg/mips/mips64-dsp/precequ_qh_obl.c         |  22 --
+ tests/tcg/mips/mips64-dsp/precequ_qh_obla.c        |  22 --
+ tests/tcg/mips/mips64-dsp/precequ_qh_obr.c         |  24 --
+ tests/tcg/mips/mips64-dsp/precequ_qh_obra.c        |  24 --
+ tests/tcg/mips/mips64-dsp/preceu_ph_qbl.c          |  23 --
+ tests/tcg/mips/mips64-dsp/preceu_ph_qbla.c         |  23 --
+ tests/tcg/mips/mips64-dsp/preceu_ph_qbr.c          |  23 --
+ tests/tcg/mips/mips64-dsp/preceu_ph_qbra.c         |  23 --
+ tests/tcg/mips/mips64-dsp/preceu_qh_obl.c          |  22 --
+ tests/tcg/mips/mips64-dsp/preceu_qh_obla.c         |  22 --
+ tests/tcg/mips/mips64-dsp/preceu_qh_obr.c          |  23 --
+ tests/tcg/mips/mips64-dsp/preceu_qh_obra.c         |  23 --
+ tests/tcg/mips/mips64-dsp/precr_ob_qh.c            |  25 --
+ tests/tcg/mips/mips64-dsp/precr_sra_qh_pw.c        |  40 ---
+ tests/tcg/mips/mips64-dsp/precr_sra_r_qh_pw.c      |  40 ---
+ tests/tcg/mips/mips64-dsp/precrq_ob_qh.c           |  25 --
+ tests/tcg/mips/mips64-dsp/precrq_ph_w.c            |  24 --
+ tests/tcg/mips/mips64-dsp/precrq_pw_l.c            |  25 --
+ tests/tcg/mips/mips64-dsp/precrq_qb_ph.c           |  24 --
+ tests/tcg/mips/mips64-dsp/precrq_qh_pw.c           |  25 --
+ tests/tcg/mips/mips64-dsp/precrq_rs_ph_w.c         |  41 ---
+ tests/tcg/mips/mips64-dsp/precrq_rs_qh_pw.c        |  43 ---
+ tests/tcg/mips/mips64-dsp/precrqu_s_ob_qh.c        |  27 --
+ tests/tcg/mips/mips64-dsp/precrqu_s_qb_ph.c        |  26 --
+ tests/tcg/mips/mips64-dsp/prependd.c               |  37 ---
+ tests/tcg/mips/mips64-dsp/prependw.c               |  37 ---
+ tests/tcg/mips/mips64-dsp/printf.c                 | 266 ------------------
+ tests/tcg/mips/mips64-dsp/raddu_l_ob.c             |  22 --
+ tests/tcg/mips/mips64-dsp/raddu_w_qb.c             |  23 --
+ tests/tcg/mips/mips64-dsp/rddsp.c                  |  53 ----
+ tests/tcg/mips/mips64-dsp/repl_ob.c                |  21 --
+ tests/tcg/mips/mips64-dsp/repl_ph.c                |  30 --
+ tests/tcg/mips/mips64-dsp/repl_pw.c                |  34 ---
+ tests/tcg/mips/mips64-dsp/repl_qb.c                |  19 --
+ tests/tcg/mips/mips64-dsp/repl_qh.c                |  34 ---
+ tests/tcg/mips/mips64-dsp/replv_ob.c               |  23 --
+ tests/tcg/mips/mips64-dsp/replv_ph.c               |  22 --
+ tests/tcg/mips/mips64-dsp/replv_pw.c               |  23 --
+ tests/tcg/mips/mips64-dsp/replv_qb.c               |  22 --
+ tests/tcg/mips/mips64-dsp/shilo.c                  |  29 --
+ tests/tcg/mips/mips64-dsp/shilov.c                 |  31 ---
+ tests/tcg/mips/mips64-dsp/shll_ob.c                |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_ph.c                |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_pw.c                |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_qb.c                |  26 --
+ tests/tcg/mips/mips64-dsp/shll_qh.c                |  42 ---
+ tests/tcg/mips/mips64-dsp/shll_s_ph.c              |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_s_pw.c              |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_s_qh.c              |  43 ---
+ tests/tcg/mips/mips64-dsp/shll_s_w.c               |  26 --
+ tests/tcg/mips/mips64-dsp/shllv_ob.c               |  45 ---
+ tests/tcg/mips/mips64-dsp/shllv_ph.c               |  27 --
+ tests/tcg/mips/mips64-dsp/shllv_pw.c               |  45 ---
+ tests/tcg/mips/mips64-dsp/shllv_qb.c               |  27 --
+ tests/tcg/mips/mips64-dsp/shllv_qh.c               |  45 ---
+ tests/tcg/mips/mips64-dsp/shllv_s_ph.c             |  27 --
+ tests/tcg/mips/mips64-dsp/shllv_s_pw.c             |  45 ---
+ tests/tcg/mips/mips64-dsp/shllv_s_qh.c             |  45 ---
+ tests/tcg/mips/mips64-dsp/shllv_s_w.c              |  27 --
+ tests/tcg/mips/mips64-dsp/shra_ob.c                |  23 --
+ tests/tcg/mips/mips64-dsp/shra_ph.c                |  23 --
+ tests/tcg/mips/mips64-dsp/shra_pw.c                |  36 ---
+ tests/tcg/mips/mips64-dsp/shra_qh.c                |  37 ---
+ tests/tcg/mips/mips64-dsp/shra_r_ob.c              |  22 --
+ tests/tcg/mips/mips64-dsp/shra_r_ph.c              |  23 --
+ tests/tcg/mips/mips64-dsp/shra_r_pw.c              |  36 ---
+ tests/tcg/mips/mips64-dsp/shra_r_qh.c              |  37 ---
+ tests/tcg/mips/mips64-dsp/shra_r_w.c               |  23 --
+ tests/tcg/mips/mips64-dsp/shrav_ph.c               |  24 --
+ tests/tcg/mips/mips64-dsp/shrav_pw.c               |  38 ---
+ tests/tcg/mips/mips64-dsp/shrav_qh.c               |  39 ---
+ tests/tcg/mips/mips64-dsp/shrav_r_ph.c             |  24 --
+ tests/tcg/mips/mips64-dsp/shrav_r_pw.c             |  37 ---
+ tests/tcg/mips/mips64-dsp/shrav_r_qh.c             |  39 ---
+ tests/tcg/mips/mips64-dsp/shrav_r_w.c              |  24 --
+ tests/tcg/mips/mips64-dsp/shrl_ob.c                |  38 ---
+ tests/tcg/mips/mips64-dsp/shrl_qb.c                |  23 --
+ tests/tcg/mips/mips64-dsp/shrl_qh.c                |  22 --
+ tests/tcg/mips/mips64-dsp/shrlv_ob.c               |  39 ---
+ tests/tcg/mips/mips64-dsp/shrlv_qb.c               |  24 --
+ tests/tcg/mips/mips64-dsp/shrlv_qh.c               |  23 --
+ tests/tcg/mips/mips64-dsp/subq_ph.c                |  27 --
+ tests/tcg/mips/mips64-dsp/subq_pw.c                |  44 ---
+ tests/tcg/mips/mips64-dsp/subq_qh.c                |  26 --
+ tests/tcg/mips/mips64-dsp/subq_s_ph.c              |  27 --
+ tests/tcg/mips/mips64-dsp/subq_s_pw.c              |  63 -----
+ tests/tcg/mips/mips64-dsp/subq_s_qh.c              |  61 ----
+ tests/tcg/mips/mips64-dsp/subq_s_w.c               |  27 --
+ tests/tcg/mips/mips64-dsp/subu_ob.c                |  26 --
+ tests/tcg/mips/mips64-dsp/subu_qb.c                |  27 --
+ tests/tcg/mips/mips64-dsp/subu_s_ob.c              |  26 --
+ tests/tcg/mips/mips64-dsp/subu_s_qb.c              |  27 --
+ tests/tcg/mips/mips64-dsp/wrdsp.c                  |  48 ----
+ tests/tcg/mips/mips64-dspr2/Makefile               | 116 --------
+ tests/tcg/mips/mips64-dspr2/absq_s_qb.c            |  42 ---
+ tests/tcg/mips/mips64-dspr2/addqh_ph.c             |  35 ---
+ tests/tcg/mips/mips64-dspr2/addqh_r_ph.c           |  35 ---
+ tests/tcg/mips/mips64-dspr2/addqh_r_w.c            |  38 ---
+ tests/tcg/mips/mips64-dspr2/addqh_w.c              |  39 ---
+ tests/tcg/mips/mips64-dspr2/addu_ph.c              |  37 ---
+ tests/tcg/mips/mips64-dspr2/addu_qh.c              |  43 ---
+ tests/tcg/mips/mips64-dspr2/addu_s_ph.c            |  37 ---
+ tests/tcg/mips/mips64-dspr2/addu_s_qh.c            |  43 ---
+ tests/tcg/mips/mips64-dspr2/adduh_ob.c             |  35 ---
+ tests/tcg/mips/mips64-dspr2/adduh_qb.c             |  35 ---
+ tests/tcg/mips/mips64-dspr2/adduh_r_ob.c           |  35 ---
+ tests/tcg/mips/mips64-dspr2/adduh_r_qb.c           |  35 ---
+ tests/tcg/mips/mips64-dspr2/append.c               |  35 ---
+ tests/tcg/mips/mips64-dspr2/balign.c               |  35 ---
+ tests/tcg/mips/mips64-dspr2/cmpgdu_eq_ob.c         |  44 ---
+ tests/tcg/mips/mips64-dspr2/cmpgdu_eq_qb.c         |  41 ---
+ tests/tcg/mips/mips64-dspr2/cmpgdu_le_ob.c         |  44 ---
+ tests/tcg/mips/mips64-dspr2/cmpgdu_le_qb.c         |  48 ----
+ tests/tcg/mips/mips64-dspr2/cmpgdu_lt_ob.c         |  44 ---
+ tests/tcg/mips/mips64-dspr2/cmpgdu_lt_qb.c         |  48 ----
+ tests/tcg/mips/mips64-dspr2/dbalign.c              |  39 ---
+ tests/tcg/mips/mips64-dspr2/dpa_w_ph.c             |  47 ----
+ tests/tcg/mips/mips64-dspr2/dpa_w_qh.c             |  56 ----
+ tests/tcg/mips/mips64-dspr2/dpaqx_s_w_ph.c         |  97 -------
+ tests/tcg/mips/mips64-dspr2/dpaqx_sa_w_ph.c        |  54 ----
+ tests/tcg/mips/mips64-dspr2/dpax_w_ph.c            |  32 ---
+ tests/tcg/mips/mips64-dspr2/dps_w_ph.c             |  28 --
+ tests/tcg/mips/mips64-dspr2/dps_w_qh.c             |  55 ----
+ tests/tcg/mips/mips64-dspr2/dpsqx_s_w_ph.c         |  55 ----
+ tests/tcg/mips/mips64-dspr2/dpsqx_sa_w_ph.c        |  53 ----
+ tests/tcg/mips/mips64-dspr2/dpsx_w_ph.c            |  28 --
+ tests/tcg/mips/mips64-dspr2/head.S                 |  16 --
+ tests/tcg/mips/mips64-dspr2/io.h                   |  22 --
+ tests/tcg/mips/mips64-dspr2/mips_boot.lds          |  31 ---
+ tests/tcg/mips/mips64-dspr2/mul_ph.c               |  50 ----
+ tests/tcg/mips/mips64-dspr2/mul_s_ph.c             |  67 -----
+ tests/tcg/mips/mips64-dspr2/mulq_rs_w.c            |  40 ---
+ tests/tcg/mips/mips64-dspr2/mulq_s_ph.c            |  26 --
+ tests/tcg/mips/mips64-dspr2/mulq_s_w.c             |  40 ---
+ tests/tcg/mips/mips64-dspr2/mulsa_w_ph.c           |  30 --
+ tests/tcg/mips/mips64-dspr2/mulsaq_s_w_ph.c        |  30 --
+ tests/tcg/mips/mips64-dspr2/precr_qb_ph.c          |  23 --
+ tests/tcg/mips/mips64-dspr2/precr_sra_ph_w.c       |  37 ---
+ tests/tcg/mips/mips64-dspr2/precr_sra_r_ph_w.c     |  37 ---
+ tests/tcg/mips/mips64-dspr2/prepend.c              |  35 ---
+ tests/tcg/mips/mips64-dspr2/printf.c               | 266 ------------------
+ tests/tcg/mips/mips64-dspr2/shra_qb.c              |  35 ---
+ tests/tcg/mips/mips64-dspr2/shra_r_qb.c            |  35 ---
+ tests/tcg/mips/mips64-dspr2/shrav_ob.c             |  22 --
+ tests/tcg/mips/mips64-dspr2/shrav_qb.c             |  37 ---
+ tests/tcg/mips/mips64-dspr2/shrav_r_ob.c           |  22 --
+ tests/tcg/mips/mips64-dspr2/shrav_r_qb.c           |  37 ---
+ tests/tcg/mips/mips64-dspr2/shrl_ph.c              |  22 --
+ tests/tcg/mips/mips64-dspr2/shrlv_ph.c             |  23 --
+ tests/tcg/mips/mips64-dspr2/subqh_ph.c             |  23 --
+ tests/tcg/mips/mips64-dspr2/subqh_r_ph.c           |  23 --
+ tests/tcg/mips/mips64-dspr2/subqh_r_w.c            |  23 --
+ tests/tcg/mips/mips64-dspr2/subqh_w.c              |  23 --
+ tests/tcg/mips/mips64-dspr2/subu_ph.c              |  26 --
+ tests/tcg/mips/mips64-dspr2/subu_qh.c              |  24 --
+ tests/tcg/mips/mips64-dspr2/subu_s_ph.c            |  25 --
+ tests/tcg/mips/mips64-dspr2/subu_s_qh.c            |  42 ---
+ tests/tcg/mips/mips64-dspr2/subuh_ob.c             |  36 ---
+ tests/tcg/mips/mips64-dspr2/subuh_qb.c             |  23 --
+ tests/tcg/mips/mips64-dspr2/subuh_r_ob.c           |  23 --
+ tests/tcg/mips/mips64-dspr2/subuh_r_qb.c           |  37 ---
+ tests/tcg/mips/mipsr5900/Makefile                  |  32 ---
+ tests/tcg/mips/mipsr5900/div1.c                    |  73 -----
+ tests/tcg/mips/mipsr5900/divu1.c                   |  48 ----
+ tests/tcg/mips/mipsr5900/madd.c                    |  78 ------
+ tests/tcg/mips/mipsr5900/maddu.c                   |  70 -----
+ tests/tcg/mips/mipsr5900/mflohi1.c                 |  35 ---
+ tests/tcg/mips/mipsr5900/mtlohi1.c                 |  40 ---
+ tests/tcg/mips/mipsr5900/mult.c                    |  76 -----
+ tests/tcg/mips/mipsr5900/multu.c                   |  68 -----
+ tests/tcg/mips/user/ase/dsp/Makefile               | 184 +++++++++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_absq_s_ph.c  |  31 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_absq_s_w.c |  37 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_addq_ph.c  |  46 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_addq_s_ph.c  |  69 +++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_addq_s_w.c |  44 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_addsc.c    |  33 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_addu_qb.c  |  35 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_addu_s_qb.c  |  35 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_addwc.c    |  49 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_bitrev.c   |  20 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_bposge32.c |  44 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmp_eq_ph.c  |  35 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmp_le_ph.c  |  35 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmp_lt_ph.c  |  35 +++
+ .../mips/user/ase/dsp/test_dsp_r1_cmpgu_eq_qb.c    |  31 +++
+ .../mips/user/ase/dsp/test_dsp_r1_cmpgu_le_qb.c    |  31 +++
+ .../mips/user/ase/dsp/test_dsp_r1_cmpgu_lt_qb.c    |  31 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_eq_qb.c |  35 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_le_qb.c |  35 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_lt_qb.c |  35 +++
+ .../mips/user/ase/dsp/test_dsp_r1_dpaq_s_w_ph.c    |  31 +++
+ .../mips/user/ase/dsp/test_dsp_r1_dpaq_sa_l_w.c    | 125 +++++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_dpau_h_qbl.c |  27 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_dpau_h_qbr.c |  27 ++
+ .../mips/user/ase/dsp/test_dsp_r1_dpsq_s_w_ph.c    |  45 +++
+ .../mips/user/ase/dsp/test_dsp_r1_dpsq_sa_l_w.c    |  55 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_dpsu_h_qbl.c |  27 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_dpsu_h_qbr.c |  27 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extp.c     |  62 +++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpdp.c   |  64 +++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpdpv.c  |  47 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpv.c    |  45 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_r_w.c |  94 +++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_extr_rs_w.c  | 117 ++++++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_s_h.c |  86 ++++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_w.c   |  94 +++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_extrv_r_w.c  |  79 ++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_extrv_rs_w.c |  77 ++++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_extrv_s_h.c  |  88 ++++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_extrv_w.c  |  80 ++++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_insv.c     |  36 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_lbux.c     |  25 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_lhx.c      |  25 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_lwx.c      |  25 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_madd.c     |  31 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_maddu.c    |  31 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_main.c     |   6 +
+ .../mips/user/ase/dsp/test_dsp_r1_maq_s_w_phl.c    |  55 ++++
+ .../mips/user/ase/dsp/test_dsp_r1_maq_s_w_phr.c    |  55 ++++
+ .../mips/user/ase/dsp/test_dsp_r1_maq_sa_w_phl.c   |  55 ++++
+ .../mips/user/ase/dsp/test_dsp_r1_maq_sa_w_phr.c   |  55 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mfhi.c     |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mflo.c     |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_modsub.c   |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_msub.c     |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_msubu.c    |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mthi.c     |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mthlip.c   |  58 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mtlo.c     |  21 ++
+ .../mips/user/ase/dsp/test_dsp_r1_muleq_s_w_phl.c  |  41 +++
+ .../mips/user/ase/dsp/test_dsp_r1_muleq_s_w_phr.c  |  40 +++
+ .../mips/user/ase/dsp/test_dsp_r1_muleu_s_ph_qbl.c |  25 ++
+ .../mips/user/ase/dsp/test_dsp_r1_muleu_s_ph_qbr.c |  25 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_mulq_rs_ph.c |  42 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_mult.c     |  24 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_multu.c    |  24 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_packrl_ph.c  |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_pick_ph.c  |  49 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_pick_qb.c  |  36 +++
+ .../mips/user/ase/dsp/test_dsp_r1_preceq_w_phl.c   |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_preceq_w_phr.c   |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbl.c |  20 ++
+ .../user/ase/dsp/test_dsp_r1_precequ_ph_qbla.c     |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbr.c |  20 ++
+ .../user/ase/dsp/test_dsp_r1_precequ_ph_qbra.c     |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbl.c  |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbla.c |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbr.c  |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbra.c |  20 ++
+ .../mips/user/ase/dsp/test_dsp_r1_precrq_ph_w.c    |  21 ++
+ .../mips/user/ase/dsp/test_dsp_r1_precrq_qb_ph.c   |  21 ++
+ .../mips/user/ase/dsp/test_dsp_r1_precrq_rs_ph_w.c |  51 ++++
+ .../user/ase/dsp/test_dsp_r1_precrqu_s_qb_ph.c     |  24 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_raddu_w_qb.c |  20 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_rddsp.c    |  46 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_repl_ph.c  |  23 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_repl_qb.c  |  16 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_replv_ph.c |  19 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_replv_qb.c |  19 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shilo.c    |  45 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shilov.c   |  49 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_ph.c  |  55 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_qb.c  |  55 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shll_s_ph.c  |  24 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_s_w.c |  52 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_ph.c |  40 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_qb.c |  38 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shllv_s_ph.c |  40 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shllv_s_w.c  |  40 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shra_ph.c  |  30 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shra_r_ph.c  |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shra_r_w.c |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrav_ph.c |  32 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shrav_r_ph.c |  32 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_shrav_r_w.c  |  32 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrl_qb.c  |  31 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrlv_qb.c |  32 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_subq_ph.c  |  40 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_subq_s_ph.c  |  58 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_subq_s_w.c |  74 +++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_subu_qb.c  |  25 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r1_subu_s_qb.c  |  25 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r1_wrdsp.c    |  46 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_absq_s_qb.c  |  35 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_ph.c |  30 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_addqh_r_ph.c |  30 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_addqh_r_w.c  |  34 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_w.c  |  34 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_addu_ph.c  |  33 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_addu_s_ph.c  |  33 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_adduh_qb.c |  30 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_adduh_r_qb.c |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_append.c   |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_balign.c   |  30 ++
+ .../mips/user/ase/dsp/test_dsp_r2_cmpgdu_eq_qb.c   |  37 +++
+ .../mips/user/ase/dsp/test_dsp_r2_cmpgdu_le_qb.c   |  37 +++
+ .../mips/user/ase/dsp/test_dsp_r2_cmpgdu_lt_qb.c   |  37 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpa_w_ph.c |  44 +++
+ .../mips/user/ase/dsp/test_dsp_r2_dpaqx_s_w_ph.c   |  79 ++++++
+ .../mips/user/ase/dsp/test_dsp_r2_dpaqx_sa_w_ph.c  |  57 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_dpax_w_ph.c  |  44 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_dps_w_ph.c |  44 +++
+ .../mips/user/ase/dsp/test_dsp_r2_dpsqx_s_w_ph.c   |  54 ++++
+ .../mips/user/ase/dsp/test_dsp_r2_dpsqx_sa_w_ph.c  |  53 ++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_dpsx_w_ph.c  |  27 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_mul_ph.c   |  47 ++++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_mul_s_ph.c |  62 +++++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_mulq_rs_w.c  |  36 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_mulq_s_ph.c  |  40 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulq_s_w.c |  36 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_mulsa_w_ph.c |  29 ++
+ .../mips/user/ase/dsp/test_dsp_r2_mulsaq_s_w_ph.c  |  29 ++
+ .../mips/user/ase/dsp/test_dsp_r2_precr_qb_ph.c    |  21 ++
+ .../mips/user/ase/dsp/test_dsp_r2_precr_sra_ph_w.c |  32 +++
+ .../user/ase/dsp/test_dsp_r2_precr_sra_r_ph_w.c    |  32 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_prepend.c  |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_shra_qb.c  |  30 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_shra_r_qb.c  |  30 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrav_qb.c |  32 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_shrav_r_qb.c |  32 +++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrl_ph.c  |  20 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrlv_ph.c |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_ph.c |  21 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_subqh_r_ph.c |  21 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_subqh_r_w.c  |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_w.c  |  21 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_subu_ph.c  |  40 +++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_subu_s_ph.c  |  25 ++
+ tests/tcg/mips/user/ase/dsp/test_dsp_r2_subuh_qb.c |  21 ++
+ .../tcg/mips/user/ase/dsp/test_dsp_r2_subuh_r_qb.c |  32 +++
+ tests/tcg/mips/user/isa/r5900/Makefile             |  32 +++
+ tests/tcg/mips/user/isa/r5900/test_r5900_div1.c    |  73 +++++
+ tests/tcg/mips/user/isa/r5900/test_r5900_divu1.c   |  48 ++++
+ tests/tcg/mips/user/isa/r5900/test_r5900_madd.c    |  78 ++++++
+ tests/tcg/mips/user/isa/r5900/test_r5900_maddu.c   |  70 +++++
+ tests/tcg/mips/user/isa/r5900/test_r5900_mflohi1.c |  35 +++
+ tests/tcg/mips/user/isa/r5900/test_r5900_mtlohi1.c |  40 +++
+ tests/tcg/mips/user/isa/r5900/test_r5900_mult.c    |  76 +++++
+ tests/tcg/mips/user/isa/r5900/test_r5900_multu.c   |  68 +++++
+ 672 files changed, 7081 insertions(+), 20320 deletions(-)
+ delete mode 100644 tests/tcg/mips/mips32-dsp/Makefile
+ delete mode 100644 tests/tcg/mips/mips32-dsp/absq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/absq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addq_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addsc.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addu_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addu_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/addwc.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/bitrev.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/bposge32.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmp_eq_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmp_le_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmp_lt_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpgu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpgu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpgu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/cmpu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpaq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpaq_sa_l_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpau_h_qbl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpau_h_qbr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpsq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpsq_sa_l_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpsu_h_qbl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/dpsu_h_qbr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extp.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extpdp.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extpdpv.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extpv.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extr_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extr_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extr_s_h.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extr_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extrv_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extrv_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extrv_s_h.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/extrv_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/insv.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/lbux.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/lhx.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/lwx.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/madd.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/maddu.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/main.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/maq_s_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/maq_s_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/maq_sa_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/maq_sa_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mfhi.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mflo.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/modsub.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/msub.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/msubu.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mthi.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mthlip.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mtlo.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/muleq_s_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/muleq_s_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/muleu_s_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/muleu_s_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mulq_rs_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/mult.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/multu.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/packrl_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/pick_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/pick_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceq_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceq_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precequ_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precequ_ph_qbla.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precequ_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precequ_ph_qbra.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceu_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceu_ph_qbla.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceu_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/preceu_ph_qbra.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precrq_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precrq_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precrq_rs_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/precrqu_s_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/raddu_w_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/rddsp.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/repl_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/repl_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/replv_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/replv_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shilo.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shilov.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shll_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shll_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shll_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shll_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shllv_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shllv_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shllv_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shllv_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shra_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shra_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shra_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shrav_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shrav_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shrav_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shrl_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/shrlv_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/subq_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/subq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/subq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/subu_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/subu_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dsp/wrdsp.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/Makefile
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/absq_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addqh_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addqh_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addqh_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addqh_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addu_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/addu_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/adduh_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/adduh_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/append.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/balign.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/cmpgdu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/cmpgdu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/cmpgdu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpaqx_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpaqx_sa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpax_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dps_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpsqx_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpsqx_sa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/dpsx_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mul_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mul_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mulq_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mulq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mulq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mulsa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/mulsaq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/precr_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/precr_sra_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/precr_sra_r_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/prepend.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shra_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shra_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shrav_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shrav_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shrl_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/shrlv_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subqh_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subqh_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subqh_r_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subqh_w.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subu_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subu_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subuh_qb.c
+ delete mode 100644 tests/tcg/mips/mips32-dspr2/subuh_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/Makefile
+ delete mode 100644 tests/tcg/mips/mips64-dsp/absq_s_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/absq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/absq_s_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/absq_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/absq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_s_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addsc.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addu_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addu_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addu_s_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addu_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/addwc.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/bitrev.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/bposge32.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/bposge64.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_eq_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_eq_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_eq_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_le_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_le_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_le_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_lt_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_lt_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmp_lt_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_eq_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_le_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_lt_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpgu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_eq_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_le_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_lt_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/cmpu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dappend.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextp.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextpdp.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextpdpv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextpv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_r_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_rs_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_s_h.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextr_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_r_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_rs_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_s_h.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dextrv_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dinsv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dmadd.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dmaddu.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dmsub.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dmsubu.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dmthlip.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpaq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpaq_s_w_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpaq_sa_l_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpaq_sa_l_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpau_h_obl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpau_h_obr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpau_h_qbl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpau_h_qbr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsq_s_w_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsq_sa_l_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsq_sa_l_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsu_h_obl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsu_h_obr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsu_h_qbl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dpsu_h_qbr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dshilo.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/dshilov.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extp.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extpdp.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extpdpv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extpv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extr_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extr_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extr_s_h.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extr_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extrv_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extrv_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extrv_s_h.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/extrv_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/head.S
+ delete mode 100644 tests/tcg/mips/mips64-dsp/insv.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/io.h
+ delete mode 100644 tests/tcg/mips/mips64-dsp/lbux.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/ldx.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/lhx.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/lwx.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/madd.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maddu.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_l_pwl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_l_pwr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_qhll.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_qhlr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_qhrl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_s_w_qhrr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_qhll.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_qhlr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_qhrl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/maq_sa_w_qhrr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mfhi.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mflo.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mips_boot.lds
+ delete mode 100644 tests/tcg/mips/mips64-dsp/modsub.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/msub.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/msubu.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mthi.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mthlip.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mtlo.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleq_s_pw_qhl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleq_s_pw_qhr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleq_s_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleq_s_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleu_s_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleu_s_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleu_s_qh_obl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/muleu_s_qh_obr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mulq_rs_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mulq_rs_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mulsaq_s_l_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mulsaq_s_w_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/mult.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/multu.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/packrl_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/packrl_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/pick_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/pick_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/pick_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/pick_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/pick_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_l_pwl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_l_pwr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_pw_qhl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_pw_qhla.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_pw_qhr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_pw_qhra.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_w_phl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceq_w_phr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_ph_qbla.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_ph_qbra.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_qh_obl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_qh_obla.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_qh_obr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precequ_qh_obra.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_ph_qbl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_ph_qbla.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_ph_qbr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_ph_qbra.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_qh_obl.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_qh_obla.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_qh_obr.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/preceu_qh_obra.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precr_ob_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precr_sra_qh_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precr_sra_r_qh_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_ob_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_pw_l.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_qh_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_rs_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrq_rs_qh_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrqu_s_ob_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/precrqu_s_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/prependd.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/prependw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/printf.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/raddu_l_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/raddu_w_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/rddsp.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/repl_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/repl_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/repl_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/repl_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/repl_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/replv_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/replv_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/replv_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/replv_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shilo.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shilov.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_s_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shll_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_s_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shllv_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_r_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_r_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_r_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shra_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_r_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_r_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrav_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrl_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrl_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrl_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrlv_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrlv_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/shrlv_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_s_pw.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subu_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subu_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subu_s_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/subu_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dsp/wrdsp.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/Makefile
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/absq_s_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addqh_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addqh_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addqh_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addqh_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addu_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addu_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addu_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/addu_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/adduh_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/adduh_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/adduh_r_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/adduh_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/append.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/balign.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_eq_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_eq_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_le_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_le_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_lt_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/cmpgdu_lt_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dbalign.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpa_w_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpaqx_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpaqx_sa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpax_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dps_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dps_w_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpsqx_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpsqx_sa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/dpsx_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/head.S
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/io.h
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mips_boot.lds
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mul_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mul_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mulq_rs_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mulq_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mulq_s_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mulsa_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/mulsaq_s_w_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/precr_qb_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/precr_sra_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/precr_sra_r_ph_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/prepend.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/printf.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shra_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shra_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrav_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrav_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrav_r_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrav_r_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrl_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/shrlv_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subqh_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subqh_r_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subqh_r_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subqh_w.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subu_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subu_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subu_s_ph.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subu_s_qh.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subuh_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subuh_qb.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subuh_r_ob.c
+ delete mode 100644 tests/tcg/mips/mips64-dspr2/subuh_r_qb.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/Makefile
+ delete mode 100644 tests/tcg/mips/mipsr5900/div1.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/divu1.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/madd.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/maddu.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/mflohi1.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/mtlohi1.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/mult.c
+ delete mode 100644 tests/tcg/mips/mipsr5900/multu.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/Makefile
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_absq_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_absq_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addq_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addq_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addq_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addsc.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addu_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addu_s_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_addwc.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_bitrev.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_bposge32.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmp_eq_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmp_le_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmp_lt_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpgu_eq_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpgu_le_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpgu_lt_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_eq_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_le_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_cmpu_lt_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpaq_s_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpaq_sa_l_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpau_h_qbl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpau_h_qbr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpsq_s_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpsq_sa_l_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpsu_h_qbl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_dpsu_h_qbr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extp.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpdp.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpdpv.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extpv.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_rs_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extr_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extrv_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extrv_rs_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extrv_s_h.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_extrv_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_insv.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_lbux.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_lhx.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_lwx.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_madd.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_maddu.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_main.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_maq_s_w_phl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_maq_s_w_phr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_maq_sa_w_phl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_maq_sa_w_phr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mfhi.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mflo.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_modsub.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_msub.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_msubu.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mthi.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mthlip.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mtlo.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_muleq_s_w_phl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_muleq_s_w_phr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_muleu_s_ph_qbl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_muleu_s_ph_qbr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mulq_rs_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_mult.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_multu.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_packrl_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_pick_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_pick_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceq_w_phl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceq_w_phr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbla.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precequ_ph_qbra.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbl.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbla.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbr.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_preceu_ph_qbra.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precrq_ph_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precrq_qb_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precrq_rs_ph_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_precrqu_s_qb_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_raddu_w_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_rddsp.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_repl_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_repl_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_replv_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_replv_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shilo.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shilov.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shll_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shllv_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shra_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shra_r_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shra_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrav_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrav_r_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrav_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrl_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_shrlv_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_subq_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_subq_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_subq_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_subu_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_subu_s_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r1_wrdsp.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_absq_s_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_r_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addqh_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addu_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_addu_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_adduh_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_adduh_r_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_append.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_balign.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_cmpgdu_eq_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_cmpgdu_le_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_cmpgdu_lt_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpa_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpaqx_s_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpaqx_sa_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpax_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dps_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpsqx_s_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpsqx_sa_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_dpsx_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mul_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mul_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulq_rs_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulq_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulq_s_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulsa_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_mulsaq_s_w_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_precr_qb_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_precr_sra_ph_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_precr_sra_r_ph_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_prepend.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shra_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shra_r_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrav_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrav_r_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrl_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_shrlv_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_r_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_r_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subqh_w.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subu_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subu_s_ph.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subuh_qb.c
+ create mode 100644 tests/tcg/mips/user/ase/dsp/test_dsp_r2_subuh_r_qb.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/Makefile
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_div1.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_divu1.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_madd.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_maddu.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_mflohi1.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_mtlohi1.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_mult.c
+ create mode 100644 tests/tcg/mips/user/isa/r5900/test_r5900_multu.c
+
 -- 
 2.7.4
