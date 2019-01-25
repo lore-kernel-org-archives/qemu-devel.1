@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33965)
+Received: from eggs.gnu.org ([209.51.188.92]:34346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gn57J-0000Y8-EZ
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:18:10 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gn591-0001dZ-Hi
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gn57C-0006cr-Ow
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:18:09 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gn57C-0006cA-G3
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:18:02 -0500
-Received: by mail-wr1-x436.google.com with SMTP id l9so11063571wrt.13
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 09:18:01 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	w12sm91534922wrr.23.2019.01.25.09.17.59 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 25 Jan 2019 09:17:59 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 25 Jan 2019 18:17:56 +0100
-Message-Id: <1548436676-31749-3-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1548436676-31749-1-git-send-email-pbonzini@redhat.com>
-References: <1548436676-31749-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <cfergeau@redhat.com>) id 1gn590-0007if-F8
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:19:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:23357)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gn590-0007PT-44
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 12:19:54 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A6DB2D4B72
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 17:19:30 +0000 (UTC)
+Date: Fri, 25 Jan 2019 18:19:24 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20190125171924.GP30040@natto.ory.fergeau.eu>
+References: <20190121170434.13592-1-cfergeau@redhat.com>
+	<87munqc9zf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/50] vhost-user-test: create a temporary
- directory per TestServer
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MGmrTRZxVujQoXMz"
+Content-Disposition: inline
+In-Reply-To: <87munqc9zf.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v5] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,227 +34,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>
 
-This makes the tests more independent, and also the source and destination
-TestServers in the migration test.
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-15-git-send-email-pbonzini@redhat.com>
----
- tests/vhost-user-test.c | 77 ++++++++++++++++++++++---------------------------
- 1 file changed, 35 insertions(+), 42 deletions(-)
+--MGmrTRZxVujQoXMz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 803b64b..a1d17af 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -142,6 +142,8 @@ typedef struct TestServer {
-     gchar *socket_path;
-     gchar *mig_path;
-     gchar *chr_name;
-+    const gchar *mem_path;
-+    gchar *tmpfs;
-     CharBackend chr;
-     int fds_num;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-@@ -162,9 +164,6 @@ static TestServer *test_server_new(const gchar *name);
- static void test_server_free(TestServer *server);
- static void test_server_listen(TestServer *server);
- 
--static const char *tmpfs;
--static const char *root;
--
- enum test_memfd {
-     TEST_MEMFD_AUTO,
-     TEST_MEMFD_YES,
-@@ -172,7 +171,7 @@ enum test_memfd {
- };
- 
- static char *get_qemu_cmd(TestServer *s,
--                          int mem, enum test_memfd memfd, const char *mem_path,
-+                          int mem, enum test_memfd memfd,
-                           const char *chr_opts, const char *extra)
- {
-     if (memfd == TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
-@@ -187,7 +186,7 @@ static char *get_qemu_cmd(TestServer *s,
-     } else {
-         return g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR
-                                QEMU_CMD_NETDEV QEMU_CMD_NET "%s", mem, mem,
--                               mem_path, s->chr_name, s->socket_path,
-+                               s->mem_path, s->chr_name, s->socket_path,
-                                chr_opts, s->chr_name, extra);
-     }
- }
-@@ -506,6 +505,8 @@ static const char *init_hugepagefs(void)
- static TestServer *test_server_new(const gchar *name)
- {
-     TestServer *server = g_new0(TestServer, 1);
-+    char template[] = "/tmp/vhost-test-XXXXXX";
-+    const char *tmpfs;
-     GMainContext *context = g_main_context_new();
- 
-     server->loop = g_main_loop_new(context, FALSE);
-@@ -514,6 +515,14 @@ static TestServer *test_server_new(const gchar *name)
-     /* run the main loop thread so the chardev may operate */
-     server->thread = g_thread_new(NULL, thread_function, server->loop);
- 
-+    tmpfs = mkdtemp(template);
-+    if (!tmpfs) {
-+        g_test_message("mkdtemp on path (%s): %s", template, strerror(errno));
-+    }
-+    g_assert(tmpfs);
-+
-+    server->tmpfs = g_strdup(tmpfs);
-+    server->mem_path = init_hugepagefs() ? : server->tmpfs;
-     server->socket_path = g_strdup_printf("%s/%s.sock", tmpfs, name);
-     server->mig_path = g_strdup_printf("%s/%s.mig", tmpfs, name);
-     server->chr_name = g_strdup_printf("chr-%s", name);
-@@ -559,7 +568,7 @@ static void test_server_listen(TestServer *server)
- 
- static void test_server_free(TestServer *server)
- {
--    int i;
-+    int i, ret;
- 
-     /* finish the helper thread and dispatch pending sources */
-     g_main_loop_quit(server->loop);
-@@ -569,6 +578,18 @@ static void test_server_free(TestServer *server)
-     }
-     g_main_loop_unref(server->loop);
- 
-+    unlink(server->socket_path);
-+    g_free(server->socket_path);
-+
-+    unlink(server->mig_path);
-+    g_free(server->mig_path);
-+
-+    ret = rmdir(server->tmpfs);
-+    if (ret != 0) {
-+        g_test_message("unable to rmdir: path (%s): %s",
-+                       server->tmpfs, strerror(errno));
-+    }
-+
-     qemu_chr_fe_deinit(&server->chr, true);
- 
-     for (i = 0; i < server->fds_num; i++) {
-@@ -579,12 +600,6 @@ static void test_server_free(TestServer *server)
-         close(server->log_fd);
-     }
- 
--    unlink(server->socket_path);
--    g_free(server->socket_path);
--
--    unlink(server->mig_path);
--    g_free(server->mig_path);
--
-     g_free(server->chr_name);
-     g_assert(server->bus);
-     qpci_free_pc(server->bus);
-@@ -690,7 +705,7 @@ static void test_read_guest_mem(const void *arg)
-                              "read-guest-memfd" : "read-guest-mem");
-     test_server_listen(server);
- 
--    qemu_cmd = get_qemu_cmd(server, 512, memfd, root, "", "");
-+    qemu_cmd = get_qemu_cmd(server, 512, memfd, "", "");
- 
-     s = qtest_start(qemu_cmd);
-     g_free(qemu_cmd);
-@@ -725,7 +740,7 @@ static void test_migrate(void)
-     test_server_listen(s);
-     test_server_listen(dest);
- 
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, "", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, "", "");
-     from = qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -738,7 +753,7 @@ static void test_migrate(void)
-     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
- 
-     tmp = g_strdup_printf(" -incoming %s", uri);
--    cmd = get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, root, "", tmp);
-+    cmd = get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, "", tmp);
-     g_free(tmp);
-     to = qtest_init(cmd);
-     g_free(cmd);
-@@ -848,7 +863,7 @@ static void test_reconnect_subprocess(void)
-     char *cmd;
- 
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -890,7 +905,7 @@ static void test_connect_fail_subprocess(void)
- 
-     s->test_fail = true;
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -923,7 +938,7 @@ static void test_flags_mismatch_subprocess(void)
- 
-     s->test_flags = TEST_FLAGS_DISCONNECT;
-     g_thread_new("connect", connect_thread, s);
--    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, root, ",server", "");
-+    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
-     qtest_start(cmd);
-     g_free(cmd);
- 
-@@ -971,7 +986,7 @@ static void test_multiqueue(void)
-         cmd = g_strdup_printf(
-             QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
-             "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
--            512, 512, root, s->chr_name,
-+            512, 512, s->mem_path, s->chr_name,
-             s->socket_path, "", s->chr_name,
-             s->queues, s->queues * 2 + 2);
-     }
-@@ -991,22 +1006,11 @@ static void test_multiqueue(void)
- 
- int main(int argc, char **argv)
- {
--    int ret;
--    char template[] = "/tmp/vhost-test-XXXXXX";
--
-     g_test_init(&argc, &argv, NULL);
- 
-     module_call_init(MODULE_INIT_QOM);
-     qemu_add_opts(&qemu_chardev_opts);
- 
--    tmpfs = mkdtemp(template);
--    if (!tmpfs) {
--        g_test_message("mkdtemp on path (%s): %s\n", template, strerror(errno));
--    }
--    g_assert(tmpfs);
--
--    root = init_hugepagefs() ? : tmpfs;
--
-     if (qemu_memfd_check(0)) {
-         qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
-                             GINT_TO_POINTER(TEST_MEMFD_YES),
-@@ -1030,16 +1034,5 @@ int main(int argc, char **argv)
-         qtest_add_func("/vhost-user/flags-mismatch", test_flags_mismatch);
-     }
- 
--    ret = g_test_run();
--
--    /* cleanup */
--
--    ret = rmdir(tmpfs);
--    if (ret != 0) {
--        g_test_message("unable to rmdir: path (%s): %s\n",
--                       tmpfs, strerror(errno));
--    }
--    g_assert_cmpint(ret, ==, 0);
--
--    return ret;
-+    return g_test_run();
- }
--- 
-1.8.3.1
+On Thu, Jan 24, 2019 at 05:10:28PM +0100, Markus Armbruster wrote:
+> Christophe Fergeau <cfergeau@redhat.com> writes:
+>=20
+> > This commit adds a qemu_init_logging() helper which calls
+> > g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+> > are handled similarly to other QEMU logs. This means they will get a
+> > timestamp if timestamps are enabled, and they will go through the
+> > monitor if one is configured.
+>=20
+> s/monitor/HMP monitor/
+>=20
+> I see why one would like to extend the timestamp feature to GLib log
+> messages.  Routing them through the HMP monitor is perhaps debatable.
+> Cc: Dave in case he has an opinion.
+
+Yep, I don't mind whether this goes through HMP or not, this definitely
+was not one of my goals when writing this patch. I mention it in the
+commit log because this is what the current code is going to do.
+
+> > [snip]
+> > diff --git a/util/qemu-error.c b/util/qemu-error.c
+> > index fcbe8a1f74..1118ed4695 100644
+> > --- a/util/qemu-error.c
+> > +++ b/util/qemu-error.c
+> > @@ -345,3 +345,50 @@ bool warn_report_once_cond(bool *printed, const ch=
+ar *fmt, ...)
+> >      va_end(ap);
+> >      return true;
+> >  }
+> > +
+> > +static char *qemu_glog_domains;
+> > +
+> > +static void qemu_log_func(const gchar *log_domain,
+> > +                          GLogLevelFlags log_level,
+> > +                          const gchar *message,
+> > +                          gpointer user_data)
+> > +{
+> > +    switch (log_level & G_LOG_LEVEL_MASK) {
+> > +    case G_LOG_LEVEL_DEBUG:
+> > +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable d=
+ebug
+> > +         * messages
+> > +         */
+>=20
+> Wing both ends of the comment, please.
+
+Fixed.
+
+>=20
+> > +        if (qemu_glog_domains =3D=3D NULL) {
+> > +            break;
+> > +        }
+> > +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
+> > +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, log_do=
+main))) {
+> > +            break;
+> > +        }
+> > +        /* Fall through */
+> > +    case G_LOG_LEVEL_INFO:
+> > +        /* Fall through */
+>=20
+> g_log_default_handler() applies G_MESSAGES_DEBUG suppression logic to
+> G_LOG_LEVEL_INFO messages, too.  Do you deviate intentionally?
+
+Nope, I thought INFO and MESSAGE were equivalent. Fixed now.
+
+>=20
+> > +    case G_LOG_LEVEL_MESSAGE:
+> > +        info_report("%s: %s", log_domain, message);
+>=20
+> @log_domain can be null.  You even check for that above.
+
+Fixed.
+
+>=20
+> > +        break;
+> > +    case G_LOG_LEVEL_WARNING:
+> > +        warn_report("%s: %s", log_domain, message);
+> > +        break;
+> > +    case G_LOG_LEVEL_CRITICAL:
+> > +        /* Fall through */
+> > +    case G_LOG_LEVEL_ERROR:
+> > +        error_report("%s: %s", log_domain, message);
+> > +        break;
+>=20
+> Sure we don't need to check for G_LOG_FLAG_RECURSION?
+> g_log_default_handler() has a conditional for that...
+>=20
+> Not sure it has anything for G_LOG_FLAG_FATAL; it's code is surprisingly
+> complex.
+
+Both are filtered out from the switch() through G_LOG_LEVEL_MASK:
+   switch (log_level & G_LOG_LEVEL_MASK) {
+and
+https://developer.gnome.org/glib/2.58/glib-Message-Logging.html#G-LOG-FLAG-=
+RECURSION:CAPS
+documents G_LOG_FLAG_FATAL and G_LOG_FLAG_RECURSION as fatal.
+
+However, g_log_set_handler() then mentions handling them anyways:
+https://developer.gnome.org/glib/2.58/glib-Message-Logging.html#g-log-set-h=
+andler
+"Sets the log handler for a domain and a set of log levels. To handle
+fatal and recursive messages the log_levels parameter must be combined
+with the G_LOG_FLAG_FATAL and G_LOG_FLAG_RECURSION bit flags."
+
+My understanding of glib's code is if any of these 2 flags is set, glib
+is going to abort anyways, so handling or not handling these flags is
+not going to make a big difference.
+
+>=20
+> > +    }
+> > +}
+> > +
+> > +/*
+> > + * Init QEMU logging subsystem. This sets up glib logging so libraries=
+ using it
+> > + * also print their logs through {info,warn,error}_report.
+> > + */
+>=20
+> Format like the other function comments:
+>=20
+>    /*
+>     * Init QEMU logging subsystem.
+>     * This sets up glib logging so libraries using it also print their lo=
+gs
+>     * through error_report(), warn_report(), info_report().
+>     */
+>=20
+> Braces expanded for better grepability.
+>=20
+> > +void qemu_init_logging(void)
+>=20
+> Naming is hard...  Yes, this "initializes logging" in a sense: it
+> installs a GLib default log handler that routes GLib log messages
+> through this module.  But that's detail; the callers don't care what
+> this function does, all they care for is "must call early".  If this
+> module ever grows a need to initialize something else before it gets
+> used, we'll regret naming its initialization function
+> qemu_init_logging().
+>=20
+> Hmm, it has already grown such a need: initializing @progname.
+> error_set_progname() does it.  Asking a module's users to call *two*
+> initializtion functions is not nice.
+>=20
+> Fuse the two into error_init(const char *argv0)?
+
+Ok, I've done that now, I'll send a v6.
+
+Thanks for the review,
+
+Christophe
+
+--MGmrTRZxVujQoXMz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlxLRRgACgkQqdjCFCms
+bIJ/Mg//U6isw9ToT1reDvLCsragx+8Cy3CQYUb3X9SJBVrBqrzFBzgWrt1rtUEa
+kGaYj7O+VDpSGeIQPSLErhi5OeWjiRWX03lWYXF31DRkj2ApyzE6GgTtx41ZMlR5
+Pq7QFoKJVS9StUabD9NpSbawE25y908eXDRyEs1La1K0GNIuPFThd6/QuYLMDVjr
+c6vyKnou/f37zSFiI+ZTqjRasB1SAswxIkVv9bvtEsBQlG5W12jnxoMryurrzagY
+jRBtfx4h/JUShevTFyikKk6AMpipOAv5gTyax42LI6e7sdQ15U/J7b2wPiU0ours
+OVC8HIPS4b/Ap1YfObPDXudveJXdqQwORzfJGyaGbT4wCaJehydUeIqboNXtailC
+uYkhAPVTdwSdNKxsnkvfcb2LyBVEojz/JmVcGOetKXSkt0Gqz90UUjN6Mzju8S9n
+3fB/AXmcfq6BkxRtsiQD5uIoMZP0R4zSzsvnoJpGAQihHNBv2OaxDdMlPaC+7lez
+FKKJ6PleLu+riO4EMSrVMdx6Znp8fXcmtmvIcBMBQQcrmHggmWZ3uyxHf4nULhwU
+Q+KXW4l7xoGnJSUWqq31G0jtu7C46ECx7AKP1HjjUl9QezpGOAMcKAPdEQpNlbXM
+LWx7Ic7An3P2hwAc5C5cTSCIiwb/KI5D+eMIuB/y8JYbFafZkQE=
+=e/jN
+-----END PGP SIGNATURE-----
+
+--MGmrTRZxVujQoXMz--
