@@ -1,16 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:35899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gn37C-0003Ng-Ia
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:09:55 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gn37K-0003Ng-7M
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gn31D-0002JS-Ce
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:03:44 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 25 Jan 2019 16:03:33 +0100
-Message-ID: <87y378n5iy.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1gn2zI-0001aW-51
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:01:45 -0500
+References: <20181221234750.23577-1-mreitz@redhat.com>
+	<20181221234750.23577-4-mreitz@redhat.com>
+	<b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
+	<04d2a9e7-9cb8-74cf-0c0e-0c9d19940020@redhat.com>
+	<8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
+	<57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c6b7307d-8394-c415-bd97-72f7542e0c36@redhat.com>
+Date: Fri, 25 Jan 2019 16:01:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] Configuring pflash devices for OVMF firmware
+In-Reply-To: <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be
+ run concurrently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,227 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, libvir-list@redhat.com, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-We configure OVMF firmware for PC machine types with -drive if=pflash.
-This is pretty much the last remaining use of -drive in libvirt we can't
-yet replace by -blockdev.  Such a replacement is desirable, because
--blockdev + -device is more flexible than -drive if=pflash.  Also, once
-we don't need -drive with new QEMU anymore, the path for deleting all
--drive code in libvirt some day is open.  As with all desirables, the
-benefit needs to exceed the cost.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c6b7307d-8394-c415-bd97-72f7542e0c36@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be run
+ concurrently
+References: <20181221234750.23577-1-mreitz@redhat.com>
+ <20181221234750.23577-4-mreitz@redhat.com>
+ <b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
+ <04d2a9e7-9cb8-74cf-0c0e-0c9d19940020@redhat.com>
+ <8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
+ <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
+In-Reply-To: <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm going to describe the status quo, how we got there (briefly and much
-simplified), then sketch how to replace -drive if=pflash.  I'm afraid
-this is fairly long; sorry.  Please correct misunderstandings.  Beware,
-my libvirt and OVMF fu is much weaker than my QEMU fu.
+On 23.01.19 18:47, John Snow wrote:
+>=20
+>=20
+> On 1/23/19 12:34 PM, Max Reitz wrote:
+>> On 23.01.19 14:05, Max Reitz wrote:
+>>> On 21.01.19 21:50, John Snow wrote:
+>>
+>> [...]
+>>
+>>>> I guess my only other observation is that we have a lot of "while Tr=
+ue"
+>>>> loops now, is it worth creating some kind of helper that does the di=
+rty
+>>>> work of finding a serviceable port or nah?
+>>>
+>>> Seems reasonable, I'll see how it looks.
+>>
+>> If I do that, the diff stat looks to be 40+, 33-.  Is that worth it?
+>>
+>> Max
+>>
+>=20
+> Instead of:
+>  1 file changed, 68 insertions(+), 30 deletions(-)
+>=20
+> Or in addition to?
 
-In the beginning, board code read the BIOS from a fixed file and mapped
-it into the guest's address space.  Life was simple.
+In addition to.
 
-On physical hardware, the BIOS can persist a bit of state across (cold)
-reboots by storing it in (non-volatile) CMOS RAM.  We didn't bother.
-Simple.
+> Use your own judg[e?]ment on it, I guess it's local to this one iotest
+> for now anyway, so if it's not an obvious win just skip it.
 
-Fast forward several years, and The Law of OS Envy (every program wants
-to grow into a full-blown operating system) has asserted itself: PC
-Firmware has grown from an 8KiB ROM using a few bytes of volatile and
-non-volatile RAM into a multi-megabyte beast with much more complex
-storage needs.
+OK.  I guess I'll skip it then, but let it be noted that your criticism
+was listened to. :-)
 
-On today's physical PC hardware, firmware is stored in flash memory.
-There's code, and there's persistent data.  For obvious reasons, the
-code should be write-protected except when doing an upgrade.  "Secure
-boot" additionally needs to restrict data writes to system management
-mode (SMM).
+Max
 
-Here's our first iteration of OVMF support, at QEMU level:
 
-    -drive if=pflash,format=raw,file=/where/ever/OVMF.fd
+--GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Generic code creates a block backend for it.  Magic board code picks up
-the backend, creates a frontend (a cfi.pflash01 device), and maps it
-into the guest's address space.
+-----BEGIN PGP SIGNATURE-----
 
-At libvirt level:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxLJMcACgkQ9AfbAGHV
+z0D41gf/SbGOjZ/F+vjYMthidgrfr6byF1yRkqR8EOyevzof5FQ2IuG+vJuQDrFL
+n4cCfRLjRBMtthshT55XRM+6f1ZmOd9XPRYG3Eknttdbz/mQAl6a0AG9EugUXjXK
+1a39hD+ZcEJC9e1bS/6RBs4wtmi4LqDRd4CSapfxJOYQFse58fH3BSiz5L3U+Ken
+yPh/HMbHnr3dgNlAb5DE6zaDcdK+pFR6kIPrNrNUvBA6iZagVs++0ch9FOMBa6cy
+taYtAAPCFq0YCOkzw84MmFE6BPAvcoSIoSZJp6jqW+eDFj03jhMA3KPYKdTElVjo
+aV+yDJM928TKQ19oZdUk9ZlUajMsjA==
+=iwAU
+-----END PGP SIGNATURE-----
 
-  <loader type="pflash">/where/ever/OVMF.fd</loader>
-
-Problem: while the flash device model provides read-only capability,
-it's all-or-nothing.  You can't tell it to write-protect just the part
-holding code.  The examples above don't write-protect anything.
-/where/ever/OVMF.fd better be writable exclusively.
-
-The flash device model could be enhanced, but we went down a different
-path: we split the single OVMF image OVMF.fd ("unified build") into a
-code image OVMF_CODE.fd and a data image OVMF_VARS.fd ("split build").
-At QEMU level:
-
-    -drive if=pflash,format=raw,readonly,file=/usr/share/OVMF/OVMF_CODE.fd
-    -drive if=pflash,format=raw,file=/where/ever/OVMF_VARS.fd
-
-OVMF_CODE.fd must be unit 0, and OVMF_VARS.fd must be unit 1.
-
-Generic code creates two block backends.  Magic board code picks them
-up, creates a frontend (a cfi.pflash01 device) for each, and maps them
-into the guest's address space.
-
-Note there are *two* virtual flash devices now, whereas physical
-hardware commonly has just one.
-
-At libvirt level:
-
-  <loader type="pflash" readonly="yes">/usr/share/OVMF/OVMF_CODE.fd</loader>
-  <nvram template="/usr/share/OVMF/OVMF_VARS.fd">/var/libvirt/nvram/${guest}_VARS.fd</nvram>
-
-This treats OVMF_VARS.fd as a read-only template, and gives each guest
-its own writable copy, which is nice.
-
-The flash device model supports restricting writes to SMM (remember,
-that's required for secure boot).  It's controlled by cfi.pflash01
-property secure, off by default.  If we created the device model with
--device, we'd simply pass secure=on.  But since we create it with -drive
-if=pflash, we can't.  Instead we have to use
-
-    -global driver=cfi.pflash01,property=secure,value=on
-
-This flips the global default value.  Awkward, but works out okay,
-because (1) the flash device holding OVMF_VARS.fd wants this value, and
-(2) the flash device holding OVMF_CODE.fd doesn't care (it's read-only),
-and (3) there is no way to create additional flash devices.
-
-At the libvirt level, we add secure='yes' to the loader element.
-
-We also have to enable SMM emulation.  At QEMU level:
-
-    -machine smm=on
-
-At libvirt level:
-
-    <features>
-      <smm state='on'/>
-    </features>
-
-Note that the above configuration examples involve selecting OVMF
-images.  A bit of an inconvenience compared to BIOS, where the default
-"use the BIOS shipped with QEMU" pretty much just works.
-
-To add annoyance to inconvenience, different distributions have
-different ideas on where to install OVMF images.  And because that's not
-complicated enough, we also have to pair code with data images.  And
-because that's still not complicated enough, any specific machine type
-may work only with a subset of the available firmwares.
-
-The proposed way to deal with all that works as follows.
-
-Each set of firmware images comes with a descriptor file.  These are
-JSON and conform to the QAPI schema docs/interop/firmware.json.
-
-Among the descriptors that declare support for the kind of machine we
-want, we pick (really: the management application picks) the one with
-the highest priority.  The distribution provides default priorities,
-which system administrator and user can override.  firmware.json
-documents this in much more detail.
-
-I wrote "proposed", because as far as I can tell, neither distributions
-nor libvirt are there, yet.
-
-After all this text, I'm finally ready to curve towards -blockdev.
-Going from -drive if=T, T!=none to -blockdev involves two steps.  The
-first step replaces if=T with if=none and -device.  The second step
-replaces -drive if=none with -blockdev.  That step is "obvious" (it took
-us a few years to get to obvious, but I digress).  The difficulty is in
-the first step.  Two issues:
-
-(1) cfi.pflash01 isn't available with -device.
-
-(2) "Magic board code picks up the backend [created for -drive
-    if=pflash], creates a frontend (a cfi.pflash01 device), and maps it
-    into the guest's address space."  When we replace if=pflash by
-    if=none, we get to replicate that magic on top of -device.
-
-Issue (1) isn't too hard: we add the device to the dynamic sysbus device
-white-list, move a sysbus_mmio_map() from pflash_cfi01_realize() into
-pflash_cfi01_realize().  The latter requires a new device property to
-configure the base address.  I got a working prototype.  Since this
-makes the device model's name and properties ABI, review would be
-advisable.
-
-To solve (2), we first have to understand the magic.  Device
-cfi.pflash01 has the following properties:
-
-    num-blocks                  Size of the device in blocks
-    sector-length               Size of a block
-                                (admire the choice of names)
-    width                       Bank width
-    big-endian                  Endianess (d'oh)
-    id0, id1, id2, id3          Some kind of device ID, guest-visible,
-                                default to zero, few boards change it
-    name                        Memory region name
-                                (why is this even configurable?)
-    phys-addr                   Physical base address
-                                (this is the new device property
-                                mentioned above)
-    secure                      For restricting access to firmware,
-                                default off
-    device-width                you don't want to know,
-                                there is a default, but it's documented
-                                as "bad, do not use", yet pretty much
-                                all boards use it
-    max-device-width            defaults to device-width
-                                not actually set anywhere
-    old-multiple-chip-handling  back-compat gunk for
-                                machine types 2.8 and older
-
-The magic board code in hw/i386/pc_sysfw.c configures as follows:
-
-    num-blocks                  computed from backend size
-    sector-length               4096
-    width                       1
-    big-endian                  0
-    id0, id1, id2, id3          all 0
-    name                        system.pflash<U>, where U is -drive's
-                                unit number
-    phys-addr                   computed so
-                                unit 0 ends right below 0x100000000,
-                                unit n+1 ends at right below unit n
-
-"secure", "device-width", "max-device-width",
-"old-multiple-chip-handling" are left at the default.
-
-One additional bit of magic is actually in libvirt: it configures
-"secure" by flipping its default with
--global driver=cfi.pflash01,property=secure,value=on.
-
-Now let's consider how to replicate this magic on top of device.
-
-Perhaps machine-type specific defaults could take care of sector-length,
-width, big-endian, id0, id1, id2, id3.  Leaves num-blocks, name, and
-phys-addr.
-
-Perhaps the realize() method could default num-blocks to size of
-backend.  But that doesn't really help the management application,
-because it needs to mess with the size anyway to compute phys-addr.  So
-scratch that idea.
-
-Moving the magic code to compute num-blocks, phys-addr and name to the
-management application is certainly possible, but ugly.
-
-Note that the values computed are fixed when the firmware gets deployed.
-If we record them in the firmware descriptor, the management application
-doesn't need magic, it can simply pass on the values obtained from the
-descriptor.
-
-We'd want to include sector-length in the descriptor then, to ensure
-num-block has a defined meaning.
-
-Same technique could take care of width, big-endian, ... in case
-machine-type specific defaults turn out to be inadequate for them.
-
-Opinions?
-
-One more problem: the magic board code does a bit more than just
-configure the cfi.pflash01 device.  That additional magic needs to be
-generalized to work regardless of whether the device gets configured
-with -drive if=pflash or with -device.  I got a working prototype.
+--GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn--
