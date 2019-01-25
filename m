@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38439)
+Received: from eggs.gnu.org ([209.51.188.92]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmyj8-0007oE-Qv
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:28:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gmyl5-00010i-Kg
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gmyj7-0007Q9-Nl
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:28:46 -0500
-Date: Fri, 25 Jan 2019 10:28:42 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190125102842.GB28305@stefanha-x1.localdomain>
-References: <20190123212234.32068-1-stefanha@redhat.com>
-	<20190123212234.32068-3-stefanha@redhat.com>
-	<f58f9085-c895-1fa5-9fae-afe4ac8de39a@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gmyl4-0008P5-Ga
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 05:30:47 -0500
+Date: Fri, 25 Jan 2019 11:30:15 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190125103015.GA9055@linux.fritz.box>
+References: <20190124141731.21509-1-kwolf@redhat.com>
+	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
+	<20190124151105.GH4601@localhost.localdomain>
+	<093415a1-c31c-c727-583f-bf3176621336@virtuozzo.com>
+	<20190124154248.GK4601@localhost.localdomain>
+	<3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JP+T4n/bALQSJXh8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f58f9085-c895-1fa5-9fae-afe4ac8de39a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] pflash: flush rom device memory
- region
+In-Reply-To: <3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, jim@groklearning.com, Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, jusual@mail.ru, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
+Am 25.01.2019 um 11:10 hat Paolo Bonzini geschrieben:
+> On 24/01/19 16:42, Kevin Wolf wrote:
+> >> Recently Paolo asked me not to add more users of AioContext lock. Unfortunately
+> >> I don't understand the whole picture around it.. Doesn't this apply here?
+> >> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg03410.html
+> > I don't know. Honestly I feel nobody except Paolo knows, because we
+> > don't know his patches yet.
+> 
+> This is true.  On the other hand, the AioContext lock is only used in
+> some special cases around block jobs and blk_set_aio_context, and in
+> general the block devices already should not have any dependencies
+> (unless they crept in without me noticing).
 
---JP+T4n/bALQSJXh8
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's also used in those cases where coroutines don't need locking, but
+threads would. Did you audit all of the drivers for such cases?
 
-On Thu, Jan 24, 2019 at 12:11:55PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 1/23/19 10:22 PM, Stefan Hajnoczi wrote:
-> > pflash devices should mark the memory region dirty and invalidate TBs
-> > after directly writing to the RAM backing the ROM device.
-> >=20
-> > Note that pflash_cfi01_get_memory() is used by several machine types to
-> > populate ROM contents directly.  Callers are untouched by this patch
-> > because they only modify memory before the guest is started.
-=2E..
-> > @@ -763,6 +766,8 @@ static void pflash_cfi01_realize(DeviceState *dev, =
-Error **errp)
-> >              error_setg(errp, "failed to read the initial flash content=
-");
-> >              return;
-> >          }
-> > +
-> > +        memory_region_flush_rom_device(&pfl->mem, 0, total_len);
->=20
-> The device realize() is also executed before the guest is started, is
-> this call really necessary?
+> In particular...
+> 
+> > But raw doesn't have an s->lock yet, so I
+> > think removing the AioContext lock involves some work on it anyway and
+> > adding this doesn't really change the amount of work.
+> 
+> ... BDRVRawState doesn't have any data that changes after open, does it?
+>  This is why it doesn't have an s->lock.
 
-My rationale was that machine init only happens before the guest is
-started while ->realize() is called by hotplug too.
+No important data anyway. We do things like setting s->has_write_zeroes
+= false after failure, but if we got a race and end up trying twice
+before disabling it, it doesn't really hurt either.
 
-That said, can pflash devices be hotplugged?
+Then there is reopen, but that involves a drain anyway. And that's it
+probably.
 
-If you guys prefer not flushing from pflash ->realize() then I'll drop
-it.
+So do you think I should introduce a CoMutex for raw here? Or QemuMutex?
 
-Stefan
-
---JP+T4n/bALQSJXh8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcSuTaAAoJEJykq7OBq3PIVtgH/3jX/5SKfR95RxpxWSFIAMsV
-e22lJdwugIsjiczcIJAKW8o3WjWh/2NVzmFN0rTtXYWUf1E5TJ8OAdv/OJ3/YDPB
-/o/0mEVUrD73RodPdRsASZOIsuoB+Waoc7FK1+ea34dpt/d3c+k82GvW/I3s9yxq
-zu7K/4REkOYNGw4PN58IK0xQpWDFQ1m6JizU1RbS9sdL+xAYgU5KQddkUGPOfPPO
-6OlmC6aZYFNgLO2PCl34Mja0ii/p5FQuiRAYP5vQhRH3OXtN8kg1SqqCk8To4ceI
-3eGe+sUaLVYYuVKNnnWekCVMKmuvyxr/im843ogBufzho7l6FKeeYXEWXFhFtvc=
-=g+Wg
------END PGP SIGNATURE-----
-
---JP+T4n/bALQSJXh8--
+Kevin
