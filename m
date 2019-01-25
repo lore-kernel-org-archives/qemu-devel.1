@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40147)
+Received: from eggs.gnu.org ([209.51.188.92]:40977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn10I-0007Ns-Om
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:54:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1gn11o-0000xe-4o
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gn0n3-0004p8-1B
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:40:58 -0500
-References: <CAAJhNetR-8z37JuOmFDRuq3JfG_S03VDZkciqiKh_kieoqxQ1g@mail.gmail.com>
-	<628a94ba-2202-6a15-865b-16d52653288d@redhat.com>
-	<CAFEAcA8jvRRpphFS7jvisU+f0SEvU1DOhrBxgKSRWEMkZV3eOw@mail.gmail.com>
-	<CAAJhNeta4fWX7y-ap-CSUhrHDGrZH_Xss6tyDa6=vn_uUJSk0Q@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1gn11m-0003O6-2f
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 07:56:11 -0500
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c7e75a05-d1ca-8a7d-5f90-19e4efa0e28f@redhat.com>
-Date: Fri, 25 Jan 2019 13:40:36 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAAJhNeta4fWX7y-ap-CSUhrHDGrZH_Xss6tyDa6=vn_uUJSk0Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] object owner argument of
- memory_region_init_ram
+Date: Fri, 25 Jan 2019 13:56:00 +0100
+Message-Id: <1548420960-5555-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/virtio: Use CONFIG_VIRTIO_PCI switch
+ instead of CONFIG_PCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +18,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ksourav <sourav.jb1988@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, Miroslav Rezanina <mrezanin@redhat.com>
 
-On 2019-01-23 16:50, ksourav wrote:
-> Thanks for the reply.
-> Should I send patches for socs using NULL owner to qemu-trivial@nongnu.=
-org ?
+For downstream s390x builds, we'd like to be able to build QEMU with
+CONFIG_VIRTIO_PCI disabled (since virtio-ccw is used here instead),
+but still with CONFIG_PCI enabled. This currently fails since the
+virtio-*-pci.o files are still included in the build, but virtio-pci.o
+is missing. Use the right config switch CONFIG_VIRTIO_PCI to exclude
+the virtio-*-pci.o files from the build.
 
-Sure, but please also CC: qemu-arm@nongnu.org for ARM-related patches.
+Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/virtio/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> I have been reading qemu source code for soc and different device
-> implementation for past few days to understand qemu internals.
-> While I have a rough idea of qemu object model, I would like to have yo=
-ur input.
-> If someone has to learn about qemu object model or soc implementation,
-> what would be the correct way ?
-
-We certainly lack documentation here. Studying the available sources is
-likely the best thing you can do. There were also a couple of
-presentations about QOM and qdev during the various KVM Forums (see
-https://www.linux-kvm.org/page/KVM_Forum for example), but they are
-likely not quite up to date anymore.
-
- Thomas
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index ea7913d..d335dd0 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -11,7 +11,7 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-p
+ 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+-ifeq ($(CONFIG_PCI),y)
++ifeq ($(CONFIG_VIRTIO_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+-- 
+1.8.3.1
