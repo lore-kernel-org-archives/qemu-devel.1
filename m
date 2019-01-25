@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35899)
+Received: from eggs.gnu.org ([209.51.188.92]:36119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gn37K-0003Ng-7M
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:10:03 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gn37q-0003tP-Ie
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:10:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gn2zI-0001aW-51
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 10:01:45 -0500
-References: <20181221234750.23577-1-mreitz@redhat.com>
-	<20181221234750.23577-4-mreitz@redhat.com>
-	<b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
-	<04d2a9e7-9cb8-74cf-0c0e-0c9d19940020@redhat.com>
-	<8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
-	<57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c6b7307d-8394-c415-bd97-72f7542e0c36@redhat.com>
-Date: Fri, 25 Jan 2019 16:01:26 +0100
+	(envelope-from <stefanha@gmail.com>) id 1gn2wd-0000RY-5b
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 09:59:00 -0500
+Date: Fri, 25 Jan 2019 14:58:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190125145856.GC28305@stefanha-x1.localdomain>
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-2-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be
- run concurrently
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Bu8it7iiRSEf40bY"
+Content-Disposition: inline
+In-Reply-To: <20190124172323.230296-2-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/2] virtio-blk: add DISCARD and WRITE
+ ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +25,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c6b7307d-8394-c415-bd97-72f7542e0c36@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 3/3] iotests: Allow 147 to be run
- concurrently
-References: <20181221234750.23577-1-mreitz@redhat.com>
- <20181221234750.23577-4-mreitz@redhat.com>
- <b064fb74-520f-3551-3d0c-603889e0cee6@redhat.com>
- <04d2a9e7-9cb8-74cf-0c0e-0c9d19940020@redhat.com>
- <8204d711-5769-c2f7-7baf-0d26eaf8fa54@redhat.com>
- <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
-In-Reply-To: <57f12e0d-0fef-43f6-ab18-86624ed4d152@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 23.01.19 18:47, John Snow wrote:
->=20
->=20
-> On 1/23/19 12:34 PM, Max Reitz wrote:
->> On 23.01.19 14:05, Max Reitz wrote:
->>> On 21.01.19 21:50, John Snow wrote:
->>
->> [...]
->>
->>>> I guess my only other observation is that we have a lot of "while Tr=
-ue"
->>>> loops now, is it worth creating some kind of helper that does the di=
-rty
->>>> work of finding a serviceable port or nah?
->>>
->>> Seems reasonable, I'll see how it looks.
->>
->> If I do that, the diff stat looks to be 40+, 33-.  Is that worth it?
->>
->> Max
->>
->=20
-> Instead of:
->  1 file changed, 68 insertions(+), 30 deletions(-)
->=20
-> Or in addition to?
-
-In addition to.
-
-> Use your own judg[e?]ment on it, I guess it's local to this one iotest
-> for now anyway, so if it's not an obvious win just skip it.
-
-OK.  I guess I'll skip it then, but let it be noted that your criticism
-was listened to. :-)
-
-Max
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn
+--Bu8it7iiRSEf40bY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Jan 24, 2019 at 06:23:22PM +0100, Stefano Garzarella wrote:
+> @@ -584,6 +603,56 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+>          virtio_blk_free_request(req);
+>          break;
+>      }
+> +    /*
+> +     * VIRTIO_BLK_T_DISCARD and VIRTIO_BLK_T_WRITE_ZEROES are defined with
+> +     * VIRTIO_BLK_T_OUT flag set. We masked this flag in the switch statement,
+> +     * so we must mask it for these requests, then we will check the type.
+> +     */
+> +    case VIRTIO_BLK_T_DISCARD & ~VIRTIO_BLK_T_OUT:
+> +    case VIRTIO_BLK_T_WRITE_ZEROES & ~VIRTIO_BLK_T_OUT:
+> +    {
+> +        struct virtio_blk_discard_write_zeroes dwz_hdr;
+> +        uint64_t sector;
+> +        int bytes;
+> +
+> +        if (unlikely(iov_to_buf(out_iov, out_num, 0, &dwz_hdr,
+> +                                sizeof(dwz_hdr)) != sizeof(dwz_hdr))) {
+
+"The data used for discard or write zeroes command is described by one
+or more virtio_blk_discard_write_zeroes structs."
+
+This needs to be a loop so that multiple dwz structs can be processed up
+to the length of virtio_blk_req->data[].
+
+> +            virtio_error(vdev, "virtio-blk discard/wzeroes header too short");
+> +            return -1;
+> +        }
+> +
+> +        sector = virtio_ldq_p(VIRTIO_DEVICE(req->dev), &dwz_hdr.sector);
+> +        bytes = virtio_ldl_p(VIRTIO_DEVICE(req->dev),
+> +                             &dwz_hdr.num_sectors) << BDRV_SECTOR_BITS;
+
+Please handle num_sectors << BDRV_SECTOR_BITS overflow so that we don't
+need to worry about what happens with an overflowed value later on.
+
+> +
+> +        if (!virtio_blk_sect_range_ok(req->dev, sector, bytes)) {
+> +            virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+> +            virtio_blk_free_request(req);
+> +            return 0;
+> +        }
+> +
+> +        if ((type & ~(VIRTIO_BLK_T_BARRIER)) == VIRTIO_BLK_T_DISCARD) {
+
+Missing device requirement: "the device MUST set the status byte to VIRTIO_BLK_S_UNSUPP for discard commands if the unmap flag is set."
+
+> +            blk_aio_pdiscard(req->dev->blk, sector << BDRV_SECTOR_BITS, bytes,
+> +                             virtio_blk_discard_wzeroes_complete, req);
+> +        } else if ((type & ~(VIRTIO_BLK_T_BARRIER)) ==
+> +                   VIRTIO_BLK_T_WRITE_ZEROES) {
+> +            int flags = 0;
+> +
+> +            if (virtio_ldl_p(VIRTIO_DEVICE(req->dev), &dwz_hdr.flags) &
+> +                VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP) {
+> +                flags |= BDRV_REQ_MAY_UNMAP;
+> +            }
+> +
+> +            blk_aio_pwrite_zeroes(req->dev->blk, sector << BDRV_SECTOR_BITS,
+> +                                  bytes, flags,
+> +                                  virtio_blk_discard_wzeroes_complete, req);
+
+Please add block_acct_start(), this is treated as a write.
+
+> +        } else { /* Unsupported if VIRTIO_BLK_T_OUT is not set */
+> +            virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
+> +            virtio_blk_free_request(req);
+> +        }
+> +
+> +        break;
+> +    }
+>      default:
+>          virtio_blk_req_complete(req, VIRTIO_BLK_S_UNSUPP);
+>          virtio_blk_free_request(req);
+> @@ -763,6 +832,14 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+>      blkcfg.alignment_offset = 0;
+>      blkcfg.wce = blk_enable_write_cache(s->blk);
+>      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
+> +    virtio_stl_p(vdev, &blkcfg.max_discard_sectors, BDRV_REQUEST_MAX_SECTORS);
+> +    virtio_stl_p(vdev, &blkcfg.max_discard_seg, 1);
+> +    virtio_stl_p(vdev, &blkcfg.discard_sector_alignment,
+> +                 blk_size >> BDRV_SECTOR_BITS);
+> +    virtio_stl_p(vdev, &blkcfg.max_write_zeroes_sectors,
+> +                 BDRV_REQUEST_MAX_SECTORS);
+> +    virtio_stl_p(vdev, &blkcfg.max_write_zeroes_seg, 1);
+> +    blkcfg.write_zeroes_may_unmap = 1;
+
+Please check hw/scsi/scsi-disk.c for an example of how to initialize
+these limits.  It should be possible to set some of them via s->conf so
+I'm surprised so many fields are hardcoded in this patch.
+
+--Bu8it7iiRSEf40bY
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxLJMcACgkQ9AfbAGHV
-z0D41gf/SbGOjZ/F+vjYMthidgrfr6byF1yRkqR8EOyevzof5FQ2IuG+vJuQDrFL
-n4cCfRLjRBMtthshT55XRM+6f1ZmOd9XPRYG3Eknttdbz/mQAl6a0AG9EugUXjXK
-1a39hD+ZcEJC9e1bS/6RBs4wtmi4LqDRd4CSapfxJOYQFse58fH3BSiz5L3U+Ken
-yPh/HMbHnr3dgNlAb5DE6zaDcdK+pFR6kIPrNrNUvBA6iZagVs++0ch9FOMBa6cy
-taYtAAPCFq0YCOkzw84MmFE6BPAvcoSIoSZJp6jqW+eDFj03jhMA3KPYKdTElVjo
-aV+yDJM928TKQ19oZdUk9ZlUajMsjA==
-=iwAU
+iQEcBAEBAgAGBQJcSyQwAAoJEJykq7OBq3PIW6QH/1g6SZokGKaxp/6IStD2RCFk
+SP5BfRaKwLiIM600U6gl4vglhkzUxATAqzBBlnyXhQg7PW1ZNYbCGaI+taKc7tSP
+BL6/qmsn+r3OSALyjeWJMdU6T2j7pkPn2rT2EYLx+iH0y0rGlIZFo+Ajx1/UuWX1
+NLtg+5c8JR3sdelvrdFMKexhPcaCSsFj6/Ez3NYCNgzQORJKtvMGrol1cC8GW4zb
+jqkfrIfGgQN7ZpfHoQXiiN5TQ3mboZu9/Jr2mYHutg//NdV3hdULbPpwPSBKoe0J
+pmd5y35IztMebH2cBaxUHnFZo1rpK5H0pvWKIgTpROcy0x15jOliaMHuArBmhTU=
+=ipas
 -----END PGP SIGNATURE-----
 
---GLcm7hXKfXjvTI0LPUZMLB20BBQvkSPtn--
+--Bu8it7iiRSEf40bY--
