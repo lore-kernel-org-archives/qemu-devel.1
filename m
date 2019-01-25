@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46619)
+Received: from eggs.gnu.org ([209.51.188.92]:47322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gmuVT-0004Le-4E
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 00:58:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1gmuYP-0006H1-Pk
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 01:01:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gmuMK-0007vX-0W
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 00:48:57 -0500
-References: <20181102152257.20637-1-mark.cave-ayland@ilande.co.uk>
-	<20181102152257.20637-6-mark.cave-ayland@ilande.co.uk>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <839269a0-4b07-a084-8e9a-fcffa76bc658@tuxfamily.org>
-Date: Fri, 25 Jan 2019 06:48:49 +0100
+	(envelope-from <thuth@redhat.com>) id 1gmuYN-0005ru-Ui
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 01:01:25 -0500
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-3-sgarzare@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5b3c3076-8f0e-c6a2-b6d1-707db2ae3a66@redhat.com>
+Date: Fri, 25 Jan 2019 07:01:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181102152257.20637-6-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190124172323.230296-3-sgarzare@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 05/10] esp: add pseudo-DMA as used by
- Macintosh
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
+ WRITE_ZEROES command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,217 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, hpoussin@reactos.org, kraxel@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net, laurent@vivier.eu
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2018-11-02 16:22, Mark Cave-Ayland wrote:
-> From: Laurent Vivier <laurent@vivier.eu>
-
-I'd suggest to add a patch description that contains the text that
-Laurent provided as a reply to this patch in v5:
-
----------------------------- 8< --------------------------------------
-There is no DMA in Quadra 800, so the CPU reads/writes the data from the
-PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
-to/from the memory.
-
-There is a nice assembly loop in the kernel to do that, see
-linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
-
-The start of the transfer is triggered by the DREQ interrupt (see linux
-mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
-transfer after a SCSI command has been sent (in Quadra 800 it goes
-through the VIA2, the via2-irq line and the vIFR register)
-
-The Macintosh hardware includes hardware handshaking to prevent the CPU
-from reading invalid data or writing data faster than the peripheral
-device can accept it.
-
-This is the "blind mode", and from the doc:
-"Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
-second for blind transfers in the Macintosh II"
-
-Some references can be found in:
-  Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
-  Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
----------------------------- >8 --------------------------------------
-
-?
-
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  hw/scsi/esp.c         | 291 +++++++++++++++++++++++++++++++++++++++++++++-----
->  include/hw/scsi/esp.h |   7 ++
->  2 files changed, 269 insertions(+), 29 deletions(-)
+On 2019-01-24 18:23, Stefano Garzarella wrote:
+> If the WRITE_ZEROES feature is enabled, we check this
+> command in the test_basic().
 > 
-> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-> index 630d923623..8e9e27e479 100644
-> --- a/hw/scsi/esp.c
-> +++ b/hw/scsi/esp.c
-[...]
-> @@ -356,8 +511,7 @@ static void handle_ti(ESPState *s)
->          s->dma_left = minlen;
->          s->rregs[ESP_RSTAT] &= ~STAT_TC;
->          esp_do_dma(s);
-> -    }
-> -    if (s->do_cmd) {
-> +    } else if (s->do_cmd) {
-
-I'm not sure about this change... is it required? It could also change
-the behavior of the other users of this device...?
-
->          trace_esp_handle_ti_cmd(s->cmdlen);
->          s->ti_size = 0;
->          s->cmdlen = 0;
-> @@ -384,6 +538,7 @@ void esp_hard_reset(ESPState *s)
->  static void esp_soft_reset(ESPState *s)
->  {
->      qemu_irq_lower(s->irq);
-> +    qemu_irq_lower(s->irq_data);
->      esp_hard_reset(s);
->  }
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  tests/virtio-blk-test.c | 63 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 63 insertions(+)
+> 
+> diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+> index 04c608764b..8cabbcb85a 100644
+> --- a/tests/virtio-blk-test.c
+> +++ b/tests/virtio-blk-test.c
+> @@ -231,6 +231,69 @@ static void test_basic(QVirtioDevice *dev, QGuestAllocator *alloc,
 >  
-> @@ -619,6 +774,80 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
->      .valid.accepts = esp_mem_accepts,
->  };
+>      guest_free(alloc, req_addr);
 >  
-> +static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-> +                                  uint64_t val, unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint32_t dmalen;
+> +    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
+> +        struct virtio_blk_discard_write_zeroes *dwz_hdr;
+> +        void *expected;
 > +
-> +    dmalen = s->rregs[ESP_TCLO];
-> +    dmalen |= s->rregs[ESP_TCMID] << 8;
-> +    dmalen |= s->rregs[ESP_TCHI] << 16;
-> +    if (dmalen == 0 || s->pdma_len == 0) {
-> +        return;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        *s->pdma_cur++ = val;
-> +        s->pdma_len--;
-> +        dmalen--;
-> +        break;
-> +    case 2:
-> +        *s->pdma_cur++ = val >> 8;
-> +        *s->pdma_cur++ = val;
+> +        /*
+> +         * WRITE_ZEROES request on the same sector of previous test where
+> +         * we wrote "TEST".
+> +         */
+> +        req.type = VIRTIO_BLK_T_WRITE_ZEROES;
+> +        req.data = g_malloc0(512);
 
-Is there any chance that we could end up here with pdma_len == 1 or
-dmalen == 1 ? If yes, the following two lines will trigger a wrap-around
-with likely very bad side effects in the future...
+Wouldn't it be more interesting to do a memset(req.data, 0xaa, 512) or
+something similar here, to see whether zeroes or 0xaa is written?
 
-Maybe assert(s->pdma_len >= 2 && dmalen >= 2) at least?
-
-> +        s->pdma_len -= 2;
-> +        dmalen -= 2;
-> +        break;
-> +    }
-> +    s->rregs[ESP_TCLO] = dmalen & 0xff;
-> +    s->rregs[ESP_TCMID] = dmalen >> 8;
-> +    s->rregs[ESP_TCHI] = dmalen >> 16;
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +}
+> +        dwz_hdr = (struct virtio_blk_discard_write_zeroes *)req.data;
+> +        dwz_hdr->sector = 0;
+> +        dwz_hdr->num_sectors = 1;
+> +        dwz_hdr->flags = 0;
 > +
-> +static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-> +                                     unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint64_t val = 0;
+> +        req_addr = virtio_blk_request(alloc, dev, &req, 512);
 > +
-> +    if (s->pdma_len == 0) {
-> +        return 0;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        val = *s->pdma_cur++;
-> +        s->pdma_len--;
-> +        break;
-> +    case 2:
-
-assert(s->pdma_len >= 2) ?
-
-> +        val = *s->pdma_cur++;
-> +        val = (val << 8) | *s->pdma_cur++;
-> +        s->pdma_len -= 2;
-> +        break;
+> +        g_free(req.data);
+> +
+> +        free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
+> +        qvirtqueue_add(vq, req_addr + 16, 512, false, true);
+> +        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
+> +
+> +        qvirtqueue_kick(dev, vq, free_head);
+> +
+> +        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
+> +                               QVIRTIO_BLK_TIMEOUT_US);
+> +        status = readb(req_addr + 528);
+> +        g_assert_cmpint(status, ==, 0);
+> +
+> +        guest_free(alloc, req_addr);
+> +
+> +        /* Read request to check if the sector contains all zeroes */
+> +        req.type = VIRTIO_BLK_T_IN;
+> +        req.ioprio = 1;
+> +        req.sector = 0;
+> +        req.data = g_malloc0(512);
+> +
+> +        req_addr = virtio_blk_request(alloc, dev, &req, 512);
+> +
+> +        g_free(req.data);
+> +
+> +        free_head = qvirtqueue_add(vq, req_addr, 16, false, true);
+> +        qvirtqueue_add(vq, req_addr + 16, 512, true, true);
+> +        qvirtqueue_add(vq, req_addr + 528, 1, true, false);
+> +
+> +        qvirtqueue_kick(dev, vq, free_head);
+> +
+> +        qvirtio_wait_used_elem(dev, vq, free_head, NULL,
+> +                               QVIRTIO_BLK_TIMEOUT_US);
+> +        status = readb(req_addr + 528);
+> +        g_assert_cmpint(status, ==, 0);
+> +
+> +        data = g_malloc(512);
+> +        expected = g_malloc0(512);
+> +        memread(req_addr + 16, data, 512);
+> +        g_assert_cmpmem(data, 512, expected, 512);
+> +        g_free(expected);
+> +        g_free(data);
+> +
+> +        guest_free(alloc, req_addr);
 > +    }
 > +
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps sysbus_esp_pdma_ops = {
-> +    .read = sysbus_esp_pdma_read,
-> +    .write = sysbus_esp_pdma_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 2,
-> +};
-> +
->  static const struct SCSIBusInfo esp_scsi_info = {
->      .tcq = false,
->      .max_target = ESP_MAX_DEVS,
-> @@ -651,12 +880,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
->      ESPState *s = &sysbus->esp;
->  
->      sysbus_init_irq(sbd, &s->irq);
-> +    sysbus_init_irq(sbd, &s->irq_data);
->      assert(sysbus->it_shift != -1);
->  
->      s->chip_id = TCHI_FAS100A;
->      memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
-> -                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-> +                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
->      sysbus_init_mmio(sbd, &sysbus->iomem);
-> +    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-> +                          sysbus, "esp-pdma", 2);
-> +    sysbus_init_mmio(sbd, &sysbus->pdma);
->  
->      qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
->  
-> diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-> index 682a0d2de0..5e94917ef8 100644
-> --- a/include/hw/scsi/esp.h
-> +++ b/include/hw/scsi/esp.h
-> @@ -18,6 +18,7 @@ struct ESPState {
->      uint8_t rregs[ESP_REGS];
->      uint8_t wregs[ESP_REGS];
->      qemu_irq irq;
-> +    qemu_irq irq_data;
->      uint8_t chip_id;
->      bool tchi_written;
->      int32_t ti_size;
-> @@ -46,6 +47,11 @@ struct ESPState {
->      ESPDMAMemoryReadWriteFunc dma_memory_write;
->      void *dma_opaque;
->      void (*dma_cb)(ESPState *s);
-> +    uint8_t pdma_buf[32];
-> +    uint32_t pdma_len;
-> +    uint8_t *pdma_start;
-> +    uint8_t *pdma_cur;
-> +    void (*pdma_cb)(ESPState *s);
->  };
->  
->  #define TYPE_ESP "esp"
-> @@ -57,6 +63,7 @@ typedef struct {
->      /*< public >*/
->  
->      MemoryRegion iomem;
-> +    MemoryRegion pdma;
->      uint32_t it_shift;
->      ESPState esp;
->  } SysBusESPState;
-
- Thomas
+>      if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
+>          /* Write and read with 2 descriptor layout */
+>          /* Write request */
+> 
