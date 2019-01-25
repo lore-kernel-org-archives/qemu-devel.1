@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56260)
+Received: from eggs.gnu.org ([209.51.188.92]:32900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmvhE-00047I-Rz
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:14:37 -0500
+	(envelope-from <tgfbeta@me.com>) id 1gmwD7-0001cr-Jx
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:47:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gmvhD-0007mM-QV
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:14:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41974)
+	(envelope-from <tgfbeta@me.com>) id 1gmwD5-0008A5-R0
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:47:33 -0500
+Received: from pv50p00im-ztbu10011701.me.com ([17.58.6.53]:36953)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gmvhD-0007mA-IN
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:14:35 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
-	<20190111161515.GG2738@work-vm>
-	<CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
-	<fcc36df4-5900-7c83-836c-14ca6e6d8f09@redhat.com>
-	<CAFEAcA-ZrpiBu-Xm6dm6bcTkZ49zMBU3=spQ1UTgG61SNUj40w@mail.gmail.com>
-	<64411f3f-0071-fc94-945c-af16cf5edc77@redhat.com>
-	<20190123195345.GI2193@work-vm>
-	<a0c711c1-17d4-9fbe-b78c-4cd4a2419633@redhat.com>
-	<20190124091113.GA2101@work-vm> <20190124095152.GM18231@xz-x1>
-	<7c445e35-13f7-b017-3bb7-e01874014ed6@redhat.com>
-Date: Fri, 25 Jan 2019 08:14:30 +0100
-In-Reply-To: <7c445e35-13f7-b017-3bb7-e01874014ed6@redhat.com> (Jason Wang's
-	message of "Fri, 25 Jan 2019 11:55:12 +0800")
-Message-ID: <875zudtdih.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1gmwD5-00088u-12
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 02:47:31 -0500
+From: Chen Zhang <tgfbeta@me.com>
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Message-Id: <23B229B3-3095-4DFB-8369-866784808D30@me.com>
+Date: Fri, 25 Jan 2019 15:47:23 +0800
+Content-Type: text/plain;
+	charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] test-filter-mirror hangs
+Subject: [Qemu-devel] [PATCH v2] ui/egl-helpers: Augment parameter list of
+ egl_texture_blend() to convey scales of viewport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,105 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Jason Wang <jasowang@redhat.com> writes:
+=46rom 0be823a56682be57fe0370bb91e4062ec7b47be5 Mon Sep 17 00:00:00 2001
+From: Chen Zhang <tgfbeta@me.com>
+Date: Fri, 25 Jan 2019 15:33:08 +0800
+Subject: [PATCH v2] ui/egl-helpers: Augment parameter list of
+ egl_texture_blend() to convey scales of viewport.
 
-> On 2019/1/24 =E4=B8=8B=E5=8D=885:51, Peter Xu wrote:
->> On Thu, Jan 24, 2019 at 09:11:15AM +0000, Dr. David Alan Gilbert wrote:
->>> * Jason Wang (jasowang@redhat.com) wrote:
->>>> On 2019/1/24 =E4=B8=8A=E5=8D=883:53, Dr. David Alan Gilbert wrote:
->>>>> * Jason Wang (jasowang@redhat.com) wrote:
->>>>>> On 2019/1/22 =E4=B8=8A=E5=8D=882:56, Peter Maydell wrote:
->>>>>>> On Thu, 17 Jan 2019 at 09:46, Jason Wang<jasowang@redhat.com>  wrot=
-e:
->>>>>>>> On 2019/1/15 =E4=B8=8A=E5=8D=8812:33, Zhang Chen wrote:
->>>>>>>>> On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert
->>>>>>>>> <dgilbert@redhat.com  <mailto:dgilbert@redhat.com>> wrote:
->>>>>>>>>
->>>>>>>>>        * Peter Maydell (peter.maydell@linaro.org
->>>>>>>>>        <mailto:peter.maydell@linaro.org>) wrote:
->>>>>>>>>        > Recently I've noticed that test-filter-mirror has been h=
-anging
->>>>>>>>>        > intermittently, typically when run on some other TCG arc=
-hitecture.
->>>>>>>>>        > In the instance I've just looked at, this was with s390x=
- guest on
->>>>>>>>>        > x86-64 host, though I've also seen it on other host arch=
-s and
->>>>>>>>>        > perhaps with other guests.
->>>>>>>>>
->>>>>>>>>        Watch out to see if you really do see it for other guests;
->>>>>>>>>        it carefully avoids using virtio-net to avoid vhost; but o=
-n s390x it
->>>>>>>>>        uses virtio-net-ccw - could that hit the vhost it was tryi=
-ng to avoid?
->>>>>>>>>
->>>>>>>>>        > Below is a backtrace, though it seems to be pretty unhel=
-pful.
->>>>>>>>>        > Anybody got any theories ? Does the mirror test rely on =
-dirty
->>>>>>>>>        > memory bitmaps like the migration test (which also hangs
->>>>>>>>>        > occasionally with TCG due to some bug I'm sure we've inv=
-estigated
->>>>>>>>>        > in the past) ?
->>>>>>>>>
->>>>>>>>>        I don't think it relies on the CPU at all.
->>>>>>>>>     I have no idea about this currently, but Jason and I designed=
- the
->>>>>>>>> test case.
->>>>>>>>> Add Jason: Have any comments about this ?
->>>>>>>> I can't reproduce this locally with s390x-softmmu. It looks to me =
-the
->>>>>>>> test should be independent to any kinds of emulation. It should pa=
-ss
->>>>>>>> when mainloop work.
->>>>>>> I've just seen a hang with ppc64 guest on s390x host, so it is
->>>>>>> indeed not specific to s390x guest (and so not specific to
->>>>>>> virtio-net either, since the ppc64 guest setup uses e1000).
->>>>>>>
->>>>>>> thanks
->>>>>>> -- PMM
->>>>>> Finally reproduced locally after hundreds (sometimes thousands) time=
-s of
->>>>>> running.
->>>>>>
->>>>>> Bisection points to OOB monitor[1].
->>>>>>
->>>>>> It looks to me after OOB is used unconditionally we lose a barrier t=
-o make
->>>>>> sure socket is connected before sending packets in test-filter-mirro=
-r.c. Is
->>>>>> there any other similar and simple thing that we could do to kick the
->>>>>> mainloop?
->>>>> Do you mean the:
->>>>>
->>>>>       /* send a qmp command to guarantee that 'connected' is setting =
-to true. */
->>>>>       qmp_discard_response(qts, "{ 'execute' : 'query-status'}");
->>>>
->>>> Yes.
->>>>
->>>>
->>>>> why was that ever sufficient to know the socket was ready?
->>>>
->>>> It was suggested by Fam, I don't remember the details. Can we make sur=
-e all
->>>> pending events has been processed (UNIX socket was set to connected) a=
-fter
->>>> query-status is returned with an non OOB monitor?
->>> I'm not sure - it doesn't sound like a 'query-status' should ensure
->>> anything else.
->>> How about something like a 'query-chardev' - can that tell you what you
->>> need and loop until it's ready?
->> Yeah it sounds hacky to use "query status" to make sure a specific
->> chardev is connected even before the OOB...
->
->
-> Probably, but anyway it works before OOB.
+ This would help gtk-egl display showing scaled DMABuf cursor images =
+when
+ gtk window was zoomed. A default scale of (1.0, 1.0) was presumed for
+ call sites where no scaling is needed.
 
-I don't doubt it worked.  Relying on inappropriate assumptions always
-works just fine right until the assumptions become invalid :)
+Signed-off-by: Chen Zhang <tgfbeta@me.com>
+---
+ include/ui/egl-helpers.h | 2 +-
+ ui/egl-headless.c        | 3 ++-
+ ui/egl-helpers.c         | 9 +++++----
+ ui/gtk-egl.c             | 3 ++-
+ ui/spice-display.c       | 2 +-
+ 5 files changed, 11 insertions(+), 8 deletions(-)
 
-[...]
+diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+index 3fc656a..b976cb8 100644
+--- a/include/ui/egl-helpers.h
++++ b/include/ui/egl-helpers.h
+@@ -27,7 +27,7 @@ void egl_fb_read(void *dst, egl_fb *src);
+=20
+ void egl_texture_blit(QemuGLShader *gls, egl_fb *dst, egl_fb *src, bool =
+flip);
+ void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, =
+bool flip,
+-                       int x, int y);
++                       int x, int y, double scale_x, double scale_y);
+=20
+ #ifdef CONFIG_OPENGL_DMABUF
+=20
+diff --git a/ui/egl-headless.c b/ui/egl-headless.c
+index 519e7ba..e67b47a 100644
+--- a/ui/egl-headless.c
++++ b/ui/egl-headless.c
+@@ -142,7 +142,8 @@ static void egl_scanout_flush(DisplayChangeListener =
+*dcl,
+         egl_texture_blit(edpy->gls, &edpy->blit_fb, &edpy->guest_fb,
+                          !edpy->y_0_top);
+         egl_texture_blend(edpy->gls, &edpy->blit_fb, &edpy->cursor_fb,
+-                          !edpy->y_0_top, edpy->pos_x, edpy->pos_y);
++                          !edpy->y_0_top, edpy->pos_x, edpy->pos_y,
++                          1.0, 1.0);
+     } else {
+         /* no cursor -> use simple framebuffer blit */
+         egl_fb_blit(&edpy->blit_fb, &edpy->guest_fb, edpy->y_0_top);
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 5e115b3..e90eef8 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -120,14 +120,15 @@ void egl_texture_blit(QemuGLShader *gls, egl_fb =
+*dst, egl_fb *src, bool flip)
+ }
+=20
+ void egl_texture_blend(QemuGLShader *gls, egl_fb *dst, egl_fb *src, =
+bool flip,
+-                       int x, int y)
++                       int x, int y, double scale_x, double scale_y)
+ {
+     glBindFramebuffer(GL_FRAMEBUFFER_EXT, dst->framebuffer);
++    int w =3D scale_x * src->width;
++    int h =3D scale_y * src->height;
+     if (flip) {
+-        glViewport(x, y, src->width, src->height);
++        glViewport(x, y, w, h);
+     } else {
+-        glViewport(x, dst->height - src->height - y,
+-                   src->width, src->height);
++        glViewport(x, dst->height - h - y, w, h);
+     }
+     glEnable(GL_TEXTURE_2D);
+     glBindTexture(GL_TEXTURE_2D, src->texture);
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index afd1714..42801b6 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -278,7 +278,8 @@ void gd_egl_scanout_flush(DisplayChangeListener =
+*dcl,
+                          vc->gfx.y0_top);
+         egl_texture_blend(vc->gfx.gls, &vc->gfx.win_fb, =
+&vc->gfx.cursor_fb,
+                           vc->gfx.y0_top,
+-                          vc->gfx.cursor_x, vc->gfx.cursor_y);
++                          vc->gfx.cursor_x, vc->gfx.cursor_y,
++                          vc->gfx.scale_x, vc->gfx.scale_y);
+     } else {
+         egl_fb_blit(&vc->gfx.win_fb, &vc->gfx.guest_fb, =
+!vc->gfx.y0_top);
+     }
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 52f8cb5..aea6f6e 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -1090,7 +1090,7 @@ static void =
+qemu_spice_gl_update(DisplayChangeListener *dcl,
+         egl_texture_blit(ssd->gls, &ssd->blit_fb, &ssd->guest_fb,
+                          !y_0_top);
+         egl_texture_blend(ssd->gls, &ssd->blit_fb, &ssd->cursor_fb,
+-                          !y_0_top, x, y);
++                          !y_0_top, x, y, 1.0, 1.0);
+         glFlush();
+     }
+=20
+--=20
+2.7.4=
