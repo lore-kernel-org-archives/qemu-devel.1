@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59777)
+Received: from eggs.gnu.org ([209.51.188.92]:36202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gn9co-0005Fi-21
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:07:00 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gn9m3-0003lT-5B
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gn9cm-0006ah-3e
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:06:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gn9ck-0006Yl-7P
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:06:54 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 25 Jan 2019 17:06:42 -0500
-Message-Id: <20190125220648.28164-3-jsnow@redhat.com>
-In-Reply-To: <20190125220648.28164-1-jsnow@redhat.com>
-References: <20190125220648.28164-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 2/8] cmd646: Remove IDEBus from CMD646BAR
+	(envelope-from <alistair23@gmail.com>) id 1gn9m0-0005MF-Qb
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:16:31 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gn9ls-0005FA-Uc
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:16:22 -0500
+Received: by mail-pl1-x642.google.com with SMTP id w4so5178994plz.1
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:16:17 -0800 (PST)
+References: <20190123225705.28963-1-richard.henderson@linaro.org>
+	<20190123225705.28963-9-richard.henderson@linaro.org>
+From: Alistair <alistair23@gmail.com>
+Message-ID: <ec37df14-eee4-9220-43b5-76bbcad547e9@gmail.com>
+Date: Fri, 25 Jan 2019 14:16:14 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190123225705.28963-9-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 08/13] tcg/riscv: enable dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,122 +31,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jsnow@redhat.com, BALATON Zoltan <balaton@eik.bme.hu>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: cota@braap.org, alex.bennee@linaro.org
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+On 1/23/19 2:57 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-The cmd646 io mem ops callbacks only need the IDEBus which is
-currently passed via a CMD646BAR struct. No need to wrap it up like
-that, we can pass it directly to these callbacks which then allows to
-drop the IDEBus from the CMD646BAR.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 7a31c155c9899869794499d841d30c7ef32aae47.1547166960.git.balaton@eik.bme.hu
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/cmd646.c      | 29 ++++++++++++++---------------
- include/hw/ide/pci.h |  1 -
- 2 files changed, 14 insertions(+), 16 deletions(-)
+Alistair
 
-diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-index 41c1831f9a..c24f71e219 100644
---- a/hw/ide/cmd646.c
-+++ b/hw/ide/cmd646.c
-@@ -53,23 +53,23 @@ static void cmd646_update_irq(PCIDevice *pd);
- static uint64_t cmd646_cmd_read(void *opaque, hwaddr addr,
-                                 unsigned size)
- {
--    CMD646BAR *cmd646bar = opaque;
-+    IDEBus *bus = opaque;
- 
-     if (addr != 2 || size != 1) {
-         return ((uint64_t)1 << (size * 8)) - 1;
-     }
--    return ide_status_read(cmd646bar->bus, addr + 2);
-+    return ide_status_read(bus, addr + 2);
- }
- 
- static void cmd646_cmd_write(void *opaque, hwaddr addr,
-                              uint64_t data, unsigned size)
- {
--    CMD646BAR *cmd646bar = opaque;
-+    IDEBus *bus = opaque;
- 
-     if (addr != 2 || size != 1) {
-         return;
-     }
--    ide_cmd_write(cmd646bar->bus, addr + 2, data);
-+    ide_cmd_write(bus, addr + 2, data);
- }
- 
- static const MemoryRegionOps cmd646_cmd_ops = {
-@@ -81,15 +81,15 @@ static const MemoryRegionOps cmd646_cmd_ops = {
- static uint64_t cmd646_data_read(void *opaque, hwaddr addr,
-                                  unsigned size)
- {
--    CMD646BAR *cmd646bar = opaque;
-+    IDEBus *bus = opaque;
- 
-     if (size == 1) {
--        return ide_ioport_read(cmd646bar->bus, addr);
-+        return ide_ioport_read(bus, addr);
-     } else if (addr == 0) {
-         if (size == 2) {
--            return ide_data_readw(cmd646bar->bus, addr);
-+            return ide_data_readw(bus, addr);
-         } else {
--            return ide_data_readl(cmd646bar->bus, addr);
-+            return ide_data_readl(bus, addr);
-         }
-     }
-     return ((uint64_t)1 << (size * 8)) - 1;
-@@ -98,15 +98,15 @@ static uint64_t cmd646_data_read(void *opaque, hwaddr addr,
- static void cmd646_data_write(void *opaque, hwaddr addr,
-                              uint64_t data, unsigned size)
- {
--    CMD646BAR *cmd646bar = opaque;
-+    IDEBus *bus = opaque;
- 
-     if (size == 1) {
--        ide_ioport_write(cmd646bar->bus, addr, data);
-+        ide_ioport_write(bus, addr, data);
-     } else if (addr == 0) {
-         if (size == 2) {
--            ide_data_writew(cmd646bar->bus, addr, data);
-+            ide_data_writew(bus, addr, data);
-         } else {
--            ide_data_writel(cmd646bar->bus, addr, data);
-+            ide_data_writel(bus, addr, data);
-         }
-     }
- }
-@@ -122,10 +122,9 @@ static void setup_cmd646_bar(PCIIDEState *d, int bus_num)
-     IDEBus *bus = &d->bus[bus_num];
-     CMD646BAR *bar = &d->cmd646_bar[bus_num];
- 
--    bar->bus = bus;
--    memory_region_init_io(&bar->cmd, OBJECT(d), &cmd646_cmd_ops, bar,
-+    memory_region_init_io(&bar->cmd, OBJECT(d), &cmd646_cmd_ops, bus,
-                           "cmd646-cmd", 4);
--    memory_region_init_io(&bar->data, OBJECT(d), &cmd646_data_ops, bar,
-+    memory_region_init_io(&bar->data, OBJECT(d), &cmd646_data_ops, bus,
-                           "cmd646-data", 8);
- }
- 
-diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
-index ed723acfb4..013d7937d2 100644
---- a/include/hw/ide/pci.h
-+++ b/include/hw/ide/pci.h
-@@ -40,7 +40,6 @@ typedef struct BMDMAState {
- typedef struct CMD646BAR {
-     MemoryRegion cmd;
-     MemoryRegion data;
--    IDEBus *bus;
- } CMD646BAR;
- 
- #define TYPE_PCI_IDE "pci-ide"
--- 
-2.17.2
+> ---
+>   tcg/riscv/tcg-target.h     |   2 +-
+>   tcg/riscv/tcg-target.inc.c | 126 ++++++++++++++++---------------------
+>   2 files changed, 56 insertions(+), 72 deletions(-)
+> 
+> diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
+> index 1eb032626c..83b123ca03 100644
+> --- a/tcg/riscv/tcg-target.h
+> +++ b/tcg/riscv/tcg-target.h
+> @@ -33,7 +33,7 @@
+>   
+>   #define TCG_TARGET_INSN_UNIT_SIZE 4
+>   #define TCG_TARGET_TLB_DISPLACEMENT_BITS 20
+> -#define TCG_TARGET_IMPLEMENTS_DYN_TLB 0
+> +#define TCG_TARGET_IMPLEMENTS_DYN_TLB 1
+>   #define TCG_TARGET_NB_REGS 32
+>   
+>   typedef enum {
+> diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+> index 6cf8de32b5..b785f4acb7 100644
+> --- a/tcg/riscv/tcg-target.inc.c
+> +++ b/tcg/riscv/tcg-target.inc.c
+> @@ -958,6 +958,17 @@ static void * const qemu_st_helpers[16] = {
+>       [MO_BEQ]  = helper_be_stq_mmu,
+>   };
+>   
+> +/* We don't support oversize guests */
+> +QEMU_BUILD_BUG_ON(TCG_TARGET_REG_BITS < TARGET_LONG_BITS);
+> +
+> +/* We expect tlb_mask to be before tlb_table.  */
+> +QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_table) <
+> +                  offsetof(CPUArchState, tlb_mask));
+> +
+> +/* We expect tlb_mask to be "near" tlb_table.  */
+> +QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_table) -
+> +                  offsetof(CPUArchState, tlb_mask) >= 0x800);
+> +
+>   static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
+>                                TCGReg addrh, TCGMemOpIdx oi,
+>                                tcg_insn_unit **label_ptr, bool is_load)
+> @@ -965,94 +976,67 @@ static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
+>       TCGMemOp opc = get_memop(oi);
+>       unsigned s_bits = opc & MO_SIZE;
+>       unsigned a_bits = get_alignment_bits(opc);
+> -    target_ulong mask;
+> +    tcg_target_long compare_mask;
+>       int mem_index = get_mmuidx(oi);
+> -    int cmp_off
+> -        = (is_load
+> -           ? offsetof(CPUArchState, tlb_table[mem_index][0].addr_read)
+> -           : offsetof(CPUArchState, tlb_table[mem_index][0].addr_write));
+> -    int add_off = offsetof(CPUArchState, tlb_table[mem_index][0].addend);
+> -    RISCVInsn load_cmp_op = (TARGET_LONG_BITS == 64 ? OPC_LD :
+> -                             TCG_TARGET_REG_BITS == 64 ? OPC_LWU : OPC_LW);
+> -    RISCVInsn load_add_op = TCG_TARGET_REG_BITS == 64 ? OPC_LD : OPC_LW;
+> -    TCGReg base = TCG_AREG0;
+> +    int mask_off, table_off;
+> +    TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0;
+>   
+> -    /* We don't support oversize guests */
+> -    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
+> -        g_assert_not_reached();
+> +    mask_off = offsetof(CPUArchState, tlb_mask[mem_index]);
+> +    table_off = offsetof(CPUArchState, tlb_table[mem_index]);
+> +    if (table_off > 0x7ff) {
+> +        int mask_hi = mask_off - sextreg(mask_off, 0, 12);
+> +        int table_hi = table_off - sextreg(table_off, 0, 12);
+> +
+> +        if (likely(mask_hi == table_hi)) {
+> +            mask_base = table_base = TCG_REG_TMP1;
+> +            tcg_out_opc_upper(s, OPC_LUI, mask_base, mask_hi);
+> +            tcg_out_opc_reg(s, OPC_ADD, mask_base, mask_base, TCG_AREG0);
+> +            mask_off -= mask_hi;
+> +            table_off -= mask_hi;
+> +        } else {
+> +            mask_base = TCG_REG_TMP0;
+> +            table_base = TCG_REG_TMP1;
+> +            tcg_out_opc_upper(s, OPC_LUI, mask_base, mask_hi);
+> +            tcg_out_opc_reg(s, OPC_ADD, mask_base, mask_base, TCG_AREG0);
+> +            table_off -= mask_off;
+> +            mask_off -= mask_hi;
+> +            tcg_out_opc_imm(s, OPC_ADDI, table_base, mask_base, mask_off);
+> +        }
+>       }
+>   
+> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP0, mask_base, mask_off);
+> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP1, table_base, table_off);
+> +
+> +    tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP2, addrl,
+> +                    TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
+> +    tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP2, TCG_REG_TMP2, TCG_REG_TMP0);
+> +    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP2, TCG_REG_TMP2, TCG_REG_TMP1);
+> +
+> +    /* Load the tlb comparator and the addend.  */
+> +    tcg_out_ld(s, TCG_TYPE_TL, TCG_REG_TMP0, TCG_REG_TMP2,
+> +               is_load ? offsetof(CPUTLBEntry, addr_read)
+> +               : offsetof(CPUTLBEntry, addr_write));
+> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP2, TCG_REG_TMP2,
+> +               offsetof(CPUTLBEntry, addend));
+> +
+>       /* We don't support unaligned accesses. */
+>       if (a_bits < s_bits) {
+>           a_bits = s_bits;
+>       }
+> -    mask = (target_ulong)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
+> -
+> -
+> -    /* Compensate for very large offsets.  */
+> -    if (add_off >= 0x1000) {
+> -        int adj;
+> -        base = TCG_REG_TMP2;
+> -        if (cmp_off <= 2 * 0xfff) {
+> -            adj = 0xfff;
+> -            tcg_out_opc_imm(s, OPC_ADDI, base, TCG_AREG0, adj);
+> -        } else {
+> -            adj = cmp_off - sextreg(cmp_off, 0, 12);
+> -            tcg_debug_assert(add_off - adj >= -0x1000
+> -                             && add_off - adj < 0x1000);
+> -
+> -            tcg_out_opc_upper(s, OPC_LUI, base, adj);
+> -            tcg_out_opc_reg(s, OPC_ADD, base, base, TCG_AREG0);
+> -        }
+> -        add_off -= adj;
+> -        cmp_off -= adj;
+> -    }
+> -
+> -    /* Extract the page index.  */
+> -    if (CPU_TLB_BITS + CPU_TLB_ENTRY_BITS < 12) {
+> -        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl,
+> -                        TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
+> -        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
+> -                        MAKE_64BIT_MASK(CPU_TLB_ENTRY_BITS, CPU_TLB_BITS));
+> -    } else if (TARGET_PAGE_BITS >= 12) {
+> -        tcg_out_opc_upper(s, OPC_LUI, TCG_REG_TMP0,
+> -                          MAKE_64BIT_MASK(TARGET_PAGE_BITS, CPU_TLB_BITS));
+> -        tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP0, TCG_REG_TMP0, addrl);
+> -        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, TCG_REG_TMP0,
+> -                        CPU_TLB_BITS - CPU_TLB_ENTRY_BITS);
+> -    } else {
+> -        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl, TARGET_PAGE_BITS);
+> -        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
+> -                        MAKE_64BIT_MASK(0, CPU_TLB_BITS));
+> -        tcg_out_opc_imm(s, OPC_SLLI, TCG_REG_TMP0, TCG_REG_TMP0,
+> -                        CPU_TLB_ENTRY_BITS);
+> -    }
+> -
+> -    /* Add that to the base address to index the tlb.  */
+> -    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP2, base, TCG_REG_TMP0);
+> -    base = TCG_REG_TMP2;
+> -
+> -    /* Load the tlb comparator and the addend.  */
+> -    tcg_out_ldst(s, load_cmp_op, TCG_REG_TMP0, base, cmp_off);
+> -    tcg_out_ldst(s, load_add_op, TCG_REG_TMP2, base, add_off);
+> -
+>       /* Clear the non-page, non-alignment bits from the address.  */
+> -    if (mask == sextreg(mask, 0, 12)) {
+> -        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP1, addrl, mask);
+> +    compare_mask = (tcg_target_long)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
+> +    if (compare_mask == sextreg(compare_mask, 0, 12)) {
+> +        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP1, addrl, compare_mask);
+>       } else {
+> -        tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_TMP1, mask);
+> +        tcg_out_movi(s, TCG_TYPE_TL, TCG_REG_TMP1, compare_mask);
+>           tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP1, TCG_REG_TMP1, addrl);
+> -     }
+> +    }
+>   
+>       /* Compare masked address with the TLB entry. */
+>       label_ptr[0] = s->code_ptr;
+>       tcg_out_opc_branch(s, OPC_BNE, TCG_REG_TMP0, TCG_REG_TMP1, 0);
+>       /* NOP to allow patching later */
+>       tcg_out_opc_imm(s, OPC_ADDI, TCG_REG_ZERO, TCG_REG_ZERO, 0);
+> -    /* TODO: Move this out of line
+> -     * see:
+> -     *   https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg02234.html
+> -     */
+>   
+>       /* TLB Hit - translate address using addend.  */
+>       if (TCG_TARGET_REG_BITS > TARGET_LONG_BITS) {
+> 
