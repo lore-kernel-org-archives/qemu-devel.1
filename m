@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50628)
+Received: from eggs.gnu.org ([209.51.188.92]:50654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmxyc-0004Vn-NF
+	(envelope-from <peter.maydell@linaro.org>) id 1gmxyc-0004Vq-OS
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gmxm6-0002iX-3s
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:27:47 -0500
-References: <1548349076-350255-1-git-send-email-imammedo@redhat.com>
-	<20190125102305.76f1bc71.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <27d71937-59d0-436b-2888-1d9cce0e5cd8@redhat.com>
-Date: Fri, 25 Jan 2019 10:27:23 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gmxl1-0002EU-Rd
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:26:42 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:46910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gmxkw-00029u-1b
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:26:35 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id x202so7173845oif.13
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 01:26:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190125102305.76f1bc71.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: remove direct reference to mem_path
- global form s90x code
+References: <20190124103651.26227-1-kraxel@redhat.com>
+In-Reply-To: <20190124103651.26227-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 09:26:14 +0000
+Message-ID: <CAFEAcA-xrGThJLJ-cd+00f=AnYszN9U+zVYUsCzx94MgSdrnhQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Ui 20190124 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, qemu-s390x@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On 25.01.19 10:23, Cornelia Huck wrote:
-> On Thu, 24 Jan 2019 17:57:56 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
->> I plan to deprecate -mem-path option and replace it with memory-backend,
->> for that it's necessary to get rid of mem_path global variable.
->> Do it for s390x case, replacing it with alternative way to enable
->> 1Mb hugepages capability.
-> 
-> Getting rid of accessing mem_path directly sounds good.
-> 
->>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> PS:
->> Original code nor the new one probably is not entirely correct when
->> huge pages are enabled in case where mixed initial RAM and memory
->> backends are used, backend's page size might not match initial RAM's
->> so I'm not sure if enabling 1MB cap is correct in this case on s390
->> (should it be the same for all RAM???).
->> With new approach 1Mb cap is not enabled if the smallest page size
->> is not 1Mb.
->> ---
->>  target/s390x/kvm.c | 37 ++++++++++++++++---------------------
->>  1 file changed, 16 insertions(+), 21 deletions(-)
->>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index 2ebf26a..22e868a 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -285,33 +285,28 @@ void kvm_s390_crypto_reset(void)
->>      }
->>  }
->>  
->> -static int kvm_s390_configure_mempath_backing(KVMState *s)
->> +static int kvm_s390_configure_hugepage_backing(KVMState *s)
->>  {
->> -    size_t path_psize = qemu_mempath_getpagesize(mem_path);
->> +    size_t psize = qemu_getrampagesize();
->>  
->> -    if (path_psize == 4 * KiB) {
->> -        return 0;
->> -    }
->> -
->> -    if (!hpage_1m_allowed()) {
->> -        error_report("This QEMU machine does not support huge page "
->> -                     "mappings");
->> -        return -EINVAL;
->> -    }
->> +    if (psize == 1 * MiB) {
->> +        if (!hpage_1m_allowed()) {
->> +            error_report("This QEMU machine does not support huge page "
->> +                         "mappings");
->> +            return -EINVAL;
->> +        }
->>  
->> -    if (path_psize != 1 * MiB) {
->> +        if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
->> +            error_report("Memory backing with 1M pages was specified, "
->> +                         "but KVM does not support this memory backing");
->> +            return -EINVAL;
->> +        }
->> +        cap_hpage_1m = 1;
->> +    } else if (psize == 2 * GiB) {
->>          error_report("Memory backing with 2G pages was specified, "
->>                       "but KVM does not support this memory backing");
->>          return -EINVAL;
->>      }
->> -
->> -    if (kvm_vm_enable_cap(s, KVM_CAP_S390_HPAGE_1M, 0)) {
->> -        error_report("Memory backing with 1M pages was specified, "
->> -                     "but KVM does not support this memory backing");
->> -        return -EINVAL;
->> -    }
->> -
->> -    cap_hpage_1m = 1;
->>      return 0;
-> 
-> Just to compare, the old code did:
-> - 4K pages -> all fine, do nothing
-> - 1MB pages not allowed -> get out, regardless of the actual huge page
->   size
-> - 1MB pages -> try to enable, if possible
-> - all other sizes -> moan about 2G pages and get out
-> 
-> And the new code does:
-> - 1M pages -> get out if 1MB not allowed, otherwise try to enable
-> - 2G pages -> moan about 2G pages and get out
-> - all other sizes -> all fine, do nothing
-> 
-> So, now the user will:
-> - get a different error if they try to run with a 2G backing but
->   hpage_1m_allowed is off (which does not sound like a problem to me)
-> - get the all-clear if they specified a hypothetical different page
->   size, while the code always complained about 2G pages before
-> 
-> Are there any chances at all that there may Yet Another Size? If not,
-> this looks fine.
+On Thu, 24 Jan 2019 at 10:45, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit f6b06fcceef465de0cf2514c9f76fe0192896781:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-request' into staging (2019-01-23 17:57:47 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ui-20190124-pull-request
+>
+> for you to fetch changes up to 2657846fb2e47e8ba847b5ef6fe742466414c745:
+>
+>   input-linux: customizable grab toggle keys (2019-01-24 10:42:38 +0100)
+>
+> ----------------------------------------------------------------
+> input-linux: customizable grab toggle keys
+>
+> ----------------------------------------------------------------
+>
+> Ryan El Kochta (1):
+>   input-linux: customizable grab toggle keys
+>
+>  ui/input-linux.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  qapi/ui.json     | 10 +++++++++
+>  2 files changed, 73 insertions(+), 3 deletions(-)
 
-I think the next logical step is 1TB pages - unlikely for the next years ;)
+Applied, thanks.
 
--- 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Thanks,
-
-David / dhildenb
+-- PMM
