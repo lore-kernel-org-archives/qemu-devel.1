@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53958)
+Received: from eggs.gnu.org ([209.51.188.92]:55258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4Vh-0003D4-An
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:39:19 -0500
+	(envelope-from <philmd@redhat.com>) id 1gn4b8-0005Fc-Dt
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn4Vg-0003nL-3P
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:39:17 -0500
-Received: from mail-wr1-f53.google.com ([209.85.221.53]:45166)
+	(envelope-from <philmd@redhat.com>) id 1gn4b7-0006mV-Ik
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:54 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn4Vb-0003kp-36
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:39:13 -0500
-Received: by mail-wr1-f53.google.com with SMTP id t6so10934504wrr.12
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:39:09 -0800 (PST)
-References: <20190125155630.17430-1-sourav.jb1988@gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn4b7-0006l9-D6
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 11:44:53 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t6so10953479wrr.12
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 08:44:52 -0800 (PST)
+References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
+	<f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <634199bb-6444-a5de-2234-1895b02b5615@redhat.com>
-Date: Fri, 25 Jan 2019 17:39:07 +0100
+Message-ID: <cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
+Date: Fri, 25 Jan 2019 17:44:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190125155630.17430-1-sourav.jb1988@gmail.com>
+In-Reply-To: <f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/nrf51_soc: set object owner in
- memory_region_init_ram
+Subject: Re: [Qemu-devel] [PATCH] hw: input: set category of the i8042 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, joel@jms.id.au, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-On 1/25/19 4:56 PM, kumar sourav wrote:
-> set object owner in memory_region_init_ram() instead
-> of NULL.
+On 1/25/19 4:24 PM, Thomas Huth wrote:
+> On 2019-01-25 16:14, kumar sourav wrote:
+>> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
+>> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
+>>
+>> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+>> ---
+>>  hw/input/pckbd.c | 1 +
+
+It seems we have other potential cases:
+
+$ git grep -L 'set_bit(DEVICE_CATEGORY_INPUT' hw/input/*c
+hw/input/adb.c
+hw/input/hid.c
+hw/input/lm832x.c
+hw/input/milkymist-softusb.c
+hw/input/pckbd.c
+hw/input/pl050.c
+hw/input/ps2.c
+hw/input/pxa2xx_keypad.c
+hw/input/stellaris_input.c
+hw/input/tsc2005.c
+hw/input/tsc210x.c
+hw/input/virtio-input-hid.c
+hw/input/virtio-input-host.c
+
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+>> index 3e66713b47..72e7d5f6cc 100644
+>> --- a/hw/input/pckbd.c
+>> +++ b/hw/input/pckbd.c
+>> @@ -574,6 +574,7 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
+>>  
+>>      dc->realize = i8042_realizefn;
+>>      dc->vmsd = &vmstate_kbd_isa;
+>> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>>  }
+>>  
+>>  static const TypeInfo i8042_info = {
+>>
 > 
-> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/arm/nrf51_soc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-> index 1630c27594..3a1c7e200c 100644
-> --- a/hw/arm/nrf51_soc.c
-> +++ b/hw/arm/nrf51_soc.c
-> @@ -89,7 +89,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
->      }
->      memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->flash);
->  
-> -    memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &err);
-> +    memory_region_init_ram(&s->sram, OBJECT(s), "nrf51.sram", s->sram_size,
-> +                           &err);
->      if (err) {
->          error_propagate(errp, err);
->          return;
-> 
