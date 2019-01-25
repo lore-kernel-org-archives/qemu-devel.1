@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49904)
+Received: from eggs.gnu.org ([209.51.188.92]:54368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn60R-0001r9-Uw
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gn6Bj-0004Jp-1A
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:26:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gn60Q-0004uN-2y
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:07 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35109)
+	(envelope-from <peter.maydell@linaro.org>) id 1gn6Bh-0002cE-SA
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:26:46 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45418)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gn60O-0004sg-3t
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:15:05 -0500
-Received: by mail-wr1-f65.google.com with SMTP id 96so11329934wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:15:02 -0800 (PST)
-References: <20170816072104.24420-1-famz@redhat.com>
-	<20170816072104.24420-9-famz@redhat.com>
-	<ed7262b4-f84e-1405-dbe6-1ea5f11e73f1@redhat.com>
-	<f4ede6c1-ba9e-777d-8b82-5776cd897943@gmx.com>
-	<4bf0c77e-ea8f-1813-a6a4-6ab6eb857cd0@redhat.com>
-	<20190124165253.GT7953@redhat.com>
-	<509cf069-5d03-8e2e-fb3c-5828d32f38e1@comstyle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7b56e9a1-5844-3b36-2938-ef63985d54f4@redhat.com>
-Date: Fri, 25 Jan 2019 19:15:00 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gn6Bh-0002WC-LX
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 13:26:45 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so11280931wrr.12
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 10:26:36 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Jan 2019 18:26:25 +0000
+Message-Id: <20190125182626.9221-7-peter.maydell@linaro.org>
+In-Reply-To: <20190125182626.9221-1-peter.maydell@linaro.org>
+References: <20190125182626.9221-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <509cf069-5d03-8e2e-fb3c-5828d32f38e1@comstyle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH RFC 8/9] tests: Add OpenBSD image
+Subject: [Qemu-devel] [PATCH 6/7] target/arm/translate-a64: Don't
+ underdecode FP insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: Kamil Rytarowski <n54@gmx.com>, Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Desnogues <laurent.desnogues@gmail.com>
 
-On 1/25/19 1:48 AM, Brad Smith wrote:
-> On 1/24/2019 11:52 AM, Daniel P. Berrangé wrote:
-> 
->> On Thu, Jan 24, 2019 at 05:10:19PM +0100, Philippe Mathieu-Daudé wrote:
->>> On 1/24/19 4:56 PM, Kamil Rytarowski wrote:
->>>> On 24.01.2019 16:52, Philippe Mathieu-Daudé wrote:
->>>>> On 8/16/17 9:21 AM, Fam Zheng wrote:
->>>>>> The image is prepared following instructions as in:
->>>>>>
->>>>>> https://wiki.qemu.org/Hosts/BSD
->>>>>>
->>>>>> Signed-off-by: Fam Zheng <famz@redhat.com>
->>>>>> ---
->>>>>>   tests/vm/openbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
->>>>>>   1 file changed, 45 insertions(+)
->>>>>>   create mode 100755 tests/vm/openbsd
->>>>>>
->>>>>> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
->>>>>> new file mode 100755
->>>>>> index 0000000000..d37ff83a59
->>>>>> --- /dev/null
->>>>>> +++ b/tests/vm/openbsd
->>>>>> @@ -0,0 +1,45 @@
->>>>>> +#!/usr/bin/env python
->>>>>> +#
->>>>>> +# OpenBSD VM image
->>>>>> +#
->>>>>> +# Copyright (C) 2017 Red Hat Inc.
->>>>>> +#
->>>>>> +# Authors:
->>>>>> +#  Fam Zheng <famz@redhat.com>
->>>>>> +#
->>>>>> +# This work is licensed under the terms of the GNU GPL, version
->>>>>> 2.  See
->>>>>> +# the COPYING file in the top-level directory.
->>>>>> +#
->>>>>> +
->>>>>> +import os
->>>>>> +import sys
->>>>>> +import logging
->>>>>> +import subprocess
->>>>>> +import tempfile
->>>>>> +import time
->>>>>> +import basevm
->>>>>> +
->>>>>> +class OpenBSDVM(basevm.BaseVM):
->>>>>> +    name = "openbsd"
->>>>>> +    BUILD_SCRIPT = """
->>>>>> +        set -e;
->>>>>> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->>>>>> +        tar -xf /dev/rsd1c;
->>>>>> +        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4
->>>>>> --python=python2.7 {configure_opts};
->>>>>> +        gmake -j{jobs};
->>>>>> +        # XXX: "gmake check" seems to always hang or fail
->>>>>> +        #gmake check;
->>>>> OK, Now it makes more sense...
->>>>>
->>>>> After spending various hours trying to fix various issues on
->>>>> OpenBSD, I
->>>>> notice that we never ran tests on this OS.
->>>>> The only binary I can run is qemu-img, the rest seems useless.
->>>>> I'll summarize in a different thread.
->>>>>
->>>> Is this W^X related?
->>> Part of it could be but I'm not sure.
->>>
->>> The 6.1 VM provided by Fam has /usr/local mounted with wxallowed, I
->>> tried building/running there and nothing changed, mmap() still returns
->>> ENOTSUP:
->> ENOTSUP from mmap is certainly what you'd expect from the W^X  scenario
->>
->>    https://undeadly.org/cgi?action=article&sid=20160527203200
->>
->>   "W^X violations are no longer permitted by default.  A kernel log
->> message
->>    is generated, and mprotect/mmap return ENOTSUP.  If the sysctl(8) flag
->>    kern.wxabort is set then a SIGABRT occurs instead, for gdb use or
->> coredump
->>    creation."
-> 
-> Yes, this policy change was introduced with 6.0.
-> 
-> Our ports tree has an option which results in the QEMU binaries being
-> linked with "-z wxneeded".
+In the encoding groups
+ * floating-point data-processing (1 source)
+ * floating-point data-processing (2 source)
+ * floating-point data-processing (3 source)
+ * floating-point immediate
+ * floating-point compare
+ * floating-ponit conditional compare
+ * floating-point conditional select
 
-I was preparing a draft about deprecating/removing OpenBSD support
-because it is broken/untested... For sure it is untested.
-/me feeling he lost 2 days...
+
+bit 31 is M and bit 29 is S (and bit 30 is 0, already checked at
+this point in the decode). None of these groups allocate any
+encoding for M=1 or S=1. We checked this in disas_fp_compare(),
+disas_fp_ccomp() and disas_fp_csel(), but missed it in disas_fp_1src(),
+disas_fp_2src(), disas_fp_3src() and disas_fp_imm().
+
+We also missed that in the fp immediate encoding the imm5 field
+must be all zeroes.
+
+Correctly UNDEF the unallocated encodings here.
+
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-a64.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index efd2f6490b5..474d9bfb5f0 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5636,11 +5636,17 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+  */
+ static void disas_fp_1src(DisasContext *s, uint32_t insn)
+ {
++    int mos = extract32(insn, 29, 3);
+     int type = extract32(insn, 22, 2);
+     int opcode = extract32(insn, 15, 6);
+     int rn = extract32(insn, 5, 5);
+     int rd = extract32(insn, 0, 5);
+ 
++    if (mos) {
++        unallocated_encoding(s);
++        return;
++    }
++
+     switch (opcode) {
+     case 0x4: case 0x5: case 0x7:
+     {
+@@ -5867,13 +5873,14 @@ static void handle_fp_2src_half(DisasContext *s, int opcode,
+  */
+ static void disas_fp_2src(DisasContext *s, uint32_t insn)
+ {
++    int mos = extract32(insn, 29, 3);
+     int type = extract32(insn, 22, 2);
+     int rd = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+     int rm = extract32(insn, 16, 5);
+     int opcode = extract32(insn, 12, 4);
+ 
+-    if (opcode > 8) {
++    if (opcode > 8 || mos) {
+         unallocated_encoding(s);
+         return;
+     }
+@@ -6028,6 +6035,7 @@ static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1,
+  */
+ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+ {
++    int mos = extract32(insn, 29, 3);
+     int type = extract32(insn, 22, 2);
+     int rd = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+@@ -6036,6 +6044,11 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+     bool o0 = extract32(insn, 15, 1);
+     bool o1 = extract32(insn, 21, 1);
+ 
++    if (mos) {
++        unallocated_encoding(s);
++        return;
++    }
++
+     switch (type) {
+     case 0:
+         if (!fp_access_check(s)) {
+@@ -6105,12 +6118,19 @@ uint64_t vfp_expand_imm(int size, uint8_t imm8)
+ static void disas_fp_imm(DisasContext *s, uint32_t insn)
+ {
+     int rd = extract32(insn, 0, 5);
++    int imm5 = extract32(insn, 5, 5);
+     int imm8 = extract32(insn, 13, 8);
+     int type = extract32(insn, 22, 2);
++    int mos = extract32(insn, 29, 3);
+     uint64_t imm;
+     TCGv_i64 tcg_res;
+     TCGMemOp sz;
+ 
++    if (mos || imm5) {
++        unallocated_encoding(s);
++        return;
++    }
++
+     switch (type) {
+     case 0:
+         sz = MO_32;
+-- 
+2.20.1
