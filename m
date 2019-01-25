@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50654)
+Received: from eggs.gnu.org ([209.51.188.92]:50718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmxyY-0004Vq-7I
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:40:40 -0500
+	(envelope-from <david@redhat.com>) id 1gmxyb-0004Yx-PO
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gmxod-0003hU-8P
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:30:24 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gmxod-0003gy-3b
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:30:23 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id i20so7977237otl.0
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 01:30:22 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gmxmt-000321-9I
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 04:28:38 -0500
+References: <20190123082425.10643-1-david@redhat.com>
+	<11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <af5b995d-0db2-e64a-1e7b-de5a8b45b64d@redhat.com>
+Date: Fri, 25 Jan 2019 10:28:24 +0100
 MIME-Version: 1.0
-References: <CAFEAcA-4r8_K0=WTaK+A_KvO93ni+3==+a5FRvGTFJ3av0GPFw@mail.gmail.com>
-	<0e9cc6c1-010b-9f6d-b6b4-dc1757880463@redhat.com>
-In-Reply-To: <0e9cc6c1-010b-9f6d-b6b4-dc1757880463@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 Jan 2019 09:30:10 +0000
-Message-ID: <CAFEAcA-stgWuym4HYw9v4cYPytj_rz0YF9oiSpz9V1p8bzaEYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] building rst docs with sphinx
+In-Reply-To: <11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] spapr/pci: Fix primary bus number for
+ PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, 24 Jan 2019 at 21:54, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Hi Peter,
->
-> On 1/24/19 7:56 PM, Peter Maydell wrote:
-> > I had another look this afternoon at building our rST docs
-> > with sphinx-build. In particular, we currently have some
-> > docs in rst format, but we're not building them into HTML
-> > or shipping them. (Predictably, this means a few errors and
-> > warnings have crept in...)
->
-> Are you talking about the files in docs/ such docs/devel/testing.rst?
+On 24.01.19 03:48, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 23/01/2019 19:24, David Hildenbrand wrote:
+>> While looking at the s390x implementation, looks like spapr has a
+>> similar BUG when building the topology.
+>>
+>> The primary bus number corresponds always to the bus number of the
+>> bus the bridge is attached to.
+>>
+>> Right now, if we have two bridges attached to the same bus (e.g. root
+>> bus) this is however not the case. The first bridge will have primary
+>> bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
+>>
+>> While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+>> Setting it temporarily to that value (as discussed e.g. in [1]), is
+>> only relevant for a running system that probes the buses. The value is
+>> effectively unused for us just doing a DFS.
+> 
+> What is DFS?
 
-I mean the .rst files in docs/. (I do want to do some autogen
-as well -- we're planning to use the Linux kernel's kerneldoc
-sphinx plugin for this, and I have some prototype patches to
-plumb that in -- but since that will all be "developer"
-docs I'd like to get the basic framework of manuals sorted
-before adding that in.)
+Depth-first search :)
 
-thanks
--- PMM
+> 
+>>
+>> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+>>
+>> Note: Is hotplug of bridges supported? I can't find where the topology
+>> is fixed up when hotplugging a PCI bridge. (e.g. bus numbers assigned
+>> and PCI_SUBORDINATE_BUS of path to the root updated). But maybe we are
+>> excluding bridges or this is not necessary for some reason.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> 
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> 
+
+Thanks!
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
