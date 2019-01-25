@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36814)
+Received: from eggs.gnu.org ([209.51.188.92]:36634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004sK-Si
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAe7-0004qA-SL
 	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnAPa-0005Kp-A5
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:23 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46741)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnAPc-0005NG-IS
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:25 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:47007)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnAPa-0005JV-3w
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:22 -0500
-Received: by mail-pf1-x442.google.com with SMTP id c73so5375584pfe.13
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:22 -0800 (PST)
+	id 1gnAPc-0005LI-6e
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 17:57:24 -0500
+Received: by mail-pl1-x644.google.com with SMTP id t13so5179947ply.13
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 14:57:23 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 25 Jan 2019 14:57:10 -0800
-Message-Id: <20190125225714.10234-4-richard.henderson@linaro.org>
+Date: Fri, 25 Jan 2019 14:57:11 -0800
+Message-Id: <20190125225714.10234-5-richard.henderson@linaro.org>
 In-Reply-To: <20190125225714.10234-1-richard.henderson@linaro.org>
 References: <20190125225714.10234-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/6] aarch64-linux-user: Update HWCAP bits from
- linux 5.0-rc1
+Subject: [Qemu-devel] [PATCH 3/6] aarch64-linux-user: Enable HWCAP bits for
+ PAuth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +32,20 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/elfload.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ linux-user/elfload.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 4cff9e1a31..3c7a7c2836 100644
+index 3c7a7c2836..775a36ccdd 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -560,6 +560,15 @@ enum {
-     ARM_HWCAP_A64_ASIMDDP       = 1 << 20,
-     ARM_HWCAP_A64_SHA512        = 1 << 21,
-     ARM_HWCAP_A64_SVE           = 1 << 22,
-+    ARM_HWCAP_A64_ASIMDFHM      = 1 << 23,
-+    ARM_HWCAP_A64_DIT           = 1 << 24,
-+    ARM_HWCAP_A64_USCAT         = 1 << 25,
-+    ARM_HWCAP_A64_ILRCPC        = 1 << 26,
-+    ARM_HWCAP_A64_FLAGM         = 1 << 27,
-+    ARM_HWCAP_A64_SSBS          = 1 << 28,
-+    ARM_HWCAP_A64_SB            = 1 << 29,
-+    ARM_HWCAP_A64_PACA          = 1 << 30,
-+    ARM_HWCAP_A64_PACG          = 1UL << 31,
- };
+@@ -600,6 +600,7 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE_ID(aa64_dp, ARM_HWCAP_A64_ASIMDDP);
+     GET_FEATURE_ID(aa64_fcma, ARM_HWCAP_A64_FCMA);
+     GET_FEATURE_ID(aa64_sve, ARM_HWCAP_A64_SVE);
++    GET_FEATURE_ID(aa64_pauth, ARM_HWCAP_A64_PACA | ARM_HWCAP_A64_PACG);
  
- #define ELF_HWCAP get_elf_hwcap()
+ #undef GET_FEATURE_ID
+ 
 -- 
 2.17.2
