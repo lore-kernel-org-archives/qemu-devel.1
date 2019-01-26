@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46521)
+Received: from eggs.gnu.org ([209.51.188.92]:46519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIp-0005aC-Sb
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIp-0005aB-OB
 	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-0001zj-LC
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-0001zr-LQ
 	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:03 -0500
-Date: Sat, 26 Jan 2019 14:42:24 +1300
+Date: Sat, 26 Jan 2019 14:50:06 +1300
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190126014223.GA22942@umbus>
-References: <20190123082425.10643-1-david@redhat.com>
-	<11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+Message-ID: <20190126015006.GB22942@umbus>
+References: <20190122170112.8706-1-farosas@linux.ibm.com>
+	<20190122170112.8706-3-farosas@linux.ibm.com>
+	<30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
+	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
 Content-Disposition: inline
-In-Reply-To: <11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH v1] spapr/pci: Fix primary bus number for
- PCI bridges
+In-Reply-To: <30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
+ callbacks for SPRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +27,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, Richard Henderson <richard.henderson@linaro.org>
 
 
---2oS5YaxWCcQjTEyO
+--LpQ9ahxlCli8rRTG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 24, 2019 at 01:48:36PM +1100, Alexey Kardashevskiy wrote:
+On Thu, Jan 24, 2019 at 06:20:02PM +1100, Alexey Kardashevskiy wrote:
 >=20
 >=20
-> On 23/01/2019 19:24, David Hildenbrand wrote:
-> > While looking at the s390x implementation, looks like spapr has a
-> > similar BUG when building the topology.
+> On 23/01/2019 04:01, Fabiano Rosas wrote:
+> > These will be used to let GDB know about PPC's Special Purpose
+> > Registers (SPR).
 > >=20
-> > The primary bus number corresponds always to the bus number of the
-> > bus the bridge is attached to.
+> > They take an index based on the order the registers appear in the XML
+> > file sent by QEMU to GDB. This index does not match the actual
+> > location of the registers in the env->spr array so the
+> > gdb_find_spr_idx function does that conversion.
 > >=20
-> > Right now, if we have two bridges attached to the same bus (e.g. root
-> > bus) this is however not the case. The first bridge will have primary
-> > bus 0, the second bridge primary bus 1, which is wrong. Fix the assignm=
-ent.
-> >=20
-> > While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
-> > Setting it temporarily to that value (as discussed e.g. in [1]), is
-> > only relevant for a running system that probes the buses. The value is
-> > effectively unused for us just doing a DFS.
->=20
-> What is DFS?
->=20
-> >=20
-> > [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
-> >=20
-> > Note: Is hotplug of bridges supported? I can't find where the topology
-> > is fixed up when hotplugging a PCI bridge. (e.g. bus numbers assigned
-> > and PCI_SUBORDINATE_BUS of path to the root updated). But maybe we are
-> > excluding bridges or this is not necessary for some reason.
-> >=20
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
->=20
->=20
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Applied, thanks.
-
->=20
->=20
+> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 > > ---
-> >  hw/ppc/spapr_pci.c | 5 +----
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> >  target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 53 insertions(+), 1 deletion(-)
 > >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index b74f2632ec..5cdc98513d 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -2030,8 +2030,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
- *bus, PCIDevice *pdev,
-> >                                             void *opaque)
+> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
+t.inc.c
+> > index 710064a25d..f29ac3558a 100644
+> > --- a/target/ppc/translate_init.inc.c
+> > +++ b/target/ppc/translate_init.inc.c
+> > @@ -9487,6 +9487,55 @@ static bool avr_need_swap(CPUPPCState *env)
+> >  #endif
+> >  }
+> > =20
+> > +#if !defined(CONFIG_USER_ONLY)
+> > +static int gdb_find_spr_idx(CPUPPCState *env, int n)
+> > +{
+> > +    int i;
+> > +
+> > +    for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+> > +        ppc_spr_t *spr =3D &env->spr_cb[i];
+> > +
+> > +        if (spr->name && spr->gdb_id =3D=3D n) {
+> > +            return i;
+> > +        }
+> > +    }
+> > +    return -1;
+> > +}
+> > +
+> > +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> > +{
+> > +    int reg;
+> > +    int len;
+> > +
+> > +    reg =3D gdb_find_spr_idx(env, n);
+> > +    if (reg < 0) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    len =3D TARGET_LONG_SIZE;
+> > +    stn_p(mem_buf, len, env->spr[reg]);
+> > +    ppc_maybe_bswap_register(env, mem_buf, len);
+>=20
+>=20
+> I am confused by this as it produces different results depending on the
+> guest mode:
+
+
+Hm, yeah, I thought the bswap here looked odd, but it wasn't obvious
+to me if it was bogus here, or just a bogus gdb interface we have to
+work around.
+
+> (gdb) p $pvr
+> $1 =3D 0x14c0000000000
+> (gdb) c
+> Continuing.
+> Program received signal SIGINT, Interrupt.
+> (gdb) p $pvr
+> $2 =3D 0x4c0100
+
+But that behaviour definitely looks wrong.
+
+> First print is when I stopped the guest in the SLOF firmware (so it is
+> big-endian) and then I continued and stopped gdb when the guest booted a
+> little-endian system; the KVM host is little endian, the machine running
+> gdb is LE too.
+>=20
+> QEMU monitor prints the same 0x4c0100 in both cases.
+>=20
+> I am adding the inventor of maybe_bswap_register() in cc: for
+> assistance. Swapping happens:
+> - once for BE: after stn_p()
+> 	*(unsigned long *)mem_buf is 0x14c0000000000
+> - twice for LE.
+>=20
+>=20
+>=20
+>=20
+>=20
+> > +    return len;
+> > +}
+> > +
+> > +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+> > +{
+> > +    int reg;
+> > +    int len;
+> > +
+> > +    reg =3D gdb_find_spr_idx(env, n);
+> > +    if (reg < 0) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    len =3D TARGET_LONG_SIZE;
+> > +    ppc_maybe_bswap_register(env, mem_buf, len);
+> > +    env->spr[reg] =3D ldn_p(mem_buf, len);
+> > +
+> > +    return len;
+> > +}
+> > +#endif
+> > +
+> >  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
 > >  {
-> >      unsigned int *bus_no =3D opaque;
-> > -    unsigned int primary =3D *bus_no;
-> > -    unsigned int subordinate =3D 0xff;
-> >      PCIBus *sec_bus =3D NULL;
-> > =20
-> >      if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=3D
-> > @@ -2040,7 +2038,7 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
- *bus, PCIDevice *pdev,
+> >      if (n < 32) {
+> > @@ -9716,7 +9765,10 @@ static void ppc_cpu_realize(DeviceState *dev, Er=
+ror **errp)
+> >          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+> >                                   32, "power-vsx.xml", 0);
 > >      }
+> > -
+> > +#ifndef CONFIG_USER_ONLY
+> > +    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
+> > +                             pcc->gdb_num_sprs, "power-spr.xml", 0);
+> > +#endif
+> >      qemu_init_vcpu(cs);
 > > =20
-> >      (*bus_no)++;
-> > -    pci_default_write_config(pdev, PCI_PRIMARY_BUS, primary, 1);
-> > +    pci_default_write_config(pdev, PCI_PRIMARY_BUS, pci_dev_bus_num(pd=
-ev), 1);
-> >      pci_default_write_config(pdev, PCI_SECONDARY_BUS, *bus_no, 1);
-> >      pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
-> > =20
-> > @@ -2049,7 +2047,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
- *bus, PCIDevice *pdev,
-> >          return;
-> >      }
-> > =20
-> > -    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, subordinate, 1=
-);
-> >      pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
-> >                          spapr_phb_pci_enumerate_bridge, bus_no);
-> >      pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
+> >      pcc->parent_realize(dev, errp);
 > >=20
 >=20
 
@@ -121,24 +172,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2oS5YaxWCcQjTEyO
+--LpQ9ahxlCli8rRTG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLuv0ACgkQbDjKyiDZ
-s5LcUxAAmyRC5wFOf+EMqFPJK7wxdIF+x/MyRpSfbdcdWh2S7xcA2UvNCUi7pBl9
-cd6M/tqAte3jhI2RUSq3o4QgpAMaPfdC+HPPfzYD4XcKPKRltyX8jFl0ZLWd4w2y
-7/fyc42weEmlpc1X576yMQ6/2WMGsxO6s1vSyPKEebQmTTEV+FscWQfeAU8PMQTz
-I3LM9MpHDTDbVSWxDPW/b011ibXI2tSC0SlWDtic45ldt6rg8F+dlNTVheolmHTa
-/jo/3Hkq7M8uO1iNtd1UhbnToC0Aw7KJjlLm93dTkOda5DYDqVLTAqY619UzLQ5e
-mXQb6XgYEfimqEC/HCosWQKaIhJq4n7nOyxn3S3lY8MkPvUfDOByUmhriPbnMHkJ
-aRKBCZPbbFbSDEdrh0D6J3B+T53cINol9dkbEZDpdTiD95KH7usU6/pQcCVqt14M
-iIqAqQ4WyCn2IZ83NlAPc8t70AcON6ltrLxaID0ApYc63J44F27BfcvMnz1nM69F
-thrqyaVbpKUHo/ZgGG+0oUtMHe/I5JT+WFZYgTyRjUPQvvAEsDOfuMeBMmbOpslU
-Uk6Ogo7F/I6Tz2OjBK6WQhBGCi1fvkoM/LSrkAQSKTNOYqH+9Wr5ldQFmQ6U/gqL
-QVX6/Jp0m/dSrc/KgxsmoQiqb0+RZEMJpGIkh00xWIp/YL+7hJI=
-=+oW8
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLvM0ACgkQbDjKyiDZ
+s5JuhQ//XcRTfnTG9TPDG0nQf5WFgulF4N2JX+S7ZZjIjKgYPeSb6ibeekT1AN/U
+v3v2VFq/DdzAqA3BC8OuEyA2yQQz4S3xRdLgPGKhGNUDT4jqCgwrVCvgBKUlgyq+
+kmuq5VqngoYKtJ/0tsO5pHWfWBIanljEmF2ux5R9eQudFlhQd5o78Q5o61V561+H
+DHfjoK6wPkwoaZ89VoZ1GBfPv/XIyXtqxtvnClOpp0JUr0msLW63jpMd+nH2ivc7
+anJzEfRoG100sxbvr0SkFgxzbeVeTp72iS4enT//yn5SdtCGD1UP6FNhuK7HCKkt
+UuE+xIktECWPqtMhuWmttV1QkjTauwTkDL7L9if1Tf3j/OELJ8eb+8uVoR2Bq40L
+2LafyldC1kQ/Bw/kMLVsx1CR94uu2XHLD88NnfAkcnFK3Qmv/5UdpXMGpNwVM0iO
+UfjDx6lxkMdW5VHvOo4RzDKLhSS8vwj8fYiZb6x+rKw7zJFotGwKgTI3Y+Va9gFT
+GeBdlI/DVe4LDvBCAQnt3js8Rr4ZwNSIitkLzfQ9AORBD+2KQCwcUeyRvYpENO1Y
+42Bl5jXADuEQoxUY/VjdbMxn1FnWzCk3P+fBzazadAbzXRg+7YYuOV49zeH5reHj
+NKfBGTyImZJNOckfFg6k9xicIZM+RzNJC4yTEctNMOwzMJBMEJA=
+=snXt
 -----END PGP SIGNATURE-----
 
---2oS5YaxWCcQjTEyO--
+--LpQ9ahxlCli8rRTG--
