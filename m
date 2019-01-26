@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41613)
+Received: from eggs.gnu.org ([209.51.188.92]:33157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gnJgs-0008Pc-Vr
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 03:51:52 -0500
+	(envelope-from <ptsneves@gmail.com>) id 1gnO62-00036p-S7
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 08:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1gnJgs-0006G9-0I
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 03:51:50 -0500
-References: <mhng-a089b75c-29ca-4a50-b64c-e86349ac6190@palmer-si-x1c4>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <69b40819-748e-d555-316a-6ce90e944bde@mail.uni-paderborn.de>
-Date: Sat, 26 Jan 2019 09:51:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <mhng-a089b75c-29ca-4a50-b64c-e86349ac6190@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
- decodetree
+	(envelope-from <ptsneves@gmail.com>) id 1gnO61-0004xY-Vw
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 08:34:06 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42678)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ptsneves@gmail.com>) id 1gnO61-0004x0-P4
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 08:34:05 -0500
+Received: by mail-lj1-x243.google.com with SMTP id l15-v6so10619914lja.9
+	for <qemu-devel@nongnu.org>; Sat, 26 Jan 2019 05:34:04 -0800 (PST)
+From: Paulo Neves <ptsneves@gmail.com>
+Date: Sat, 26 Jan 2019 14:33:55 +0100
+Message-Id: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] chardev: Allow for pty path passing.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +23,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>, richard.henderson@linaro.org
-Cc: peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, sagark@eecs.berkeley.edu
+To: qemu-devel@nongnu.org
+Cc: Paulo Neves <ptsneves@gmail.com>
 
-On 1/26/19 12:54 AM, Palmer Dabbelt wrote:
-> On Tue, 22 Jan 2019 13:38:52 PST (-0800), richard.henderson@linaro.org wrote:
->> On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
->>> Hi,
->>>
->>> this patchset converts the RISC-V decoder to decodetree in four major steps:
->>>
->>> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
->>>     Many of the gen_* functions are called by the decode functions for 16-bit
->>>     and 32-bit functions. If we move translation code from the gen_*
->>>     functions to the generated trans_* functions of decode-tree, we get a lot of
->>>     duplication. Therefore, we mostly generate calls to the old gen_* function
->>>     which are properly replaced after step 2).
->>>
->>>     Each of the trans_ functions are grouped into files corresponding to their
->>>     ISA extension, e.g. addi which is in RV32I is translated in the file
->>>     'trans_rvi.inc.c'.
->>>
->>> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
->>>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
->>>     we convert the arguments in the 16 bit trans_ function to the arguments of
->>>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
->>>
->>> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
->>>     this move all manual translation code into the trans_* instructions of
->>>     decode tree, such that we can remove the old decode_* functions.
->>>
->>> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
->>>    by Richard. [Patch 31-35]
->>>
->>> full tree available at
->>> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
->>>
->>> Cheers,
->>> Bastian
->>>
->>> v4 -> v5:
->>>     - fixed rebase error
->>>     - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
->>>     - removed extra sign extension of sraiw
->>>     - removed rs2 == 0 special cases in sraw/srlw
->>
->> All looks good to me now.  Thanks for persevering.
-> 
-> Thanks for reviewing this.
-> 
-> Bastian: what sort of testing have you done here?  This is a pretty big change,
-> and while it's been fairly extensively reviewed I'm just generally paranoid.
-> 
+If a user requires a virtual serial device like provided
+by the pty char device, the user needs to accept the
+returned device name. This makes the program need to
+have smarts to parse or communicate with qemu to get the
+pty device.
+With this patch the program can pass the path where
+a symlink to the pty device will be, removing the
+need for 2 way communication or smarts.
 
-I ran riscv-test as well as booting the newest fedora.
+Signed-off-by: Paulo Neves <ptsneves@gmail.com>
+---
+ chardev/char-pty.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+ chardev/char.c     |  6 +++++-
+ qapi/char.json     |  4 ++--
+ 3 files changed, 47 insertions(+), 4 deletions(-)
 
-Cheers,
-Bastian
+diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+index f681d63..5c312ce 100644
+--- a/chardev/char-pty.c
++++ b/chardev/char-pty.c
+@@ -28,12 +28,14 @@
+ #include "io/channel-file.h"
+ #include "qemu/sockets.h"
+ #include "qemu/error-report.h"
++#include "qemu/option.h"
+ 
+ #include "chardev/char-io.h"
+ 
+ typedef struct {
+     Chardev parent;
+     QIOChannel *ioc;
++    char *link_name;
+     int read_bytes;
+ 
+     /* Protected by the Chardev chr_write_lock.  */
+@@ -234,6 +236,12 @@ static void char_pty_finalize(Object *obj)
+     qemu_mutex_lock(&chr->chr_write_lock);
+     pty_chr_state(chr, 0);
+     object_unref(OBJECT(s->ioc));
++
++    if (s->link_name) {
++        unlink(s->link_name);
++        g_free(s->link_name);
++    }
++
+     pty_chr_timer_cancel(s);
+     qemu_mutex_unlock(&chr->chr_write_lock);
+     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+@@ -244,8 +252,9 @@ static void char_pty_open(Chardev *chr,
+                           bool *be_opened,
+                           Error **errp)
+ {
++    ChardevHostdev *opts = backend->u.pty.data;
+     PtyChardev *s;
+-    int master_fd, slave_fd;
++    int master_fd, slave_fd, symlink_ret;
+     char pty_name[PATH_MAX];
+     char *name;
+ 
+@@ -256,6 +265,17 @@ static void char_pty_open(Chardev *chr,
+     }
+ 
+     close(slave_fd);
++
++    s = PTY_CHARDEV(chr);
++    s->link_name = g_strdup(opts->device);
++    symlink_ret = symlink(pty_name, s->link_name);
++
++    if (symlink_ret < 0) {
++        close(master_fd);
++        error_setg_errno(errp, errno, "Failed to create symlink to PTY");
++        return;
++    }
++
+     qemu_set_nonblock(master_fd);
+ 
+     chr->filename = g_strdup_printf("pty:%s", pty_name);
+@@ -271,6 +291,24 @@ static void char_pty_open(Chardev *chr,
+     *be_opened = false;
+ }
+ 
++static void char_pty_parse(QemuOpts *opts, ChardevBackend *backend,
++                                Error **errp)
++{
++    const char *symlink_path = qemu_opt_get(opts, "path");
++    if (symlink_path == NULL) {
++        error_setg(errp, "chardev: pty symlink: no device path given");
++        return;
++
++    }
++
++    ChardevHostdev *dev;
++
++    backend->type = CHARDEV_BACKEND_KIND_PTY;
++    dev = backend->u.pipe.data = g_new0(ChardevHostdev, 1);
++    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(dev));
++    dev->device = g_strdup(symlink_path);
++}
++
+ static void char_pty_class_init(ObjectClass *oc, void *data)
+ {
+     ChardevClass *cc = CHARDEV_CLASS(oc);
+@@ -279,6 +317,7 @@ static void char_pty_class_init(ObjectClass *oc, void *data)
+     cc->chr_write = char_pty_chr_write;
+     cc->chr_update_read_handler = pty_chr_update_read_handler;
+     cc->chr_add_watch = pty_chr_add_watch;
++    cc->parse = char_pty_parse;
+ }
+ 
+ static const TypeInfo char_pty_type_info = {
+diff --git a/chardev/char.c b/chardev/char.c
+index ccba36b..43fce4a 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -373,7 +373,6 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+     }
+ 
+     if (strcmp(filename, "null")    == 0 ||
+-        strcmp(filename, "pty")     == 0 ||
+         strcmp(filename, "msmouse") == 0 ||
+         strcmp(filename, "wctablet") == 0 ||
+         strcmp(filename, "braille") == 0 ||
+@@ -418,6 +417,11 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+         qemu_opt_set(opts, "path", p, &error_abort);
+         return opts;
+     }
++    if (strstart(filename, "pty:", &p)) {
++        qemu_opt_set(opts, "backend", "pty", &error_abort);
++        qemu_opt_set(opts, "path", p, &error_abort);
++        return opts;
++    }
+     if (strstart(filename, "tcp:", &p) ||
+         strstart(filename, "telnet:", &p) ||
+         strstart(filename, "tn3270:", &p) ||
+diff --git a/qapi/char.json b/qapi/char.json
+index 77ed847..88c62bd 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -229,7 +229,7 @@
+ ##
+ # @ChardevHostdev:
+ #
+-# Configuration info for device and pipe chardevs.
++# Configuration info for device, pty and pipe chardevs.
+ #
+ # @device: The name of the special file for the device,
+ #          i.e. /dev/ttyS0 on Unix or COM1: on Windows
+@@ -395,7 +395,7 @@
+             'pipe': 'ChardevHostdev',
+             'socket': 'ChardevSocket',
+             'udp': 'ChardevUdp',
+-            'pty': 'ChardevCommon',
++            'pty': 'ChardevHostdev',
+             'null': 'ChardevCommon',
+             'mux': 'ChardevMux',
+             'msmouse': 'ChardevCommon',
+-- 
+2.7.4
