@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58802)
+Received: from eggs.gnu.org ([209.51.188.92]:59435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gnXd7-0007D5-HT
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:44:54 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnXgA-0008DC-LX
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:48:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gnXd6-00065t-Fd
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:44:53 -0500
-Received: from mail-oln040092011059.outbound.protection.outlook.com
-	([40.92.11.59]:48064
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
-	id 1gnXd6-00064R-1x
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:44:52 -0500
-From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
-Date: Sat, 26 Jan 2019 23:44:47 +0000
-Message-ID: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <87BF248530AEDC42A704450A4E395355@LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnXg9-0007So-T7
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:48:02 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:37284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gnXg9-0007RP-Mf
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 18:48:01 -0500
+Date: Sun, 27 Jan 2019 00:47:58 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190126234758.5rpcprzi2hxxcxlf@function>
+References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
+	<20190117114359.5164-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190117114359.5164-2-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/27] slirp: generalize guestfwd with a
+ callback based approach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +30,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-V2l0aCBRRU1VIHZlcnNpb24gMy4xLjUwICh2My4xLjAtMTIxOC1nYWQ3YTIxZTgxMi1kaXJ0eSkg
-KGNvbW1pdA0KYWQ3YTIxZTgxMjMxYWU2NDU0MDMxMDM4NGZiMGY4N2FjODc1OGIwMikgb24gWHVi
-dW50dSAxOC4wNCBob3N0LCBhIEtERQ0KTmVvbiBndWVzdCBpcyBjcmFzaGluZyBvbiBib290LiBU
-aGUgUUVNVSBjb21tYW5kIGxpbmUgaXM6DQoNCmdkYiAtcSAtZXggInNldCBwYWdpbmF0aW9uIG9m
-ZiIgLWV4ICJzZXQgcHJpbnQgdGhyZWFkLWV2ZW50cyBvZmYiIC1leA0KImhhbmRsZSBTSUdVU1Ix
-IG5vc3RvcCBub3Bhc3Mgbm9wcmludCIgLWV4ICJydW4iIC0tYXJncw0KcWVtdS1zeXN0ZW0teDg2
-XzY0IC1hY2NlbCBrdm0gLWNwdSBob3N0IC1zbXAgY29yZXM9Mix0aHJlYWRzPTEgLW0gMjA0OA0K
-LWhkYSBuZW9uYnJva2VuLnFjb3cyIC1jZHJvbQ0Kfi9Eb3dubG9hZHMvbmVvbi11c2VyZWRpdGlv
-bi0yMDE5MDEyNC0wNTMwLWFtZDY0LmlzbyAtZGV2aWNlDQpxeGwtdmdhLHhyZXM9MTM2Nix5cmVz
-PTc2OCxhZGRyPTIgLWRpc3BsYXkgZ3RrLGdsPW9uIC1tb25pdG9yIHZjIC1zZXJpYWwNCnZjIC1k
-ZXZpY2UgcWVtdS14aGNpLGFkZHI9MyAtbmV0ZGV2IHVzZXIsaWQ9bmV0MCAtZGV2aWNlDQplMTAw
-MCxuZXRkZXY9bmV0MCxhZGRyPTQgLWJpb3MgL3Vzci9zaGFyZS9vdm1mL09WTUYuZmQNCg0KVGhl
-IGNyYXNoIGlzIGhhcHBlbmluZyBwcmV0dHkgZnJlcXVlbnRseSBidXQgbm90IDEwMCUgb2YgdGhl
-IHRpbWVzLg0KVXNpbmcgdmlydGlvLXZnYSBpbnN0ZWFkIG9mIHF4bC12Z2EgaXQncyBwb3NzaWJs
-ZSB0byB1c2UgdGhlIGd1ZXN0DQpub3JtYWxseS4gQmVmb3JlIHRoZSBjcmFzaCB0aGVyZSBhcmUg
-c29tZSBncmFwaGljYWwgYXJ0aWZhY3RzIG9uIGd1ZXN0DQpzY3JlZW4sIHRoZXkgY2FuIGJlIHNl
-ZW4gYXQgaHR0cHM6Ly9pLmltZ3VyLmNvbS9yZlRtbUowLnBuZw0KDQpPbiB0ZXJtaW5hbCBRRU1V
-IHByaW50cyB0aGUgZm9sbG93aW5nIG1lc3NhZ2VzOg0KDQokIHFlbXUtc3lzdGVtLXg4Nl82NCAt
-YWNjZWwga3ZtIC1jcHUgaG9zdCAtc21wIGNvcmVzPTIsdGhyZWFkcz0xIC1tIDIwNDgNCi1oZGEg
-bmVvbmJyb2tlbi5xY293MiAtY2Ryb20NCn4vRG93bmxvYWRzL25lb24tdXNlcmVkaXRpb24tMjAx
-OTAxMjQtMDUzMC1hbWQ2NC5pc28gLWRldmljZQ0KcXhsLXZnYSx4cmVzPTEzNjYseXJlcz03Njgs
-YWRkcj0yIC1kaXNwbGF5IGd0ayxnbD1vbiAtbW9uaXRvciB2YyAtc2VyaWFsDQp2YyAtZGV2aWNl
-IHFlbXUteGhjaSxhZGRyPTMgLW5ldGRldiB1c2VyLGlkPW5ldDAgLWRldmljZQ0KZTEwMDAsbmV0
-ZGV2PW5ldDAsYWRkcj00IC1iaW9zIC91c3Ivc2hhcmUvb3ZtZi9PVk1GLmZkDQoNCihxZW11LXN5
-c3RlbS14ODZfNjQ6MTE2ODMpOiBHdGstV0FSTklORyAqKjogMTg6MTg6MzQuNzk3OiBUaGVtZSBw
-YXJzaW5nDQplcnJvcjogZ3RrLmNzczo0NzoxNTogbmVnYXRpdmUgdmFsdWVzIGFyZSBub3QgYWxs
-b3dlZC4NCmlkIDAsIGdyb3VwIDAsIHZpcnQgc3RhcnQgMCwgdmlydCBlbmQgZmZmZmZmZmZmZmZm
-ZmZmZiwgZ2VuZXJhdGlvbiAwLA0KZGVsdGEgMA0KaWQgMSwgZ3JvdXAgMSwgdmlydCBzdGFydCA3
-ZmYzMWZlMDAwMDAsIHZpcnQgZW5kIDdmZjMyM2RmZTAwMCwNCmdlbmVyYXRpb24gMCwgZGVsdGEg
-N2ZmMzFmZTAwMDAwDQppZCAyLCBncm91cCAxLCB2aXJ0IHN0YXJ0IDdmZjMxYmMwMDAwMCwgdmly
-dCBlbmQgN2ZmMzFmYzAwMDAwLA0KZ2VuZXJhdGlvbiAwLCBkZWx0YSA3ZmYzMWJjMDAwMDANCg0K
-KHFlbXU6MTE2ODMpOiBTcGljZS1DUklUSUNBTCAqKjogMTg6Mzk6NDAuNzQ3Og0KbWVtc2xvdC5j
-OjExMTptZW1zbG90X2dldF92aXJ0OiBzbG90X2lkIDI1NSB0b28gYmlnLCBhZGRyPWZmMDAwMDAw
-ZmYwMDAwMDANCkFib3J0YWRvIChpbWFnZW0gZG8gbsO6Y2xlbyBncmF2YWRhKQ0KDQpIZXJlIGlz
-IHRoZSBiYWNrdHJhY2U6DQoNCihnZGIpIGJ0DQojMCAgMHgwMDAwN2ZmZmYwMzczZTk3IGluIF9f
-R0lfcmFpc2UgKHNpZz1zaWdAZW50cnk9NikgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4
-L3JhaXNlLmM6NTENCiMxICAweDAwMDA3ZmZmZjAzNzU4MDEgaW4gX19HSV9hYm9ydCAoKSBhdCBh
-Ym9ydC5jOjc5DQojMiAgMHgwMDAwN2ZmZmYxMTcxY2M5IGluICAoKSBhdA0KL3Vzci9saWIveDg2
-XzY0LWxpbnV4LWdudS9saWJzcGljZS1zZXJ2ZXIuc28uMQ0KIzMgIDB4MDAwMDdmZmZmMTEzNzNi
-OCBpbiAgKCkgYXQNCi91c3IvbGliL3g4Nl82NC1saW51eC1nbnUvbGlic3BpY2Utc2VydmVyLnNv
-LjENCiM0ICAweDAwMDA3ZmZmZjExNDA3ZDAgaW4gICgpIGF0DQovdXNyL2xpYi94ODZfNjQtbGlu
-dXgtZ251L2xpYnNwaWNlLXNlcnZlci5zby4xDQojNSAgMHgwMDAwN2ZmZmYxMTQwYTc2IGluICAo
-KSBhdA0KL3Vzci9saWIveDg2XzY0LWxpbnV4LWdudS9saWJzcGljZS1zZXJ2ZXIuc28uMQ0KIzYg
-IDB4MDAwMDdmZmZmMTE0MTlhMSBpbiAgKCkgYXQNCi91c3IvbGliL3g4Nl82NC1saW51eC1nbnUv
-bGlic3BpY2Utc2VydmVyLnNvLjENCiM3ICAweDAwMDA3ZmZmZjExNTQzY2QgaW4gICgpIGF0DQov
-dXNyL2xpYi94ODZfNjQtbGludXgtZ251L2xpYnNwaWNlLXNlcnZlci5zby4xDQojOCAgMHgwMDAw
-N2ZmZmYxMTUyZDIxIGluICAoKSBhdA0KL3Vzci9saWIveDg2XzY0LWxpbnV4LWdudS9saWJzcGlj
-ZS1zZXJ2ZXIuc28uMQ0KIzkgIDB4MDAwMDdmZmZmMTE1MzRiZiBpbiAgKCkgYXQNCi91c3IvbGli
-L3g4Nl82NC1saW51eC1nbnUvbGlic3BpY2Utc2VydmVyLnNvLjENCiMxMCAweDAwMDA3ZmZmZjEx
-MjE0ZjEgaW4gICgpIGF0DQovdXNyL2xpYi94ODZfNjQtbGludXgtZ251L2xpYnNwaWNlLXNlcnZl
-ci5zby4xDQojMTEgMHgwMDAwN2ZmZmYxMTI3ZDdiIGluICAoKSBhdA0KL3Vzci9saWIveDg2XzY0
-LWxpbnV4LWdudS9saWJzcGljZS1zZXJ2ZXIuc28uMQ0KIzEyIDB4MDAwMDdmZmZmNDc5MzFmNSBp
-biBnX21haW5fY29udGV4dF9kaXNwYXRjaCAoKSBhdA0KL3Vzci9saWIveDg2XzY0LWxpbnV4LWdu
-dS9saWJnbGliLTIuMC5zby4wDQojMTMgMHgwMDAwN2ZmZmY0NzkzNWMwIGluICAoKSBhdCAvdXNy
-L2xpYi94ODZfNjQtbGludXgtZ251L2xpYmdsaWItMi4wLnNvLjANCiMxNCAweDAwMDA3ZmZmZjQ3
-OTM4ZDIgaW4gZ19tYWluX2xvb3BfcnVuICgpIGF0DQovdXNyL2xpYi94ODZfNjQtbGludXgtZ251
-L2xpYmdsaWItMi4wLnNvLjANCiMxNSAweDAwMDA3ZmZmZjExNTNiM2EgaW4gICgpIGF0DQovdXNy
-L2xpYi94ODZfNjQtbGludXgtZ251L2xpYnNwaWNlLXNlcnZlci5zby4xDQojMTYgMHgwMDAwN2Zm
-ZmYwNzJkNmRiIGluIHN0YXJ0X3RocmVhZCAoYXJnPTB4N2ZmZjM2MDJjNzAwKSBhdA0KcHRocmVh
-ZF9jcmVhdGUuYzo0NjMNCg==
+Marc-Andr=C3=A9 Lureau, le jeu. 17 janv. 2019 15:43:33 +0400, a ecrit:
+> Instead of calling into QEMU chardev directly, and mixing it with
+> slirp_add_exec() handling, add a new function slirp_add_guestfwd()
+> which takes a write callback.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+applied, thanks!
