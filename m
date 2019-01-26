@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46525)
+Received: from eggs.gnu.org ([209.51.188.92]:46522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIq-0005aE-0R
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIp-0005aD-St
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-0001z7-G0
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-00020T-Rx
 	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:03 -0500
-Date: Sat, 26 Jan 2019 15:31:29 +1300
+Date: Sat, 26 Jan 2019 14:53:57 +1300
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190126023128.GF22942@umbus>
-References: <20190117075327.22194-1-clg@kaod.org>
-	<20190117075327.22194-4-clg@kaod.org>
-	<20190117091426.1175a851@bahia.lan>
+Message-ID: <20190126015357.GD22942@umbus>
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20190102025904.GH27457@umbus.fritz.box>
+	<41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
+	<20190120202824.GA2423@umbus>
+	<38f72c0d-a64b-1ac5-d4cd-70c1a6087226@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="VuQYccsttdhdIfIP"
+	protocol="application/pgp-signature"; boundary="jL2BoiuKMElzg3CS"
 Content-Disposition: inline
-In-Reply-To: <20190117091426.1175a851@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 3/4] spapr: move the interrupt presenters
- under machine_data
+In-Reply-To: <38f72c0d-a64b-1ac5-d4cd-70c1a6087226@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,299 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-ppc@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
 
---VuQYccsttdhdIfIP
-Content-Type: text/plain; charset=iso-8859-1
+--jL2BoiuKMElzg3CS
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 17, 2019 at 09:14:26AM +0100, Greg Kurz wrote:
-> On Thu, 17 Jan 2019 08:53:26 +0100
-> C=E9dric Le Goater <clg@kaod.org> wrote:
->=20
-> > Next step is to remove them from under the PowerPCCPU
+On Mon, Jan 21, 2019 at 05:15:20AM +0000, Mark Cave-Ayland wrote:
+> On 20/01/2019 20:28, David Gibson wrote:
+> > On Fri, Jan 18, 2019 at 01:25:37PM +0000, Mark Cave-Ayland wrote:
+> >> On 02/01/2019 02:59, David Gibson wrote:
+> >>
+> >>> On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+> >>>> >From working on the TCG vector operations patchset, it is apparent =
+that there
+> >>>> are a large number of endian-based hacks in int_helper.c which can b=
+e removed by
+> >>>> making use of the various Vsr* macros.
+> >>>>
+> >>>> Patch 1 is simple enough, and implements the complete set of Vsr* ma=
+cros for
+> >>>> both big endian and little endian hosts.
+> >>>>
+> >>>> Patches 2 and 3 rework the vector merge and multiply algorithms so t=
+hat they
+> >>>> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+> >>>>
+> >>>> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX =
+macros by
+> >>>> replacing the element accesses with their equivalent Vsr* macro inst=
+ead.
+> >>>>
+> >>>> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential sh=
+ift bug
+> >>>> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the =
+review of
+> >>>> v1.
+> >>>>
+> >>>> Finally patch 8 is an inspection-based removal of other HOST_WORDS_B=
+IGENDIAN
+> >>>> hacks in int_helper.c, again replacing accesses with the relevant Vs=
+r* macro
+> >>>> instead.
+> >>>>
+> >>>> Note that there are still some endian hacks left in int_helper.c aft=
+er this
+> >>>> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I m=
+acro still
+> >>>> remains in places where the index variable was used for purposes oth=
+er than
+> >>>> accessing elements within the vector.
+> >>>>
+> >>>> There were also some parts where additional conversion could be done=
+, but I
+> >>>> wasn't confident enough to make the change without access to PPC64 t=
+est images
+> >>>> or real big-endian host hardware.
+> >>>
+> >>> Applied to ppc-for-4.0, thanks.
+> >>
+> >> Just checking your ppc-for-4.0 branch on github, I can't see where thi=
+s has been
+> >> applied? Is it queued in a local branch still?
 > >=20
-> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > ---
+> > Yeah, probably.  I've pushed it out now.
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Thanks David. I've just had another quick look, and whilst I can see newe=
+r commits in
+> the branch, I think these ones belonging to this patchset are still
+> missing?
 
-Applied, thanks.
-
->=20
-> >  include/hw/ppc/spapr_cpu_core.h |  2 ++
-> >  hw/intc/spapr_xive.c            |  3 ++-
-> >  hw/intc/xics_spapr.c            | 11 ++++++-----
-> >  hw/ppc/spapr.c                  |  2 +-
-> >  hw/ppc/spapr_cpu_core.c         |  8 ++++----
-> >  hw/ppc/spapr_irq.c              | 17 ++++++++++-------
-> >  6 files changed, 25 insertions(+), 18 deletions(-)
-> >=20
-> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu=
-_core.h
-> > index 9e2821e4b31f..d64f86bc284e 100644
-> > --- a/include/hw/ppc/spapr_cpu_core.h
-> > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > @@ -46,6 +46,8 @@ typedef struct sPAPRCPUState {
-> >      uint64_t vpa_addr;
-> >      uint64_t slb_shadow_addr, slb_shadow_size;
-> >      uint64_t dtl_addr, dtl_size;
-> > +    struct ICPState *icp;
-> > +    struct XiveTCTX *tctx;
-> >  } sPAPRCPUState;
-> > =20
-> >  static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index 136d872f16bc..a0f5ff929447 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -16,6 +16,7 @@
-> >  #include "monitor/monitor.h"
-> >  #include "hw/ppc/fdt.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_cpu_core.h"
-> >  #include "hw/ppc/spapr_xive.h"
-> >  #include "hw/ppc/xive.h"
-> >  #include "hw/ppc/xive_regs.h"
-> > @@ -394,7 +395,7 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xr=
-tr, CPUState *cs)
-> >  {
-> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -    return cpu->tctx;
-> > +    return spapr_cpu_state(cpu)->tctx;
-> >  }
-> > =20
-> >  static const VMStateDescription vmstate_spapr_xive_end =3D {
-> > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> > index de6cc15b6474..e2d8b3818336 100644
-> > --- a/hw/intc/xics_spapr.c
-> > +++ b/hw/intc/xics_spapr.c
-> > @@ -31,6 +31,7 @@
-> >  #include "trace.h"
-> >  #include "qemu/timer.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_cpu_core.h"
-> >  #include "hw/ppc/xics.h"
-> >  #include "hw/ppc/xics_spapr.h"
-> >  #include "hw/ppc/fdt.h"
-> > @@ -45,7 +46,7 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
-> >  {
-> >      target_ulong cppr =3D args[0];
-> > =20
-> > -    icp_set_cppr(cpu->icp, cppr);
-> > +    icp_set_cppr(spapr_cpu_state(cpu)->icp, cppr);
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > @@ -66,7 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-> >  static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >                             target_ulong opcode, target_ulong *args)
-> >  {
-> > -    uint32_t xirr =3D icp_accept(cpu->icp);
-> > +    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-> > =20
-> >      args[0] =3D xirr;
-> >      return H_SUCCESS;
-> > @@ -75,7 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
-> >  static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >                               target_ulong opcode, target_ulong *args)
-> >  {
-> > -    uint32_t xirr =3D icp_accept(cpu->icp);
-> > +    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-> > =20
-> >      args[0] =3D xirr;
-> >      args[1] =3D cpu_get_host_ticks();
-> > @@ -87,7 +88,7 @@ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-> >  {
-> >      target_ulong xirr =3D args[0];
-> > =20
-> > -    icp_eoi(cpu->icp, xirr);
-> > +    icp_eoi(spapr_cpu_state(cpu)->icp, xirr);
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > @@ -95,7 +96,7 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-> >                              target_ulong opcode, target_ulong *args)
-> >  {
-> >      uint32_t mfrr;
-> > -    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
-> > +    uint32_t xirr =3D icp_ipoll(spapr_cpu_state(cpu)->icp, &mfrr);
-> > =20
-> >      args[0] =3D xirr;
-> >      args[1] =3D mfrr;
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 83081defde4e..181f994c87a7 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3896,7 +3896,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, in=
-t vcpu_id)
-> >  {
-> >      PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-> > =20
-> > -    return cpu ? cpu->icp : NULL;
-> > +    return cpu ? spapr_cpu_state(cpu)->icp : NULL;
-> >  }
-> > =20
-> >  static void spapr_pic_print_info(InterruptStatsProvider *obj,
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 0405306d1e59..ef6cbb9c2943 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -194,11 +194,11 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu,=
- sPAPRCPUCore *sc)
-> >          vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machin=
-e_data);
-> >      }
-> >      qemu_unregister_reset(spapr_cpu_reset, cpu);
-> > -    if (cpu->icp) {
-> > -        object_unparent(OBJECT(cpu->icp));
-> > +    if (spapr_cpu_state(cpu)->icp) {
-> > +        object_unparent(OBJECT(spapr_cpu_state(cpu)->icp));
-> >      }
-> > -    if (cpu->tctx) {
-> > -        object_unparent(OBJECT(cpu->tctx));
-> > +    if (spapr_cpu_state(cpu)->tctx) {
-> > +        object_unparent(OBJECT(spapr_cpu_state(cpu)->tctx));
-> >      }
-> >      cpu_remove_sync(CPU(cpu));
-> >      object_unparent(OBJECT(cpu));
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 1da7a32348fc..2d7a7c163876 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -12,6 +12,7 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qapi/error.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_cpu_core.h"
-> >  #include "hw/ppc/spapr_xive.h"
-> >  #include "hw/ppc/xics.h"
-> >  #include "hw/ppc/xics_spapr.h"
-> > @@ -185,7 +186,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineS=
-tate *spapr, Monitor *mon)
-> >      CPU_FOREACH(cs) {
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -        icp_pic_print_info(cpu->icp, mon);
-> > +        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-> >      }
-> > =20
-> >      ics_pic_print_info(spapr->ics, mon);
-> > @@ -196,6 +197,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMac=
-hineState *spapr,
-> >  {
-> >      Error *local_err =3D NULL;
-> >      Object *obj;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > =20
-> >      obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr=
-),
-> >                       &local_err);
-> > @@ -204,7 +206,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMac=
-hineState *spapr,
-> >          return;
-> >      }
-> > =20
-> > -    cpu->icp =3D ICP(obj);
-> > +    spapr_cpu->icp =3D ICP(obj);
-> >  }
-> > =20
-> >  static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int vers=
-ion_id)
-> > @@ -213,7 +215,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineSta=
-te *spapr, int version_id)
-> >          CPUState *cs;
-> >          CPU_FOREACH(cs) {
-> >              PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -            icp_resend(cpu->icp);
-> > +            icp_resend(spapr_cpu_state(cpu)->icp);
-> >          }
-> >      }
-> >      return 0;
-> > @@ -334,7 +336,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineS=
-tate *spapr,
-> >      CPU_FOREACH(cs) {
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -        xive_tctx_pic_print_info(cpu->tctx, mon);
-> > +        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-> >      }
-> > =20
-> >      spapr_xive_pic_print_info(spapr->xive, mon);
-> > @@ -345,6 +347,7 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMac=
-hineState *spapr,
-> >  {
-> >      Error *local_err =3D NULL;
-> >      Object *obj;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > =20
-> >      obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &l=
-ocal_err);
-> >      if (local_err) {
-> > @@ -352,13 +355,13 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRM=
-achineState *spapr,
-> >          return;
-> >      }
-> > =20
-> > -    cpu->tctx =3D XIVE_TCTX(obj);
-> > +    spapr_cpu->tctx =3D XIVE_TCTX(obj);
-> > =20
-> >      /*
-> >       * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
-> >       * don't beneficiate from the reset of the XIVE IRQ backend
-> >       */
-> > -    spapr_xive_set_tctx_os_cam(cpu->tctx);
-> > +    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
-> >  }
-> > =20
-> >  static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int vers=
-ion_id)
-> > @@ -374,7 +377,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState =
-*spapr, Error **errp)
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> >          /* (TCG) Set the OS CAM line of the thread interrupt context. =
-*/
-> > -        spapr_xive_set_tctx_os_cam(cpu->tctx);
-> > +        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
-> >      }
-> > =20
-> >      /* Activate the XIVE MMIOs */
->=20
-
+Um.. hrm.. in that case I think I've lost track of these ones :/
 --=20
 David Gibson			| I'll have my music baroque, and my code
 david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VuQYccsttdhdIfIP
+--jL2BoiuKMElzg3CS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLxoAACgkQbDjKyiDZ
-s5LsNQ//URvJg3xbV5yGN3U2+cXr65+nlZiu4ibhNe+E9PnSto+t672UMw6MIDlk
-fLBaCl6Hw93rw5bAEdMI4otVE9FdHZpnWXQxv+FdehovwdxOHsjtJRFz0ggweJ2O
-GQRHfZFItw+gkLOM2/D3VfaRuQDUAXAVTCGBVHYOtywtaqp6Klbt3+gtwerZOf81
-2tSrztvf31IAy4VRrwwig4VuwSKG5J6iI8kloowZdLX6/b6u2I9sx4Kc4yFj89HS
-l8yEdQA7WBHwSurCZWFM6dzzdaYDqHanmynSn40FSPtaN5ckAifaXND4J6pEOFoa
-RFvhRynGZgVmz+23OhiOHA2rsbJEDKOqmHPmN76nnj8p83sHcFwYIF7Bx2VUqiUe
-rxZgV+epuERlsBqB/8PKxNVIsx3KruJZy0sUJIpYP08LaGNwqBv3r7sTXt3kPdIw
-quom/W/12hp4AN+E6OwvqBsq2Ap0d4FdcAuPCr3LhcPw6x/Moh+HMCRcjuP2dzDi
-Xui2DPU8R0jja/BU39lroEl1AA/aTu+mbqq9VGnuBJF3JKUgUuhVZsdKThXqR6zm
-V0cNfljSagrbqBwamjKMUs0aCCfUY3QoL9T6DpRamfch/2Q0Nypuombged3YIxDH
-IHyEHDhWBOdYwG7PG/f4hsL2wLQn9pPqNJzemN09qb4AVE1yknU=
-=8VYo
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLvbQACgkQbDjKyiDZ
+s5KLTA/9GGXmSVKgNNenIGexk7in9kn1FDAykBlaEAbEBex41eXVl75oL3GLOdAn
+Jpkse1wEkbUWIViPkvt88ZYEdYA2qE7S9VQr4wDbmPVJFplL3SOTNCL3o1Q8XuH9
+qFwensdx0RdQv+HSm8nSdl+LSjEkD1y/7q8gwB2CKpY0ryS5WHSyUN27znPK8oV3
+gWxTUXPw/Wq5pz9w5fNdwYpACitugt/PMQBw9hXYnCN5WIu+4oa7ZOF3ZJgytIwN
+mRMNDYouzX7B+P+lk05oynN1ctigcFU4MteniBmy7pqZu8lWOHBmTwfYWTfzpN8L
+vkkv919cC9uRW/PY4Bkst499V9VBZgUm1kym712vkQpzBW1dpcKiTsEmGCLvCWZZ
+PKFQ6nKDhpJuBiFNZw5AiPfZf6Jx0i/1PN6gUhtILzstWiMT9rcj5Yo2juNlUiWM
+dj6hu0PugbXVsYcEBQyI6qguozDqOlgEL0OoaF9x/0eQa4RdKpaNDT5/OlNDtQLg
++Jwej0H1uj1/WJCMLCZ4kFuk9zP9Swf2ue0YvydMCMaL9oStCda0MxT0TGCDOlDi
+cTIFD2bCUCqNGHV8mKJXrnLA7gWTl0fW99+Gz/ypgfAprA98AiNTGxiJ/gC4xzGS
+n2Dd3YB/XV9GLMgFi8t6zM8r5yw2Yso3ABI1JWMGfd4jEgyrnBM=
+=lPkS
 -----END PGP SIGNATURE-----
 
---VuQYccsttdhdIfIP--
+--jL2BoiuKMElzg3CS--
