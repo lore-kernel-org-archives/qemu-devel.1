@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50378)
+Received: from eggs.gnu.org ([209.51.188.92]:58840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gnBJO-0003Oq-0L
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnBPu-0004xG-24
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 19:01:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gnBJM-0005H6-K5
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:01 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37439)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnBPt-0001o2-8f
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 19:01:45 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33644)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gnBJM-0005Eb-9o
-	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 18:55:00 -0500
-Received: by mail-pg1-x544.google.com with SMTP id c25so4835726pgb.4
-	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 15:54:59 -0800 (PST)
-Date: Fri, 25 Jan 2019 15:54:58 -0800 (PST)
-In-Reply-To: <2153eec6-f25f-4e34-6423-01d76a14815c@linaro.org>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-a089b75c-29ca-4a50-b64c-e86349ac6190@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
- decodetree
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gnBPr-0001fj-SS
+	for qemu-devel@nongnu.org; Fri, 25 Jan 2019 19:01:45 -0500
+Received: by mail-pf1-x441.google.com with SMTP id c123so5478259pfb.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Jan 2019 16:01:37 -0800 (PST)
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
+	<20190121185118.18550-8-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a16fa8de-cf25-54c0-f394-1624017d18df@linaro.org>
+Date: Fri, 25 Jan 2019 16:01:33 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190121185118.18550-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/23] hw/arm/iotkit: Rename files to
+ hw/arm/armsse.[ch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, sagark@eecs.berkeley.edu, peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, 22 Jan 2019 13:38:52 PST (-0800), richard.henderson@linaro.org wrote:
-> On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
->> Hi,
->>
->> this patchset converts the RISC-V decoder to decodetree in four major steps:
->>
->> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
->>     Many of the gen_* functions are called by the decode functions for 16-bit
->>     and 32-bit functions. If we move translation code from the gen_*
->>     functions to the generated trans_* functions of decode-tree, we get a lot of
->>     duplication. Therefore, we mostly generate calls to the old gen_* function
->>     which are properly replaced after step 2).
->>
->>     Each of the trans_ functions are grouped into files corresponding to their
->>     ISA extension, e.g. addi which is in RV32I is translated in the file
->>     'trans_rvi.inc.c'.
->>
->> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
->>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
->>     we convert the arguments in the 16 bit trans_ function to the arguments of
->>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
->>
->> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
->>     this move all manual translation code into the trans_* instructions of
->>     decode tree, such that we can remove the old decode_* functions.
->>
->> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
->>    by Richard. [Patch 31-35]
->>
->> full tree available at
->> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
->>
->> Cheers,
->> Bastian
->>
->> v4 -> v5:
->>     - fixed rebase error
->>     - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
->>     - removed extra sign extension of sraiw
->>     - removed rs2 == 0 special cases in sraw/srlw
->
-> All looks good to me now.  Thanks for persevering.
+On 1/21/19 10:51 AM, Peter Maydell wrote:
+> Rename the files that used to be iotkit.[ch] to
+> armsse.[ch] to reflect the fact they new cover
+> multiple Arm subsystems for embedded.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/Makefile.objs                  | 2 +-
+>  include/hw/arm/{iotkit.h => armsse.h} | 4 ++--
+>  hw/arm/{iotkit.c => armsse.c}         | 2 +-
+>  hw/arm/mps2-tz.c                      | 2 +-
+>  MAINTAINERS                           | 4 ++--
+>  default-configs/arm-softmmu.mak       | 2 +-
+>  6 files changed, 8 insertions(+), 8 deletions(-)
+>  rename include/hw/arm/{iotkit.h => armsse.h} (99%)
+>  rename hw/arm/{iotkit.c => armsse.c} (99%)
 
-Thanks for reviewing this.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Bastian: what sort of testing have you done here?  This is a pretty big change, 
-and while it's been fairly extensively reviewed I'm just generally paranoid.
+
+r~
