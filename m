@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46559)
+Received: from eggs.gnu.org ([209.51.188.92]:46521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIs-0005ad-7a
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:07 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIr-00021r-6P
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIp-0005aC-Sb
 	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:06 -0500
-Date: Sat, 26 Jan 2019 15:37:12 +1300
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-0001zj-LC
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:03 -0500
+Date: Sat, 26 Jan 2019 14:42:24 +1300
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190126023712.GG22942@umbus>
-References: <20190117075327.22194-1-clg@kaod.org>
-	<20190117075327.22194-3-clg@kaod.org>
-	<20190117091302.1d46e737@bahia.lan>
+Message-ID: <20190126014223.GA22942@umbus>
+References: <20190123082425.10643-1-david@redhat.com>
+	<11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="V32M1hWVjliPHW+c"
+	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
 Content-Disposition: inline
-In-Reply-To: <20190117091302.1d46e737@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/4] ppc/pnv: introduce a CPU machine_data
+In-Reply-To: <11e508cf-bff8-71e0-8d25-b54250d3d201@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH v1] spapr/pci: Fix primary bus number for
+ PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,139 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
 
---V32M1hWVjliPHW+c
-Content-Type: text/plain; charset=iso-8859-1
+--2oS5YaxWCcQjTEyO
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 17, 2019 at 09:13:02AM +0100, Greg Kurz wrote:
-> On Thu, 17 Jan 2019 08:53:25 +0100
-> C=E9dric Le Goater <clg@kaod.org> wrote:
+On Thu, Jan 24, 2019 at 01:48:36PM +1100, Alexey Kardashevskiy wrote:
 >=20
-> > Include the interrupt presenter under the machine_data as we plan to
-> > remove it from under PowerPCCPU
+>=20
+> On 23/01/2019 19:24, David Hildenbrand wrote:
+> > While looking at the s390x implementation, looks like spapr has a
+> > similar BUG when building the topology.
 > >=20
-> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > ---
+> > The primary bus number corresponds always to the bus number of the
+> > bus the bridge is attached to.
+> >=20
+> > Right now, if we have two bridges attached to the same bus (e.g. root
+> > bus) this is however not the case. The first bridge will have primary
+> > bus 0, the second bridge primary bus 1, which is wrong. Fix the assignm=
+ent.
+> >=20
+> > While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+> > Setting it temporarily to that value (as discussed e.g. in [1]), is
+> > only relevant for a running system that probes the buses. The value is
+> > effectively unused for us just doing a DFS.
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> What is DFS?
+>=20
+> >=20
+> > [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+> >=20
+> > Note: Is hotplug of bridges supported? I can't find where the topology
+> > is fixed up when hotplugging a PCI bridge. (e.g. bus numbers assigned
+> > and PCI_SUBORDINATE_BUS of path to the root updated). But maybe we are
+> > excluding bridges or this is not necessary for some reason.
+> >=20
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+>=20
+>=20
+> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 Applied, thanks.
 
 >=20
-> >  include/hw/ppc/pnv_core.h |  9 +++++++++
-> >  hw/ppc/pnv.c              |  7 ++++---
-> >  hw/ppc/pnv_core.c         | 12 +++++++++++-
-> >  3 files changed, 24 insertions(+), 4 deletions(-)
+>=20
+> > ---
+> >  hw/ppc/spapr_pci.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
 > >=20
-> > diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
-> > index 447ae761f7ae..9961ea3a92cd 100644
-> > --- a/include/hw/ppc/pnv_core.h
-> > +++ b/include/hw/ppc/pnv_core.h
-> > @@ -47,4 +47,13 @@ typedef struct PnvCoreClass {
-> >  #define PNV_CORE_TYPE_SUFFIX "-" TYPE_PNV_CORE
-> >  #define PNV_CORE_TYPE_NAME(cpu_model) cpu_model PNV_CORE_TYPE_SUFFIX
-> > =20
-> > +typedef struct PnvCPUState {
-> > +    struct ICPState *icp;
-> > +} PnvCPUState;
-> > +
-> > +static inline PnvCPUState *pnv_cpu_state(PowerPCCPU *cpu)
-> > +{
-> > +    return (PnvCPUState *)cpu->machine_data;
-> > +}
-> > +
-> >  #endif /* _PPC_PNV_CORE_H */
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index d84acef55b69..da540860a2b0 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -673,6 +673,7 @@ static void pnv_chip_power8_intc_create(PnvChip *ch=
-ip, PowerPCCPU *cpu,
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index b74f2632ec..5cdc98513d 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -2030,8 +2030,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
+ *bus, PCIDevice *pdev,
+> >                                             void *opaque)
 > >  {
-> >      Error *local_err =3D NULL;
-> >      Object *obj;
-> > +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
+> >      unsigned int *bus_no =3D opaque;
+> > -    unsigned int primary =3D *bus_no;
+> > -    unsigned int subordinate =3D 0xff;
+> >      PCIBus *sec_bus =3D NULL;
 > > =20
-> >      obj =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, XICS_FABRIC(qdev_get=
-_machine()),
-> >                       &local_err);
-> > @@ -681,7 +682,7 @@ static void pnv_chip_power8_intc_create(PnvChip *ch=
-ip, PowerPCCPU *cpu,
+> >      if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=3D
+> > @@ -2040,7 +2038,7 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
+ *bus, PCIDevice *pdev,
+> >      }
+> > =20
+> >      (*bus_no)++;
+> > -    pci_default_write_config(pdev, PCI_PRIMARY_BUS, primary, 1);
+> > +    pci_default_write_config(pdev, PCI_PRIMARY_BUS, pci_dev_bus_num(pd=
+ev), 1);
+> >      pci_default_write_config(pdev, PCI_SECONDARY_BUS, *bus_no, 1);
+> >      pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
+> > =20
+> > @@ -2049,7 +2047,6 @@ static void spapr_phb_pci_enumerate_bridge(PCIBus=
+ *bus, PCIDevice *pdev,
 > >          return;
 > >      }
 > > =20
-> > -    cpu->icp =3D ICP(obj);
-> > +    pnv_cpu->icp =3D ICP(obj);
-> >  }
-> > =20
-> >  /*
-> > @@ -1099,7 +1100,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int =
-pir)
-> >  {
-> >      PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
-> > =20
-> > -    return cpu ? cpu->icp : NULL;
-> > +    return cpu ? pnv_cpu_state(cpu)->icp : NULL;
-> >  }
-> > =20
-> >  static void pnv_pic_print_info(InterruptStatsProvider *obj,
-> > @@ -1112,7 +1113,7 @@ static void pnv_pic_print_info(InterruptStatsProv=
-ider *obj,
-> >      CPU_FOREACH(cs) {
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -        icp_pic_print_info(cpu->icp, mon);
-> > +        icp_pic_print_info(pnv_cpu_state(cpu)->icp, mon);
-> >      }
-> > =20
-> >      for (i =3D 0; i < pnv->num_chips; i++) {
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index b98f277f1e02..7c806da720c6 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -155,7 +155,10 @@ static void pnv_core_realize(DeviceState *dev, Err=
-or **errp)
-> > =20
-> >      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
-> >      for (i =3D 0; i < cc->nr_threads; i++) {
-> > +        PowerPCCPU *cpu;
-> > +
-> >          obj =3D object_new(typename);
-> > +        cpu =3D POWERPC_CPU(obj);
-> > =20
-> >          pc->threads[i] =3D POWERPC_CPU(obj);
-> > =20
-> > @@ -163,6 +166,9 @@ static void pnv_core_realize(DeviceState *dev, Erro=
-r **errp)
-> >          object_property_add_child(OBJECT(pc), name, obj, &error_abort);
-> >          object_property_add_alias(obj, "core-pir", OBJECT(pc),
-> >                                    "pir", &error_abort);
-> > +
-> > +        cpu->machine_data =3D g_new0(PnvCPUState, 1);
-> > +
-> >          object_unref(obj);
-> >      }
-> > =20
-> > @@ -189,9 +195,13 @@ err:
-> > =20
-> >  static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
-> >  {
-> > +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> > +
-> >      qemu_unregister_reset(pnv_cpu_reset, cpu);
-> > -    object_unparent(OBJECT(cpu->icp));
-> > +    object_unparent(OBJECT(pnv_cpu_state(cpu)->icp));
-> >      cpu_remove_sync(CPU(cpu));
-> > +    cpu->machine_data =3D NULL;
-> > +    g_free(pnv_cpu);
-> >      object_unparent(OBJECT(cpu));
-> >  }
-> > =20
+> > -    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, subordinate, 1=
+);
+> >      pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+> >                          spapr_phb_pci_enumerate_bridge, bus_no);
+> >      pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, *bus_no, 1);
+> >=20
 >=20
 
 --=20
@@ -166,24 +121,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---V32M1hWVjliPHW+c
+--2oS5YaxWCcQjTEyO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLx9gACgkQbDjKyiDZ
-s5LeqA/+I25XDcosVwOae0sW9hp5cvYHolXC2ryCxc3sO34Vw/KEUTO73WH1OThJ
-1ve2lISwarF7J0yHwzIGvE1pBKsAU0rZnz1W3VsTWlzLwQzYiaXGsH9y9crgTMWf
-/NXv/DazKGhIEKY/xXCswk39gS/0hEvT67gWJuUbM8YYwU1g1Xcv5AlURpIrupaM
-rL7jd3A2TANQuaj4PPdpG6yYz3U30zA8RWtMBXAsA96V7FkvVUMAo5kC9mGjVahg
-aLzdupgqjuInxveaqq5njCvKaXBUIwq8sDEbUZ1mwG1E16uOXG2orX60+JpgJrIq
-77XdmRkePHB2qAe0YhpDb9ZR//zPWc7/5XqMUJFZGva5McZSfurrZnGYQHOnriF7
-k3HnFjxGWKot6dH4tiBo6CBcsJk3IU2NvITLX92YXJ28PXk4jZkrc5W5ZRASHlJU
-0uz1HUlx6MVn8UiQw+wIzzqHAj9Erkm+clJjNoq0+daEBJVlgocy1+Hy38bw6F4+
-GsO/fvKqlb4lX4exHH2eQPGnCEzLPyQNIhW8kMkQZ/rJK8RxMD55+XGQ1uCo9Yp8
-2OPhUUN358qxHIWTeStnpmXV7fEEoNitxY/6tCXUXWsDcE0CpCyzL/7q+fmoGrZm
-r0bOgtnkcf/6bgNf5y2SzOsTT3Wq65/huX0+28rDbthzLIExGEY=
-=MxV9
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLuv0ACgkQbDjKyiDZ
+s5LcUxAAmyRC5wFOf+EMqFPJK7wxdIF+x/MyRpSfbdcdWh2S7xcA2UvNCUi7pBl9
+cd6M/tqAte3jhI2RUSq3o4QgpAMaPfdC+HPPfzYD4XcKPKRltyX8jFl0ZLWd4w2y
+7/fyc42weEmlpc1X576yMQ6/2WMGsxO6s1vSyPKEebQmTTEV+FscWQfeAU8PMQTz
+I3LM9MpHDTDbVSWxDPW/b011ibXI2tSC0SlWDtic45ldt6rg8F+dlNTVheolmHTa
+/jo/3Hkq7M8uO1iNtd1UhbnToC0Aw7KJjlLm93dTkOda5DYDqVLTAqY619UzLQ5e
+mXQb6XgYEfimqEC/HCosWQKaIhJq4n7nOyxn3S3lY8MkPvUfDOByUmhriPbnMHkJ
+aRKBCZPbbFbSDEdrh0D6J3B+T53cINol9dkbEZDpdTiD95KH7usU6/pQcCVqt14M
+iIqAqQ4WyCn2IZ83NlAPc8t70AcON6ltrLxaID0ApYc63J44F27BfcvMnz1nM69F
+thrqyaVbpKUHo/ZgGG+0oUtMHe/I5JT+WFZYgTyRjUPQvvAEsDOfuMeBMmbOpslU
+Uk6Ogo7F/I6Tz2OjBK6WQhBGCi1fvkoM/LSrkAQSKTNOYqH+9Wr5ldQFmQ6U/gqL
+QVX6/Jp0m/dSrc/KgxsmoQiqb0+RZEMJpGIkh00xWIp/YL+7hJI=
+=+oW8
 -----END PGP SIGNATURE-----
 
---V32M1hWVjliPHW+c--
+--2oS5YaxWCcQjTEyO--
