@@ -1,14 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46389)
+Received: from eggs.gnu.org ([209.51.188.92]:55821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gnPSQ-0001Kj-KG
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 10:01:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gnQEE-0003Fy-0W
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 10:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gnPSO-0002YD-Fz
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 10:01:18 -0500
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Sat, 26 Jan 2019 15:50:28 +0100
-Message-Id: <20190126150102.7AABC74569F@zero.eik.bme.hu>
-Subject: [Qemu-devel] [PATCH] target/ppc: Fix msync to do what hardware does
+	(envelope-from <bounces@canonical.com>) id 1gnQEA-0003Ib-GZ
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 10:50:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gnQE7-0003Gy-M8
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 10:50:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gnQE6-0000di-0W
+	for <qemu-devel@nongnu.org>; Sat, 26 Jan 2019 15:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D9D2E2E80C7
+	for <qemu-devel@nongnu.org>; Sat, 26 Jan 2019 15:50:33 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 26 Jan 2019 15:45:10 -0000
+From: Chen Zhang <1813406@bugs.launchpad.net>
+Reply-To: Bug 1813406 <1813406@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154851751023.19548.18254052025186745164.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813406] [NEW] qemu-img convert malfunction on
+ macOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,55 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-According to BookE docs, invalid bits (while undefined behaviour) should
-not raise exception but be ignored. This seems to be implementation
-dependent though and QEMU currently does what e500 CPUs do and raise
-exception for invalid bits. Unfortunately some versions of libstdc++
-(and so all programs compiled with it) have lwsync on PPC440 which is
-invalid but on real hardware it's just executed as msync ignoring the
-invalid bits (maybe that's why it got undetected) but they fail on QEMU.
-This patch changes invalid mask of msync to allow these programs to run
-but keep generating exception on e500 cores to follow what hardware does.
+Public bug reported:
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- target/ppc/translate.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+On macOS 10.13.6, `qemu-img convert` failed to convert a qcow2 into a
+new qcow2 (for the purpose of shrinking the image).
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e169c43643..5429ceb1ab 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6476,7 +6476,12 @@ static void gen_mbar(DisasContext *ctx)
- /* msync replaces sync on 440 */
- static void gen_msync_4xx(DisasContext *ctx)
- {
--    /* interpreted as no-op */
-+    /* Only e500 seems to treat reserved bits as invalid */
-+    if ((ctx->insns_flags2 & PPC2_BOOKE206) &&
-+        (ctx->opcode & 0x03FFF801)) {
-+        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-+    }
-+    /* otherwise interpreted as no-op */
- }
- 
- /* icbt */
-@@ -7054,11 +7059,11 @@ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
- GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
- GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
-               PPC_BOOKE, PPC2_BOOKE206),
--GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
-+GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x039FF801, PPC_BOOKE),
- GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
-                PPC_BOOKE, PPC2_BOOKE206),
- GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
--               PPC_440_SPEC),
-+             PPC_440_SPEC),
- GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
--- 
-2.13.7
+A 50GB (3.7GB allocated) qcow2 image was used as source. The qemu-img
+convert output was a 3.4MB file.
+
+qemu-img from HomeBrew were tested. Both 2.11.1 and 3.1.0_1 failed to
+convert a qcow2 image.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: macos qemu-img
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813406
+
+Title:
+  qemu-img convert malfunction on macOS
+
+Status in QEMU:
+  New
+
+Bug description:
+  On macOS 10.13.6, `qemu-img convert` failed to convert a qcow2 into a
+  new qcow2 (for the purpose of shrinking the image).
+
+  A 50GB (3.7GB allocated) qcow2 image was used as source. The qemu-img
+  convert output was a 3.4MB file.
+
+  qemu-img from HomeBrew were tested. Both 2.11.1 and 3.1.0_1 failed to
+  convert a qcow2 image.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813406/+subscriptions
