@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46519)
+Received: from eggs.gnu.org ([209.51.188.92]:49630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIp-0005aB-OB
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:06 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnZfM-0003KZ-NV
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gnZIo-0001zr-LQ
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:32:03 -0500
-Date: Sat, 26 Jan 2019 14:50:06 +1300
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190126015006.GB22942@umbus>
-References: <20190122170112.8706-1-farosas@linux.ibm.com>
-	<20190122170112.8706-3-farosas@linux.ibm.com>
-	<30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnZfK-000320-KM
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:55:20 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:36346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gnZfE-0002zn-L2
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:55:14 -0500
+Date: Sun, 27 Jan 2019 02:55:09 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20190127015509.ngofhbiduuwwbf7r@function>
+References: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="LpQ9ahxlCli8rRTG"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
- callbacks for SPRs
+In-Reply-To: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Replace QEMU_BUILD_BUG_ON with own
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,170 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jan.kiszka@siemens.com, marcandre.lureau@redhat.com, zhangckid@gmail.com, lizhijian@cn.fujitsu.com, pbonzini@redhat.com, jasowang@redhat.com
 
+(Which I'll fold as appropriate within Marc-Andr=C3=A9's patch series)
 
---LpQ9ahxlCli8rRTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 24, 2019 at 06:20:02PM +1100, Alexey Kardashevskiy wrote:
+Samuel Thibault, le dim. 27 janv. 2019 02:51:13 +0100, a ecrit:
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  slirp/ip.h       |  6 ++++--
+>  slirp/ip6.h      |  6 ++++--
+>  slirp/ip6_icmp.h | 12 +++++++-----
+>  slirp/util.h     | 25 +++++++++++++++++++++++++
+>  4 files changed, 40 insertions(+), 9 deletions(-)
 >=20
->=20
-> On 23/01/2019 04:01, Fabiano Rosas wrote:
-> > These will be used to let GDB know about PPC's Special Purpose
-> > Registers (SPR).
-> >=20
-> > They take an index based on the order the registers appear in the XML
-> > file sent by QEMU to GDB. This index does not match the actual
-> > location of the registers in the env->spr array so the
-> > gdb_find_spr_idx function does that conversion.
-> >=20
-> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> > ---
-> >  target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
-> >  1 file changed, 53 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> > index 710064a25d..f29ac3558a 100644
-> > --- a/target/ppc/translate_init.inc.c
-> > +++ b/target/ppc/translate_init.inc.c
-> > @@ -9487,6 +9487,55 @@ static bool avr_need_swap(CPUPPCState *env)
-> >  #endif
-> >  }
-> > =20
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +static int gdb_find_spr_idx(CPUPPCState *env, int n)
-> > +{
-> > +    int i;
-> > +
-> > +    for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-> > +        ppc_spr_t *spr =3D &env->spr_cb[i];
-> > +
-> > +        if (spr->name && spr->gdb_id =3D=3D n) {
-> > +            return i;
-> > +        }
-> > +    }
-> > +    return -1;
-> > +}
-> > +
-> > +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-> > +{
-> > +    int reg;
-> > +    int len;
-> > +
-> > +    reg =3D gdb_find_spr_idx(env, n);
-> > +    if (reg < 0) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    len =3D TARGET_LONG_SIZE;
-> > +    stn_p(mem_buf, len, env->spr[reg]);
-> > +    ppc_maybe_bswap_register(env, mem_buf, len);
->=20
->=20
-> I am confused by this as it produces different results depending on the
-> guest mode:
-
-
-Hm, yeah, I thought the bswap here looked odd, but it wasn't obvious
-to me if it was bogus here, or just a bogus gdb interface we have to
-work around.
-
-> (gdb) p $pvr
-> $1 =3D 0x14c0000000000
-> (gdb) c
-> Continuing.
-> Program received signal SIGINT, Interrupt.
-> (gdb) p $pvr
-> $2 =3D 0x4c0100
-
-But that behaviour definitely looks wrong.
-
-> First print is when I stopped the guest in the SLOF firmware (so it is
-> big-endian) and then I continued and stopped gdb when the guest booted a
-> little-endian system; the KVM host is little endian, the machine running
-> gdb is LE too.
->=20
-> QEMU monitor prints the same 0x4c0100 in both cases.
->=20
-> I am adding the inventor of maybe_bswap_register() in cc: for
-> assistance. Swapping happens:
-> - once for BE: after stn_p()
-> 	*(unsigned long *)mem_buf is 0x14c0000000000
-> - twice for LE.
->=20
->=20
->=20
->=20
->=20
-> > +    return len;
-> > +}
-> > +
-> > +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-> > +{
-> > +    int reg;
-> > +    int len;
-> > +
-> > +    reg =3D gdb_find_spr_idx(env, n);
-> > +    if (reg < 0) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    len =3D TARGET_LONG_SIZE;
-> > +    ppc_maybe_bswap_register(env, mem_buf, len);
-> > +    env->spr[reg] =3D ldn_p(mem_buf, len);
-> > +
-> > +    return len;
-> > +}
-> > +#endif
-> > +
-> >  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-> >  {
-> >      if (n < 32) {
-> > @@ -9716,7 +9765,10 @@ static void ppc_cpu_realize(DeviceState *dev, Er=
-ror **errp)
-> >          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
-> >                                   32, "power-vsx.xml", 0);
-> >      }
-> > -
-> > +#ifndef CONFIG_USER_ONLY
-> > +    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
-> > +                             pcc->gdb_num_sprs, "power-spr.xml", 0);
-> > +#endif
-> >      qemu_init_vcpu(cs);
-> > =20
-> >      pcc->parent_realize(dev, errp);
-> >=20
+> diff --git a/slirp/ip.h b/slirp/ip.h
+> index 2baeeb9a3a..77182e61a9 100644
+> --- a/slirp/ip.h
+> +++ b/slirp/ip.h
+> @@ -35,6 +35,8 @@
+> =20
+>  #include <glib.h>
+> =20
+> +#include "util.h"
+> +
+>  #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+>  # undef NTOHL
+>  # undef NTOHS
+> @@ -229,8 +231,8 @@ struct	ipasfrag {
+>  	struct ip ipf_ip;
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
+> -                  offsetof(struct ipasfrag, ipf_link));
+> +SLIRP_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
+> +                   offsetof(struct ipasfrag, ipf_link));
+> =20
+>  #define ipf_off      ipf_ip.ip_off
+>  #define ipf_tos      ipf_ip.ip_tos
+> diff --git a/slirp/ip6.h b/slirp/ip6.h
+> index 4e7c366505..3db099acef 100644
+> --- a/slirp/ip6.h
+> +++ b/slirp/ip6.h
+> @@ -8,6 +8,8 @@
+> =20
+>  #include <glib.h>
+> =20
+> +#include "util.h"
+> +
+>  #define ALLNODES_MULTICAST  { .s6_addr =3D \
+>                              { 0xff, 0x02, 0x00, 0x00,\
+>                              0x00, 0x00, 0x00, 0x00,\
+> @@ -152,7 +154,7 @@ struct ip6_pseudohdr {
+>   * If we marked the struct as packed then we would be unable to take
+>   * the address of any of the fields in it.
+>   */
+> -QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
+> -QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
+> =20
+>  #endif
+> diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+> index 3f44ed2f49..ea7fcfe5e6 100644
+> --- a/slirp/ip6_icmp.h
+> +++ b/slirp/ip6_icmp.h
+> @@ -6,6 +6,8 @@
+>  #ifndef SLIRP_IP6_ICMP_H
+>  #define SLIRP_IP6_ICMP_H
+> =20
+> +#include "util.h"
+> +
+>  /*
+>   * Interface Control Message Protocol version 6 Definitions.
+>   * Per RFC 4443, March 2006.
+> @@ -50,14 +52,14 @@ struct ndp_ra {     /* Router Advertisement Message=
+ */
+>      uint32_t retrans_time;  /* Retrans Timer */
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
+> =20
+>  struct ndp_ns {     /* Neighbor Solicitation Message */
+>      uint32_t reserved;
+>      struct in6_addr target; /* Target Address */
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
+> =20
+>  struct ndp_na {     /* Neighbor Advertisement Message */
+>  #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+> @@ -78,7 +80,7 @@ struct ndp_na {     /* Neighbor Advertisement Message=
+ */
+>      struct in6_addr target; /* Target Address */
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
+> =20
+>  struct ndp_redirect {
+>      uint32_t reserved;
+> @@ -86,7 +88,7 @@ struct ndp_redirect {
+>      struct in6_addr dest;   /* Destination Address */
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
+> =20
+>  /*
+>   * Structure of an icmpv6 header.
+> @@ -113,7 +115,7 @@ struct icmp6 {
+>  #define icmp6_redirect icmp6_body.ndp_redirect
+>  };
+> =20
+> -QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
+> +SLIRP_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
+> =20
+>  #define ICMP6_MINLEN    4
+>  #define ICMP6_ERROR_MINLEN  8
+> diff --git a/slirp/util.h b/slirp/util.h
+> index ef75804560..fc2c2e58fe 100644
+> --- a/slirp/util.h
+> +++ b/slirp/util.h
+> @@ -48,6 +48,31 @@
+>  # define SLIRP_PACKED __attribute__((packed))
+>  #endif
+> =20
+> +#ifndef glue
+> +#define xglue(x, y) x ## y
+> +#define glue(x, y) xglue(x, y)
+> +#endif
+> +
+> +#define SLIRP_BUILD_BUG_ON_STRUCT(x) \
+> +    struct { \
+> +        int:(x) ? -1 : 1; \
+> +    }
+> +
+> +/* SLIRP_BUILD_BUG_MSG() emits the message given if _Static_assert is
+> + * supported; otherwise, it will be omitted from the compiler error
+> + * message (but as it remains present in the source code, it can still
+> + * be useful when debugging). */
+> +#if defined(CONFIG_STATIC_ASSERT)
+> +#define SLIRP_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+> +#elif defined(__COUNTER__)
+> +#define SLIRP_BUILD_BUG_MSG(x, msg) typedef SLIRP_BUILD_BUG_ON_STRUCT(=
+x) \
+> +    glue(qemu_build_bug_on__, __COUNTER__) __attribute__((unused))
+> +#else
+> +#define SLIRP_BUILD_BUG_MSG(x, msg)
+> +#endif
+> +
+> +#define SLIRP_BUILD_BUG_ON(x) SLIRP_BUILD_BUG_MSG(x, "not expecting: "=
+ #x)
+> +
+>  #define SCALE_MS 1000000
+> =20
+>  #define ETH_ALEN    6
+> --=20
+> 2.20.1
 >=20
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---LpQ9ahxlCli8rRTG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxLvM0ACgkQbDjKyiDZ
-s5JuhQ//XcRTfnTG9TPDG0nQf5WFgulF4N2JX+S7ZZjIjKgYPeSb6ibeekT1AN/U
-v3v2VFq/DdzAqA3BC8OuEyA2yQQz4S3xRdLgPGKhGNUDT4jqCgwrVCvgBKUlgyq+
-kmuq5VqngoYKtJ/0tsO5pHWfWBIanljEmF2ux5R9eQudFlhQd5o78Q5o61V561+H
-DHfjoK6wPkwoaZ89VoZ1GBfPv/XIyXtqxtvnClOpp0JUr0msLW63jpMd+nH2ivc7
-anJzEfRoG100sxbvr0SkFgxzbeVeTp72iS4enT//yn5SdtCGD1UP6FNhuK7HCKkt
-UuE+xIktECWPqtMhuWmttV1QkjTauwTkDL7L9if1Tf3j/OELJ8eb+8uVoR2Bq40L
-2LafyldC1kQ/Bw/kMLVsx1CR94uu2XHLD88NnfAkcnFK3Qmv/5UdpXMGpNwVM0iO
-UfjDx6lxkMdW5VHvOo4RzDKLhSS8vwj8fYiZb6x+rKw7zJFotGwKgTI3Y+Va9gFT
-GeBdlI/DVe4LDvBCAQnt3js8Rr4ZwNSIitkLzfQ9AORBD+2KQCwcUeyRvYpENO1Y
-42Bl5jXADuEQoxUY/VjdbMxn1FnWzCk3P+fBzazadAbzXRg+7YYuOV49zeH5reHj
-NKfBGTyImZJNOckfFg6k9xicIZM+RzNJC4yTEctNMOwzMJBMEJA=
-=snXt
------END PGP SIGNATURE-----
-
---LpQ9ahxlCli8rRTG--
+Samuel
+Hi ! I'm a .signature virus ! Copy me into your ~/.signature, please !
