@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59103)
+Received: from eggs.gnu.org ([209.51.188.92]:40777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1gnaoc-0008K2-FL
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 22:08:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1gnc50-0001CY-Ot
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1gnaob-0001uK-Dt
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 22:08:58 -0500
-Date: Sun, 27 Jan 2019 12:08:53 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20190127030853.GV3235@lianli.shorne-pla.net>
-References: <1548252536-6242-1-git-send-email-thuth@redhat.com>
-	<1548252536-6242-3-git-send-email-thuth@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gnc4z-0004wL-TB
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:29:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gnc4z-0004vx-NK
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:29:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gnc4y-0002YC-0R
+	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 04:29:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFFD42E80C7
+	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 04:29:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1548252536-6242-3-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/openrisc: Fix LGPL version
- number
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 27 Jan 2019 04:17:34 -0000
+From: Launchpad Bug Tracker <1525123@bugs.launchpad.net>
+Reply-To: Bug 1525123 <1525123@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151211084346.25665.93589.malonedeb@gac.canonical.com>
+Message-Id: <154856265432.21534.1946367695365825954.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1525123] Re: USB assert failure on hcd-uhci.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, Jan 23, 2019 at 03:08:54PM +0100, Thomas Huth wrote:
-> It's either "GNU *Library* General Public version 2" or "GNU Lesser
-> General Public version *2.1*", but there was no "version 2.0" of the
-> "Lesser" library. So assume that version 2.1 is meant here.
-> 
-> Cc: Stafford Horne <shorne@gmail.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/openrisc/cpu.c              | 2 +-
->  target/openrisc/exception.h        | 2 +-
->  target/openrisc/gdbstub.c          | 2 +-
->  target/openrisc/helper.h           | 2 +-
->  target/openrisc/interrupt_helper.c | 2 +-
->  target/openrisc/sys_helper.c       | 2 +-
->  target/openrisc/translate.c        | 2 +-
->  7 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-> index fb7cb5c..541b2a6 100644
-> --- a/target/openrisc/cpu.c
-> +++ b/target/openrisc/cpu.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/exception.h b/target/openrisc/exception.h
-> index 4ec56b4..c9c4e47 100644
-> --- a/target/openrisc/exception.h
-> +++ b/target/openrisc/exception.h
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/gdbstub.c b/target/openrisc/gdbstub.c
-> index f9af650..43b1a18 100644
-> --- a/target/openrisc/gdbstub.c
-> +++ b/target/openrisc/gdbstub.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-> index 9db9bf3..96d79a8 100644
-> --- a/target/openrisc/helper.h
-> +++ b/target/openrisc/helper.h
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-> index 9c5489f..ab4ea88 100644
-> --- a/target/openrisc/interrupt_helper.c
-> +++ b/target/openrisc/interrupt_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-> index b66a45c..05f66c4 100644
-> --- a/target/openrisc/sys_helper.c
-> +++ b/target/openrisc/sys_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-> index c089914..89680f8 100644
-> --- a/target/openrisc/translate.c
-> +++ b/target/openrisc/translate.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+[Expired for QEMU because there has been no activity for 60 days.]
 
-All of this looks ok to me, though I didn't the licenses:
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Acked-by: Stafford Horne <shorne@gmail.com>
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1525123
+
+Title:
+  USB assert failure on hcd-uhci.c
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  When inserting the attached kernel moudle in the guest OS, QEMU quits
+  with therse assert failure:
+
+  [insert kernel module in guest root shell]
+  root@qemu:~# insmod mymod.ko
+  root@qemu:~#
+  Connection closed by foreign host.
+
+  [host message]
+  qemu-system-x86_64: hw/usb/core.c:718: usb_ep_get: Assertion `pid =3D=3D =
+0x69 || pid =3D=3D 0xe1' failed.
+  Aborted
+
+  The direct cause of this bug is due to misimplementation of UHCI.
+  According to Intel's UHCI design guide, packet identification in transfer=
+ descriptor must be one of these three values : IN (69h), OUT (E1h), and SE=
+TUP (2Dh). Any other value in this field must cause the HALT of only HOST C=
+ONTROLLER.
+
+  However, due to misimplementation in uhci_handle_td, instead of host
+  controller being halted, QEMU itself dies with assertion failure. The
+  assertion code is in usb_ep_get():718, which is called during
+  uhci_handle_td().
+
+  Another issue resides in uhci_handle_td(). This function must check
+  that transfer descriptor's pid is one of IN, OUT, SETUP before calling
+  usb_ep_get() or other functions. If it does so, usb_ep_get() only
+  needs to check if pid is not SETUP.
+
+  This kind of assert failure can be misused by malwares to avoid being
+  analyzed by terminating only in the virtual environments and still
+  execute the malicious code in real machines.
+
+  =
+
+  [How to run exploit code]
+  Prepare linux kernel's source header, then type these lines in root shell.
+  # make
+  # insmod mymod.ko
+
+  It needs uhci-hcd.h from linux kernel source.
+  I attached linux 3.18.24's uhci-hcd.h for tempory measure; You should get=
+ proper version of uhci-hcd.h.
+  In the following envrionment, this exploit worked, exiting whole QEMU, no=
+t only USB.
+
+  QEMU was running on these environment :
+  [CPU model] Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
+  [qemu version] QEMU 2.5.0-rc3 (compiled from source, gcc 4.8.4)
+  [host info] Ubuntu 14.04.3, x86_64, 3.19.0-32-generic
+  [guest info] Ubuntu 14.04.3, x86_64, 3.19.0-28-generic
+  [QEMU argument]
+  x86_64-softmmu/qemu-system-x86_64 -hda /media/hdd/img/ubuntu1404.qcow2 \
+  =C2=A0-m 512 \
+  =C2=A0--usbdevice disk:format=3Dqcow2:../usb.img \
+  =C2=A0--enable-kvm
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1525123/+subscriptions
