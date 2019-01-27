@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52623)
+Received: from eggs.gnu.org ([209.51.188.92]:52608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCE-0001Qg-VB
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCE-0001QF-Mh
 	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCB-0007S5-NR
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCD-0007UR-0F
 	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:54 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:46442)
+Received: from hera.aquilenet.fr ([185.233.100.1]:46470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnjCB-0007PG-AA
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:51 -0500
+	id 1gnjCC-0007Rn-Jx
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:52 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 27 Jan 2019 13:05:09 +0100
-Message-Id: <20190127120526.15457-15-samuel.thibault@ens-lyon.org>
+Date: Sun, 27 Jan 2019 13:05:18 +0100
+Message-Id: <20190127120526.15457-24-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 References: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/31] slirp: replace qemu_notify_event() with a
- callback
+Subject: [Qemu-devel] [PULL 23/31] slirp: replace QEMU_BUILD_BUG_ON with
+ G_STATIC_ASSERT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +29,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Introduce a SlirpCb callback to kick the main io-thread.
-
-Add an intermediary sodrop() function that will call SlirpCb.notify
-callback when sbdrop() returns true.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- net/slirp.c       | 1 +
- slirp/libslirp.h  | 2 ++
- slirp/sbuf.c      | 6 ++++--
- slirp/sbuf.h      | 2 +-
- slirp/socket.c    | 7 +++++++
- slirp/socket.h    | 1 +
- slirp/tcp_input.c | 6 +++---
- 7 files changed, 19 insertions(+), 6 deletions(-)
+ slirp/ip.h       |  4 ++--
+ slirp/ip6.h      |  4 ++--
+ slirp/ip6_icmp.h | 10 +++++-----
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 78ba96b63f..7b4f9f5c5e 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -205,6 +205,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_mod =3D net_slirp_timer_mod,
-     .register_poll_fd =3D net_slirp_register_poll_fd,
-     .unregister_poll_fd =3D net_slirp_unregister_poll_fd,
-+    .notify =3D qemu_notify_event,
+diff --git a/slirp/ip.h b/slirp/ip.h
+index 2baeeb9a3a..73a4d2a3d2 100644
+--- a/slirp/ip.h
++++ b/slirp/ip.h
+@@ -229,8 +229,8 @@ struct	ipasfrag {
+ 	struct ip ipf_ip;
  };
 =20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 8ce69f0be3..679a25422b 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -31,6 +31,8 @@ typedef struct SlirpCb {
-     void (*register_poll_fd)(int fd);
-     /* Unregister a fd */
-     void (*unregister_poll_fd)(int fd);
-+    /* Kick the io-thread, to signal that new events may be processed */
-+    void (*notify)(void);
- } SlirpCb;
+-QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
+-                  offsetof(struct ipasfrag, ipf_link));
++G_STATIC_ASSERT(offsetof(struct ipq, frag_link) =3D=3D
++                offsetof(struct ipasfrag, ipf_link));
 =20
+ #define ipf_off      ipf_ip.ip_off
+ #define ipf_tos      ipf_ip.ip_tos
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 4e7c366505..5361bd7449 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -152,7 +152,7 @@ struct ip6_pseudohdr {
+  * If we marked the struct as packed then we would be unable to take
+  * the address of any of the fields in it.
+  */
+-QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
+-QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
++G_STATIC_ASSERT(sizeof(struct ip6) =3D=3D 40);
++G_STATIC_ASSERT(sizeof(struct ip6_pseudohdr) =3D=3D 40);
 =20
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index 912f235f65..17f28e97a6 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -17,7 +17,7 @@ sbfree(struct sbuf *sb)
- 	free(sb->sb_data);
- }
-=20
--void
-+bool
- sbdrop(struct sbuf *sb, int num)
- {
-     int limit =3D sb->sb_datalen / 2;
-@@ -34,8 +34,10 @@ sbdrop(struct sbuf *sb, int num)
- 		sb->sb_rptr -=3D sb->sb_datalen;
-=20
-     if (sb->sb_cc < limit && sb->sb_cc + num >=3D limit) {
--        qemu_notify_event();
-+        return true;
-     }
-+
-+    return false;
- }
-=20
- void
-diff --git a/slirp/sbuf.h b/slirp/sbuf.h
-index 644c201341..1cb9a42834 100644
---- a/slirp/sbuf.h
-+++ b/slirp/sbuf.h
-@@ -21,7 +21,7 @@ struct sbuf {
+ #endif
+diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+index 3f44ed2f49..e8ed753db5 100644
+--- a/slirp/ip6_icmp.h
++++ b/slirp/ip6_icmp.h
+@@ -50,14 +50,14 @@ struct ndp_ra {     /* Router Advertisement Message *=
+/
+     uint32_t retrans_time;  /* Retrans Timer */
  };
 =20
- void sbfree(struct sbuf *);
--void sbdrop(struct sbuf *, int);
-+bool sbdrop(struct sbuf *, int);
- void sbreserve(struct sbuf *, int);
- void sbappend(struct socket *, struct mbuf *);
- void sbcopy(struct sbuf *, int, int, char *);
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 5805d30f3d..2e8dc22fb6 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -928,3 +928,10 @@ void sotranslate_accept(struct socket *so)
-         break;
-     }
- }
-+
-+void sodrop(struct socket *s, int num)
-+{
-+    if (sbdrop(&s->so_snd, num)) {
-+        s->slirp->cb->notify();
-+    }
-+}
-diff --git a/slirp/socket.h b/slirp/socket.h
-index fc35ca5f72..1c1c8b5871 100644
---- a/slirp/socket.h
-+++ b/slirp/socket.h
-@@ -156,6 +156,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
- size);
- void sotranslate_out(struct socket *, struct sockaddr_storage *);
- void sotranslate_in(struct socket *, struct sockaddr_storage *);
- void sotranslate_accept(struct socket *);
-+void sodrop(struct socket *, int num);
+-QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
++G_STATIC_ASSERT(sizeof(struct ndp_ra) =3D=3D 12);
 =20
+ struct ndp_ns {     /* Neighbor Solicitation Message */
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+ };
 =20
- #endif /* SLIRP_SOCKET_H */
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index de5b74a52b..7c1fe18fec 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -506,7 +506,7 @@ findso:
- 				    SEQ_GT(ti->ti_ack, tp->t_rtseq))
- 					tcp_xmit_timer(tp, tp->t_rtt);
- 				acked =3D ti->ti_ack - tp->snd_una;
--				sbdrop(&so->so_snd, acked);
-+				sodrop(so, acked);
- 				tp->snd_una =3D ti->ti_ack;
- 				m_free(m);
+-QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
++G_STATIC_ASSERT(sizeof(struct ndp_ns) =3D=3D 20);
 =20
-@@ -1118,10 +1118,10 @@ trimthenstep6:
- 		}
- 		if (acked > so->so_snd.sb_cc) {
- 			tp->snd_wnd -=3D so->so_snd.sb_cc;
--			sbdrop(&so->so_snd, (int )so->so_snd.sb_cc);
-+			sodrop(so, (int)so->so_snd.sb_cc);
- 			ourfinisacked =3D 1;
- 		} else {
--			sbdrop(&so->so_snd, acked);
-+			sodrop(so, acked);
- 			tp->snd_wnd -=3D acked;
- 			ourfinisacked =3D 0;
- 		}
+ struct ndp_na {     /* Neighbor Advertisement Message */
+ #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+@@ -78,7 +78,7 @@ struct ndp_na {     /* Neighbor Advertisement Message *=
+/
+     struct in6_addr target; /* Target Address */
+ };
+=20
+-QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
++G_STATIC_ASSERT(sizeof(struct ndp_na) =3D=3D 20);
+=20
+ struct ndp_redirect {
+     uint32_t reserved;
+@@ -86,7 +86,7 @@ struct ndp_redirect {
+     struct in6_addr dest;   /* Destination Address */
+ };
+=20
+-QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
++G_STATIC_ASSERT(sizeof(struct ndp_redirect) =3D=3D 36);
+=20
+ /*
+  * Structure of an icmpv6 header.
+@@ -113,7 +113,7 @@ struct icmp6 {
+ #define icmp6_redirect icmp6_body.ndp_redirect
+ };
+=20
+-QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
++G_STATIC_ASSERT(sizeof(struct icmp6) =3D=3D 40);
+=20
+ #define ICMP6_MINLEN    4
+ #define ICMP6_ERROR_MINLEN  8
 --=20
 2.20.1
