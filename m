@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52903)
+Received: from eggs.gnu.org ([209.51.188.92]:52883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCS-0001co-KM
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:10 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCR-0001c6-PJ
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCO-0007k0-Ov
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:08 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:43456)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCN-0007gk-7h
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:07 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:46480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnjCO-0007VE-Au
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:04 -0500
+	id 1gnjCM-0007Sd-PD
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:03 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 27 Jan 2019 13:05:25 +0100
-Message-Id: <20190127120526.15457-31-samuel.thibault@ens-lyon.org>
+Date: Sun, 27 Jan 2019 13:05:22 +0100
+Message-Id: <20190127120526.15457-28-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 References: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/31] slirp: pass opaque to all callbacks
+Subject: [Qemu-devel] [PULL 27/31] slirp: replace global polling with
+ per-instance & notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,390 +33,903 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This is friendlier for FFI bindings.
+Remove hard-coded dependency on slirp in main-loop, and use a "poll"
+notifier instead. The notifier is registered per slirp instance.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      | 25 ++++++++++++++++---------
- slirp/dhcpv6.c   |  2 +-
- slirp/if.c       |  2 +-
- slirp/ip6_icmp.c | 15 +++++++++------
- slirp/ip_icmp.c  |  2 +-
- slirp/libslirp.h | 16 ++++++++--------
- slirp/misc.c     |  2 +-
- slirp/slirp.c    | 13 ++++++-------
- slirp/socket.c   |  2 +-
- slirp/tcp_subr.c |  8 ++++----
- slirp/udp.c      |  2 +-
- 11 files changed, 49 insertions(+), 40 deletions(-)
+ include/qemu/main-loop.h |  15 ++
+ net/slirp.c              |  24 ++
+ slirp/libslirp.h         |   4 +-
+ slirp/slirp.c            | 555 +++++++++++++++++++--------------------
+ stubs/Makefile.objs      |   1 -
+ stubs/slirp.c            |  13 -
+ util/main-loop.c         |  30 ++-
+ 7 files changed, 333 insertions(+), 309 deletions(-)
+ delete mode 100644 stubs/slirp.c
 
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index e59f9ae1e9..f6ba78ea73 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -302,4 +302,19 @@ void qemu_fd_register(int fd);
+ QEMUBH *qemu_bh_new(QEMUBHFunc *cb, void *opaque);
+ void qemu_bh_schedule_idle(QEMUBH *bh);
+=20
++enum {
++    MAIN_LOOP_POLL_FILL,
++    MAIN_LOOP_POLL_ERR,
++    MAIN_LOOP_POLL_OK,
++};
++
++typedef struct MainLoopPoll {
++    int state;
++    uint32_t timeout;
++    GArray *pollfds;
++} MainLoopPoll;
++
++void main_loop_poll_add_notifier(Notifier *notify);
++void main_loop_poll_remove_notifier(Notifier *notify);
++
+ #endif
 diff --git a/net/slirp.c b/net/slirp.c
-index a85e42ff43..7a16d8d615 100644
+index 664ff1c002..4d55f64168 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -161,44 +161,51 @@ static NetClientInfo net_slirp_info =3D {
-     .cleanup =3D net_slirp_cleanup,
+@@ -86,6 +86,7 @@ typedef struct SlirpState {
+     NetClientState nc;
+     QTAILQ_ENTRY(SlirpState) entry;
+     Slirp *slirp;
++    Notifier poll_notifier;
+     Notifier exit_notifier;
+ #ifndef _WIN32
+     gchar *smb_dir;
+@@ -144,6 +145,7 @@ static void net_slirp_cleanup(NetClientState *nc)
+     SlirpState *s =3D DO_UPCAST(SlirpState, nc, nc);
+=20
+     g_slist_free_full(s->fwd, slirp_free_fwd);
++    main_loop_poll_remove_notifier(&s->poll_notifier);
+     slirp_cleanup(s->slirp);
+     if (s->exit_notifier.notify) {
+         qemu_remove_exit_notifier(&s->exit_notifier);
+@@ -209,6 +211,25 @@ static const SlirpCb slirp_cb =3D {
+     .notify =3D qemu_notify_event,
  };
 =20
--static void net_slirp_guest_error(const char *msg)
-+static void net_slirp_guest_error(const char *msg, void *opaque)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "%s", msg);
- }
-=20
--static int64_t net_slirp_clock_get_ns(void)
-+static int64_t net_slirp_clock_get_ns(void *opaque)
- {
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- }
-=20
--static void *net_slirp_timer_new(SlirpTimerCb cb, void *opaque)
-+static void *net_slirp_timer_new(SlirpTimerCb cb,
-+                                 void *cb_opaque, void *opaque)
- {
-     return timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-                           SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
--                          cb, opaque);
-+                          cb, cb_opaque);
- }
-=20
--static void net_slirp_timer_free(void *timer)
-+static void net_slirp_timer_free(void *timer, void *opaque)
- {
-     timer_del(timer);
-     timer_free(timer);
- }
-=20
--static void net_slirp_timer_mod(void *timer, int64_t expire_timer)
-+static void net_slirp_timer_mod(void *timer, int64_t expire_timer,
-+                                void *opaque)
- {
-     timer_mod(timer, expire_timer);
- }
-=20
--static void net_slirp_register_poll_fd(int fd)
-+static void net_slirp_register_poll_fd(int fd, void *opaque)
- {
-     qemu_fd_register(fd);
- }
-=20
--static void net_slirp_unregister_poll_fd(int fd)
-+static void net_slirp_unregister_poll_fd(int fd, void *opaque)
- {
-     /* no qemu_fd_unregister */
- }
-=20
-+static void net_slirp_notify(void *opaque)
++static void net_slirp_poll_notify(Notifier *notifier, void *data)
 +{
-+    qemu_notify_event();
++    MainLoopPoll *poll =3D data;
++    SlirpState *s =3D container_of(notifier, SlirpState, poll_notifier);
++
++    switch (poll->state) {
++    case MAIN_LOOP_POLL_FILL:
++        slirp_pollfds_fill(s->slirp, poll->pollfds, &poll->timeout);
++        break;
++    case MAIN_LOOP_POLL_OK:
++    case MAIN_LOOP_POLL_ERR:
++        slirp_pollfds_poll(s->slirp, poll->pollfds,
++                           poll->state =3D=3D MAIN_LOOP_POLL_ERR);
++        break;
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
- static const SlirpCb slirp_cb =3D {
-     .send_packet =3D net_slirp_send_packet,
-     .guest_error =3D net_slirp_guest_error,
-@@ -208,7 +215,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_mod =3D net_slirp_timer_mod,
-     .register_poll_fd =3D net_slirp_register_poll_fd,
-     .unregister_poll_fd =3D net_slirp_unregister_poll_fd,
--    .notify =3D qemu_notify_event,
-+    .notify =3D net_slirp_notify,
- };
+ static int net_slirp_init(NetClientState *peer, const char *model,
+                           const char *name, int restricted,
+                           bool ipv4, const char *vnetwork, const char *v=
+host,
+@@ -429,6 +450,9 @@ static int net_slirp_init(NetClientState *peer, const=
+ char *model,
+                           &slirp_cb, s);
+     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
 =20
- static int slirp_poll_to_gio(int events)
-diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
-index 9ffba38e8f..e655c7d5b1 100644
---- a/slirp/dhcpv6.c
-+++ b/slirp/dhcpv6.c
-@@ -59,7 +59,7 @@ static int dhcpv6_parse_info_request(Slirp *slirp, uint=
-8_t *odata, int olen,
-         int len =3D odata[2] << 8 | odata[3];
-=20
-         if (len + 4 > olen) {
--            slirp->cb->guest_error("Guest sent bad DHCPv6 packet!");
-+            slirp->cb->guest_error("Guest sent bad DHCPv6 packet!", slir=
-p->opaque);
-             return -E2BIG;
-         }
-=20
-diff --git a/slirp/if.c b/slirp/if.c
-index 2ad03b8a79..1830cc396c 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -146,7 +146,7 @@ diddit:
-  */
- void if_start(Slirp *slirp)
- {
--    uint64_t now =3D slirp->cb->clock_get_ns();
-+    uint64_t now =3D slirp->cb->clock_get_ns(slirp->opaque);
-     bool from_batchq =3D false;
-     struct mbuf *ifm, *ifm_next, *ifqt;
-=20
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 2a432ebbd4..c1e3d30470 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -14,7 +14,8 @@ static void ra_timer_handler(void *opaque)
-     Slirp *slirp =3D opaque;
-=20
-     slirp->cb->timer_mod(slirp->ra_timer,
--                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-+        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
-,
-+        slirp->opaque);
-     ndp_send_ra(slirp);
- }
-=20
-@@ -24,9 +25,10 @@ void icmp6_init(Slirp *slirp)
-         return;
-     }
-=20
--    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp);
-+    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp, sl=
-irp->opaque);
-     slirp->cb->timer_mod(slirp->ra_timer,
--                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-+        slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS + NDP_Interval=
-,
-+        slirp->opaque);
- }
-=20
- void icmp6_cleanup(Slirp *slirp)
-@@ -35,7 +37,7 @@ void icmp6_cleanup(Slirp *slirp)
-         return;
-     }
-=20
--    slirp->cb->timer_free(slirp->ra_timer);
-+    slirp->cb->timer_free(slirp->ra_timer, slirp->opaque);
- }
-=20
- static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip=
-6 *ip,
-@@ -334,7 +336,8 @@ static void ndp_input(struct mbuf *m, Slirp *slirp, s=
-truct ip6 *ip,
-=20
-     case ICMP6_NDP_RA:
-         DEBUG_CALL(" type =3D Router Advertisement");
--        slirp->cb->guest_error("Warning: guest sent NDP RA, but shouldn'=
-t");
-+        slirp->cb->guest_error("Warning: guest sent NDP RA, but shouldn'=
-t",
-+                               slirp->opaque);
-         break;
-=20
-     case ICMP6_NDP_NS:
-@@ -368,7 +371,7 @@ static void ndp_input(struct mbuf *m, Slirp *slirp, s=
-truct ip6 *ip,
-     case ICMP6_NDP_REDIRECT:
-         DEBUG_CALL(" type =3D Redirect");
-         slirp->cb->guest_error(
--            "Warning: guest sent NDP REDIRECT, but shouldn't");
-+            "Warning: guest sent NDP REDIRECT, but shouldn't", slirp->op=
-aque);
-         break;
-     }
- }
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 7c5cb75ae5..ce79c0b051 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -113,7 +113,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
-m, int hlen)
-=20
- void icmp_detach(struct socket *so)
- {
--    so->slirp->cb->unregister_poll_fd(so->s);
-+    so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-     slirp_closesocket(so->s);
-     sofree(so);
- }
++    s->poll_notifier.notify =3D net_slirp_poll_notify;
++    main_loop_poll_add_notifier(&s->poll_notifier);
++
+     for (config =3D slirp_configs; config; config =3D config->next) {
+         if (config->flags & SLIRP_CFG_HOSTFWD) {
+             if (slirp_hostfwd(s, config->str, errp) < 0) {
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index b5c1b2122b..9b13d8250c 100644
+index 8e5d4ed11b..18d5fb0133 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -40,21 +40,21 @@ typedef struct SlirpCb {
-      */
-     SlirpWriteCb send_packet;
-     /* Print a message for an error due to guest misbehavior.  */
--    void (*guest_error)(const char *msg);
-+    void (*guest_error)(const char *msg, void *opaque);
-     /* Return the virtual clock value in nanoseconds */
--    int64_t (*clock_get_ns)(void);
-+    int64_t (*clock_get_ns)(void *opaque);
-     /* Create a new timer with the given callback and opaque data */
--    void *(*timer_new)(SlirpTimerCb cb, void *opaque);
-+    void *(*timer_new)(SlirpTimerCb cb, void *cb_opaque, void *opaque);
-     /* Remove and free a timer */
--    void (*timer_free)(void *timer);
-+    void (*timer_free)(void *timer, void *opaque);
-     /* Modify a timer to expire at @expire_time */
--    void (*timer_mod)(void *timer, int64_t expire_time);
-+    void (*timer_mod)(void *timer, int64_t expire_time, void *opaque);
-     /* Register a fd for future polling */
--    void (*register_poll_fd)(int fd);
-+    void (*register_poll_fd)(int fd, void *opaque);
-     /* Unregister a fd */
--    void (*unregister_poll_fd)(int fd);
-+    void (*unregister_poll_fd)(int fd, void *opaque);
-     /* Kick the io-thread, to signal that new events may be processed */
--    void (*notify)(void);
-+    void (*notify)(void *opaque);
- } SlirpCb;
+@@ -63,9 +63,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, stru=
+ct in_addr vnetwork,
+                   void *opaque);
+ void slirp_cleanup(Slirp *slirp);
 =20
+-void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
++void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
+);
 =20
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 4662071be0..edb0d187d7 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -160,7 +160,7 @@ fork_exec(struct socket *so, const char *ex)
-     opt =3D 1;
-     slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
+-void slirp_pollfds_poll(GArray *pollfds, int select_error);
++void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)=
 ;
-     slirp_set_nonblock(so->s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     return 1;
- }
+=20
+ void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
 =20
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 04886d05fd..93b2cd0141 100644
+index 60cd8249bf..a0de8b711c 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -289,6 +289,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
-ruct in_addr vnetwork,
+@@ -368,9 +368,8 @@ void slirp_cleanup(Slirp *slirp)
+ #define CONN_CANFSEND(so) (((so)->so_state & (SS_FCANTSENDMORE|SS_ISFCON=
+NECTED)) =3D=3D SS_ISFCONNECTED)
+ #define CONN_CANFRCV(so) (((so)->so_state & (SS_FCANTRCVMORE|SS_ISFCONNE=
+CTED)) =3D=3D SS_ISFCONNECTED)
 =20
-     slirp_init_once();
+-static void slirp_update_timeout(uint32_t *timeout)
++static void slirp_update_timeout(Slirp *slirp, uint32_t *timeout)
+ {
+-    Slirp *slirp;
+     uint32_t t;
 =20
-+    slirp->opaque =3D opaque;
-     slirp->cb =3D callbacks;
-     slirp->grand =3D g_rand_new();
-     slirp->restricted =3D restricted;
-@@ -325,12 +326,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, s=
-truct in_addr vnetwork,
-         translate_dnssearch(slirp, vdnssearch);
+     if (*timeout <=3D TIMEOUT_FAST) {
+@@ -382,370 +381,352 @@ static void slirp_update_timeout(uint32_t *timeou=
+t)
+     /* If we have tcp timeout with slirp, then we will fill @timeout wit=
+h
+      * more precise value.
+      */
+-    QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
+-        if (slirp->time_fasttimo) {
+-            *timeout =3D TIMEOUT_FAST;
+-            return;
+-        }
+-        if (slirp->do_slowtimo) {
+-            t =3D MIN(TIMEOUT_SLOW, t);
+-        }
++    if (slirp->time_fasttimo) {
++        *timeout =3D TIMEOUT_FAST;
++        return;
++    }
++    if (slirp->do_slowtimo) {
++        t =3D MIN(TIMEOUT_SLOW, t);
      }
-=20
--    slirp->opaque =3D opaque;
--
- #ifdef WITH_QEMU
-     slirp_state_register(slirp);
- #endif
--
-     return slirp;
+     *timeout =3D t;
  }
 =20
-@@ -537,7 +535,7 @@ void slirp_pollfds_poll(Slirp *slirp, int select_erro=
-r,
+-void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout)
++void slirp_pollfds_fill(Slirp *slirp, GArray *pollfds, uint32_t *timeout=
+)
+ {
+-    Slirp *slirp;
+     struct socket *so, *so_next;
+=20
+-    if (QTAILQ_EMPTY(&slirp_instances)) {
+-        return;
+-    }
+-
+     /*
+      * First, TCP sockets
+      */
+=20
+-    QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
+-        /*
+-         * *_slowtimo needs calling if there are IP fragments
+-         * in the fragment queue, or there are TCP connections active
+-         */
+-        slirp->do_slowtimo =3D ((slirp->tcb.so_next !=3D &slirp->tcb) ||
+-                (&slirp->ipq.ip_link !=3D slirp->ipq.ip_link.next));
+-
+-        for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb;
+-                so =3D so_next) {
+-            int events =3D 0;
+-
+-            so_next =3D so->so_next;
++    /*
++     * *_slowtimo needs calling if there are IP fragments
++     * in the fragment queue, or there are TCP connections active
++     */
++    slirp->do_slowtimo =3D ((slirp->tcb.so_next !=3D &slirp->tcb) ||
++                          (&slirp->ipq.ip_link !=3D slirp->ipq.ip_link.n=
+ext));
+=20
+-            so->pollfds_idx =3D -1;
++    for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so_next)=
+ {
++        int events =3D 0;
+=20
+-            /*
+-             * See if we need a tcp_fasttimo
+-             */
+-            if (slirp->time_fasttimo =3D=3D 0 &&
+-                so->so_tcpcb->t_flags & TF_DELACK) {
+-                slirp->time_fasttimo =3D curtime; /* Flag when want a fa=
+sttimo */
+-            }
++        so_next =3D so->so_next;
+=20
+-            /*
+-             * NOFDREF can include still connecting to local-host,
+-             * newly socreated() sockets etc. Don't want to select these=
+.
+-             */
+-            if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
+-                continue;
+-            }
++        so->pollfds_idx =3D -1;
+=20
+-            /*
+-             * Set for reading sockets which are accepting
+-             */
+-            if (so->so_state & SS_FACCEPTCONN) {
+-                GPollFD pfd =3D {
+-                    .fd =3D so->s,
+-                    .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-                };
+-                so->pollfds_idx =3D pollfds->len;
+-                g_array_append_val(pollfds, pfd);
+-                continue;
+-            }
++        /*
++         * See if we need a tcp_fasttimo
++         */
++        if (slirp->time_fasttimo =3D=3D 0 &&
++            so->so_tcpcb->t_flags & TF_DELACK) {
++            slirp->time_fasttimo =3D curtime; /* Flag when want a fastti=
+mo */
++        }
+=20
+-            /*
+-             * Set for writing sockets which are connecting
+-             */
+-            if (so->so_state & SS_ISFCONNECTING) {
+-                GPollFD pfd =3D {
+-                    .fd =3D so->s,
+-                    .events =3D G_IO_OUT | G_IO_ERR,
+-                };
+-                so->pollfds_idx =3D pollfds->len;
+-                g_array_append_val(pollfds, pfd);
+-                continue;
+-            }
++        /*
++         * NOFDREF can include still connecting to local-host,
++         * newly socreated() sockets etc. Don't want to select these.
++         */
++        if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
++            continue;
++        }
+=20
+-            /*
+-             * Set for writing if we are connected, can send more, and
+-             * we have something to send
+-             */
+-            if (CONN_CANFSEND(so) && so->so_rcv.sb_cc) {
+-                events |=3D G_IO_OUT | G_IO_ERR;
+-            }
++        /*
++         * Set for reading sockets which are accepting
++         */
++        if (so->so_state & SS_FACCEPTCONN) {
++            GPollFD pfd =3D {
++                .fd =3D so->s,
++                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
++            };
++            so->pollfds_idx =3D pollfds->len;
++            g_array_append_val(pollfds, pfd);
++            continue;
++        }
+=20
+-            /*
+-             * Set for reading (and urgent data) if we are connected, ca=
+n
+-             * receive more, and we have room for it XXX /2 ?
+-             */
+-            if (CONN_CANFRCV(so) &&
+-                (so->so_snd.sb_cc < (so->so_snd.sb_datalen/2))) {
+-                events |=3D G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI;
+-            }
++        /*
++         * Set for writing sockets which are connecting
++         */
++        if (so->so_state & SS_ISFCONNECTING) {
++            GPollFD pfd =3D {
++                .fd =3D so->s,
++                .events =3D G_IO_OUT | G_IO_ERR,
++            };
++            so->pollfds_idx =3D pollfds->len;
++            g_array_append_val(pollfds, pfd);
++            continue;
++        }
+=20
+-            if (events) {
+-                GPollFD pfd =3D {
+-                    .fd =3D so->s,
+-                    .events =3D events,
+-                };
+-                so->pollfds_idx =3D pollfds->len;
+-                g_array_append_val(pollfds, pfd);
+-            }
++        /*
++         * Set for writing if we are connected, can send more, and
++         * we have something to send
++         */
++        if (CONN_CANFSEND(so) && so->so_rcv.sb_cc) {
++            events |=3D G_IO_OUT | G_IO_ERR;
+         }
+=20
+         /*
+-         * UDP sockets
++         * Set for reading (and urgent data) if we are connected, can
++         * receive more, and we have room for it XXX /2 ?
+          */
+-        for (so =3D slirp->udb.so_next; so !=3D &slirp->udb;
+-                so =3D so_next) {
+-            so_next =3D so->so_next;
++        if (CONN_CANFRCV(so) &&
++            (so->so_snd.sb_cc < (so->so_snd.sb_datalen/2))) {
++            events |=3D G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI;
++        }
+=20
+-            so->pollfds_idx =3D -1;
++        if (events) {
++            GPollFD pfd =3D {
++                .fd =3D so->s,
++                .events =3D events,
++            };
++            so->pollfds_idx =3D pollfds->len;
++            g_array_append_val(pollfds, pfd);
++        }
++    }
+=20
+-            /*
+-             * See if it's timed out
+-             */
+-            if (so->so_expire) {
+-                if (so->so_expire <=3D curtime) {
+-                    udp_detach(so);
+-                    continue;
+-                } else {
+-                    slirp->do_slowtimo =3D true; /* Let socket expire */
+-                }
+-            }
++    /*
++     * UDP sockets
++     */
++    for (so =3D slirp->udb.so_next; so !=3D &slirp->udb; so =3D so_next)=
+ {
++        so_next =3D so->so_next;
+=20
+-            /*
+-             * When UDP packets are received from over the
+-             * link, they're sendto()'d straight away, so
+-             * no need for setting for writing
+-             * Limit the number of packets queued by this session
+-             * to 4.  Note that even though we try and limit this
+-             * to 4 packets, the session could have more queued
+-             * if the packets needed to be fragmented
+-             * (XXX <=3D 4 ?)
+-             */
+-            if ((so->so_state & SS_ISFCONNECTED) && so->so_queued <=3D 4=
+) {
+-                GPollFD pfd =3D {
+-                    .fd =3D so->s,
+-                    .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-                };
+-                so->pollfds_idx =3D pollfds->len;
+-                g_array_append_val(pollfds, pfd);
++        so->pollfds_idx =3D -1;
++
++        /*
++         * See if it's timed out
++         */
++        if (so->so_expire) {
++            if (so->so_expire <=3D curtime) {
++                udp_detach(so);
++                continue;
++            } else {
++                slirp->do_slowtimo =3D true; /* Let socket expire */
+             }
+         }
+=20
+         /*
+-         * ICMP sockets
++         * When UDP packets are received from over the
++         * link, they're sendto()'d straight away, so
++         * no need for setting for writing
++         * Limit the number of packets queued by this session
++         * to 4.  Note that even though we try and limit this
++         * to 4 packets, the session could have more queued
++         * if the packets needed to be fragmented
++         * (XXX <=3D 4 ?)
+          */
+-        for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp;
+-                so =3D so_next) {
+-            so_next =3D so->so_next;
++        if ((so->so_state & SS_ISFCONNECTED) && so->so_queued <=3D 4) {
++            GPollFD pfd =3D {
++                .fd =3D so->s,
++                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
++            };
++            so->pollfds_idx =3D pollfds->len;
++            g_array_append_val(pollfds, pfd);
++        }
++    }
+=20
+-            so->pollfds_idx =3D -1;
++    /*
++     * ICMP sockets
++     */
++    for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp; so =3D so_nex=
+t) {
++        so_next =3D so->so_next;
+=20
+-            /*
+-             * See if it's timed out
+-             */
+-            if (so->so_expire) {
+-                if (so->so_expire <=3D curtime) {
+-                    icmp_detach(so);
+-                    continue;
+-                } else {
+-                    slirp->do_slowtimo =3D true; /* Let socket expire */
+-                }
+-            }
++        so->pollfds_idx =3D -1;
+=20
+-            if (so->so_state & SS_ISFCONNECTED) {
+-                GPollFD pfd =3D {
+-                    .fd =3D so->s,
+-                    .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
+-                };
+-                so->pollfds_idx =3D pollfds->len;
+-                g_array_append_val(pollfds, pfd);
++        /*
++         * See if it's timed out
++         */
++        if (so->so_expire) {
++            if (so->so_expire <=3D curtime) {
++                icmp_detach(so);
++                continue;
++            } else {
++                slirp->do_slowtimo =3D true; /* Let socket expire */
+             }
+         }
++
++        if (so->so_state & SS_ISFCONNECTED) {
++            GPollFD pfd =3D {
++                .fd =3D so->s,
++                .events =3D G_IO_IN | G_IO_HUP | G_IO_ERR,
++            };
++            so->pollfds_idx =3D pollfds->len;
++            g_array_append_val(pollfds, pfd);
++        }
+     }
+-    slirp_update_timeout(timeout);
++
++    slirp_update_timeout(slirp, timeout);
+ }
+=20
+-void slirp_pollfds_poll(GArray *pollfds, int select_error)
++void slirp_pollfds_poll(Slirp *slirp, GArray *pollfds, int select_error)
+ {
+-    Slirp *slirp =3D QTAILQ_FIRST(&slirp_instances);
      struct socket *so, *so_next;
      int ret;
 =20
--    curtime =3D slirp->cb->clock_get_ns() / SCALE_MS;
-+    curtime =3D slirp->cb->clock_get_ns(slirp->opaque) / SCALE_MS;
+-    if (!slirp) {
+-        return;
+-    }
+-
+     curtime =3D slirp->cb->clock_get_ns() / SCALE_MS;
 =20
-     /*
-      * See if anything has timed out
-@@ -860,7 +858,8 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-             ifm->resolution_requested =3D true;
+-    QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
+-        /*
+-         * See if anything has timed out
+-         */
+-        if (slirp->time_fasttimo &&
+-            ((curtime - slirp->time_fasttimo) >=3D TIMEOUT_FAST)) {
+-            tcp_fasttimo(slirp);
+-            slirp->time_fasttimo =3D 0;
+-        }
+-        if (slirp->do_slowtimo &&
+-            ((curtime - slirp->last_slowtimo) >=3D TIMEOUT_SLOW)) {
+-            ip_slowtimo(slirp);
+-            tcp_slowtimo(slirp);
+-            slirp->last_slowtimo =3D curtime;
+-        }
++    /*
++     * See if anything has timed out
++     */
++    if (slirp->time_fasttimo &&
++        ((curtime - slirp->time_fasttimo) >=3D TIMEOUT_FAST)) {
++        tcp_fasttimo(slirp);
++        slirp->time_fasttimo =3D 0;
++    }
++    if (slirp->do_slowtimo &&
++        ((curtime - slirp->last_slowtimo) >=3D TIMEOUT_SLOW)) {
++        ip_slowtimo(slirp);
++        tcp_slowtimo(slirp);
++        slirp->last_slowtimo =3D curtime;
++    }
 =20
-             /* Expire request and drop outgoing packet after 1 second */
--            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
-+            ifm->expiration_date =3D
-+                slirp->cb->clock_get_ns(slirp->opaque) + 1000000000ULL;
++    /*
++     * Check sockets
++     */
++    if (!select_error) {
+         /*
+-         * Check sockets
++         * Check TCP sockets
+          */
+-        if (!select_error) {
+-            /*
+-             * Check TCP sockets
+-             */
+-            for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb;
+-                    so =3D so_next) {
+-                int revents;
++        for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb;
++             so =3D so_next) {
++            int revents;
+=20
+-                so_next =3D so->so_next;
++            so_next =3D so->so_next;
+=20
+-                revents =3D 0;
+-                if (so->pollfds_idx !=3D -1) {
+-                    revents =3D g_array_index(pollfds, GPollFD,
+-                                            so->pollfds_idx).revents;
+-                }
++            revents =3D 0;
++            if (so->pollfds_idx !=3D -1) {
++                revents =3D g_array_index(pollfds, GPollFD,
++                                        so->pollfds_idx).revents;
++            }
+=20
+-                if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
++            if (so->so_state & SS_NOFDREF || so->s =3D=3D -1) {
++                continue;
++            }
++
++            /*
++             * Check for URG data
++             * This will soread as well, so no need to
++             * test for G_IO_IN below if this succeeds
++             */
++            if (revents & G_IO_PRI) {
++                ret =3D sorecvoob(so);
++                if (ret < 0) {
++                    /* Socket error might have resulted in the socket be=
+ing
++                     * removed, do not try to do anything more with it. =
+*/
+                     continue;
+                 }
+-
++            }
++            /*
++             * Check sockets for reading
++             */
++            else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
+                 /*
+-                 * Check for URG data
+-                 * This will soread as well, so no need to
+-                 * test for G_IO_IN below if this succeeds
++                 * Check for incoming connections
+                  */
+-                if (revents & G_IO_PRI) {
+-                    ret =3D sorecvoob(so);
+-                    if (ret < 0) {
+-                        /* Socket error might have resulted in the socke=
+t being
+-                         * removed, do not try to do anything more with =
+it. */
+-                        continue;
+-                    }
++                if (so->so_state & SS_FACCEPTCONN) {
++                    tcp_connect(so);
++                    continue;
++                } /* else */
++                ret =3D soread(so);
++
++                /* Output it if we read something */
++                if (ret > 0) {
++                    tcp_output(sototcpcb(so));
++                }
++                if (ret < 0) {
++                    /* Socket error might have resulted in the socket be=
+ing
++                     * removed, do not try to do anything more with it. =
+*/
++                    continue;
+                 }
++            }
++
++            /*
++             * Check sockets for writing
++             */
++            if (!(so->so_state & SS_NOFDREF) &&
++                (revents & (G_IO_OUT | G_IO_ERR))) {
+                 /*
+-                 * Check sockets for reading
++                 * Check for non-blocking, still-connecting sockets
+                  */
+-                else if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) {
+-                    /*
+-                     * Check for incoming connections
+-                     */
+-                    if (so->so_state & SS_FACCEPTCONN) {
+-                        tcp_connect(so);
+-                        continue;
+-                    } /* else */
+-                    ret =3D soread(so);
++                if (so->so_state & SS_ISFCONNECTING) {
++                    /* Connected */
++                    so->so_state &=3D ~SS_ISFCONNECTING;
+=20
+-                    /* Output it if we read something */
+-                    if (ret > 0) {
+-                        tcp_output(sototcpcb(so));
+-                    }
++                    ret =3D send(so->s, (const void *) &ret, 0, 0);
+                     if (ret < 0) {
+-                        /* Socket error might have resulted in the socke=
+t being
+-                         * removed, do not try to do anything more with =
+it. */
+-                        continue;
++                        /* XXXXX Must fix, zero bytes is a NOP */
++                        if (errno =3D=3D EAGAIN || errno =3D=3D EWOULDBL=
+OCK ||
++                            errno =3D=3D EINPROGRESS || errno =3D=3D ENO=
+TCONN) {
++                            continue;
++                        }
++
++                        /* else failed */
++                        so->so_state &=3D SS_PERSISTENT_MASK;
++                        so->so_state |=3D SS_NOFDREF;
+                     }
+-                }
++                    /* else so->so_state &=3D ~SS_ISFCONNECTING; */
+=20
+-                /*
+-                 * Check sockets for writing
+-                 */
+-                if (!(so->so_state & SS_NOFDREF) &&
+-                        (revents & (G_IO_OUT | G_IO_ERR))) {
+                     /*
+-                     * Check for non-blocking, still-connecting sockets
++                     * Continue tcp_input
+                      */
+-                    if (so->so_state & SS_ISFCONNECTING) {
+-                        /* Connected */
+-                        so->so_state &=3D ~SS_ISFCONNECTING;
+-
+-                        ret =3D send(so->s, (const void *) &ret, 0, 0);
+-                        if (ret < 0) {
+-                            /* XXXXX Must fix, zero bytes is a NOP */
+-                            if (errno =3D=3D EAGAIN || errno =3D=3D EWOU=
+LDBLOCK ||
+-                                errno =3D=3D EINPROGRESS || errno =3D=3D=
+ ENOTCONN) {
+-                                continue;
+-                            }
+-
+-                            /* else failed */
+-                            so->so_state &=3D SS_PERSISTENT_MASK;
+-                            so->so_state |=3D SS_NOFDREF;
+-                        }
+-                        /* else so->so_state &=3D ~SS_ISFCONNECTING; */
+-
+-                        /*
+-                         * Continue tcp_input
+-                         */
+-                        tcp_input((struct mbuf *)NULL, sizeof(struct ip)=
+, so,
+-                                  so->so_ffamily);
+-                        /* continue; */
+-                    } else {
+-                        ret =3D sowrite(so);
+-                        if (ret > 0) {
+-                            /* Call tcp_output in case we need to send a=
+ window
+-                             * update to the guest, otherwise it will be=
+ stuck
+-                             * until it sends a window probe. */
+-                            tcp_output(sototcpcb(so));
+-                        }
++                    tcp_input((struct mbuf *)NULL, sizeof(struct ip), so=
+,
++                              so->so_ffamily);
++                    /* continue; */
++                } else {
++                    ret =3D sowrite(so);
++                    if (ret > 0) {
++                        /* Call tcp_output in case we need to send a win=
+dow
++                         * update to the guest, otherwise it will be stu=
+ck
++                         * until it sends a window probe. */
++                        tcp_output(sototcpcb(so));
+                     }
+                 }
+             }
++        }
+=20
+-            /*
+-             * Now UDP sockets.
+-             * Incoming packets are sent straight away, they're not buff=
+ered.
+-             * Incoming UDP data isn't buffered either.
+-             */
+-            for (so =3D slirp->udb.so_next; so !=3D &slirp->udb;
+-                    so =3D so_next) {
+-                int revents;
++        /*
++         * Now UDP sockets.
++         * Incoming packets are sent straight away, they're not buffered=
+.
++         * Incoming UDP data isn't buffered either.
++         */
++        for (so =3D slirp->udb.so_next; so !=3D &slirp->udb;
++             so =3D so_next) {
++            int revents;
+=20
+-                so_next =3D so->so_next;
++            so_next =3D so->so_next;
+=20
+-                revents =3D 0;
+-                if (so->pollfds_idx !=3D -1) {
+-                    revents =3D g_array_index(pollfds, GPollFD,
+-                            so->pollfds_idx).revents;
+-                }
++            revents =3D 0;
++            if (so->pollfds_idx !=3D -1) {
++                revents =3D g_array_index(pollfds, GPollFD,
++                                        so->pollfds_idx).revents;
++            }
+=20
+-                if (so->s !=3D -1 &&
+-                    (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
+-                    sorecvfrom(so);
+-                }
++            if (so->s !=3D -1 &&
++                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
++                sorecvfrom(so);
+             }
++        }
+=20
+-            /*
+-             * Check incoming ICMP relies.
+-             */
+-            for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp;
+-                    so =3D so_next) {
+-                    int revents;
++        /*
++         * Check incoming ICMP relies.
++         */
++        for (so =3D slirp->icmp.so_next; so !=3D &slirp->icmp;
++             so =3D so_next) {
++            int revents;
+=20
+-                    so_next =3D so->so_next;
++            so_next =3D so->so_next;
+=20
+-                    revents =3D 0;
+-                    if (so->pollfds_idx !=3D -1) {
+-                        revents =3D g_array_index(pollfds, GPollFD,
+-                                                so->pollfds_idx).revents=
+;
+-                    }
++            revents =3D 0;
++            if (so->pollfds_idx !=3D -1) {
++                revents =3D g_array_index(pollfds, GPollFD,
++                                        so->pollfds_idx).revents;
++            }
+=20
+-                    if (so->s !=3D -1 &&
+-                        (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
+-                    icmp_receive(so);
+-                }
++            if (so->s !=3D -1 &&
++                (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR))) {
++                icmp_receive(so);
+             }
          }
-         return 0;
-     } else {
-@@ -886,7 +885,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-         if (!ifm->resolution_requested) {
-             ndp_send_ns(slirp, ip6h->ip_dst);
-             ifm->resolution_requested =3D true;
--            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
-+            ifm->expiration_date =3D slirp->cb->clock_get_ns(slirp->opaq=
-ue) + 1000000000ULL;
-         }
-         return 0;
-     } else {
-@@ -961,7 +960,7 @@ int slirp_remove_hostfwd(Slirp *slirp, int is_udp, st=
-ruct in_addr host_addr,
-             getsockname(so->s, (struct sockaddr *)&addr, &addr_len) =3D=3D=
- 0 &&
-             addr.sin_addr.s_addr =3D=3D host_addr.s_addr &&
-             addr.sin_port =3D=3D port) {
--            so->slirp->cb->unregister_poll_fd(so->s);
-+            so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-             slirp_closesocket(so->s);
-             sofree(so);
-             return 0;
-diff --git a/slirp/socket.c b/slirp/socket.c
-index c896fa6da3..ce1d6ffa1d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -930,6 +930,6 @@ void sotranslate_accept(struct socket *so)
- void sodrop(struct socket *s, int num)
- {
-     if (sbdrop(&s->so_snd, num)) {
--        s->slirp->cb->notify();
-+        s->slirp->cb->notify(s->slirp->opaque);
+-
+-        if_start(slirp);
      }
++
++    if_start(slirp);
  }
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index e35628a892..cda94815f6 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -336,7 +336,7 @@ tcp_close(struct tcpcb *tp)
- 	/* clobber input socket cache if we're closing the cached connection */
- 	if (so =3D=3D slirp->tcp_last_so)
- 		slirp->tcp_last_so =3D &slirp->tcb;
--	so->slirp->cb->unregister_poll_fd(so->s);
-+	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
- 	slirp_closesocket(so->s);
- 	sbfree(&so->so_rcv);
- 	sbfree(&so->so_snd);
-@@ -413,7 +413,7 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     struct sockaddr_storage addr;
 =20
-     slirp_set_nonblock(s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -486,7 +486,7 @@ void tcp_connect(struct socket *inso)
-         return;
-     }
-     slirp_set_nonblock(s);
--    so->slirp->cb->register_poll_fd(so->s);
-+    so->slirp->cb->register_poll_fd(so->s, so->slirp->opaque);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-@@ -498,7 +498,7 @@ void tcp_connect(struct socket *inso)
-     /* Close the accept() socket, set right state */
-     if (inso->so_state & SS_FACCEPTONCE) {
-         /* If we only accept once, close the accept() socket */
--        so->slirp->cb->unregister_poll_fd(so->s);
-+        so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
-         slirp_closesocket(so->s);
+ static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index cda0efa4e8..1558ff1fe7 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -26,7 +26,6 @@ stub-obj-y +=3D qtest.o
+ stub-obj-y +=3D replay.o
+ stub-obj-y +=3D runstate-check.o
+ stub-obj-y +=3D set-fd-handler.o
+-stub-obj-y +=3D slirp.o
+ stub-obj-y +=3D sysbus.o
+ stub-obj-y +=3D tpm.o
+ stub-obj-y +=3D trace-control.o
+diff --git a/stubs/slirp.c b/stubs/slirp.c
+deleted file mode 100644
+index 70704346fd..0000000000
+--- a/stubs/slirp.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qemu/host-utils.h"
+-#include "slirp/libslirp.h"
+-
+-void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout)
+-{
+-}
+-
+-void slirp_pollfds_poll(GArray *pollfds, int select_error)
+-{
+-}
+-
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 443cb4cfe8..d4a521caeb 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -469,25 +469,42 @@ static int os_host_main_loop_wait(int64_t timeout)
+ }
+ #endif
 =20
-         /* Don't select it yet, even though we have an FD */
-diff --git a/slirp/udp.c b/slirp/udp.c
-index 5baa604b33..29a31e9400 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -291,7 +291,7 @@ udp_attach(struct socket *so, unsigned short af)
- void
- udp_detach(struct socket *so)
++static NotifierList main_loop_poll_notifiers =3D
++    NOTIFIER_LIST_INITIALIZER(main_loop_poll_notifiers);
++
++void main_loop_poll_add_notifier(Notifier *notify)
++{
++    notifier_list_add(&main_loop_poll_notifiers, notify);
++}
++
++void main_loop_poll_remove_notifier(Notifier *notify)
++{
++    notifier_remove(notify);
++}
++
+ void main_loop_wait(int nonblocking)
  {
--	so->slirp->cb->unregister_poll_fd(so->s);
-+	so->slirp->cb->unregister_poll_fd(so->s, so->slirp->opaque);
- 	slirp_closesocket(so->s);
- 	sofree(so);
- }
++    MainLoopPoll mlpoll =3D {
++        .state =3D MAIN_LOOP_POLL_FILL,
++        .timeout =3D UINT32_MAX,
++        .pollfds =3D gpollfds,
++    };
+     int ret;
+-    uint32_t timeout =3D UINT32_MAX;
+     int64_t timeout_ns;
+=20
+     if (nonblocking) {
+-        timeout =3D 0;
++        mlpoll.timeout =3D 0;
+     }
+=20
+     /* poll any events */
+     g_array_set_size(gpollfds, 0); /* reset for new iteration */
+     /* XXX: separate device handlers from system ones */
+-    slirp_pollfds_fill(gpollfds, &timeout);
++    notifier_list_notify(&main_loop_poll_notifiers, &mlpoll);
+=20
+-    if (timeout =3D=3D UINT32_MAX) {
++    if (mlpoll.timeout =3D=3D UINT32_MAX) {
+         timeout_ns =3D -1;
+     } else {
+-        timeout_ns =3D (uint64_t)timeout * (int64_t)(SCALE_MS);
++        timeout_ns =3D (uint64_t)mlpoll.timeout * (int64_t)(SCALE_MS);
+     }
+=20
+     timeout_ns =3D qemu_soonest_timeout(timeout_ns,
+@@ -495,7 +512,8 @@ void main_loop_wait(int nonblocking)
+                                           &main_loop_tlg));
+=20
+     ret =3D os_host_main_loop_wait(timeout_ns);
+-    slirp_pollfds_poll(gpollfds, (ret < 0));
++    mlpoll.state =3D ret < 0 ? MAIN_LOOP_POLL_ERR : MAIN_LOOP_POLL_OK;
++    notifier_list_notify(&main_loop_poll_notifiers, &mlpoll);
+=20
+     /* CPU thread can infinitely wait for event after
+        missing the warp */
 --=20
 2.20.1
