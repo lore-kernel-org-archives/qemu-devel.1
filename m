@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40783)
+Received: from eggs.gnu.org ([209.51.188.92]:47971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gnc51-0001CZ-Dx
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:30:00 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gnfjI-00083P-6l
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 03:23:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gnc4z-0004wF-PU
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:29:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gnc4z-0004w3-K6
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 23:29:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gnc4y-0002Y5-GJ
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 04:29:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 67B572E80D2
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 04:29:56 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gnfjH-00084f-Ad
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 03:23:48 -0500
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20190102025904.GH27457@umbus.fritz.box>
+	<41c0bc74-a976-93e1-1104-99b191934d89@ilande.co.uk>
+	<20190120202824.GA2423@umbus>
+	<38f72c0d-a64b-1ac5-d4cd-70c1a6087226@ilande.co.uk>
+	<20190126015357.GD22942@umbus>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <a3bdcb03-2737-211c-fd6a-68765196bc68@ilande.co.uk>
+Date: Sun, 27 Jan 2019 08:23:19 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 27 Jan 2019 04:17:35 -0000
-From: Launchpad Bug Tracker <1523811@bugs.launchpad.net>
-Reply-To: Bug 1523811 <1523811@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151208084519.14688.79647.malonedeb@wampee.canonical.com>
-Message-Id: <154856265516.21534.12740904546539744641.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1523811] Re: USB assert failure on dev-storage.c
+In-Reply-To: <20190126015357.GD22942@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 26/01/2019 01:53, David Gibson wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> On Mon, Jan 21, 2019 at 05:15:20AM +0000, Mark Cave-Ayland wrote:
+>> On 20/01/2019 20:28, David Gibson wrote:
+>>> On Fri, Jan 18, 2019 at 01:25:37PM +0000, Mark Cave-Ayland wrote:
+>>>> On 02/01/2019 02:59, David Gibson wrote:
+>>>>
+>>>>> On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+>>>>>> >From working on the TCG vector operations patchset, it is apparent that there
+>>>>>> are a large number of endian-based hacks in int_helper.c which can be removed by
+>>>>>> making use of the various Vsr* macros.
+>>>>>>
+>>>>>> Patch 1 is simple enough, and implements the complete set of Vsr* macros for
+>>>>>> both big endian and little endian hosts.
+>>>>>>
+>>>>>> Patches 2 and 3 rework the vector merge and multiply algorithms so that they
+>>>>>> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+>>>>>>
+>>>>>> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macros by
+>>>>>> replacing the element accesses with their equivalent Vsr* macro instead.
+>>>>>>
+>>>>>> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift bug
+>>>>>> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the review of
+>>>>>> v1.
+>>>>>>
+>>>>>> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGENDIAN
+>>>>>> hacks in int_helper.c, again replacing accesses with the relevant Vsr* macro
+>>>>>> instead.
+>>>>>>
+>>>>>> Note that there are still some endian hacks left in int_helper.c after this
+>>>>>> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro still
+>>>>>> remains in places where the index variable was used for purposes other than
+>>>>>> accessing elements within the vector.
+>>>>>>
+>>>>>> There were also some parts where additional conversion could be done, but I
+>>>>>> wasn't confident enough to make the change without access to PPC64 test images
+>>>>>> or real big-endian host hardware.
+>>>>>
+>>>>> Applied to ppc-for-4.0, thanks.
+>>>>
+>>>> Just checking your ppc-for-4.0 branch on github, I can't see where this has been
+>>>> applied? Is it queued in a local branch still?
+>>>
+>>> Yeah, probably.  I've pushed it out now.
+>>
+>> Thanks David. I've just had another quick look, and whilst I can see newer commits in
+>> the branch, I think these ones belonging to this patchset are still
+>> missing?
+> 
+> Um.. hrm.. in that case I think I've lost track of these ones :/
 
--- =
+Looking back over my archives, I can see that Richard added a few more R-B tags after
+v2. Probably the easiest way forward is for me to pick these up and re-send a v3 that
+you can apply, so I'll go and do that.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523811
 
-Title:
-  USB assert failure on dev-storage.c
+ATB,
 
-Status in QEMU:
-  Expired
-
-Bug description:
-  On executing the attached python script in the guest OS, QEMU dies
-  with assert failure:
-
-  [run python script in guest root shell]
-  # python a.py
-
-  [host message]
-  qemu-system-x86_64: hw/usb/dev-storage.c:445: usb_msd_handle_data: Assert=
-ion `le32_to_cpu(s->csw.residue) =3D=3D 0' failed.
-  Aborted (core dumped)
-
-  =
-
-  When I detach the kernel driver and send CBW and reattach it again, witho=
-ut conforming to the command/data/status protocol, QEMU dies.
-  I think this is due to misimplementation of Command/Data/Status protocol =
-in Bulk-only transfer.
-  This kind of assert failure can be misused by malwares to avoid being ana=
-lyzed by terminating only in the virtual environments and still execute the=
- malicious code in real machines.
-  Before running python script, make sure to change a.py that it should poi=
-nts to usb mass storage's vid and pid.
-
-  QEMU was running on these environment : =
-
-  [CPU model]    Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
-  [qemu version] QEMU 2.5.0-rc2 (compiled from source, gcc 4.8.4)
-  [host info]    Ubuntu 14.04.3, x86_64, 3.19.0-32-generic
-  [guest info]   Ubuntu 14.04.3, x86_64, 3.19.0-28-generic
-  [QEMU argument]
-  x86_64-softmmu/qemu-system-x86_64 -hda /media/hdd/img/ubuntu1404.qcow2.5 \
-  	-m 512 \
-  	--usbdevice disk:format=3Dqcow2:../usb.img.5 \
-  	--enable-kvm
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523811/+subscriptions
+Mark.
