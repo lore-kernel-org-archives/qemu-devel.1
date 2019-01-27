@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40030)
+Received: from eggs.gnu.org ([209.51.188.92]:40460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnppr-0003sk-IN
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnpsZ-0004w3-Ms
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:14:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gnppq-0004DV-Jf
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:15 -0500
-Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:33745)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnpsX-0005HF-Mu
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:14:03 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35073)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gnppq-0004D2-8d
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:14 -0500
-Received: by mail-pg1-x529.google.com with SMTP id z11so6296908pgu.0
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 11:11:13 -0800 (PST)
-References: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+	id 1gnpsX-0005Gi-8f
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:14:01 -0500
+Received: by mail-pg1-x541.google.com with SMTP id s198so6291112pgs.2
+	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 11:14:00 -0800 (PST)
+References: <20190127090306.30826-1-mark.cave-ayland@ilande.co.uk>
+	<20190127090306.30826-5-mark.cave-ayland@ilande.co.uk>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <60153071-3be0-584f-94b1-bb199a81e7fc@linaro.org>
-Date: Sun, 27 Jan 2019 11:11:09 -0800
+Message-ID: <a4d87525-9ef3-e163-4265-58b2ca23e4f7@linaro.org>
+Date: Sun, 27 Jan 2019 11:13:56 -0800
 MIME-Version: 1.0
-In-Reply-To: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190127090306.30826-5-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: replace QEMU_BUILD_BUG_ON with
- G_STATIC_ASSERT
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] target/ppc: eliminate use of HI_IDX
+ and LO_IDX macros from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-Cc: lizhijian@cn.fujitsu.com, jan.kiszka@siemens.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, zhangckid@gmail.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 1/27/19 3:46 AM, Samuel Thibault wrote:
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+On 1/27/19 1:03 AM, Mark Cave-Ayland wrote:
+> The original purpose of these macros was to correctly reference the high and low
+> parts of the VSRs regardless of the host endianness.
+> 
+> Replace these direct references to high and low parts with the relevant VsrD
+> macro instead, and completely remove the now-unused HI_IDX and LO_IDX macros.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  slirp/ip.h       |  4 ++--
->  slirp/ip6.h      |  4 ++--
->  slirp/ip6_icmp.h | 10 +++++-----
->  3 files changed, 9 insertions(+), 9 deletions(-)
+>  target/ppc/int_helper.c | 180 +++++++++++++++++++++++-------------------------
+>  1 file changed, 85 insertions(+), 95 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
