@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49630)
+Received: from eggs.gnu.org ([209.51.188.92]:49744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnZfq-0003KZ-5A
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:55:51 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gnZfs-0003W1-FB
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnZbW-00023w-Fx
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:51:24 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:39332)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnZbV-00022r-8s
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:51:22 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 27 Jan 2019 02:51:13 +0100
-Message-Id: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] slirp: Replace QEMU_BUILD_BUG_ON with own macro
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gnZVc-0008Gi-0N
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:45:16 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gnZVb-0008GY-Py
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 20:45:15 -0500
+Received: by mail-lj1-x243.google.com with SMTP id k19-v6so11339241lji.11
+	for <qemu-devel@nongnu.org>; Sat, 26 Jan 2019 17:45:15 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Sat, 26 Jan 2019 17:45:01 -0800
+Message-Id: <20190127014501.21840-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: rearrange access to external
+ interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +25,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, marcandre.lureau@redhat.com, zhangckid@gmail.com, lizhijian@cn.fujitsu.com, pbonzini@redhat.com, jasowang@redhat.com
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Replace xtensa_get_extint that returns single external IRQ descriptor
+with xtensa_get_extints that returns a vector of all external IRQs.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- slirp/ip.h       |  6 ++++--
- slirp/ip6.h      |  6 ++++--
- slirp/ip6_icmp.h | 12 +++++++-----
- slirp/util.h     | 25 +++++++++++++++++++++++++
- 4 files changed, 40 insertions(+), 9 deletions(-)
+ hw/xtensa/pic_cpu.c | 24 +++++++++++-------------
+ hw/xtensa/xtfpga.c  |  8 +++++---
+ target/xtensa/cpu.h |  5 +++--
+ 3 files changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index 2baeeb9a3a..77182e61a9 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -35,6 +35,8 @@
-=20
- #include <glib.h>
-=20
-+#include "util.h"
+diff --git a/hw/xtensa/pic_cpu.c b/hw/xtensa/pic_cpu.c
+index f70684902628..077f4ad53d6d 100644
+--- a/hw/xtensa/pic_cpu.c
++++ b/hw/xtensa/pic_cpu.c
+@@ -88,11 +88,11 @@ static void xtensa_ccompare_cb(void *opaque)
+ 
+ void xtensa_irq_init(CPUXtensaState *env)
+ {
+-    env->irq_inputs = (void **)qemu_allocate_irqs(
+-            xtensa_set_irq, env, env->config->ninterrupt);
+-    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
+-        unsigned i;
++    unsigned i;
+ 
++    env->irq_inputs = qemu_allocate_irqs(xtensa_set_irq, env,
++                                         env->config->ninterrupt);
++    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
+         env->time_base = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+         env->ccount_base = env->sregs[CCOUNT];
+         for (i = 0; i < env->config->nccompare; ++i) {
+@@ -101,16 +101,14 @@ void xtensa_irq_init(CPUXtensaState *env)
+                     xtensa_ccompare_cb, env->ccompare + i);
+         }
+     }
++    for (i = 0; i < env->config->nextint; ++i) {
++        unsigned irq = env->config->extint[i];
 +
- #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
- # undef NTOHL
- # undef NTOHS
-@@ -229,8 +231,8 @@ struct	ipasfrag {
- 	struct ip ipf_ip;
- };
-=20
--QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
--                  offsetof(struct ipasfrag, ipf_link));
-+SLIRP_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
-+                   offsetof(struct ipasfrag, ipf_link));
-=20
- #define ipf_off      ipf_ip.ip_off
- #define ipf_tos      ipf_ip.ip_tos
-diff --git a/slirp/ip6.h b/slirp/ip6.h
-index 4e7c366505..3db099acef 100644
---- a/slirp/ip6.h
-+++ b/slirp/ip6.h
-@@ -8,6 +8,8 @@
-=20
- #include <glib.h>
-=20
-+#include "util.h"
-+
- #define ALLNODES_MULTICAST  { .s6_addr =3D \
-                             { 0xff, 0x02, 0x00, 0x00,\
-                             0x00, 0x00, 0x00, 0x00,\
-@@ -152,7 +154,7 @@ struct ip6_pseudohdr {
-  * If we marked the struct as packed then we would be unable to take
-  * the address of any of the fields in it.
-  */
--QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
--QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
-=20
- #endif
-diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
-index 3f44ed2f49..ea7fcfe5e6 100644
---- a/slirp/ip6_icmp.h
-+++ b/slirp/ip6_icmp.h
-@@ -6,6 +6,8 @@
- #ifndef SLIRP_IP6_ICMP_H
- #define SLIRP_IP6_ICMP_H
-=20
-+#include "util.h"
-+
- /*
-  * Interface Control Message Protocol version 6 Definitions.
-  * Per RFC 4443, March 2006.
-@@ -50,14 +52,14 @@ struct ndp_ra {     /* Router Advertisement Message *=
-/
-     uint32_t retrans_time;  /* Retrans Timer */
- };
-=20
--QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
-=20
- struct ndp_ns {     /* Neighbor Solicitation Message */
-     uint32_t reserved;
-     struct in6_addr target; /* Target Address */
- };
-=20
--QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
-=20
- struct ndp_na {     /* Neighbor Advertisement Message */
- #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-@@ -78,7 +80,7 @@ struct ndp_na {     /* Neighbor Advertisement Message *=
-/
-     struct in6_addr target; /* Target Address */
- };
-=20
--QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
-=20
- struct ndp_redirect {
-     uint32_t reserved;
-@@ -86,7 +88,7 @@ struct ndp_redirect {
-     struct in6_addr dest;   /* Destination Address */
- };
-=20
--QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
-+SLIRP_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
-=20
- /*
-  * Structure of an icmpv6 header.
-@@ -113,7 +115,7 @@ struct icmp6 {
- #define icmp6_redirect icmp6_body.ndp_redirect
- };
-=20
--QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
-+SLIRP_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
-=20
- #define ICMP6_MINLEN    4
- #define ICMP6_ERROR_MINLEN  8
-diff --git a/slirp/util.h b/slirp/util.h
-index ef75804560..fc2c2e58fe 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -48,6 +48,31 @@
- # define SLIRP_PACKED __attribute__((packed))
- #endif
-=20
-+#ifndef glue
-+#define xglue(x, y) x ## y
-+#define glue(x, y) xglue(x, y)
-+#endif
-+
-+#define SLIRP_BUILD_BUG_ON_STRUCT(x) \
-+    struct { \
-+        int:(x) ? -1 : 1; \
++        env->ext_irq_inputs[i] = env->irq_inputs[irq];
 +    }
-+
-+/* SLIRP_BUILD_BUG_MSG() emits the message given if _Static_assert is
-+ * supported; otherwise, it will be omitted from the compiler error
-+ * message (but as it remains present in the source code, it can still
-+ * be useful when debugging). */
-+#if defined(CONFIG_STATIC_ASSERT)
-+#define SLIRP_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
-+#elif defined(__COUNTER__)
-+#define SLIRP_BUILD_BUG_MSG(x, msg) typedef SLIRP_BUILD_BUG_ON_STRUCT(x)=
- \
-+    glue(qemu_build_bug_on__, __COUNTER__) __attribute__((unused))
-+#else
-+#define SLIRP_BUILD_BUG_MSG(x, msg)
-+#endif
-+
-+#define SLIRP_BUILD_BUG_ON(x) SLIRP_BUILD_BUG_MSG(x, "not expecting: " #=
-x)
-+
- #define SCALE_MS 1000000
-=20
- #define ETH_ALEN    6
---=20
-2.20.1
+ }
+ 
+-void *xtensa_get_extint(CPUXtensaState *env, unsigned extint)
++qemu_irq *xtensa_get_extints(CPUXtensaState *env)
+ {
+-    if (extint < env->config->nextint) {
+-        unsigned irq = env->config->extint[extint];
+-        return env->irq_inputs[irq];
+-    } else {
+-        qemu_log("%s: trying to acquire invalid external interrupt %d\n",
+-                __func__, extint);
+-        return NULL;
+-    }
++    return env->ext_irq_inputs;
+ }
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 7379b3fff427..3102f8c04709 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -225,6 +225,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     XtensaCPU *cpu = NULL;
+     CPUXtensaState *env = NULL;
+     MemoryRegion *system_io;
++    qemu_irq *extints;
+     DriveInfo *dinfo;
+     pflash_t *flash = NULL;
+     QemuOpts *machine_opts = qemu_get_machine_opts();
+@@ -253,6 +254,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+          */
+         cpu_reset(CPU(cpu));
+     }
++    extints = xtensa_get_extints(env);
+ 
+     if (env) {
+         XtensaMemory sysram = env->config->sysram;
+@@ -284,11 +286,11 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     xtfpga_fpga_init(system_io, 0x0d020000, freq);
+     if (nd_table[0].used) {
+         xtfpga_net_init(system_io, 0x0d030000, 0x0d030400, 0x0d800000,
+-                xtensa_get_extint(env, 1), nd_table);
++                        extints[1], nd_table);
+     }
+ 
+-    serial_mm_init(system_io, 0x0d050020, 2, xtensa_get_extint(env, 0),
+-            115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
++    serial_mm_init(system_io, 0x0d050020, 2, extints[0],
++                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
+ 
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     if (dinfo) {
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index f579294822c3..176af8a53cf0 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -483,7 +483,8 @@ typedef struct CPUXtensaState {
+     AddressSpace *address_space_er;
+     MemoryRegion *system_er;
+     int pending_irq_level; /* level of last raised IRQ */
+-    void **irq_inputs;
++    qemu_irq *irq_inputs;
++    qemu_irq ext_irq_inputs[MAX_NINTERRUPT];
+     XtensaCcompareTimer ccompare[MAX_NCCOMPARE];
+     uint64_t time_base;
+     uint64_t ccount_time;
+@@ -569,7 +570,7 @@ void xtensa_register_core(XtensaConfigList *node);
+ void xtensa_sim_open_console(Chardev *chr);
+ void check_interrupts(CPUXtensaState *s);
+ void xtensa_irq_init(CPUXtensaState *env);
+-void *xtensa_get_extint(CPUXtensaState *env, unsigned extint);
++qemu_irq *xtensa_get_extints(CPUXtensaState *env);
+ int cpu_xtensa_signal_handler(int host_signum, void *pinfo, void *puc);
+ void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ void xtensa_sync_window_from_phys(CPUXtensaState *env);
+-- 
+2.11.0
