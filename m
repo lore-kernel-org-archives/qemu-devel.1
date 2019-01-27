@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52485)
+Received: from eggs.gnu.org ([209.51.188.92]:52493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCB-0001Nm-6i
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:52 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCB-0001Nn-Gv
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCA-0007Oo-8K
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCA-0007P1-AS
 	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:51 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:43210)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:43376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnjCA-00070F-0w
+	id 1gnjC9-0007LM-Va
 	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:05:50 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 27 Jan 2019 13:05:01 +0100
-Message-Id: <20190127120526.15457-7-samuel.thibault@ens-lyon.org>
+Date: Sun, 27 Jan 2019 13:04:57 +0100
+Message-Id: <20190127120526.15457-3-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 References: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/31] net/slirp: free forwarding rules on
- cleanup
+Subject: [Qemu-devel] [PULL 02/31] slirp: Avoid marking naturally packed
+ structs as QEMU_PACKED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +28,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Various ipv6 structs in the slirp headers are marked QEMU_PACKED,
+but they are actually naturally aligned and will have no padding
+in them. Instead of marking them with the 'packed' attribute,
+assert at compile time that they are the size we expect. This
+allows us to take the address of fields within the structs
+without risking undefined behaviour, and suppresses clang
+-Waddress-of-packed-member warnings.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ slirp/ip6.h      | 12 ++++++++++--
+ slirp/ip6_icmp.h | 20 +++++++++++++++-----
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index b91741b8fc..750105a466 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -75,6 +75,13 @@ struct slirp_config_str {
-     char str[1024];
- };
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 14e9c78735..1e3e329ce6 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -133,7 +133,7 @@ struct ip6 {
+     uint8_t     ip_nh;               /* next header */
+     uint8_t     ip_hl;               /* hop limit */
+     struct in6_addr ip_src, ip_dst;  /* source and dest address */
+-} QEMU_PACKED;
++};
 =20
-+struct GuestFwd {
-+    CharBackend hd;
-+    struct in_addr server;
-+    int port;
-+    Slirp *slirp;
+ /*
+  * IPv6 pseudo-header used by upper-layer protocols
+@@ -145,7 +145,15 @@ struct ip6_pseudohdr {
+     uint16_t    ih_zero_hi;       /* zero */
+     uint8_t     ih_zero_lo;       /* zero */
+     uint8_t     ih_nh;            /* next header */
+-} QEMU_PACKED;
++};
+=20
++/*
++ * We don't want to mark these ip6 structs as packed as they are natural=
+ly
++ * correctly aligned; instead assert that there is no stray padding.
++ * If we marked the struct as packed then we would be unable to take
++ * the address of any of the fields in it.
++ */
++QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
++QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
+=20
+ #endif
+diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+index 32b0914055..2ad2b75e67 100644
+--- a/slirp/ip6_icmp.h
++++ b/slirp/ip6_icmp.h
+@@ -48,12 +48,16 @@ struct ndp_ra {     /* Router Advertisement Message *=
+/
+     uint16_t lifetime;      /* Router Lifetime */
+     uint32_t reach_time;    /* Reachable Time */
+     uint32_t retrans_time;  /* Retrans Timer */
+-} QEMU_PACKED;
 +};
 +
- typedef struct SlirpState {
-     NetClientState nc;
-     QTAILQ_ENTRY(SlirpState) entry;
-@@ -83,6 +90,7 @@ typedef struct SlirpState {
- #ifndef _WIN32
-     gchar *smb_dir;
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
+=20
+ struct ndp_ns {     /* Neighbor Solicitation Message */
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
+=20
+ struct ndp_na {     /* Neighbor Advertisement Message */
+ #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+@@ -72,13 +76,17 @@ struct ndp_na {     /* Neighbor Advertisement Message=
+ */
+         reserved_lo:24;
  #endif
-+    GSList *fwd;
- } SlirpState;
-=20
- static struct slirp_config_str *slirp_configs;
-@@ -122,10 +130,19 @@ static void slirp_smb_exit(Notifier *n, void *data)
-     slirp_smb_cleanup(s);
- }
-=20
-+static void slirp_free_fwd(gpointer data)
-+{
-+    struct GuestFwd *fwd =3D data;
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++};
 +
-+    qemu_chr_fe_deinit(&fwd->hd, true);
-+    g_free(data);
-+}
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
+=20
+ struct ndp_redirect {
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+     struct in6_addr dest;   /* Destination Address */
+-} QEMU_PACKED;
++};
 +
- static void net_slirp_cleanup(NetClientState *nc)
- {
-     SlirpState *s =3D DO_UPCAST(SlirpState, nc, nc);
++QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
 =20
-+    g_slist_free_full(s->fwd, slirp_free_fwd);
-     slirp_cleanup(s->slirp);
-     if (s->exit_notifier.notify) {
-         qemu_remove_exit_notifier(&s->exit_notifier);
-@@ -717,13 +734,6 @@ static int slirp_smb(SlirpState* s, const char *expo=
-rted_dir,
+ /*
+  * Structure of an icmpv6 header.
+@@ -103,7 +111,9 @@ struct icmp6 {
+ #define icmp6_nns icmp6_body.ndp_ns
+ #define icmp6_nna icmp6_body.ndp_na
+ #define icmp6_redirect icmp6_body.ndp_redirect
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
 =20
- #endif /* !defined(_WIN32) */
-=20
--struct GuestFwd {
--    CharBackend hd;
--    struct in_addr server;
--    int port;
--    Slirp *slirp;
--};
--
- static int guestfwd_can_read(void *opaque)
- {
-     struct GuestFwd *fwd =3D opaque;
-@@ -814,6 +824,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
-config_str, Error **errp)
-=20
-         qemu_chr_fe_set_handlers(&fwd->hd, guestfwd_can_read, guestfwd_r=
-ead,
-                                  NULL, NULL, fwd, NULL, true);
-+        s->fwd =3D g_slist_append(s->fwd, fwd);
-     }
-     return 0;
-=20
+ #define ICMP6_MINLEN    4
+ #define ICMP6_ERROR_MINLEN  8
 --=20
 2.20.1
