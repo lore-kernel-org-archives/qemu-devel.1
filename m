@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52857)
+Received: from eggs.gnu.org ([209.51.188.92]:52844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCQ-0001bG-Tp
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:10 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCQ-0001ap-BW
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCN-0007hJ-I2
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnjCN-0007gT-3q
 	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:06 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:46482)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:43434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnjCN-0007Se-0i
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:03 -0500
+	id 1gnjCM-0007Rv-KO
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:06:02 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun, 27 Jan 2019 13:05:19 +0100
-Message-Id: <20190127120526.15457-25-samuel.thibault@ens-lyon.org>
+Date: Sun, 27 Jan 2019 13:05:17 +0100
+Message-Id: <20190127120526.15457-23-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 References: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/31] slirp: replace remaining qemu headers
- dependency
+Subject: [Qemu-devel] [PULL 22/31] slirp: replace qemu qtailq with slirp own
+ copy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,400 +33,314 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Except for the migration code which is gated by WITH_QEMU, only
-include our own headers, so libslirp can be built standalone.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/arp_table.c  |  1 -
- slirp/bootp.c      |  1 -
- slirp/cksum.c      |  1 -
- slirp/dhcpv6.c     |  1 -
- slirp/dnssearch.c  |  1 -
- slirp/if.c         |  1 -
- slirp/ip6_icmp.c   |  1 -
- slirp/ip6_input.c  |  1 -
- slirp/ip6_output.c |  2 --
- slirp/ip_icmp.c    |  1 -
- slirp/ip_input.c   |  1 -
- slirp/ip_output.c  |  1 -
- slirp/mbuf.c       |  1 -
- slirp/misc.c       |  2 --
- slirp/ncsi.c       |  1 -
- slirp/ndp_table.c  |  2 --
- slirp/sbuf.c       |  1 -
- slirp/slirp.c      |  2 --
- slirp/socket.c     |  2 --
- slirp/tcp_input.c  |  1 -
- slirp/tcp_output.c |  1 -
- slirp/tcp_subr.c   |  1 -
- slirp/tcp_timer.c  |  1 -
- slirp/tftp.c       |  6 ++++--
- slirp/udp.c        |  1 -
- slirp/udp6.c       |  2 --
- slirp/util.h       | 21 +++++++++++++++++++++
- 27 files changed, 25 insertions(+), 33 deletions(-)
+ slirp/qtailq.h | 193 +++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/slirp.h  |   3 +-
+ 2 files changed, 194 insertions(+), 2 deletions(-)
+ create mode 100644 slirp/qtailq.h
 
-diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-index bf71b984ad..8ea655f79d 100644
---- a/slirp/arp_table.c
-+++ b/slirp/arp_table.c
-@@ -22,7 +22,6 @@
-  * THE SOFTWARE.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
-LEN])
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 4c9a77eb98..d396849a05 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -21,7 +21,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- #if defined(_WIN32)
-diff --git a/slirp/cksum.c b/slirp/cksum.c
-index 84c858fafb..25bfa67348 100644
---- a/slirp/cksum.c
-+++ b/slirp/cksum.c
-@@ -30,7 +30,6 @@
-  * in_cksum.c,v 1.2 1994/08/02 07:48:16 davidg Exp
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- /*
-diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
-index e27d9a46f8..9ffba38e8f 100644
---- a/slirp/dhcpv6.c
-+++ b/slirp/dhcpv6.c
-@@ -20,7 +20,6 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "dhcpv6.h"
-=20
-diff --git a/slirp/dnssearch.c b/slirp/dnssearch.c
-index 8fb563321b..c459cece8d 100644
---- a/slirp/dnssearch.c
-+++ b/slirp/dnssearch.c
-@@ -22,7 +22,6 @@
-  * THE SOFTWARE.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static const uint8_t RFC3397_OPT_DOMAIN_SEARCH =3D 119;
-diff --git a/slirp/if.c b/slirp/if.c
-index 90b9078687..2ad03b8a79 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -5,7 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static void
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index b3b7e50a31..2a432ebbd4 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -3,7 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip6_icmp.h"
-=20
-diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
-index ab656a0a9d..1b8c003c66 100644
---- a/slirp/ip6_input.c
-+++ b/slirp/ip6_input.c
-@@ -3,7 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip6_icmp.h"
-=20
-diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
-index 52c88ad691..19d1ae7748 100644
---- a/slirp/ip6_output.c
-+++ b/slirp/ip6_output.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
-=20
- /* Number of packets queued before we start sending
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 19e247f773..6b6344b776 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -30,7 +30,6 @@
-  * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/ip_input.c b/slirp/ip_input.c
-index d360620838..774ce662e6 100644
---- a/slirp/ip_input.c
-+++ b/slirp/ip_input.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/ip_output.c b/slirp/ip_output.c
-index db403f04c1..f6ec141df5 100644
---- a/slirp/ip_output.c
-+++ b/slirp/ip_output.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- /* Number of packets queued before we start sending
-diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-index d8d275e0e7..521c02c967 100644
---- a/slirp/mbuf.c
-+++ b/slirp/mbuf.c
-@@ -15,7 +15,6 @@
-  * the flags
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- #define MBUF_THRESH 30
-diff --git a/slirp/misc.c b/slirp/misc.c
-index a77cc34b30..4662071be0 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -5,9 +5,7 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
--#include "libslirp.h"
-=20
- inline void
- insque(void *a, void *b)
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 8594382270..327f17543c 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -6,7 +6,6 @@
-  * This code is licensed under the GPL version 2 or later. See the
-  * COPYING file in the top-level directory.
-  */
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- #include "ncsi-pkt.h"
-diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
-index b7b73722f7..34ea4fdf1f 100644
---- a/slirp/ndp_table.c
-+++ b/slirp/ndp_table.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
-=20
- void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index c83e4dd8ed..51a9f0cc7d 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -5,7 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static void sbappendsb(struct sbuf *sb, struct mbuf *m);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ec1f606d72..730b78255c 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -21,8 +21,6 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
-=20
- #ifdef WITH_QEMU
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 2e8dc22fb6..dea201f5ce 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -5,8 +5,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
- #include "ip_icmp.h"
- #ifdef __sun__
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index 7c1fe18fec..864da7d857 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
-index 6dd1ecf5d9..2b4335eb34 100644
---- a/slirp/tcp_output.c
-+++ b/slirp/tcp_output.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static const u_char  tcp_outflags[TCP_NSTATES] =3D {
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index d8846a33b0..879a7dcd29 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- /* patchable/settable parameters for tcp */
-diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
-index a843e57a2b..703907eb37 100644
---- a/slirp/tcp_timer.c
-+++ b/slirp/tcp_timer.c
-@@ -30,7 +30,6 @@
-  * tcp_timer.c,v 1.2 1994/08/02 07:49:10 davidg Exp
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
-=20
- static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
-diff --git a/slirp/tftp.c b/slirp/tftp.c
-index 5c31886190..2d8f978786 100644
---- a/slirp/tftp.c
-+++ b/slirp/tftp.c
-@@ -22,9 +22,11 @@
-  * THE SOFTWARE.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
--#include "qemu-common.h"
+diff --git a/slirp/qtailq.h b/slirp/qtailq.h
+new file mode 100644
+index 0000000000..a89b0c439a
+--- /dev/null
++++ b/slirp/qtailq.h
+@@ -0,0 +1,193 @@
++/*      $NetBSD: queue.h,v 1.52 2009/04/20 09:56:08 mschuett Exp $ */
 +
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-=20
- static inline int tftp_session_in_use(struct tftp_session *spt)
- {
-diff --git a/slirp/udp.c b/slirp/udp.c
-index 3915971b50..ac42be0d8e 100644
---- a/slirp/udp.c
-+++ b/slirp/udp.c
-@@ -38,7 +38,6 @@
-  * terms and conditions of the copyright.
-  */
-=20
--#include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-diff --git a/slirp/udp6.c b/slirp/udp6.c
-index fa531e03c4..be5cba1f54 100644
---- a/slirp/udp6.c
-+++ b/slirp/udp6.c
-@@ -3,8 +3,6 @@
-  * Guillaume Subiron
-  */
-=20
--#include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "slirp.h"
- #include "udp.h"
- #include "dhcpv6.h"
-diff --git a/slirp/util.h b/slirp/util.h
-index ef75804560..4963747aef 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -48,6 +48,27 @@
- # define SLIRP_PACKED __attribute__((packed))
- #endif
-=20
-+#ifndef DIV_ROUND_UP
-+#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
-+#endif
++/*
++ * slirp version: Copy from QEMU, removed all but tail queues.
++ */
 +
-+#ifndef container_of
-+#define container_of(ptr, type, member) __extension__ ({    \
-+    void *__mptr =3D (void *)(ptr);               \
-+    ((type *)(__mptr - offsetof(type, member))); })
-+#endif
++/*
++ * Copyright (c) 1991, 1993
++ *      The Regents of the University of California.  All rights reserve=
+d.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in th=
+e
++ *    documentation and/or other materials provided with the distributio=
+n.
++ * 3. Neither the name of the University nor the names of its contributo=
+rs
++ *    may be used to endorse or promote products derived from this softw=
+are
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
++ * SUCH DAMAGE.
++ *
++ *      @(#)queue.h     8.5 (Berkeley) 8/20/94
++ */
 +
-+#if defined(_WIN32) /* CONFIG_IOVEC */
-+# if !defined(IOV_MAX) /* XXX: to avoid duplicate with QEMU osdep.h */
-+struct iovec {
-+    void *iov_base;
-+    size_t iov_len;
-+};
-+# endif
-+#else
-+#include <sys/uio.h>
-+#endif
++#ifndef QTAILQ_H
++#define QTAILQ_H
 +
- #define SCALE_MS 1000000
++/*
++ * A tail queue is headed by a pair of pointers, one to the head of the
++ * list and the other to the tail of the list. The elements are doubly
++ * linked so that an arbitrary element can be removed without a need to
++ * traverse the list. New elements can be added to the list before or
++ * after an existing element, at the head of the list, or at the end of
++ * the list. A tail queue may be traversed in either direction.
++ */
++typedef struct QTailQLink {
++    void *tql_next;
++    struct QTailQLink *tql_prev;
++} QTailQLink;
++
++/*
++ * Tail queue definitions.  The union acts as a poor man template, as if
++ * it were QTailQLink<type>.
++ */
++#define QTAILQ_HEAD(name, type)                                         =
+\
++    union name {                                                        =
+\
++        struct type *tqh_first;       /* first element */               =
+\
++        QTailQLink tqh_circ;          /* link for circular backwards lis=
+t */ \
++    }
++
++#define QTAILQ_HEAD_INITIALIZER(head)           \
++    { .tqh_circ =3D { NULL, &(head).tqh_circ } }
++
++#define QTAILQ_ENTRY(type)                                              =
+\
++    union {                                                             =
+\
++        struct type *tqe_next;        /* next element */                =
+\
++        QTailQLink tqe_circ;          /* link for circular backwards lis=
+t */ \
++    }
++
++#define QTAILQ_INIT(head) do {                                          =
+\
++        (head)->tqh_first =3D NULL;                                     =
+  \
++        (head)->tqh_circ.tql_prev =3D &(head)->tqh_circ;                =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_INSERT_HEAD(head, elm, field) do {                       =
+\
++        if (((elm)->field.tqe_next =3D (head)->tqh_first) !=3D NULL)    =
+    \
++            (head)->tqh_first->field.tqe_circ.tql_prev =3D              =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
++        (head)->tqh_first =3D (elm);                                    =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(head)->tqh_circ;           =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_INSERT_TAIL(head, elm, field) do {                       =
+\
++        (elm)->field.tqe_next =3D NULL;                                 =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D (head)->tqh_circ.tql_prev;   =
+  \
++        (head)->tqh_circ.tql_prev->tql_next =3D (elm);                  =
+  \
++        (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;           =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do {             =
+\
++        if (((elm)->field.tqe_next =3D (listelm)->field.tqe_next) !=3D N=
+ULL)\
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                &(elm)->field.tqe_circ;                                 =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D &(elm)->field.tqe_circ;       =
+  \
++        (listelm)->field.tqe_next =3D (elm);                            =
+  \
++        (elm)->field.tqe_circ.tql_prev =3D &(listelm)->field.tqe_circ;  =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                  =
+     \
++        (elm)->field.tqe_circ.tql_prev =3D (listelm)->field.tqe_circ.tql=
+_prev; \
++        (elm)->field.tqe_next =3D (listelm);                            =
+       \
++        (listelm)->field.tqe_circ.tql_prev->tql_next =3D (elm);         =
+       \
++        (listelm)->field.tqe_circ.tql_prev =3D &(elm)->field.tqe_circ;  =
+       \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_REMOVE(head, elm, field) do {                            =
+\
++        if (((elm)->field.tqe_next) !=3D NULL)                          =
+  \
++            (elm)->field.tqe_next->field.tqe_circ.tql_prev =3D          =
+  \
++                (elm)->field.tqe_circ.tql_prev;                         =
+\
++        else                                                            =
+\
++            (head)->tqh_circ.tql_prev =3D (elm)->field.tqe_circ.tql_prev=
+; \
++        (elm)->field.tqe_circ.tql_prev->tql_next =3D (elm)->field.tqe_ne=
+xt; \
++        (elm)->field.tqe_circ.tql_prev =3D NULL;                        =
+  \
++} while (/*CONSTCOND*/0)
++
++#define QTAILQ_FOREACH(var, head, field)                                =
+\
++        for ((var) =3D ((head)->tqh_first);                             =
+  \
++                (var);                                                  =
+\
++                (var) =3D ((var)->field.tqe_next))
++
++#define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
+\
++        for ((var) =3D ((head)->tqh_first);                             =
+  \
++                (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
+  \
++                (var) =3D (next_var))
++
++#define QTAILQ_FOREACH_REVERSE(var, head, field)                        =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
++                (var);                                                  =
+\
++                (var) =3D QTAILQ_PREV(var, field))
++
++#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         =
+\
++        for ((var) =3D QTAILQ_LAST(head);                               =
+  \
++             (var) && ((prev_var) =3D QTAILQ_PREV(var, field));         =
+  \
++             (var) =3D (prev_var))
++
++/*
++ * Tail queue access methods.
++ */
++#define QTAILQ_EMPTY(head)               ((head)->tqh_first =3D=3D NULL)
++#define QTAILQ_FIRST(head)               ((head)->tqh_first)
++#define QTAILQ_NEXT(elm, field)          ((elm)->field.tqe_next)
++#define QTAILQ_IN_USE(elm, field)        ((elm)->field.tqe_circ.tql_prev=
+ !=3D NULL)
++
++#define QTAILQ_LINK_PREV(link)                                          =
+\
++        ((link).tql_prev->tql_prev->tql_next)
++#define QTAILQ_LAST(head)                                               =
+\
++        ((typeof((head)->tqh_first)) QTAILQ_LINK_PREV((head)->tqh_circ))
++#define QTAILQ_PREV(elm, field)                                         =
+\
++        ((typeof((elm)->field.tqe_next)) QTAILQ_LINK_PREV((elm)->field.t=
+qe_circ))
++
++#define field_at_offset(base, offset, type)                             =
+       \
++        ((type *) (((char *) (base)) + (offset)))
++
++/*
++ * Raw access of elements of a tail queue head.  Offsets are all zero
++ * because it's a union.
++ */
++#define QTAILQ_RAW_FIRST(head)                                          =
+       \
++        field_at_offset(head, 0, void *)
++#define QTAILQ_RAW_TQH_CIRC(head)                                       =
+       \
++        field_at_offset(head, 0, QTailQLink)
++
++/*
++ * Raw access of elements of a tail entry
++ */
++#define QTAILQ_RAW_NEXT(elm, entry)                                     =
+       \
++        field_at_offset(elm, entry, void *)
++#define QTAILQ_RAW_TQE_CIRC(elm, entry)                                 =
+       \
++        field_at_offset(elm, entry, QTailQLink)
++/*
++ * Tail queue traversal using pointer arithmetic.
++ */
++#define QTAILQ_RAW_FOREACH(elm, head, entry)                            =
+       \
++        for ((elm) =3D *QTAILQ_RAW_FIRST(head);                         =
+         \
++             (elm);                                                     =
+       \
++             (elm) =3D *QTAILQ_RAW_NEXT(elm, entry))
++/*
++ * Tail queue insertion using pointer arithmetic.
++ */
++#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                   =
+        \
++        *QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                          =
+          \
++        QTAILQ_RAW_TQE_CIRC(elm, entry)->tql_prev =3D QTAILQ_RAW_TQH_CIR=
+C(head)->tql_prev; \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev->tql_next =3D (elm);        =
+          \
++        QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm,=
+ entry);  \
++} while (/*CONSTCOND*/0)
++
++#endif /* QTAILQ_H */
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index c9f9143801..0e4d973c2a 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -46,8 +46,7 @@ typedef char *caddr_t;
 =20
- #define ETH_ALEN    6
+ #include "debug.h"
+ #include "util.h"
+-
+-#include "qemu/queue.h"
++#include "qtailq.h"
+=20
+ #include "libslirp.h"
+ #include "ip.h"
 --=20
 2.20.1
