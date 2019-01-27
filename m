@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34853)
+Received: from eggs.gnu.org ([209.51.188.92]:55689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gnk06-0001pJ-78
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:57:26 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gnmDr-0003TY-NE
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 10:19:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gnk05-0003wq-JM
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 07:57:26 -0500
-Date: Sun, 27 Jan 2019 12:57:20 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190127125720.GC13784@stefanha-x1.localdomain>
-References: <20190124172323.230296-1-sgarzare@redhat.com>
-	<20190124172323.230296-3-sgarzare@redhat.com>
-	<5b3c3076-8f0e-c6a2-b6d1-707db2ae3a66@redhat.com>
-	<962ebaff-23ce-57ff-3387-9017c2ccd14a@redhat.com>
-	<20190125081615.2cevf7cy7bcnxqwh@steredhat>
-	<d4aa8b25-f0ad-1444-587c-3d90a8ddc74a@redhat.com>
-	<20190125151245.GD28305@stefanha-x1.localdomain>
-	<20190125141502-mutt-send-email-mst@kernel.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gnmDq-0000j0-AW
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 10:19:47 -0500
+References: <20190127090306.30826-1-mark.cave-ayland@ilande.co.uk>
+	<20190127090306.30826-3-mark.cave-ayland@ilande.co.uk>
+	<alpine.BSF.2.21.9999.1901271251060.35973@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <3dc12858-4254-9da1-7eb2-309948d0d376@ilande.co.uk>
+Date: Sun, 27 Jan 2019 15:19:33 +0000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yLVHuoLXiP9kZBkt"
-Content-Disposition: inline
-In-Reply-To: <20190125141502-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] tests/virtio-blk: add test for
- WRITE_ZEROES command
+In-Reply-To: <alpine.BSF.2.21.9999.1901271251060.35973@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 2/8] target/ppc: rework
+ vmrg{l, h}{b, h, w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, virtio-comment@lists.oasis-open.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+
+On 27/01/2019 12:07, BALATON Zoltan wrote:
+
+> On Sun, 27 Jan 2019, Mark Cave-Ayland wrote:
+>> The current implementations make use of the endian-specific macros MRGLO/MRGHI
+>> and also reference HI_IDX and LO_IDX directly to calculate array offsets.
+>>
+>> Rework the implementation to use the Vsr* macros so that these per-endian
+>> references can be removed.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>> target/ppc/int_helper.c | 52 ++++++++++++++++++++++++-------------------------
+>> 1 file changed, 25 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+>> index 598731d47a..f084a706ee 100644
+>> --- a/target/ppc/int_helper.c
+>> +++ b/target/ppc/int_helper.c
+>> @@ -976,43 +976,41 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t
+>> *b, ppc_avr_t *c)
+>>     }
+>> }
+>>
+>> -#define VMRG_DO(name, element, highp)                                   \
+>> +#define VMRG_DOLO(name, element, access)                                \
+>>     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+>>     {                                                                   \
+>>         ppc_avr_t result;                                               \
+>>         int i;                                                          \
+>> -        size_t n_elems = ARRAY_SIZE(r->element);                        \
+>> +        int m = ARRAY_SIZE(r->element) - 1;                             \
+>>                                                                         \
+>> -        for (i = 0; i < n_elems / 2; i++) {                             \
+>> -            if (highp) {                                                \
+>> -                result.element[i*2+HI_IDX] = a->element[i];             \
+>> -                result.element[i*2+LO_IDX] = b->element[i];             \
+>> -            } else {                                                    \
+>> -                result.element[n_elems - i * 2 - (1 + HI_IDX)] =        \
+>> -                    b->element[n_elems - i - 1];                        \
+>> -                result.element[n_elems - i * 2 - (1 + LO_IDX)] =        \
+>> -                    a->element[n_elems - i - 1];                        \
+>> -            }                                                           \
+>> +        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
+> 
+> Isn't this a performance hit? You seem to do twice as many iterations now:
+> 
+> - before, the loop was to ARRAY_SIZE/2 and was called twice so it executed ARRAY_SIZE
+> times
+> 
+> - after you have a loop to ARRAY_SIZE but still called twice so it executes
+> 2*ARRAY_SIZE times
+> 
+> Or do I miss something? If these are replaced with hardware vector instructions at
+> the end then it may not matter to those who have CPU with needed vector instructions
+> but for others this may be slower than the previous hand optimised version. But I
+> haven't tested it, just guessing.
+
+One point to clarify here is that the HI and LO variants of vmrg{l,h}{b,h,w} are
+separate instructions, so the input elements are being iterated over once, both
+before and after the patch.
+
+Simplifying the patch down then effectively what happens is that the patch has
+changed the merge implementation from:
+
+    for (i = 0; i < ARRAY_SIZE / 2; i++) {
+        result[f(2 * i)] = a->element[g(i)];
+        result[f(2 * i + 1)] = b->element[g(i)];
+    }
+
+to:
+
+    for (i = 0; i < ARRAY_SIZE; i++) {
+        result[f(i)] = (i & 1) ? a->element[g(i)] : b->element[g(i)];
+    }
+
+So you're still calculating the same number of result elements, even though the loop
+executes twice as many times.
+
+Could this make the loop slower? I certainly haven't noticed any obvious performance
+difference during testing (OS X uses merge quite a bit for display rendering), and
+I'd hope that with a good compiler and modern branch prediction then any effect here
+would be negligible.
 
 
---yLVHuoLXiP9kZBkt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ATB,
 
-On Fri, Jan 25, 2019 at 02:17:01PM -0500, Michael S. Tsirkin wrote:
-> On Fri, Jan 25, 2019 at 03:12:45PM +0000, Stefan Hajnoczi wrote:
-> > Based on the Linux guest driver code and the lack of more evidence in
-> > the spec, I'm pretty sure data[] doesn't need to be padded to 512 bytes
-> > for discard/write zero requests.
->=20
-> OK. Must devices support such padding?
-
-I see no reason to require padding.  Host APIs and physical storage
-controllers do not require it.
-
-> > > Looking at the QEMU sources, it seems like it can deal with both and
-> > > always sets the status right behind the last byte:
-> > >=20
-> > >     req->in =3D (void *)in_iov[in_num - 1].iov_base
-> > >               + in_iov[in_num - 1].iov_len
-> > >               - sizeof(struct virtio_blk_inhdr);
-> > >=20
-> > > Anyway, I think the virtio spec should be clearer here to avoid bad
-> > > implementations in the future, so maybe Changpeng or Michael could
-> > > update the spec here a little bit?
-> >=20
-> > Yep, good point.  VIRTIO 1.1 is available for public comments, so I've
-> > CCed the list.
-> >=20
-> > Stefan
->=20
-> Thanks!
-> Care creating a github issue? And maybe proposing a spec patch.
-
-Okay.  I will do this on Wednesday 30th of January.
-
-Stefan
-
---yLVHuoLXiP9kZBkt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcTaqwAAoJEJykq7OBq3PI5EMIAL5RlXi3OXGuij11tSpqsIGe
-EBBEO4B4RUVUmre3fbSwlHeaC2QR4/NpeFEjHckNpxhGT6AB+hOa9haSH9uD+3n/
-o+lidkVfkFX6pNNANMxc75Xg7MlXY0z3Jt/pWncThSIqpOC+zF9tbzuQN+0FUVQ8
-RBQKi6b7h4SuFpa3Fl5x4KQV/YwwrTGQf67yCirHIyaMbcyBVoUci4Y2OViCl2CC
-AeDah/vNHlgFg/FJiRHMXtdLFuPeSE7NdEh+7gK3vdb/Bz+8vxt/vDe9Ze/MuI2n
-+JzK8rBeh2xm1EPqZTQ36W4zuC0N6JkEH3nxrT3zJzQnk//g8x7jOW1lHrPZFQg=
-=HxOX
------END PGP SIGNATURE-----
-
---yLVHuoLXiP9kZBkt--
+Mark.
