@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38682)
+Received: from eggs.gnu.org ([209.51.188.92]:38965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnYVr-0006PZ-Sn
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:41:28 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnYXO-00071m-Ey
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:43:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnYVr-0003HH-8o
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:41:27 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:38416)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gnYXN-0004xs-T6
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:43:02 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:38442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gnYVr-0003Fg-2T
-	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:41:27 -0500
-Date: Sun, 27 Jan 2019 01:41:23 +0100
+	id 1gnYXN-0004xC-Mg
+	for qemu-devel@nongnu.org; Sat, 26 Jan 2019 19:43:01 -0500
+Date: Sun, 27 Jan 2019 01:42:59 +0100
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190127004123.auagyzmdc6n5fj5q@function>
+Message-ID: <20190127004259.k4eeph24obsnamm4@function>
 References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
-	<20190117114359.5164-15-marcandre.lureau@redhat.com>
+	<20190117114359.5164-16-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190117114359.5164-15-marcandre.lureau@redhat.com>
+In-Reply-To: <20190117114359.5164-16-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/27] slirp: improve windows headers
- inclusion
+Subject: Re: [Qemu-devel] [PATCH 15/27] slirp: add slirp own version of
+ pstrcpy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,12 +33,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-Marc-Andr=C3=A9 Lureau, le jeu. 17 janv. 2019 15:43:46 +0400, a ecrit:
-> Our API usage requires Vista, set WIN32_LEAN_AND_MEAN to fix a number
-> of issues (winsock2.h include order for ex, which is better to include
-> first for legacy reasons).
->=20
-> While at it, group redundants #ifndef _WIN32 blocks.
+Marc-Andr=C3=A9 Lureau, le jeu. 17 janv. 2019 15:43:47 +0400, a ecrit:
+> Remove a dependency on qemu util.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
