@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39979)
+Received: from eggs.gnu.org ([209.51.188.92]:40030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gnppP-0003dN-Ug
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:10:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gnppr-0003sk-IN
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gnppP-000440-4c
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:10:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48196)
+	(envelope-from <richard.henderson@linaro.org>) id 1gnppq-0004DV-Jf
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:15 -0500
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:33745)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gnppO-00043U-V1
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:10:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gnppN-0003Ed-63
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 19:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CE352E80C7
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 19:10:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gnppq-0004D2-8d
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 14:11:14 -0500
+Received: by mail-pg1-x529.google.com with SMTP id z11so6296908pgu.0
+	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 11:11:13 -0800 (PST)
+References: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <60153071-3be0-584f-94b1-bb199a81e7fc@linaro.org>
+Date: Sun, 27 Jan 2019 11:11:09 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 27 Jan 2019 19:04:49 -0000
-From: Richard Henderson <rth@twiddle.net>
-Reply-To: Bug 1813460 <1813460@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154858120998.1748.9152682687215641431.malonedeb@wampee.canonical.com>
-Message-Id: <154861588978.19624.1945585311119463857.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1813460] Re:
- qemu/target/arm/translate-a64.c:2039: bad test ?
+In-Reply-To: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] slirp: replace QEMU_BUILD_BUG_ON with
+ G_STATIC_ASSERT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: lizhijian@cn.fujitsu.com, jan.kiszka@siemens.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, zhangckid@gmail.com
 
-There is a patch on list for this:
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06728.html
+On 1/27/19 3:46 AM, Samuel Thibault wrote:
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  slirp/ip.h       |  4 ++--
+>  slirp/ip6.h      |  4 ++--
+>  slirp/ip6_icmp.h | 10 +++++-----
+>  3 files changed, 9 insertions(+), 9 deletions(-)
 
-Using the flag is a good idea.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-** Changed in: qemu
-       Status: New =3D> In Progress
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813460
-
-Title:
-  qemu/target/arm/translate-a64.c:2039: bad test ?
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  qemu/target/arm/translate-a64.c:2039]: (warning) Logical disjunction
-  always evaluates to true: op3 !=3D 2 || op3 !=3D 3.
-
-  Source code is
-
-         if (op3 !=3D 2 || op3 !=3D 3) {
-
-  Maybe better code
-
-         if (op3 !=3D 2 && op3 !=3D 3) {
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813460/+subscriptions
+r~
