@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58285)
+Received: from eggs.gnu.org ([209.51.188.92]:58543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goAo0-00070I-JZ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:34:45 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1goAox-0007et-3w
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goAnz-00071I-S9
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:34:44 -0500
-Date: Mon, 28 Jan 2019 18:34:16 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190128183416.084884aa.cohuck@redhat.com>
-In-Reply-To: <9742e9c6-627d-2c00-b666-f669b264bbb4@linux.ibm.com>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-4-cohuck@redhat.com>
-	<74c910bf-d34b-b798-db9d-da29787f0a9e@linux.ibm.com>
-	<9742e9c6-627d-2c00-b666-f669b264bbb4@linux.ibm.com>
+	(envelope-from <dgilbert@redhat.com>) id 1goAov-0008IS-Ba
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:35:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51106)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goAov-0008G4-34
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:35:41 -0500
+Date: Mon, 28 Jan 2019 17:35:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190128173536.GE2585@work-vm>
+References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128121331.GB2939@work-vm>
+	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] vfio-ccw: add capabilities chain
+Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +29,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Leonardo Soares =?iso-8859-1?Q?M=FCller?= <leozinho29_eu@hotmail.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 25 Jan 2019 16:00:18 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
+* Leonardo Soares M=FCller (leozinho29_eu@hotmail.com) wrote:
+> Here is the backtrace with the debug symbols added:
 
-> On 01/25/2019 11:19 AM, Eric Farman wrote:
-> >=20
-> >=20
-> > On 01/21/2019 06:03 AM, Cornelia Huck wrote: =20
-> >> Allow to extend the regions used by vfio-ccw. The first user will be
-> >> handling of halt and clear subchannel.
-> >>
-> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >> ---
-> >> =C2=A0 drivers/s390/cio/vfio_ccw_ops.c=C2=A0=C2=A0=C2=A0=C2=A0 | 181 +=
-+++++++++++++++++++++++----
-> >> =C2=A0 drivers/s390/cio/vfio_ccw_private.h |=C2=A0 38 ++++++ =20
-> ...snip...
-> >> diff --git a/drivers/s390/cio/vfio_ccw_private.h=20
-> >> b/drivers/s390/cio/vfio_ccw_private.h
-> >> index e88237697f83..20e75f4f3695 100644
-> >> --- a/drivers/s390/cio/vfio_ccw_private.h
-> >> +++ b/drivers/s390/cio/vfio_ccw_private.h
-> >> @@ -3,9 +3,11 @@
-> >> =C2=A0=C2=A0 * Private stuff for vfio_ccw driver
-> >> =C2=A0=C2=A0 *
-> >> =C2=A0=C2=A0 * Copyright IBM Corp. 2017
-> >> + * Copyright Red Hat, Inc. 2019
-> >> =C2=A0=C2=A0 *
-> >> =C2=A0=C2=A0 * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> >> =C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> >> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-Cornelia Huck <cohuck@redhat.com>
-> >> =C2=A0=C2=A0 */
-> >> =C2=A0 #ifndef _VFIO_CCW_PRIVATE_H_
-> >> @@ -19,6 +21,38 @@
-> >> =C2=A0 #include "css.h"
-> >> =C2=A0 #include "vfio_ccw_cp.h"
-> >> +#define VFIO_CCW_OFFSET_SHIFT=C2=A0=C2=A0 40
-> >> +#define VFIO_CCW_OFFSET_TO_INDEX(off)=C2=A0=C2=A0=C2=A0 (off >> VFIO_=
-CCW_OFFSET_SHIFT)
-> >> +#define VFIO_CCW_INDEX_TO_OFFSET(index)=C2=A0=C2=A0=C2=A0 ((u64)(inde=
-x) <<=20
-> >> VFIO_CCW_OFFSET_SHIFT)
-> >> +#define VFIO_CCW_OFFSET_MASK=C2=A0=C2=A0=C2=A0 (((u64)(1) << VFIO_CCW=
-_OFFSET_SHIFT)=20
-> >> - 1)
-> >> +
-> >> +/* capability chain handling similar to vfio-pci */
-> >> +struct vfio_ccw_private;
-> >> +struct vfio_ccw_region;
-> >> +
-> >> +struct vfio_ccw_regops {
-> >> +=C2=A0=C2=A0=C2=A0 size_t=C2=A0=C2=A0=C2=A0 (*read)(struct vfio_ccw_p=
-rivate *private, char __user=20
-> >> *buf,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
-ze_t count, loff_t *ppos);
-> >> +=C2=A0=C2=A0=C2=A0 size_t=C2=A0=C2=A0=C2=A0 (*write)(struct vfio_ccw_=
-private *private,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 const char __user *buf, size_t count, loff_t *ppos); =20
+OK, great;  can can you confirm the version of the spice packages
+on both the guest and host, and the kernel on the guest.
+
+Dave
+
+> (gdb) bt
+> #0  0x00007ffff0373e97 in __GI_raise (sig=3Dsig@entry=3D6) at
+> ../sysdeps/unix/sysv/linux/raise.c:51
+> #1  0x00007ffff0375801 in __GI_abort () at abort.c:79
+> #2  0x00007ffff1171cc9 in spice_logv (log_domain=3D0x7ffff11dc9f5 "Spic=
+e",
+> args=3D0x7fff36028cb0, format=3D0x7ffff11e3c5b "slot_id %d too big,
+> addr=3D%lx", function=3D0x7ffff11e3d90 <__FUNCTION__.15594>
+> "memslot_get_virt", strloc=3D0x7ffff11e3c78 "memslot.c:111",
+> log_level=3DG_LOG_LEVEL_CRITICAL) at log.c:183
+> #3  0x00007ffff1171cc9 in spice_log
+> (log_level=3Dlog_level@entry=3DG_LOG_LEVEL_CRITICAL,
+> strloc=3Dstrloc@entry=3D0x7ffff11e3c78 "memslot.c:111",
+> function=3Dfunction@entry=3D0x7ffff11e3d90 <__FUNCTION__.15594>
+> "memslot_get_virt", format=3Dformat@entry=3D0x7ffff11e3c5b "slot_id %d =
+too
+> big, addr=3D%lx") at log.c:196
+> #4  0x00007ffff11373b8 in memslot_get_virt
+> (info=3Dinfo@entry=3D0x5555579b8630, addr=3Daddr@entry=3D18374686483949=
+813760,
+> add_size=3Dadd_size@entry=3D10, group_id=3Dgroup_id@entry=3D1,
+> error=3Derror@entry=3D0x7fff36028e08)
+>     at memslot.c:111
+> #5  0x00007ffff11407d0 in red_get_image
+> (slots=3Dslots@entry=3D0x5555579b8630, group_id=3Dgroup_id@entry=3D1,
+> addr=3D<optimized out>, flags=3Dflags@entry=3D0, is_mask=3Dis_mask@entr=
+y=3Dfalse)
+> at red-parse-qxl.c:512
+> #6  0x00007ffff1140a76 in red_get_copy_ptr
+> (slots=3Dslots@entry=3D0x5555579b8630, group_id=3Dgroup_id@entry=3D1,
+> red=3Dred@entry=3D0x7fff1409f5f0, qxl=3D0x7fff1fe0107b, flags=3Dflags@e=
+ntry=3D0)
+> at red-parse-qxl.c:680
+> #7  0x00007ffff11419a1 in red_get_native_drawable (flags=3D<optimized
+> out>, addr=3D<optimized out>, red=3D<optimized out>, group_id=3D<optimi=
+zed
+> out>, slots=3D<optimized out>) at red-parse-qxl.c:1072
+> #8  0x00007ffff11419a1 in red_get_drawable
+> (slots=3Dslots@entry=3D0x5555579b8630, group_id=3D1,
+> red=3Dred@entry=3D0x7fff1409f550, addr=3D<optimized out>, flags=3D0) at
+> red-parse-qxl.c:1206
+> #9  0x00007ffff11543cd in red_process_display (worker=3D0x5555579b85a0,
+> ring_is_empty=3D0x7fff36028f9c) at red-worker.c:224
+> #10 0x00007ffff1152d21 in flush_commands
+> (worker=3Dworker@entry=3D0x5555579b85a0, red_channel=3D0x5555579b4a10,
+> process=3Dprocess@entry=3D0x7ffff1154220 <red_process_display>) at
+> red-worker.c:315
+> #11 0x00007ffff1152e58 in flush_display_commands
+> (worker=3Dworker@entry=3D0x5555579b85a0) at red-worker.c:352
+> #12 0x00007ffff11534bf in flush_all_qxl_commands (worker=3D0x5555579b85=
+a0)
+> at red-worker.c:367
+> #13 0x00007ffff11534bf in destroy_primary_surface
+> (worker=3D0x5555579b85a0, surface_id=3D0) at red-worker.c:558
+> #14 0x00007ffff11214f1 in dispatcher_handle_single_read
+> (dispatcher=3D0x555556a0c1c0) at dispatcher.c:284
+> #15 0x00007ffff11214f1 in dispatcher_handle_recv_read
+> (dispatcher=3D0x555556a0c1c0) at dispatcher.c:304
+> #16 0x00007ffff1127d7b in watch_func (source=3D<optimized out>,
+> condition=3D<optimized out>, data=3D0x5555579b8780) at event-loop.c:128
+> #17 0x00007ffff47931f5 in g_main_context_dispatch () at
+> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #18 0x00007ffff47935c0 in  () at /usr/lib/x86_64-linux-gnu/libglib-2.0.=
+so.0
+> #19 0x00007ffff47938d2 in g_main_loop_run () at
+> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+> #20 0x00007ffff1153b3a in red_worker_main (arg=3D0x5555579b85a0) at
+> red-worker.c:1372
+> #21 0x00007ffff072d6db in start_thread (arg=3D0x7fff3602c700) at
+> pthread_create.c:463
+> #22 0x00007ffff045688f in clone () at
+> ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
 >=20
-> Oops.  Per my recommendation on v1, you change these to "ssize_t" in=20
-> patch 5.  Might as well just do that here.
-
-Seems to have slipped into the wrong patch during rebase. Will fix.
+>=20
+> =C0s 10:13 de 28/01/2019, Dr. David Alan Gilbert escreveu:
+> >=20
+> > Thanks for the report,
+> >=20
+> > Could you install the debug packages of libspice-server on your syste=
+m
+> > so that the backtrace you get has symbols?
+> >=20
+> > Dave
+> >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
