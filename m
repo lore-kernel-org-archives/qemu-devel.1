@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44948)
+Received: from eggs.gnu.org ([209.51.188.92]:45227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9o7-0005C4-AD
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:30:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9pK-00062S-Tl
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9o5-000515-9G
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:30:47 -0500
-Date: Mon, 28 Jan 2019 17:30:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190128163028.GJ5756@localhost.localdomain>
-References: <735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
-	<w518szbmmw9.fsf@maestria.local.igalia.com>
-	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
-	<w5136pjmjrp.fsf@maestria.local.igalia.com>
-	<20190124091222.GB4601@localhost.localdomain>
-	<w51d0ogsv1y.fsf@maestria.local.igalia.com>
-	<20190128145743.GC5756@localhost.localdomain>
-	<w517eeoss2l.fsf@maestria.local.igalia.com>
-	<20190128160109.GF5756@localhost.localdomain>
-	<w514l9ssqqv.fsf@maestria.local.igalia.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1go9pJ-0006Ox-1K
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:32:02 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41632)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1go9pH-0006E0-5C
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:32:00 -0500
+Received: by mail-pg1-x544.google.com with SMTP id m1so7421665pgq.8
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:31:53 -0800 (PST)
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
+	<20190121185118.18550-23-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <55a04e92-4d8e-8455-e16f-bdd45b094a68@linaro.org>
+Date: Mon, 28 Jan 2019 08:31:48 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w514l9ssqqv.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
- different iothreads sharing a blockdev
+In-Reply-To: <20190121185118.18550-23-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 22/23] hw/arm/mps2-tz: Add IRQ
+ infrastructure to support SSE-200
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Am 28.01.2019 um 17:15 hat Alberto Garcia geschrieben:
-> On Mon 28 Jan 2019 05:01:09 PM CET, Kevin Wolf wrote:
+On 1/21/19 10:51 AM, Peter Maydell wrote:
+> In preparation for adding support for the AN521 MPS2 image, we need
+> to handle wiring up the MPS2 device interrupt lines to both CPUs in
+> the SSE-200, rather than just the one that the IoTKit has.
 > 
-> > And actually... if you move the first virtio-blk device to an
-> > iothread, then downgrading the others isn't going to save us, because
-> > that would still be using the backend from two threads (one
-> > successfully enabled iothread, and the main thread).
+> Abstract out a "connect to the IoTKit interrupt line" function
+> and make it connect to a splitter which feeds both sets of inputs
+> for the SSE-200 case.
 > 
-> ...which makes me think that, since patch 1 from this series moves the
-> BlockBackend back to the main AioContext on unplug, we could have a
-> similar problem if the BDS is being used by other devices. Or am I
-> missing something?
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/mps2-tz.c | 79 ++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 59 insertions(+), 20 deletions(-)
 
-Oops. :-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Maybe we do need to implement the proper solution?
 
-Kevin
+r~
