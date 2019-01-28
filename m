@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33182)
+Received: from eggs.gnu.org ([209.51.188.92]:33243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1go57i-0003W6-EF
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:30:44 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1go57q-0003Zg-EL
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1go57Y-0005EO-6k
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:30:35 -0500
-Date: Mon, 28 Jan 2019 12:24:48 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190128122448.4c99fe97.cohuck@redhat.com>
-In-Reply-To: <20190122094143.8857-1-david@redhat.com>
-References: <20190122094143.8857-1-david@redhat.com>
+	(envelope-from <rkagan@virtuozzo.com>) id 1go57m-0005Hw-NR
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:30:48 -0500
+Received: from mail-ve1eur04hn2017.outbound.protection.outlook.com
+	([52.101.139.17]:35638
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1go57m-0005B7-FX
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:30:46 -0500
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Mon, 28 Jan 2019 11:30:20 +0000
+Message-ID: <20190128113017.GA2435@rkaganb.sw.ru>
+References: <20190125114155.32062-1-vkuznets@redhat.com>
+	<20190125114155.32062-5-vkuznets@redhat.com>
+	<20190125124738.GB30730@rkaganb.sw.ru>
+	<87bm44onnh.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87bm44onnh.fsf@vitty.brq.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E008EF1662FFED4FA6FE95F0958BDC00@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Warn when adding PCI devices
- without the 'zpci' feature
+Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
+ pass-through mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 22 Jan 2019 10:41:43 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Fri, Jan 25, 2019 at 02:46:42PM +0100, Vitaly Kuznetsov wrote:
+> Roman Kagan <rkagan@virtuozzo.com> writes:
+> 
+> > On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
+> >> In many case we just want to give Windows guests all currently supported
+> >> Hyper-V enlightenments and that's where this new mode may come handy. We
+> >> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
+> >
+> > How is the compatibility ensured on migration between kernels reporting
+> > different feature sets?
+> 
+> AFAIU we don't change anything in this regard (or, my intention was to
+> not change anything): hv-all is converted to the individual hv-*
+> properties (hv_cpuid_check_and_set()) actually sets cpu->hyperv_* flags
+> according to what's supported by kernel so when we migrate we will
+> require all these features supported.
 
-> We decided to always create the PCI host bridge, even if 'zpci' is not
-> enabled (due to migration compatibility). This however right now allows
-> to add zPCI/PCI devices to a VM although the guest will never actually see
-> them, confusing people that are using a simple CPU model that has no
-> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
-> 
-> Let's check for 'zpci' and at least print a warning that this will not
-> work as expected. We could also bail out, however that might break
-> existing QEMU commandlines.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index b86a8bdcd4..e7d4f49611 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->  
-> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
-> +                    " The guest will not be able to see/use these devices.");
-> +    }
-> +
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pdev = PCI_DEVICE(dev);
->  
+Migration relies on the upper layer to run the destination QEMU with the
+identical command line (except for -incoming) as the source, and QEMU is
+then supposed to set up identical environment in the target VM as was in
+the source, or refuse to start if that's impossible.  (If I'm
+misunderstanding this Dave (cc-d) may want to correct me.)
 
-So, it seems that the consensus was that this patch is fine in its
-current shape, right? If so, can I please get an ack from the zpci
-maintainer so I can queue it?
+AFAICS this hv-all attribute will enable different feature sets
+depending on the kernel it's run on, so the migration between different
+kernels will appear to succeed, but the guest may suddenly encounter an
+incompatible change in the environment.
+
+Roman.
