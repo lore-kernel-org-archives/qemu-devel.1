@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43614)
+Received: from eggs.gnu.org ([209.51.188.92]:43805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9kZ-0001yD-Mb
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:27:08 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9lC-0002VX-7k
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9kX-0000nz-Jb
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:27:07 -0500
-Date: Mon, 28 Jan 2019 17:26:52 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190128162652.GI5756@localhost.localdomain>
-References: <20190128151521.13875-1-antonkuchin@yandex-team.ru>
-	<20190128153750.GE5756@localhost.localdomain>
-	<20190128161257.GC3437@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1go9lB-0001jr-Fj
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:27:46 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40428)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1go9lB-0001YB-9w
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:27:45 -0500
+Received: by mail-pl1-x642.google.com with SMTP id u18so7953421plq.7
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:27:35 -0800 (PST)
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
+	<20190121185118.18550-21-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ac1c5f45-17eb-32cb-a94f-8bc4988b23bd@linaro.org>
+Date: Mon, 28 Jan 2019 08:27:31 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190128161257.GC3437@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH] qmp: Deprecate query-nodes
- option of query-blockstats
+In-Reply-To: <20190121185118.18550-21-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 20/23] hw/arm/armsse: Add CPU_IDENTITY
+ block to SSE-200
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Anton Kuchin <antonkuchin@yandex-team.ru>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, nsoffer@redhat.com, Max Reitz <mreitz@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Am 28.01.2019 um 17:12 hat Daniel P. Berrang=E9 geschrieben:
-> On Mon, Jan 28, 2019 at 04:37:50PM +0100, Kevin Wolf wrote:
-> > Am 28.01.2019 um 16:15 hat Anton Kuchin geschrieben:
-> > > This option is broken since a6baa60807 in v2.9 and returns mostly
-> > > zeroes instead of real stats because actual querring of BlockStats
-> > > that resides in blk is missing.
-> > >=20
-> > > And it makes no sense because with this option BlockDriverState-s
-> > > are iterated but BlockAcctStats belong to BlockBackend and not BDS
-> > > since 7f0e9da6f13 in v2.5
-> > >=20
-> > > Signed-off-by: Anton Kuchin <antonkuchin@yandex-team.ru>
-> >=20
-> > Isn't query-nodes the only way to get wr_highest_offset for the proto=
-col
-> > layer? oVirt depends on this, as far as I know.
->=20
-> Libvirt just invokes 'query-blockstats' with no arguments, so is not
-> relying on 'query-nodes' working. Given that libvirt doesn't use it,
-> it doesn't seem like this is relevant for oVirt unless they were
-> using QMP passthrough from libvirt. That this has been broken
-> since v2.9 though rather suggests oVirt doesn't use it.
+On 1/21/19 10:51 AM, Peter Maydell wrote:
+> Instantiate a copy of the CPU_IDENTITY register block for each CPU
+> in an SSE-200.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/arm/armsse.h |  3 +++
+>  hw/arm/armsse.c         | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 31 insertions(+)
 
-It's not broken at all. The type of the return value is just a bit messy
-because we mix statistics from the device with statistics from the
-nodes. query-nodes=3Dtrue can't return device statistics, but the
-respective fields aren't optional in the schema either, so it just puts
-0 there. This is ugly, but if you know which information you can use, it
-works fine, so cleaning it up was never considered to have a good
-justification for breaking compatibility.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-In any case, wr_highest_offset is part of the node statistics and it
-contains the correct value for each node.
 
-Kevin
+r~
