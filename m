@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41959)
+Received: from eggs.gnu.org ([209.51.188.92]:42042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1go7oD-0004Oy-Pz
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:22:46 -0500
+	(envelope-from <david@redhat.com>) id 1go7oU-0004bM-2e
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:23:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1go7oB-00028f-3N
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:22:45 -0500
-Received: from m15-113.126.com ([220.181.15.113]:56455)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1go7o8-00022j-JJ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:22:41 -0500
-From: Fei Li <lifei1214@126.com>
-Date: Mon, 28 Jan 2019 22:22:13 +0800
-Message-Id: <20190128142217.12979-6-lifei1214@126.com>
-In-Reply-To: <20190128142217.12979-1-lifei1214@126.com>
-References: <20190128142217.12979-1-lifei1214@126.com>
-Subject: [Qemu-devel] [PATCH for-4.0 07/11] qemu_thread: supplement error
- handling for iothread_complete
+	(envelope-from <david@redhat.com>) id 1go7oQ-0002J2-A3
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:23:02 -0500
+References: <20190123195527.29575-1-david@redhat.com>
+	<20190128151833.15532428@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b530ad83-3c05-68ae-c7d2-cb5584849ab3@redhat.com>
+Date: Mon, 28 Jan 2019 15:22:49 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190128151833.15532428@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFCv2 0/9] qdev: Hotplug handler chaining +
+ virtio-pmem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, shirley17fei@gmail.com
-Cc: Markus Armbruster <armbru@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Fei Li <fli@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-From: Fei Li <fli@suse.com>
+On 28.01.19 15:18, Igor Mammedov wrote:
+> On Wed, 23 Jan 2019 20:55:18 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> This series implements supprt for hotplug handler chaining (proposed
+>> by Igor), something that is necessary to turn selected virtio devices into
+>> memory devices. Planned devices inlude virtio-mem and virtio-pmem. The
+>> current prototype of virtio-pmem is included.
+>>
+>> The machine hotplug handler can intercept hotplug handler calls
+>> to properly prepare/teardown the memory device part of a device. Control
+>> is then passed on to the actual bus hotplug handler. So the default hotplug
+>> handler is effectively overwritten to make interception possible.
+>>
+>> It is based on the following patches/series
+>> - [PATCH v1] pc: Use hotplug_handler_(plug|unplug|unplug_request)
+>> -- Queued by Paolo
+>> - [PATCH v3 0/2] s390x/pci: hotplug handler fixes and reworks
+>>
+>> Patch 1-3 are the preparations for hotplug handler chaining.
+> we probably should merge this ones even without pmem patches.
 
-For iothread_complete: utilize the existed errp to propagate the
-error and do the corresponding cleanup to replace the temporary
-&error_abort.
+Sounds good to me. I'll do more testing.
 
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Signed-off-by: Fei Li <fli@suse.com>
----
- iothread.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+> 
+>> The remaining patches are a modified prototype of virtio-pmem.
+> I'm not sure yet that virtio-pmem should be merged.
+> 
+> Initial goal for fake pmem was to eliminate page-cache in guest
+> so that only host will have it and cached pages could be shared
+> between several guest.
+> 
+> However recently (if I read kernel driver thread right),
+> sharing is to be disabled due to security implication and then
+> only dropping page cache on one side is left, which could be done
+> using existing frontends/backends (disabling caching on host side).
+> 
 
-diff --git a/iothread.c b/iothread.c
-index 8e8aa01999..ea2e553dc5 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -148,6 +148,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-     Error *local_error = NULL;
-     IOThread *iothread = IOTHREAD(obj);
-     char *name, *thread_name;
-+    int thread_ok;
- 
-     iothread->stopping = false;
-     iothread->running = true;
-@@ -164,9 +165,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-                                 &local_error);
-     if (local_error) {
-         error_propagate(errp, local_error);
--        aio_context_unref(iothread->ctx);
--        iothread->ctx = NULL;
--        return;
-+        goto fail;
-     }
- 
-     qemu_mutex_init(&iothread->init_done_lock);
-@@ -178,11 +177,15 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-      */
-     name = object_get_canonical_path_component(OBJECT(obj));
-     thread_name = g_strdup_printf("IO %s", name);
--    /* TODO: let the further caller handle the error instead of abort() here */
--    qemu_thread_create(&iothread->thread, thread_name, iothread_run,
--                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
-+    thread_ok = qemu_thread_create(&iothread->thread, thread_name, iothread_run,
-+                                   iothread, QEMU_THREAD_JOINABLE, errp);
-     g_free(thread_name);
-     g_free(name);
-+    if (thread_ok < 0) {
-+        qemu_cond_destroy(&iothread->init_done_cond);
-+        qemu_mutex_destroy(&iothread->init_done_lock);
-+        goto fail;
-+    }
- 
-     /* Wait for initialization to complete */
-     qemu_mutex_lock(&iothread->init_done_lock);
-@@ -191,6 +194,10 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-                        &iothread->init_done_lock);
-     }
-     qemu_mutex_unlock(&iothread->init_done_lock);
-+    return;
-+fail:
-+    aio_context_unref(iothread->ctx);
-+    iothread->ctx = NULL;
- }
- 
- typedef struct {
+Yes, we should at least wait for the kernel part to settle. Anyhow, I
+will base my virtio-mem work on this in a very similar fashion!
+
+Thanks Igor!
+
+
 -- 
-2.17.2 (Apple Git-113)
+
+Thanks,
+
+David / dhildenb
