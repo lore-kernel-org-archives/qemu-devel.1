@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53729)
+Received: from eggs.gnu.org ([209.51.188.92]:54033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2Vy-0006q4-1L
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:35 -0500
+	(envelope-from <thuth@redhat.com>) id 1go2XD-0007SS-UV
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2Vw-0007GI-61
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58816)
+	(envelope-from <thuth@redhat.com>) id 1go2XC-00083R-Up
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59251)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1go2Vu-0007El-8Z
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:30 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1go2XC-00082R-Ll
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:50 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EA9781DF1
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:44:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-122.ams2.redhat.com [10.36.116.122])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 855BF627DD
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:44:48 +0000 (UTC)
 References: <20190125192719.15339-1-philmd@redhat.com>
-	<20190125192719.15339-2-philmd@redhat.com>
+	<20190125192719.15339-4-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <76f0dc0e-620c-407b-a99f-8629c25472fb@redhat.com>
-Date: Mon, 28 Jan 2019 09:43:12 +0100
+Message-ID: <154f8a45-723d-6f3c-a278-1767361bc94e@redhat.com>
+Date: Mon, 28 Jan 2019 09:44:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190125192719.15339-2-philmd@redhat.com>
+In-Reply-To: <20190125192719.15339-4-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] configure: Disable W^X on OpenBSD
+Subject: Re: [Qemu-devel] [PATCH 3/3] WIP tests/vm: Run tests on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <fam@euphon.net>, Li Qiang <liq3ea@163.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
 On 2019-01-25 20:27, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
-> TCG requires WX access. Disable W^X if it is available.
-> This fixes:
->=20
->   # lm32-softmmu/qemu-system-lm32
->   Could not allocate dynamic translator buffer
->=20
->   # sysctl kern.wxabort=3D1
->   kern.wxabort: 0 -> 1
->   # lm32-softmmu/qemu-system-lm32
->   mmap: Not supported
->   Abort trap (core dumped)
->   # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
->   (gdb) bt
->   #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input=
-}:5
->   #1  0x000017e3c15e5d7a in *_libc_mmap (addr=3DVariable "addr" is not =
-available.) at /usr/src/lib/libc/sys/mmap.c:47
->   #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/a=
-ccel/tcg/translate-all.c:1064
->   #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=3D0) at /usr/src/qe=
-mu/accel/tcg/translate-all.c:1112
->   #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=3D0) at /usr/src/qem=
-u/accel/tcg/translate-all.c:1149
->   #5  0x000017e17d9897e9 in tcg_init (ms=3D0x17e45e456800) at /usr/src/=
-qemu/accel/tcg/tcg-all.c:66
->   #6  0x000017e17d9891b8 in accel_init_machine (acc=3D0x17e3c3f50800, m=
-s=3D0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
->   #7  0x000017e17d989312 in configure_accelerator (ms=3D0x17e45e456800,=
- progname=3D0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/q=
-emu/accel/accel.c:111
->   #8  0x000017e17d9d8616 in main (argc=3D1, argv=3D0x7f7fffff06b8, envp=
-=3D0x7f7fffff06c8) at vl.c:4325
->=20
-> [1] https://www.openbsd.org/faq/upgrade60.html
-> [2] https://undeadly.org/cgi?action=3Darticle&sid=3D20160527203200
->=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  configure | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  tests/vm/openbsd | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >=20
-> diff --git a/configure b/configure
-> index b18281c61f..f6acc028a7 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5795,6 +5795,17 @@ if test "$mingw32" =3D "yes" ; then
->      done
->  fi
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> index cfe0572c59..de907dd21c 100755
+> --- a/tests/vm/openbsd
+> +++ b/tests/vm/openbsd
+> @@ -25,9 +25,7 @@ class OpenBSDVM(basevm.BaseVM):
+>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>          tar -xf /dev/rsd1c;
+>          ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --pytho=
+n=3Dpython2.7 {configure_opts};
+> -        gmake --output-sync -j{jobs} {verbose};
+> -        # XXX: "gmake check" seems to always hang or fail
+> -        #gmake --output-sync -j{jobs} check {verbose};
+> +        gmake --output-sync -j{jobs} check {verbose};
+>      """
 > =20
-> +# Disable W^X if available
+>      def build_image(self, img):
+>=20
 
-I'd like to suggest to mention OpenBSD in the comment.
+Please add a proper patch description and remove the WIP from the subject=
+.
 
-> +if test "$tcg" =3D "yes" -a "$targetos" =3D "OpenBSD"; then
-> +    cat > $TMPC <<EOF
-> +    int main(void) { return 0; }
-> +EOF
-> +    wx_ldflags=3D"-Wl,-z,wxneeded"
-> +    if compile_prog "" "$wx_ldflags"; then
-> +        QEMU_LDFLAGS=3D"$QEMU_LDFLAGS -Wl,-z,wxneeded"
-
-Why do you introduce the wx_ldflags variable above, just to use it one
-time? I'd suggest to either use it in the QEMU_LDFLAGS line, too, or to
-get rid of the variable completely and always use -Wl,-z,wxneeded directl=
-y.
-
- Thomas
-
-> +    fi
-> +fi
-> +
->  qemu_confdir=3D$sysconfdir$confsuffix
->  qemu_moddir=3D$libdir$confsuffix
->  qemu_datadir=3D$datadir$confsuffix
+ Thanks,
+  Thomas
