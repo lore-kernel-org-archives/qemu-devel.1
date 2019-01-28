@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43943)
+Received: from eggs.gnu.org ([209.51.188.92]:47273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <antonkuchin@yandex-team.ru>) id 1go7ta-0000TN-01
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:28:18 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1go86Z-0001t1-Eo
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <antonkuchin@yandex-team.ru>) id 1go7tZ-0006JF-7u
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:28:17 -0500
-From: Anton Kuchin <antonkuchin@yandex-team.ru>
-Date: Mon, 28 Jan 2019 17:27:48 +0300
-Message-Id: <20190128142748.29140-3-antonkuchin@yandex-team.ru>
-In-Reply-To: <20190128142748.29140-1-antonkuchin@yandex-team.ru>
-References: <20190128142748.29140-1-antonkuchin@yandex-team.ru>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1go86Y-0006zZ-FF
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:43 -0500
+Received: from mail-am5eur02on0708.outbound.protection.outlook.com
+	([2a01:111:f400:fe07::708]:37000
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1go86X-0006xW-F4
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:42 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 28 Jan 2019 14:41:35 +0000
+Message-ID: <23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
+References: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
+In-Reply-To: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ACDD5CFF92497A44937DBABA9AEE1C26@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] block: migrate callers from blk_by_name to
- blk_lookup
+Subject: Re: [Qemu-devel] Very slow finding extents in QCOW2-backed nbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,74 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, Anton Kuchin <antonkuchin@yandex-team.ru>
+To: Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Anton Kuchin <antonkuchin@yandex-team.ru>
----
- blockdev-nbd.c | 2 +-
- blockdev.c     | 6 +++---
- hmp.c          | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index d73ac1b026..f2ea7318cf 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -162,7 +162,7 @@ void qmp_nbd_server_add(const char *device, bool has_=
-name, const char *name,
-         return;
-     }
-=20
--    on_eject_blk =3D blk_by_name(device);
-+    on_eject_blk =3D blk_lookup(device);
-=20
-     bs =3D bdrv_lookup_bs(device, device, errp);
-     if (!bs) {
-diff --git a/blockdev.c b/blockdev.c
-index a8fa8748a9..bb01c41038 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1082,7 +1082,7 @@ void hmp_commit(Monitor *mon, const QDict *qdict)
-         BlockDriverState *bs;
-         AioContext *aio_context;
-=20
--        blk =3D blk_by_name(device);
-+        blk =3D blk_lookup(device);
-         if (!blk) {
-             monitor_printf(mon, "Device '%s' not found\n", device);
-             return;
-@@ -3066,7 +3066,7 @@ void hmp_drive_del(Monitor *mon, const QDict *qdict=
-)
-         return;
-     }
-=20
--    blk =3D blk_by_name(id);
-+    blk =3D blk_lookup(id);
-     if (!blk) {
-         error_report("Device '%s' not found", id);
-         return;
-@@ -4431,7 +4431,7 @@ void qmp_x_block_latency_histogram_set(
-     bool has_boundaries_flush, uint64List *boundaries_flush,
-     Error **errp)
- {
--    BlockBackend *blk =3D blk_by_name(device);
-+    BlockBackend *blk =3D blk_lookup(device);
-     BlockAcctStats *stats;
-     int ret;
-=20
-diff --git a/hmp.c b/hmp.c
-index b2a2b1f84e..7b03d5c1d7 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2460,7 +2460,7 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
-     Error *err =3D NULL;
-     int ret;
-=20
--    blk =3D blk_by_name(device);
-+    blk =3D blk_lookup(device);
-     if (!blk) {
-         BlockDriverState *bs =3D bdrv_lookup_bs(NULL, device, &err);
-         if (bs) {
---=20
-2.19.1
+DQoyOC4wMS4yMDE5IDE0OjU4LCBUaW0gU21pdGggd3JvdGU6DQo+IEhpIGFsbCwgSSBoYXZlIGEg
+cXVlc3Rpb24gYWJvdXQgdGhlIGludGVudCBvZiB0aGUgbGFzdCBjYWxsIHRvDQo+IGJkcnZfY29f
+YmxvY2tfc3RhdHVzKCkgaW4gYmRydl9jb19ibG9ja19zdGF0dXMoKSwgaW4gYmxvY2svaW8uYyBh
+Ym91dCBsaW5lDQo+IDIxOTUsIHdoaWNoIGxvb2tzIGxpa2UgdGhpczoNCj4gDQo+ICAgICAgICAg
+IHJldDIgPSBiZHJ2X2NvX2Jsb2NrX3N0YXR1cyhsb2NhbF9maWxlLCB3YW50X3plcm8sIGxvY2Fs
+X21hcCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICpwbnVtLCAmZmls
+ZV9wbnVtLCBOVUxMLCBOVUxMKTsNCj4gICAgICAgICAgaWYgKHJldDIgPj0gMCkgew0KPiAgICAg
+ICAgICAgICAgLyogSWdub3JlIGVycm9ycy4gIFRoaXMgaXMganVzdCBwcm92aWRpbmcgZXh0cmEg
+aW5mb3JtYXRpb24sIGl0DQo+ICAgICAgICAgICAgICAgKiBpcyB1c2VmdWwgYnV0IG5vdCBuZWNl
+c3NhcnkuDQo+ICAgICAgICAgICAgICAgKi8NCg0KSGkgVGltIQ0KDQpUaGUgcXVlc3Rpb24gaXMg
+aGlnaGx5IGRpc2N1c3NlZCBub3cgb24gbGlzdCwgaW4gc2hvcnQ6IHllcyBpdCdzIGEgcHJvYmxl
+bSwgYW5kLA0KSSBob3BlLCB3ZSdsbCBzb29uIHJlYWNoIGEgY29uc2Vuc3VzIGFib3V0IGhvdyB0
+byBmaW5hbGx5IGZpeCBpdC4NCg0KVGhpcyBzZWNvbmQgYmxvY2tfc3RhdHVzIHJlcXVlc3QgaXMg
+bmVlZGVkIHdoZW4gd2UgaGF2ZSBxY293MiBpbWFnZSB3aXRoDQptZXRhZGF0YSBwcmVhbGxvY2F0
+aW9uLCB3aGljaCBtZWFucyB0aGF0IHFjb3cyIGRhdGEgY2x1c3RlcnMgYXJlIGFjdHVhbGx5IGJh
+Y2tlZA0KYnkgaG9sZXMgb24gZmlsZXN5c3RlbSBsZXZlbC4NCg0KWW91IGNhbiBmb2xsb3cgdGhl
+IGRpc2N1c3Npb24gdW5kZXIgdGhlIGZvbGxvd2luZyB0aHJlYWRzOg0KDQppbml0aWFsIGRpc2N1
+c3Npb246DQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAx
+OC0xMi9tc2cwNTc0OS5odG1sDQoNCnNvbHV0aW9uczoNCg0KY2FjaGUgbHNlZWsgcmVzdWx0cywg
+YnkgS2V2aW46DQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwv
+MjAxOS0wMS9tc2cwNjI3MS5odG1sDQoNCmRldGVjdCBwcmVhbGxvY2F0aW9uLCBhbmQgZG9uJ3Qg
+ZG8gc2Vjb25kIGJsb2NrX3N0YXR1cyBmb3Igbm90IHByZWFsbG9jYXRlZCwNCm15IGxhc3QgdHJ5
+Og0KaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEv
+bXNnMDY1OTguaHRtbA0KDQoNCj4gDQo+IEkgaGF2ZSBhIGxhcmdlICg+MiBUQiB2aXJ0dWFsLCB+
+NjAwR0IgcmVhbCkgUUNPVzIgZmlsZSB3aGljaCBpcyBiZWluZyBleHBvcnRlZA0KPiBhcyBhIG5l
+dHdvcmsgYmxvY2sgZGV2aWNlLCBhbmQgYSBjb25uZWN0ZWQgY2xpZW50IGhhcyBhc2tlZCBmb3Ig
+dGhlIGFsbG9jYXRpb24NCj4gaW5mb3JtYXRpb24gdmlhIE5CRF9DTURfQkxPQ0tfU1RBVFVTLiBU
+aGUgdmlydHVhbCBkaXNrIGlzIHF1aXRlIGZyYWdtZW50ZWQNCj4gKGRlbGliZXJhdGVkbHk7IHRo
+aXMgaXMgYSB0ZXN0IGNhc2UpLCBhbmQgdGh1cyBoYXMgcXVpdGUgYSBsb3Qgb2YgZXh0ZW50cy4N
+Cj4gDQo+IEVhY2ggZXh0ZW50IGlzIHRha2luZyB+MC41cyB0byBpZGVudGlmeSwgYW5kIHByZXR0
+eSBtdWNoIGFsbCBvZiB0aGF0IHRpbWUgaXMNCj4gdGFrZW4gdXAgaW4gbHNlZWsoU0VFS19FTkQp
+IGZyb20gZmluZF9hbGxvY2F0aW9uKCkgaW4gYmxvY2svZmlsZS1wb3NpeC5jIHdoaWNoDQo+IGlz
+IGdldHRpbmcgY2FsbGVkIGFzIGEgcmVzdWx0IG9mIHRoZSBiZHJ2X2NvX2Jsb2NrX3N0YXR1cygp
+IG1lbnRpb25lZCBhYm92ZSwNCj4gd2l0aCB0aGUgcmVzdWx0IHRoYXQgZ2V0dGluZyB0aGUgZGF0
+YSBvdXQgdGhyb3VnaCB0aGUgbmJkIGlzIHRha2luZyBhbiBvcmRlcg0KPiBvZiBtYWduaXR1ZGUg
+bG9uZ2VyIHRoYW4gaXQgc2hvdWxkLg0KPiANCj4gSSByYW4gc29tZSB0ZXN0cyB3aXRoIHRoZSBp
+Zi1ibG9jayBjb250YWluaW5nIHRoZSBjYWxsIHJlbW92ZWQsIGFuZCB0aGUgb25seQ0KPiBkaXNj
+ZXJuYWJsZSBkaWZmZXJlbmNlIHdhcyB0aGF0IGV2ZXJ5dGhpbmcgd2VudCBhIGxvdCBmYXN0ZXIu
+IFNvIEknbSB3b25kZXJpbmcNCj4gd2hhdCB0aGUgaW50ZW50IGlzIGZvciB0aGF0IGNvZGUsIGFu
+ZCBpbiB3aGF0IGNpcmN1bXN0YW5jZXMgaXQgaXMgdXNlZnVsPw0KPiANCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
