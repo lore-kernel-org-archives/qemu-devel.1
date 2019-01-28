@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33858)
+Received: from eggs.gnu.org ([209.51.188.92]:37045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goAyg-0007KD-24
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:45:47 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1goBDg-0003Db-KF
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goAye-0008V1-MK
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:45:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49324)
+	(envelope-from <ccarrara@redhat.com>) id 1goBAL-00070n-70
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:57:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1goAye-0008QD-Ch
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:45:44 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1goBAK-0006yC-VC
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:57:49 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14E3E804EB
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:45:31 +0000 (UTC)
-References: <20190128170321.16936-1-dgilbert@redhat.com>
-	<20190128170321.16936-3-dgilbert@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <743a07c4-0c9f-8b51-f792-7132e82dc0dc@redhat.com>
-Date: Mon, 28 Jan 2019 11:45:27 -0600
+	by mx1.redhat.com (Postfix) with ESMTPS id EDDBFC067831
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:47:36 +0000 (UTC)
+From: Caio Carrara <ccarrara@redhat.com>
+Date: Mon, 28 Jan 2019 15:47:24 -0200
+Message-Id: <20190128174725.8809-2-ccarrara@redhat.com>
+In-Reply-To: <20190128174725.8809-1-ccarrara@redhat.com>
+References: <20190128174725.8809-1-ccarrara@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190128170321.16936-3-dgilbert@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xOKqYRXcOGkGrhMdkMIjDSqmFY7HsXdYI"
-Subject: Re: [Qemu-devel] [PATCH 2/9] migration: Add announce parameters
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 1/2] tests.acceptance: adds multi vm
+ capability for acceptance tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,145 +32,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: wainersm@redhat.com, ehabkost@redhat.com, philmd@redhat.com, crosa@redhat.com, Caio Carrara <ccarrara@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xOKqYRXcOGkGrhMdkMIjDSqmFY7HsXdYI
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com,
- mst@redhat.com, armbru@redhat.com, berrange@redhat.com
-Message-ID: <743a07c4-0c9f-8b51-f792-7132e82dc0dc@redhat.com>
-Subject: Re: [PATCH 2/9] migration: Add announce parameters
-References: <20190128170321.16936-1-dgilbert@redhat.com>
- <20190128170321.16936-3-dgilbert@redhat.com>
-In-Reply-To: <20190128170321.16936-3-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This change adds the possibility to write acceptance tests with multi
+virtual machine support. It's done keeping the virtual machines objects
+stored in a test attribute (dictionary). This dictionary shouldn't be
+accessed directly but through the new method added `get_vm`. This new
+method accept a list of args (that will be added as virtual machine
+arguments) and an optional name argument. The name is the key that
+identify a single virtual machine along the test machines available. If
+a name without a machine is informed a new machine will be instantiated.
 
-On 1/28/19 11:03 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Add migration parameters that control RARP/GARP announcement timeouts.
->=20
-> Based on earlier patches by myself and
->   Vladislav Yasevich <vyasevic@redhat.com>
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
+The current usage of vm in tests will not be broken by this change since
+it keeps a property called vm in the base test class. This property only
+calls the new method `get_vm` with default parameters (no args and
+'default' as machine name).
 
-> +++ b/qapi/migration.json
-> @@ -6,6 +6,7 @@
->  ##
-> =20
->  { 'include': 'common.json' }
-> +{ 'include': 'net.json' }
-> =20
->  ##
->  # @MigrationStats:
-> @@ -480,6 +481,18 @@
->  #
->  # Migration parameters enumeration
->  #
-> +# @announce-initial: Inital delay (in ms) before sending the first ann=
-ounce
+Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+---
+ docs/devel/testing.rst                    | 40 ++++++++++++++++++++++-
+ tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
+ 2 files changed, 60 insertions(+), 5 deletions(-)
 
-s/Inital/Initial/ [2]
-
-> +#          (Since 4.0)
-> +#
-> +# @announce-max: Maximum delay (in ms) between packets in the announcm=
-ent
-> +#          (Since 4.0)
-> +#
-> +# @announce-rounds: Number of self-announce packets sent after migrati=
-on
-> +#          (Since 4.0)
-> +#
-> +# @announce-step: Increase in delay (in ms) between subsequent packets=
- in
-> +#          the announcement (Since 4.0)
-> +#
-
-The new parameters are optional below [1]; should they have a default
-value documented, and are there any constraints such that if you set
-one, you must set all four to match the previous' patch having all four
-be non-optional?
-
-
-> @@ -653,7 +681,11 @@
->  # TODO either fuse back into MigrationParameters, or make
->  # MigrationParameters members mandatory
->  { 'struct': 'MigrateSetParameters',
-> -  'data': { '*compress-level': 'int',
-> +  'data': { '*announce-initial': 'size',
-> +            '*announce-max': 'size',
-> +            '*announce-rounds': 'size',
-> +            '*announce-step': 'size',
-> +            '*compress-level': 'int',
-
-[1] mentioned above
-
->              '*compress-threads': 'int',
->              '*compress-wait-thread': 'bool',
->              '*decompress-threads': 'int',
-> @@ -692,6 +724,18 @@
->  #
->  # The optional members aren't actually optional.
->  #
-> +# @announce-initial: Inital delay (in ms) before sending the first ann=
-ounce
-> +#          (Since 4.0)
-
-[2] again
-
-
-> @@ -769,7 +813,11 @@
->  # Since: 2.4
->  ##
->  { 'struct': 'MigrationParameters',
-> -  'data': { '*compress-level': 'uint8',
-> +  'data': { '*announce-initial': 'size',
-> +            '*announce-max': 'size',
-> +            '*announce-rounds': 'size',
-> +            '*announce-step': 'size',
-> +            '*compress-level': 'uint8',
-
-[1] again
-
->              '*compress-threads': 'uint8',
->              '*compress-wait-thread': 'bool',
->              '*decompress-threads': 'uint8',
-> @@ -785,7 +833,7 @@
->              '*x-multifd-page-count': 'uint32',
->              '*xbzrle-cache-size': 'size',
->  	    '*max-postcopy-bandwidth': 'size',
-> -            '*max-cpu-throttle':'uint8'} }
-> +            '*max-cpu-throttle':'uint8' } }
-
-Why the whitespace churn?
-
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 18e2c0868a..b97c0368bc 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -634,7 +634,45 @@ instance, available at ``self.vm``.  Because many te=
+sts will tweak the
+ QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
+)``)
+ is left to the test writer.
+=20
+-At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
++The base test class has also support for tests with more than one
++QEMUMachine. The way to get machines is through the ``self.get_vm()``
++method which will return a QEMUMachine instance. The ``self.get_vm()``
++method also accepts an optional `name` attribute so you can identify a
++specific machine and get it more than once through the tests methods. A
++simple and hypothetical example follows:
++
++.. code::
++
++  from avocado_qemu import Test
++
++
++  class MultipleMachines(Test):
++      """
++      :avocado: enable
++      """
++      def test_multiple_machines(self):
++          first_machine =3D self.get_vm()
++          second_machine =3D self.get_vm()
++          self.get_vm(name=3D'third_machine').launch()
++
++          first_machine.launch()
++          second_machine.launch()
++
++          first_res =3D first_machine.command(
++              'human-monitor-command',
++              command_line=3D'info version')
++
++          second_res =3D second_machine.command(
++              'human-monitor-command',
++              command_line=3D'info version')
++
++          third_res =3D self.get_vm(name=3D'third_machine').command(
++              'human-monitor-command',
++              command_line=3D'info version')
++
++          self.assertEquals(first_res, second_res, third_res)
++
++At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
+ shutdown.
+=20
+ QEMUMachine
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+index 1e54fd5932..4c9e27feda 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -10,6 +10,7 @@
+=20
+ import os
+ import sys
++import uuid
+=20
+ import avocado
+=20
+@@ -42,13 +43,29 @@ def pick_default_qemu_bin():
+=20
+ class Test(avocado.Test):
+     def setUp(self):
+-        self.vm =3D None
++        self._vms =3D {}
+         self.qemu_bin =3D self.params.get('qemu_bin',
+                                         default=3Dpick_default_qemu_bin(=
+))
+         if self.qemu_bin is None:
+             self.cancel("No QEMU binary defined or found in the source t=
+ree")
+-        self.vm =3D QEMUMachine(self.qemu_bin)
++
++    def _new_vm(self, *args):
++        vm =3D QEMUMachine(self.qemu_bin)
++        if args:
++            vm.add_args(*args)
++        return vm
++
++    @property
++    def vm(self):
++        return self.get_vm(name=3D'default')
++
++    def get_vm(self, *args, name=3DNone):
++        if not name:
++            name =3D str(uuid.uuid4())
++        if self._vms.get(name) is None:
++            self._vms[name] =3D self._new_vm(*args)
++        return self._vms[name]
+=20
+     def tearDown(self):
+-        if self.vm is not None:
+-            self.vm.shutdown()
++        for vm in self._vms.values():
++            vm.shutdown()
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---xOKqYRXcOGkGrhMdkMIjDSqmFY7HsXdYI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxPP7cACgkQp6FrSiUn
-Q2r9Zwf+LGnUWHJ3VL86Q3MHgGlMauVPGWmAOnYRd28IEZsfoSgWZ3JOhaTJXnBY
-0WgS36UB5Qnt7TVvy0NNX6EZ/NRg2CcphPOqv3sMP998UYmudrE2yedkhSv1MM+o
-Oy+rrQOL1qBfhx+JxniQqnwikyKqAc9WyE5foJfr6dO6HryKoEIrpIuScfm+5D1U
-bKyXIqZO0QHtFdqnMkoHUJ9axjTLHTUH6TWH2oZkZakaNm+rz6xO/D2TIuxINKvw
-vHQ8RNxP3KR6u/BX6Az0AUlgFsDUfWZ53FmEK1EM1vCW8N2IfLFuTYaAmuF2fdlJ
-mfxbJk+hYCcmNvmCZmlQKixkSVMC9A==
-=el/y
------END PGP SIGNATURE-----
-
---xOKqYRXcOGkGrhMdkMIjDSqmFY7HsXdYI--
+2.20.1
