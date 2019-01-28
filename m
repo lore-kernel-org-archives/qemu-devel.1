@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49291)
+Received: from eggs.gnu.org ([209.51.188.92]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1go4FU-0006FM-Ff
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:34:41 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1go4GX-0006my-Jd
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1go4FS-0002XE-Kn
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:34:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1go4FP-0002OT-HV
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:34:36 -0500
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Mon, 28 Jan 2019 11:26:05 +0100
-Message-Id: <20190128102605.15994-1-lhrazky@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1go4GV-0003eM-LJ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:45 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44893)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1go4GS-0003a0-NU
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:41 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z5so17381279wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:35:39 -0800 (PST)
+References: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
+Date: Mon, 28 Jan 2019 10:35:37 +0000
+Message-ID: <8736pdnk7a.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] spice: set device address and device display
- ID in QXL interface
+Subject: Re: [Qemu-devel] [PATCH] slirp: replace QEMU_BUILD_BUG_ON with
+ G_STATIC_ASSERT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,175 +30,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: spice-devel@lists.freedesktop.org
+To: qemu-devel@nongnu.org
+Cc: lizhijian@cn.fujitsu.com, jan.kiszka@siemens.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, zhangckid@gmail.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-Calls the new SPICE QXL interface function spice_qxl_set_device_info to
-set the hardware address of the graphics device represented by the QXL
-interface (e.g. a PCI path) and the device display IDs (the IDs of the
-device's monitors that belong to this QXL interface).
 
-Also stops using the deprecated spice_qxl_set_max_monitors, the new
-interface function replaces it.
+Samuel Thibault <samuel.thibault@ens-lyon.org> writes:
 
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
----
-Hello,
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-the spice part of the interface was merged to spice server, so this is
-ready to merge now too.
+Is there a rationale as to why we should replace QEMU_BUILD_BUG_ON with
+G_STATIC_ASSERT or is it particular to these QEMU_BUILD_BUG_ON
+instances? It would be nice to have a little more context in the commit
+message.
 
-The original series:
-https://lists.freedesktop.org/archives/spice-devel/2019-January/046997.ht=
-ml
+Otherwise the changes themselves look fine.
 
-Cheers,
-Lukas
+> ---
+>  slirp/ip.h       |  4 ++--
+>  slirp/ip6.h      |  4 ++--
+>  slirp/ip6_icmp.h | 10 +++++-----
+>  3 files changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/slirp/ip.h b/slirp/ip.h
+> index 2baeeb9a3a..73a4d2a3d2 100644
+> --- a/slirp/ip.h
+> +++ b/slirp/ip.h
+> @@ -229,8 +229,8 @@ struct	ipasfrag {
+>  	struct ip ipf_ip;
+>  };
+>
+> -QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
+> -                  offsetof(struct ipasfrag, ipf_link));
+> +G_STATIC_ASSERT(offsetof(struct ipq, frag_link) =3D=3D
+> +                offsetof(struct ipasfrag, ipf_link));
+>
+>  #define ipf_off      ipf_ip.ip_off
+>  #define ipf_tos      ipf_ip.ip_tos
+> diff --git a/slirp/ip6.h b/slirp/ip6.h
+> index 4e7c366505..5361bd7449 100644
+> --- a/slirp/ip6.h
+> +++ b/slirp/ip6.h
+> @@ -152,7 +152,7 @@ struct ip6_pseudohdr {
+>   * If we marked the struct as packed then we would be unable to take
+>   * the address of any of the fields in it.
+>   */
+> -QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
+> -QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
+> +G_STATIC_ASSERT(sizeof(struct ip6) =3D=3D 40);
+> +G_STATIC_ASSERT(sizeof(struct ip6_pseudohdr) =3D=3D 40);
+>
+>  #endif
+> diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+> index 3f44ed2f49..e8ed753db5 100644
+> --- a/slirp/ip6_icmp.h
+> +++ b/slirp/ip6_icmp.h
+> @@ -50,14 +50,14 @@ struct ndp_ra {     /* Router Advertisement Message */
+>      uint32_t retrans_time;  /* Retrans Timer */
+>  };
+>
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
+> +G_STATIC_ASSERT(sizeof(struct ndp_ra) =3D=3D 12);
+>
+>  struct ndp_ns {     /* Neighbor Solicitation Message */
+>      uint32_t reserved;
+>      struct in6_addr target; /* Target Address */
+>  };
+>
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
+> +G_STATIC_ASSERT(sizeof(struct ndp_ns) =3D=3D 20);
+>
+>  struct ndp_na {     /* Neighbor Advertisement Message */
+>  #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+> @@ -78,7 +78,7 @@ struct ndp_na {     /* Neighbor Advertisement Message */
+>      struct in6_addr target; /* Target Address */
+>  };
+>
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
+> +G_STATIC_ASSERT(sizeof(struct ndp_na) =3D=3D 20);
+>
+>  struct ndp_redirect {
+>      uint32_t reserved;
+> @@ -86,7 +86,7 @@ struct ndp_redirect {
+>      struct in6_addr dest;   /* Destination Address */
+>  };
+>
+> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
+> +G_STATIC_ASSERT(sizeof(struct ndp_redirect) =3D=3D 36);
+>
+>  /*
+>   * Structure of an icmpv6 header.
+> @@ -113,7 +113,7 @@ struct icmp6 {
+>  #define icmp6_redirect icmp6_body.ndp_redirect
+>  };
+>
+> -QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
+> +G_STATIC_ASSERT(sizeof(struct icmp6) =3D=3D 40);
+>
+>  #define ICMP6_MINLEN    4
+>  #define ICMP6_ERROR_MINLEN  8
 
- hw/display/qxl.c           | 14 ++++++++++++-
- include/ui/spice-display.h |  2 ++
- ui/spice-core.c            | 42 ++++++++++++++++++++++++++++++++++++++
- ui/spice-display.c         | 11 ++++++++++
- 4 files changed, 68 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index 8e9a65e75b..434a2be7a4 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
-ice *qxl, int replay)
-                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
-                     0));
-     } else {
--#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
-+#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */ && \
-+    SPICE_SERVER_VERSION < 0x000e02
-         if (qxl->max_outputs) {
-             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
-         }
-@@ -2182,6 +2183,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
-Error **errp)
-                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
-;
-         return;
-     }
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
-)) {
-+        spice_qxl_set_device_info(&qxl->ssd.qxl,
-+                                  device_address,
-+                                  0,
-+                                  qxl->max_outputs);
-+    }
-+#endif
-+
-     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
-=20
-     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 87a84a59d4..7608fa7ebd 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -179,3 +179,5 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
- void qemu_spice_display_start(void);
- void qemu_spice_display_stop(void);
- int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con, char *device_addre=
-ss, size_t size);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a40fb2c00d..65ad66ea53 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -34,6 +34,8 @@
- #include "qemu/option.h"
- #include "migration/misc.h"
- #include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "ui/spice-display.h"
-=20
- /* core bits */
-@@ -863,6 +865,46 @@ bool qemu_spice_have_display_interface(QemuConsole *=
-con)
-     return false;
- }
-=20
-+/*
-+ * Recursively (in reverse order) appends addresses of PCI devices as it=
- moves
-+ * up in the PCI hierarchy.
-+ *
-+ * @returns true on success, false when the buffer wasn't large enough
-+ */
-+static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
-ce *pci)
-+{
-+    PCIBus *bus =3D pci_get_bus(pci);
-+    if (!pci_bus_is_root(bus)) {
-+        append_pci_address(buf, buf_size, bus->parent_dev);
-+    }
-+
-+    size_t len =3D strlen(buf);
-+    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
-+        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
-+
-+    return written > 0 && written < buf_size - len;
-+}
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con, char *device_addre=
-ss, size_t size)
-+{
-+    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con), "d=
-evice", &error_abort));
-+    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev), TY=
-PE_PCI_DEVICE);
-+
-+    if (pci =3D=3D NULL) {
-+        warn_report("Setting device address of a display device to SPICE=
-: Not a PCI device.");
-+        return false;
-+    }
-+
-+    strncpy(device_address, "pci/0000", size);
-+    if (!append_pci_address(device_address, size, pci)) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+            "Too many PCI devices in the chain.");
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
-n)
- {
-     if (g_slist_find(spice_consoles, con)) {
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 52f8cb5ae1..c1605b3bc9 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
-e *con)
-=20
-     ssd->qxl.base.sif =3D &dpy_interface.base;
-     qemu_spice_add_display_interface(&ssd->qxl, con);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(con, device_address, 256)) {
-+        spice_qxl_set_device_info(&ssd->qxl,
-+                                  device_address,
-+                                  qemu_console_get_head(con),
-+                                  1);
-+    }
-+#endif
-+
-     qemu_spice_create_host_memslot(ssd);
-=20
-     register_displaychangelistener(&ssd->dcl);
---=20
-2.20.1
+--
+Alex Benn=C3=A9e
