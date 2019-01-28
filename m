@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38429)
+Received: from eggs.gnu.org ([209.51.188.92]:38483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go5UO-00026a-9h
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:54:10 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1go5Ug-0002Fp-TK
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go5UN-0002yM-LQ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:54:08 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1go5UN-0002wg-4J
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:54:07 -0500
-Received: by mail-ot1-x344.google.com with SMTP id n8so14357246otl.6
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:54:06 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1go5Ue-00032V-Bi
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:54:26 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 28 Jan 2019 11:54:17 +0000
+Message-ID: <26c31c6f-09d3-fe4d-25fd-45142c25d521@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D2DE448F745DEE4A94CAF62B49283328@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190125184913.5970-1-richard.henderson@linaro.org>
-In-Reply-To: <20190125184913.5970-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 11:53:54 +0000
-Message-ID: <CAFEAcA8-zs8uq576zpHDQ=-iC_6KBs3PaF=APGV4eRPPn7RTzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Fix validation of 32-bit
- address spaces for aa32
+Subject: [Qemu-devel] ping Re: [PATCH v3 0/9] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On Fri, 25 Jan 2019 at 18:49, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> When tsz == 0, aarch32 selects the address space via exclusion,
-> and there are no "top_bits" remaining that require validation.
->
-> Fixes: ba97be9f4a4
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
-
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+cGluZw0KDQpIaSENCg0KTW9zdGx5IHJldmlld2VkLWJ5IEFsYmVydG8sICIvKiBObyBzZW5zZSBp
+biByZWxlYXNpbmcgdGhlIGxvY2sgKi8iIHNob3VsZCBiZSByZW1vdmVkDQpmcm9tIDA2LCBzaG91
+bGQgSSByZXNlbmQganVzdCBmb3IgdGhpcz8gSSdkIHByZWZlciB0byBoYW5kbGUgc29tZSBvdGhl
+ciBjb21tZW50cywgaWYgYW55Lg0KDQowOC4wMS4yMDE5IDIwOjA2LCBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5IHdyb3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBUaGUgc2VyaWVzIGJyaW5ncyB0
+aHJlYWRzIHRvIHFjb3cyIGVuY3J5cHRpb24vZGVjcnlwdGlvbiBwYXRoLA0KPiBsaWtlIGl0IGlz
+IGFscmVhZHkgZG9uZSBmb3IgY29tcHJlc3Npb24uDQo+IE5vdywgYmFzZWQgb24gbWFzdGVyDQo+
+IA0KPiB2MzoNCj4gMDE6IGRyb3AgJ2luY2x1ZGUgYmxvY2tfaW50LmgnIGxpbmVzIG5vdCBuZWVk
+ZWQgbW9yZSBbQWxiZXJ0b10NCj4gMDI6IGZpeCBjb21tZW50cyBzdHlsZSAob3Blbi9jbG9zZSBv
+biBzZXBhcmF0ZSBsaW5lKSwgYWRkIEFsYmVydG8ncyByLWINCj4gMDM6IGltcHJvdmUgY29tbWl0
+IG1lc3NhZ2UsIGFkZCBBbGJlcnRvJ3Mgci1iDQo+IDA0OiBuZXcsIGZvbGxvd3MgUGFvbG8ncyBj
+b21tZW50DQo+IA0KPiANCj4gdjI6IChub3QgdmVyeSBjYXJlZnVsIGNoYW5nZSBsaXN0KQ0KPiAg
+ICAgIC0gbXVsdGlwbGUgY2lwaGVyIGluc2lkZSBRQ3J5cHRvQmxvY2sgaW5zdGVhZCBvZiBtdWx0
+aXBsZQ0KPiAgICAgICAgYmxvY2tzIGluc2lkZSBxY293MiwgYXMgc3VnZ2VzdGVkIGJ5IERhbmll
+bCwgYW5kIGl0IGlzDQo+ICAgICAgICBkb25lIGluIHNlcGFyYXRlIHNlcmllcw0KPiAgICAgIC0g
+dXNlIHRocmVhZGVkIGVuY3J5cHRpb24gaW4gZG9fcGVyZm9ybV9jb3dfZW5jcnlwdCgpIHRvbw0K
+PiAgICAgIC0gc29tZSByZW5hbWluZyBhbmQgcmVmYWN0b3JpbmcgYW5kIHNpbXBsaWZpY2F0aW9u
+cw0KPiANCj4gDQo+ID09IFBlcmZvcm1hbmNlIHRlc3RpbmcgPT0NCj4gDQo+IEhtbSwgZG8gd2Ug
+aGF2ZSBzb21ldGhpbmcgbGlrZSB0ZXN0cy9xZW11LWlvdGVzdHMsIGJ1dCBmb3IgcGVyZm9ybWFu
+Y2U/DQo+IA0KPiBbcm9vdEBrdm0gdXAtcWNvdzItZW5jcnlwdC10aHJlYWRzXSMgY2F0IHRlc3Qu
+c2gNCj4gICAgICAjIS9iaW4vYmFzaA0KPiANCj4gICAgICBzaXplPTFHDQo+ICAgICAgc3JjPS9z
+c2Qvc3JjLnJhdw0KPiAgICAgIGRzdD0vc3NkL2RzdC5lbmMucWNvdzINCj4gDQo+ICAgICAgIyBj
+cmVhdGUgc291cmNlIGZvciB0ZXN0cw0KPiAgICAgIC4vcWVtdS1pbWcgY3JlYXRlIC1mIHJhdyAi
+JHNyYyIgJHNpemUgPiAvZGV2L251bGwNCj4gICAgICAuL3FlbXUtaW8gLWYgcmF3IC1jICJ3cml0
+ZSAtUCAweGEgMCAkc2l6ZSIgIiRzcmMiID4gL2Rldi9udWxsDQo+IA0KPiAgICAgIGZvciB3IGlu
+ICIiICItVyI7IGRvDQo+ICAgICAgICAgIGVjaG8gLWUgIlRlc3Qgd2l0aCBhZGRpdGlvbmFsIHBh
+cmFtdGVyIGZvciBxZW11LWltZzogJyR3JyINCj4gDQo+ICAgICAgICAgICMgY3JlYXRlIHRhcmdl
+dA0KPiAgICAgICAgICAuL3FlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiAtLW9iamVjdCBzZWNyZXQs
+aWQ9c2VjMCxkYXRhPXRlc3QgLW8gZW5jcnlwdC5mb3JtYXQ9bHVrcyxlbmNyeXB0LmtleS1zZWNy
+ZXQ9c2VjMCAiJGRzdCIgJHNpemUgPiAvZGV2L251bGwNCj4gDQo+ICAgICAgICAgIHRpbWUgLi9x
+ZW11LWltZyBjb252ZXJ0ICR3IC1mIHJhdyAtLW9iamVjdCBzZWNyZXQsaWQ9c2VjMCxkYXRhPXRl
+c3QgLS10YXJnZXQtaW1hZ2Utb3B0cyAtbiAiJHNyYyIgImRyaXZlcj1xY293MixmaWxlLmZpbGVu
+YW1lPSRkc3QsZW5jcnlwdC5rZXktc2VjcmV0PXNlYzAiDQo+ICAgICAgICAgIGVjaG8NCj4gICAg
+ICBkb25lDQo+IA0KPiANCj4gYmVmb3JlIHRoZSBzZXJpZXM6DQo+ICAgICAgVGVzdCB3aXRoIGFk
+ZGl0aW9uYWwgcGFyYW10ZXIgZm9yIHFlbXUtaW1nOiAnJw0KPiANCj4gICAgICByZWFsICAgIDBt
+MTQuMzE4cw0KPiAgICAgIHVzZXIgICAgMG0xMy42MzdzDQo+ICAgICAgc3lzICAgICAwbTAuODgx
+cw0KPiANCj4gICAgICBUZXN0IHdpdGggYWRkaXRpb25hbCBwYXJhbXRlciBmb3IgcWVtdS1pbWc6
+ICctVycNCj4gDQo+ICAgICAgcmVhbCAgICAwbTEzLjk2MnMNCj4gICAgICB1c2VyICAgIDBtMTMu
+Njgxcw0KPiAgICAgIHN5cyAgICAgMG0xLjE1NnMNCj4gDQo+IA0KPiBhZnRlciB0aGUgc2VyaWVz
+Og0KPiAgICAgIFRlc3Qgd2l0aCBhZGRpdGlvbmFsIHBhcmFtdGVyIGZvciBxZW11LWltZzogJycN
+Cj4gDQo+ICAgICAgcmVhbCAgICAwbTE0LjM4MnMNCj4gICAgICB1c2VyICAgIDBtMTMuNzM1cw0K
+PiAgICAgIHN5cyAgICAgMG0wLjgzNXMNCj4gDQo+ICAgICAgVGVzdCB3aXRoIGFkZGl0aW9uYWwg
+cGFyYW10ZXIgZm9yIHFlbXUtaW1nOiAnLVcnDQo+IA0KPiAgICAgIHJlYWwgICAgMG01LjY5NnMN
+Cj4gICAgICB1c2VyICAgIDBtMTUuOTMxcw0KPiAgICAgIHN5cyAgICAgMG0xLjE0NHMNCj4gDQo+
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgKDkpOg0KPiAgICBxY293Mi5oOiBhZGQgbWlz
+c2luZyBpbmNsdWRlDQo+ICAgIHFjb3cyOiBhZGQgc2VwYXJhdGUgZmlsZSBmb3IgdGhyZWFkZWQg
+ZGF0YSBwcm9jZXNzaW5nIGZ1bmN0aW9ucw0KPiAgICBxY293Mi10aHJlYWRzOiB1c2UgdGhyZWFk
+X3Bvb2xfc3VibWl0X2NvDQo+ICAgIHFjb3cyLXRocmVhZHM6IHFjb3cyX2NvX2RvX2NvbXByZXNz
+OiBwcm90ZWN0IHF1ZXVpbmcgYnkgbXV0ZXgNCj4gICAgcWNvdzItdGhyZWFkczogc3BsaXQgb3V0
+IGdlbmVyaWMgcGF0aA0KPiAgICBxY293MjogcWNvdzJfY29fcHJlYWR2OiBpbXByb3ZlIGxvY2tp
+bmcNCj4gICAgcWNvdzI6IHFjb3cyX2NvX3ByZWFkdjogc2tpcCB1c2luZyBoZF9xaW92IHdoZW4g
+cG9zc2libGUNCj4gICAgcWNvdzI6IGJkcnZfY29fcHdyaXRldjogbW92ZSBlbmNyeXB0aW9uIGNv
+ZGUgb3V0IG9mIHRoZSBsb2NrDQo+ICAgIHFjb3cyOiBkbyBlbmNyeXB0aW9uIGluIHRocmVhZHMN
+Cj4gDQo+ICAgYmxvY2svcWNvdzIuaCAgICAgICAgICB8ICAyMCArKy0NCj4gICBibG9jay9xY293
+Mi1iaXRtYXAuYyAgIHwgICAxIC0NCj4gICBibG9jay9xY293Mi1jYWNoZS5jICAgIHwgICAxIC0N
+Cj4gICBibG9jay9xY293Mi1jbHVzdGVyLmMgIHwgICA4ICstDQo+ICAgYmxvY2svcWNvdzItcmVm
+Y291bnQuYyB8ICAgMSAtDQo+ICAgYmxvY2svcWNvdzItc25hcHNob3QuYyB8ICAgMSAtDQo+ICAg
+YmxvY2svcWNvdzItdGhyZWFkcy5jICB8IDI2OCArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysNCj4gICBibG9jay9xY293Mi5jICAgICAgICAgIHwgMjc3ICsrKysrKysrLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgYmxvY2svTWFrZWZpbGUub2JqcyAg
+ICB8ICAgMiArLQ0KPiAgIDkgZmlsZXMgY2hhbmdlZCwgMzQzIGluc2VydGlvbnMoKyksIDIzNiBk
+ZWxldGlvbnMoLSkNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svcWNvdzItdGhyZWFkcy5j
+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
