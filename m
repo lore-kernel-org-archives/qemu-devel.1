@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55466)
+Received: from eggs.gnu.org ([209.51.188.92]:55957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go8pC-00032i-O1
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:27:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1go8qz-0004B6-51
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go8p7-0008Bo-MI
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:27:49 -0500
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:46676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1go8p7-00084Z-Dd
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:27:45 -0500
-Received: by mail-ot1-x335.google.com with SMTP id w25so14899777otm.13
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:27:31 -0800 (PST)
-MIME-Version: 1.0
-References: <20190125220648.28164-1-jsnow@redhat.com>
-In-Reply-To: <20190125220648.28164-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 15:27:18 +0000
-Message-ID: <CAFEAcA9BUy6crxUB-W617Fkm9Fxpd6NdAHPLf=KVvbq+qV1w=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Ide patches
+	(envelope-from <thuth@redhat.com>) id 1go8qy-0000gC-8f
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:29:41 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 28 Jan 2019 16:29:26 +0100
+Message-Id: <1548689366-31916-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+Subject: [Qemu-devel] [PATCH] s390x: express dependencies with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +19,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, yang.zhong@intel.com
+Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org
 
-On Fri, 25 Jan 2019 at 22:06, John Snow <jsnow@redhat.com> wrote:
->
-> The following changes since commit ad7a21e81231ae64540310384fb0f87ac8758b02:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2019-01-25 17:22:20 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 4ea98d317eb442c738f898f16cfdd47a18b7ca49:
->
->   ide/via: Implement and use native PCI IDE mode (2019-01-25 14:52:12 -0500)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> ----------------------------------------------------------------
+Instead of hard-coding all config switches in the config file
+default-configs/s390x-softmmu.mak, let's use the new Kconfig files
+to express the necessary dependencies: The S390_CCW_VIRTIO config switch
+for the "s390-ccw-virtio" machine now selects all non-optional devices.
 
-Applied, thanks.
+And since we already have the VIRTIO_PCI and VIRTIO_MMIO config switches
+for the other two virtio transports, this patch also introduces a new
+config switch VIRTIO_CCW for the third, s390x-specific virtio transport,
+so that all three virtio transports are now handled in the same way.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ This goes on top of the curren Kconfig series:
 
--- PMM
+ Based-on: 1548410831-19553-1-git-send-email-pbonzini@redhat.com
+
+ default-configs/s390x-softmmu.mak | 12 ++++++++----
+ hw/s390x/Kconfig                  |  4 ++++
+ hw/s390x/Makefile.objs            |  2 +-
+ hw/virtio/Kconfig                 |  4 ++++
+ 4 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 2be5059..08b1683 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,9 +1,13 @@
+-CONFIG_PCI=y
++# Default configuration for s390x-softmmu
++
++# Optional devices:
++#
+ CONFIG_VIRTIO_PCI=y
+-CONFIG_SCLPCONSOLE=y
+ CONFIG_TERMINAL3270=y
+-CONFIG_S390_FLIC=y
+ CONFIG_WDT_DIAG288=y
+-CONFIG_S390_CCW_VIRTIO=y
+ CONFIG_VFIO_CCW=y
+ CONFIG_VFIO_AP=y
++
++# Boards:
++#
++CONFIG_S390_CCW_VIRTIO=y
+diff --git a/hw/s390x/Kconfig b/hw/s390x/Kconfig
+index 303db7f..9a36c39 100644
+--- a/hw/s390x/Kconfig
++++ b/hw/s390x/Kconfig
+@@ -1,2 +1,6 @@
+ config S390_CCW_VIRTIO
+     bool
++    select PCI
++    select S390_FLIC
++    select SCLPCONSOLE
++    select VIRTIO_CCW
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index a884aae..0dc798a 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -8,7 +8,7 @@ obj-y += ipl.o
+ obj-y += css.o
+ obj-y += s390-virtio-ccw.o
+ obj-y += 3270-ccw.o
+-obj-y += virtio-ccw.o
++obj-$(CONFIG_VIRTIO_CCW) += virtio-ccw.o
+ obj-$(CONFIG_VIRTIO_SERIAL) += virtio-ccw-serial.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-ccw-balloon.o
+ obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
+diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
+index 74f4573..e0452de 100644
+--- a/hw/virtio/Kconfig
++++ b/hw/virtio/Kconfig
+@@ -16,6 +16,10 @@ config VIRTIO_MMIO
+     bool
+     select VIRTIO
+ 
++config VIRTIO_CCW
++    bool
++    select VIRTIO
++
+ config VIRTIO_BALLOON
+     bool
+     default y
+-- 
+1.8.3.1
