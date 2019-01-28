@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54033)
+Received: from eggs.gnu.org ([209.51.188.92]:55159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2XD-0007SS-UV
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:52 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1go2dC-0000U5-BV
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2XC-00083R-Up
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59251)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1go2XC-00082R-Ll
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:44:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3EA9781DF1
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:44:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-122.ams2.redhat.com [10.36.116.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 855BF627DD
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:44:48 +0000 (UTC)
-References: <20190125192719.15339-1-philmd@redhat.com>
-	<20190125192719.15339-4-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <154f8a45-723d-6f3c-a278-1767361bc94e@redhat.com>
-Date: Mon, 28 Jan 2019 09:44:47 +0100
+	(envelope-from <pkrempa@redhat.com>) id 1go2d9-0004HG-52
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:51:02 -0500
+Date: Mon, 28 Jan 2019 09:50:41 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190128085041.GA16630@andariel.pipo.sk>
+References: <20190125174653.4604-1-kwolf@redhat.com>
+	<20190125174653.4604-3-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190125192719.15339-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] WIP tests/vm: Run tests on OpenBSD
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="OXfL5xGRrasGEqWY"
+Content-Disposition: inline
+In-Reply-To: <20190125174653.4604-3-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] scsi-disk: Add device_id property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-On 2019-01-25 20:27, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+--OXfL5xGRrasGEqWY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 25, 2019 at 18:46:52 +0100, Kevin Wolf wrote:
+> The new device_id property specifies which value to use for the vendor
+> specific designator in the Device Identification VPD page.
+>=20
+> In particular, this is necessary for libvirt to maintain guest ABI
+> compatibility when no serial number is given and a VM is switched from
+> -drive (where the BlockBackend name is used) to -blockdev (where the
+> vendor specific designator is left out by default).
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  tests/vm/openbsd | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index cfe0572c59..de907dd21c 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -25,9 +25,7 @@ class OpenBSDVM(basevm.BaseVM):
->          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->          tar -xf /dev/rsd1c;
->          ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --pytho=
-n=3Dpython2.7 {configure_opts};
-> -        gmake --output-sync -j{jobs} {verbose};
-> -        # XXX: "gmake check" seems to always hang or fail
-> -        #gmake --output-sync -j{jobs} check {verbose};
-> +        gmake --output-sync -j{jobs} check {verbose};
->      """
-> =20
->      def build_image(self, img):
->=20
+>  hw/scsi/scsi-disk.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
 
-Please add a proper patch description and remove the WIP from the subject=
-.
+[...]
 
- Thanks,
-  Thomas
+> @@ -2904,7 +2910,9 @@ static const TypeInfo scsi_disk_base_info =3D {
+>      DEFINE_PROP_STRING("ver", SCSIDiskState, version),               \
+>      DEFINE_PROP_STRING("serial", SCSIDiskState, serial),             \
+>      DEFINE_PROP_STRING("vendor", SCSIDiskState, vendor),             \
+> -    DEFINE_PROP_STRING("product", SCSIDiskState, product)
+> +    DEFINE_PROP_STRING("product", SCSIDiskState, product),           \
+> +    DEFINE_PROP_STRING("device_id", SCSIDiskState, device_id)
+
+This adds the property only to 'scsi-disk', whereas libvirt will use
+'scsi-cd' or 'scsi-hd' depending on the media type if the 'scsi-cd'
+device is detected. The following logic decides:
+
+https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/qemu/qemu_command=
+=2Ec;h=3D3e46f3ced3c1e6a4865e98e2d0cdce3214c4a5d2;hb=3DHEAD#l1978
+
+This brings multiple questions:
+
+1) Is this necssary also for scsi-cd/scsi-hd and if yes, the property
+does not seem to be present for those
+
+2) Is actually using 'scsi-cd'/'scsi-hd' the better option than
+'scsi-disk'?
+
+3) Since upstream libvirt supports qemu-1.5 and newer and 'scsi-cd' is
+already supported there, can we assume that all newer versions support
+it? (Basically the question is whether it can be compiled out by
+upstream means).
+
+
+
+--OXfL5xGRrasGEqWY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlxOwl4ACgkQHGwCByjY
+1GpzyQ//bIbnCAaV/g58tFb9Z2yjGUmXzaR0GtVOGbsWu1py0rswU7kREykpShmk
+jwcBsUQzuW2BVVNlPHDeABdpODmH88RKyP/uwYZTr5xr3EjDqytEfD692D85F65+
+LPUPiJUXnbRP2H0pEGSvBF9UNkkf53gI2LIkPpYuxPPsDUcUbb1b4hyKOy371ZLa
+yuc43j978ZxRnEKVFXSKiztytdBaidzHgctFPbu1wr7xugMbZuP37IMOm5MsBdWC
+wL7AbCOKjTDzo9TqGWz5vQhDWuDKrhNA3e3gCsa3cVJwbzbLUsVUXThIcrTLLZpx
+o4V0q9OESAQo9JLz29ICs1OS2jdPx027D2YJXU+NlAQOEhYHnDnQk9m0wLOwsl7K
+qEWQzK3ldU+Ueo6Uw/jan7OUy5wLq0YVM+bkwJVGuS2HbeDMPFPN0Ww9ZrxKPIal
+PK8QyZBplcg8lkTFljpe9CNtgIkX4SQ97WdatIkVsF++wW48XYHVPGFyXI3KNKXT
+fOo9MEQ1GuX7YQ6oMiroY1Lft415GYhwFDzzwCv32jaLbw6RlPYe9sAPrSy++9wn
+eXnuwy8V6Pzxx7cgxqEhbbgEGclfNKcrN4CTNRGimOvmrptVaoUxv2Iyj9NkM7Sl
+YfoCeW6nc7wVWi3061l/ZqPVyuITkTWyCLqZZIsjNCXIbqT+h34=
+=OSsN
+-----END PGP SIGNATURE-----
+
+--OXfL5xGRrasGEqWY--
