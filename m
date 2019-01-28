@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56060)
+Received: from eggs.gnu.org ([209.51.188.92]:56090)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1go4km-0003fk-4X
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:01 -0500
+	id 1go4kt-0003o0-77
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1go4ki-00044P-HH
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:06:58 -0500
+	id 1go4kq-00046f-Gd
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:06 -0500
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Date: Mon, 28 Jan 2019 11:05:42 +0000
-Message-ID: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 28 Jan 2019 11:05:43 +0000
+Message-ID: <20190128110545.20644-2-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH 0/4] ARM virt: ACPI memory hotplug support
+Subject: [Qemu-devel] [RFC PATCH 1/4] hw:acpi: Make ACPI IO address space
+ configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, imammedo@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: xuwei5@huawei.com, linuxarm@huawei.com
 
-This series is an attempt to provide hotplug support to both
-pc-dimm and nvdimm device memory on ARM virt platform. This is
-based on Eric's recent works to support PCDIMM/NVDIMM device memory[1].
-The kernel support for arm64 memory hot add was added only
-recently by Robin[2] and hence the guest kernel should be => 5.0-rc1.
+This is in preparation for adding support for ARM64 platforms
+where it doesn't use port mapped IO for ACPI IO space.
 
-This makes use of PL061 GPIO controller to sent related ACPI events
-to the Guest. The only reference I could find with respect to the GPIO
-pins usage is here[3] which says, "use PIN 3 for system_powerdown,
-reserving PIN 0, 1, 2 for PCI hotplug, CPU hotplug and memory hotplug".
-Hence Pin 2 is used for PCDIMM and pin 4 for NVDIMM.
+Also add a flag to identify hw reduced ACPI platforms as they
+might use GPIO hw for signaling ACPI platform events.
 
-This is sanity tested on a HiSilicon ARM64 platform and appreciate
-any further testing.
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ hw/acpi/memory_hotplug.c         | 13 ++++++++-----
+ hw/i386/acpi-build.c             |  3 ++-
+ include/hw/acpi/memory_hotplug.h |  6 ++++--
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
-This series can be applied on top of Eric's branch here[4]
-
-Test:
-------
-Please use a Guest kernel image >5.0-rc1 with all the mem/nvdimm
-hotplug related CONFIGs enabled.
-
-./qemu-system-aarch64 \
--machine virt,gic-version=3,nvdimm \
--m 1G,maxmem=4G,slots=4 \
--cpu host \
--kernel Image \
--initrd rootfs-iperf.cpio \
--bios QEMU_EFI.fd \
--numa node,nodeid=0 \
--net none \
--nographic -enable-kvm \
--append "console=ttyAMA0 acpi=force earlycon=pl011,0x9000000"
-
-Enter Qemu monitor,
-Add pc-dimm:
-object_add memory-backend-ram,id=mem1,size=1G
-device_add pc-dimm,id=dimm1,memdev=mem1
-
-Add nvdimm:
-object_add memory-backend-ram,id=mem2,size=1G
-device_add nvdimm,id=dimm2,memdev=mem2
-
-Known Issue:
-
-It is observed that hot adding nvdimm will results in guest reboot
-failure. EDK2 fails to build the ACPI tables on reboot. Please find
-below EDK2 log on Guest reboot after nvdimm hot-add,
-
-ProcessCmdAddChecksum: invalid checksum range in "etc/acpi/tables"
-OnRootBridgesConnected: InstallAcpiTables: Protocol Error
-
-The root cause seems to be EDK2 ACPI table checksum failure
-as NFIT table is getting updated on hot-add. This needs further
-investigation.
-
-Thanks,
-Shameer
-
-[1]https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05740.html
-[2]https://patchwork.kernel.org/patch/10724455/
-[3]https://lists.gnu.org/archive/html/qemu-arm/2015-12/msg00095.html
-[4]https://github.com/eauger/qemu/tree/v3.1.0-dimm-v5
-
-Shameer Kolothum (4):
-  hw:acpi: Make ACPI IO address space configurable
-  hw/arm/virt: Add GPIO based pcdimm hotplug ACPI event support
-  hw/arm/virt: Enable pc-dimm hotplug support
-  hw/arm/virt: Add nvdimm hotplug support
-
- default-configs/arm-softmmu.mak  |   1 +
- hw/acpi/memory_hotplug.c         |  13 +++--
- hw/arm/virt-acpi-build.c         |  45 +++++++++++++++--
- hw/arm/virt.c                    | 105 ++++++++++++++++++++++++++++++++++++---
- hw/i386/acpi-build.c             |   3 +-
- include/hw/acpi/memory_hotplug.h |   6 ++-
- include/hw/arm/virt.h            |  15 ++++++
- 7 files changed, 168 insertions(+), 20 deletions(-)
-
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index 921cad2..05f1d45 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -34,7 +34,7 @@
+ #define MEMORY_HOTPLUG_IO_LEN         24
+ #define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
+ 
+-static uint16_t memhp_io_base;
++static hwaddr memhp_io_base;
+ 
+ static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
+ {
+@@ -208,7 +208,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+ };
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base)
++                              MemHotplugState *state, hwaddr io_base)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+ 
+@@ -279,7 +279,9 @@ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+     mdev->is_enabled = true;
+     if (dev->hotplugged) {
+         mdev->is_inserting = true;
+-        acpi_send_event(DEVICE(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
++        if (!mem_st->hw_reduced_acpi) {
++            acpi_send_event(DEVICE(hotplug_dev), ACPI_MEMORY_HOTPLUG_STATUS);
++        }
+     }
+ }
+ 
+@@ -341,7 +343,8 @@ const VMStateDescription vmstate_memory_hotplug = {
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method)
++                              const char *event_handler_method,
++                              AmlRegionSpace rs)
+ {
+     int i;
+     Aml *ifctx;
+@@ -371,7 +374,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+ 
+         aml_append(mem_ctrl_dev, aml_operation_region(
+-            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
++            MEMORY_HOTPLUG_IO_REGION, rs,
+             aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+         );
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2e21a31..b62c1a3 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1852,7 +1852,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+                        "\\_SB.PCI0", "\\_GPE._E02");
+     }
+-    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
++    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0",
++                             "\\_GPE._E03", AML_SYSTEM_IO);
+ 
+     scope =  aml_scope("_GPE");
+     {
+diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
+index 77c6576..ec56579 100644
+--- a/include/hw/acpi/memory_hotplug.h
++++ b/include/hw/acpi/memory_hotplug.h
+@@ -26,10 +26,11 @@ typedef struct MemHotplugState {
+     uint32_t selector;
+     uint32_t dev_count;
+     MemStatus *devs;
++    bool hw_reduced_acpi; /*true for hw reduced acpi platform */
+ } MemHotplugState;
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state, uint16_t io_base);
++                              MemHotplugState *state, hwaddr io_base);
+ 
+ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+                          DeviceState *dev, Error **errp);
+@@ -48,5 +49,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+                               const char *res_root,
+-                              const char *event_handler_method);
++                              const char *event_handler_method,
++                              AmlRegionSpace rs);
+ #endif
 -- 
 2.7.4
