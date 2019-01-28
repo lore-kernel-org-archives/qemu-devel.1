@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51902)
+Received: from eggs.gnu.org ([209.51.188.92]:53509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1go4QZ-0003o6-J5
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:46:08 -0500
+	(envelope-from <philmd@redhat.com>) id 1go4YV-0006Om-CE
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1go4QY-00015e-Kj
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:46:07 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39736 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1go4QY-00014O-Au
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:46:06 -0500
-Received: from relay2.suse.de (unknown [195.135.220.254])
-	by mx1.suse.de (Postfix) with ESMTP id 054B3AF7E
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 10:46:03 +0000 (UTC)
-From: Andreas Schwab <schwab@suse.de>
-Date: Mon, 28 Jan 2019 11:46:02 +0100
-Message-ID: <mvmh8dt3vrp.fsf@suse.de>
+	(envelope-from <philmd@redhat.com>) id 1go4YT-0006IM-Cm
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:54:19 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42350)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go4YK-0006A5-8r
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:54:12 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so17471280wrx.9
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:54:02 -0800 (PST)
+References: <20190125192719.15339-1-philmd@redhat.com>
+	<20190125192719.15339-2-philmd@redhat.com>
+	<76f0dc0e-620c-407b-a99f-8629c25472fb@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4c012925-b081-ce21-40c0-7cca7a2c403c@redhat.com>
+Date: Mon, 28 Jan 2019 11:53:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: fix emulation of
- accept4/getpeername/getsockname/recvfrom syscalls
+In-Reply-To: <76f0dc0e-620c-407b-a99f-8629c25472fb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] configure: Disable W^X on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, Li Qiang <liq3ea@163.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-System calls that return a socket address do so by putting the possibly
-truncated address into the provided buffer space, but setting the addrlen
-parameter to the actual size of the address.  To determine how much to
-copy back to the target memory the emulation needs to remember the old
-value of the addrlen parameter, so that it doesn't write past the buffer
-limits.
+On 1/28/19 9:43 AM, Thomas Huth wrote:
+> On 2019-01-25 20:27, Philippe Mathieu-Daudé wrote:
+>> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
+>> TCG requires WX access. Disable W^X if it is available.
+>> This fixes:
+>>
+>>   # lm32-softmmu/qemu-system-lm32
+>>   Could not allocate dynamic translator buffer
+>>
+>>   # sysctl kern.wxabort=1
+>>   kern.wxabort: 0 -> 1
+>>   # lm32-softmmu/qemu-system-lm32
+>>   mmap: Not supported
+>>   Abort trap (core dumped)
+>>   # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
+>>   (gdb) bt
+>>   #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input}:5
+>>   #1  0x000017e3c15e5d7a in *_libc_mmap (addr=Variable "addr" is not available.) at /usr/src/lib/libc/sys/mmap.c:47
+>>   #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/accel/tcg/translate-all.c:1064
+>>   #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1112
+>>   #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1149
+>>   #5  0x000017e17d9897e9 in tcg_init (ms=0x17e45e456800) at /usr/src/qemu/accel/tcg/tcg-all.c:66
+>>   #6  0x000017e17d9891b8 in accel_init_machine (acc=0x17e3c3f50800, ms=0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
+>>   #7  0x000017e17d989312 in configure_accelerator (ms=0x17e45e456800, progname=0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/qemu/accel/accel.c:111
+>>   #8  0x000017e17d9d8616 in main (argc=1, argv=0x7f7fffff06b8, envp=0x7f7fffff06c8) at vl.c:4325
+>>
+>> [1] https://www.openbsd.org/faq/upgrade60.html
+>> [2] https://undeadly.org/cgi?action=article&sid=20160527203200
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  configure | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/configure b/configure
+>> index b18281c61f..f6acc028a7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -5795,6 +5795,17 @@ if test "$mingw32" = "yes" ; then
+>>      done
+>>  fi
+>>  
+>> +# Disable W^X if available
+> 
+> I'd like to suggest to mention OpenBSD in the comment.
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
----
- linux-user/syscall.c | 38 ++++++++++++++++++++++----------------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+Good idea.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d5db01122aa4..46ca889556c8 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2884,7 +2884,7 @@ static abi_long do_sendrecvmmsg(int fd, abi_ulong target_msgvec,
- static abi_long do_accept4(int fd, abi_ulong target_addr,
-                            abi_ulong target_addrlen_addr, int flags)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
-     int host_flags;
-@@ -2908,10 +2908,11 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(safe_accept4(fd, addr, &addrlen, host_flags));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(safe_accept4(fd, addr, &ret_addrlen, host_flags));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -2921,7 +2922,7 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
- static abi_long do_getpeername(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2937,10 +2938,11 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getpeername(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getpeername(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -2950,7 +2952,7 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
- static abi_long do_getsockname(int fd, abi_ulong target_addr,
-                                abi_ulong target_addrlen_addr)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     abi_long ret;
- 
-@@ -2966,10 +2968,11 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
- 
-     addr = alloca(addrlen);
- 
--    ret = get_errno(getsockname(fd, addr, &addrlen));
-+    ret_addrlen = addrlen;
-+    ret = get_errno(getsockname(fd, addr, &ret_addrlen));
-     if (!is_error(ret)) {
--        host_to_target_sockaddr(target_addr, addr, addrlen);
--        if (put_user_u32(addrlen, target_addrlen_addr))
-+        host_to_target_sockaddr(target_addr, addr, MIN(addrlen, ret_addrlen));
-+        if (put_user_u32(ret_addrlen, target_addrlen_addr))
-             ret = -TARGET_EFAULT;
-     }
-     return ret;
-@@ -3042,7 +3045,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-                             abi_ulong target_addr,
-                             abi_ulong target_addrlen)
- {
--    socklen_t addrlen;
-+    socklen_t addrlen, ret_addrlen;
-     void *addr;
-     void *host_msg;
-     abi_long ret;
-@@ -3060,10 +3063,12 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             goto fail;
-         }
-         addr = alloca(addrlen);
-+        ret_addrlen = addrlen;
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags,
--                                      addr, &addrlen));
-+                                      addr, &ret_addrlen));
-     } else {
-         addr = NULL; /* To keep compiler quiet.  */
-+        addrlen = 0; /* To keep compiler quiet.  */
-         ret = get_errno(safe_recvfrom(fd, host_msg, len, flags, NULL, 0));
-     }
-     if (!is_error(ret)) {
-@@ -3076,8 +3081,9 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
-             }
-         }
-         if (target_addr) {
--            host_to_target_sockaddr(target_addr, addr, addrlen);
--            if (put_user_u32(addrlen, target_addrlen)) {
-+            host_to_target_sockaddr(target_addr, addr,
-+                                    MIN(addrlen, ret_addrlen));
-+            if (put_user_u32(ret_addrlen, target_addrlen)) {
-                 ret = -TARGET_EFAULT;
-                 goto fail;
-             }
--- 
-2.20.1
+>> +if test "$tcg" = "yes" -a "$targetos" = "OpenBSD"; then
+>> +    cat > $TMPC <<EOF
+>> +    int main(void) { return 0; }
+>> +EOF
+>> +    wx_ldflags="-Wl,-z,wxneeded"
+>> +    if compile_prog "" "$wx_ldflags"; then
+>> +        QEMU_LDFLAGS="$QEMU_LDFLAGS -Wl,-z,wxneeded"
+> 
+> Why do you introduce the wx_ldflags variable above, just to use it one
+> time? I'd suggest to either use it in the QEMU_LDFLAGS line, too, or to
+> get rid of the variable completely and always use -Wl,-z,wxneeded directly.
 
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+I did not notice :) I'll remove the variable to avoid creating variables
+used once.
+
+Thanks!
+
+Phil.
+
+> 
+>  Thomas
+> 
+>> +    fi
+>> +fi
+>> +
+>>  qemu_confdir=$sysconfdir$confsuffix
+>>  qemu_moddir=$libdir$confsuffix
+>>  qemu_datadir=$datadir$confsuffix
