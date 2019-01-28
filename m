@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52532)
+Received: from eggs.gnu.org ([209.51.188.92]:52539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goAK6-0008KB-8V
+	(envelope-from <dgilbert@redhat.com>) id 1goAK6-0008LG-LG
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goAK1-0004Mz-7M
+	(envelope-from <dgilbert@redhat.com>) id 1goAK0-0004M8-KT
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38500)
+Received: from mx1.redhat.com ([209.132.183.28]:36770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goAJr-0003gH-5J
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:38 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goAJr-0003l2-56
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:36 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1EB8C073D6F
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:03:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A95F9AB409
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:03:30 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 28 Jan 2019 17:03:13 +0000
-Message-Id: <20190128170321.16936-2-dgilbert@redhat.com>
+Date: Mon, 28 Jan 2019 17:03:15 +0000
+Message-Id: <20190128170321.16936-4-dgilbert@redhat.com>
 In-Reply-To: <20190128170321.16936-1-dgilbert@redhat.com>
 References: <20190128170321.16936-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/9] net: Introduce announce timer
+Subject: [Qemu-devel] [PATCH 3/9] virtio-net: Switch to using announce timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,205 +35,179 @@ To: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The 'announce timer' will be used by migration, and explicit
-requests for qemu to perform network announces.
+Switch virtio's self announcement to use the AnnounceTimer.
+It keeps it's own AnnounceTimer (per device), and starts running it
+using a migration post-load and a virtual clock; that way the
+announce happens once the guest is actually running.
+The timer uses the migration parameters to set the timing of
+the repeats.
 
-Based on the work by Germano Veit Michel <germano@redhat.com>
- and Vlad Yasevich <vyasevic@redhat.com>
+Based on earlier patches by myself and
+ Vladislav Yasevich <vyasevic@redhat.com>
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/net/announce.h  | 39 ++++++++++++++++++++++++++
- include/qemu/typedefs.h |  1 +
- migration/migration.c   |  1 +
- net/Makefile.objs       |  1 +
- net/announce.c          | 61 +++++++++++++++++++++++++++++++++++++++++
- qapi/net.json           | 23 ++++++++++++++++
- 6 files changed, 126 insertions(+)
- create mode 100644 include/net/announce.h
- create mode 100644 net/announce.c
+ hw/net/trace-events            |  7 +++++++
+ hw/net/virtio-net.c            | 36 ++++++++++++++++++++++------------
+ include/hw/virtio/virtio-net.h |  4 ++--
+ 3 files changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/announce.h b/include/net/announce.h
-new file mode 100644
-index 0000000000..b89f1c28b5
---- /dev/null
-+++ b/include/net/announce.h
-@@ -0,0 +1,39 @@
-+/*
-+ *  Self-announce facility
-+ *  (c) 2017-2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index 9d49f62fa1..fc800dd606 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -359,3 +359,10 @@ sunhme_rx_filter_reject(void) "rejecting incoming fr=
+ame"
+ sunhme_rx_filter_accept(void) "accepting incoming frame"
+ sunhme_rx_desc(uint32_t addr, int offset, uint32_t status, int len, int =
+cr, int nr) "addr 0x%"PRIx32"(+0x%x) status 0x%"PRIx32 " len %d (ring %d/=
+%d)"
+ sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
 +
-+#ifndef QEMU_NET_ANNOUNCE_H
-+#define QEMU_NET_ANNOUNCE_H
++# hw/net/virtio-net.c
++virtio_net_announce_timer(int round) "%d"
++virtio_net_handle_announce(int round) "%d"
++virtio_net_post_load_device(void)
 +
-+#include "qemu-common.h"
-+#include "qapi/qapi-types-net.h"
-+#include "qemu/timer.h"
 +
-+struct AnnounceTimer {
-+    QEMUTimer *tm;
-+    AnnounceParameters params;
-+    QEMUClockType type;
-+    int round;
-+};
-+
-+/* Returns: update the timer to the next time point */
-+int64_t qemu_announce_timer_step(AnnounceTimer *timer);
-+
-+/* Delete the underlying timer */
-+void qemu_announce_timer_del(AnnounceTimer *timer);
-+
-+/*
-+ * Under BQL/main thread
-+ * Reset the timer to the given parameters/type/notifier.
-+ */
-+void qemu_announce_timer_reset(AnnounceTimer *timer,
-+                               AnnounceParameters *params,
-+                               QEMUClockType type,
-+                               QEMUTimerCB *cb,
-+                               void *opaque);
-+
-+#endif
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 5d1a2d8329..e4a0a656d1 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -8,6 +8,7 @@
- typedef struct AdapterInfo AdapterInfo;
- typedef struct AddressSpace AddressSpace;
- typedef struct AioContext AioContext;
-+typedef struct AnnounceTimer AnnounceTimer;
- typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
- typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
- typedef struct BlockBackend BlockBackend;
-diff --git a/migration/migration.c b/migration/migration.c
-index 37e06b76dc..a9c4c6f01d 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -45,6 +45,7 @@
- #include "migration/colo.h"
- #include "hw/boards.h"
- #include "monitor/monitor.h"
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 3f319ef723..b50f86d230 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -21,12 +21,14 @@
+ #include "qemu/timer.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "net/vhost_net.h"
++#include "net/announce.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-net.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/misc.h"
+ #include "standard-headers/linux/ethtool.h"
++#include "trace.h"
+=20
+ #define VIRTIO_NET_VM_VERSION    11
+=20
+@@ -164,8 +166,9 @@ static void virtio_net_announce_timer(void *opaque)
+ {
+     VirtIONet *n =3D opaque;
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
++    trace_virtio_net_announce_timer(n->announce_timer.round);
+=20
+-    n->announce_counter--;
++    n->announce_timer.round--;
+     n->status |=3D VIRTIO_NET_S_ANNOUNCE;
+     virtio_notify_config(vdev);
+ }
+@@ -479,8 +482,8 @@ static void virtio_net_reset(VirtIODevice *vdev)
+     n->nobcast =3D 0;
+     /* multiqueue is disabled by default */
+     n->curr_queues =3D 1;
+-    timer_del(n->announce_timer);
+-    n->announce_counter =3D 0;
++    timer_del(n->announce_timer.tm);
++    n->announce_timer.round =3D 0;
+     n->status &=3D ~VIRTIO_NET_S_ANNOUNCE;
+=20
+     /* Flush any MAC and VLAN filter table state */
+@@ -976,13 +979,12 @@ static int virtio_net_handle_vlan_table(VirtIONet *=
+n, uint8_t cmd,
+ static int virtio_net_handle_announce(VirtIONet *n, uint8_t cmd,
+                                       struct iovec *iov, unsigned int io=
+v_cnt)
+ {
++    trace_virtio_net_handle_announce(n->announce_timer.round);
+     if (cmd =3D=3D VIRTIO_NET_CTRL_ANNOUNCE_ACK &&
+         n->status & VIRTIO_NET_S_ANNOUNCE) {
+         n->status &=3D ~VIRTIO_NET_S_ANNOUNCE;
+-        if (n->announce_counter) {
+-            timer_mod(n->announce_timer,
+-                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-                      self_announce_delay(n->announce_counter));
++        if (n->announce_timer.round) {
++            qemu_announce_timer_step(&n->announce_timer);
+         }
+         return VIRTIO_NET_OK;
+     } else {
+@@ -2298,6 +2300,7 @@ static int virtio_net_post_load_device(void *opaque=
+, int version_id)
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+     int i, link_down;
+=20
++    trace_virtio_net_post_load_device();
+     virtio_net_set_mrg_rx_bufs(n, n->mergeable_rx_bufs,
+                                virtio_vdev_has_feature(vdev,
+                                                        VIRTIO_F_VERSION_=
+1));
+@@ -2334,8 +2337,15 @@ static int virtio_net_post_load_device(void *opaqu=
+e, int version_id)
+=20
+     if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
+         virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+-        n->announce_counter =3D SELF_ANNOUNCE_ROUNDS;
+-        timer_mod(n->announce_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUA=
+L));
++        qemu_announce_timer_reset(&n->announce_timer, migrate_announce_p=
+arams(),
++                                  QEMU_CLOCK_VIRTUAL,
++                                  virtio_net_announce_timer, n);
++        if (n->announce_timer.round) {
++            timer_mod(n->announce_timer.tm,
++                      qemu_clock_get_ms(n->announce_timer.type));
++        } else {
++            qemu_announce_timer_del(&n->announce_timer);
++        }
+     }
+=20
+     return 0;
+@@ -2696,8 +2706,9 @@ static void virtio_net_device_realize(DeviceState *=
+dev, Error **errp)
+     qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+     memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+     n->status =3D VIRTIO_NET_S_LINK_UP;
+-    n->announce_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
+-                                     virtio_net_announce_timer, n);
++    qemu_announce_timer_reset(&n->announce_timer, migrate_announce_param=
+s(),
++                              QEMU_CLOCK_VIRTUAL,
++                              virtio_net_announce_timer, n);
+=20
+     if (n->netclient_type) {
+         /*
+@@ -2760,8 +2771,7 @@ static void virtio_net_device_unrealize(DeviceState=
+ *dev, Error **errp)
+         virtio_net_del_queue(n, i);
+     }
+=20
+-    timer_del(n->announce_timer);
+-    timer_free(n->announce_timer);
++    qemu_announce_timer_del(&n->announce_timer);
+     g_free(n->vqs);
+     qemu_del_nic(n->nic);
+     virtio_net_rsc_cleanup(n);
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-ne=
+t.h
+index a1a0be3bea..b96f0c643f 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -17,6 +17,7 @@
+ #include "qemu/units.h"
+ #include "standard-headers/linux/virtio_net.h"
+ #include "hw/virtio/virtio.h"
 +#include "net/announce.h"
 =20
- #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thrott=
-ling */
-=20
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index b2bf88a0ef..b363fe92d9 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -2,6 +2,7 @@ common-obj-y =3D net.o queue.o checksum.o util.o hub.o
- common-obj-y +=3D socket.o
- common-obj-y +=3D dump.o
- common-obj-y +=3D eth.o
-+common-obj-y +=3D announce.o
- common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
- common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
- common-obj-$(CONFIG_SLIRP) +=3D slirp.o
-diff --git a/net/announce.c b/net/announce.c
-new file mode 100644
-index 0000000000..a37089bf27
---- /dev/null
-+++ b/net/announce.c
-@@ -0,0 +1,61 @@
-+/*
-+ *  Self-announce
-+ *  (c) 2017-2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "net/announce.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/qapi-visit-net.h"
-+
-+int64_t qemu_announce_timer_step(AnnounceTimer *timer)
-+{
-+    int64_t step;
-+
-+    step =3D  timer->params.initial +
-+            (timer->params.rounds - timer->round - 1) *
-+            timer->params.step;
-+
-+    if (step < 0 || step > timer->params.max) {
-+        step =3D timer->params.max;
-+    }
-+    timer_mod(timer->tm, qemu_clock_get_ms(timer->type) + step);
-+
-+    return step;
-+}
-+
-+void qemu_announce_timer_del(AnnounceTimer *timer)
-+{
-+    if (timer->tm) {
-+        timer_del(timer->tm);
-+        timer_free(timer->tm);
-+        timer->tm =3D NULL;
-+    }
-+}
-+
-+/*
-+ * Under BQL/main thread
-+ * Reset the timer to the given parameters/type/notifier.
-+ */
-+void qemu_announce_timer_reset(AnnounceTimer *timer,
-+                               AnnounceParameters *params,
-+                               QEMUClockType type,
-+                               QEMUTimerCB *cb,
-+                               void *opaque)
-+{
-+    /*
-+     * We're under the BQL, so the current timer can't
-+     * be firing, so we should be able to delete it.
-+     */
-+    qemu_announce_timer_del(timer);
-+
-+    QAPI_CLONE_MEMBERS(AnnounceParameters, &timer->params, params);
-+    timer->round =3D params->rounds;
-+    timer->type =3D type;
-+    timer->tm =3D timer_new_ms(type, cb, opaque);
-+}
-+
-diff --git a/qapi/net.json b/qapi/net.json
-index a1a0f39f74..b9ff7617bd 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -684,3 +684,26 @@
- ##
- { 'event': 'NIC_RX_FILTER_CHANGED',
-   'data': { '*name': 'str', 'path': 'str' } }
-+
-+##
-+# @AnnounceParameters:
-+#
-+# Parameters for self-announce timers
-+#
-+# @initial: Initial delay (in ms) before sending the first GARP/RARP
-+#       announcement
-+#
-+# @max: Maximum delay (in ms) to between GARP/RARP announcement packets
-+#
-+# @rounds: Number of self-announcement attempts
-+#
-+# @step: Delay increase (in ms) after each self-announcement attempt
-+#
-+# Since: 4.0
-+##
-+
-+{ 'struct': 'AnnounceParameters',
-+  'data': { 'initial': 'int',
-+            'max': 'int',
-+            'rounds': 'int',
-+            'step': 'int' } }
+ #define TYPE_VIRTIO_NET "virtio-net-device"
+ #define VIRTIO_NET(obj) \
+@@ -181,8 +182,7 @@ struct VirtIONet {
+     char *netclient_name;
+     char *netclient_type;
+     uint64_t curr_guest_offloads;
+-    QEMUTimer *announce_timer;
+-    int announce_counter;
++    AnnounceTimer announce_timer;
+     bool needs_vnet_hdr_swap;
+     bool mtu_bypass_backend;
+ };
 --=20
 2.20.1
