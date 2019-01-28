@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34400)
+Received: from eggs.gnu.org ([209.51.188.92]:37129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1go7NL-0008Cf-P2
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:55:02 -0500
+	(envelope-from <kraxel@redhat.com>) id 1go7T2-0002J3-Pb
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1go7NJ-00031d-VY
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:54:59 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51955)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1go7NJ-0002zi-Od
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:54:57 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b11so14102258wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 05:54:55 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20190128113017.GA2435@rkaganb.sw.ru>
-References: <20190125114155.32062-1-vkuznets@redhat.com>
-	<20190125114155.32062-5-vkuznets@redhat.com>
-	<20190125124738.GB30730@rkaganb.sw.ru>
-	<87bm44onnh.fsf@vitty.brq.redhat.com>
-	<20190128113017.GA2435@rkaganb.sw.ru>
-Date: Mon, 28 Jan 2019 14:54:52 +0100
-Message-ID: <87lg34zy37.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
- pass-through mode
+	(envelope-from <kraxel@redhat.com>) id 1go7T1-0007E7-BT
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:00:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45110)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1go7T0-0007DE-Bg
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:00:50 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 28 Jan 2019 15:00:27 +0100
+Message-Id: <20190128140027.9448-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] Introduce new "no_guest_reset" parameter for
+ usb-host device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +22,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: agk@godking.net, Gerd Hoffmann <kraxel@redhat.com>
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+From: Alexander Kappner <agk@godking.net>
 
-> On Fri, Jan 25, 2019 at 02:46:42PM +0100, Vitaly Kuznetsov wrote:
->> Roman Kagan <rkagan@virtuozzo.com> writes:
->> 
->> > On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
->> >> In many case we just want to give Windows guests all currently supported
->> >> Hyper-V enlightenments and that's where this new mode may come handy. We
->> >> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
->> >
->> > How is the compatibility ensured on migration between kernels reporting
->> > different feature sets?
->> 
->> AFAIU we don't change anything in this regard (or, my intention was to
->> not change anything): hv-all is converted to the individual hv-*
->> properties (hv_cpuid_check_and_set()) actually sets cpu->hyperv_* flags
->> according to what's supported by kernel so when we migrate we will
->> require all these features supported.
->
-> Migration relies on the upper layer to run the destination QEMU with the
-> identical command line (except for -incoming) as the source, and QEMU is
-> then supposed to set up identical environment in the target VM as was in
-> the source, or refuse to start if that's impossible.  (If I'm
-> misunderstanding this Dave (cc-d) may want to correct me.)
->
-> AFAICS this hv-all attribute will enable different feature sets
-> depending on the kernel it's run on, so the migration between different
-> kernels will appear to succeed, but the guest may suddenly encounter an
-> incompatible change in the environment.
+With certain USB devices passed through via usb-host, a guest attempting to
+reset a usb-host device can trigger a reset loop that renders the USB device
+unusable. In my use case, the device was an iPhone XR that was passed through to
+a Mac OS X Mojave guest. Upon connecting the device, the following happens:
 
-With 'hv-all' I'm trying to achieve behavior similar to '-cpu host' and
-AFAIK these VMs are migratable 'at your own risk' (if you do it directly
-from qemu). Libvirt (or whatever upper layer), however, would do CPU
-feature comparison and in case you have less features on the destination
-host than you had on the source code it will forbid the migration. I
-think if this also works for Hyper-V features than were fine.
+1) Guest recognizes new device, sends reset to emulated USB host
+2) QEMU's USB host sends reset to host kernel
+3) Host kernel resets device
+4) After reset, host kernel determines that some part of the device descriptor
+has changed ("device firmware changed" in dmesg), so host kernel decides to
+re-enumerate the device.
+5) Re-enumeration causes QEMU to disconnect and reconnect the device in the
+guest.
+6) goto 1)
 
-Dave, feel free to tell me I'm completely wrong with my assumptions)
+Here's from the host kernel (note the "device firmware changed" lines")
 
+[3677704.473050] usb 1-1.3: new high-speed USB device number 53 using ehci-pci
+[3677704.555594] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677704.555599] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677704.555602] usb 1-1.3: Product: iPhone
+[3677704.555605] usb 1-1.3: Manufacturer: Apple Inc.
+[3677704.555607] usb 1-1.3: SerialNumber: [[removed]]
+[3677709.401040] usb 1-1.3: reset high-speed USB device number 53 using ehci-pci
+[3677709.479486] usb 1-1.3: device firmware changed
+[3677709.479842] usb 1-1.3: USB disconnect, device number 53
+[3677709.546039] usb 1-1.3: new high-speed USB device number 54 using ehci-pci
+[3677709.627471] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677709.627476] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677709.627479] usb 1-1.3: Product: iPhone
+[3677709.627481] usb 1-1.3: Manufacturer: Apple Inc.
+[3677709.627483] usb 1-1.3: SerialNumber: [[removed]]
+[3677762.320044] usb 1-1.3: reset high-speed USB device number 54 using ehci-pci
+[3677762.615630] usb 1-1.3: USB disconnect, device number 54
+[3677762.787043] usb 1-1.3: new high-speed USB device number 55 using ehci-pci
+[3677762.869016] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
+[3677762.869024] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[3677762.869028] usb 1-1.3: Product: iPhone
+[3677762.869032] usb 1-1.3: Manufacturer: Apple Inc.
+[3677762.869035] usb 1-1.3: SerialNumber: [[removed]]
+[3677815.662036] usb 1-1.3: reset high-speed USB device number 55 using ehci-pci
+
+Here's from QEMU:
+
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/022: No such file or directory
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
+libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
+
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/024: No such file or directory
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [udev_hotplug_event] ignoring udev action bind
+libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/5-1/bConfigurationValue failed ret=-1 errno=2
+libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try again
+
+libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/005/026: No such file or directory
+
+The result of this is that the device remains permanently unusable in the guest.
+The same problem has been previously reported for an iPad:
+https://stackoverflow.com/questions/52617634/how-do-i-get-qemu-usb-passthrough-to-work-for-ipad-iphone
+
+This problem can be elegantly solved by interrupting step 2) above. Instead of
+passing through the reset, QEMU simply ignores it. To allow this to be
+configured on a per-device level,  a new parameter "no_guest_reset" is
+introduced for the usb-host device. I can confirm that the configuration
+described above (iPhone XS + Mojave guest) works flawlessly with
+no_guest_reset=True specified.
+
+Working command line for my scenario:
+device_add usb-host,vendorid=0x05ac,productid=0x12a8,no_guest_reset=True,id=iphone
+
+Best regards
+Alexander
+
+Signed-off-by: Alexander Kappner <agk@godking.net>
+
+[ kraxel: rename parameter to "guest-reset" ]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/host-libusb.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 833250a886..67b7465915 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -82,7 +82,7 @@ struct USBHostDevice {
+     uint32_t                         options;
+     uint32_t                         loglevel;
+     bool                             needs_autoscan;
+-
++    bool                             allow_guest_reset;
+     /* state */
+     QTAILQ_ENTRY(USBHostDevice)      next;
+     int                              seen, errcount;
+@@ -1456,6 +1456,10 @@ static void usb_host_handle_reset(USBDevice *udev)
+     USBHostDevice *s = USB_HOST_DEVICE(udev);
+     int rc;
+ 
++    if (!s->allow_guest_reset) {
++        return;
++    }
++
+     trace_usb_host_reset(s->bus_num, s->addr);
+ 
+     rc = libusb_reset_device(s->dh);
+@@ -1573,6 +1577,7 @@ static Property usb_host_dev_properties[] = {
+     DEFINE_PROP_UINT32("productid", USBHostDevice, match.product_id, 0),
+     DEFINE_PROP_UINT32("isobufs",  USBHostDevice, iso_urb_count,    4),
+     DEFINE_PROP_UINT32("isobsize", USBHostDevice, iso_urb_frames,   32),
++    DEFINE_PROP_BOOL("guest-reset", USBHostDevice, allow_guest_reset, true),
+     DEFINE_PROP_UINT32("loglevel",  USBHostDevice, loglevel,
+                        LIBUSB_LOG_LEVEL_WARNING),
+     DEFINE_PROP_BIT("pipeline",    USBHostDevice, options,
 -- 
-Vitaly
+2.9.3
