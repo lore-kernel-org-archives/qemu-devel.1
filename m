@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51733)
+Received: from eggs.gnu.org ([209.51.188.92]:52480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1go2Mj-0004Uc-KC
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:34:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1go2QL-0005Pq-RL
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1go2Mi-0001fc-F7
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:34:01 -0500
-Received: from mga09.intel.com ([134.134.136.24]:63734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1go2Mh-0001X2-UB
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:34:00 -0500
-References: <20181227024304.12182-1-tao3.xu@intel.com>
-	<20181227024304.12182-3-tao3.xu@intel.com>
-	<20190114183545.GB28115@habkost.net>
-	<ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
-	<20190123191550.GX4136@habkost.net>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
-Date: Mon, 28 Jan 2019 16:33:40 +0800
+	(envelope-from <thuth@redhat.com>) id 1go2QK-0003ty-PY
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:37:45 -0500
+References: <20190127101836.15451-1-sourav.jb1988@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <33a499ed-6f6a-ccd2-a1f8-48646b6be6c9@redhat.com>
+Date: Mon, 28 Jan 2019 09:37:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190123191550.GX4136@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190127101836.15451-1-sourav.jb1988@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] i386: Add some MSR based features on
- Cascadelake-Server CPU model
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/input/lm832x: set device category of
+ lm832x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, robert.hu@linux.intel.com, thomas.lendacky@amd.com, xuelian.guo@intel.com
+To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 1/24/2019 3:15 AM, Eduardo Habkost wrote:
-> On Mon, Jan 21, 2019 at 05:29:32PM +0800, Tao Xu wrote:
->> On 1/15/2019 2:35 AM, Eduardo Habkost wrote:
->>> Sorry, we do have a problem here:
->>>
->>> On Thu, Dec 27, 2018 at 10:43:04AM +0800, Tao Xu wrote:
->>> [...]
->>>>    #define PC_COMPAT_3_0 \
->>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>>> index 09706ad51a..5296c73cd5 100644
->>>> --- a/target/i386/cpu.c
->>>> +++ b/target/i386/cpu.c
->>>> @@ -2499,7 +2499,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>>>                CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
->>>>                CPUID_7_0_ECX_AVX512VNNI,
->>>>            .features[FEAT_7_0_EDX] =
->>>> -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
->>>> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
->>>> +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
->>>
->>> CPUID_7_0_EDX_ARCH_CAPABILITIES is still set on
->>> unmigratable_flags.  We need to make it migratable before adding
->>> it by default to a named CPU model.
->>>
->> Hi Eduardo,
->>
->> Do you mean I need to remove CPUID_7_0_EDX_ARCH_CAPABILITIES
->> from .migratable_flags? Or CPUID_7_0_EDX_ARCH_CAPABILITIES can not
->> support migration now?
-> 
-> We need to remove it from .unmigratable_flags, but only after
-> confirm it is really migration-safe.  To make it migration-safe,
-> the MSR value seen by the guest must have a predictable value
-> that is 100% independent from host hardware or host software
-> version.
-> 
-> This is easy to ensure if MSR_IA32_ARCH_CAPABILITIES is in
-> KVM_GET_MSR_INDEX_LIST (meaning QEMU can actually configure the
-> MSR value seen by the guest).  If MSR_IA32_ARCH_CAPABILITIES is
-> not on KVM_GET_MSR_INDEX_LIST, arch-capabilities must not be
-> returned by x86_cpu_get_supported_feature_word() when
-> migratable_only is true.
-> 
-Thank you. I have seen your patch to migratable it:
+ Hi,
 
-[PATCH 0/2] i386: arch_capabilities fixes + migratability
-http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06701.html
+On 2019-01-27 11:18, kumar sourav wrote:
+> Sets the category of lm832x as DEVICE_CATEGORY_INPUT
+> Devices should be assigned to one of DEVICE_CATEGORY_XXXX
+>=20
+> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+> ---
+>  hw/input/lm832x.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+> index cffbf586d4..07ae5e0aee 100644
+> --- a/hw/input/lm832x.c
+> +++ b/hw/input/lm832x.c
+> @@ -509,6 +509,7 @@ static void lm8323_class_init(ObjectClass *klass, v=
+oid *data)
+>      k->recv =3D lm_i2c_rx;
+>      k->send =3D lm_i2c_tx;
+>      dc->vmsd =3D &vmstate_lm_kbd;
+> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>  }
 
-So now can arch-capabilities and features exposed by it be added in 
-Cascadelake CPU model? Because Cascadelake CPU model can support it in 
-hardware. And for Icelake CPU model, Robert will add in the future.
-> 
->>
->>> Also, why are you setting this only on Cascadelake-Server and not
->>> on all the other Intel CPUs?
->>>
->> Thank you for your notice. I reviewed the git log of KVM.
->> "MSR_IA32_ARCH_CAPABILITIES is emulated in kvm, there is no dependency on
->> hardware support for this feature". So do you mean we should also add
->> features based on ARCH_CAPABILITIES in former CPU(such as skylake)?
-> 
-> It doesn't depend on host hardware features, but it does depend
-> on host KVM code added in Linux v4.17, which makes this more
-> tricky.
-> 
-> We don't want a QEMU upgrade to make an existing VM configuration
-> to stop running under Linux v4.16.  This will probably require
-> versioned CPU models[1] to work well.
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08422.html
-> 
-Hi Eduardo, I think the versioned CPU models solution is great. But I 
-haven't seen further patches in the mail list. What is the recent 
-progress of this work? Need me to do something?
+This device already has DEVICE_CATEGORY_MISC set since it is derived
+from TYPE_I2C_SLAVE. If you now set another category bit here, the
+device shows up twice in the output of "-device help". That's not so nice=
+.
 
-Looking forward to your reply.
-Tao
+I see multiple options here:
+
+1) Drop this patch since the device already has a category
+
+2) Make sure to clear_bit() the MISC category here again
+
+3) Remove the set_bit(DEVICE_CATEGORY_MISC, k->categories) in
+   hw/i2c/core.c - it does not make that much sense to set the
+   MISC category for an abstract parent class.
+
+4) Introduce a new DEVICE_CATEGORY_I2C which could be used
+   instead of the DEVICE_CATEGORY_MISC in hw/i2c/core.c
+
+One of the last two options sound most appealing to me.
+
+ Thomas
