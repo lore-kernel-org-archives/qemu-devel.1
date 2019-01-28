@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49223)
+Received: from eggs.gnu.org ([209.51.188.92]:49874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goA4b-0007Z2-2z
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:47:51 -0500
+	(envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
+	id 1goA7w-0000hB-V8
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goA4a-000083-CG
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:47:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33570)
+	(envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
+	id 1goA7v-0002xE-Tq
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:16 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:26422)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1goA4a-0008Us-2r
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:47:48 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3417C58E22
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 16:47:43 +0000 (UTC)
-References: <20190128142410.11584-1-bsd@redhat.com>
-	<20190128142410.11584-2-bsd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6587b190-16d8-c7d7-af9c-f5f221ca79a5@redhat.com>
-Date: Mon, 28 Jan 2019 10:47:41 -0600
+	(Exim 4.71) (envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
+	id 1goA7v-0002vi-KL
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:15 -0500
+From: Tim Smith <tim.smith@citrix.com>
+Date: Mon, 28 Jan 2019 16:50:31 +0000
+Message-ID: <3048424.2nWJ6aN5el@dhcp-3-135.uk.xensource.com>
+In-Reply-To: <23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
+References: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
+	<23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190128142410.11584-2-bsd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2Bmlip3XvGjyX7Q0Hy7lnHE4XhAw9SHyk"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] usb-mtp: Reallocate buffer in
- multiples of MTP_WRITE_BUF_SZ
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [Qemu-devel] Very slow finding extents in QCOW2-backed nbd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,75 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2Bmlip3XvGjyX7Q0Hy7lnHE4XhAw9SHyk
-From: Eric Blake <eblake@redhat.com>
-To: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
-Message-ID: <6587b190-16d8-c7d7-af9c-f5f221ca79a5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] usb-mtp: Reallocate buffer in
- multiples of MTP_WRITE_BUF_SZ
-References: <20190128142410.11584-1-bsd@redhat.com>
- <20190128142410.11584-2-bsd@redhat.com>
-In-Reply-To: <20190128142410.11584-2-bsd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Monday, 28 January 2019 14:41:35 GMT Vladimir Sementsov-Ogievskiy wrote:
+> 28.01.2019 14:58, Tim Smith wrote:
+> 
+> > Hi all, I have a question about the intent of the last call to
+> > bdrv_co_block_status() in bdrv_co_block_status(), in block/io.c about
+> > line
+> > 2195, which looks like this:
+> > 
+> > 
+> >          ret2 = bdrv_co_block_status(local_file, want_zero, local_map,
+> >          
+> >                                      *pnum, &file_pnum, NULL, NULL);
+> >          
+> >          if (ret2 >= 0) {
+> >          
+> >              /* Ignore errors.  This is just providing extra information,
+> >              it
+> >              
+> >               * is useful but not necessary.
+> >               */
+> 
+> 
+> Hi Tim!
+> 
+> The question is highly discussed now on list, in short: yes it's a problem,
+> and, I hope, we'll soon reach a consensus about how to finally fix it. 
+> This second block_status request is needed when we have qcow2 image with
+> metadata preallocation, which means that qcow2 data clusters are actually
+> backed by holes on filesystem level.
+> 
+> You can follow the discussion under the following threads:
+> 
+> initial discussion:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05749.html
+> 
+> solutions:
+> 
+> cache lseek results, by Kevin:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06271.html
+> 
+> detect preallocation, and don't do second block_status for not
+> preallocated, my last try:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06598.html
 
-On 1/28/19 8:24 AM, Bandan Das wrote:
-> This is a "pre-patch" to breaking up the write buffer for
-> MTP writes. Instead of allocating a mtp buffer equal to size
-> sent by the initiator, we start with a small size and reallocate
-> multiples (of that small size) as needed.
->=20
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> ---
->  hw/usb/dev-mtp.c | 26 ++++++++++++--------------
->  1 file changed, 12 insertions(+), 14 deletions(-)
->=20
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index 68c5eb8eaa..2f3536a26d 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -152,7 +152,6 @@ struct MTPData {
->      bool         first;
->      /* Used for >4G file sizes */
->      bool         pending;
-> -    uint64_t     cached_length;
->      int          fd;
->  };
-> =20
-> @@ -244,6 +243,7 @@ typedef struct {
-> =20
->  #define MTP_MANUFACTURER  "QEMU"
->  #define MTP_PRODUCT       "QEMU filesharing"
-> +#define MTP_WRITE_BUF_SZ  512000
+Thanks, I'll keep an eye on these. My use-case does not require preallocation 
+so I'll carry a patch for a bit and see how it works out.
 
-Why a non-power-of-2 instead of using units.h and writing (512 * KiB)?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---2Bmlip3XvGjyX7Q0Hy7lnHE4XhAw9SHyk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxPMi0ACgkQp6FrSiUn
-Q2ov/AgAg3tn2dfHpdgR58wJW6qBYktXS+LBM0tIdYhK5GG1UnietMcTgY//GJg5
-0NFy/iEoegClF/RYkG394Yu1bfWI3H9A3xGxopkfRgdCBW1Ru+cnEhoWS2IRpRTW
-053tC9lnQMv4v7WQQISxjwQ9nBZ1ghNuFtqzBclUFasB7KOuqeUFO0SYkzEC+Y+C
-0Ks0By/duqs0AZezaiaetLXYh6RcTBwU6yqRzW+8SQLIrKupoLeX9I4UNPixneXS
-FRmsvnsXK2UnCHk4Z3cAlI+O6tO2shEQ/DVcr+FLYlR5b2UTu6Nq0BSx+JjFuI5G
-da8pCrcG5cD6DfXFfJxP7tEz2QISzw==
-=mXX0
------END PGP SIGNATURE-----
-
---2Bmlip3XvGjyX7Q0Hy7lnHE4XhAw9SHyk--
+-- 
+Tim Smith <tim.smith@citrix.com>
