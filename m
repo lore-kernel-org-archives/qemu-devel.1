@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40965)
+Received: from eggs.gnu.org ([209.51.188.92]:40982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goBNA-0002g8-9O
+	(envelope-from <peter.maydell@linaro.org>) id 1goBNA-0002gd-Oo
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goBN8-0008PY-Py
+	(envelope-from <peter.maydell@linaro.org>) id 1goBN9-0008Rf-RI
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:04 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38717)
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44063)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1goBN8-0008NJ-I4
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:02 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m22so15036222wml.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 10:11:02 -0800 (PST)
+	id 1goBN9-0008Pf-JS
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:03 -0500
+Received: by mail-wr1-x436.google.com with SMTP id z5so19119239wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 10:11:03 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	b18sm97910681wrw.83.2019.01.28.10.10.59 for <qemu-devel@nongnu.org>
+	b18sm97910681wrw.83.2019.01.28.10.11.01 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 28 Jan 2019 10:11:00 -0800 (PST)
+	Mon, 28 Jan 2019 10:11:01 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 18:10:30 +0000
-Message-Id: <20190128181047.20781-10-peter.maydell@linaro.org>
+Date: Mon, 28 Jan 2019 18:10:31 +0000
+Message-Id: <20190128181047.20781-11-peter.maydell@linaro.org>
 In-Reply-To: <20190128181047.20781-1-peter.maydell@linaro.org>
 References: <20190128181047.20781-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/26] target/arm: Don't clear supported PMU
- events when initializing PMCEID1
+Subject: [Qemu-devel] [PULL 10/26] memory: add
+ memory_region_flush_rom_device()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,131 +36,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-A bug was introduced during a respin of:
+ROM devices go via MemoryRegionOps->write() callbacks for write
+operations and do not dirty/invalidate that memory.  Device emulation
+must be able to mark memory ranges that have been modified internally
+(e.g. using memory_region_get_ram_ptr()).
 
-	commit 57a4a11b2b281bb548b419ca81bfafb214e4c77a
-	target/arm: Add array for supported PMU events, generate PMCEID[01]_EL0
+Introduce the memory_region_flush_rom_device() API for this purpose.
 
-This patch introduced two calls to get_pmceid() during CPU
-initialization - one each for PMCEID0 and PMCEID1. In addition to
-building the register values, get_pmceid() clears an internal array
-mapping event numbers to their implementations (supported_event_map)
-before rebuilding it. This is an optimization since much of the logic is
-shared. However, since it was called twice, the contents of
-supported_event_map reflect only the events in PMCEID1 (the second call
-to get_pmceid()).
-
-Fix this bug by moving the initialization of PMCEID0 and PMCEID1 back
-into a single function call, and name it more appropriately since it is
-doing more than simply generating the contents of the PMCEID[01]
-registers.
-
-Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190123195814.29253-1-aaron@os.amperecomputing.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20190123212234.32068-2-stefanha@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: fix block comment style]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h    | 11 +++++------
- target/arm/cpu.c    |  3 +--
- target/arm/helper.c | 27 ++++++++++++++++-----------
- 3 files changed, 22 insertions(+), 19 deletions(-)
+ include/exec/memory.h | 18 ++++++++++++++++++
+ exec.c                | 13 +++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ff81db420d5..b8161cb6d73 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1012,14 +1012,13 @@ void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
- void pmu_post_el_change(ARMCPU *cpu, void *ignored);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index cd2f209b64e..abe9cc79c0d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1344,6 +1344,24 @@ bool memory_region_snapshot_get_dirty(MemoryRegion *mr,
+ void memory_region_reset_dirty(MemoryRegion *mr, hwaddr addr,
+                                hwaddr size, unsigned client);
  
- /*
-- * get_pmceid
-- * @env: CPUARMState
-- * @which: which PMCEID register to return (0 or 1)
-+ * pmu_init
-+ * @cpu: ARMCPU
++/**
++ * memory_region_flush_rom_device: Mark a range of pages dirty and invalidate
++ *                                 TBs (for self-modifying code).
++ *
++ * The MemoryRegionOps->write() callback of a ROM device must use this function
++ * to mark byte ranges that have been modified internally, such as by directly
++ * accessing the memory returned by memory_region_get_ram_ptr().
++ *
++ * This function marks the range dirty and invalidates TBs so that TCG can
++ * detect self-modifying code.
++ *
++ * @mr: the region being flushed.
++ * @addr: the start, relative to the start of the region, of the range being
++ *        flushed.
++ * @size: the size, in bytes, of the range being flushed.
++ */
++void memory_region_flush_rom_device(MemoryRegion *mr, hwaddr addr, hwaddr size);
++
+ /**
+  * memory_region_set_readonly: Turn a memory region read-only (or read-write)
   *
-- * Return the PMCEID[01]_EL0 register values corresponding to the counters
-- * which are supported given the current configuration
-+ * Initialize the CPU's PMCEID[01]_EL0 registers and associated internal state
-+ * for the current configuration
-  */
--uint64_t get_pmceid(CPUARMState *env, unsigned which);
-+void pmu_init(ARMCPU *cpu);
- 
- /* SCTLR bit meanings. Several bits have been reused in newer
-  * versions of the architecture; in that case we define constants
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 7e1f3dd637a..d6da3f4fed3 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1039,8 +1039,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         unset_feature(env, ARM_FEATURE_PMU);
-     }
-     if (arm_feature(env, ARM_FEATURE_PMU)) {
--        cpu->pmceid0 = get_pmceid(&cpu->env, 0);
--        cpu->pmceid1 = get_pmceid(&cpu->env, 1);
-+        pmu_init(cpu);
- 
-         if (!kvm_enabled()) {
-             arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 676059cb386..66faebea8ec 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1090,22 +1090,24 @@ static const pm_event pm_events[] = {
- static uint16_t supported_event_map[MAX_EVENT_ID + 1];
- 
- /*
-- * Called upon initialization to build PMCEID0_EL0 or PMCEID1_EL0 (indicated by
-- * 'which'). We also use it to build a map of ARM event numbers to indices in
-- * our pm_events array.
-+ * Called upon CPU initialization to initialize PMCEID[01]_EL0 and build a map
-+ * of ARM event numbers to indices in our pm_events array.
-  *
-  * Note: Events in the 0x40XX range are not currently supported.
-  */
--uint64_t get_pmceid(CPUARMState *env, unsigned which)
-+void pmu_init(ARMCPU *cpu)
- {
--    uint64_t pmceid = 0;
-     unsigned int i;
- 
--    assert(which <= 1);
--
-+    /*
-+     * Empty supported_event_map and cpu->pmceid[01] before adding supported
-+     * events to them
-+     */
-     for (i = 0; i < ARRAY_SIZE(supported_event_map); i++) {
-         supported_event_map[i] = UNSUPPORTED_EVENT;
-     }
-+    cpu->pmceid0 = 0;
-+    cpu->pmceid1 = 0;
- 
-     for (i = 0; i < ARRAY_SIZE(pm_events); i++) {
-         const pm_event *cnt = &pm_events[i];
-@@ -1113,13 +1115,16 @@ uint64_t get_pmceid(CPUARMState *env, unsigned which)
-         /* We do not currently support events in the 0x40xx range */
-         assert(cnt->number <= 0x3f);
- 
--        if ((cnt->number & 0x20) == (which << 6) &&
--                cnt->supported(env)) {
--            pmceid |= (1 << (cnt->number & 0x1f));
-+        if (cnt->supported(&cpu->env)) {
-             supported_event_map[cnt->number] = i;
-+            uint64_t event_mask = 1 << (cnt->number & 0x1f);
-+            if (cnt->number & 0x20) {
-+                cpu->pmceid1 |= event_mask;
-+            } else {
-+                cpu->pmceid0 |= event_mask;
-+            }
-         }
-     }
--    return pmceid;
+diff --git a/exec.c b/exec.c
+index 9557a4e523c..da3e635f91b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3162,6 +3162,19 @@ static void invalidate_and_set_dirty(MemoryRegion *mr, hwaddr addr,
+     cpu_physical_memory_set_dirty_range(addr, length, dirty_log_mask);
  }
  
- /*
++void memory_region_flush_rom_device(MemoryRegion *mr, hwaddr addr, hwaddr size)
++{
++    /*
++     * In principle this function would work on other memory region types too,
++     * but the ROM device use case is the only one where this operation is
++     * necessary.  Other memory regions should use the
++     * address_space_read/write() APIs.
++     */
++    assert(memory_region_is_romd(mr));
++
++    invalidate_and_set_dirty(mr, addr, size);
++}
++
+ static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
+ {
+     unsigned access_size_max = mr->ops->valid.max_access_size;
 -- 
 2.20.1
