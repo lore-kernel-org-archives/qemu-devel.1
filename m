@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37375)
+Received: from eggs.gnu.org ([209.51.188.92]:37612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go7UB-0002nO-Lf
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:02:04 -0500
+	(envelope-from <david@redhat.com>) id 1go7Us-0003FQ-Tv
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:02:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go7U4-0007dn-E2
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:02:03 -0500
-Date: Mon, 28 Jan 2019 15:01:41 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190128150141.2a4f8fca@redhat.com>
-In-Reply-To: <20190123195527.29575-4-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1go7Un-0000r5-Dw
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:02:46 -0500
 References: <20190123195527.29575-1-david@redhat.com>
 	<20190123195527.29575-4-david@redhat.com>
+	<20190128150141.2a4f8fca@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a9ed2520-8c2b-b06b-54e2-68af17b5fc61@redhat.com>
+Date: Mon, 28 Jan 2019 15:02:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190128150141.2a4f8fca@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH RFCv2 3/9] qdev: Provide
  qdev_get_bus_hotplug_handler()
@@ -24,62 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 23 Jan 2019 20:55:21 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> Let's use a wrapper instead of looking it up manually. This function can
-> than be reused when we explicitly want to have the bus hotplug handler
-> (e.g. when the bus hotplug handler was overwritten by the machine
-> hotplug handler).
+On 28.01.19 15:01, Igor Mammedov wrote:
+> On Wed, 23 Jan 2019 20:55:21 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-maybe drop the 2nd one?
+>> Let's use a wrapper instead of looking it up manually. This function can
+>> than be reused when we explicitly want to have the bus hotplug handler
+>> (e.g. when the bus hotplug handler was overwritten by the machine
+>> hotplug handler).
+>>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> maybe drop the 2nd one?
 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/core/qdev.c         | 10 +++++++++-
->  include/hw/qdev-core.h |  1 +
->  2 files changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 7ad45c0bd6..e2207d77a4 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
->      return NULL;
->  }
->  
-> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
-> +{
-> +    if (dev->parent_bus) {
-> +        return dev->parent_bus->hotplug_handler;
-> +    }
-> +    return NULL;
-> +}
-> +
->  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
->  {
->      HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
->  
->      if (hotplug_ctrl == NULL && dev->parent_bus) {
-> -        hotplug_ctrl = dev->parent_bus->hotplug_handler;
-> +        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
->      }
->      return hotplug_ctrl;
->  }
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 9081fb0030..cb0ec63c2d 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -280,6 +280,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
->  void qdev_init_nofail(DeviceState *dev);
->  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
->                                   int required_for_version);
-> +HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
->  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
->  /**
->   * qdev_get_hotplug_handler: Get handler responsible for device wiring
+Whoops, indeed! Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
