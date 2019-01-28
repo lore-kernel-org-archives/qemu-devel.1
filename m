@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36897)
+Received: from eggs.gnu.org ([209.51.188.92]:37045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1goBEC-00038N-SB
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:01:50 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1goBED-0003Db-HM
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1goB8U-0005ss-OE
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:56:04 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:44473)
+	(envelope-from <tcminyard@gmail.com>) id 1goB8V-0005ta-06
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:56:03 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34205)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1goB8U-0005fY-IY
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1goB8U-0005cJ-PN
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:55:54 -0500
-Received: by mail-io1-xd42.google.com with SMTP id r200so14206443iod.11
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 09:55:26 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id h3so8353036pfg.1
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 09:55:23 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Mon, 28 Jan 2019 11:54:53 -0600
-Message-Id: <20190128175458.27255-15-minyard@acm.org>
+Date: Mon, 28 Jan 2019 11:54:54 -0600
+Message-Id: <20190128175458.27255-16-minyard@acm.org>
 In-Reply-To: <20190128175458.27255-1-minyard@acm.org>
 References: <20190128175458.27255-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v4 14/19] i2c:smbus_slave: Add an SMBus vmstate
- structure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 15/19] i2c:smbus_eeprom: Add normal type
+ name and cast to smbus_eeprom.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +35,76 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
 
 From: Corey Minyard <cminyard@mvista.com>
 
-There is no vmstate handling for SMBus, so no device sitting on SMBus
-can have a state transfer that works reliably.  So add it.
+Create a type name and a cast macro and use those through the
+code.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
- include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
- 2 files changed, 39 insertions(+), 3 deletions(-)
+ hw/i2c/smbus_eeprom.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-index 5b3046f6a3..9a2d314d1a 100644
---- a/hw/i2c/smbus_slave.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -201,6 +201,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
-     sc->send = smbus_i2c_send;
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 62e634c745..91d68ff588 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -30,6 +30,11 @@
+ 
+ //#define DEBUG
+ 
++#define TYPE_SMBUS_EEPROM "smbus-eeprom"
++
++#define SMBUS_EEPROM(obj) \
++    OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
++
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     void *data;
+@@ -38,7 +43,7 @@ typedef struct SMBusEEPROMDevice {
+ 
+ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+     uint8_t *data = eeprom->data;
+     uint8_t val = data[eeprom->offset++];
+ 
+@@ -51,7 +56,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+ 
+ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+     uint8_t *data = eeprom->data;
+ 
+ #ifdef DEBUG
+@@ -73,7 +78,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+ 
+ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
+-    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
++    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+ 
+     eeprom->offset = 0;
+ }
+@@ -97,7 +102,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
  }
  
-+bool smbus_vmstate_needed(SMBusDevice *dev)
-+{
-+    return dev->mode != SMBUS_IDLE;
-+}
-+
-+const VMStateDescription vmstate_smbus_device = {
-+    .name = TYPE_SMBUS_DEVICE,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
-+        VMSTATE_INT32(mode, SMBusDevice),
-+        VMSTATE_INT32(data_len, SMBusDevice),
-+        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo smbus_device_type_info = {
-     .name = TYPE_SMBUS_DEVICE,
-     .parent = TYPE_I2C_SLAVE,
-diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
-index 79050fb92d..ebe068304e 100644
---- a/include/hw/i2c/smbus_slave.h
-+++ b/include/hw/i2c/smbus_slave.h
-@@ -69,14 +69,32 @@ typedef struct SMBusDeviceClass
-     uint8_t (*receive_byte)(SMBusDevice *dev);
- } SMBusDeviceClass;
+ static const TypeInfo smbus_eeprom_info = {
+-    .name          = "smbus-eeprom",
++    .name          = TYPE_SMBUS_EEPROM,
+     .parent        = TYPE_SMBUS_DEVICE,
+     .instance_size = sizeof(SMBusEEPROMDevice),
+     .class_init    = smbus_eeprom_class_initfn,
+@@ -114,7 +119,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf)
+ {
+     DeviceState *dev;
  
-+#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
-+
- struct SMBusDevice {
-     /* The SMBus protocol is implemented on top of I2C.  */
-     I2CSlave i2c;
- 
-     /* Remaining fields for internal use only.  */
--    int mode;
--    int data_len;
--    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
-+    int32_t mode;
-+    int32_t data_len;
-+    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
- };
- 
-+extern const VMStateDescription vmstate_smbus_device;
-+
-+#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
-+    .name       = (stringify(_field)),                               \
-+    .size       = sizeof(SMBusDevice),                               \
-+    .vmsd       = &vmstate_smbus_device,                             \
-+    .flags      = VMS_STRUCT,                                        \
-+    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
-+}
-+
-+/*
-+ * Users should call this in their .needed functions to know if the
-+ * SMBus slave data needs to be transferred.
-+ */
-+bool smbus_vmstate_needed(SMBusDevice *dev);
-+
- #endif
+-    dev = qdev_create((BusState *) smbus, "smbus-eeprom");
++    dev = qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
+     qdev_prop_set_uint8(dev, "address", address);
+     qdev_prop_set_ptr(dev, "data", eeprom_buf);
+     qdev_init_nofail(dev);
 -- 
 2.17.1
