@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33385)
+Received: from eggs.gnu.org ([209.51.188.92]:33399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9Jg-0004pU-NH
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:22 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9Jh-0004qz-R2
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9Jf-0007is-8m
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:20 -0500
-Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:42636)
+	(envelope-from <richard.henderson@linaro.org>) id 1go9Jf-0007j1-To
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:21 -0500
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:38959)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1go9Je-0007iK-W3
+	id 1go9Jf-0007in-LU
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:19 -0500
-Received: by mail-pl1-x632.google.com with SMTP id y1so7917332plp.9
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:59:17 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id w6so7382890pgl.6
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:59:19 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 28 Jan 2019 07:58:48 -0800
-Message-Id: <20190128155907.20607-5-richard.henderson@linaro.org>
+Date: Mon, 28 Jan 2019 07:58:49 -0800
+Message-Id: <20190128155907.20607-6-richard.henderson@linaro.org>
 In-Reply-To: <20190128155907.20607-1-richard.henderson@linaro.org>
 References: <20190128155907.20607-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 04/23] tcg: Add opcodes for vector saturated
+Subject: [Qemu-devel] [PULL 05/23] tcg: Add opcodes for vector minmax
  arithmetic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,319 +32,553 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/aarch64/tcg-target.h |  1 +
- tcg/i386/tcg-target.h    |  1 +
- tcg/tcg-op.h             |  4 ++
- tcg/tcg-opc.h            |  4 ++
- tcg/tcg.h                |  1 +
- tcg/tcg-op-gvec.c        | 84 ++++++++++++++++++++++++++++++----------
- tcg/tcg-op-vec.c         | 34 ++++++++++++++--
- tcg/tcg.c                |  5 +++
- tcg/README               |  9 +++++
- 9 files changed, 119 insertions(+), 24 deletions(-)
+ accel/tcg/tcg-runtime.h      |  20 ++++
+ tcg/aarch64/tcg-target.h     |   1 +
+ tcg/i386/tcg-target.h        |   1 +
+ tcg/tcg-op-gvec.h            |  10 ++
+ tcg/tcg-op.h                 |   4 +
+ tcg/tcg-opc.h                |   4 +
+ tcg/tcg.h                    |   1 +
+ accel/tcg/tcg-runtime-gvec.c | 224 +++++++++++++++++++++++++++++++++++
+ tcg/tcg-op-gvec.c            | 108 +++++++++++++++++
+ tcg/tcg-op-vec.c             |  20 ++++
+ tcg/tcg.c                    |   5 +
+ tcg/README                   |  10 ++
+ 12 files changed, 408 insertions(+)
 
+diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+index 835ddfebb2..dfe325625c 100644
+--- a/accel/tcg/tcg-runtime.h
++++ b/accel/tcg/tcg-runtime.h
+@@ -200,6 +200,26 @@ DEF_HELPER_FLAGS_4(gvec_ussub16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_ussub32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_ussub64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ 
++DEF_HELPER_FLAGS_4(gvec_smin8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smin16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smin32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smin64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(gvec_smax8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smax16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smax32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_smax64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(gvec_umin8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umin16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umin32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umin64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(gvec_umax8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umax16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umax32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_umax64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_3(gvec_neg8, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_neg16, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_neg32, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index f966a4fcb3..98556bcf22 100644
+index 98556bcf22..545a6eec75 100644
 --- a/tcg/aarch64/tcg-target.h
 +++ b/tcg/aarch64/tcg-target.h
-@@ -135,6 +135,7 @@ typedef enum {
- #define TCG_TARGET_HAS_shv_vec          0
+@@ -136,6 +136,7 @@ typedef enum {
  #define TCG_TARGET_HAS_cmp_vec          1
  #define TCG_TARGET_HAS_mul_vec          1
-+#define TCG_TARGET_HAS_sat_vec          0
+ #define TCG_TARGET_HAS_sat_vec          0
++#define TCG_TARGET_HAS_minmax_vec       0
  
  #define TCG_TARGET_DEFAULT_MO (0)
  #define TCG_TARGET_HAS_MEMORY_BSWAP     1
 diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index f378d29568..44381062e6 100644
+index 44381062e6..7bd7eae672 100644
 --- a/tcg/i386/tcg-target.h
 +++ b/tcg/i386/tcg-target.h
-@@ -185,6 +185,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_shv_vec          0
+@@ -186,6 +186,7 @@ extern bool have_avx2;
  #define TCG_TARGET_HAS_cmp_vec          1
  #define TCG_TARGET_HAS_mul_vec          1
-+#define TCG_TARGET_HAS_sat_vec          0
+ #define TCG_TARGET_HAS_sat_vec          0
++#define TCG_TARGET_HAS_minmax_vec       0
  
  #define TCG_TARGET_deposit_i32_valid(ofs, len) \
      (((ofs) == 0 && (len) == 8) || ((ofs) == 8 && (len) == 8) || \
+diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
+index 2cb447112e..4734eef7de 100644
+--- a/tcg/tcg-op-gvec.h
++++ b/tcg/tcg-op-gvec.h
+@@ -234,6 +234,16 @@ void tcg_gen_gvec_usadd(unsigned vece, uint32_t dofs, uint32_t aofs,
+ void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
+                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+ 
++/* Min/max.  */
++void tcg_gen_gvec_smin(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
++void tcg_gen_gvec_umin(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
++void tcg_gen_gvec_smax(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
++void tcg_gen_gvec_umax(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
++
+ void tcg_gen_gvec_and(unsigned vece, uint32_t dofs, uint32_t aofs,
+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+ void tcg_gen_gvec_or(unsigned vece, uint32_t dofs, uint32_t aofs,
 diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index f6ef1cd690..4a93d730e8 100644
+index 4a93d730e8..2d98868d8f 100644
 --- a/tcg/tcg-op.h
 +++ b/tcg/tcg-op.h
-@@ -967,6 +967,10 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
- void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
-+void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+@@ -971,6 +971,10 @@ void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
++void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
++void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
++void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
++void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
  
  void tcg_gen_shli_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
  void tcg_gen_shri_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
 diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index 7a8a3edb5b..94b2ed80af 100644
+index 94b2ed80af..4e0238ad1a 100644
 --- a/tcg/tcg-opc.h
 +++ b/tcg/tcg-opc.h
-@@ -222,6 +222,10 @@ DEF(add_vec, 1, 2, 0, IMPLVEC)
- DEF(sub_vec, 1, 2, 0, IMPLVEC)
- DEF(mul_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_mul_vec))
- DEF(neg_vec, 1, 1, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_neg_vec))
-+DEF(ssadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
-+DEF(usadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
-+DEF(sssub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
-+DEF(ussub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+@@ -226,6 +226,10 @@ DEF(ssadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+ DEF(usadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+ DEF(sssub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
+ DEF(ussub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
++DEF(smin_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
++DEF(umin_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
++DEF(smax_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
++DEF(umax_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
  
  DEF(and_vec, 1, 2, 0, IMPLVEC)
  DEF(or_vec, 1, 2, 0, IMPLVEC)
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index f8ec265027..5590dc512a 100644
+index 5590dc512a..045c24a357 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -183,6 +183,7 @@ typedef uint64_t TCGRegSet;
- #define TCG_TARGET_HAS_shs_vec          0
+@@ -184,6 +184,7 @@ typedef uint64_t TCGRegSet;
  #define TCG_TARGET_HAS_shv_vec          0
  #define TCG_TARGET_HAS_mul_vec          0
-+#define TCG_TARGET_HAS_sat_vec          0
+ #define TCG_TARGET_HAS_sat_vec          0
++#define TCG_TARGET_HAS_minmax_vec       0
  #else
  #define TCG_TARGET_MAYBE_vec            1
  #endif
+diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
+index d1802467d5..9358749741 100644
+--- a/accel/tcg/tcg-runtime-gvec.c
++++ b/accel/tcg/tcg-runtime-gvec.c
+@@ -1028,3 +1028,227 @@ void HELPER(gvec_ussub64)(void *d, void *a, void *b, uint32_t desc)
+     }
+     clear_high(d, oprsz, desc);
+ }
++
++void HELPER(gvec_smin8)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
++        int8_t aa = *(int8_t *)(a + i);
++        int8_t bb = *(int8_t *)(b + i);
++        int8_t dd = aa < bb ? aa : bb;
++        *(int8_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smin16)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
++        int16_t aa = *(int16_t *)(a + i);
++        int16_t bb = *(int16_t *)(b + i);
++        int16_t dd = aa < bb ? aa : bb;
++        *(int16_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smin32)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
++        int32_t aa = *(int32_t *)(a + i);
++        int32_t bb = *(int32_t *)(b + i);
++        int32_t dd = aa < bb ? aa : bb;
++        *(int32_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smin64)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
++        int64_t aa = *(int64_t *)(a + i);
++        int64_t bb = *(int64_t *)(b + i);
++        int64_t dd = aa < bb ? aa : bb;
++        *(int64_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smax8)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
++        int8_t aa = *(int8_t *)(a + i);
++        int8_t bb = *(int8_t *)(b + i);
++        int8_t dd = aa > bb ? aa : bb;
++        *(int8_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smax16)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
++        int16_t aa = *(int16_t *)(a + i);
++        int16_t bb = *(int16_t *)(b + i);
++        int16_t dd = aa > bb ? aa : bb;
++        *(int16_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smax32)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
++        int32_t aa = *(int32_t *)(a + i);
++        int32_t bb = *(int32_t *)(b + i);
++        int32_t dd = aa > bb ? aa : bb;
++        *(int32_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_smax64)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
++        int64_t aa = *(int64_t *)(a + i);
++        int64_t bb = *(int64_t *)(b + i);
++        int64_t dd = aa > bb ? aa : bb;
++        *(int64_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umin8)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint8_t)) {
++        uint8_t aa = *(uint8_t *)(a + i);
++        uint8_t bb = *(uint8_t *)(b + i);
++        uint8_t dd = aa < bb ? aa : bb;
++        *(uint8_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umin16)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint16_t)) {
++        uint16_t aa = *(uint16_t *)(a + i);
++        uint16_t bb = *(uint16_t *)(b + i);
++        uint16_t dd = aa < bb ? aa : bb;
++        *(uint16_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umin32)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint32_t)) {
++        uint32_t aa = *(uint32_t *)(a + i);
++        uint32_t bb = *(uint32_t *)(b + i);
++        uint32_t dd = aa < bb ? aa : bb;
++        *(uint32_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umin64)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
++        uint64_t aa = *(uint64_t *)(a + i);
++        uint64_t bb = *(uint64_t *)(b + i);
++        uint64_t dd = aa < bb ? aa : bb;
++        *(uint64_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umax8)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint8_t)) {
++        uint8_t aa = *(uint8_t *)(a + i);
++        uint8_t bb = *(uint8_t *)(b + i);
++        uint8_t dd = aa > bb ? aa : bb;
++        *(uint8_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umax16)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint16_t)) {
++        uint16_t aa = *(uint16_t *)(a + i);
++        uint16_t bb = *(uint16_t *)(b + i);
++        uint16_t dd = aa > bb ? aa : bb;
++        *(uint16_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umax32)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint32_t)) {
++        uint32_t aa = *(uint32_t *)(a + i);
++        uint32_t bb = *(uint32_t *)(b + i);
++        uint32_t dd = aa > bb ? aa : bb;
++        *(uint32_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
++
++void HELPER(gvec_umax64)(void *d, void *a, void *b, uint32_t desc)
++{
++    intptr_t oprsz = simd_oprsz(desc);
++    intptr_t i;
++
++    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
++        uint64_t aa = *(uint64_t *)(a + i);
++        uint64_t bb = *(uint64_t *)(b + i);
++        uint64_t dd = aa > bb ? aa : bb;
++        *(uint64_t *)(d + i) = dd;
++    }
++    clear_high(d, oprsz, desc);
++}
 diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index c10d3d7b26..0a33f51065 100644
+index 0a33f51065..3ee44fcb75 100644
 --- a/tcg/tcg-op-gvec.c
 +++ b/tcg/tcg-op-gvec.c
-@@ -1678,10 +1678,22 @@ void tcg_gen_gvec_ssadd(unsigned vece, uint32_t dofs, uint32_t aofs,
-                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
- {
-     static const GVecGen3 g[4] = {
--        { .fno = gen_helper_gvec_ssadd8, .vece = MO_8 },
--        { .fno = gen_helper_gvec_ssadd16, .vece = MO_16 },
--        { .fno = gen_helper_gvec_ssadd32, .vece = MO_32 },
--        { .fno = gen_helper_gvec_ssadd64, .vece = MO_64 }
-+        { .fniv = tcg_gen_ssadd_vec,
-+          .fno = gen_helper_gvec_ssadd8,
-+          .opc = INDEX_op_ssadd_vec,
+@@ -1810,6 +1810,114 @@ void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
+     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
+ }
+ 
++void tcg_gen_gvec_smin(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++{
++    static const GVecGen3 g[4] = {
++        { .fniv = tcg_gen_smin_vec,
++          .fno = gen_helper_gvec_smin8,
++          .opc = INDEX_op_smin_vec,
 +          .vece = MO_8 },
-+        { .fniv = tcg_gen_ssadd_vec,
-+          .fno = gen_helper_gvec_ssadd16,
-+          .opc = INDEX_op_ssadd_vec,
++        { .fniv = tcg_gen_smin_vec,
++          .fno = gen_helper_gvec_smin16,
++          .opc = INDEX_op_smin_vec,
 +          .vece = MO_16 },
-+        { .fniv = tcg_gen_ssadd_vec,
-+          .fno = gen_helper_gvec_ssadd32,
-+          .opc = INDEX_op_ssadd_vec,
++        { .fni4 = tcg_gen_smin_i32,
++          .fniv = tcg_gen_smin_vec,
++          .fno = gen_helper_gvec_smin32,
++          .opc = INDEX_op_smin_vec,
 +          .vece = MO_32 },
-+        { .fniv = tcg_gen_ssadd_vec,
-+          .fno = gen_helper_gvec_ssadd64,
-+          .opc = INDEX_op_ssadd_vec,
-+          .vece = MO_64 },
-     };
-     tcg_debug_assert(vece <= MO_64);
-     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
-@@ -1691,16 +1703,28 @@ void tcg_gen_gvec_sssub(unsigned vece, uint32_t dofs, uint32_t aofs,
-                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
- {
-     static const GVecGen3 g[4] = {
--        { .fno = gen_helper_gvec_sssub8, .vece = MO_8 },
--        { .fno = gen_helper_gvec_sssub16, .vece = MO_16 },
--        { .fno = gen_helper_gvec_sssub32, .vece = MO_32 },
--        { .fno = gen_helper_gvec_sssub64, .vece = MO_64 }
-+        { .fniv = tcg_gen_sssub_vec,
-+          .fno = gen_helper_gvec_sssub8,
-+          .opc = INDEX_op_sssub_vec,
++        { .fni8 = tcg_gen_smin_i64,
++          .fniv = tcg_gen_smin_vec,
++          .fno = gen_helper_gvec_smin64,
++          .opc = INDEX_op_smin_vec,
++          .vece = MO_64 }
++    };
++    tcg_debug_assert(vece <= MO_64);
++    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++}
++
++void tcg_gen_gvec_umin(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++{
++    static const GVecGen3 g[4] = {
++        { .fniv = tcg_gen_umin_vec,
++          .fno = gen_helper_gvec_umin8,
++          .opc = INDEX_op_umin_vec,
 +          .vece = MO_8 },
-+        { .fniv = tcg_gen_sssub_vec,
-+          .fno = gen_helper_gvec_sssub16,
-+          .opc = INDEX_op_sssub_vec,
++        { .fniv = tcg_gen_umin_vec,
++          .fno = gen_helper_gvec_umin16,
++          .opc = INDEX_op_umin_vec,
 +          .vece = MO_16 },
-+        { .fniv = tcg_gen_sssub_vec,
-+          .fno = gen_helper_gvec_sssub32,
-+          .opc = INDEX_op_sssub_vec,
++        { .fni4 = tcg_gen_umin_i32,
++          .fniv = tcg_gen_umin_vec,
++          .fno = gen_helper_gvec_umin32,
++          .opc = INDEX_op_umin_vec,
 +          .vece = MO_32 },
-+        { .fniv = tcg_gen_sssub_vec,
-+          .fno = gen_helper_gvec_sssub64,
-+          .opc = INDEX_op_sssub_vec,
-+          .vece = MO_64 },
-     };
-     tcg_debug_assert(vece <= MO_64);
-     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
- }
- 
--static void tcg_gen_vec_usadd32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+static void tcg_gen_usadd_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
- {
-     TCGv_i32 max = tcg_const_i32(-1);
-     tcg_gen_add_i32(d, a, b);
-@@ -1708,7 +1732,7 @@ static void tcg_gen_vec_usadd32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-     tcg_temp_free_i32(max);
- }
- 
--static void tcg_gen_vec_usadd32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+static void tcg_gen_usadd_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
-     TCGv_i64 max = tcg_const_i64(-1);
-     tcg_gen_add_i64(d, a, b);
-@@ -1720,20 +1744,30 @@ void tcg_gen_gvec_usadd(unsigned vece, uint32_t dofs, uint32_t aofs,
-                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
- {
-     static const GVecGen3 g[4] = {
--        { .fno = gen_helper_gvec_usadd8, .vece = MO_8 },
--        { .fno = gen_helper_gvec_usadd16, .vece = MO_16 },
--        { .fni4 = tcg_gen_vec_usadd32_i32,
-+        { .fniv = tcg_gen_usadd_vec,
-+          .fno = gen_helper_gvec_usadd8,
-+          .opc = INDEX_op_usadd_vec,
++        { .fni8 = tcg_gen_umin_i64,
++          .fniv = tcg_gen_umin_vec,
++          .fno = gen_helper_gvec_umin64,
++          .opc = INDEX_op_umin_vec,
++          .vece = MO_64 }
++    };
++    tcg_debug_assert(vece <= MO_64);
++    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++}
++
++void tcg_gen_gvec_smax(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++{
++    static const GVecGen3 g[4] = {
++        { .fniv = tcg_gen_smax_vec,
++          .fno = gen_helper_gvec_smax8,
++          .opc = INDEX_op_smax_vec,
 +          .vece = MO_8 },
-+        { .fniv = tcg_gen_usadd_vec,
-+          .fno = gen_helper_gvec_usadd16,
-+          .opc = INDEX_op_usadd_vec,
++        { .fniv = tcg_gen_smax_vec,
++          .fno = gen_helper_gvec_smax16,
++          .opc = INDEX_op_smax_vec,
 +          .vece = MO_16 },
-+        { .fni4 = tcg_gen_usadd_i32,
-+          .fniv = tcg_gen_usadd_vec,
-           .fno = gen_helper_gvec_usadd32,
-+          .opc = INDEX_op_usadd_vec,
-           .vece = MO_32 },
--        { .fni8 = tcg_gen_vec_usadd32_i64,
-+        { .fni8 = tcg_gen_usadd_i64,
-+          .fniv = tcg_gen_usadd_vec,
-           .fno = gen_helper_gvec_usadd64,
-+          .opc = INDEX_op_usadd_vec,
-           .vece = MO_64 }
-     };
-     tcg_debug_assert(vece <= MO_64);
-     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
- }
- 
--static void tcg_gen_vec_ussub32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+static void tcg_gen_ussub_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
- {
-     TCGv_i32 min = tcg_const_i32(0);
-     tcg_gen_sub_i32(d, a, b);
-@@ -1741,7 +1775,7 @@ static void tcg_gen_vec_ussub32_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-     tcg_temp_free_i32(min);
- }
- 
--static void tcg_gen_vec_ussub32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+static void tcg_gen_ussub_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
-     TCGv_i64 min = tcg_const_i64(0);
-     tcg_gen_sub_i64(d, a, b);
-@@ -1753,13 +1787,23 @@ void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
-                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
- {
-     static const GVecGen3 g[4] = {
--        { .fno = gen_helper_gvec_ussub8, .vece = MO_8 },
--        { .fno = gen_helper_gvec_ussub16, .vece = MO_16 },
--        { .fni4 = tcg_gen_vec_ussub32_i32,
-+        { .fniv = tcg_gen_ussub_vec,
-+          .fno = gen_helper_gvec_ussub8,
-+          .opc = INDEX_op_ussub_vec,
++        { .fni4 = tcg_gen_smax_i32,
++          .fniv = tcg_gen_smax_vec,
++          .fno = gen_helper_gvec_smax32,
++          .opc = INDEX_op_smax_vec,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_smax_i64,
++          .fniv = tcg_gen_smax_vec,
++          .fno = gen_helper_gvec_smax64,
++          .opc = INDEX_op_smax_vec,
++          .vece = MO_64 }
++    };
++    tcg_debug_assert(vece <= MO_64);
++    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++}
++
++void tcg_gen_gvec_umax(unsigned vece, uint32_t dofs, uint32_t aofs,
++                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++{
++    static const GVecGen3 g[4] = {
++        { .fniv = tcg_gen_umax_vec,
++          .fno = gen_helper_gvec_umax8,
++          .opc = INDEX_op_umax_vec,
 +          .vece = MO_8 },
-+        { .fniv = tcg_gen_ussub_vec,
-+          .fno = gen_helper_gvec_ussub16,
-+          .opc = INDEX_op_ussub_vec,
++        { .fniv = tcg_gen_umax_vec,
++          .fno = gen_helper_gvec_umax16,
++          .opc = INDEX_op_umax_vec,
 +          .vece = MO_16 },
-+        { .fni4 = tcg_gen_ussub_i32,
-+          .fniv = tcg_gen_ussub_vec,
-           .fno = gen_helper_gvec_ussub32,
-+          .opc = INDEX_op_ussub_vec,
-           .vece = MO_32 },
--        { .fni8 = tcg_gen_vec_ussub32_i64,
-+        { .fni8 = tcg_gen_ussub_i64,
-+          .fniv = tcg_gen_ussub_vec,
-           .fno = gen_helper_gvec_ussub64,
-+          .opc = INDEX_op_ussub_vec,
-           .vece = MO_64 }
-     };
-     tcg_debug_assert(vece <= MO_64);
++        { .fni4 = tcg_gen_umax_i32,
++          .fniv = tcg_gen_umax_vec,
++          .fno = gen_helper_gvec_umax32,
++          .opc = INDEX_op_umax_vec,
++          .vece = MO_32 },
++        { .fni8 = tcg_gen_umax_i64,
++          .fniv = tcg_gen_umax_vec,
++          .fno = gen_helper_gvec_umax64,
++          .opc = INDEX_op_umax_vec,
++          .vece = MO_64 }
++    };
++    tcg_debug_assert(vece <= MO_64);
++    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++}
++
+ /* Perform a vector negation using normal negation and a mask.
+    Compare gen_subv_mask above.  */
+ static void gen_negv_mask(TCGv_i64 d, TCGv_i64 b, TCGv_i64 m)
 diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index d77fdf7c1d..675aa09258 100644
+index 675aa09258..36f35022ac 100644
 --- a/tcg/tcg-op-vec.c
 +++ b/tcg/tcg-op-vec.c
-@@ -386,7 +386,8 @@ void tcg_gen_cmp_vec(TCGCond cond, unsigned vece,
-     }
- }
- 
--void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+static void do_op3(unsigned vece, TCGv_vec r, TCGv_vec a,
-+                   TCGv_vec b, TCGOpcode opc)
+@@ -433,3 +433,23 @@ void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
  {
-     TCGTemp *rt = tcgv_vec_temp(r);
-     TCGTemp *at = tcgv_vec_temp(a);
-@@ -399,11 +400,36 @@ void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- 
-     tcg_debug_assert(at->base_type >= type);
-     tcg_debug_assert(bt->base_type >= type);
--    can = tcg_can_emit_vec_op(INDEX_op_mul_vec, type, vece);
-+    can = tcg_can_emit_vec_op(opc, type, vece);
-     if (can > 0) {
--        vec_gen_3(INDEX_op_mul_vec, type, vece, ri, ai, bi);
-+        vec_gen_3(opc, type, vece, ri, ai, bi);
-     } else {
-         tcg_debug_assert(can < 0);
--        tcg_expand_vec_op(INDEX_op_mul_vec, type, vece, ri, ai, bi);
-+        tcg_expand_vec_op(opc, type, vece, ri, ai, bi);
-     }
+     do_op3(vece, r, a, b, INDEX_op_ussub_vec);
  }
 +
-+void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
 +{
-+    do_op3(vece, r, a, b, INDEX_op_mul_vec);
++    do_op3(vece, r, a, b, INDEX_op_smin_vec);
 +}
 +
-+void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
 +{
-+    do_op3(vece, r, a, b, INDEX_op_ssadd_vec);
++    do_op3(vece, r, a, b, INDEX_op_umin_vec);
 +}
 +
-+void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
 +{
-+    do_op3(vece, r, a, b, INDEX_op_usadd_vec);
++    do_op3(vece, r, a, b, INDEX_op_smax_vec);
 +}
 +
-+void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
 +{
-+    do_op3(vece, r, a, b, INDEX_op_sssub_vec);
-+}
-+
-+void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    do_op3(vece, r, a, b, INDEX_op_ussub_vec);
++    do_op3(vece, r, a, b, INDEX_op_umax_vec);
 +}
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f34f52fbdb..6363f0cb29 100644
+index 6363f0cb29..20a5d8f315 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -1607,6 +1607,11 @@ bool tcg_op_supported(TCGOpcode op)
-     case INDEX_op_shrv_vec:
-     case INDEX_op_sarv_vec:
-         return have_vec && TCG_TARGET_HAS_shv_vec;
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_ussub_vec:
-+        return have_vec && TCG_TARGET_HAS_sat_vec;
+@@ -1612,6 +1612,11 @@ bool tcg_op_supported(TCGOpcode op)
+     case INDEX_op_sssub_vec:
+     case INDEX_op_ussub_vec:
+         return have_vec && TCG_TARGET_HAS_sat_vec;
++    case INDEX_op_smin_vec:
++    case INDEX_op_umin_vec:
++    case INDEX_op_smax_vec:
++    case INDEX_op_umax_vec:
++        return have_vec && TCG_TARGET_HAS_minmax_vec;
  
      default:
          tcg_debug_assert(op > INDEX_op_last_generic && op < NB_OPS);
 diff --git a/tcg/README b/tcg/README
-index d22ee084b8..dd9fd9c86c 100644
+index dd9fd9c86c..603f4df659 100644
 --- a/tcg/README
 +++ b/tcg/README
-@@ -554,6 +554,15 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
+@@ -554,6 +554,16 @@ E.g. VECL=1 -> 64 << 1 -> v128, and VECE=2 -> 1 << 2 -> i32.
  
    Similarly, v0 = -v1.
  
-+* ssadd_vec:
-+* sssub_vec:
-+* usadd_vec:
-+* ussub_vec:
++* smin_vec:
++* umin_vec:
 +
-+  Signed and unsigned saturating addition and subtraction.  If the true
-+  result is not representable within the element type, the element is
-+  set to the minimum or maximum value for the type.
++  Similarly, v0 = MIN(v1, v2), for signed and unsigned element types.
 +
- * and_vec   v0, v1, v2
- * or_vec    v0, v1, v2
- * xor_vec   v0, v1, v2
++* smax_vec:
++* umax_vec:
++
++  Similarly, v0 = MAX(v1, v2), for signed and unsigned element types.
++
+ * ssadd_vec:
+ * sssub_vec:
+ * usadd_vec:
 -- 
 2.17.2
