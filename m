@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57611)
+Received: from eggs.gnu.org ([209.51.188.92]:60323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go8zJ-0007PU-8w
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:38:17 -0500
+	(envelope-from <berto@igalia.com>) id 1go9HI-0002Bv-A9
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go8zH-00082C-F4
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:38:16 -0500
-Date: Mon, 28 Jan 2019 16:37:50 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190128153750.GE5756@localhost.localdomain>
-References: <20190128151521.13875-1-antonkuchin@yandex-team.ru>
+	(envelope-from <berto@igalia.com>) id 1go97Y-0002jW-CR
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:46:49 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190128145743.GC5756@localhost.localdomain>
+References: <cover.1548171741.git.berto@igalia.com>
+	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
+	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
+	<w518szbmmw9.fsf@maestria.local.igalia.com>
+	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
+	<w5136pjmjrp.fsf@maestria.local.igalia.com>
+	<20190124091222.GB4601@localhost.localdomain>
+	<w51d0ogsv1y.fsf@maestria.local.igalia.com>
+	<20190128145743.GC5756@localhost.localdomain>
+Date: Mon, 28 Jan 2019 16:46:42 +0100
+Message-ID: <w517eeoss2l.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190128151521.13875-1-antonkuchin@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH] qmp: Deprecate query-nodes option of
- query-blockstats
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
+ different iothreads sharing a blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,21 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Kuchin <antonkuchin@yandex-team.ru>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, libvir-list@redhat.com, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, nsoffer@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 28.01.2019 um 16:15 hat Anton Kuchin geschrieben:
-> This option is broken since a6baa60807 in v2.9 and returns mostly
-> zeroes instead of real stats because actual querring of BlockStats
-> that resides in blk is missing.
-> 
-> And it makes no sense because with this option BlockDriverState-s
-> are iterated but BlockAcctStats belong to BlockBackend and not BDS
-> since 7f0e9da6f13 in v2.5
-> 
-> Signed-off-by: Anton Kuchin <antonkuchin@yandex-team.ru>
+On Mon 28 Jan 2019 03:57:43 PM CET, Kevin Wolf wrote:
 
-Isn't query-nodes the only way to get wr_highest_offset for the protocol
-layer? oVirt depends on this, as far as I know.
+>> > I think the proper solution on the block layer level would be that
+>> > AioContext is managed per BdrvChild and only BdrvChild objects with
+>> > the same AioContext can be attached to the same node.
+>> > bdrv_set_aio_context() would then fail if another parent is already
+>> > using the node.
+>> 
+>> How would that solve the virtio-blk problem, though? :-?
+>
+> It wouldn't, but it would make clear that bdrv_set_aio_context() can
+> fail and we'd have to handle the problem exactly there.
 
-Kevin
+Yes, that sound like the proper solution.
+
+> The only other option I see is downgrading to non-dataplane mode, but
+> this would have to be silent because during machine reset we have no
+> way to report errors.
+
+Yes, I actually had a patch doing that, but as you said the user has no
+way of knowing that it went wrong.
+
+If you have 2 or 3 virtio-blk devices with different iothreads using the
+same BDS then after the guest reboot only one would succeed, but you
+can't see which one, or can you?
+
+Berto
