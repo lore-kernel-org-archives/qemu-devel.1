@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38840)
+Received: from eggs.gnu.org ([209.51.188.92]:38851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1go3W1-0005gp-OF
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:47:42 -0500
+	(envelope-from <clg@kaod.org>) id 1go3W2-0005h9-3S
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:47:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1go3W0-00044f-Mm
+	(envelope-from <clg@kaod.org>) id 1go3W0-00044p-SU
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:47:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35254)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1go3W0-00037a-Br
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1go3W0-00036O-GJ
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:47:40 -0500
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0S9i6uW074239
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 04:47:05 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q9vhk7b0a-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	x0S9i5lw074178
 	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 04:47:04 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q9vhk7ayh-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 04:47:03 -0500
 Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Mon, 28 Jan 2019 09:47:02 -0000
+	Mon, 28 Jan 2019 09:47:01 -0000
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 28 Jan 2019 10:46:25 +0100
+Date: Mon, 28 Jan 2019 10:46:24 +0100
 In-Reply-To: <20190128094625.4428-1-clg@kaod.org>
 References: <20190128094625.4428-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190128094625.4428-20-clg@kaod.org>
+Message-Id: <20190128094625.4428-19-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 19/19] target/ppc: Add support for LPCR:HEIC on
- POWER9
+Subject: [Qemu-devel] [PATCH 18/19] ppc/xive: Make XIVE generate the proper
+ interrupt types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,49 +45,88 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@ker
 
 From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This controls whether the External Interrupt (0x500) can be
-delivered to the hypervisor or not.
+It should be generic Hypervisor Virtualization interrupts for HV
+directed rings and traditional External Interrupts for the OS directed
+ring.
+
+Don't generate anything for the user ring as it isn't actually
+supported.
 
 Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/excp_helper.c        | 5 ++++-
- target/ppc/translate_init.inc.c | 5 ++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ include/hw/ppc/xive.h |  3 ++-
+ hw/intc/xive.c        | 22 +++++++++++++++++++---
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index d171a5eb6236..39bedbb11db0 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -827,7 +827,10 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-     /* External interrupt can ignore MSR:EE under some circumstances */
-     if (env->pending_interrupts & (1 << PPC_INTERRUPT_EXT)) {
-         bool lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
--        if (async_deliver || (env->has_hv_mode && msr_hv =3D=3D 0 && !lp=
-es0)) {
-+        bool heic =3D !!(env->spr[SPR_LPCR] & LPCR_HEIC);
-+        /* HEIC blocks delivery to the hypervisor */
-+        if ((async_deliver && !(heic && msr_hv && !msr_pr)) ||
-+            (env->has_hv_mode && msr_hv =3D=3D 0 && !lpes0)) {
-             powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_EXTERNAL);
-             return;
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 2bad8526221b..82e9aef677c5 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -316,7 +316,8 @@ typedef struct XiveTCTX {
+     DeviceState parent_obj;
+=20
+     CPUState    *cs;
+-    qemu_irq    output;
++    qemu_irq    hv_output;
++    qemu_irq    os_output;
+=20
+     uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+     uint32_t    hw_cam;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 119bb02d345d..14b854181ab7 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -61,13 +61,28 @@ static uint8_t exception_mask(uint8_t ring)
+     }
+ }
+=20
++static qemu_irq xive_tctx_output(XiveTCTX *tctx, uint8_t ring)
++{
++        switch (ring) {
++        case TM_QW0_USER:
++                return 0; /* Not supported */
++        case TM_QW1_OS:
++                return tctx->os_output;
++        case TM_QW2_HV_POOL:
++        case TM_QW3_HV_PHYS:
++                return tctx->hv_output;
++        default:
++                return 0;
++        }
++}
++
+ static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+ {
+     uint8_t *regs =3D &tctx->regs[ring];
+     uint8_t nsr =3D regs[TM_NSR];
+     uint8_t mask =3D exception_mask(ring);
+=20
+-    qemu_irq_lower(tctx->output);
++    qemu_irq_lower(xive_tctx_output(tctx, ring));
+=20
+     if (regs[TM_NSR] & mask) {
+         uint8_t cppr =3D regs[TM_PIPR];
+@@ -100,7 +115,7 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t =
+ring)
+         default:
+             g_assert_not_reached();
          }
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 7f25215f0192..63ded33ea7ea 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8823,7 +8823,10 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-         /* External Exception */
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-             (env->spr[SPR_LPCR] & LPCR_EEE)) {
--            return true;
-+            bool heic =3D !!(env->spr[SPR_LPCR] & LPCR_HEIC);
-+            if (heic =3D=3D 0 || !msr_hv || msr_pr) {
-+                return true;
-+            }
-         }
-         /* Decrementer Exception */
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+-        qemu_irq_raise(tctx->output);
++        qemu_irq_raise(xive_tctx_output(tctx, ring));
+     }
+ }
+=20
+@@ -554,7 +569,8 @@ static void xive_tctx_realize(DeviceState *dev, Error=
+ **errp)
+     env =3D &cpu->env;
+     switch (PPC_INPUT(env)) {
+     case PPC_FLAGS_INPUT_POWER9:
+-        tctx->output =3D env->irq_inputs[POWER7_INPUT_INT];
++        tctx->hv_output =3D env->irq_inputs[POWER9_INPUT_HINT];
++        tctx->os_output =3D env->irq_inputs[POWER9_INPUT_INT];
+         break;
+=20
+     default:
 --=20
 2.20.1
