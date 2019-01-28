@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37545)
+Received: from eggs.gnu.org ([209.51.188.92]:38244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1go3RX-0003cv-Cm
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:43:05 -0500
+	(envelope-from <hongbo.zhang@linaro.org>) id 1go3V7-0004zo-31
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:46:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1go3RV-0000aS-Sv
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:43:03 -0500
-Received: from mga01.intel.com ([192.55.52.88]:12790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1go3RV-0000ZG-JR
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:43:01 -0500
-References: <20190111153451.14304-1-tao3.xu@intel.com>
-	<20190111153451.14304-5-tao3.xu@intel.com>
-	<859ba7db-4129-1f8b-f4e4-8609f2d3755d@redhat.com>
-	<1c57aaaf-4c12-fb6e-7d59-c113004dc3a8@intel.com>
-	<e781ace4-b415-2325-d74f-88f586de6dda@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <d4fef646-8c95-aa60-b116-8f54ed2ce71e@intel.com>
-Date: Mon, 28 Jan 2019 17:42:54 +0800
+	(envelope-from <hongbo.zhang@linaro.org>) id 1go3V0-0002fd-1v
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:46:41 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:45330)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1go3Ur-0002bi-Rz
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:46:32 -0500
+Received: by mail-lf1-x142.google.com with SMTP id b20so11312145lfa.12
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 01:46:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e781ace4-b415-2325-d74f-88f586de6dda@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/9] Extend the command-line to provide
- memory latency and bandwidth information
+References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
+	<1544173675-14217-3-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9mF+WiPLW4yyv1aEMLTg2QK2krZvxyjCSsMziJtzx3Ug@mail.gmail.com>
+In-Reply-To: <CAFEAcA9mF+WiPLW4yyv1aEMLTg2QK2krZvxyjCSsMziJtzx3Ug@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Mon, 28 Jan 2019 17:46:14 +0800
+Message-ID: <CAHmQWvCw5ndod93WqLXDgGxDERtRM3ee_qiLA+S34Y9X2JFvVQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] hw/arm: add Arm SBSA reference
+ machine, devices part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, mst@redhat.com, imammedo@redhat.com
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org, pbonzini@redhat.com, danmei.wei@intel.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
 
-On 1/22/2019 1:09 AM, Eric Blake wrote:
-> On 1/21/19 12:03 AM, Tao Xu wrote:
-> 
->>>>    #
->>>> +# @hmat-lb: memory latency and bandwidth information (Since: 2.13)
->>> s/2.13/4.0/ (probably in multiple spots in your series)
->> Hi Eric,
->>
->> Thank you for your comments. The spell mistakes in patches 1/9 to 6/9
->> have been corrected in patch 7/9. Because patches 1/9 to 6/9 are jingqi's
->> initial V1 patchesand7/9 to 9/9 are the changes compared withV1.
-> 
-> Still, it's better to rebase the series to avoid the mistakes in the
-> first place, instead of having churn with a mistake early in the series
-> corrected only later in the series.  Even if the mistake is corrected by
-> a different author than the bulk of the patch, as long as there are
-> Signed-off-by lines for both the original author and the person making
-> the spelling correction, then proper attribution has been made.
-> 
->>
->> About s/2.13/4.0/,do you mean ACPI HMAT will not be merged before QEMU
->> 4.0?
-> 
-> Correct - 4.0 is the next release planned.  There was no 2.13 release;
-> after 2.12 was the 3.0 release; the current release is 3.1, and the next
-> release is 4.0; for more details, see
-> https://www.qemu.org/2018/08/15/qemu-3-0-0/ for a description of the
-> current version numbering scheme.  And even making it in time for 4.0
-> means polishing this by mid-March: https://wiki.qemu.org/Planning/4.0
-> 
->>
->> In addition, do you have any other comments about these patches?
-> 
-> I was commenting on the high-level user interface issues, but will leave
-> the bulk of the technical review to those more familiar with the code
-> being added.
-> 
-Hi Eric, I am sorry for asking you so frequently and don't mean to rush 
-you. Could you tell me when I can know this comments on the high-level 
-user interface issues? So that I can improve my patch in the next 
-version. Thank you and looking forward to your reply!
+On Tue, 22 Jan 2019 at 19:49, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 7 Dec 2018 at 09:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> >
+> > Following the previous patch, this patch adds peripheral devices to the
+> > newly introduced SBSA-ref machine.
+> >
+> > Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+> > ---
+> >  hw/arm/sbsa-ref.c | 421 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 421 insertions(+)
+>
+> Most of this code looks good, thanks.
+>
+
+Thanks.
+By the way, this patch https://patchwork.kernel.org/patch/10744759/
+has been merged, now we have a generic EHCI controller, I will add
+this in my next iteration.
+
+> > +
+> > +static void sbsa_ref_machine_done(Notifier *notifier, void *data)
+> > +{
+> > +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
+> > +                                         machine_done);
+> > +    ARMCPU *cpu = ARM_CPU(first_cpu);
+> > +    struct arm_boot_info *info = &vms->bootinfo;
+> > +    AddressSpace *as = arm_boot_address_space(cpu, info);
+> > +
+> > +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
+> > +        exit(1);
+> > +    }
+> > +}
+>
+> I still don't understand why we need this -- it doesn't seem
+> to be doing anything different from the default behaviour that
+> boot.c implements if skip_dtb_autoload is false.
+>
+
+According to the process of arm_load_kernel() in boot.c, If only
+kernel loaded via -kernel but without any firmware, it works fine.
+While in this case, we have have firmware loaded but no kernel (eg
+firmware loads kernel from storage, firmware never come back to qemu
+again), so the arm_load_kernel() returns in the middle before calling
+arm_load_dtb(),  because arm_load_dtb() is the final step in
+arm_load_kernel(), so there is no chance for the arm_load_dtb() to be
+called, then we get error message and qemu quits.
+
+> thanks
+> -- PMM
