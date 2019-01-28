@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33342)
+Received: from eggs.gnu.org ([209.51.188.92]:33360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9Jd-0004lL-76
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:19 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9Jf-0004ne-1q
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9Jc-0007hb-1J
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:17 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34960)
+	(envelope-from <richard.henderson@linaro.org>) id 1go9Jd-0007hv-5J
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:18 -0500
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:43918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1go9Jb-0007h2-5K
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:15 -0500
-Received: by mail-pl1-x642.google.com with SMTP id p8so7917958plo.2
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:59:15 -0800 (PST)
+	id 1go9Jc-0007hR-U9
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:17 -0500
+Received: by mail-pg1-x535.google.com with SMTP id v28so7381336pgk.10
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:59:16 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 28 Jan 2019 07:58:46 -0800
-Message-Id: <20190128155907.20607-3-richard.henderson@linaro.org>
+Date: Mon, 28 Jan 2019 07:58:47 -0800
+Message-Id: <20190128155907.20607-4-richard.henderson@linaro.org>
 In-Reply-To: <20190128155907.20607-1-richard.henderson@linaro.org>
 References: <20190128155907.20607-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 02/23] tcg: Add gvec expanders for nand, nor, eqv
+Subject: [Qemu-devel] [PULL 03/23] tcg: Add write_aofs to GVecGen4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,199 +29,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+This allows writing 2 output, 3 input operations.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/tcg-runtime.h      |  3 +++
- tcg/tcg-op-gvec.h            |  6 +++++
- tcg/tcg-op.h                 |  3 +++
- accel/tcg/tcg-runtime-gvec.c | 33 +++++++++++++++++++++++
- tcg/tcg-op-gvec.c            | 51 ++++++++++++++++++++++++++++++++++++
- tcg/tcg-op-vec.c             | 21 +++++++++++++++
- 6 files changed, 117 insertions(+)
+ tcg/tcg-op-gvec.h |  2 ++
+ tcg/tcg-op-gvec.c | 27 +++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index 1bd39d136d..835ddfebb2 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -211,6 +211,9 @@ DEF_HELPER_FLAGS_4(gvec_or, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_xor, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_andc, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_orc, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_nand, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_nor, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_eqv, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
- DEF_HELPER_FLAGS_4(gvec_ands, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(gvec_xors, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
 diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index ff43a29a0b..d65b9d9d4c 100644
+index d65b9d9d4c..2cb447112e 100644
 --- a/tcg/tcg-op-gvec.h
 +++ b/tcg/tcg-op-gvec.h
-@@ -242,6 +242,12 @@ void tcg_gen_gvec_andc(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
- void tcg_gen_gvec_orc(unsigned vece, uint32_t dofs, uint32_t aofs,
-                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_nand(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_nor(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                      uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_eqv(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                      uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
+@@ -181,6 +181,8 @@ typedef struct {
+     uint8_t vece;
+     /* Prefer i64 to v64.  */
+     bool prefer_i64;
++    /* Write aofs as a 2nd dest operand.  */
++    bool write_aofs;
+ } GVecGen4;
  
- void tcg_gen_gvec_andi(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t c, uint32_t oprsz, uint32_t maxsz);
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 7007ec0d4d..f6ef1cd690 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -962,6 +962,9 @@ void tcg_gen_or_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_xor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_andc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_orc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_nand_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
- void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
- 
-diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-index 90340e56e0..d1802467d5 100644
---- a/accel/tcg/tcg-runtime-gvec.c
-+++ b/accel/tcg/tcg-runtime-gvec.c
-@@ -512,6 +512,39 @@ void HELPER(gvec_orc)(void *d, void *a, void *b, uint32_t desc)
-     clear_high(d, oprsz, desc);
- }
- 
-+void HELPER(gvec_nand)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(vec64)) {
-+        *(vec64 *)(d + i) = ~(*(vec64 *)(a + i) & *(vec64 *)(b + i));
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_nor)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(vec64)) {
-+        *(vec64 *)(d + i) = ~(*(vec64 *)(a + i) | *(vec64 *)(b + i));
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_eqv)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(vec64)) {
-+        *(vec64 *)(d + i) = ~(*(vec64 *)(a + i) ^ *(vec64 *)(b + i));
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
- void HELPER(gvec_ands)(void *d, void *a, uint64_t b, uint32_t desc)
- {
-     intptr_t oprsz = simd_oprsz(desc);
+ void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
 diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index ec231b78fb..81689d02f7 100644
+index 81689d02f7..c10d3d7b26 100644
 --- a/tcg/tcg-op-gvec.c
 +++ b/tcg/tcg-op-gvec.c
-@@ -1920,6 +1920,57 @@ void tcg_gen_gvec_orc(unsigned vece, uint32_t dofs, uint32_t aofs,
-     }
- }
+@@ -665,7 +665,7 @@ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
  
-+void tcg_gen_gvec_nand(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-+{
-+    static const GVecGen3 g = {
-+        .fni8 = tcg_gen_nand_i64,
-+        .fniv = tcg_gen_nand_vec,
-+        .fno = gen_helper_gvec_nand,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+    };
-+
-+    if (aofs == bofs) {
-+        tcg_gen_gvec_not(vece, dofs, aofs, oprsz, maxsz);
-+    } else {
-+        tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
-+    }
-+}
-+
-+void tcg_gen_gvec_nor(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                      uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-+{
-+    static const GVecGen3 g = {
-+        .fni8 = tcg_gen_nor_i64,
-+        .fniv = tcg_gen_nor_vec,
-+        .fno = gen_helper_gvec_nor,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+    };
-+
-+    if (aofs == bofs) {
-+        tcg_gen_gvec_not(vece, dofs, aofs, oprsz, maxsz);
-+    } else {
-+        tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
-+    }
-+}
-+
-+void tcg_gen_gvec_eqv(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                      uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-+{
-+    static const GVecGen3 g = {
-+        .fni8 = tcg_gen_eqv_i64,
-+        .fniv = tcg_gen_eqv_vec,
-+        .fno = gen_helper_gvec_eqv,
-+        .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+    };
-+
-+    if (aofs == bofs) {
-+        tcg_gen_gvec_dup8i(dofs, oprsz, maxsz, -1);
-+    } else {
-+        tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
-+    }
-+}
-+
- static const GVecGen2s gop_ands = {
-     .fni8 = tcg_gen_and_i64,
-     .fniv = tcg_gen_and_vec,
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index cefba3d185..d77fdf7c1d 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -275,6 +275,27 @@ void tcg_gen_orc_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-     }
- }
- 
-+void tcg_gen_nand_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    /* TODO: Add TCG_TARGET_HAS_nand_vec when adding a backend supports it. */
-+    tcg_gen_and_vec(0, r, a, b);
-+    tcg_gen_not_vec(0, r, r);
-+}
-+
-+void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    /* TODO: Add TCG_TARGET_HAS_nor_vec when adding a backend supports it. */
-+    tcg_gen_or_vec(0, r, a, b);
-+    tcg_gen_not_vec(0, r, r);
-+}
-+
-+void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    /* TODO: Add TCG_TARGET_HAS_eqv_vec when adding a backend supports it. */
-+    tcg_gen_xor_vec(0, r, a, b);
-+    tcg_gen_not_vec(0, r, r);
-+}
-+
- void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+ /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
+ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t oprsz,
++                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
+                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_i32))
  {
-     if (TCG_TARGET_HAS_not_vec) {
+     TCGv_i32 t0 = tcg_temp_new_i32();
+@@ -680,6 +680,9 @@ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+         tcg_gen_ld_i32(t3, cpu_env, cofs + i);
+         fni(t0, t1, t2, t3);
+         tcg_gen_st_i32(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_i32(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_i32(t3);
+     tcg_temp_free_i32(t2);
+@@ -769,7 +772,7 @@ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
+ 
+ /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
+ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+-                         uint32_t cofs, uint32_t oprsz,
++                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
+                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_i64))
+ {
+     TCGv_i64 t0 = tcg_temp_new_i64();
+@@ -784,6 +787,9 @@ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+         tcg_gen_ld_i64(t3, cpu_env, cofs + i);
+         fni(t0, t1, t2, t3);
+         tcg_gen_st_i64(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_i64(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_i64(t3);
+     tcg_temp_free_i64(t2);
+@@ -880,7 +886,7 @@ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+ /* Expand OPSZ bytes worth of four-operand operations using host vectors.  */
+ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
+-                         uint32_t tysz, TCGType type,
++                         uint32_t tysz, TCGType type, bool write_aofs,
+                          void (*fni)(unsigned, TCGv_vec, TCGv_vec,
+                                      TCGv_vec, TCGv_vec))
+ {
+@@ -896,6 +902,9 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
+         tcg_gen_ld_vec(t3, cpu_env, cofs + i);
+         fni(vece, t0, t1, t2, t3);
+         tcg_gen_st_vec(t0, cpu_env, dofs + i);
++        if (write_aofs) {
++            tcg_gen_st_vec(t1, cpu_env, aofs + i);
++        }
+     }
+     tcg_temp_free_vec(t3);
+     tcg_temp_free_vec(t2);
+@@ -1187,7 +1196,7 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
+          */
+         some = QEMU_ALIGN_DOWN(oprsz, 32);
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, some,
+-                     32, TCG_TYPE_V256, g->fniv);
++                     32, TCG_TYPE_V256, g->write_aofs, g->fniv);
+         if (some == oprsz) {
+             break;
+         }
+@@ -1200,18 +1209,20 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
+         /* fallthru */
+     case TCG_TYPE_V128:
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
+-                     16, TCG_TYPE_V128, g->fniv);
++                     16, TCG_TYPE_V128, g->write_aofs, g->fniv);
+         break;
+     case TCG_TYPE_V64:
+         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
+-                     8, TCG_TYPE_V64, g->fniv);
++                     8, TCG_TYPE_V64, g->write_aofs, g->fniv);
+         break;
+ 
+     case 0:
+         if (g->fni8 && check_size_impl(oprsz, 8)) {
+-            expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
++            expand_4_i64(dofs, aofs, bofs, cofs, oprsz,
++                         g->write_aofs, g->fni8);
+         } else if (g->fni4 && check_size_impl(oprsz, 4)) {
+-            expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
++            expand_4_i32(dofs, aofs, bofs, cofs, oprsz,
++                         g->write_aofs, g->fni4);
+         } else {
+             assert(g->fno != NULL);
+             tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
 -- 
 2.17.2
