@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55454)
+Received: from eggs.gnu.org ([209.51.188.92]:55498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go4hQ-0001q2-HA
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:03:33 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1go4hV-0001rV-J7
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go4hP-0003EQ-6c
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:03:32 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go4hO-0003C4-W2
+	(envelope-from <pbonzini@redhat.com>) id 1go4hP-0003Eb-Bv
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:03:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1go4hP-0003Dt-4F
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:03:31 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b11so13512447wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:03:23 -0800 (PST)
 References: <20190125192719.15339-1-philmd@redhat.com>
-	<20190125192719.15339-4-philmd@redhat.com>
-	<154f8a45-723d-6f3c-a278-1767361bc94e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6c12ece7-96c8-b96a-edb6-b7ef376ebf6a@redhat.com>
-Date: Mon, 28 Jan 2019 12:03:21 +0100
+	<20190125192719.15339-3-philmd@redhat.com> <874l9tnmev.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8f1c2854-fb0a-b8cd-14aa-1b30924f11bf@redhat.com>
+Date: Mon, 28 Jan 2019 12:03:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <154f8a45-723d-6f3c-a278-1767361bc94e@redhat.com>
+In-Reply-To: <874l9tnmev.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] WIP tests/vm: Run tests on OpenBSD
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] XXX oslib-posix: Ignore
+ fcntl("/dev/null", F_SETFL, O_NONBLOCK) failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>
 
-On 1/28/19 9:44 AM, Thomas Huth wrote:
-> On 2019-01-25 20:27, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  tests/vm/openbsd | 4 +---
->>  1 file changed, 1 insertion(+), 3 deletions(-)
+On 28/01/19 10:47, Alex Benn=C3=A9e wrote:
 >>
->> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
->> index cfe0572c59..de907dd21c 100755
->> --- a/tests/vm/openbsd
->> +++ b/tests/vm/openbsd
->> @@ -25,9 +25,7 @@ class OpenBSDVM(basevm.BaseVM):
->>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
->>          tar -xf /dev/rsd1c;
->>          ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
->> -        gmake --output-sync -j{jobs} {verbose};
->> -        # XXX: "gmake check" seems to always hang or fail
->> -        #gmake --output-sync -j{jobs} check {verbose};
->> +        gmake --output-sync -j{jobs} check {verbose};
->>      """
->>  
->>      def build_image(self, img):
->>
-> 
-> Please add a proper patch description and remove the WIP from the subject.
+>> [1] The fix seems https://github.com/openbsd/src/commit/c2a35b387f9d3c
+>>   "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, =
+so
+>>   the memory devices (/dev/null, /dev/zero, etc) need to permit them."
+> I assume set_nonblock is called on more than just these special devices=
+?
+> Is there anyway to check this on OpenBSD or is it just an anonymous fd
+> at this point?
+>=20
 
-Oops :/ I thought about renaming this also NOTFORMERGE.
+Perhaps on OpenBSD we should just assert that we don't get EBADF?
 
-The description could be:
-
-  OpenBSD tests are still failing, but this patch help to test
-  the improvement of the previous 2 patches (disable W^X, disable
-  assert(fcntl)).
+Paolo
