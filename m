@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48216)
+Received: from eggs.gnu.org ([209.51.188.92]:48459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go8CV-0004M0-0h
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:47:51 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1go8DW-0004tr-0o
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go8CU-0000sN-2X
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:47:50 -0500
-Date: Mon, 28 Jan 2019 15:41:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190128144147.GA5756@localhost.localdomain>
-References: <20190125174653.4604-1-kwolf@redhat.com>
-	<20190125174653.4604-3-kwolf@redhat.com>
-	<20190128085041.GA16630@andariel.pipo.sk>
+	(envelope-from <ehabkost@redhat.com>) id 1go8DU-0002A4-SM
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1go8DU-00026o-Ja
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:52 -0500
+Date: Mon, 28 Jan 2019 12:48:48 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190128144848.GS4136@habkost.net>
+References: <20181227024304.12182-1-tao3.xu@intel.com>
+	<20181227024304.12182-3-tao3.xu@intel.com>
+	<20190114183545.GB28115@habkost.net>
+	<ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
+	<20190123191550.GX4136@habkost.net>
+	<ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190128085041.GA16630@andariel.pipo.sk>
-Subject: Re: [Qemu-devel] [PATCH 2/3] scsi-disk: Add device_id property
+In-Reply-To: <ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] i386: Add some MSR based features on
+ Cascadelake-Server CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: Tao Xu <tao3.xu@intel.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, robert.hu@linux.intel.com, thomas.lendacky@amd.com, xuelian.guo@intel.com
+
+On Mon, Jan 28, 2019 at 04:33:40PM +0800, Tao Xu wrote:
+> On 1/24/2019 3:15 AM, Eduardo Habkost wrote:
+> > On Mon, Jan 21, 2019 at 05:29:32PM +0800, Tao Xu wrote:
+> > > On 1/15/2019 2:35 AM, Eduardo Habkost wrote:
+> > > > Sorry, we do have a problem here:
+> > > > 
+> > > > On Thu, Dec 27, 2018 at 10:43:04AM +0800, Tao Xu wrote:
+> > > > [...]
+> > > > >    #define PC_COMPAT_3_0 \
+> > > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > > > index 09706ad51a..5296c73cd5 100644
+> > > > > --- a/target/i386/cpu.c
+> > > > > +++ b/target/i386/cpu.c
+> > > > > @@ -2499,7 +2499,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> > > > >                CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+> > > > >                CPUID_7_0_ECX_AVX512VNNI,
+> > > > >            .features[FEAT_7_0_EDX] =
+> > > > > -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> > > > > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
+> > > > > +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
+> > > > 
+> > > > CPUID_7_0_EDX_ARCH_CAPABILITIES is still set on
+> > > > unmigratable_flags.  We need to make it migratable before adding
+> > > > it by default to a named CPU model.
+> > > > 
+> > > Hi Eduardo,
+> > > 
+> > > Do you mean I need to remove CPUID_7_0_EDX_ARCH_CAPABILITIES
+> > > from .migratable_flags? Or CPUID_7_0_EDX_ARCH_CAPABILITIES can not
+> > > support migration now?
+> > 
+> > We need to remove it from .unmigratable_flags, but only after
+> > confirm it is really migration-safe.  To make it migration-safe,
+> > the MSR value seen by the guest must have a predictable value
+> > that is 100% independent from host hardware or host software
+> > version.
+> > 
+> > This is easy to ensure if MSR_IA32_ARCH_CAPABILITIES is in
+> > KVM_GET_MSR_INDEX_LIST (meaning QEMU can actually configure the
+> > MSR value seen by the guest).  If MSR_IA32_ARCH_CAPABILITIES is
+> > not on KVM_GET_MSR_INDEX_LIST, arch-capabilities must not be
+> > returned by x86_cpu_get_supported_feature_word() when
+> > migratable_only is true.
+> > 
+> Thank you. I have seen your patch to migratable it:
+> 
+> [PATCH 0/2] i386: arch_capabilities fixes + migratability
+> http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06701.html
+> 
+> So now can arch-capabilities and features exposed by it be added in
+> Cascadelake CPU model? Because Cascadelake CPU model can support it in
+> hardware. And for Icelake CPU model, Robert will add in the future.
+
+Even if there's host hardware support for the MSR, the feature
+still depends on a KVM commit added in Linux v6.16 (commit
+28c1c9fabf48 "KVM/VMX: Emulate MSR_IA32_ARCH_CAPABILITIES").  We
+would still have the kernel version dependency described below.
 
 
---Dxnq1zWXvFF0Q93v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > 
+> > > 
+> > > > Also, why are you setting this only on Cascadelake-Server and not
+> > > > on all the other Intel CPUs?
+> > > > 
+> > > Thank you for your notice. I reviewed the git log of KVM.
+> > > "MSR_IA32_ARCH_CAPABILITIES is emulated in kvm, there is no dependency on
+> > > hardware support for this feature". So do you mean we should also add
+> > > features based on ARCH_CAPABILITIES in former CPU(such as skylake)?
+> > 
+> > It doesn't depend on host hardware features, but it does depend
+> > on host KVM code added in Linux v4.17, which makes this more
+> > tricky.
+> > 
+> > We don't want a QEMU upgrade to make an existing VM configuration
+> > to stop running under Linux v4.16.  This will probably require
+> > versioned CPU models[1] to work well.
+> > 
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08422.html
+> > 
+> Hi Eduardo, I think the versioned CPU models solution is great. But I
+> haven't seen further patches in the mail list. What is the recent progress
+> of this work? Need me to do something?
 
-Am 28.01.2019 um 09:50 hat Peter Krempa geschrieben:
-> On Fri, Jan 25, 2019 at 18:46:52 +0100, Kevin Wolf wrote:
-> > The new device_id property specifies which value to use for the vendor
-> > specific designator in the Device Identification VPD page.
-> >=20
-> > In particular, this is necessary for libvirt to maintain guest ABI
-> > compatibility when no serial number is given and a VM is switched from
-> > -drive (where the BlockBackend name is used) to -blockdev (where the
-> > vendor specific designator is left out by default).
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  hw/scsi/scsi-disk.c | 24 ++++++++++++++++--------
-> >  1 file changed, 16 insertions(+), 8 deletions(-)
->=20
-> [...]
->=20
-> > @@ -2904,7 +2910,9 @@ static const TypeInfo scsi_disk_base_info =3D {
-> >      DEFINE_PROP_STRING("ver", SCSIDiskState, version),               \
-> >      DEFINE_PROP_STRING("serial", SCSIDiskState, serial),             \
-> >      DEFINE_PROP_STRING("vendor", SCSIDiskState, vendor),             \
-> > -    DEFINE_PROP_STRING("product", SCSIDiskState, product)
-> > +    DEFINE_PROP_STRING("product", SCSIDiskState, product),           \
-> > +    DEFINE_PROP_STRING("device_id", SCSIDiskState, device_id)
->=20
-> This adds the property only to 'scsi-disk', whereas libvirt will use
-> 'scsi-cd' or 'scsi-hd' depending on the media type if the 'scsi-cd'
-> device is detected.
+Nothing was done to implement this yet.  Before implementing it,
+I'd like to get decent automated test coverage for CPUID
+compatibility.  Keeping compatibility with non-versioned CPU
+models is already too error-prone today, and I don't want to make
+the situation worse.  I have an old branch where I was working on
+it, at:
+https://github.com/ehabkost/qemu-hacks/commits/work/guest-abi-tests
 
-I'm adding this to the macro DEFINE_SCSI_DISK_PROPERTIES(), which is
-used for scsi-hd, scsi-cd and scsi-disk.
+Unfortunately I'll be away from work for the next 4 weeks, so
+I'll need to get back to this discussion after I'm back.
 
-It is not added to scsi-block, but there we pass through the VPD page of
-the real disk, so this looks correct to me.
-
-> The following logic decides:
->=20
-> https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dblob;f=3Dsrc/qemu/qemu_comma=
-nd.c;h=3D3e46f3ced3c1e6a4865e98e2d0cdce3214c4a5d2;hb=3DHEAD#l1978
->=20
-> This brings multiple questions:
->=20
-> 1) Is this necssary also for scsi-cd/scsi-hd and if yes, the property
-> does not seem to be present for those
-
-Yes, but the property is added there.
-
-> 2) Is actually using 'scsi-cd'/'scsi-hd' the better option than
-> 'scsi-disk'?
-
-Yes, scsi-disk is a legacy device. Maybe we should formally deprecate
-it.
-
-> 3) Since upstream libvirt supports qemu-1.5 and newer and 'scsi-cd' is
-> already supported there, can we assume that all newer versions support
-> it? (Basically the question is whether it can be compiled out by
-> upstream means).
-
-I think so.
-
-Kevin
-
---Dxnq1zWXvFF0Q93v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcTxSrAAoJEH8JsnLIjy/WjrkP/j6EATS1YiOtbcmich+jG0Sv
-WuF87FIdgu+ydVFGeMMPUwNx6JgUV6K3IaFDrI/sFJi9mtUhTKc6LPPGBS5+3JKE
-jIPnRSHSRerLAp3JfXiN6+v4T/eYvBrUs+WvDLhWlSLI8fnFxAMDsZPl98eqPot0
-fPHwfPjRSXA40cZf9m8CI8vA21WtLB1abT8zmsil1OZVZJm5FY5WdxaeAXIMFj8X
-T3O/bRHglmj/vOnIUFoXXYj+lapwEqQ0HZ/u8zjwMKJUMnZcLySCdWktYxr1HtQx
-j7ETe7HfZ74w9M7e8MsWXN02Z8s3SDfbPKgKZwsi9rT/B+h7Wg26fk63KcO+AZjc
-0ZfvVDZhIXSnGF094tD3dErAZyA4lpPvI1XeuRv2Ltu5IZ6SmIhx4pILjdudHfvw
-upYCKE0mS9Nh2BwKuIgU0TpEcbTOVnqHKz/QOVrm7B7LOgRFZkUTX1oDAdvO7TvA
-606A31TQj5cT5o7O5axUCQw01jwL/wxUo5EElxuTG/o8l5hKRlTuxFZLgB1kssJR
-ktyHkB9q5opHslZjnrxnm2syEySdTaQr3E8lvNokBvIUWWw1+VpHI5l1u285S4xz
-y3lVQNx7pWHJArYTnF5jWaNsU6CbkjzNOq3bADYb7Bd4RmHIIBgE7NnCGg7jYtZ2
-vvDQKg2CZItkFq2T7ZE8
-=ZI1Y
------END PGP SIGNATURE-----
-
---Dxnq1zWXvFF0Q93v--
+-- 
+Eduardo
