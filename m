@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52617)
+Received: from eggs.gnu.org ([209.51.188.92]:52618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goAKC-0008WC-Hz
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:58 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1goAKC-0008WD-Hz
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goAKA-0004ew-N1
+	(envelope-from <dgilbert@redhat.com>) id 1goAKA-0004fG-Ui
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56070)
+Received: from mx1.redhat.com ([209.132.183.28]:48588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goAKA-0004ML-4i
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goAKA-00044P-JL
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:03:54 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A82F3C2CF9
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:03:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E0184E92B
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:03:39 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 28 Jan 2019 17:03:21 +0000
-Message-Id: <20190128170321.16936-10-dgilbert@redhat.com>
+Date: Mon, 28 Jan 2019 17:03:18 +0000
+Message-Id: <20190128170321.16936-7-dgilbert@redhat.com>
 In-Reply-To: <20190128170321.16936-1-dgilbert@redhat.com>
 References: <20190128170321.16936-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 9/9] tests: Add a test for qemu self
- announcments
+Subject: [Qemu-devel] [PATCH 6/9] virtio-net: Allow qemu_announce_self to
+ trigger virtio announcements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,121 +36,102 @@ To: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We now expose qemu_announce_self through QMP and HMP.  Add a test
-with some very basic packet validation (make sure we get a RARP).
+Expose the virtio-net self announcement capability and allow
+qemu_announce_self() to call it.
 
-Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
+These announces are caused by something external (i.e. the
+announce-self command); they won't trigger if the migration
+counter is triggering announces at the same time.
+
+Signed-off-by: Vladislav Yasevich <vyasevic@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/Makefile.include     |  2 +
- tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 tests/test-announce-self.c
+ hw/net/trace-events |  1 +
+ hw/net/virtio-net.c | 35 ++++++++++++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 19b4c0a696..57ce722d73 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -143,6 +143,8 @@ check-qtest-generic-y +=3D tests/qmp-cmd-test$(EXESUF=
-)
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index fc800dd606..b419d0b1a7 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -361,6 +361,7 @@ sunhme_rx_desc(uint32_t addr, int offset, uint32_t st=
+atus, int len, int cr, int
+ sunhme_rx_xsum_calc(uint16_t xsum) "calculated incoming xsum as 0x%x"
 =20
- check-qtest-generic-y +=3D tests/device-introspect-test$(EXESUF)
- check-qtest-generic-y +=3D tests/cdrom-test$(EXESUF)
-+check-qtest-generic-y +=3D tests/test-announce-self$(EXESUF)
-+gcov-files-generic-y =3D migration/savevm.c
+ # hw/net/virtio-net.c
++virtio_net_announce_notify(void) ""
+ virtio_net_announce_timer(int round) "%d"
+ virtio_net_handle_announce(int round) "%d"
+ virtio_net_post_load_device(void)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index b50f86d230..ed0fa97b88 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -162,15 +162,42 @@ static bool virtio_net_started(VirtIONet *n, uint8_=
+t status)
+         (n->status & VIRTIO_NET_S_LINK_UP) && vdev->vm_running;
+ }
 =20
- check-qtest-ipack-y +=3D tests/ipoctal232-test$(EXESUF)
++static void virtio_net_announce_notify(VirtIONet *net)
++{
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(net);
++    trace_virtio_net_announce_notify();
++
++    net->status |=3D VIRTIO_NET_S_ANNOUNCE;
++    virtio_notify_config(vdev);
++}
++
+ static void virtio_net_announce_timer(void *opaque)
+ {
+     VirtIONet *n =3D opaque;
+-    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
+     trace_virtio_net_announce_timer(n->announce_timer.round);
 =20
-diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-new file mode 100644
-index 0000000000..2ff0c77255
---- /dev/null
-+++ b/tests/test-announce-self.c
-@@ -0,0 +1,83 @@
-+/*
-+ * QTest testcase for qemu_announce_self
-+ *
-+ * Copyright (c) 2017 Red hat, Inc.
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu-common.h"
-+#include "qemu/sockets.h"
-+#include "qemu/iov.h"
-+#include "libqos/libqos-pc.h"
-+#include "libqos/libqos-spapr.h"
-+
-+#ifndef ETH_P_RARP
-+#define ETH_P_RARP 0x8035
-+#endif
-+
-+static QTestState *test_init(int socket)
-+{
-+    char *args;
-+
-+    args =3D g_strdup_printf("-netdev socket,fd=3D%d,id=3Dhs0 -device "
-+                           "virtio-net-pci,netdev=3Dhs0", socket);
-+
-+    return qtest_start(args);
+     n->announce_timer.round--;
+-    n->status |=3D VIRTIO_NET_S_ANNOUNCE;
+-    virtio_notify_config(vdev);
++    virtio_net_announce_notify(n);
 +}
 +
-+
-+static void test_announce(int socket)
++static void virtio_net_announce(NetClientState *nc)
 +{
-+    char buffer[60];
-+    int len;
-+    QDict *rsp;
-+    int ret;
-+    uint16_t *proto =3D (uint16_t *)&buffer[12];
++    VirtIONet *n =3D qemu_get_nic_opaque(nc);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
 +
-+    rsp =3D qmp("{ 'execute' : 'announce-self', "
-+                  " 'arguments': {"
-+                      " 'params': {"
-+                          " 'initial': 50, 'max': 550,"
-+                          " 'rounds': 10, 'step': 50 } } }");
-+    assert(!qdict_haskey(rsp, "error"));
-+    qobject_unref(rsp);
++    /*
++     * Make sure the virtio migration announcement timer isn't running
++     * If it is, let it trigger announcement so that we do not cause
++     * confusion.
++     */
++    if (n->announce_timer.round) {
++        return;
++    }
 +
-+    /* Catch the packet and make sure it's a RARP */
-+    ret =3D qemu_recv(socket, &len, sizeof(len), 0);
-+    g_assert_cmpint(ret, =3D=3D,  sizeof(len));
-+    len =3D ntohl(len);
-+
-+    ret =3D qemu_recv(socket, buffer, len, 0);
-+    g_assert_cmpint(*proto, =3D=3D, htons(ETH_P_RARP));
-+}
-+
-+static void setup(gconstpointer data)
-+{
-+    QTestState *qs;
-+    void (*func) (int socket) =3D data;
-+    int sv[2], ret;
-+
-+    ret =3D socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-+    g_assert_cmpint(ret, !=3D, -1);
-+
-+    qs =3D test_init(sv[1]);
-+    func(sv[0]);
-+
-+    /* End test */
-+    close(sv[0]);
-+    qtest_quit(qs);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+    qtest_add_data_func("/virtio/net/test_announce_self", test_announce,=
- setup);
-+
-+    return g_test_run();
-+}
++    if (virtio_vdev_has_feature(vdev, VIRTIO_NET_F_GUEST_ANNOUNCE) &&
++        virtio_vdev_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
++            virtio_net_announce_notify(n);
++    }
+ }
+=20
+ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+@@ -2568,6 +2595,7 @@ static NetClientInfo net_virtio_info =3D {
+     .receive =3D virtio_net_receive,
+     .link_status_changed =3D virtio_net_set_link_status,
+     .query_rx_filter =3D virtio_net_query_rxfilter,
++    .announce =3D virtio_net_announce,
+ };
+=20
+ static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int id=
+x)
+@@ -2709,6 +2737,7 @@ static void virtio_net_device_realize(DeviceState *=
+dev, Error **errp)
+     qemu_announce_timer_reset(&n->announce_timer, migrate_announce_param=
+s(),
+                               QEMU_CLOCK_VIRTUAL,
+                               virtio_net_announce_timer, n);
++    n->announce_timer.round =3D 0;
+=20
+     if (n->netclient_type) {
+         /*
 --=20
 2.20.1
