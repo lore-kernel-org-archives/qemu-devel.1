@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47273)
+Received: from eggs.gnu.org ([209.51.188.92]:47418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1go86Z-0001t1-Eo
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:44 -0500
+	(envelope-from <berto@igalia.com>) id 1go87Z-0002NT-5k
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:42:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1go86Y-0006zZ-FF
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:43 -0500
-Received: from mail-am5eur02on0708.outbound.protection.outlook.com
-	([2a01:111:f400:fe07::708]:37000
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1go86X-0006xW-F4
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:41:42 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 28 Jan 2019 14:41:35 +0000
-Message-ID: <23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
-References: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ACDD5CFF92497A44937DBABA9AEE1C26@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berto@igalia.com>) id 1go87Y-0007bI-CG
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:42:45 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190124091222.GB4601@localhost.localdomain>
+References: <cover.1548171741.git.berto@igalia.com>
+	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
+	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
+	<w518szbmmw9.fsf@maestria.local.igalia.com>
+	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
+	<w5136pjmjrp.fsf@maestria.local.igalia.com>
+	<20190124091222.GB4601@localhost.localdomain>
+Date: Mon, 28 Jan 2019 15:42:17 +0100
+Message-ID: <w51d0ogsv1y.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Very slow finding extents in QCOW2-backed nbd
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
+ different iothreads sharing a blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-DQoyOC4wMS4yMDE5IDE0OjU4LCBUaW0gU21pdGggd3JvdGU6DQo+IEhpIGFsbCwgSSBoYXZlIGEg
-cXVlc3Rpb24gYWJvdXQgdGhlIGludGVudCBvZiB0aGUgbGFzdCBjYWxsIHRvDQo+IGJkcnZfY29f
-YmxvY2tfc3RhdHVzKCkgaW4gYmRydl9jb19ibG9ja19zdGF0dXMoKSwgaW4gYmxvY2svaW8uYyBh
-Ym91dCBsaW5lDQo+IDIxOTUsIHdoaWNoIGxvb2tzIGxpa2UgdGhpczoNCj4gDQo+ICAgICAgICAg
-IHJldDIgPSBiZHJ2X2NvX2Jsb2NrX3N0YXR1cyhsb2NhbF9maWxlLCB3YW50X3plcm8sIGxvY2Fs
-X21hcCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICpwbnVtLCAmZmls
-ZV9wbnVtLCBOVUxMLCBOVUxMKTsNCj4gICAgICAgICAgaWYgKHJldDIgPj0gMCkgew0KPiAgICAg
-ICAgICAgICAgLyogSWdub3JlIGVycm9ycy4gIFRoaXMgaXMganVzdCBwcm92aWRpbmcgZXh0cmEg
-aW5mb3JtYXRpb24sIGl0DQo+ICAgICAgICAgICAgICAgKiBpcyB1c2VmdWwgYnV0IG5vdCBuZWNl
-c3NhcnkuDQo+ICAgICAgICAgICAgICAgKi8NCg0KSGkgVGltIQ0KDQpUaGUgcXVlc3Rpb24gaXMg
-aGlnaGx5IGRpc2N1c3NlZCBub3cgb24gbGlzdCwgaW4gc2hvcnQ6IHllcyBpdCdzIGEgcHJvYmxl
-bSwgYW5kLA0KSSBob3BlLCB3ZSdsbCBzb29uIHJlYWNoIGEgY29uc2Vuc3VzIGFib3V0IGhvdyB0
-byBmaW5hbGx5IGZpeCBpdC4NCg0KVGhpcyBzZWNvbmQgYmxvY2tfc3RhdHVzIHJlcXVlc3QgaXMg
-bmVlZGVkIHdoZW4gd2UgaGF2ZSBxY293MiBpbWFnZSB3aXRoDQptZXRhZGF0YSBwcmVhbGxvY2F0
-aW9uLCB3aGljaCBtZWFucyB0aGF0IHFjb3cyIGRhdGEgY2x1c3RlcnMgYXJlIGFjdHVhbGx5IGJh
-Y2tlZA0KYnkgaG9sZXMgb24gZmlsZXN5c3RlbSBsZXZlbC4NCg0KWW91IGNhbiBmb2xsb3cgdGhl
-IGRpc2N1c3Npb24gdW5kZXIgdGhlIGZvbGxvd2luZyB0aHJlYWRzOg0KDQppbml0aWFsIGRpc2N1
-c3Npb246DQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAx
-OC0xMi9tc2cwNTc0OS5odG1sDQoNCnNvbHV0aW9uczoNCg0KY2FjaGUgbHNlZWsgcmVzdWx0cywg
-YnkgS2V2aW46DQpodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwv
-MjAxOS0wMS9tc2cwNjI3MS5odG1sDQoNCmRldGVjdCBwcmVhbGxvY2F0aW9uLCBhbmQgZG9uJ3Qg
-ZG8gc2Vjb25kIGJsb2NrX3N0YXR1cyBmb3Igbm90IHByZWFsbG9jYXRlZCwNCm15IGxhc3QgdHJ5
-Og0KaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEv
-bXNnMDY1OTguaHRtbA0KDQoNCj4gDQo+IEkgaGF2ZSBhIGxhcmdlICg+MiBUQiB2aXJ0dWFsLCB+
-NjAwR0IgcmVhbCkgUUNPVzIgZmlsZSB3aGljaCBpcyBiZWluZyBleHBvcnRlZA0KPiBhcyBhIG5l
-dHdvcmsgYmxvY2sgZGV2aWNlLCBhbmQgYSBjb25uZWN0ZWQgY2xpZW50IGhhcyBhc2tlZCBmb3Ig
-dGhlIGFsbG9jYXRpb24NCj4gaW5mb3JtYXRpb24gdmlhIE5CRF9DTURfQkxPQ0tfU1RBVFVTLiBU
-aGUgdmlydHVhbCBkaXNrIGlzIHF1aXRlIGZyYWdtZW50ZWQNCj4gKGRlbGliZXJhdGVkbHk7IHRo
-aXMgaXMgYSB0ZXN0IGNhc2UpLCBhbmQgdGh1cyBoYXMgcXVpdGUgYSBsb3Qgb2YgZXh0ZW50cy4N
-Cj4gDQo+IEVhY2ggZXh0ZW50IGlzIHRha2luZyB+MC41cyB0byBpZGVudGlmeSwgYW5kIHByZXR0
-eSBtdWNoIGFsbCBvZiB0aGF0IHRpbWUgaXMNCj4gdGFrZW4gdXAgaW4gbHNlZWsoU0VFS19FTkQp
-IGZyb20gZmluZF9hbGxvY2F0aW9uKCkgaW4gYmxvY2svZmlsZS1wb3NpeC5jIHdoaWNoDQo+IGlz
-IGdldHRpbmcgY2FsbGVkIGFzIGEgcmVzdWx0IG9mIHRoZSBiZHJ2X2NvX2Jsb2NrX3N0YXR1cygp
-IG1lbnRpb25lZCBhYm92ZSwNCj4gd2l0aCB0aGUgcmVzdWx0IHRoYXQgZ2V0dGluZyB0aGUgZGF0
-YSBvdXQgdGhyb3VnaCB0aGUgbmJkIGlzIHRha2luZyBhbiBvcmRlcg0KPiBvZiBtYWduaXR1ZGUg
-bG9uZ2VyIHRoYW4gaXQgc2hvdWxkLg0KPiANCj4gSSByYW4gc29tZSB0ZXN0cyB3aXRoIHRoZSBp
-Zi1ibG9jayBjb250YWluaW5nIHRoZSBjYWxsIHJlbW92ZWQsIGFuZCB0aGUgb25seQ0KPiBkaXNj
-ZXJuYWJsZSBkaWZmZXJlbmNlIHdhcyB0aGF0IGV2ZXJ5dGhpbmcgd2VudCBhIGxvdCBmYXN0ZXIu
-IFNvIEknbSB3b25kZXJpbmcNCj4gd2hhdCB0aGUgaW50ZW50IGlzIGZvciB0aGF0IGNvZGUsIGFu
-ZCBpbiB3aGF0IGNpcmN1bXN0YW5jZXMgaXQgaXMgdXNlZnVsPw0KPiANCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+On Thu 24 Jan 2019 10:12:22 AM CET, Kevin Wolf wrote:
+> Am 23.01.2019 um 17:16 hat Alberto Garcia geschrieben:
+>> On Wed 23 Jan 2019 04:47:30 PM CET, Paolo Bonzini wrote:
+>> >> You mean a common function with the code below?
+>> >> 
+>> >>>> +        ctx = blk_get_aio_context(sd->conf.blk);
+>> >>>> +        if (ctx != s->ctx && ctx != qemu_get_aio_context()) {
+>> >>>> +            error_setg(errp, "Cannot attach a blockdev that is using "
+>> >>>> +                       "a different iothread");
+>> >>>> +            return;
+>> >>>> +        }
+>> >> 
+>> >> Who else would be the user?
+>> >
+>> > If it isn't, probably virtio-blk should be using too.
+>> 
+>> I agree, but that's the problem that I mentioned on the cover letter.
+>> 
+>> In the virtio-blk case I don't know how to tell that the block device
+>> is using a different iothread during device_add, because the iothread
+>> is not set during realize() but by virtio_blk_data_plane_start() that
+>> happens only when I reboot the guest.
+>
+> I think the proper solution on the block layer level would be that
+> AioContext is managed per BdrvChild and only BdrvChild objects with
+> the same AioContext can be attached to the same node.
+> bdrv_set_aio_context() would then fail if another parent is already
+> using the node.
+
+How would that solve the virtio-blk problem, though? :-?
+
+> Now, Paolo keeps talking about how AioContexts are going to disappear
+> soon (TM), so I wonder whether it's still worth fixing this properly
+> now?
+
+Either way, should we commit this series already and later update it
+once we have a proper solution for virtio-blk?
+
+Berto
