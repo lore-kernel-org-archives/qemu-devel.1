@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57018)
+Received: from eggs.gnu.org ([209.51.188.92]:58668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1go2lo-0002xh-9i
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:59:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1go2rp-0004al-LW
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:06:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1go2ln-0002oy-MR
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:59:56 -0500
-Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:54127)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1go2ln-0002Z5-H6
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:59:55 -0500
-Received: from player759.ha.ovh.net (unknown [10.109.160.244])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5F4F83A2D6
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 09:59:37 +0100 (CET)
-Date: Mon, 28 Jan 2019 09:59:31 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190128095931.11679de4@bahia.lan>
-In-Reply-To: <20190128065552.31514-1-clg@kaod.org>
-References: <20190128065552.31514-1-clg@kaod.org>
+	(envelope-from <thuth@redhat.com>) id 1go2ro-00083P-SI
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:06:09 -0500
+References: <20190127100215.12584-1-sourav.jb1988@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <758ce56b-4a03-405f-b668-f81094bec147@redhat.com>
+Date: Mon, 28 Jan 2019 10:06:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: remove the interrupt
- presenters from under PowerPCCPU
+In-Reply-To: <20190127100215.12584-1-sourav.jb1988@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/input/adb.c: set device
+ category of adb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Mon, 28 Jan 2019 07:55:52 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-
-> These fields have now been replaced by equivalents under the machine
-> data.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On 2019-01-27 11:02, kumar sourav wrote:
+> Sets the category of adb as DEVICE_CATEGORY_INPUT
+> Devices should be assigned to one of DEVICE_CATEGORY_XXXX
+> 
+> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
 > ---
+>  hw/input/adb.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/input/adb.c b/hw/input/adb.c
+> index bbb40aeef1..6ca7c5641c 100644
+> --- a/hw/input/adb.c
+> +++ b/hw/input/adb.c
+> @@ -126,6 +126,7 @@ static void adb_device_class_init(ObjectClass *oc, void *data)
+>      dc->realize = adb_device_realizefn;
+>      dc->props = adb_device_properties;
+>      dc->bus_type = TYPE_ADB_BUS;
+> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>  }
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+This patch does not make too much sense in its current shape:
+TYPE_ADB_DEVICE is an abstract device and does not show up in the output
+of "-device help", so it is not necessary for this device itself.
 
->  target/ppc/cpu.h | 5 -----
->  1 file changed, 5 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index a62ff60414f4..2c22292e7f41 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1178,9 +1178,6 @@ do {                                            \
->  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
->  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-> =20
-> -struct XiveTCTX;
-> -struct ICPState;
-> -
->  /**
->   * PowerPCCPU:
->   * @env: #CPUPPCState
-> @@ -1198,8 +1195,6 @@ struct PowerPCCPU {
->      int vcpu_id;
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
-> -    struct ICPState *icp;
-> -    struct XiveTCTX *tctx;
->      void *machine_data;
->      int32_t node_id; /* NUMA node this CPU belongs to */
->      PPCHash64Options *hash64_opts;
+Looking at the "child" devices adb-kdb and adb-mouse, they bother
+already set DEVICE_CATEGORY_INPUT in their own, so they are already fine.
+
+Thus please do one of the following:
+
+1) Simply drop this patch.
+
+2) Keep setting the category here in the abstract parent class, but then
+also remove the DEVICE_CATEGORY_INPUT in the adb-kdb and adb-mouse child
+classes.
+
+ Thomas
