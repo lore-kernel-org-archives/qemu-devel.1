@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45644)
+Received: from eggs.gnu.org ([209.51.188.92]:46887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwPo-0004zY-HC
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:12:49 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwVd-0008Vu-89
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwN7-0005cs-AM
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:10:01 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:46519)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwVc-00015c-Fe
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:49 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gnwN6-0005c1-Pr
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:10:01 -0500
-Received: by mail-lf1-x144.google.com with SMTP id f5so10645660lfc.13
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 18:10:00 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gnwVc-00014z-8h
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:48 -0500
+Received: by mail-lf1-x142.google.com with SMTP id u18so10666447lff.10
+	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 18:18:48 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 27 Jan 2019 18:09:33 -0800
-Message-Id: <20190128020937.22775-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 0/4] target/xtensa: add SMP linux capable
- hardware
+Date: Sun, 27 Jan 2019 18:18:35 -0800
+Message-Id: <20190128021835.24451-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/xtensa: xtfpga: raise CPU number limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +26,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Hello,
+MX PIC can support up to 32 CPUs on xtfpga boards, raise per-board
+limit accordingly.
 
-this series adds SMP-capable interrupt controller model amd instantiates
-it on the XTFPGA boards when more than one CPU is specified in command
-line. It also adds an MMUv2 SMP-capable xtensa core.
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ hw/xtensa/xtfpga.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Max Filippov (4):
-  target/xtensa: expose core runstall as an IRQ line
-  target/xtensa: add MX interrupt controller
-  hw/xtensa: xtfpga: use MX PIC for SMP
-  target-xtensa: add test_mmuhifi_c3 core
-
- hw/xtensa/Makefile.objs                            |     1 +
- hw/xtensa/mx_pic.c                                 |   354 +
- hw/xtensa/pic_cpu.c                                |    12 +
- hw/xtensa/xtfpga.c                                 |    22 +-
- include/hw/xtensa/mx_pic.h                         |    44 +
- target/xtensa/Makefile.objs                        |     1 +
- target/xtensa/core-test_mmuhifi_c3.c               |    53 +
- target/xtensa/core-test_mmuhifi_c3/core-isa.h      |   384 +
- .../xtensa/core-test_mmuhifi_c3/gdb-config.inc.c   |   140 +
- .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 36403 +++++++++++++++++++
- target/xtensa/cpu.h                                |     2 +
- 11 files changed, 37415 insertions(+), 1 deletion(-)
- create mode 100644 hw/xtensa/mx_pic.c
- create mode 100644 include/hw/xtensa/mx_pic.h
- create mode 100644 target/xtensa/core-test_mmuhifi_c3.c
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/core-isa.h
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/gdb-config.inc.c
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc.c
-
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 792a225e03a2..1d21162a2773 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -599,7 +599,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init = xtfpga_lx60_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+     mc->default_ram_size = 64 * MiB;
+ }
+@@ -616,7 +616,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "lx60 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
+     mc->init = xtfpga_lx60_nommu_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+     mc->default_ram_size = 64 * MiB;
+ }
+@@ -633,7 +633,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init = xtfpga_lx200_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+     mc->default_ram_size = 96 * MiB;
+ }
+@@ -650,7 +650,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "lx200 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
+     mc->init = xtfpga_lx200_nommu_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+     mc->default_ram_size = 96 * MiB;
+ }
+@@ -667,7 +667,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init = xtfpga_ml605_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+     mc->default_ram_size = 512 * MiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
+ }
+@@ -684,7 +684,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ml605 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
+     mc->init = xtfpga_ml605_nommu_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+     mc->default_ram_size = 256 * MiB;
+ }
+@@ -701,7 +701,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
+     mc->init = xtfpga_kc705_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+     mc->default_ram_size = 1 * GiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
+ }
+@@ -718,7 +718,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "kc705 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
+     mc->init = xtfpga_kc705_nommu_init;
+-    mc->max_cpus = 4;
++    mc->max_cpus = 32;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+     mc->default_ram_size = 256 * MiB;
+ }
 -- 
 2.11.0
