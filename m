@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52883)
+Received: from eggs.gnu.org ([209.51.188.92]:53703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goAM3-0001YS-GA
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:05:53 -0500
+	(envelope-from <cohuck@redhat.com>) id 1goAQ4-0004Yz-Li
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goAM1-0005x0-3k
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:05:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goALz-0005sD-JA
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:05:48 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4EA5C0C237A
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:05:35 +0000 (UTC)
-Date: Mon, 28 Jan 2019 12:05:34 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190128120446-mutt-send-email-mst@kernel.org>
-References: <20190128170321.16936-1-dgilbert@redhat.com>
-	<20190128170321.16936-10-dgilbert@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1goAQ1-0000zm-CN
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:09:58 -0500
+Date: Mon, 28 Jan 2019 18:09:48 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190128180948.506a9695.cohuck@redhat.com>
+In-Reply-To: <20190125150101.3b61f0a1@oc2783563651>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
+	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
+	<20190125112437.2c06fac6.cohuck@redhat.com>
+	<20190125135835.2d59b511.cohuck@redhat.com>
+	<20190125150101.3b61f0a1@oc2783563651>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190128170321.16936-10-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 9/9] tests: Add a test for qemu self
- announcments
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,127 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, Jan 28, 2019 at 05:03:21PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> We now expose qemu_announce_self through QMP and HMP.  Add a test
-> with some very basic packet validation (make sure we get a RARP).
-> 
-> Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Fri, 25 Jan 2019 15:01:01 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-typo in subject
+> On Fri, 25 Jan 2019 13:58:35 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
 
-> ---
->  tests/Makefile.include     |  2 +
->  tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 85 insertions(+)
->  create mode 100644 tests/test-announce-self.c
+> > - The code should not be interrupted while we process the channel
+> >   program, do the ssch etc. We want the caller to try again later (i.e.
+> >   return -EAGAIN)  
+
+(...)
+
+> > - With the async interface, we want user space to be able to submit a
+> >   halt/clear while a start request is still in flight, but not while
+> >   we're processing a start request with translation etc. We probably
+> >   want to do -EAGAIN in that case.  
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 19b4c0a696..57ce722d73 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -143,6 +143,8 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
->  
->  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
->  check-qtest-generic-y += tests/cdrom-test$(EXESUF)
-> +check-qtest-generic-y += tests/test-announce-self$(EXESUF)
-> +gcov-files-generic-y = migration/savevm.c
->  
->  check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
->  
-> diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-> new file mode 100644
-> index 0000000000..2ff0c77255
-> --- /dev/null
-> +++ b/tests/test-announce-self.c
-> @@ -0,0 +1,83 @@
-> +/*
-> + * QTest testcase for qemu_announce_self
-> + *
-> + * Copyright (c) 2017 Red hat, Inc.
-> + * Copyright (c) 2014 SUSE LINUX Products GmbH
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "libqtest.h"
-> +#include "qapi/qmp/qdict.h"
-> +#include "qemu-common.h"
-> +#include "qemu/sockets.h"
-> +#include "qemu/iov.h"
-> +#include "libqos/libqos-pc.h"
-> +#include "libqos/libqos-spapr.h"
-> +
-> +#ifndef ETH_P_RARP
-> +#define ETH_P_RARP 0x8035
-> +#endif
-> +
-> +static QTestState *test_init(int socket)
-> +{
-> +    char *args;
-> +
-> +    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
-> +                           "virtio-net-pci,netdev=hs0", socket);
-> +
-> +    return qtest_start(args);
-> +}
-> +
-> +
-> +static void test_announce(int socket)
-> +{
-> +    char buffer[60];
-> +    int len;
-> +    QDict *rsp;
-> +    int ret;
-> +    uint16_t *proto = (uint16_t *)&buffer[12];
-> +
-> +    rsp = qmp("{ 'execute' : 'announce-self', "
-> +                  " 'arguments': {"
-> +                      " 'params': {"
-> +                          " 'initial': 50, 'max': 550,"
-> +                          " 'rounds': 10, 'step': 50 } } }");
-> +    assert(!qdict_haskey(rsp, "error"));
-> +    qobject_unref(rsp);
-> +
-> +    /* Catch the packet and make sure it's a RARP */
-> +    ret = qemu_recv(socket, &len, sizeof(len), 0);
-> +    g_assert_cmpint(ret, ==,  sizeof(len));
-> +    len = ntohl(len);
-> +
-> +    ret = qemu_recv(socket, buffer, len, 0);
-> +    g_assert_cmpint(*proto, ==, htons(ETH_P_RARP));
-> +}
-> +
-> +static void setup(gconstpointer data)
-> +{
-> +    QTestState *qs;
-> +    void (*func) (int socket) = data;
-> +    int sv[2], ret;
-> +
-> +    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-> +    g_assert_cmpint(ret, !=, -1);
-> +
-> +    qs = test_init(sv[1]);
-> +    func(sv[0]);
-> +
-> +    /* End test */
-> +    close(sv[0]);
-> +    qtest_quit(qs);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    g_test_init(&argc, &argv, NULL);
-> +    qtest_add_data_func("/virtio/net/test_announce_self", test_announce, setup);
-> +
-> +    return g_test_run();
-> +}
-> -- 
-> 2.20.1
+> This reads very similar to your first point.
+
+Not quite. ssch() means that we have a cp around; for hsch()/csch() we
+don't have such a thing. So we want to protect the process of
+translating the cp etc., but we don't need such protection for the
+halt/clear processing.
+
+> 
+> > 
+> > My idea would be:
+> > 
+> > - The BUSY state denotes "I'm busy processing a request right now, try
+> >   again". We hold it while processing the cp and doing the ssch and
+> >   leave it afterwards (i.e., while the start request is processed by
+> >   the hardware). I/O requests and async requests get -EAGAIN in that
+> >   state.
+> > - A new state (CP_PENDING?) is entered after ssch returned with cc 0
+> >   (from the BUSY state). We stay in there as long as no final state for
+> >   that request has been received and delivered. (This may be final
+> >   interrupt for that request, a deferred cc, or successful halt/clear.)
+> >   I/O requests get -EBUSY, async requests are processed. This state can
+> >   be removed again once we are able to handle more than one outstanding
+> >   cp.
+> > 
+> > Does that make sense?
+> >   
+> 
+> AFAIU your idea is to split up the busy state into two states: CP_PENDING
+> and of busy without CP_PENDING called BUSY. I like the idea of having a
+> separate state for CP_PENDING but I don't like the new semantic of BUSY.
+> 
+> Hm mashing a conceptual state machine and the jumptabe stuff ain't
+> making reasoning about this simpler either. I'm taking about the
+> conceptual state machine. It would be nice to have a picture of it and
+> then think about how to express that in code.
+
+Sorry, I'm having a hard time parsing your comments. Are you looking
+for something like the below?
+
+IDLE --- IO_REQ --> BUSY ---> CP_PENDING --- IRQ ---> IDLE (if final
+state for I/O)
+(normal ssch)
+
+BUSY --- IO_REQ ---> return -EAGAIN, stay in BUSY
+(user space is supposed to retry, as we'll eventually progress from
+BUSY)
+
+CP_PENDING --- IO_REQ ---> return -EBUSY, stay in CP_PENDING
+(user space is supposed to map this to the appropriate cc for the guest)
+
+IDLE --- ASYNC_REQ ---> IDLE
+(user space is welcome to do anything else right away)
+
+BUSY --- ASYNC_REQ ---> return -EAGAIN, stay in BUSY
+(user space is supposed to retry, as above)
+
+CP_PENDING --- ASYNC_REQ ---> return success, stay in CP_PENDING
+(the interrupt will get us out of CP_PENDING eventually)
