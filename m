@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34152)
+Received: from eggs.gnu.org ([209.51.188.92]:34967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9Ls-0006n8-NS
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:01:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1go9Ou-0000s6-20
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1go9Lf-0000gf-Ta
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:01:27 -0500
-Date: Mon, 28 Jan 2019 17:01:09 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190128160109.GF5756@localhost.localdomain>
-References: <cover.1548171741.git.berto@igalia.com>
-	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
-	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
-	<w518szbmmw9.fsf@maestria.local.igalia.com>
-	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
-	<w5136pjmjrp.fsf@maestria.local.igalia.com>
-	<20190124091222.GB4601@localhost.localdomain>
-	<w51d0ogsv1y.fsf@maestria.local.igalia.com>
-	<20190128145743.GC5756@localhost.localdomain>
-	<w517eeoss2l.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1go9Oo-0002dN-9m
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:04:42 -0500
+References: <20190128151521.13875-1-antonkuchin@yandex-team.ru>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9c6b6121-a071-58a3-942a-2f3909549782@redhat.com>
+Date: Mon, 28 Jan 2019 17:04:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w517eeoss2l.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
- different iothreads sharing a blockdev
+In-Reply-To: <20190128151521.13875-1-antonkuchin@yandex-team.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qmp: Deprecate query-nodes option of
+ query-blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Anton Kuchin <antonkuchin@yandex-team.ru>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-Am 28.01.2019 um 16:46 hat Alberto Garcia geschrieben:
-> On Mon 28 Jan 2019 03:57:43 PM CET, Kevin Wolf wrote:
-> 
-> >> > I think the proper solution on the block layer level would be that
-> >> > AioContext is managed per BdrvChild and only BdrvChild objects with
-> >> > the same AioContext can be attached to the same node.
-> >> > bdrv_set_aio_context() would then fail if another parent is already
-> >> > using the node.
-> >> 
-> >> How would that solve the virtio-blk problem, though? :-?
-> >
-> > It wouldn't, but it would make clear that bdrv_set_aio_context() can
-> > fail and we'd have to handle the problem exactly there.
-> 
-> Yes, that sound like the proper solution.
-> 
-> > The only other option I see is downgrading to non-dataplane mode, but
-> > this would have to be silent because during machine reset we have no
-> > way to report errors.
-> 
-> Yes, I actually had a patch doing that, but as you said the user has no
-> way of knowing that it went wrong.
-> 
-> If you have 2 or 3 virtio-blk devices with different iothreads using the
-> same BDS then after the guest reboot only one would succeed, but you
-> can't see which one, or can you?
+On 2019-01-28 16:15, Anton Kuchin wrote:
+> This option is broken since a6baa60807 in v2.9 and returns mostly
+> zeroes instead of real stats because actual querring of BlockStats
 
-I suppose you could add a QOM property that tells whether the assigned
-iothread is actually in use, but it would still be quite obscure. And
-you would have to check explicitly, so I don't think that's a good
-solution.
+s/querring/querying/
 
-And actually... if you move the first virtio-blk device to an iothread,
-then downgrading the others isn't going to save us, because that would
-still be using the backend from two threads (one successfully enabled
-iothread, and the main thread).
+> that resides in blk is missing.
+>=20
+> And it makes no sense because with this option BlockDriverState-s
+> are iterated but BlockAcctStats belong to BlockBackend and not BDS
+> since 7f0e9da6f13 in v2.5
+>=20
+> Signed-off-by: Anton Kuchin <antonkuchin@yandex-team.ru>
+> ---
+[...]
+> @@ -577,21 +576,10 @@ BlockStatsList *qmp_query_blockstats(bool has_que=
+ry_nodes,
+>  {
+>      BlockStatsList *head =3D NULL, **p_next =3D &head;
+>      BlockBackend *blk;
+> -    BlockDriverState *bs;
+> =20
+>      /* Just to be safe if query_nodes is not always initialized */
+>      if (has_query_nodes && query_nodes) {
+> -        for (bs =3D bdrv_next_node(NULL); bs; bs =3D bdrv_next_node(bs=
+)) {
+> -            BlockStatsList *info =3D g_malloc0(sizeof(*info));
+> -            AioContext *ctx =3D bdrv_get_aio_context(bs);
+> -
+> -            aio_context_acquire(ctx);
+> -            info->value =3D bdrv_query_bds_stats(bs, false);
+> -            aio_context_release(ctx);
+> -
+> -            *p_next =3D info;
+> -            p_next =3D &info->next;
+> -        }
+> +        error_setg(errp, "Option query_nodes is deprecated");
 
-Kevin
+You don't only deprecate the option here, you completely disable it ...
+that does not make too much sense IMHO. If it is really broken since
+multiple releases already and nobody complained or tried to fix it so
+far, I think it could be simply removed immediately. Otherwise, if it is
+only partly broken, please leave it in the current state (if it is not
+fixable), and only mark it as deprecated in the qemu-deprecated.texi and
+block-core.json documentation.
+
+>      } else {
+>          for (blk =3D blk_all_next(NULL); blk; blk =3D blk_all_next(blk=
+)) {
+>              BlockStatsList *info;
+> @@ -604,7 +592,7 @@ BlockStatsList *qmp_query_blockstats(bool has_query=
+_nodes,
+>              }
+> =20
+>              aio_context_acquire(ctx);
+> -            s =3D bdrv_query_bds_stats(blk_bs(blk), true);
+> +            s =3D bdrv_query_bds_stats(blk_bs(blk));
+>              s->has_device =3D true;
+>              s->device =3D g_strdup(blk_name(blk));
+> =20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 91685be6c2..2dd5f6032c 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -892,13 +892,7 @@
+>  #
+>  # Query the @BlockStats for all virtual block devices.
+>  #
+> -# @query-nodes: If true, the command will query all the block nodes
+> -#               that have a node name, in a list which will include "p=
+arent"
+> -#               information, but not "backing".
+> -#               If false or omitted, the behavior is as before - query=
+ all the
+> -#               device backends, recursively including their "parent" =
+and
+> -#               "backing". Filter nodes that were created implicitly a=
+re
+> -#               skipped over in this mode. (Since 2.3)
+> +# @query-nodes: deprecated since 3.2
+>  #
+>  # Returns: A list of @BlockStats for each virtual block devices.
+>  #
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 219206a836..e1e04ced7d 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -112,6 +112,11 @@ Use ``device_add'' for hotplugging vCPUs instead o=
+f ``cpu-add''.  See
+>  documentation of ``query-hotpluggable-cpus'' for additional
+>  details.
+> =20
+> +@subsection query-blockstats (since 3.2)
+> +
+> +"query-nodes" parameter is not supported anymore because blockstats
+> +are not a prorerty of node.
+
+s/prorerty/property/
+
+>  @section Human Monitor Protocol (HMP) commands
+> =20
+>  @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (=
+since 3.1)
+>=20
+
+ Thomas
