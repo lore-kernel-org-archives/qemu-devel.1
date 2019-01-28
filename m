@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33358)
+Received: from eggs.gnu.org ([209.51.188.92]:34400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go7Ke-0007GS-T3
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:52:13 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1go7NL-0008Cf-P2
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go7Kd-0000eM-O8
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:52:12 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44096)
+	(envelope-from <vkuznets@redhat.com>) id 1go7NJ-00031d-VY
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:54:59 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51955)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1go7Kd-0000c0-Gc
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:52:11 -0500
-Received: by mail-ot1-x343.google.com with SMTP id g16so10626329otg.11
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 05:52:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1go7NJ-0002zi-Od
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:54:57 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so14102258wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 05:54:55 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20190128113017.GA2435@rkaganb.sw.ru>
+References: <20190125114155.32062-1-vkuznets@redhat.com>
+	<20190125114155.32062-5-vkuznets@redhat.com>
+	<20190125124738.GB30730@rkaganb.sw.ru>
+	<87bm44onnh.fsf@vitty.brq.redhat.com>
+	<20190128113017.GA2435@rkaganb.sw.ru>
+Date: Mon, 28 Jan 2019 14:54:52 +0100
+Message-ID: <87lg34zy37.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20190122145132.12571-1-paul.durrant@citrix.com>
-	<57cd3429-41a3-48c5-4d06-5d203cf70f97@redhat.com>
-In-Reply-To: <57cd3429-41a3-48c5-4d06-5d203cf70f97@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 13:51:57 +0000
-Message-ID: <CAFEAcA9Ne8=buW5FGr8AbuTdovrdAdFcZJG01N_zkQGrXJ85FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/block: clean up stake xen_disk trace
- entries
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 4/8] i386/kvm: Implement 'hv-all'
+ pass-through mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Paul Durrant <paul.durrant@citrix.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On Mon, 28 Jan 2019 at 13:41, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Cc'ing QEMU Trivial.
->
-> On 1/22/19 3:51 PM, Paul Durrant wrote:
-> > This should have been removed then xen_disk.c was removed but I missed =
-them.
->
-> ... when xen_disk.c was removed (19f87870baa) ...
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-also s/stake/stale/ in the subject line I guess ?
+> On Fri, Jan 25, 2019 at 02:46:42PM +0100, Vitaly Kuznetsov wrote:
+>> Roman Kagan <rkagan@virtuozzo.com> writes:
+>> 
+>> > On Fri, Jan 25, 2019 at 12:41:51PM +0100, Vitaly Kuznetsov wrote:
+>> >> In many case we just want to give Windows guests all currently supported
+>> >> Hyper-V enlightenments and that's where this new mode may come handy. We
+>> >> pass through what was returned by KVM_GET_SUPPORTED_HV_CPUID.
+>> >
+>> > How is the compatibility ensured on migration between kernels reporting
+>> > different feature sets?
+>> 
+>> AFAIU we don't change anything in this regard (or, my intention was to
+>> not change anything): hv-all is converted to the individual hv-*
+>> properties (hv_cpuid_check_and_set()) actually sets cpu->hyperv_* flags
+>> according to what's supported by kernel so when we migrate we will
+>> require all these features supported.
+>
+> Migration relies on the upper layer to run the destination QEMU with the
+> identical command line (except for -incoming) as the source, and QEMU is
+> then supposed to set up identical environment in the target VM as was in
+> the source, or refuse to start if that's impossible.  (If I'm
+> misunderstanding this Dave (cc-d) may want to correct me.)
+>
+> AFAICS this hv-all attribute will enable different feature sets
+> depending on the kernel it's run on, so the migration between different
+> kernels will appear to succeed, but the guest may suddenly encounter an
+> incompatible change in the environment.
 
-thanks
--- PMM
+With 'hv-all' I'm trying to achieve behavior similar to '-cpu host' and
+AFAIK these VMs are migratable 'at your own risk' (if you do it directly
+from qemu). Libvirt (or whatever upper layer), however, would do CPU
+feature comparison and in case you have less features on the destination
+host than you had on the source code it will forbid the migration. I
+think if this also works for Hyper-V features than were fine.
+
+Dave, feel free to tell me I'm completely wrong with my assumptions)
+
+-- 
+Vitaly
