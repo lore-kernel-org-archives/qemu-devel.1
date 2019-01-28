@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60434)
+Received: from eggs.gnu.org ([209.51.188.92]:32848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go52v-0000o7-Si
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1go55o-0002KW-Fh
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go52u-0003Dr-Uc
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:45 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1go52u-000396-06
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:44 -0500
-Received: by mail-oi1-x244.google.com with SMTP id r62so12749945oie.1
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:25:21 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1go55n-0003we-DG
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:28:44 -0500
+Date: Mon, 28 Jan 2019 12:28:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190128122833.4613659a.cohuck@redhat.com>
+In-Reply-To: <20190123120539.3ca367f9.cohuck@redhat.com>
+References: <20190121134249.16615-1-david@redhat.com>
+	<20190121134249.16615-3-david@redhat.com>
+	<20190123120539.3ca367f9.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
-	<20190127015509.ngofhbiduuwwbf7r@function>
-	<CAJ+F1CKYNEVXNbmN2ppvPOtN_2nMyzTX612aZ9twnYc0+Rgg_Q@mail.gmail.com>
-	<b71e3a2b-61d6-2a2d-3c17-f9c832b4cad4@redhat.com>
-In-Reply-To: <b71e3a2b-61d6-2a2d-3c17-f9c832b4cad4@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 11:25:08 +0000
-Message-ID: <CAFEAcA8arejWDEYd1zZhFR+ANyOeJ8KsJvVR==pE55dDZoO5Bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: Replace QEMU_BUILD_BUG_ON with own
- macro
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] s390x/pci: Unplug remaining devices
+ on pcihost reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 28 Jan 2019 at 11:22, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> On 1/27/19 12:37 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Did you try using G_STATIC_ASSERT* instead?
-> [...]
->
-> Is there a same plan for QEMU codebase?
+On Wed, 23 Jan 2019 12:05:39 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Our version uses _Static_assert where possible, which I think
-will give better error messages than the glib version. There are
-also some corner cases where the glib macros don't work:
-https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07090.html
+> On Mon, 21 Jan 2019 14:42:49 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> > When resetting the guest we should unplug and remove all devices that
+> > are still pending. Otherwise the fresh guest will see devices that will
+> > suddenly vanish.
+> > 
+> > Can be triggered e.g. via
+> > (hmp) device_add virtio-mouse-pci,id=test
+> > (hmp) stop
+> > (hmp) device_del test
+> > (hmp) system_reset
+> > (hmp) c
+> > 
+> > The device will vanish after roughly 5 minutes. With this patch, the
+> > device will vanish on reboot (S390_RESET_EXTERNAL and S390_RESET_REIPL,
+> > which reset the pcihost bridge via qemu_devices_reset()). If we want
+> > these devices to vanish directly on any reset (S390_RESET_MODIFIED_CLEAR
+> > and S390_RESET_LOAD_NORMAL), we have to modify s390_machine_reset(). But
+> > I have the feeling that this should not be done for all reset types.
+> > 
+> > This approach is similar to what's done for acpi PCI hotplug in
+> > acpi_pcihp_reset() -> acpi_pcihp_update() ->
+> > acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+> > 
+> > s390_pci_generate_plug_event()'s will still be generated, I guess this
+> > is not an issue (same thing could happen right now if the timer expires
+> > just after reset).  
+> 
+> I'm wondering what the architecture says regarding those events -- can
+> someone with access to the documentation comment?
 
-Broadly, our implementation works and so I don't see much need
-to mess with it, outside of the special case of slirp that's
-trying to cut its ties with QEMU.
+Ping. Any comments from the IBM folks?
 
-thanks
--- PMM
+> 
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  hw/s390x/s390-pci-bus.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> > index bc17a8cf65..b70ae25533 100644
+> > --- a/hw/s390x/s390-pci-bus.c
+> > +++ b/hw/s390x/s390-pci-bus.c
+> > @@ -1102,6 +1102,14 @@ static void s390_pcihost_reset(DeviceState *dev)
+> >  {
+> >      S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+> >      PCIBus *bus = s->parent_obj.bus;
+> > +    S390PCIBusDevice *pbdev, *next;
+> > +
+> > +    /* Unplug all pending devices that were requested to be released */
+> > +    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
+> > +        if (pbdev->release_timer) {
+> > +            s390_pcihost_timer_cb(pbdev);
+> > +        }
+> > +    }
+> >  
+> >      s->bus_no = 0;
+> >      pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);  
+> 
