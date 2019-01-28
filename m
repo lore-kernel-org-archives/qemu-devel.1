@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49874)
+Received: from eggs.gnu.org ([209.51.188.92]:50349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
-	id 1goA7w-0000hB-V8
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:17 -0500
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1goAAR-00022h-Os
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:53:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
-	id 1goA7v-0002xE-Tq
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:16 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:26422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=924f879ed=tim.smith@citrix.com>)
-	id 1goA7v-0002vi-KL
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:51:15 -0500
-From: Tim Smith <tim.smith@citrix.com>
-Date: Mon, 28 Jan 2019 16:50:31 +0000
-Message-ID: <3048424.2nWJ6aN5el@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
-References: <1914320.zObNlfPuOX@dhcp-3-135.uk.xensource.com>
-	<23d84b3a-f4ac-07e0-5ce2-f86ec899cc2c@virtuozzo.com>
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1goAAQ-0004SC-Qz
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:53:51 -0500
+References: <20190128142748.29140-1-antonkuchin@yandex-team.ru>
+	<20190128144720.GB5756@localhost.localdomain>
+From: Anton Kuchin <antonkuchin@yandex-team.ru>
+Message-ID: <d5c28554-fee3-5c12-3528-150c0d048903@yandex-team.ru>
+Date: Mon, 28 Jan 2019 19:53:44 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Subject: Re: [Qemu-devel] Very slow finding extents in QCOW2-backed nbd
+In-Reply-To: <20190128144720.GB5756@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/2] block: add blk_lookup() for getting
+ device by node_name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Monday, 28 January 2019 14:41:35 GMT Vladimir Sementsov-Ogievskiy wrote:
-> 28.01.2019 14:58, Tim Smith wrote:
-> 
-> > Hi all, I have a question about the intent of the last call to
-> > bdrv_co_block_status() in bdrv_co_block_status(), in block/io.c about
-> > line
-> > 2195, which looks like this:
-> > 
-> > 
-> >          ret2 = bdrv_co_block_status(local_file, want_zero, local_map,
-> >          
-> >                                      *pnum, &file_pnum, NULL, NULL);
-> >          
-> >          if (ret2 >= 0) {
-> >          
-> >              /* Ignore errors.  This is just providing extra information,
-> >              it
-> >              
-> >               * is useful but not necessary.
-> >               */
-> 
-> 
-> Hi Tim!
-> 
-> The question is highly discussed now on list, in short: yes it's a problem,
-> and, I hope, we'll soon reach a consensus about how to finally fix it. 
-> This second block_status request is needed when we have qcow2 image with
-> metadata preallocation, which means that qcow2 data clusters are actually
-> backed by holes on filesystem level.
-> 
-> You can follow the discussion under the following threads:
-> 
-> initial discussion:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05749.html
-> 
-> solutions:
-> 
-> cache lseek results, by Kevin:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06271.html
-> 
-> detect preallocation, and don't do second block_status for not
-> preallocated, my last try:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06598.html
+On 28/01/2019 17:47, Kevin Wolf wrote:
+> Am 28.01.2019 um 15:27 hat Anton Kuchin geschrieben:
+>> Some HMP and QMP commands are targeting BlockBackend but
+>> for hotplugged devices name of BB is deprecated, instead
+>> name of root BlockDriverState is set. These patches add
+>> functions to search BB by attached root BDS name.
+>>
+>> This approach isn't perfect, but I couldn't invent a better
+>> one and I belive it's more convinient than accessing BB
+>> by QOM path.
+> There could be more than one BlockBackend attached to a single node, so
+> this approach is simply wrong.
 
-Thanks, I'll keep an eye on these. My use-case does not require preallocation 
-so I'll carry a patch for a bit and see how it works out.
+I was thinking about this but couldn't imagine configuration when it's 
+having more than one root. Can you give an example, please, so I 
+understand this case better.
 
--- 
-Tim Smith <tim.smith@citrix.com>
+> I think the qdev ID is actually not only a pretty convenient way, but in
+> fact the only logical way to address a guest device (and BlockBackends
+> that can be accessed by the monitor are essentially a part of the guest
+> device).
+
+As far as I remember backends currently have emply qdev ID so the only 
+way to address them now is QOM path like 
+".../my_hotplug_drive/virtio-backend". So I have to remember the name of 
+the root driver it is connected to and also add this "/virtio-backend" 
+suffix.
+
+Can you explain a bit what are "monitor referenced" backends and which 
+one can be accessed from monitor and which can not.
+
+> Does your series allow to perform any operation that isn't possible
+> currently? If so, it's probably this operation that needs to be fixed to
+> either accept node names (if it's a backend operation) or a device ID
+> (if it's a frontend operation).
+
+Yes. It fixes latency histogram setting, nbd server binding to remove 
+event and a couple of hmp comands. I also suspect that this can affect 
+migration but I could't figure out what name is used for identifying drives.
+
+Some of this code is also linked to utilities (qemu-img, qemu-io-cmds 
+...) which require linking all QAPI stuff to them, that seems to be an 
+overkill. I'll prepare the patch to eliminate this dependency and allow 
+using QOM here if we decide that this is the best way.
+
+> Kevin
+>
