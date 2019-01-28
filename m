@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44159)
+Received: from eggs.gnu.org ([209.51.188.92]:44948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9lr-000368-7a
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:28:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1go9o7-0005C4-AD
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1go9lq-0002nt-IQ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:28:27 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38717)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1go9lq-0002jv-6R
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:28:26 -0500
-Received: by mail-pl1-x644.google.com with SMTP id e5so7961711plb.5
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:28:24 -0800 (PST)
-References: <20190121185118.18550-1-peter.maydell@linaro.org>
-	<20190121185118.18550-22-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <69a854f8-c52d-20f9-ddee-0c1d751b32dc@linaro.org>
-Date: Mon, 28 Jan 2019 08:28:19 -0800
+	(envelope-from <kwolf@redhat.com>) id 1go9o5-000515-9G
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:30:47 -0500
+Date: Mon, 28 Jan 2019 17:30:28 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190128163028.GJ5756@localhost.localdomain>
+References: <735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
+	<w518szbmmw9.fsf@maestria.local.igalia.com>
+	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
+	<w5136pjmjrp.fsf@maestria.local.igalia.com>
+	<20190124091222.GB4601@localhost.localdomain>
+	<w51d0ogsv1y.fsf@maestria.local.igalia.com>
+	<20190128145743.GC5756@localhost.localdomain>
+	<w517eeoss2l.fsf@maestria.local.igalia.com>
+	<20190128160109.GF5756@localhost.localdomain>
+	<w514l9ssqqv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190121185118.18550-22-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 21/23] hw/arm/armsse: Add SSE-200 model
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w514l9ssqqv.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
+ different iothreads sharing a blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 1/21/19 10:51 AM, Peter Maydell wrote:
-> Add a model of the SSE-200, now we have put in all
-> the code that lets us make it different from the IoTKit.
+Am 28.01.2019 um 17:15 hat Alberto Garcia geschrieben:
+> On Mon 28 Jan 2019 05:01:09 PM CET, Kevin Wolf wrote:
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/armsse.h | 19 ++++++++++++++++---
->  hw/arm/armsse.c         | 12 ++++++++++++
->  2 files changed, 28 insertions(+), 3 deletions(-)
+> > And actually... if you move the first virtio-blk device to an
+> > iothread, then downgrading the others isn't going to save us, because
+> > that would still be using the backend from two threads (one
+> > successfully enabled iothread, and the main thread).
+> 
+> ...which makes me think that, since patch 1 from this series moves the
+> BlockBackend back to the main AioContext on unplug, we could have a
+> similar problem if the BDS is being used by other devices. Or am I
+> missing something?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Oops. :-)
 
+Maybe we do need to implement the proper solution?
 
-r~
+Kevin
