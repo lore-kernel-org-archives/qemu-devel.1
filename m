@@ -1,32 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44458)
+Received: from eggs.gnu.org ([209.51.188.92]:44875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1goD4Q-0007gl-JX
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 14:59:51 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1goD4n-0008Cd-EX
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:00:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1goCxb-0004QZ-5q
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 14:52:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1goCxa-0004OV-GH
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 14:52:47 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A997EC0C429D
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 19:42:30 +0000 (UTC)
-References: <20190128174725.8809-1-ccarrara@redhat.com>
-	<20190128174725.8809-2-ccarrara@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <bc08dd05-82c5-a4e9-ca7f-883eb27c865e@redhat.com>
-Date: Mon, 28 Jan 2019 17:42:24 -0200
+	(envelope-from <farosas@linux.ibm.com>) id 1goD4l-00024v-Gi
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:00:12 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59088
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+	id 1goD4l-00022w-B2
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:00:11 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0SJwm6Z058718
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 15:00:09 -0500
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qa69cefy8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 15:00:09 -0500
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
+	Mon, 28 Jan 2019 20:00:08 -0000
+From: Fabiano Rosas <farosas@linux.ibm.com>
+In-Reply-To: <20190126015006.GB22942@umbus>
+References: <20190122170112.8706-1-farosas@linux.ibm.com>
+	<20190122170112.8706-3-farosas@linux.ibm.com>
+	<30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
+	<20190126015006.GB22942@umbus>
+Date: Mon, 28 Jan 2019 18:00:02 -0200
 MIME-Version: 1.0
-In-Reply-To: <20190128174725.8809-2-ccarrara@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] tests.acceptance: adds multi vm
- capability for acceptance tests
+Content-Type: text/plain
+Message-Id: <878sz41rjx.fsf@linux.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
+ callbacks for SPRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,143 +44,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, philmd@redhat.com, crosa@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Richard Henderson <richard.henderson@linaro.org>, groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-On 01/28/2019 03:47 PM, Caio Carrara wrote:
-> This change adds the possibility to write acceptance tests with multi
-> virtual machine support. It's done keeping the virtual machines objects
-> stored in a test attribute (dictionary). This dictionary shouldn't be
-> accessed directly but through the new method added `get_vm`. This new
-> method accept a list of args (that will be added as virtual machine
-> arguments) and an optional name argument. The name is the key that
-> identify a single virtual machine along the test machines available. If
-> a name without a machine is informed a new machine will be instantiated.
+> On Thu, Jan 24, 2019 at 06:20:02PM +1100, Alexey Kardashevskiy wrote:
+>> 
+>> 
+>> On 23/01/2019 04:01, Fabiano Rosas wrote:
+>> > These will be used to let GDB know about PPC's Special Purpose
+>> > Registers (SPR).
+>> > 
+>> > They take an index based on the order the registers appear in the XML
+>> > file sent by QEMU to GDB. This index does not match the actual
+>> > location of the registers in the env->spr array so the
+>> > gdb_find_spr_idx function does that conversion.
+>> > 
+>> > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+>> > ---
+>> >  target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
+>> >  1 file changed, 53 insertions(+), 1 deletion(-)
+>> > 
+>> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+>> > index 710064a25d..f29ac3558a 100644
+>> > --- a/target/ppc/translate_init.inc.c
+>> > +++ b/target/ppc/translate_init.inc.c
+>> > @@ -9487,6 +9487,55 @@ static bool avr_need_swap(CPUPPCState *env)
+>> >  #endif
+>> >  }
+>> >  
+>> > +#if !defined(CONFIG_USER_ONLY)
+>> > +static int gdb_find_spr_idx(CPUPPCState *env, int n)
+>> > +{
+>> > +    int i;
+>> > +
+>> > +    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+>> > +        ppc_spr_t *spr = &env->spr_cb[i];
+>> > +
+>> > +        if (spr->name && spr->gdb_id == n) {
+>> > +            return i;
+>> > +        }
+>> > +    }
+>> > +    return -1;
+>> > +}
+>> > +
+>> > +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>> > +{
+>> > +    int reg;
+>> > +    int len;
+>> > +
+>> > +    reg = gdb_find_spr_idx(env, n);
+>> > +    if (reg < 0) {
+>> > +        return 0;
+>> > +    }
+>> > +
+>> > +    len = TARGET_LONG_SIZE;
+>> > +    stn_p(mem_buf, len, env->spr[reg]);
+>> > +    ppc_maybe_bswap_register(env, mem_buf, len);
+>> 
+>> 
+>> I am confused by this as it produces different results depending on the
+>> guest mode:
 >
-> The current usage of vm in tests will not be broken by this change since
-> it keeps a property called vm in the base test class. This property only
-> calls the new method `get_vm` with default parameters (no args and
-> 'default' as machine name).
-
-I've checked that current tests does not break by this change. I also 
-checked the example you provided on docs/devel/testing.rst works too.
-
-So Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
 >
-> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
-> ---
->   docs/devel/testing.rst                    | 40 ++++++++++++++++++++++-
->   tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
->   2 files changed, 60 insertions(+), 5 deletions(-)
+> Hm, yeah, I thought the bswap here looked odd, but it wasn't obvious
+> to me if it was bogus here, or just a bogus gdb interface we have to
+> work around.
 >
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index 18e2c0868a..b97c0368bc 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -634,7 +634,45 @@ instance, available at ``self.vm``.  Because many tests will tweak the
->   QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
->   is left to the test writer.
->   
-> -At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-> +The base test class has also support for tests with more than one
-> +QEMUMachine. The way to get machines is through the ``self.get_vm()``
-> +method which will return a QEMUMachine instance. The ``self.get_vm()``
-> +method also accepts an optional `name` attribute so you can identify a
-> +specific machine and get it more than once through the tests methods. A
-> +simple and hypothetical example follows:
+>> (gdb) p $pvr
+>> $1 = 0x14c0000000000
+>> (gdb) c
+>> Continuing.
+>> Program received signal SIGINT, Interrupt.
+>> (gdb) p $pvr
+>> $2 = 0x4c0100
+>
+> But that behaviour definitely looks wrong.
 
-Since you explain the self.get_vm() optional name attribute, you also 
-could mention it accepts arguments to be passed to the newly created VM.
+GDB detects the endianness by looking at the ELF headers:
 
-> +
-> +.. code::
-> +
-> +  from avocado_qemu import Test
-> +
-> +
-> +  class MultipleMachines(Test):
-> +      """
-> +      :avocado: enable
-> +      """
-> +      def test_multiple_machines(self):
-> +          first_machine = self.get_vm()
-> +          second_machine = self.get_vm()
-> +          self.get_vm(name='third_machine').launch()
-> +
-> +          first_machine.launch()
-> +          second_machine.launch()
-> +
-> +          first_res = first_machine.command(
-> +              'human-monitor-command',
-> +              command_line='info version')
-> +
-> +          second_res = second_machine.command(
-> +              'human-monitor-command',
-> +              command_line='info version')
-> +
-> +          third_res = self.get_vm(name='third_machine').command(
-> +              'human-monitor-command',
-> +              command_line='info version')
-> +
-> +          self.assertEquals(first_res, second_res, third_res)
-> +
-> +At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
->   shutdown.
->   
->   QEMUMachine
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-> index 1e54fd5932..4c9e27feda 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -10,6 +10,7 @@
->   
->   import os
->   import sys
-> +import uuid
->   
->   import avocado
->   
-> @@ -42,13 +43,29 @@ def pick_default_qemu_bin():
->   
->   class Test(avocado.Test):
->       def setUp(self):
-> -        self.vm = None
-> +        self._vms = {}
->           self.qemu_bin = self.params.get('qemu_bin',
->                                           default=pick_default_qemu_bin())
->           if self.qemu_bin is None:
->               self.cancel("No QEMU binary defined or found in the source tree")
-> -        self.vm = QEMUMachine(self.qemu_bin)
-> +
-> +    def _new_vm(self, *args):
-> +        vm = QEMUMachine(self.qemu_bin)
-> +        if args:
-> +            vm.add_args(*args)
-> +        return vm
-> +
-> +    @property
-> +    def vm(self):
-> +        return self.get_vm(name='default')
-> +
-> +    def get_vm(self, *args, name=None):
-> +        if not name:
-> +            name = str(uuid.uuid4())
+(gdb) p/x $pvr
+$1 = 0x1024b0000000000
+(gdb) file ~/qemu/roms/SLOF/board-qemu/llfw/stage1.elf
+Reading symbols from ~/qemu/roms/SLOF/board-qemu/llfw/stage1.elf...done.
+(gdb) show endian
+The target endianness is set automatically (currently big endian)
+(gdb) p/x $pvr
+$2 = 0x4b0201
+(gdb) c
+Continuing.
 
-Beware that if you don't give a name to the VM, the only way to access 
-it later is to keep the reference returned by get_vm(). Do you think it 
-is something we should care about? or assume the test writer handle this 
-(unlikely?) case somehow?
+(gdb) ^C
+Program received signal SIGINT, Interrupt.
+0x74a70c00000000c0 in ?? ()
+(gdb) file vmlinux
+Reading symbols from vmlinux...done.
+(gdb) show endian
+The target endianness is set automatically (currently little endian)
+(gdb) p/x $pvr
+$3 = 0x4b0201
 
-- Wainer
+The maybe_bswap_register is done due to QEMU having TARGET_WORDS_BIGENDIAN set
+even after we have changed into LE mode.
 
-> +        if self._vms.get(name) is None:
-> +            self._vms[name] = self._new_vm(*args)
-> +        return self._vms[name]
->   
->       def tearDown(self):
-> -        if self.vm is not None:
-> -            self.vm.shutdown()
-> +        for vm in self._vms.values():
-> +            vm.shutdown()
+>> First print is when I stopped the guest in the SLOF firmware (so it is
+>> big-endian) and then I continued and stopped gdb when the guest booted a
+>> little-endian system; the KVM host is little endian, the machine running
+>> gdb is LE too.
+>> 
+>> QEMU monitor prints the same 0x4c0100 in both cases.
+>> 
+>> I am adding the inventor of maybe_bswap_register() in cc: for
+>> assistance. Swapping happens:
+>> - once for BE: after stn_p()
+>> 	*(unsigned long *)mem_buf is 0x14c0000000000
+>> - twice for LE.
+>> 
+>> 
+>> 
+>> 
+>> 
+>> > +    return len;
+>> > +}
+>> > +
+>> > +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>> > +{
+>> > +    int reg;
+>> > +    int len;
+>> > +
+>> > +    reg = gdb_find_spr_idx(env, n);
+>> > +    if (reg < 0) {
+>> > +        return 0;
+>> > +    }
+>> > +
+>> > +    len = TARGET_LONG_SIZE;
+>> > +    ppc_maybe_bswap_register(env, mem_buf, len);
+>> > +    env->spr[reg] = ldn_p(mem_buf, len);
+>> > +
+>> > +    return len;
+>> > +}
+>> > +#endif
+>> > +
+>> >  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+>> >  {
+>> >      if (n < 32) {
+>> > @@ -9716,7 +9765,10 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+>> >          gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+>> >                                   32, "power-vsx.xml", 0);
+>> >      }
+>> > -
+>> > +#ifndef CONFIG_USER_ONLY
+>> > +    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
+>> > +                             pcc->gdb_num_sprs, "power-spr.xml", 0);
+>> > +#endif
+>> >      qemu_init_vcpu(cs);
+>> >  
+>> >      pcc->parent_realize(dev, errp);
+>> > 
+>> 
