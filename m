@@ -1,28 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54876)
+Received: from eggs.gnu.org ([209.51.188.92]:55772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goAUz-0008Tl-Qv
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:15:06 -0500
+	(envelope-from <stefanb@linux.ibm.com>) id 1goAZi-00029t-M7
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:19:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goAUx-0003wn-Jo
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:15:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 28 Jan 2019 17:14:59 +0000
-Message-ID: <0b5b93d0-4ee9-b1b1-a895-9873a9e6de83@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-12-vsementsov@virtuozzo.com>
-	<1ea09d99-04ff-711e-9137-cdae33ca8681@redhat.com>
-	<643f318f-392d-1370-f952-b2a01e7d9bb7@virtuozzo.com>
-	<ea0a19fd-2db5-bfa5-180b-68c3ef80e046@redhat.com>
-	<cd1c98bd-1f40-5aa9-01ec-5109ee36e1e8@virtuozzo.com>
-	<0298f3ec-2267-c624-91bb-6136df3b786a@redhat.com>
-In-Reply-To: <0298f3ec-2267-c624-91bb-6136df3b786a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <07DFB67941548C46A31113094BD168AA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanb@linux.ibm.com>) id 1goAZg-0007d3-E2
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:19:58 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+	id 1goAZe-0007YT-HT
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:19:54 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0SHEa46063311
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 12:19:51 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qa5phh6ub-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 12:19:50 -0500
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
+	Mon, 28 Jan 2019 17:19:49 -0000
+From: Stefan Berger <stefanb@linux.ibm.com>
+References: <20190125210058.1092551-1-stefanb@linux.ibm.com>
+	<20190128154553.583f79a3@redhat.com>
+	<f7fc884b-0a7f-17d5-ada4-fc44c08bfba1@linux.ibm.com>
+Date: Mon, 28 Jan 2019 12:19:37 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 11/11] block/backup: use backup-top
- instead of write notifiers
+In-Reply-To: <f7fc884b-0a7f-17d5-ada4-fc44c08bfba1@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <f93f5ab2-8b51-ca05-c4c3-902743e4b13e@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] acpi: Make TPM 2.0 with TIS available as
+ MSFT0101
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,130 +44,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mst@redhat.com
 
-MjguMDEuMjAxOSAxOTo1MywgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOC4wMS4xOSAxNzo0NCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDI4LjAxLjIwMTkgMTg6NTks
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyOC4wMS4xOSAxMjoyOSwgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMTguMDEuMjAxOSAxNzo1NiwgTWF4IFJlaXR6IHdy
-b3RlOg0KPj4+Pj4gT24gMjkuMTIuMTggMTM6MjAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+IA0KPiBbLi4uXQ0KPiANCj4+Pj4+PiBAQCAtNTA1LDggKzQ3NCwyMCBAQCBz
-dGF0aWMgaW50IGNvcm91dGluZV9mbiBiYWNrdXBfcnVuKEpvYiAqam9iLCBFcnJvciAqKmVycnAp
-DQo+Pj4+Pj4gICAgICAgICAgICAgICAgIGlmIChhbGxvY2VkIDwgMCkgew0KPj4+Pj4+ICAgICAg
-ICAgICAgICAgICAgICAgcmV0ID0gYWxsb2NlZDsNCj4+Pj4+PiAgICAgICAgICAgICAgICAgfSBl
-bHNlIHsNCj4+Pj4+PiArICAgICAgICAgICAgICAgIGlmICghaGJpdG1hcF9nZXQocy0+Y29weV9i
-aXRtYXAsIG9mZnNldCkpIHsNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICB0cmFjZV9iYWNr
-dXBfZG9fY293X3NraXAoam9iLCBvZmZzZXQpOw0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgICAg
-IGNvbnRpbnVlOyAvKiBhbHJlYWR5IGNvcGllZCAqLw0KPj4+Pj4+ICsgICAgICAgICAgICAgICAg
-fQ0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgaWYgKCFsb2NrKSB7DQo+Pj4+Pj4gKyAgICAgICAg
-ICAgICAgICAgICAgbG9jayA9IGJkcnZfY29fdHJ5X2xvY2socy0+c291cmNlLCBvZmZzZXQsIHMt
-PmNsdXN0ZXJfc2l6ZSk7DQo+Pj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgLyoNCj4+Pj4+PiAr
-ICAgICAgICAgICAgICAgICAgICAgKiBEaXJ0eSBiaXQgaXMgc2V0LCB3aGljaCBtZWFucyB0aGF0
-IHRoZXJlIGFyZSBubyBpbi1mbGlnaHQNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAgKiB3
-cml0ZSByZXF1ZXN0cyBvbiB0aGlzIGFyZWEuIFdlIG11c3Qgc3VjY2VlZC4NCj4+Pj4+PiArICAg
-ICAgICAgICAgICAgICAgICAgKi8NCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICBhc3NlcnQo
-bG9jayk7DQo+Pj4+Pg0KPj4+Pj4gV2hhdCBpZiBJIGhhdmUgYSBkaWZmZXJlbnQgcGFyZW50IG5v
-ZGUgZm9yIHRoZSBzb3VyY2UgdGhhdCBpc3N1ZXMNCj4+Pj4+IGNvbmN1cnJlbnQgd3JpdGVzPyAg
-VGhpcyB1c2VkIHRvIHdvcmsgZmluZSBiZWNhdXNlIHRoZSBiZWZvcmVfd3JpdGUNCj4+Pj4+IG5v
-dGlmaWVyIHdvdWxkIHN0aWxsIHdvcmsuICBBZnRlciB0aGlzIHBhdGNoLCB0aGF0IHdvdWxkIGJl
-IGJyb2tlbg0KPj4+Pj4gYmVjYXVzZSB0aG9zZSB3cml0ZXMgd291bGQgbm90IGNhdXNlIGEgQ2JX
-Lg0KPj4+Pg0KPj4+PiBCdXQgaGF3IGNvdWxkIHlvdSBoYXZlIHRoaXMgZGlmZmVyZW50IHBhcmVu
-dCBub2RlPyBBZnRlciBhcHBlbmRpbmcgZmlsdGVyLA0KPj4+PiB0aGVyZSBzaG91bGQgbm90IGJl
-IHN1Y2ggbm9kZXMuDQo+Pj4NCj4+PiBVbmxlc3MgeW91IGFwcGVuZCB0aGVtIGFmdGVyd2FyZHM6
-DQo+Pj4NCj4+Pj4gQW5kIEkgdGhpbmssIGR1cmluZyBiYWNrdXAgaXQgc2hvdWxkIGJlDQo+Pj4+
-IGZvcmJpZGRlbiB0byBhcHBlbmQgbmV3IHBhcmVudHMgdG8gc291cmNlLCBpZ25vcmluZyBmaWx0
-ZXIsIGFzIGl0IGRlZmluaXRlbHkNCj4+Pj4gYnJlYWtzIHdoYXQgZmlsdGVyIGRvZXMuDQo+Pj4N
-Cj4+PiBBZ3JlZWQsIGJ1dCB0aGVuIHRoaXMgbmVlZHMgdG8gYmUgaW1wbGVtZW50ZWQuDQo+Pj4N
-Cj4+Pj4gQW5kIGl0IGFwcGxpZXMgdG8gb3RoZXIgYmxvY2stam9iIHdpdGggdGhlaXIgZmlsdGVy
-cy4NCj4+Pj4gSWYgd2UgYXBwZW5kZWQgYSBmaWx0ZXIsIHdlIGRvbid0IHdhbnQgc29tZW9uZSBv
-dGhlciB0byB3cml0ZSBvbWl0IG91ciBmaWx0ZXIuDQo+Pj4+DQo+Pj4+Pg0KPj4+Pj4gVGhhdCdz
-IG5vdCBzbyBiYWQgYmVjYXVzZSB3ZSBqdXN0IGhhdmUgdG8gbWFrZSBzdXJlIHRoYXQgYWxsIHdy
-aXRlcyBnbw0KPj4+Pj4gdGhyb3VnaCB0aGUgYmFja3VwLXRvcCBub2RlLiAgVGhhdCB3b3VsZCBt
-YWtlIHRoaXMgYXNzZXJ0aW9uIHZhbGlkDQo+Pj4+PiBhZ2FpbiwgdG9vLiAgQnV0IHRoYXQgbWVh
-bnMgd2UgY2Fubm90IHNoYXJlIFBFUk1fV1JJVEU7IHNlZSBbMV0uDQo+Pj4+DQo+Pj4+IEJ1dCB3
-ZSBkb24ndCBzaGFyZSBQRVJNX1dSSVRFIG9uIHNvdXJjZSBpbiBiYWNrdXBfdG9wLCBvbmx5IG9u
-IHRhcmdldC4NCj4+Pg0KPj4+IEFyZSB5b3Ugc3VyZT8gIFRoZSBqb2IgaXRzZWxmIHNoYXJlcyBp
-dCwgYW5kIHRoZSBmaWx0ZXIgc2hhcmVzIGl0LCB0b28sDQo+Pj4gYXMgZmFyIGFzIEkgY2FuIHNl
-ZS4gIEl0IHVzZXMgYmRydl9maWx0ZXJfZGVmYXVsdF9wZXJtcygpLCBhbmQgdGhhdCBkb2VzDQo+
-Pj4gc2VlbSB0byBzaGFyZSBQRVJNX1dSSVRFLg0KPj4NCj4+IEFuZCBpbiBiZHJ2X0ZpbHRlcl9k
-ZWZhdWx0X3Blcm1zIGl0IGRvZXMgIipuc2hhcmVkID0gKm5zaGFyZWQgfCBCTEtfUEVSTV9XUklU
-RSINCj4+IG9ubHkgZm9yIGNoaWxkX2ZpbGUsIGl0IGlzIHRhcmdldC4gU291cmNlIGlzIGNoaWxk
-X2JhY2tpbmcuDQo+IA0KPiBIbT8gIGJkcnZfZmlsdGVyX2RlZmF1bHRfcGVybXMoKSBkb2VzIHRo
-aXMsIHVuY29uZGl0aW9uYWxseToNCj4gDQo+PiAgICAgICpuc2hhcmVkID0gKHNoYXJlZCAmIERF
-RkFVTFRfUEVSTV9QQVNTVEhST1VHSCkgfA0KPj4gICAgICAgICAgICAgICAgIChjLT5zaGFyZWRf
-cGVybSAmIERFRkFVTFRfUEVSTV9VTkNIQU5HRUQpOw0KPiANCj4gVGhlIGJhY2t1cF90b3AgZmls
-dGVyIGRvZXMgd2hhdCB5b3UgZGVzY3JpYmUsIGJ1dCBpdCBqdXN0IGxlYXZlcw0KPiAqbnNoYXJl
-ZCB1bnRvdWNoZWQgYWZ0ZXIgYmRydl9maWx0ZXJfZGVmYXVsdF9wZXJtcygpIGhhcyBkb25lIHRo
-ZSBhYm92ZS4NCg0KDQpPb3BzLCB5ZXMsIEkgbWVhbnQgbXkgYmFja3VwX3RvcF9jaGlsZF9wZXJt
-KCksIG5vdCBiZHJ2X2ZpbHRlcl9kZWZhdWx0X3Blcm1zKCksIHdoaWNoIGl0IGNhbGxzDQp0b28u
-IFNvLCBPSywgd2lsbCB0cnkgdG8gZml4IGl0LiBTb3JyeSBmb3IgdGhhdCBsb25nIGV4dHJhIGFy
-Z3VpbmcgOigNCg0KPiANCj4gWy4uLl0NCj4gDQo+Pj4+Pj4gQEAgLTY1NSwyNSArNjU2LDMxIEBA
-IEJsb2NrSm9iICpiYWNrdXBfam9iX2NyZWF0ZShjb25zdCBjaGFyICpqb2JfaWQsIEJsb2NrRHJp
-dmVyU3RhdGUgKmJzLA0KPj4+Pj4+ICAgICANCj4+Pj4+PiAgICAgICAgIGNvcHlfYml0bWFwID0g
-aGJpdG1hcF9hbGxvYyhsZW4sIGN0ejMyKGNsdXN0ZXJfc2l6ZSkpOw0KPj4+Pj4+ICAgICANCj4+
-Pj4+PiAtICAgIC8qIGpvYi0+bGVuIGlzIGZpeGVkLCBzbyB3ZSBjYW4ndCBhbGxvdyByZXNpemUg
-Ki8NCj4+Pj4+PiAtICAgIGpvYiA9IGJsb2NrX2pvYl9jcmVhdGUoam9iX2lkLCAmYmFja3VwX2pv
-Yl9kcml2ZXIsIHR4biwgYnMsDQo+Pj4+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgIEJM
-S19QRVJNX0NPTlNJU1RFTlRfUkVBRCwNCj4+Pj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgQkxLX1BFUk1fQ09OU0lTVEVOVF9SRUFEIHwgQkxLX1BFUk1fV1JJVEUgfA0KPj4+Pj4+IC0g
-ICAgICAgICAgICAgICAgICAgICAgICAgICBCTEtfUEVSTV9XUklURV9VTkNIQU5HRUQgfCBCTEtf
-UEVSTV9HUkFQSF9NT0QsDQo+Pj4+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgIHNwZWVk
-LCBjcmVhdGlvbl9mbGFncywgY2IsIG9wYXF1ZSwgZXJycCk7DQo+Pj4+Pj4gLSAgICBpZiAoIWpv
-Yikgew0KPj4+Pj4+ICsgICAgLyoNCj4+Pj4+PiArICAgICAqIGJkcnZfZ2V0X2RldmljZV9uYW1l
-IHdpbGwgbm90IGhlbHAgdG8gZmluZCBkZXZpY2UgbmFtZSBzdGFydGluZyBmcm9tDQo+Pj4+Pj4g
-KyAgICAgKiBAYnMgYWZ0ZXIgYmFja3VwLXRvcCBhcHBlbmQsDQo+Pj4+Pg0KPj4+Pj4gV2h5IG5v
-dD8gIFNpbmNlIGJhY2t1cC10b3AgaXMgYXBwZW5kZWQsIHNob3VsZG4ndCBhbGwgcGFyZW50cyBv
-ZiBAYnMgYmUNCj4+Pj4+IHBhcmVudHMgb2YgQGJhY2t1cF90b3AgdGhlbj8gIChNYWtpbmcgYmRy
-dl9nZXRfcGFyZW50X25hbWUoKSByZXR1cm4gdGhlDQo+Pj4+PiBzYW1lIHJlc3VsdCkNCj4+Pj4N
-Cj4+Pj4gYmRydl9nZXRfZGV2aWNlX25hbWUgZ29lcyBmaW5hbGx5IHRocm91Z2ggcm9sZS0+Z2V0
-X25hbWUsIGFuZCBvbmx5IHJvb3Qgcm9sZSBoYXMNCj4+Pj4gdGhpcyBoYW5kbGVyLiBBZnRlciBh
-cHBlbmQgd2UnbGwgaGF2ZSBiYWNraW5nIHJvbGUgaW5zdGVhZCBvZiByb290Lg0KPj4+DQo+Pj4g
-QWgsIEkgc2VlLCBJIGFza2VkIHRoZSB3cm9uZyBxdWVzdGlvbi4NCj4+Pg0KPj4+IFdoeSBpcyBi
-bG9ja19qb2JfY3JlYXRlKCkgY2FsbGVkIG9uIGJzIGFuZCBub3Qgb24gYmFja3VwX3RvcD8gIG1p
-cnJvcg0KPj4+IGNhbGxzIGl0IG9uIG1pcnJvcl90b3BfYnMuDQo+Pg0KPj4gR29vZCBxdWVzdGlv
-bi4gSSBkb24ndCBleGFjdGx5IHJlbWVtYmVyLCBtYXkgYmUgdGhlcmUgYXJlIHdlcmUgbW9yZSB0
-cm91YmxlcyB3aXRoDQo+PiBwZXJtaXNzaW9ucyBvciBzb210aGluZy4gU28sIEkndmUgdG8gdHJ5
-IGl0IGFnYWluLi4NCj4+DQo+PiBXaGF0IGlzIG1vcmUgYmVuZWZpY2lhbD8NCj4+DQo+PiBNeSBj
-dXJyZW50IGFwcHJvYWNoLCBpcyB0aGF0IGpvYiBhbmQgZmlsdGVyIGFyZSB0d28gc2libGluZyB1
-c2VycyBvZiBzb3VyY2Ugbm9kZSwNCj4+IHRoZXkgZG8gY29weWluZywgdGhleSBhcmUgc3luY2hy
-b25pemVkLiBBbmQgaW4gdGhpcyB3YXksIGl0IGlzIGJldHRlciB0byByZWFkIGZyb20NCj4+IHNv
-dXJjZSBkaXJlY3RseSwgdG8gbm90IGNyZWF0ZSBleHRyYSBpbnRlcnNlY3Rpb24gYmV0d2VlbiBq
-b2IgYW5kIGZpbHRlci4uDQo+Pg0KPj4gT24gdGhlIG90aGVyIGhhbmQsIGlmIHdlIHJlYWQgdGhy
-b3VnaCB0aGUgZmlsdGVyLCB3ZSBwb3NzaWJsZSBzaG91bGQgZG8gdGhlIHdob2xlDQo+PiBjb3B5
-IG9wZXJhdGlvbiB0aHJvdWdoIHRoZSBmaWx0ZXIuLg0KPj4NCj4+IFdoYXQgaXMgdGhlIGRpZmZl
-cmVuY2UgYmV0d2VlbiBndWVzdCByZWFkIGFuZCBiYWNrdXAtam9iIHJlYWQsIGluIGZpbHRlciBQ
-T1Y/IEkgdGhpbms6DQo+Pg0KPj4gRm9yIGd1ZXN0IHJlYWQsIGZpbHRlciBNVVNUIHJlYWQgKGFz
-IHdlIG11c3QgaGFuZGxlIGd1ZXN0IHJlcXVlc3QpLCBhbmQgdGhhbiwgaWYNCj4+IHdlIGRvbid0
-IGhhdmUgdG9vIG11Y2ggaW4tZmxpZ2h0IHJlcXVlc3RzLCByYW0tY2FjaGUgaXMgbm90IGZ1bGws
-IGV0Yywgd2UgY2FuIGhhbmRsZQ0KPj4gYWxyZWFkeSByZWFkIGRhdGEgaW4gdGVybXMgb2YgYmFj
-a3VwLCBzbywgY29weSBpdCBzb21ld2hlcmUuIE9yIHdlIGNhbiBkcm9wIGl0LCBpZg0KPj4gd2Ug
-Y2FuJ3QgaGFuZGxlIGl0IGF0IHRoZSBtb21lbnQuLg0KPj4NCj4+IEZvciBqb2IgcmVhZCwgd2Ug
-ZXZlbiBNQVkgbm90IHJlYWQsIGlmIG91ciBxdWV1ZXMgYXJlIGZ1bGwsIHBvc3Rwb25pbmcgam9i
-IHJlcXVlc3QuDQo+Pg0KPj4gU28NCj4+DQo+PiBHdWVzdCByZWFkOiBNVVNUIHJlYWQsIE1BWSBi
-YWNrdXANCj4+IEpvYiByZWFkOiBNQVkgcmVhZCBhbmQgYmFja3VwDQo+Pg0KPj4gU28sIHJlYWRp
-bmcgdGhyb3VnaCBmaWx0ZXIgaGFzIGEgcG9zc2liaWxpdHkgb2YgY29tbW9uIGNvZGUgcGF0aCAr
-IG5hdGl2ZSBwcmlvcml0aXphdGlvbg0KPj4gb2YgY29weSBvcGVyYXRpb25zLiBUaGlzIG9mIGNv
-dXJzZSB3aWxsIG5lZWQgbW9yZSByZWZhY3RvcmluZyBvZiBiYWNrdXAsIGFuZCBtYXkgYmUgZG9u
-ZQ0KPj4gYXMgYSBzZXBhcmF0ZSBzdGVwLCBidXQgZGVmaW5pdGVseSwgSSBoYXZlIHRvIGF0IGxl
-YXN0IHRyeSB0byBjcmVhdGUgam9iIGFib3ZlIHRoZSBmaWx0ZXIuDQo+IA0KPiBXZWxsLCBhcyBm
-YXIgYXMgSSBzZWUgaXQsIHJpZ2h0IG5vdyBiYWNrdXBfdG9wJ3MgcmVhZCBmdW5jdGlvbiBpcyBq
-dXN0IGENCj4gcGFzc3Rocm91Z2guICBJIGRvbid0IHNlZSBhIGZ1bmN0aW9uYWwgZGlmZmVyZW5j
-ZSBiZXR3ZWVuIHJlYWRpbmcgZnJvbQ0KPiBiYWNrdXBfdG9wIGFuZCBzb3VyY2UsIGJ1dCB0aGUg
-ZmFjdCB0aGF0IHlvdSBjb3VsZCBzYXZlIHlvdXJzZWxmIHRoZQ0KPiB0cm91YmxlIG9mIGZpZ3Vy
-aW5nIG91dCB0aGUgam9iIElEIG1hbnVhbGx5Lg0KPiANCj4gQXMgZm9yIHRoZSBSQU0gY2FjaGUs
-IEkgdGhvdWdodCBpdCB3YXMganVzdCBhIHRhcmdldCBsaWtlIGFueSBvdGhlciBhbmQNCj4gYmFj
-a3VwX3RvcCB3b3VsZG4ndCBuZWVkIHRvIGNhcmUgYXQgYWxsLi4uPw0KDQpOb3Qgc3VyZS4uIFdl
-IGNhbiBoYXZlIFJBTSBjYWNoZSwgYmFja2VkIGJ5IGRpc2sgY2FjaGUgdG9nZXRoZXIgd2l0aCBh
-Y3R1YWwgYmFja3VwIHRhcmdldA0KKG5iZCwgZm9yIGV4LikuLiBBbmQgaG93IHNob3VsZCB0aGV5
-IGFsbCBiZSBmaW5hbGx5IGNvbm5lY3RlZCBpcyBhIHF1ZXN0aW9uOyBJIHRoaW5rLCBpdA0Kd291
-bGQgYmUgc2ltcGxlciB0byBmaWd1cmUgaXQgb3V0LCB3aGVuIEkgc3RhcnQgaW1wbGVtZW50aW5n
-IGl0Lg0KDQpJIGhvcGUgdGhhdCBSQU0gY2FjaGUgc2hvdWxkIHNvbWVob3cgYmUgYW4gYWx0ZXJu
-YXRpdmUgdG8gaW5mbGlnaHQgY29weSByZXF1ZXN0cy4gUkFNIGNhY2hlDQppcyBiZXR0ZXIsIGFz
-IGl0J3MgZGF0YSBtYXkgYmUgY2xlYXJseSByZXVzZWQgYnkgZ3Vlc3QgcmVhZHMuLiBIbW0sIG1h
-eSBiZSB3ZSdsbCBmaW5pc2ggd2l0aA0KdHdvIGpvYnMsIG9uZSBjb3B5aW5nIGZyb20gYWN0aXZl
-IGRpc2sgdG8gUkFNIGNhY2hlLCBhbmQgb25lIGZyb20gUkFNIGNhY2hlIHRvIHRhcmdldD8gT3IN
-ClJBTSBjYWNoZSB3b3VsZCBiZSBpbnNpZGUgb25lIGJhY2t1cCBqb2I/DQoNClNvIGFnYWluLCBJ
-J2QgcHJlZmVyIHRvIHJldHVybiB0byB0aGVzZSBxdWVzdGlvbnMgYWZ0ZXIgYmFja3VwX3RvcCBj
-b21wbGV0ZWQsIGFzIGl0J3Mgc2ltcGxlcg0KdG8gZGlzY3VzcyBzb21ldGhpbmcgdGhhdCB3b3Jr
-cy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 1/28/19 11:14 AM, Stefan Berger wrote:
+> On 1/28/19 9:45 AM, Igor Mammedov wrote:
+>> On Fri, 25 Jan 2019 16:00:58 -0500
+>> Stefan Berger <stefanb@linux.ibm.com> wrote:
+>>
+>>> This patch makes the a TPM 2.0 with TIS interface available under the
+>>> HID 'MSF0101'. This is supported by Linux and also Windows now
+>> MSF0101 is relatively recent addition to Linux,
+>> are there in wild (old) kernels that worked with PNP0C31 but won't wor=
+k
+>> with MSF0101?
+>
+>
+> Linux 4.3.4 and later references this HID here:=20
+> https://elixir.bootlin.com/linux/v4.3.4/source/drivers/char/tpm/tpm_tis=
+.c=20
+> . I don't see it before that. A 3.10 kernel works with this patch as=20
+> well.
+
+
+... that 3.10 kernel from el7 has been patched, though.
+
+ =C2=A0=C2=A0 Stefan
