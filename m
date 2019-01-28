@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54606)
+Received: from eggs.gnu.org ([209.51.188.92]:54843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goATz-0007jK-FF
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:14:04 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1goAUu-0008Qf-Tt
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:15:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goATy-0003QO-Ks
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:14:03 -0500
-Date: Mon, 28 Jan 2019 18:13:55 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190128181355.2d79cae7.cohuck@redhat.com>
-In-Reply-To: <20190125170404.28c61eab@oc2783563651>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
-	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
-	<20190125112437.2c06fac6.cohuck@redhat.com>
-	<20190125135835.2d59b511.cohuck@redhat.com>
-	<20190125150101.3b61f0a1@oc2783563651>
-	<20190125152154.05120461.cohuck@redhat.com>
-	<20190125170404.28c61eab@oc2783563651>
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1goAUt-0003uB-Vp
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:15:00 -0500
+Received: from mail-oln040092010057.outbound.protection.outlook.com
+	([40.92.10.57]:39056
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1goAUt-0003rM-Lv
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:14:59 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Mon, 28 Jan 2019 17:14:54 +0000
+Message-ID: <RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128121331.GB2939@work-vm>
+In-Reply-To: <20190128121331.GB2939@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AE2A3BE0DEEB7A4EA10BEC518A36DEB0@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "kraxel@redhat.com" <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 25 Jan 2019 17:04:04 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> Do we expect userspace/QEMU to fence the bad scenarios as tries to do
-> today, or is this supposed to change to hardware should sort out
-> requests whenever possible.
-
-Does my other mail answer that?
-
-> The problem I see with the let the hardware sort it out is that, for that
-> to work, we need to juggle multiple translations simultaneously (or am I
-> wrong?). Doing that does not appear particularly simple to me.
-
-None in the first stage, at most two in the second stage, I guess.
-
-> Furthermore we would go through all that hassle knowingly that the sole
-> reason is working around bugs. We still expect our Linux guests
-> serializing it's ssch() stuff as it does today. Thus I would except this
-> code not getting the love nor the coverage that would guard against bugs
-> in that code.
-
-So, we should have test code for that? (Any IBM-internal channel I/O
-exercisers that may help?)
-
-We should not rely on the guest being sane, although Linux probably is
-in that respect.
+SGVyZSBpcyB0aGUgYmFja3RyYWNlIHdpdGggdGhlIGRlYnVnIHN5bWJvbHMgYWRkZWQ6DQoNCihn
+ZGIpIGJ0DQojMCAgMHgwMDAwN2ZmZmYwMzczZTk3IGluIF9fR0lfcmFpc2UgKHNpZz1zaWdAZW50
+cnk9NikgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4L3JhaXNlLmM6NTENCiMxICAweDAw
+MDA3ZmZmZjAzNzU4MDEgaW4gX19HSV9hYm9ydCAoKSBhdCBhYm9ydC5jOjc5DQojMiAgMHgwMDAw
+N2ZmZmYxMTcxY2M5IGluIHNwaWNlX2xvZ3YgKGxvZ19kb21haW49MHg3ZmZmZjExZGM5ZjUgIlNw
+aWNlIiwNCmFyZ3M9MHg3ZmZmMzYwMjhjYjAsIGZvcm1hdD0weDdmZmZmMTFlM2M1YiAic2xvdF9p
+ZCAlZCB0b28gYmlnLA0KYWRkcj0lbHgiLCBmdW5jdGlvbj0weDdmZmZmMTFlM2Q5MCA8X19GVU5D
+VElPTl9fLjE1NTk0Pg0KIm1lbXNsb3RfZ2V0X3ZpcnQiLCBzdHJsb2M9MHg3ZmZmZjExZTNjNzgg
+Im1lbXNsb3QuYzoxMTEiLA0KbG9nX2xldmVsPUdfTE9HX0xFVkVMX0NSSVRJQ0FMKSBhdCBsb2cu
+YzoxODMNCiMzICAweDAwMDA3ZmZmZjExNzFjYzkgaW4gc3BpY2VfbG9nDQoobG9nX2xldmVsPWxv
+Z19sZXZlbEBlbnRyeT1HX0xPR19MRVZFTF9DUklUSUNBTCwNCnN0cmxvYz1zdHJsb2NAZW50cnk9
+MHg3ZmZmZjExZTNjNzggIm1lbXNsb3QuYzoxMTEiLA0KZnVuY3Rpb249ZnVuY3Rpb25AZW50cnk9
+MHg3ZmZmZjExZTNkOTAgPF9fRlVOQ1RJT05fXy4xNTU5ND4NCiJtZW1zbG90X2dldF92aXJ0Iiwg
+Zm9ybWF0PWZvcm1hdEBlbnRyeT0weDdmZmZmMTFlM2M1YiAic2xvdF9pZCAlZCB0b28NCmJpZywg
+YWRkcj0lbHgiKSBhdCBsb2cuYzoxOTYNCiM0ICAweDAwMDA3ZmZmZjExMzczYjggaW4gbWVtc2xv
+dF9nZXRfdmlydA0KKGluZm89aW5mb0BlbnRyeT0weDU1NTU1NzliODYzMCwgYWRkcj1hZGRyQGVu
+dHJ5PTE4Mzc0Njg2NDgzOTQ5ODEzNzYwLA0KYWRkX3NpemU9YWRkX3NpemVAZW50cnk9MTAsIGdy
+b3VwX2lkPWdyb3VwX2lkQGVudHJ5PTEsDQplcnJvcj1lcnJvckBlbnRyeT0weDdmZmYzNjAyOGUw
+OCkNCiAgICBhdCBtZW1zbG90LmM6MTExDQojNSAgMHgwMDAwN2ZmZmYxMTQwN2QwIGluIHJlZF9n
+ZXRfaW1hZ2UNCihzbG90cz1zbG90c0BlbnRyeT0weDU1NTU1NzliODYzMCwgZ3JvdXBfaWQ9Z3Jv
+dXBfaWRAZW50cnk9MSwNCmFkZHI9PG9wdGltaXplZCBvdXQ+LCBmbGFncz1mbGFnc0BlbnRyeT0w
+LCBpc19tYXNrPWlzX21hc2tAZW50cnk9ZmFsc2UpDQphdCByZWQtcGFyc2UtcXhsLmM6NTEyDQoj
+NiAgMHgwMDAwN2ZmZmYxMTQwYTc2IGluIHJlZF9nZXRfY29weV9wdHINCihzbG90cz1zbG90c0Bl
+bnRyeT0weDU1NTU1NzliODYzMCwgZ3JvdXBfaWQ9Z3JvdXBfaWRAZW50cnk9MSwNCnJlZD1yZWRA
+ZW50cnk9MHg3ZmZmMTQwOWY1ZjAsIHF4bD0weDdmZmYxZmUwMTA3YiwgZmxhZ3M9ZmxhZ3NAZW50
+cnk9MCkNCmF0IHJlZC1wYXJzZS1xeGwuYzo2ODANCiM3ICAweDAwMDA3ZmZmZjExNDE5YTEgaW4g
+cmVkX2dldF9uYXRpdmVfZHJhd2FibGUgKGZsYWdzPTxvcHRpbWl6ZWQNCm91dD4sIGFkZHI9PG9w
+dGltaXplZCBvdXQ+LCByZWQ9PG9wdGltaXplZCBvdXQ+LCBncm91cF9pZD08b3B0aW1pemVkDQpv
+dXQ+LCBzbG90cz08b3B0aW1pemVkIG91dD4pIGF0IHJlZC1wYXJzZS1xeGwuYzoxMDcyDQojOCAg
+MHgwMDAwN2ZmZmYxMTQxOWExIGluIHJlZF9nZXRfZHJhd2FibGUNCihzbG90cz1zbG90c0BlbnRy
+eT0weDU1NTU1NzliODYzMCwgZ3JvdXBfaWQ9MSwNCnJlZD1yZWRAZW50cnk9MHg3ZmZmMTQwOWY1
+NTAsIGFkZHI9PG9wdGltaXplZCBvdXQ+LCBmbGFncz0wKSBhdA0KcmVkLXBhcnNlLXF4bC5jOjEy
+MDYNCiM5ICAweDAwMDA3ZmZmZjExNTQzY2QgaW4gcmVkX3Byb2Nlc3NfZGlzcGxheSAod29ya2Vy
+PTB4NTU1NTU3OWI4NWEwLA0KcmluZ19pc19lbXB0eT0weDdmZmYzNjAyOGY5YykgYXQgcmVkLXdv
+cmtlci5jOjIyNA0KIzEwIDB4MDAwMDdmZmZmMTE1MmQyMSBpbiBmbHVzaF9jb21tYW5kcw0KKHdv
+cmtlcj13b3JrZXJAZW50cnk9MHg1NTU1NTc5Yjg1YTAsIHJlZF9jaGFubmVsPTB4NTU1NTU3OWI0
+YTEwLA0KcHJvY2Vzcz1wcm9jZXNzQGVudHJ5PTB4N2ZmZmYxMTU0MjIwIDxyZWRfcHJvY2Vzc19k
+aXNwbGF5PikgYXQNCnJlZC13b3JrZXIuYzozMTUNCiMxMSAweDAwMDA3ZmZmZjExNTJlNTggaW4g
+Zmx1c2hfZGlzcGxheV9jb21tYW5kcw0KKHdvcmtlcj13b3JrZXJAZW50cnk9MHg1NTU1NTc5Yjg1
+YTApIGF0IHJlZC13b3JrZXIuYzozNTINCiMxMiAweDAwMDA3ZmZmZjExNTM0YmYgaW4gZmx1c2hf
+YWxsX3F4bF9jb21tYW5kcyAod29ya2VyPTB4NTU1NTU3OWI4NWEwKQ0KYXQgcmVkLXdvcmtlci5j
+OjM2Nw0KIzEzIDB4MDAwMDdmZmZmMTE1MzRiZiBpbiBkZXN0cm95X3ByaW1hcnlfc3VyZmFjZQ0K
+KHdvcmtlcj0weDU1NTU1NzliODVhMCwgc3VyZmFjZV9pZD0wKSBhdCByZWQtd29ya2VyLmM6NTU4
+DQojMTQgMHgwMDAwN2ZmZmYxMTIxNGYxIGluIGRpc3BhdGNoZXJfaGFuZGxlX3NpbmdsZV9yZWFk
+DQooZGlzcGF0Y2hlcj0weDU1NTU1NmEwYzFjMCkgYXQgZGlzcGF0Y2hlci5jOjI4NA0KIzE1IDB4
+MDAwMDdmZmZmMTEyMTRmMSBpbiBkaXNwYXRjaGVyX2hhbmRsZV9yZWN2X3JlYWQNCihkaXNwYXRj
+aGVyPTB4NTU1NTU2YTBjMWMwKSBhdCBkaXNwYXRjaGVyLmM6MzA0DQojMTYgMHgwMDAwN2ZmZmYx
+MTI3ZDdiIGluIHdhdGNoX2Z1bmMgKHNvdXJjZT08b3B0aW1pemVkIG91dD4sDQpjb25kaXRpb249
+PG9wdGltaXplZCBvdXQ+LCBkYXRhPTB4NTU1NTU3OWI4NzgwKSBhdCBldmVudC1sb29wLmM6MTI4
+DQojMTcgMHgwMDAwN2ZmZmY0NzkzMWY1IGluIGdfbWFpbl9jb250ZXh0X2Rpc3BhdGNoICgpIGF0
+DQovdXNyL2xpYi94ODZfNjQtbGludXgtZ251L2xpYmdsaWItMi4wLnNvLjANCiMxOCAweDAwMDA3
+ZmZmZjQ3OTM1YzAgaW4gICgpIGF0IC91c3IvbGliL3g4Nl82NC1saW51eC1nbnUvbGliZ2xpYi0y
+LjAuc28uMA0KIzE5IDB4MDAwMDdmZmZmNDc5MzhkMiBpbiBnX21haW5fbG9vcF9ydW4gKCkgYXQN
+Ci91c3IvbGliL3g4Nl82NC1saW51eC1nbnUvbGliZ2xpYi0yLjAuc28uMA0KIzIwIDB4MDAwMDdm
+ZmZmMTE1M2IzYSBpbiByZWRfd29ya2VyX21haW4gKGFyZz0weDU1NTU1NzliODVhMCkgYXQNCnJl
+ZC13b3JrZXIuYzoxMzcyDQojMjEgMHgwMDAwN2ZmZmYwNzJkNmRiIGluIHN0YXJ0X3RocmVhZCAo
+YXJnPTB4N2ZmZjM2MDJjNzAwKSBhdA0KcHRocmVhZF9jcmVhdGUuYzo0NjMNCiMyMiAweDAwMDA3
+ZmZmZjA0NTY4OGYgaW4gY2xvbmUgKCkgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4L3g4
+Nl82NC9jbG9uZS5TOjk1DQoNCg0Kw4BzIDEwOjEzIGRlIDI4LzAxLzIwMTksIERyLiBEYXZpZCBB
+bGFuIEdpbGJlcnQgZXNjcmV2ZXU6DQo+IA0KPiBUaGFua3MgZm9yIHRoZSByZXBvcnQsDQo+IA0K
+PiBDb3VsZCB5b3UgaW5zdGFsbCB0aGUgZGVidWcgcGFja2FnZXMgb2YgbGlic3BpY2Utc2VydmVy
+IG9uIHlvdXIgc3lzdGVtDQo+IHNvIHRoYXQgdGhlIGJhY2t0cmFjZSB5b3UgZ2V0IGhhcyBzeW1i
+b2xzPw0KPiANCj4gRGF2ZQ0KPiANCg==
