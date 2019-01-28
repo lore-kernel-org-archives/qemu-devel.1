@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46887)
+Received: from eggs.gnu.org ([209.51.188.92]:35179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwVd-0008Vu-89
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:50 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gnyHO-00071X-Q9
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gnwVc-00015c-Fe
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:49 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gnwVc-00014z-8h
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 21:18:48 -0500
-Received: by mail-lf1-x142.google.com with SMTP id u18so10666447lff.10
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 18:18:48 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 27 Jan 2019 18:18:35 -0800
-Message-Id: <20190128021835.24451-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/xtensa: xtfpga: raise CPU number limit
+	(envelope-from <jasowang@redhat.com>) id 1gnyHN-0003Il-Ip
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gnyHM-0003Ff-6x
+	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:12 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 28 Jan 2019 12:11:59 +0800
+Message-Id: <20190128041159.28643-1-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH] test-filter-mirror: pass UNIX domain socket
+ through fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +22,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-MX PIC can support up to 32 CPUs on xtfpga boards, raise per-board
-limit accordingly.
+The tests tries to let qemu server mode to process the connection
+which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
+"x-oob", offer capability "oob" unconditionally"). This is because the
+filter may try to mirror the packets before UNIX socket object is
+ready (connected was set to true) from the view of qemu. In this case
+the packet will be dropped silently.
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Fixing this by passing pre-connected socket created by socketpair() to
+qemu through fd.
+
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/xtensa/xtfpga.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ tests/test-filter-mirror.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 792a225e03a2..1d21162a2773 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -599,7 +599,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
+diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+index 7ab2aed8a0..3c3d1f8961 100644
+--- a/tests/test-filter-mirror.c
++++ b/tests/test-filter-mirror.c
+@@ -21,10 +21,9 @@
  
-     mc->desc = "lx60 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init = xtfpga_lx60_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-     mc->default_ram_size = 64 * MiB;
- }
-@@ -616,7 +616,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
+ static void test_mirror(void)
+ {
+-    int send_sock[2], recv_sock;
++    int send_sock[2], recv_sock[2];
+     uint32_t ret = 0, len = 0;
+     char send_buf[] = "Hello! filter-mirror~";
+-    char sock_path[] = "filter-mirror.XXXXXX";
+     char *recv_buf;
+     uint32_t size = sizeof(send_buf);
+     size = htonl(size);
+@@ -38,18 +37,15 @@ static void test_mirror(void)
+     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
+     g_assert_cmpint(ret, !=, -1);
  
-     mc->desc = "lx60 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
-     mc->init = xtfpga_lx60_nommu_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-     mc->default_ram_size = 64 * MiB;
- }
-@@ -633,7 +633,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
+-    ret = mkstemp(sock_path);
++    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
+     g_assert_cmpint(ret, !=, -1);
  
-     mc->desc = "lx200 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init = xtfpga_lx200_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-     mc->default_ram_size = 96 * MiB;
- }
-@@ -650,7 +650,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
+     qts = qtest_initf(
+         "-netdev socket,id=qtest-bn0,fd=%d "
+         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
+-        "-chardev socket,id=mirror0,path=%s,server,nowait "
++        "-chardev socket,id=mirror0,fd=%d "
+         "-object filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
+-        , send_sock[1], devstr, sock_path);
+-
+-    recv_sock = unix_connect(sock_path, NULL);
+-    g_assert_cmpint(recv_sock, !=, -1);
++        , send_sock[1], devstr, recv_sock[1]);
  
-     mc->desc = "lx200 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
-     mc->init = xtfpga_lx200_nommu_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-     mc->default_ram_size = 96 * MiB;
- }
-@@ -667,7 +667,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+     struct iovec iov[] = {
+         {
+@@ -67,18 +63,16 @@ static void test_mirror(void)
+     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
+     close(send_sock[0]);
  
-     mc->desc = "ml605 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init = xtfpga_ml605_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-     mc->default_ram_size = 512 * MiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
- }
-@@ -684,7 +684,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+-    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
++    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
+     g_assert_cmpint(ret, ==, sizeof(len));
+     len = ntohl(len);
  
-     mc->desc = "ml605 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
-     mc->init = xtfpga_ml605_nommu_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-     mc->default_ram_size = 256 * MiB;
- }
-@@ -701,7 +701,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
+     g_assert_cmpint(len, ==, sizeof(send_buf));
+     recv_buf = g_malloc(len);
+-    ret = qemu_recv(recv_sock, recv_buf, len, 0);
++    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
+     g_assert_cmpstr(recv_buf, ==, send_buf);
  
-     mc->desc = "kc705 EVB (" XTENSA_DEFAULT_CPU_MODEL ")";
-     mc->init = xtfpga_kc705_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-     mc->default_ram_size = 1 * GiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
+     g_free(recv_buf);
+-    close(recv_sock);
+-    unlink(sock_path);
+     qtest_quit(qts);
  }
-@@ -718,7 +718,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
  
-     mc->desc = "kc705 noMMU EVB (" XTENSA_DEFAULT_CPU_NOMMU_MODEL ")";
-     mc->init = xtfpga_kc705_nommu_init;
--    mc->max_cpus = 4;
-+    mc->max_cpus = 32;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-     mc->default_ram_size = 256 * MiB;
- }
 -- 
-2.11.0
+2.17.1
