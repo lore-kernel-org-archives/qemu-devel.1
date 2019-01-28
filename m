@@ -1,25 +1,27 @@
 Received: from eggs.gnu.org ([209.51.188.92]:51412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1go8XD-0008Io-Ks
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:09:18 -0500
+	(envelope-from <philmd@redhat.com>) id 1go8XP-0008Io-9t
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1go8L8-00042O-KM
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:56:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40456)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1go8L8-00042H-E0
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:56:46 -0500
-Date: Mon, 28 Jan 2019 14:56:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190128145642.GA3437@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAChFQ9RDi+VK_EERZsPB6UK_DpL-LDs97A6VivYSbuk=0VKP7A@mail.gmail.com>
-	<CAFEAcA9gvX_9HDadd1VaC214CLDg7w1dOdCaKXuG5PXxC+-quA@mail.gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1go8JU-0003gJ-93
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:55:04 -0500
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:50494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go8JU-0003fu-3b
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:55:04 -0500
+Received: by mail-wm1-f50.google.com with SMTP id n190so14334318wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 06:55:04 -0800 (PST)
+References: <1548678699-15717-1-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ae5efb07-6079-e102-4c21-65bdd5c9d9a2@redhat.com>
+Date: Mon, 28 Jan 2019 15:55:00 +0100
 MIME-Version: 1.0
+In-Reply-To: <1548678699-15717-1-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9gvX_9HDadd1VaC214CLDg7w1dOdCaKXuG5PXxC+-quA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Building nsis installer - cross compile for Windows
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390x: remove direct reference to
+ mem_path global form s390x code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Adam Baxter <voltagex@voltagex.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: david@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Mon, Jan 28, 2019 at 01:46:57PM +0000, Peter Maydell wrote:
-> On Mon, 28 Jan 2019 at 13:34, Adam Baxter <voltagex@voltagex.org> wrote:
-> >
-> > I'm getting stuck trying to build the NSIS installer for Windows
-> >
-> >
-> > export CFLAGS="-Wno-stringop-truncation"
-> > ./configure --python=$(command -v python3)
-> > --cross-prefix=x86_64-w64-mingw32- --enable-docs
-> > echo 3.99.99 > VERSION
-> > make -j`nproc`
-> > make -j`nproc` installer
-> >
-> > results in:
+On 1/28/19 1:31 PM, Igor Mammedov wrote:
+> I plan to deprecate -mem-path option and replace it with memory-backend,
+> for that it's necessary to get rid of mem_path global variable.
+> Do it for s390x case, replacing it with alternative way to enable
+> 1Mb hugepages capability.
 > 
-> > File: "/tmp/qemu-nsis\*.bmp" -> no files found.
-> > Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
-> >    /oname=outfile one_file_only)
-> > Error in script "/drone/src/qemu.nsi" on line 122 -- aborting creation process
-> > make: *** [Makefile:915: qemu-setup-3.99.99.exe] Error 1
+> Todo that replace qemu_mempath_getpagesize() with qemu_getrampagesize()
+
+I guess this should be: "To do that, replace ..."
+
+> which also checks for -mem-path provided RAM.
 > 
-> I suspect this is because we've recently removed the
-> qemu-icon.bmp but didn't update the NSIS installer script,
-> which is now looking for a wildcard that doesn't match anything
-> (and isn't trying to install the new .png icon files).
-> If you try this on a commit before a8260d3876389eb52 does it
-> work?
-
-Opps, I'll cook up a fix that.
-
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   * s/qemu_mempath_getpagesize/qemu_getrampagesiz/ and drop the rest of changes
+>           David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> qemu-icon.bmp seems also to still be listed in the LINKS
-> in configure which defines what we symlink from the source
-> tree to the build tree (and again, the png files are not).
-
-Wierd, I don't understand why we need any of that LINKS stuff in
-configure. Not having the png files listed doesn't cause any
-obvious problem that I can see. For that matter nor does having
-the (now deleted) qemu-icon.bmp seem to cause a failure, as we
-silent ignore source tree files that don't exist.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 2ebf26a..90766fa 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -287,7 +287,7 @@ void kvm_s390_crypto_reset(void)
+>  
+>  static int kvm_s390_configure_mempath_backing(KVMState *s)
+>  {
+> -    size_t path_psize = qemu_mempath_getpagesize(mem_path);
+> +    size_t path_psize = qemu_getrampagesize();
+>  
+>      if (path_psize == 4 * KiB) {
+>          return 0;
+> @@ -319,7 +319,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>  
+> -    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
+> +    if (kvm_s390_configure_mempath_backing(s)) {
+>          return -EINVAL;
+>      }
+>  
+> 
