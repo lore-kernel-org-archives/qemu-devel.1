@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37215)
+Received: from eggs.gnu.org ([209.51.188.92]:36956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goBEL-0003Zq-G0
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:01:58 -0500
+	(envelope-from <laurent@vivier.eu>) id 1goBEW-000396-J9
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goB6g-0004ps-Cd
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:54:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1goB6e-0004Zt-Fh
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:54:01 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D011D4E90B
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:47:34 +0000 (UTC)
-From: Caio Carrara <ccarrara@redhat.com>
-Date: Mon, 28 Jan 2019 15:47:23 -0200
-Message-Id: <20190128174725.8809-1-ccarrara@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1goB2m-0002aX-Lz
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:50:01 -0500
+References: <20190128173940.25813-1-alex.bennee@linaro.org>
+	<20190128173940.25813-4-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <1fe0a234-c951-2862-8c6e-a2da8b9d7d88@vivier.eu>
+Date: Mon, 28 Jan 2019 18:49:34 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/2] Acceptance tests: adds multi vm
- capability and basic migration test
+In-Reply-To: <20190128173940.25813-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 3/4] linux-user/elfload: enable
+ HWCAP_CPUID for AArch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wainersm@redhat.com, ehabkost@redhat.com, philmd@redhat.com, crosa@redhat.com, Caio Carrara <ccarrara@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-This is the second attempt to add the multi vm capability to base class
-of acceptance tests. The difference from first version is that in this
-current version a simple migration test was added (done by Cleber) so
-the new code that is being added is properly used and we're not adding
-"new dead code".
+On 28/01/2019 18:39, Alex Bennée wrote:
+> Userspace programs should (in theory) query the ELF HWCAP before
+> probing these registers. Now we have implemented them all make it
+> public.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/elfload.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 4cff9e1a31..e95c162097 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -571,6 +571,7 @@ static uint32_t get_elf_hwcap(void)
+>  
+>      hwcaps |= ARM_HWCAP_A64_FP;
+>      hwcaps |= ARM_HWCAP_A64_ASIMD;
+> +    hwcaps |= ARM_HWCAP_A64_CPUID;
+>  
+>      /* probe for the extra features */
+>  #define GET_FEATURE_ID(feat, hwcap) \
+> 
 
-There are more tests and test cases that can be added, but I'm assuming
-this patch is complete enough and other series can be sent after
-covering the other cases.
-
-Caio Carrara (1):
-  tests.acceptance: adds multi vm capability for acceptance tests
-
-Cleber Rosa (1):
-  Acceptance tests: add simple migration test
-
- docs/devel/testing.rst                    | 40 +++++++++++++++++++-
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++--
- tests/acceptance/migration.py             | 45 +++++++++++++++++++++++
- 3 files changed, 105 insertions(+), 5 deletions(-)
- create mode 100644 tests/acceptance/migration.py
-
---=20
-2.20.1
+Acked-by: Laurent Vivier <laurent@vivier.eu>
