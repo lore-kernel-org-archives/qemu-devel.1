@@ -1,39 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52875)
+Received: from eggs.gnu.org ([209.51.188.92]:53705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1goDjJ-0004oS-HF
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:42:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1goDlG-0006Fk-1y
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:44:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1goDck-0006rn-Om
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:35:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42770
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1goDck-0006rU-Ix
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:35:18 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0SKO3Qv056056
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 15:35:17 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qa817jghv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 15:35:17 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Mon, 28 Jan 2019 20:35:16 -0000
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Mon, 28 Jan 2019 15:35:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1goDlF-00044s-0p
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:44:06 -0500
+References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d278f3d1-9c35-e522-603c-f26733d38659@redhat.com>
+Date: Mon, 28 Jan 2019 14:43:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <e2394dc4-1d95-2c23-5e11-cff441d57c78@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+In-Reply-To: <1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RM4jGOtcpqlZJxPZntg4ZxpO0Sg0SzyOf"
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,89 +25,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pasic@linux.ibm.com, imammedo@redhat.com, pmorel@linux.ibm.com
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 12/17/18 10:57 AM, Tony Krowiak wrote:
-> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> value of the BusState structure with the max_dev value of the BusClass structure
-> to determine whether the maximum number of children has been reached for the
-> bus. The problem is, the max_index field of the BusState structure does not
-> necessarily reflect the number of devices that have been plugged into
-> the bus.
-> 
-> Whenever a child device is plugged into the bus, the bus's max_index value is
-> assigned to the child device and then incremented. If the child is subsequently
-> unplugged, the value of the max_index does not change and no longer reflects the
-> number of children.
-> 
-> When the bus's max_index value reaches the maximum number of devices
-> allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> attempts to plug another device will be rejected claiming that the bus is
-> full -- even if the bus is actually empty.
-> 
-> To resolve the problem, a new 'num_children' field is being added to the
-> BusState structure to keep track of the number of children plugged into the
-> bus. It will be incremented when a child is plugged, and decremented when a
-> child is unplugged.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RM4jGOtcpqlZJxPZntg4ZxpO0Sg0SzyOf
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org,
+ vsementsov@virtuozzo.com
+Message-ID: <d278f3d1-9c35-e522-603c-f26733d38659@redhat.com>
+Subject: Re: [PATCH v9 1/2] qemu-img info lists bitmap directory entries
+References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/28/19 2:01 PM, Andrey Shinkevich wrote:
+> In the 'Format specific information' section of the 'qemu-img info'
+> command output, the supplemental information about existing QCOW2
+> bitmaps will be shown, such as a bitmap name, flags and granularity:
+>=20
+
+>=20
+> As the print of the qcow2 specific information expanded by adding
+> the bitmap parameters to the 'qemu-img info' command output,
+> it requires amendment of the output benchmark in the following
+> tests: 060, 065, 082, 198, and 206.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->   hw/core/qdev.c         | 3 +++
->   include/hw/qdev-core.h | 1 +
->   qdev-monitor.c         | 2 +-
->   3 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6b3cc55b27c2..956923f33520 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
->               snprintf(name, sizeof(name), "child[%d]", kid->index);
->               QTAILQ_REMOVE(&bus->children, kid, sibling);
->   
-> +            bus->num_children--;
+
+> =20
+> +static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)=
+
+> +{
+> +    Qcow2BitmapInfoFlagsList *list =3D NULL;
+> +    Qcow2BitmapInfoFlagsList **plist =3D &list;
 > +
->               /* This gives back ownership of kid->child back to us.  */
->               object_property_del(OBJECT(bus), name, NULL);
->               object_unref(OBJECT(kid->child));
-> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
->       char name[32];
->       BusChild *kid = g_malloc0(sizeof(*kid));
->   
-> +    bus->num_children++;
->       kid->index = bus->max_index++;
->       kid->child = child;
->       object_ref(OBJECT(kid->child));
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index a24d0dd566e3..521f0a947ead 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -206,6 +206,7 @@ struct BusState {
->       HotplugHandler *hotplug_handler;
->       int max_index;
->       bool realized;
-> +    int num_children;
->       QTAILQ_HEAD(ChildrenHead, BusChild) children;
->       QLIST_ENTRY(BusState) sibling;
->   };
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 07147c63bf8b..45a8ba49644c 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
->   static inline bool qbus_is_full(BusState *bus)
->   {
->       BusClass *bus_class = BUS_GET_CLASS(bus);
-> -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
-> +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
->   }
->   
->   /*
+> +    if (flags & BME_FLAG_IN_USE) {
+> +        Qcow2BitmapInfoFlagsList *entry =3D g_new0(Qcow2BitmapInfoFlag=
+sList, 1);
+> +        entry->value =3D QCOW2_BITMAP_INFO_FLAGS_IN_USE;
+> +        *plist =3D entry;
+> +        plist =3D &entry->next;
 
-Just checking back on this one. Do we want to merge this patch and deal
-with the max_index issue in another patch, in this patch, or not at all?
+This line...
 
-> 
+> +    }
+> +    if (flags & BME_FLAG_AUTO) {
+> +        Qcow2BitmapInfoFlagsList *entry =3D g_new0(Qcow2BitmapInfoFlag=
+sList, 1);
+> +        entry->value =3D QCOW2_BITMAP_INFO_FLAGS_AUTO;
+> +        *plist =3D entry;
+> +    }
+
+=2E..is omitted here. Harmless for now, but may cause grief if a later
+flag is added and we forget to add it in. On the other hand, I don't
+know if a static analyzer might warn about a dead assignment, so
+breaking the symmetry between the two is okay if that is the justificatio=
+n.
+
+Also, thinking about future flag additions, would it make any sense to
+write this code in a for loop?  Something like (untested):
+
+    static const struct Map {
+        int bme;
+        int info;
+    } map[] =3D {
+        { BME_FLAG_IN_USE, QCOW2_BITMAP_INFO_FLAGS_IN_USE },
+        { BME_FLAG_AUTO,   QCOW2_BITMAP_INFO_FLAGS_AUTO },
+    };
+
+    for (i =3D 0; i < ARRAY_LENGTH(map); i++) {
+        if (flags & map[i].bme) {
+            ...; entry->value =3D map[i].info;
+    }
+
+where adding a new bit is now a one-liner change to the definition of
+'map' rather than a 6-line addition of a new conditional.
+
+
+> +##
+> +# @Qcow2BitmapInfo:
+> +#
+> +# Qcow2 bitmap information.
+> +#
+> +# @name: the name of the bitmap
+> +#
+> +# @granularity: granularity of the bitmap in bytes
+> +#
+> +# @flags: flags of the bitmap
+> +#
+> +# @unknown-flags: unspecified flags if detected
+
+Maybe:
+
+@flags: recognized flags of the bitmap
+
+@unknown-flags: any remaining flags not recognized by this qemu version
+
+
+> +++ b/tests/qemu-iotests/060.out
+> @@ -18,6 +18,7 @@ cluster_size: 65536
+>  Format specific information:
+>      compat: 1.1
+>      lazy refcounts: false
+> +    bitmaps:
+
+Hmm. I'm wondering if the human-readable output of a QAPI type with an
+optional array should output "<none>" or something similar for a
+0-element array, to make it obvious to the human reading the output that
+there are no bitmaps.  That's not necessarily a problem in your patch;
+and may have even bigger effects to other iotests, so it should be done
+as a separate patch if we want it.  But even in your patch, if we did
+that,...
+
+>      refcount bits: 16
+>      corrupt: true
+>  can't open device TEST_DIR/t.IMGFMT: IMGFMT: Image is corrupt; cannot =
+be opened read/write
+> diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+> index 8bac383..86406cb 100755
+> --- a/tests/qemu-iotests/065
+> +++ b/tests/qemu-iotests/065
+> @@ -88,23 +88,23 @@ class TestQMP(TestImageInfoSpecific):
+>  class TestQCow2(TestQemuImgInfo):
+>      '''Testing a qcow2 version 2 image'''
+>      img_options =3D 'compat=3D0.10'
+> -    json_compare =3D { 'compat': '0.10', 'refcount-bits': 16 }
+> -    human_compare =3D [ 'compat: 0.10', 'refcount bits: 16' ]
+> +    json_compare =3D { 'compat': '0.10', 'bitmaps': [], 'refcount-bits=
+': 16 }
+> +    human_compare =3D [ 'compat: 0.10', 'bitmaps:', 'refcount bits: 16=
+' ]
+
+=2E..the human_compare dict would have to account for whatever string we
+output for an empty JSON array.
+
+I'm finding the functionality useful, though, so unless there are strong
+opinions presented on making further tweaks, I'm also fine giving this
+version as-is:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--RM4jGOtcpqlZJxPZntg4ZxpO0Sg0SzyOf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxPaY8ACgkQp6FrSiUn
+Q2qi2AgAktY16lo3QBL6pqC75KCwmGWtunQCyXhgwSwylBmT9B88y047xafODj4r
+FApx2Km5ITmveHM09oUJznGBNSjbLgAiDq769HuAKOQoMXsgxtSRJM90UT6VBGqJ
+gzRTga/1ZY4dN83Tzb61jCHH8ed5tKqPxWGJ3AXQV+9Jl0Obuqv0+DY9CC45ZSa6
+2drkvWIE0vbzvmuvg7Ma/HRR74VMD2OyARkwCrKs2GoGFZo+DH0oniBfujnDM8ZJ
+gNsxucG6qTfxt9YwYOdUMrYTRk6NwiwMonIng8y+F54M/PWXp4DWrvk379y5f5DY
+euWEPLtSxEkp7iU9jhhF+q0XZ3f1Zw==
+=/B8x
+-----END PGP SIGNATURE-----
+
+--RM4jGOtcpqlZJxPZntg4ZxpO0Sg0SzyOf--
