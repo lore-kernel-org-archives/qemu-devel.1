@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54302)
+Received: from eggs.gnu.org ([209.51.188.92]:54606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goASk-0006Z5-5W
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:12:47 -0500
+	(envelope-from <cohuck@redhat.com>) id 1goATz-0007jK-FF
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:14:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goASj-0002iB-58
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:12:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goASh-0002Yq-8I
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:12:45 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E3FFA7E1
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:12:31 +0000 (UTC)
-Date: Mon, 28 Jan 2019 12:12:29 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190128121142-mutt-send-email-mst@kernel.org>
-References: <20190128170321.16936-1-dgilbert@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1goATy-0003QO-Ks
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:14:03 -0500
+Date: Mon, 28 Jan 2019 18:13:55 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190128181355.2d79cae7.cohuck@redhat.com>
+In-Reply-To: <20190125170404.28c61eab@oc2783563651>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
+	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
+	<20190125112437.2c06fac6.cohuck@redhat.com>
+	<20190125135835.2d59b511.cohuck@redhat.com>
+	<20190125150101.3b61f0a1@oc2783563651>
+	<20190125152154.05120461.cohuck@redhat.com>
+	<20190125170404.28c61eab@oc2783563651>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190128170321.16936-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/9] Network announce changes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Mon, Jan 28, 2019 at 05:03:12PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Hi,
->   This is a reworking of a few sets of patches from 2017
-> that were put together by myself, Germano and Vlad that make
-> the network announce system more flexible.
-> 
->   Firstly, it's parameterised, so that you can change the number
-> of packets and the gap between them; the number can be set to 0
-> to disable announce completely.
-> 
->   Secondly, you can force an announce by a qmp or hmp command at
-> any time.  This is useful if you need the guest to do an announce
-> for a different reason; for example if the management layer
-> has just juggled some bonding configuration around.
-> 
->   The packet creation and timing also moves to net/ from migration/
-> 
->   The previous set was:
->      https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05594.html
-> 
-> Dave
+On Fri, 25 Jan 2019 17:04:04 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Do we expect userspace/QEMU to fence the bad scenarios as tries to do
+> today, or is this supposed to change to hardware should sort out
+> requests whenever possible.
 
-Who's applying this? Jason?
+Does my other mail answer that?
 
+> The problem I see with the let the hardware sort it out is that, for that
+> to work, we need to juggle multiple translations simultaneously (or am I
+> wrong?). Doing that does not appear particularly simple to me.
 
-> Dr. David Alan Gilbert (9):
->   net: Introduce announce timer
->   migration: Add announce parameters
->   virtio-net: Switch to using announce timer
->   migration: Switch to using announce timer
->   net: Add a network device specific self-announcement ability
->   virtio-net: Allow qemu_announce_self to trigger virtio announcements
->   qmp: Add announce-self command
->   hmp: Add hmp_announce_self
->   tests: Add a test for qemu self announcments
-> 
->  hmp-commands.hx                |  14 ++++
->  hmp.c                          |  33 ++++++++
->  hmp.h                          |   1 +
->  hw/net/trace-events            |   8 ++
->  hw/net/virtio-net.c            |  69 ++++++++++++----
->  include/hw/virtio/virtio-net.h |   4 +-
->  include/migration/misc.h       |  12 +--
->  include/net/announce.h         |  41 ++++++++++
->  include/net/net.h              |   2 +
->  include/qemu/typedefs.h        |   2 +
->  include/sysemu/sysemu.h        |   2 -
->  migration/migration.c          | 103 +++++++++++++++++++++++-
->  migration/migration.h          |   4 +
->  migration/savevm.c             |  72 +----------------
->  migration/trace-events         |   1 -
->  net/Makefile.objs              |   1 +
->  net/announce.c                 | 141 +++++++++++++++++++++++++++++++++
->  net/trace-events               |   4 +
->  qapi/migration.json            |  56 ++++++++++++-
->  qapi/net.json                  |  43 ++++++++++
->  tests/Makefile.include         |   2 +
->  tests/test-announce-self.c     |  83 +++++++++++++++++++
->  tests/test-hmp.c               |   1 +
->  23 files changed, 595 insertions(+), 104 deletions(-)
->  create mode 100644 include/net/announce.h
->  create mode 100644 net/announce.c
->  create mode 100644 tests/test-announce-self.c
-> 
-> -- 
-> 2.20.1
+None in the first stage, at most two in the second stage, I guess.
+
+> Furthermore we would go through all that hassle knowingly that the sole
+> reason is working around bugs. We still expect our Linux guests
+> serializing it's ssch() stuff as it does today. Thus I would except this
+> code not getting the love nor the coverage that would guard against bugs
+> in that code.
+
+So, we should have test code for that? (Any IBM-internal channel I/O
+exercisers that may help?)
+
+We should not rely on the guest being sane, although Linux probably is
+in that respect.
