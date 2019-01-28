@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48459)
+Received: from eggs.gnu.org ([209.51.188.92]:51157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1go8DW-0004tr-0o
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1go8X3-0008Dl-7E
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1go8DU-0002A4-SM
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1go8DU-00026o-Ja
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:48:52 -0500
-Date: Mon, 28 Jan 2019 12:48:48 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190128144848.GS4136@habkost.net>
-References: <20181227024304.12182-1-tao3.xu@intel.com>
-	<20181227024304.12182-3-tao3.xu@intel.com>
-	<20190114183545.GB28115@habkost.net>
-	<ad912a4e-986b-61d3-0fd8-1047ecabd651@intel.com>
-	<20190123191550.GX4136@habkost.net>
-	<ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
+	(envelope-from <philmd@redhat.com>) id 1go8TP-0006Iy-Bh
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:05:21 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go8TP-0006IL-5g
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:05:19 -0500
+Received: by mail-wm1-f68.google.com with SMTP id g67so14249635wmd.2
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:05:19 -0800 (PST)
+References: <20190125192719.15339-1-philmd@redhat.com>
+	<20190125192719.15339-3-philmd@redhat.com> <874l9tnmev.fsf@linaro.org>
+	<8f1c2854-fb0a-b8cd-14aa-1b30924f11bf@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cfa21c5e-5cb5-8996-0712-a6516e50b8aa@redhat.com>
+Date: Mon, 28 Jan 2019 16:05:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab92f502-bc96-34fd-0b21-6d1918648549@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] i386: Add some MSR based features on
- Cascadelake-Server CPU model
+In-Reply-To: <8f1c2854-fb0a-b8cd-14aa-1b30924f11bf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] XXX oslib-posix: Ignore
+ fcntl("/dev/null", F_SETFL, O_NONBLOCK) failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Xu <tao3.xu@intel.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, robert.hu@linux.intel.com, thomas.lendacky@amd.com, xuelian.guo@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>
 
-On Mon, Jan 28, 2019 at 04:33:40PM +0800, Tao Xu wrote:
-> On 1/24/2019 3:15 AM, Eduardo Habkost wrote:
-> > On Mon, Jan 21, 2019 at 05:29:32PM +0800, Tao Xu wrote:
-> > > On 1/15/2019 2:35 AM, Eduardo Habkost wrote:
-> > > > Sorry, we do have a problem here:
-> > > > 
-> > > > On Thu, Dec 27, 2018 at 10:43:04AM +0800, Tao Xu wrote:
-> > > > [...]
-> > > > >    #define PC_COMPAT_3_0 \
-> > > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > > index 09706ad51a..5296c73cd5 100644
-> > > > > --- a/target/i386/cpu.c
-> > > > > +++ b/target/i386/cpu.c
-> > > > > @@ -2499,7 +2499,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-> > > > >                CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
-> > > > >                CPUID_7_0_ECX_AVX512VNNI,
-> > > > >            .features[FEAT_7_0_EDX] =
-> > > > > -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> > > > > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
-> > > > > +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
-> > > > 
-> > > > CPUID_7_0_EDX_ARCH_CAPABILITIES is still set on
-> > > > unmigratable_flags.  We need to make it migratable before adding
-> > > > it by default to a named CPU model.
-> > > > 
-> > > Hi Eduardo,
-> > > 
-> > > Do you mean I need to remove CPUID_7_0_EDX_ARCH_CAPABILITIES
-> > > from .migratable_flags? Or CPUID_7_0_EDX_ARCH_CAPABILITIES can not
-> > > support migration now?
-> > 
-> > We need to remove it from .unmigratable_flags, but only after
-> > confirm it is really migration-safe.  To make it migration-safe,
-> > the MSR value seen by the guest must have a predictable value
-> > that is 100% independent from host hardware or host software
-> > version.
-> > 
-> > This is easy to ensure if MSR_IA32_ARCH_CAPABILITIES is in
-> > KVM_GET_MSR_INDEX_LIST (meaning QEMU can actually configure the
-> > MSR value seen by the guest).  If MSR_IA32_ARCH_CAPABILITIES is
-> > not on KVM_GET_MSR_INDEX_LIST, arch-capabilities must not be
-> > returned by x86_cpu_get_supported_feature_word() when
-> > migratable_only is true.
-> > 
-> Thank you. I have seen your patch to migratable it:
+On 1/28/19 12:03 PM, Paolo Bonzini wrote:
+> On 28/01/19 10:47, Alex Bennée wrote:
+>>>
+>>> [1] The fix seems https://github.com/openbsd/src/commit/c2a35b387f9d3c
+>>>   "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, so
+>>>   the memory devices (/dev/null, /dev/zero, etc) need to permit them."
+>> I assume set_nonblock is called on more than just these special devices?
+>> Is there anyway to check this on OpenBSD or is it just an anonymous fd
+>> at this point?
+>>
 > 
-> [PATCH 0/2] i386: arch_capabilities fixes + migratability
-> http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06701.html
-> 
-> So now can arch-capabilities and features exposed by it be added in
-> Cascadelake CPU model? Because Cascadelake CPU model can support it in
-> hardware. And for Icelake CPU model, Robert will add in the future.
+> Perhaps on OpenBSD we should just assert that we don't get EBADF?
 
-Even if there's host hardware support for the MSR, the feature
-still depends on a KVM commit added in Linux v6.16 (commit
-28c1c9fabf48 "KVM/VMX: Emulate MSR_IA32_ARCH_CAPABILITIES").  We
-would still have the kernel version dependency described below.
+We get ENODEV for "not a memory device":
 
+    19 ENODEV Operation not supported by device.
+    An attempt was made to apply an inappropriate function to a device,
+    for example, trying to read a write-only device such as a printer.
 
-> > 
-> > > 
-> > > > Also, why are you setting this only on Cascadelake-Server and not
-> > > > on all the other Intel CPUs?
-> > > > 
-> > > Thank you for your notice. I reviewed the git log of KVM.
-> > > "MSR_IA32_ARCH_CAPABILITIES is emulated in kvm, there is no dependency on
-> > > hardware support for this feature". So do you mean we should also add
-> > > features based on ARCH_CAPABILITIES in former CPU(such as skylake)?
-> > 
-> > It doesn't depend on host hardware features, but it does depend
-> > on host KVM code added in Linux v4.17, which makes this more
-> > tricky.
-> > 
-> > We don't want a QEMU upgrade to make an existing VM configuration
-> > to stop running under Linux v4.16.  This will probably require
-> > versioned CPU models[1] to work well.
-> > 
-> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08422.html
-> > 
-> Hi Eduardo, I think the versioned CPU models solution is great. But I
-> haven't seen further patches in the mail list. What is the recent progress
-> of this work? Need me to do something?
+I'll respin with your suggestion.
 
-Nothing was done to implement this yet.  Before implementing it,
-I'd like to get decent automated test coverage for CPUID
-compatibility.  Keeping compatibility with non-versioned CPU
-models is already too error-prone today, and I don't want to make
-the situation worse.  I have an old branch where I was working on
-it, at:
-https://github.com/ehabkost/qemu-hacks/commits/work/guest-abi-tests
+Thanks!
 
-Unfortunately I'll be away from work for the next 4 weeks, so
-I'll need to get back to this discussion after I'm back.
-
--- 
-Eduardo
+Phil.
