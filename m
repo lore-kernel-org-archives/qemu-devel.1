@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47716)
+Received: from eggs.gnu.org ([209.51.188.92]:47773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFdD-0007rh-Lm
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:57 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFdE-0007sv-O7
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFd9-0003Sh-6b
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:54 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36643)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFdA-0003Tt-Jn
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:56 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34491)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1goFd8-0003RV-Sa
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:51 -0500
-Received: by mail-wr1-x443.google.com with SMTP id u4so19968666wrp.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 14:43:50 -0800 (PST)
+	id 1goFdA-0003T7-Ax
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:52 -0500
+Received: by mail-wr1-x443.google.com with SMTP id f7so20038907wrp.1
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 14:43:52 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Mon, 28 Jan 2019 23:43:34 +0100
-Message-Id: <0e99034cf5499c02bd66b80aa83774d0cb68dba7.1548714862.git.DirtY.iCE.hu@gmail.com>
+Date: Mon, 28 Jan 2019 23:43:36 +0100
+Message-Id: <07ff0a573156785125eeed6fa88e7e4982f9443a.1548714862.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 11/14] sdlaudio: port to -audiodev config
+Subject: [Qemu-devel] [PATCH v4 13/14] wavaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,109 +35,157 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio_legacy.c | 12 ++++++++++++
- audio/sdlaudio.c     | 22 ++++------------------
- 2 files changed, 16 insertions(+), 18 deletions(-)
+ audio/audio_legacy.c | 15 ++++++++++++
+ audio/wavaudio.c     | 58 +++++++-------------------------------------
+ 2 files changed, 24 insertions(+), 49 deletions(-)
 
 diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
-index d8cd5e27f6..214774b947 100644
+index 214774b947..2c2447176c 100644
 --- a/audio/audio_legacy.c
 +++ b/audio/audio_legacy.c
-@@ -285,6 +285,14 @@ static void handle_pa(Audiodev *dev)
-     get_str("QEMU_PA_SERVER", &dev->u.pa.server, &dev->u.pa.has_server);
+@@ -293,6 +293,17 @@ static void handle_sdl(Audiodev *dev)
+                          &dev->out->has_buffer_len, dev->out);
  }
  
-+/* SDL */
-+static void handle_sdl(Audiodev *dev)
++/* wav */
++static void handle_wav(Audiodev *dev)
 +{
-+    /* SDL is output only */
-+    get_samples_to_usecs("QEMU_SDL_SAMPLES", &dev->out->buffer_len,
-+                         &dev->out->has_buffer_len, dev->out);
++    get_int("QEMU_WAV_FREQUENCY",
++            &dev->out->frequency, &dev->out->has_frequency);
++    get_fmt("QEMU_WAV_FORMAT", &dev->out->format, &dev->out->has_format);
++    get_int("QEMU_WAV_DAC_FIXED_CHANNELS",
++            &dev->out->channels, &dev->out->has_channels);
++    get_str("QEMU_WAV_PATH", &dev->u.wav.path, &dev->u.wav.has_path);
 +}
 +
  /* general */
  static void handle_per_direction(
      AudiodevPerDirectionOptions *pdo, const char *prefix)
-@@ -348,6 +356,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
-         handle_pa(e->dev);
+@@ -360,6 +371,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_sdl(e->dev);
          break;
  
-+    case AUDIODEV_DRIVER_SDL:
-+        handle_sdl(e->dev);
++    case AUDIODEV_DRIVER_WAV:
++        handle_wav(e->dev);
 +        break;
 +
      default:
          break;
      }
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index 097841fde1..cf6ac19927 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -49,12 +49,6 @@ typedef struct SDLVoiceOut {
-     int decr;
- } SDLVoiceOut;
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 9eff3555b3..214e30ccd9 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -24,6 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/timer.h"
++#include "qapi/opts-visitor.h"
+ #include "audio.h"
  
--static struct {
--    int nb_samples;
--} conf = {
--    .nb_samples = 1024
+ #define AUDIO_CAP "wav"
+@@ -37,11 +38,6 @@ typedef struct WAVVoiceOut {
+     int total_samples;
+ } WAVVoiceOut;
+ 
+-typedef struct {
+-    struct audsettings settings;
+-    const char *wav_path;
+-} WAVConf;
+-
+ static int wav_run_out (HWVoiceOut *hw, int live)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+@@ -112,8 +108,10 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+         0x02, 0x00, 0x44, 0xac, 0x00, 0x00, 0x10, 0xb1, 0x02, 0x00, 0x04,
+         0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00
+     };
+-    WAVConf *conf = drv_opaque;
+-    struct audsettings wav_as = conf->settings;
++    Audiodev *dev = drv_opaque;
++    AudiodevWavOptions *wopts = &dev->u.wav;
++    struct audsettings wav_as = audiodev_to_audsettings(dev->out);
++    const char *wav_path = wopts->has_path ? wopts->path : "qemu.wav";
+ 
+     stereo = wav_as.nchannels == 2;
+     switch (wav_as.fmt) {
+@@ -154,10 +152,10 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
+     le_store (hdr + 32, 1 << (bits16 + stereo), 2);
+ 
+-    wav->f = fopen (conf->wav_path, "wb");
++    wav->f = fopen(wav_path, "wb");
+     if (!wav->f) {
+         dolog ("Failed to open wave file `%s'\nReason: %s\n",
+-               conf->wav_path, strerror (errno));
++               wav_path, strerror(errno));
+         g_free (wav->pcm_buf);
+         wav->pcm_buf = NULL;
+         return -1;
+@@ -225,54 +223,17 @@ static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static WAVConf glob_conf = {
+-    .settings.freq      = 44100,
+-    .settings.nchannels = 2,
+-    .settings.fmt       = AUDIO_FORMAT_S16,
+-    .wav_path           = "qemu.wav"
 -};
 -
- static struct SDLAudioState {
-     int exit;
- #if USE_SEMAPHORE
-@@ -63,6 +57,7 @@ static struct SDLAudioState {
- #endif
-     int initialized;
-     bool driver_created;
-+    Audiodev *dev;
- } glob_sdl;
- typedef struct SDLAudioState SDLAudioState;
- 
-@@ -392,7 +387,7 @@ static int sdl_init_out(HWVoiceOut *hw, struct audsettings *as,
-     req.freq = as->freq;
-     req.format = aud_to_sdlfmt (as->fmt);
-     req.channels = as->nchannels;
--    req.samples = conf.nb_samples;
-+    req.samples = audio_buffer_samples(s->dev->out, as, 11610);
-     req.callback = sdl_callback;
-     req.userdata = sdl;
- 
-@@ -467,6 +462,7 @@ static void *sdl_audio_init(Audiodev *dev)
- #endif
- 
-     s->driver_created = true;
-+    s->dev = dev;
-     return s;
+ static void *wav_audio_init(Audiodev *dev)
+ {
+-    WAVConf *conf = g_malloc(sizeof(WAVConf));
+-    *conf = glob_conf;
+-    return conf;
++    assert(dev->driver == AUDIODEV_DRIVER_WAV);
++    return dev;
  }
  
-@@ -480,18 +476,9 @@ static void sdl_audio_fini (void *opaque)
- #endif
-     SDL_QuitSubSystem (SDL_INIT_AUDIO);
-     s->driver_created = false;
-+    s->dev = NULL;
+ static void wav_audio_fini (void *opaque)
+ {
+     ldebug ("wav_fini");
+-    g_free(opaque);
  }
  
--static struct audio_option sdl_options[] = {
+-static struct audio_option wav_options[] = {
 -    {
--        .name  = "SAMPLES",
+-        .name  = "FREQUENCY",
 -        .tag   = AUD_OPT_INT,
--        .valp  = &conf.nb_samples,
--        .descr = "Size of SDL buffer in samples"
+-        .valp  = &glob_conf.settings.freq,
+-        .descr = "Frequency"
+-    },
+-    {
+-        .name  = "FORMAT",
+-        .tag   = AUD_OPT_FMT,
+-        .valp  = &glob_conf.settings.fmt,
+-        .descr = "Format"
+-    },
+-    {
+-        .name  = "DAC_FIXED_CHANNELS",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.settings.nchannels,
+-        .descr = "Number of channels (1 - mono, 2 - stereo)"
+-    },
+-    {
+-        .name  = "PATH",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.wav_path,
+-        .descr = "Path to wave file"
 -    },
 -    { /* End of list */ }
 -};
 -
- static struct audio_pcm_ops sdl_pcm_ops = {
-     .init_out = sdl_init_out,
-     .fini_out = sdl_fini_out,
-@@ -503,7 +490,6 @@ static struct audio_pcm_ops sdl_pcm_ops = {
- static struct audio_driver sdl_audio_driver = {
-     .name           = "sdl",
-     .descr          = "SDL http://www.libsdl.org",
--    .options        = sdl_options,
-     .init           = sdl_audio_init,
-     .fini           = sdl_audio_fini,
-     .pcm_ops        = &sdl_pcm_ops,
+ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+@@ -284,7 +245,6 @@ static struct audio_pcm_ops wav_pcm_ops = {
+ static struct audio_driver wav_audio_driver = {
+     .name           = "wav",
+     .descr          = "WAV renderer http://wikipedia.org/wiki/WAV",
+-    .options        = wav_options,
+     .init           = wav_audio_init,
+     .fini           = wav_audio_fini,
+     .pcm_ops        = &wav_pcm_ops,
 -- 
 2.20.1
