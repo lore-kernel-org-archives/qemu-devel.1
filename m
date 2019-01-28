@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58516)
+Received: from eggs.gnu.org ([209.51.188.92]:58839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go4vd-0003uk-CT
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:18:13 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1go4xB-00056j-Bx
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go4vX-0000XP-Ur
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:18:13 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go4vX-0000Wg-PN
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:18:07 -0500
-Received: by mail-wr1-f68.google.com with SMTP id q18so17561721wrx.9
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:18:07 -0800 (PST)
-References: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
-	<20190127015509.ngofhbiduuwwbf7r@function>
-	<CAJ+F1CKYNEVXNbmN2ppvPOtN_2nMyzTX612aZ9twnYc0+Rgg_Q@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b71e3a2b-61d6-2a2d-3c17-f9c832b4cad4@redhat.com>
-Date: Mon, 28 Jan 2019 12:18:05 +0100
+	(envelope-from <laurent.desnogues@gmail.com>) id 1go4x9-00016R-D9
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:19:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKYNEVXNbmN2ppvPOtN_2nMyzTX612aZ9twnYc0+Rgg_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: Replace QEMU_BUILD_BUG_ON with own
- macro
+References: <20190125182626.9221-1-peter.maydell@linaro.org>
+	<20190125182626.9221-7-peter.maydell@linaro.org>
+In-Reply-To: <20190125182626.9221-7-peter.maydell@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Mon, 28 Jan 2019 12:19:34 +0100
+Message-ID: <CABoDooPPwWwdg3yFe-K1U5w2f1gGh991m4D__OJXFcgZh0n4Tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 6/7] target/arm/translate-a64: Don't
+ underdecode FP insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +23,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Samuel Thibault <samuel.thibault@gnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-Hi Marc-André,
+On Fri, Jan 25, 2019 at 7:26 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> In the encoding groups
+>  * floating-point data-processing (1 source)
+>  * floating-point data-processing (2 source)
+>  * floating-point data-processing (3 source)
+>  * floating-point immediate
+>  * floating-point compare
+>  * floating-ponit conditional compare
+>  * floating-point conditional select
+>
+>
+> bit 31 is M and bit 29 is S (and bit 30 is 0, already checked at
+> this point in the decode). None of these groups allocate any
+> encoding for M=1 or S=1. We checked this in disas_fp_compare(),
+> disas_fp_ccomp() and disas_fp_csel(), but missed it in disas_fp_1src(),
+> disas_fp_2src(), disas_fp_3src() and disas_fp_imm().
+>
+> We also missed that in the fp immediate encoding the imm5 field
+> must be all zeroes.
+>
+> Correctly UNDEF the unallocated encodings here.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 1/27/19 12:37 PM, Marc-André Lureau wrote:
-> Hi
-> 
-> On Sun, Jan 27, 2019 at 5:55 AM Samuel Thibault <samuel.thibault@gnu.org> wrote:
->>
->> (Which I'll fold as appropriate within Marc-André's patch series)
-> 
-> Did you try using G_STATIC_ASSERT* instead?
-[...]
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-Is there a same plan for QEMU codebase?
+Thanks,
+
+Laurent
+
+> ---
+>  target/arm/translate-a64.c | 22 +++++++++++++++++++++-
+>  1 file changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index efd2f6490b5..474d9bfb5f0 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -5636,11 +5636,17 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+>   */
+>  static void disas_fp_1src(DisasContext *s, uint32_t insn)
+>  {
+> +    int mos = extract32(insn, 29, 3);
+>      int type = extract32(insn, 22, 2);
+>      int opcode = extract32(insn, 15, 6);
+>      int rn = extract32(insn, 5, 5);
+>      int rd = extract32(insn, 0, 5);
+>
+> +    if (mos) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+>      switch (opcode) {
+>      case 0x4: case 0x5: case 0x7:
+>      {
+> @@ -5867,13 +5873,14 @@ static void handle_fp_2src_half(DisasContext *s, int opcode,
+>   */
+>  static void disas_fp_2src(DisasContext *s, uint32_t insn)
+>  {
+> +    int mos = extract32(insn, 29, 3);
+>      int type = extract32(insn, 22, 2);
+>      int rd = extract32(insn, 0, 5);
+>      int rn = extract32(insn, 5, 5);
+>      int rm = extract32(insn, 16, 5);
+>      int opcode = extract32(insn, 12, 4);
+>
+> -    if (opcode > 8) {
+> +    if (opcode > 8 || mos) {
+>          unallocated_encoding(s);
+>          return;
+>      }
+> @@ -6028,6 +6035,7 @@ static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1,
+>   */
+>  static void disas_fp_3src(DisasContext *s, uint32_t insn)
+>  {
+> +    int mos = extract32(insn, 29, 3);
+>      int type = extract32(insn, 22, 2);
+>      int rd = extract32(insn, 0, 5);
+>      int rn = extract32(insn, 5, 5);
+> @@ -6036,6 +6044,11 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+>      bool o0 = extract32(insn, 15, 1);
+>      bool o1 = extract32(insn, 21, 1);
+>
+> +    if (mos) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+>      switch (type) {
+>      case 0:
+>          if (!fp_access_check(s)) {
+> @@ -6105,12 +6118,19 @@ uint64_t vfp_expand_imm(int size, uint8_t imm8)
+>  static void disas_fp_imm(DisasContext *s, uint32_t insn)
+>  {
+>      int rd = extract32(insn, 0, 5);
+> +    int imm5 = extract32(insn, 5, 5);
+>      int imm8 = extract32(insn, 13, 8);
+>      int type = extract32(insn, 22, 2);
+> +    int mos = extract32(insn, 29, 3);
+>      uint64_t imm;
+>      TCGv_i64 tcg_res;
+>      TCGMemOp sz;
+>
+> +    if (mos || imm5) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+>      switch (type) {
+>      case 0:
+>          sz = MO_32;
+> --
+> 2.20.1
+>
