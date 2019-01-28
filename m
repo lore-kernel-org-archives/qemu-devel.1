@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52480)
+Received: from eggs.gnu.org ([209.51.188.92]:53729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2QL-0005Pq-RL
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:37:46 -0500
+	(envelope-from <thuth@redhat.com>) id 1go2Vy-0006q4-1L
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2QK-0003ty-PY
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:37:45 -0500
-References: <20190127101836.15451-1-sourav.jb1988@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1go2Vw-0007GI-61
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1go2Vu-0007El-8Z
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:43:30 -0500
+References: <20190125192719.15339-1-philmd@redhat.com>
+	<20190125192719.15339-2-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <33a499ed-6f6a-ccd2-a1f8-48646b6be6c9@redhat.com>
-Date: Mon, 28 Jan 2019 09:37:29 +0100
+Message-ID: <76f0dc0e-620c-407b-a99f-8629c25472fb@redhat.com>
+Date: Mon, 28 Jan 2019 09:43:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190127101836.15451-1-sourav.jb1988@gmail.com>
+In-Reply-To: <20190125192719.15339-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/input/lm832x: set device category of
- lm832x
+Subject: Re: [Qemu-devel] [PATCH 1/3] configure: Disable W^X on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, Li Qiang <liq3ea@163.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
- Hi,
-
-On 2019-01-27 11:18, kumar sourav wrote:
-> Sets the category of lm832x as DEVICE_CATEGORY_INPUT
-> Devices should be assigned to one of DEVICE_CATEGORY_XXXX
+On 2019-01-25 20:27, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
+> TCG requires WX access. Disable W^X if it is available.
+> This fixes:
 >=20
-> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+>   # lm32-softmmu/qemu-system-lm32
+>   Could not allocate dynamic translator buffer
+>=20
+>   # sysctl kern.wxabort=3D1
+>   kern.wxabort: 0 -> 1
+>   # lm32-softmmu/qemu-system-lm32
+>   mmap: Not supported
+>   Abort trap (core dumped)
+>   # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
+>   (gdb) bt
+>   #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input=
+}:5
+>   #1  0x000017e3c15e5d7a in *_libc_mmap (addr=3DVariable "addr" is not =
+available.) at /usr/src/lib/libc/sys/mmap.c:47
+>   #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/a=
+ccel/tcg/translate-all.c:1064
+>   #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=3D0) at /usr/src/qe=
+mu/accel/tcg/translate-all.c:1112
+>   #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=3D0) at /usr/src/qem=
+u/accel/tcg/translate-all.c:1149
+>   #5  0x000017e17d9897e9 in tcg_init (ms=3D0x17e45e456800) at /usr/src/=
+qemu/accel/tcg/tcg-all.c:66
+>   #6  0x000017e17d9891b8 in accel_init_machine (acc=3D0x17e3c3f50800, m=
+s=3D0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
+>   #7  0x000017e17d989312 in configure_accelerator (ms=3D0x17e45e456800,=
+ progname=3D0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/q=
+emu/accel/accel.c:111
+>   #8  0x000017e17d9d8616 in main (argc=3D1, argv=3D0x7f7fffff06b8, envp=
+=3D0x7f7fffff06c8) at vl.c:4325
+>=20
+> [1] https://www.openbsd.org/faq/upgrade60.html
+> [2] https://undeadly.org/cgi?action=3Darticle&sid=3D20160527203200
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  hw/input/lm832x.c | 1 +
->  1 file changed, 1 insertion(+)
+>  configure | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >=20
-> diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
-> index cffbf586d4..07ae5e0aee 100644
-> --- a/hw/input/lm832x.c
-> +++ b/hw/input/lm832x.c
-> @@ -509,6 +509,7 @@ static void lm8323_class_init(ObjectClass *klass, v=
-oid *data)
->      k->recv =3D lm_i2c_rx;
->      k->send =3D lm_i2c_tx;
->      dc->vmsd =3D &vmstate_lm_kbd;
-> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->  }
+> diff --git a/configure b/configure
+> index b18281c61f..f6acc028a7 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5795,6 +5795,17 @@ if test "$mingw32" =3D "yes" ; then
+>      done
+>  fi
+> =20
+> +# Disable W^X if available
 
-This device already has DEVICE_CATEGORY_MISC set since it is derived
-from TYPE_I2C_SLAVE. If you now set another category bit here, the
-device shows up twice in the output of "-device help". That's not so nice=
-.
+I'd like to suggest to mention OpenBSD in the comment.
 
-I see multiple options here:
+> +if test "$tcg" =3D "yes" -a "$targetos" =3D "OpenBSD"; then
+> +    cat > $TMPC <<EOF
+> +    int main(void) { return 0; }
+> +EOF
+> +    wx_ldflags=3D"-Wl,-z,wxneeded"
+> +    if compile_prog "" "$wx_ldflags"; then
+> +        QEMU_LDFLAGS=3D"$QEMU_LDFLAGS -Wl,-z,wxneeded"
 
-1) Drop this patch since the device already has a category
-
-2) Make sure to clear_bit() the MISC category here again
-
-3) Remove the set_bit(DEVICE_CATEGORY_MISC, k->categories) in
-   hw/i2c/core.c - it does not make that much sense to set the
-   MISC category for an abstract parent class.
-
-4) Introduce a new DEVICE_CATEGORY_I2C which could be used
-   instead of the DEVICE_CATEGORY_MISC in hw/i2c/core.c
-
-One of the last two options sound most appealing to me.
+Why do you introduce the wx_ldflags variable above, just to use it one
+time? I'd suggest to either use it in the QEMU_LDFLAGS line, too, or to
+get rid of the variable completely and always use -Wl,-z,wxneeded directl=
+y.
 
  Thomas
+
+> +    fi
+> +fi
+> +
+>  qemu_confdir=3D$sysconfdir$confsuffix
+>  qemu_moddir=3D$libdir$confsuffix
+>  qemu_datadir=3D$datadir$confsuffix
