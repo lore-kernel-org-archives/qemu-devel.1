@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59723)
+Received: from eggs.gnu.org ([209.51.188.92]:60434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go51H-0007lz-0O
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1go52v-0000o7-Si
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go51E-0002X4-HQ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:01 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43164)
+	(envelope-from <peter.maydell@linaro.org>) id 1go52u-0003Dr-Uc
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:45 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go51E-0002Wo-Ax
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:00 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r10so17566748wrs.10
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:24:00 -0800 (PST)
-References: <20190127014501.21840-1-jcmvbkbc@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <00bc7460-9961-fe00-177a-3cf46ffcbc41@redhat.com>
-Date: Mon, 28 Jan 2019 12:23:57 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1go52u-000396-06
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:25:44 -0500
+Received: by mail-oi1-x244.google.com with SMTP id r62so12749945oie.1
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:25:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190127014501.21840-1-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/xtensa: rearrange access to
- external interrupts
+References: <20190127015113.1599-1-samuel.thibault@ens-lyon.org>
+	<20190127015509.ngofhbiduuwwbf7r@function>
+	<CAJ+F1CKYNEVXNbmN2ppvPOtN_2nMyzTX612aZ9twnYc0+Rgg_Q@mail.gmail.com>
+	<b71e3a2b-61d6-2a2d-3c17-f9c832b4cad4@redhat.com>
+In-Reply-To: <b71e3a2b-61d6-2a2d-3c17-f9c832b4cad4@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 28 Jan 2019 11:25:08 +0000
+Message-ID: <CAFEAcA8arejWDEYd1zZhFR+ANyOeJ8KsJvVR==pE55dDZoO5Bw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Replace QEMU_BUILD_BUG_ON with own
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1/27/19 2:45 AM, Max Filippov wrote:
-> Replace xtensa_get_extint that returns single external IRQ descriptor
-> with xtensa_get_extints that returns a vector of all external IRQs.
-> 
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  hw/xtensa/pic_cpu.c | 24 +++++++++++-------------
->  hw/xtensa/xtfpga.c  |  8 +++++---
->  target/xtensa/cpu.h |  5 +++--
->  3 files changed, 19 insertions(+), 18 deletions(-)
-> 
-> diff --git a/hw/xtensa/pic_cpu.c b/hw/xtensa/pic_cpu.c
-> index f70684902628..077f4ad53d6d 100644
-> --- a/hw/xtensa/pic_cpu.c
-> +++ b/hw/xtensa/pic_cpu.c
-> @@ -88,11 +88,11 @@ static void xtensa_ccompare_cb(void *opaque)
->  
->  void xtensa_irq_init(CPUXtensaState *env)
->  {
-> -    env->irq_inputs = (void **)qemu_allocate_irqs(
-> -            xtensa_set_irq, env, env->config->ninterrupt);
-> -    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
-> -        unsigned i;
-> +    unsigned i;
->  
-> +    env->irq_inputs = qemu_allocate_irqs(xtensa_set_irq, env,
-> +                                         env->config->ninterrupt);
-> +    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
->          env->time_base = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
->          env->ccount_base = env->sregs[CCOUNT];
->          for (i = 0; i < env->config->nccompare; ++i) {
-> @@ -101,16 +101,14 @@ void xtensa_irq_init(CPUXtensaState *env)
->                      xtensa_ccompare_cb, env->ccompare + i);
->          }
->      }
-> +    for (i = 0; i < env->config->nextint; ++i) {
-> +        unsigned irq = env->config->extint[i];
-> +
-> +        env->ext_irq_inputs[i] = env->irq_inputs[irq];
-> +    }
->  }
->  
-> -void *xtensa_get_extint(CPUXtensaState *env, unsigned extint)
-> +qemu_irq *xtensa_get_extints(CPUXtensaState *env)
->  {
-> -    if (extint < env->config->nextint) {
-> -        unsigned irq = env->config->extint[extint];
-> -        return env->irq_inputs[irq];
-> -    } else {
-> -        qemu_log("%s: trying to acquire invalid external interrupt %d\n",
-> -                __func__, extint);
-> -        return NULL;
-> -    }
-> +    return env->ext_irq_inputs;
->  }
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index 7379b3fff427..3102f8c04709 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -225,6 +225,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->      XtensaCPU *cpu = NULL;
->      CPUXtensaState *env = NULL;
->      MemoryRegion *system_io;
-> +    qemu_irq *extints;
->      DriveInfo *dinfo;
->      pflash_t *flash = NULL;
->      QemuOpts *machine_opts = qemu_get_machine_opts();
-> @@ -253,6 +254,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->           */
->          cpu_reset(CPU(cpu));
->      }
-> +    extints = xtensa_get_extints(env);
->  
->      if (env) {
->          XtensaMemory sysram = env->config->sysram;
-> @@ -284,11 +286,11 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->      xtfpga_fpga_init(system_io, 0x0d020000, freq);
->      if (nd_table[0].used) {
->          xtfpga_net_init(system_io, 0x0d030000, 0x0d030400, 0x0d800000,
-> -                xtensa_get_extint(env, 1), nd_table);
-> +                        extints[1], nd_table);
->      }
->  
-> -    serial_mm_init(system_io, 0x0d050020, 2, xtensa_get_extint(env, 0),
-> -            115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-> +    serial_mm_init(system_io, 0x0d050020, 2, extints[0],
-> +                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
->  
->      dinfo = drive_get(IF_PFLASH, 0, 0);
->      if (dinfo) {
-> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-> index f579294822c3..176af8a53cf0 100644
-> --- a/target/xtensa/cpu.h
-> +++ b/target/xtensa/cpu.h
-> @@ -483,7 +483,8 @@ typedef struct CPUXtensaState {
->      AddressSpace *address_space_er;
->      MemoryRegion *system_er;
->      int pending_irq_level; /* level of last raised IRQ */
-> -    void **irq_inputs;
-> +    qemu_irq *irq_inputs;
-> +    qemu_irq ext_irq_inputs[MAX_NINTERRUPT];
->      XtensaCcompareTimer ccompare[MAX_NCCOMPARE];
->      uint64_t time_base;
->      uint64_t ccount_time;
-> @@ -569,7 +570,7 @@ void xtensa_register_core(XtensaConfigList *node);
->  void xtensa_sim_open_console(Chardev *chr);
->  void check_interrupts(CPUXtensaState *s);
->  void xtensa_irq_init(CPUXtensaState *env);
-> -void *xtensa_get_extint(CPUXtensaState *env, unsigned extint);
-> +qemu_irq *xtensa_get_extints(CPUXtensaState *env);
->  int cpu_xtensa_signal_handler(int host_signum, void *pinfo, void *puc);
->  void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
->  void xtensa_sync_window_from_phys(CPUXtensaState *env);
-> 
+On Mon, 28 Jan 2019 at 11:22, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+> On 1/27/19 12:37 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Did you try using G_STATIC_ASSERT* instead?
+> [...]
+>
+> Is there a same plan for QEMU codebase?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Our version uses _Static_assert where possible, which I think
+will give better error messages than the glib version. There are
+also some corner cases where the glib macros don't work:
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07090.html
+
+Broadly, our implementation works and so I don't see much need
+to mess with it, outside of the special case of slirp that's
+trying to cut its ties with QEMU.
+
+thanks
+-- PMM
