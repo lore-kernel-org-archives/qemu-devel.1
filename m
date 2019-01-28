@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37380)
+Received: from eggs.gnu.org ([209.51.188.92]:37974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goBEs-0003dP-Uu
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1goBEu-0004Ao-IK
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goB0j-0001RK-5a
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:47:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1goB0i-0001LY-VR
+	(envelope-from <eblake@redhat.com>) id 1goB0i-0001Q9-CN
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:47:53 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from mx1.redhat.com ([209.132.183.28]:52252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1goB0i-0001Lo-2Y
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:47:52 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2C93C04BD46
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:47:38 +0000 (UTC)
-From: Caio Carrara <ccarrara@redhat.com>
-Date: Mon, 28 Jan 2019 15:47:25 -0200
-Message-Id: <20190128174725.8809-3-ccarrara@redhat.com>
-In-Reply-To: <20190128174725.8809-1-ccarrara@redhat.com>
-References: <20190128174725.8809-1-ccarrara@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id D148F7F6CB
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 17:47:39 +0000 (UTC)
+References: <20190128170321.16936-1-dgilbert@redhat.com>
+	<20190128170321.16936-8-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cf3e5c3d-0802-42b0-a4eb-ffc2dfbf3706@redhat.com>
+Date: Mon, 28 Jan 2019 11:47:35 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/2] Acceptance tests: add simple migration
- test
+In-Reply-To: <20190128170321.16936-8-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vf2DETuNPqRryj0pL0vp9MCZNfv5IiOcw"
+Subject: Re: [Qemu-devel] [PATCH 7/9] qmp: Add announce-self command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +34,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wainersm@redhat.com, ehabkost@redhat.com, philmd@redhat.com, crosa@redhat.com
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-From: Cleber Rosa <crosa@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vf2DETuNPqRryj0pL0vp9MCZNfv5IiOcw
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com,
+ mst@redhat.com, armbru@redhat.com, berrange@redhat.com
+Message-ID: <cf3e5c3d-0802-42b0-a4eb-ffc2dfbf3706@redhat.com>
+Subject: Re: [PATCH 7/9] qmp: Add announce-self command
+References: <20190128170321.16936-1-dgilbert@redhat.com>
+ <20190128170321.16936-8-dgilbert@redhat.com>
+In-Reply-To: <20190128170321.16936-8-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is the simplest possible migration test, exercising the multi
-VM capabilities of the test class.
+On 1/28/19 11:03 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Add a qmp command that can trigger guest announcements.
+>=20
+> It uses it's own announce-timer instance, and parameters
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/migration.py | 45 +++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
- create mode 100644 tests/acceptance/migration.py
+s/it's/its/ (here, you want the possessive form without apostrophe; the
+contraction form is correct only when you can use "it is" in the same pla=
+ce)
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
-y
-new file mode 100644
-index 0000000000..973ae0ab4b
---- /dev/null
-+++ b/tests/acceptance/migration.py
-@@ -0,0 +1,45 @@
-+# Migration test
-+#
-+# Copyright (c) 2019 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+
-+from avocado_qemu import Test
-+
-+from avocado.utils import network
-+from avocado.utils import wait
-+
-+
-+class Migration(Test):
-+    """
-+    :avocado: enable
-+    """
-+
-+    timeout =3D 10
-+
-+    @staticmethod
-+    def migration_completed(vm):
-+        cmd_result =3D vm.qmp('query-migrate')
-+        if cmd_result is not None:
-+            result =3D cmd_result.get('return')
-+            if result is not None:
-+                return result.get('status') =3D=3D 'completed'
-+        return False
-+
-+    def test_tcp(self):
-+        source =3D self.get_vm()
-+        port =3D network.find_free_port()
-+        if port is None:
-+            self.cancel('Failed to find a free port')
-+        dest_uri =3D 'tcp:localhost:%u' % port
-+        dest =3D self.get_vm('-incoming', dest_uri)
-+        dest.launch()
-+        source.launch()
-+        source.qmp('migrate', uri=3Ddest_uri)
-+        wait.wait_for(self.migration_completed, timeout=3Dself.timeout,
-+                      step=3D0.1, args=3D(source,))
+> passed to it explicitly in the command.
+>=20
+> Like most qmp commands, it's in the main thread/bql, so
+
+Here, "it's" is correct.
+
+> there's no racing with any outstanding timer.
+>=20
+> Based on work of Germano Veit Michel <germano@redhat.com> and
+>                  Vladislav Yasevich <vyasevic@redhat.com>
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  net/announce.c |  8 ++++++++
+>  qapi/net.json  | 20 ++++++++++++++++++++
+>  2 files changed, 28 insertions(+)
+>=20
+
+> +++ b/qapi/net.json
+> @@ -707,3 +707,23 @@
+>              'max': 'int',
+>              'rounds': 'int',
+>              'step': 'int' } }
+> +
+> +##
+> +# @announce-self:
+> +#
+> +# Trigger generation of broadcast RARP frames to update network switch=
+es.
+> +# This can be useful when network bonds fail-over the active slave.
+> +#
+> +# @params: AnnounceParameters giving timing and repetition count of an=
+nounce
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "announce-self"
+> +#      "arguments": { "initial": 50, "max": 550, "rounds": 10, "step":=
+ 50 } }
+
+Again, can any of these have useful defaults to be left optional?
+
+> +# <- { "return": {} }
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'command': 'announce-self',
+> +  'data' : {'params': 'AnnounceParameters'} }
+> +
+>=20
+
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--vf2DETuNPqRryj0pL0vp9MCZNfv5IiOcw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxPQDcACgkQp6FrSiUn
+Q2rKywf8DxfSpt6ZyA/J+FcQxvFN+QMBTrvbm47kClsHRWNgpQBfCazvOHyUITF3
+/qL+sImmHYt3K2KX7V4AzaJdtm8VMJ3T1FkFIY6D3I4+E0oN0Dtb7HEpTrn2Bo4q
+65HB/gXYDUduv2exZESpmvEEii3ukjuLQGjp8E4qUwMgenpEGcBdadQeKS7AUyQa
+0GY9yfg2HlPmmPKLy2IjuWcQJ+M46XAWGgHktJi5DmXpGbaMJH/E3g20XKpKMCWp
+e5z7XUEzMA5am8ePU/8Pa5GTaS2SehKVo8zgZsloc2/jkU+jCT9d82ClU1l9jEeF
+n5OEq3Mddqz+ATLlXxb/13Wz6d3xog==
+=y2VA
+-----END PGP SIGNATURE-----
+
+--vf2DETuNPqRryj0pL0vp9MCZNfv5IiOcw--
