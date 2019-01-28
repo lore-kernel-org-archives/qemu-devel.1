@@ -1,29 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:51157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go8X3-0008Dl-7E
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:09:06 -0500
+	(envelope-from <lersek@redhat.com>) id 1go8X6-0008Dl-KQ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1go8TP-0006Iy-Bh
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:05:21 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go8TP-0006IL-5g
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:05:19 -0500
-Received: by mail-wm1-f68.google.com with SMTP id g67so14249635wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:05:19 -0800 (PST)
-References: <20190125192719.15339-1-philmd@redhat.com>
-	<20190125192719.15339-3-philmd@redhat.com> <874l9tnmev.fsf@linaro.org>
-	<8f1c2854-fb0a-b8cd-14aa-1b30924f11bf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cfa21c5e-5cb5-8996-0712-a6516e50b8aa@redhat.com>
-Date: Mon, 28 Jan 2019 16:05:11 +0100
+	(envelope-from <lersek@redhat.com>) id 1go8SD-0005pY-C5
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:04:11 -0500
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
+	<20190128124027.776wwcqrckalvr7x@sirius.home.kraxel.org>
+	<CAFEAcA-jwBhBXQb-SHT=b_Vy5Sq+M2iaMP2XtVn_2HQvzaEoVQ@mail.gmail.com>
+	<5daf9f5e-cbda-8642-f4f6-46939fe223d1@redhat.com>
+	<CAFEAcA_XxEXVcvR-3DMQsWpu8YRYspdDQ5SsrNKHnKjNw0YA-w@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <b5f82ed4-151e-fcca-1719-aa68825e8b31@redhat.com>
+Date: Mon, 28 Jan 2019 16:03:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <8f1c2854-fb0a-b8cd-14aa-1b30924f11bf@redhat.com>
+In-Reply-To: <CAFEAcA_XxEXVcvR-3DMQsWpu8YRYspdDQ5SsrNKHnKjNw0YA-w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] XXX oslib-posix: Ignore
- fcntl("/dev/null", F_SETFL, O_NONBLOCK) failure
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] Configuring pflash devices for OVMF
+ firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Kamil Rytarowski <kamil@netbsd.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@163.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On 1/28/19 12:03 PM, Paolo Bonzini wrote:
-> On 28/01/19 10:47, Alex Bennée wrote:
->>>
->>> [1] The fix seems https://github.com/openbsd/src/commit/c2a35b387f9d3c
->>>   "fcntl(F_SETFL) invokes the FIONBIO and FIOASYNC ioctls internally, so
->>>   the memory devices (/dev/null, /dev/zero, etc) need to permit them."
->> I assume set_nonblock is called on more than just these special devices?
->> Is there anyway to check this on OpenBSD or is it just an anonymous fd
->> at this point?
+On 01/28/19 15:58, Peter Maydell wrote:
+> On Mon, 28 Jan 2019 at 14:56, Laszlo Ersek <lersek@redhat.com> wrote:
+>> Regarding OVMF, I kept the flash driver intentionally in the dark about
+>> split vs. unified pflash, so OVMF will not care, as long as the same
+>> GPAs behave the same as before.
 >>
+>> Regarding ArmVirtQemu, I'm not so sure. It think it already depends on
+>> two separate pflash chips, through the DTB that QEMU exposes. So
+>> unifying the chips (albeit with multiple regions) might actually confuse
+>> the firmware.
 > 
-> Perhaps on OpenBSD we should just assert that we don't get EBADF?
+> "virt" is a funny case because there is no underlying hardware
+> that we're trying to match. So it is whatever we say it is
+> and we've said it's two separate pflash chips. We don't need
+> to change that I think. (IIRC this is derived partly from
+> OVMF usecase requirements and partly from the vexpress devboards
+> having 2 flash chips.)
 
-We get ENODEV for "not a memory device":
+That sounds great, but in that case, would the work be justified in
+practice, to introduce single-ship-with-multiple-regions, if only x86
+put it to use (for OVMF), but arm/aarch64 "virt" would have to stick
+with the current layout?
 
-    19 ENODEV Operation not supported by device.
-    An attempt was made to apply an inappropriate function to a device,
-    for example, trying to read a write-only device such as a printer.
-
-I'll respin with your suggestion.
-
-Thanks!
-
-Phil.
+Thanks
+Laszlo
