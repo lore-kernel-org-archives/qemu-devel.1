@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38980)
+Received: from eggs.gnu.org ([209.51.188.92]:39853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1go9ZY-00011c-7I
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:15:44 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9bV-0002TR-Lg
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:17:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1go9ZV-0000bd-2r
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:15:44 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190128160109.GF5756@localhost.localdomain>
-References: <cover.1548171741.git.berto@igalia.com>
-	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
-	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
-	<w518szbmmw9.fsf@maestria.local.igalia.com>
-	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
-	<w5136pjmjrp.fsf@maestria.local.igalia.com>
-	<20190124091222.GB4601@localhost.localdomain>
-	<w51d0ogsv1y.fsf@maestria.local.igalia.com>
-	<20190128145743.GC5756@localhost.localdomain>
-	<w517eeoss2l.fsf@maestria.local.igalia.com>
-	<20190128160109.GF5756@localhost.localdomain>
-Date: Mon, 28 Jan 2019 17:15:20 +0100
-Message-ID: <w514l9ssqqv.fsf@maestria.local.igalia.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1go9bU-0001U2-7Z
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:17:45 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1go9bT-0001OA-Ou
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:17:44 -0500
+Received: by mail-pl1-x643.google.com with SMTP id e5so7947482plb.5
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 08:17:33 -0800 (PST)
+References: <20190121185118.18550-1-peter.maydell@linaro.org>
+	<20190121185118.18550-17-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b1286c90-6cb6-7ec2-4c9a-336f4817548b@linaro.org>
+Date: Mon, 28 Jan 2019 08:17:29 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
- different iothreads sharing a blockdev
+In-Reply-To: <20190121185118.18550-17-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/23] hw/arm/armsse: Add
+ unimplemented-device stubs for PPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Mon 28 Jan 2019 05:01:09 PM CET, Kevin Wolf wrote:
+On 1/21/19 10:51 AM, Peter Maydell wrote:
+> Add unimplemented-device stubs for the various Power Policy Unit
+> devices that the SSE-200 has.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/arm/armsse.h | 11 ++++++++
+>  hw/arm/armsse.c         | 58 +++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 69 insertions(+)
 
-> And actually... if you move the first virtio-blk device to an
-> iothread, then downgrading the others isn't going to save us, because
-> that would still be using the backend from two threads (one
-> successfully enabled iothread, and the main thread).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-...which makes me think that, since patch 1 from this series moves the
-BlockBackend back to the main AioContext on unplug, we could have a
-similar problem if the BDS is being used by other devices. Or am I
-missing something?
 
-Berto
+r~
