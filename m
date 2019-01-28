@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41176)
+Received: from eggs.gnu.org ([209.51.188.92]:41259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goBNd-00039G-GL
+	(envelope-from <peter.maydell@linaro.org>) id 1goBNf-0003BY-K6
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goBNc-0000Xg-6W
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:33 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:50563)
+	(envelope-from <peter.maydell@linaro.org>) id 1goBNc-0000Ys-Pt
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:35 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:44053)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1goBNb-0000RK-V0
+	id 1goBNc-0000P1-Fn
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:11:32 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id n190so15061143wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 10:11:23 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id z5so19120114wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 10:11:18 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	b18sm97910681wrw.83.2019.01.28.10.11.20 for <qemu-devel@nongnu.org>
+	b18sm97910681wrw.83.2019.01.28.10.11.16 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 28 Jan 2019 10:11:20 -0800 (PST)
+	Mon, 28 Jan 2019 10:11:16 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 18:10:46 +0000
-Message-Id: <20190128181047.20781-26-peter.maydell@linaro.org>
+Date: Mon, 28 Jan 2019 18:10:43 +0000
+Message-Id: <20190128181047.20781-23-peter.maydell@linaro.org>
 In-Reply-To: <20190128181047.20781-1-peter.maydell@linaro.org>
 References: <20190128181047.20781-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 25/26] accel/tcg: Add cluster number to TCG TB
- hash
+Subject: [Qemu-devel] [PULL 22/26] tests/microbit-test: Add tests for nRF51
+ NVMC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +37,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Include the cluster number in the hash we use to look
-up TBs. This is important because a TB that is valid
-for one cluster at a given physical address and set
-of CPU flags is not necessarily valid for another:
-the two clusters may have different views of physical
-memory, or may have different CPU features (eg FPU
-present or absent).
+From: Steffen Görtz <contrib@steffen-goertz.de>
 
-We put the cluster number in the high 8 bits of the
-TB cflags. This gives us up to 256 clusters, which should
-be enough for anybody. If we ever need more, or need
-more bits in cflags for other purposes, we could make
-tb_hash_func() take more data (and expand qemu_xxhash7()
-to qemu_xxhash8()).
-
+Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190124141147.8416-1-stefanha@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20190121152218.9592-4-peter.maydell@linaro.org
 ---
- include/exec/exec-all.h   | 4 +++-
- accel/tcg/cpu-exec.c      | 3 +++
- accel/tcg/translate-all.c | 3 +++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ tests/microbit-test.c | 108 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 815e5b1e838..aa7b81aaf01 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -351,9 +351,11 @@ struct TranslationBlock {
- #define CF_USE_ICOUNT  0x00020000
- #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
- #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
-+#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
-+#define CF_CLUSTER_SHIFT 24
- /* cflags' mask for hashing/comparison */
- #define CF_HASH_MASK   \
--    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
-+    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL | CF_CLUSTER_MASK)
+diff --git a/tests/microbit-test.c b/tests/microbit-test.c
+index 3bad947b6cd..04e199ec33f 100644
+--- a/tests/microbit-test.c
++++ b/tests/microbit-test.c
+@@ -21,6 +21,7 @@
+ #include "hw/arm/nrf51.h"
+ #include "hw/char/nrf51_uart.h"
+ #include "hw/gpio/nrf51_gpio.h"
++#include "hw/nvram/nrf51_nvm.h"
+ #include "hw/timer/nrf51_timer.h"
+ #include "hw/i2c/microbit_i2c.h"
  
-     /* Per-vCPU dynamic tracing state used to generate this TB */
-     uint32_t trace_vcpu_dstate;
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 870027d4359..6c4a33262f5 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -325,6 +325,9 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
-     struct tb_desc desc;
-     uint32_t h;
+@@ -156,6 +157,112 @@ static void test_microbit_i2c(void)
+     qtest_quit(qts);
+ }
  
-+    cf_mask &= ~CF_CLUSTER_MASK;
-+    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
++#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
 +
-     desc.env = (CPUArchState *)cpu->env_ptr;
-     desc.cs_base = cs_base;
-     desc.flags = flags;
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8cb8c8870e6..7364e8a071f 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1688,6 +1688,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         cflags |= CF_NOCACHE | 1;
-     }
- 
-+    cflags &= ~CF_CLUSTER_MASK;
-+    cflags |= cpu->cluster_index << CF_CLUSTER_SHIFT;
++static void fill_and_erase(QTestState *qts, hwaddr base, hwaddr size,
++                           uint32_t address_reg)
++{
++    hwaddr i;
 +
-  buffer_overflow:
-     tb = tb_alloc(pc);
-     if (unlikely(!tb)) {
++    /* Erase Page */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + address_reg, base);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    /* Check memory */
++    for (i = 0; i < size / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, base + i * 4), ==, 0xFFFFFFFF);
++    }
++
++    /* Fill memory */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < size / 4; i++) {
++        qtest_writel(qts, base + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, base + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++}
++
++static void test_nrf51_nvmc(void)
++{
++    uint32_t value;
++    hwaddr i;
++    QTestState *qts = qtest_init("-M microbit");
++
++    /* Test always ready */
++    value = qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_READY);
++    g_assert_cmpuint(value & 0x01, ==, 0x01);
++
++    /* Test write-read config register */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x03);
++    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG),
++                     ==, 0x03);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG),
++                     ==, 0x00);
++
++    /* Test PCR0 */
++    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
++                   NRF51_NVMC_ERASEPCR0);
++    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
++                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR0);
++
++    /* Test PCR1 */
++    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
++                   NRF51_NVMC_ERASEPCR1);
++    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
++                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR1);
++
++    /* Erase all */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < FLASH_SIZE / 4; i++) {
++        qtest_writel(qts, NRF51_FLASH_BASE + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < FLASH_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    /* Erase UICR */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        qtest_writel(qts, NRF51_UICR_BASE + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    qtest_quit(qts);
++}
++
+ static void test_nrf51_gpio(void)
+ {
+     size_t i;
+@@ -392,6 +499,7 @@ int main(int argc, char **argv)
+ 
+     qtest_add_func("/microbit/nrf51/uart", test_nrf51_uart);
+     qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
++    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
+     qtest_add_func("/microbit/nrf51/timer", test_nrf51_timer);
+     qtest_add_func("/microbit/microbit/i2c", test_microbit_i2c);
+ 
 -- 
 2.20.1
