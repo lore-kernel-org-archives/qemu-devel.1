@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47610)
+Received: from eggs.gnu.org ([209.51.188.92]:47668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFd8-0007hw-Hf
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:56 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFdA-0007oK-Qa
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFd6-0003Oc-3F
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:50 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55514)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1goFd7-0003Pd-1A
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:52 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1goFd4-0003Mt-JM
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:47 -0500
-Received: by mail-wm1-x334.google.com with SMTP id y139so15672185wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 14:43:43 -0800 (PST)
+	id 1goFd6-0003Ny-Mh
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 17:43:48 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l9so19893289wrt.13
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 14:43:45 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Mon, 28 Jan 2019 23:43:26 +0100
-Message-Id: <92b6dc0f167f0c0f53ad9c0fbf127ea255b7429f.1548714862.git.DirtY.iCE.hu@gmail.com>
+Date: Mon, 28 Jan 2019 23:43:29 +0100
+Message-Id: <cb9801ff642400b8817cf455b4ce8f0d097b6bd3.1548714862.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 03/14] audio: -audiodev command line option:
- documentation
+Subject: [Qemu-devel] [PATCH v4 06/14] coreaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,258 +33,168 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This patch adds documentation of an -audiodev command line option, that
-deprecates the old QEMU_* environment variables for audio backend
-configuration.  It's syntax is similar to existing options (-netdev,
--device, etc):
-
-  -audiodev driver_name,property=value,...
-
-Although now it's possible to specify multiple -audiodev options on
-command line, multiple audio backends are not supported yet.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- qemu-options.hx | 222 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 219 insertions(+), 3 deletions(-)
+ audio/audio_legacy.c | 24 ++++++++++++++++++++++
+ audio/coreaudio.c    | 48 +++++++++-----------------------------------
+ 2 files changed, 34 insertions(+), 38 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 521511ec13..a12931899b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -416,14 +416,230 @@ The default is @code{en-us}.
- ETEXI
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index 8319dc5240..301934bf0c 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -109,6 +109,17 @@ static uint32_t frames_to_usecs(uint32_t frames,
+     return (frames * 1000000 + freq / 2) / freq;
+ }
  
++
++static void get_frames_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
++                                AudiodevPerDirectionOptions *pdo)
++{
++    const char *val = getenv(env);
++    if (val) {
++        *dst = frames_to_usecs(toui32(val), pdo);
++        *has_dst = true;
++    }
++}
++
+ /* backend specific functions */
+ /* ALSA */
+ static void handle_alsa_per_direction(
+@@ -166,6 +177,15 @@ static void handle_alsa(Audiodev *dev)
+                         &aopt->threshold, &aopt->has_threshold);
+ }
  
-+HXCOMM Deprecated by -audiodev
- DEF("audio-help", 0, QEMU_OPTION_audio_help,
--    "-audio-help     print list of audio drivers and their options\n",
-+    "-audio-help     show -audiodev equivalent of the currently specified audio settings\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -audio-help
- @findex -audio-help
--Will show the audio subsystem help: list of drivers, tunable
--parameters.
-+Will show the -audiodev equivalent of the currently specified
-+(deprecated) environment variables.
-+ETEXI
++/* coreaudio */
++static void handle_coreaudio(Audiodev *dev)
++{
++    get_frames_to_usecs("QEMU_COREAUDIO_BUFFER_SIZE", &dev->out->buffer_len,
++                        &dev->out->has_buffer_len, dev->out);
++    get_int("QEMU_COREAUDIO_BUFFER_COUNT",
++            &dev->out->buffer_count, &dev->out->has_buffer_count);
++}
 +
-+DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
-+    "-audiodev [driver=]driver,id=id[,prop[=value][,...]]\n"
-+    "                specifies the audio backend to use\n"
-+    "                id= identifier of the backend\n"
-+    "                timer-period= timer period in microseconds\n"
-+    "                in|out.fixed-settings= use fixed settings for host audio\n"
-+    "                in|out.frequency= frequency to use with fixed settings\n"
-+    "                in|out.channels= number of channels to use with fixed settings\n"
-+    "                in|out.format= sample format to use with fixed settings\n"
-+    "                valid values: s8, s16, s32, u8, u16, u32\n"
-+    "                in|out.voices= number of voices to use\n"
-+    "                in|out.buffer-len= size of buffer in microseconds\n"
-+    "                in|out.buffer-count= number of buffers\n"
-+    "-audiodev none,id=id,[,prop[=value][,...]]\n"
-+    "                dummy driver that discards all output\n"
-+#ifdef CONFIG_ALSA
-+    "-audiodev alsa,id=id[,prop[=value][,...]]\n"
-+    "                alsa-in|alsa-out.dev= name of the audio device to use\n"
-+    "                alsa-in|alsa-out.try-poll= attempt to use poll mode\n"
-+    "                threshold= threshold (in microseconds) when playback starts\n"
-+#endif
-+#ifdef CONFIG_COREAUDIO
-+    "-audiodev coreaudio,id=id[,prop[=value][,...]]\n"
-+#endif
-+#ifdef CONFIG_DSOUND
-+    "-audiodev dsound,id=id[,prop[=value][,...]]\n"
-+    "                latency= add extra latency to playback in microseconds\n"
-+#endif
-+#ifdef CONFIG_OSS
-+    "-audiodev oss,id=id[,prop[=value][,...]]\n"
-+    "                oss-in|oss-out.dev= path of the audio device to use\n"
-+    "                oss-in|oss-out.try-poll= attempt to use poll mode\n"
-+    "                try-mmap= try using memory mapped access\n"
-+    "                exclusive= open device in exclusive mode\n"
-+    "                dsp-policy= set timing policy (0..10), -1 to use fragment mode\n"
-+#endif
-+#ifdef CONFIG_PA
-+    "-audiodev pa,id=id[,prop[=value][,...]]\n"
-+    "                server= PulseAudio server address\n"
-+    "                sink|source.name= sink/source device name\n"
-+#endif
-+#ifdef CONFIG_SDL
-+    "-audiodev sdl,id=id[,prop[=value][,...]]\n"
-+#endif
-+#ifdef CONFIG_SPICE
-+    "-audiodev spice,id=id[,prop[=value][,...]]\n"
-+#endif
-+    "-audiodev wav,id=id[,prop[=value][,...]]\n"
-+    "                path= path of wav file to record\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@item -audiodev [driver=]@var{driver},id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+@findex -audiodev
-+Adds a new audio backend @var{driver} identified by @var{id}.  There are
-+global and driver specific properties.  Some values can be set
-+differently for input and output, they're marked with @code{in|out.}.
-+You can set the input's property with @code{in.@var{prop}} and the
-+output's property with @code{out.@var{prop}}. For example:
-+@example
-+-audiodev alsa,id=example,in.frequency=44110,out.frequency=8000
-+-audiodev alsa,id=example,out.channels=1 # leaves in.channels unspecified
-+@end example
-+
-+Valid global options are:
-+
-+@table @option
-+@item id=@var{identifier}
-+Identifies the audio backend.
-+
-+@item timer-period=@var{period}
-+Sets the timer @var{period} used by the audio subsystem in microseconds.
-+Default is 10000 (10 ms).
-+
-+@item in|out.fixed-settings=on|off
-+Use fixed settings for host audio.  When off, it will change based on
-+how the guest opens the sound card.  In this case you must not specify
-+@var{frequency}, @var{channels} or @var{format}.  Default is on.
-+
-+@item in|out.frequency=@var{frequency}
-+Specify the @var{frequency} to use when using @var{fixed-settings}.
-+Default is 44100Hz.
-+
-+@item in|out.channels=@var{channels}
-+Specify the number of @var{channels} to use when using
-+@var{fixed-settings}. Default is 2 (stereo).
-+
-+@item in|out.format=@var{format}
-+Specify the sample @var{format} to use when using @var{fixed-settings}.
-+Valid values are: @code{s8}, @code{s16}, @code{s32}, @code{u8},
-+@code{u16}, @code{u32}. Default is @code{s16}.
-+
-+@item in|out.voices=@var{voices}
-+Specify the number of @var{voices} to use.  Default is 1.
-+
-+@item in|out.buffer=@var{usecs}
-+Sets the size of the buffer in microseconds.
-+
-+@item in|out.buffer-count=@var{count}
-+Sets the @var{count} of the buffers.
-+
-+@end table
-+
-+@item -audiodev none,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a dummy backend that discards all outputs.  This backend has no
-+backend specific properties.
-+
-+@item -audiodev alsa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates backend using the ALSA.  This backend is only available on
-+Linux.
-+
-+ALSA specific options are:
-+
-+@table @option
-+@item alsa-in|alsa-out.dev=@var{device}
-+Specify the ALSA @var{device} to use for input and/or output.  Default
-+is @code{default}.
-+
-+@item alsa-in|alsa-out.try-poll=on|off
-+Attempt to use poll mode with the device.  Default is on.
-+
-+@item threshold=@var{threshold}
-+Threshold (in microseconds) when playback starts.  Default is 0.
-+
-+@end table
-+
-+@item -audiodev coreaudio,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend using Apple's Core Audio.  This backend is only
-+available on Mac OS and only supports playback.  This backend has no
-+backend specific properties.
-+
-+@item -audiodev dsound,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend using Microsoft's DirectSound.  This backend is only
-+available on Windows and only supports playback.
-+
-+Backend specific options are:
-+
-+@table @option
-+
-+@item latency=@var{usecs}
-+Add extra @var{usecs} microseconds latency to playback.  Default is
-+10000 (10 ms).
-+
-+@end table
-+
-+@item -audiodev oss,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend using OSS.  This backend is available on most
-+Unix-like systems.
-+
-+OSS specific options are:
-+
-+@table @option
-+
-+@item oss-in|oss-out.dev=@var{device}
-+Specify the file name of the OSS @var{device} to use.  Default is
-+@code{/dev/dsp}.
-+
-+@item oss-in|oss-out.try-poll=on|of
-+Attempt to use poll mode with the device.  Default is on.
-+
-+@item try-mmap=on|off
-+Try using memory mapped device access.  Default is off.
-+
-+@item exclusive=on|off
-+Open the device in exclusive mode (vmix won't work in this case).
-+Default is off.
-+
-+@item dsp-policy=@var{policy}
-+Sets the timing policy (between 0 and 10, where smaller number means
-+smaller latency but higher CPU usage).  Use -1 to use buffer sizes
-+specified by @code{buffer} and @code{buffer-count}.  This option is
-+ignored if you do not have OSS 4. Default is 5.
-+
-+@end table
-+
-+@item -audiodev pa,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend using PulseAudio.  This backend is available on most
-+systems.
-+
-+PulseAudio specific options are:
-+
-+@table @option
-+
-+@item server=@var{server}
-+Sets the PulseAudio @var{server} to connect to.
-+
-+@item sink|source.name=@var{sink}
-+Use the specified sink/source for playback/recording.
-+
-+@end table
-+
-+@item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend using SDL.  This backend is available on most systems,
-+but you should use your platform's native backend if possible.  This
-+backend has no backend specific properties.
-+
-+@item -audiodev spice,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend that sends audio through SPICE.  This backend requires
-+@code{-spice} and automatically selected in that case, so usually you
-+can ignore this option.  This backend has no backend specific
-+properties.
-+
-+@item -audiodev wav,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-+Creates a backend that writes audio to a WAV file.
-+
-+Backend specific options are:
-+
-+@table @option
-+
-+@item path=@var{path}
-+Write recorded audio into the specified file.  Default is
-+@code{qemu.wav}.
-+
-+@end table
- ETEXI
+ /* general */
+ static void handle_per_direction(
+     AudiodevPerDirectionOptions *pdo, const char *prefix)
+@@ -213,6 +233,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_alsa(e->dev);
+         break;
  
- DEF("soundhw", HAS_ARG, QEMU_OPTION_soundhw,
++    case AUDIODEV_DRIVER_COREAUDIO:
++        handle_coreaudio(e->dev);
++        break;
++
+     default:
+         break;
+     }
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index 7d4225dbee..a7c1e418b6 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -36,11 +36,6 @@
+ #define MAC_OS_X_VERSION_10_6 1060
+ #endif
+ 
+-typedef struct {
+-    int buffer_frames;
+-    int nbuffers;
+-} CoreaudioConf;
+-
+ typedef struct coreaudioVoiceOut {
+     HWVoiceOut hw;
+     pthread_mutex_t mutex;
+@@ -507,7 +502,9 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+     int err;
+     const char *typ = "playback";
+     AudioValueRange frameRange;
+-    CoreaudioConf *conf = drv_opaque;
++    Audiodev *dev = drv_opaque;
++    AudiodevPerDirectionOptions *pdo = dev->out;
++    int frames;
+ 
+     /* create mutex */
+     err = pthread_mutex_init(&core->mutex, NULL);
+@@ -538,16 +535,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+         return -1;
+     }
+ 
+-    if (frameRange.mMinimum > conf->buffer_frames) {
++    frames = audio_buffer_frames(pdo, as, 11610);
++    if (frameRange.mMinimum > frames) {
+         core->audioDevicePropertyBufferFrameSize = (UInt32) frameRange.mMinimum;
+         dolog ("warning: Upsizing Buffer Frames to %f\n", frameRange.mMinimum);
+-    }
+-    else if (frameRange.mMaximum < conf->buffer_frames) {
++    } else if (frameRange.mMaximum < frames) {
+         core->audioDevicePropertyBufferFrameSize = (UInt32) frameRange.mMaximum;
+         dolog ("warning: Downsizing Buffer Frames to %f\n", frameRange.mMaximum);
+     }
+     else {
+-        core->audioDevicePropertyBufferFrameSize = conf->buffer_frames;
++        core->audioDevicePropertyBufferFrameSize = frames;
+     }
+ 
+     /* set Buffer Frame Size */
+@@ -568,7 +565,8 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                            "Could not get device buffer frame size\n");
+         return -1;
+     }
+-    hw->samples = conf->nbuffers * core->audioDevicePropertyBufferFrameSize;
++    hw->samples = (pdo->has_buffer_count ? pdo->buffer_count : 4) *
++        core->audioDevicePropertyBufferFrameSize;
+ 
+     /* get StreamFormat */
+     status = coreaudio_get_streamformat(core->outputDeviceID,
+@@ -680,40 +678,15 @@ static int coreaudio_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static CoreaudioConf glob_conf = {
+-    .buffer_frames = 512,
+-    .nbuffers = 4,
+-};
+-
+ static void *coreaudio_audio_init(Audiodev *dev)
+ {
+-    CoreaudioConf *conf = g_malloc(sizeof(CoreaudioConf));
+-    *conf = glob_conf;
+-
+-    return conf;
++    return dev;
+ }
+ 
+ static void coreaudio_audio_fini (void *opaque)
+ {
+-    g_free(opaque);
+ }
+ 
+-static struct audio_option coreaudio_options[] = {
+-    {
+-        .name  = "BUFFER_SIZE",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.buffer_frames,
+-        .descr = "Size of the buffer in frames"
+-    },
+-    {
+-        .name  = "BUFFER_COUNT",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.nbuffers,
+-        .descr = "Number of buffers"
+-    },
+-    { /* End of list */ }
+-};
+-
+ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+@@ -725,7 +698,6 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
+ static struct audio_driver coreaudio_audio_driver = {
+     .name           = "coreaudio",
+     .descr          = "CoreAudio http://developer.apple.com/audio/coreaudio.html",
+-    .options        = coreaudio_options,
+     .init           = coreaudio_audio_init,
+     .fini           = coreaudio_audio_fini,
+     .pcm_ops        = &coreaudio_pcm_ops,
 -- 
 2.20.1
