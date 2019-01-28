@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56307)
+Received: from eggs.gnu.org ([209.51.188.92]:56774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4lP-0004CU-7S
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:40 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1go4nX-00068K-Dn
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4lO-0004My-3x
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:39 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1go4lM-0004K7-Sl
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:37 -0500
-Received: by mail-wm1-x343.google.com with SMTP id t200so13511443wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:07:36 -0800 (PST)
-References: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
-	<8736pdnk7a.fsf@linaro.org>
-	<20190128103900.ea6nxhm45u4p5mpd@function>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190128103900.ea6nxhm45u4p5mpd@function>
-Date: Mon, 28 Jan 2019 11:07:32 +0000
-Message-ID: <87zhrlm45n.fsf@linaro.org>
+	(envelope-from <laurent.desnogues@gmail.com>) id 1go4nW-0005az-Pf
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:09:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: replace QEMU_BUILD_BUG_ON with
- G_STATIC_ASSERT
+References: <20190125182626.9221-1-peter.maydell@linaro.org>
+	<20190125182626.9221-2-peter.maydell@linaro.org>
+In-Reply-To: <20190125182626.9221-2-peter.maydell@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Mon, 28 Jan 2019 12:09:39 +0100
+Message-ID: <CABoDooPvj56h=3kkT80afx6FGGnS8fNqWNxouhX8xSBQ79pf7w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/arm/translate-a64: Don't
+ underdecode system instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org, lizhijian@cn.fujitsu.com, jan.kiszka@siemens.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, zhangckid@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-
-Samuel Thibault <samuel.thibault@gnu.org> writes:
-
-> Alex Benn=C3=A9e, le lun. 28 janv. 2019 10:35:37 +0000, a ecrit:
->> Samuel Thibault <samuel.thibault@ens-lyon.org> writes:
->>
->> > Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->>
->> Is there a rationale as to why we should replace QEMU_BUILD_BUG_ON with
->> G_STATIC_ASSERT or is it particular to these QEMU_BUILD_BUG_ON
->> instances? It would be nice to have a little more context in the commit
->> message.
+On Fri, Jan 25, 2019 at 7:26 PM Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> It is yet more work towards moving slirp/ to a separately-maintained
-> libslirp.
+> The "system instructions" and "system register move" subcategories
+> of "branches, exception generating and system instructions" for A64
+> only apply if bits [23:22] are zero; other values are currently
+> unallocated. Correctly UNDEF these unallocated encodings.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks, that makes more sense. If you could just mention that in the
-commit it would save confusion about QEMU_BUILD_BUG_ON being deprecated
-;-)
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-With that:
+Thanks,
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Laurent
 
---
-Alex Benn=C3=A9e
+> ---
+>  target/arm/translate-a64.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 4d28a27c3bd..e6df303e321 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -2144,7 +2144,11 @@ static void disas_b_exc_sys(DisasContext *s, uint32_t insn)
+>          break;
+>      case 0x6a: /* Exception generation / System */
+>          if (insn & (1 << 24)) {
+> -            disas_system(s, insn);
+> +            if (extract32(insn, 22, 2) == 0) {
+> +                disas_system(s, insn);
+> +            } else {
+> +                unallocated_encoding(s);
+> +            }
+>          } else {
+>              disas_exc(s, insn);
+>          }
+> --
+> 2.20.1
+>
