@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46095)
+Received: from eggs.gnu.org ([209.51.188.92]:46138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@janustech.com>) id 1goD9q-0003Xf-2z
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:26 -0500
+	(envelope-from <yuri.benditovich@janustech.com>) id 1goDA5-0003q0-N9
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@janustech.com>) id 1goD9c-0005DW-3C
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:16 -0500
-Received: from mail-eopbgr790123.outbound.protection.outlook.com
-	([40.107.79.123]:1377
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <yuri.benditovich@janustech.com>) id 1goD9q-0005OQ-3b
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:32 -0500
+Received: from mail-eopbgr800129.outbound.protection.outlook.com
+	([40.107.80.129]:58944
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuri.benditovich@janustech.com>)
-	id 1goD9b-0005Bz-Gp
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:11 -0500
+	id 1goD9c-0005CQ-Ht
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 15:05:16 -0500
 From: Yuri Benditovich <yuri.benditovich@janustech.com>
-Date: Mon, 28 Jan 2019 20:05:05 +0000
-Message-ID: <20190128200444.5128-1-yuri.benditovich@janustech.com>
+Date: Mon, 28 Jan 2019 20:05:09 +0000
+Message-ID: <20190128200444.5128-3-yuri.benditovich@janustech.com>
+References: <20190128200444.5128-1-yuri.benditovich@janustech.com>
+In-Reply-To: <20190128200444.5128-1-yuri.benditovich@janustech.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH 0/2] Fix XHCI errors with isochronous transfer
+Subject: [Qemu-devel] [PATCH 2/2] usb: implement XHCI underrun/overrun events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +33,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: Dmitry Fleytman <dmitry.fleytman@janustech.com>
 
-These patches fix errors causing isochronous transfer to stop
-when XHCI works with redirected devices:
-* avoid halt of isochronous endpoints
-* implement underrun/overrun events
+Implement underrun/overrun events of isochronous endpoints
+according to XHCI spec (4.10.3.1)
+Guest software restarts data streaming when receives these events.
+The XHCI reports these events using interrupter assigned
+to the slot (as these events do not have TRB), so current
+commit adds the field of assigned interrupter to the
+XHCISlot structure. Guest software assigns interrupter to the
+slot on 'Address Device' and 'Evaluate Context' commands.
 
-Note that checkpatch emits errors for patch 2 on usage by
-'slotid-1' statement. I still leave it for readability
-as this construction is used in this file everywhere.
-
-Yuri Benditovich (2):
-  usb: XHCI shall not halt isochronous endpoints
-  usb: implement XHCI underrun/overrun events
-
- hw/usb/hcd-xhci.c | 22 ++++++++++++++++++++--
+Signed-off-by: Yuri Benditovich <yuri.benditovich@janustech.com>
+---
+ hw/usb/hcd-xhci.c | 17 +++++++++++++++--
  hw/usb/hcd-xhci.h |  1 +
- 2 files changed, 21 insertions(+), 2 deletions(-)
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 1a8fd96..19c64f7 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -1949,6 +1949,16 @@ static void xhci_kick_epctx(XHCIEPContext *epctx, un=
+signed int streamid)
+     while (1) {
+         length =3D xhci_ring_chain_length(xhci, ring);
+         if (length <=3D 0) {
++            if (epctx->type =3D=3D ET_ISO_OUT || epctx->type =3D=3D ET_ISO=
+_IN) {
++                /* 4.10.3.1 */
++                XHCIEvent ev =3D { ER_TRANSFER };
++                ev.ccode  =3D epctx->type =3D=3D ET_ISO_IN ?
++                    CC_RING_OVERRUN : CC_RING_UNDERRUN;
++                ev.slotid =3D epctx->slotid;
++                ev.epid   =3D epctx->epid;
++                ev.ptr    =3D epctx->ring.dequeue;
++                xhci_event(xhci, &ev, xhci->slots[epctx->slotid-1].intr);
++            }
+             break;
+         }
+         xfer =3D xhci_ep_alloc_xfer(epctx, length);
+@@ -2028,6 +2038,7 @@ static TRBCCode xhci_disable_slot(XHCIState *xhci, un=
+signed int slotid)
+     xhci->slots[slotid-1].enabled =3D 0;
+     xhci->slots[slotid-1].addressed =3D 0;
+     xhci->slots[slotid-1].uport =3D NULL;
++    xhci->slots[slotid-1].intr =3D 0;
+     return CC_SUCCESS;
+ }
+=20
+@@ -2127,6 +2138,7 @@ static TRBCCode xhci_address_slot(XHCIState *xhci, un=
+signed int slotid,
+     slot =3D &xhci->slots[slotid-1];
+     slot->uport =3D uport;
+     slot->ctx =3D octx;
++    slot->intr =3D get_field(slot_ctx[2], TRB_INTR);
+=20
+     /* Make sure device is in USB_STATE_DEFAULT state */
+     usb_device_reset(dev);
+@@ -2300,8 +2312,9 @@ static TRBCCode xhci_evaluate_slot(XHCIState *xhci, u=
+nsigned int slotid,
+=20
+         slot_ctx[1] &=3D ~0xFFFF; /* max exit latency */
+         slot_ctx[1] |=3D islot_ctx[1] & 0xFFFF;
+-        slot_ctx[2] &=3D ~0xFF00000; /* interrupter target */
+-        slot_ctx[2] |=3D islot_ctx[2] & 0xFF000000;
++        /* update interrupter target field */
++        xhci->slots[slotid-1].intr =3D get_field(islot_ctx[2], TRB_INTR);
++        set_field(&slot_ctx[2], xhci->slots[slotid-1].intr, TRB_INTR);
+=20
+         DPRINTF("xhci: output slot context: %08x %08x %08x %08x\n",
+                 slot_ctx[0], slot_ctx[1], slot_ctx[2], slot_ctx[3]);
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index fc36a4c..240caa4 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -140,6 +140,7 @@ typedef struct XHCIPort {
+ typedef struct XHCISlot {
+     bool enabled;
+     bool addressed;
++    uint16_t intr;
+     dma_addr_t ctx;
+     USBPort *uport;
+     XHCIEPContext *eps[31];
 --=20
 2.9.5
