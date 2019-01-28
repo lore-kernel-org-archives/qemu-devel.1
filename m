@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47418)
+Received: from eggs.gnu.org ([209.51.188.92]:47952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1go87Z-0002NT-5k
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:42:45 -0500
+	(envelope-from <imammedo@redhat.com>) id 1go8Ao-0003cC-7W
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:46:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1go87Y-0007bI-CG
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:42:45 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190124091222.GB4601@localhost.localdomain>
-References: <cover.1548171741.git.berto@igalia.com>
-	<6ad371df66eecffccce29a0bd14695f40edd6120.1548171741.git.berto@igalia.com>
-	<735410dc-a63e-6a28-4526-2caa810a797d@redhat.com>
-	<w518szbmmw9.fsf@maestria.local.igalia.com>
-	<b3e3cb90-32a6-77b0-1c5b-8281181c8ae8@redhat.com>
-	<w5136pjmjrp.fsf@maestria.local.igalia.com>
-	<20190124091222.GB4601@localhost.localdomain>
-Date: Mon, 28 Jan 2019 15:42:17 +0100
-Message-ID: <w51d0ogsv1y.fsf@maestria.local.igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1go8Am-0000RO-EJ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:46:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1go8Am-0000Ql-7p
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:46:04 -0500
+Date: Mon, 28 Jan 2019 15:45:53 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190128154553.583f79a3@redhat.com>
+In-Reply-To: <20190125210058.1092551-1-stefanb@linux.ibm.com>
+References: <20190125210058.1092551-1-stefanb@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/3] virtio-scsi: Forbid devices with
- different iothreads sharing a blockdev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: Make TPM 2.0 with TIS available as
+ MSFT0101
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mst@redhat.com
 
-On Thu 24 Jan 2019 10:12:22 AM CET, Kevin Wolf wrote:
-> Am 23.01.2019 um 17:16 hat Alberto Garcia geschrieben:
->> On Wed 23 Jan 2019 04:47:30 PM CET, Paolo Bonzini wrote:
->> >> You mean a common function with the code below?
->> >> 
->> >>>> +        ctx = blk_get_aio_context(sd->conf.blk);
->> >>>> +        if (ctx != s->ctx && ctx != qemu_get_aio_context()) {
->> >>>> +            error_setg(errp, "Cannot attach a blockdev that is using "
->> >>>> +                       "a different iothread");
->> >>>> +            return;
->> >>>> +        }
->> >> 
->> >> Who else would be the user?
->> >
->> > If it isn't, probably virtio-blk should be using too.
->> 
->> I agree, but that's the problem that I mentioned on the cover letter.
->> 
->> In the virtio-blk case I don't know how to tell that the block device
->> is using a different iothread during device_add, because the iothread
->> is not set during realize() but by virtio_blk_data_plane_start() that
->> happens only when I reboot the guest.
->
-> I think the proper solution on the block layer level would be that
-> AioContext is managed per BdrvChild and only BdrvChild objects with
-> the same AioContext can be attached to the same node.
-> bdrv_set_aio_context() would then fail if another parent is already
-> using the node.
+On Fri, 25 Jan 2019 16:00:58 -0500
+Stefan Berger <stefanb@linux.ibm.com> wrote:
 
-How would that solve the virtio-blk problem, though? :-?
+> This patch makes the a TPM 2.0 with TIS interface available under the
+> HID 'MSF0101'. This is supported by Linux and also Windows now
+MSF0101 is relatively recent addition to Linux,
+are there in wild (old) kernels that worked with PNP0C31 but won't work
+with MSF0101?
 
-> Now, Paolo keeps talking about how AioContexts are going to disappear
-> soon (TM), so I wonder whether it's still worth fixing this properly
-> now?
-
-Either way, should we commit this series already and later update it
-once we have a proper solution for virtio-blk?
-
-Berto
+> recognizes the TPM 2.0 with TIS interface. Leave the TPM 1.2 as before.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> ---
+>  hw/i386/acpi-build.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2e21a31f82..f51225b4a7 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2141,8 +2141,16 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+>  
+>              if (TPM_IS_TIS(tpm)) {
+> -                dev = aml_device("ISA.TPM");
+> -                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+> +                if (misc->tpm_version == TPM_VERSION_2_0) {
+> +                    dev = aml_device("TPM");
+> +                    aml_append(dev, aml_name_decl("_HID",
+> +                                                  aml_string("MSFT0101")));
+> +                } else {
+> +                    dev = aml_device("ISA.TPM");
+> +                    aml_append(dev, aml_name_decl("_HID",
+> +                                                  aml_eisaid("PNP0C31")));
+> +                }
+> +
+>                  aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+>                  crs = aml_resource_template();
+>                  aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
