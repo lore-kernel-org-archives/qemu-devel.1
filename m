@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37215)
+Received: from eggs.gnu.org ([209.51.188.92]:38292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goBEu-0003Zq-Id
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1goBFD-0004Nj-10
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goB0i-0001Pz-36
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:47:52 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goB0h-0001Ls-T1
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:47:52 -0500
-Received: by mail-wm1-f65.google.com with SMTP id g67so14866977wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 09:47:40 -0800 (PST)
-References: <20190124011554.25418-1-philmd@redhat.com>
-	<20190124011554.25418-5-philmd@redhat.com>
-	<20190124114305.bdxz76bsxk5lvc3d@sirius.home.kraxel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
-Date: Mon, 28 Jan 2019 18:47:37 +0100
+	(envelope-from <kwolf@redhat.com>) id 1goBF9-0001Yu-06
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:48 -0500
+Date: Mon, 28 Jan 2019 19:02:19 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190128180219.GM5756@localhost.localdomain>
+References: <20190128142748.29140-1-antonkuchin@yandex-team.ru>
+	<20190128144720.GB5756@localhost.localdomain>
+	<d5c28554-fee3-5c12-3528-150c0d048903@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <20190124114305.bdxz76bsxk5lvc3d@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/display/milkymist-tmu2: Move
- inlined code from header to source
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d5c28554-fee3-5c12-3528-150c0d048903@yandex-team.ru>
+Subject: Re: [Qemu-devel] [PATCH 0/2] block: add blk_lookup() for getting
+ device by node_name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Anton Kuchin <antonkuchin@yandex-team.ru>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Cc'ing Thomas/Paolo for Makefile rules...
-
-On 1/24/19 12:43 PM, Gerd Hoffmann wrote:
-> On Thu, Jan 24, 2019 at 02:15:54AM +0100, Philippe Mathieu-Daudé wrote:
->> Move the complexity of milkymist_tmu2_create() into the
->> source file. Doing so we avoid to include the X11/OpenGL
->> headers in all LM32 devices, and we also avoid the duplicate
->> declaration of glx_fbconfig_attr[] (it is already declared
->> in hw/display/milkymist-tmu2.c).
->> Since TYPE_MILKYMIST_TMU2 is now accessible, use it.
+Am 28.01.2019 um 17:53 hat Anton Kuchin geschrieben:
+> On 28/01/2019 17:47, Kevin Wolf wrote:
+> > Am 28.01.2019 um 15:27 hat Anton Kuchin geschrieben:
+> > > Some HMP and QMP commands are targeting BlockBackend but
+> > > for hotplugged devices name of BB is deprecated, instead
+> > > name of root BlockDriverState is set. These patches add
+> > > functions to search BB by attached root BDS name.
+> > > 
+> > > This approach isn't perfect, but I couldn't invent a better
+> > > one and I belive it's more convinient than accessing BB
+> > > by QOM path.
+> > There could be more than one BlockBackend attached to a single node, so
+> > this approach is simply wrong.
 > 
-> Oops, fails the build:
+> I was thinking about this but couldn't imagine configuration when it's
+> having more than one root. Can you give an example, please, so I understand
+> this case better.
+
+You can configure such setups explicitly by just using the same -device
+drive=node-name twice, though I admit this is unusual.
+
+The more practical case are internal BlockBackends for use by block jobs
+or the NBD server. In that case, the user might modify a completely
+different BlockBackend than they had in mind.
+
+> > I think the qdev ID is actually not only a pretty convenient way, but in
+> > fact the only logical way to address a guest device (and BlockBackends
+> > that can be accessed by the monitor are essentially a part of the guest
+> > device).
 > 
->   LINK    lm32-softmmu/qemu-system-lm32
-> hw/lm32/milkymist.o: In function `milkymist_init':
-> milkymist.c:(.text+0xb0f): undefined reference to `milkymist_tmu2_create'
+> As far as I remember backends currently have emply qdev ID so the only way
+> to address them now is QOM path like ".../my_hotplug_drive/virtio-backend".
+> So I have to remember the name of the root driver it is connected to and
+> also add this "/virtio-backend" suffix.
 
-The problem comes from patch #2:
+virtio-blk is ugly, indeed, because the device is split in two halves
+and the half with the assigned ID isn't the half that owns the
+BlockBackend. But the paths are relative to /machine/peripheral, so I
+think just "my_hotplug_drive/virtio-backend" should work.
 
-> diff --git a/default-configs/lm32-softmmu.mak
-b/default-configs/lm32-softmmu.mak
-> index 4889348a10..4049b23562 100644
-> --- a/default-configs/lm32-softmmu.mak
-> +++ b/default-configs/lm32-softmmu.mak
-> @@ -2,7 +2,7 @@
->
->  CONFIG_LM32=y
->  CONFIG_MILKYMIST=y
-> -CONFIG_MILKYMIST_TMU2=$(CONFIG_OPENGL)
-> +CONFIG_MILKYMIST_TMU2=$(call land,$(CONFIG_X11),$(CONFIG_OPENGL))
->  CONFIG_FRAMEBUFFER=y
->  CONFIG_PTIMER=y
->  CONFIG_PFLASH_CFI01=y
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index 97acd5b6cb..079e702f25 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -29,8 +29,8 @@ common-obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
->  common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
->
->  common-obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
-> -milkymist-tmu2.o-cflags := $(X11_CFLAGS)
-> -milkymist-tmu2.o-libs := $(X11_LIBS)
-> +milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
-> +milkymist-tmu2.o-libs := $(X11_LIBS) $(OPENGL_LIBS)
->
->  obj-$(CONFIG_OMAP) += omap_dss.o
->  obj-$(CONFIG_OMAP) += omap_lcdc.o
+For all other devices, it's just the ID, as far as I know.
 
-Using $(call land) seems to break CONFIG_MILKYMIST_TMU2 availability in
-$(common-obj), while it works correctly in the per-target $(obj).
-I'm not sure what is the cause, but moving milkymist-tmu2.o to $(obj)
-makes more sense and fix this, so I'll go this way.
+> Can you explain a bit what are "monitor referenced" backends and which one
+> can be accessed from monitor and which can not.
 
-Regards,
+The user isn't supposed to access internal BlockBackends, like those of
+block jobs and the NBD server.
 
-Phil.
+> > Does your series allow to perform any operation that isn't possible
+> > currently? If so, it's probably this operation that needs to be fixed to
+> > either accept node names (if it's a backend operation) or a device ID
+> > (if it's a frontend operation).
+> 
+> Yes. It fixes latency histogram setting, nbd server binding to remove event
+> and a couple of hmp comands. I also suspect that this can affect migration
+> but I could't figure out what name is used for identifying drives.
+
+qmp_x_block_latency_histogram_set() uses blk_by_name() to get the
+BlockBackend. The fix is to make it use qmp_get_blk() instead.
+
+I'm not sure what the exact NBD thing is you mean.
+
+Kevin
