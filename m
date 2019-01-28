@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57849)
+Received: from eggs.gnu.org ([209.51.188.92]:59543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go71q-0000xI-Ge
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:32:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1go796-0004wM-RQ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:40:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go71l-0001EP-Uq
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:32:44 -0500
-Date: Mon, 28 Jan 2019 14:32:30 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190128143230.3bda74a0@redhat.com>
-In-Reply-To: <20190125060157.29935-1-richardw.yang@linux.intel.com>
-References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1go790-0007gf-Sq
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:40:16 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42294)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go790-0007Zu-MT
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 08:40:10 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so18076064wrx.9
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 05:40:10 -0800 (PST)
+References: <20190122145132.12571-1-paul.durrant@citrix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <57cd3429-41a3-48c5-4d06-5d203cf70f97@redhat.com>
+Date: Mon, 28 Jan 2019 14:40:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] hw/i386/pc.c: remove unused function
- pc_acpi_init()
+In-Reply-To: <20190122145132.12571-1-paul.durrant@citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/block: clean up stake xen_disk trace
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu, mst@redhat.com
+To: Paul Durrant <paul.durrant@citrix.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On Fri, 25 Jan 2019 14:01:55 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+Cc'ing QEMU Trivial.
 
-> Function pc_acpi_init() is now used in no place.
-s/is now used in no place./in not used anymore,/
+On 1/22/19 3:51 PM, Paul Durrant wrote:
+> This should have been removed then xen_disk.c was removed but I missed them.
 
-fixup the same phrase in other patches.
+... when xen_disk.c was removed (19f87870baa) ...
 
-otherwise series looks good, so fix commit messages and resubmit series.
-
-Also when sending  multi-patch series, pls use cover letter
-(see help for git format-patch --cover-letter)
-
- 
-> Remove the definition and declaration.
 > 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  hw/i386/pc.c         | 27 ---------------------------
->  include/hw/i386/pc.h |  1 -
->  2 files changed, 28 deletions(-)
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> ---
+>  hw/block/trace-events | 7 -------
+>  1 file changed, 7 deletions(-)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 5317e08f60..734d3268fa 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1280,33 +1280,6 @@ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
->                                          pci_address_space, -1);
->  }
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index 55e5a5500c..d0851953c5 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -121,13 +121,6 @@ nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue
+>  nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
+>  nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
 >  
-> -void pc_acpi_init(const char *default_dsdt)
-> -{
-> -    char *filename;
+> -# hw/block/xen_disk.c
+> -xen_disk_alloc(char *name) "%s"
+> -xen_disk_init(char *name) "%s"
+> -xen_disk_connect(char *name) "%s"
+> -xen_disk_disconnect(char *name) "%s"
+> -xen_disk_free(char *name) "%s"
 > -
-> -    if (acpi_tables != NULL) {
-> -        /* manually set via -acpitable, leave it alone */
-> -        return;
-> -    }
-> -
-> -    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
-> -    if (filename == NULL) {
-> -        warn_report("failed to find %s", default_dsdt);
-> -    } else {
-> -        QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
-> -                                          &error_abort);
-> -        Error *err = NULL;
-> -
-> -        qemu_opt_set(opts, "file", filename, &error_abort);
-> -
-> -        acpi_table_add_builtin(opts, &err);
-> -        if (err) {
-> -            warn_reportf_err(err, "failed to load %s: ", filename);
-> -        }
-> -        g_free(filename);
-> -    }
-> -}
-> -
->  void xen_load_linux(PCMachineState *pcms)
->  {
->      int i;
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 9d29c4b1df..541124ba6d 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -187,7 +187,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
->  
->  void pc_cpus_init(PCMachineState *pcms);
->  void pc_hot_add_cpu(const int64_t id, Error **errp);
-> -void pc_acpi_init(const char *default_dsdt);
->  
->  void pc_guest_info_init(PCMachineState *pcms);
->  
+>  # hw/block/xen-block.c
+>  xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
+>  xen_block_connect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
+> 
