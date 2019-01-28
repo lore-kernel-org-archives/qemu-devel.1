@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49437)
+Received: from eggs.gnu.org ([209.51.188.92]:50165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4GX-0006my-Jd
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1go4KH-00083i-Df
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:39:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4GV-0003eM-LJ
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:45 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44893)
+	(envelope-from <peter.maydell@linaro.org>) id 1go4KE-0005t8-RJ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:39:37 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:43459)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1go4GS-0003a0-NU
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:35:41 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z5so17381279wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:35:39 -0800 (PST)
-References: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190127114659.12881-1-samuel.thibault@ens-lyon.org>
-Date: Mon, 28 Jan 2019 10:35:37 +0000
-Message-ID: <8736pdnk7a.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1go4KE-0005nq-MW
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:39:34 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id a11so14162658otr.10
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:39:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: replace QEMU_BUILD_BUG_ON with
- G_STATIC_ASSERT
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+In-Reply-To: <87y378n5iy.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 28 Jan 2019 10:39:09 +0000
+Message-ID: <CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lizhijian@cn.fujitsu.com, jan.kiszka@siemens.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, zhangckid@gmail.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
+On Fri, 25 Jan 2019 at 15:11, Markus Armbruster <armbru@redhat.com> wrote:
+> (1) cfi.pflash01 isn't available with -device.
+>
+> (2) "Magic board code picks up the backend [created for -drive
+>     if=pflash], creates a frontend (a cfi.pflash01 device), and maps it
+>     into the guest's address space."  When we replace if=pflash by
+>     if=none, we get to replicate that magic on top of -device.
+>
+> Issue (1) isn't too hard: we add the device to the dynamic sysbus device
+> white-list, move a sysbus_mmio_map() from pflash_cfi01_realize() into
+> pflash_cfi01_realize().  The latter requires a new device property to
+> configure the base address.  I got a working prototype.  Since this
+> makes the device model's name and properties ABI, review would be
+> advisable.
 
-Samuel Thibault <samuel.thibault@ens-lyon.org> writes:
+Flash devices exist on the board at specific addresses, so they
+should in general be created by the board model. Creating them
+by the user on the command line is a mess because then the
+user has to know the right base address. And then the board
+code needs to do something for "if the user didn't create this
+then we need to do it", because the flash device should exist
+in the model whether the user cared about its contents or not.
 
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Dynamic sysbus is something I'd rather we did less of, not more
+of. It's there because it solves an annoying problem (people
+want to do device passthrough of hardware that's not on a nice
+pluggable probeable bus), but it's really awkward.
 
-Is there a rationale as to why we should replace QEMU_BUILD_BUG_ON with
-G_STATIC_ASSERT or is it particular to these QEMU_BUILD_BUG_ON
-instances? It would be nice to have a little more context in the commit
-message.
+> To solve (2), we first have to understand the magic.  Device
+> cfi.pflash01 has the following properties:
+>
+>     num-blocks                  Size of the device in blocks
+>     sector-length               Size of a block
+>                                 (admire the choice of names)
+>     width                       Bank width
+>     big-endian                  Endianess (d'oh)
+>     id0, id1, id2, id3          Some kind of device ID, guest-visible,
+>                                 default to zero, few boards change it
 
-Otherwise the changes themselves look fine.
+Note that most of this is stuff that the hardware has.
+A lot of boards set these to garbage values which happened
+to be what the very old implementation of pflash hardcoded,
+because most guests don't care. This is strictly speaking
+wrong and they should use whatever the hardware really has,
+but most of these cases are for old not-very-maintained dev
+boards where probably nobody even has the relevant hardware
+even if they cared enough to find out what its ID values are.
 
-> ---
->  slirp/ip.h       |  4 ++--
->  slirp/ip6.h      |  4 ++--
->  slirp/ip6_icmp.h | 10 +++++-----
->  3 files changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/slirp/ip.h b/slirp/ip.h
-> index 2baeeb9a3a..73a4d2a3d2 100644
-> --- a/slirp/ip.h
-> +++ b/slirp/ip.h
-> @@ -229,8 +229,8 @@ struct	ipasfrag {
->  	struct ip ipf_ip;
->  };
->
-> -QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
-> -                  offsetof(struct ipasfrag, ipf_link));
-> +G_STATIC_ASSERT(offsetof(struct ipq, frag_link) =3D=3D
-> +                offsetof(struct ipasfrag, ipf_link));
->
->  #define ipf_off      ipf_ip.ip_off
->  #define ipf_tos      ipf_ip.ip_tos
-> diff --git a/slirp/ip6.h b/slirp/ip6.h
-> index 4e7c366505..5361bd7449 100644
-> --- a/slirp/ip6.h
-> +++ b/slirp/ip6.h
-> @@ -152,7 +152,7 @@ struct ip6_pseudohdr {
->   * If we marked the struct as packed then we would be unable to take
->   * the address of any of the fields in it.
->   */
-> -QEMU_BUILD_BUG_ON(sizeof(struct ip6) !=3D 40);
-> -QEMU_BUILD_BUG_ON(sizeof(struct ip6_pseudohdr) !=3D 40);
-> +G_STATIC_ASSERT(sizeof(struct ip6) =3D=3D 40);
-> +G_STATIC_ASSERT(sizeof(struct ip6_pseudohdr) =3D=3D 40);
->
->  #endif
-> diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
-> index 3f44ed2f49..e8ed753db5 100644
-> --- a/slirp/ip6_icmp.h
-> +++ b/slirp/ip6_icmp.h
-> @@ -50,14 +50,14 @@ struct ndp_ra {     /* Router Advertisement Message */
->      uint32_t retrans_time;  /* Retrans Timer */
->  };
->
-> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ra) !=3D 12);
-> +G_STATIC_ASSERT(sizeof(struct ndp_ra) =3D=3D 12);
->
->  struct ndp_ns {     /* Neighbor Solicitation Message */
->      uint32_t reserved;
->      struct in6_addr target; /* Target Address */
->  };
->
-> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_ns) !=3D 20);
-> +G_STATIC_ASSERT(sizeof(struct ndp_ns) =3D=3D 20);
->
->  struct ndp_na {     /* Neighbor Advertisement Message */
->  #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-> @@ -78,7 +78,7 @@ struct ndp_na {     /* Neighbor Advertisement Message */
->      struct in6_addr target; /* Target Address */
->  };
->
-> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_na) !=3D 20);
-> +G_STATIC_ASSERT(sizeof(struct ndp_na) =3D=3D 20);
->
->  struct ndp_redirect {
->      uint32_t reserved;
-> @@ -86,7 +86,7 @@ struct ndp_redirect {
->      struct in6_addr dest;   /* Destination Address */
->  };
->
-> -QEMU_BUILD_BUG_ON(sizeof(struct ndp_redirect) !=3D 36);
-> +G_STATIC_ASSERT(sizeof(struct ndp_redirect) =3D=3D 36);
->
->  /*
->   * Structure of an icmpv6 header.
-> @@ -113,7 +113,7 @@ struct icmp6 {
->  #define icmp6_redirect icmp6_body.ndp_redirect
->  };
->
-> -QEMU_BUILD_BUG_ON(sizeof(struct icmp6) !=3D 40);
-> +G_STATIC_ASSERT(sizeof(struct icmp6) =3D=3D 40);
->
->  #define ICMP6_MINLEN    4
->  #define ICMP6_ERROR_MINLEN  8
+>     name                        Memory region name
+>                                 (why is this even configurable?)
 
+(a) for debug purposes, so a machine can create two flash
+devices and give them names which make them easier to tell
+apart in monitor "info mem" and similar command output
+(b) more  importantly, the memory region name is used as
+the migration vmstate ram name, so if you change it you
+break migration compat.
 
---
-Alex Benn=C3=A9e
+>     phys-addr                   Physical base address
+>                                 (this is the new device property
+>                                 mentioned above)
+>     secure                      For restricting access to firmware,
+>                                 default off
+>     device-width                you don't want to know,
+>                                 there is a default, but it's documented
+>                                 as "bad, do not use", yet pretty much
+>                                 all boards use it
+
+See above about "old not-very-maintained dev boards". A
+board which does use this is one that's doing it for
+back-compat because nobody's cared to fix and test.
+
+>     max-device-width            defaults to device-width
+>                                 not actually set anywhere
+>     old-multiple-chip-handling  back-compat gunk for
+>                                 machine types 2.8 and older
+>
+> The magic board code in hw/i386/pc_sysfw.c configures as follows:
+>
+>     num-blocks                  computed from backend size
+>     sector-length               4096
+>     width                       1
+>     big-endian                  0
+>     id0, id1, id2, id3          all 0
+>     name                        system.pflash<U>, where U is -drive's
+>                                 unit number
+>     phys-addr                   computed so
+>                                 unit 0 ends right below 0x100000000,
+>                                 unit n+1 ends at right below unit n
+>
+> "secure", "device-width", "max-device-width",
+> "old-multiple-chip-handling" are left at the default.
+>
+> One additional bit of magic is actually in libvirt: it configures
+> "secure" by flipping its default with
+> -global driver=cfi.pflash01,property=secure,value=on.
+>
+> Now let's consider how to replicate this magic on top of device.
+>
+> Perhaps machine-type specific defaults could take care of sector-length,
+> width, big-endian, id0, id1, id2, id3.  Leaves num-blocks, name, and
+> phys-addr.
+
+You could at least in theory have a machine with several
+different flash devices of different make/ID. This is why
+they're device properties. I think they're fine the way
+they are, ie set by the code that creates the device.
+
+thanks
+-- PMM
