@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55951)
+Received: from eggs.gnu.org ([209.51.188.92]:56060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4kG-0003QS-J7
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:06:29 -0500
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1go4km-0003fk-4X
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1go4kE-0003yR-54
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:06:28 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1go4k7-0003xi-8M
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:06:20 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m22so13467891wml.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:06:17 -0800 (PST)
-References: <20190125225714.10234-1-richard.henderson@linaro.org>
-	<20190125225714.10234-8-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190125225714.10234-8-richard.henderson@linaro.org>
-Date: Mon, 28 Jan 2019 11:06:14 +0000
-Message-ID: <871s4xnis9.fsf@linaro.org>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1go4ki-00044P-HH
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:06:58 -0500
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 28 Jan 2019 11:05:42 +0000
+Message-ID: <20190128110545.20644-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] tests/tcg/aarch64: Add pauth smoke
- tests
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC PATCH 0/4] ARM virt: ACPI memory hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +21,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: eric.auger@redhat.com, shannon.zhaosl@gmail.com, peter.maydell@linaro.org, imammedo@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: xuwei5@huawei.com, linuxarm@huawei.com
 
+This series is an attempt to provide hotplug support to both
+pc-dimm and nvdimm device memory on ARM virt platform. This is
+based on Eric's recent works to support PCDIMM/NVDIMM device memory[1].
+The kernel support for arm64 memory hot add was added only
+recently by Robin[2] and hence the guest kernel should be => 5.0-rc1.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+This makes use of PL061 GPIO controller to sent related ACPI events
+to the Guest. The only reference I could find with respect to the GPIO
+pins usage is here[3] which says, "use PIN 3 for system_powerdown,
+reserving PIN 0, 1, 2 for PCI hotplug, CPU hotplug and memory hotplug".
+Hence Pin 2 is used for PCDIMM and pin 4 for NVDIMM.
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tests/tcg/aarch64/pauth-1.c       | 23 +++++++++++++++++++++++
->  tests/tcg/aarch64/Makefile.target |  7 ++++++-
->  2 files changed, 29 insertions(+), 1 deletion(-)
->  create mode 100644 tests/tcg/aarch64/pauth-1.c
->
-> diff --git a/tests/tcg/aarch64/pauth-1.c b/tests/tcg/aarch64/pauth-1.c
-> new file mode 100644
-> index 0000000000..9bd8d28ede
-> --- /dev/null
-> +++ b/tests/tcg/aarch64/pauth-1.c
-> @@ -0,0 +1,23 @@
-> +#include <assert.h>
-> +#include <sys/prctl.h>
-> +
-> +asm(".arch armv8.4-a");
-> +
-> +#ifndef PR_PAC_RESET_KEYS
-> +#define PR_PAC_RESET_KEYS  54
-> +#define PR_PAC_APDAKEY     (1 << 2)
-> +#endif
-> +
-> +int main()
-> +{
-> +    int x;
-> +    void *p0 =3D &x, *p1, *p2;
-> +
-> +    asm volatile("pacdza %0" : "=3Dr"(p1) : "0"(p0));
-> +    prctl(PR_PAC_RESET_KEYS, PR_PAC_APDAKEY);
-> +    asm volatile("pacdza %0" : "=3Dr"(p2) : "0"(p0));
-> +
-> +    assert(p1 !=3D p0);
-> +    assert(p1 !=3D p2);
-> +    return 0;
-> +}
-> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefi=
-le.target
-> index 08c45b8470..e80d07276c 100644
-> --- a/tests/tcg/aarch64/Makefile.target
-> +++ b/tests/tcg/aarch64/Makefile.target
-> @@ -8,10 +8,15 @@ VPATH 		+=3D $(AARCH64_SRC)
->  # we don't build any of the ARM tests
->  AARCH64_TESTS=3D$(filter-out $(ARM_TESTS), $(TESTS))
->  AARCH64_TESTS+=3Dfcvt
-> -TESTS:=3D$(AARCH64_TESTS)
->
->  fcvt: LDFLAGS+=3D-lm
->
->  run-fcvt: fcvt
->  	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
->  	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
-> +
-> +AARCH64_TESTS +=3D pauth-1
-> +pauth-%: CFLAGS +=3D -O -g
+This is sanity tested on a HiSilicon ARM64 platform and appreciate
+any further testing.
 
-We build all tests with:
+This series can be applied on top of Eric's branch here[4]
 
-  CFLAGS+=3D-Wall -O0 -g -fno-strict-aliasing
+Test:
+------
+Please use a Guest kernel image >5.0-rc1 with all the mem/nvdimm
+hotplug related CONFIGs enabled.
 
-mainly because the first thing you want to do when they fail is run them
-through gdb to see what went wrong. Do you actually need optimisation on
-for the build to work? Everything else looks good though:
+./qemu-system-aarch64 \
+-machine virt,gic-version=3,nvdimm \
+-m 1G,maxmem=4G,slots=4 \
+-cpu host \
+-kernel Image \
+-initrd rootfs-iperf.cpio \
+-bios QEMU_EFI.fd \
+-numa node,nodeid=0 \
+-net none \
+-nographic -enable-kvm \
+-append "console=ttyAMA0 acpi=force earlycon=pl011,0x9000000"
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Enter Qemu monitor,
+Add pc-dimm:
+object_add memory-backend-ram,id=mem1,size=1G
+device_add pc-dimm,id=dimm1,memdev=mem1
 
-> +run-pauth-%: QEMU +=3D -cpu max
-> +
-> +TESTS:=3D$(AARCH64_TESTS)
+Add nvdimm:
+object_add memory-backend-ram,id=mem2,size=1G
+device_add nvdimm,id=dimm2,memdev=mem2
 
+Known Issue:
 
---
-Alex Benn=C3=A9e
+It is observed that hot adding nvdimm will results in guest reboot
+failure. EDK2 fails to build the ACPI tables on reboot. Please find
+below EDK2 log on Guest reboot after nvdimm hot-add,
+
+ProcessCmdAddChecksum: invalid checksum range in "etc/acpi/tables"
+OnRootBridgesConnected: InstallAcpiTables: Protocol Error
+
+The root cause seems to be EDK2 ACPI table checksum failure
+as NFIT table is getting updated on hot-add. This needs further
+investigation.
+
+Thanks,
+Shameer
+
+[1]https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05740.html
+[2]https://patchwork.kernel.org/patch/10724455/
+[3]https://lists.gnu.org/archive/html/qemu-arm/2015-12/msg00095.html
+[4]https://github.com/eauger/qemu/tree/v3.1.0-dimm-v5
+
+Shameer Kolothum (4):
+  hw:acpi: Make ACPI IO address space configurable
+  hw/arm/virt: Add GPIO based pcdimm hotplug ACPI event support
+  hw/arm/virt: Enable pc-dimm hotplug support
+  hw/arm/virt: Add nvdimm hotplug support
+
+ default-configs/arm-softmmu.mak  |   1 +
+ hw/acpi/memory_hotplug.c         |  13 +++--
+ hw/arm/virt-acpi-build.c         |  45 +++++++++++++++--
+ hw/arm/virt.c                    | 105 ++++++++++++++++++++++++++++++++++++---
+ hw/i386/acpi-build.c             |   3 +-
+ include/hw/acpi/memory_hotplug.h |   6 ++-
+ include/hw/arm/virt.h            |  15 ++++++
+ 7 files changed, 168 insertions(+), 20 deletions(-)
+
+-- 
+2.7.4
