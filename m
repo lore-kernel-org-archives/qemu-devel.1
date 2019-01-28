@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38134)
+Received: from eggs.gnu.org ([209.51.188.92]:35458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <voltagex@voltagex.org>) id 1gnydM-0001ei-9d
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:34:57 -0500
+	(envelope-from <hle@owl.eu.com>) id 1go3Gx-0001dQ-QK
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <voltagex@voltagex.org>) id 1gnydL-0008Rt-3i
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:34:56 -0500
-Received: from mail-vk1-xa2b.google.com ([2607:f8b0:4864:20::a2b]:32783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <voltagex@voltagex.org>)
-	id 1gnydJ-0008PB-0D
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:34:54 -0500
-Received: by mail-vk1-xa2b.google.com with SMTP id d201so3393795vka.0
-	for <qemu-devel@nongnu.org>; Sun, 27 Jan 2019 20:34:52 -0800 (PST)
+	(envelope-from <hle@owl.eu.com>) id 1go3Gw-000827-Lb
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:32:07 -0500
+Received: from relay7-d.mail.gandi.net ([217.70.183.200]:45271)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hle@owl.eu.com>) id 1go3Gw-00080t-7d
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 04:32:06 -0500
+Date: Mon, 28 Jan 2019 10:31:57 +0100
+From: Hugo Lefeuvre <hle@debian.org>
+Message-ID: <20190128093157.GA27483@hle-laptop>
+References: <20181119110757.2692-1-ppandit@redhat.com>
 MIME-Version: 1.0
-From: Adam Baxter <voltagex@voltagex.org>
-Date: Mon, 28 Jan 2019 15:34:38 +1100
-Message-ID: <CAChFQ9RDi+VK_EERZsPB6UK_DpL-LDs97A6VivYSbuk=0VKP7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Building nsis installer - cross compile for Windows
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
+Content-Disposition: inline
+In-Reply-To: <20181119110757.2692-1-ppandit@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] bt: use size_t type for length
+ parameters instead of int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>, Arash TC <tohidi.arash@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, debian-lts@lists.debian.org
 
-I'm getting stuck trying to build the NSIS installer for Windows
 
+--VbJkn9YxBvnuCH5J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-export CFLAGS="-Wno-stringop-truncation"
-./configure --python=$(command -v python3)
---cross-prefix=x86_64-w64-mingw32- --enable-docs
-echo 3.99.99 > VERSION
-make -j`nproc`
-make -j`nproc` installer
+Hi,
 
-results in:
+> The length parameter values are not negative, thus use an unsigned
+> type 'size_t' for them. Many routines pass 'len' values to memcpy(3)
+> calls. If it was negative, it could lead to memory corruption issues.
+> Add check to avoid it.
 
-make[1]: Leaving directory '/drone/src'
-(cd /tmp/qemu-nsis; \
-         for i in qemu-system-*.exe; do \
-           arch=${i%.exe}; \
-           arch=${arch#qemu-system-}; \
-           echo Section \"$arch\" Section_$arch; \
-           echo SetOutPath \"\$INSTDIR\"; \
-           echo File \"\${BINDIR}\\$i\"; \
-           echo SectionEnd; \
-         done \
-        ) >/tmp/qemu-nsis/system-emulations.nsh
-makensis -V2 -NOCD \
-                -DCONFIG_DOCUMENTATION="y" \
-                 \
-                -DBINDIR="/tmp/qemu-nsis" \
-                 \
-                -DSRCDIR="/drone/src" \
-                -DOUTFILE="qemu-setup-3.99.99.exe" \
-                -DDISPLAYVERSION="3.99.99" \
-                /drone/src/qemu.nsi
-File: "/tmp/qemu-nsis\*.bmp" -> no files found.
-Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
-   /oname=outfile one_file_only)
-Error in script "/drone/src/qemu.nsi" on line 122 -- aborting creation process
-make: *** [Makefile:915: qemu-setup-3.99.99.exe] Error 1
+I'm working on a Debian LTS security update for qemu and am currently
+thinking about addressing this issue as well.
 
-Any ideas?
+I see this patch has not been applied yet and the bluetooth subsystem
+is pending deprecation. Are you still considering to apply it?
 
-Platform is Fedora / mingw x86_64-w64-mingw32 in a Docker container.
+> @@ -113,6 +113,7 @@ static void vhci_host_send(void *opaque,
+>      static uint8_t buf[4096];
+> =20
+>      buf[0] =3D type;
+> +    assert(len < sizeof(buf));
+>      memcpy(buf + 1, data, len);
+> =20
+>      while (write(s->fd, buf, len + 1) < 0)
 
-Thanks,
-Adam
+Any reason why assert() calls are used here ?
+
+These checks should always be executed, but they won't if user compiles
+without asserts. Also, AFAIK any assert failure will stop the qemu host
+process which is not what we want in this case.
+
+regards,
+ Hugo
+
+--=20
+                Hugo Lefeuvre (hle)    |    www.owl.eu.com
+RSA4096_ 360B 03B3 BF27 4F4D 7A3F D5E8 14AA 1EB8 A247 3DFD
+ed25519_ 37B2 6D38 0B25 B8A2 6B9F 3A65 A36F 5357 5F2D DC4C
+
+--VbJkn9YxBvnuCH5J
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUFZhdgIWqBhwqCvuZYVUZx9w0DQFAlxOzA0ACgkQZYVUZx9w
+0DQpBAf+Oeu+pXI8UKQ0M0HO5mSl2MT/8egWoy/nTCuR2YxcTlsxOwxKbOcZBXqi
+p4HO1gItQMaEfMTGOhvVE2BJRvWar+/CS8j5ymD+6M6nm32TWdoqCAeoua/C/pI+
+ycAkNAxhbpZfuzWFomc5Gqzm2+SWPR6wbFBOT8Z7fTRrZ61AFFuixJq0jdtCFEBZ
+rx1gA+/r4+dll4hxxB4sZrIh2+Bde/0ZOEgHUJp9RqrXfwcJB9eSeBFNkClTRV+q
+aB1iTFm0bTwIyuTO78jz/ofCD++Pxesdw6FYCZIoXx49Riyx6g7GzOQFGuevyqtI
+2RxyGZOxf3pHM67ave5uXO1OK7FKxA==
+=20/0
+-----END PGP SIGNATURE-----
+
+--VbJkn9YxBvnuCH5J--
