@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36956)
+Received: from eggs.gnu.org ([209.51.188.92]:37045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goBEi-000396-9M
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:21 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1goBEk-0003Db-FR
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goB2i-0002X4-UX
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:49:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46172)
+	(envelope-from <ehabkost@redhat.com>) id 1goB1u-0002Ei-JL
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:49:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goB2g-0002Tg-Ta
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:49:56 -0500
-Date: Mon, 28 Jan 2019 12:49:42 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190128124924-mutt-send-email-mst@kernel.org>
-References: <20190125210058.1092551-1-stefanb@linux.ibm.com>
-	<20190128154553.583f79a3@redhat.com>
-	<f7fc884b-0a7f-17d5-ada4-fc44c08bfba1@linux.ibm.com>
-	<f93f5ab2-8b51-ca05-c4c3-902743e4b13e@linux.ibm.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1goB1u-0002EQ-DN
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:49:06 -0500
+Date: Mon, 28 Jan 2019 15:48:57 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190128174857.GT4136@habkost.net>
+References: <20190118133826.22447-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <f93f5ab2-8b51-ca05-c4c3-902743e4b13e@linux.ibm.com>
+In-Reply-To: <20190118133826.22447-1-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] acpi: Make TPM 2.0 with TIS available as
- MSFT0101
+Subject: Re: [Qemu-devel] [PATCH] hw: report invalid disable-legacy|modern
+ usage for virtio-1-only devs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Jan 28, 2019 at 12:19:37PM -0500, Stefan Berger wrote:
-> On 1/28/19 11:14 AM, Stefan Berger wrote:
-> > On 1/28/19 9:45 AM, Igor Mammedov wrote:
-> > > On Fri, 25 Jan 2019 16:00:58 -0500
-> > > Stefan Berger <stefanb@linux.ibm.com> wrote:
-> > >=20
-> > > > This patch makes the a TPM 2.0 with TIS interface available under=
- the
-> > > > HID 'MSF0101'. This is supported by Linux and also Windows now
-> > > MSF0101 is relatively recent addition to Linux,
-> > > are there in wild (old) kernels that worked with PNP0C31 but won't =
-work
-> > > with MSF0101?
-> >=20
-> >=20
-> > Linux 4.3.4 and later references this HID here:
-> > https://elixir.bootlin.com/linux/v4.3.4/source/drivers/char/tpm/tpm_t=
-is.c
-> > . I don't see it before that. A 3.10 kernel works with this patch as
-> > well.
+On Fri, Jan 18, 2019 at 01:38:26PM +0000, Daniel P. Berrang=E9 wrote:
+> A number of virtio devices (gpu, crypto, mouse, keyboard, tablet) only
+> support the virtio-1 (aka modern) mode. Currently if the user launches
+> QEMU, setting those devices to enable legacy mode, QEMU will silently
+> create them in modern mode, ignoring the user's (mistaken) request.
 >=20
+> This patch introduces proper data validation so that an attempt to
+> configure a virtio-1-only devices in legacy mode gets reported as an
+> error to the user.
 >=20
-> ... that 3.10 kernel from el7 has been patched, though.
+> Checking this required introduction of a new field to explicitly track
+> what operating model is to be used for a device, separately from the
+> disable_modern and disable_legacy fields that record the user's
+> requested configuration.
 >=20
-> =A0=A0 Stefan
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-.. and supports the new HID.
+This breaks the virtio-1-only devices on pc-*-2.6:
+
+  $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga -machine pc-i4=
+40fx-2.6
+  qemu-system-x86_64: -device virtio-vga: Unable to set disable-legacy=3D=
+off on a virtio-1.0 only device
+
+Probably the simplest way to fix that is to append the following to
+hw_compat_2_6:
+
+  { virtio-vga,        disable-modern, off },
+  { virtio-gpu-pci,    disable-modern, off },
+  { virtio-input-pci,  disable-modern, off },
+  { virtio-crypto-pci, disable-modern, off }
+
+We could also remove the property completely from those devices
+(e.g. by moving virtio-vga to virtio_vga_info.non_transitional_name),
+but it would break compatibility in case people are explicitly
+setting "disable-modern=3Doff" on those devices.
 
 --=20
-MST
+Eduardo
