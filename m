@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49076)
+Received: from eggs.gnu.org ([209.51.188.92]:50507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2Ak-0001H0-5R
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:21:39 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1go2Hb-0002Ni-Ly
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:28:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1go2Ai-0001Fj-FP
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:21:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12959)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1go2Ah-0001Dx-Kx
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:21:36 -0500
-References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
-	<f9288ca3-1f07-3409-ac16-ce4dc958940e@redhat.com>
-	<cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c3d19d18-3269-ff31-affb-68d38de7cc3e@redhat.com>
-Date: Mon, 28 Jan 2019 09:14:03 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1go2Ha-0004Zu-RL
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:28:43 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1go2Ha-0004Yp-Ke
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 03:28:42 -0500
+Received: by mail-wm1-f68.google.com with SMTP id y8so12799636wmi.4
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 00:28:42 -0800 (PST)
+Date: Mon, 28 Jan 2019 09:28:37 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190128082837.6xdlg3b57pqay5ah@steredhat>
+References: <20190124172323.230296-1-sgarzare@redhat.com>
+	<20190124172323.230296-2-sgarzare@redhat.com>
+	<20190125145856.GC28305@stefanha-x1.localdomain>
+	<20190125161813.tyd5ququvhdunt4d@steredhat>
+	<20190127125144.GB13784@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <cc09d469-56bc-9438-acc0-0d4ccf67e6a5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw: input: set category of the i8042 device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190127125144.GB13784@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/2] virtio-blk: add DISCARD and WRITE
+ ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2019-01-25 17:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/25/19 4:24 PM, Thomas Huth wrote:
->> On 2019-01-25 16:14, kumar sourav wrote:
->>> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
->>> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
->>>
->>> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
->>> ---
->>>  hw/input/pckbd.c | 1 +
->=20
-> It seems we have other potential cases:
->=20
-> $ git grep -L 'set_bit(DEVICE_CATEGORY_INPUT' hw/input/*c
-> hw/input/adb.c
-> hw/input/hid.c
-> hw/input/lm832x.c
-> hw/input/milkymist-softusb.c
-> hw/input/pckbd.c
-> hw/input/pl050.c
-> hw/input/ps2.c
-> hw/input/pxa2xx_keypad.c
-> hw/input/stellaris_input.c
-> hw/input/tsc2005.c
-> hw/input/tsc210x.c
-> hw/input/virtio-input-hid.c
-> hw/input/virtio-input-host.c
+On Sun, Jan 27, 2019 at 12:51:44PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Jan 25, 2019 at 05:18:13PM +0100, Stefano Garzarella wrote:
+> > On Fri, Jan 25, 2019 at 02:58:56PM +0000, Stefan Hajnoczi wrote:
+> > > On Thu, Jan 24, 2019 at 06:23:22PM +0100, Stefano Garzarella wrote:
+> > > > +            virtio_error(vdev, "virtio-blk discard/wzeroes header too short");
+> > > > +            return -1;
+> > > > +        }
+> > > > +
+> > > > +        sector = virtio_ldq_p(VIRTIO_DEVICE(req->dev), &dwz_hdr.sector);
+> > > > +        bytes = virtio_ldl_p(VIRTIO_DEVICE(req->dev),
+> > > > +                             &dwz_hdr.num_sectors) << BDRV_SECTOR_BITS;
+> > > 
+> > > Please handle num_sectors << BDRV_SECTOR_BITS overflow so that we don't
+> > > need to worry about what happens with an overflowed value later on.
+> > > 
+> > 
+> > Should I also check if num_sectors is less than "max_discard_sectors" or
+> > "max_write_zeroes_sectors"?
+> 
+> Yes, anything that virtio_blk_sect_range_ok() doesn't check needs to be
+> checked manually in this patch.  I can't see a reason for allowing
+> requests through that exceed the limit.
+> 
+> > Do you think make sense flush the MultiReqBuffer before call
+> > blk_aio_pdiscard() or blk_aio_pwrite_zeroes()?
+> 
+> I don't think that is necessary since virtio-blk doesn't guarantee
+> ordering (the legacy barrier feature isn't supported by QEMU).
+> 
+> Even the MultiReqBuffer is flushed, -drive aio=threads (the default
+> setting) could end up submitting discard/write zeroes before "earlier"
+> requests - it depends on host kernel thread scheduler decisions.
+> 
 
-Note that some of these are not even "qomified" yet (e.g. tsc2005),
-others are not creatable by the user (pl050) as far as I can see, so it
-does not make much sense to set a category for these devices yet.
+Thanks for the details!
 
- Thomas
+Stefano
