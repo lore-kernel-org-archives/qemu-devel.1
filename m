@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59072)
+Received: from eggs.gnu.org ([209.51.188.92]:59723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1go4yB-0005jj-1d
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:20:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1go51H-0007lz-0O
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1go4y9-0001XQ-CD
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:20:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1go51E-0002X4-HQ
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:01 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43164)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1go51E-0002Wo-Ax
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 06:24:00 -0500
+Received: by mail-wr1-f66.google.com with SMTP id r10so17566748wrs.10
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 03:24:00 -0800 (PST)
+References: <20190127014501.21840-1-jcmvbkbc@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <00bc7460-9961-fe00-177a-3cf46ffcbc41@redhat.com>
+Date: Mon, 28 Jan 2019 12:23:57 +0100
 MIME-Version: 1.0
-References: <20190125182626.9221-1-peter.maydell@linaro.org>
-	<20190125182626.9221-8-peter.maydell@linaro.org>
-In-Reply-To: <20190125182626.9221-8-peter.maydell@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Mon, 28 Jan 2019 12:20:38 +0100
-Message-ID: <CABoDooN5JjtJKWA=5io=Ttycys1Nwe4FQjxj4N+_iMx0hW1qJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 7/7] target/arm/translate-a64: Don't
- underdecode SDOT and UDOT
+In-Reply-To: <20190127014501.21840-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/xtensa: rearrange access to
+ external interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
 
-On Fri, Jan 25, 2019 at 7:26 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> In the AdvSIMD scalar x indexed element and vector x indexed element
-> encoding group, the SDOT and UDOT instructions are vector only,
-> and their opcode is unallocated in the scalar group. Correctly
-> UNDEF this unallocated encoding.
->
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-
-Thanks,
-
-Laurent
-
+On 1/27/19 2:45 AM, Max Filippov wrote:
+> Replace xtensa_get_extint that returns single external IRQ descriptor
+> with xtensa_get_extints that returns a vector of all external IRQs.
+> 
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->  target/arm/translate-a64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 474d9bfb5f0..30bc2412fc0 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -12641,7 +12641,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
->          break;
->      case 0x0e: /* SDOT */
->      case 0x1e: /* UDOT */
-> -        if (size != MO_32 || !dc_isar_feature(aa64_dp, s)) {
-> +        if (is_scalar || size != MO_32 || !dc_isar_feature(aa64_dp, s)) {
->              unallocated_encoding(s);
->              return;
+>  hw/xtensa/pic_cpu.c | 24 +++++++++++-------------
+>  hw/xtensa/xtfpga.c  |  8 +++++---
+>  target/xtensa/cpu.h |  5 +++--
+>  3 files changed, 19 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/xtensa/pic_cpu.c b/hw/xtensa/pic_cpu.c
+> index f70684902628..077f4ad53d6d 100644
+> --- a/hw/xtensa/pic_cpu.c
+> +++ b/hw/xtensa/pic_cpu.c
+> @@ -88,11 +88,11 @@ static void xtensa_ccompare_cb(void *opaque)
+>  
+>  void xtensa_irq_init(CPUXtensaState *env)
+>  {
+> -    env->irq_inputs = (void **)qemu_allocate_irqs(
+> -            xtensa_set_irq, env, env->config->ninterrupt);
+> -    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
+> -        unsigned i;
+> +    unsigned i;
+>  
+> +    env->irq_inputs = qemu_allocate_irqs(xtensa_set_irq, env,
+> +                                         env->config->ninterrupt);
+> +    if (xtensa_option_enabled(env->config, XTENSA_OPTION_TIMER_INTERRUPT)) {
+>          env->time_base = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>          env->ccount_base = env->sregs[CCOUNT];
+>          for (i = 0; i < env->config->nccompare; ++i) {
+> @@ -101,16 +101,14 @@ void xtensa_irq_init(CPUXtensaState *env)
+>                      xtensa_ccompare_cb, env->ccompare + i);
 >          }
-> --
-> 2.20.1
->
+>      }
+> +    for (i = 0; i < env->config->nextint; ++i) {
+> +        unsigned irq = env->config->extint[i];
+> +
+> +        env->ext_irq_inputs[i] = env->irq_inputs[irq];
+> +    }
+>  }
+>  
+> -void *xtensa_get_extint(CPUXtensaState *env, unsigned extint)
+> +qemu_irq *xtensa_get_extints(CPUXtensaState *env)
+>  {
+> -    if (extint < env->config->nextint) {
+> -        unsigned irq = env->config->extint[extint];
+> -        return env->irq_inputs[irq];
+> -    } else {
+> -        qemu_log("%s: trying to acquire invalid external interrupt %d\n",
+> -                __func__, extint);
+> -        return NULL;
+> -    }
+> +    return env->ext_irq_inputs;
+>  }
+> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+> index 7379b3fff427..3102f8c04709 100644
+> --- a/hw/xtensa/xtfpga.c
+> +++ b/hw/xtensa/xtfpga.c
+> @@ -225,6 +225,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+>      XtensaCPU *cpu = NULL;
+>      CPUXtensaState *env = NULL;
+>      MemoryRegion *system_io;
+> +    qemu_irq *extints;
+>      DriveInfo *dinfo;
+>      pflash_t *flash = NULL;
+>      QemuOpts *machine_opts = qemu_get_machine_opts();
+> @@ -253,6 +254,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+>           */
+>          cpu_reset(CPU(cpu));
+>      }
+> +    extints = xtensa_get_extints(env);
+>  
+>      if (env) {
+>          XtensaMemory sysram = env->config->sysram;
+> @@ -284,11 +286,11 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+>      xtfpga_fpga_init(system_io, 0x0d020000, freq);
+>      if (nd_table[0].used) {
+>          xtfpga_net_init(system_io, 0x0d030000, 0x0d030400, 0x0d800000,
+> -                xtensa_get_extint(env, 1), nd_table);
+> +                        extints[1], nd_table);
+>      }
+>  
+> -    serial_mm_init(system_io, 0x0d050020, 2, xtensa_get_extint(env, 0),
+> -            115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
+> +    serial_mm_init(system_io, 0x0d050020, 2, extints[0],
+> +                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
+>  
+>      dinfo = drive_get(IF_PFLASH, 0, 0);
+>      if (dinfo) {
+> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+> index f579294822c3..176af8a53cf0 100644
+> --- a/target/xtensa/cpu.h
+> +++ b/target/xtensa/cpu.h
+> @@ -483,7 +483,8 @@ typedef struct CPUXtensaState {
+>      AddressSpace *address_space_er;
+>      MemoryRegion *system_er;
+>      int pending_irq_level; /* level of last raised IRQ */
+> -    void **irq_inputs;
+> +    qemu_irq *irq_inputs;
+> +    qemu_irq ext_irq_inputs[MAX_NINTERRUPT];
+>      XtensaCcompareTimer ccompare[MAX_NCCOMPARE];
+>      uint64_t time_base;
+>      uint64_t ccount_time;
+> @@ -569,7 +570,7 @@ void xtensa_register_core(XtensaConfigList *node);
+>  void xtensa_sim_open_console(Chardev *chr);
+>  void check_interrupts(CPUXtensaState *s);
+>  void xtensa_irq_init(CPUXtensaState *env);
+> -void *xtensa_get_extint(CPUXtensaState *env, unsigned extint);
+> +qemu_irq *xtensa_get_extints(CPUXtensaState *env);
+>  int cpu_xtensa_signal_handler(int host_signum, void *pinfo, void *puc);
+>  void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>  void xtensa_sync_window_from_phys(CPUXtensaState *env);
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
