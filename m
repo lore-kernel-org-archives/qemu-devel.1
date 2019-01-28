@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36956)
+Received: from eggs.gnu.org ([209.51.188.92]:37779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1goBEW-000396-J9
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:09 -0500
+	(envelope-from <kwolf@redhat.com>) id 1goBEi-00040H-9h
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1goB2m-0002aX-Lz
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:50:01 -0500
-References: <20190128173940.25813-1-alex.bennee@linaro.org>
-	<20190128173940.25813-4-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <1fe0a234-c951-2862-8c6e-a2da8b9d7d88@vivier.eu>
-Date: Mon, 28 Jan 2019 18:49:34 +0100
+	(envelope-from <kwolf@redhat.com>) id 1goB2g-0002WM-VI
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 12:49:56 -0500
+Date: Mon, 28 Jan 2019 18:49:19 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190128174919.GL5756@localhost.localdomain>
+References: <20190125174653.4604-1-kwolf@redhat.com>
+	<20190125174653.4604-3-kwolf@redhat.com>
+	<20190128085041.GA16630@andariel.pipo.sk>
+	<20190128144147.GA5756@localhost.localdomain>
+	<87tvhszpql.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190128173940.25813-4-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] linux-user/elfload: enable
- HWCAP_CPUID for AArch64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tvhszpql.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] scsi-disk: Add device_id property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On 28/01/2019 18:39, Alex Bennée wrote:
-> Userspace programs should (in theory) query the ELF HWCAP before
-> probing these registers. Now we have implemented them all make it
-> public.
+Am 28.01.2019 um 17:55 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/elfload.c | 1 +
->  1 file changed, 1 insertion(+)
+> > Am 28.01.2019 um 09:50 hat Peter Krempa geschrieben:
+> [...]
+> >> 2) Is actually using 'scsi-cd'/'scsi-hd' the better option than
+> >> 'scsi-disk'?
+> >
+> > Yes, scsi-disk is a legacy device. Maybe we should formally deprecate
+> > it.
 > 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 4cff9e1a31..e95c162097 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -571,6 +571,7 @@ static uint32_t get_elf_hwcap(void)
->  
->      hwcaps |= ARM_HWCAP_A64_FP;
->      hwcaps |= ARM_HWCAP_A64_ASIMD;
-> +    hwcaps |= ARM_HWCAP_A64_CPUID;
->  
->      /* probe for the extra features */
->  #define GET_FEATURE_ID(feat, hwcap) \
+> There's an internal use in scsi_bus_legacy_add_drive(), which in turn
+> powers two legacy features:
 > 
+> 1. -drive if=scsi
+> 
+>    Creates scsi-disk frontends.
+> 
+>    Only works with onboard HBAs since commit 14545097267, v2.12.0.
+> 
+> 2. -device usb-storage
+> 
+>    Bad magic: usb-storage pretends to be a block device, but it's really
+>    a SCSI bus that can serve only a single device, which it creates
+>    automatically.
+> 
+> If we deprecate scsi-disk, we should deprecate these, too.  Can't say
+> whether that's practical right now.
 
-Acked-by: Laurent Vivier <laurent@vivier.eu>
+Most likely not worth the effort anyway. I don't think it's blocking
+anything.
+
+> >> 3) Since upstream libvirt supports qemu-1.5 and newer and 'scsi-cd' is
+> >> already supported there, can we assume that all newer versions support
+> >> it? (Basically the question is whether it can be compiled out by
+> >> upstream means).
+> >
+> > I think so.
+> 
+> Compiling out scsi-hd or scsi-cd, but not scsi-disk would be silly.  All
+> three devices are in scsi-disk.c.  You'd have to hack that up to be
+> silly.
+
+I understood this as a question about libvirt, i.e. whether libvirt can
+drop/compile out their scsi-disk code and instead assume that scsi-hd/cd
+are always present. Maybe I misunderstood, though?
+
+Kevin
