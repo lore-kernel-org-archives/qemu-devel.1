@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35179)
+Received: from eggs.gnu.org ([209.51.188.92]:50050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gnyHO-00071X-Q9
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:15 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1go04b-0004X1-B7
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 01:07:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gnyHN-0003Il-Ip
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59220)
+	(envelope-from <luwei.kang@intel.com>) id 1go04Z-0002yH-1t
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 01:07:07 -0500
+Received: from mga01.intel.com ([192.55.52.88]:61524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gnyHM-0003Ff-6x
-	for qemu-devel@nongnu.org; Sun, 27 Jan 2019 23:12:12 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 28 Jan 2019 12:11:59 +0800
-Message-Id: <20190128041159.28643-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH] test-filter-mirror: pass UNIX domain socket
- through fd
+	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+	id 1go04Y-0002tu-QN
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 01:07:06 -0500
+From: "Kang, Luwei" <luwei.kang@intel.com>
+Date: Mon, 28 Jan 2019 06:06:56 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E172CD25E3@SHSMSX101.ccr.corp.intel.com>
+References: <1548381283-16688-1-git-send-email-luwei.kang@intel.com>
+	<20190124183909.GA4136@habkost.net>
+	<82D7661F83C1A047AF7DC287873BF1E172CCDB7C@SHSMSX101.ccr.corp.intel.com>
+	<20190126025129.GN4136@habkost.net>
+In-Reply-To: <20190126025129.GN4136@habkost.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] i386: extended the cpuid level when Intel
+ PT is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,89 +32,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, jasowang@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-The tests tries to let qemu server mode to process the connection
-which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
-"x-oob", offer capability "oob" unconditionally"). This is because the
-filter may try to mirror the packets before UNIX socket object is
-ready (connected was set to true) from the view of qemu. In this case
-the packet will be dropped silently.
+> > > > Intel Processor Trace required CPUID[0x14] but the cpuid level is
+> > > > 0xd when create a kvm guest with e.g. "-cpu qemu64,+intel-pt".
+> > > >
+> > > > Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> > > > ---
+> > > >  target/i386/cpu.c | 7 +++++++
+> > > >  1 file changed, 7 insertions(+)
+> > > >
+> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
+> > > > 2f54125..da477b3 100644
+> > > > --- a/target/i386/cpu.c
+> > > > +++ b/target/i386/cpu.c
+> > > > @@ -5023,6 +5023,13 @@ static void x86_cpu_expand_features(X86CPU *=
+cpu, Error **errp)
+> > > >          x86_cpu_adjust_feat_level(cpu, FEAT_C000_0001_EDX);
+> > > >          x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+> > > >          x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+> > > > +
+> > > > +        /* Intel Processor Trace requires CPUID[0x14] */
+> > > > +        if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)=
+ &&
+> > > > +             kvm_enabled()) {
+> > > > +            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0=
+x14);
+> > > > +        }
+> > >
+> > > This will require a new machine-type compatibility flag to enable the=
+ new behavior, so we don't change CPUID data under the guest feet
+> during live migration.
+> >
+> > Hi Eduardo,
+> >     Thanks for your reply. I have some question on your comments.
+> >     The cpuid level come from specific machine-type (e.g. qemu64, Skyla=
+ke-Server) and they are all 0xd, but Intel PT required 0x14 so I
+> extend the cpuid level.
+> >     I don't fully understand what is the "require a new machine-type co=
+mpatibility flag" mean, I need to add a new flag in each machine-
+> type?
+> >     I try to do live migration with "-cpu qemu64,+intel-pt" and "-cpu h=
+ost" are all passed test. We didn't change the cpuid data during live
+> migration just initialize the cpuid data when create a new vcpu. Please c=
+orrect me if anything wrong.
+>=20
+> CPUID data is not sent as part of the migration stream (it is recreated o=
+n the migration destination), so if "-cpu qemu,+intel-pt"
+> results in different CPUID data, migration between QEMU 4.0 and
+> 3.1 will make CPUID level change during live migration.
 
-Fixing this by passing pre-connected socket created by socketpair() to
-qemu through fd.
+Yes, CPUID data is not sent as part of migration stream. But when will the =
+"-cpu qemu,+intel-pt" result different results? I think CPU type include so=
+me specific features and CPUID data of Intel PT are constant value, so I th=
+ink the CPUID data should not change as well.
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- tests/test-filter-mirror.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-index 7ab2aed8a0..3c3d1f8961 100644
---- a/tests/test-filter-mirror.c
-+++ b/tests/test-filter-mirror.c
-@@ -21,10 +21,9 @@
- 
- static void test_mirror(void)
- {
--    int send_sock[2], recv_sock;
-+    int send_sock[2], recv_sock[2];
-     uint32_t ret = 0, len = 0;
-     char send_buf[] = "Hello! filter-mirror~";
--    char sock_path[] = "filter-mirror.XXXXXX";
-     char *recv_buf;
-     uint32_t size = sizeof(send_buf);
-     size = htonl(size);
-@@ -38,18 +37,15 @@ static void test_mirror(void)
-     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
-     g_assert_cmpint(ret, !=, -1);
- 
--    ret = mkstemp(sock_path);
-+    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
-     g_assert_cmpint(ret, !=, -1);
- 
-     qts = qtest_initf(
-         "-netdev socket,id=qtest-bn0,fd=%d "
-         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
--        "-chardev socket,id=mirror0,path=%s,server,nowait "
-+        "-chardev socket,id=mirror0,fd=%d "
-         "-object filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
--        , send_sock[1], devstr, sock_path);
--
--    recv_sock = unix_connect(sock_path, NULL);
--    g_assert_cmpint(recv_sock, !=, -1);
-+        , send_sock[1], devstr, recv_sock[1]);
- 
-     struct iovec iov[] = {
-         {
-@@ -67,18 +63,16 @@ static void test_mirror(void)
-     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
-     close(send_sock[0]);
- 
--    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
-+    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
-     g_assert_cmpint(ret, ==, sizeof(len));
-     len = ntohl(len);
- 
-     g_assert_cmpint(len, ==, sizeof(send_buf));
-     recv_buf = g_malloc(len);
--    ret = qemu_recv(recv_sock, recv_buf, len, 0);
-+    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
-     g_assert_cmpstr(recv_buf, ==, send_buf);
- 
-     g_free(recv_buf);
--    close(recv_sock);
--    unlink(sock_path);
-     qtest_quit(qts);
- }
- 
--- 
-2.17.1
+Thanks,
+Luwei Kang
