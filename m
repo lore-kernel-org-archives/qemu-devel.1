@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42042)
+Received: from eggs.gnu.org ([209.51.188.92]:42380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1go7oU-0004bM-2e
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:23:02 -0500
+	(envelope-from <bsd@redhat.com>) id 1go7q2-0005px-Rm
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:24:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1go7oQ-0002J2-A3
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:23:02 -0500
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190128151833.15532428@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <b530ad83-3c05-68ae-c7d2-cb5584849ab3@redhat.com>
-Date: Mon, 28 Jan 2019 15:22:49 +0100
+	(envelope-from <bsd@redhat.com>) id 1go7q1-0003Ck-3x
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:24:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1go7q0-00037j-Lp
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 09:24:36 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3106DDA334
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 14:24:26 +0000 (UTC)
+From: Bandan Das <bsd@redhat.com>
+Date: Mon, 28 Jan 2019 09:24:07 -0500
+Message-Id: <20190128142410.11584-1-bsd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190128151833.15532428@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFCv2 0/9] qdev: Hotplug handler chaining +
- virtio-pmem
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/3] Break down the MTP write operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
-
-On 28.01.19 15:18, Igor Mammedov wrote:
-> On Wed, 23 Jan 2019 20:55:18 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> This series implements supprt for hotplug handler chaining (proposed
->> by Igor), something that is necessary to turn selected virtio devices into
->> memory devices. Planned devices inlude virtio-mem and virtio-pmem. The
->> current prototype of virtio-pmem is included.
->>
->> The machine hotplug handler can intercept hotplug handler calls
->> to properly prepare/teardown the memory device part of a device. Control
->> is then passed on to the actual bus hotplug handler. So the default hotplug
->> handler is effectively overwritten to make interception possible.
->>
->> It is based on the following patches/series
->> - [PATCH v1] pc: Use hotplug_handler_(plug|unplug|unplug_request)
->> -- Queued by Paolo
->> - [PATCH v3 0/2] s390x/pci: hotplug handler fixes and reworks
->>
->> Patch 1-3 are the preparations for hotplug handler chaining.
-> we probably should merge this ones even without pmem patches.
-
-Sounds good to me. I'll do more testing.
-
-> 
->> The remaining patches are a modified prototype of virtio-pmem.
-> I'm not sure yet that virtio-pmem should be merged.
-> 
-> Initial goal for fake pmem was to eliminate page-cache in guest
-> so that only host will have it and cached pages could be shared
-> between several guest.
-> 
-> However recently (if I read kernel driver thread right),
-> sharing is to be disabled due to security implication and then
-> only dropping page cache on one side is left, which could be done
-> using existing frontends/backends (disabling caching on host side).
-> 
-
-Yes, we should at least wait for the kernel part to settle. Anyhow, I
-will base my virtio-mem work on this in a very similar fashion!
-
-Thanks Igor!
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
 
--- 
+v3:
+  Added patch 3/3
+v2:
+  Rebased on top of master and retested
 
-Thanks,
+For larger files, not only do we keep reallocating to increase the mtp bu=
+ffer
+size, the write also happens in one go. This does two things:
 
-David / dhildenb
+Write to file upto a certain data size we have received so far and second=
+,
+reuse the buffer again instead of reallocating to a larger buffer size.
+
+Tested with different file sizes on a Linux guest.
+
+
+Bandan Das (3):
+  usb-mtp: Reallocate buffer in multiples of MTP_WRITE_BUF_SZ
+  usb-mtp: breakup MTP write into smaller chunks
+  usb-mtp: replace the homebrew write with qemu_write_full
+
+ hw/usb/dev-mtp.c | 166 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 102 insertions(+), 64 deletions(-)
+
+--=20
+2.19.2
