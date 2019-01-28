@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50049)
+Received: from eggs.gnu.org ([209.51.188.92]:50828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goBno-0008Sx-Mv
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:38:37 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpT-0001d0-Tf
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goBnZ-0004FG-OW
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:38:25 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <271482fe-741a-6a15-15fd-181d4e55a8c4@redhat.com>
-	<w51bm469xhh.fsf@maestria.local.igalia.com>
-	<w518szam8em.fsf@maestria.local.igalia.com>
-	<4236ceac-fd50-ad04-811a-0be7b3dbd667@redhat.com>
-	<w51a7jkstdd.fsf@maestria.local.igalia.com>
-Date: Mon, 28 Jan 2019 19:38:08 +0100
-In-Reply-To: <w51a7jkstdd.fsf@maestria.local.igalia.com> (Alberto Garcia's
-	message of "Mon, 28 Jan 2019 16:18:38 +0100")
-Message-ID: <87tvhsy6en.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Consistency of iotests 093 and 136
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpR-0005Zq-DK
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:40:19 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Mon, 28 Jan 2019 21:40:05 +0300
+Message-Id: <1548700805-1016533-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v8 2/2] qemu-img info: bitmaps extension new
+ test 239
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +20,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Alberto Garcia <berto@igalia.com> writes:
+A new test file 239 added to the qemu-iotests set. It checks
+the output format of 'qemu-img info' for bitmaps extension of
+qcow2 specific information.
 
-> On Thu 24 Jan 2019 07:07:47 PM CET, Eric Blake wrote:
->>>>> 093 and 136 seem really flaky to me.  I can reproduce that by
->>>>> running:
->>>>
->>>> That's interesting, I can make 093 fail quite easily now (I haven't
->>>> tested the other one yet), but I don't think this happened
->>>> earlier. I'll try to figure out what's going on.
->>> 
->>> I bisected this and it seems that 093 started to fail after this:
->>> 
->>> 8258292e monitor: Remove "x-oob", offer capability "oob" unconditionally
->>> 
->>> I'm not familiar with that option so I need to investigate.
->>
->> We've got several tests failing after making x-oob unconditional; here's
->> another thread:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05587.html
->>
->> Could it be that the test was using some sort of QMP command as an
->> attempt to synchronize state, but the OOB handling is now making it not
->> a reliable sync point?
->
-> 093 submits several I/O requests using aio_read and aio_write with
-> hmp_qemu_io(), then advances the clock using clock_step and finally
-> calls query-blockstats to see how much of the I/O has been completed
-> (it's an I/O throttling test).
->
-> The expectation is that by the time query-blockstats is called all
-> submitted I/O requests have been processed (up to the amount allowed by
-> the throttling limits).
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/239     | 58 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/239.out | 33 ++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 92 insertions(+)
+ create mode 100755 tests/qemu-iotests/239
+ create mode 100644 tests/qemu-iotests/239.out
 
-Assumptions like "when we see the reply to QMP command X, surely the
-main loop has completed doing Y" are problematic.  When possible, rely
-on something more direct, such as a query command that shows you whether
-Y has been completed.
-
-Mind, I'm not claiming the assumption you described is invalid.
-
-> Are the QMP (hmp_qemu_io, query-blockstats) and qtest (clock_step)
-> sockets maybe running in different threads?
-
-First order approximation: the QMP *monitors* run in the monitor I/O
-thread (as of commit 8258292e18c), but the QMP *commands* still run in
-the main loop.  The QMP monitor suspends itself after reading a command
-and sending it to the main loop.  The main loop resumes the monitor
-after sending the reply.
-
-Before this change, the QMP monitors also ran in the main loop, and
-executed each command right after reading it.  The monitor suspend /
-resume described above is designed to minimize observable differences in
-behavior.
-
-More exact version, may not be relevant to you now.
-
-The QMP monitors run in the monitor I/O thread when the underlying
-character can support that.  The character devices you typically want to
-use with QMP, such as socket, all can.  Some character devices can't,
-e.g. ringbuf, spice, braille, MUX.
-
-Monitors offer capability "oob" when running in the I/O thread.  For
-instance:
-
-    $ qemu-system-x86_64 -nodefaults -S -display none -qmp-pretty stdio
-    {
-        "QMP": {
-            "version": {
-                "qemu": {
-                    "micro": 50,
-                    "minor": 1,
-                    "major": 3
-                },
-                "package": "v3.1.0-1200-g9dd0d8111f"
-            },
-            "capabilities": [
--->             "oob"
-            ]
-        }
-    }
-
-QMP commands still run in the main loop.  The monitor reads commands and
-sends them to the main loop.  The main loop executes them one after the
-other, and sends replies.  The number of commands in flight is limited.
-
-Unless the client accepted capability "oob", the limit is one.
-
-Clients that accepted capability "oob" can execute oob-capable commands
-out of band.  The monitor executes them right away, jumping the queue.
-The only commands that can be executed out of band so far are
-migrate-recover and migrate-pause.  See docs/interop/qmp-spec.txt for
-more detailed information.
+diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
+new file mode 100755
+index 0000000..db05096
+--- /dev/null
++++ b/tests/qemu-iotests/239
+@@ -0,0 +1,58 @@
++#!/usr/bin/env python
++#
++# Test for qcow2 bitmap printed information
++#
++# Copyright (c) 2018 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import iotests
++import json
++from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
++                    file_path, log
++
++disk = file_path('disk')
++chunk = 256
++
++def add_bitmap(bitmap_number):
++    granularity = 2**(13 + bitmap_number)
++    bitmap_name = 'bitmap-' + str(bitmap_number)
++    vm = iotests.VM().add_drive(disk)
++    vm.launch()
++    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name=bitmap_name,
++               granularity=granularity, persistent=True)
++    vm.shutdown()
++
++
++iotests.verify_image_format(supported_fmts=['qcow2'])
++
++qemu_img_create('-f', iotests.imgfmt, disk, '1M')
++
++
++for num in range(1, 4):
++    add_bitmap(num)
++    write = 'write {} {}K'.format((num-1)*chunk, chunk)
++    qemu_io('-f', iotests.imgfmt, '-c', write, disk)
++
++vm = iotests.VM().add_drive(disk)
++vm.launch()
++
++result = json.loads(qemu_img_pipe('info', '--force-share', '--output=json', disk))
++bitmaps = result['format-specific']['data']['bitmaps']
++
++vm.shutdown()
++
++log('bitmaps')
++log(bitmaps, indent=2)
+diff --git a/tests/qemu-iotests/239.out b/tests/qemu-iotests/239.out
+new file mode 100644
+index 0000000..9085fc7
+--- /dev/null
++++ b/tests/qemu-iotests/239.out
+@@ -0,0 +1,33 @@
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 16384, "name": "bitmap-1", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 32768, "name": "bitmap-2", "node": "drive0", "persistent": true}}
++{"return": {}}
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 65536, "name": "bitmap-3", "node": "drive0", "persistent": true}}
++{"return": {}}
++bitmaps
++[
++  {
++    "flags": [
++      "in-use",
++      "auto"
++    ],
++    "granularity": 16384,
++    "name": "bitmap-1"
++  },
++  {
++    "flags": [
++      "in-use",
++      "auto"
++    ],
++    "granularity": 32768,
++    "name": "bitmap-2"
++  },
++  {
++    "flags": [
++      "in-use",
++      "auto"
++    ],
++    "granularity": 65536,
++    "name": "bitmap-3"
++  }
++]
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0f1c3f9..3e310c7 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -235,3 +235,4 @@
+ 235 auto quick
+ 236 auto quick
+ 238 auto quick
++239 rw auto quick
+-- 
+1.8.3.1
