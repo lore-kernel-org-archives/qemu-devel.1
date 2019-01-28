@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50828)
+Received: from eggs.gnu.org ([209.51.188.92]:50841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpT-0001d0-Tf
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpU-0001dU-Gx
 	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpR-0005Zq-DK
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:40:19 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goBpR-0005aC-K1
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 13:40:20 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Mon, 28 Jan 2019 21:40:05 +0300
-Message-Id: <1548700805-1016533-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v8 2/2] qemu-img info: bitmaps extension new
- test 239
+Date: Mon, 28 Jan 2019 21:40:03 +0300
+Message-Id: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v8 0/2] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +21,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-A new test file 239 added to the qemu-iotests set. It checks
-the output format of 'qemu-img info' for bitmaps extension of
-qcow2 specific information.
+Here is the update for the bitmap extension of the qcow2 specific
+information as the output of the 'qemu-img info' command.
+The version #7 was in email with the message ID:
+<1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/239     | 58 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/239.out | 33 ++++++++++++++++++++++++++
+v8:
+The output benchmark files for the qemu-iotests, namely 060, 065 082, 198
+and 206, were modified to show the bitmap extension for the qemu specific
+information. A new test file 239 was added to the test set that checks the
+output for the fields of the bitmap section.
+The backward compatibility of the output for images of the version 2
+of qcow2 was added.
+
+v7:
+A description was added to the function qcow2_get_bitmap_info_list().
+In the function qcow2_get_specific_info(), the comment was modified
+so that we ignore any error in obtaining the list of bitmaps to
+pass the rest of QCOW2 specific information to a caller.
+
+v6:
+'[PATCH v6] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was reversed.
+
+v5:
+'[PATCH v5] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was fixed and documented.
+
+v4:
+'[PATCH v4] qemu-img info lists bitmap directory entries'.
+Unknown flags are checked with the mask BME_RESERVED_FLAGS.
+The code minor refactoring was made.
+
+v3:
+'[PATCH v3] qemu-img info lists bitmap directory entries'.
+Now, qcow2_get_bitmap_info_list() is invoked under the condition of QCOW
+version #3 to avoid memory leaks in case of QCOW version #2.
+Furthermore, qcow2_get_bitmap_info_list() checks the number of existing bitmaps.
+So, if no bitmap exists, no bitmap error message is printed in the output.
+The data type of the bitmap 'granularity' parameter was left as 'uint32'
+because bitmap_list_load() returns error if granularity_bits is grater than 31.
+
+v2:
+'[PATCH v2] qemu-img info lists bitmap directory entries'.
+The targeted version of the release at 'Since' word of the comments to the new
+structures changed to 4.0 in the file qapi/block-core.json.
+A comment to the 'bitmaps' new member was supplied.
+The 'unknown flags' parameter was introduced to indicate presence of QCOW2
+bitmap unknown flags, if any.
+The word 'dirty' was removed from the code and from the comments as we list all
+the bitmaps.
+The 'bitmaps' printed parameter was removed for the release versions earlier
+than 3.x.
+The example of the output was moved above the 'Signed-off-by' line.
+
+The first version was '[PATCH] qemu-img info lists bitmap directory entries'.
+
+Andrey Shinkevich (2):
+  qemu-img info lists bitmap directory entries
+  qemu-img info: bitmaps extension new test 239
+
+ block/qapi.c               |  6 +++++
+ block/qcow2-bitmap.c       | 64 ++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c              | 13 ++++++++++
+ block/qcow2.h              |  2 ++
+ qapi/block-core.json       | 42 +++++++++++++++++++++++++++++-
+ tests/qemu-iotests/060.out |  1 +
+ tests/qemu-iotests/065     | 16 ++++++------
+ tests/qemu-iotests/082.out |  7 +++++
+ tests/qemu-iotests/198.out |  2 ++
+ tests/qemu-iotests/206.out |  5 ++++
+ tests/qemu-iotests/239     | 58 +++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/239.out | 33 ++++++++++++++++++++++++
  tests/qemu-iotests/group   |  1 +
- 3 files changed, 92 insertions(+)
+ 13 files changed, 241 insertions(+), 9 deletions(-)
  create mode 100755 tests/qemu-iotests/239
  create mode 100644 tests/qemu-iotests/239.out
 
-diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
-new file mode 100755
-index 0000000..db05096
---- /dev/null
-+++ b/tests/qemu-iotests/239
-@@ -0,0 +1,58 @@
-+#!/usr/bin/env python
-+#
-+# Test for qcow2 bitmap printed information
-+#
-+# Copyright (c) 2018 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+import json
-+from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
-+                    file_path, log
-+
-+disk = file_path('disk')
-+chunk = 256
-+
-+def add_bitmap(bitmap_number):
-+    granularity = 2**(13 + bitmap_number)
-+    bitmap_name = 'bitmap-' + str(bitmap_number)
-+    vm = iotests.VM().add_drive(disk)
-+    vm.launch()
-+    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name=bitmap_name,
-+               granularity=granularity, persistent=True)
-+    vm.shutdown()
-+
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-+
-+
-+for num in range(1, 4):
-+    add_bitmap(num)
-+    write = 'write {} {}K'.format((num-1)*chunk, chunk)
-+    qemu_io('-f', iotests.imgfmt, '-c', write, disk)
-+
-+vm = iotests.VM().add_drive(disk)
-+vm.launch()
-+
-+result = json.loads(qemu_img_pipe('info', '--force-share', '--output=json', disk))
-+bitmaps = result['format-specific']['data']['bitmaps']
-+
-+vm.shutdown()
-+
-+log('bitmaps')
-+log(bitmaps, indent=2)
-diff --git a/tests/qemu-iotests/239.out b/tests/qemu-iotests/239.out
-new file mode 100644
-index 0000000..9085fc7
---- /dev/null
-+++ b/tests/qemu-iotests/239.out
-@@ -0,0 +1,33 @@
-+{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 16384, "name": "bitmap-1", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 32768, "name": "bitmap-2", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 65536, "name": "bitmap-3", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+bitmaps
-+[
-+  {
-+    "flags": [
-+      "in-use",
-+      "auto"
-+    ],
-+    "granularity": 16384,
-+    "name": "bitmap-1"
-+  },
-+  {
-+    "flags": [
-+      "in-use",
-+      "auto"
-+    ],
-+    "granularity": 32768,
-+    "name": "bitmap-2"
-+  },
-+  {
-+    "flags": [
-+      "in-use",
-+      "auto"
-+    ],
-+    "granularity": 65536,
-+    "name": "bitmap-3"
-+  }
-+]
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 0f1c3f9..3e310c7 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -235,3 +235,4 @@
- 235 auto quick
- 236 auto quick
- 238 auto quick
-+239 rw auto quick
 -- 
 1.8.3.1
