@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46172)
+Received: from eggs.gnu.org ([209.51.188.92]:47427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1go3y7-0000O2-1I
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:16:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1go45O-00030t-7I
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:24:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1go3y5-00088W-Oh
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:16:43 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:33758)
+	(envelope-from <peter.maydell@linaro.org>) id 1go45N-0003kb-98
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:24:14 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37669)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1go3y4-00082N-TU
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:16:41 -0500
-Received: by mail-lj1-x244.google.com with SMTP id v1-v6so13741755ljd.0
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:16:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1go45N-0003k7-3V
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 05:24:13 -0500
+Received: by mail-oi1-x244.google.com with SMTP id y23so12580351oia.4
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 02:24:12 -0800 (PST)
 MIME-Version: 1.0
-References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
-	<1544173675-14217-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA8WF1nKfgQWZ11GgMzgLxOtGwoJS9zyeFQkm5ii5GLrpw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8WF1nKfgQWZ11GgMzgLxOtGwoJS9zyeFQkm5ii5GLrpw@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Mon, 28 Jan 2019 18:16:18 +0800
-Message-ID: <CAHmQWvD-gqxR+7dOG3BKA-5cGA-JBb4SAfJWpRAtqrOkfRw-kw@mail.gmail.com>
+References: <83206F6D-0BA5-4781-8635-84D48DD33A2A@foghorn.io>
+	<CAFEAcA-PJadBG0sE43N9wEx9Qm3Nxu2am_0Zy2Zqtz66C9SJ-w@mail.gmail.com>
+	<ECFBC025-CD7F-444B-BF7F-62E20954A85A@foghorn.io>
+	<CAFEAcA9M73BdXs345vdqkuQE3sxT+GnS4PWZ2OPO8DWwNtRQ-A@mail.gmail.com>
+	<EC65CD28-C2F9-49D7-BDE1-9C3B5F68665E@foghorn.io>
+	<47126B68-3AF7-48AB-B904-4D8EAC854BC7@foghorn.io>
+	<CAFEAcA9Oc3Rg_NWkeEjYPVz8yQnBbWd0WM5UQSWNRRP9VfjonQ@mail.gmail.com>
+	<alpine.BSF.2.21.9999.1901272321030.63988@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1901272321030.63988@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 28 Jan 2019 10:24:00 +0000
+Message-ID: <CAFEAcA-9rbjin-k-bxq=UZ_j4N2rADJ4=NWB7D9ogB1K_=7Zdw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] hw/arm: Add arm SBSA reference
- machine, skeleton part
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,190 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Ben Hekster <ben.hekster@foghorn.io>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 22 Jan 2019 at 19:42, Peter Maydell <peter.maydell@linaro.org> wrote:
+On Sun, 27 Jan 2019 at 23:13, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> On Sun, 27 Jan 2019, Peter Maydell wrote:
+> > Unfortunately I'm not sufficiently familiar with how OSX
+> > event handling works to figure out how to plumb it back in
+> > again. It ought to be a fairly simple matter of "implement
+> > whatever method OSX sends events to on whatever of our
+> > various classes is the right one, and make it call handleEvent
+> > with the NSEvent", but I've tried a few things and haven't
+> > been able to actually get any event handling methods to
+> > fire at all :-(
 >
-> On Fri, 7 Dec 2018 at 09:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> >
-> > For the Aarch64, there is one machine 'virt', it is primarily meant to
-> > run on KVM and execute virtualization workloads, but we need an
-> > environment as faithful as possible to physical hardware, for supporting
-> > firmware and OS development for pysical Aarch64 machines.
-> >
-> > This patch introduces new machine type 'sbsa-ref' with main features:
-> >  - Based on 'virt' machine type.
-> >  - Re-designed memory map.
-> >  - CPU type cortex-a57.
-> >  - EL2 and EL3 are enabled.
-> >  - GIC version 3.
-> >  - System bus AHCI controller.
-> >  - System bus XHCI controller(TBD).
-> >  - CDROM and hard disc on AHCI bus.
-> >  - E1000E ethernet card on PCIE bus.
-> >  - VGA display adaptor on PCIE bus.
-> >  - No virtio deivces.
-> >  - No fw_cfg device.
-> >  - No ACPI table supplied.
-> >  - Only minimal device tree nodes.
-> >
-> > Arm Trusted Firmware and UEFI porting to this are done accordingly, and
-> > it should supply ACPI tables to load OS, the minimal device tree nodes
-> > supplied from this platform are only to pass the dynamic info reflecting
-> > command line input to firmware, not for loading OS.
-> >
-> > To make the review easier, this task is split into two patches, the
-> > fundamental sceleton part and the peripheral devices part, this patch is
-> > the first part.
+> I think you need to implement keyDown: and keyUp: methods in QemuCocoaView
+> to get keyboard events and there are similar methods for mouse events,
+> see:
 >
-> Firstly, apologies for this having sat on my to-review queue for
-> so long...
->
-Understand, it is OK, thanks for review.
+> https://developer.apple.com/documentation/appkit/nsview?language=objc
 
-> > Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> > ---
-> >  hw/arm/Makefile.objs  |   2 +-
-> >  hw/arm/sbsa-ref.c     | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/arm/virt.h |   1 +
-> >  3 files changed, 279 insertions(+), 1 deletion(-)
-> >  create mode 100644 hw/arm/sbsa-ref.c
-> >
-> > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> > index d51fcec..a8895eb 100644
-> > --- a/hw/arm/Makefile.objs
-> > +++ b/hw/arm/Makefile.objs
-> > @@ -1,4 +1,4 @@
-> > -obj-y += boot.o virt.o sysbus-fdt.o
-> > +obj-y += boot.o virt.o sbsa-ref.o sysbus-fdt.o
-> >  obj-$(CONFIG_ACPI) += virt-acpi-build.o
-> >  obj-$(CONFIG_DIGIC) += digic_boards.o
-> >  obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
-> > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> > new file mode 100644
-> > index 0000000..1d6252b
-> > --- /dev/null
-> > +++ b/hw/arm/sbsa-ref.c
-> > @@ -0,0 +1,277 @@
-> > +/*
-> > + * ARM SBSA Reference Platform emulation
-> > + *
-> > + * Copyright (c) 2018 Linaro Limited
-> > + * Written by Hongbo Zhang <hongbo.zhang@linaro.org>
-> > + *
-> > + * Based on hw/arm/virt.c
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify it
-> > + * under the terms and conditions of the GNU General Public License,
-> > + * version 2 or later, as published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope it will be useful, but WITHOUT
-> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> > + * more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License along with
-> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qapi/error.h"
-> > +#include "hw/arm/arm.h"
-> > +#include "hw/arm/virt.h"
->
-> This isn't the virt board, so I think it would be better if it did
-> not include the virt.h header or use structures/classes that are
-> private to the virt board. It should be its own thing.
->
-> > +#include "hw/devices.h"
-> > +#include "net/net.h"
-> > +#include "sysemu/device_tree.h"
-> > +#include "sysemu/numa.h"
-> > +#include "sysemu/sysemu.h"
-> > +#include "hw/loader.h"
-> > +#include "exec/address-spaces.h"
-> > +#include "qemu/error-report.h"
-> > +#include "hw/pci-host/gpex.h"
-> > +#include "hw/arm/sysbus-fdt.h"
-> > +#include "hw/arm/fdt.h"
-> > +#include "hw/intc/arm_gic.h"
-> > +#include "hw/intc/arm_gicv3_common.h"
-> > +#include "kvm_arm.h"
-> > +#include "hw/ide/internal.h"
-> > +#include "hw/ide/ahci_internal.h"
-> > +#include "qemu/units.h"
-> > +
-> > +#define NUM_IRQS 256
-> > +
-> > +#define RAMLIMIT_GB 8192
-> > +#define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
-> > +
-> > +static const MemMapEntry sbsa_ref_memmap[] = {
-> > +    /* 512M boot ROM */
-> > +    [VIRT_FLASH] =              {          0, 0x20000000 },
-> > +    /* 512M secure memery */
->
-> "memory"
->
-Oops :(
+Yeah, I got something working later last night. You also need
+to implement acceptsFirstResponder or you don't get any events.
+So I have something that at least works for key events in the
+monitor window now. I need to check whether we do the right
+thing for things like cmd-key hotkeys which need to be handled
+by the stock OSX event handling. (In the old scheme we deal with
+these by having handleEvent pass them on to sendEvent, but in
+the new setup that's an infinite recursion.)
 
-> > +    [VIRT_SECURE_MEM] =         { 0x20000000, 0x20000000 },
-> > +    [VIRT_CPUPERIPHS] =         { 0x40000000, 0x00080000 },
-> > +    /* GIC distributor and CPU interface expansion spaces reserved */
-> > +    [VIRT_GIC_DIST] =           { 0x40000000, 0x00010000 },
-> > +    [VIRT_GIC_CPU] =            { 0x40040000, 0x00010000 },
->
-> If they're just reserved you don't really need to list them here,
-> as they're covered by the VIRT_CPUPERIPHS space anyway. (You
-> don't list the VIRT_GIC_HYP registers or VIRT_GIC_VCPU.)
->
-Yes, this can be removed.
+> But these are a lot of methods which are supposedly called from the
+> sendEvent: method of the NSWindow containing this view so maybe a better
+> place to catch all events is there. For this we need an NSWindow subclass
+> implementing sendEvent: which is then used to hold QemuCocoaView. I may be
+> wrong though, haven't tested it and don't know what you've tried.
 
-> > +    /* 64M redistributor space allows up to 512 CPUs */
-> > +    [VIRT_GIC_REDIST] =         { 0x40080000, 0x04000000 },
-> > +    /* Space here reserved for redistributor and vCPU/HYP expansion */
-> > +    [VIRT_UART] =               { 0x60000000, 0x00001000 },
-> > +    [VIRT_RTC] =                { 0x60010000, 0x00001000 },
-> > +    [VIRT_GPIO] =               { 0x60020000, 0x00001000 },
-> > +    [VIRT_SECURE_UART] =        { 0x60030000, 0x00001000 },
-> > +    [VIRT_SMMU] =               { 0x60040000, 0x00020000 },
-> > +    /* Space here reserved for more SMMUs */
-> > +    [VIRT_AHCI] =               { 0x60100000, 0x00010000 },
-> > +    /* Space here reserved for other devices */
-> > +    [VIRT_PCIE_PIO] =           { 0x7fff0000, 0x00010000 },
-> > +    /* 256M PCIE ECAM space */
-> > +    [VIRT_PCIE_ECAM] =          { 0x80000000, 0x10000000 },
->
-> Comment says 256M but the size field says it's larger...
->
-I calculated, 256M should be 0x10000000, 7 zeros.
+Yeah, we could also do something like that, or another approach
+I found by searching around is to use addLocalMonitorForEventsMatchingMask
+to catch events. I'd kind of prefer to do whatever is the "expected"
+setup for OSX apps, though, and I get the impression that completely
+overriding sendEvent is a bit outside the normal path.
 
-> > +    /* ~1TB for PCIE MMIO (4GB to 1024GB boundary) */
-> > +    [VIRT_PCIE_MMIO] =          { 0x100000000ULL, 0xFF00000000ULL },
-> > +    [VIRT_MEM] =                { 0x10000000000ULL, RAMLIMIT_BYTES },
-> > +};
-> > +
-> > +static const int sbsa_ref_irqmap[] = {
-> > +    [VIRT_UART] = 1,
-> > +    [VIRT_RTC] = 2,
-> > +    [VIRT_PCIE] = 3, /* ... to 6 */
-> > +    [VIRT_GPIO] = 7,
-> > +    [VIRT_SECURE_UART] = 8,
-> > +    [VIRT_AHCI] = 9,
-> > +};
-> > +
-> > +static void sbsa_ref_init(MachineState *machine)
-> > +{
-> > +    VirtMachineState *vms = VIRT_MACHINE(machine);
->
-> As noted above, I think it would be better to be your own
-> subclass of MachineState, rather than being a subclass of
-> the virt board. Is there anything that becomes particularly
-> awkward if you do it that way?
->
-Just wanted to save code lines since this board derives from virt.
-It is fine to have its own header file, will do that.
-
-> thanks
-> -- PMM
+thanks
+-- PMM
