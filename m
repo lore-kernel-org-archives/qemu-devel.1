@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60899)
+Received: from eggs.gnu.org ([209.51.188.92]:33318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go9Hf-00039K-Bs
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:57:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1go9Jb-0004jS-2u
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1go91n-0000cn-6g
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:40:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1go91l-0000cS-Pm
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:40:51 -0500
-Date: Mon, 28 Jan 2019 16:40:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190128164046.100ac6f6@redhat.com>
-In-Reply-To: <20190128101331-mutt-send-email-mst@kernel.org>
-References: <20190125210058.1092551-1-stefanb@linux.ibm.com>
-	<20190128154553.583f79a3@redhat.com>
-	<20190128101331-mutt-send-email-mst@kernel.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1go9JZ-0007gs-IK
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:14 -0500
+Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:43262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1go9JZ-0007gO-CD
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:59:13 -0500
+Received: by mail-pl1-x634.google.com with SMTP id gn14so7902280plb.10
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:59:12 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon, 28 Jan 2019 07:58:44 -0800
+Message-Id: <20190128155907.20607-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] acpi: Make TPM 2.0 with TIS available as
- MSFT0101
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/23] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Berger <stefanb@linux.ibm.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Mon, 28 Jan 2019 10:15:55 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+The following changes since commit ad7a21e81231ae64540310384fb0f87ac8758b02:
 
-> On Mon, Jan 28, 2019 at 03:45:53PM +0100, Igor Mammedov wrote:
-> > On Fri, 25 Jan 2019 16:00:58 -0500
-> > Stefan Berger <stefanb@linux.ibm.com> wrote:
-> >   
-> > > This patch makes the a TPM 2.0 with TIS interface available under the
-> > > HID 'MSF0101'. This is supported by Linux and also Windows now  
-> > MSF0101 is relatively recent addition to Linux,
-> > are there in wild (old) kernels that worked with PNP0C31 but won't work
-> > with MSF0101?  
-> 
-> Well what would you do? You either have TPM 2.0 or you don't.
-> If you have a 2.0 backend you need to expose it as 2.0
-> to the frontend right?
-I wasn't clear enough, question is:
-If there are kernels where TPM2 worked with PNP0C31 and without MSF0101 support?
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2019-01-25 17:22:20 +0000)
 
- 
-> > > recognizes the TPM 2.0 with TIS interface. Leave the TPM 1.2 as before.
-> > > 
-> > > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> > > ---
-> > >  hw/i386/acpi-build.c | 12 ++++++++++--
-> > >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index 2e21a31f82..f51225b4a7 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -2141,8 +2141,16 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> > >              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-> > >  
-> > >              if (TPM_IS_TIS(tpm)) {
-> > > -                dev = aml_device("ISA.TPM");
-> > > -                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
-> > > +                if (misc->tpm_version == TPM_VERSION_2_0) {
-> > > +                    dev = aml_device("TPM");
-> > > +                    aml_append(dev, aml_name_decl("_HID",
-> > > +                                                  aml_string("MSFT0101")));
-> > > +                } else {
-> > > +                    dev = aml_device("ISA.TPM");
-> > > +                    aml_append(dev, aml_name_decl("_HID",
-> > > +                                                  aml_eisaid("PNP0C31")));
-> > > +                }
-> > > +
-> > >                  aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
-> > >                  crs = aml_resource_template();
-> > >                  aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,  
+are available in the Git repository at:
+
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190128
+
+for you to fetch changes up to e77c89fb086a9bf09dd11f72e4cb2093b426f32b:
+
+  cputlb: Remove static tlb sizing (2019-01-28 07:04:35 -0800)
+
+----------------------------------------------------------------
+Backend vector enhancements
+Dynamic tlb resizing
+
+----------------------------------------------------------------
+Emilio G. Cota (3):
+      cputlb: do not evict empty entries to the vtlb
+      tcg: introduce dynamic TLB sizing
+      tcg/i386: enable dynamic TLB sizing
+
+Richard Henderson (20):
+      tcg: Add logical simplifications during gvec expand
+      tcg: Add gvec expanders for nand, nor, eqv
+      tcg: Add write_aofs to GVecGen4
+      tcg: Add opcodes for vector saturated arithmetic
+      tcg: Add opcodes for vector minmax arithmetic
+      tcg/i386: Split subroutines out of tcg_expand_vec_op
+      tcg/i386: Implement vector saturating arithmetic
+      tcg/i386: Implement vector minmax arithmetic
+      tcg/aarch64: Implement vector saturating arithmetic
+      tcg/aarch64: Implement vector minmax arithmetic
+      tcg/aarch64: enable dynamic TLB sizing
+      tcg/ppc: enable dynamic TLB sizing
+      tcg/sparc: enable dynamic TLB sizing
+      tcg/s390: enable dynamic TLB sizing
+      tcg/riscv: enable dynamic TLB sizing
+      tcg/arm: enable dynamic TLB sizing
+      tcg/mips: Fix tcg_out_qemu_ld_slow_path
+      tcg/mips: enable dynamic TLB sizing
+      tcg/tci: enable dynamic TLB sizing
+      cputlb: Remove static tlb sizing
+
+ accel/tcg/tcg-runtime.h      |  23 ++
+ include/exec/cpu-defs.h      |  71 ++---
+ include/exec/cpu_ldst.h      |   9 +-
+ tcg/aarch64/tcg-target.h     |   2 +
+ tcg/i386/tcg-target.h        |   2 +
+ tcg/tcg-op-gvec.h            |  18 ++
+ tcg/tcg-op.h                 |  11 +
+ tcg/tcg-opc.h                |   8 +
+ tcg/tcg.h                    |   2 +
+ accel/tcg/cputlb.c           | 192 +++++++++++++-
+ accel/tcg/tcg-runtime-gvec.c | 257 ++++++++++++++++++
+ tcg/aarch64/tcg-target.inc.c | 148 ++++++++---
+ tcg/arm/tcg-target.inc.c     | 143 +++++-----
+ tcg/i386/tcg-target.inc.c    | 608 ++++++++++++++++++++++++++-----------------
+ tcg/mips/tcg-target.inc.c    |  97 ++++---
+ tcg/ppc/tcg-target.inc.c     |  91 ++++---
+ tcg/riscv/tcg-target.inc.c   | 126 ++++-----
+ tcg/s390/tcg-target.inc.c    |  45 ++--
+ tcg/sparc/tcg-target.inc.c   |  82 +++---
+ tcg/tcg-op-gvec.c            | 305 +++++++++++++++++++---
+ tcg/tcg-op-vec.c             |  75 +++++-
+ tcg/tcg.c                    |  10 +
+ tcg/README                   |  19 ++
+ 23 files changed, 1714 insertions(+), 630 deletions(-)
