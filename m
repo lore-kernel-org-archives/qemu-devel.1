@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50349)
+Received: from eggs.gnu.org ([209.51.188.92]:50403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <antonkuchin@yandex-team.ru>) id 1goAAR-00022h-Os
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:53:52 -0500
+	(envelope-from <svens@stackframe.org>) id 1goAAg-0002Bs-5k
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <antonkuchin@yandex-team.ru>) id 1goAAQ-0004SC-Qz
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:53:51 -0500
-References: <20190128142748.29140-1-antonkuchin@yandex-team.ru>
-	<20190128144720.GB5756@localhost.localdomain>
-From: Anton Kuchin <antonkuchin@yandex-team.ru>
-Message-ID: <d5c28554-fee3-5c12-3528-150c0d048903@yandex-team.ru>
-Date: Mon, 28 Jan 2019 19:53:44 +0300
+	(envelope-from <svens@stackframe.org>) id 1goAAf-0004a3-5p
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:54:06 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:41415)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1goAAe-0004Ye-OC
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 11:54:05 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Mon, 28 Jan 2019 17:53:33 +0100
+Message-Id: <20190128165333.3814-1-svens@stackframe.org>
 MIME-Version: 1.0
-In-Reply-To: <20190128144720.GB5756@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/2] block: add blk_lookup() for getting
- device by node_name
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/hppa: fix setting registers via gdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Evgeny Yakovlev <wrfsh@yandex-team.ru>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 
-On 28/01/2019 17:47, Kevin Wolf wrote:
-> Am 28.01.2019 um 15:27 hat Anton Kuchin geschrieben:
->> Some HMP and QMP commands are targeting BlockBackend but
->> for hotplugged devices name of BB is deprecated, instead
->> name of root BlockDriverState is set. These patches add
->> functions to search BB by attached root BDS name.
->>
->> This approach isn't perfect, but I couldn't invent a better
->> one and I belive it's more convinient than accessing BB
->> by QOM path.
-> There could be more than one BlockBackend attached to a single node, so
-> this approach is simply wrong.
+While doing 'set $pcoqh=0xf0000000' i triggered the assertion below. From looking
+at the source, it looks like the argument order for deposit64() is wrong, and val
+needs to be moved to the end.
 
-I was thinking about this but couldn't imagine configuration when it's 
-having more than one root. Can you give an example, please, so I 
-understand this case better.
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
 
-> I think the qdev ID is actually not only a pretty convenient way, but in
-> fact the only logical way to address a guest device (and BlockBackends
-> that can be accessed by the monitor are essentially a part of the guest
-> device).
+qemu-system-hppa: /home/svens/qemu/include/qemu/bitops.h:419: deposit64: Assertion `start >= 0 && length > 0 && length <= 64 - start' failed.
 
-As far as I remember backends currently have emply qdev ID so the only 
-way to address them now is QOM path like 
-".../my_hotplug_drive/virtio-backend". So I have to remember the name of 
-the root driver it is connected to and also add this "/virtio-backend" 
-suffix.
+Thread 1 "qemu-system-hpp" received signal SIGABRT, Aborted.
+__GI_raise (sig=sig@entry=0x6) at ../sysdeps/unix/sysv/linux/raise.c:50
+50	../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+ #0  0x00007ffff4f8785b in __GI_raise (sig=sig@entry=0x6) at ../sysdeps/unix/sysv/linux/raise.c:50
+ #1  0x00007ffff4f72535 in __GI_abort () at abort.c:79
+ #2  0x00007ffff4f7240f in __assert_fail_base
+    (fmt=0x7ffff50d4ee0 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=0x555555cc62a8 "start >= 0 && length > 0 && length <= 64 - start", file=0x555555cc6280 "/home/svens/qemu/include/qemu/bitops.h", line=0x1a3, function=<optimized out>) at assert.c:92
+ #3  0x00007ffff4f800a2 in __GI___assert_fail
+    (assertion=0x555555cc62a8 "start >= 0 && length > 0 && length <= 64 - start", file=0x555555cc6280 "/home/svens/qemu/include/qemu/bitops.h", line=0x1a3, function=0x555555cc6760 <__PRETTY_FUNCTION__.15114> "deposit64") at assert.c:101
+ #4  0x00005555558dd0db in deposit64 (value=0x0, start=0x0, length=0x0, fieldval=0x20) at /home/svens/qemu/include/qemu/bitops.h:419
+ #5  0x00005555558dd87a in hppa_cpu_gdb_write_register (cs=0x5555563394e0, mem_buf=0x7fffffffb134 "", n=0x41) at /home/svens/qemu/target/hppa/gdbstub.c:269
+ #6  0x0000555555822397 in gdb_write_register (cpu=0x5555563394e0, mem_buf=0x7fffffffb134 "", reg=0x41) at /home/svens/qemu/gdbstub.c:905
+ #7  0x0000555555823802 in gdb_handle_packet (s=0x555556992020, line_buf=0x55555699203c "G", '0' <repeats 40 times>, "fff1", '0' <repeats 131 times>, "1", '0' <repeats 22 times>, "6"...) at /home/svens/qemu/gdbstub.c:1481
+ #8  0x000055555582573c in gdb_read_byte (s=0x555556992020, ch=0x35) at /home/svens/qemu/gdbstub.c:2131
+ #9  0x0000555555825972 in gdb_chr_receive (opaque=0x555556992020, buf=0x7fffffffd170 "$G", '0' <repeats 40 times>, "fff1", '0' <repeats 131 times>, "1", '0' <repeats 22 times>..., size=0x405) at /home/svens/qemu/gdbstub.c:2369
+ #10 0x0000555555bd51bc in qemu_chr_be_write_impl (s=0x5555566cd100, buf=0x7fffffffd170 "$G", '0' <repeats 40 times>, "fff1", '0' <repeats 131 times>, "1", '0' <repeats 22 times>..., len=0x405) at chardev/char.c:175
+ #11 0x0000555555bd5220 in qemu_chr_be_write (s=0x5555566cd100, buf=0x7fffffffd170 "$G", '0' <repeats 40 times>, "fff1", '0' <repeats 131 times>, "1", '0' <repeats 22 times>..., len=0x405) at chardev/char.c:187
+ #12 0x0000555555bdde8d in tcp_chr_read (chan=0x55555697ea00, cond=G_IO_IN, opaque=0x5555566cd100) at chardev/char-socket.c:490
+ #13 0x0000555555bf81c3 in qio_channel_fd_source_dispatch (source=0x5555569c6220, callback=0x555555bddcdf <tcp_chr_read>, user_data=0x5555566cd100) at io/channel-watch.c:84
+ #14 0x00007ffff6937cb8 in g_main_context_dispatch () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+ #15 0x0000555555c73851 in glib_pollfds_poll () at util/main-loop.c:215
+ #16 0x0000555555c738cb in os_host_main_loop_wait (timeout=0x3b9aca00) at util/main-loop.c:238
+ #17 0x0000555555c73984 in main_loop_wait (nonblocking=0x0) at util/main-loop.c:497
+ #18 0x00005555558f4130 in main_loop () at vl.c:1925
+ #19 0x00005555558fbb43 in main (argc=0xd, argv=0x7fffffffe5e8, envp=0x7fffffffe658) at vl.c:4662
 
-Can you explain a bit what are "monitor referenced" backends and which 
-one can be accessed from monitor and which can not.
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ target/hppa/gdbstub.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Does your series allow to perform any operation that isn't possible
-> currently? If so, it's probably this operation that needs to be fixed to
-> either accept node names (if it's a backend operation) or a device ID
-> (if it's a frontend operation).
-
-Yes. It fixes latency histogram setting, nbd server binding to remove 
-event and a couple of hmp comands. I also suspect that this can affect 
-migration but I could't figure out what name is used for identifying drives.
-
-Some of this code is also linked to utilities (qemu-img, qemu-io-cmds 
-...) which require linking all QAPI stuff to them, that seems to be an 
-overkill. I'll prepare the patch to eliminate this dependency and allow 
-using QOM here if we decide that this is the best way.
-
-> Kevin
->
+diff --git a/target/hppa/gdbstub.c b/target/hppa/gdbstub.c
+index e2e9c4d77f..3157a690f2 100644
+--- a/target/hppa/gdbstub.c
++++ b/target/hppa/gdbstub.c
+@@ -266,7 +266,7 @@ int hppa_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     case 65 ... 127:
+         {
+             uint64_t *fr = &env->fr[(n - 64) / 2];
+-            *fr = deposit64(*fr, val, (n & 1 ? 0 : 32), 32);
++            *fr = deposit64(*fr, (n & 1 ? 0 : 32), 32, val);
+         }
+         break;
+     default:
+-- 
+2.20.1
