@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60786)
+Received: from eggs.gnu.org ([209.51.188.92]:60899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go9HT-0002zY-PK
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:57:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1go9Hf-00039K-Bs
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1go95Z-0002Bx-E6
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:44:46 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1go95Y-00029s-U5
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:44:45 -0500
-Received: by mail-ot1-x342.google.com with SMTP id n8so14989331otl.6
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 07:44:34 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1go91n-0000cn-6g
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:40:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1go91l-0000cS-Pm
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 10:40:51 -0500
+Date: Mon, 28 Jan 2019 16:40:46 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190128164046.100ac6f6@redhat.com>
+In-Reply-To: <20190128101331-mutt-send-email-mst@kernel.org>
+References: <20190125210058.1092551-1-stefanb@linux.ibm.com>
+	<20190128154553.583f79a3@redhat.com>
+	<20190128101331-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190127120526.15457-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Jan 2019 15:44:21 +0000
-Message-ID: <CAFEAcA8zBxFFvBc3taTE3Q=JFdG9VgcCXnZ3=MNE7u8VyvKyrQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/31] More work towards libslirp
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi: Make TPM 2.0 with TIS available as
+ MSFT0101
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Berger <stefanb@linux.ibm.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-On Sun, 27 Jan 2019 at 12:13, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
->
-> The following changes since commit ad7a21e81231ae64540310384fb0f87ac8758b=
-02:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
-quest' into staging (2019-01-25 17:22:20 +0000)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to 10163f695fe66f9d3d099a33752996dae70be98c:
->
->   slirp: API is extern C (2019-01-27 13:03:59 +0100)
->
-> ----------------------------------------------------------------
-> More work towards libslirp
+On Mon, 28 Jan 2019 10:15:55 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-This fails to build on almost all hosts:
+> On Mon, Jan 28, 2019 at 03:45:53PM +0100, Igor Mammedov wrote:
+> > On Fri, 25 Jan 2019 16:00:58 -0500
+> > Stefan Berger <stefanb@linux.ibm.com> wrote:
+> >   
+> > > This patch makes the a TPM 2.0 with TIS interface available under the
+> > > HID 'MSF0101'. This is supported by Linux and also Windows now  
+> > MSF0101 is relatively recent addition to Linux,
+> > are there in wild (old) kernels that worked with PNP0C31 but won't work
+> > with MSF0101?  
+> 
+> Well what would you do? You either have TPM 2.0 or you don't.
+> If you have a 2.0 backend you need to expose it as 2.0
+> to the frontend right?
+I wasn't clear enough, question is:
+If there are kernels where TPM2 worked with PNP0C31 and without MSF0101 support?
 
-x86-64 linux ubuntu:
-
-/home/petmay01/linaro/qemu-for-merges/slirp/misc.c: In function =E2=80=98fo=
-rk_exec=E2=80=99:
-/home/petmay01/linaro/qemu-for-merges/slirp/misc.c:139:5: error:
-implicit declaration of function =E2=80=98g_spawn_async_with_fds=E2=80=99; =
-did you
-mean =E2=80=98g_spawn_async_with_pipes=E2=80=99?
-[-Werror=3Dimplicit-function-declaration]
-     g_spawn_async_with_fds(NULL /* cwd */,
-     ^~~~~~~~~~~~~~~~~~~~~~
-     g_spawn_async_with_pipes
-/home/petmay01/linaro/qemu-for-merges/slirp/misc.c:139:5: error:
-nested extern declaration of =E2=80=98g_spawn_async_with_fds=E2=80=99
-[-Werror=3Dnested-externs]
-cc1: all warnings being treated as errors
-/home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
-'slirp/misc.o' failed
-
-Note that g_spawn_async_with_fds() is one of the glib routines
-which we have a version of in glib-compat.h to cope with older
-glib versions -- have you removed the #include of that and
-not provided the equivalent code for slirp?
-
-
-On OpenBSD there are lots of compiler errors, eg:
-
-In file included from slirp/slirp.h:51:0,
-                 from slirp/arp_table.c:25:
-slirp/ip6.h: In function 'in6_equal':
-slirp/ip6.h:37:5: warning: implicit declaration of function 'memcmp'
-[-Wimplicit-function-declaration]
-     return memcmp(a, b, sizeof(*a)) =3D=3D 0;
-     ^
-slirp/ip6.h: In function 'in6_compute_ethaddr':
-slirp/ip6.h:102:5: warning: implicit declaration of function 'memcpy'
-[-Wimplicit-function-declaration]
-     memcpy(&eth[2], &ip.s6_addr[16 - (ETH_ALEN - 2)], ETH_ALEN - 2);
-     ^
-slirp/ip6.h:102:5: warning: incompatible implicit declaration of
-built-in function 'memcpy'
-slirp/arp_table.c: In function 'arp_table_add':
-slirp/arp_table.c:49:13: warning: incompatible implicit declaration of
-built-in function 'memcpy'
-             memcpy(arptbl->table[i].ar_sha, ethaddr, ETH_ALEN);
-             ^
-slirp/arp_table.c:56:5: warning: incompatible implicit declaration of
-built-in function 'memcpy'
-     memcpy(arptbl->table[arptbl->next_victim].ar_sha,  ethaddr, ETH_ALEN);
-     ^
-slirp/arp_table.c: In function 'arp_table_search':
-slirp/arp_table.c:74:9: warning: implicit declaration of function
-'memset' [-Wimplicit-function-declaration]
-         memset(out_ethaddr, 0xff, ETH_ALEN);
-         ^
-slirp/arp_table.c:74:9: warning: incompatible implicit declaration of
-built-in function 'memset'
-slirp/arp_table.c:80:13: warning: incompatible implicit declaration of
-built-in function 'memcpy'
-             memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
-             ^
-
-In most of QEMU memcpy and friends are provided via
-osdep.h -- if you don't want to include that you need
-to replicate chunks of its functionality.
-
-Linux s390 host fails similarly (memcpy, memcmp, strlen, etc all
-not declared).
-
-thanks
--- PMM
+ 
+> > > recognizes the TPM 2.0 with TIS interface. Leave the TPM 1.2 as before.
+> > > 
+> > > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> > > ---
+> > >  hw/i386/acpi-build.c | 12 ++++++++++--
+> > >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > index 2e21a31f82..f51225b4a7 100644
+> > > --- a/hw/i386/acpi-build.c
+> > > +++ b/hw/i386/acpi-build.c
+> > > @@ -2141,8 +2141,16 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> > >              build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+> > >  
+> > >              if (TPM_IS_TIS(tpm)) {
+> > > -                dev = aml_device("ISA.TPM");
+> > > -                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+> > > +                if (misc->tpm_version == TPM_VERSION_2_0) {
+> > > +                    dev = aml_device("TPM");
+> > > +                    aml_append(dev, aml_name_decl("_HID",
+> > > +                                                  aml_string("MSFT0101")));
+> > > +                } else {
+> > > +                    dev = aml_device("ISA.TPM");
+> > > +                    aml_append(dev, aml_name_decl("_HID",
+> > > +                                                  aml_eisaid("PNP0C31")));
+> > > +                }
+> > > +
+> > >                  aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+> > >                  crs = aml_resource_template();
+> > >                  aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,  
