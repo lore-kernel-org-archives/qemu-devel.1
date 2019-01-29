@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60417)
+Received: from eggs.gnu.org ([209.51.188.92]:60424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1goTSm-0000Fw-Ed
+	(envelope-from <jjherne@linux.ibm.com>) id 1goTSm-0000GL-OP
 	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1goTSl-0000Tv-Ik
+	(envelope-from <jjherne@linux.ibm.com>) id 1goTSl-0000U7-LN
 	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:30:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35456)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1goTSl-0000SA-56
+	id 1goTSl-0008T0-BE
 	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:30:03 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0TDRXSO078724
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:30:01 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qap89nkrb-1
+	x0TDT60q072900
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:33 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qapyttvck-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:59 -0500
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:32 -0500
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Tue, 29 Jan 2019 13:29:47 -0000
+	Tue, 29 Jan 2019 13:29:26 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Tue, 29 Jan 2019 08:29:19 -0500
-In-Reply-To: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1548768562-20007-13-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
- channel programs via cio
+Date: Tue, 29 Jan 2019 08:29:07 -0500
+Message-Id: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 00/15] s390: vfio-ccw dasd ipl support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,122 +37,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Now that we have a Channel I/O library let's modify virtio boot code to
-make use of it for running channel programs.
+This is to support booting from vfio-ccw dasd devices. We basically implement
+the real hardware ipl procedure. This allows for booting Linux guests on
+vfio-ccw devices.
 
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
----
- pc-bios/s390-ccw/virtio.c | 48 +++++++++++++++++++----------------------------
- 1 file changed, 19 insertions(+), 29 deletions(-)
+vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
+channel programs dynamically modify themselves. Details on the ipl process and
+how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.
 
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index aa9da72..f8d71ed 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -89,33 +89,20 @@ int drain_irqs(SubChannelId schid)
-     }
- }
- 
--static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
-+static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
- {
-     Ccw1 ccw = {};
--    CmdOrb orb = {};
--    int r;
--
--    enable_subchannel(vdev->schid);
--
--    /* start subchannel command */
--    orb.fmt = 1;
--    orb.cpa = (u32)(long)&ccw;
--    orb.lpm = 0x80;
- 
-     ccw.cmd_code = cmd;
-     ccw.cda = (long)ptr;
-     ccw.count = len;
- 
--    r = ssch(vdev->schid, &orb);
--    /*
--     * XXX Wait until device is done processing the CCW. For now we can
--     *     assume that a simple tsch will have finished the CCW processing,
--     *     but the architecture allows for asynchronous operation
--     */
--    if (!r) {
--        r = drain_irqs(vdev->schid);
-+    if (sli) {
-+        ccw.flags |= CCW_FLAG_SLI;
-     }
--    return r;
-+
-+    enable_subchannel(vdev->schid);
-+    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
- }
- 
- static void vring_init(VRing *vr, VqInfo *info)
-@@ -257,7 +244,7 @@ void virtio_setup_ccw(VDev *vdev)
-     vdev->config.blk.blk_size = 0; /* mark "illegal" - setup started... */
-     vdev->guessed_disk_nature = VIRTIO_GDN_NONE;
- 
--    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
-+    run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0, false);
- 
-     switch (vdev->senseid.cu_model) {
-     case VIRTIO_ID_NET:
-@@ -278,18 +265,19 @@ void virtio_setup_ccw(VDev *vdev)
-     default:
-         panic("Unsupported virtio device\n");
-     }
--    IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size) == 0,
--               "Could not get block device configuration");
-+    IPL_assert(
-+        run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size, false) == 0,
-+       "Could not get block device configuration");
- 
-     /* Feature negotiation */
-     for (i = 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
-         feats.features = 0;
-         feats.index = i;
--        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
-+        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats), false);
-         IPL_assert(rc == 0, "Could not get features bits");
-         vdev->guest_features[i] &= bswap32(feats.features);
-         feats.features = bswap32(vdev->guest_features[i]);
--        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
-+        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats), false);
-         IPL_assert(rc == 0, "Could not set features bits");
-     }
- 
-@@ -306,16 +294,17 @@ void virtio_setup_ccw(VDev *vdev)
-         };
- 
-         IPL_assert(
--            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config)) == 0,
-+            run_ccw(vdev, CCW_CMD_READ_VQ_CONF, &config, sizeof(config), false) == 0,
-             "Could not get block device VQ configuration");
-         info.num = config.num;
-         vring_init(&vdev->vrings[i], &info);
-         vdev->vrings[i].schid = vdev->schid;
--        IPL_assert(run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info)) == 0,
--                   "Cannot set VQ info");
-+        IPL_assert(
-+            run_ccw(vdev, CCW_CMD_SET_VQ, &info, sizeof(info), false) == 0,
-+            "Cannot set VQ info");
-     }
-     IPL_assert(
--        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status)) == 0,
-+        run_ccw(vdev, CCW_CMD_WRITE_STATUS, &status, sizeof(status), false) == 0,
-         "Could not write status to host");
- }
- 
-@@ -324,7 +313,8 @@ bool virtio_is_supported(SubChannelId schid)
-     vdev.schid = schid;
-     memset(&vdev.senseid, 0, sizeof(vdev.senseid));
-     /* run sense id command */
--    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid))) {
-+    if (run_ccw(&vdev, CCW_CMD_SENSE_ID, &vdev.senseid, sizeof(vdev.senseid),
-+                true)) {
-         return false;
-     }
-     if (vdev.senseid.cu_type == 0x3832) {
--- 
+This version brings better error handling, namely retrying I/O operations in the
+event of some transient failure conditions. I've also renamed the sense data
+structures and error output to indicate that they are for eckd dasd only. A few
+other fixups as well, see changelog for details.
+
+Changelog
+==========
+v2
+---------
+01/15: s390 vfio-ccw: Add bootindex property and IPLB data
+- Remove accidental changes to roms/SLOF
+- Fix bad include in hw/vfio/ccw.c
+- ipl.c: Rename vc to vfio_ccw_dev
+
+10/15: s390-bios: Support for running format-0/1 channel programs
+- cio.c: Retry ssch on cc=1 or interface-control-check status
+- cio.c: SLI now used instead of special code in irb_error
+- Rename CU_TYPE_DASD to CU_TYPE_DASD_3990
+- Rename dasd sense data structures and constants
+- cio.c: Fix comment typos
+
+11/15: s390-bios: cio error handling
+- - Rename dasd sense data structures and constants
+
+12/15: s390-bios: Refactor virtio to run channel programs via cio
+- Use SLI for Sense ID ccws.
+
+rfc -> v1
+---------
+- Retry start subchannel operations on unexpected unit check status
+- Print more complete state information on i/o error
+- Fixed asm constraints (Q -> QS)
+- Align lowcore to 8k boundary
+- Initialize next_cpa in run_dynamic_ccw_program to avoid compiler warning
+- Cleanup: Rework handling of i/o interrupts in assembler
+- Fix netboot image (include cio.o in make file)
+- Misc cleanups
+
+Jason J. Herne (15):
+  s390 vfio-ccw: Add bootindex property and IPLB data
+  s390-bios: decouple cio setup from virtio
+  s390-bios: decouple common boot logic from virtio
+  s390-bios: Extend find_dev() for non-virtio devices
+  s390-bios: Factor finding boot device out of virtio code path
+  s390-bios: Clean up cio.h
+  s390-bios: Decouple channel i/o logic from virtio
+  s390-bios: Map low core memory
+  s390-bios: ptr2u32 and u32toptr
+  s390-bios: Support for running format-0/1 channel programs
+  s390-bios: cio error handling
+  s390-bios: Refactor virtio to run channel programs via cio
+  s390-bios: Use control unit type to determine boot method
+  s390-bios: Add channel command codes/structs needed for dasd-ipl
+  s390-bios: Support booting from real dasd device
+
+ docs/devel/s390-dasd-ipl.txt     | 132 ++++++++++++++
+ hw/s390x/ipl.c                   |  14 ++
+ hw/s390x/s390-ccw.c              |   9 +
+ hw/vfio/ccw.c                    |  13 +-
+ include/hw/s390x/s390-ccw.h      |   1 +
+ include/hw/s390x/vfio-ccw.h      |  38 ++++
+ pc-bios/s390-ccw/Makefile        |   2 +-
+ pc-bios/s390-ccw/cio.c           | 380 +++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/cio.h           | 239 +++++++++++++++++++-----
+ pc-bios/s390-ccw/dasd-ipl.c      | 249 +++++++++++++++++++++++++
+ pc-bios/s390-ccw/dasd-ipl.h      |  16 ++
+ pc-bios/s390-ccw/libc.h          |  23 +++
+ pc-bios/s390-ccw/main.c          | 161 +++++++++++------
+ pc-bios/s390-ccw/netboot.mak     |   2 +-
+ pc-bios/s390-ccw/netmain.c       |   1 +
+ pc-bios/s390-ccw/s390-arch.h     | 113 ++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h      |  10 +-
+ pc-bios/s390-ccw/start.S         |  33 +++-
+ pc-bios/s390-ccw/virtio-blkdev.c |   1 +
+ pc-bios/s390-ccw/virtio.c        |  73 +++-----
+ tests/boot-serial-test.c         |   2 +-
+ 21 files changed, 1332 insertions(+), 180 deletions(-)
+ create mode 100644 docs/devel/s390-dasd-ipl.txt
+ create mode 100644 include/hw/s390x/vfio-ccw.h
+ create mode 100644 pc-bios/s390-ccw/cio.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+ create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+ create mode 100644 pc-bios/s390-ccw/s390-arch.h
+
+--
 2.7.4
