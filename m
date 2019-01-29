@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35582)
+Received: from eggs.gnu.org ([209.51.188.92]:35574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1goMjE-00037N-VI
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:37 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1goMjD-00037H-AN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1goMj5-0006N0-Ez
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:31 -0500
-Received: from mga07.intel.com ([134.134.136.100]:32025)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1goMj5-0006Ms-3b
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:29 -0500
+Received: from mga11.intel.com ([192.55.52.93]:56280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1goMj4-0006Mh-Qz
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:27 -0500
+	id 1goMj2-0006Lt-UX
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:18:25 -0500
 From: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Date: Tue, 29 Jan 2019 22:49:01 +0800
-Message-Id: <8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1548771590.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v11 1/3] util/mmap-alloc: Add a 'is_pmem'
- parameter to qemu_ram_mmap
+Date: Tue, 29 Jan 2019 22:48:53 +0800
+Message-Id: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v11 0/3] support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +24,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, mst@redhat.com, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, "Zhang, Yi" <yi.z.zhang@linux.intel.com>
 
-From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-besides the existing 'shared' flags, we are going to add
-'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
-file is a persist memory.
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
+In order to make sure that the file metadata is in sync after a fault 
+while we are writing a shared DAX supporting backend files, this
+patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+
+As the DAX vs DMA truncated issue was solved, we refined the code and
+send out this feature for the v5 version.
+
+We will pass MAP_SYNC to mmap(2); if MAP_SYNC is supported and
+'share=on' & 'pmem=on'. 
+Or QEMU will not pass this flag to mmap(2)
+
+Test with below cases:
+1. pmem=on is set, shared=on is set, MAP_SYNC supported:
+   a: backend is a dax supporting file.
+   1) start VM1 with options:
+   -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_1},size=${DAX_FILE_SIZE_1},align=128M,pmem=on,share=on
+   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+   
+   2) start VM2 with options:
+   -object memory-backend-file,id=nv_be4,share,mem-path=${DAX_FILE_2,size=${DAX_FILE_SIZE_2},align=128M,pmem=on,share=on
+   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+
+   3) live migrate from VM1 to VM2.
+   
+   4) Suddly let Host crash or power failure.
+
+   5) check DAX_FILE_1 and DAX_FILE_2, no corrupt.
+
+   b: backend is a regular file.
+   1) start with options
+   -object memory-backend-file,id=nv_be4,share,mem-path=${REG_FILE},size=${REG_FILE_SIZE},align=128M,pmem=on,share=on
+   -device nvdimm,id=nv4,memdev=nv_be4,label-size=2M.
+
+   will warning "failed to validate with mapping flags: Operation not supported"
+   FILE_1 and FILE_2 random corrupt.
+
+2. Other cases:
+   FILE_1 and FILE_2 random corrupt.
+
+Changes in V11:
+ * 1/3: Micheal: Change to just add a bool is_pmem in qemu_ram_mmap.
+ * 2/3: Micheal: Fix the compatibility for old kernel.
+ * 2/3&3/3: Micheal&Eduardo :Update the behavior below: 
+   Waning at no-dax and continue without MAP_SYNC.
+   Test if fails again for compatibility, then remove the MAP_VALIDATE and
+   silently proceed.
+
+Changes in V10:
+ * 4/4: refine the document.
+ * 3/4: Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+ * 2/4: refine the commit message, Added MAP_SHARED_VALIDATE.
+ * 2/4: Fix the wrong include header
+
+Changes in V9:
+ * 1/6: Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+ * 2/6: New Added: Micheal: use sparse feature define RAM_FLAG. 
+ since I don't have much knowledge about the sparse feature, @Micheal Could you 
+ add some documentation/commit message on this patch? Thank you very much.
+ * 3/6: from 2/5: Eduardo: updated the commit message. 
+ * 4/6: from 3/5: Micheal: don't ignore MAP_SYNC failures silently.
+ * 5/6: from 4/5: Eduardo: updated the commit message.
+ * 6/6: from 5/5: Micheal: Drop the sync option, document the MAP_SYNC.
+
+Changes in v8:
+ * Micheal: 3/5, remove the duplicated define in the os_dep.h
+ * Micheal: 2/5, make type define safety.
+ * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+ * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+   MAP_SYNC only worked with pmem=on.
+ * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
+   all the flags in one parameter.
+
+Changes in v7:
+ * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+
+Changes in v6:
+ * Pankaj: 3/7 are squashed with 2/7
+ * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+ * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+ * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+ * Stefan, 5/7 Add missing "munmap"
+ * Stefan, 2/7 refine the shared/flag.
+
+Changes in v5:
+ * Add patch 1 to fix a memory leak issue.
+ * Refine the patch 4-6
+ * Remove the patch 3 as we already change the parameter from "shared" to
+   "flags"
+
+Changes in v4:
+ * Add patch 1-3 to switch some functions to a single 'flags'
+   parameters. (Michael S. Tsirkin)
+ * v3 patch 1-3 become v4 patch 4-6.
+ * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+ * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
+
+Zhang Yi (3):
+  util/mmap-alloc: Add a 'is_pmem' parameter to qemu_ram_mmap
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  docs: Added MAP_SYNC documentation
+
+ docs/nvdimm.txt           | 29 ++++++++++++++++++++++++++++-
  exec.c                    |  2 +-
  include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
- util/mmap-alloc.c         |  6 +++++-
+ include/qemu/osdep.h      | 21 +++++++++++++++++++++
+ qemu-options.hx           |  4 ++++
+ util/mmap-alloc.c         | 34 ++++++++++++++++++++++++++++++++--
  util/oslib-posix.c        |  2 +-
- 4 files changed, 27 insertions(+), 4 deletions(-)
+ 7 files changed, 107 insertions(+), 6 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index bb6170d..27cea52 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1860,7 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
- 
-     area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED);
-+                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index 50385e3..190688a 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
- 
- size_t qemu_mempath_getpagesize(const char *mem_path);
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
-+/**
-+ * qemu_ram_mmap: mmap the specified file or device.
-+ *
-+ * Parameters:
-+ *  @fd: the file or the device to mmap
-+ *  @size: the number of bytes to be mmaped
-+ *  @align: if not zero, specify the alignment of the starting mapping address;
-+ *          otherwise, the alignment in use will be determined by QEMU.
-+ *  @shared: map has RAM_SHARED flag.
-+ *  @is_pmem: map has RAM_PMEM flag.
-+ *
-+ * Return:
-+ *  On success, return a pointer to the mapped area.
-+ *  On failure, return MAP_FAILED.
-+ */
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem);
- 
- void qemu_ram_munmap(void *ptr, size_t size);
- 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index fd329ec..97bbeed 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-     return getpagesize();
- }
- 
--void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-+void *qemu_ram_mmap(int fd,
-+                    size_t size,
-+                    size_t align,
-+                    bool shared,
-+                    bool is_pmem)
- {
-     /*
-      * Note: this always allocates at least one extra page of virtual address
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index fbd0dc8..040937f 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
 -- 
 2.7.4
