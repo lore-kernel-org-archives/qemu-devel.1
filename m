@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38968)
+Received: from eggs.gnu.org ([209.51.188.92]:41448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1goJrQ-0000lo-Kw
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 22:14:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1goK81-0003lE-Vv
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 22:32:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1goJda-0002Bq-7F
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 22:00:36 -0500
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:39535)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1goJdT-00028I-Bk
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 22:00:31 -0500
-Received: by mail-vs1-xe43.google.com with SMTP id h78so11104769vsi.6
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 19:00:16 -0800 (PST)
+	(envelope-from <stefanha@gmail.com>) id 1goK81-0007RX-4r
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 22:32:01 -0500
+Date: Tue, 29 Jan 2019 11:31:55 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190129033155.GD3264@stefanha-x1.localdomain>
+References: <20190125164601.130556-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-References: <CAFyWVaai=5K7j8w+Abpk9jxGyKuo4v9w2BgmDbY=_29+Q++Jyw@mail.gmail.com>
-	<20181228220951.4962-1-jimw@sifive.com>
-	<f3e26863-4624-2c8f-5a9d-f3e76b7e6f0e@linaro.org>
-	<CAFyWVaYnSCDnX7j3XugT8zMw-wC=EdXiEJevb1pJkvzfD_qfGg@mail.gmail.com>
-	<CAKmqyKP3wOiHvpqyFZZCzy3c7sJP86P30JXUA0P2jAvRL7QgbQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKP3wOiHvpqyFZZCzy3c7sJP86P30JXUA0P2jAvRL7QgbQ@mail.gmail.com>
-From: Jim Wilson <jimw@sifive.com>
-Date: Mon, 28 Jan 2019 19:00:04 -0800
-Message-ID: <CAFyWVaa-L4pZXtJpUu7hom08LMx0q5pFmRyhO0TrmATD7CoRoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/5 v2] RISC-V: Map gdb CSR reg numbers to
- hw reg numbers.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fXStkuK2IQBfcDe+"
+Content-Disposition: inline
+In-Reply-To: <20190125164601.130556-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,15 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com
 
-On Tue, Jan 22, 2019 at 1:45 PM Alistair Francis <alistair23@gmail.com> wrote:
-> I think it makes more sense to just define the variable in the
-> gdbstubs.c file then. Can you move it to patch 5?
 
-Yes, that is no problem.  That makes patch 3 a lot smaller and patch 5
-a lot bigger, but it is the same code as before, just arranged
-differently, so this shouldn't complicate the review too much.
+--fXStkuK2IQBfcDe+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Jim
+On Fri, Jan 25, 2019 at 07:46:01PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all.
+>=20
+> What about such a simple helper for a very often patter around
+> qemu_iovec_init_external ?
+
+Sounds good, qemu_iovec_init() has 55 references vs
+qemu_iovec_init_external() with 51.  It's worth making
+qemu_iovec_init_external() nicer to use.
+
+> If we like it, I'll update other callers of qemu_iovec_init_external.
+>=20
+> Possible interface change would be
+> LOCAL_QIOV(lc, buf, len);
+> instead of=20
+> LocalQiov lc =3D LOCAL_QIOV(lc, buf, len);
+>=20
+> or, may be, someone has a better idea?
+
+Bike-shedding territory, but I prefer LocalQiov lc =3D LOCAL_QIOV(lc, buf,
+len) because it reveals the type.  This makes the code easier to read
+than just LOCAL_QIOV(lc, buf, len) by itself - the reader is forced to
+look up the macro definition to figure out what magic happens.
+
+> diff --git a/block/io.c b/block/io.c
+> index bd9d688f8b..c7d7b199c1 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -949,18 +949,13 @@ int bdrv_preadv(BdrvChild *child, int64_t offset, Q=
+EMUIOVector *qiov)
+> =20
+>  int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
+>  {
+> -    QEMUIOVector qiov;
+> -    struct iovec iov =3D {
+> -        .iov_base =3D (void *)buf,
+> -        .iov_len =3D bytes,
+> -    };
+> +    LocalQiov lq =3D LOCAL_QIOV(lq, buf, bytes);
+> =20
+>      if (bytes < 0) {
+>          return -EINVAL;
+>      }
+> =20
+> -    qemu_iovec_init_external(&qiov, &iov, 1);
+> -    return bdrv_preadv(child, offset, &qiov);
+> +    return bdrv_preadv(child, offset, &lq.qiov);
+
+I think it's unfortunate that LocalQiov is necessary since the caller
+only needs the qiov.  Can we afford to embed the struct iovec into
+QEMUIOVector?
+
+That way callers don't need a separate LocalQiov type:
+
+  QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+  ...
+  return bdrv_preadv(child, offset, &qiov);
+
+--fXStkuK2IQBfcDe+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcT8krAAoJEJykq7OBq3PIcxoIAIph6+Nf+kQcGPco2jCJuRxa
+/0u0tJ8fOCBONT72YZSL9+OIE5HttUf/B1HAYixCW9pcQVXOXA69lgw30ZQqmt3s
+rF17UoNwNfvFnn+N7+CvKRxiOisj7TGGryfgg1YyAZ2fAobr9AGsO3wWXbaPXY+A
+k9WpAe5RcVD0epORJ2hm6BMaLnhG4k46GYDc14KMCOfhPACQxJ1jljkfkabRjP/c
+lysLYD6zOlALUiGWZzlxgbmrCGaHOby5RJ1dAocf4KZ/9n/zgdGX2XHo2JtQS7AC
+dgN8KpaXLAIkcotxgYXYnunR9iOPdpFYckL7yR9FDFkzkOiSkJQHev/mEh9LT6E=
+=qbYg
+-----END PGP SIGNATURE-----
+
+--fXStkuK2IQBfcDe+--
