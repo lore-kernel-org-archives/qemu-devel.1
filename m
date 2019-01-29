@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55607)
+Received: from eggs.gnu.org ([209.51.188.92]:59089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1goLrD-0004EE-Or
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1goMFd-0007CT-GQ
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1goLrC-0002Xt-LA
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40252)
+	(envelope-from <thuth@redhat.com>) id 1goMFc-00054G-PN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1goLrC-0002W1-B4
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:46 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE558C0669AB
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 05:14:43 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 29 Jan 2019 13:14:32 +0800
-Message-Id: <20190129051432.22023-1-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goMFc-000540-Hg
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:00 -0500
+References: <20190124011554.25418-1-philmd@redhat.com>
+	<20190124011554.25418-5-philmd@redhat.com>
+	<20190124114305.bdxz76bsxk5lvc3d@sirius.home.kraxel.org>
+	<ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <84607872-9520-8416-b0fe-8883a4b565ea@redhat.com>
+Date: Tue, 29 Jan 2019 06:47:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] iothread: fix iothread hang when stop too soon
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/display/milkymist-tmu2: Move
+ inlined code from header to source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Thomas Huth <thuth@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-Lukas reported an hard to reproduce QMP iothread hang on s390 that
-QEMU might hang at pthread_join() of the QMP monitor iothread before
-quitting:
+On 2019-01-28 18:47, Philippe Mathieu-Daud=C3=A9 wrote:
+> Cc'ing Thomas/Paolo for Makefile rules...
+>=20
+> On 1/24/19 12:43 PM, Gerd Hoffmann wrote:
+>> On Thu, Jan 24, 2019 at 02:15:54AM +0100, Philippe Mathieu-Daud=C3=A9 =
+wrote:
+>>> Move the complexity of milkymist_tmu2_create() into the
+>>> source file. Doing so we avoid to include the X11/OpenGL
+>>> headers in all LM32 devices, and we also avoid the duplicate
+>>> declaration of glx_fbconfig_attr[] (it is already declared
+>>> in hw/display/milkymist-tmu2.c).
+>>> Since TYPE_MILKYMIST_TMU2 is now accessible, use it.
+>>
+>> Oops, fails the build:
+>>
+>>   LINK    lm32-softmmu/qemu-system-lm32
+>> hw/lm32/milkymist.o: In function `milkymist_init':
+>> milkymist.c:(.text+0xb0f): undefined reference to `milkymist_tmu2_crea=
+te'
+>=20
+> The problem comes from patch #2:
+>=20
+>> diff --git a/default-configs/lm32-softmmu.mak
+> b/default-configs/lm32-softmmu.mak
+>> index 4889348a10..4049b23562 100644
+>> --- a/default-configs/lm32-softmmu.mak
+>> +++ b/default-configs/lm32-softmmu.mak
+>> @@ -2,7 +2,7 @@
+>>
+>>  CONFIG_LM32=3Dy
+>>  CONFIG_MILKYMIST=3Dy
+>> -CONFIG_MILKYMIST_TMU2=3D$(CONFIG_OPENGL)
+>> +CONFIG_MILKYMIST_TMU2=3D$(call land,$(CONFIG_X11),$(CONFIG_OPENGL))
+>>  CONFIG_FRAMEBUFFER=3Dy
+>>  CONFIG_PTIMER=3Dy
+>>  CONFIG_PFLASH_CFI01=3Dy
+>> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+>> index 97acd5b6cb..079e702f25 100644
+>> --- a/hw/display/Makefile.objs
+>> +++ b/hw/display/Makefile.objs
+>> @@ -29,8 +29,8 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.=
+o
+>>  common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
+>>
+>>  common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
+>> -milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
+>> -milkymist-tmu2.o-libs :=3D $(X11_LIBS)
+>> +milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS) $(OPENGL_CFLAGS)
+>> +milkymist-tmu2.o-libs :=3D $(X11_LIBS) $(OPENGL_LIBS)
+>>
+>>  obj-$(CONFIG_OMAP) +=3D omap_dss.o
+>>  obj-$(CONFIG_OMAP) +=3D omap_lcdc.o
+>=20
+> Using $(call land) seems to break CONFIG_MILKYMIST_TMU2 availability in
+> $(common-obj), while it works correctly in the per-target $(obj).
+> I'm not sure what is the cause, but moving milkymist-tmu2.o to $(obj)
+> makes more sense and fix this, so I'll go this way.
 
-  Thread 1
-  #0  0x000003ffad10932c in pthread_join
-  #1  0x0000000109e95750 in qemu_thread_join
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
-  #2  0x0000000109c95a1c in iothread_stop
-  #3  0x0000000109bb0874 in monitor_cleanup
-  #4  0x0000000109b55042 in main
+You could try whether adding an additional
 
-While the iothread is still in the main loop:
+ common-obj-$(CONFIG_ALL) +=3D milkymist-tmu2.o
 
-  Thread 4
-  #0  0x000003ffad0010e4 in ??
-  #1  0x000003ffad553958 in g_main_context_iterate.isra.19
-  #2  0x000003ffad553d90 in g_main_loop_run
-  #3  0x0000000109c9585a in iothread_run
-      at /home/thuth/devel/qemu/iothread.c:74
-  #4  0x0000000109e94752 in qemu_thread_start
-      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
-  #5  0x000003ffad10825a in start_thread
-  #6  0x000003ffad00dcf2 in thread_start
+fixes the issue for you, too.
 
-IMHO it's because there's a race between the main thread and iothread
-when stopping the thread in following sequence:
+OTOH, milkymist is only used by one target, so there is really no reason
+that this file should be added to common-obj, thus using $(obj) is fine
+here.
 
-    main thread                       iothread
-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                                      aio_poll()
-    iothread_get_g_main_context
-      set iothread->worker_context
-    iothread_stop
-      schedule iothread_stop_bh
-                                        execute iothread_stop_bh [1]
-                                          set iothread->running=3Dfalse
-                                          (since main_loop=3D=3DNULL so
-                                           skip to quit main loop.
-                                           Note: although main_loop is
-                                           NULL but worker_context is
-                                           not!)
-                                      atomic_read(&iothread->worker_conte=
-xt) [2]
-                                        create main_loop object
-                                        g_main_loop_run() [3]
-    pthread_join() [4]
-
-We can see that when execute iothread_stop_bh() at [1] it's possible
-that main_loop is still NULL because it's only created until the first
-check of the worker_context later at [2].  Then the iothread will hang
-in the main loop [3] and it'll starve the main thread too [4].
-
-Here the simple solution should be that we check again the "running"
-variable before check against worker_context.
-
-CC: Thomas Huth <thuth@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
-
-This hasn't yet been verified on the initial s390 systems, but since I
-can reproduce it locally with this code clip:
-
-        IOThread *iothread =3D iothread_create("test", NULL);
-        iothread_get_g_main_context(iothread);
-        iothread_stop(iothread);
-
-so I'm still posting this out for review first in case it was hit by
-other users.
----
- iothread.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/iothread.c b/iothread.c
-index 2fb1cdf55d..e615b7ae52 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
-     while (iothread->running) {
-         aio_poll(iothread->ctx, true);
-=20
--        if (atomic_read(&iothread->worker_context)) {
-+        /*
-+         * We must check the running state again in case it was
-+         * changed in previous aio_poll()
-+         */
-+        if (iothread->running && atomic_read(&iothread->worker_context))=
- {
-             GMainLoop *loop;
-=20
-             g_main_context_push_thread_default(iothread->worker_context)=
-;
---=20
-2.17.1
+ Thomas
