@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59089)
+Received: from eggs.gnu.org ([209.51.188.92]:35060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMFd-0007CT-GQ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1goMek-0001hs-IO
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMFc-00054G-PN
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41840)
+	(envelope-from <thuth@redhat.com>) id 1goMej-0005ct-U2
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goMFc-000540-Hg
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:48:00 -0500
-References: <20190124011554.25418-1-philmd@redhat.com>
-	<20190124011554.25418-5-philmd@redhat.com>
-	<20190124114305.bdxz76bsxk5lvc3d@sirius.home.kraxel.org>
-	<ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goMej-0005cV-MD
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:57 -0500
+References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
+	<92b6dc0f167f0c0f53ad9c0fbf127ea255b7429f.1548714862.git.DirtY.iCE.hu@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <84607872-9520-8416-b0fe-8883a4b565ea@redhat.com>
-Date: Tue, 29 Jan 2019 06:47:50 +0100
+Message-ID: <bfdf1243-9bf1-128a-3f6d-93e425a0839c@redhat.com>
+Date: Tue, 29 Jan 2019 07:13:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
+In-Reply-To: <92b6dc0f167f0c0f53ad9c0fbf127ea255b7429f.1548714862.git.DirtY.iCE.hu@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/display/milkymist-tmu2: Move
- inlined code from header to source
+Subject: Re: [Qemu-devel] [PATCH v4 03/14] audio: -audiodev command line
+ option: documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Brad Smith <brad@comstyle.com>, Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Libvirt <libvir-list@redhat.com>
 
-On 2019-01-28 18:47, Philippe Mathieu-Daud=C3=A9 wrote:
-> Cc'ing Thomas/Paolo for Makefile rules...
+On 2019-01-28 23:43, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wrote:
+> This patch adds documentation of an -audiodev command line option, that
+> deprecates the old QEMU_* environment variables for audio backend
+> configuration.  It's syntax is similar to existing options (-netdev,
+> -device, etc):
 >=20
-> On 1/24/19 12:43 PM, Gerd Hoffmann wrote:
->> On Thu, Jan 24, 2019 at 02:15:54AM +0100, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> Move the complexity of milkymist_tmu2_create() into the
->>> source file. Doing so we avoid to include the X11/OpenGL
->>> headers in all LM32 devices, and we also avoid the duplicate
->>> declaration of glx_fbconfig_attr[] (it is already declared
->>> in hw/display/milkymist-tmu2.c).
->>> Since TYPE_MILKYMIST_TMU2 is now accessible, use it.
->>
->> Oops, fails the build:
->>
->>   LINK    lm32-softmmu/qemu-system-lm32
->> hw/lm32/milkymist.o: In function `milkymist_init':
->> milkymist.c:(.text+0xb0f): undefined reference to `milkymist_tmu2_crea=
-te'
+>   -audiodev driver_name,property=3Dvalue,...
 >=20
-> The problem comes from patch #2:
+> Although now it's possible to specify multiple -audiodev options on
+> command line, multiple audio backends are not supported yet.
 >=20
->> diff --git a/default-configs/lm32-softmmu.mak
-> b/default-configs/lm32-softmmu.mak
->> index 4889348a10..4049b23562 100644
->> --- a/default-configs/lm32-softmmu.mak
->> +++ b/default-configs/lm32-softmmu.mak
->> @@ -2,7 +2,7 @@
->>
->>  CONFIG_LM32=3Dy
->>  CONFIG_MILKYMIST=3Dy
->> -CONFIG_MILKYMIST_TMU2=3D$(CONFIG_OPENGL)
->> +CONFIG_MILKYMIST_TMU2=3D$(call land,$(CONFIG_X11),$(CONFIG_OPENGL))
->>  CONFIG_FRAMEBUFFER=3Dy
->>  CONFIG_PTIMER=3Dy
->>  CONFIG_PFLASH_CFI01=3Dy
->> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
->> index 97acd5b6cb..079e702f25 100644
->> --- a/hw/display/Makefile.objs
->> +++ b/hw/display/Makefile.objs
->> @@ -29,8 +29,8 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.=
-o
->>  common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
->>
->>  common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
->> -milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
->> -milkymist-tmu2.o-libs :=3D $(X11_LIBS)
->> +milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS) $(OPENGL_CFLAGS)
->> +milkymist-tmu2.o-libs :=3D $(X11_LIBS) $(OPENGL_LIBS)
->>
->>  obj-$(CONFIG_OMAP) +=3D omap_dss.o
->>  obj-$(CONFIG_OMAP) +=3D omap_lcdc.o
+> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
+om>
+> ---
+>  qemu-options.hx | 222 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 219 insertions(+), 3 deletions(-)
 >=20
-> Using $(call land) seems to break CONFIG_MILKYMIST_TMU2 availability in
-> $(common-obj), while it works correctly in the per-target $(obj).
-> I'm not sure what is the cause, but moving milkymist-tmu2.o to $(obj)
-> makes more sense and fix this, so I'll go this way.
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 521511ec13..a12931899b 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -416,14 +416,230 @@ The default is @code{en-us}.
+>  ETEXI
+> =20
+> =20
+> +HXCOMM Deprecated by -audiodev
+>  DEF("audio-help", 0, QEMU_OPTION_audio_help,
+> -    "-audio-help     print list of audio drivers and their options\n",
+> +    "-audio-help     show -audiodev equivalent of the currently specif=
+ied audio settings\n",
+>      QEMU_ARCH_ALL)
 
-You could try whether adding an additional
-
- common-obj-$(CONFIG_ALL) +=3D milkymist-tmu2.o
-
-fixes the issue for you, too.
-
-OTOH, milkymist is only used by one target, so there is really no reason
-that this file should be added to common-obj, thus using $(obj) is fine
-here.
+Note that if you want to deprecate a parameter "officially" (in the
+sense that it could be removed in a future release), you also have to
+add an entry to qemu-deprecated.texi. But that could also be done in an
+additional patch later, so no need to respin just because of this.
 
  Thomas
