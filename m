@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41365)
+Received: from eggs.gnu.org ([209.51.188.92]:41896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1goZx5-0006bV-GJ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 15:25:48 -0500
+	(envelope-from <david@redhat.com>) id 1goZzA-0007P0-G8
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 15:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1goZx4-0001T3-KJ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 15:25:47 -0500
+	(envelope-from <david@redhat.com>) id 1goZz9-00024B-MV
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 15:27:56 -0500
+References: <20190121134249.16615-1-david@redhat.com>
+	<20190121134249.16615-2-david@redhat.com>
+	<7f7d8582-b6d2-b120-c768-8cc8350b416c@linux.ibm.com>
+	<86377327-ab6d-df3a-b914-688206273bd5@redhat.com>
+	<14055713-cd8e-7fc5-d819-3724838662a3@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <376e6094-eacf-782a-ebfe-42838d235c78@redhat.com>
+Date: Tue, 29 Jan 2019 21:27:51 +0100
 MIME-Version: 1.0
-References: <20181207090135.7651-1-luc.michel@greensocs.com>
-	<20181207090135.7651-8-luc.michel@greensocs.com>
-	<CAMo8Bf+siB=vdjK+WPKvRCqKS59OVGOcAoH0HtN6VSvFyOc9gQ@mail.gmail.com>
-	<CAFEAcA9uVMs8aGTcbUpz+EGGyFBXtCNVMT-_t5eYPBjJF_4Rrw@mail.gmail.com>
-In-Reply-To: <CAFEAcA9uVMs8aGTcbUpz+EGGyFBXtCNVMT-_t5eYPBjJF_4Rrw@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 29 Jan 2019 12:25:34 -0800
-Message-ID: <CAMo8BfL7AVGwmXnBVf_RN8eUBshv+fYrkFhgZQ5UB_4bJ8Ss0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 07/16] gdbstub: add multiprocess support
- to (f|s)ThreadInfo and ThreadExtraInfo
+In-Reply-To: <14055713-cd8e-7fc5-d819-3724838662a3@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] s390x/pci: Introduce unplug
+ requests and split unplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Luc Michel <luc.michel@greensocs.com>, qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: pmorel@linux.ibm.com, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jan 29, 2019 at 2:05 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Starting with this commit it is no longer possible to kill QEMU
-> > with the 'kill' command from the gdb. This was a nice feature,
-> > was this removal intentional, or is it just an implementation
-> > bug?
->
-> That sounds like a bug. I think with the multiprocess extensions
-> available gdb may switch from killing using the 'k' packet to using
-> the 'vKill;pid' packet, which we don't implement? Looking at
-> what gdb is sending ('set debug remote 1' turns on logging in
-> gdb of remote protocol packets) would let us check that theory.
+On 29.01.19 17:54, Pierre Morel wrote:
+> On 29/01/2019 16:14, David Hildenbrand wrote:
+>> On 29.01.19 14:31, Pierre Morel wrote:
+>>> On 21/01/2019 14:42, David Hildenbrand wrote:
+>>>> PCI on s390x is really weird and how it was modeled in QEMU might no=
+t have
+>>>> been the right choice. Anyhow, right now it is the case that:
+>>>> - Hotplugging a PCI device will silently create a zPCI device
+>>>>     (if none is provided)
+>>>> - Hotunplugging a zPCI device will unplug the PCI device (if any)
+>>>> - Hotunplugging a PCI device will unplug also the zPCI device
+>>>> As far as I can see, we can no longer change this behavior. But we
+>>>> should fix it.
+>=20
+>=20
+>>> So unplugging PCI first will deny the guest any possibility to smooth=
+ly
+>>> relinquish a device.
+>>>
+>>>
+>>> Is it possible the other way around?
+>>
+>> Maybe, but it does not really matter. We unplug both devices
+>> synchronously, without the guest recognizing the order. We always have
+>> the unplug request first that notifies the guest. When we get an ACK
+>> from the guest, we can unpplug both devices in any order.
+>>
+>> (and if we want to change the order, we should do it in a separate
+>> patch, this patch does not change the order, just refactors the code)
+>=20
+>=20
+> If it is done atomically, then I have no objection.
 
-That's correct:
+Yes, this is atomically. It is two separate steps, but only logically.
+The guest cannot observe it.
 
-(gdb) kill
-Kill the program being debugged? (y or n) y
-Sending packet: $vKill;1#6e...Ack
-Packet received:
-Packet vKill (kill) is NOT supported
-Can't kill process
+Thanks!
 
-> It's not clear how our implementation should deal with being asked
-> to kill just one process if we have more than one, though...
+>=20
+> Regards,
+> Pierre
+>=20
+>=20
+>=20
 
-I'll send a fix that restores previous behavior in case of a single
-inferior process.
 
--- 
-Thanks.
--- Max
+--=20
+
+Thanks,
+
+David / dhildenb
