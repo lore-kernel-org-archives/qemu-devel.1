@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51291)
+Received: from [209.51.188.92] (port=51275 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goUxq-0002SA-0j
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:06:20 -0500
+	(envelope-from <crobinso@redhat.com>) id 1goUxr-0002Or-Md
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:06:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goUxZ-00052m-Sk
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:06:07 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goUxZ-000507-8t
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:05:57 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y139so18063957wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 07:05:55 -0800 (PST)
-References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
-	<20190129145156.6719b8a4.cohuck@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f98acef2-90b7-6ae3-682a-504a29ad57b4@redhat.com>
-Date: Tue, 29 Jan 2019 16:05:41 +0100
+	(envelope-from <crobinso@redhat.com>) id 1goUxW-00051I-JX
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:06:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1goUxR-0004ap-Tu
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:05:54 -0500
+References: <CAFEAcA-4r8_K0=WTaK+A_KvO93ni+3==+a5FRvGTFJ3av0GPFw@mail.gmail.com>
+	<20190129021815.GA3264@stefanha-x1.localdomain>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <5ada804a-0832-e557-48b7-217e6213a9a0@redhat.com>
+Date: Tue, 29 Jan 2019 09:39:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190129145156.6719b8a4.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190129021815.GA3264@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
- header comments
+Subject: Re: [Qemu-devel] building rst docs with sphinx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, pkg-qemu-devel@lists.alioth.debian.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 1/29/19 2:51 PM, Cornelia Huck wrote:
-> On Tue, 29 Jan 2019 14:37:47 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
+On 1/28/19 9:18 PM, Stefan Hajnoczi wrote:
+> On Thu, Jan 24, 2019 at 06:56:09PM +0000, Peter Maydell wrote:
+>> (1) configure: My thought is that we should just make
+>> sphinx-build a requirement for the existing --enable-docs
+>> switch (as texinfo and pod2man are currently). The
+>> disadvantage is that we won't support a "build the half
+>> of the docs you have the tools for and leave the others"
+>> setup. The advantage, which I think is significant, is that
+>> distros will naturally be directed to the missing build
+>> dependency (either they're building with --enable-docs
+>> and will get the configure message, or they aren't and
+>> then their build will fail later because of missing docs
+>> files when they try to put the built files into the package).
 > 
->> It's either "GNU *Library* General Public License version 2" or
->> "GNU Lesser General Public License version *2.1*", but there was
->> no "version 2.0" of the "Lesser" license. So assume that version
->> 2.1 is meant here.
-> 
-> I think we can assume that.
-> 
-> Given that there have been several of these cases (and that there's a
-> lot of boilerplate in general): Should we adopt SPDX license
-> identifiers for QEMU, as the Linux kernel did? They also discovered and
-> fixed some problems/oddities while at it.
+> I'm CCing Cole (Fedora) and the Debian QEMU team so they can give their
+> input on this point and your next point.
+>
 
-This might be cheaper than adding checkpatch rules to parse current
-licenses to avoid miswritten one coming back...
+Peter's assessment sounds correct to me. And sphinx is so widely 
+available that adding it as a build dep is no problem at all IMO
 
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  target/s390x/cc_helper.c   | 2 +-
->>  target/s390x/excp_helper.c | 2 +-
->>  target/s390x/fpu_helper.c  | 2 +-
->>  target/s390x/gdbstub.c     | 2 +-
->>  target/s390x/helper.c      | 2 +-
->>  target/s390x/int_helper.c  | 2 +-
->>  target/s390x/mem_helper.c  | 2 +-
->>  target/s390x/misc_helper.c | 2 +-
->>  target/s390x/translate.c   | 2 +-
->>  9 files changed, 9 insertions(+), 9 deletions(-)
+>> (2) What do we actually want to ship?
+>> That is, what do we want 'make install-doc' to copy into
+>> the installation directory?
+>> https://wiki.qemu.org/Features/Documentation
+>> has a good suggested breakdown of docs for where we
+>> eventually want to be. I think we probably don't want
+>> to install the "developer's guide" (docs/devel) on
+>> end-user systems. The others are presumably OK.
+>> Currently, we seem to only install manpages and a
+>> few other things in the 'install-doc' makefile target
+>> (we don't install a bunch of plain-text user-facing
+>> docs) so this would be a significant expansion.
 > 
-> Is this going through the trivial tree? If so,
+> I agree, developer documentation is not relevant to end-users.
 > 
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> I can also take this through the s390x tree.
-> 
+
+Agreed as well. On my Fedora system I see that some packages install 
+HACKING/CONTRIBUTING files but even that seems a little weird. If qemu 
+cared about installing developer docs it could be a separate makefile 
+target so it's easy to control whether it's handled during package build
+
+Thanks,
+Cole
