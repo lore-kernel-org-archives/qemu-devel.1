@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54436)
+Received: from eggs.gnu.org ([209.51.188.92]:54448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tklauser@sym2.noone.org>) id 1goQhI-0004We-Mr
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:32:55 -0500
+	(envelope-from <stefanha@gmail.com>) id 1goQhO-0004YB-GB
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tklauser@sym2.noone.org>) id 1goQhH-0003VS-Nr
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:32:52 -0500
-Received: from sym2.noone.org ([2a01:4f8:120:4161::3]:56200)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tklauser@sym2.noone.org>)
-	id 1goQhH-0003Ub-Ha
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:32:51 -0500
-Date: Tue, 29 Jan 2019 11:32:47 +0100
-From: Tobias Klauser <tklauser@distanz.ch>
-Message-ID: <20190129103247.GF13934@distanz.ch>
-References: <1548755497-30459-1-git-send-email-tklauser@distanz.ch>
-	<CAFEAcA-nePUjjABt+r6ODq_7Pmbbz58prAU7Gr2LM5efaRMFaQ@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1goQhN-0003Yd-OZ
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:32:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-nePUjjABt+r6ODq_7Pmbbz58prAU7Gr2LM5efaRMFaQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/char: Add Altera JTAG UART emulation
+References: <20190125164601.130556-1-vsementsov@virtuozzo.com>
+	<20190129033155.GD3264@stefanha-x1.localdomain>
+	<fa3cc31b-937c-a22c-4079-2ad7d968aac5@virtuozzo.com>
+In-Reply-To: <fa3cc31b-937c-a22c-4079-2ad7d968aac5@virtuozzo.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 29 Jan 2019 18:32:44 +0800
+Message-ID: <CAJSP0QUCeM2wHA5Z4wnBYHoE9=sLxxAqyDMZ5-i4g12v2DQEiQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] block: local qiov helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juro Bystricky <juro.bystricky@intel.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On 2019-01-29 at 11:19:02 +0100, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Tue, 29 Jan 2019 at 09:51, Tobias Klauser <tklauser@distanz.ch> wrote:
-> >
-> > Add the Altera JTAG UART model.
-> >
-> > Hardware emulation based on:
-> > https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-> > (Please see "Register Map" on page 65)
-> >
-> > Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
-> > Acked-by: Marek Vasut <marex@denx.de>
-> > Tested-by: Tobias Klauser <tklauser@distanz.ch>
-> > Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
-> 
-> Do you also have a patch which makes one of the QEMU machine
-> models use this new device ?
+On Tue, Jan 29, 2019 at 6:24 PM Vladimir Sementsov-Ogievskiy
+<vsementsov@virtuozzo.com> wrote:
+> 29.01.2019 6:31, Stefan Hajnoczi wrote:
+> > On Fri, Jan 25, 2019 at 07:46:01PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Hmm. In this case we definitely will have tiny extra memory usage, but we gain beautiful
+> readability.
+>
+> So, like this:
+>
+> diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+> index 5f433c7768..53de1b38bb 100644
+> --- a/include/qemu/iov.h
+> +++ b/include/qemu/iov.h
+> @@ -134,9 +134,31 @@ typedef struct QEMUIOVector {
+>       struct iovec *iov;
+>       int niov;
+>       int nalloc;
+> -    size_t size;
+> +    union {
+> +        struct {
+> +            void *__unused_iov_base;
 
-Yes, I have a patch (which needs some adjustments) to add the 3c120 Nios
-devboard which will use this UART.
+This could be struct iovec *iov for nalloc > 0 users.  Must resist hackiness! :)
 
-It could also be used with the 10m50 as it was used in version 15 of the
-hardware reference design provided by Altera [1]. Though it seems it is
-no longer used in version 16 of the reference design [2].
+> +            size_t size;
+> +        };
+> +        struct iovec local_iov;
+> +    };
+>   } QEMUIOVector;
 
-[1]
-https://rocketboards.org/foswiki/view/Documentation/AlteraMAX1010M50RevCDevelopmentKitLinuxSetupUsingMAX10GHRDVersion151
-[2]
-https://rocketboards.org/foswiki/Documentation/AlteraMAX1010M50RevCDevelopmentKitLinuxSetupV160
+That's clever and not too hacky.  Please include a comment so the
+intent is clear:
 
-Thanks
-Tobias
+  /* Save space by reusing the embedded iovec's size field as the
+total size field.  Users with external iovecs don't use the embedded
+iovec so this is safe. */
+
+Stefan
