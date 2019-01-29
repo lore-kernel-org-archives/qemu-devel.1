@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50805)
+Received: from eggs.gnu.org ([209.51.188.92]:52221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goSgx-0001go-1j
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:40:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goSqR-0003Oo-Nh
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goSgk-0003hA-8g
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:40:31 -0500
-Date: Tue, 29 Jan 2019 13:39:31 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190129133931.54d64d58.cohuck@redhat.com>
-In-Reply-To: <1548689558-23960-1-git-send-email-imammedo@redhat.com>
-References: <ae5efb07-6079-e102-4c21-65bdd5c9d9a2@redhat.com>
-	<1548689558-23960-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goSqF-0007m6-CI
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:50:23 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 29 Jan 2019 12:50:07 +0000
+Message-ID: <829cb522-05bf-57cc-b81e-4c028eea6821@virtuozzo.com>
+References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
+	<9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
+	<20190129123851.GE4467@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190129123851.GE4467@dhcp-200-176.str.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EC630DD1FB367A4C9618B6308CED996F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] s390x: remove direct reference to
- mem_path global form s390x code
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net, david@redhat.com, philmd@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Mon, 28 Jan 2019 16:32:38 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-In the subject: s/form/from/
-
-> I plan to deprecate -mem-path option and replace it with memory-backend,
-> for that it's necessary to get rid of mem_path global variable.
-> Do it for s390x case, replacing it with alternative way to enable
-> 1Mb hugepages capability.
->=20
-> To do that, replace qemu_mempath_getpagesize() with qemu_getrampagesize()
-> which also checks for -mem-path provided RAM.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
-> v3:
->   fixup, typo in commit msg (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om>)
-> v2:
->   * s/qemu_mempath_getpagesize/qemu_getrampagesiz/ and drop the rest of c=
-hanges
->           David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 2ebf26a..90766fa 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -287,7 +287,7 @@ void kvm_s390_crypto_reset(void)
-> =20
->  static int kvm_s390_configure_mempath_backing(KVMState *s)
->  {
-> -    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
-> +    size_t path_psize =3D qemu_getrampagesize();
-> =20
->      if (path_psize =3D=3D 4 * KiB) {
->          return 0;
-> @@ -319,7 +319,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-> =20
-> -    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-> +    if (kvm_s390_configure_mempath_backing(s)) {
->          return -EINVAL;
->      }
-> =20
-
-This needs an #include "exec/ram_addr.h", or the compilation fails.
-
-Should I fix it up while applying, or will you resend?
+MjkuMDEuMjAxOSAxNTozOCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjkuMDEuMjAxOSB1bSAx
+MzowNCBoYXQgQW5kcmV5IFNoaW5rZXZpY2ggZ2VzY2hyaWViZW46DQo+Pj4+DQo+Pj4+IGRpZmYg
+LS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+Pj4gaW5kZXggYzY2Zjk0OS4u
+MGZkZTk4YyAxMDA2NDQNCj4+Pj4gLS0tIGEvYmxvY2svcWFwaS5jDQo+Pj4+ICsrKyBiL2Jsb2Nr
+L3FhcGkuYw0KPj4+PiBAQCAtMzgsNiArMzgsNyBAQA0KPj4+PiAgICAjaW5jbHVkZSAicWFwaS9x
+bXAvcXN0cmluZy5oIg0KPj4+PiAgICAjaW5jbHVkZSAic3lzZW11L2Jsb2NrLWJhY2tlbmQuaCIN
+Cj4+Pj4gICAgI2luY2x1ZGUgInFlbXUvY3V0aWxzLmgiDQo+Pj4+ICsjaW5jbHVkZSAicWVtdS9l
+cnJvci1yZXBvcnQuaCINCj4+Pj4gICAgDQo+Pj4+ICAgIEJsb2NrRGV2aWNlSW5mbyAqYmRydl9i
+bG9ja19kZXZpY2VfaW5mbyhCbG9ja0JhY2tlbmQgKmJsaywNCj4+Pj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBFcnJvciAq
+KmVycnApDQo+Pj4+IEBAIC04NjgsNiArODY5LDExIEBAIHZvaWQgYmRydl9pbWFnZV9pbmZvX2R1
+bXAoZnByaW50Zl9mdW5jdGlvbiBmdW5jX2ZwcmludGYsIHZvaWQgKmYsDQo+Pj4+ICAgIA0KPj4+
+PiAgICAgICAgaWYgKGluZm8tPmhhc19mb3JtYXRfc3BlY2lmaWMpIHsNCj4+Pj4gICAgICAgICAg
+ICBmdW5jX2ZwcmludGYoZiwgIkZvcm1hdCBzcGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPj4+
+PiArICAgICAgICBpZiAoaW5mby0+Zm9ybWF0X3NwZWNpZmljICYmDQo+Pj4+ICsgICAgICAgICAg
+ICBpbmZvLT5mb3JtYXRfc3BlY2lmaWMtPnR5cGUgPT0gSU1BR0VfSU5GT19TUEVDSUZJQ19LSU5E
+X1FDT1cyICYmDQo+Pj4+ICsgICAgICAgICAgICBpbmZvLT5mb3JtYXRfc3BlY2lmaWMtPnUucWNv
+dzIuZGF0YS0+aGFzX2JpdG1hcHMgPT0gZmFsc2UpIHsNCj4+Pj4gKyAgICAgICAgICAgIHdhcm5f
+cmVwb3J0KCJGYWlsZWQgdG8gbG9hZCBiaXRtYXAgbGlzdCIpOw0KPj4+PiArICAgICAgICB9DQo+
+Pj4+ICAgICAgICAgICAgYmRydl9pbWFnZV9pbmZvX3NwZWNpZmljX2R1bXAoZnVuY19mcHJpbnRm
+LCBmLCBpbmZvLT5mb3JtYXRfc3BlY2lmaWMpOw0KPj4+PiAgICAgICAgfQ0KPj4+PiAgICB9DQo+
+Pj4NCj4+PiBJcyBpdCByZWFsbHkgbmVjZXNzYXJ5IHRvIGludHJvZHVjZSBxY293MiBzcGVjaWZp
+YyBrbm93bGVkZ2UgaW4NCj4+PiBibG9jay9xYXBpLmMgKHdoZXJlIGl0IGRlZmluaXRlbHkgZG9l
+c24ndCBiZWxvbmcpLCBqdXN0IHRvIGVtaXQgYQ0KPj4+IHdhcm5pbmc/DQo+Pj4NCj4+PiBXaHkg
+Y2FuJ3QgeW91IHByaW50IHRoZSB3YXJuaW5nIGluIHFjb3cyX2dldF9zcGVjaWZpY19pbmZvKCk/
+DQo+Pg0KPj4gRGVhciBLZXZpbiwNCj4+IFRoZSByZWFzb24gYmVoaW5kIHRoZSBpZGVhIHRvIG1v
+dmUgdGhlIHdhcm5pbmcgdG8gcWFwaSBpcyB0aGF0IHdlDQo+PiB3b3VsZG4ndCBsaWtlIHRvIHBy
+aW50IHRoYXQgaW4gY2FzZSBvZiBKU09OIGZvcm1hdC4NCj4+DQo+Pj4NCj4+Pj4gZGlmZiAtLWdp
+dCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+Pj4+IGluZGV4IDQ4OTdhYmEuLjA3
+Yjk5ZWUgMTAwNjQ0DQo+Pj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4gKysrIGIvYmxvY2sv
+cWNvdzIuYw0KPj4+PiBAQCAtNDM4Niw4ICs0Mzg2LDE0IEBAIHN0YXRpYyBJbWFnZUluZm9TcGVj
+aWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+Pj4+
+ICAgICAgICAgICAgKnNwZWNfaW5mby0+dS5xY293Mi5kYXRhID0gKEltYWdlSW5mb1NwZWNpZmlj
+UUNvdzIpew0KPj4+PiAgICAgICAgICAgICAgICAuY29tcGF0ICAgICAgICAgICAgID0gZ19zdHJk
+dXAoIjAuMTAiKSwNCj4+Pj4gICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMgICAgICA9IHMt
+PnJlZmNvdW50X2JpdHMsDQo+Pj4+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAgID0g
+dHJ1ZSwgLyogVG8gaGFuZGxlIGVycm9yIGNoZWNrIHByb3Blcmx5ICovDQo+Pj4+ICsgICAgICAg
+ICAgICAuYml0bWFwcyAgICAgICAgICAgID0gTlVMTCwgLyogVW5zdXBwb3J0ZWQgZm9yIHZlcnNp
+b24gMiAqLw0KPj4+DQo+Pj4gLmhhc19iaXRtYXBzID0gZmFsc2Ugd291bGQgYmUgbmljZXIgaWYg
+dGhlIGZvcm1hdCBkb2Vzbid0IGV2ZW4gc3VwcG9ydA0KPj4+IGJpdG1hcHMuIFlvdSBvbmx5IG5l
+ZWQgdGhpcyBoZXJlIGJlY2F1c2UgeW91IHB1dCB0aGUgd2FybmluZyBpbiB0aGUNCj4+PiB3cm9u
+ZyBwbGFjZS4NCj4+Pg0KPj4+PiAgICAgICAgICAgIH07DQo+Pj4+ICAgICAgICB9IGVsc2UgaWYg
+KHMtPnFjb3dfdmVyc2lvbiA9PSAzKSB7DQo+Pj4+ICsgICAgICAgIFFjb3cyQml0bWFwSW5mb0xp
+c3QgKmJpdG1hcHM7DQo+Pj4+ICsgICAgICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPj4+
+PiArDQo+Pj4+ICsgICAgICAgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0bWFwX2luZm9fbGlzdChi
+cywgJmxvY2FsX2Vycik7DQo+Pj4NCj4+PiBIZXJlIHlvdSBldmVuIGhhZCBhIGdvb2QgZXJyb3Ig
+bWVzc2FnZSB0byBwcmludC4uLg0KPj4+DQo+Pj4+ICAgICAgICAgICAgKnNwZWNfaW5mby0+dS5x
+Y293Mi5kYXRhID0gKEltYWdlSW5mb1NwZWNpZmljUUNvdzIpew0KPj4+PiAgICAgICAgICAgICAg
+ICAuY29tcGF0ICAgICAgICAgICAgID0gZ19zdHJkdXAoIjEuMSIpLA0KPj4+PiAgICAgICAgICAg
+ICAgICAubGF6eV9yZWZjb3VudHMgICAgID0gcy0+Y29tcGF0aWJsZV9mZWF0dXJlcyAmDQo+Pj4+
+IEBAIC00Mzk3LDcgKzQ0MDMsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9n
+ZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+Pj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFFDT1cyX0lOQ09NUEFUX0NPUlJVUFQsDQo+Pj4+ICAg
+ICAgICAgICAgICAgIC5oYXNfY29ycnVwdCAgICAgICAgPSB0cnVlLA0KPj4+PiAgICAgICAgICAg
+ICAgICAucmVmY291bnRfYml0cyAgICAgID0gcy0+cmVmY291bnRfYml0cywNCj4+Pj4gKyAgICAg
+ICAgICAgIC5oYXNfYml0bWFwcyAgICAgICAgPSAhbG9jYWxfZXJyLA0KPj4+PiArICAgICAgICAg
+ICAgLmJpdG1hcHMgICAgICAgICAgICA9IGJpdG1hcHMsDQo+Pj4+ICAgICAgICAgICAgfTsNCj4+
+Pj4gKyAgICAgICAgLyoNCj4+Pj4gKyAgICAgICAgICogSWYgYW4gZXJyb3Igb2NjdXJzIGluIG9i
+dGFpbmluZyBiaXRtYXBzLCBpZ25vcmUNCj4+Pj4gKyAgICAgICAgICogaXQgdG8gc2hvdyBvdGhl
+ciBRQ09XMiBzcGVjaWZpYyBpbmZvcm1hdGlvbi4NCj4+Pj4gKyAgICAgICAgICovDQo+Pj4+ICsg
+ICAgICAgIGVycm9yX2ZyZWUobG9jYWxfZXJyKTsNCj4+Pg0KPj4+IC4uLmJ1dCB5b3UgZGVjaWRl
+ZCB0byBkaXNjYXJkIGl0Lg0KPj4+DQo+Pj4gSG93IGFib3V0IHlvdSBkbyB0aGlzIGhlcmU6DQo+
+Pj4NCj4+PiAgICAgICB3YXJuX3JlcG9ydGZfZXJyKGxvY2FsX2VyciwgIkZhaWxlZCB0byBsb2Fk
+IGJpdG1hcCBsaXN0OiAiKTsNCj4+DQo+PiBJbiBjYXNlIG9mIEpTT04gZm9ybWF0LCB3ZSBjYW4g
+ZmFpbCBoZXJlLg0KPj4gSXQgd2lsbCBoYXBwZW4gaW4gdGhlIGN1cnJlbnQgaW1wbGVtZW50YXRp
+b24gb2YgdGhlIG5ldyB0ZXN0ICMyMzkuDQo+IA0KPiBXaHkgZG8geW91IHdhbnQgdG8gc2lsZW50
+bHkgbGVhdmUgb3V0IHRoZSBiaXRtYXAgbGlzdCBmb3IgSlNPTiBvdXRwdXQ/DQo+IA0KPiBFc3Nl
+bnRpYWxseSwgdGhpcyBpcyB0aGUgc2FtZSBxdWVzdGlvbiBJIGFza2VkIGhlcmU6DQo+IA0KPj4+
+IEFuZCB0aGVuIGdldCByaWQgb2YgdGhlIGNvZGUgaW4gYmxvY2svcWFwaS5jIGFuZCB0aGUgdmVy
+c2lvbiAyIHBhdGg/DQo+Pj4NCj4+PiBBY3R1YWxseSwgc2hvdWxkIHRoaXMgcmVhbGx5IG9ubHkg
+YmUgYSB3YXJuaW5nLCBvciBpbiBmYWN0IGFuIGVycm9yPw0KPj4+IFdoYXQncyB0aGUgY2FzZSB3
+aGVyZSB3ZSBleHBlY3QgdGhhdCBsb2FkaW5nIHRoZSBiaXRtYXAgbGlzdCBjYW4gZmFpbCwNCj4+
+PiBidXQgdGhlIG1hbmFnZW1lbnQgdG9vbCBkb2Vzbid0IG5lZWQgdG8ga25vdyB0aGF0IGFuZCB3
+ZSBqdXN0IHdhbnQgdG8NCj4+PiBsb2cgYSBtZXNzYWdlPw0KPiANCj4gSSBkb24ndCB1bmRlcnN0
+YW5kIHdoeSBpdCdzIG9rYXkgbm90IHRvIHByaW50IGJpdG1hcHMgd2l0aG91dCBtYWtpbmcgaXQN
+Cj4gYW4gZXJyb3IuIERvIHlvdSBoYXZlIGEgc3BlY2lmaWMgdXNlIGNhc2UgaW4gbWluZCBmb3Ig
+dGhpcyBiZWhhdmlvdXI/DQo+IA0KDQoNCldlIGp1c3QgY2FuJ3QgcHJpbnQgYW55dGhpbmcgaGVy
+ZSwgYXMgdGhpcyBjb2RlIGlzIGV4ZWN1dGVkIGZyb20gcW1wIGNvbW1hbmQuDQoNCkl0IHdhcyBk
+aXNjdXNzZWQsIHRoYXQgd2UgZG9uJ3Qgd2FudCB0byBmYWlsIHRoZSB3aG9sZSBxdWVyeSwgaWYg
+ZmFpbGVkIHRvDQpvYnRhaW4gYml0bWFwcy4gU28sIHRvIHNob3csIHRoYXQgdGhlcmUgd2VyZSBl
+cnJvciBkdXJpbmcgYml0bWFwcyBxdWVyeWluZw0Kd2UgZGVjaWRlZCB0byB1c2UgdGhlIGZvbGxv
+d2luZyBzZW1hbnRpY3M6DQoNCmVtcHR5IGxpc3QgKGhhc19iaXRtYXBzPXRydWUpIG1lYW5zIHRo
+YXQgdGhlcmUgbm8gYml0bWFwcywgYW5kIHRoZXJlIHdlcmUNCm5vIGVycm9ycyBkdXJpbmcgYml0
+bWFwcyBxdWVyaW5nIChpZiBpdCB3YXMpDQoNCmFic2VuY2Ugb2YgdGhlIGZpZWxkIChoYXNfYml0
+bWFwcz1mYWxzZSkgbWVhbnMgdGhhdCB0aGVyZSBfd2VyZV8gZXJyb3JzIGR1cmluZw0KYml0bWFw
+cyBxdWVyeWluZy4NCg0KU28gcWFwaSB1c2VyLCBhcyB3ZWxsIGFzIGpzb24tb3V0cHV0IHVzZXIg
+c2hvdWxkIGZvbGxvdyB0aGlzIHNlbWFudGljcyBpbg0KdW5kZXJzdGFuZGluZyB0aGUgb3V0cHV0
+LiBBbmQgYXMgd2VsbCBhcyBmb3IgcWFwaSwgaXQncyBpbmNvcnJlY3QgdG8gYWRkIHRleHQNCm1l
+c3NhZ2VzIHRvIGpzb24gb3V0cHV0Lg0KDQpPbiB0aGUgb3RoZXIgaGFuZCwgaXQgc2VlbXMgcmVh
+c29uYWJsZSB0byBwdXQgYWRkaXRpb25hbCBub3RpY2UgZm9yIGh1bWFuLWZvcm1hdA0KdXNlci4N
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
