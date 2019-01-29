@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40699)
+Received: from eggs.gnu.org ([209.51.188.92]:41566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goXxb-0001yY-2M
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:12 -0500
+	(envelope-from <david@redhat.com>) id 1goY0M-00036Y-SC
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:21:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goXxZ-0001et-Ov
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57663)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1goXxZ-0001Yl-Fo
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:09 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F5828666E
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 18:17:57 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190125172229.23025-1-cfergeau@redhat.com>
-	<20190125172229.23025-2-cfergeau@redhat.com>
-Date: Tue, 29 Jan 2019 19:17:51 +0100
-In-Reply-To: <20190125172229.23025-2-cfergeau@redhat.com> (Christophe
-	Fergeau's message of "Fri, 25 Jan 2019 18:22:29 +0100")
-Message-ID: <87k1inpbu8.fsf@dusky.pond.sub.org>
+	(envelope-from <david@redhat.com>) id 1goY0L-0002jy-IO
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:21:02 -0500
+References: <20190121134249.16615-1-david@redhat.com>
+	<20190121134249.16615-3-david@redhat.com>
+	<20190123120539.3ca367f9.cohuck@redhat.com>
+	<20190128122833.4613659a.cohuck@redhat.com>
+	<3b9f7e27-5f3b-5a36-87ab-209942334e59@linux.ibm.com>
+	<0c546fd4-28dd-6e62-8f9f-cd7894d36849@redhat.com>
+	<a904740f-66e5-0956-44e7-4c29a4552897@linux.ibm.com>
+	<accf8243-1100-117b-9bae-899537bf433c@redhat.com>
+	<f9959c97-463e-9681-46ef-19ea728c2025@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <eecbc9c1-cae8-f5d6-32be-8bf71436ac2f@redhat.com>
+Date: Tue, 29 Jan 2019 19:20:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] log: Make glib logging go through
- QEMU
+In-Reply-To: <f9959c97-463e-9681-46ef-19ea728c2025@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 2/2] s390x/pci: Unplug
+ remaining devices on pcihost reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,267 +32,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: pmorel@linux.ibm.com, Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Christophe Fergeau <cfergeau@redhat.com> writes:
+On 29.01.19 17:50, Pierre Morel wrote:
+> On 29/01/2019 16:11, David Hildenbrand wrote:
+>> On 29.01.19 14:50, Pierre Morel wrote:
+>>> On 29/01/2019 11:24, David Hildenbrand wrote:
+>>>>>>> I'm wondering what the architecture says regarding those events -=
+- can
+>>>>>>> someone with access to the documentation comment?
+>>>>>>
+>>>>>> Ping. Any comments from the IBM folks?
+>>>
+>>> Hi,
+>>>
+>>> Sorry to have wait so long.
+>>> At least Collin was faster.
+>>>
+>>>>>>
+>>>>>
+>>>>>
+>>>>> So the idea here is that if we have a PCI device that is the proces=
+s of
+>>>>> being deconfigured and we are also in the middle of a reset, then l=
+et's
+>>>>> accelerate deconfiguring of the PCI device during the reset. Makes =
+sense.
+>>>
+>>> to me too.
+>>> However, how do we ensure that the guest got time to respond to the
+>>> first deconfigure request?
+>>
+>> 30 seconds, then the reboot. On a reboot, I don't see why we should gi=
+ve
+>> a guest more time. "It's dead", rip out the card as the guest refused =
+to
+>> hand it back. (maybe it crashed! but after a reboot the guest state is
+>> reset and baught back to life)
+>=20
+> I agree that 30 seconds is way enough,
+> also agree that in most cases the guest is dead.
+>=20
+>=20
+>>
+>>>
+>>>>>
+>>>>> Note:
+>>>>>
+>>>>> The callback function will deconfigure the the device and put it in=
+to
+>>>>> standby mode. However, a PCI device should only go into standby fro=
+m the
+>>>>> *disabled state* (which it could already be in due to the unplug
+>>>>> sequence), or from a *permanent error state* (something we should
+>>>>> hopefully never see -- this means something went seriously wrong wi=
+th
+>>>>> the device).
+>>>
+>>> Not completely exact, the CHSC event 0x304, on the initiative of the
+>>> host, force the "deconfigure state" from "configure state" generally,
+>>> whatever sub-state it has (enabled/disabled/error...).
+>>>
+>>>>
+>>>> Right, this should already have been checked before setting up the t=
+imer.
+>>>
+>>> Apropos timer, do we need a timer or wouldn't it be better to use a
+>>> delay / a timer + condition?
+>>
+>> I don't think we need a timer at all.
+>=20
+> Yes, if it is possible to wait synchronously 30s it seems good to me.
 
-> This commit adds a qemu_init_logging() helper which calls
-> g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
-> are handled similarly to other QEMU logs. This means they will get a
-> timestamp if timestamps are enabled, and they will go through the
-> HMP monitor if one is configured.
-> This commit also adds a call to qemu_init_logging() to the binaries
-> installed by QEMU.
-> glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
-> glib default log handler.
->
-> At the moment, this change will mostly impact SPICE logging if your
-> spice version is >= 0.14.1. With older spice versions, this is not going
-> to work as expected, but will not have any ill effect, so this call is
-> not conditional on the SPICE version.
->
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> ---
->  bsd-user/main.c             |  2 ++
->  include/qemu/error-report.h |  3 ++-
->  linux-user/main.c           |  2 ++
->  qemu-img.c                  |  2 +-
->  qemu-io.c                   |  2 +-
->  qemu-nbd.c                  |  2 +-
->  scsi/qemu-pr-helper.c       |  1 +
->  util/qemu-error.c           | 48 ++++++++++++++++++++++++++++++++++++-
->  vl.c                        |  2 +-
->  9 files changed, 58 insertions(+), 6 deletions(-)
->
-> diff --git a/bsd-user/main.c b/bsd-user/main.c
-> index 0d3156974c..8fd8ae4127 100644
-> --- a/bsd-user/main.c
-> +++ b/bsd-user/main.c
-> @@ -24,6 +24,7 @@
->  #include "qapi/error.h"
->  #include "qemu.h"
->  #include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/path.h"
->  #include "qemu/help_option.h"
->  #include "cpu.h"
-> @@ -743,6 +744,7 @@ int main(int argc, char **argv)
->      if (argc <= 1)
->          usage();
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
->      qemu_init_cpu_list();
->      module_call_init(MODULE_INIT_QOM);
+I mean, we don't have to wait 30 seconds at all.
 
-This changes output of error_report() & friends in this program.
-Probably in a good way.  Should it be a separate commit?  If not, it
-should at least be mentioned in the commit message.
+1. We send a request to the guest
+2. It responds (after some seconds), letting go of the zPCI device
+3. We unplug the device
 
-> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> index 0a8d9cc9ea..ce43c02314 100644
-> --- a/include/qemu/error-report.h
-> +++ b/include/qemu/error-report.h
-> @@ -34,7 +34,6 @@ void error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> -void error_set_progname(const char *argv0);
->  
->  void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-> @@ -49,6 +48,8 @@ bool error_report_once_cond(bool *printed, const char *fmt, ...)
->  bool warn_report_once_cond(bool *printed, const char *fmt, ...)
->      GCC_FMT_ATTR(2, 3);
->  
-> +void error_init(const char *argv0);
-> +
->  /*
->   * Similar to error_report(), except it prints the message just once.
->   * Return true when it prints, false otherwise.
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index a0aba9cb1e..f9efe9ff6e 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/path.h"
->  #include "qemu/config-file.h"
->  #include "qemu/cutils.h"
-> +#include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
-> @@ -600,6 +601,7 @@ int main(int argc, char **argv, char **envp)
->      int ret;
->      int execfd;
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
->      qemu_init_cpu_list();
->      module_call_init(MODULE_INIT_QOM);
+1. We send a request to the guest
+2. Guest does not respond, request keeps pending forever
+3. On reboot, unplug the device
 
-Likewise.
+This is how x86/ACPI handles it.
 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index ad04f59565..0af9cac244 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -4912,8 +4912,8 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
-> -    error_set_progname(argv[0]);
->      qemu_init_exec_dir(argv[0]);
->  
->      if (qemu_init_main_loop(&local_error)) {
-> diff --git a/qemu-io.c b/qemu-io.c
-> index 2c52ac0ade..8d5d5911cb 100644
-> --- a/qemu-io.c
-> +++ b/qemu-io.c
-> @@ -522,8 +522,8 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
-> -    error_set_progname(argv[0]);
->      qemu_init_exec_dir(argv[0]);
->  
->      qcrypto_init(&error_fatal);
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index 1f7b2a03f5..39849f1692 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -685,8 +685,8 @@ int main(int argc, char **argv)
->      signal(SIGPIPE, SIG_IGN);
->  #endif
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
-> -    error_set_progname(argv[0]);
->      qcrypto_init(&error_fatal);
->  
->      module_call_init(MODULE_INIT_QOM);
-> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-> index e7af637232..2541fbbd1b 100644
-> --- a/scsi/qemu-pr-helper.c
-> +++ b/scsi/qemu-pr-helper.c
-> @@ -895,6 +895,7 @@ int main(int argc, char **argv)
->  
->      signal(SIGPIPE, SIG_IGN);
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
->      module_call_init(MODULE_INIT_QOM);
->      qemu_add_opts(&qemu_trace_opts);
+>=20
+>>
+>>>
+>>> AFAIU we get out of the unplug without waiting for any answer from th=
+e
+>>> guest and we surely get the timer triggering after the reset has been=
+ done.
+>>> That seems bad.
+>>
+>> This is the case right now, correct.
+>>
+>>>
+>>>
+>>>>
+>>>>>
+>>>>> Two things I'm concerned about:
+>>>>>
+>>>>> 1)
+>>>>>
+>>>>> What I would suggest is adding a check for the pbdev->state for
+>>>>> ZPCI_FS_DISABLED || ZPCI_FS_PERMANENT_ERROR. If it is in either of =
+these
+>>>>> states, then we're safe to deconfigure and put into standby. If the
+>>>>
+>>>> We setup a timer if !ZPCI_FS_STANDBY and !ZPCI_FS_RESERVED.
+>>>>
+>>>> So for
+>>>> - ZPCI_FS_DISABLED
+>>>> - ZPCI_FS_ENABLED
+>>>> - ZPCI_FS_BLOCKED
+>>>> - ZPCI_FS_ERROR
+>>>> - ZPCI_FS_PERMANENT_ERROR
+>>>>
+>>>> We setup a timer and simply go ahead and unplug the device when the
+>>>> timer expires ("forced unplug").
+>>>
+>>> I agree only for ZPCI_FS_ENABLED why do we need to be smooth for othe=
+r
+>>> states?
+>>> ZPCI_FS_DISABLED may be a candidate even I do not see the interrest b=
+ut
+>>> other states of the device should issue a HP_EVENT_DECONFIGURE_REQUES=
+T
+>>> and we do not need a timer (or any delay)
+>>
+>> You can always expect that your guest driver is dead.
+>=20
+> hum, the device is dead.
+> May be the guest got hit too if the driver is not right written.
+>=20
+>>
+>>>
+>>>>
+>>>> Changing that behavior might be more invasive. Simply not unplugging=
+ in
+>>>> s390_pcihost_timer_cb() on some of these states would mean that some=
+body
+>>>> issued a request and that requests is simply lost/ignored. Not sure =
+if
+>>>> that is what we want. I think we need separate patches to change
+>>>> something like that. Especially
+>>>>
+>>>> 1. What happens if the device was in ZPCI_FS_DISABLED, the guest ign=
+ores
+>>>> the unplug request and moves the device to ZPCI_FS_ENABLED before th=
+e
+>>>> timer expires? These are corner cases to consider.
+>>>
+>>> +1, we must ensure to do the work inside the unplug CB.
+>>>
+>>>>
+>>>> 2. Do we need a timer at all? Now that Patch #1 introduces
+>>>> unplug_requests, we are free to ignore requests from the user if the
+>>>> guest is not reacting. I would really favor getting rid of the timer
+>>>> completely. Was there a special reason why this was introduced?
+>>>
+>>> Yes, to let a chance to the guest to smoothly relinquish the device.
+>>> (for example sync/clean the disk)
+>>> However I do not think it is right implemented.
+>>>
+>>>>
+>>>> No other architecture (e.g. ACPI) uses such a timer. They use a simp=
+le
+>>>> flag to remember if a request is pending. I would really favor going
+>>>> into that direction.
+>>>
+>>> I am not sure that the Intel architecture is a good example. :)
+>>
+>> Right, we all learned that zPCI did it better. (sorry ;) )
+>=20
+> Well I really think so.
+> It is designed with several guest in parallel and shared devices.
+>=20
+> In such an architecture, ripping of a device from a guest may have inte=
+rest.
+> One good thing would be that the software of the guest handle it :)
 
-Likewise.
+That is indeed true, but I think such a forced removal also works on
+x86. Theoretically. ("physically rip out the card"). See below.
 
-> diff --git a/util/qemu-error.c b/util/qemu-error.c
-> index fcbe8a1f74..2684870683 100644
-> --- a/util/qemu-error.c
-> +++ b/util/qemu-error.c
-> @@ -142,7 +142,7 @@ static const char *progname;
->  /*
->   * Set the program name for error_print_loc().
->   */
-> -void error_set_progname(const char *argv0)
-> +static void error_set_progname(const char *argv0)
->  {
->      const char *p = strrchr(argv0, '/');
->      progname = p ? p + 1 : argv0;
-> @@ -345,3 +345,49 @@ bool warn_report_once_cond(bool *printed, const char *fmt, ...)
->      va_end(ap);
->      return true;
->  }
-> +
-> +static char *qemu_glog_domains;
-> +
-> +static void qemu_log_func(const gchar *log_domain,
-> +                          GLogLevelFlags log_level,
-> +                          const gchar *message,
-> +                          gpointer user_data)
-> +{
-> +    switch (log_level & G_LOG_LEVEL_MASK) {
-> +    case G_LOG_LEVEL_DEBUG:
-> +    case G_LOG_LEVEL_INFO:
-> +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable debug
-> +         * messages */
+>=20
+>>
+>>>
+>>> AFAIU they do not wait for the guest to have relinquish the device.
+>>> Or do they?
+>>> How long do they wait?
+>>
+>> They wait for ever. And I guess we should do the same thing. If the
+>> guest driver is broken (and this is really a rare scenario!) we would
+>> not get the device back. Which is perfectly fine in my point of view. =
+In
+>> all other scenarios I guess the guest will simply respond in a timely
+>> manner. And ripping out stuff from the guest always feels wrong. (yes
+>> the channel subsystem works like that, but here we actually have a cho=
+ice)
+>>
+>> If we reboot, we can unplug the device. Otherwise, let's keep it simpl=
+y
+>> and don't use a timer.
+>>
+>> Thanks!
+>>
+>=20
+> AFAIK We have no plan to operate on pools of PCI devices so for me I=20
+> have no objection to keep it simple:
 
-Let's wing this comment.
+Especially one note:
 
-> +        if (qemu_glog_domains == NULL) {
-> +            break;
-> +        }
-> +        if (strcmp(qemu_glog_domains, "all") != 0 &&
-> +          (log_domain == NULL || !strstr(qemu_glog_domains, log_domain))) {
-> +            break;
-> +        }
-> +        /* Fall through */
-> +    case G_LOG_LEVEL_MESSAGE:
-> +        info_report("%s: %s", log_domain?:"", message);
+There seems to be demand for a so called "forced PCI removal" also on
+other architectures. However, this would than rather most probably be
+modeled on top of what we have right now.
 
-Spaces around ?:, please.
+E.g. instead of "device_del XXX" which would request the guest to let go
+of the device, there could be something like "device_del XXX,forced=3Dtru=
+e".
 
-If log_domain is null, the message will look like
+E.g. ask the guest. If it does not respond after some time, force remove
+it. This is basically the timer, but managed by a different level, of
+software. And you can than actually decide if you want to do eventually
+harm to the guest OS.
 
-    info: : MESSAGE text
+Are there any other objects of getting rid of the timer?
 
-which is ugly.  What about
+Conny could pick up patch #1 once you get an ACK. I would send more
+patches to drop the timer and rework this patch.
 
-           info_report("%s%s%s",
-                       log_domain ? ": " : "", log_domain ?: "", message);
+Thanks Pierre!
 
-More of the same below.
+>=20
+> Regards,
+> Pierre
+>=20
+>=20
+>=20
 
-> +        break;
-> +    case G_LOG_LEVEL_WARNING:
-> +        warn_report("%s: %s", log_domain?:"", message);
-> +        break;
-> +    case G_LOG_LEVEL_CRITICAL:
-> +        /* Fall through */
-> +    case G_LOG_LEVEL_ERROR:
-> +        error_report("%s: %s", log_domain?:"", message);
-> +        break;
-> +    }
-> +}
-> +
-> +void error_init(const char *argv0)
-> +{
-> +    /* Set the program name for error_print_loc(). */
-> +    error_set_progname(argv0);
-> +
-> +    /* This sets up glib logging so libraries using it also print their logs
-> +     * through error_report(), warn_report(), info_report(). */
 
-Let's wing this comment.
+--=20
 
-> +    g_log_set_default_handler(qemu_log_func, NULL);
-> +    g_warn_if_fail(qemu_glog_domains == NULL);
-> +    qemu_glog_domains = g_strdup(g_getenv("G_MESSAGES_DEBUG"));
-> +}
-> diff --git a/vl.c b/vl.c
-> index bc9fbec654..bfef38c3a3 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
->      QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
->          = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
->  
-> +    error_init(argv[0]);
->      module_call_init(MODULE_INIT_TRACE);
->  
->      qemu_init_cpu_list();
-> @@ -3047,7 +3048,6 @@ int main(int argc, char **argv, char **envp)
->      qemu_mutex_lock_iothread();
->  
->      atexit(qemu_run_exit_notifiers);
-> -    error_set_progname(argv[0]);
->      qemu_init_exec_dir(argv[0]);
->  
->      module_call_init(MODULE_INIT_QOM);
+Thanks,
 
-Almost ready.
+David / dhildenb
