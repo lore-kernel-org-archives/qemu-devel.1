@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55197)
+Received: from eggs.gnu.org ([209.51.188.92]:55225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYto-00063G-St
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:21 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYu0-0006DJ-AN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYtm-00088E-U7
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:20 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYto-00088h-Tl
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:24 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue, 29 Jan 2019 19:17:43 +0000
-Message-Id: <20190129191746.14868-6-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 29 Jan 2019 19:17:44 +0000
+Message-Id: <20190129191746.14868-7-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
 References: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v4 5/8] target/ppc: eliminate use of EL_IDX
- macros from int_helper.c
+Subject: [Qemu-devel] [PATCH v4 6/8] target/ppc: simplify VEXT_SIGNED macro
+ in int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,133 +22,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-These macros can be eliminated by instead using the relavant Vsr* macros in
-the few locations where they appear.
+As pointed out by Richard: it does not need the mask argument, nor does it need
+the recast argument. The masking is implied by the cast argument, and the
+recast is implied by the assignment.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/int_helper.c | 66 ++++++++++++++++++++-----------------------------
- 1 file changed, 27 insertions(+), 39 deletions(-)
+ target/ppc/int_helper.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index a6f37c0e2e..cffc15aa81 100644
+index cffc15aa81..9a0c69bf18 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -3306,12 +3306,7 @@ void helper_vncipherlast(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     *r = result;
+@@ -2024,19 +2024,19 @@ void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
+     putVSR(xtn, &xt, env);
  }
  
--#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32-n)))
--#if defined(HOST_WORDS_BIGENDIAN)
--#define EL_IDX(i) (i)
--#else
--#define EL_IDX(i) (3 - (i))
--#endif
-+#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32 - n)))
- 
- void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
- {
-@@ -3319,40 +3314,34 @@ void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
-     int six = st_six & 0xF;
-     int i;
- 
--    VECTOR_FOR_INORDER_I(i, u32) {
-+    for (i = 0; i < ARRAY_SIZE(r->u32); i++) {
-         if (st == 0) {
-             if ((six & (0x8 >> i)) == 0) {
--                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 7) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 18) ^
--                                    (a->u32[EL_IDX(i)] >> 3);
-+                r->VsrW(i) = ROTRu32(a->VsrW(i), 7) ^
-+                             ROTRu32(a->VsrW(i), 18) ^
-+                             (a->VsrW(i) >> 3);
-             } else { /* six.bit[i] == 1 */
--                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 17) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 19) ^
--                                    (a->u32[EL_IDX(i)] >> 10);
-+                r->VsrW(i) = ROTRu32(a->VsrW(i), 17) ^
-+                             ROTRu32(a->VsrW(i), 19) ^
-+                             (a->VsrW(i) >> 10);
-             }
-         } else { /* st == 1 */
-             if ((six & (0x8 >> i)) == 0) {
--                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 2) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 13) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 22);
-+                r->VsrW(i) = ROTRu32(a->VsrW(i), 2) ^
-+                             ROTRu32(a->VsrW(i), 13) ^
-+                             ROTRu32(a->VsrW(i), 22);
-             } else { /* six.bit[i] == 1 */
--                r->u32[EL_IDX(i)] = ROTRu32(a->u32[EL_IDX(i)], 6) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 11) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 25);
-+                r->VsrW(i) = ROTRu32(a->VsrW(i), 6) ^
-+                             ROTRu32(a->VsrW(i), 11) ^
-+                             ROTRu32(a->VsrW(i), 25);
-             }
-         }
-     }
+-#define VEXT_SIGNED(name, element, mask, cast, recast)              \
++#define VEXT_SIGNED(name, element, cast)                            \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+     int i;                                                          \
+     VECTOR_FOR_INORDER_I(i, element) {                              \
+-        r->element[i] = (recast)((cast)(b->element[i] & mask));     \
++        r->element[i] = (cast)b->element[i];                        \
+     }                                                               \
  }
+-VEXT_SIGNED(vextsb2w, s32, UINT8_MAX, int8_t, int32_t)
+-VEXT_SIGNED(vextsb2d, s64, UINT8_MAX, int8_t, int64_t)
+-VEXT_SIGNED(vextsh2w, s32, UINT16_MAX, int16_t, int32_t)
+-VEXT_SIGNED(vextsh2d, s64, UINT16_MAX, int16_t, int64_t)
+-VEXT_SIGNED(vextsw2d, s64, UINT32_MAX, int32_t, int64_t)
++VEXT_SIGNED(vextsb2w, s32, int8_t)
++VEXT_SIGNED(vextsb2d, s64, int8_t)
++VEXT_SIGNED(vextsh2w, s32, int16_t)
++VEXT_SIGNED(vextsh2d, s64, int16_t)
++VEXT_SIGNED(vextsw2d, s64, int32_t)
+ #undef VEXT_SIGNED
  
- #undef ROTRu32
--#undef EL_IDX
- 
- #define ROTRu64(v, n) (((v) >> (n)) | ((v) << (64-n)))
--#if defined(HOST_WORDS_BIGENDIAN)
--#define EL_IDX(i) (i)
--#else
--#define EL_IDX(i) (1 - (i))
--#endif
- 
- void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
- {
-@@ -3360,33 +3349,32 @@ void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
-     int six = st_six & 0xF;
-     int i;
- 
--    VECTOR_FOR_INORDER_I(i, u64) {
-+    for (i = 0; i < ARRAY_SIZE(r->u64); i++) {
-         if (st == 0) {
-             if ((six & (0x8 >> (2*i))) == 0) {
--                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 1) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 8) ^
--                                    (a->u64[EL_IDX(i)] >> 7);
-+                r->VsrD(i) = ROTRu64(a->VsrD(i), 1) ^
-+                             ROTRu64(a->VsrD(i), 8) ^
-+                             (a->VsrD(i) >> 7);
-             } else { /* six.bit[2*i] == 1 */
--                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 19) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 61) ^
--                                    (a->u64[EL_IDX(i)] >> 6);
-+                r->VsrD(i) = ROTRu64(a->VsrD(i), 19) ^
-+                             ROTRu64(a->VsrD(i), 61) ^
-+                             (a->VsrD(i) >> 6);
-             }
-         } else { /* st == 1 */
-             if ((six & (0x8 >> (2*i))) == 0) {
--                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 28) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 34) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 39);
-+                r->VsrD(i) = ROTRu64(a->VsrD(i), 28) ^
-+                             ROTRu64(a->VsrD(i), 34) ^
-+                             ROTRu64(a->VsrD(i), 39);
-             } else { /* six.bit[2*i] == 1 */
--                r->u64[EL_IDX(i)] = ROTRu64(a->u64[EL_IDX(i)], 14) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 18) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 41);
-+                r->VsrD(i) = ROTRu64(a->VsrD(i), 14) ^
-+                             ROTRu64(a->VsrD(i), 18) ^
-+                             ROTRu64(a->VsrD(i), 41);
-             }
-         }
-     }
- }
- 
- #undef ROTRu64
--#undef EL_IDX
- 
- void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
- {
+ #define VNEG(name, element)                                         \
 -- 
 2.11.0
