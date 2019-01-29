@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57194)
+Received: from eggs.gnu.org ([209.51.188.92]:58190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1goQwp-0001EQ-Uq
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:48:57 -0500
+	(envelope-from <luwei.kang@intel.com>) id 1goR1B-0002To-PJ
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:53:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1goQwp-0004U5-3f
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:48:55 -0500
-Received: from mga03.intel.com ([134.134.136.65]:50611)
+	(envelope-from <luwei.kang@intel.com>) id 1goR19-00067p-1y
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:53:25 -0500
+Received: from mga14.intel.com ([192.55.52.115]:45131)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <luwei.kang@intel.com>)
-	id 1goQwo-0004SD-PL
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:48:55 -0500
+	id 1goR17-00066n-Bt
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:53:22 -0500
 From: Luwei Kang <luwei.kang@intel.com>
-Date: Tue, 29 Jan 2019 18:48:22 -0500
-Message-Id: <1548805702-12161-1-git-send-email-luwei.kang@intel.com>
+Date: Tue, 29 Jan 2019 18:52:59 -0500
+Message-Id: <1548805979-12321-1-git-send-email-luwei.kang@intel.com>
 Subject: [Qemu-devel] [PATCH V2] i386: extended the cpuid_level when Intel
  PT is enabled
 List-Id: <qemu-devel.nongnu.org>
@@ -30,6 +30,7 @@ Intel Processor Trace required CPUID[0x14] but the cpuid_level
 have no change when create a kvm guest with
 e.g. "-cpu qemu64,+intel-pt".
 
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 ---
  hw/i386/pc.c      | 1 +
@@ -45,7 +46,7 @@ index 73d688f..72a0a70 100644
      { "Cascadelake-Server" "-" TYPE_X86_CPU,  "mpx", "on" },
      { "Icelake-Client" "-" TYPE_X86_CPU,      "mpx", "on" },
      { "Icelake-Server" "-" TYPE_X86_CPU,      "mpx", "on" },
-+    { TYPE_X86_CPU, "x-intel-pt-auto-leevl", "off" },
++    { TYPE_X86_CPU, "x-intel-pt-auto-level", "off" },
  };
  const size_t pc_compat_3_1_len = G_N_ELEMENTS(pc_compat_3_1);
  
