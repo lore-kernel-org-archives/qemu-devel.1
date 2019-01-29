@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54816)
+Received: from eggs.gnu.org ([209.51.188.92]:55084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1goOeE-0004DI-Fh
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:21:35 -0500
+	(envelope-from <philmd@redhat.com>) id 1goOfo-0004rR-8k
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:23:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1goOeA-0001ye-W1
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:21:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1goOe9-0001xj-9N
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:21:30 -0500
-References: <20190124011554.25418-1-philmd@redhat.com>
-	<20190124011554.25418-5-philmd@redhat.com>
-	<20190124114305.bdxz76bsxk5lvc3d@sirius.home.kraxel.org>
-	<ad4d15ab-a625-2171-358a-95266ec53bf4@redhat.com>
-	<CAFEAcA8-FiXLns3Aj42cFkpUE54gAU0SRAO=kmWojU4+QdVm1w@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f5f2d687-11ba-52bd-159e-21a2d4cfa46e@redhat.com>
-Date: Tue, 29 Jan 2019 09:21:22 +0100
+	(envelope-from <philmd@redhat.com>) id 1goOfn-0002yp-GP
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:23:12 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46640)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goOfn-0002yM-8p
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:23:11 -0500
+Received: by mail-wr1-f67.google.com with SMTP id l9so20898465wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 00:23:11 -0800 (PST)
+References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
+	<20190129000820.31190-1-richardw.yang@linux.intel.com>
+	<feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
+	<20190129080455.GA10084@richard>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <91c53c72-8e9c-f68d-1dc8-f6320ed3dfc0@redhat.com>
+Date: Tue, 29 Jan 2019 09:23:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8-FiXLns3Aj42cFkpUE54gAU0SRAO=kmWojU4+QdVm1w@mail.gmail.com>
+In-Reply-To: <20190129080455.GA10084@richard>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/display/milkymist-tmu2: Move
- inlined code from header to source
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
 
-On 28/01/19 19:02, Peter Maydell wrote:
+On 1/29/19 9:04 AM, Wei Yang wrote:
+> On Tue, Jan 29, 2019 at 07:56:54AM +0100, Philippe Mathieu-Daudé wrote:
+>> Hi Wei,
+>>
+>> On 1/29/19 1:08 AM, Wei Yang wrote:
+>>> There are several functions/variable which are not used anymore.
+>>>
+>>> This serials just remove those without functional change.
+>>>
+>>> Wei Yang (3):
+>>>   hw/i386/pc.c: remove unused function pc_acpi_init()
+>>>   hw/acpi: remove unused function acpi_table_add_builtin()
+>>>   hw/acpi: remove unnecessary variable acpi_table_builtin
+>>>
+>>>  hw/acpi/core.c         | 10 +---------
+>>>  hw/i386/pc.c           | 27 ---------------------------
+>>>  include/hw/acpi/acpi.h |  1 -
+>>>  include/hw/i386/pc.h   |  1 -
+>>>  4 files changed, 1 insertion(+), 38 deletions(-)
+>>>
+>>
+>> Please do not post iterated series in reply to previous version, but as
+>> new thread:
+>> - patches are parsed by scripts
+>> - some email clients can tag a thread as "reviewed, skip" and replies to
+>> this thread will be masked.
+>>
 > 
-> I don't understand why the build/config-all-devices.mak versions of
-> the defines of CONFIG_FOO variables are so weird:
-> 
-> CONFIG_ACPI:=$(findstring y,$(CONFIG_ACPI)y)
-> 
-> ...are they really intended to be self-referential like that?
+> Well, do I need to repost it in a new thread?
 
-Yes, config-all-devices.mak is basically on "OR" of all the
-config-devices.mak files.
-
-Are CONFIG_X11 and CONFIG_OPENGL defined at the time
-config-all-devices.mak is included?
-
-Paolo
+It depends who will take this patchset and his mood :)
+Let's wait and see.
