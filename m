@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38418)
+Received: from eggs.gnu.org ([209.51.188.92]:38570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goN03-0007pP-14
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:59 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goN0o-0008CU-1U
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:36:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goN02-0005Q8-9S
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1goN02-0005Py-3c
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:58 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3121088E66
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 06:28:10 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Tue, 29 Jan 2019 11:58:01 +0530
-Message-Id: <20190129062801.15799-1-pagupta@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goN0n-0006Lj-3r
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:36:45 -0500
+References: <20190127090306.30826-1-mark.cave-ayland@ilande.co.uk>
+	<20190127090306.30826-3-mark.cave-ayland@ilande.co.uk>
+	<alpine.BSF.2.21.9999.1901271251060.35973@zero.eik.bme.hu>
+	<3dc12858-4254-9da1-7eb2-309948d0d376@ilande.co.uk>
+	<5ea37d08-91f6-33cc-b220-f1a96796d794@linaro.org>
+	<897875e0-fc56-c280-0cd0-c7e0dac04fa1@ilande.co.uk>
+	<3f43ac97-26d0-98b3-a8b4-8102acb73457@linaro.org>
+	<20190129022847.GG1870@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <622b9eaf-712c-9e9b-a416-ea79a5687e01@ilande.co.uk>
+Date: Tue, 29 Jan 2019 06:36:05 +0000
+MIME-Version: 1.0
+In-Reply-To: <20190129022847.GG1870@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 2/8] target/ppc: rework
+ vmrg{l, h}{b, h, w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, xiaohli@redhat.com, pagupta@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hotplugging existing char chardev with qmp, dereferences(removes) 
-existing chardev. This patch avoids adding a chardev if a chardev 
-with same id exists.
+On 29/01/2019 02:28, David Gibson wrote:
 
-RH BZ 1660831: 
+> On Sun, Jan 27, 2019 at 10:07:12AM -0800, Richard Henderson wrote:
+>> On 1/27/19 9:45 AM, Mark Cave-Ayland wrote:
+>>>> I would expect the i < n/2 loop to be faster, because the assignments are
+>>>> unconditional.  FWIW.
+>>>
+>>> Do you have any idea as to how much faster? Is it something that would show
+>>> up as significant within the context of QEMU?
+>>
+>> I don't have any numbers on that, no.
+>>
+>>> As well as eliminating the HI_IDX/LO_IDX constants I do find the updated
+>>> version much easier to read, so I would prefer to keep it if possible.
+>>> What about unrolling the loop into 2 separate ones...
+>>
+>> I doubt that would be helpful.
+>>
+>> I would think that
+>>
+>> #define VMRG_DO(name, access, ofs)
+>> ...
+>>     int i, half = ARRAY_SIZE(r->access(0)) / 2;
+>> ...
+>>     for (i = 0; i < half; i++) {
+>>         result.access(2 * i + 0) = a->access(i + ofs);
+>>         result.access(2 * i + 1) = b->access(i + ofs);
+>>     }
+>>
+>> where OFS = 0 for HI and half for LO is best.  I find it quite readable, and it
+>> avoids duplicating code between LO and HI as you're currently doing.
+> 
+> Marc, Richard, where are we at with this?
+> 
+> Should I wait on a revised version of this patch before applying the
+> series?
 
-# (host) ls -lt /tmp/helloworld*
-srwxr-xr-x.  /tmp/helloworld1
-srwxr-xr-x.  /tmp/helloworld2
+Certainly the v3 as posted is correct (I've tested this particular patch on both big
+and small endian machines), so I believe the only question is whether this introduces
+any noticeable performance penalty.
 
-Before this patch:
+Let me try and run a few simple tests and report back.
 
-hotplug existed chardev(channel1) in qmp:
-{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
-"data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
+BTW are you able to take my qemu-macppc queue posted yesterday at
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07263.html? There's no
+functional change except for PPC MacOS users who explicitly enable the new QEMU EDID
+support on the command line.
 
-{"error": {"class": "GenericError", "desc": "attempt to add duplicate 
-property 'charchannel1' to object (type 'container')"}}
 
-# ls -lt /tmp/helloworld*
-srwxr-xr-x. 1 root root 0 Dec 19 16:39 /tmp/helloworld2
+ATB,
 
-After this patch:
-
-{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
-"data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
-{"error": {"class": "GenericError", "desc": "Chardev 'charchannel1' already exists"}}
-
-# ls -lt /tmp/helloworld*
-srwxr-xr-x. 1 /tmp/helloworld1
-srwxr-xr-x. 1 /tmp/helloworld2
- 
-Reported-by: Xiaohui Li <xiaohli@redhat.com>
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
-
-v1->v2
- Correct error message - Eric 
-
- chardev/char.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/chardev/char.c b/chardev/char.c
-index ccba36bafb..cab0d3df16 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -985,6 +985,12 @@ ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend,
-     ChardevReturn *ret;
-     Chardev *chr;
- 
-+    chr = qemu_chr_find(id);
-+    if (chr) {
-+        error_setg(errp, "Chardev '%s' already exists", id);
-+        return NULL;
-+    }
-+
-     cc = char_get_class(ChardevBackendKind_str(backend->type), errp);
-     if (!cc) {
-         return NULL;
--- 
-2.14.3
+Mark.
