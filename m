@@ -1,48 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43347)
+Received: from eggs.gnu.org ([209.51.188.92]:43580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1goUAa-00027y-ED
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:35 -0500
+	(envelope-from <mst@redhat.com>) id 1goUC3-0002WO-PS
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1goUAL-0003oi-5G
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1goUAK-0003kZ-CP
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:05 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0TE4Voq038744
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 09:14:48 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qaqtm2eva-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 09:14:48 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Tue, 29 Jan 2019 14:14:47 -0000
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
-	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
-	<20190125112437.2c06fac6.cohuck@redhat.com>
-	<20190125135835.2d59b511.cohuck@redhat.com>
-	<20190125150101.3b61f0a1@oc2783563651>
-	<20190128180948.506a9695.cohuck@redhat.com>
-	<20190128201548.1ecfb84f@oc2783563651>
-	<d43e273d-ef90-9a1e-c87a-1365718d8978@linux.ibm.com>
-	<20190129112024.401b8184.cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Tue, 29 Jan 2019 09:14:40 -0500
+	(envelope-from <mst@redhat.com>) id 1goUAy-000430-Ox
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:22324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goUAr-0003va-1U
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:42 -0500
+Date: Tue, 29 Jan 2019 09:15:10 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190129091012-mutt-send-email-mst@kernel.org>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-2-xieyongji@baidu.com>
+	<20190129041155.GG3264@stefanha-x1.localdomain>
+	<20190128232025-mutt-send-email-mst@kernel.org>
+	<CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190129112024.401b8184.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <691e91ea-df02-1455-93ed-7e8369fceec2@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,90 +31,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Yongji Xie <elohimes@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+
+On Tue, Jan 29, 2019 at 02:15:35PM +0800, Yongji Xie wrote:
+> On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
+> > > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
+> > > > +typedef struct DescState {
+> > > > +    uint8_t inuse;
+> > > > +    uint8_t version;
+> > > > +    uint16_t used_idx;
+> > > > +    uint16_t avail_idx;
+> > > > +    uint16_t reserved;
+> > > > +} DescState;
+> > > > +
+> > > > +typedef struct QueueRegion {
+> > > > +    uint8_t valid;
+> >
+> > what's this?
+> >
+> 
+> We can use this to check whether this buffer is reset by qemu.
+
+
+I'd use version here. Document that it's 1 currently.
+Or do we want feature flags so we can support downgrades too?
 
 
 
-On 01/29/2019 05:20 AM, Cornelia Huck wrote:
-> On Mon, 28 Jan 2019 16:48:10 -0500
-> Eric Farman <farman@linux.ibm.com> wrote:
+> > > > +    uint16_t desc_num;
+> >
+> > there's padding before this field. Pls make it explicit.
+> >
 > 
->> On 01/28/2019 02:15 PM, Halil Pasic wrote:
->>> On Mon, 28 Jan 2019 18:09:48 +0100
->>> Cornelia Huck <cohuck@redhat.com> wrote:
+> Will do it.
 > 
->> I guess if
->>> the ssch() returns with non cc == 0 the CP_PENDING ---IRQ---> IDLE
->>> transition
->>> won't take place. And I guess the IRQ is a final one.
->>
->> Yes this is the one point I hadn't seen explicitly stated.  We shouldn't
->> remain in state=BUSY if the ssch got cc!=0, and probably return to IDLE
->> when processing the failure.  In Connie's response (Mon, 28 Jan 2019
->> 18:24:24 +0100) to my note, she expressed some agreement to that.
+> > > > +    DescState desc[0];
+> > > > +} QueueRegion;
+> > > > +
+> > > > +The struct DescState is used to describe one head-descriptor's state. The
+> > > > +fields have following meanings:
+> > > > +
+> > > > +    inuse: Indicate whether the descriptor is inuse or not.
+> >
+> > inuse by what?
+> >
 > 
-> Yes, I think that's what should happen.
+> Maybe inflight is better?
 > 
+> > > > +
+> > > > +    version: Indicate whether we have an atomic update to used ring and
+> > > > +    inflight buffer when slave crash at that point. This field should be
+> > > > +    increased by one before and after this two updates. An odd version
+> > > > +    indicates an in-progress update.
+> >
+> > I'm not sure I understand what does the above say. Also does this
+> > require two atomics? Seems pretty expensive. And why is it called
+> > version?
+> >
+> > > > +
+> > > > +    used_idx: Store old index of used ring before we update used ring and
+> > > > +    inflight buffer so that slave can know whether an odd version inflight
+> > > > +    head-descriptor in inflight buffer is processed or not.
+> >
+> > Here too.
+> >
 > 
->>>> state for I/O)
->>>> (normal ssch)
->>>>
->>>> BUSY --- IO_REQ ---> return -EAGAIN, stay in BUSY
->>>> (user space is supposed to retry, as we'll eventually progress from
->>>> BUSY)
->>>>
->>>> CP_PENDING --- IO_REQ ---> return -EBUSY, stay in CP_PENDING
->>>> (user space is supposed to map this to the appropriate cc for the guest)
->>>
->>>   From this it seems you don't intend to issue the second  requested ssch()
->>> any more (and don't want to do any translation). Is that right? (If it
->>> is, that what I was asking for for a while, but then it's a pity for the
->>> retries.)
->>>    
->>>>
->>>> IDLE --- ASYNC_REQ ---> IDLE
->>>> (user space is welcome to do anything else right away)
->>>
->>> Your idea is to not issue a requested hsch() if we think we are IDLE
->>> it seems. Do I understand this right? We would end up with a different
->>> semantic for hsch()/and csch() (compared to PoP) in the guest with this
->>> (AFAICT).
->>>    
->>>>
->>>> BUSY --- ASYNC_REQ ---> return -EAGAIN, stay in BUSY
->>>> (user space is supposed to retry, as above)
->>>>
->>>> CP_PENDING --- ASYNC_REQ ---> return success, stay in CP_PENDING
->>>> (the interrupt will get us out of CP_PENDING eventually)
->>>
->>> Issue (c|h)sch() is an action that is done on this internal
->>> transition (within CP_PENDING).
->>
->> These three do read like CSCH/HSCH are subject to the same rules as
->> SSCH, when in fact they would be (among other reasons) issued to clean
->> up a lost interrupt from a previous SSCH.  So maybe return -EAGAIN on
->> state=BUSY (don't race ourselves with the start), but issue to hardware
->> if CP_PENDING.
+> Sorry, the above description may be not clear. This two fields are
+> used to indicate whether we have an in-progress update to used ring
+> and inflight buffer. If slave crash before the update to used_ring and
+> after the update to inflight buffer, the version should be odd and
+> used_idx should be equal to used_ring.idx. Then we need to roll back
+> the update to inflight buffer. As for the name of the version filed,
+> actually I didn't find a good one, so I just copy it from struct
+> kvm_steal_time...
 > 
-> I think there are some devices which require a certain hsch/csch
-> sequence during device bringup, so it's not just cleaning up after a
-> ssch. 
+> > > > +
+> > > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
+> > > > +    slave can resubmit descriptors in order.
+> >
+> > Why would that be necessary?
+> >
+> 
+> Maybe some devices will be able to use it to preserve order after
+> reconnecting in future?
 
-Ah, yes.
+If buffers are used in order then old entries in the ring
+are not overwritten so inflight tracking is not
+necessary. This is exactly the case with vhost user net today.
 
-Therefore, we should always try to do the requested hsch/csch,
-> unless things like "we're in the process of translating a cp, and can't
-> deal with another request right now" prevent it.
-
-Agreed.  I'm in support of all of this.
-
+> > >
+> > > Will a completely new "packed vring" inflight shm layout be necessary to
+> > > support the packed vring layout in VIRTIO 1.1?
+> > >
+> > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
+> >
+> > Probably.
+> >
 > 
->>
->> If we get an async request when state=IDLE, then maybe just issue it for
->> fun, as if it were an SSCH?
+> How about supporting packed virtqueue in guest driver?
 > 
-> For fun, but mainly because the guest wants it :)
-> 
+> Thanks,
+> Yongji
 
-Well, that too.  ;-)
+Depends on the guest right? Linux has it:
+
+
+commit f959a128fe83090981add69aadc87a4e496e9369
+Author: Tiwei Bie <tiwei.bie@intel.com>
+Date:   Wed Nov 21 18:03:30 2018 +0800
+
+    virtio_ring: advertize packed ring layout
+
+-- 
+MST
