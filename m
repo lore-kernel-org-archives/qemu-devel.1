@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35060)
+Received: from eggs.gnu.org ([209.51.188.92]:35295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMek-0001hs-IO
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:59 -0500
+	(envelope-from <elohimes@gmail.com>) id 1goMgY-0002QG-Ox
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMej-0005ct-U2
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goMej-0005cV-MD
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:13:57 -0500
-References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<92b6dc0f167f0c0f53ad9c0fbf127ea255b7429f.1548714862.git.DirtY.iCE.hu@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bfdf1243-9bf1-128a-3f6d-93e425a0839c@redhat.com>
-Date: Tue, 29 Jan 2019 07:13:46 +0100
+	(envelope-from <elohimes@gmail.com>) id 1goMgX-00060s-SC
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:15:50 -0500
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:44535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1goMgX-00060Y-LN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:15:49 -0500
+Received: by mail-yw1-xc44.google.com with SMTP id b63so7752311ywc.11
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 22:15:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <92b6dc0f167f0c0f53ad9c0fbf127ea255b7429f.1548714862.git.DirtY.iCE.hu@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 03/14] audio: -audiodev command line
- option: documentation
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-2-xieyongji@baidu.com>
+	<20190129041155.GG3264@stefanha-x1.localdomain>
+	<20190128232025-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190128232025-mutt-send-email-mst@kernel.org>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Tue, 29 Jan 2019 14:15:35 +0800
+Message-ID: <CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Libvirt <libvir-list@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 2019-01-28 23:43, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wrote:
-> This patch adds documentation of an -audiodev command line option, that
-> deprecates the old QEMU_* environment variables for audio backend
-> configuration.  It's syntax is similar to existing options (-netdev,
-> -device, etc):
->=20
->   -audiodev driver_name,property=3Dvalue,...
->=20
-> Although now it's possible to specify multiple -audiodev options on
-> command line, multiple audio backends are not supported yet.
->=20
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
-om>
-> ---
->  qemu-options.hx | 222 +++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 219 insertions(+), 3 deletions(-)
->=20
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 521511ec13..a12931899b 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -416,14 +416,230 @@ The default is @code{en-us}.
->  ETEXI
-> =20
-> =20
-> +HXCOMM Deprecated by -audiodev
->  DEF("audio-help", 0, QEMU_OPTION_audio_help,
-> -    "-audio-help     print list of audio drivers and their options\n",
-> +    "-audio-help     show -audiodev equivalent of the currently specif=
-ied audio settings\n",
->      QEMU_ARCH_ALL)
+On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
+> > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
+> > > +typedef struct DescState {
+> > > +    uint8_t inuse;
+> > > +    uint8_t version;
+> > > +    uint16_t used_idx;
+> > > +    uint16_t avail_idx;
+> > > +    uint16_t reserved;
+> > > +} DescState;
+> > > +
+> > > +typedef struct QueueRegion {
+> > > +    uint8_t valid;
+>
+> what's this?
+>
 
-Note that if you want to deprecate a parameter "officially" (in the
-sense that it could be removed in a future release), you also have to
-add an entry to qemu-deprecated.texi. But that could also be done in an
-additional patch later, so no need to respin just because of this.
+We can use this to check whether this buffer is reset by qemu.
 
- Thomas
+> > > +    uint16_t desc_num;
+>
+> there's padding before this field. Pls make it explicit.
+>
+
+Will do it.
+
+> > > +    DescState desc[0];
+> > > +} QueueRegion;
+> > > +
+> > > +The struct DescState is used to describe one head-descriptor's state. The
+> > > +fields have following meanings:
+> > > +
+> > > +    inuse: Indicate whether the descriptor is inuse or not.
+>
+> inuse by what?
+>
+
+Maybe inflight is better?
+
+> > > +
+> > > +    version: Indicate whether we have an atomic update to used ring and
+> > > +    inflight buffer when slave crash at that point. This field should be
+> > > +    increased by one before and after this two updates. An odd version
+> > > +    indicates an in-progress update.
+>
+> I'm not sure I understand what does the above say. Also does this
+> require two atomics? Seems pretty expensive. And why is it called
+> version?
+>
+> > > +
+> > > +    used_idx: Store old index of used ring before we update used ring and
+> > > +    inflight buffer so that slave can know whether an odd version inflight
+> > > +    head-descriptor in inflight buffer is processed or not.
+>
+> Here too.
+>
+
+Sorry, the above description may be not clear. This two fields are
+used to indicate whether we have an in-progress update to used ring
+and inflight buffer. If slave crash before the update to used_ring and
+after the update to inflight buffer, the version should be odd and
+used_idx should be equal to used_ring.idx. Then we need to roll back
+the update to inflight buffer. As for the name of the version filed,
+actually I didn't find a good one, so I just copy it from struct
+kvm_steal_time...
+
+> > > +
+> > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
+> > > +    slave can resubmit descriptors in order.
+>
+> Why would that be necessary?
+>
+
+Maybe some devices will be able to use it to preserve order after
+reconnecting in future?
+
+> >
+> > Will a completely new "packed vring" inflight shm layout be necessary to
+> > support the packed vring layout in VIRTIO 1.1?
+> >
+> > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
+>
+> Probably.
+>
+
+How about supporting packed virtqueue in guest driver?
+
+Thanks,
+Yongji
