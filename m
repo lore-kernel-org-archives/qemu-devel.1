@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43788)
+Received: from eggs.gnu.org ([209.51.188.92]:44459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goS3t-0005Or-DD
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:00:19 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goS8R-0006iw-Vz
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goS3j-0001Lf-LJ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:00:17 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:37329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1goS3j-0001Ja-8I
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:00:07 -0500
-Received: by mail-wm1-x332.google.com with SMTP id g67so17445573wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 04:00:06 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id a8sm4717974wme.23.2019.01.29.04.00.03
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 29 Jan 2019 04:00:04 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 Jan 2019 12:00:02 +0000
-Message-Id: <20190129120002.3866-1-peter.maydell@linaro.org>
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goS8R-0003Fi-28
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:04:59 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Tue, 29 Jan 2019 12:04:49 +0000
+Message-ID: <9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
+References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190129095224.GA4467@dhcp-200-176.str.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ECC0F6461F15D64582C6D8A03A322984@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/23] target-arm queue
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,115 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-v2: dropped patches that add the microbit nRF51 non-volatile memories
-and the test case for them.
-
-thanks
--- PMM
-
-
-The following changes since commit 3a183e330dbd7dbcac3841737ac874979552cca2:
-
-  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190128' into staging (2019-01-28 16:26:47 +0000)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190129
-
-for you to fetch changes up to 46f5abc0a2566ac3dc954eeb62fd625f0eaca120:
-
-  gdbstub: Simplify gdb_get_cpu_pid() to use cpu->cluster_index (2019-01-29 11:46:06 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * Fix validation of 32-bit address spaces for aa32 (fixes an assert introduced in ba97be9f4a4)
- * v8m: Ensure IDAU is respected if SAU is disabled
- * gdbstub: fix gdb_get_cpu(s, pid, tid) when pid and/or tid are 0
- * exec.c: Use correct attrs in cpu_memory_rw_debug()
- * accel/tcg/user-exec: Don't parse aarch64 insns to test for read vs write
- * target/arm: Don't clear supported PMU events when initializing PMCEID1
- * memory: add memory_region_flush_rom_device()
- * microbit: Add stub NRF51 TWI magnetometer/accelerometer detection
- * tests/microbit-test: extend testing of microbit devices
- * checkpatch: Don't emit spurious warnings about block comments
- * aspeed/smc: misc bug fixes
- * xlnx-zynqmp: Don't create rpu-cluster if there are no RPUs
- * xlnx-zynqmp: Realize cluster after putting RPUs in it
- * accel/tcg: Add cluster number to TCG TB hash so differently configured
-   CPUs don't pick up cached TBs for the wrong kind of CPU
-
-----------------------------------------------------------------
-Aaron Lindsay OS (1):
-      target/arm: Don't clear supported PMU events when initializing PMCEID1
-
-Cédric Le Goater (4):
-      aspeed/smc: fix default read value
-      aspeed/smc: define registers for all possible CS
-      aspeed/smc: Add dummy data register
-      aspeed/smc: snoop SPI transfers to fake dummy cycles
-
-Julia Suvorova (3):
-      tests/libqtest: Introduce qtest_init_with_serial()
-      tests/microbit-test: Make test independent of global_qtest
-      tests/microbit-test: Check nRF51 UART functionality
-
-Luc Michel (1):
-      gdbstub: fix gdb_get_cpu(s, pid, tid) when pid and/or tid are 0
-
-Peter Maydell (8):
-      exec.c: Use correct attrs in cpu_memory_rw_debug()
-      accel/tcg/user-exec: Don't parse aarch64 insns to test for read vs write
-      checkpatch: Don't emit spurious warnings about block comments
-      xlnx-zynqmp: Don't create rpu-cluster if there are no RPUs
-      hw/arm/xlnx-zynqmp: Realize cluster after putting RPUs in it
-      qom/cpu: Add cluster_index to CPUState
-      accel/tcg: Add cluster number to TCG TB hash
-      gdbstub: Simplify gdb_get_cpu_pid() to use cpu->cluster_index
-
-Richard Henderson (1):
-      target/arm: Fix validation of 32-bit address spaces for aa32
-
-Stefan Hajnoczi (3):
-      tests/microbit-test: add TWI stub device test
-      MAINTAINERS: update microbit ARM board files
-      memory: add memory_region_flush_rom_device()
-
-Steffen Görtz (1):
-      arm: Stub out NRF51 TWI magnetometer/accelerometer detection
-
-Thomas Roth (1):
-      target/arm: v8m: Ensure IDAU is respected if SAU is disabled
-
- hw/i2c/Makefile.objs          |   1 +
- include/exec/exec-all.h       |   4 +-
- include/exec/memory.h         |  18 +++
- include/hw/arm/nrf51.h        |   2 +
- include/hw/arm/nrf51_soc.h    |   1 +
- include/hw/cpu/cluster.h      |  24 +++
- include/hw/i2c/microbit_i2c.h |  42 +++++
- include/hw/ssi/aspeed_smc.h   |   3 +
- include/qom/cpu.h             |   7 +
- target/arm/cpu.h              |  11 +-
- tests/libqtest.h              |  11 ++
- accel/tcg/cpu-exec.c          |   3 +
- accel/tcg/translate-all.c     |   3 +
- accel/tcg/user-exec.c         |  66 ++++++--
- exec.c                        |  19 ++-
- gdbstub.c                     | 120 ++++++---------
- hw/arm/microbit.c             |  16 ++
- hw/arm/xlnx-zynqmp.c          |   9 +-
- hw/cpu/cluster.c              |  46 ++++++
- hw/i2c/microbit_i2c.c         | 127 +++++++++++++++
- hw/ssi/aspeed_smc.c           | 128 ++++++++++++++-
- qom/cpu.c                     |   1 +
- target/arm/cpu.c              |   3 +-
- target/arm/helper.c           |  67 ++++----
- tests/libqtest.c              |  25 +++
- tests/microbit-test.c         | 350 +++++++++++++++++++++++++++++-------------
- MAINTAINERS                   |   8 +-
- scripts/checkpatch.pl         |   2 +-
- 28 files changed, 874 insertions(+), 243 deletions(-)
- create mode 100644 include/hw/i2c/microbit_i2c.h
- create mode 100644 hw/i2c/microbit_i2c.c
+Pj4NCj4+IGRpZmYgLS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+IGluZGV4
+IGM2NmY5NDkuLjBmZGU5OGMgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xYXBpLmMNCj4+ICsrKyBi
+L2Jsb2NrL3FhcGkuYw0KPj4gQEAgLTM4LDYgKzM4LDcgQEANCj4+ICAgI2luY2x1ZGUgInFhcGkv
+cW1wL3FzdHJpbmcuaCINCj4+ICAgI2luY2x1ZGUgInN5c2VtdS9ibG9jay1iYWNrZW5kLmgiDQo+
+PiAgICNpbmNsdWRlICJxZW11L2N1dGlscy5oIg0KPj4gKyNpbmNsdWRlICJxZW11L2Vycm9yLXJl
+cG9ydC5oIg0KPj4gICANCj4+ICAgQmxvY2tEZXZpY2VJbmZvICpiZHJ2X2Jsb2NrX2RldmljZV9p
+bmZvKEJsb2NrQmFja2VuZCAqYmxrLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCkNCj4+IEBAIC04
+NjgsNiArODY5LDExIEBAIHZvaWQgYmRydl9pbWFnZV9pbmZvX2R1bXAoZnByaW50Zl9mdW5jdGlv
+biBmdW5jX2ZwcmludGYsIHZvaWQgKmYsDQo+PiAgIA0KPj4gICAgICAgaWYgKGluZm8tPmhhc19m
+b3JtYXRfc3BlY2lmaWMpIHsNCj4+ICAgICAgICAgICBmdW5jX2ZwcmludGYoZiwgIkZvcm1hdCBz
+cGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPj4gKyAgICAgICAgaWYgKGluZm8tPmZvcm1hdF9z
+cGVjaWZpYyAmJg0KPj4gKyAgICAgICAgICAgIGluZm8tPmZvcm1hdF9zcGVjaWZpYy0+dHlwZSA9
+PSBJTUFHRV9JTkZPX1NQRUNJRklDX0tJTkRfUUNPVzIgJiYNCj4+ICsgICAgICAgICAgICBpbmZv
+LT5mb3JtYXRfc3BlY2lmaWMtPnUucWNvdzIuZGF0YS0+aGFzX2JpdG1hcHMgPT0gZmFsc2UpIHsN
+Cj4+ICsgICAgICAgICAgICB3YXJuX3JlcG9ydCgiRmFpbGVkIHRvIGxvYWQgYml0bWFwIGxpc3Qi
+KTsNCj4+ICsgICAgICAgIH0NCj4+ICAgICAgICAgICBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNf
+ZHVtcChmdW5jX2ZwcmludGYsIGYsIGluZm8tPmZvcm1hdF9zcGVjaWZpYyk7DQo+PiAgICAgICB9
+DQo+PiAgIH0NCj4gDQo+IElzIGl0IHJlYWxseSBuZWNlc3NhcnkgdG8gaW50cm9kdWNlIHFjb3cy
+IHNwZWNpZmljIGtub3dsZWRnZSBpbg0KPiBibG9jay9xYXBpLmMgKHdoZXJlIGl0IGRlZmluaXRl
+bHkgZG9lc24ndCBiZWxvbmcpLCBqdXN0IHRvIGVtaXQgYQ0KPiB3YXJuaW5nPw0KPiANCj4gV2h5
+IGNhbid0IHlvdSBwcmludCB0aGUgd2FybmluZyBpbiBxY293Ml9nZXRfc3BlY2lmaWNfaW5mbygp
+Pw0KDQpEZWFyIEtldmluLA0KVGhlIHJlYXNvbiBiZWhpbmQgdGhlIGlkZWEgdG8gbW92ZSB0aGUg
+d2FybmluZyB0byBxYXBpIGlzIHRoYXQgd2UgDQp3b3VsZG4ndCBsaWtlIHRvIHByaW50IHRoYXQg
+aW4gY2FzZSBvZiBKU09OIGZvcm1hdC4NCg0KPiANCj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
+Mi5jIGIvYmxvY2svcWNvdzIuYw0KPj4gaW5kZXggNDg5N2FiYS4uMDdiOTllZSAxMDA2NDQNCj4+
+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+IEBAIC00Mzg2
+LDggKzQzODYsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lm
+aWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+ICAgICAgICAgICAqc3BlY19pbmZvLT51
+LnFjb3cyLmRhdGEgPSAoSW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+PiAgICAgICAgICAgICAg
+IC5jb21wYXQgICAgICAgICAgICAgPSBnX3N0cmR1cCgiMC4xMCIpLA0KPj4gICAgICAgICAgICAg
+ICAucmVmY291bnRfYml0cyAgICAgID0gcy0+cmVmY291bnRfYml0cywNCj4+ICsgICAgICAgICAg
+ICAuaGFzX2JpdG1hcHMgICAgICAgID0gdHJ1ZSwgLyogVG8gaGFuZGxlIGVycm9yIGNoZWNrIHBy
+b3Blcmx5ICovDQo+PiArICAgICAgICAgICAgLmJpdG1hcHMgICAgICAgICAgICA9IE5VTEwsIC8q
+IFVuc3VwcG9ydGVkIGZvciB2ZXJzaW9uIDIgKi8NCj4gDQo+IC5oYXNfYml0bWFwcyA9IGZhbHNl
+IHdvdWxkIGJlIG5pY2VyIGlmIHRoZSBmb3JtYXQgZG9lc24ndCBldmVuIHN1cHBvcnQNCj4gYml0
+bWFwcy4gWW91IG9ubHkgbmVlZCB0aGlzIGhlcmUgYmVjYXVzZSB5b3UgcHV0IHRoZSB3YXJuaW5n
+IGluIHRoZQ0KPiB3cm9uZyBwbGFjZS4NCj4gDQo+PiAgICAgICAgICAgfTsNCj4+ICAgICAgIH0g
+ZWxzZSBpZiAocy0+cWNvd192ZXJzaW9uID09IDMpIHsNCj4+ICsgICAgICAgIFFjb3cyQml0bWFw
+SW5mb0xpc3QgKmJpdG1hcHM7DQo+PiArICAgICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsN
+Cj4+ICsNCj4+ICsgICAgICAgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0bWFwX2luZm9fbGlzdChi
+cywgJmxvY2FsX2Vycik7DQo+IA0KPiBIZXJlIHlvdSBldmVuIGhhZCBhIGdvb2QgZXJyb3IgbWVz
+c2FnZSB0byBwcmludC4uLg0KPiANCj4+ICAgICAgICAgICAqc3BlY19pbmZvLT51LnFjb3cyLmRh
+dGEgPSAoSW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+PiAgICAgICAgICAgICAgIC5jb21wYXQg
+ICAgICAgICAgICAgPSBnX3N0cmR1cCgiMS4xIiksDQo+PiAgICAgICAgICAgICAgIC5sYXp5X3Jl
+ZmNvdW50cyAgICAgPSBzLT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4+IEBAIC00Mzk3LDcgKzQ0
+MDMsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5m
+byhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFFDT1cyX0lOQ09NUEFUX0NPUlJVUFQsDQo+PiAgICAgICAgICAgICAgIC5oYXNfY29y
+cnVwdCAgICAgICAgPSB0cnVlLA0KPj4gICAgICAgICAgICAgICAucmVmY291bnRfYml0cyAgICAg
+ID0gcy0+cmVmY291bnRfYml0cywNCj4+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAg
+ID0gIWxvY2FsX2VyciwNCj4+ICsgICAgICAgICAgICAuYml0bWFwcyAgICAgICAgICAgID0gYml0
+bWFwcywNCj4+ICAgICAgICAgICB9Ow0KPj4gKyAgICAgICAgLyoNCj4+ICsgICAgICAgICAqIElm
+IGFuIGVycm9yIG9jY3VycyBpbiBvYnRhaW5pbmcgYml0bWFwcywgaWdub3JlDQo+PiArICAgICAg
+ICAgKiBpdCB0byBzaG93IG90aGVyIFFDT1cyIHNwZWNpZmljIGluZm9ybWF0aW9uLg0KPj4gKyAg
+ICAgICAgICovDQo+PiArICAgICAgICBlcnJvcl9mcmVlKGxvY2FsX2Vycik7DQo+IA0KPiAuLi5i
+dXQgeW91IGRlY2lkZWQgdG8gZGlzY2FyZCBpdC4NCj4gDQo+IEhvdyBhYm91dCB5b3UgZG8gdGhp
+cyBoZXJlOg0KPiANCj4gICAgICB3YXJuX3JlcG9ydGZfZXJyKGxvY2FsX2VyciwgIkZhaWxlZCB0
+byBsb2FkIGJpdG1hcCBsaXN0OiAiKTsNCg0KSW4gY2FzZSBvZiBKU09OIGZvcm1hdCwgd2UgY2Fu
+IGZhaWwgaGVyZS4NCkl0IHdpbGwgaGFwcGVuIGluIHRoZSBjdXJyZW50IGltcGxlbWVudGF0aW9u
+IG9mIHRoZSBuZXcgdGVzdCAjMjM5Lg0KDQo+IA0KPiBBbmQgdGhlbiBnZXQgcmlkIG9mIHRoZSBj
+b2RlIGluIGJsb2NrL3FhcGkuYyBhbmQgdGhlIHZlcnNpb24gMiBwYXRoPw0KPiANCj4gQWN0dWFs
+bHksIHNob3VsZCB0aGlzIHJlYWxseSBvbmx5IGJlIGEgd2FybmluZywgb3IgaW4gZmFjdCBhbiBl
+cnJvcj8NCj4gV2hhdCdzIHRoZSBjYXNlIHdoZXJlIHdlIGV4cGVjdCB0aGF0IGxvYWRpbmcgdGhl
+IGJpdG1hcCBsaXN0IGNhbiBmYWlsLA0KPiBidXQgdGhlIG1hbmFnZW1lbnQgdG9vbCBkb2Vzbid0
+IG5lZWQgdG8ga25vdyB0aGF0IGFuZCB3ZSBqdXN0IHdhbnQgdG8NCj4gbG9nIGEgbWVzc2FnZT8N
+Cj4gDQo+PiAgICAgICB9IGVsc2Ugew0KPj4gICAgICAgICAgIC8qIGlmIHRoaXMgYXNzZXJ0aW9u
+IGZhaWxzLCB0aGlzIHByb2JhYmx5IG1lYW5zIGEgbmV3IHZlcnNpb24gd2FzDQo+PiAgICAgICAg
+ICAgICogYWRkZWQgd2l0aG91dCBoYXZpbmcgaXQgY292ZXJlZCBoZXJlICovDQo+IA0KPiBLZXZp
+bg0KPiANCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
