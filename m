@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47323)
+Received: from eggs.gnu.org ([209.51.188.92]:52958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gochS-0002sY-Dp
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:51 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1goddM-0001Fx-T9
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:21:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gochR-0003Wl-EN
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:50 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gochR-0003WT-1H
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:49 -0500
-Received: by mail-pg1-x541.google.com with SMTP id t13so9432789pgr.11
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 15:21:48 -0800 (PST)
-Date: Tue, 29 Jan 2019 15:21:46 -0800 (PST)
-In-Reply-To: <CAFyWVaYACGYvUe2ehYiT0hjJR4bUc44ZG5niEdT7mJOMXxGVpg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-742f375b-47d4-4554-b13a-270e098799e7@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <richardw.yang@linux.intel.com>) id 1goddD-00042T-Nw
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:21:34 -0500
+Date: Wed, 30 Jan 2019 07:58:40 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190129235840.GA15790@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
+	<20190129000820.31190-1-richardw.yang@linux.intel.com>
+	<feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
+	<20190129080455.GA10084@richard>
+	<91c53c72-8e9c-f68d-1dc8-f6320ed3dfc0@redhat.com>
+	<f6f1703e-1c77-055e-1906-300df3c79479@vivier.eu>
+	<20190129153254.r7y2vto4ltxsivpj@master>
+	<20190129105828-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/5 v2] RISC-V: Add hooks to use the gdb
- xml files.
+In-Reply-To: <20190129105828-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jim Wilson <jimw@sifive.com>
-Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Yang <richard.weiyang@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, imammedo@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 28 Jan 2019 19:11:58 PST (-0800), Jim Wilson wrote:
-> On Tue, Jan 22, 2019 at 1:52 PM Alistair Francis <alistair23@gmail.com> wrote:
->> You can get env and then check for floating point support:
->>
->> CPURISCVState *env = &cs->env;
->> if (env->misa_mask & RVF) {
->> ...
+On Tue, Jan 29, 2019 at 10:58:50AM -0500, Michael S. Tsirkin wrote:
+>On Tue, Jan 29, 2019 at 03:32:54PM +0000, Wei Yang wrote:
+>> On Tue, Jan 29, 2019 at 09:43:20AM +0100, Laurent Vivier wrote:
+>> >On 29/01/2019 09:23, Philippe Mathieu-Daudé wrote:
+>> >> On 1/29/19 9:04 AM, Wei Yang wrote:
+>> >>> On Tue, Jan 29, 2019 at 07:56:54AM +0100, Philippe Mathieu-Daudé wrote:
+>> >>>> Hi Wei,
+>> >>>>
+>> >>>> On 1/29/19 1:08 AM, Wei Yang wrote:
+>> >>>>> There are several functions/variable which are not used anymore.
+>> >>>>>
+>> >>>>> This serials just remove those without functional change.
+>> >>>>>
+>> >>>>> Wei Yang (3):
+>> >>>>>   hw/i386/pc.c: remove unused function pc_acpi_init()
+>> >>>>>   hw/acpi: remove unused function acpi_table_add_builtin()
+>> >>>>>   hw/acpi: remove unnecessary variable acpi_table_builtin
+>> >>>>>
+>> >>>>>  hw/acpi/core.c         | 10 +---------
+>> >>>>>  hw/i386/pc.c           | 27 ---------------------------
+>> >>>>>  include/hw/acpi/acpi.h |  1 -
+>> >>>>>  include/hw/i386/pc.h   |  1 -
+>> >>>>>  4 files changed, 1 insertion(+), 38 deletions(-)
+>> >>>>>
+>> >>>>
+>> >>>> Please do not post iterated series in reply to previous version, but as
+>> >>>> new thread:
+>> >>>> - patches are parsed by scripts
+>> >>>> - some email clients can tag a thread as "reviewed, skip" and replies to
+>> >>>> this thread will be masked.
+>> >>>>
+>> >>>
+>> >>> Well, do I need to repost it in a new thread?
+>> >> 
+>> >> It depends who will take this patchset and his mood :)
+>> >> Let's wait and see.
+>> >> 
+>> >
+>> >No need to repost if they go through the trivial branch.
+>> 
+>> Thanks :-)
+>> 
+>> >
+>> >Thanks,
+>> >Laurent
 >
-> I needed this which wasn't hard to figure out.
->     RISCVCPU *cpu = RISCV_CPU(cs);
->     CPURISCVState *env = &cpu->env;
->     if (env->misa & RVF) {
+>Pls repost with all acks etc and I'll pick it up.
 >
-> The tricky bit was figuring out how to test it, because I wasn't sure
-> if making registers conditional would actually work.  I figured out
-> that using -machine sifive_e gives me a target with no fpu, and
-> playing with that a bit I get the expected result, which is that the
-> FP regs don't print anymore.  The FP related CSRs still do, but that
-> would require gdb fixes I think, because gdb knows that they are both
-> FP regs and CSR, and tries to print them both ways.  That leads to a
-> more general problem of figuring out exactly which CSRs a particular
-> target implements, which is a bigger problem than I have time to fix
-> at the moment, and should be handled as a separate problem.
->
-> Since my patch set is now a month old, I'll rebase onto current master
-> and post a version 3 patch set.
 
-Thanks!
+Got it.
+
+>> -- 
+>> Wei Yang
+>> Help you, Help me
+
+-- 
+Wei Yang
+Help you, Help me
