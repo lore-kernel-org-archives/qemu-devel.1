@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59124)
+Received: from eggs.gnu.org ([209.51.188.92]:59415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1goR4Z-0003vz-6q
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:56:55 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1goR6A-0004mE-6N
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:58:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1goR4Y-0007gC-Dy
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:56:55 -0500
-Date: Tue, 29 Jan 2019 11:56:48 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190129105648.GC4467@dhcp-200-176.str.redhat.com>
-References: <20190124141731.21509-1-kwolf@redhat.com>
-	<f314a45b-72d4-bc00-07a4-1437c58d286a@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1goR67-0008O7-QC
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:58:32 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:43848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1goR62-0008LQ-2F
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:58:28 -0500
+Date: Tue, 29 Jan 2019 11:58:17 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1901291123160.84186@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1901291156010.93614@zero.eik.bme.hu>
+References: <alpine.BSF.2.21.9999.1901290213290.42676@zero.eik.bme.hu>
+	<8b87466e-3e9a-14ae-c827-ac5e61717a87@redhat.com>
+	<alpine.BSF.2.21.9999.1901291123160.84186@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
-Content-Disposition: inline
-In-Reply-To: <f314a45b-72d4-bc00-07a4-1437c58d286a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] macOS build error after ddac19f534 (virtio: split
+ virtio 9p bits from virtio-pci)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, vsementsov@virtuozzo.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
+On Tue, 29 Jan 2019, BALATON Zoltan wrote:
+> On Tue, 29 Jan 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 1/29/19 2:20 AM, BALATON Zoltan wrote:
+>>> Hello,
+>>>=20
+>>> I'm getting error building on macOS after commit ddac19f534:
+>>>=20
+>>> ? CC????? aarch64-softmmu/hw/virtio/virtio-blk-pci.o
+>>> In file included from qemu/hw/virtio/virtio-9p-pci.c:19:
+>>> In file included from qemu/hw/9pfs/virtio-9p.h:6:
+>>> In file included from qemu/hw/9pfs/9p.h:7:
+>>> qemu/fsdev/file-op-9p.h:19:10: fatal error: 'sys/vfs.h' file not foun=
+d
+>>> #include <sys/vfs.h>
+>>> ???????? ^~~~~~~~~~~
+>>>=20
+>>> Am I missing something? (Apart from the include file which is not
+>>> present on OS X... Maybe this needs the #ifdefs it had before the spl=
+it?)
+>>=20
+>> It seems commits are not correctly ordered for bisectability :(
+>>=20
+>> If you cherry-pick ecd3b89b054, does it build?
+>
+> No it fails with same error on HEAD as well ever since the above commit=
+.
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Now it has built after completely removing build directory. Somehow a=20
+CONFIG_VIRTIO_9P got set before even after doing make distclean several=20
+times. Only completetly removing build dir has helped.
 
-Am 24.01.2019 um 16:56 hat Eric Blake geschrieben:
-> On 1/24/19 8:17 AM, Kevin Wolf wrote:
-> > Depending on the exact image layout and the storage backend (tmpfs is
-> > konwn to have very slow SEEK_HOLE/SEEK_DATA), caching lseek results can
-> > save us a lot of time e.g. during a mirror block job or qemu-img convert
-> > with a fragmented source image (.bdrv_co_block_status on the protocol
-> > layer can be called for every single cluster in the extreme case).
-> >=20
-> > We may only cache data regions because of possible concurrent writers.
-> > This means that we can later treat a recently punched hole as data, but
-> > this is safe. We can't cache holes because then we might treat recently
-> > written data as holes, which can cause corruption.
->=20
-> gluster copies heavily from file-posix's implementation; should it also
-> copy this cache of known-data?  Should NBD also cache known-data when
-> NBD_CMD_BLOCK_STATUS is available?
-
-This almost suggests that we should do the caching in generic block
-layer code.
-
-It would require that we can return a *pnum from the block driver that
-is larger than the requested bytes from, but it looks like
-raw_co_block_status() already handles this? We just don't seem to do
-this yet in the block drivers.
-
-If we want to cache for all drivers, however, the question is whether
-there are drivers that can transition a block from data to hole without
-a discard operation, so that we would have to invalidate the cache in
-more places. One thing that comes to mind is loading an internal
-snapshot for qcow2.
-
-Or maybe we need to make this opt-in for drivers, with a bool flag in
-BlockDriver?
-
-Kevin
-
---zYM0uCDKw75PZbzx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcUDFwAAoJEH8JsnLIjy/WSAEP/AoqquViMvHYDHlKSGuhLnKF
-1Zpby/tt4MvM56nGGYLJ7ApPntjAR638Skc3hTGSiLRN6RJK1GKS6AEqn1h90zAk
-tdOj43CE3qhQvK5iRjNp+ElX1Y2XipT3u5b6nT2ZhBABA7gyLyytv46kgw0REhfv
-dHYD0lI2xbwE7yaA2wai0xfhAhx/4UI72RgsiP4gWDLVjbBC81pXbef17zeK4MFS
-DYPrP8EL3eTa9AQQ3pK8rIbRnWdjHzxvTthMrDNyR0UGXag5mECqRtNxJ1o37Bzu
-166vw6LmdxRebHNTCijmuApKjELlG+xsfahmmQdr/GypnC7sozt3wVhNlrLKPMTR
-HQa0aTMoRBPJFVaQN+7913KIDdLOugjNylpr4M0wg5VaYvDU5Z8SvjK0FCrgGATY
-cqZQOwuCMMMjg9BDH22LrOApUEkuYiw3Qk2JQJ6GLekpLwz5s3OGdlp4lNx6Eiyj
-9PUC4yN118S3W4auEbqRIp4y+W7v04bwSj6EKSxkKbV2HNgtLv8ZFpEnRypiUfLM
-a8qhMTOURMOiyp6m4dLvSUJgMXYyYb4yGTF4L1udeRtntOK4IBpSL7Gsv8wuUNC5
-9wXy8UkvjaDSH0cRIzmdGMGEJsgtBfweAoVlKDnoh6tjr0j6uDKcH06XCNzBVkhg
-BINZf8JsbdPpsradN7G7
-=EfA/
------END PGP SIGNATURE-----
-
---zYM0uCDKw75PZbzx--
+Regards,
+BALATON Zoltan
