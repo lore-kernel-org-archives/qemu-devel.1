@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55468)
+Received: from eggs.gnu.org ([209.51.188.92]:55607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1goLqF-0003l1-Hf
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:21:48 -0500
+	(envelope-from <peterx@redhat.com>) id 1goLrD-0004EE-Or
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1goLqE-00008n-Ew
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:21:47 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43673)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1goLqC-0008VQ-PT
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:21:46 -0500
-Received: by mail-wr1-x434.google.com with SMTP id r10so20515834wrs.10
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 21:21:43 -0800 (PST)
+	(envelope-from <peterx@redhat.com>) id 1goLrC-0002Xt-LA
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40252)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1goLrC-0002W1-B4
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 00:22:46 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE558C0669AB
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 05:14:43 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue, 29 Jan 2019 13:14:32 +0800
+Message-Id: <20190129051432.22023-1-peterx@redhat.com>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 29 Jan 2019 13:21:29 +0800
-Message-ID: <CAJSP0QUuZZOVOxhuUG4J3sh0qp_BTf-MrVV=Z9eQs4dXBpY1qA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Last call for GSoC/Outreachy project ideas
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] iothread: fix iothread hang when stop too soon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, Jailhouse <jailhouse-dev@googlegroups.com>, rust-vmm@lists.opendev.org
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Thomas Huth <thuth@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Dear QEMU, KVM, Jailhouse, and Rust-VMM communities,
-Please post your internship project ideas by February 1st so we can
-include them in the Google Summer of Code and Outreachy ideas list:
+Lukas reported an hard to reproduce QMP iothread hang on s390 that
+QEMU might hang at pthread_join() of the QMP monitor iothread before
+quitting:
 
-https://wiki.qemu.org/Google_Summer_of_Code_2019
+  Thread 1
+  #0  0x000003ffad10932c in pthread_join
+  #1  0x0000000109e95750 in qemu_thread_join
+      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
+  #2  0x0000000109c95a1c in iothread_stop
+  #3  0x0000000109bb0874 in monitor_cleanup
+  #4  0x0000000109b55042 in main
 
-If you'd like to mentor but don't have your own project idea, take a
-look at the list and ask to co-mentor one of the existing project
-ideas.
+While the iothread is still in the main loop:
 
-Good project ideas are suitable for 12 weeks of full-time work by a
-competent programmer who is not yet familiar with the codebase.  In
-addition, they are:
- * Well-defined - the scope is clear
- * Self-contained - there are few dependencies
- * Uncontroversial - they are acceptable to the community
- * Incremental - they produce deliverables along the way
+  Thread 4
+  #0  0x000003ffad0010e4 in ??
+  #1  0x000003ffad553958 in g_main_context_iterate.isra.19
+  #2  0x000003ffad553d90 in g_main_loop_run
+  #3  0x0000000109c9585a in iothread_run
+      at /home/thuth/devel/qemu/iothread.c:74
+  #4  0x0000000109e94752 in qemu_thread_start
+      at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
+  #5  0x000003ffad10825a in start_thread
+  #6  0x000003ffad00dcf2 in thread_start
 
-For more background on QEMU internships, check out this video:
-https://www.youtube.com/watch?v=xNVCX7YMUL8
+IMHO it's because there's a race between the main thread and iothread
+when stopping the thread in following sequence:
 
-Please let me know if you have any questions.
+    main thread                       iothread
+    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+                                      aio_poll()
+    iothread_get_g_main_context
+      set iothread->worker_context
+    iothread_stop
+      schedule iothread_stop_bh
+                                        execute iothread_stop_bh [1]
+                                          set iothread->running=3Dfalse
+                                          (since main_loop=3D=3DNULL so
+                                           skip to quit main loop.
+                                           Note: although main_loop is
+                                           NULL but worker_context is
+                                           not!)
+                                      atomic_read(&iothread->worker_conte=
+xt) [2]
+                                        create main_loop object
+                                        g_main_loop_run() [3]
+    pthread_join() [4]
 
-Stefan
+We can see that when execute iothread_stop_bh() at [1] it's possible
+that main_loop is still NULL because it's only created until the first
+check of the worker_context later at [2].  Then the iothread will hang
+in the main loop [3] and it'll starve the main thread too [4].
+
+Here the simple solution should be that we check again the "running"
+variable before check against worker_context.
+
+CC: Thomas Huth <thuth@redhat.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+
+This hasn't yet been verified on the initial s390 systems, but since I
+can reproduce it locally with this code clip:
+
+        IOThread *iothread =3D iothread_create("test", NULL);
+        iothread_get_g_main_context(iothread);
+        iothread_stop(iothread);
+
+so I'm still posting this out for review first in case it was hit by
+other users.
+---
+ iothread.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/iothread.c b/iothread.c
+index 2fb1cdf55d..e615b7ae52 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
+     while (iothread->running) {
+         aio_poll(iothread->ctx, true);
+=20
+-        if (atomic_read(&iothread->worker_context)) {
++        /*
++         * We must check the running state again in case it was
++         * changed in previous aio_poll()
++         */
++        if (iothread->running && atomic_read(&iothread->worker_context))=
+ {
+             GMainLoop *loop;
+=20
+             g_main_context_push_thread_default(iothread->worker_context)=
+;
+--=20
+2.17.1
