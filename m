@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47446)
+Received: from eggs.gnu.org ([209.51.188.92]:52265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goNsV-0003Vn-NX
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:32:16 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1goOOz-0008TP-2l
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goNsT-00053b-Ee
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:32:15 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42023)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goNsR-0004xd-Rz
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:32:13 -0500
-Received: by mail-wr1-f67.google.com with SMTP id q18so20792942wrx.9
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 23:32:11 -0800 (PST)
-References: <alpine.BSF.2.21.9999.1901290213290.42676@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8b87466e-3e9a-14ae-c827-ac5e61717a87@redhat.com>
-Date: Tue, 29 Jan 2019 08:32:08 +0100
+	(envelope-from <richardw.yang@linux.intel.com>) id 1goOOx-0000GJ-5U
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:05:49 -0500
+Date: Tue, 29 Jan 2019 16:04:55 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190129080455.GA10084@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
+	<20190129000820.31190-1-richardw.yang@linux.intel.com>
+	<feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901290213290.42676@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] macOS build error after ddac19f534 (virtio: split
- virtio 9p bits from virtio-pci)
+In-Reply-To: <feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
 
-Hi Zoltan,
+On Tue, Jan 29, 2019 at 07:56:54AM +0100, Philippe Mathieu-Daud� wrote:
+>Hi Wei,
+>
+>On 1/29/19 1:08 AM, Wei Yang wrote:
+>> There are several functions/variable which are not used anymore.
+>> 
+>> This serials just remove those without functional change.
+>> 
+>> Wei Yang (3):
+>>   hw/i386/pc.c: remove unused function pc_acpi_init()
+>>   hw/acpi: remove unused function acpi_table_add_builtin()
+>>   hw/acpi: remove unnecessary variable acpi_table_builtin
+>> 
+>>  hw/acpi/core.c         | 10 +---------
+>>  hw/i386/pc.c           | 27 ---------------------------
+>>  include/hw/acpi/acpi.h |  1 -
+>>  include/hw/i386/pc.h   |  1 -
+>>  4 files changed, 1 insertion(+), 38 deletions(-)
+>> 
+>
+>Please do not post iterated series in reply to previous version, but as
+>new thread:
+>- patches are parsed by scripts
+>- some email clients can tag a thread as "reviewed, skip" and replies to
+>this thread will be masked.
+>
 
-On 1/29/19 2:20 AM, BALATON Zoltan wrote:
-> Hello,
-> 
-> I'm getting error building on macOS after commit ddac19f534:
-> 
->   CC      aarch64-softmmu/hw/virtio/virtio-blk-pci.o
-> In file included from qemu/hw/virtio/virtio-9p-pci.c:19:
-> In file included from qemu/hw/9pfs/virtio-9p.h:6:
-> In file included from qemu/hw/9pfs/9p.h:7:
-> qemu/fsdev/file-op-9p.h:19:10: fatal error: 'sys/vfs.h' file not found
-> #include <sys/vfs.h>
->          ^~~~~~~~~~~
-> 
-> Am I missing something? (Apart from the include file which is not
-> present on OS X... Maybe this needs the #ifdefs it had before the split?)
+Well, do I need to repost it in a new thread?
 
-It seems commits are not correctly ordered for bisectability :(
+>Regards,
+>
+>Phil.
 
-If you cherry-pick ecd3b89b054, does it build?
+-- 
+Wei Yang
+Help you, Help me
