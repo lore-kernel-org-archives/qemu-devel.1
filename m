@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60684)
+Received: from eggs.gnu.org ([209.51.188.92]:34217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1goXV1-0006iC-6x
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 12:48:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1goXaz-0001Hb-OV
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 12:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1goXUw-0005tE-0t
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 12:48:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1goXUt-0005qg-TY
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 12:48:33 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 499DA80F6C
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 17:48:26 +0000 (UTC)
-References: <20190128174725.8809-1-ccarrara@redhat.com>
-	<20190128174725.8809-2-ccarrara@redhat.com>
-	<bc08dd05-82c5-a4e9-ca7f-883eb27c865e@redhat.com>
-	<20190129113055.GA19301@localhost.localdomain>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <935ae139-4142-aa68-e05f-3cd99c113cbd@redhat.com>
-Date: Tue, 29 Jan 2019 15:48:19 -0200
+	(envelope-from <philmd@redhat.com>) id 1goXay-0008VR-9g
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 12:54:49 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 29 Jan 2019 18:53:45 +0100
+Message-Id: <20190129175403.18017-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190129113055.GA19301@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] tests.acceptance: adds multi vm
- capability for acceptance tests
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/18] OpenBSD: Enable qtesting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,144 +20,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Caio Carrara <ccarrara@redhat.com>
-Cc: crosa@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
+Various fixes I encountered while trying to run QEMU test suite on OpenBS=
+D.
+Now than various tests are disabled, we can run the qtests again.
+(Conversely, if we can not test a feature, we should deprecate/remove it.=
+)
 
-On 01/29/2019 09:30 AM, Caio Carrara wrote:
-> Hi, Wainer.
->
-> On Mon, Jan 28, 2019 at 05:42:24PM -0200, Wainer dos Santos Moschetta wrote:
->> On 01/28/2019 03:47 PM, Caio Carrara wrote:
->>> This change adds the possibility to write acceptance tests with multi
->>> virtual machine support. It's done keeping the virtual machines objects
->>> stored in a test attribute (dictionary). This dictionary shouldn't be
->>> accessed directly but through the new method added `get_vm`. This new
->>> method accept a list of args (that will be added as virtual machine
->>> arguments) and an optional name argument. The name is the key that
->>> identify a single virtual machine along the test machines available. If
->>> a name without a machine is informed a new machine will be instantiated.
->>>
->>> The current usage of vm in tests will not be broken by this change since
->>> it keeps a property called vm in the base test class. This property only
->>> calls the new method `get_vm` with default parameters (no args and
->>> 'default' as machine name).
->> I've checked that current tests does not break by this change. I also
->> checked the example you provided on docs/devel/testing.rst works too.
->>
->> So Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
->>
->>> Signed-off-by: Caio Carrara <ccarrara@redhat.com>
->>> ---
->>>    docs/devel/testing.rst                    | 40 ++++++++++++++++++++++-
->>>    tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
->>>    2 files changed, 60 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
->>> index 18e2c0868a..b97c0368bc 100644
->>> --- a/docs/devel/testing.rst
->>> +++ b/docs/devel/testing.rst
->>> @@ -634,7 +634,45 @@ instance, available at ``self.vm``.  Because many tests will tweak the
->>>    QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
->>>    is left to the test writer.
->>> -At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
->>> +The base test class has also support for tests with more than one
->>> +QEMUMachine. The way to get machines is through the ``self.get_vm()``
->>> +method which will return a QEMUMachine instance. The ``self.get_vm()``
->>> +method also accepts an optional `name` attribute so you can identify a
->>> +specific machine and get it more than once through the tests methods. A
->>> +simple and hypothetical example follows:
->> Since you explain the self.get_vm() optional name attribute, you also could
->> mention it accepts arguments to be passed to the newly created VM.
->>
->>> +
->>> +.. code::
->>> +
->>> +  from avocado_qemu import Test
->>> +
->>> +
->>> +  class MultipleMachines(Test):
->>> +      """
->>> +      :avocado: enable
->>> +      """
->>> +      def test_multiple_machines(self):
->>> +          first_machine = self.get_vm()
->>> +          second_machine = self.get_vm()
->>> +          self.get_vm(name='third_machine').launch()
->>> +
->>> +          first_machine.launch()
->>> +          second_machine.launch()
->>> +
->>> +          first_res = first_machine.command(
->>> +              'human-monitor-command',
->>> +              command_line='info version')
->>> +
->>> +          second_res = second_machine.command(
->>> +              'human-monitor-command',
->>> +              command_line='info version')
->>> +
->>> +          third_res = self.get_vm(name='third_machine').command(
->>> +              'human-monitor-command',
->>> +              command_line='info version')
->>> +
->>> +          self.assertEquals(first_res, second_res, third_res)
->>> +
->>> +At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
->>>    shutdown.
->>>    QEMUMachine
->>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
->>> index 1e54fd5932..4c9e27feda 100644
->>> --- a/tests/acceptance/avocado_qemu/__init__.py
->>> +++ b/tests/acceptance/avocado_qemu/__init__.py
->>> @@ -10,6 +10,7 @@
->>>    import os
->>>    import sys
->>> +import uuid
->>>    import avocado
->>> @@ -42,13 +43,29 @@ def pick_default_qemu_bin():
->>>    class Test(avocado.Test):
->>>        def setUp(self):
->>> -        self.vm = None
->>> +        self._vms = {}
->>>            self.qemu_bin = self.params.get('qemu_bin',
->>>                                            default=pick_default_qemu_bin())
->>>            if self.qemu_bin is None:
->>>                self.cancel("No QEMU binary defined or found in the source tree")
->>> -        self.vm = QEMUMachine(self.qemu_bin)
->>> +
->>> +    def _new_vm(self, *args):
->>> +        vm = QEMUMachine(self.qemu_bin)
->>> +        if args:
->>> +            vm.add_args(*args)
->>> +        return vm
->>> +
->>> +    @property
->>> +    def vm(self):
->>> +        return self.get_vm(name='default')
->>> +
->>> +    def get_vm(self, *args, name=None):
->>> +        if not name:
->>> +            name = str(uuid.uuid4())
->> Beware that if you don't give a name to the VM, the only way to access it
->> later is to keep the reference returned by get_vm(). Do you think it is
->> something we should care about? or assume the test writer handle this
->> (unlikely?) case somehow?
-> I think it's something e should assume the test writer is going to
-> handle.
+Since v1:
+- various qemu-block fixes and notes.
 
-Fair enough.
+Some patches care be applied by respective maintainers, but I prefer
+to submit the series as a whole, since it makes the testing easier
+than various 'based-on:' ...
 
-- Wainer
+- patches 1, 3, 9, 11, !14 can go via 'test automation' (Alex/Fam)
+- patche 2: Brad or Paolo 'Misc'???
+- patche 8 eventually 'ACPI' (MST)
+- patches 4-7 via the 'block layer' (Kevin)
+- other RFC patches require review by the block team!!!
 
->> - Wainer
->>
->>> +        if self._vms.get(name) is None:
->>> +            self._vms[name] = self._new_vm(*args)
->>> +        return self._vms[name]
->>>        def tearDown(self):
->>> -        if self.vm is not None:
->>> -            self.vm.shutdown()
->>> +        for vm in self._vms.values():
->>> +            vm.shutdown()
-> Thanks,
->
+Regards,
+
+Phil.
+
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06676.html
+
+Philippe Mathieu-Daud=C3=A9 (18):
+  tests/vm: Be verbose while extracting compressed images
+  configure: Disable W^X on OpenBSD
+  tests/vm/openbsd: Disable the W^X protection on the build partition
+  ahci-test: Add dependency to qemu-img tool
+  qemu-iotests: Add dependency to qemu-nbd tool
+  qemu-iotests: Improve portability by searching bash in the $PATH
+  tests/multiboot: Improve portability by searching bash in the $PATH
+  tests/bios-tables: Improve portability by searching bash in the $PATH
+  tests/vm/openbsd: Install Bash from the ports
+  RFC qemu-iotests: Ensure GNU sed is used
+  tests/vm/openbsd: Install GNU sed from the ports
+  RFC test-iov: Disable iov/io test on OpenBSD
+  RFC oslib-posix: Ignore fcntl("/dev/null", F_SETFL, O_NONBLOCK)
+    failure
+  tests/vm: Run tests on OpenBSD
+  iotests: Let verify_platform() check for unsupported platforms
+  RFC iotests: Disable 208 on OpenBSD
+  RFC iotests: Disable 209 on OpenBSD
+  RFC iotests: Disable 236 and 238 on OpenBSD
+
+ configure                               | 11 +++++++
+ tests/Makefile.include                  |  4 +--
+ tests/data/acpi/rebuild-expected-aml.sh |  2 +-
+ tests/multiboot/run_test.sh             |  2 +-
+ tests/qemu-iotests/001                  |  2 +-
+ tests/qemu-iotests/002                  |  2 +-
+ tests/qemu-iotests/003                  |  2 +-
+ tests/qemu-iotests/004                  |  2 +-
+ tests/qemu-iotests/005                  |  2 +-
+ tests/qemu-iotests/007                  |  2 +-
+ tests/qemu-iotests/008                  |  2 +-
+ tests/qemu-iotests/009                  |  2 +-
+ tests/qemu-iotests/010                  |  2 +-
+ tests/qemu-iotests/011                  |  2 +-
+ tests/qemu-iotests/012                  |  2 +-
+ tests/qemu-iotests/013                  |  2 +-
+ tests/qemu-iotests/014                  |  2 +-
+ tests/qemu-iotests/015                  |  2 +-
+ tests/qemu-iotests/017                  |  2 +-
+ tests/qemu-iotests/018                  |  2 +-
+ tests/qemu-iotests/019                  |  2 +-
+ tests/qemu-iotests/020                  |  2 +-
+ tests/qemu-iotests/021                  |  2 +-
+ tests/qemu-iotests/022                  |  2 +-
+ tests/qemu-iotests/023                  |  2 +-
+ tests/qemu-iotests/024                  |  2 +-
+ tests/qemu-iotests/025                  |  2 +-
+ tests/qemu-iotests/026                  |  2 +-
+ tests/qemu-iotests/027                  |  2 +-
+ tests/qemu-iotests/028                  |  2 +-
+ tests/qemu-iotests/029                  |  2 +-
+ tests/qemu-iotests/031                  |  2 +-
+ tests/qemu-iotests/032                  |  2 +-
+ tests/qemu-iotests/033                  |  2 +-
+ tests/qemu-iotests/034                  |  2 +-
+ tests/qemu-iotests/035                  |  2 +-
+ tests/qemu-iotests/036                  |  2 +-
+ tests/qemu-iotests/037                  |  2 +-
+ tests/qemu-iotests/038                  |  2 +-
+ tests/qemu-iotests/039                  |  2 +-
+ tests/qemu-iotests/042                  |  2 +-
+ tests/qemu-iotests/043                  |  2 +-
+ tests/qemu-iotests/046                  |  2 +-
+ tests/qemu-iotests/047                  |  2 +-
+ tests/qemu-iotests/048                  |  2 +-
+ tests/qemu-iotests/049                  |  2 +-
+ tests/qemu-iotests/050                  |  2 +-
+ tests/qemu-iotests/051                  |  2 +-
+ tests/qemu-iotests/052                  |  2 +-
+ tests/qemu-iotests/053                  |  2 +-
+ tests/qemu-iotests/054                  |  2 +-
+ tests/qemu-iotests/058                  |  2 +-
+ tests/qemu-iotests/059                  |  2 +-
+ tests/qemu-iotests/060                  |  2 +-
+ tests/qemu-iotests/061                  |  2 +-
+ tests/qemu-iotests/062                  |  2 +-
+ tests/qemu-iotests/063                  |  2 +-
+ tests/qemu-iotests/064                  |  2 +-
+ tests/qemu-iotests/066                  |  2 +-
+ tests/qemu-iotests/067                  |  2 +-
+ tests/qemu-iotests/068                  |  2 +-
+ tests/qemu-iotests/069                  |  2 +-
+ tests/qemu-iotests/070                  |  2 +-
+ tests/qemu-iotests/071                  |  2 +-
+ tests/qemu-iotests/072                  |  2 +-
+ tests/qemu-iotests/073                  |  2 +-
+ tests/qemu-iotests/074                  |  2 +-
+ tests/qemu-iotests/075                  |  2 +-
+ tests/qemu-iotests/076                  |  2 +-
+ tests/qemu-iotests/077                  |  2 +-
+ tests/qemu-iotests/078                  |  2 +-
+ tests/qemu-iotests/079                  |  2 +-
+ tests/qemu-iotests/080                  |  2 +-
+ tests/qemu-iotests/081                  |  2 +-
+ tests/qemu-iotests/082                  |  2 +-
+ tests/qemu-iotests/083                  |  2 +-
+ tests/qemu-iotests/084                  |  2 +-
+ tests/qemu-iotests/085                  |  2 +-
+ tests/qemu-iotests/086                  |  2 +-
+ tests/qemu-iotests/087                  |  2 +-
+ tests/qemu-iotests/088                  |  2 +-
+ tests/qemu-iotests/089                  |  2 +-
+ tests/qemu-iotests/090                  |  2 +-
+ tests/qemu-iotests/091                  |  2 +-
+ tests/qemu-iotests/092                  |  2 +-
+ tests/qemu-iotests/094                  |  2 +-
+ tests/qemu-iotests/095                  |  2 +-
+ tests/qemu-iotests/097                  |  2 +-
+ tests/qemu-iotests/098                  |  2 +-
+ tests/qemu-iotests/099                  |  2 +-
+ tests/qemu-iotests/101                  |  2 +-
+ tests/qemu-iotests/102                  |  2 +-
+ tests/qemu-iotests/103                  |  2 +-
+ tests/qemu-iotests/104                  |  2 +-
+ tests/qemu-iotests/105                  |  2 +-
+ tests/qemu-iotests/106                  |  2 +-
+ tests/qemu-iotests/107                  |  2 +-
+ tests/qemu-iotests/108                  |  2 +-
+ tests/qemu-iotests/109                  |  2 +-
+ tests/qemu-iotests/110                  |  2 +-
+ tests/qemu-iotests/111                  |  2 +-
+ tests/qemu-iotests/112                  |  2 +-
+ tests/qemu-iotests/113                  |  2 +-
+ tests/qemu-iotests/114                  |  2 +-
+ tests/qemu-iotests/115                  |  2 +-
+ tests/qemu-iotests/116                  |  2 +-
+ tests/qemu-iotests/117                  |  2 +-
+ tests/qemu-iotests/119                  |  2 +-
+ tests/qemu-iotests/120                  |  2 +-
+ tests/qemu-iotests/121                  |  2 +-
+ tests/qemu-iotests/122                  |  2 +-
+ tests/qemu-iotests/123                  |  2 +-
+ tests/qemu-iotests/125                  |  2 +-
+ tests/qemu-iotests/126                  |  2 +-
+ tests/qemu-iotests/127                  |  2 +-
+ tests/qemu-iotests/128                  |  2 +-
+ tests/qemu-iotests/130                  |  2 +-
+ tests/qemu-iotests/131                  |  2 +-
+ tests/qemu-iotests/133                  |  2 +-
+ tests/qemu-iotests/134                  |  2 +-
+ tests/qemu-iotests/135                  |  2 +-
+ tests/qemu-iotests/137                  |  2 +-
+ tests/qemu-iotests/138                  |  2 +-
+ tests/qemu-iotests/140                  |  2 +-
+ tests/qemu-iotests/141                  |  2 +-
+ tests/qemu-iotests/142                  |  2 +-
+ tests/qemu-iotests/143                  |  2 +-
+ tests/qemu-iotests/144                  |  2 +-
+ tests/qemu-iotests/145                  |  2 +-
+ tests/qemu-iotests/146                  |  2 +-
+ tests/qemu-iotests/150                  |  2 +-
+ tests/qemu-iotests/153                  |  2 +-
+ tests/qemu-iotests/154                  |  2 +-
+ tests/qemu-iotests/156                  |  2 +-
+ tests/qemu-iotests/157                  |  2 +-
+ tests/qemu-iotests/158                  |  2 +-
+ tests/qemu-iotests/159                  |  2 +-
+ tests/qemu-iotests/160                  |  2 +-
+ tests/qemu-iotests/161                  |  2 +-
+ tests/qemu-iotests/162                  |  2 +-
+ tests/qemu-iotests/170                  |  2 +-
+ tests/qemu-iotests/171                  |  2 +-
+ tests/qemu-iotests/172                  |  2 +-
+ tests/qemu-iotests/173                  |  2 +-
+ tests/qemu-iotests/174                  |  2 +-
+ tests/qemu-iotests/175                  |  2 +-
+ tests/qemu-iotests/176                  |  2 +-
+ tests/qemu-iotests/177                  |  2 +-
+ tests/qemu-iotests/178                  |  2 +-
+ tests/qemu-iotests/179                  |  2 +-
+ tests/qemu-iotests/181                  |  2 +-
+ tests/qemu-iotests/182                  |  2 +-
+ tests/qemu-iotests/183                  |  2 +-
+ tests/qemu-iotests/184                  |  2 +-
+ tests/qemu-iotests/185                  |  2 +-
+ tests/qemu-iotests/186                  |  2 +-
+ tests/qemu-iotests/187                  |  2 +-
+ tests/qemu-iotests/188                  |  2 +-
+ tests/qemu-iotests/189                  |  2 +-
+ tests/qemu-iotests/190                  |  2 +-
+ tests/qemu-iotests/191                  |  2 +-
+ tests/qemu-iotests/192                  |  2 +-
+ tests/qemu-iotests/195                  |  2 +-
+ tests/qemu-iotests/197                  |  2 +-
+ tests/qemu-iotests/198                  |  2 +-
+ tests/qemu-iotests/200                  |  2 +-
+ tests/qemu-iotests/201                  |  2 +-
+ tests/qemu-iotests/204                  |  2 +-
+ tests/qemu-iotests/208                  |  1 +
+ tests/qemu-iotests/209                  |  1 +
+ tests/qemu-iotests/214                  |  2 +-
+ tests/qemu-iotests/215                  |  2 +-
+ tests/qemu-iotests/217                  |  2 +-
+ tests/qemu-iotests/220                  |  2 +-
+ tests/qemu-iotests/221                  |  2 +-
+ tests/qemu-iotests/223                  |  2 +-
+ tests/qemu-iotests/225                  |  2 +-
+ tests/qemu-iotests/226                  |  2 +-
+ tests/qemu-iotests/227                  |  2 +-
+ tests/qemu-iotests/229                  |  2 +-
+ tests/qemu-iotests/231                  |  2 +-
+ tests/qemu-iotests/232                  |  2 +-
+ tests/qemu-iotests/233                  |  2 +-
+ tests/qemu-iotests/236                  |  1 +
+ tests/qemu-iotests/238                  |  2 ++
+ tests/qemu-iotests/check                |  2 +-
+ tests/qemu-iotests/common.config        |  2 +-
+ tests/qemu-iotests/common.filter        | 38 ++++++++++++-------------
+ tests/qemu-iotests/common.nbd           |  2 +-
+ tests/qemu-iotests/common.pattern       |  2 +-
+ tests/qemu-iotests/common.qemu          |  2 +-
+ tests/qemu-iotests/common.rc            | 14 ++++++++-
+ tests/qemu-iotests/common.tls           |  2 +-
+ tests/qemu-iotests/iotests.py           |  4 ++-
+ tests/test-iov.c                        |  8 ++++--
+ tests/vm/centos                         |  3 +-
+ tests/vm/freebsd                        |  3 +-
+ tests/vm/netbsd                         |  3 +-
+ tests/vm/openbsd                        | 17 ++++++++---
+ util/oslib-posix.c                      | 10 +++++++
+ 200 files changed, 272 insertions(+), 218 deletions(-)
+
+--=20
+2.20.1
