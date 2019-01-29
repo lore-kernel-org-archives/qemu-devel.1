@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34896)
+Received: from eggs.gnu.org ([209.51.188.92]:36724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goRPB-0001dK-8v
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:18:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1goRYK-0004M6-0s
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:27:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goRPA-00060P-CU
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:18:13 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 29 Jan 2019 11:18:03 +0000
-Message-ID: <49f1af0b-a245-3b17-7e74-6b3837e42406@virtuozzo.com>
-References: <20190125164601.130556-1-vsementsov@virtuozzo.com>
-	<20190129033155.GD3264@stefanha-x1.localdomain>
-	<fa3cc31b-937c-a22c-4079-2ad7d968aac5@virtuozzo.com>
-	<CAJSP0QUCeM2wHA5Z4wnBYHoE9=sLxxAqyDMZ5-i4g12v2DQEiQ@mail.gmail.com>
-In-Reply-To: <CAJSP0QUCeM2wHA5Z4wnBYHoE9=sLxxAqyDMZ5-i4g12v2DQEiQ@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C954E7396137A64C9A9BC86589A876FF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1goRYH-0004iY-8q
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:27:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goRY8-0004fr-EL
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:27:30 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 33CC9D4E72
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 11:27:27 +0000 (UTC)
+Date: Tue, 29 Jan 2019 11:27:20 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190129112720.GC2650@work-vm>
+References: <20190128170321.16936-1-dgilbert@redhat.com>
+	<20190128170321.16936-2-dgilbert@redhat.com>
+	<5e2fce30-a0da-33d2-ed34-a963e4464b1a@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] block: local qiov helper
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e2fce30-a0da-33d2-ed34-a963e4464b1a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/9] net: Introduce announce timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-MjkuMDEuMjAxOSAxMzozMiwgU3RlZmFuIEhham5vY3ppIHdyb3RlOg0KPiBPbiBUdWUsIEphbiAy
-OSwgMjAxOSBhdCA2OjI0IFBNIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkNCj4gPHZzZW1l
-bnRzb3ZAdmlydHVvenpvLmNvbT4gd3JvdGU6DQo+PiAyOS4wMS4yMDE5IDY6MzEsIFN0ZWZhbiBI
-YWpub2N6aSB3cm90ZToNCj4+PiBPbiBGcmksIEphbiAyNSwgMjAxOSBhdCAwNzo0NjowMVBNICsw
-MzAwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gSG1tLiBJbiB0aGlz
-IGNhc2Ugd2UgZGVmaW5pdGVseSB3aWxsIGhhdmUgdGlueSBleHRyYSBtZW1vcnkgdXNhZ2UsIGJ1
-dCB3ZSBnYWluIGJlYXV0aWZ1bA0KPj4gcmVhZGFiaWxpdHkuDQo+Pg0KPj4gU28sIGxpa2UgdGhp
-czoNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xZW11L2lvdi5oIGIvaW5jbHVkZS9xZW11
-L2lvdi5oDQo+PiBpbmRleCA1ZjQzM2M3NzY4Li41M2RlMWIzOGJiIDEwMDY0NA0KPj4gLS0tIGEv
-aW5jbHVkZS9xZW11L2lvdi5oDQo+PiArKysgYi9pbmNsdWRlL3FlbXUvaW92LmgNCj4+IEBAIC0x
-MzQsOSArMTM0LDMxIEBAIHR5cGVkZWYgc3RydWN0IFFFTVVJT1ZlY3RvciB7DQo+PiAgICAgICAg
-c3RydWN0IGlvdmVjICppb3Y7DQo+PiAgICAgICAgaW50IG5pb3Y7DQo+PiAgICAgICAgaW50IG5h
-bGxvYzsNCj4+IC0gICAgc2l6ZV90IHNpemU7DQo+PiArICAgIHVuaW9uIHsNCj4+ICsgICAgICAg
-IHN0cnVjdCB7DQo+PiArICAgICAgICAgICAgdm9pZCAqX191bnVzZWRfaW92X2Jhc2U7DQo+IA0K
-PiBUaGlzIGNvdWxkIGJlIHN0cnVjdCBpb3ZlYyAqaW92IGZvciBuYWxsb2MgPiAwIHVzZXJzLiAg
-TXVzdCByZXNpc3QgaGFja2luZXNzISA6KQ0KDQpjYW4ndCBiZSBpb3YsIGdjYyBjb21wbGFpbnM6
-DQppbmNsdWRlL3FlbXUvaW92Lmg6MTM5OjI3OiBlcnJvcjogZHVwbGljYXRlIG1lbWJlciDigJhp
-b3bigJkNCiAgICAgICAgICAgICAgc3RydWN0IGlvdmVjICppb3Y7DQoNCj4gDQo+PiArICAgICAg
-ICAgICAgc2l6ZV90IHNpemU7DQo+PiArICAgICAgICB9Ow0KPj4gKyAgICAgICAgc3RydWN0IGlv
-dmVjIGxvY2FsX2lvdjsNCj4+ICsgICAgfTsNCj4+ICAgIH0gUUVNVUlPVmVjdG9yOw0KPiANCj4g
-VGhhdCdzIGNsZXZlciBhbmQgbm90IHRvbyBoYWNreS4gIFBsZWFzZSBpbmNsdWRlIGEgY29tbWVu
-dCBzbyB0aGUNCj4gaW50ZW50IGlzIGNsZWFyOg0KPiANCj4gICAgLyogU2F2ZSBzcGFjZSBieSBy
-ZXVzaW5nIHRoZSBlbWJlZGRlZCBpb3ZlYydzIHNpemUgZmllbGQgYXMgdGhlDQo+IHRvdGFsIHNp
-emUgZmllbGQuICBVc2VycyB3aXRoIGV4dGVybmFsIGlvdmVjcyBkb24ndCB1c2UgdGhlIGVtYmVk
-ZGVkDQo+IGlvdmVjIHNvIHRoaXMgaXMgc2FmZS4gKi8NCj4gDQo+IFN0ZWZhbg0KPiANCg0KDQot
-LSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+* Eric Blake (eblake@redhat.com) wrote:
+> On 1/28/19 11:03 AM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > The 'announce timer' will be used by migration, and explicit
+> > requests for qemu to perform network announces.
+> > 
+> > Based on the work by Germano Veit Michel <germano@redhat.com>
+> >  and Vlad Yasevich <vyasevic@redhat.com>
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> 
+> > +++ b/qapi/net.json
+> > @@ -684,3 +684,26 @@
+> >  ##
+> >  { 'event': 'NIC_RX_FILTER_CHANGED',
+> >    'data': { '*name': 'str', 'path': 'str' } }
+> > +
+> > +##
+> > +# @AnnounceParameters:
+> > +#
+> > +# Parameters for self-announce timers
+> > +#
+> > +# @initial: Initial delay (in ms) before sending the first GARP/RARP
+> > +#       announcement
+> > +#
+> > +# @max: Maximum delay (in ms) to between GARP/RARP announcement packets
+> 
+> "to between" should be either "to use in between" or merely "between"
+
+I've changed it to the plain 'between'.
+
+> > +#
+> > +# @rounds: Number of self-announcement attempts
+> > +#
+> > +# @step: Delay increase (in ms) after each self-announcement attempt
+> > +#
+> > +# Since: 4.0
+> > +##
+> > +
+> > +{ 'struct': 'AnnounceParameters',
+> > +  'data': { 'initial': 'int',
+> > +            'max': 'int',
+> > +            'rounds': 'int',
+> > +            'step': 'int' } }
+> > 
+> 
+> Can/should any of the parameters be optional with a sane (documented)
+> default?
+
+I think last time Dan was arguing for it to be explicit, the only
+default we could pick are the values we currently use, which I think are
+only defendable as 'seem to have worked well so far'.
+
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
