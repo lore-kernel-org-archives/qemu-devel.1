@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37685)
+Received: from eggs.gnu.org ([209.51.188.92]:40406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goTo1-0007iQ-NF
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:52:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1goTzy-0004Zo-RX
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:04:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goTo1-0003u7-0V
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:52:01 -0500
-Date: Tue, 29 Jan 2019 14:51:56 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190129145156.6719b8a4.cohuck@redhat.com>
-In-Reply-To: <1548769067-20792-1-git-send-email-thuth@redhat.com>
-References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1goTzv-000071-EP
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:04:21 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1goTzr-0008Pn-Hj
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:04:17 -0500
+Received: by mail-wr1-x436.google.com with SMTP id z5so22160713wrt.11
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 06:04:15 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Jan 2019 14:04:09 +0000
+Message-Id: <20190129140411.682-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
- header comments
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/2] target/arm: Fix FCMLA decoding errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-s390x@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Laurent Desnogues <laurent.desnogues@gmail.com>
 
-On Tue, 29 Jan 2019 14:37:47 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+This patchset fixes the two bugs in our decode of
+FCMLA (by element) reported by Laurent.
 
-> It's either "GNU *Library* General Public License version 2" or
-> "GNU Lesser General Public License version *2.1*", but there was
-> no "version 2.0" of the "Lesser" license. So assume that version
-> 2.1 is meant here.
+Based-on: 20190125182626.9221-1-peter.maydell@linaro.org
+("target/arm: Fix various underdecodings")
 
-I think we can assume that.
+thanks
+-- PMM
 
-Given that there have been several of these cases (and that there's a
-lot of boilerplate in general): Should we adopt SPDX license
-identifiers for QEMU, as the Linux kernel did? They also discovered and
-fixed some problems/oddities while at it.
+Peter Maydell (2):
+  target/arm/translate-a64: Fix FCMLA decoding error
+  target/arm/translate-a64: Fix mishandling of size in FCMLA decode
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/s390x/cc_helper.c   | 2 +-
->  target/s390x/excp_helper.c | 2 +-
->  target/s390x/fpu_helper.c  | 2 +-
->  target/s390x/gdbstub.c     | 2 +-
->  target/s390x/helper.c      | 2 +-
->  target/s390x/int_helper.c  | 2 +-
->  target/s390x/mem_helper.c  | 2 +-
->  target/s390x/misc_helper.c | 2 +-
->  target/s390x/translate.c   | 2 +-
->  9 files changed, 9 insertions(+), 9 deletions(-)
+ target/arm/translate-a64.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Is this going through the trivial tree? If so,
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-
-I can also take this through the s390x tree.
+-- 
+2.20.1
