@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36678)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goXiN-0007vq-67
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:02:28 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:38551)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1goXpp-00055b-SN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goXiA-0003bp-OD
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:02:23 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:47011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goXiA-0003bS-BY
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:02:14 -0500
-Received: by mail-wr1-f67.google.com with SMTP id l9so23059590wrt.13
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 10:02:14 -0800 (PST)
+	(envelope-from <n54@gmx.com>) id 1goXpp-0006wM-2O
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:10:09 -0500
 References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-3-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a91a9a56-9abd-cb00-ab1d-6799518f05fa@redhat.com>
-Date: Tue, 29 Jan 2019 19:02:11 +0100
+	<20190129175403.18017-8-philmd@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <90782f04-779c-8eec-99bb-4293ab62a75c@gmx.com>
+Date: Tue, 29 Jan 2019 19:10:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190129175403.18017-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/18] configure: Disable W^X on OpenBSD
+In-Reply-To: <20190129175403.18017-8-philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KjiZQtQDy5QBnGiPCsrW8rqk6aGeYLKxZ"
+Subject: Re: [Qemu-devel] [PATCH v2 07/18] tests/multiboot: Improve
+ portability by searching bash in the $PATH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
-On 1/29/19 6:53 PM, Philippe Mathieu-Daudé wrote:
-> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
-> TCG requires WX access. Disable W^X if it is available.
-> This fixes:
-> 
->   # lm32-softmmu/qemu-system-lm32
->   Could not allocate dynamic translator buffer
-> 
->   # sysctl kern.wxabort=1
->   kern.wxabort: 0 -> 1
->   # lm32-softmmu/qemu-system-lm32
->   mmap: Not supported
->   Abort trap (core dumped)
->   # gdb -q lm32-softmmu/qemu-system-lm32 qemu-system-lm32.core
->   (gdb) bt
->   #0  0x000017e3c156c50a in _thread_sys___syscall () at {standard input}:5
->   #1  0x000017e3c15e5d7a in *_libc_mmap (addr=Variable "addr" is not available.) at /usr/src/lib/libc/sys/mmap.c:47
->   #2  0x000017e17d9abc8b in alloc_code_gen_buffer () at /usr/src/qemu/accel/tcg/translate-all.c:1064
->   #3  0x000017e17d9abd04 in code_gen_alloc (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1112
->   #4  0x000017e17d9abe81 in tcg_exec_init (tb_size=0) at /usr/src/qemu/accel/tcg/translate-all.c:1149
->   #5  0x000017e17d9897e9 in tcg_init (ms=0x17e45e456800) at /usr/src/qemu/accel/tcg/tcg-all.c:66
->   #6  0x000017e17d9891b8 in accel_init_machine (acc=0x17e3c3f50800, ms=0x17e45e456800) at /usr/src/qemu/accel/accel.c:63
->   #7  0x000017e17d989312 in configure_accelerator (ms=0x17e45e456800, progname=0x7f7fffff07b0 "lm32-softmmu/qemu-system-lm32") at /usr/src/qemu/accel/accel.c:111
->   #8  0x000017e17d9d8616 in main (argc=1, argv=0x7f7fffff06b8, envp=0x7f7fffff06c8) at vl.c:4325
-> 
-> [1] https://www.openbsd.org/faq/upgrade60.html
-> [2] https://undeadly.org/cgi?action=article&sid=20160527203200
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KjiZQtQDy5QBnGiPCsrW8rqk6aGeYLKxZ
+From: Kamil Rytarowski <n54@gmx.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+Message-ID: <90782f04-779c-8eec-99bb-4293ab62a75c@gmx.com>
+Subject: Re: [PATCH v2 07/18] tests/multiboot: Improve portability by
+ searching bash in the $PATH
+References: <20190129175403.18017-1-philmd@redhat.com>
+ <20190129175403.18017-8-philmd@redhat.com>
+In-Reply-To: <20190129175403.18017-8-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 29.01.2019 18:53, Philippe Mathieu-Daud=C3=A9 wrote:
+> Bash is not always installed as /bin/bash. In particular on OpenBSD,
+> the package installs it in /usr/local/bin.
+> Use the 'env' shebang to search bash in the $PATH.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Kamil Rytarowski <n54@gmx.com>
+
 > ---
->  configure | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index b18281c61f..799ec2013b 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5795,6 +5795,17 @@ if test "$mingw32" = "yes" ; then
->      done
->  fi
->  
-> +# Disable OpenBSD W^X if available
-> +if test "$tcg" = "yes" -a "$targetos" = "OpenBSD"; then
-> +    cat > $TMPC <<EOF
-> +    int main(void) { return 0; }
-> +EOF
-> +    wx_ldflags="-Wl,-z,wxneeded"
+>  tests/multiboot/run_test.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
+> index 6c33003e71..a88e423992 100755
+> --- a/tests/multiboot/run_test.sh
+> +++ b/tests/multiboot/run_test.sh
+> @@ -1,4 +1,4 @@
+> -#!/bin/bash
+> +#! /usr/bin/env bash
+> =20
+>  # Copyright (c) 2013 Kevin Wolf <kwolf@redhat.com>
+>  #
+>=20
 
-I told Thomas I'd remove the wx_ldflags but forgot.
-Anyway this doesn't change the patch correctness.
 
-> +    if compile_prog "" "$wx_ldflags"; then
-> +        QEMU_LDFLAGS="$QEMU_LDFLAGS $wx_ldflags"
-> +    fi
-> +fi
-> +
->  qemu_confdir=$sysconfdir$confsuffix
->  qemu_moddir=$libdir$confsuffix
->  qemu_datadir=$datadir$confsuffix
-> 
+
+--KjiZQtQDy5QBnGiPCsrW8rqk6aGeYLKxZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlxQlx8MHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsDMwP/1bEIDaT/BAvFwRqo6QyreczS7KdaBa3AxiN3mLs
++L3HmkGEWGYNVtRSDOH0PgTSXnRAvsInoLrE4WcEWTGto+NetQ6FqZSmzj8Cu8Hi
+OKkATrzz0vckQLcAOSwQIbrIz0eTys5Tfj3bATCHw/oqqv0apKDhZYs+FYDTpCQ/
+d+k1JbLsXC+fXc0w+lRF8O4mRs2bEcxjTsjEH/z2ogIqFCLXXvGjZFMHH5IbM3kp
+IKym89kOnmU3LjwhsCge/zcpL9V9LsUqDmV4BchQf9DcMXsm7GAW2RyleCjw6jeJ
+4i9iR9WVRYAYItAYRTXySz8WrSCbLLaQzho09PFtNQfALaUJjy6jsWDBufGcW+CN
+kTqbxSDB+VjibY+IyhA9CxiO3dtanh5Hdhnhd9aFkFfjD7ldRsW56yylSciFqlSy
+PlPsGc/byYei60qKodryf6nNlorfFaqDVCBsX3sD7XoKy7kGOQREtcPB3pXG+3NV
+ktT9/CtzKb982q3sBpSqjMuqMmUc7jPV4qAXV1WMIbvmkKoJnpYnguaQ1D0qfBo+
+GpkQDJei1Nk6/R15und2tcsMvw9qURa66pTrariuq0xZ27aDh3xv//zTrFoI48/x
+FAqr6sV5MWR8D94ddDHj/Aegs90tjW30WR9tdnOVMDtpszZAsQCzIM53jiCDIQYk
+iFcp
+=DkER
+-----END PGP SIGNATURE-----
+
+--KjiZQtQDy5QBnGiPCsrW8rqk6aGeYLKxZ--
