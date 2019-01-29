@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52448)
+Received: from eggs.gnu.org ([209.51.188.92]:53520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1goSrc-0003vq-Im
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:51:42 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goSxY-0005rq-HK
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:57:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1goSrW-00087b-5F
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:51:40 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:33968)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1goSrQ-00085e-8T
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:51:32 -0500
-References: <1548327184-13416-1-git-send-email-thuth@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <4aa7084c-3134-ec7b-a3ac-556a5ba9a7b7@oracle.com>
-Date: Tue, 29 Jan 2019 12:51:20 +0000
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goSxW-0003Ep-DS
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:57:48 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 29 Jan 2019 12:57:16 +0000
+Message-ID: <cca39538-c265-fd7a-8599-749499c7aae4@virtuozzo.com>
+References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
+	<9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
+	<20190129123851.GE4467@dhcp-200-176.str.redhat.com>
+	<829cb522-05bf-57cc-b81e-4c028eea6821@virtuozzo.com>
+In-Reply-To: <829cb522-05bf-57cc-b81e-4c028eea6821@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8C48F4AD5E9CBA45911F209E19153630@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1548327184-13416-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: Fix LGPL information in the
- file headers
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: liam.merwick@oracle.com, thuth@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 24/01/2019 10:53, Thomas Huth wrote:
-> It's either "GNU *Library* General Public version 2" or "GNU Lesser
-> General Public version *2.1*", but there was no "version 2.0" of the
-
-Should the word "License" be after both instances of "Public" above ?
-
-> "Lesser" library. So assume that version 2.1 is meant here.
-
-'"Lesser" library.' -> '"Lesser" license.' ?
-
-
-> Also some files mentioned the GPL instead of the LGPL after declaring
-> that the files are licensed under the LGPL, so change these spots to
-> use LGPL, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-changes below LGTM
-
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-
-> ---
->   linux-user/m68k/target_cpu.h     | 4 ++--
->   linux-user/m68k/target_structs.h | 2 +-
->   target/m68k/cpu.h                | 4 ++--
->   target/m68k/fpu_helper.c         | 4 ++--
->   target/m68k/gdbstub.c            | 2 +-
->   target/m68k/helper.c             | 4 ++--
->   target/m68k/op_helper.c          | 2 +-
->   target/m68k/translate.c          | 4 ++--
->   8 files changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
-> index 611df06..7a26f3c 100644
-> --- a/linux-user/m68k/target_cpu.h
-> +++ b/linux-user/m68k/target_cpu.h
-> @@ -7,12 +7,12 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
->    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * General Public License for more details.
-> + * Lesser General Public License for more details.
->    *
->    * You should have received a copy of the GNU Lesser General Public
->    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> diff --git a/linux-user/m68k/target_structs.h b/linux-user/m68k/target_structs.h
-> index a003676..e373d48 100644
-> --- a/linux-user/m68k/target_structs.h
-> +++ b/linux-user/m68k/target_structs.h
-> @@ -6,7 +6,7 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index b288a38..f154565 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -7,12 +7,12 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
->    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * General Public License for more details.
-> + * Lesser General Public License for more details.
->    *
->    * You should have received a copy of the GNU Lesser General Public
->    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-> index 6eeffdf..b35489b 100644
-> --- a/target/m68k/fpu_helper.c
-> +++ b/target/m68k/fpu_helper.c
-> @@ -7,12 +7,12 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
->    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * General Public License for more details.
-> + * Lesser General Public License for more details.
->    *
->    * You should have received a copy of the GNU Lesser General Public
->    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> diff --git a/target/m68k/gdbstub.c b/target/m68k/gdbstub.c
-> index 99e5be8..fd2bb46 100644
-> --- a/target/m68k/gdbstub.c
-> +++ b/target/m68k/gdbstub.c
-> @@ -7,7 +7,7 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index 917d46e..3e26d33 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -7,12 +7,12 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
->    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * General Public License for more details.
-> + * Lesser General Public License for more details.
->    *
->    * You should have received a copy of the GNU Lesser General Public
->    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-> index 8d09ed9..76f4399 100644
-> --- a/target/m68k/op_helper.c
-> +++ b/target/m68k/op_helper.c
-> @@ -6,7 +6,7 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-> index 752e46e..6217a68 100644
-> --- a/target/m68k/translate.c
-> +++ b/target/m68k/translate.c
-> @@ -7,12 +7,12 @@
->    * This library is free software; you can redistribute it and/or
->    * modify it under the terms of the GNU Lesser General Public
->    * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->    *
->    * This library is distributed in the hope that it will be useful,
->    * but WITHOUT ANY WARRANTY; without even the implied warranty of
->    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * General Public License for more details.
-> + * Lesser General Public License for more details.
->    *
->    * You should have received a copy of the GNU Lesser General Public
->    * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> 
+MjkuMDEuMjAxOSAxNTo1MCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MjkuMDEuMjAxOSAxNTozOCwgS2V2aW4gV29sZiB3cm90ZToNCj4+IEFtIDI5LjAxLjIwMTkgdW0g
+MTM6MDQgaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4+Pj4NCj4+Pj4+IGRp
+ZmYgLS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+Pj4+IGluZGV4IGM2NmY5
+NDkuLjBmZGU5OGMgMTAwNjQ0DQo+Pj4+PiAtLS0gYS9ibG9jay9xYXBpLmMNCj4+Pj4+ICsrKyBi
+L2Jsb2NrL3FhcGkuYw0KPj4+Pj4gQEAgLTM4LDYgKzM4LDcgQEANCj4+Pj4+IMKgwqAgI2luY2x1
+ZGUgInFhcGkvcW1wL3FzdHJpbmcuaCINCj4+Pj4+IMKgwqAgI2luY2x1ZGUgInN5c2VtdS9ibG9j
+ay1iYWNrZW5kLmgiDQo+Pj4+PiDCoMKgICNpbmNsdWRlICJxZW11L2N1dGlscy5oIg0KPj4+Pj4g
+KyNpbmNsdWRlICJxZW11L2Vycm9yLXJlcG9ydC5oIg0KPj4+Pj4gwqDCoCBCbG9ja0RldmljZUlu
+Zm8gKmJkcnZfYmxvY2tfZGV2aWNlX2luZm8oQmxvY2tCYWNrZW5kICpibGssDQo+Pj4+PiDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJy
+cCkNCj4+Pj4+IEBAIC04NjgsNiArODY5LDExIEBAIHZvaWQgYmRydl9pbWFnZV9pbmZvX2R1bXAo
+ZnByaW50Zl9mdW5jdGlvbiBmdW5jX2ZwcmludGYsIHZvaWQgKmYsDQo+Pj4+PiDCoMKgwqDCoMKg
+wqAgaWYgKGluZm8tPmhhc19mb3JtYXRfc3BlY2lmaWMpIHsNCj4+Pj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIGZ1bmNfZnByaW50ZihmLCAiRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uOlxuIik7
+DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKGluZm8tPmZvcm1hdF9zcGVjaWZpYyAmJg0KPj4+
+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW5mby0+Zm9ybWF0X3NwZWNpZmljLT50eXBlID09
+IElNQUdFX0lORk9fU1BFQ0lGSUNfS0lORF9RQ09XMiAmJg0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgaW5mby0+Zm9ybWF0X3NwZWNpZmljLT51LnFjb3cyLmRhdGEtPmhhc19iaXRtYXBz
+ID09IGZhbHNlKSB7DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3YXJuX3JlcG9ydCgi
+RmFpbGVkIHRvIGxvYWQgYml0bWFwIGxpc3QiKTsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCB9DQo+
+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNfZHVtcChm
+dW5jX2ZwcmludGYsIGYsIGluZm8tPmZvcm1hdF9zcGVjaWZpYyk7DQo+Pj4+PiDCoMKgwqDCoMKg
+wqAgfQ0KPj4+Pj4gwqDCoCB9DQo+Pj4+DQo+Pj4+IElzIGl0IHJlYWxseSBuZWNlc3NhcnkgdG8g
+aW50cm9kdWNlIHFjb3cyIHNwZWNpZmljIGtub3dsZWRnZSBpbg0KPj4+PiBibG9jay9xYXBpLmMg
+KHdoZXJlIGl0IGRlZmluaXRlbHkgZG9lc24ndCBiZWxvbmcpLCBqdXN0IHRvIGVtaXQgYQ0KPj4+
+PiB3YXJuaW5nPw0KPj4+Pg0KPj4+PiBXaHkgY2FuJ3QgeW91IHByaW50IHRoZSB3YXJuaW5nIGlu
+IHFjb3cyX2dldF9zcGVjaWZpY19pbmZvKCk/DQo+Pj4NCj4+PiBEZWFyIEtldmluLA0KPj4+IFRo
+ZSByZWFzb24gYmVoaW5kIHRoZSBpZGVhIHRvIG1vdmUgdGhlIHdhcm5pbmcgdG8gcWFwaSBpcyB0
+aGF0IHdlDQo+Pj4gd291bGRuJ3QgbGlrZSB0byBwcmludCB0aGF0IGluIGNhc2Ugb2YgSlNPTiBm
+b3JtYXQuDQo+Pj4NCj4+Pj4NCj4+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxv
+Y2svcWNvdzIuYw0KPj4+Pj4gaW5kZXggNDg5N2FiYS4uMDdiOTllZSAxMDA2NDQNCj4+Pj4+IC0t
+LSBhL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4+IEBAIC00
+Mzg2LDggKzQzODYsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3Bl
+Y2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgICpzcGVjX2luZm8tPnUucWNvdzIuZGF0YSA9IChJbWFnZUluZm9TcGVjaWZpY1FDb3cyKXsN
+Cj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLmNvbXBhdMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCA9IGdfc3RyZHVwKCIwLjEwIiksDQo+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIC5yZWZjb3VudF9iaXRzwqDCoMKgwqDCoCA9IHMtPnJlZmNvdW50X2JpdHMsDQo+
+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAuaGFzX2JpdG1hcHPCoMKgwqDCoMKgwqDCoCA9
+IHRydWUsIC8qIFRvIGhhbmRsZSBlcnJvciBjaGVjayBwcm9wZXJseSAqLw0KPj4+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgLmJpdG1hcHPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID0gTlVMTCwg
+LyogVW5zdXBwb3J0ZWQgZm9yIHZlcnNpb24gMiAqLw0KPj4+Pg0KPj4+PiAuaGFzX2JpdG1hcHMg
+PSBmYWxzZSB3b3VsZCBiZSBuaWNlciBpZiB0aGUgZm9ybWF0IGRvZXNuJ3QgZXZlbiBzdXBwb3J0
+DQo+Pj4+IGJpdG1hcHMuIFlvdSBvbmx5IG5lZWQgdGhpcyBoZXJlIGJlY2F1c2UgeW91IHB1dCB0
+aGUgd2FybmluZyBpbiB0aGUNCj4+Pj4gd3JvbmcgcGxhY2UuDQo+Pj4+DQo+Pj4+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCB9Ow0KPj4+Pj4gwqDCoMKgwqDCoMKgIH0gZWxzZSBpZiAocy0+cWNvd192
+ZXJzaW9uID09IDMpIHsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCBRY293MkJpdG1hcEluZm9MaXN0
+ICpiaXRtYXBzOw0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxM
+Ow0KPj4+Pj4gKw0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0
+bWFwX2luZm9fbGlzdChicywgJmxvY2FsX2Vycik7DQo+Pj4+DQo+Pj4+IEhlcmUgeW91IGV2ZW4g
+aGFkIGEgZ29vZCBlcnJvciBtZXNzYWdlIHRvIHByaW50Li4uDQo+Pj4+DQo+Pj4+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCAqc3BlY19pbmZvLT51LnFjb3cyLmRhdGEgPSAoSW1hZ2VJbmZvU3BlY2lm
+aWNRQ293Mil7DQo+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5jb21wYXTCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgPSBnX3N0cmR1cCgiMS4xIiksDQo+Pj4+PiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIC5sYXp5X3JlZmNvdW50c8KgwqDCoMKgID0gcy0+Y29tcGF0aWJs
+ZV9mZWF0dXJlcyAmDQo+Pj4+PiBAQCAtNDM5Nyw3ICs0NDAzLDE0IEBAIHN0YXRpYyBJbWFnZUlu
+Zm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMp
+DQo+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUUNPVzJfSU5DT01QQVRfQ09SUlVQVCwNCj4+Pj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLmhhc19jb3JydXB0wqDCoMKgwqDCoMKgwqAgPSB0
+cnVlLA0KPj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAucmVmY291bnRfYml0c8Kg
+wqDCoMKgwqAgPSBzLT5yZWZjb3VudF9iaXRzLA0KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgLmhhc19iaXRtYXBzwqDCoMKgwqDCoMKgwqAgPSAhbG9jYWxfZXJyLA0KPj4+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgLmJpdG1hcHPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID0gYml0bWFw
+cywNCj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIH07DQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAg
+LyoNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogSWYgYW4gZXJyb3Igb2NjdXJzIGluIG9idGFp
+bmluZyBiaXRtYXBzLCBpZ25vcmUNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogaXQgdG8gc2hv
+dyBvdGhlciBRQ09XMiBzcGVjaWZpYyBpbmZvcm1hdGlvbi4NCj4+Pj4+ICvCoMKgwqDCoMKgwqDC
+oMKgICovDQo+Pj4+PiArwqDCoMKgwqDCoMKgwqAgZXJyb3JfZnJlZShsb2NhbF9lcnIpOw0KPj4+
+Pg0KPj4+PiAuLi5idXQgeW91IGRlY2lkZWQgdG8gZGlzY2FyZCBpdC4NCj4+Pj4NCj4+Pj4gSG93
+IGFib3V0IHlvdSBkbyB0aGlzIGhlcmU6DQo+Pj4+DQo+Pj4+IMKgwqDCoMKgwqAgd2Fybl9yZXBv
+cnRmX2Vycihsb2NhbF9lcnIsICJGYWlsZWQgdG8gbG9hZCBiaXRtYXAgbGlzdDogIik7DQo+Pj4N
+Cj4+PiBJbiBjYXNlIG9mIEpTT04gZm9ybWF0LCB3ZSBjYW4gZmFpbCBoZXJlLg0KPj4+IEl0IHdp
+bGwgaGFwcGVuIGluIHRoZSBjdXJyZW50IGltcGxlbWVudGF0aW9uIG9mIHRoZSBuZXcgdGVzdCAj
+MjM5Lg0KPj4NCj4+IFdoeSBkbyB5b3Ugd2FudCB0byBzaWxlbnRseSBsZWF2ZSBvdXQgdGhlIGJp
+dG1hcCBsaXN0IGZvciBKU09OIG91dHB1dD8NCj4+DQo+PiBFc3NlbnRpYWxseSwgdGhpcyBpcyB0
+aGUgc2FtZSBxdWVzdGlvbiBJIGFza2VkIGhlcmU6DQo+Pg0KPj4+PiBBbmQgdGhlbiBnZXQgcmlk
+IG9mIHRoZSBjb2RlIGluIGJsb2NrL3FhcGkuYyBhbmQgdGhlIHZlcnNpb24gMiBwYXRoPw0KPj4+
+Pg0KPj4+PiBBY3R1YWxseSwgc2hvdWxkIHRoaXMgcmVhbGx5IG9ubHkgYmUgYSB3YXJuaW5nLCBv
+ciBpbiBmYWN0IGFuIGVycm9yPw0KPj4+PiBXaGF0J3MgdGhlIGNhc2Ugd2hlcmUgd2UgZXhwZWN0
+IHRoYXQgbG9hZGluZyB0aGUgYml0bWFwIGxpc3QgY2FuIGZhaWwsDQo+Pj4+IGJ1dCB0aGUgbWFu
+YWdlbWVudCB0b29sIGRvZXNuJ3QgbmVlZCB0byBrbm93IHRoYXQgYW5kIHdlIGp1c3Qgd2FudCB0
+bw0KPj4+PiBsb2cgYSBtZXNzYWdlPw0KPj4NCj4+IEkgZG9uJ3QgdW5kZXJzdGFuZCB3aHkgaXQn
+cyBva2F5IG5vdCB0byBwcmludCBiaXRtYXBzIHdpdGhvdXQgbWFraW5nIGl0DQo+PiBhbiBlcnJv
+ci4gRG8geW91IGhhdmUgYSBzcGVjaWZpYyB1c2UgY2FzZSBpbiBtaW5kIGZvciB0aGlzIGJlaGF2
+aW91cj8NCj4+DQo+IA0KPiANCj4gV2UganVzdCBjYW4ndCBwcmludCBhbnl0aGluZyBoZXJlLCBh
+cyB0aGlzIGNvZGUgaXMgZXhlY3V0ZWQgZnJvbSBxbXAgY29tbWFuZC4NCg0KSG1tLCBvciB3ZSBj
+YW4/DQoNCk9rLCBmb3IganNvbiBvdXRwdXQsIGl0IG1heSBiZSBvayB0byBwcmludCB3YXJuaW5n
+cyB0byBzdGRlcnIsIHdoaWxlIGZvcm1hdHRlZA0KanNvbiB0byBzdGRvdXQuDQoNCkFuZCBmb3Ig
+cWFwaSwgd2FybmluZyB3aWxsIGdvIHRvIGxvZ3MsIHdoaWNoIGlzIG5vdCBiYWQgdG9vLg0KDQpP
+aywgbm93IEkgZG9uJ3Qgc2VlIGFueSBjb3VudGVyYXJndW1lbnRzLi4NCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
