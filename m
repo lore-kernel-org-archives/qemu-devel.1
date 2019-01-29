@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49639)
+Received: from eggs.gnu.org ([209.51.188.92]:49691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goUpI-0005VH-DH
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:57:36 -0500
+	(envelope-from <jiakernel2@gmail.com>) id 1goUpZ-0005rz-Fw
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:57:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goUiB-0001Bd-Ew
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:50:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goUdi-0000da-EE
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:50:03 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A95FBA402E
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 14:44:19 +0000 (UTC)
-References: <20190129051432.22023-1-peterx@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cd92ce4d-e78f-1ad2-18d0-f50a0343e990@redhat.com>
-Date: Tue, 29 Jan 2019 15:44:05 +0100
+	(envelope-from <jiakernel2@gmail.com>) id 1goUgU-0000zd-7q
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:48:27 -0500
+References: <20190123101458.12478-1-eric.auger@redhat.com>
+	<20190123101458.12478-8-eric.auger@redhat.com>
+From: Jia He <jiakernel2@gmail.com>
+Message-ID: <85896c69-2434-ee08-331a-2216704d25e0@gmail.com>
+Date: Tue, 29 Jan 2019 22:25:31 +0800
 MIME-Version: 1.0
-In-Reply-To: <20190129051432.22023-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] iothread: fix iothread hang when stop too
- soon
+In-Reply-To: <20190123101458.12478-8-eric.auger@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 07/18] kvm: add
+ kvm_arm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,115 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
+Cc: drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-On 2019-01-29 06:14, Peter Xu wrote:
-> Lukas reported an hard to reproduce QMP iothread hang on s390 that
-> QEMU might hang at pthread_join() of the QMP monitor iothread before
-> quitting:
->=20
->   Thread 1
->   #0  0x000003ffad10932c in pthread_join
->   #1  0x0000000109e95750 in qemu_thread_join
->       at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
->   #2  0x0000000109c95a1c in iothread_stop
->   #3  0x0000000109bb0874 in monitor_cleanup
->   #4  0x0000000109b55042 in main
->=20
-> While the iothread is still in the main loop:
->=20
->   Thread 4
->   #0  0x000003ffad0010e4 in ??
->   #1  0x000003ffad553958 in g_main_context_iterate.isra.19
->   #2  0x000003ffad553d90 in g_main_loop_run
->   #3  0x0000000109c9585a in iothread_run
->       at /home/thuth/devel/qemu/iothread.c:74
->   #4  0x0000000109e94752 in qemu_thread_start
->       at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
->   #5  0x000003ffad10825a in start_thread
->   #6  0x000003ffad00dcf2 in thread_start
->=20
-> IMHO it's because there's a race between the main thread and iothread
-> when stopping the thread in following sequence:
->=20
->     main thread                       iothread
->     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->                                       aio_poll()
->     iothread_get_g_main_context
->       set iothread->worker_context
->     iothread_stop
->       schedule iothread_stop_bh
->                                         execute iothread_stop_bh [1]
->                                           set iothread->running=3Dfalse
->                                           (since main_loop=3D=3DNULL so
->                                            skip to quit main loop.
->                                            Note: although main_loop is
->                                            NULL but worker_context is
->                                            not!)
->                                       atomic_read(&iothread->worker_con=
-text) [2]
->                                         create main_loop object
->                                         g_main_loop_run() [3]
->     pthread_join() [4]
->=20
-> We can see that when execute iothread_stop_bh() at [1] it's possible
-> that main_loop is still NULL because it's only created until the first
-> check of the worker_context later at [2].  Then the iothread will hang
-> in the main loop [3] and it'll starve the main thread too [4].
->=20
-> Here the simple solution should be that we check again the "running"
-> variable before check against worker_context.
->=20
-> CC: Thomas Huth <thuth@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Hi Eric
+
+On 2019/1/23 18:14, Eric Auger wrote:
+> Add the kvm_arm_get_max_vm_phys_shift() helper that returns the
+> log of the maximum IPA size supported by KVM. This capability
+> needs to be known to create the VM with a specific IPA max size
+> (kvm_type passed along KVM_CREATE_VM ioctl.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
 > ---
->=20
-> This hasn't yet been verified on the initial s390 systems, but since I
-> can reproduce it locally with this code clip:
->=20
->         IOThread *iothread =3D iothread_create("test", NULL);
->         iothread_get_g_main_context(iothread);
->         iothread_stop(iothread);
->=20
-> so I'm still posting this out for review first in case it was hit by
-> other users.
+> v3 -> v4:
+> - s/s/ms in kvm_arm_get_max_vm_phys_shift function comment
+> - check KVM_CAP_ARM_VM_IPA_SIZE extension
+>
+> v1 -> v2:
+> - put this in ARM specific code
 > ---
->  iothread.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/iothread.c b/iothread.c
-> index 2fb1cdf55d..e615b7ae52 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -63,7 +63,11 @@ static void *iothread_run(void *opaque)
->      while (iothread->running) {
->          aio_poll(iothread->ctx, true);
-> =20
-> -        if (atomic_read(&iothread->worker_context)) {
-> +        /*
-> +         * We must check the running state again in case it was
-> +         * changed in previous aio_poll()
-> +         */
-> +        if (iothread->running && atomic_read(&iothread->worker_context=
-)) {
->              GMainLoop *loop;
-> =20
->              g_main_context_push_thread_default(iothread->worker_contex=
-t);
->=20
+>   target/arm/kvm.c     |  8 ++++++++
+>   target/arm/kvm_arm.h | 16 ++++++++++++++++
+>   2 files changed, 24 insertions(+)
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index e00ccf9c98..877c588ef5 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -18,6 +18,7 @@
+>   #include "qemu/error-report.h"
+>   #include "sysemu/sysemu.h"
+>   #include "sysemu/kvm.h"
+> +#include "sysemu/kvm_int.h"
+>   #include "kvm_arm.h"
+>   #include "cpu.h"
+>   #include "trace.h"
+> @@ -162,6 +163,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>       env->features = arm_host_cpu_features.features;
+>   }
+>   
+> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
+> +{
+> +    KVMState *s = KVM_STATE(ms->accelerator);
+> +
+> +    return kvm_check_extension(s, KVM_CAP_ARM_VM_IPA_SIZE);
 
-I ran this on s390x with Luk=C3=A1=C5=A1' reproducer for a while now, and=
- so far I
-haven't seen any hangs anymore. Thus this seems to fix the issue as far
-as I can see, thanks!
+If KVM_CAP_ARM_VM_IPA_SIZE is not supported in host kernel, would it be
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+better if kvm_arm_get_max_vm_phys_shift returns a default value
+
+(e.g. 40),instead of an errno?
+
+---
+Cheers,
+Jia He
+
+> +}
+> +
+>   int kvm_arch_init(MachineState *ms, KVMState *s)
+>   {
+>       /* For ARM interrupt delivery is always asynchronous,
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 6393455b1d..5969c41f83 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -207,6 +207,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+>    */
+>   void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+>   
+> +/**
+> + * kvm_arm_get_max_vm_phys_shift - Returns log2 of the max IPA size
+> + * supported by KVM
+> + *
+> + * @ms: Machine state handle
+> + *
+> + * Return the max number of IPA bits or a negative value if
+> + * the host kernel does not expose this value.
+> + */
+> +int kvm_arm_get_max_vm_phys_shift(MachineState *ms);
+> +
+>   /**
+>    * kvm_arm_sync_mpstate_to_kvm
+>    * @cpu: ARMCPU
+> @@ -239,6 +250,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>       cpu->host_cpu_probe_failed = true;
+>   }
+>   
+> +static inline int kvm_arm_get_max_vm_phys_shift(MachineState *ms)
+> +{
+> +    return -ENOENT;
+> +}
+> +
+>   static inline int kvm_arm_vgic_probe(void)
+>   {
+>       return 0;
