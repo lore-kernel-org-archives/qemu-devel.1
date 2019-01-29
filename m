@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46815)
+Received: from eggs.gnu.org ([209.51.188.92]:47598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1goYMD-0001Pn-P5
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:43:38 -0500
+	(envelope-from <wainersm@redhat.com>) id 1goYPK-00036E-OX
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1goYM6-0006Vw-7y
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:43:32 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1goYM4-0006TP-JR
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:43:28 -0500
-Received: by mail-oi1-x243.google.com with SMTP id v6so17052604oif.2
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 10:43:16 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20180709014953.26230-1-richard.henderson@linaro.org>
-Message-ID: <aaf2844d-ff09-5121-3266-1244a2c20d9c@linaro.org>
-Date: Tue, 29 Jan 2019 10:43:13 -0800
+	(envelope-from <wainersm@redhat.com>) id 1goYPJ-0007tb-SK
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:46:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1goYPH-0007kX-UJ
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:46:48 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E242D1B8A
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 18:46:33 +0000 (UTC)
+References: <20190128174725.8809-1-ccarrara@redhat.com>
+	<20190128174725.8809-3-ccarrara@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <b7accb3f-db58-66e5-4874-4244cab4092a@redhat.com>
+Date: Tue, 29 Jan 2019 16:46:27 -0200
 MIME-Version: 1.0
-In-Reply-To: <20180709014953.26230-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190128174725.8809-3-ccarrara@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg/multiarch/linux-test: Fix error
- check for shmat
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] Acceptance tests: add simple
+ migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +35,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org
+Cc: philmd@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 
-Ping.
 
-On 7/8/18 6:49 PM, Richard Henderson wrote:
-> The error indicator for this syscall is -1, not 0.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 01/28/2019 03:47 PM, Caio Carrara wrote:
+> From: Cleber Rosa <crosa@redhat.com>
+>
+> This is the simplest possible migration test, exercising the multi
+> VM capabilities of the test class.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  tests/tcg/multiarch/linux-test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-> index e80eccc0ce..6d2c02c5c0 100644
-> --- a/tests/tcg/multiarch/linux-test.c
-> +++ b/tests/tcg/multiarch/linux-test.c
-> @@ -503,8 +503,9 @@ static void test_shm(void)
->  
->      shmid = chk_error(shmget(IPC_PRIVATE, SHM_SIZE, IPC_CREAT | 0777));
->      ptr = shmat(shmid, NULL, 0);
-> -    if (!ptr)
-> +    if (ptr == (void *)-1) {
->          error("shmat");
-> +    }
->  
->      memset(ptr, 0, SHM_SIZE);
->  
-> 
+>   tests/acceptance/migration.py | 45 ++++++++++++++++++++++++++++++++++=
++
+>   1 file changed, 45 insertions(+)
+>   create mode 100644 tests/acceptance/migration.py
+>
+> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration=
+.py
+> new file mode 100644
+> index 0000000000..973ae0ab4b
+> --- /dev/null
+> +++ b/tests/acceptance/migration.py
+> @@ -0,0 +1,45 @@
+> +# Migration test
+> +#
+> +# Copyright (c) 2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Cleber Rosa <crosa@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +
+> +from avocado_qemu import Test
+> +
+> +from avocado.utils import network
+> +from avocado.utils import wait
+> +
+> +
+> +class Migration(Test):
+> +    """
+> +    :avocado: enable
+> +    """
+> +
+> +    timeout =3D 10
+> +
+> +    @staticmethod
+> +    def migration_completed(vm):
+> +        cmd_result =3D vm.qmp('query-migrate')
+> +        if cmd_result is not None:
+> +            result =3D cmd_result.get('return')
+> +            if result is not None:
+> +                return result.get('status') =3D=3D 'completed'
+
+You could verify other status that indicate failure on the migration to=20
+nicely fail the test, because the printed messaged on timeout does not=20
+help much to identify what went wrong.
+
+It could be something like:
+
+-=C2=A0=C2=A0=C2=A0 @staticmethod
+-=C2=A0=C2=A0=C2=A0 def migration_completed(vm):
++=C2=A0=C2=A0=C2=A0 def migration_completed(self, vm):
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd_result =3D vm.qmp('=
+query-migrate')
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if cmd_result is not No=
+ne:
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ result =3D cmd_result.get('return')
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ if result is not None:
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 self.assertNotEqual(result.get('status'), 'failed')
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 return result.get('status') =3D=3D 'completed'
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return False
+
+
+> +        return False
+> +
+> +    def test_tcp(self):
+
+What if you rename it to something like "test_with_tcp_on_localhost" to=20
+better represent the test scenario?
+
+- Wainer
+
+> +        source =3D self.get_vm()
+> +        port =3D network.find_free_port()
+> +        if port is None:
+> +            self.cancel('Failed to find a free port')
+> +        dest_uri =3D 'tcp:localhost:%u' % port
+> +        dest =3D self.get_vm('-incoming', dest_uri)
+> +        dest.launch()
+> +        source.launch()
+> +        source.qmp('migrate', uri=3Ddest_uri)
+> +        wait.wait_for(self.migration_completed, timeout=3Dself.timeout=
+,
+> +                      step=3D0.1, args=3D(source,))
