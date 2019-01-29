@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41576)
+Received: from eggs.gnu.org ([209.51.188.92]:41850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goNKM-0004Th-6l
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:58 -0500
+	(envelope-from <pagupta@redhat.com>) id 1goNLX-0005AX-9X
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goNKL-00072n-9S
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:58 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goNKL-00072B-39
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:57 -0500
-Received: by mail-wr1-f66.google.com with SMTP id z5so20681120wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 22:56:56 -0800 (PST)
-References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
-	<20190129000820.31190-1-richardw.yang@linux.intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
-Date: Tue, 29 Jan 2019 07:56:54 +0100
+	(envelope-from <pagupta@redhat.com>) id 1goNLW-0007s0-BY
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1goNLW-0007rS-2o
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:10 -0500
+Date: Tue, 29 Jan 2019 01:58:09 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1615390597.67462150.1548745089034.JavaMail.zimbra@redhat.com>
+In-Reply-To: <8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1548771590.git.yi.z.zhang@linux.intel.com>
+References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
+	<8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1548771590.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190129000820.31190-1-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Trivial cleanup in hw/acpi
+Subject: Re: [Qemu-devel] [PATCH v11 1/3] util/mmap-alloc: Add a 'is_pmem'
+ parameter to qemu_ram_mmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
+To: Yi Zhang <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, richardw yang <richardw.yang@linux.intel.com>, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org
 
-Hi Wei,
 
-On 1/29/19 1:08 AM, Wei Yang wrote:
-> There are several functions/variable which are not used anymore.
 > 
-> This serials just remove those without functional change.
+> From: Zhang Yi <yi.z.zhang@linux.intel.com>
 > 
-> Wei Yang (3):
->   hw/i386/pc.c: remove unused function pc_acpi_init()
->   hw/acpi: remove unused function acpi_table_add_builtin()
->   hw/acpi: remove unnecessary variable acpi_table_builtin
+> besides the existing 'shared' flags, we are going to add
+> 'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
+> file is a persist memory.
 > 
->  hw/acpi/core.c         | 10 +---------
->  hw/i386/pc.c           | 27 ---------------------------
->  include/hw/acpi/acpi.h |  1 -
->  include/hw/i386/pc.h   |  1 -
->  4 files changed, 1 insertion(+), 38 deletions(-)
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  exec.c                    |  2 +-
+>  include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
+>  util/mmap-alloc.c         |  6 +++++-
+>  util/oslib-posix.c        |  2 +-
+>  4 files changed, 27 insertions(+), 4 deletions(-)
 > 
+> diff --git a/exec.c b/exec.c
+> index bb6170d..27cea52 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1860,7 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>      }
+>  
+>      area = qemu_ram_mmap(fd, memory, block->mr->align,
+> -                         block->flags & RAM_SHARED);
+> +                         block->flags & RAM_SHARED, block->flags &
+> RAM_PMEM);
+>      if (area == MAP_FAILED) {
+>          error_setg_errno(errp, errno,
+>                           "unable to map backing store for guest RAM");
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 50385e3..190688a 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
+>  
+>  size_t qemu_mempath_getpagesize(const char *mem_path);
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+> +/**
+> + * qemu_ram_mmap: mmap the specified file or device.
+> + *
+> + * Parameters:
+> + *  @fd: the file or the device to mmap
+> + *  @size: the number of bytes to be mmaped
+> + *  @align: if not zero, specify the alignment of the starting mapping
+> address;
+> + *          otherwise, the alignment in use will be determined by QEMU.
+> + *  @shared: map has RAM_SHARED flag.
+> + *  @is_pmem: map has RAM_PMEM flag.
+> + *
+> + * Return:
+> + *  On success, return a pointer to the mapped area.
+> + *  On failure, return MAP_FAILED.
+> + */
+> +void *qemu_ram_mmap(int fd,
+> +                    size_t size,
+> +                    size_t align,
+> +                    bool shared,
+> +                    bool is_pmem);
+>  
+>  void qemu_ram_munmap(void *ptr, size_t size);
+>  
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index fd329ec..97bbeed 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>      return getpagesize();
+>  }
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+> +void *qemu_ram_mmap(int fd,
+> +                    size_t size,
+> +                    size_t align,
+> +                    bool shared,
+> +                    bool is_pmem)
+>  {
+>      /*
+>       * Note: this always allocates at least one extra page of virtual
+>       address
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index fbd0dc8..040937f 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
+>  void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+>  {
+>      size_t align = QEMU_VMALLOC_ALIGN;
+> -    void *ptr = qemu_ram_mmap(-1, size, align, shared);
+> +    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
+>  
+>      if (ptr == MAP_FAILED) {
+>          return NULL;
+> --
+> 2.7.4
 
-Please do not post iterated series in reply to previous version, but as
-new thread:
-- patches are parsed by scripts
-- some email clients can tag a thread as "reviewed, skip" and replies to
-this thread will be masked.
+Looks good to me.
 
-Regards,
+Reviewed-by: pagupta@redhat.com
 
-Phil.
+> 
+> 
+> 
