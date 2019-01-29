@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49406)
+Received: from eggs.gnu.org ([209.51.188.92]:54370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goYVd-0006wd-8X
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:53:22 -0500
+	(envelope-from <svens@stackframe.org>) id 1goYqM-00045F-00
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1goYVc-0003RT-6d
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:53:21 -0500
-Date: Tue, 29 Jan 2019 19:53:03 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190129195303.72d5fbc4.cohuck@redhat.com>
-In-Reply-To: <691e91ea-df02-1455-93ed-7e8369fceec2@linux.ibm.com>
-References: <20190121110354.2247-1-cohuck@redhat.com>
-	<20190121110354.2247-3-cohuck@redhat.com>
-	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
-	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
-	<20190125112437.2c06fac6.cohuck@redhat.com>
-	<20190125135835.2d59b511.cohuck@redhat.com>
-	<20190125150101.3b61f0a1@oc2783563651>
-	<20190128180948.506a9695.cohuck@redhat.com>
-	<20190128201548.1ecfb84f@oc2783563651>
-	<d43e273d-ef90-9a1e-c87a-1365718d8978@linux.ibm.com>
-	<20190129112024.401b8184.cohuck@redhat.com>
-	<691e91ea-df02-1455-93ed-7e8369fceec2@linux.ibm.com>
+	(envelope-from <svens@stackframe.org>) id 1goYqL-00079R-5C
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:45 -0500
+Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:52218)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <svens@stackframe.org>)
+	id 1goYqK-00074c-MX
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:45 -0500
+From: Sven Schnelle <svens@stackframe.org>
+Date: Tue, 29 Jan 2019 20:14:02 +0100
+Message-Id: <20190129191402.29539-1-svens@stackframe.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] target/hppa: fix PSW Q bit behaviour to match
+ hardware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 29 Jan 2019 09:14:40 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
+PA-RISC specification says: "Setting the PSW Q-bit, PSW{28}, to 1
+with this instruction, if it was not already 1, is an undefined
+operation." However, at least HP-UX 10.20 sets the Q bit from 0 to 1
+with the SSM instruction. Tested this both on HP9000/712 and
+HP9000/785/C3750, both machines set the Q bit from 0 to 1 without
+exception. This makes HP-UX 10.20 progress a little bit further.
 
-> On 01/29/2019 05:20 AM, Cornelia Huck wrote:
-> > On Mon, 28 Jan 2019 16:48:10 -0500
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> On 01/28/2019 02:15 PM, Halil Pasic wrote:  
-> >>> On Mon, 28 Jan 2019 18:09:48 +0100
-> >>> Cornelia Huck <cohuck@redhat.com> wrote:  
-> >   
-> >> I guess if  
-> >>> the ssch() returns with non cc == 0 the CP_PENDING ---IRQ---> IDLE
-> >>> transition
-> >>> won't take place. And I guess the IRQ is a final one.  
-> >>
-> >> Yes this is the one point I hadn't seen explicitly stated.  We shouldn't
-> >> remain in state=BUSY if the ssch got cc!=0, and probably return to IDLE
-> >> when processing the failure.  In Connie's response (Mon, 28 Jan 2019
-> >> 18:24:24 +0100) to my note, she expressed some agreement to that.  
-> > 
-> > Yes, I think that's what should happen.
-> > 
-> >   
-> >>>> state for I/O)
-> >>>> (normal ssch)
-> >>>>
-> >>>> BUSY --- IO_REQ ---> return -EAGAIN, stay in BUSY
-> >>>> (user space is supposed to retry, as we'll eventually progress from
-> >>>> BUSY)
-> >>>>
-> >>>> CP_PENDING --- IO_REQ ---> return -EBUSY, stay in CP_PENDING
-> >>>> (user space is supposed to map this to the appropriate cc for the guest)  
-> >>>
-> >>>   From this it seems you don't intend to issue the second  requested ssch()
-> >>> any more (and don't want to do any translation). Is that right? (If it
-> >>> is, that what I was asking for for a while, but then it's a pity for the
-> >>> retries.)
-> >>>      
-> >>>>
-> >>>> IDLE --- ASYNC_REQ ---> IDLE
-> >>>> (user space is welcome to do anything else right away)  
-> >>>
-> >>> Your idea is to not issue a requested hsch() if we think we are IDLE
-> >>> it seems. Do I understand this right? We would end up with a different
-> >>> semantic for hsch()/and csch() (compared to PoP) in the guest with this
-> >>> (AFAICT).
-> >>>      
-> >>>>
-> >>>> BUSY --- ASYNC_REQ ---> return -EAGAIN, stay in BUSY
-> >>>> (user space is supposed to retry, as above)
-> >>>>
-> >>>> CP_PENDING --- ASYNC_REQ ---> return success, stay in CP_PENDING
-> >>>> (the interrupt will get us out of CP_PENDING eventually)  
-> >>>
-> >>> Issue (c|h)sch() is an action that is done on this internal
-> >>> transition (within CP_PENDING).  
-> >>
-> >> These three do read like CSCH/HSCH are subject to the same rules as
-> >> SSCH, when in fact they would be (among other reasons) issued to clean
-> >> up a lost interrupt from a previous SSCH.  So maybe return -EAGAIN on
-> >> state=BUSY (don't race ourselves with the start), but issue to hardware
-> >> if CP_PENDING.  
-> > 
-> > I think there are some devices which require a certain hsch/csch
-> > sequence during device bringup, so it's not just cleaning up after a
-> > ssch.   
-> 
-> Ah, yes.
-> 
-> Therefore, we should always try to do the requested hsch/csch,
-> > unless things like "we're in the process of translating a cp, and can't
-> > deal with another request right now" prevent it.  
-> 
-> Agreed.  I'm in support of all of this.
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ target/hppa/op_helper.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Cool. In the meantime, I've coded the changes, and I think the result
-looks reasonable. I'll give it some testing and then send it out; it's
-probably easier to discuss it with some code in front of us.
-
-[The QEMU part should not need any changes.]
-
-> 
-> >   
-> >>
-> >> If we get an async request when state=IDLE, then maybe just issue it for
-> >> fun, as if it were an SSCH?  
-> > 
-> > For fun, but mainly because the guest wants it :)
-> >   
-> 
-> Well, that too.  ;-)
-> 
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 912e8d5be4..3adcfd8976 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -665,11 +665,6 @@ void HELPER(reset)(CPUHPPAState *env)
+ target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
+ {
+     target_ulong psw = env->psw;
+-    /* ??? On second reading this condition simply seems
+-       to be undefined rather than a diagnosed trap.  */
+-    if (nsm & ~psw & PSW_Q) {
+-        hppa_dynamic_excp(env, EXCP_ILL, GETPC());
+-    }
+     env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
+     return psw & PSW_SM;
+ }
+-- 
+2.20.1
