@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44459)
+Received: from eggs.gnu.org ([209.51.188.92]:45903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goS8R-0006iw-Vz
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:05:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1goSEY-0001au-Iw
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:11:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1goS8R-0003Fi-28
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:04:59 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Tue, 29 Jan 2019 12:04:49 +0000
-Message-ID: <9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
-References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190129095224.GA4467@dhcp-200-176.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ECC0F6461F15D64582C6D8A03A322984@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1goSEX-0006Pf-UM
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 07:11:18 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <271482fe-741a-6a15-15fd-181d4e55a8c4@redhat.com>
+	<w51bm469xhh.fsf@maestria.local.igalia.com>
+	<w518szam8em.fsf@maestria.local.igalia.com>
+	<4236ceac-fd50-ad04-811a-0be7b3dbd667@redhat.com>
+	<w51a7jkstdd.fsf@maestria.local.igalia.com>
+	<87tvhsy6en.fsf@dusky.pond.sub.org>
+	<w51ef8v3hn4.fsf@maestria.local.igalia.com>
+Date: Tue, 29 Jan 2019 13:11:07 +0100
+In-Reply-To: <w51ef8v3hn4.fsf@maestria.local.igalia.com> (Alberto Garcia's
+	message of "Tue, 29 Jan 2019 11:03:27 +0100")
+Message-ID: <87tvhrhdes.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
- directory entries
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Consistency of iotests 093 and 136
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Pj4NCj4+IGRpZmYgLS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+IGluZGV4
-IGM2NmY5NDkuLjBmZGU5OGMgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xYXBpLmMNCj4+ICsrKyBi
-L2Jsb2NrL3FhcGkuYw0KPj4gQEAgLTM4LDYgKzM4LDcgQEANCj4+ICAgI2luY2x1ZGUgInFhcGkv
-cW1wL3FzdHJpbmcuaCINCj4+ICAgI2luY2x1ZGUgInN5c2VtdS9ibG9jay1iYWNrZW5kLmgiDQo+
-PiAgICNpbmNsdWRlICJxZW11L2N1dGlscy5oIg0KPj4gKyNpbmNsdWRlICJxZW11L2Vycm9yLXJl
-cG9ydC5oIg0KPj4gICANCj4+ICAgQmxvY2tEZXZpY2VJbmZvICpiZHJ2X2Jsb2NrX2RldmljZV9p
-bmZvKEJsb2NrQmFja2VuZCAqYmxrLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCkNCj4+IEBAIC04
-NjgsNiArODY5LDExIEBAIHZvaWQgYmRydl9pbWFnZV9pbmZvX2R1bXAoZnByaW50Zl9mdW5jdGlv
-biBmdW5jX2ZwcmludGYsIHZvaWQgKmYsDQo+PiAgIA0KPj4gICAgICAgaWYgKGluZm8tPmhhc19m
-b3JtYXRfc3BlY2lmaWMpIHsNCj4+ICAgICAgICAgICBmdW5jX2ZwcmludGYoZiwgIkZvcm1hdCBz
-cGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPj4gKyAgICAgICAgaWYgKGluZm8tPmZvcm1hdF9z
-cGVjaWZpYyAmJg0KPj4gKyAgICAgICAgICAgIGluZm8tPmZvcm1hdF9zcGVjaWZpYy0+dHlwZSA9
-PSBJTUFHRV9JTkZPX1NQRUNJRklDX0tJTkRfUUNPVzIgJiYNCj4+ICsgICAgICAgICAgICBpbmZv
-LT5mb3JtYXRfc3BlY2lmaWMtPnUucWNvdzIuZGF0YS0+aGFzX2JpdG1hcHMgPT0gZmFsc2UpIHsN
-Cj4+ICsgICAgICAgICAgICB3YXJuX3JlcG9ydCgiRmFpbGVkIHRvIGxvYWQgYml0bWFwIGxpc3Qi
-KTsNCj4+ICsgICAgICAgIH0NCj4+ICAgICAgICAgICBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNf
-ZHVtcChmdW5jX2ZwcmludGYsIGYsIGluZm8tPmZvcm1hdF9zcGVjaWZpYyk7DQo+PiAgICAgICB9
-DQo+PiAgIH0NCj4gDQo+IElzIGl0IHJlYWxseSBuZWNlc3NhcnkgdG8gaW50cm9kdWNlIHFjb3cy
-IHNwZWNpZmljIGtub3dsZWRnZSBpbg0KPiBibG9jay9xYXBpLmMgKHdoZXJlIGl0IGRlZmluaXRl
-bHkgZG9lc24ndCBiZWxvbmcpLCBqdXN0IHRvIGVtaXQgYQ0KPiB3YXJuaW5nPw0KPiANCj4gV2h5
-IGNhbid0IHlvdSBwcmludCB0aGUgd2FybmluZyBpbiBxY293Ml9nZXRfc3BlY2lmaWNfaW5mbygp
-Pw0KDQpEZWFyIEtldmluLA0KVGhlIHJlYXNvbiBiZWhpbmQgdGhlIGlkZWEgdG8gbW92ZSB0aGUg
-d2FybmluZyB0byBxYXBpIGlzIHRoYXQgd2UgDQp3b3VsZG4ndCBsaWtlIHRvIHByaW50IHRoYXQg
-aW4gY2FzZSBvZiBKU09OIGZvcm1hdC4NCg0KPiANCj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
-Mi5jIGIvYmxvY2svcWNvdzIuYw0KPj4gaW5kZXggNDg5N2FiYS4uMDdiOTllZSAxMDA2NDQNCj4+
-IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLmMNCj4+IEBAIC00Mzg2
-LDggKzQzODYsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lm
-aWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+ICAgICAgICAgICAqc3BlY19pbmZvLT51
-LnFjb3cyLmRhdGEgPSAoSW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+PiAgICAgICAgICAgICAg
-IC5jb21wYXQgICAgICAgICAgICAgPSBnX3N0cmR1cCgiMC4xMCIpLA0KPj4gICAgICAgICAgICAg
-ICAucmVmY291bnRfYml0cyAgICAgID0gcy0+cmVmY291bnRfYml0cywNCj4+ICsgICAgICAgICAg
-ICAuaGFzX2JpdG1hcHMgICAgICAgID0gdHJ1ZSwgLyogVG8gaGFuZGxlIGVycm9yIGNoZWNrIHBy
-b3Blcmx5ICovDQo+PiArICAgICAgICAgICAgLmJpdG1hcHMgICAgICAgICAgICA9IE5VTEwsIC8q
-IFVuc3VwcG9ydGVkIGZvciB2ZXJzaW9uIDIgKi8NCj4gDQo+IC5oYXNfYml0bWFwcyA9IGZhbHNl
-IHdvdWxkIGJlIG5pY2VyIGlmIHRoZSBmb3JtYXQgZG9lc24ndCBldmVuIHN1cHBvcnQNCj4gYml0
-bWFwcy4gWW91IG9ubHkgbmVlZCB0aGlzIGhlcmUgYmVjYXVzZSB5b3UgcHV0IHRoZSB3YXJuaW5n
-IGluIHRoZQ0KPiB3cm9uZyBwbGFjZS4NCj4gDQo+PiAgICAgICAgICAgfTsNCj4+ICAgICAgIH0g
-ZWxzZSBpZiAocy0+cWNvd192ZXJzaW9uID09IDMpIHsNCj4+ICsgICAgICAgIFFjb3cyQml0bWFw
-SW5mb0xpc3QgKmJpdG1hcHM7DQo+PiArICAgICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsN
-Cj4+ICsNCj4+ICsgICAgICAgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0bWFwX2luZm9fbGlzdChi
-cywgJmxvY2FsX2Vycik7DQo+IA0KPiBIZXJlIHlvdSBldmVuIGhhZCBhIGdvb2QgZXJyb3IgbWVz
-c2FnZSB0byBwcmludC4uLg0KPiANCj4+ICAgICAgICAgICAqc3BlY19pbmZvLT51LnFjb3cyLmRh
-dGEgPSAoSW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+PiAgICAgICAgICAgICAgIC5jb21wYXQg
-ICAgICAgICAgICAgPSBnX3N0cmR1cCgiMS4xIiksDQo+PiAgICAgICAgICAgICAgIC5sYXp5X3Jl
-ZmNvdW50cyAgICAgPSBzLT5jb21wYXRpYmxlX2ZlYXR1cmVzICYNCj4+IEBAIC00Mzk3LDcgKzQ0
-MDMsMTQgQEAgc3RhdGljIEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5m
-byhCbG9ja0RyaXZlclN0YXRlICpicykNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFFDT1cyX0lOQ09NUEFUX0NPUlJVUFQsDQo+PiAgICAgICAgICAgICAgIC5oYXNfY29y
-cnVwdCAgICAgICAgPSB0cnVlLA0KPj4gICAgICAgICAgICAgICAucmVmY291bnRfYml0cyAgICAg
-ID0gcy0+cmVmY291bnRfYml0cywNCj4+ICsgICAgICAgICAgICAuaGFzX2JpdG1hcHMgICAgICAg
-ID0gIWxvY2FsX2VyciwNCj4+ICsgICAgICAgICAgICAuYml0bWFwcyAgICAgICAgICAgID0gYml0
-bWFwcywNCj4+ICAgICAgICAgICB9Ow0KPj4gKyAgICAgICAgLyoNCj4+ICsgICAgICAgICAqIElm
-IGFuIGVycm9yIG9jY3VycyBpbiBvYnRhaW5pbmcgYml0bWFwcywgaWdub3JlDQo+PiArICAgICAg
-ICAgKiBpdCB0byBzaG93IG90aGVyIFFDT1cyIHNwZWNpZmljIGluZm9ybWF0aW9uLg0KPj4gKyAg
-ICAgICAgICovDQo+PiArICAgICAgICBlcnJvcl9mcmVlKGxvY2FsX2Vycik7DQo+IA0KPiAuLi5i
-dXQgeW91IGRlY2lkZWQgdG8gZGlzY2FyZCBpdC4NCj4gDQo+IEhvdyBhYm91dCB5b3UgZG8gdGhp
-cyBoZXJlOg0KPiANCj4gICAgICB3YXJuX3JlcG9ydGZfZXJyKGxvY2FsX2VyciwgIkZhaWxlZCB0
-byBsb2FkIGJpdG1hcCBsaXN0OiAiKTsNCg0KSW4gY2FzZSBvZiBKU09OIGZvcm1hdCwgd2UgY2Fu
-IGZhaWwgaGVyZS4NCkl0IHdpbGwgaGFwcGVuIGluIHRoZSBjdXJyZW50IGltcGxlbWVudGF0aW9u
-IG9mIHRoZSBuZXcgdGVzdCAjMjM5Lg0KDQo+IA0KPiBBbmQgdGhlbiBnZXQgcmlkIG9mIHRoZSBj
-b2RlIGluIGJsb2NrL3FhcGkuYyBhbmQgdGhlIHZlcnNpb24gMiBwYXRoPw0KPiANCj4gQWN0dWFs
-bHksIHNob3VsZCB0aGlzIHJlYWxseSBvbmx5IGJlIGEgd2FybmluZywgb3IgaW4gZmFjdCBhbiBl
-cnJvcj8NCj4gV2hhdCdzIHRoZSBjYXNlIHdoZXJlIHdlIGV4cGVjdCB0aGF0IGxvYWRpbmcgdGhl
-IGJpdG1hcCBsaXN0IGNhbiBmYWlsLA0KPiBidXQgdGhlIG1hbmFnZW1lbnQgdG9vbCBkb2Vzbid0
-IG5lZWQgdG8ga25vdyB0aGF0IGFuZCB3ZSBqdXN0IHdhbnQgdG8NCj4gbG9nIGEgbWVzc2FnZT8N
-Cj4gDQo+PiAgICAgICB9IGVsc2Ugew0KPj4gICAgICAgICAgIC8qIGlmIHRoaXMgYXNzZXJ0aW9u
-IGZhaWxzLCB0aGlzIHByb2JhYmx5IG1lYW5zIGEgbmV3IHZlcnNpb24gd2FzDQo+PiAgICAgICAg
-ICAgICogYWRkZWQgd2l0aG91dCBoYXZpbmcgaXQgY292ZXJlZCBoZXJlICovDQo+IA0KPiBLZXZp
-bg0KPiANCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+Alberto Garcia <berto@igalia.com> writes:
+
+> On Mon 28 Jan 2019 07:38:08 PM CET, Markus Armbruster wrote:
+>
+>>> 093 submits several I/O requests using aio_read and aio_write with
+>>> hmp_qemu_io(), then advances the clock using clock_step and finally
+>>> calls query-blockstats to see how much of the I/O has been completed
+>>> (it's an I/O throttling test).
+>>>
+>>> The expectation is that by the time query-blockstats is called all
+>>> submitted I/O requests have been processed (up to the amount allowed
+>>> by the throttling limits).
+>>
+>> Assumptions like "when we see the reply to QMP command X, surely the
+>> main loop has completed doing Y" are problematic.  When possible, rely
+>> on something more direct, such as a query command that shows you
+>> whether Y has been completed.
+>
+> Right, but how to do that for aio_read / aio_write ?
+
+Fair question.
+
+What exactly do you need to wait for?
