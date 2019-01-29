@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49812)
+Received: from eggs.gnu.org ([209.51.188.92]:49687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1goUqU-0006Fb-Nu
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:58:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1goUq6-0005zd-KY
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1goUXc-00005V-R0
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:39:14 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44705)
+	(envelope-from <richard.henderson@linaro.org>) id 1goUa2-0000I8-RJ
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:41:45 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1goUXW-0008Vu-3g
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:39:08 -0500
-Received: by mail-oi1-x243.google.com with SMTP id m6so16257059oig.11
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 06:38:58 -0800 (PST)
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-5-richard.henderson@linaro.org>
-	<CAFEAcA9Yz53O1OiG-eN=0eCdnO=Lz+yJPUtqVxfFSb3rrG4TEg@mail.gmail.com>
-	<ae0d3ea5-e7e1-da8e-9b10-4534a1ff9162@linaro.org>
-	<CAFEAcA9OuF=rdRBRpoXFG3r4_rntc-fRa2m2g=+w+cpfC1Vg1w@mail.gmail.com>
+	id 1goUZy-0000HC-Sx
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:41:38 -0500
+Received: by mail-oi1-x241.google.com with SMTP id r62so16346921oie.1
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 06:41:28 -0800 (PST)
+References: <20190128174241.5860-1-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <be92c862-e7ac-23fb-0ad8-b7f86f7f2e36@linaro.org>
-Date: Tue, 29 Jan 2019 06:38:35 -0800
+Message-ID: <3da1b20c-5168-d32c-1ea8-f6a05212da7c@linaro.org>
+Date: Tue, 29 Jan 2019 06:41:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9OuF=rdRBRpoXFG3r4_rntc-fRa2m2g=+w+cpfC1Vg1w@mail.gmail.com>
+In-Reply-To: <20190128174241.5860-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/11] target/arm: Record the GP bit for a
- page in MemTxAttrs
+Subject: Re: [Qemu-devel] [PATCH] exec.c: Don't reallocate IOMMUNotifiers
+ that are in use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,17 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On 1/29/19 1:55 AM, Peter Maydell wrote:
->> As written above, this will execute more than once.
+On 1/28/19 9:42 AM, Peter Maydell wrote:
+> The tcg_register_iommu_notifier() code has a GArray of
+> TCGIOMMUNotifier structs which it has registered by passing
+> memory_region_register_iommu_notifier() a pointer to the embedded
+> IOMMUNotifier field. Unfortunately, if we need to enlarge the
+> array via g_array_set_size() this can cause a realloc(), which
+> invalidates the pointer that memory_region_register_iommu_notifier()
+> put into the MemoryRegion's iommu_notify list. This can result
+> in segfaults.
 > 
-> I don't see how -- all the code paths forward from
-> "guarded |= extract64(descriptor, 50, 1);" reach a
-> "break" statement that terminates the loop, don't they?
+> Switch the GArray to holding pointers to the TCGIOMMUNotifier
+> structs, so that we can individually allocate and free them.
+> 
+> Cc: qemu-stable@nongnu.org
+> Fixes: 1f871c5e6b0f30644a60a ("exec.c: Handle IOMMUs in address_space_translate_for_iotlb()")
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I don't know why I've suddenly started running into this; possibly
+> it's because of a recent Ubuntu upgrade and so a newer glibc.
+> ---
+>  exec.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-You're right.  I've misread the surrounding code.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+It is odd that we have not seen this before...
 
 
 r~
