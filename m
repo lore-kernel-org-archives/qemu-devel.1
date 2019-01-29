@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37696)
+Received: from eggs.gnu.org ([209.51.188.92]:38466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goRby-0006nR-G2
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:31:27 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1goRfM-0008Kg-Pg
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1goRbt-00069X-PG
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:31:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60776)
+	(envelope-from <dgilbert@redhat.com>) id 1goRfL-0008Nv-Jy
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:34:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33954)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1goRbp-00066l-O6
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:31:19 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goRfL-0008N1-Ay
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 06:34:55 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D0B2420B7
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 11:31:10 +0000 (UTC)
-Date: Tue, 29 Jan 2019 09:30:56 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20190129113055.GA19301@localhost.localdomain>
-References: <20190128174725.8809-1-ccarrara@redhat.com>
-	<20190128174725.8809-2-ccarrara@redhat.com>
-	<bc08dd05-82c5-a4e9-ca7f-883eb27c865e@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F557806B6
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 11:34:54 +0000 (UTC)
+Date: Tue, 29 Jan 2019 11:34:47 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190129113447.GD2650@work-vm>
+References: <20190128170321.16936-1-dgilbert@redhat.com>
+	<20190128170321.16936-3-dgilbert@redhat.com>
+	<743a07c4-0c9f-8b51-f792-7132e82dc0dc@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bc08dd05-82c5-a4e9-ca7f-883eb27c865e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] tests.acceptance: adds multi vm
- capability for acceptance tests
+In-Reply-To: <743a07c4-0c9f-8b51-f792-7132e82dc0dc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/9] migration: Add announce parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,150 +34,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, philmd@redhat.com, crosa@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, berrange@redhat.com
 
-Hi, Wainer.
-
-On Mon, Jan 28, 2019 at 05:42:24PM -0200, Wainer dos Santos Moschetta wrote:
-> 
-> On 01/28/2019 03:47 PM, Caio Carrara wrote:
-> > This change adds the possibility to write acceptance tests with multi
-> > virtual machine support. It's done keeping the virtual machines objects
-> > stored in a test attribute (dictionary). This dictionary shouldn't be
-> > accessed directly but through the new method added `get_vm`. This new
-> > method accept a list of args (that will be added as virtual machine
-> > arguments) and an optional name argument. The name is the key that
-> > identify a single virtual machine along the test machines available. If
-> > a name without a machine is informed a new machine will be instantiated.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 1/28/19 11:03 AM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > > 
-> > The current usage of vm in tests will not be broken by this change since
-> > it keeps a property called vm in the base test class. This property only
-> > calls the new method `get_vm` with default parameters (no args and
-> > 'default' as machine name).
-> 
-> I've checked that current tests does not break by this change. I also
-> checked the example you provided on docs/devel/testing.rst works too.
-> 
-> So Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> 
+> > Add migration parameters that control RARP/GARP announcement timeouts.
 > > 
-> > Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+> > Based on earlier patches by myself and
+> >   Vladislav Yasevich <vyasevic@redhat.com>
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > > ---
-> >   docs/devel/testing.rst                    | 40 ++++++++++++++++++++++-
-> >   tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
-> >   2 files changed, 60 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> > index 18e2c0868a..b97c0368bc 100644
-> > --- a/docs/devel/testing.rst
-> > +++ b/docs/devel/testing.rst
-> > @@ -634,7 +634,45 @@ instance, available at ``self.vm``.  Because many tests will tweak the
-> >   QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
-> >   is left to the test writer.
-> > -At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-> > +The base test class has also support for tests with more than one
-> > +QEMUMachine. The way to get machines is through the ``self.get_vm()``
-> > +method which will return a QEMUMachine instance. The ``self.get_vm()``
-> > +method also accepts an optional `name` attribute so you can identify a
-> > +specific machine and get it more than once through the tests methods. A
-> > +simple and hypothetical example follows:
 > 
-> Since you explain the self.get_vm() optional name attribute, you also could
-> mention it accepts arguments to be passed to the newly created VM.
+> > +++ b/qapi/migration.json
+> > @@ -6,6 +6,7 @@
+> >  ##
+> >  
+> >  { 'include': 'common.json' }
+> > +{ 'include': 'net.json' }
+> >  
+> >  ##
+> >  # @MigrationStats:
+> > @@ -480,6 +481,18 @@
+> >  #
+> >  # Migration parameters enumeration
+> >  #
+> > +# @announce-initial: Inital delay (in ms) before sending the first announce
 > 
-> > +
-> > +.. code::
-> > +
-> > +  from avocado_qemu import Test
-> > +
-> > +
-> > +  class MultipleMachines(Test):
-> > +      """
-> > +      :avocado: enable
-> > +      """
-> > +      def test_multiple_machines(self):
-> > +          first_machine = self.get_vm()
-> > +          second_machine = self.get_vm()
-> > +          self.get_vm(name='third_machine').launch()
-> > +
-> > +          first_machine.launch()
-> > +          second_machine.launch()
-> > +
-> > +          first_res = first_machine.command(
-> > +              'human-monitor-command',
-> > +              command_line='info version')
-> > +
-> > +          second_res = second_machine.command(
-> > +              'human-monitor-command',
-> > +              command_line='info version')
-> > +
-> > +          third_res = self.get_vm(name='third_machine').command(
-> > +              'human-monitor-command',
-> > +              command_line='info version')
-> > +
-> > +          self.assertEquals(first_res, second_res, third_res)
-> > +
-> > +At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
-> >   shutdown.
-> >   QEMUMachine
-> > diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-> > index 1e54fd5932..4c9e27feda 100644
-> > --- a/tests/acceptance/avocado_qemu/__init__.py
-> > +++ b/tests/acceptance/avocado_qemu/__init__.py
-> > @@ -10,6 +10,7 @@
-> >   import os
-> >   import sys
-> > +import uuid
-> >   import avocado
-> > @@ -42,13 +43,29 @@ def pick_default_qemu_bin():
-> >   class Test(avocado.Test):
-> >       def setUp(self):
-> > -        self.vm = None
-> > +        self._vms = {}
-> >           self.qemu_bin = self.params.get('qemu_bin',
-> >                                           default=pick_default_qemu_bin())
-> >           if self.qemu_bin is None:
-> >               self.cancel("No QEMU binary defined or found in the source tree")
-> > -        self.vm = QEMUMachine(self.qemu_bin)
-> > +
-> > +    def _new_vm(self, *args):
-> > +        vm = QEMUMachine(self.qemu_bin)
-> > +        if args:
-> > +            vm.add_args(*args)
-> > +        return vm
-> > +
-> > +    @property
-> > +    def vm(self):
-> > +        return self.get_vm(name='default')
-> > +
-> > +    def get_vm(self, *args, name=None):
-> > +        if not name:
-> > +            name = str(uuid.uuid4())
-> 
-> Beware that if you don't give a name to the VM, the only way to access it
-> later is to keep the reference returned by get_vm(). Do you think it is
-> something we should care about? or assume the test writer handle this
-> (unlikely?) case somehow?
+> s/Inital/Initial/ [2]
 
-I think it's something e should assume the test writer is going to
-handle.
+Fixed.
+
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-max: Maximum delay (in ms) between packets in the announcment
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-rounds: Number of self-announce packets sent after migration
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-step: Increase in delay (in ms) between subsequent packets in
+> > +#          the announcement (Since 4.0)
+> > +#
 > 
-> - Wainer
+> The new parameters are optional below [1]; should they have a default
+> value documented, and are there any constraints such that if you set
+> one, you must set all four to match the previous' patch having all four
+> be non-optional?
+
+I think this is just the same as all the other migration-parameters
+isn't it?  It's the way that the 'migrate-set-parameters' command allows
+you to set an individual parameter without changing the others; it's
+not about defaults, just that whatever setting you currently have
+doesn't change.
+
 > 
-> > +        if self._vms.get(name) is None:
-> > +            self._vms[name] = self._new_vm(*args)
-> > +        return self._vms[name]
-> >       def tearDown(self):
-> > -        if self.vm is not None:
-> > -            self.vm.shutdown()
-> > +        for vm in self._vms.values():
-> > +            vm.shutdown()
+> > @@ -653,7 +681,11 @@
+> >  # TODO either fuse back into MigrationParameters, or make
+> >  # MigrationParameters members mandatory
+> >  { 'struct': 'MigrateSetParameters',
+> > -  'data': { '*compress-level': 'int',
+> > +  'data': { '*announce-initial': 'size',
+> > +            '*announce-max': 'size',
+> > +            '*announce-rounds': 'size',
+> > +            '*announce-step': 'size',
+> > +            '*compress-level': 'int',
+> 
+> [1] mentioned above
+> 
+> >              '*compress-threads': 'int',
+> >              '*compress-wait-thread': 'bool',
+> >              '*decompress-threads': 'int',
+> > @@ -692,6 +724,18 @@
+> >  #
+> >  # The optional members aren't actually optional.
+> >  #
+> > +# @announce-initial: Inital delay (in ms) before sending the first announce
+> > +#          (Since 4.0)
+> 
+> [2] again
+> 
+Fixed.
+> 
+> > @@ -769,7 +813,11 @@
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'MigrationParameters',
+> > -  'data': { '*compress-level': 'uint8',
+> > +  'data': { '*announce-initial': 'size',
+> > +            '*announce-max': 'size',
+> > +            '*announce-rounds': 'size',
+> > +            '*announce-step': 'size',
+> > +            '*compress-level': 'uint8',
+> 
+> [1] again
+> 
+> >              '*compress-threads': 'uint8',
+> >              '*compress-wait-thread': 'bool',
+> >              '*decompress-threads': 'uint8',
+> > @@ -785,7 +833,7 @@
+> >              '*x-multifd-page-count': 'uint32',
+> >              '*xbzrle-cache-size': 'size',
+> >  	    '*max-postcopy-bandwidth': 'size',
+> > -            '*max-cpu-throttle':'uint8'} }
+> > +            '*max-cpu-throttle':'uint8' } }
+> 
+> Why the whitespace churn?
+
+Removed (although I think the extra space is cleaner).
+
+Dave
+
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
 > 
 
-Thanks,
 
--- 
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
