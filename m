@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46086)
+Received: from eggs.gnu.org ([209.51.188.92]:46339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goQ77-00069q-2b
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:55:29 -0500
+	(envelope-from <christophe.lyon@linaro.org>) id 1goQ8F-0006vx-Qn
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1goQ76-0004Wv-1A
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:55:29 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39627)
+	(envelope-from <christophe.lyon@linaro.org>) id 1goQ8D-000584-QK
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:56:39 -0500
+Received: from mail-vs1-xe31.google.com ([2607:f8b0:4864:20::e31]:45714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1goQ75-0004W8-Nn
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:55:27 -0500
-Received: by mail-ot1-x343.google.com with SMTP id n8so17351199otl.6
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 01:55:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <christophe.lyon@linaro.org>)
+	id 1goQ8B-0004zV-R0
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:56:35 -0500
+Received: by mail-vs1-xe31.google.com with SMTP id x28so11573555vsh.12
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 01:56:22 -0800 (PST)
 MIME-Version: 1.0
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-	<20190110121736.23448-5-richard.henderson@linaro.org>
-	<CAFEAcA9Yz53O1OiG-eN=0eCdnO=Lz+yJPUtqVxfFSb3rrG4TEg@mail.gmail.com>
-	<ae0d3ea5-e7e1-da8e-9b10-4534a1ff9162@linaro.org>
-In-Reply-To: <ae0d3ea5-e7e1-da8e-9b10-4534a1ff9162@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 Jan 2019 09:55:14 +0000
-Message-ID: <CAFEAcA9OuF=rdRBRpoXFG3r4_rntc-fRa2m2g=+w+cpfC1Vg1w@mail.gmail.com>
+References: <154842501977.29408.13715859935418850955.malonedeb@soybean.canonical.com>
+	<20190129025352.GB3264@stefanha-x1.localdomain>
+In-Reply-To: <20190129025352.GB3264@stefanha-x1.localdomain>
+From: Christophe Lyon <christophe.lyon@linaro.org>
+Date: Tue, 29 Jan 2019 10:56:09 +0100
+Message-ID: <CAKdteOZ1faQ9crPSR67RB_c6UvUgSfQW2u+mSrikkhjCqkk52Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 04/11] target/arm: Record the GP bit for a
- page in MemTxAttrs
+Subject: Re: [Qemu-devel] [Bug 1813305] [NEW] trace-root.h is not
+ regerenerated after re-configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Bug 1813305 <1813305@bugs.launchpad.net>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 28 Jan 2019 at 21:08, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Tue, 29 Jan 2019 at 03:55, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
-> On 1/22/19 5:26 AM, Peter Maydell wrote:
-> >> +        guarded |= extract64(descriptor, 50, 1);  /* GP */
+> On Fri, Jan 25, 2019 at 02:03:39PM -0000, Christophe Lyon wrote:
+> > I've just realized that after I reconfigured my qemu with
+> > ../configure --target-list=arm-softmmu,arm-linux-user,aarch64-softmmu,aarch64-linux-user --enable-trace-backends=simple
 > >
-> > Do we need to do the logical-OR here? Since this is a
-> > block/page entry bit with no similar bit in the table
-> > descriptors, there's no merging to be done (ie we
-> > only execute this code once and 'guarded' will always
-> > be 'false' before execution of the |=.)
+> > $ make
+> > did rebuild some stuff for the 'simple' trace, but it did not update trace-root.h until after I
+> > $ make clean
+> >
+> >
+> > I took me while to understand why I didn't get the traces I wanted (my trace-root.h still thought it was configured for the default 'log').
+> >
+> > I didn't check how easy it is to fix this in the build system.
 >
-> The document that I have has exactly one sentence about this, and does not
-> specify whether the bit is akin to the page table attributes (which appear at
-> every table level) or not.
+> Thank you for reporting this.  I have sent a patch to fix the makefile.
+>
 
-Translation table descriptor formats come in four flavours:
- * Invalid
- * Table (which gives the address of the next level table)
- * Block (which gives the address of a large lump of memory)
- * Page (which gives the address of a page)
+Thanks for the quick patch.
 
-The GP bit documented to be in Block and Page entries, not
-Table (which is how you've coded it).
-
-> As written above, this will execute more than once.
-
-I don't see how -- all the code paths forward from
-"guarded |= extract64(descriptor, 50, 1);" reach a
-"break" statement that terminates the loop, don't they?
-
-thanks
--- PMM
+> Stefan
