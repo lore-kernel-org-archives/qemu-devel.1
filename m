@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50022)
+Received: from eggs.gnu.org ([209.51.188.92]:50846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goadf-0002pC-6a
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:09:47 -0500
+	(envelope-from <alistair23@gmail.com>) id 1goaht-00041m-AN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1goade-0007a3-GU
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:09:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1goade-0007ZI-8B
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:09:46 -0500
-References: <20190129113921.21599-1-berrange@redhat.com>
-	<20190129113921.21599-3-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9fadf240-07c7-b569-f300-a4fc4d9044eb@redhat.com>
-Date: Tue, 29 Jan 2019 15:09:44 -0600
+	(envelope-from <alistair23@gmail.com>) id 1goahs-0000sH-BC
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:14:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190129113921.21599-3-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ptvInMV81hFCJqtLbmaEwh5bSjJt5rTrR"
-Subject: Re: [Qemu-devel] [PATCH 2/5] make: don't insert a '/' after
- $(DESTDIR)
+References: <69b40819-748e-d555-316a-6ce90e944bde@mail.uni-paderborn.de>
+	<mhng-2dd4c232-3efb-4173-aae1-491b9aa2685b@palmer-si-x1c4>
+In-Reply-To: <mhng-2dd4c232-3efb-4173-aae1-491b9aa2685b@palmer-si-x1c4>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 29 Jan 2019 13:13:36 -0800
+Message-ID: <CAKmqyKPdGDB9Apd0SwsLBGwpaJqb1W-mGMEnw005q1jLSnGAkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Adam Baxter <voltagex@voltagex.org>, Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ptvInMV81hFCJqtLbmaEwh5bSjJt5rTrR
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Adam Baxter <voltagex@voltagex.org>, Stefan Weil <sw@weilnetz.de>,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <9fadf240-07c7-b569-f300-a4fc4d9044eb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] make: don't insert a '/' after
- $(DESTDIR)
-References: <20190129113921.21599-1-berrange@redhat.com>
- <20190129113921.21599-3-berrange@redhat.com>
-In-Reply-To: <20190129113921.21599-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 29, 2019 at 11:31 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Sat, 26 Jan 2019 00:51:23 PST (-0800), Bastian Koppelmann wrote:
+> > On 1/26/19 12:54 AM, Palmer Dabbelt wrote:
+> >> On Tue, 22 Jan 2019 13:38:52 PST (-0800), richard.henderson@linaro.org wrote:
+> >>> On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
+> >>>> Hi,
+> >>>>
+> >>>> this patchset converts the RISC-V decoder to decodetree in four major steps:
+> >>>>
+> >>>> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
+> >>>>     Many of the gen_* functions are called by the decode functions for 16-bit
+> >>>>     and 32-bit functions. If we move translation code from the gen_*
+> >>>>     functions to the generated trans_* functions of decode-tree, we get a lot of
+> >>>>     duplication. Therefore, we mostly generate calls to the old gen_* function
+> >>>>     which are properly replaced after step 2).
+> >>>>
+> >>>>     Each of the trans_ functions are grouped into files corresponding to their
+> >>>>     ISA extension, e.g. addi which is in RV32I is translated in the file
+> >>>>     'trans_rvi.inc.c'.
+> >>>>
+> >>>> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
+> >>>>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
+> >>>>     we convert the arguments in the 16 bit trans_ function to the arguments of
+> >>>>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
+> >>>>
+> >>>> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
+> >>>>     this move all manual translation code into the trans_* instructions of
+> >>>>     decode tree, such that we can remove the old decode_* functions.
+> >>>>
+> >>>> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
+> >>>>    by Richard. [Patch 31-35]
+> >>>>
+> >>>> full tree available at
+> >>>> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
+> >>>>
+> >>>> Cheers,
+> >>>> Bastian
+> >>>>
+> >>>> v4 -> v5:
+> >>>>     - fixed rebase error
+> >>>>     - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
+> >>>>     - removed extra sign extension of sraiw
+> >>>>     - removed rs2 == 0 special cases in sraw/srlw
+> >>>
+> >>> All looks good to me now.  Thanks for persevering.
+> >>
+> >> Thanks for reviewing this.
+> >>
+> >> Bastian: what sort of testing have you done here?  This is a pretty big change,
+> >> and while it's been fairly extensively reviewed I'm just generally paranoid.
+> >>
+> >
+> > I ran riscv-test as well as booting the newest fedora.
+>
+> Well, that pretty much exhausts my testing scheme :).  I think Alistair might
+> have a setup for booting a 32-bit Yocto-based distro in QEMU.  Assuming he has
+> the flow set up and it boots then I don't see any reason not to merge it.
 
-On 1/29/19 5:39 AM, Daniel P. Berrang=C3=A9 wrote:
-> This breaks when $(prefix) is a relative directory, as it turns it
-> into an absolute path.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  Makefile | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+I just tested it and 32-bit images boot the same before and after this
+patchset. So the 4.19 (with patches ontop) kernel boots, but the 5.0
+(with patches ontop) crashes at init.
 
-Yes, it is long-standing practice among Automake and others that
-$(DESTDIR) is normally empty but should contain its own trailing slash
-when defined, as it is NOT separated from the rest of the installation
-lines with an explicit /.
+>
+> Thanks for pulling this all together, it's really great to have a cleaner
+> decoder!
+>
+> Alistair: if that's true, can you give this a shot?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Yep, I have been using this in my daily use and haven't seen any
+problems. That isn't exhaustive testing but should cover a bit.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Tested-by: Alistair Francis <alistair.francis@wdc.com>
 
+Alistair
 
---ptvInMV81hFCJqtLbmaEwh5bSjJt5rTrR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxQwRgACgkQp6FrSiUn
-Q2pH4Qf/ef/GkzDXef8sS7ACzEeSdER/z9tBg2vWOqtSD15MF6m4kL8q5EqaDRRe
-lnF9jHGwDei/kcN7NS58eZAP71vpVTqurPACXsX6f4YYbYBG0rVu/1q5ytJ8Hvfr
-knqnEvLLWPL3Ayw0hkXngPFtDb8paLhFwGePHQ7PpDxX+M9moJTl8Du3Ib4OY2rk
-wQCVGC7XM5DuDaoc6O/2EZOmq4FOG9rzt2nGSQb9dFW9wiqZyh10/C4S8U5qxR/e
-5J2SzyoELBKyykuCufyArgXDZt19PLuitcuLE1JRJf1RbxFkYDwQWcIF8mcpwfCR
-j7YgaFxs4FKBhxuXRYXAOPmBMKNhOQ==
-=+tsT
------END PGP SIGNATURE-----
-
---ptvInMV81hFCJqtLbmaEwh5bSjJt5rTrR--
+>
+> Bastian: do you mind collecting the relevant tags (Reviwed-by, etc) and putting
+> them in a v6?
+>
