@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40211)
+Received: from eggs.gnu.org ([209.51.188.92]:40699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goXvc-0001Cm-Jw
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:16:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1goXxb-0001yY-2M
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goXvb-0000zs-Lc
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:16:08 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goXvb-0000zE-Fb
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:16:07 -0500
-Received: by mail-wr1-f67.google.com with SMTP id z5so23133607wrt.11
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 10:16:07 -0800 (PST)
-References: <alpine.BSF.2.21.9999.1901290213290.42676@zero.eik.bme.hu>
-	<8b87466e-3e9a-14ae-c827-ac5e61717a87@redhat.com>
-	<alpine.BSF.2.21.9999.1901291123160.84186@zero.eik.bme.hu>
-	<alpine.BSF.2.21.9999.1901291156010.93614@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <411a9bb8-1264-1e8f-5af0-741d8af6cd89@redhat.com>
-Date: Tue, 29 Jan 2019 19:16:04 +0100
+	(envelope-from <armbru@redhat.com>) id 1goXxZ-0001et-Ov
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57663)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1goXxZ-0001Yl-Fo
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 13:18:09 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F5828666E
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 18:17:57 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190125172229.23025-1-cfergeau@redhat.com>
+	<20190125172229.23025-2-cfergeau@redhat.com>
+Date: Tue, 29 Jan 2019 19:17:51 +0100
+In-Reply-To: <20190125172229.23025-2-cfergeau@redhat.com> (Christophe
+	Fergeau's message of "Fri, 25 Jan 2019 18:22:29 +0100")
+Message-ID: <87k1inpbu8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901291156010.93614@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] macOS build error after ddac19f534 (virtio: split
- virtio 9p bits from virtio-pci)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] log: Make glib logging go through
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +34,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 1/29/19 11:58 AM, BALATON Zoltan wrote:
-> On Tue, 29 Jan 2019, BALATON Zoltan wrote:
->> On Tue, 29 Jan 2019, Philippe Mathieu-Daudé wrote:
->>> On 1/29/19 2:20 AM, BALATON Zoltan wrote:
->>>> Hello,
->>>>
->>>> I'm getting error building on macOS after commit ddac19f534:
->>>>
->>>> ? CC????? aarch64-softmmu/hw/virtio/virtio-blk-pci.o
->>>> In file included from qemu/hw/virtio/virtio-9p-pci.c:19:
->>>> In file included from qemu/hw/9pfs/virtio-9p.h:6:
->>>> In file included from qemu/hw/9pfs/9p.h:7:
->>>> qemu/fsdev/file-op-9p.h:19:10: fatal error: 'sys/vfs.h' file not found
->>>> #include <sys/vfs.h>
->>>> ???????? ^~~~~~~~~~~
->>>>
->>>> Am I missing something? (Apart from the include file which is not
->>>> present on OS X... Maybe this needs the #ifdefs it had before the
->>>> split?)
->>>
->>> It seems commits are not correctly ordered for bisectability :(
->>>
->>> If you cherry-pick ecd3b89b054, does it build?
->>
->> No it fails with same error on HEAD as well ever since the above commit.
-> 
-> Now it has built after completely removing build directory. Somehow a
-> CONFIG_VIRTIO_9P got set before even after doing make distclean several
-> times. Only completetly removing build dir has helped.
+Christophe Fergeau <cfergeau@redhat.com> writes:
 
-I think a similar bug you experienced hits me via another way, while
-running the block tests:
+> This commit adds a qemu_init_logging() helper which calls
+> g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
+> are handled similarly to other QEMU logs. This means they will get a
+> timestamp if timestamps are enabled, and they will go through the
+> HMP monitor if one is configured.
+> This commit also adds a call to qemu_init_logging() to the binaries
+> installed by QEMU.
+> glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
+> glib default log handler.
+>
+> At the moment, this change will mostly impact SPICE logging if your
+> spice version is >= 0.14.1. With older spice versions, this is not going
+> to work as expected, but will not have any ill effect, so this call is
+> not conditional on the SPICE version.
+>
+> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+> ---
+>  bsd-user/main.c             |  2 ++
+>  include/qemu/error-report.h |  3 ++-
+>  linux-user/main.c           |  2 ++
+>  qemu-img.c                  |  2 +-
+>  qemu-io.c                   |  2 +-
+>  qemu-nbd.c                  |  2 +-
+>  scsi/qemu-pr-helper.c       |  1 +
+>  util/qemu-error.c           | 48 ++++++++++++++++++++++++++++++++++++-
+>  vl.c                        |  2 +-
+>  9 files changed, 58 insertions(+), 6 deletions(-)
+>
+> diff --git a/bsd-user/main.c b/bsd-user/main.c
+> index 0d3156974c..8fd8ae4127 100644
+> --- a/bsd-user/main.c
+> +++ b/bsd-user/main.c
+> @@ -24,6 +24,7 @@
+>  #include "qapi/error.h"
+>  #include "qemu.h"
+>  #include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu/path.h"
+>  #include "qemu/help_option.h"
+>  #include "cpu.h"
+> @@ -743,6 +744,7 @@ int main(int argc, char **argv)
+>      if (argc <= 1)
+>          usage();
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+>      qemu_init_cpu_list();
+>      module_call_init(MODULE_INIT_QOM);
 
---- /home/phil/source/qemu/tests/qemu-iotests/095.out	2018-12-12
-15:06:54.019029386 +0100
-+++ /home/phil/source/qemu/build/tests/qemu-iotests/095.out.bad
-2019-01-29 08:34:54.701705730 +0100
-@@ -10,18 +10,5 @@
+This changes output of error_report() & friends in this program.
+Probably in a good way.  Should it be a separate commit?  If not, it
+should at least be mentioned in the commit message.
 
- === Running QEMU Live Commit Test ===
+> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+> index 0a8d9cc9ea..ce43c02314 100644
+> --- a/include/qemu/error-report.h
+> +++ b/include/qemu/error-report.h
+> @@ -34,7 +34,6 @@ void error_vprintf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+>  void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>  void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+>  void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> -void error_set_progname(const char *argv0);
+>  
+>  void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+>  void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> @@ -49,6 +48,8 @@ bool error_report_once_cond(bool *printed, const char *fmt, ...)
+>  bool warn_report_once_cond(bool *printed, const char *fmt, ...)
+>      GCC_FMT_ATTR(2, 3);
+>  
+> +void error_init(const char *argv0);
+> +
+>  /*
+>   * Similar to error_report(), except it prints the message just once.
+>   * Return true when it prints, false otherwise.
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index a0aba9cb1e..f9efe9ff6e 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/path.h"
+>  #include "qemu/config-file.h"
+>  #include "qemu/cutils.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu/help_option.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+> @@ -600,6 +601,7 @@ int main(int argc, char **argv, char **envp)
+>      int ret;
+>      int execfd;
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+>      qemu_init_cpu_list();
+>      module_call_init(MODULE_INIT_QOM);
 
--{"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "test"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "test"}}
--{"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "test"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "test"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "BLOCK_JOB_COMPLETED", "data": {"device": "test", "len":
-104857600, "offset": 104857600, "speed": 0, "type": "commit"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "test"}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "test"}}
--
--=== Base image info after commit and resize ===
--image: TEST_DIR/t.IMGFMT.base
--file format: IMGFMT
--virtual size: 100M (104857600 bytes)
--*** done
-+QEMU_PROG: -drive file=TEST_DIR/t.qcow2,if=virtio,id=test:
-'virtio-blk-pci' is not a valid device model name
-+Timeout waiting for return on handle 0
+Likewise.
 
-I'm using out-of-tree builds, I rebased by branch onto /master, which
-correctly triggered a reconfigure:
+> diff --git a/qemu-img.c b/qemu-img.c
+> index ad04f59565..0af9cac244 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -4912,8 +4912,8 @@ int main(int argc, char **argv)
+>      signal(SIGPIPE, SIG_IGN);
+>  #endif
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+> -    error_set_progname(argv[0]);
+>      qemu_init_exec_dir(argv[0]);
+>  
+>      if (qemu_init_main_loop(&local_error)) {
+> diff --git a/qemu-io.c b/qemu-io.c
+> index 2c52ac0ade..8d5d5911cb 100644
+> --- a/qemu-io.c
+> +++ b/qemu-io.c
+> @@ -522,8 +522,8 @@ int main(int argc, char **argv)
+>      signal(SIGPIPE, SIG_IGN);
+>  #endif
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+> -    error_set_progname(argv[0]);
+>      qemu_init_exec_dir(argv[0]);
+>  
+>      qcrypto_init(&error_fatal);
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index 1f7b2a03f5..39849f1692 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -685,8 +685,8 @@ int main(int argc, char **argv)
+>      signal(SIGPIPE, SIG_IGN);
+>  #endif
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+> -    error_set_progname(argv[0]);
+>      qcrypto_init(&error_fatal);
+>  
+>      module_call_init(MODULE_INIT_QOM);
+> diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+> index e7af637232..2541fbbd1b 100644
+> --- a/scsi/qemu-pr-helper.c
+> +++ b/scsi/qemu-pr-helper.c
+> @@ -895,6 +895,7 @@ int main(int argc, char **argv)
+>  
+>      signal(SIGPIPE, SIG_IGN);
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+>      module_call_init(MODULE_INIT_QOM);
+>      qemu_add_opts(&qemu_trace_opts);
 
-  config-host.mak is out-of-date, running configure
+Likewise.
 
-But then there was a desync with the config variables (CONFIG_VIRTIO_BLK
-here?). Maybe I did something wrong at some point, I was working with VM
-tests at the same time.
-However in my case a 'make clean' was enough and I could rebuild/test in
-the same directory.
-Anyway, I won't worry much about this.
+> diff --git a/util/qemu-error.c b/util/qemu-error.c
+> index fcbe8a1f74..2684870683 100644
+> --- a/util/qemu-error.c
+> +++ b/util/qemu-error.c
+> @@ -142,7 +142,7 @@ static const char *progname;
+>  /*
+>   * Set the program name for error_print_loc().
+>   */
+> -void error_set_progname(const char *argv0)
+> +static void error_set_progname(const char *argv0)
+>  {
+>      const char *p = strrchr(argv0, '/');
+>      progname = p ? p + 1 : argv0;
+> @@ -345,3 +345,49 @@ bool warn_report_once_cond(bool *printed, const char *fmt, ...)
+>      va_end(ap);
+>      return true;
+>  }
+> +
+> +static char *qemu_glog_domains;
+> +
+> +static void qemu_log_func(const gchar *log_domain,
+> +                          GLogLevelFlags log_level,
+> +                          const gchar *message,
+> +                          gpointer user_data)
+> +{
+> +    switch (log_level & G_LOG_LEVEL_MASK) {
+> +    case G_LOG_LEVEL_DEBUG:
+> +    case G_LOG_LEVEL_INFO:
+> +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable debug
+> +         * messages */
 
-Regards,
+Let's wing this comment.
 
-Phil.
+> +        if (qemu_glog_domains == NULL) {
+> +            break;
+> +        }
+> +        if (strcmp(qemu_glog_domains, "all") != 0 &&
+> +          (log_domain == NULL || !strstr(qemu_glog_domains, log_domain))) {
+> +            break;
+> +        }
+> +        /* Fall through */
+> +    case G_LOG_LEVEL_MESSAGE:
+> +        info_report("%s: %s", log_domain?:"", message);
+
+Spaces around ?:, please.
+
+If log_domain is null, the message will look like
+
+    info: : MESSAGE text
+
+which is ugly.  What about
+
+           info_report("%s%s%s",
+                       log_domain ? ": " : "", log_domain ?: "", message);
+
+More of the same below.
+
+> +        break;
+> +    case G_LOG_LEVEL_WARNING:
+> +        warn_report("%s: %s", log_domain?:"", message);
+> +        break;
+> +    case G_LOG_LEVEL_CRITICAL:
+> +        /* Fall through */
+> +    case G_LOG_LEVEL_ERROR:
+> +        error_report("%s: %s", log_domain?:"", message);
+> +        break;
+> +    }
+> +}
+> +
+> +void error_init(const char *argv0)
+> +{
+> +    /* Set the program name for error_print_loc(). */
+> +    error_set_progname(argv0);
+> +
+> +    /* This sets up glib logging so libraries using it also print their logs
+> +     * through error_report(), warn_report(), info_report(). */
+
+Let's wing this comment.
+
+> +    g_log_set_default_handler(qemu_log_func, NULL);
+> +    g_warn_if_fail(qemu_glog_domains == NULL);
+> +    qemu_glog_domains = g_strdup(g_getenv("G_MESSAGES_DEBUG"));
+> +}
+> diff --git a/vl.c b/vl.c
+> index bc9fbec654..bfef38c3a3 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
+>      QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
+>          = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+>  
+> +    error_init(argv[0]);
+>      module_call_init(MODULE_INIT_TRACE);
+>  
+>      qemu_init_cpu_list();
+> @@ -3047,7 +3048,6 @@ int main(int argc, char **argv, char **envp)
+>      qemu_mutex_lock_iothread();
+>  
+>      atexit(qemu_run_exit_notifiers);
+> -    error_set_progname(argv[0]);
+>      qemu_init_exec_dir(argv[0]);
+>  
+>      module_call_init(MODULE_INIT_QOM);
+
+Almost ready.
