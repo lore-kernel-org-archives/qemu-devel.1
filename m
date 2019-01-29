@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42591)
+Received: from eggs.gnu.org ([209.51.188.92]:44172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goPuZ-0008Pc-RA
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:42:32 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1goPym-0001mL-O2
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goPuR-0002ee-NF
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:42:25 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 29 Jan 2019 10:42:14 +0100
-Message-Id: <1548754934-6031-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <20190128170819.4998232d.cohuck@redhat.com>
-References: <20190128170819.4998232d.cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] s390x: express dependencies with Kconfig
+	(envelope-from <pkrempa@redhat.com>) id 1goPyl-00069g-RI
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 04:46:52 -0500
+Date: Tue, 29 Jan 2019 10:40:35 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190129094035.GV3382@angien.pipo.sk>
+References: <20190125174653.4604-1-kwolf@redhat.com>
+	<20190125174653.4604-3-kwolf@redhat.com>
+	<20190128085041.GA16630@andariel.pipo.sk>
+	<20190128144147.GA5756@localhost.localdomain>
+	<87tvhszpql.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="OFtM20PmL5gDcvsL"
+Content-Disposition: inline
+In-Reply-To: <87tvhszpql.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] scsi-disk: Add device_id property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,100 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Instead of hard-coding all config switches in the config file
-default-configs/s390x-softmmu.mak, let's use the new Kconfig files
-to express the necessary dependencies: The S390_CCW_VIRTIO config switch
-for the "s390-ccw-virtio" machine now selects all non-optional devices.
 
-And since we already have the VIRTIO_PCI and VIRTIO_MMIO config switches
-for the other two virtio transports, this patch also introduces a new
-config switch VIRTIO_CCW for the third, s390x-specific virtio transport,
-so that all three virtio transports are now handled in the same way.
+--OFtM20PmL5gDcvsL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2:
- - Use CONFIG_TERMINAL3270 for 3270-ccw.o
- - Use CONFIG_VIRTIO_CCW for all related devices in the Makefile
+On Mon, Jan 28, 2019 at 17:55:14 +0100, Markus Armbruster wrote:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 28.01.2019 um 09:50 hat Peter Krempa geschrieben:
+> [...]
+> >> 2) Is actually using 'scsi-cd'/'scsi-hd' the better option than
+> >> 'scsi-disk'?
+> >
+> > Yes, scsi-disk is a legacy device. Maybe we should formally deprecate
+> > it.
+>=20
+> There's an internal use in scsi_bus_legacy_add_drive(), which in turn
+> powers two legacy features:
+>=20
+> 1. -drive if=3Dscsi
+>=20
+>    Creates scsi-disk frontends.
+>=20
+>    Only works with onboard HBAs since commit 14545097267, v2.12.0.
+>=20
+> 2. -device usb-storage
+>=20
+>    Bad magic: usb-storage pretends to be a block device, but it's really
+>    a SCSI bus that can serve only a single device, which it creates
+>    automatically.
+>=20
+> If we deprecate scsi-disk, we should deprecate these, too.  Can't say
+> whether that's practical right now.
 
- default-configs/s390x-softmmu.mak | 12 ++++++++----
- hw/s390x/Kconfig                  |  4 ++++
- hw/s390x/Makefile.objs            |  4 +++-
- hw/virtio/Kconfig                 |  4 ++++
- 4 files changed, 19 insertions(+), 5 deletions(-)
+Unfortunately we did not bother replacing usb-storage yet.
 
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 2be5059..08b1683 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -1,9 +1,13 @@
--CONFIG_PCI=y
-+# Default configuration for s390x-softmmu
-+
-+# Optional devices:
-+#
- CONFIG_VIRTIO_PCI=y
--CONFIG_SCLPCONSOLE=y
- CONFIG_TERMINAL3270=y
--CONFIG_S390_FLIC=y
- CONFIG_WDT_DIAG288=y
--CONFIG_S390_CCW_VIRTIO=y
- CONFIG_VFIO_CCW=y
- CONFIG_VFIO_AP=y
-+
-+# Boards:
-+#
-+CONFIG_S390_CCW_VIRTIO=y
-diff --git a/hw/s390x/Kconfig b/hw/s390x/Kconfig
-index 303db7f..9a36c39 100644
---- a/hw/s390x/Kconfig
-+++ b/hw/s390x/Kconfig
-@@ -1,2 +1,6 @@
- config S390_CCW_VIRTIO
-     bool
-+    select PCI
-+    select S390_FLIC
-+    select SCLPCONSOLE
-+    select VIRTIO_CCW
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index a884aae..ac56a63 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -7,7 +7,8 @@ obj-y += sclpcpu.o
- obj-y += ipl.o
- obj-y += css.o
- obj-y += s390-virtio-ccw.o
--obj-y += 3270-ccw.o
-+obj-$(CONFIG_TERMINAL3270) += 3270-ccw.o
-+ifeq ($(CONFIG_VIRTIO_CCW),y)
- obj-y += virtio-ccw.o
- obj-$(CONFIG_VIRTIO_SERIAL) += virtio-ccw-serial.o
- obj-$(CONFIG_VIRTIO_BALLOON) += virtio-ccw-balloon.o
-@@ -20,6 +21,7 @@ obj-$(CONFIG_VIRTIO_NET) += virtio-ccw-net.o
- obj-$(CONFIG_VIRTIO_BLK) += virtio-ccw-blk.o
- obj-$(call land,$(CONFIG_VIRTIO_9P),$(CONFIG_VIRTFS)) += virtio-ccw-9p.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-ccw.o
-+endif
- obj-y += css-bridge.o
- obj-y += ccw-device.o
- obj-$(CONFIG_PCI) += s390-pci-bus.o s390-pci-inst.o
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index 74f4573..e0452de 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -16,6 +16,10 @@ config VIRTIO_MMIO
-     bool
-     select VIRTIO
- 
-+config VIRTIO_CCW
-+    bool
-+    select VIRTIO
-+
- config VIRTIO_BALLOON
-     bool
-     default y
--- 
-1.8.3.1
+scsi-disk was unused for some time (if scsi-hd was supported). I just
+deleted any mentions of it from libvirt now.
+
+>=20
+> >> 3) Since upstream libvirt supports qemu-1.5 and newer and 'scsi-cd' is
+> >> already supported there, can we assume that all newer versions support
+> >> it? (Basically the question is whether it can be compiled out by
+> >> upstream means).
+> >
+> > I think so.
+>=20
+> Compiling out scsi-hd or scsi-cd, but not scsi-disk would be silly.  All
+> three devices are in scsi-disk.c.  You'd have to hack that up to be
+> silly.
+
+That would be a downstream modification of qemu thus libvirt will
+not want to support that.
+
+--OFtM20PmL5gDcvsL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIyBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlxQHvQACgkQHGwCByjY
+1Go6pQ/45m/tJwGrynJ4wRXrB9ZbGl4VSkowhepkpbsg73uD2rT0X53Kh4Wp75Bm
+rbNZMje4L7/xwHT1fQSovEa4UQoAVCI/dDrwpisiErcSL7LpwXIyW20IdZcp700z
+9doINYl5FjkcnnXcgVlbCIvitGBjxaes4exDW8rzrd/PGd6qH35Bn3iDEJRROmkB
+tmNduqpgMMMpqqS7yms9xQjegfwX9TV/tNjCh228bhaq8tdvG/19OJkN05tdToj4
+kpRcztA1IK7/EtqYplipT0hAVjy7SAlkjTz86EuaAkJfIK6llZT0kim04Lzee4Xl
+YoezYVqxSWy4yWrHBo6wfh76MtCbueCV34LRLjN1eHdjdVNuppfrk8eB1PeKd900
+Pw39hU6RUZS6mPmj/+yBwm5+tG1FKx2cz3c4jmddU049URtyKGXw008pHX7Ics7s
+qTJGSBCWvaodZ3caJogJIzt3X+yjk+W8I+tIiYL/UDt/+ESxr/E2eNfSWpF23mcO
+fLmFlQtOWdhUON2nCFz01cmgpG9EOsD8+HCEEWbag8omrrOrQDYe62nqeCIET4aJ
+cqhZKS8lmBiZEt8NT/DU9YrP+dTHlHjHeWButxVeTnd+6xMtzorgqRVmdSolS9c4
+81pC3SlTe5vn2aeKHr0LAkXumlj+EhoR/CmF6OMndPhJaquZ8Q==
+=KXTq
+-----END PGP SIGNATURE-----
+
+--OFtM20PmL5gDcvsL--
