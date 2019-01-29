@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43651)
+Received: from eggs.gnu.org ([209.51.188.92]:45417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goNXQ-0007l2-US
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:10:29 -0500
+	(envelope-from <clg@kaod.org>) id 1goNhS-0001AO-JK
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:20:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1goNXQ-0002rI-9L
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:10:28 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190125174653.4604-1-kwolf@redhat.com>
-	<20190125174653.4604-3-kwolf@redhat.com>
-	<20190128085041.GA16630@andariel.pipo.sk>
-	<20190128144147.GA5756@localhost.localdomain>
-	<87tvhszpql.fsf@dusky.pond.sub.org>
-	<20190128174919.GL5756@localhost.localdomain>
-Date: Tue, 29 Jan 2019 08:10:19 +0100
-In-Reply-To: <20190128174919.GL5756@localhost.localdomain> (Kevin Wolf's
-	message of "Mon, 28 Jan 2019 18:49:19 +0100")
-Message-ID: <87womovt0k.fsf@dusky.pond.sub.org>
+	(envelope-from <clg@kaod.org>) id 1goNhR-0007JD-Sf
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:20:50 -0500
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:42369)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1goNhR-0007Fu-NI
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:20:49 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.160.76])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 01CAB1A5009
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:20:38 +0100 (CET)
+References: <20190107183946.7230-1-clg@kaod.org>
+	<20190107183946.7230-9-clg@kaod.org>
+	<c916f6f3-7f5b-fa87-3343-f65cfc1da29e@ozlabs.ru>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <043a5864-12b1-b384-247d-2e361c4ff009@kaod.org>
+Date: Tue, 29 Jan 2019 08:20:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] scsi-disk: Add device_id property
+In-Reply-To: <c916f6f3-7f5b-fa87-3343-f65cfc1da29e@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/13] spapr/rtas: modify
+ spapr_rtas_register() to remove RTAS handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: libvir-list@redhat.com, pbonzini@redhat.com, Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 1/29/19 6:09 AM, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 08/01/2019 05:39, C=C3=A9dric Le Goater wrote:
+>> Removing RTAS handlers will become necessary when the new pseries
+>> machine supporting multiple interrupt mode is introduced.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr.h | 4 ++++
+>>  hw/ppc/spapr_rtas.c    | 2 +-
+>>  2 files changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 9e01a5a12e4a..9a6d015b9cf5 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -657,6 +657,10 @@ typedef void (*spapr_rtas_fn)(PowerPCCPU *cpu, sP=
+APRMachineState *sm,
+>>                                uint32_t nargs, target_ulong args,
+>>                                uint32_t nret, target_ulong rets);
+>>  void spapr_rtas_register(int token, const char *name, spapr_rtas_fn f=
+n);
+>> +static inline void spapr_rtas_unregister(int token)
+>> +{
+>> +    spapr_rtas_register(token, NULL, NULL);
+>> +}
+>=20
+> The new helper is not used anywhere.
 
-> Am 28.01.2019 um 17:55 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > Am 28.01.2019 um 09:50 hat Peter Krempa geschrieben:
->> [...]
->> >> 2) Is actually using 'scsi-cd'/'scsi-hd' the better option than
->> >> 'scsi-disk'?
->> >
->> > Yes, scsi-disk is a legacy device. Maybe we should formally deprecate
->> > it.
->> 
->> There's an internal use in scsi_bus_legacy_add_drive(), which in turn
->> powers two legacy features:
->> 
->> 1. -drive if=scsi
->> 
->>    Creates scsi-disk frontends.
->> 
->>    Only works with onboard HBAs since commit 14545097267, v2.12.0.
->> 
->> 2. -device usb-storage
->> 
->>    Bad magic: usb-storage pretends to be a block device, but it's really
->>    a SCSI bus that can serve only a single device, which it creates
->>    automatically.
->> 
->> If we deprecate scsi-disk, we should deprecate these, too.  Can't say
->> whether that's practical right now.
->
-> Most likely not worth the effort anyway. I don't think it's blocking
-> anything.
+ah yes. patch 10 should be introducing the helper in xics_kvm_disconnect(=
+)
 
-We could also wean them off the legacy device models.
+I am fixing that.
 
->> >> 3) Since upstream libvirt supports qemu-1.5 and newer and 'scsi-cd' is
->> >> already supported there, can we assume that all newer versions support
->> >> it? (Basically the question is whether it can be compiled out by
->> >> upstream means).
->> >
->> > I think so.
->> 
->> Compiling out scsi-hd or scsi-cd, but not scsi-disk would be silly.  All
->> three devices are in scsi-disk.c.  You'd have to hack that up to be
->> silly.
->
-> I understood this as a question about libvirt, i.e. whether libvirt can
-> drop/compile out their scsi-disk code and instead assume that scsi-hd/cd
-> are always present. Maybe I misunderstood, though?
+Thanks,
 
-If questions remain, I trust Peter will ask.
+C.
+
+>>  target_ulong spapr_rtas_call(PowerPCCPU *cpu, sPAPRMachineState *sm,
+>>                               uint32_t token, uint32_t nargs, target_u=
+long args,
+>>                               uint32_t nret, target_ulong rets);
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index d6a0952154ac..e005d5d08151 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -404,7 +404,7 @@ void spapr_rtas_register(int token, const char *na=
+me, spapr_rtas_fn fn)
+>> =20
+>>      token -=3D RTAS_TOKEN_BASE;
+>> =20
+>> -    assert(!rtas_table[token].name);
+>> +    assert(!name || !rtas_table[token].name);
+>=20
+>=20
+> but allowing name=3D=3DNULL is.
+>=20
+>=20
+>> =20
+>>      rtas_table[token].name =3D name;
+>>      rtas_table[token].fn =3D fn;
+>>
+>=20
