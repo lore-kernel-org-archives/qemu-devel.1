@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37268)
+Received: from eggs.gnu.org ([209.51.188.92]:40213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1goGrQ-0000xj-IE
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 19:02:41 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1goHB5-0003TM-CW
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 19:23:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1goGrO-0005mY-N5
-	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 19:02:40 -0500
-Date: Tue, 29 Jan 2019 08:01:57 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190129000157.GA30562@richard>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
-	<20190128143230.3bda74a0@redhat.com>
+	(envelope-from <walling@linux.ibm.com>) id 1goGyX-0000QL-Lo
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 19:10:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59042
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1goGyX-0000Po-FN
+	for qemu-devel@nongnu.org; Mon, 28 Jan 2019 19:10:01 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0SNwuwi142052
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 19:09:59 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qaa23ndhu-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 19:09:59 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 29 Jan 2019 00:09:59 -0000
+References: <20190121134249.16615-1-david@redhat.com>
+	<20190121134249.16615-3-david@redhat.com>
+	<20190123120539.3ca367f9.cohuck@redhat.com>
+	<20190128122833.4613659a.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Mon, 28 Jan 2019 19:09:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190128143230.3bda74a0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] hw/i386/pc.c: remove unused function
- pc_acpi_init()
+In-Reply-To: <20190128122833.4613659a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <3b9f7e27-5f3b-5a36-87ab-209942334e59@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 2/2] s390x/pci: Unplug
+ remaining devices on pcihost reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +46,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu, mst@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Jan 28, 2019 at 02:32:30PM +0100, Igor Mammedov wrote:
->On Fri, 25 Jan 2019 14:01:55 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> Function pc_acpi_init() is now used in no place.
->s/is now used in no place./in not used anymore,/
->
->fixup the same phrase in other patches.
->
->otherwise series looks good, so fix commit messages and resubmit series.
->
->Also when sending  multi-patch series, pls use cover letter
->(see help for git format-patch --cover-letter)
-
-Thanks :-)
-
-Will change and re-submit.
-
->
+On 1/28/19 6:28 AM, Cornelia Huck wrote:
+> On Wed, 23 Jan 2019 12:05:39 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
->> Remove the definition and declaration.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  hw/i386/pc.c         | 27 ---------------------------
->>  include/hw/i386/pc.h |  1 -
->>  2 files changed, 28 deletions(-)
->> 
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 5317e08f60..734d3268fa 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1280,33 +1280,6 @@ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
->>                                          pci_address_space, -1);
->>  }
->>  
->> -void pc_acpi_init(const char *default_dsdt)
->> -{
->> -    char *filename;
->> -
->> -    if (acpi_tables != NULL) {
->> -        /* manually set via -acpitable, leave it alone */
->> -        return;
->> -    }
->> -
->> -    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
->> -    if (filename == NULL) {
->> -        warn_report("failed to find %s", default_dsdt);
->> -    } else {
->> -        QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
->> -                                          &error_abort);
->> -        Error *err = NULL;
->> -
->> -        qemu_opt_set(opts, "file", filename, &error_abort);
->> -
->> -        acpi_table_add_builtin(opts, &err);
->> -        if (err) {
->> -            warn_reportf_err(err, "failed to load %s: ", filename);
->> -        }
->> -        g_free(filename);
->> -    }
->> -}
->> -
->>  void xen_load_linux(PCMachineState *pcms)
->>  {
->>      int i;
->> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->> index 9d29c4b1df..541124ba6d 100644
->> --- a/include/hw/i386/pc.h
->> +++ b/include/hw/i386/pc.h
->> @@ -187,7 +187,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
->>  
->>  void pc_cpus_init(PCMachineState *pcms);
->>  void pc_hot_add_cpu(const int64_t id, Error **errp);
->> -void pc_acpi_init(const char *default_dsdt);
->>  
->>  void pc_guest_info_init(PCMachineState *pcms);
->>  
+>> On Mon, 21 Jan 2019 14:42:49 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> When resetting the guest we should unplug and remove all devices that
+>>> are still pending. Otherwise the fresh guest will see devices that will
+>>> suddenly vanish.
+>>>
+>>> Can be triggered e.g. via
+>>> (hmp) device_add virtio-mouse-pci,id=test
+>>> (hmp) stop
+>>> (hmp) device_del test
+>>> (hmp) system_reset
+>>> (hmp) c
+>>>
+>>> The device will vanish after roughly 5 minutes. With this patch, the
+>>> device will vanish on reboot (S390_RESET_EXTERNAL and S390_RESET_REIPL,
+>>> which reset the pcihost bridge via qemu_devices_reset()). If we want
+>>> these devices to vanish directly on any reset (S390_RESET_MODIFIED_CLEAR
+>>> and S390_RESET_LOAD_NORMAL), we have to modify s390_machine_reset(). But
+>>> I have the feeling that this should not be done for all reset types.
+>>>
+>>> This approach is similar to what's done for acpi PCI hotplug in
+>>> acpi_pcihp_reset() -> acpi_pcihp_update() ->
+>>> acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+>>>
+>>> s390_pci_generate_plug_event()'s will still be generated, I guess this
+>>> is not an issue (same thing could happen right now if the timer expires
+>>> just after reset).
+>>
+>> I'm wondering what the architecture says regarding those events -- can
+>> someone with access to the documentation comment?
+> 
+> Ping. Any comments from the IBM folks?
+> 
 
--- 
-Wei Yang
-Help you, Help me
+
+So the idea here is that if we have a PCI device that is the process of 
+being deconfigured and we are also in the middle of a reset, then let's 
+accelerate deconfiguring of the PCI device during the reset. Makes sense.
+
+Note:
+
+The callback function will deconfigure the the device and put it into 
+standby mode. However, a PCI device should only go into standby from the 
+*disabled state* (which it could already be in due to the unplug 
+sequence), or from a *permanent error state* (something we should 
+hopefully never see -- this means something went seriously wrong with 
+the device).
+
+Two things I'm concerned about:
+
+1)
+
+What I would suggest is adding a check for the pbdev->state for 
+ZPCI_FS_DISABLED || ZPCI_FS_PERMANENT_ERROR. If it is in either of these 
+states, then we're safe to deconfigure and put into standby. If the 
+device is still in another state (such as enabled or blocked, etc) then 
+we should allow the timer to resume and give the device some more time 
+before forcing an unplug. It's also probably not a good idea to try and 
+deconfigure a device that might already be deconfigured (e.g. if it's 
+already in standby or reserved state). That might not happen though, but 
+it's good to cover our bases.
+
+A side thought: In addition to checking the states, what would happen if 
+you forced the timer to 0? Would the callback get called? Would that 
+just accelerate the already-in-progress unplug sequence?
+
+and 2)
+
+I worry that the sclp might try to deconfigure a PCI device at the same 
+time we force the callback in this patch. I noticed that the 
+sclp_deconfigure function also checks on the release timer before 
+unplugging. I think we should make sure the timer is properly stopped or 
+canceled before the sclp tries to deconfigure and before this patch 
+forces the callback, that way we hopefully won't try to do both at the 
+same time.
+
+something like
+
+if (release_timer) {
+	stop timer
+	unplug
+}
+
+Your adjustments to the pcihost_unplug function in patch #1 would of 
+course handle freeing the release timer later on.
+
+>>
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>   hw/s390x/s390-pci-bus.c | 8 ++++++++
+>>>   1 file changed, 8 insertions(+)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index bc17a8cf65..b70ae25533 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -1102,6 +1102,14 @@ static void s390_pcihost_reset(DeviceState *dev)
+>>>   {
+>>>       S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+>>>       PCIBus *bus = s->parent_obj.bus;
+>>> +    S390PCIBusDevice *pbdev, *next;
+>>> +
+>>> +    /* Unplug all pending devices that were requested to be released */
+>>> +    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
+>>> +        if (pbdev->release_timer) {
+>>> +            s390_pcihost_timer_cb(pbdev);
+>>> +        }
+>>> +    }
+>>>   
+>>>       s->bus_no = 0;
+>>>       pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);
+>>
+> 
