@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41850)
+Received: from eggs.gnu.org ([209.51.188.92]:42699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goNLX-0005AX-9X
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:12 -0500
+	(envelope-from <philmd@redhat.com>) id 1goNQd-0006AD-RY
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:03:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goNLW-0007s0-BY
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1goNLW-0007rS-2o
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:58:10 -0500
-Date: Tue, 29 Jan 2019 01:58:09 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1615390597.67462150.1548745089034.JavaMail.zimbra@redhat.com>
-In-Reply-To: <8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1548771590.git.yi.z.zhang@linux.intel.com>
-References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-	<8d5b28ca0350dfb6a0313f06c6ceb0f15201c8d7.1548771590.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1goNQb-00017e-Pu
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:03:27 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goNQb-00017G-KY
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 02:03:25 -0500
+Received: by mail-wm1-f65.google.com with SMTP id a62so16546583wmh.4
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 23:03:24 -0800 (PST)
+References: <20190125203402.18904-1-philmd@redhat.com>
+	<1c788b0e-6a4b-f04f-b413-e7211fc62e85@redhat.com>
+	<20190128160830.GH5756@localhost.localdomain>
+	<73afb8ac-aa0c-6095-82d4-f91afff36cb9@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a5a96799-c354-27fb-b36c-08a1e3f8e915@redhat.com>
+Date: Tue, 29 Jan 2019 08:03:21 +0100
 MIME-Version: 1.0
+In-Reply-To: <73afb8ac-aa0c-6095-82d4-f91afff36cb9@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 1/3] util/mmap-alloc: Add a 'is_pmem'
- parameter to qemu_ram_mmap
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] ahci-test: Add dependency to qemu-img
+ tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Zhang <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, richardw yang <richardw.yang@linux.intel.com>, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
+On 1/28/19 8:14 PM, John Snow wrote:
+> On 1/28/19 11:08 AM, Kevin Wolf wrote:
+>> Am 25.01.2019 um 22:57 hat John Snow geschrieben:
+>>> On 1/25/19 3:34 PM, Philippe Mathieu-Daudé wrote:
+>>>> Since the ahci-test uses qemu-img, add a dependency to build it
+>>>> before using it.
+>>>> This fixes:
+>>>>
+>>>>   $ gmake check-qtest V=1
+>>>>   QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=qemu-img tests/ahci-test
+>>>>   Failed to execute child process "/tmp/qemu-test.19tMRF/qemu-img" (No such file or directory)
+>>>>   ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !err)
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>> ---
+>>>> RFC because while this dependency is valid, I don't think this is the
+>>>> clever way to solve this problem (which is, assuming the host
+>>>> distribution has the qemu-tools installed).
+>>>> I guess remember a thread about it (Eric, John?) where it was asked
+>>>> "What do we want to test, qemu-img or AHCI? Can we trust an unstable
+>>>> version of a tool to verify a device?"
+>>>>
+>>> [...]
+>>>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
+>> Are you taking this through your tree, or through which tree should it
+>> be merged?
+>>
+>> Kevin
+>>
+> 
+> I can, but it'd be the only patch I have this week. If it's not a
+> burden, would you mind including it?
 
-> 
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> 
-> besides the existing 'shared' flags, we are going to add
-> 'is_pmem' to qemu_ram_mmap(), which indicated the memory backend
-> file is a persist memory.
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  exec.c                    |  2 +-
->  include/qemu/mmap-alloc.h | 21 ++++++++++++++++++++-
->  util/mmap-alloc.c         |  6 +++++-
->  util/oslib-posix.c        |  2 +-
->  4 files changed, 27 insertions(+), 4 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index bb6170d..27cea52 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1860,7 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
->      }
->  
->      area = qemu_ram_mmap(fd, memory, block->mr->align,
-> -                         block->flags & RAM_SHARED);
-> +                         block->flags & RAM_SHARED, block->flags &
-> RAM_PMEM);
->      if (area == MAP_FAILED) {
->          error_setg_errno(errp, errno,
->                           "unable to map backing store for guest RAM");
-> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-> index 50385e3..190688a 100644
-> --- a/include/qemu/mmap-alloc.h
-> +++ b/include/qemu/mmap-alloc.h
-> @@ -7,7 +7,26 @@ size_t qemu_fd_getpagesize(int fd);
->  
->  size_t qemu_mempath_getpagesize(const char *mem_path);
->  
-> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
-> +/**
-> + * qemu_ram_mmap: mmap the specified file or device.
-> + *
-> + * Parameters:
-> + *  @fd: the file or the device to mmap
-> + *  @size: the number of bytes to be mmaped
-> + *  @align: if not zero, specify the alignment of the starting mapping
-> address;
-> + *          otherwise, the alignment in use will be determined by QEMU.
-> + *  @shared: map has RAM_SHARED flag.
-> + *  @is_pmem: map has RAM_PMEM flag.
-> + *
-> + * Return:
-> + *  On success, return a pointer to the mapped area.
-> + *  On failure, return MAP_FAILED.
-> + */
-> +void *qemu_ram_mmap(int fd,
-> +                    size_t size,
-> +                    size_t align,
-> +                    bool shared,
-> +                    bool is_pmem);
->  
->  void qemu_ram_munmap(void *ptr, size_t size);
->  
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index fd329ec..97bbeed 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -75,7 +75,11 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
->      return getpagesize();
->  }
->  
-> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
-> +void *qemu_ram_mmap(int fd,
-> +                    size_t size,
-> +                    size_t align,
-> +                    bool shared,
-> +                    bool is_pmem)
->  {
->      /*
->       * Note: this always allocates at least one extra page of virtual
->       address
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index fbd0dc8..040937f 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -203,7 +203,7 @@ void *qemu_memalign(size_t alignment, size_t size)
->  void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
->  {
->      size_t align = QEMU_VMALLOC_ALIGN;
-> -    void *ptr = qemu_ram_mmap(-1, size, align, shared);
-> +    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
->  
->      if (ptr == MAP_FAILED) {
->          return NULL;
-> --
-> 2.7.4
-
-Looks good to me.
-
-Reviewed-by: pagupta@redhat.com
-
-> 
-> 
-> 
+Actually there are few follow up patches slighly related (not AHCI), so
+it indeed makes sense Kevin takes them. I'll respin.
