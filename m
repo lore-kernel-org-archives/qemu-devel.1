@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43580)
+Received: from eggs.gnu.org ([209.51.188.92]:46209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goUC3-0002WO-PS
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:17:02 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1goULl-0003cR-4t
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goUAy-000430-Ox
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:22324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goUAr-0003va-1U
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:42 -0500
-Date: Tue, 29 Jan 2019 09:15:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190129091012-mutt-send-email-mst@kernel.org>
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-2-xieyongji@baidu.com>
-	<20190129041155.GG3264@stefanha-x1.localdomain>
-	<20190128232025-mutt-send-email-mst@kernel.org>
-	<CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
+	(envelope-from <laurent.desnogues@gmail.com>) id 1goULU-0006iw-Ih
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:26:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
- inflight buffer between qemu and backend
+References: <20190129140411.682-1-peter.maydell@linaro.org>
+	<20190129140411.682-3-peter.maydell@linaro.org>
+In-Reply-To: <20190129140411.682-3-peter.maydell@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Tue, 29 Jan 2019 15:25:54 +0100
+Message-ID: <CABoDooMVGMsOvHiMZVQ_pBr4ZUrw4JndMtYyG=HmaPu2hZyksg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm/translate-a64: Fix
+ mishandling of size in FCMLA decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,119 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, Jan 29, 2019 at 02:15:35PM +0800, Yongji Xie wrote:
-> On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
-> > > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
-> > > > +typedef struct DescState {
-> > > > +    uint8_t inuse;
-> > > > +    uint8_t version;
-> > > > +    uint16_t used_idx;
-> > > > +    uint16_t avail_idx;
-> > > > +    uint16_t reserved;
-> > > > +} DescState;
-> > > > +
-> > > > +typedef struct QueueRegion {
-> > > > +    uint8_t valid;
-> >
-> > what's this?
-> >
-> 
-> We can use this to check whether this buffer is reset by qemu.
+On Tue, Jan 29, 2019 at 3:04 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> In disas_simd_indexed(), for the case of "complex fp", each indexable
+> element is a complex pair, so the total size is twice that indicated
+> in the 'size' field in the encoding. We were trying to do this
+> "double the size" operation with a left shift by 1, but this is
+> incorrect because the 'size' field is a MO_8/MO_16/MO_32/MO_64
+> value, and doubling the size should be done by a simple increment.
+>
+> This meant we were mishandling FCMLA (by element) of values where
+> the real and imaginary parts are 32-bit floats, and would incorrectly
+> UNDEF this encoding. (No other insns take this code path, and for
+> 16-bit floats it happens that 1 << 1 and 1 + 1 are both the same).
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-I'd use version here. Document that it's 1 currently.
-Or do we want feature flags so we can support downgrades too?
+Thanks,
 
+Laurent
 
-
-> > > > +    uint16_t desc_num;
-> >
-> > there's padding before this field. Pls make it explicit.
-> >
-> 
-> Will do it.
-> 
-> > > > +    DescState desc[0];
-> > > > +} QueueRegion;
-> > > > +
-> > > > +The struct DescState is used to describe one head-descriptor's state. The
-> > > > +fields have following meanings:
-> > > > +
-> > > > +    inuse: Indicate whether the descriptor is inuse or not.
-> >
-> > inuse by what?
-> >
-> 
-> Maybe inflight is better?
-> 
-> > > > +
-> > > > +    version: Indicate whether we have an atomic update to used ring and
-> > > > +    inflight buffer when slave crash at that point. This field should be
-> > > > +    increased by one before and after this two updates. An odd version
-> > > > +    indicates an in-progress update.
-> >
-> > I'm not sure I understand what does the above say. Also does this
-> > require two atomics? Seems pretty expensive. And why is it called
-> > version?
-> >
-> > > > +
-> > > > +    used_idx: Store old index of used ring before we update used ring and
-> > > > +    inflight buffer so that slave can know whether an odd version inflight
-> > > > +    head-descriptor in inflight buffer is processed or not.
-> >
-> > Here too.
-> >
-> 
-> Sorry, the above description may be not clear. This two fields are
-> used to indicate whether we have an in-progress update to used ring
-> and inflight buffer. If slave crash before the update to used_ring and
-> after the update to inflight buffer, the version should be odd and
-> used_idx should be equal to used_ring.idx. Then we need to roll back
-> the update to inflight buffer. As for the name of the version filed,
-> actually I didn't find a good one, so I just copy it from struct
-> kvm_steal_time...
-> 
-> > > > +
-> > > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
-> > > > +    slave can resubmit descriptors in order.
-> >
-> > Why would that be necessary?
-> >
-> 
-> Maybe some devices will be able to use it to preserve order after
-> reconnecting in future?
-
-If buffers are used in order then old entries in the ring
-are not overwritten so inflight tracking is not
-necessary. This is exactly the case with vhost user net today.
-
-> > >
-> > > Will a completely new "packed vring" inflight shm layout be necessary to
-> > > support the packed vring layout in VIRTIO 1.1?
-> > >
-> > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
-> >
-> > Probably.
-> >
-> 
-> How about supporting packed virtqueue in guest driver?
-> 
-> Thanks,
-> Yongji
-
-Depends on the guest right? Linux has it:
-
-
-commit f959a128fe83090981add69aadc87a4e496e9369
-Author: Tiwei Bie <tiwei.bie@intel.com>
-Date:   Wed Nov 21 18:03:30 2018 +0800
-
-    virtio_ring: advertize packed ring layout
-
--- 
-MST
+> ---
+>  target/arm/translate-a64.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index a7b999d2b5a..06418f0ac3c 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -12680,7 +12680,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+>
+>      case 2: /* complex fp */
+>          /* Each indexable element is a complex pair.  */
+> -        size <<= 1;
+> +        size += 1;
+>          switch (size) {
+>          case MO_32:
+>              if (h && !is_q) {
+> --
+> 2.20.1
+>
