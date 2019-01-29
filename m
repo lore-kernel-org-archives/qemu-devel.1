@@ -1,25 +1,48 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42490)
+Received: from eggs.gnu.org ([209.51.188.92]:43347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goU5R-00009e-L6
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:10:07 -0500
+	(envelope-from <farman@linux.ibm.com>) id 1goUAa-00027y-ED
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1goU5Q-0002Kn-AM
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:10:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1goU5P-0002Jj-Tl
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:10:00 -0500
-Date: Tue, 29 Jan 2019 09:09:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190129085131-mutt-send-email-mst@kernel.org>
-References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-	<4f91d5a46fc26d5672c91d80b78e986d4267c612.1548771590.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <farman@linux.ibm.com>) id 1goUAL-0003oi-5G
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1goUAK-0003kZ-CP
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:15:05 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0TE4Voq038744
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 09:14:48 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qaqtm2eva-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 09:14:48 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Tue, 29 Jan 2019 14:14:47 -0000
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
+	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
+	<20190125112437.2c06fac6.cohuck@redhat.com>
+	<20190125135835.2d59b511.cohuck@redhat.com>
+	<20190125150101.3b61f0a1@oc2783563651>
+	<20190128180948.506a9695.cohuck@redhat.com>
+	<20190128201548.1ecfb84f@oc2783563651>
+	<d43e273d-ef90-9a1e-c87a-1365718d8978@linux.ibm.com>
+	<20190129112024.401b8184.cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Tue, 29 Jan 2019 09:14:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4f91d5a46fc26d5672c91d80b78e986d4267c612.1548771590.git.yi.z.zhang@linux.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 3/3] docs: Added MAP_SYNC documentation
+In-Reply-To: <20190129112024.401b8184.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <691e91ea-df02-1455-93ed-7e8369fceec2@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,135 +51,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhang, Yi" <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
-
-On Tue, Jan 29, 2019 at 10:49:18PM +0800, Zhang, Yi wrote:
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
->=20
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  docs/nvdimm.txt | 29 ++++++++++++++++++++++++++++-
->  qemu-options.hx |  4 ++++
->  2 files changed, 32 insertions(+), 1 deletion(-)
->=20
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 5f158a6..9da96aa 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -142,11 +142,38 @@ backend of vNVDIMM:
->  Guest Data Persistence
->  ----------------------
-> =20
-> +vNVDIMM is designed and implemented to guarantee the guest data
-> +persistence on the backends in case of host crash or a power failures.
-> +However, there are still some requirements and limitations
-> +as explained below.
-> +
-
-I'd just drop the above paragraph.
-
->  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> -currently the only one that can guarantee the guest write persistence
-> +if MAP_SYNC is not supported by the host kernel and the backends,
-> +the only backend that can guarantee the guest write persistence
->  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
->  which all guest access do not involve any host-side kernel cache.
-> =20
-> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-> +systems, QEMU can mmap(2) the dax backend files with MAP_SYNC, which
-> +ensures filesystem metadata consistency in case of a host crash or a p=
-ower
-> +failure. Enabling MAP_SYNC in QEMU requires below conditions
-> +
-> + - 'pmem' option of memory-backend-file is 'on':
-> +   The backend is a file supporting DAX, e.g., a file on an ext4 or
-> +   xfs file system mounted with '-o dax'. if your pmem=3Don ,but the b=
-ackend is
-> +   not a file supporting DAX, mapping with this flag results in an EOP=
-NOTSUPP
-> +   warning. then MAP_SYNC will be ignored
-> +
-> + - 'share' option of memory-backend-file is 'on':
-> +   MAP_SYNC flag available only with the MAP_SHARED_VALIDATE mapping t=
-ype.
-> +
-> + - 'MAP_SYNC' is supported on linux kernel.(default opened since Linux=
- 4.15)
-> +
-> +Otherwise, We will ignore the MAP_SYNC flag.
-> +
-> +For more details, please reference mmap(2) man page:
-> +http://man7.org/linux/man-pages/man2/mmap.2.html.
-> +
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 
-OK above is too low level so it doesn't really help anyone. Instead
-it describes code internals and will quickly get out of sync
-(pun intended). Let's look at the manpage:
 
-	Shared file mappings with this flag provide the guarantee that
-              while some memory is writably mapped in the address space o=
-f
-              the process, it will be visible in the same file at the sam=
-e
-              offset even after the system crashes or is rebooted.  In co=
-n=E2=80=90
-              junction with the use of appropriate CPU instructions, this
-              provides users of such mappings with a more efficient way o=
-f
-              making data modifications persistent.
+On 01/29/2019 05:20 AM, Cornelia Huck wrote:
+> On Mon, 28 Jan 2019 16:48:10 -0500
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> On 01/28/2019 02:15 PM, Halil Pasic wrote:
+>>> On Mon, 28 Jan 2019 18:09:48 +0100
+>>> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> I guess if
+>>> the ssch() returns with non cc == 0 the CP_PENDING ---IRQ---> IDLE
+>>> transition
+>>> won't take place. And I guess the IRQ is a final one.
+>>
+>> Yes this is the one point I hadn't seen explicitly stated.  We shouldn't
+>> remain in state=BUSY if the ssch got cc!=0, and probably return to IDLE
+>> when processing the failure.  In Connie's response (Mon, 28 Jan 2019
+>> 18:24:24 +0100) to my note, she expressed some agreement to that.
+> 
+> Yes, I think that's what should happen.
+> 
+> 
+>>>> state for I/O)
+>>>> (normal ssch)
+>>>>
+>>>> BUSY --- IO_REQ ---> return -EAGAIN, stay in BUSY
+>>>> (user space is supposed to retry, as we'll eventually progress from
+>>>> BUSY)
+>>>>
+>>>> CP_PENDING --- IO_REQ ---> return -EBUSY, stay in CP_PENDING
+>>>> (user space is supposed to map this to the appropriate cc for the guest)
+>>>
+>>>   From this it seems you don't intend to issue the second  requested ssch()
+>>> any more (and don't want to do any translation). Is that right? (If it
+>>> is, that what I was asking for for a while, but then it's a pity for the
+>>> retries.)
+>>>    
+>>>>
+>>>> IDLE --- ASYNC_REQ ---> IDLE
+>>>> (user space is welcome to do anything else right away)
+>>>
+>>> Your idea is to not issue a requested hsch() if we think we are IDLE
+>>> it seems. Do I understand this right? We would end up with a different
+>>> semantic for hsch()/and csch() (compared to PoP) in the guest with this
+>>> (AFAICT).
+>>>    
+>>>>
+>>>> BUSY --- ASYNC_REQ ---> return -EAGAIN, stay in BUSY
+>>>> (user space is supposed to retry, as above)
+>>>>
+>>>> CP_PENDING --- ASYNC_REQ ---> return success, stay in CP_PENDING
+>>>> (the interrupt will get us out of CP_PENDING eventually)
+>>>
+>>> Issue (c|h)sch() is an action that is done on this internal
+>>> transition (within CP_PENDING).
+>>
+>> These three do read like CSCH/HSCH are subject to the same rules as
+>> SSCH, when in fact they would be (among other reasons) issued to clean
+>> up a lost interrupt from a previous SSCH.  So maybe return -EAGAIN on
+>> state=BUSY (don't race ourselves with the start), but issue to hardware
+>> if CP_PENDING.
+> 
+> I think there are some devices which require a certain hsch/csch
+> sequence during device bringup, so it's not just cleaning up after a
+> ssch. 
 
-OK this is more readable. We already have:
+Ah, yes.
 
-	Though QEMU supports multiple types of vNVDIMM backends on Linux,
-	the only backend that can guarantee the guest write persistence
-	is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
-	which all guest access do not involve any host-side kernel cache.
+Therefore, we should always try to do the requested hsch/csch,
+> unless things like "we're in the process of translating a cp, and can't
+> deal with another request right now" prevent it.
 
-Let's add:
+Agreed.  I'm in support of all of this.
 
-When using a file supporting DAX (direct mapping of persistent memory)
-as a backend, write persistence is guaranteed if the host kernel
-has support for the MAP_SYNC flag in the mmap system call
-(available since Linux 4.15 and on certain distro kernels)
-and additionally both 'pmem' and 'share' flags are set to 'on'
-on the backend.
+> 
+>>
+>> If we get an async request when state=IDLE, then maybe just issue it for
+>> fun, as if it were an SSCH?
+> 
+> For fun, but mainly because the guest wants it :)
+> 
 
-If these conditions are not satisfied i.e. if either 'pmem' or 'share'
-are not set, if the backend file does not support DAX
-or if MAP_SYNC is not supported by the host kernel, write
-persistence is not guaranteed after a system crash.
-For compatibility reasons, these conditions are silently ignored if not
-satisfied. Currently, no way is provided to test for them.
-
-
->  When using other types of backends, it's suggested to set 'unarmed'
->  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
->  guest NVDIMM region mapping structure.  This unarmed flag indicates
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 08f8516..0cd41f4 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel=
- NVDIMM).
->  If @option{pmem} is set to 'on', QEMU will take necessary operations t=
-o
->  guarantee the persistence of its own writes to @option{mem-path}
->  (e.g. in vNVDIMM label emulation and live migration).
-> +Also, we will map the backend-file with MAP_SYNC flag, which can ensur=
-e
-> +the file metadata is in sync to @option{mem-path} in case of host cras=
-h
-> +or a power failure. MAP_SYNC requires support from both the host kerne=
-l
-> +(since Linux kernel 4.15) and @option{mem-path} (only files supporting=
- DAX).
-> =20
->  @item -object memory-backend-ram,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@va=
-r{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bin=
-d|interleave}
-> =20
-> --=20
-> 2.7.4
+Well, that too.  ;-)
