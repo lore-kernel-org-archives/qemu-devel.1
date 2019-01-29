@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56610)
+Received: from eggs.gnu.org ([209.51.188.92]:56639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goQuF-0008EU-83
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:16 -0500
+	(envelope-from <berrange@redhat.com>) id 1goQuN-0008Iy-Px
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1goQu8-0003TR-K7
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:25705)
+	(envelope-from <berrange@redhat.com>) id 1goQuH-0003Vr-ET
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1goQu6-0003RA-MJ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:06 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F8F82D7EF
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 10:46:05 +0000 (UTC)
-Date: Tue, 29 Jan 2019 10:45:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190129104557.GB2650@work-vm>
-References: <20190128170321.16936-1-dgilbert@redhat.com>
-	<20190128170321.16936-10-dgilbert@redhat.com>
-	<20190128120446-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1goQuF-0003UG-Ar
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:46:17 -0500
+Date: Tue, 29 Jan 2019 10:36:02 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190129103602.GB16847@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA-4r8_K0=WTaK+A_KvO93ni+3==+a5FRvGTFJ3av0GPFw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190128120446-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 9/9] tests: Add a test for qemu self
- announcments
+In-Reply-To: <CAFEAcA-4r8_K0=WTaK+A_KvO93ni+3==+a5FRvGTFJ3av0GPFw@mail.gmail.com>
+Subject: Re: [Qemu-devel] building rst docs with sphinx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,134 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Mon, Jan 28, 2019 at 05:03:21PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > We now expose qemu_announce_self through QMP and HMP.  Add a test
-> > with some very basic packet validation (make sure we get a RARP).
-> > 
-> > Signed-off-by: Vlad Yasevich <vyasevic@redhat.com>
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Thu, Jan 24, 2019 at 06:56:09PM +0000, Peter Maydell wrote:
+> I had another look this afternoon at building our rST docs
+> with sphinx-build. In particular, we currently have some
+> docs in rst format, but we're not building them into HTML
+> or shipping them. (Predictably, this means a few errors and
+> warnings have crept in...)
 > 
-> typo in subject
+> I had a play about with adding some makefile runes, but
+> I'm not sure entirely what I should be aiming for.
+> 
+> (1) configure: My thought is that we should just make
+> sphinx-build a requirement for the existing --enable-docs
+> switch (as texinfo and pod2man are currently). The
+> disadvantage is that we won't support a "build the half
+> of the docs you have the tools for and leave the others"
+> setup. The advantage, which I think is significant, is that
+> distros will naturally be directed to the missing build
+> dependency (either they're building with --enable-docs
+> and will get the configure message, or they aren't and
+> then their build will fail later because of missing docs
+> files when they try to put the built files into the package).
 
-Thanks, fixed.
+Currently in Fedora RPMs we ship the man pages and the
+qemu-doc.html, qemu-ga-ref.html & qemu-qmp-ref.html files.
+I'm not really seeing stuff in docs/ that grabs me as very
+important to ship to users in Fedora RPMs. In fact I rather
+doubt anyone even looks at the HTML files we currently
+ship in the RPMs, as opposed to just looking in QEMU git.
+Aside from man pages, I imagine most users just turn to
+Google and/or qemu.org to find QEMU docs, not look inside
+the distro packages. 
 
-Dave
+IOW from a distro POV I think I'd probably find sphinx-build
+to be an undesirable mandatory dep.
 
-> > ---
-> >  tests/Makefile.include     |  2 +
-> >  tests/test-announce-self.c | 83 ++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 85 insertions(+)
-> >  create mode 100644 tests/test-announce-self.c
-> > 
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 19b4c0a696..57ce722d73 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -143,6 +143,8 @@ check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
-> >  
-> >  check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
-> >  check-qtest-generic-y += tests/cdrom-test$(EXESUF)
-> > +check-qtest-generic-y += tests/test-announce-self$(EXESUF)
-> > +gcov-files-generic-y = migration/savevm.c
-> >  
-> >  check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
-> >  
-> > diff --git a/tests/test-announce-self.c b/tests/test-announce-self.c
-> > new file mode 100644
-> > index 0000000000..2ff0c77255
-> > --- /dev/null
-> > +++ b/tests/test-announce-self.c
-> > @@ -0,0 +1,83 @@
-> > +/*
-> > + * QTest testcase for qemu_announce_self
-> > + *
-> > + * Copyright (c) 2017 Red hat, Inc.
-> > + * Copyright (c) 2014 SUSE LINUX Products GmbH
-> > + *
-> > + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> > + * See the COPYING file in the top-level directory.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "libqtest.h"
-> > +#include "qapi/qmp/qdict.h"
-> > +#include "qemu-common.h"
-> > +#include "qemu/sockets.h"
-> > +#include "qemu/iov.h"
-> > +#include "libqos/libqos-pc.h"
-> > +#include "libqos/libqos-spapr.h"
-> > +
-> > +#ifndef ETH_P_RARP
-> > +#define ETH_P_RARP 0x8035
-> > +#endif
-> > +
-> > +static QTestState *test_init(int socket)
-> > +{
-> > +    char *args;
-> > +
-> > +    args = g_strdup_printf("-netdev socket,fd=%d,id=hs0 -device "
-> > +                           "virtio-net-pci,netdev=hs0", socket);
-> > +
-> > +    return qtest_start(args);
-> > +}
-> > +
-> > +
-> > +static void test_announce(int socket)
-> > +{
-> > +    char buffer[60];
-> > +    int len;
-> > +    QDict *rsp;
-> > +    int ret;
-> > +    uint16_t *proto = (uint16_t *)&buffer[12];
-> > +
-> > +    rsp = qmp("{ 'execute' : 'announce-self', "
-> > +                  " 'arguments': {"
-> > +                      " 'params': {"
-> > +                          " 'initial': 50, 'max': 550,"
-> > +                          " 'rounds': 10, 'step': 50 } } }");
-> > +    assert(!qdict_haskey(rsp, "error"));
-> > +    qobject_unref(rsp);
-> > +
-> > +    /* Catch the packet and make sure it's a RARP */
-> > +    ret = qemu_recv(socket, &len, sizeof(len), 0);
-> > +    g_assert_cmpint(ret, ==,  sizeof(len));
-> > +    len = ntohl(len);
-> > +
-> > +    ret = qemu_recv(socket, buffer, len, 0);
-> > +    g_assert_cmpint(*proto, ==, htons(ETH_P_RARP));
-> > +}
-> > +
-> > +static void setup(gconstpointer data)
-> > +{
-> > +    QTestState *qs;
-> > +    void (*func) (int socket) = data;
-> > +    int sv[2], ret;
-> > +
-> > +    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-> > +    g_assert_cmpint(ret, !=, -1);
-> > +
-> > +    qs = test_init(sv[1]);
-> > +    func(sv[0]);
-> > +
-> > +    /* End test */
-> > +    close(sv[0]);
-> > +    qtest_quit(qs);
-> > +}
-> > +
-> > +int main(int argc, char **argv)
-> > +{
-> > +    g_test_init(&argc, &argv, NULL);
-> > +    qtest_add_data_func("/virtio/net/test_announce_self", test_announce, setup);
-> > +
-> > +    return g_test_run();
-> > +}
-> > -- 
-> > 2.20.1
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Of course I do agree that we should be a enabling sphinx-build
+during any of our CI builds so that we catch badly formatted
+.rst docs. In addition I think much of docs/ could be useful
+published on qemu.org.
+
+> (2) What do we actually want to ship?
+> That is, what do we want 'make install-doc' to copy into
+> the installation directory?
+> https://wiki.qemu.org/Features/Documentation
+> has a good suggested breakdown of docs for where we
+> eventually want to be. I think we probably don't want
+> to install the "developer's guide" (docs/devel) on
+> end-user systems. The others are presumably OK.
+> Currently, we seem to only install manpages and a
+> few other things in the 'install-doc' makefile target
+> (we don't install a bunch of plain-text user-facing
+> docs) so this would be a significant expansion.
+
+I think 'make install-doc' should ship stuff that is useful
+to end users of QEMU. This would be man pages, usage guides,
+application developer information, etc.
+
+It would not include anything that's related to the internals
+of QEMU, as that's targetted at QEMU's developers themselves.
+
+In Fedora we would not care to ship any docs that are targetting
+QEMU developers, since those people would not be likely to be
+using distro packaged QEMU.
+
+> 
+> (3) Indexes, table-of-contents pages, etc
+> Are we aiming to ship these?
+> I think that we probably want to have what from
+> Sphinx's point of view are multiple separate documents,
+> so that they each get their own ToC and index. This
+> means we can for instance ship the ToC/index for
+> the user docs but not have it contain index entries
+> for developer docs.
+> 
+> Overall what I'm hoping for is to be able to get some
+> basic structure/building commands into master so we
+> have a framework and something we can iterate on to
+> move forward.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
