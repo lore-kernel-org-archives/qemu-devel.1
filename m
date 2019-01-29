@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44036)
+Received: from eggs.gnu.org ([209.51.188.92]:47323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gocSE-0007wi-Q8
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:06:07 -0500
+	(envelope-from <palmer@sifive.com>) id 1gochS-0002sY-Dp
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gocSD-0004F7-Vs
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:06:06 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:46224)
+	(envelope-from <palmer@sifive.com>) id 1gochR-0003Wl-EN
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:50 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44303)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gocSC-0004D3-0s
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:06:05 -0500
-Received: by mail-oi1-x236.google.com with SMTP id x202so17633655oif.13
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 15:06:01 -0800 (PST)
-References: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
-	<20190129191746.14868-3-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6cb56e8a-384b-03b9-1e83-04bfe3157ee0@linaro.org>
-Date: Tue, 29 Jan 2019 15:05:56 -0800
-MIME-Version: 1.0
-In-Reply-To: <20190129191746.14868-3-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/8] target/ppc: rework vmrg{l, h}{b, h,
- w} instructions to use Vsr* macros
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gochR-0003WT-1H
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 18:21:49 -0500
+Received: by mail-pg1-x541.google.com with SMTP id t13so9432789pgr.11
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 15:21:48 -0800 (PST)
+Date: Tue, 29 Jan 2019 15:21:46 -0800 (PST)
+In-Reply-To: <CAFyWVaYACGYvUe2ehYiT0hjJR4bUc44ZG5niEdT7mJOMXxGVpg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-742f375b-47d4-4554-b13a-270e098799e7@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 5/5 v2] RISC-V: Add hooks to use the gdb
+ xml files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Jim Wilson <jimw@sifive.com>
+Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-On 1/29/19 11:17 AM, Mark Cave-Ayland wrote:
-> +#define VMRG_DO(name, element, access, ofs)                             \
->      void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
->      {                                                                   \
->          ppc_avr_t result;                                               \
->          int i;                                                          \
->                                                                          \
-> +        for (i = 0; i < ARRAY_SIZE(r->element) / 2; i++) {              \
-> +            result.access(i * 2 + 0) = a->access(i + ofs);              \
-> +            result.access(i * 2 + 1) = b->access(i + ofs);              \
->          }                                                               \
->          *r = result;                                                    \
->      }
-> +
-> +#define VMRG(suffix, element, access, half)        \
-> +    VMRG_DO(mrgl##suffix, element, access, half)   \
-> +    VMRG_DO(mrgh##suffix, element, access, 0)
-> +VMRG(b, u8, VsrB, 8)
-> +VMRG(h, u16, VsrH, 4)
-> +VMRG(w, u32, VsrW, 2)
+On Mon, 28 Jan 2019 19:11:58 PST (-0800), Jim Wilson wrote:
+> On Tue, Jan 22, 2019 at 1:52 PM Alistair Francis <alistair23@gmail.com> wrote:
+>> You can get env and then check for floating point support:
+>>
+>> CPURISCVState *env = &cs->env;
+>> if (env->misa_mask & RVF) {
+>> ...
+>
+> I needed this which wasn't hard to figure out.
+>     RISCVCPU *cpu = RISCV_CPU(cs);
+>     CPURISCVState *env = &cpu->env;
+>     if (env->misa & RVF) {
+>
+> The tricky bit was figuring out how to test it, because I wasn't sure
+> if making registers conditional would actually work.  I figured out
+> that using -machine sifive_e gives me a target with no fpu, and
+> playing with that a bit I get the expected result, which is that the
+> FP regs don't print anymore.  The FP related CSRs still do, but that
+> would require gdb fixes I think, because gdb knows that they are both
+> FP regs and CSR, and tries to print them both ways.  That leads to a
+> more general problem of figuring out exactly which CSRs a particular
+> target implements, which is a bigger problem than I have time to fix
+> at the moment, and should be handled as a separate problem.
+>
+> Since my patch set is now a month old, I'll rebase onto current master
+> and post a version 3 patch set.
 
-So... the point of "half" was to not replicate knowledge out to VMRG.
-Just use
-
-    int i, half = ARRAY_SIZE(r->element) / 2;
-    for (i = 0; i < half; i++) {
-
-within VMRG_DO.
-
-
-r~
+Thanks!
