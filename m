@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47814)
+Received: from eggs.gnu.org ([209.51.188.92]:48246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1goQF8-0001eQ-55
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:03:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1goQHC-0002eZ-3n
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1goQF3-0002Gb-Js
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:03:46 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <87tvhsy6en.fsf@dusky.pond.sub.org>
-References: <271482fe-741a-6a15-15fd-181d4e55a8c4@redhat.com>
-	<w51bm469xhh.fsf@maestria.local.igalia.com>
-	<w518szam8em.fsf@maestria.local.igalia.com>
-	<4236ceac-fd50-ad04-811a-0be7b3dbd667@redhat.com>
-	<w51a7jkstdd.fsf@maestria.local.igalia.com>
-	<87tvhsy6en.fsf@dusky.pond.sub.org>
-Date: Tue, 29 Jan 2019 11:03:27 +0100
-Message-ID: <w51ef8v3hn4.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1goQH8-0004jO-DU
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:05:52 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37579)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1goQH1-0004Nn-7v
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 05:05:46 -0500
+Received: by mail-ot1-x343.google.com with SMTP id s13so17374699otq.4
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 02:05:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Consistency of iotests 093 and 136
+References: <20181207090135.7651-1-luc.michel@greensocs.com>
+	<20181207090135.7651-8-luc.michel@greensocs.com>
+	<CAMo8Bf+siB=vdjK+WPKvRCqKS59OVGOcAoH0HtN6VSvFyOc9gQ@mail.gmail.com>
+In-Reply-To: <CAMo8Bf+siB=vdjK+WPKvRCqKS59OVGOcAoH0HtN6VSvFyOc9gQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Jan 2019 10:05:10 +0000
+Message-ID: <CAFEAcA9uVMs8aGTcbUpz+EGGyFBXtCNVMT-_t5eYPBjJF_4Rrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 07/16] gdbstub: add multiprocess support
+ to (f|s)ThreadInfo and ThreadExtraInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon 28 Jan 2019 07:38:08 PM CET, Markus Armbruster wrote:
-
->> 093 submits several I/O requests using aio_read and aio_write with
->> hmp_qemu_io(), then advances the clock using clock_step and finally
->> calls query-blockstats to see how much of the I/O has been completed
->> (it's an I/O throttling test).
->>
->> The expectation is that by the time query-blockstats is called all
->> submitted I/O requests have been processed (up to the amount allowed
->> by the throttling limits).
+On Tue, 29 Jan 2019 at 04:56, Max Filippov <jcmvbkbc@gmail.com> wrote:
 >
-> Assumptions like "when we see the reply to QMP command X, surely the
-> main loop has completed doing Y" are problematic.  When possible, rely
-> on something more direct, such as a query command that shows you
-> whether Y has been completed.
+> Hello,
+>
+> On Fri, Dec 7, 2018 at 1:04 AM Luc Michel <luc.michel@greensocs.com> wrot=
+e:
+> >
+> > Change the thread info related packets handling to support multiprocess
+> > extension.
+> >
+> > Add the CPUs class name in the extra info to help differentiate
+> > them in multiprocess mode.
+> >
+> > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > ---
+> >  gdbstub.c | 37 +++++++++++++++++++++++++++----------
+> >  1 file changed, 27 insertions(+), 10 deletions(-)
+>
+> Starting with this commit it is no longer possible to kill QEMU
+> with the 'kill' command from the gdb. This was a nice feature,
+> was this removal intentional, or is it just an implementation
+> bug?
 
-Right, but how to do that for aio_read / aio_write ?
+That sounds like a bug. I think with the multiprocess extensions
+available gdb may switch from killing using the 'k' packet to using
+the 'vKill;pid' packet, which we don't implement? Looking at
+what gdb is sending ('set debug remote 1' turns on logging in
+gdb of remote protocol packets) would let us check that theory.
+It's not clear how our implementation should deal with being asked
+to kill just one process if we have more than one, though...
 
-Berto
+thanks
+-- PMM
