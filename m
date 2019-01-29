@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50178)
+Received: from eggs.gnu.org ([209.51.188.92]:50565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goUrT-00077a-5U
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:59:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1goUtJ-0008Q8-Fe
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:01:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1goUrD-0002yR-EC
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 09:59:33 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 29 Jan 2019 14:35:57 +0000
-Message-ID: <b065edfa-f997-4e58-dc8d-12cda093fe8c@virtuozzo.com>
-References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
-	<9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
-	<20190129123851.GE4467@dhcp-200-176.str.redhat.com>
-	<829cb522-05bf-57cc-b81e-4c028eea6821@virtuozzo.com>
-	<20190129131740.GF4467@dhcp-200-176.str.redhat.com>
-	<57eb5708-3e21-25b1-a559-d77fc3a11e2f@virtuozzo.com>
-	<20190129142355.GG4467@dhcp-200-176.str.redhat.com>
-In-Reply-To: <20190129142355.GG4467@dhcp-200-176.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <869DB33182B1B8468BBEC5BE30B1BD58@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1goUt5-0003ck-I3
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:01:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goUt2-0003bq-Pf
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:01:19 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 29 Jan 2019 16:00:25 +0100
+Message-Id: <20190129150029.29829-2-philmd@redhat.com>
+In-Reply-To: <20190129150029.29829-1-philmd@redhat.com>
+References: <20190129150029.29829-1-philmd@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
- directory entries
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 1/5] hw/lm32: Move LM32 specific hardware
+ out of common-obj list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,150 +27,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-MjkuMDEuMjAxOSAxNzoyMywgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjkuMDEuMjAxOSB1bSAx
-NTowNiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDI5
-LjAxLjIwMTkgMTY6MTcsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMjkuMDEuMjAxOSB1bSAx
-Mzo1MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-MjkuMDEuMjAxOSAxNTozOCwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+IEFtIDI5LjAxLjIwMTkg
-dW0gMTM6MDQgaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4+Pj4+Pj4NCj4+
-Pj4+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+Pj4+Pj4+
-IGluZGV4IGM2NmY5NDkuLjBmZGU5OGMgMTAwNjQ0DQo+Pj4+Pj4+PiAtLS0gYS9ibG9jay9xYXBp
-LmMNCj4+Pj4+Pj4+ICsrKyBiL2Jsb2NrL3FhcGkuYw0KPj4+Pj4+Pj4gQEAgLTM4LDYgKzM4LDcg
-QEANCj4+Pj4+Pj4+ICAgICAgI2luY2x1ZGUgInFhcGkvcW1wL3FzdHJpbmcuaCINCj4+Pj4+Pj4+
-ICAgICAgI2luY2x1ZGUgInN5c2VtdS9ibG9jay1iYWNrZW5kLmgiDQo+Pj4+Pj4+PiAgICAgICNp
-bmNsdWRlICJxZW11L2N1dGlscy5oIg0KPj4+Pj4+Pj4gKyNpbmNsdWRlICJxZW11L2Vycm9yLXJl
-cG9ydC5oIg0KPj4+Pj4+Pj4gICAgICANCj4+Pj4+Pj4+ICAgICAgQmxvY2tEZXZpY2VJbmZvICpi
-ZHJ2X2Jsb2NrX2RldmljZV9pbmZvKEJsb2NrQmFja2VuZCAqYmxrLA0KPj4+Pj4+Pj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAq
-YnMsIEVycm9yICoqZXJycCkNCj4+Pj4+Pj4+IEBAIC04NjgsNiArODY5LDExIEBAIHZvaWQgYmRy
-dl9pbWFnZV9pbmZvX2R1bXAoZnByaW50Zl9mdW5jdGlvbiBmdW5jX2ZwcmludGYsIHZvaWQgKmYs
-DQo+Pj4+Pj4+PiAgICAgIA0KPj4+Pj4+Pj4gICAgICAgICAgaWYgKGluZm8tPmhhc19mb3JtYXRf
-c3BlY2lmaWMpIHsNCj4+Pj4+Pj4+ICAgICAgICAgICAgICBmdW5jX2ZwcmludGYoZiwgIkZvcm1h
-dCBzcGVjaWZpYyBpbmZvcm1hdGlvbjpcbiIpOw0KPj4+Pj4+Pj4gKyAgICAgICAgaWYgKGluZm8t
-PmZvcm1hdF9zcGVjaWZpYyAmJg0KPj4+Pj4+Pj4gKyAgICAgICAgICAgIGluZm8tPmZvcm1hdF9z
-cGVjaWZpYy0+dHlwZSA9PSBJTUFHRV9JTkZPX1NQRUNJRklDX0tJTkRfUUNPVzIgJiYNCj4+Pj4+
-Pj4+ICsgICAgICAgICAgICBpbmZvLT5mb3JtYXRfc3BlY2lmaWMtPnUucWNvdzIuZGF0YS0+aGFz
-X2JpdG1hcHMgPT0gZmFsc2UpIHsNCj4+Pj4+Pj4+ICsgICAgICAgICAgICB3YXJuX3JlcG9ydCgi
-RmFpbGVkIHRvIGxvYWQgYml0bWFwIGxpc3QiKTsNCj4+Pj4+Pj4+ICsgICAgICAgIH0NCj4+Pj4+
-Pj4+ICAgICAgICAgICAgICBiZHJ2X2ltYWdlX2luZm9fc3BlY2lmaWNfZHVtcChmdW5jX2Zwcmlu
-dGYsIGYsIGluZm8tPmZvcm1hdF9zcGVjaWZpYyk7DQo+Pj4+Pj4+PiAgICAgICAgICB9DQo+Pj4+
-Pj4+PiAgICAgIH0NCj4+Pj4+Pj4NCj4+Pj4+Pj4gSXMgaXQgcmVhbGx5IG5lY2Vzc2FyeSB0byBp
-bnRyb2R1Y2UgcWNvdzIgc3BlY2lmaWMga25vd2xlZGdlIGluDQo+Pj4+Pj4+IGJsb2NrL3FhcGku
-YyAod2hlcmUgaXQgZGVmaW5pdGVseSBkb2Vzbid0IGJlbG9uZyksIGp1c3QgdG8gZW1pdCBhDQo+
-Pj4+Pj4+IHdhcm5pbmc/DQo+Pj4+Pj4+DQo+Pj4+Pj4+IFdoeSBjYW4ndCB5b3UgcHJpbnQgdGhl
-IHdhcm5pbmcgaW4gcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oKT8NCj4+Pj4+Pg0KPj4+Pj4+IERl
-YXIgS2V2aW4sDQo+Pj4+Pj4gVGhlIHJlYXNvbiBiZWhpbmQgdGhlIGlkZWEgdG8gbW92ZSB0aGUg
-d2FybmluZyB0byBxYXBpIGlzIHRoYXQgd2UNCj4+Pj4+PiB3b3VsZG4ndCBsaWtlIHRvIHByaW50
-IHRoYXQgaW4gY2FzZSBvZiBKU09OIGZvcm1hdC4NCj4+Pj4+Pg0KPj4+Pj4+Pg0KPj4+Pj4+Pj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+Pj4+Pj4+PiBpbmRl
-eCA0ODk3YWJhLi4wN2I5OWVlIDEwMDY0NA0KPj4+Pj4+Pj4gLS0tIGEvYmxvY2svcWNvdzIuYw0K
-Pj4+Pj4+Pj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPj4+Pj4+Pj4gQEAgLTQzODYsOCArNDM4Niwx
-NCBAQCBzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgKnFjb3cyX2dldF9zcGVjaWZpY19pbmZvKEJs
-b2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4+Pj4+Pj4gICAgICAgICAgICAgICpzcGVjX2luZm8tPnUu
-cWNvdzIuZGF0YSA9IChJbWFnZUluZm9TcGVjaWZpY1FDb3cyKXsNCj4+Pj4+Pj4+ICAgICAgICAg
-ICAgICAgICAgLmNvbXBhdCAgICAgICAgICAgICA9IGdfc3RyZHVwKCIwLjEwIiksDQo+Pj4+Pj4+
-PiAgICAgICAgICAgICAgICAgIC5yZWZjb3VudF9iaXRzICAgICAgPSBzLT5yZWZjb3VudF9iaXRz
-LA0KPj4+Pj4+Pj4gKyAgICAgICAgICAgIC5oYXNfYml0bWFwcyAgICAgICAgPSB0cnVlLCAvKiBU
-byBoYW5kbGUgZXJyb3IgY2hlY2sgcHJvcGVybHkgKi8NCj4+Pj4+Pj4+ICsgICAgICAgICAgICAu
-Yml0bWFwcyAgICAgICAgICAgID0gTlVMTCwgLyogVW5zdXBwb3J0ZWQgZm9yIHZlcnNpb24gMiAq
-Lw0KPj4+Pj4+Pg0KPj4+Pj4+PiAuaGFzX2JpdG1hcHMgPSBmYWxzZSB3b3VsZCBiZSBuaWNlciBp
-ZiB0aGUgZm9ybWF0IGRvZXNuJ3QgZXZlbiBzdXBwb3J0DQo+Pj4+Pj4+IGJpdG1hcHMuIFlvdSBv
-bmx5IG5lZWQgdGhpcyBoZXJlIGJlY2F1c2UgeW91IHB1dCB0aGUgd2FybmluZyBpbiB0aGUNCj4+
-Pj4+Pj4gd3JvbmcgcGxhY2UuDQo+Pj4+Pj4+DQo+Pj4+Pj4+PiAgICAgICAgICAgICAgfTsNCj4+
-Pj4+Pj4+ICAgICAgICAgIH0gZWxzZSBpZiAocy0+cWNvd192ZXJzaW9uID09IDMpIHsNCj4+Pj4+
-Pj4+ICsgICAgICAgIFFjb3cyQml0bWFwSW5mb0xpc3QgKmJpdG1hcHM7DQo+Pj4+Pj4+PiArICAg
-ICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4+Pj4+Pj4+ICsNCj4+Pj4+Pj4+ICsgICAg
-ICAgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0bWFwX2luZm9fbGlzdChicywgJmxvY2FsX2Vycik7
-DQo+Pj4+Pj4+DQo+Pj4+Pj4+IEhlcmUgeW91IGV2ZW4gaGFkIGEgZ29vZCBlcnJvciBtZXNzYWdl
-IHRvIHByaW50Li4uDQo+Pj4+Pj4+DQo+Pj4+Pj4+PiAgICAgICAgICAgICAgKnNwZWNfaW5mby0+
-dS5xY293Mi5kYXRhID0gKEltYWdlSW5mb1NwZWNpZmljUUNvdzIpew0KPj4+Pj4+Pj4gICAgICAg
-ICAgICAgICAgICAuY29tcGF0ICAgICAgICAgICAgID0gZ19zdHJkdXAoIjEuMSIpLA0KPj4+Pj4+
-Pj4gICAgICAgICAgICAgICAgICAubGF6eV9yZWZjb3VudHMgICAgID0gcy0+Y29tcGF0aWJsZV9m
-ZWF0dXJlcyAmDQo+Pj4+Pj4+PiBAQCAtNDM5Nyw3ICs0NDAzLDE0IEBAIHN0YXRpYyBJbWFnZUlu
-Zm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMp
-DQo+Pj4+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBRQ09XMl9J
-TkNPTVBBVF9DT1JSVVBULA0KPj4+Pj4+Pj4gICAgICAgICAgICAgICAgICAuaGFzX2NvcnJ1cHQg
-ICAgICAgID0gdHJ1ZSwNCj4+Pj4+Pj4+ICAgICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMg
-ICAgICA9IHMtPnJlZmNvdW50X2JpdHMsDQo+Pj4+Pj4+PiArICAgICAgICAgICAgLmhhc19iaXRt
-YXBzICAgICAgICA9ICFsb2NhbF9lcnIsDQo+Pj4+Pj4+PiArICAgICAgICAgICAgLmJpdG1hcHMg
-ICAgICAgICAgICA9IGJpdG1hcHMsDQo+Pj4+Pj4+PiAgICAgICAgICAgICAgfTsNCj4+Pj4+Pj4+
-ICsgICAgICAgIC8qDQo+Pj4+Pj4+PiArICAgICAgICAgKiBJZiBhbiBlcnJvciBvY2N1cnMgaW4g
-b2J0YWluaW5nIGJpdG1hcHMsIGlnbm9yZQ0KPj4+Pj4+Pj4gKyAgICAgICAgICogaXQgdG8gc2hv
-dyBvdGhlciBRQ09XMiBzcGVjaWZpYyBpbmZvcm1hdGlvbi4NCj4+Pj4+Pj4+ICsgICAgICAgICAq
-Lw0KPj4+Pj4+Pj4gKyAgICAgICAgZXJyb3JfZnJlZShsb2NhbF9lcnIpOw0KPj4+Pj4+Pg0KPj4+
-Pj4+PiAuLi5idXQgeW91IGRlY2lkZWQgdG8gZGlzY2FyZCBpdC4NCj4+Pj4+Pj4NCj4+Pj4+Pj4g
-SG93IGFib3V0IHlvdSBkbyB0aGlzIGhlcmU6DQo+Pj4+Pj4+DQo+Pj4+Pj4+ICAgICAgICAgd2Fy
-bl9yZXBvcnRmX2Vycihsb2NhbF9lcnIsICJGYWlsZWQgdG8gbG9hZCBiaXRtYXAgbGlzdDogIik7
-DQo+Pj4+Pj4NCj4+Pj4+PiBJbiBjYXNlIG9mIEpTT04gZm9ybWF0LCB3ZSBjYW4gZmFpbCBoZXJl
-Lg0KPj4+Pj4+IEl0IHdpbGwgaGFwcGVuIGluIHRoZSBjdXJyZW50IGltcGxlbWVudGF0aW9uIG9m
-IHRoZSBuZXcgdGVzdCAjMjM5Lg0KPj4+Pj4NCj4+Pj4+IFdoeSBkbyB5b3Ugd2FudCB0byBzaWxl
-bnRseSBsZWF2ZSBvdXQgdGhlIGJpdG1hcCBsaXN0IGZvciBKU09OIG91dHB1dD8NCj4+Pj4+DQo+
-Pj4+PiBFc3NlbnRpYWxseSwgdGhpcyBpcyB0aGUgc2FtZSBxdWVzdGlvbiBJIGFza2VkIGhlcmU6
-DQo+Pj4+Pg0KPj4+Pj4+PiBBbmQgdGhlbiBnZXQgcmlkIG9mIHRoZSBjb2RlIGluIGJsb2NrL3Fh
-cGkuYyBhbmQgdGhlIHZlcnNpb24gMiBwYXRoPw0KPj4+Pj4+Pg0KPj4+Pj4+PiBBY3R1YWxseSwg
-c2hvdWxkIHRoaXMgcmVhbGx5IG9ubHkgYmUgYSB3YXJuaW5nLCBvciBpbiBmYWN0IGFuIGVycm9y
-Pw0KPj4+Pj4+PiBXaGF0J3MgdGhlIGNhc2Ugd2hlcmUgd2UgZXhwZWN0IHRoYXQgbG9hZGluZyB0
-aGUgYml0bWFwIGxpc3QgY2FuIGZhaWwsDQo+Pj4+Pj4+IGJ1dCB0aGUgbWFuYWdlbWVudCB0b29s
-IGRvZXNuJ3QgbmVlZCB0byBrbm93IHRoYXQgYW5kIHdlIGp1c3Qgd2FudCB0bw0KPj4+Pj4+PiBs
-b2cgYSBtZXNzYWdlPw0KPj4+Pj4NCj4+Pj4+IEkgZG9uJ3QgdW5kZXJzdGFuZCB3aHkgaXQncyBv
-a2F5IG5vdCB0byBwcmludCBiaXRtYXBzIHdpdGhvdXQgbWFraW5nIGl0DQo+Pj4+PiBhbiBlcnJv
-ci4gRG8geW91IGhhdmUgYSBzcGVjaWZpYyB1c2UgY2FzZSBpbiBtaW5kIGZvciB0aGlzIGJlaGF2
-aW91cj8NCj4+Pj4+DQo+Pj4+DQo+Pj4+DQo+Pj4+IFdlIGp1c3QgY2FuJ3QgcHJpbnQgYW55dGhp
-bmcgaGVyZSwgYXMgdGhpcyBjb2RlIGlzIGV4ZWN1dGVkIGZyb20gcW1wIGNvbW1hbmQuDQo+Pj4+
-DQo+Pj4+IEl0IHdhcyBkaXNjdXNzZWQsIHRoYXQgd2UgZG9uJ3Qgd2FudCB0byBmYWlsIHRoZSB3
-aG9sZSBxdWVyeSwgaWYgZmFpbGVkIHRvDQo+Pj4+IG9idGFpbiBiaXRtYXBzLg0KPj4+DQo+Pj4g
-SXQncyBvYnZpb3VzIHRoYXQgeW91IGRvbid0IHdhbnQgdG8gZmFpbCB0aGUgcXVlcnkgY29tbWFu
-ZCwgYnV0IEkNCj4+PiBoYXZlbid0IGZvdW5kIGFueSBleHBsYW5hdGlvbiBmb3IgX3doeV8geW91
-IHdhbnQgdGhpcy4NCj4+Pg0KPj4+IFRoZSB0aGluZyB0aGF0IGlzIGNsb3Nlc3QgdG8gYW4gZXhw
-bGFuYXRpb24gaXMgIml0IG1heSBiZSBzYWQgdG8gZmFpbA0KPj4+IGdldCBhbnkgaW5mb3JtYXRp
-b24gYmVjYXVzZSBvZiByZXBlYXRpbmcgc29tZSBkaXNrL3Fjb3cyIGVycm9yIiwgd3JpdHRlbg0K
-Pj4+IGJ5IHlvdSBpbiB0aGUgdjQgdGhyZWFkLg0KPj4+DQo+Pj4gSSBkb24ndCB0aGluayAibWF5
-IGJlIHNhZCIgaXMgYSBnb29kIGp1c3RpZmljYXRpb24gZm9yIG5vbi1zdGFuZGFyZA0KPj4+IGJl
-aGF2aW91ci4gSWYgd2UgY2FuJ3QgbG9hZCB0aGUgYml0bWFwcywgdGhlIGltYWdlIGlzIGJyb2tl
-bi4gQW5kIGlmIHRoZQ0KPj4+IGltYWdlIGlzIGJyb2tlbiwgdGhlIHJlc3Qgb2YgdGhlIGluZm9y
-bWF0aW9uIG1heSBiZSBpbnZhbGlkLCB0b28uDQo+Pg0KPj4gU28sIHlvdSBtZWFuIHRoYXQgd2Ug
-Z28gd3Jvbmcgd2F5LiBBbmQgaXQgd2FzIG15IGlkZWEuIFRoYXQgaXMgc2FkIHRvby4NCj4+DQo+
-PiBUaGFuLCBzZWVtcyBsaWtlIHdlIHNob3VsZCBhZGQgZXJycCB0byB0aGUgZnVuY3Rpb24gYW5k
-IHRvIHRoZSBmdWxsIHN0YWNrDQo+PiBkb3duIHRvIHFtcF9xdWVyeV9ibG9jay4gQW5kIGRyb3Ag
-ZXh0cmEgcGFydGlhbC1zdWNjZXNzIHFhcGkgbG9naWMuDQo+IA0KPiBJJ20gbm90IG5lY2Vzc2Fy
-aWx5IHNheWluZyB0aGF0IGl0J3MgdGhlIHdyb25nIHdheSwgdGhvdWdoIHBvc3NpYmx5IGl0DQo+
-IGlzIHdyb25nIGluZGVlZC4NCj4gDQo+IEJ1dCBpZ25vcmluZyBzb21lIGtpbmQgb2YgZmFpbHVy
-ZXMgaXMgc3BlY2lhbCwgc28gd2hhdCBJIHdhcyBsb29raW5nIGZvcg0KPiB3ZXJlIGNvbW1lbnRz
-IG9yIGRvY3VtZW50YXRpb24gdG8gZXhwbGFpbiB0aGUgcmVhc29uIGJlaGluZCBpdCBhdCBsZWFz
-dC4NCj4gTm93IGZyb20gdGhlIHJlcGxpZXMgSSBnb3Qgc28gZmFyIGl0IGxvb2tzIHRvIG1lIHRo
-YXQgcG9zc2libHkgdGhlDQo+IHJlYXNvbnMgYXJlIG5vdCBvbmx5IHVuZG9jdW1lbnRlZCwgYnV0
-IHdlIG1pZ2h0IGFjdHVhbGx5IG5vdCBoYXZlIGFueS4NCj4gDQo+Pj4+IFNvLCB0byBzaG93LCB0
-aGF0IHRoZXJlIHdlcmUgZXJyb3IgZHVyaW5nIGJpdG1hcHMgcXVlcnlpbmcNCj4+Pj4gd2UgZGVj
-aWRlZCB0byB1c2UgdGhlIGZvbGxvd2luZyBzZW1hbnRpY3M6DQo+Pj4+DQo+Pj4+IGVtcHR5IGxp
-c3QgKGhhc19iaXRtYXBzPXRydWUpIG1lYW5zIHRoYXQgdGhlcmUgbm8gYml0bWFwcywgYW5kIHRo
-ZXJlIHdlcmUNCj4+Pj4gbm8gZXJyb3JzIGR1cmluZyBiaXRtYXBzIHF1ZXJpbmcgKGlmIGl0IHdh
-cykNCj4+Pj4NCj4+Pj4gYWJzZW5jZSBvZiB0aGUgZmllbGQgKGhhc19iaXRtYXBzPWZhbHNlKSBt
-ZWFucyB0aGF0IHRoZXJlIF93ZXJlXyBlcnJvcnMgZHVyaW5nDQo+Pj4+IGJpdG1hcHMgcXVlcnlp
-bmcuDQo+Pj4NCj4+PiAuLi5vciB0aGF0IHlvdSdyZSBydW5uaW5nIGFuIG9sZCBRRU1VIHZlcnNp
-b24uIEknbSBub3Qgc3VyZSBpZiBtYWtpbmcNCj4+PiBvbGQgUUVNVSB2ZXJzaW9ucyBhbmQgaW1h
-Z2UgZXJyb3JzIGxvb2sgdGhlIHNhbWUgaXMgYSBnb29kIG1vdmUuDQo+Pg0KPj4gTm8sIGZvciBv
-bGQgdmVyc2lvbnMgd2UgcmV0dXJuIGVtcHR5IGxpc3QsIHRvIHNob3cgdGhhdCB0aGVyZSB3ZXJl
-IG5vIGVycm9ycy4NCj4gDQo+IFlvdSBtZWFuIG9sZCBpbWFnZSBmb3JtYXQgdmVyc2lvbnM/DQoN
-Cnllcy4NCg0KSSdtIHRhbGtpbmcgYWJvdXQgb2xkIFFFTVUgdmVyc2lvbnMNCj4gdGhhdCBkb24n
-dCBldmVuIGtub3cgdGhlICdiaXRtYXBzJyBmaWVsZC4NCg0KaG1tLiBZZXMsIHRoYXQncyBhIHBy
-b2JsZW0sIHdoaWNoIHdlIGRpZG4ndCBjb25zaWRlcmVkLg0KDQo+IA0KPiBBIFFNUCBjbGllbnQg
-d291bGQgaGF2ZSB0byBwYXJzZSB0aGUgc2NoZW1hIHRvIHVuZGVyc3RhbmQgd2hldGhlciBhDQo+
-IG1pc3NpbmcgJ2JpdG1hcHMnIGZpZWxkIG1lYW5zIHRoYXQgaXQncyB0YWxraW5nIHRvIGFuIG9s
-ZCBRRU1VICh0aGVuDQo+ICdiaXRtYXBzJyBkb2Vzbid0IGV4aXN0IGluIHRoZSBzY2hlbWEpLCBv
-ciB0aGF0IGFuIGVycm9yIGhhcHBlbmVkICh0aGVuDQo+IHRoZSBmaWVsZCBkb2VzIGV4aXN0IGlu
-IHRoZSBzY2hlbWEpLg0KPiANCj4gTG9va2luZyBhdCB0aGUgc2NoZW1hIGlzIG5vdCBpbXBvc3Np
-YmxlLCBzbyBpZiB3ZSByZXF1aXJlIHRoaXMgZm9yIGENCj4gZ29vZCByZWFzb24sIGl0J3Mgb2th
-eS4gQnV0IGl0J3Mgbm90IHRyaXZpYWwgZWl0aGVyLiBJZiB3ZSByZWFsbHkgd2FudA0KPiB0byBn
-byB3aXRoIHRoaXMgc2VtYW50aWNzLCB3ZSBzaG91bGQgcHJvYmFibHkgbWVudGlvbiBib3RoIHRo
-ZSBvbGQgYW5kDQo+IHRoZSBuZXcgbWVhbmluZyBpbiB0aGUgUUFQSSBkb2N1bWVudGF0aW9uLCB3
-aXRoIHRoZSByZWNvbW1lbmRhdGlvbiB0aGF0DQo+IHlvdSBwYXJzZSB0aGUgc2NoZW1hIHRvIGRl
-dGVybWluZSB0aGUgbWVhbmluZyBvZiBhIG1pc3NpbmcgJ2JpdG1hcHMnDQo+IGZpZWxkLg0KDQpI
-bSwgbm93IEkgdGhpbmsgdGhhdCBpZiB3ZSByZWFsbHkgZmFjZSB0aGUgY2FzZSB3aGVuIHdlIG5l
-ZWQgcGFydGlhbCBzdWNjZXNzDQpvZiBpbmZvIHF1ZXJ5aW5nLCBpdCBzaG91bGQgYmUgYWRkaXRp
-b25hbCBvcHRpb25hbCBwYXJhbWV0ZXIgd2hpY2ggZW5hYmxlcyBpdCwgbGlrZQ0Kc2tpcC1mYWls
-ZWQ9dHJ1ZSAoZGVmYXVsdCBmYWxzZSkgb3Igc29tZXRoaW5nLCB3aGljaCBpcyBtb3JlIGNsZWFy
-IHRoYW4gcGFyc2luZyB0aGUNCnNjaGVtYS4gQW5kLCB3aGljaCB3ZSBjYW4gYWRkIGxhdGVyIGlm
-IG5lZWRlZC4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+The LM32 specific hardware is only used by the LM32 target,
+it is pointless to compile those objects in other targets.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/audio/Makefile.objs   | 2 +-
+ hw/char/Makefile.objs    | 6 +++---
+ hw/display/Makefile.objs | 4 ++--
+ hw/intc/Makefile.objs    | 2 +-
+ hw/timer/Makefile.objs   | 4 ++--
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
+index 63db383709..c771797c2d 100644
+--- a/hw/audio/Makefile.objs
++++ b/hw/audio/Makefile.objs
+@@ -13,6 +13,6 @@ common-obj-$(CONFIG_PL041) +=3D pl041.o lm4549.o
+=20
+ common-obj-$(CONFIG_CS4231) +=3D cs4231.o
+ common-obj-$(CONFIG_MARVELL_88W8618) +=3D marvell_88w8618.o
+-common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-ac97.o
++obj-$(CONFIG_MILKYMIST) +=3D milkymist-ac97.o
+=20
+ common-obj-y +=3D soundhw.o
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index c4947d7ae7..2c8999a910 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -26,9 +26,9 @@ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
+ common-obj-$(CONFIG_ISA_DEBUG) +=3D debugcon.o
+ common-obj-$(CONFIG_GRLIB) +=3D grlib_apbuart.o
+ common-obj-$(CONFIG_IMX) +=3D imx_serial.o
+-common-obj-$(CONFIG_LM32) +=3D lm32_juart.o
+-common-obj-$(CONFIG_LM32) +=3D lm32_uart.o
+-common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-uart.o
++obj-$(CONFIG_LM32) +=3D lm32_juart.o
++obj-$(CONFIG_LM32) +=3D lm32_uart.o
++obj-$(CONFIG_MILKYMIST) +=3D milkymist-uart.o
+ common-obj-$(CONFIG_SCLPCONSOLE) +=3D sclpconsole.o sclpconsole-lm.o
+=20
+ obj-$(CONFIG_VIRTIO) +=3D virtio-serial-bus.o
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 97acd5b6cb..5b770817c7 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -25,10 +25,10 @@ common-obj-$(CONFIG_BOCHS_DISPLAY) +=3D edid-region.o
+ common-obj-$(CONFIG_BLIZZARD) +=3D blizzard.o
+ common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_fimd.o
+ common-obj-$(CONFIG_FRAMEBUFFER) +=3D framebuffer.o
+-common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
++obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
+ common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
+=20
+-common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
++obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
+ milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
+ milkymist-tmu2.o-libs :=3D $(X11_LIBS)
+=20
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index 301a8e972d..82bbbefdeb 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -7,7 +7,7 @@ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-pmu-iomod-intc=
+.o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-ipi.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_pic.o
+ common-obj-$(CONFIG_IMX) +=3D imx_avic.o imx_gpcv2.o
+-common-obj-$(CONFIG_LM32) +=3D lm32_pic.o
++obj-$(CONFIG_LM32) +=3D lm32_pic.o
+ common-obj-$(CONFIG_REALVIEW) +=3D realview_gic.o
+ common-obj-$(CONFIG_SLAVIO) +=3D slavio_intctl.o
+ common-obj-$(CONFIG_IOAPIC) +=3D ioapic_common.o
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f8..3a7740f447 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -20,8 +20,8 @@ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_timer.o
+ common-obj-$(CONFIG_GRLIB) +=3D grlib_gptimer.o
+ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
+ common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
+-common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
+-common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
++obj-$(CONFIG_LM32) +=3D lm32_timer.o
++obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
+ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
+=20
+--=20
+2.20.1
