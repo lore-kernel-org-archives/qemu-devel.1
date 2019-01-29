@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56404)
+Received: from eggs.gnu.org ([209.51.188.92]:57091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goOmg-0007dk-VM
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:30:20 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1goOrO-0000Zp-1u
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1goOmg-0006Yk-92
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:30:18 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55553)
+	(envelope-from <sgarzare@redhat.com>) id 1goOrI-0008NN-12
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:35:10 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goOmg-0006Y0-3C
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:30:18 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y139so16637146wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 00:30:18 -0800 (PST)
-References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
-	<20190129000820.31190-1-richardw.yang@linux.intel.com>
-	<20190129000820.31190-4-richardw.yang@linux.intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6226a33c-a72a-d7da-45ab-fadb5157e023@redhat.com>
-Date: Tue, 29 Jan 2019 09:30:15 +0100
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1goOrH-0008KQ-Qp
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 03:35:03 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y8so16666041wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 00:35:01 -0800 (PST)
+Date: Tue, 29 Jan 2019 09:34:57 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190129083457.vlapjf4ziqhyxjxf@steredhat>
+References: <20190129062801.15799-1-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190129000820.31190-4-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] hw/acpi: remove unnecessary
- variable acpi_table_builtin
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190129062801.15799-1-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: qemu-devel@nongnu.org, xiaohli@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
 
-On 1/29/19 1:08 AM, Wei Yang wrote:
-> acpi_table_builtin is now always false, it is not necessary to check it
-> again.
+On Tue, Jan 29, 2019 at 11:58:01AM +0530, Pankaj Gupta wrote:
+> Hotplugging existing char chardev with qmp, dereferences(removes) 
+> existing chardev. This patch avoids adding a chardev if a chardev 
+> with same id exists.
 > 
-> This patch just removes it.
+> RH BZ 1660831: 
 > 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> # (host) ls -lt /tmp/helloworld*
+> srwxr-xr-x.  /tmp/helloworld1
+> srwxr-xr-x.  /tmp/helloworld2
+> 
+> Before this patch:
+> 
+> hotplug existed chardev(channel1) in qmp:
+> {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
+> "data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
+> 
+> {"error": {"class": "GenericError", "desc": "attempt to add duplicate 
+> property 'charchannel1' to object (type 'container')"}}
+> 
+> # ls -lt /tmp/helloworld*
+> srwxr-xr-x. 1 root root 0 Dec 19 16:39 /tmp/helloworld2
+> 
+> After this patch:
+> 
+> {"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
+> "data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
+> {"error": {"class": "GenericError", "desc": "Chardev 'charchannel1' already exists"}}
+> 
+> # ls -lt /tmp/helloworld*
+> srwxr-xr-x. 1 /tmp/helloworld1
+> srwxr-xr-x. 1 /tmp/helloworld2
+>  
+> Reported-by: Xiaohui Li <xiaohli@redhat.com>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
 > ---
->  hw/acpi/core.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> index e9b1a85e54..f9c96535d1 100644
-> --- a/hw/acpi/core.c
-> +++ b/hw/acpi/core.c
-> @@ -303,8 +303,6 @@ out:
->      error_propagate(errp, err);
->  }
->  
-> -static bool acpi_table_builtin = false;
-> -
->  unsigned acpi_table_len(void *current)
->  {
->      struct acpi_table_header *hdr = current - sizeof(hdr->_length);
-> @@ -320,7 +318,7 @@ void *acpi_table_hdr(void *h)
->  
->  uint8_t *acpi_table_first(void)
->  {
-> -    if (acpi_table_builtin || !acpi_tables) {
-> +    if (!acpi_tables) {
->          return NULL;
->      }
->      return acpi_table_hdr(acpi_tables + ACPI_TABLE_PFX_SIZE);
+> v1->v2
+>  Correct error message - Eric 
 > 
+>  chardev/char.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
