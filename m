@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50862)
+Received: from eggs.gnu.org ([209.51.188.92]:50787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1goUvH-00011m-24
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:03:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1goUw9-0001W5-Vf
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1goUuz-0004AH-6f
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:03:23 -0500
-Date: Tue, 29 Jan 2019 15:43:15 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190129154315.4d1f1261@redhat.com>
-In-Reply-To: <20190129133931.54d64d58.cohuck@redhat.com>
-References: <ae5efb07-6079-e102-4c21-65bdd5c9d9a2@redhat.com>
-	<1548689558-23960-1-git-send-email-imammedo@redhat.com>
-	<20190129133931.54d64d58.cohuck@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1goUuR-0003zg-8C
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:02:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goUuQ-0003q2-Cj
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 10:02:43 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 29 Jan 2019 16:00:28 +0100
+Message-Id: <20190129150029.29829-5-philmd@redhat.com>
+In-Reply-To: <20190129150029.29829-1-philmd@redhat.com>
+References: <20190129150029.29829-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] s390x: remove direct reference to
- mem_path global form s390x code
+Subject: [Qemu-devel] [PATCH v3 4/5] configure: Let SDL support be optional
+ on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net, david@redhat.com, philmd@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Walle <michael@walle.cc>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Tue, 29 Jan 2019 13:39:31 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Currently if we try to build QEMU on OpenBSD with SDL disabled, we get:
 
-> On Mon, 28 Jan 2019 16:32:38 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> In the subject: s/form/from/
->=20
-> > I plan to deprecate -mem-path option and replace it with memory-backend,
-> > for that it's necessary to get rid of mem_path global variable.
-> > Do it for s390x case, replacing it with alternative way to enable
-> > 1Mb hugepages capability.
-> >=20
-> > To do that, replace qemu_mempath_getpagesize() with qemu_getrampagesize=
-()
-> > which also checks for -mem-path provided RAM.
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > ---
-> > v3:
-> >   fixup, typo in commit msg (Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com>)
-> > v2:
-> >   * s/qemu_mempath_getpagesize/qemu_getrampagesiz/ and drop the rest of=
- changes
-> >           David Hildenbrand <david@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index 2ebf26a..90766fa 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -287,7 +287,7 @@ void kvm_s390_crypto_reset(void)
-> > =20
-> >  static int kvm_s390_configure_mempath_backing(KVMState *s)
-> >  {
-> > -    size_t path_psize =3D qemu_mempath_getpagesize(mem_path);
-> > +    size_t path_psize =3D qemu_getrampagesize();
-> > =20
-> >      if (path_psize =3D=3D 4 * KiB) {
-> >          return 0;
-> > @@ -319,7 +319,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-> >  {
-> >      MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-> > =20
-> > -    if (mem_path && kvm_s390_configure_mempath_backing(s)) {
-> > +    if (kvm_s390_configure_mempath_backing(s)) {
-> >          return -EINVAL;
-> >      }
-> >   =20
->=20
-> This needs an #include "exec/ram_addr.h", or the compilation fails.
->=20
-> Should I fix it up while applying, or will you resend?
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7 --disable-sdl
 
-I'll resend
+  ERROR: sdl not found or disabled, can not use sdl audio driver
+
+Since SDL is not a requirement for OpenBSD, let it be optional.
+If it is not found, or the user explicitly disable it, remove it
+from the audio_drv_list.
+If no audio backends are available, QEMU will fall back to the
+null driver.
+Instead of displaying nothing when audio_drv_list ends up empty,
+display an informative "none".
+
+This does not change the default behavior:
+
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7
+  SDL support       yes (1.2.15)
+  Audio drivers     sdl
+
+  WARNING: Use of SDL 1.2 is deprecated and will be removed in
+  WARNING: future releases. Please switch to using SDL 2.0
+
+  GEN     config-host.h
+  ...
+
+but allows to build without SDL:
+
+  $ ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --python=3Dpyt=
+hon2.7 --disable-sdl
+  WARN: sdl not found or disabled, can not use sdl audio driver
+  SDL support       no
+  Audio drivers     none
+  GEN     config-host.h
+  ...
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ configure | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index c7024d6662..df10601fee 100755
+--- a/configure
++++ b/configure
+@@ -3380,7 +3380,8 @@ for drv in $audio_drv_list; do
+=20
+     sdl)
+     if test "$sdl" =3D "no"; then
+-        error_exit "sdl not found or disabled, can not use sdl audio dri=
+ver"
++        echo "WARNING: SDL not found or disabled, can not use sdl audio =
+driver"
++        audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/sdl *//g')
+     fi
+     ;;
+=20
+@@ -3417,6 +3418,9 @@ for drv in $audio_drv_list; do
+     ;;
+     esac
+ done
++if test -z "$audio_drv_list"; then
++    audio_drv_list=3D"none"
++fi
+=20
+ ##########################################
+ # BrlAPI probe
+--=20
+2.20.1
