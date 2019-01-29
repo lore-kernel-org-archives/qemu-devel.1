@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50846)
+Received: from eggs.gnu.org ([209.51.188.92]:52683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1goaht-00041m-AN
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:14:10 -0500
+	(envelope-from <jsnow@redhat.com>) id 1goap3-0006cI-BG
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1goahs-0000sH-BC
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:14:09 -0500
+	(envelope-from <jsnow@redhat.com>) id 1goaor-0005Af-EF
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 16:21:25 -0500
+References: <20190123144610.8842-1-mreitz@redhat.com>
+	<20190123144610.8842-6-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
+Date: Tue, 29 Jan 2019 16:21:14 -0500
 MIME-Version: 1.0
-References: <69b40819-748e-d555-316a-6ce90e944bde@mail.uni-paderborn.de>
-	<mhng-2dd4c232-3efb-4173-aae1-491b9aa2685b@palmer-si-x1c4>
-In-Reply-To: <mhng-2dd4c232-3efb-4173-aae1-491b9aa2685b@palmer-si-x1c4>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 29 Jan 2019 13:13:36 -0800
-Message-ID: <CAKmqyKPdGDB9Apd0SwsLBGwpaJqb1W-mGMEnw005q1jLSnGAkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
- decodetree
+In-Reply-To: <20190123144610.8842-6-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Fix 237 for Python 2.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Jan 29, 2019 at 11:31 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Sat, 26 Jan 2019 00:51:23 PST (-0800), Bastian Koppelmann wrote:
-> > On 1/26/19 12:54 AM, Palmer Dabbelt wrote:
-> >> On Tue, 22 Jan 2019 13:38:52 PST (-0800), richard.henderson@linaro.org wrote:
-> >>> On 1/22/19 1:28 AM, Bastian Koppelmann wrote:
-> >>>> Hi,
-> >>>>
-> >>>> this patchset converts the RISC-V decoder to decodetree in four major steps:
-> >>>>
-> >>>> 1) Convert 32-bit instructions to decodetree [Patch 1-16]:
-> >>>>     Many of the gen_* functions are called by the decode functions for 16-bit
-> >>>>     and 32-bit functions. If we move translation code from the gen_*
-> >>>>     functions to the generated trans_* functions of decode-tree, we get a lot of
-> >>>>     duplication. Therefore, we mostly generate calls to the old gen_* function
-> >>>>     which are properly replaced after step 2).
-> >>>>
-> >>>>     Each of the trans_ functions are grouped into files corresponding to their
-> >>>>     ISA extension, e.g. addi which is in RV32I is translated in the file
-> >>>>     'trans_rvi.inc.c'.
-> >>>>
-> >>>> 2) Convert 16-bit instructions to decodetree [Patch 17-19]:
-> >>>>     All 16 bit instructions have a direct mapping to a 32 bit instruction. Thus,
-> >>>>     we convert the arguments in the 16 bit trans_ function to the arguments of
-> >>>>     the corresponding 32 bit instruction and call the 32 bit trans_ function.
-> >>>>
-> >>>> 3) Remove old manual decoding in gen_* function [Patch 20-30]:
-> >>>>     this move all manual translation code into the trans_* instructions of
-> >>>>     decode tree, such that we can remove the old decode_* functions.
-> >>>>
-> >>>> 4) Simplify RVC by reusing as much as possible from the RVG decoder as suggested
-> >>>>    by Richard. [Patch 31-35]
-> >>>>
-> >>>> full tree available at
-> >>>> https://github.com/bkoppelmann/qemu/tree/riscv-dt-v5
-> >>>>
-> >>>> Cheers,
-> >>>> Bastian
-> >>>>
-> >>>> v4 -> v5:
-> >>>>     - fixed rebase error
-> >>>>     - moved TARGET_LONG_BITS check of shift instructions before rd == 0 check
-> >>>>     - removed extra sign extension of sraiw
-> >>>>     - removed rs2 == 0 special cases in sraw/srlw
-> >>>
-> >>> All looks good to me now.  Thanks for persevering.
-> >>
-> >> Thanks for reviewing this.
-> >>
-> >> Bastian: what sort of testing have you done here?  This is a pretty big change,
-> >> and while it's been fairly extensively reviewed I'm just generally paranoid.
-> >>
-> >
-> > I ran riscv-test as well as booting the newest fedora.
->
-> Well, that pretty much exhausts my testing scheme :).  I think Alistair might
-> have a setup for booting a 32-bit Yocto-based distro in QEMU.  Assuming he has
-> the flow set up and it boots then I don't see any reason not to merge it.
 
-I just tested it and 32-bit images boot the same before and after this
-patchset. So the 4.19 (with patches ontop) kernel boots, but the 5.0
-(with patches ontop) crashes at init.
+On 1/23/19 9:46 AM, Max Reitz wrote:
+> It is not quite clear whether we want to support Python 2.x for any
+> prolonged time, but this may as well be fixed along with the other
+> issues some iotests have right now.
+> 
 
->
-> Thanks for pulling this all together, it's really great to have a cleaner
-> decoder!
->
-> Alistair: if that's true, can you give this a shot?
+I'd have shuffled this above patch 01 (or immediately below) with a note
+in either commit saying that the test is still broken without both patches.
 
-Yep, I have been using this in my daily use and haven't seen any
-problems. That isn't exhaustive testing but should cover a bit.
+I'd also say what you're actually fixing in the commit
+(range wants ints, not floats.)
 
-Tested-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-Alistair
+But, like, that's just my opinion, man,,
 
->
-> Bastian: do you mind collecting the relevant tags (Reviwed-by, etc) and putting
-> them in a v6?
->
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+> ---
+>  tests/qemu-iotests/237 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+> index fe0dd0f461..06897f8c87 100755
+> --- a/tests/qemu-iotests/237
+> +++ b/tests/qemu-iotests/237
+> @@ -224,7 +224,7 @@ with iotests.FilePath('t.vmdk') as disk_path, \
+>              iotests.log("= %s %d =" % (subfmt, size))
+>              iotests.log("")
+>  
+> -            num_extents = math.ceil(size / 2.0**31)
+> +            num_extents = int(math.ceil(size / 2.0**31))
+>              extents = [ "ext%d" % (i) for i in range(1, num_extents + 1) ]
+>  
+>              vm.launch()
+> 
