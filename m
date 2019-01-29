@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60214)
+Received: from eggs.gnu.org ([209.51.188.92]:60233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1goTSP-0008LD-RX
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:29:42 -0500
+	(envelope-from <jjherne@linux.ibm.com>) id 1goTSU-0008Qb-NH
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:29:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jjherne@linux.ibm.com>) id 1goTSO-00008v-R8
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:29:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49126
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <jjherne@linux.ibm.com>) id 1goTSO-00008i-Kb
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:29:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55466)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
-	id 1goTSO-00008d-MG
+	id 1goTSO-00007j-AO
 	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 08:29:40 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0TDSEhH177341
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:40 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qamd4bsdv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0TDT7gH072967
 	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:39 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qapyttvux-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 08:29:38 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
-	Tue, 29 Jan 2019 13:29:39 -0000
+	Tue, 29 Jan 2019 13:29:37 -0000
 From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Date: Tue, 29 Jan 2019 08:29:15 -0500
+Date: Tue, 29 Jan 2019 08:29:13 -0500
 In-Reply-To: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
 References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-Message-Id: <1548768562-20007-9-git-send-email-jjherne@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 08/15] s390-bios: Map low core memory
+Message-Id: <1548768562-20007-7-git-send-email-jjherne@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 06/15] s390-bios: Clean up cio.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,142 +39,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-Create a new header for basic architecture specific definitions and add a
-mapping of low core memory. This mapping will be used by the real dasd boot
-process.
+Add proper typedefs to all structs and modify all bit fields to use consistent
+formatting.
 
 Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 ---
- pc-bios/s390-ccw/main.c      |   2 +
- pc-bios/s390-ccw/s390-arch.h | 100 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 102 insertions(+)
- create mode 100644 pc-bios/s390-ccw/s390-arch.h
+ pc-bios/s390-ccw/cio.h      | 86 ++++++++++++++++++++++-----------------------
+ pc-bios/s390-ccw/s390-ccw.h |  8 -----
+ 2 files changed, 43 insertions(+), 51 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 1bc61b5..fa90aa3 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index 1a0795f..a48eee5 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -53,12 +53,12 @@ struct schib_config {
+     __u64 mba;
+     __u32 intparm;
+     __u16 mbi;
+-    __u32 isc:3;
+-    __u32 ena:1;
+-    __u32 mme:2;
+-    __u32 mp:1;
+-    __u32 csense:1;
+-    __u32 mbfc:1;
++    __u32 isc    : 3;
++    __u32 ena    : 1;
++    __u32 mme    : 2;
++    __u32 mp     : 1;
++    __u32 csense : 1;
++    __u32 mbfc   : 1;
+ } __attribute__ ((packed));
+ 
+ struct scsw {
+@@ -77,41 +77,41 @@ struct scsw {
+ /*
+  * subchannel information block
   */
+-struct schib {
++typedef struct schib {
+     struct pmcw pmcw;     /* path management control word */
+     struct scsw scsw;     /* subchannel status word */
+     __u64 mba;            /* measurement block address */
+     __u8 mda[4];          /* model dependent area */
+-} __attribute__ ((packed,aligned(4)));
++} __attribute__ ((packed, aligned(4))) Schib;
  
- #include "libc.h"
-+#include "s390-arch.h"
- #include "s390-ccw.h"
+-struct subchannel_id {
++typedef struct subchannel_id {
+         __u32 cssid  : 8;
+         __u32        : 4;
+         __u32 m      : 1;
+         __u32 ssid   : 2;
+         __u32 one    : 1;
+         __u32 sch_no : 16;
+-} __attribute__ ((packed, aligned(4)));
++} __attribute__ ((packed, aligned(4))) SubChannelId;
+ 
+ struct chsc_header {
+     __u16 length;
+     __u16 code;
+ } __attribute__((packed));
+ 
+-struct chsc_area_sda {
++typedef struct chsc_area_sda {
+     struct chsc_header request;
+-    __u8 reserved1:4;
+-    __u8 format:4;
++    __u8 reserved1  : 4;
++    __u8 format     : 4;
+     __u8 reserved2;
+     __u16 operation_code;
+     __u32 reserved3;
+     __u32 reserved4;
+     __u32 operation_data_area[252];
+     struct chsc_header response;
+-    __u32 reserved5:4;
+-    __u32 format2:4;
+-    __u32 reserved6:24;
+-} __attribute__((packed));
++    __u32 reserved5 : 4;
++    __u32 format2   : 4;
++    __u32 reserved6 : 24;
++} __attribute__((packed)) ChscAreaSda;
+ 
+ /*
+  * TPI info structure
+@@ -128,12 +128,12 @@ struct tpi_info {
+ } __attribute__ ((packed, aligned(4)));
+ 
+ /* channel command word (type 1) */
+-struct ccw1 {
++typedef struct ccw1 {
+     __u8 cmd_code;
+     __u8 flags;
+     __u16 count;
+     __u32 cda;
+-} __attribute__ ((packed, aligned(8)));
++} __attribute__ ((packed, aligned(8))) Ccw1;
+ 
+ #define CCW_FLAG_DC              0x80
+ #define CCW_FLAG_CC              0x40
+@@ -162,27 +162,27 @@ struct ccw1 {
+ /*
+  * Command-mode operation request block
+  */
+-struct cmd_orb {
++typedef struct cmd_orb {
+     __u32 intparm;    /* interruption parameter */
+-    __u32 key:4;      /* flags, like key, suspend control, etc. */
+-    __u32 spnd:1;     /* suspend control */
+-    __u32 res1:1;     /* reserved */
+-    __u32 mod:1;      /* modification control */
+-    __u32 sync:1;     /* synchronize control */
+-    __u32 fmt:1;      /* format control */
+-    __u32 pfch:1;     /* prefetch control */
+-    __u32 isic:1;     /* initial-status-interruption control */
+-    __u32 alcc:1;     /* address-limit-checking control */
+-    __u32 ssic:1;     /* suppress-suspended-interr. control */
+-    __u32 res2:1;     /* reserved */
+-    __u32 c64:1;      /* IDAW/QDIO 64 bit control  */
+-    __u32 i2k:1;      /* IDAW 2/4kB block size control */
+-    __u32 lpm:8;      /* logical path mask */
+-    __u32 ils:1;      /* incorrect length */
+-    __u32 zero:6;     /* reserved zeros */
+-    __u32 orbx:1;     /* ORB extension control */
+-    __u32 cpa;    /* channel program address */
+-}  __attribute__ ((packed, aligned(4)));
++    __u32 key  : 4;   /* flags, like key, suspend control, etc. */
++    __u32 spnd : 1;   /* suspend control */
++    __u32 res1 : 1;   /* reserved */
++    __u32 mod  : 1;   /* modification control */
++    __u32 sync : 1;   /* synchronize control */
++    __u32 fmt  : 1;   /* format control */
++    __u32 pfch : 1;   /* prefetch control */
++    __u32 isic : 1;   /* initial-status-interruption control */
++    __u32 alcc : 1;   /* address-limit-checking control */
++    __u32 ssic : 1;   /* suppress-suspended-interr. control */
++    __u32 res2 : 1;   /* reserved */
++    __u32 c64  : 1;   /* IDAW/QDIO 64 bit control  */
++    __u32 i2k  : 1;   /* IDAW 2/4kB block size control */
++    __u32 lpm  : 8;   /* logical path mask */
++    __u32 ils  : 1;   /* incorrect length */
++    __u32 zero : 6;   /* reserved zeros */
++    __u32 orbx : 1;   /* ORB extension control */
++    __u32 cpa;        /* channel program address */
++}  __attribute__ ((packed, aligned(4))) CmdOrb;
+ 
+ struct ciw {
+     __u8 type;
+@@ -193,7 +193,7 @@ struct ciw {
+ /*
+  * sense-id response buffer layout
+  */
+-struct senseid {
++typedef struct senseid {
+     /* common part */
+     __u8  reserved;   /* always 0x'FF' */
+     __u16 cu_type;    /* control unit type */
+@@ -203,15 +203,15 @@ struct senseid {
+     __u8  unused;     /* padding byte */
+     /* extended part */
+     struct ciw ciw[62];
+-}  __attribute__ ((packed, aligned(4)));
++}  __attribute__ ((packed, aligned(4))) SenseId;
+ 
+ /* interruption response block */
+-struct irb {
++typedef struct irb {
+     struct scsw scsw;
+     __u32 esw[5];
+     __u32 ecw[8];
+     __u32 emw[8];
+-}  __attribute__ ((packed, aligned(4)));
++}  __attribute__ ((packed, aligned(4))) Irb;
+ 
+ /*
+  * Some S390 specific IO instructions as inline
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 9828aa2..241c6d0 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -49,14 +49,6 @@ typedef unsigned long long __u64;
  #include "cio.h"
- #include "virtio.h"
-@@ -19,6 +20,7 @@ static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
-+const LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+ #include "iplb.h"
  
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-new file mode 100644
-index 0000000..47eaa04
---- /dev/null
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -0,0 +1,100 @@
-+/*
-+ * S390 Basic Architecture
-+ *
-+ * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef S390_ARCH_H
-+#define S390_ARCH_H
-+
-+typedef struct PSW {
-+    uint64_t mask;
-+    uint64_t addr;
-+} __attribute__ ((packed, aligned(8))) PSW;
-+
-+/* Older PSW format used by LPSW instruction */
-+typedef struct PSWLegacy {
-+    uint32_t mask;
-+    uint32_t addr;
-+} __attribute__ ((packed, aligned(8))) PSWLegacy;
-+
-+/* s390 psw bit masks */
-+#define PSW_MASK_IOINT      0x0200000000000000ULL
-+#define PSW_MASK_WAIT       0x0002000000000000ULL
-+#define PSW_MASK_EAMODE     0x0000000100000000ULL
-+#define PSW_MASK_BAMODE     0x0000000080000000ULL
-+#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
-+
-+/* Low core mapping */
-+typedef struct LowCore {
-+    /* prefix area: defined by architecture */
-+    uint64_t        ipl_psw;                  /* 0x000 */
-+    uint32_t        ccw1[2];                  /* 0x008 */
-+    uint32_t        ccw2[2];                  /* 0x010 */
-+    uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-+    uint32_t        ext_params;               /* 0x080 */
-+    uint16_t        cpu_addr;                 /* 0x084 */
-+    uint16_t        ext_int_code;             /* 0x086 */
-+    uint16_t        svc_ilen;                 /* 0x088 */
-+    uint16_t        svc_code;                 /* 0x08a */
-+    uint16_t        pgm_ilen;                 /* 0x08c */
-+    uint16_t        pgm_code;                 /* 0x08e */
-+    uint32_t        data_exc_code;            /* 0x090 */
-+    uint16_t        mon_class_num;            /* 0x094 */
-+    uint16_t        per_perc_atmid;           /* 0x096 */
-+    uint64_t        per_address;              /* 0x098 */
-+    uint8_t         exc_access_id;            /* 0x0a0 */
-+    uint8_t         per_access_id;            /* 0x0a1 */
-+    uint8_t         op_access_id;             /* 0x0a2 */
-+    uint8_t         ar_access_id;             /* 0x0a3 */
-+    uint8_t         pad2[0xA8 - 0xA4];        /* 0x0a4 */
-+    uint64_t        trans_exc_code;           /* 0x0a8 */
-+    uint64_t        monitor_code;             /* 0x0b0 */
-+    uint16_t        subchannel_id;            /* 0x0b8 */
-+    uint16_t        subchannel_nr;            /* 0x0ba */
-+    uint32_t        io_int_parm;              /* 0x0bc */
-+    uint32_t        io_int_word;              /* 0x0c0 */
-+    uint8_t         pad3[0xc8 - 0xc4];        /* 0x0c4 */
-+    uint32_t        stfl_fac_list;            /* 0x0c8 */
-+    uint8_t         pad4[0xe8 - 0xcc];        /* 0x0cc */
-+    uint64_t        mcic;                     /* 0x0e8 */
-+    uint8_t         pad5[0xf4 - 0xf0];        /* 0x0f0 */
-+    uint32_t        external_damage_code;     /* 0x0f4 */
-+    uint64_t        failing_storage_address;  /* 0x0f8 */
-+    uint8_t         pad6[0x110 - 0x100];      /* 0x100 */
-+    uint64_t        per_breaking_event_addr;  /* 0x110 */
-+    uint8_t         pad7[0x120 - 0x118];      /* 0x118 */
-+    PSW             restart_old_psw;          /* 0x120 */
-+    PSW             external_old_psw;         /* 0x130 */
-+    PSW             svc_old_psw;              /* 0x140 */
-+    PSW             program_old_psw;          /* 0x150 */
-+    PSW             mcck_old_psw;             /* 0x160 */
-+    PSW             io_old_psw;               /* 0x170 */
-+    uint8_t         pad8[0x1a0 - 0x180];      /* 0x180 */
-+    PSW             restart_new_psw;          /* 0x1a0 */
-+    PSW             external_new_psw;         /* 0x1b0 */
-+    PSW             svc_new_psw;              /* 0x1c0 */
-+    PSW             program_new_psw;          /* 0x1d0 */
-+    PSW             mcck_new_psw;             /* 0x1e0 */
-+    PSW             io_new_psw;               /* 0x1f0 */
-+    PSW             return_psw;               /* 0x200 */
-+    uint8_t         irb[64];                  /* 0x210 */
-+    uint64_t        sync_enter_timer;         /* 0x250 */
-+    uint64_t        async_enter_timer;        /* 0x258 */
-+    uint64_t        exit_timer;               /* 0x260 */
-+    uint64_t        last_update_timer;        /* 0x268 */
-+    uint64_t        user_timer;               /* 0x270 */
-+    uint64_t        system_timer;             /* 0x278 */
-+    uint64_t        last_update_clock;        /* 0x280 */
-+    uint64_t        steal_clock;              /* 0x288 */
-+    PSW             return_mcck_psw;          /* 0x290 */
-+    uint8_t         pad9[0xc00 - 0x2a0];      /* 0x2a0 */
-+} __attribute__((packed, aligned(8192))) LowCore;
-+
-+extern const LowCore *lowcore;
-+
-+#endif
+-typedef struct irb Irb;
+-typedef struct ccw1 Ccw1;
+-typedef struct cmd_orb CmdOrb;
+-typedef struct schib Schib;
+-typedef struct chsc_area_sda ChscAreaSda;
+-typedef struct senseid SenseId;
+-typedef struct subchannel_id SubChannelId;
+-
+ /* start.s */
+ void disabled_wait(void);
+ void consume_sclp_int(void);
 -- 
 2.7.4
