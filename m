@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41372)
+Received: from eggs.gnu.org ([209.51.188.92]:41576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goNIh-0003cR-6L
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:55:16 -0500
+	(envelope-from <philmd@redhat.com>) id 1goNKM-0004Th-6l
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1goNIe-0006fP-Ha
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:55:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1goNIc-0006Xn-IM
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:55:12 -0500
-Date: Tue, 29 Jan 2019 01:55:06 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1227259419.67461932.1548744906697.JavaMail.zimbra@redhat.com>
-In-Reply-To: <ef9d5d6128b853449fda6221a67894de48a09c3c.1548771590.git.yi.z.zhang@linux.intel.com>
-References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-	<ef9d5d6128b853449fda6221a67894de48a09c3c.1548771590.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1goNKL-00072n-9S
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:58 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1goNKL-00072B-39
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:56:57 -0500
+Received: by mail-wr1-f66.google.com with SMTP id z5so20681120wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 28 Jan 2019 22:56:56 -0800 (PST)
+References: <20190125060157.29935-1-richardw.yang@linux.intel.com>
+	<20190129000820.31190-1-richardw.yang@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <feb8687e-0d0c-a20a-9b37-c8284aaae9f5@redhat.com>
+Date: Tue, 29 Jan 2019 07:56:54 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190129000820.31190-1-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Trivial cleanup in hw/acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Zhang <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, richardw yang <richardw.yang@linux.intel.com>, mst@redhat.com, ehabkost@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
 
+Hi Wei,
 
+On 1/29/19 1:08 AM, Wei Yang wrote:
+> There are several functions/variable which are not used anymore.
 > 
-> From: Zhang Yi <yi.z.zhang@linux.intel.com>
+> This serials just remove those without functional change.
 > 
-> When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> MAP_SYNC flag in addition which can ensure file system metadata
-> synced in each guest writes to the backend file, without other QEMU
-> actions (e.g., periodic fsync() by QEMU).
+> Wei Yang (3):
+>   hw/i386/pc.c: remove unused function pc_acpi_init()
+>   hw/acpi: remove unused function acpi_table_add_builtin()
+>   hw/acpi: remove unnecessary variable acpi_table_builtin
 > 
-> Current, We have below different possible use cases:
+>  hw/acpi/core.c         | 10 +---------
+>  hw/i386/pc.c           | 27 ---------------------------
+>  include/hw/acpi/acpi.h |  1 -
+>  include/hw/i386/pc.h   |  1 -
+>  4 files changed, 1 insertion(+), 38 deletions(-)
 > 
-> 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
->    a: backend is a dax supporting file.
->     - MAP_SYNC will active.
->    b: backend is not a dax supporting file.
->     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
-> 
-> 2. The rest of cases:
->    - we will never pass the MAP_SYNC to mmap2
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  include/qemu/osdep.h | 21 +++++++++++++++++++++
->  util/mmap-alloc.c    | 28 +++++++++++++++++++++++++++-
->  2 files changed, 48 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 457d24e..96209bb 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->  #  define QEMU_VMALLOC_ALIGN getpagesize()
->  #endif
->  
-> +/*
-> + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
-> + * 4.15, so they may not be defined when compiling on older kernels.
-> + */
-> +#ifdef CONFIG_LINUX
-> +
-> +#include <linux/mman.h>
-> +
-> +#ifndef MAP_SYNC
-> +#define MAP_SYNC 0x80000
-> +#endif
-> +
-> +#ifndef MAP_SHARED_VALIDATE
-> +#define MAP_SHARED_VALIDATE 0x03
-> +#endif
-> +
-> +#else  /* !CONFIG_LINUX */
-> +#define MAP_SYNC              0x0
-> +#define MAP_SHARED_VALIDATE   0x0
-> +#endif /* CONFIG_LINUX */
-> +
->  #ifdef CONFIG_POSIX
->  struct qemu_signalfd_siginfo {
->      uint32_t ssi_signo;   /* Signal number */
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index 97bbeed..2c86ad2 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -101,6 +101,7 @@ void *qemu_ram_mmap(int fd,
->  #else
->      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1,
->      0);
->  #endif
-> +    int mmap_xflags = 0;
->      size_t offset;
->      void *ptr1;
->  
-> @@ -111,13 +112,38 @@ void *qemu_ram_mmap(int fd,
->      assert(is_power_of_2(align));
->      /* Always align to host page size */
->      assert(align >= getpagesize());
-> +    if (shared && is_pmem) {
-> +        mmap_xflags = MAP_SYNC | MAP_SHARED_VALIDATE;
-> +    }
->  
->      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-> +retry_mmap:
->      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
->                  MAP_FIXED |
->                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
->                  fd, 0);
-> +
-> +    /* if map failed with MAP_SHARED_VALIDATE | MAP_SYNC,
-> +     * we try with MAP_SHARED_VALIDATE without MAP_SYNC
-> +     */
-> +    if (ptr1 == MAP_FAILED &&
-> +        mmap_xflags == (MAP_SYNC | MAP_SHARED_VALIDATE)) {
-> +        if (errno == ENOTSUP) {
-> +            perror("failed to validate with mapping flags");
-> +        }
-> +        mmap_xflags = MAP_SHARED_VALIDATE;
-> +        goto retry_mmap;
-> +    }
-> +    /* MAP_SHARED_VALIDATE flag is available since Linux 4.15
-> +     * Test only with MAP_SHARED_VALIDATE flag for compatibility.
-> +     * Then ignore the MAP_SHARED_VALIDATE flag and retry again
-> +     */
-> +    if (mmap_xflags == MAP_SHARED_VALIDATE &&
-> +        ptr1 == MAP_FAILED) {
-> +            mmap_xflags &= ~MAP_SHARED_VALIDATE;
-> +            goto retry_mmap;
-> +    }
 
-I am not sure if we need this multiple validation. If MAP_SYNC with 
-MAP_SHARED_VALIDATE is not supported or failed, just fallback to 
-mmap without MAP_SYNC & MAP_SHARED_VALIDATE?
+Please do not post iterated series in reply to previous version, but as
+new thread:
+- patches are parsed by scripts
+- some email clients can tag a thread as "reviewed, skip" and replies to
+this thread will be masked.
 
-I saw a'lot of discussion in previous version of this patch series. 
-I am not sure if its suggested this way or I am missing anything
-important here.
+Regards,
 
-Thanks,
-Pankaj
-
-
->      if (ptr1 == MAP_FAILED) {
->          munmap(ptr, total);
->          return MAP_FAILED;
-> --
-> 2.7.4
-> 
-> 
-> 
+Phil.
