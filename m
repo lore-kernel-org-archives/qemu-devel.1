@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54370)
+Received: from eggs.gnu.org ([209.51.188.92]:55040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1goYqM-00045F-00
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:46 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYtc-0005tp-Lt
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <svens@stackframe.org>) id 1goYqL-00079R-5C
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:45 -0500
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:52218)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <svens@stackframe.org>)
-	id 1goYqK-00074c-MX
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:14:45 -0500
-From: Sven Schnelle <svens@stackframe.org>
-Date: Tue, 29 Jan 2019 20:14:02 +0100
-Message-Id: <20190129191402.29539-1-svens@stackframe.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target/hppa: fix PSW Q bit behaviour to match
- hardware
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1goYtb-00083l-Nb
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 14:18:08 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue, 29 Jan 2019 19:17:39 +0000
+Message-Id: <20190129191746.14868-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
+References: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH v4 1/8] target/ppc: implement complete set of
+ Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +20,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: deller@gmx.de, Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-PA-RISC specification says: "Setting the PSW Q-bit, PSW{28}, to 1
-with this instruction, if it was not already 1, is an undefined
-operation." However, at least HP-UX 10.20 sets the Q bit from 0 to 1
-with the SSM instruction. Tested this both on HP9000/712 and
-HP9000/785/C3750, both machines set the Q bit from 0 to 1 without
-exception. This makes HP-UX 10.20 progress a little bit further.
+This prepares us for eliminating the use of direct array access within the VMX
+instruction implementations.
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/hppa/op_helper.c | 5 -----
- 1 file changed, 5 deletions(-)
+ target/ppc/internal.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 912e8d5be4..3adcfd8976 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -665,11 +665,6 @@ void HELPER(reset)(CPUHPPAState *env)
- target_ureg HELPER(swap_system_mask)(CPUHPPAState *env, target_ureg nsm)
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index c7c0f77dd6..f26a71ffcf 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -206,16 +206,23 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define VsrB(i) u8[i]
++#define VsrSB(i) s8[i]
+ #define VsrH(i) u16[i]
++#define VsrSH(i) s16[i]
+ #define VsrW(i) u32[i]
++#define VsrSW(i) s32[i]
+ #define VsrD(i) u64[i]
++#define VsrSD(i) s64[i]
+ #else
+ #define VsrB(i) u8[15 - (i)]
++#define VsrSB(i) s8[15 - (i)]
+ #define VsrH(i) u16[7 - (i)]
++#define VsrSH(i) s16[7 - (i)]
+ #define VsrW(i) u32[3 - (i)]
++#define VsrSW(i) s32[3 - (i)]
+ #define VsrD(i) u64[1 - (i)]
++#define VsrSD(i) s64[1 - (i)]
+ #endif
+-
+ static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
  {
-     target_ulong psw = env->psw;
--    /* ??? On second reading this condition simply seems
--       to be undefined rather than a diagnosed trap.  */
--    if (nsm & ~psw & PSW_Q) {
--        hppa_dynamic_excp(env, EXCP_ILL, GETPC());
--    }
-     env->psw = (psw & ~PSW_SM) | (nsm & PSW_SM);
-     return psw & PSW_SM;
- }
+     vsr->VsrD(0) = env->vsr[n].u64[0];
 -- 
-2.20.1
+2.11.0
