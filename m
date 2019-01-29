@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36347)
+Received: from eggs.gnu.org ([209.51.188.92]:38418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMmv-0005cn-2Z
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:22:25 -0500
+	(envelope-from <pagupta@redhat.com>) id 1goN03-0007pP-14
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1goMms-0000ne-HR
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:22:23 -0500
-References: <cover.1548714862.git.DirtY.iCE.hu@gmail.com>
-	<1d80d5adf4244445d18bfe1170d125a0d311383f.1548714862.git.DirtY.iCE.hu@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f06c0217-7b12-790e-52cc-dde7c0ed5b56@redhat.com>
-Date: Tue, 29 Jan 2019 07:22:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <1d80d5adf4244445d18bfe1170d125a0d311383f.1548714862.git.DirtY.iCE.hu@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 02/14] audio: use qapi AudioFormat
- instead of audfmt_e
+	(envelope-from <pagupta@redhat.com>) id 1goN02-0005Q8-9S
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1goN02-0005Py-3c
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 01:35:58 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3121088E66
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 06:28:10 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Tue, 29 Jan 2019 11:58:01 +0530
+Message-Id: <20190129062801.15799-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] chardev: Avoid adding duplicate chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Michael Walle <michael@walle.cc>, "open list:ARM" <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, eblake@redhat.com, xiaohli@redhat.com, pagupta@redhat.com
 
-On 2019-01-28 23:43, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n wrote:
-> I had to include an enum for audio sampling formats into qapi, but that
-> meant duplicating the audfmt_e enum.  This patch replaces audfmt_e and
-> associated values with the qapi generated AudioFormat enum.
->=20
-> This patch is mostly a search-and-replace, except for switches where th=
-e
-> qapi generated AUDIO_FORMAT_MAX caused problems.
->=20
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
-om>
-> ---
+Hotplugging existing char chardev with qmp, dereferences(removes) 
+existing chardev. This patch avoids adding a chardev if a chardev 
+with same id exists.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+RH BZ 1660831: 
+
+# (host) ls -lt /tmp/helloworld*
+srwxr-xr-x.  /tmp/helloworld1
+srwxr-xr-x.  /tmp/helloworld2
+
+Before this patch:
+
+hotplug existed chardev(channel1) in qmp:
+{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
+"data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
+
+{"error": {"class": "GenericError", "desc": "attempt to add duplicate 
+property 'charchannel1' to object (type 'container')"}}
+
+# ls -lt /tmp/helloworld*
+srwxr-xr-x. 1 root root 0 Dec 19 16:39 /tmp/helloworld2
+
+After this patch:
+
+{"execute":"chardev-add","arguments":{"id":"charchannel1","backend":{"type":"socket",
+"data":{"addr":{"type":"unix", "data": {"path": "/tmp/helloworld1"}}}}}}
+{"error": {"class": "GenericError", "desc": "Chardev 'charchannel1' already exists"}}
+
+# ls -lt /tmp/helloworld*
+srwxr-xr-x. 1 /tmp/helloworld1
+srwxr-xr-x. 1 /tmp/helloworld2
+ 
+Reported-by: Xiaohui Li <xiaohli@redhat.com>
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+
+v1->v2
+ Correct error message - Eric 
+
+ chardev/char.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/chardev/char.c b/chardev/char.c
+index ccba36bafb..cab0d3df16 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -985,6 +985,12 @@ ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend,
+     ChardevReturn *ret;
+     Chardev *chr;
+ 
++    chr = qemu_chr_find(id);
++    if (chr) {
++        error_setg(errp, "Chardev '%s' already exists", id);
++        return NULL;
++    }
++
+     cc = char_get_class(ChardevBackendKind_str(backend->type), errp);
+     if (!cc) {
+         return NULL;
+-- 
+2.14.3
