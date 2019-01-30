@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35667)
+Received: from eggs.gnu.org ([209.51.188.92]:36150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gom0D-0002fR-EE
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:50 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gom2D-00047w-JD
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:19:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gom0A-0005Dt-Pm
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:48 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 30 Jan 2019 09:17:24 +0000
-Message-ID: <0a10c120-9320-43f2-3b90-bac241305629@virtuozzo.com>
-References: <20190129143800.88563-1-vsementsov@virtuozzo.com>
-	<20190129143800.88563-3-vsementsov@virtuozzo.com>
-	<63bef428-e6c8-1781-cf50-8659acf88e0b@redhat.com>
-In-Reply-To: <63bef428-e6c8-1781-cf50-8659acf88e0b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <481F39A86A024D4AB4276184DBEB20CE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <laurent@vivier.eu>) id 1gom2C-000719-SP
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:19:53 -0500
+References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <9a14a8b4-b0c5-c5bd-9563-c8e6f73e9c03@vivier.eu>
+Date: Wed, 30 Jan 2019 10:19:45 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/io: use qemu_iovec_init_buf
+In-Reply-To: <20190125151440.13794-1-sourav.jb1988@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw: input: set category of
+ the i8042 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-MzAuMDEuMjAxOSAwOjQxLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxLzI5LzE5IDg6MzggQU0s
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBVc2UgbmV3IHFlbXVfaW92
-ZWNfaW5pdF9idWYoKSBpbnN0ZWFkIG9mDQo+PiBxZW11X2lvdmVjX2luaXRfZXh0ZXJuYWwoIC4u
-LiAsIDEpLCB3aGljaCBzaW1wbGlmaWVzIHRoZSBjb2RlLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
-Cj4+IC0tLQ0KPj4gICBibG9jay9pby5jIHwgODkgKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyMCBpbnNl
-cnRpb25zKCspLCA2OSBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svaW8u
-YyBiL2Jsb2NrL2lvLmMNCj4+IGluZGV4IGJkOWQ2ODhmOGIuLjgwOTYxOTEwYTYgMTAwNjQ0DQo+
-PiAtLS0gYS9ibG9jay9pby5jDQo+PiArKysgYi9ibG9jay9pby5jDQo+PiBAQCAtODQyLDE3ICs4
-NDIsMTMgQEAgc3RhdGljIGludCBiZHJ2X3Byd3ZfY28oQmRydkNoaWxkICpjaGlsZCwgaW50NjRf
-dCBvZmZzZXQsDQo+PiAgIHN0YXRpYyBpbnQgYmRydl9yd19jbyhCZHJ2Q2hpbGQgKmNoaWxkLCBp
-bnQ2NF90IHNlY3Rvcl9udW0sIHVpbnQ4X3QgKmJ1ZiwNCj4+ICAgICAgICAgICAgICAgICAgICAg
-ICAgIGludCBuYl9zZWN0b3JzLCBib29sIGlzX3dyaXRlLCBCZHJ2UmVxdWVzdEZsYWdzIGZsYWdz
-KQ0KPj4gICB7DQo+PiAtICAgIFFFTVVJT1ZlY3RvciBxaW92Ow0KPj4gLSAgICBzdHJ1Y3QgaW92
-ZWMgaW92ID0gew0KPj4gLSAgICAgICAgLmlvdl9iYXNlID0gKHZvaWQgKilidWYsDQo+PiAtICAg
-ICAgICAuaW92X2xlbiA9IG5iX3NlY3RvcnMgKiBCRFJWX1NFQ1RPUl9TSVpFLA0KPj4gLSAgICB9
-Ow0KPj4gKyAgICBRRU1VSU9WZWN0b3IgcWlvdiA9IFFFTVVfSU9WRUNfSU5JVF9CVUYocWlvdiwg
-YnVmLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJf
-c2VjdG9ycyAqIEJEUlZfU0VDVE9SX1NJWkUpOw0KPiANCj4gT2theSwgc28geW91IEFSRSB1c2lu
-ZyBib3RoIHRoZSBtYWNyby4uLg0KPiANCj4+IEBAIC05NzcsMTcgKzk2MywxMiBAQCBpbnQgYmRy
-dl9wd3JpdGV2KEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qgb2Zmc2V0LCBRRU1VSU9WZWN0b3Ig
-KnFpb3YpDQo+PiAgIA0KPj4gICBpbnQgYmRydl9wd3JpdGUoQmRydkNoaWxkICpjaGlsZCwgaW50
-NjRfdCBvZmZzZXQsIGNvbnN0IHZvaWQgKmJ1ZiwgaW50IGJ5dGVzKQ0KPj4gICB7DQo+PiAtICAg
-IFFFTVVJT1ZlY3RvciBxaW92Ow0KPj4gLSAgICBzdHJ1Y3QgaW92ZWMgaW92ID0gew0KPj4gLSAg
-ICAgICAgLmlvdl9iYXNlICAgPSAodm9pZCAqKSBidWYsDQo+PiAtICAgICAgICAuaW92X2xlbiAg
-ICA9IGJ5dGVzLA0KPj4gLSAgICB9Ow0KPj4gKyAgICBRRU1VSU9WZWN0b3IgcWlvdiA9IFFFTVVf
-SU9WRUNfSU5JVF9CVUYocWlvdiwgTlVMTCwgYnl0ZXMpOw0KPiANCj4gT3VjaCAtIHdoeSBhcmUg
-eW91IHBhc3NpbmcgTlVMTCBpbnN0ZWFkIG9mIGJ1Zj8gIEJ1dCB0aGlzIGFuc3dlcnMgd2h5DQo+
-IHRoZSBtYWNybyBoYWQgdG8gY2FzdCAtIGl0IGlzIGluZGVlZCBjYXN0aW5nIGF3YXkgY29uc3Qu
-DQo+IA0KPj4gQEAgLTEyMjksOSArMTIwOSw3IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIGJk
-cnZfY29fZG9fY29weV9vbl9yZWFkdihCZHJ2Q2hpbGQgKmNoaWxkLA0KPj4gICANCj4+ICAgICAg
-ICAgICBpZiAocmV0IDw9IDApIHsNCj4+ICAgICAgICAgICAgICAgLyogTXVzdCBjb3B5LW9uLXJl
-YWQ7IHVzZSB0aGUgYm91bmNlIGJ1ZmZlciAqLw0KPj4gLSAgICAgICAgICAgIGlvdi5pb3ZfYmFz
-ZSA9IGJvdW5jZV9idWZmZXI7DQo+PiAtICAgICAgICAgICAgaW92Lmlvdl9sZW4gPSBwbnVtID0g
-TUlOKHBudW0sIE1BWF9CT1VOQ0VfQlVGRkVSKTsNCj4+IC0gICAgICAgICAgICBxZW11X2lvdmVj
-X2luaXRfZXh0ZXJuYWwoJmxvY2FsX3Fpb3YsICZpb3YsIDEpOw0KPj4gKyAgICAgICAgICAgIHFl
-bXVfaW92ZWNfaW5pdF9idWYoJmxvY2FsX3Fpb3YsIGJvdW5jZV9idWZmZXIsIHBudW0pOw0KPiAN
-Cj4gLi4uYW5kIHRoZSBmdW5jdGlvbi4NCj4gDQo+IE91Y2ggLSB3aHkgZGlkIHlvdSBsb3NlIHRo
-ZSBhc3NpZ25tZW50IG9mIHBudW0gPSBNSU4oKSBoZXJlPw0KPiANCg0KVGhhbmsgeW91LCBib3Ro
-IGhpdCB0aGUgbWFyaywgSSB3YXMgaW5hdHRlbnRpdmUuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
-DQpWbGFkaW1pcg0K
+On 25/01/2019 16:14, kumar sourav wrote:
+> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
+> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
+> 
+> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+> ---
+>  hw/input/pckbd.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+> index 3e66713b47..72e7d5f6cc 100644
+> --- a/hw/input/pckbd.c
+> +++ b/hw/input/pckbd.c
+> @@ -574,6 +574,7 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
+>  
+>      dc->realize = i8042_realizefn;
+>      dc->vmsd = &vmstate_kbd_isa;
+> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>  }
+>  
+>  static const TypeInfo i8042_info = {
+> 
+
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
