@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38860)
+Received: from eggs.gnu.org ([209.51.188.92]:53774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1goy9H-0001gw-Nb
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:16:00 -0500
+	(envelope-from <luke.r.nels@gmail.com>) id 1gox1u-0001mL-SY
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:04:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1goy9G-0008Oe-Qt
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:15:59 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-7-crosa@redhat.com>
-	<20190118113855.020dc3c0.cohuck@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <95c86657-9d71-6f4b-b960-7d4939138a78@redhat.com>
-Date: Wed, 30 Jan 2019 17:15:48 -0500
+	(envelope-from <luke.r.nels@gmail.com>) id 1gox1r-0004aJ-UX
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:04:16 -0500
+From: Luke Nelson <luke.r.nels@gmail.com>
+Date: Wed, 30 Jan 2019 13:03:50 -0800
+Message-Id: <20190130210350.16757-1-luke.r.nels@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190118113855.020dc3c0.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/18] Acceptance tests: use "arch:" tag to
- filter target specific tests
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] RISC-V: Fix pmpcfg register indexing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +19,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: qemu-riscv@nongnu.org
+Cc: lukenels@pm.me, Luke Nelson <luke.r.nels@gmail.com>, Xi Wang <xi.wang@gmail.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
+pmpcfg_csr_{read,write} do not correctly handle accesses to PMP
+configurations 8 through 15 (CSR pmpcfg2) on RV64.
 
+The current code computes the pmpcfg index using:
 
-On 1/18/19 5:38 AM, Cornelia Huck wrote:
-> On Thu, 17 Jan 2019 13:56:16 -0500
-> Cleber Rosa <crosa@redhat.com> wrote:
-> 
->> Currently, the only test that contains some target architecture
->> information is "boot_linux_console.py" which test contains a "x86_64"
->> tag.  But that tag is not respected in the default execution, that is,
->> "make check-acceptance" doesn't do anything with it.
->>
->> That said, even the target architecture handling currently present in
->> the "avocado_qemu.Test" class, class is pretty limited.  For instance,
->> by default, it chooses a target based on the host architecture.
->>
->> Because the original implementation of the tags feature in Avocado did
->> not include any time of namespace or "key:val" mechanism, no tag has
->> relation to another tag.  The new implementation of the tags feature
->> from version 67.0 onwards, allows "key:val" tags, and because of that,
->> a test can be classified with a tag in a given key.  For instance, the
->> new proposed version of the "boot_linux_console.py" test, which
->> downloads and attempts to run a x86_64 kernel, is now tagged as:
->>
->>   :avocado: tags=arch:x86_64
->>
->> This means that it can be filtered (out) when no x86_64 target is
->> available.  At the same time, tests that don't have a "arch:" tag,
->> will not be filtered out.
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>  tests/Makefile.include                 | 3 +++
->>  tests/acceptance/boot_linux_console.py | 2 +-
->>  tests/requirements.txt                 | 2 +-
->>  3 files changed, 5 insertions(+), 2 deletions(-)
->>
-> 
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->> index 98324f7591..46b20bdfe2 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
->>      and the kernel command line is properly passed from QEMU to the kernel
->>  
->>      :avocado: enable
->> -    :avocado: tags=x86_64
->> +    :avocado: tags=arch:x86_64
->>      """
->>  
->>      timeout = 60
-> 
-> You probably want to do the same change in virtio_version.py;
-> otherwise, if I run the acceptance tests on s390x, it will run into
-> timeouts (it looks like that test is intended to be run with x86
-> machines anyway.)
-> 
+  (reg_index * sizeof(target_ulong))
 
-Right, good catch.  Also, the same applies to the "linux_initrd.py"
-test, merged after this version.
+This is incorrect on RV64.  For example, when reg_index is 2 (i.e.,
+pmpcfg2), the computed configuration index will be 16-23, which
+should be 8-15.
 
-- Cleber.
+A correct way is to use (reg_index * 4) instead, which works for
+both RV32 and RV64.
+
+Cc: Xi Wang <xi.wang@gmail.com>
+Signed-off-by: Luke Nelson <luke.r.nels@gmail.com>
+---
+ target/riscv/pmp.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index 15a5366616..a1bee56c86 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -311,9 +311,8 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
+     }
+ 
+     for (i = 0; i < sizeof(target_ulong); i++) {
+-        cfg_val = (val >> 8 * i)  & 0xff;
+-        pmp_write_cfg(env, (reg_index * sizeof(target_ulong)) + i,
+-            cfg_val);
++        cfg_val = (val >> (i * 8)) & 0xff;
++        pmp_write_cfg(env, (reg_index * 4) + i, cfg_val);
+     }
+ }
+ 
+@@ -328,7 +327,7 @@ target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
+     target_ulong val = 0;
+ 
+     for (i = 0; i < sizeof(target_ulong); i++) {
+-        val = pmp_read_cfg(env, (reg_index * sizeof(target_ulong)) + i);
++        val = pmp_read_cfg(env, (reg_index * 4) + i);
+         cfg_val |= (val << (i * 8));
+     }
+ 
+-- 
+2.19.1
