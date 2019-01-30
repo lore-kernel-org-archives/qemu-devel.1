@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44762)
+Received: from eggs.gnu.org ([209.51.188.92]:44761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1goyhZ-00022g-Mt
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:51:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1goyhZ-00022f-Mj
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:51:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1goyhX-0001I6-QK
+	(envelope-from <dgibson@ozlabs.org>) id 1goyhX-0001IO-Ug
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:51:25 -0500
-Date: Thu, 31 Jan 2019 09:50:49 +1100
+Date: Thu, 31 Jan 2019 09:40:20 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190130225045.GE1771@umbus.fritz.box>
-References: <20190130014216.98287-1-aik@ozlabs.ru>
-	<20190130134303.754a43ab@bahia.lan>
-	<ff95d376-1253-a5eb-0a71-02b8b4b76013@redhat.com>
-	<20190130175316.198597c9@bahia.lan>
+Message-ID: <20190130224020.GD1771@umbus.fritz.box>
+References: <1548865345-2638-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
+	protocol="application/pgp-signature"; boundary="a2FkP9tdjPU2nyhF"
 Content-Disposition: inline
-In-Reply-To: <20190130175316.198597c9@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] spapr: Drop unused
- parameters from fdt building helper
+In-Reply-To: <1548865345-2638-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Merge the two e500 sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---JBi0ZxuS5uaEhkUZ
+--a2FkP9tdjPU2nyhF
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 30, 2019 at 05:53:16PM +0100, Greg Kurz wrote:
-> On Wed, 30 Jan 2019 17:43:44 +0100
-> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+On Wed, Jan 30, 2019 at 05:22:25PM +0100, Thomas Huth wrote:
+> There is currently a "e500" machine section and a "ppce500" device
+> section in the maintainers file - with some oddities: The wildcard
+> in the device section also covers the files from the machine section.
+> And hw/pci-host/ppce500.c is in the device section, while its header
+> is in the machine section.
+> This is really quite confusing, and I don't see a reason why we really
+> need two sections here, so let's simply merge them.
 >=20
-> > Hi Alexey,
-> >=20
-> > On 1/30/19 1:43 PM, Greg Kurz wrote:
-> > > On Wed, 30 Jan 2019 12:42:16 +1100
-> > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> > >  =20
-> > >> spapr_load_rtas() handles now RTAS address and size information in t=
-he FDT
-> > >> so drop them from spapr_build_fdt().
-> > >>
-> > >> While we are here, fix a small typo.
-> > >>
-> > >> Fixes: 2cac78c12ade9 "pseries: Consolidate RTAS loading" =20
-> > >=20
-> > > One nit. The last rtas_* user in spapr_build_fdt() was removed by the
-> > > following hunk:
-> > >=20
-> > > @@ -949,12 +966,6 @@ static void *spapr_build_fdt(sPAPRMachineState *=
-spapr,
-> > >          }
-> > >      }
-> > > =20
-> > > -    /* RTAS */
-> > > -    ret =3D spapr_rtas_device_tree_setup(fdt, rtas_addr, rtas_size);
-> > > -    if (ret < 0) {
-> > > -        error_report("Couldn't set up RTAS device tree properties");
-> > > -    }
-> > > -
-> > >      /* cpus */
-> > >      spapr_populate_cpus_dt_node(fdt, spapr);
-> > > =20
-> > > from commit:
-> > >=20
-> > > 3f5dabceba24 "pseries: Consolidate construction of /rtas device tree =
-node" =20
-> >=20
-> > Can you (or David if he agrees) add a line about since when/why it is no
-> > more required?
-> >=20
->=20
-> Commit 3f5dabceba24 (first released in QEMU 2.10) simply moved the FDT co=
-de
-> for RTAS to some other function, leaving the rtas_addr and rtas_size argu=
-ments
-> unused in spapr_build_fdt(). This patch is a trivial cleanup really.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Applied to ppc-for-4.0, with the Fixes line adjusted as suggested.
+Applied to ppc-for-4.0, thanks.
 
+> ---
+>  MAINTAINERS | 13 +++----------
+>  1 file changed, 3 insertions(+), 10 deletions(-)
 >=20
-> > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > >  =20
-> > >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru> =20
-> >=20
-> > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> >=20
-> > >> ---
-> > >>  hw/ppc/spapr.c | 8 +++-----
-> > >>  1 file changed, 3 insertions(+), 5 deletions(-)
-> > >>
-> > >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > >> index a217c7f..fa12723 100644
-> > >> --- a/hw/ppc/spapr.c
-> > >> +++ b/hw/ppc/spapr.c
-> > >> @@ -1225,9 +1225,7 @@ static void spapr_dt_hypervisor(sPAPRMachineSt=
-ate *spapr, void *fdt)
-> > >>      }
-> > >>  }
-> > >> =20
-> > >> -static void *spapr_build_fdt(sPAPRMachineState *spapr,
-> > >> -                             hwaddr rtas_addr,
-> > >> -                             hwaddr rtas_size)
-> > >> +static void *spapr_build_fdt(sPAPRMachineState *spapr)
-> > >>  {
-> > >>      MachineState *machine =3D MACHINE(spapr);
-> > >>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-> > >> @@ -1644,14 +1642,14 @@ static void spapr_machine_reset(void)
-> > >> =20
-> > >>      /*
-> > >>       * We place the device tree and RTAS just below either the top =
-of the RMA,
-> > >> -     * or just below 2GB, whichever is lowere, so that it can be
-> > >> +     * or just below 2GB, whichever is lower, so that it can be
-> > >>       * processed with 32-bit real mode code if necessary
-> > >>       */
-> > >>      rtas_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR);
-> > >>      rtas_addr =3D rtas_limit - RTAS_MAX_SIZE;
-> > >>      fdt_addr =3D rtas_addr - FDT_MAX_SIZE;
-> > >> =20
-> > >> -    fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
-> > >> +    fdt =3D spapr_build_fdt(spapr);
-> > >> =20
-> > >>      spapr_load_rtas(spapr, fdt, rtas_addr);
-> > >>   =20
-> > >=20
-> > >  =20
->=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index eac36b6..30dbe37 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -957,9 +957,10 @@ e500
+>  M: David Gibson <david@gibson.dropbear.id.au>
+>  L: qemu-ppc@nongnu.org
+>  S: Odd Fixes
+> -F: hw/ppc/e500.[hc]
+> -F: hw/ppc/e500plat.c
+> +F: hw/ppc/e500*
+>  F: hw/gpio/mpc8xxx.c
+> +F: hw/net/fsl_etsec/
+> +F: hw/pci-host/ppce500.c
+>  F: include/hw/ppc/ppc_e500.h
+>  F: include/hw/pci-host/ppce500.h
+>  F: pc-bios/u-boot.e500
+> @@ -1316,14 +1317,6 @@ F: hw/i2c/ppc4xx_i2c.c
+>  F: include/hw/ppc/ppc4xx.h
+>  F: include/hw/i2c/ppc4xx_i2c.h
+> =20
+> -ppce500
+> -M: David Gibson <david@gibson.dropbear.id.au>
+> -L: qemu-ppc@nongnu.org
+> -S: Odd Fixes
+> -F: hw/ppc/e500*
+> -F: hw/pci-host/ppce500.c
+> -F: hw/net/fsl_etsec/
+> -
+>  Character devices
+>  M: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>  R: Paolo Bonzini <pbonzini@redhat.com>
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -143,24 +88,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---JBi0ZxuS5uaEhkUZ
+--a2FkP9tdjPU2nyhF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxSKi0ACgkQbDjKyiDZ
-s5K6rRAAmxqmS1YcLk9rRo5keijb1LkXimWfJVmfDgC0CEYYlt1RTpk/mk2TmEfF
-MaXq731kT0F0s1a9yKtORFecRm4ZDliy85s1CWLz+KEPzivyiSkpfkJ4wsQo/cSd
-40zPAaTsQ/GuJV7AyyvuEPTHP4h33rAR+UMB4BNyNMeIWlnT/2q9XPDE3H0NmkGt
-adP/U8nfzAb2JT1g142fCs4l3JKxs9s3pHb/c9DYZk9iI6aiGEL/gbXP6qTDlDqo
-/yajCkai9NRI3RkBq8Tr1Vpm7FmJubr4nd76CWL17Uo1w0b4wgPJ8xULcz4YImPR
-9RdYbgWKZxjf664FPjvaGc6Ol1YTnZvHvc7ak1Y4jqcYMHDsqEUcboNGrdKCFjKO
-TQ8jsHOFoyNsDFific9N0yaep2WMOJluMi3FzRonaOjs8S/gySOiUEiC0gD/k0Fv
-dq2MyZMMFXgkBD3A/Dp3+blq9vHwyiLFyRTlYmOsa0LE3VU/I8cS0kbE9oWPh6uK
-XICJR64ixRBIL7wpnpOwq6N+FTBM0BfJ9tTw0O4zLMaOfVikp1jOMAWGZPCKde6g
-TLE92Fz99ZH39GmfkDBcEtWKNDkzvd6VfygZ6wXYJqbQnS/TQMRH8OsydY3TTFd0
-vQpxuUrLhFFM00XpUkagWrm2ZW9zT/B8HgY1mnRCetn36TZA8hM=
-=GFn+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxSJ9QACgkQbDjKyiDZ
+s5L3QQ//UvvHHp/zqda6WF33izlPzU5YpKIBcxEMgVPV4sFGK7+grVc+Ra44J16+
+mbvasMTHz4xuawS9EM5vuFNUnuEBpctKo7Foz7EpUqJZud21bqYlPGTE+t+IJz3T
+cj/OC7N10tgJ/84K829HgrKiIbX9XOuxZm9+pPEqcZq3tQiiqLmdlmfIm5jawO9W
+brlv/Ed0uXfumqG2s1KXyj+zPvDH7C1YM0hkKCUzYr7u+SJw/WCb9PC6SzBkEWTa
+mMimFSpvYZe/kDmfvvBYoerXsXossavC4/Cuw/vs0kXC6dNor4g2GYC7X0bx6bEE
+ymGSspgFzjgM3+OrtzejQ587r1bXMC/X5OWsC2dqnx1sP2WYgKvWsJJ/Ho2Cyn3Y
+UDjEJMXKsmyVOZuXr/qdMd+GybPft1CFDDp/qq/BOYV08vLZqPXTOG3BnXfE7t1l
+q6QHNR17zP2rwK4V2I0Y6O9tHXDQrQH3cLxnPICyx8YrIPdrZFpAvkE22ReFdsyZ
+9/X8QrwCE5vPcGVLCDCfjNM4lu4Jyr9V7oKXcgmXxPW3wpNLHo42TJ0izjqFnyFz
+tgOBUaViZ7+l92Ffhv+v0BaLCGL07ycDBhMmfgE8i+BSOTmLv/QFqzeVzd2MINe3
+7UT+usOShymyAZBgOFdXtA2vC6x6cuRXnt13v1imEgrlEvjbjwI=
+=XzrW
 -----END PGP SIGNATURE-----
 
---JBi0ZxuS5uaEhkUZ--
+--a2FkP9tdjPU2nyhF--
