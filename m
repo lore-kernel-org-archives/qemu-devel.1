@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39347)
+Received: from eggs.gnu.org ([209.51.188.92]:42512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gojsW-0005lU-4G
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:01:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1gok8M-0008O2-KX
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:18:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gojsV-000317-76
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:01:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gojsU-0002xT-UX
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:01:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F08DC7A30
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 06:55:37 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 30 Jan 2019 07:55:30 +0100
-Message-Id: <20190130065530.6371-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] scripts: use git archive in archive-source
+	(envelope-from <thuth@redhat.com>) id 1gok8L-0000fX-UU
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:18:06 -0500
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-3-philmd@redhat.com>
+	<cdfb4f7e-0182-386a-6508-a13a56e6de16@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0462853c-2f19-58ff-aee5-d667a86322e1@redhat.com>
+Date: Wed, 30 Jan 2019 08:17:41 +0100
+MIME-Version: 1.0
+In-Reply-To: <cdfb4f7e-0182-386a-6508-a13a56e6de16@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="HoOULDABkRMt48Cb5eCA5dKRYIEzWVHkI"
+Subject: Re: [Qemu-devel] [PATCH v2 02/18] configure: Disable W^X on OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Use git archive to create tarballs of qemu and submodules instead of
-cloning the repository and the submodules.  This is a order of magnitude
-faster because it doesn't fetch the submodules from the internet each
-time the script runs.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HoOULDABkRMt48Cb5eCA5dKRYIEzWVHkI
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+Message-ID: <0462853c-2f19-58ff-aee5-d667a86322e1@redhat.com>
+Subject: Re: [PATCH v2 02/18] configure: Disable W^X on OpenBSD
+References: <20190129175403.18017-1-philmd@redhat.com>
+ <20190129175403.18017-3-philmd@redhat.com>
+ <cdfb4f7e-0182-386a-6508-a13a56e6de16@redhat.com>
+In-Reply-To: <cdfb4f7e-0182-386a-6508-a13a56e6de16@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- scripts/archive-source.sh | 46 ++++++++++------------------------------------
- 1 file changed, 10 insertions(+), 36 deletions(-)
+On 2019-01-29 22:54, Eric Blake wrote:
+> On 1/29/19 11:53 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Since OpenBSD 6.0 [1], W^X is enforced by default [2].
+>> TCG requires WX access. Disable W^X if it is available.
+>> This fixes:
+>>
+>=20
+>>  configure | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
+>>
+>> diff --git a/configure b/configure
+>> index b18281c61f..799ec2013b 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -5795,6 +5795,17 @@ if test "$mingw32" =3D "yes" ; then
+>>      done
+>>  fi
+>> =20
+>> +# Disable OpenBSD W^X if available
+>> +if test "$tcg" =3D "yes" -a "$targetos" =3D "OpenBSD"; then
+>=20
+> test ... -a ...
+>=20
+> is not portable (POSIX permits non-XSI systems to omit support for thes=
+e
+> operators, but even where they are supported, there are some inherently=
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 6eed2a29bd..beae968f80 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -19,8 +19,7 @@ if test $# -lt 1; then
- fi
- 
- tar_file=$(realpath "$1")
--list_file="${tar_file}.list"
--vroot_dir="${tar_file}.vroot"
-+sub_file=$(mktemp "${tar_file%.tar}.sub.XXXXXXXX.tar")
- 
- # We want a predictable list of submodules for builds, that is
- # independent of what the developer currently has initialized
-@@ -28,7 +27,7 @@ vroot_dir="${tar_file}.vroot"
- # different to the host OS.
- submodules="dtc ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
- 
--trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
-+trap "status=$?; rm -rf \"$sub_file\" ; exit \$status" 0 1 2 3 15
- 
- if git diff-index --quiet HEAD -- &>/dev/null
- then
-@@ -36,38 +35,13 @@ then
- else
-     HEAD=$(git stash create)
- fi
--git clone --shared . "$vroot_dir"
--test $? -ne 0 && error "failed to clone into '$vroot_dir'"
--
--cd "$vroot_dir"
--test $? -ne 0 && error "failed to change into '$vroot_dir'"
--
--git checkout $HEAD
--test $? -ne 0 && error "failed to checkout $HEAD revision"
--
-+git archive --format tar $HEAD > "$tar_file"
-+test $? -ne 0 && error "failed to archive qemu"
- for sm in $submodules; do
--    git submodule update --init $sm
--    test $? -ne 0 && error "failed to init submodule $sm"
-+	git submodule update --init "$sm"
-+	test $? -ne 0 && error "failed to update submodule $sm"
-+	(cd $sm; git archive --format tar --prefix "$sm/" HEAD) > "$sub_file"
-+	test $? -ne 0 && error "failed to archive submodule $sm"
-+	tar --concatenate --file "$tar_file" "$sub_file"
-+	test $? -ne 0 && error "failed append submodule $sm to $tar_file"
- done
--
--if test -n "$submodules"; then
--    {
--        git ls-files || error "git ls-files failed"
--        for sm in $submodules; do
--            (cd $sm; git ls-files) | sed "s:^:$sm/:"
--            if test "${PIPESTATUS[*]}" != "0 0"; then
--                error "git ls-files in submodule $sm failed"
--            fi
--        done
--    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
--else
--    git ls-files > "$list_file"
--fi
--
--if test $? -ne 0; then
--    error "failed to generate list file"
--fi
--
--tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
--
--exit 0
--- 
-2.9.3
+> ambiguous inputs where you CANNOT predict whether the shell will parse
+> -a as a binary operator or as an argument to some other operator).
+> Instead, you should ALWAYS break dual tests into:
+>=20
+> test ... && test ...
+>=20
+> instead.  (Same for '-o' vs '|| test')
+
+$ grep 'test.* -a ' configure | wc -l
+21
+$ grep 'test.* && ' configure | wc -l
+16
+
+Looks like we do not really care?
+
+ Thomas
+
+
+--HoOULDABkRMt48Cb5eCA5dKRYIEzWVHkI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJcUU+aAAoJEC7Z13T+cC217ikP/Ro1Rs4m1ieeXXkv7D1qZaZG
+U40SabMZeRXup1CQjXo3ohSrYz/L2cfjvhhzSspaC2sExNbawCpJvzW8Y7lO/nls
+cyHX3/KJpGkfXdNT/ChRlepsmpLwsTKpUYk5AwuPs4cYxTWfn6IxCtEwTMFjzCNd
+IVLhGClKo/Ovvyxt4xAIbIGLpSbPGdydT8JsxlIN+vQIeqKpI/1vpr3h8AjRRQ5a
+TESQwjwvTdRUYihZ2ZtJl+Ets5XJLBIjrL4dIQMHjmaNMc6lGccNaOIffd6sqfWD
+9tpxu6Cuoca+IJIEk2fgWR6tPE9epZPePPle2OMHJUxxVUxT3xhTu1oVxouXyLO6
+fdA69whYX/apVXwCGmnSpwxrQnEa6HASL9SJ4y1WF+lV915R6nNpokYIXg+pL7Tr
+rY+0ppJAO04PO/6S18dMEXxHqjNA5++xlP0TV/FI211QSjw6/A3drMT3v87G7Mvf
+4L14pdNsVSx/QEDBFdS20ugmpdWqXf5dIS7CAvWBvj51p21gBYNM0LW1aSs84+aA
+wWkRGU5hgl8sGb1IMLz/uW9v90B4MNrdCghqiZSLvO/8CZaUW0rdWMtsIM2gl8ur
+9wGV6pJLlbsZ/tdBmKug8tUZsGcBXC3/h94Sh/SnbTtvW1Ccw4BMp4Q7fKDvJwav
+ImFyxfg+WMu5EnUZ0mCZ
+=eexw
+-----END PGP SIGNATURE-----
+
+--HoOULDABkRMt48Cb5eCA5dKRYIEzWVHkI--
