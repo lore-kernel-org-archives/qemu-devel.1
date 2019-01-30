@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54864)
+Received: from eggs.gnu.org ([209.51.188.92]:55124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gosoe-0006x7-Fe
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:34:21 -0500
+	(envelope-from <philmd@redhat.com>) id 1gosq5-0007mP-6g
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:35:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gosod-0008AM-MJ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:34:20 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40144)
+	(envelope-from <philmd@redhat.com>) id 1gosq3-0000Yl-QM
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:35:49 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38948)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gosod-00089k-Ga
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:34:19 -0500
-Received: by mail-wm1-f67.google.com with SMTP id f188so167072wmf.5
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 08:34:19 -0800 (PST)
-References: <1548863140-31975-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gosq1-0000Sv-Pu
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:35:47 -0500
+Received: by mail-wm1-f66.google.com with SMTP id y8so177234wmi.4
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 08:35:38 -0800 (PST)
+References: <20190130152434.17283-1-mreitz@redhat.com>
+	<20190130152434.17283-3-mreitz@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <51a8dddf-7f14-10b9-2509-dc9acdf56a02@redhat.com>
-Date: Wed, 30 Jan 2019 17:34:16 +0100
+Message-ID: <82ddeb91-be6d-19e9-9c59-ce102e5d22b0@redhat.com>
+Date: Wed, 30 Jan 2019 17:35:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548863140-31975-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20190130152434.17283-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: XIVE is an interrupt
- controller, not a machine
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] iotests: Fix 237 for Python 2.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-On 1/30/19 4:45 PM, Thomas Huth wrote:
-> The "XIVE" section is currently listed in the "PowerPC Machines"
-> section, which is weird, since this is an interrupt controller
-> device. Move it to the "Devices" section instead.
+On 1/30/19 4:24 PM, Max Reitz wrote:
+> math.ceil() returns an integer on Python 3.x, but a float on Python 2.x.
+> range() always needs integers, so we need an explicit conversion on 2.x
+> (which does not hurt on 3.x).
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  MAINTAINERS | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+> It is not quite clear whether we want to support Python 2.x for any
+> prolonged time, but this may as well be fixed along with the other
+> issues some iotests have right now.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b334b53..eac36b6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1038,14 +1038,6 @@ F: tests/libqos/*spapr*
->  F: tests/rtas*
->  F: tests/libqos/rtas*
->  
-> -XIVE
-> -M: David Gibson <david@gibson.dropbear.id.au>
-> -M: Cédric Le Goater <clg@kaod.org>
-> -L: qemu-ppc@nongnu.org
-> -S: Supported
-> -F: hw/*/*xive*
-> -F: include/hw/*/*xive*
-> -
->  virtex_ml507
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  L: qemu-ppc@nongnu.org
-> @@ -1645,6 +1637,14 @@ F: tests/libqos/fw_cfg.c
->  F: tests/fw_cfg-test.c
->  T: git https://github.com/philmd/qemu.git fw_cfg-next
->  
-> +XIVE
-> +M: David Gibson <david@gibson.dropbear.id.au>
-> +M: Cédric Le Goater <clg@kaod.org>
-> +L: qemu-ppc@nongnu.org
-> +S: Supported
-> +F: hw/*/*xive*
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-   F: hw/intc/*xive*
-
-> +F: include/hw/*/*xive*
-
-I'd expect them in /intc/ like the source, but they are in:
-
-   F: include/hw/ppc/*xive*
-
-> +
->  Subsystems
->  ----------
->  Audio
-> 
-
-With or without the paths updated:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  tests/qemu-iotests/237 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+> index fe0dd0f461..06897f8c87 100755
+> --- a/tests/qemu-iotests/237
+> +++ b/tests/qemu-iotests/237
+> @@ -224,7 +224,7 @@ with iotests.FilePath('t.vmdk') as disk_path, \
+>              iotests.log("= %s %d =" % (subfmt, size))
+>              iotests.log("")
+>  
+> -            num_extents = math.ceil(size / 2.0**31)
+> +            num_extents = int(math.ceil(size / 2.0**31))
+>              extents = [ "ext%d" % (i) for i in range(1, num_extents + 1) ]
+>  
+>              vm.launch()
+> 
