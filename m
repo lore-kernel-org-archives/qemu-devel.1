@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35609)
+Received: from eggs.gnu.org ([209.51.188.92]:35667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gom08-0002d7-DN
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:45 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gom0D-0002fR-EE
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gom06-0005Ax-Do
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:44 -0500
-References: <20190125094047.22276-1-dgilbert@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7c6b541c-ed1d-0de2-29fe-76ca56c05640@vivier.eu>
-Date: Wed, 30 Jan 2019 10:17:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190125094047.22276-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gom0A-0005Dt-Pm
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:48 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 30 Jan 2019 09:17:24 +0000
+Message-ID: <0a10c120-9320-43f2-3b90-bac241305629@virtuozzo.com>
+References: <20190129143800.88563-1-vsementsov@virtuozzo.com>
+	<20190129143800.88563-3-vsementsov@virtuozzo.com>
+	<63bef428-e6c8-1781-cf50-8659acf88e0b@redhat.com>
+In-Reply-To: <63bef428-e6c8-1781-cf50-8659acf88e0b@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] typo: apci->acpi
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <481F39A86A024D4AB4276184DBEB20CE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/io: use qemu_iovec_init_buf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
-Cc: qemu-trivial@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On 25/01/2019 10:40, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> apci_1_compatible should be acpi_1_compatible.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/acpi/cpu.c         | 2 +-
->  hw/i386/acpi-build.c  | 2 +-
->  include/hw/acpi/cpu.h | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> index f10b190019..a0a43fe6b5 100644
-> --- a/hw/acpi/cpu.c
-> +++ b/hw/acpi/cpu.c
-> @@ -508,7 +508,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
->              GArray *madt_buf = g_array_new(0, 1, 1);
->              int arch_id = arch_ids->cpus[i].arch_id;
->  
-> -            if (opts.apci_1_compatible && arch_id < 255) {
-> +            if (opts.acpi_1_compatible && arch_id < 255) {
->                  dev = aml_processor(i, 0, 0, CPU_NAME_FMT, i);
->              } else {
->                  dev = aml_device(CPU_NAME_FMT, i);
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 2e21a31f82..d60603abd7 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1847,7 +1847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
->      } else {
->          CPUHotplugFeatures opts = {
-> -            .apci_1_compatible = true, .has_legacy_cphp = true
-> +            .acpi_1_compatible = true, .has_legacy_cphp = true
->          };
->          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
->                         "\\_SB.PCI0", "\\_GPE._E02");
-> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
-> index 89ce172941..62f0278ba2 100644
-> --- a/include/hw/acpi/cpu.h
-> +++ b/include/hw/acpi/cpu.h
-> @@ -48,7 +48,7 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
->                           CPUHotplugState *state, hwaddr base_addr);
->  
->  typedef struct CPUHotplugFeatures {
-> -    bool apci_1_compatible;
-> +    bool acpi_1_compatible;
->      bool has_legacy_cphp;
->  } CPUHotplugFeatures;
->  
-> 
-
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
+MzAuMDEuMjAxOSAwOjQxLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxLzI5LzE5IDg6MzggQU0s
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBVc2UgbmV3IHFlbXVfaW92
+ZWNfaW5pdF9idWYoKSBpbnN0ZWFkIG9mDQo+PiBxZW11X2lvdmVjX2luaXRfZXh0ZXJuYWwoIC4u
+LiAsIDEpLCB3aGljaCBzaW1wbGlmaWVzIHRoZSBjb2RlLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cj4+IC0tLQ0KPj4gICBibG9jay9pby5jIHwgODkgKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyMCBpbnNl
+cnRpb25zKCspLCA2OSBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svaW8u
+YyBiL2Jsb2NrL2lvLmMNCj4+IGluZGV4IGJkOWQ2ODhmOGIuLjgwOTYxOTEwYTYgMTAwNjQ0DQo+
+PiAtLS0gYS9ibG9jay9pby5jDQo+PiArKysgYi9ibG9jay9pby5jDQo+PiBAQCAtODQyLDE3ICs4
+NDIsMTMgQEAgc3RhdGljIGludCBiZHJ2X3Byd3ZfY28oQmRydkNoaWxkICpjaGlsZCwgaW50NjRf
+dCBvZmZzZXQsDQo+PiAgIHN0YXRpYyBpbnQgYmRydl9yd19jbyhCZHJ2Q2hpbGQgKmNoaWxkLCBp
+bnQ2NF90IHNlY3Rvcl9udW0sIHVpbnQ4X3QgKmJ1ZiwNCj4+ICAgICAgICAgICAgICAgICAgICAg
+ICAgIGludCBuYl9zZWN0b3JzLCBib29sIGlzX3dyaXRlLCBCZHJ2UmVxdWVzdEZsYWdzIGZsYWdz
+KQ0KPj4gICB7DQo+PiAtICAgIFFFTVVJT1ZlY3RvciBxaW92Ow0KPj4gLSAgICBzdHJ1Y3QgaW92
+ZWMgaW92ID0gew0KPj4gLSAgICAgICAgLmlvdl9iYXNlID0gKHZvaWQgKilidWYsDQo+PiAtICAg
+ICAgICAuaW92X2xlbiA9IG5iX3NlY3RvcnMgKiBCRFJWX1NFQ1RPUl9TSVpFLA0KPj4gLSAgICB9
+Ow0KPj4gKyAgICBRRU1VSU9WZWN0b3IgcWlvdiA9IFFFTVVfSU9WRUNfSU5JVF9CVUYocWlvdiwg
+YnVmLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJf
+c2VjdG9ycyAqIEJEUlZfU0VDVE9SX1NJWkUpOw0KPiANCj4gT2theSwgc28geW91IEFSRSB1c2lu
+ZyBib3RoIHRoZSBtYWNyby4uLg0KPiANCj4+IEBAIC05NzcsMTcgKzk2MywxMiBAQCBpbnQgYmRy
+dl9wd3JpdGV2KEJkcnZDaGlsZCAqY2hpbGQsIGludDY0X3Qgb2Zmc2V0LCBRRU1VSU9WZWN0b3Ig
+KnFpb3YpDQo+PiAgIA0KPj4gICBpbnQgYmRydl9wd3JpdGUoQmRydkNoaWxkICpjaGlsZCwgaW50
+NjRfdCBvZmZzZXQsIGNvbnN0IHZvaWQgKmJ1ZiwgaW50IGJ5dGVzKQ0KPj4gICB7DQo+PiAtICAg
+IFFFTVVJT1ZlY3RvciBxaW92Ow0KPj4gLSAgICBzdHJ1Y3QgaW92ZWMgaW92ID0gew0KPj4gLSAg
+ICAgICAgLmlvdl9iYXNlICAgPSAodm9pZCAqKSBidWYsDQo+PiAtICAgICAgICAuaW92X2xlbiAg
+ICA9IGJ5dGVzLA0KPj4gLSAgICB9Ow0KPj4gKyAgICBRRU1VSU9WZWN0b3IgcWlvdiA9IFFFTVVf
+SU9WRUNfSU5JVF9CVUYocWlvdiwgTlVMTCwgYnl0ZXMpOw0KPiANCj4gT3VjaCAtIHdoeSBhcmUg
+eW91IHBhc3NpbmcgTlVMTCBpbnN0ZWFkIG9mIGJ1Zj8gIEJ1dCB0aGlzIGFuc3dlcnMgd2h5DQo+
+IHRoZSBtYWNybyBoYWQgdG8gY2FzdCAtIGl0IGlzIGluZGVlZCBjYXN0aW5nIGF3YXkgY29uc3Qu
+DQo+IA0KPj4gQEAgLTEyMjksOSArMTIwOSw3IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIGJk
+cnZfY29fZG9fY29weV9vbl9yZWFkdihCZHJ2Q2hpbGQgKmNoaWxkLA0KPj4gICANCj4+ICAgICAg
+ICAgICBpZiAocmV0IDw9IDApIHsNCj4+ICAgICAgICAgICAgICAgLyogTXVzdCBjb3B5LW9uLXJl
+YWQ7IHVzZSB0aGUgYm91bmNlIGJ1ZmZlciAqLw0KPj4gLSAgICAgICAgICAgIGlvdi5pb3ZfYmFz
+ZSA9IGJvdW5jZV9idWZmZXI7DQo+PiAtICAgICAgICAgICAgaW92Lmlvdl9sZW4gPSBwbnVtID0g
+TUlOKHBudW0sIE1BWF9CT1VOQ0VfQlVGRkVSKTsNCj4+IC0gICAgICAgICAgICBxZW11X2lvdmVj
+X2luaXRfZXh0ZXJuYWwoJmxvY2FsX3Fpb3YsICZpb3YsIDEpOw0KPj4gKyAgICAgICAgICAgIHFl
+bXVfaW92ZWNfaW5pdF9idWYoJmxvY2FsX3Fpb3YsIGJvdW5jZV9idWZmZXIsIHBudW0pOw0KPiAN
+Cj4gLi4uYW5kIHRoZSBmdW5jdGlvbi4NCj4gDQo+IE91Y2ggLSB3aHkgZGlkIHlvdSBsb3NlIHRo
+ZSBhc3NpZ25tZW50IG9mIHBudW0gPSBNSU4oKSBoZXJlPw0KPiANCg0KVGhhbmsgeW91LCBib3Ro
+IGhpdCB0aGUgbWFyaywgSSB3YXMgaW5hdHRlbnRpdmUuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
