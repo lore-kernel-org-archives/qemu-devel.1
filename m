@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44763)
+Received: from eggs.gnu.org ([209.51.188.92]:44762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1goyhZ-00022h-Mn
+	(envelope-from <dgibson@ozlabs.org>) id 1goyhZ-00022g-Mt
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1goyhX-0001Hu-Ot
+	(envelope-from <dgibson@ozlabs.org>) id 1goyhX-0001I6-QK
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:51:25 -0500
-Date: Thu, 31 Jan 2019 09:38:32 +1100
+Date: Thu, 31 Jan 2019 09:50:49 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190130223831.GC1771@umbus.fritz.box>
-References: <1548863140-31975-1-git-send-email-thuth@redhat.com>
+Message-ID: <20190130225045.GE1771@umbus.fritz.box>
+References: <20190130014216.98287-1-aik@ozlabs.ru>
+	<20190130134303.754a43ab@bahia.lan>
+	<ff95d376-1253-a5eb-0a71-02b8b4b76013@redhat.com>
+	<20190130175316.198597c9@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
+	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
 Content-Disposition: inline
-In-Reply-To: <1548863140-31975-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: XIVE is an interrupt
- controller, not a machine
+In-Reply-To: <20190130175316.198597c9@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] spapr: Drop unused
+ parameters from fdt building helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +27,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---6zdv2QT/q3FMhpsV
+--JBi0ZxuS5uaEhkUZ
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 30, 2019 at 04:45:40PM +0100, Thomas Huth wrote:
-> The "XIVE" section is currently listed in the "PowerPC Machines"
-> section, which is weird, since this is an interrupt controller
-> device. Move it to the "Devices" section instead.
+On Wed, Jan 30, 2019 at 05:53:16PM +0100, Greg Kurz wrote:
+> On Wed, 30 Jan 2019 17:43:44 +0100
+> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Applied to ppc-for-4.0, thanks.
-
-> ---
->  MAINTAINERS | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+> > Hi Alexey,
+> >=20
+> > On 1/30/19 1:43 PM, Greg Kurz wrote:
+> > > On Wed, 30 Jan 2019 12:42:16 +1100
+> > > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> > >  =20
+> > >> spapr_load_rtas() handles now RTAS address and size information in t=
+he FDT
+> > >> so drop them from spapr_build_fdt().
+> > >>
+> > >> While we are here, fix a small typo.
+> > >>
+> > >> Fixes: 2cac78c12ade9 "pseries: Consolidate RTAS loading" =20
+> > >=20
+> > > One nit. The last rtas_* user in spapr_build_fdt() was removed by the
+> > > following hunk:
+> > >=20
+> > > @@ -949,12 +966,6 @@ static void *spapr_build_fdt(sPAPRMachineState *=
+spapr,
+> > >          }
+> > >      }
+> > > =20
+> > > -    /* RTAS */
+> > > -    ret =3D spapr_rtas_device_tree_setup(fdt, rtas_addr, rtas_size);
+> > > -    if (ret < 0) {
+> > > -        error_report("Couldn't set up RTAS device tree properties");
+> > > -    }
+> > > -
+> > >      /* cpus */
+> > >      spapr_populate_cpus_dt_node(fdt, spapr);
+> > > =20
+> > > from commit:
+> > >=20
+> > > 3f5dabceba24 "pseries: Consolidate construction of /rtas device tree =
+node" =20
+> >=20
+> > Can you (or David if he agrees) add a line about since when/why it is no
+> > more required?
+> >=20
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b334b53..eac36b6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1038,14 +1038,6 @@ F: tests/libqos/*spapr*
->  F: tests/rtas*
->  F: tests/libqos/rtas*
-> =20
-> -XIVE
-> -M: David Gibson <david@gibson.dropbear.id.au>
-> -M: C=E9dric Le Goater <clg@kaod.org>
-> -L: qemu-ppc@nongnu.org
-> -S: Supported
-> -F: hw/*/*xive*
-> -F: include/hw/*/*xive*
-> -
->  virtex_ml507
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  L: qemu-ppc@nongnu.org
-> @@ -1645,6 +1637,14 @@ F: tests/libqos/fw_cfg.c
->  F: tests/fw_cfg-test.c
->  T: git https://github.com/philmd/qemu.git fw_cfg-next
-> =20
-> +XIVE
-> +M: David Gibson <david@gibson.dropbear.id.au>
-> +M: C=E9dric Le Goater <clg@kaod.org>
-> +L: qemu-ppc@nongnu.org
-> +S: Supported
-> +F: hw/*/*xive*
-> +F: include/hw/*/*xive*
-> +
->  Subsystems
->  ----------
->  Audio
+> Commit 3f5dabceba24 (first released in QEMU 2.10) simply moved the FDT co=
+de
+> for RTAS to some other function, leaving the rtas_addr and rtas_size argu=
+ments
+> unused in spapr_build_fdt(). This patch is a trivial cleanup really.
+
+Applied to ppc-for-4.0, with the Fixes line adjusted as suggested.
+
+>=20
+> > > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > >  =20
+> > >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru> =20
+> >=20
+> > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> >=20
+> > >> ---
+> > >>  hw/ppc/spapr.c | 8 +++-----
+> > >>  1 file changed, 3 insertions(+), 5 deletions(-)
+> > >>
+> > >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > >> index a217c7f..fa12723 100644
+> > >> --- a/hw/ppc/spapr.c
+> > >> +++ b/hw/ppc/spapr.c
+> > >> @@ -1225,9 +1225,7 @@ static void spapr_dt_hypervisor(sPAPRMachineSt=
+ate *spapr, void *fdt)
+> > >>      }
+> > >>  }
+> > >> =20
+> > >> -static void *spapr_build_fdt(sPAPRMachineState *spapr,
+> > >> -                             hwaddr rtas_addr,
+> > >> -                             hwaddr rtas_size)
+> > >> +static void *spapr_build_fdt(sPAPRMachineState *spapr)
+> > >>  {
+> > >>      MachineState *machine =3D MACHINE(spapr);
+> > >>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> > >> @@ -1644,14 +1642,14 @@ static void spapr_machine_reset(void)
+> > >> =20
+> > >>      /*
+> > >>       * We place the device tree and RTAS just below either the top =
+of the RMA,
+> > >> -     * or just below 2GB, whichever is lowere, so that it can be
+> > >> +     * or just below 2GB, whichever is lower, so that it can be
+> > >>       * processed with 32-bit real mode code if necessary
+> > >>       */
+> > >>      rtas_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR);
+> > >>      rtas_addr =3D rtas_limit - RTAS_MAX_SIZE;
+> > >>      fdt_addr =3D rtas_addr - FDT_MAX_SIZE;
+> > >> =20
+> > >> -    fdt =3D spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+> > >> +    fdt =3D spapr_build_fdt(spapr);
+> > >> =20
+> > >>      spapr_load_rtas(spapr, fdt, rtas_addr);
+> > >>   =20
+> > >=20
+> > >  =20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -87,24 +143,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---6zdv2QT/q3FMhpsV
+--JBi0ZxuS5uaEhkUZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxSJ2cACgkQbDjKyiDZ
-s5Kp9g//dkBUmWq57CuI2zHeEAGehftPgsMgHT08GzvryWXIcIPtq41ZSnmr3mNS
-F4ddhHY2FkPMpFjOj27X9u3VW8WYdO7+qdifahw1pRF2CGroVINwe6AkH9wEX2ha
-5wrRgTJr+mQBJ6bvT5jASkZXslO4NkjaEUc9BELe1MaF2h/HdpFKLTvSEgHvaHLm
-wH0XyuQadwnYwk1vmzuugyOYWKRFAH1Q6AE/UK/x4pZR3eBT+rncEPnebIPXzy0M
-fDpRRa74+cDtiV28JWRo1JErOts2Cc6VzhVi6IB7ca+lwVtTLKVahcTrf3aWwgFO
-ueSgdvyaSDB+qiOsfK9b42G9fZJjq2BK96+qUjmVmjOKH3gLmnTEKDVYWB5ZDPiy
-dF8HKLW8ZVSch5pjwf4WNsmbB0L7L6gzga9rXEoTSbN+AxBPo6FHXm/S3OqtWfys
-rqYkhvV9I0QNk6y+6i6ySbU+r8XDCcxL5tKVaF7jLEQA3ndWkCoSQBeVBBaptmWC
-0UyHf1Clfwa1dvy+/rdgFbmBxzP1WOUtQNyau857fUeztahFFq2DkxMuE53CYcpz
-1HJlIn1hmGQJe6fNXCtVJ/L6FlrKnTyJgjcTuZwxiJuuYPRaKROawZb+I/XKT34i
-L+iMGkQFsC9Fqf4ZdJ6OCFz2C3ZhH3BqG52zWM2Jf210aPObBwQ=
-=VoR5
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxSKi0ACgkQbDjKyiDZ
+s5K6rRAAmxqmS1YcLk9rRo5keijb1LkXimWfJVmfDgC0CEYYlt1RTpk/mk2TmEfF
+MaXq731kT0F0s1a9yKtORFecRm4ZDliy85s1CWLz+KEPzivyiSkpfkJ4wsQo/cSd
+40zPAaTsQ/GuJV7AyyvuEPTHP4h33rAR+UMB4BNyNMeIWlnT/2q9XPDE3H0NmkGt
+adP/U8nfzAb2JT1g142fCs4l3JKxs9s3pHb/c9DYZk9iI6aiGEL/gbXP6qTDlDqo
+/yajCkai9NRI3RkBq8Tr1Vpm7FmJubr4nd76CWL17Uo1w0b4wgPJ8xULcz4YImPR
+9RdYbgWKZxjf664FPjvaGc6Ol1YTnZvHvc7ak1Y4jqcYMHDsqEUcboNGrdKCFjKO
+TQ8jsHOFoyNsDFific9N0yaep2WMOJluMi3FzRonaOjs8S/gySOiUEiC0gD/k0Fv
+dq2MyZMMFXgkBD3A/Dp3+blq9vHwyiLFyRTlYmOsa0LE3VU/I8cS0kbE9oWPh6uK
+XICJR64ixRBIL7wpnpOwq6N+FTBM0BfJ9tTw0O4zLMaOfVikp1jOMAWGZPCKde6g
+TLE92Fz99ZH39GmfkDBcEtWKNDkzvd6VfygZ6wXYJqbQnS/TQMRH8OsydY3TTFd0
+vQpxuUrLhFFM00XpUkagWrm2ZW9zT/B8HgY1mnRCetn36TZA8hM=
+=GFn+
 -----END PGP SIGNATURE-----
 
---6zdv2QT/q3FMhpsV--
+--JBi0ZxuS5uaEhkUZ--
