@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41609)
+Received: from eggs.gnu.org ([209.51.188.92]:44167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gorqO-0003xm-3t
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:32:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1gos3m-0001Rq-4Y
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gorqN-0008J3-5y
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:32:04 -0500
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:36570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gorqN-0008Ig-0R
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:32:03 -0500
-Received: by mail-ot1-x329.google.com with SMTP id k98so21453113otk.3
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 07:32:02 -0800 (PST)
-References: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
-	<20190129191746.14868-3-mark.cave-ayland@ilande.co.uk>
-	<6cb56e8a-384b-03b9-1e83-04bfe3157ee0@linaro.org>
-	<cb9beaa4-7235-9d28-aac3-fdd55529e004@ilande.co.uk>
-	<4c457307-939a-93c6-6f91-66e501d5d265@linaro.org>
-	<da262783-d354-7e8a-e8d7-650f624066bb@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b0e32c84-5513-e9ba-1841-c02a56f9a059@linaro.org>
-Date: Wed, 30 Jan 2019 07:31:58 -0800
+	(envelope-from <thuth@redhat.com>) id 1gos3l-0001P2-7t
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:45:54 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 30 Jan 2019 16:45:40 +0100
+Message-Id: <1548863140-31975-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <da262783-d354-7e8a-e8d7-650f624066bb@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/8] target/ppc: rework vmrg{l, h}{b, h,
- w} instructions to use Vsr* macros
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: XIVE is an interrupt controller,
+ not a machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org
 
-On 1/30/19 5:37 AM, Mark Cave-Ayland wrote:
-> On 30/01/2019 12:51, Richard Henderson wrote:
-> 
->>
->> Why are you over-complicating things?  I thought I'd explicitly said this
->> twice, but perhaps not:
->>
->> Pass the symbol "half" directly to VMRG_DO:
->>
->> #define VMRG(suffix, element, access)          \
->>     VMRG_DO(mrgl##suffix, element, access, 0)  \
->>     VMRG_DO(mrgh##suffix, element, access, half)
->>
->> You do not need another conditional within VMRG_DO.
-> 
-> I'm sorry - I think I got confused by your original macro definitions which used ofs
-> as both the macro parameter and variable name, which is why I thought you wanted ofs
-> passed in by value. Based upon the above I now have this which appears to work:
-> 
-> 
-> #define VMRG_DO(name, element, access, sofs)                                 \
->     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)            \
->     {                                                                        \
->         ppc_avr_t result;                                                    \
->         int ofs, half = ARRAY_SIZE(r->element) / 2;                          \
->         int i;                                                               \
->                                                                              \
->         ofs = sofs;                                                          \
+The "XIVE" section is currently listed in the "PowerPC Machines"
+section, which is weird, since this is an interrupt controller
+device. Move it to the "Devices" section instead.
 
-What is this variable and assignment for?
-What does it accomplish?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
->         for (i = 0; i < half; i++) {                                         \
->             result.access(i * 2 + 0) = a->access(i + ofs);                   \
->             result.access(i * 2 + 1) = b->access(i + ofs);                   \
->         }                                                                    \
->         *r = result;                                                         \
->     }
-> 
-> #define VMRG(suffix, element, access)          \
->     VMRG_DO(mrgl##suffix, element, access, half)   \
->     VMRG_DO(mrgh##suffix, element, access, 0)
-> VMRG(b, u8, VsrB)
-> VMRG(h, u16, VsrH)
-> VMRG(w, u32, VsrW)
-> #undef VMRG_DO
-> #undef VMRG
-> 
-> 
-> Is this what you were intending? If this looks better then I'll resubmit a v5 later
-> this evening.
-> 
->> Also, I'm pretty sure it's the "low" merge that wants the "ofs" to be non-zero,
->> since all of the Vsr* symbols implement big-endian indexing.
-> 
-> I've just tried swapping them around as you suggested, but then all my OS X
-> background fills appear with corrupted colors. So to the best of my knowledge without
-> dumping the register contents directly, the above version with low = half and high =
-> 0 still seems correct.
-
-That is exactly what I said, still quoted above.
-It is not what you had written in the previous version.
-
-
-r~
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b334b53..eac36b6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1038,14 +1038,6 @@ F: tests/libqos/*spapr*
+ F: tests/rtas*
+ F: tests/libqos/rtas*
+=20
+-XIVE
+-M: David Gibson <david@gibson.dropbear.id.au>
+-M: C=C3=A9dric Le Goater <clg@kaod.org>
+-L: qemu-ppc@nongnu.org
+-S: Supported
+-F: hw/*/*xive*
+-F: include/hw/*/*xive*
+-
+ virtex_ml507
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ L: qemu-ppc@nongnu.org
+@@ -1645,6 +1637,14 @@ F: tests/libqos/fw_cfg.c
+ F: tests/fw_cfg-test.c
+ T: git https://github.com/philmd/qemu.git fw_cfg-next
+=20
++XIVE
++M: David Gibson <david@gibson.dropbear.id.au>
++M: C=C3=A9dric Le Goater <clg@kaod.org>
++L: qemu-ppc@nongnu.org
++S: Supported
++F: hw/*/*xive*
++F: include/hw/*/*xive*
++
+ Subsystems
+ ----------
+ Audio
+--=20
+1.8.3.1
