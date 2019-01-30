@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44788)
+Received: from eggs.gnu.org ([209.51.188.92]:45761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nshah@disroot.org>) id 1gou9X-0003ow-DE
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:00:00 -0500
+	(envelope-from <eblake@redhat.com>) id 1gouCb-0005eV-I0
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:03:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nshah@disroot.org>) id 1gou9W-0004tV-Id
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:59:59 -0500
-References: <20190116183358.30287-1-nshah@disroot.org>
-	<20190123185043.GV4136@habkost.net>
-From: Nisarg Shah <nshah@disroot.org>
-Message-ID: <0f2e88e8-7a69-f5aa-e1df-70cdff2b371e@disroot.org>
-Date: Wed, 30 Jan 2019 23:30:10 +0530
-Mime-Version: 1.0
-In-Reply-To: <20190123185043.GV4136@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] device-crash-test: Convert to Python 3
+	(envelope-from <eblake@redhat.com>) id 1gouCa-0006Hc-Nz
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:03:09 -0500
+References: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548870690-647481-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2fabd78b-68cd-6ac6-0681-d6ad084c7c0b@redhat.com>
+Date: Wed, 30 Jan 2019 12:03:03 -0600
+MIME-Version: 1.0
+In-Reply-To: <1548870690-647481-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vHBT9y3OKcgqgbBbVUegcg4nvYPqATHqi"
+Subject: Re: [Qemu-devel] [PATCH v10 1/3] bdrv_query_image_info Error
+ parameter added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Thanks for the review.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vHBT9y3OKcgqgbBbVUegcg4nvYPqATHqi
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <2fabd78b-68cd-6ac6-0681-d6ad084c7c0b@redhat.com>
+Subject: Re: [PATCH v10 1/3] bdrv_query_image_info Error parameter added
+References: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1548870690-647481-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1548870690-647481-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 1/24/19 12:20 AM, Eduardo Habkost wrote:
-> 
-> This breaks Python 2 support:
-> 
-> $ python2 scripts/device-crash-test
->    File "scripts/device-crash-test", line 534
->      print("No QEMU binary found", file=sys.stderr)
->                                        ^
-> SyntaxError: invalid syntax
-> 
-> 
-Apologies. This is my first patch to qemu and I did not consider 
-backward compatibility with Python 2. I'll see if I can fix this.
->>   
->>   import sys
->>   import os
->> @@ -272,7 +272,7 @@ def qemuOptsEscape(s):
->>   
->>   def formatTestCase(t):
->>       """Format test case info as "key=value key=value" for prettier logging output"""
->> -    return ' '.join('%s=%s' % (k, v) for k, v in t.items())
->> +    return ' '.join('%s=%s' % (k, v) for k, v in list(t.items()))
-> 
-> Why is this necessary?
-> 
-> 
-This was automatically modified by the 2to3 tool. I see that it is not 
-really required.
+On 1/30/19 11:51 AM, Andrey Shinkevich wrote:
+> Inform a user in case qcow2_get_specific_info fails to obtain
+> QCOW2 image specific information. This patch is preliminary to
+> the print of bitmap information in the 'qemu-img info' output.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
 
-Regards,
-Nisarg
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--vHBT9y3OKcgqgbBbVUegcg4nvYPqATHqi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxR5tcACgkQp6FrSiUn
+Q2rvaAgAn6I+L7kq2hbVmJ7NdhbZ1XVtwW+QzjUE93AqEpEC+ypyhkAEKwBSR/zQ
+m3FAnHnV8dGbO1UlodUrAeFspQcWK1dtuNZXHPSELKduMF/R01yL3PMUBE2xUDOB
+u0pg6jId6GfqGbsJE0fePqnOQ53qFdA1SgINWl7SYhItcfMbHlB5ARIpAsQNcFo0
+vSI6Ii2+ib4plw8QXD5gn9JNjZ2NvvvuXFjGMzGAURi8zvbJe+qLPbx6zQWA+iS+
+yanNI25HPYtHujAfYtwE5nXE3VWN9ISK47Y0TyA2yCKZNUl8ydIxnZW2kZ+aHVGH
+3y1zuKGKJ37wjldxYf9WF4g4vk4NPw==
+=+2OG
+-----END PGP SIGNATURE-----
+
+--vHBT9y3OKcgqgbBbVUegcg4nvYPqATHqi--
