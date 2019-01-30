@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34413)
+Received: from eggs.gnu.org ([209.51.188.92]:34492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gogKo-0003Rc-AU
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:43 -0500
+	(envelope-from <mst@redhat.com>) id 1gogLE-0003fJ-9K
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gogKm-0004u2-Kb
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44836)
+	(envelope-from <mst@redhat.com>) id 1gogLD-00055h-OK
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gogKm-0004t2-D6
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:40 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 30 Jan 2019 11:14:27 +0800
-Message-Id: <20190130031427.13129-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain socket
- through fd
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gogLD-00054t-Fy
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:07 -0500
+Date: Tue, 29 Jan 2019 22:14:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190129213617-mutt-send-email-mst@kernel.org>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-4-xieyongji@baidu.com>
+	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
+ inflight I/O in shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, jasowang@redhat.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-The tests tries to let qemu server mode to process the connection
-which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
-"x-oob", offer capability "oob" unconditionally"). This is because the
-filter may try to mirror the packets before UNIX socket object is
-ready (connected was set to true) from the view of qemu. In this case
-the packet will be dropped silently.
+On Wed, Jan 30, 2019 at 10:31:49AM +0800, Jason Wang wrote:
+>=20
+> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
+> > +static int
+> > +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
+> > +{
+> > +    if (!has_feature(dev->protocol_features,
+> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    if (unlikely(!vq->inflight)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    vq->inflight->desc[desc_idx].inuse =3D 1;
+> > +
+> > +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int
+> > +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
+> > +{
+> > +    if (!has_feature(dev->protocol_features,
+> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    if (unlikely(!vq->inflight)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
+> > +
+> > +    barrier();
+> > +
+> > +    vq->inflight->desc[desc_idx].version++;
+> > +
+> > +    return 0;
+> > +}
+>=20
+>=20
+> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure the
+> value reach memory.
+>=20
+> Thanks
+>=20
 
-Fixing this by passing pre-connected socket created by socketpair() to
-qemu through fd.
+WRITE_ONCE is literally volatile + dependency memory barrier.
+So unless compiler is a very agressive one, it does not
+buy you much.
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
-Changes from v1:
-- close the socket pairs in the end of test
----
- tests/test-filter-mirror.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
-
-diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-index 7ab2aed8a0..d942c74a3f 100644
---- a/tests/test-filter-mirror.c
-+++ b/tests/test-filter-mirror.c
-@@ -21,10 +21,9 @@
- 
- static void test_mirror(void)
- {
--    int send_sock[2], recv_sock;
-+    int send_sock[2], recv_sock[2];
-     uint32_t ret = 0, len = 0;
-     char send_buf[] = "Hello! filter-mirror~";
--    char sock_path[] = "filter-mirror.XXXXXX";
-     char *recv_buf;
-     uint32_t size = sizeof(send_buf);
-     size = htonl(size);
-@@ -38,18 +37,15 @@ static void test_mirror(void)
-     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
-     g_assert_cmpint(ret, !=, -1);
- 
--    ret = mkstemp(sock_path);
-+    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
-     g_assert_cmpint(ret, !=, -1);
- 
-     qts = qtest_initf(
-         "-netdev socket,id=qtest-bn0,fd=%d "
-         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
--        "-chardev socket,id=mirror0,path=%s,server,nowait "
-+        "-chardev socket,id=mirror0,fd=%d "
-         "-object filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
--        , send_sock[1], devstr, sock_path);
--
--    recv_sock = unix_connect(sock_path, NULL);
--    g_assert_cmpint(recv_sock, !=, -1);
-+        , send_sock[1], devstr, recv_sock[1]);
- 
-     struct iovec iov[] = {
-         {
-@@ -67,18 +63,20 @@ static void test_mirror(void)
-     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
-     close(send_sock[0]);
- 
--    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
-+    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
-     g_assert_cmpint(ret, ==, sizeof(len));
-     len = ntohl(len);
- 
-     g_assert_cmpint(len, ==, sizeof(send_buf));
-     recv_buf = g_malloc(len);
--    ret = qemu_recv(recv_sock, recv_buf, len, 0);
-+    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
-     g_assert_cmpstr(recv_buf, ==, send_buf);
- 
-     g_free(recv_buf);
--    close(recv_sock);
--    unlink(sock_path);
-+    close(send_sock[0]);
-+    close(send_sock[1]);
-+    close(recv_sock[0]);
-+    close(recv_sock[1]);
-     qtest_quit(qts);
- }
- 
--- 
-2.17.1
+--=20
+MST
