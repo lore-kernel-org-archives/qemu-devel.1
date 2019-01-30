@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43543)
+Received: from eggs.gnu.org ([209.51.188.92]:44321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou55-0000dW-VW
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:55:24 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gou8C-0002qb-HT
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou53-0002oQ-Qm
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:55:23 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 30 Jan 2019 17:55:14 +0000
-Message-ID: <8e9165b4-5279-fc50-66d9-4d40bf5bf1ca@virtuozzo.com>
-References: <1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<d278f3d1-9c35-e522-603c-f26733d38659@redhat.com>
-In-Reply-To: <d278f3d1-9c35-e522-603c-f26733d38659@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C22C3CE88CB962419CA41D5C502B6017@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1gou8A-0004KG-Jq
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:58:36 -0500
+References: <20190114162605.5330-1-eblake@redhat.com>
+	<20190114162605.5330-12-eblake@redhat.com>
+	<20190130172734.GB892@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <eca08cfe-dc79-9356-5923-63d43c16d1db@redhat.com>
+Date: Wed, 30 Jan 2019 12:58:19 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
- directory entries
+In-Reply-To: <20190130172734.GB892@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 11/20] iotests: add iotest 236 for testing
+ bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-DQoNCk9uIDI4LzAxLzIwMTkgMjM6NDMsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDEvMjgvMTkg
-MjowMSBQTSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+PiBJbiB0aGUgJ0Zvcm1hdCBzcGVj
-aWZpYyBpbmZvcm1hdGlvbicgc2VjdGlvbiBvZiB0aGUgJ3FlbXUtaW1nIGluZm8nDQo+PiBjb21t
-YW5kIG91dHB1dCwgdGhlIHN1cHBsZW1lbnRhbCBpbmZvcm1hdGlvbiBhYm91dCBleGlzdGluZyBR
-Q09XMg0KPj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEgYml0bWFwIG5hbWUsIGZs
-YWdzIGFuZCBncmFudWxhcml0eToNCj4+DQo+IA0KPj4NCj4+IEFzIHRoZSBwcmludCBvZiB0aGUg
-cWNvdzIgc3BlY2lmaWMgaW5mb3JtYXRpb24gZXhwYW5kZWQgYnkgYWRkaW5nDQo+PiB0aGUgYml0
-bWFwIHBhcmFtZXRlcnMgdG8gdGhlICdxZW11LWltZyBpbmZvJyBjb21tYW5kIG91dHB1dCwNCj4+
-IGl0IHJlcXVpcmVzIGFtZW5kbWVudCBvZiB0aGUgb3V0cHV0IGJlbmNobWFyayBpbiB0aGUgZm9s
-bG93aW5nDQo+PiB0ZXN0czogMDYwLCAwNjUsIDA4MiwgMTk4LCBhbmQgMjA2Lg0KPj4NCj4+IFNp
-Z25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96
-em8uY29tPg0KPj4gLS0tDQo+IA0KPj4gICANCj4+ICtzdGF0aWMgUWNvdzJCaXRtYXBJbmZvRmxh
-Z3NMaXN0ICpnZXRfYml0bWFwX2luZm9fZmxhZ3ModWludDMyX3QgZmxhZ3MpDQo+PiArew0KPj4g
-KyAgICBRY293MkJpdG1hcEluZm9GbGFnc0xpc3QgKmxpc3QgPSBOVUxMOw0KPj4gKyAgICBRY293
-MkJpdG1hcEluZm9GbGFnc0xpc3QgKipwbGlzdCA9ICZsaXN0Ow0KPj4gKw0KPj4gKyAgICBpZiAo
-ZmxhZ3MgJiBCTUVfRkxBR19JTl9VU0UpIHsNCj4+ICsgICAgICAgIFFjb3cyQml0bWFwSW5mb0Zs
-YWdzTGlzdCAqZW50cnkgPSBnX25ldzAoUWNvdzJCaXRtYXBJbmZvRmxhZ3NMaXN0LCAxKTsNCj4+
-ICsgICAgICAgIGVudHJ5LT52YWx1ZSA9IFFDT1cyX0JJVE1BUF9JTkZPX0ZMQUdTX0lOX1VTRTsN
-Cj4+ICsgICAgICAgICpwbGlzdCA9IGVudHJ5Ow0KPj4gKyAgICAgICAgcGxpc3QgPSAmZW50cnkt
-Pm5leHQ7DQo+IA0KPiBUaGlzIGxpbmUuLi4NCj4gDQo+PiArICAgIH0NCj4+ICsgICAgaWYgKGZs
-YWdzICYgQk1FX0ZMQUdfQVVUTykgew0KPj4gKyAgICAgICAgUWNvdzJCaXRtYXBJbmZvRmxhZ3NM
-aXN0ICplbnRyeSA9IGdfbmV3MChRY293MkJpdG1hcEluZm9GbGFnc0xpc3QsIDEpOw0KPj4gKyAg
-ICAgICAgZW50cnktPnZhbHVlID0gUUNPVzJfQklUTUFQX0lORk9fRkxBR1NfQVVUTzsNCj4+ICsg
-ICAgICAgICpwbGlzdCA9IGVudHJ5Ow0KPj4gKyAgICB9DQo+IA0KPiAuLi5pcyBvbWl0dGVkIGhl
-cmUuIEhhcm1sZXNzIGZvciBub3csIGJ1dCBtYXkgY2F1c2UgZ3JpZWYgaWYgYSBsYXRlcg0KPiBm
-bGFnIGlzIGFkZGVkIGFuZCB3ZSBmb3JnZXQgdG8gYWRkIGl0IGluLiBPbiB0aGUgb3RoZXIgaGFu
-ZCwgSSBkb24ndA0KPiBrbm93IGlmIGEgc3RhdGljIGFuYWx5emVyIG1pZ2h0IHdhcm4gYWJvdXQg
-YSBkZWFkIGFzc2lnbm1lbnQsIHNvDQo+IGJyZWFraW5nIHRoZSBzeW1tZXRyeSBiZXR3ZWVuIHRo
-ZSB0d28gaXMgb2theSBpZiB0aGF0IGlzIHRoZSBqdXN0aWZpY2F0aW9uLg0KPiANCj4gQWxzbywg
-dGhpbmtpbmcgYWJvdXQgZnV0dXJlIGZsYWcgYWRkaXRpb25zLCB3b3VsZCBpdCBtYWtlIGFueSBz
-ZW5zZSB0bw0KPiB3cml0ZSB0aGlzIGNvZGUgaW4gYSBmb3IgbG9vcD8gIFNvbWV0aGluZyBsaWtl
-ICh1bnRlc3RlZCk6DQo+IA0KPiAgICAgIHN0YXRpYyBjb25zdCBzdHJ1Y3QgTWFwIHsNCj4gICAg
-ICAgICAgaW50IGJtZTsNCj4gICAgICAgICAgaW50IGluZm87DQo+ICAgICAgfSBtYXBbXSA9IHsN
-Cj4gICAgICAgICAgeyBCTUVfRkxBR19JTl9VU0UsIFFDT1cyX0JJVE1BUF9JTkZPX0ZMQUdTX0lO
-X1VTRSB9LA0KPiAgICAgICAgICB7IEJNRV9GTEFHX0FVVE8sICAgUUNPVzJfQklUTUFQX0lORk9f
-RkxBR1NfQVVUTyB9LA0KPiAgICAgIH07DQo+IA0KPiAgICAgIGZvciAoaSA9IDA7IGkgPCBBUlJB
-WV9MRU5HVEgobWFwKTsgaSsrKSB7DQo+ICAgICAgICAgIGlmIChmbGFncyAmIG1hcFtpXS5ibWUp
-IHsNCj4gICAgICAgICAgICAgIC4uLjsgZW50cnktPnZhbHVlID0gbWFwW2ldLmluZm87DQo+ICAg
-ICAgfQ0KPiANCj4gd2hlcmUgYWRkaW5nIGEgbmV3IGJpdCBpcyBub3cgYSBvbmUtbGluZXIgY2hh
-bmdlIHRvIHRoZSBkZWZpbml0aW9uIG9mDQo+ICdtYXAnIHJhdGhlciB0aGFuIGEgNi1saW5lIGFk
-ZGl0aW9uIG9mIGEgbmV3IGNvbmRpdGlvbmFsLg0KPiANCj4gDQo+PiArIyMNCj4+ICsjIEBRY293
-MkJpdG1hcEluZm86DQo+PiArIw0KPj4gKyMgUWNvdzIgYml0bWFwIGluZm9ybWF0aW9uLg0KPj4g
-KyMNCj4+ICsjIEBuYW1lOiB0aGUgbmFtZSBvZiB0aGUgYml0bWFwDQo+PiArIw0KPj4gKyMgQGdy
-YW51bGFyaXR5OiBncmFudWxhcml0eSBvZiB0aGUgYml0bWFwIGluIGJ5dGVzDQo+PiArIw0KPj4g
-KyMgQGZsYWdzOiBmbGFncyBvZiB0aGUgYml0bWFwDQo+PiArIw0KPj4gKyMgQHVua25vd24tZmxh
-Z3M6IHVuc3BlY2lmaWVkIGZsYWdzIGlmIGRldGVjdGVkDQo+IA0KPiBNYXliZToNCj4gDQo+IEBm
-bGFnczogcmVjb2duaXplZCBmbGFncyBvZiB0aGUgYml0bWFwDQo+IA0KPiBAdW5rbm93bi1mbGFn
-czogYW55IHJlbWFpbmluZyBmbGFncyBub3QgcmVjb2duaXplZCBieSB0aGlzIHFlbXUgdmVyc2lv
-bg0KPiANCj4gDQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMDYwLm91dA0KPj4gQEAgLTE4
-LDYgKzE4LDcgQEAgY2x1c3Rlcl9zaXplOiA2NTUzNg0KPj4gICBGb3JtYXQgc3BlY2lmaWMgaW5m
-b3JtYXRpb246DQo+PiAgICAgICBjb21wYXQ6IDEuMQ0KPj4gICAgICAgbGF6eSByZWZjb3VudHM6
-IGZhbHNlDQo+PiArICAgIGJpdG1hcHM6DQo+IA0KPiBIbW0uIEknbSB3b25kZXJpbmcgaWYgdGhl
-IGh1bWFuLXJlYWRhYmxlIG91dHB1dCBvZiBhIFFBUEkgdHlwZSB3aXRoIGFuDQo+IG9wdGlvbmFs
-IGFycmF5IHNob3VsZCBvdXRwdXQgIjxub25lPiIgb3Igc29tZXRoaW5nIHNpbWlsYXIgZm9yIGEN
-Cj4gMC1lbGVtZW50IGFycmF5LCB0byBtYWtlIGl0IG9idmlvdXMgdG8gdGhlIGh1bWFuIHJlYWRp
-bmcgdGhlIG91dHB1dCB0aGF0DQo+IHRoZXJlIGFyZSBubyBiaXRtYXBzLiAgVGhhdCdzIG5vdCBu
-ZWNlc3NhcmlseSBhIHByb2JsZW0gaW4geW91ciBwYXRjaDsNCj4gYW5kIG1heSBoYXZlIGV2ZW4g
-YmlnZ2VyIGVmZmVjdHMgdG8gb3RoZXIgaW90ZXN0cywgc28gaXQgc2hvdWxkIGJlIGRvbmUNCj4g
-YXMgYSBzZXBhcmF0ZSBwYXRjaCBpZiB3ZSB3YW50IGl0LiAgQnV0IGV2ZW4gaW4geW91ciBwYXRj
-aCwgaWYgd2UgZGlkDQo+IHRoYXQsLi4uDQo+IA0KPj4gICAgICAgcmVmY291bnQgYml0czogMTYN
-Cj4+ICAgICAgIGNvcnJ1cHQ6IHRydWUNCj4+ICAgY2FuJ3Qgb3BlbiBkZXZpY2UgVEVTVF9ESVIv
-dC5JTUdGTVQ6IElNR0ZNVDogSW1hZ2UgaXMgY29ycnVwdDsgY2Fubm90IGJlIG9wZW5lZCByZWFk
-L3dyaXRlDQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzA2NSBiL3Rlc3RzL3Fl
-bXUtaW90ZXN0cy8wNjUNCj4+IGluZGV4IDhiYWMzODMuLjg2NDA2Y2IgMTAwNzU1DQo+PiAtLS0g
-YS90ZXN0cy9xZW11LWlvdGVzdHMvMDY1DQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvMDY1
-DQo+PiBAQCAtODgsMjMgKzg4LDIzIEBAIGNsYXNzIFRlc3RRTVAoVGVzdEltYWdlSW5mb1NwZWNp
-ZmljKToNCj4+ICAgY2xhc3MgVGVzdFFDb3cyKFRlc3RRZW11SW1nSW5mbyk6DQo+PiAgICAgICAn
-JydUZXN0aW5nIGEgcWNvdzIgdmVyc2lvbiAyIGltYWdlJycnDQo+PiAgICAgICBpbWdfb3B0aW9u
-cyA9ICdjb21wYXQ9MC4xMCcNCj4+IC0gICAganNvbl9jb21wYXJlID0geyAnY29tcGF0JzogJzAu
-MTAnLCAncmVmY291bnQtYml0cyc6IDE2IH0NCj4+IC0gICAgaHVtYW5fY29tcGFyZSA9IFsgJ2Nv
-bXBhdDogMC4xMCcsICdyZWZjb3VudCBiaXRzOiAxNicgXQ0KPj4gKyAgICBqc29uX2NvbXBhcmUg
-PSB7ICdjb21wYXQnOiAnMC4xMCcsICdiaXRtYXBzJzogW10sICdyZWZjb3VudC1iaXRzJzogMTYg
-fQ0KPj4gKyAgICBodW1hbl9jb21wYXJlID0gWyAnY29tcGF0OiAwLjEwJywgJ2JpdG1hcHM6Jywg
-J3JlZmNvdW50IGJpdHM6IDE2JyBdDQo+IA0KPiAuLi50aGUgaHVtYW5fY29tcGFyZSBkaWN0IHdv
-dWxkIGhhdmUgdG8gYWNjb3VudCBmb3Igd2hhdGV2ZXIgc3RyaW5nIHdlDQo+IG91dHB1dCBmb3Ig
-YW4gZW1wdHkgSlNPTiBhcnJheS4NCj4gDQo+IEknbSBmaW5kaW5nIHRoZSBmdW5jdGlvbmFsaXR5
-IHVzZWZ1bCwgdGhvdWdoLCBzbyB1bmxlc3MgdGhlcmUgYXJlIHN0cm9uZw0KPiBvcGluaW9ucyBw
-cmVzZW50ZWQgb24gbWFraW5nIGZ1cnRoZXIgdHdlYWtzLCBJJ20gYWxzbyBmaW5lIGdpdmluZyB0
-aGlzDQo+IHZlcnNpb24gYXMtaXM6DQo+IA0KPiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJs
-YWtlQHJlZGhhdC5jb20+DQo+IA0KDQpEZWFyIEVyaWMsDQoNClRoYW5rIHlvdSB2ZXJ5IG11Y2gg
-Zm9yIHlvdXIgZm9yZXNpZ2h0IGFuZCBjb25zaWRlcmF0ZSBhcHByb2FjaC4NCkkgaGF2ZSBtYWRl
-IGNoYW5nZXMgaW4gdGhlIHNlcmllcyBhbmQgYW0gYWJvdXQgdG8gc2VuZCBhIG5ldyB2ZXJzaW9u
-ICMxMC4NClBsZWFzZSByZXZpZXcgdGhhdC4NCkkgYXBwcmVjaWF0ZSB5b3VyIGNvbGxhYm9yYXRp
-b24uDQoNCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
+
+
+On 1/30/19 12:27 PM, Kevin Wolf wrote:
+> Am 14.01.2019 um 17:25 hat Eric Blake geschrieben:
+>> From: John Snow <jsnow@redhat.com>
+>>
+>> New interface, new smoke test.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Message-Id: <20181221093529.23855-12-jsnow@redhat.com>
+>> [eblake: fix last-minute change to echo text]
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> This test fails for me (with Python 3) because I get a different dict
+> order.
+> 
+> Probably related to the OrderedDict that qmp_log() uses, so log() uses
+> sort_keys=False and the unordered dicts that are contained in the outer
+> OrderedDict stay unordered.
+> 
+> Kevin
+> 
+
+Gurg. Sorry, apparently Python is hard. Will fix.
