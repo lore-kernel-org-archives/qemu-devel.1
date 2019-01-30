@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55582)
+Received: from eggs.gnu.org ([209.51.188.92]:56151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gozf8-00019f-L2
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:52:59 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gozhK-0002Be-NY
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gozf7-00069d-OZ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:52:58 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 31 Jan 2019 00:52:51 +0100
-Message-Id: <20190130235251.17911-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] iotests: Filter second BLOCK_JOB_ERROR from 229
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gozhK-0006uN-4c
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:55:14 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:45398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gozhJ-0006tx-TC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:55:14 -0500
+Received: by mail-lj1-x241.google.com with SMTP id s5-v6so1032419ljd.12
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 15:55:13 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 30 Jan 2019 15:54:39 -0800
+Message-Id: <20190130235442.2876-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/3] target/xtensa: add basic FLIX support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,60 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-Without this filter, this test sometimes fails.
+Hello,
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-I intended to send this as part of my iotest fixes series, but it ended
-up on the wrong branch...  Doesn't really matter, though, as there is no
-functional dependency.
----
- tests/qemu-iotests/229     | 6 +++++-
- tests/qemu-iotests/229.out | 1 -
- 2 files changed, 5 insertions(+), 2 deletions(-)
+this series adds limited support for FLIX instructions.
+FLIX (flexible length instruction extensions) allows bundling multiple
+opcodes in a single instruction. Each opcode is executed as if it was
+the only opcode in the instruction. Opcodes may not simultaneously
+modify same resource (register or state). Multiple branches, even
+non-taken, are also not allowed in one instruction. 
+Instructions with opcodes that have circular dependencies between used
+resources (e.g. opcode A uses resource U and modifies resource M, while
+opcode B uses resource M and modifies resource U) are not supported in
+this series.
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-index 893d098ad2..b0d4885fa6 100755
---- a/tests/qemu-iotests/229
-+++ b/tests/qemu-iotests/229
-@@ -81,11 +81,15 @@ echo
- echo '=3D=3D=3D Force cancel job paused in error state  =3D=3D=3D'
- echo
-=20
-+# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
-+# Cancelling the job means resuming it for a bit before it is actually
-+# aborted, and in that time it may or may not re-encounter the error.
- success_or_failure=3D"y" _send_qemu_cmd $QEMU_HANDLE \
-     "{'execute': 'block-job-cancel',
-                  'arguments': { 'device': 'testdisk',
-                                 'force': true}}" \
--     "BLOCK_JOB_CANCELLED" "Assertion"
-+     "BLOCK_JOB_CANCELLED" "Assertion" \
-+    | grep -v '"BLOCK_JOB_ERROR"'
-=20
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-index 4c4112805f..a3eb33788a 100644
---- a/tests/qemu-iotests/229.out
-+++ b/tests/qemu-iotests/229.out
-@@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
-=20
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write=
-", "action": "stop"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}=
-}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152,=
- "offset": 1048576, "speed": 0, "type": "mirror"}}
- *** done
---=20
-2.20.1
+Max Filippov (3):
+  target/xtensa: sort FLIX instruction opcodes
+  target/xtensa: add generic instruction post-processing
+  target/xtensa: move WINDOW_BASE SR update to postprocessing
+
+ target/xtensa/cpu.h        |   5 +
+ target/xtensa/helper.h     |   3 +-
+ target/xtensa/translate.c  | 265 +++++++++++++++++++++++++++++++++++++++++----
+ target/xtensa/win_helper.c |  14 +--
+ 4 files changed, 251 insertions(+), 36 deletions(-)
+
+-- 
+2.11.0
