@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41110)
+Received: from eggs.gnu.org ([209.51.188.92]:41309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1goh1s-000794-8K
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:59:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1goh4L-0007wp-Dr
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 23:01:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1goh1r-0006i5-HW
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:59:12 -0500
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:41980)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1goh1r-0006hp-8p
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:59:11 -0500
-Received: by mail-yw1-xc44.google.com with SMTP id f65so9107328ywc.8
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 19:59:11 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1goh4K-0007Zk-GB
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 23:01:45 -0500
+References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <00c8b4b9-77ca-159e-4554-3311695fe3db@redhat.com>
+Date: Tue, 29 Jan 2019 22:01:39 -0600
 MIME-Version: 1.0
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-4-xieyongji@baidu.com>
-	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
-In-Reply-To: <09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 30 Jan 2019 11:58:58 +0800
-Message-ID: <CAONzpcaQhfSa-Uw2-r_XTqvw8fYq_haJ6zKR-9NkK=fBkZky0w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
- inflight I/O in shared memory
+In-Reply-To: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="N1DIPdnvCRYN3tlXs33lzF5P8i2qeNHDn"
+Subject: Re: [Qemu-devel] [PATCH v8 0/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, John Snow <jsnow@redhat.com>
 
-On Wed, 30 Jan 2019 at 10:32, Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
-> > +static int
-> > +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
-> > +{
-> > +    if (!has_feature(dev->protocol_features,
-> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    if (unlikely(!vq->inflight)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    vq->inflight->desc[desc_idx].inuse =3D 1;
-> > +
-> > +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static int
-> > +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
-> > +{
-> > +    if (!has_feature(dev->protocol_features,
-> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    if (unlikely(!vq->inflight)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
-> > +
-> > +    barrier();
-> > +
-> > +    vq->inflight->desc[desc_idx].version++;
-> > +
-> > +    return 0;
-> > +}
->
->
-> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure the
-> value reach memory.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--N1DIPdnvCRYN3tlXs33lzF5P8i2qeNHDn
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org,
+ vsementsov@virtuozzo.com, John Snow <jsnow@redhat.com>
+Message-ID: <00c8b4b9-77ca-159e-4554-3311695fe3db@redhat.com>
+Subject: Re: [PATCH v8 0/2] qemu-img info lists bitmap directory entries
+References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Is it enough to declare those variables as volatile?
+On 1/28/19 12:40 PM, Andrey Shinkevich wrote:
+> Here is the update for the bitmap extension of the qcow2 specific
+> information as the output of the 'qemu-img info' command.
+> The version #7 was in email with the message ID:
+> <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+>=20
+> v8:
+> The output benchmark files for the qemu-iotests, namely 060, 065 082, 1=
+98
+> and 206, were modified to show the bitmap extension for the qemu specif=
+ic
+> information. A new test file 239 was added to the test set that checks =
+the
+> output for the fields of the bitmap section.
+> The backward compatibility of the output for images of the version 2
+> of qcow2 was added.
 
-Thanks,
-Yongji
+So, I'm trying to test this, and I've discovered something rather
+annoying about persistent snapshots: they DON'T get written to disk
+until the qemu process exits.  In other words, even after creating a
+persistent bitmap via QMP (I'm trying to debug my libvirt API for
+incremental snapshots, so I did this via 'virsh snapshot-create-as $dom
+name', but it boils down to a QMP transaction with
+'block-dirty-bitmap-add' as one of the commands), running:
+
+$ qemu-img info -U Active1.qcow2
+
+shows
+    bitmaps:
+    refcount bits: 16
+
+for as long as the qemu process is running. What does it take to force a
+qcow2 image to write out its current set of known bitmaps to disk, even
+if they are known to be potentially dirty? Should it happen any time we
+flush L1/L2/refcount tables?  On a periodic but slow timer (say once
+every 5 minutes)? Other ideas?  I know we don't want to be flushing the
+full bitmap contents on every change to the in-memory internal bitmap,
+but meta-changes (such as adding a bitmap) seem like the sort of thing
+where it's worth flushing the qcow2 file; particularly when adding the
+bitmap via QMP 'transaction' which goes to the bother of flushing all
+pending I/O in order to properly roll back on failure (which means on
+success, it would be nice for the new bitmap name to show up in the
+qcow2 header, even if the contents of the bitmap are not up-to-date).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--N1DIPdnvCRYN3tlXs33lzF5P8i2qeNHDn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxRIaMACgkQp6FrSiUn
+Q2rYXgf/UAfTG4otK7mkrfxGOsk66VloiCqVVbavRBaKV2bNKzBHtlEOqKJButID
+HqSIoOFYUixpaM7Ll330D/uKXyHBtFiFk/KKKhYc7OALK2ZIsVhBLSf2h9Ra3PhP
+c2BJ1syRTVCBILMsIjat+CEdrFqRMjYdq8MDKtOfNJHUEKJUl/7b1zkj8ZY9J/wn
+oK8GTjh5CYLaScAvHZpA+q0TfsA5fCtG7cX3RYn7ZDEmH9Nbu3VXHn9kzuo+SjMf
+m67GkLlc/LgJFXfwrsfVY9aE77nxCoAErsvxfbmc4f5aadGTAx9rLoVRfmlvK+kV
+y726IKE7J17kkgoWbDBywDCX5pIL9A==
+=sbQI
+-----END PGP SIGNATURE-----
+
+--N1DIPdnvCRYN3tlXs33lzF5P8i2qeNHDn--
