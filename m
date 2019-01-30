@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48410)
+Received: from eggs.gnu.org ([209.51.188.92]:50485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1goqJH-0000cZ-BN
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:53:48 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goqNR-00034R-AT
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1goqJG-0007ya-AM
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:53:47 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:55505)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1goqJF-0007vx-Vr
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:53:46 -0500
-References: <20190125225714.10234-1-richard.henderson@linaro.org>
-	<20190125225714.10234-4-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <8d66f542-5471-c161-a23a-369a71b9429a@vivier.eu>
-Date: Wed, 30 Jan 2019 14:53:39 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190125225714.10234-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goqNQ-0002rG-LS
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:58:05 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 30 Jan 2019 13:58:01 +0000
+Message-ID: <1de57808-bd1d-e8a7-89b3-a08873c77346@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] aarch64-linux-user: Update HWCAP bits
- from linux 5.0-rc1
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AEC4748399E93749852FDFD97CCF0D24@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] job_pause_point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +22,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>
 
-On 25/01/2019 23:57, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/elfload.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 4cff9e1a31..3c7a7c2836 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -560,6 +560,15 @@ enum {
->      ARM_HWCAP_A64_ASIMDDP       = 1 << 20,
->      ARM_HWCAP_A64_SHA512        = 1 << 21,
->      ARM_HWCAP_A64_SVE           = 1 << 22,
-> +    ARM_HWCAP_A64_ASIMDFHM      = 1 << 23,
-> +    ARM_HWCAP_A64_DIT           = 1 << 24,
-> +    ARM_HWCAP_A64_USCAT         = 1 << 25,
-> +    ARM_HWCAP_A64_ILRCPC        = 1 << 26,
-> +    ARM_HWCAP_A64_FLAGM         = 1 << 27,
-> +    ARM_HWCAP_A64_SSBS          = 1 << 28,
-> +    ARM_HWCAP_A64_SB            = 1 << 29,
-> +    ARM_HWCAP_A64_PACA          = 1 << 30,
-> +    ARM_HWCAP_A64_PACG          = 1UL << 31,
->  };
->  
->  #define ELF_HWCAP get_elf_hwcap()
-> 
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+SGkhDQoNCkkgaGF2ZSBhIHF1ZXN0aW9uIGFib3V0IGpvYl9wYXVzZV9wb2ludC4gTm93IGEgZ29v
+ZCBqb2Igb2YgbW92aW5nIGdlbmVyaWMgdGhpbmdzIGFib3V0DQpibG9jay1qb2JzIHRvIGpvYi5j
+IGlzIGRvbmUuLg0KDQpqb2JfcGF1c2VfcG9pbnQgZG8gdmlzaWJsZSBqb2Itc3RhdGUgY2hhbmdl
+LCBhcyBjaGFuZ2luZyBqb2ItPnN0YXR1cyBhbmQgam9iLT5wYXVzZWQuDQoNCklzIGl0IGFzc3Vt
+ZWQsIHRoYXQgam9iIGRvbid0IGRvIGFueXRoaW5nIGFmdGVyIHRoYXQgc3RhdGUgY2hhbmdlPyBJ
+b3Rlc3RzIGFyZSB3cml0dGVuDQpleGFjdGx5IHdpdGggdGhpcyBhc3N1bXB0aW9uLiBPbiB0aGUg
+b3RoZXIgaGFuZCwgY29kZSBkb24ndCBndWFyYW50ZWUsIHRoYXQgYWxsIGluLWZsaWdodA0KcmVx
+dWVzdHMgYXJlIGZpbmlzaGVkIHRvIHRoaXMgcG9pbnQuDQoNCk1vcmVvdmVyLCBvbmx5IHRoZSBq
+b2IgaXRzZWxmIGtub3dzIGFib3V0IGl0J3MgaW4tZmxpZ2h0IHJlcXVlc3RzLCB0aGVyZWZvcmUg
+d2UgY2FuJ3QNCmhhbmRsZSBpdCBpbiBnZW5lcmljIGpvYl9wYXVzZV9wb2ludCgpLiBTbywgc2hv
+dWxkIG5vdCBqb2IgZG8gc29tZXRoaW5nIGxpa2UNCg0KaWYgKGpvYl9zaG91bGRfcGF1c2UoKSkg
+ew0KICAgIGRvbid0IGNyZWF0ZSBtb3JlIHJlcXVlc3RzDQogICAgd2FpdCBhbGwgaW4tZmxpZ2h0
+IHJlcXVlc3RzIHRvIGNvbXBsZXRlDQp9DQpqb2JfcGF1c2VfcG9pbnQoKQ0KDQpPciBkaWRuJ3Qg
+SSBtaXNzIHRoZXNlIHRoaW5ncyBhbHJlYWR5IGRpc2N1c3NlZD8NCg0KLS0gDQpCZXN0IHJlZ2Fy
+ZHMsDQpWbGFkaW1pcg0K
