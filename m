@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45276)
+Received: from eggs.gnu.org ([209.51.188.92]:47674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1gooLR-0002i8-SW
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:54 -0500
+	(envelope-from <thuth@redhat.com>) id 1gooVq-0004VB-S6
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1gooLQ-00032y-WE
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:53 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
-	id 1gooLQ-0002xa-Mk
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:52 -0500
-Received: by mail-pg1-x544.google.com with SMTP id d72so10224756pga.9
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 03:47:43 -0800 (PST)
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Wed, 30 Jan 2019 06:43:26 -0500
-Message-Id: <1548848606-23864-1-git-send-email-catherine.hecx@gmail.com>
-Subject: [Qemu-devel] [PATCH RESEND] tcg: add early clober modifier in
- atomic16_cmpxchg on aarch64
+	(envelope-from <thuth@redhat.com>) id 1gooVo-00084T-St
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:58:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gooVm-0007zt-Ul
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:58:36 -0500
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b6ac9950-4640-0eac-2bbe-0283b8b051f6@redhat.com>
+Date: Wed, 30 Jan 2019 12:58:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <1548410831-19553-42-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
+ kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com
 
-Without this patch, gcc might mess up the Input/Output registers and
-cause unpredictable error.
+On 2019-01-25 11:07, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+[...]
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index d50e301..6d15720 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -48,6 +48,9 @@ config LAN9118
+>  
+>  config NE2000_ISA
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+> +    depends on PCI # for NE2000State
 
-Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
+ Yang,
 
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
----
-Resend: sent previous patch before subscribing maillist
+for the time being, could you please change the last line into
 
- include/qemu/atomic128.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ depends on NE2000_PCI
 
-diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
-index a6af22ff10..ddd0d55d31 100644
---- a/include/qemu/atomic128.h
-+++ b/include/qemu/atomic128.h
-@@ -68,7 +68,7 @@ static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
-         "cbnz %w[tmp], 0b\n"
-         "1:"
-         : [mem] "+m"(*ptr), [tmp] "=&r"(tmp),
--          [oldl] "=&r"(oldl), [oldh] "=r"(oldh)
-+          [oldl] "=&r"(oldl), [oldh] "=&r"(oldh)
-         : [cmpl] "r"(cmpl), [cmph] "r"(cmph),
-           [newl] "r"(newl), [newh] "r"(newh)
-         : "memory", "cc");
--- 
-2.17.1
+instead? Otherwise, it's still possible to enable NE2000_ISA while
+NE2000_PCI is disabled, and this will currently result in linking errors.
+
+In the long run, we should likely put the common functions into a
+separate file, but that's future work, after your series has been
+merged, I think.
+
+ Thanks,
+  Thomas
