@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44293)
+Received: from eggs.gnu.org ([209.51.188.92]:45826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gomPR-0002E8-C9
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:43:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gomW1-00071j-OE
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gomPP-0004ao-Fr
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:43:53 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 30 Jan 2019 10:43:06 +0100
-Message-Id: <1548841387-7670-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1548841387-7670-1-git-send-email-thuth@redhat.com>
-References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
-	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 4/5] ppc: Express dependencies of the
- Sam460EX machines with kconfig
+	(envelope-from <laurent@vivier.eu>) id 1gomVz-0008Jj-I8
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:50:41 -0500
+References: <1548255083-8190-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <224f9e1f-34c8-7b21-5cba-f21d92ad9415@vivier.eu>
+Date: Wed, 30 Jan 2019 10:50:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <1548255083-8190-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Don't talk about the LGPL
+ if the file is licensed under the GPL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,93 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-Most of the dependencies are now directly selected by the SAM460EX
-switch. We can drop CONFIG_VGA_CIRRUS since this device is already
-selected automatically when CONFIG_PCI_DEVICES is set.
+On 23/01/2019 15:51, Thomas Huth wrote:
+> Some files claim that the code is licensed under the GPL, but then
+> suddenly suggest that the user should have a look at the LGPL.
+> That's of course non-sense, replace it with the correct GPL wording
+> instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  crypto/afsplit.c           | 11 +++++------
+>  include/crypto/afsplit.h   | 11 +++++------
+>  include/hw/pci-host/gpex.h |  4 ++--
+>  include/hw/pci-host/q35.h  |  4 ++--
+>  include/qemu/range.h       | 11 +++++------
+>  target/i386/hvf/hvf.c      |  6 +++---
+>  util/range.c               | 11 +++++------
+>  7 files changed, 27 insertions(+), 31 deletions(-)
 
-Cc: BALATON Zoltan <balaton@eik.bme.hu>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/ppc-softmmu.mak | 10 ----------
- hw/display/Kconfig              |  1 +
- hw/ppc/Kconfig                  | 12 ++++++++++++
- hw/usb/Kconfig                  |  2 +-
- 4 files changed, 14 insertions(+), 11 deletions(-)
-
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 513a8e9..5265d8a 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -25,16 +25,6 @@ CONFIG_PCI_EXPRESS=y
- 
- # For Sam460ex
- CONFIG_SAM460EX=y
--CONFIG_USB_EHCI_SYSBUS=y
--CONFIG_SM501=y
--CONFIG_DDC=y
--CONFIG_IDE_SII3112=y
--CONFIG_I2C=y
--CONFIG_AT24C=y
--CONFIG_BITBANG_I2C=y
--CONFIG_M41T80=y
--CONFIG_VGA_CIRRUS=y
--CONFIG_SMBUS_EEPROM=y
- 
- # For Macs
- CONFIG_MAC_OLDWORLD=y
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index c784fe8..f8e6136 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -76,6 +76,7 @@ config MILKYMIST_TMU2
- config SM501
-     bool
-     depends on I2C
-+    select DDC
- 
- config TCX
-     bool
-diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index f6b4206..8bd25ed 100644
---- a/hw/ppc/Kconfig
-+++ b/hw/ppc/Kconfig
-@@ -24,9 +24,21 @@ config PPC440
- 
- config PPC4XX
-     bool
-+    select BITBANG_I2C
-+    select PCI
- 
- config SAM460EX
-     bool
-+    select AT24C
-+    select PFLASH_CFI01
-+    select IDE_SII3112
-+    select ISA_BUS          # FIXME: Currently required for IDE_SII3112
-+    select M41T80
-+    select PPC440
-+    select SM501
-+    select SMBUS_EEPROM
-+    select USB_EHCI_SYSBUS
-+    select USB_OHCI
- 
- config PREP
-     bool
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index a1b7acb..871ea47 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -21,7 +21,7 @@ config USB_EHCI
- 
- config USB_EHCI_SYSBUS
-     bool
--    select USB
-+    select USB_EHCI
- 
- config USB_XHCI
-     bool
--- 
-1.8.3.1
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
