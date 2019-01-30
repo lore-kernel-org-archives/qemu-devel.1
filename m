@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34990)
+Received: from eggs.gnu.org ([209.51.188.92]:35772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1goxps-0003rv-9q
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:55:57 -0500
+	(envelope-from <crosa@redhat.com>) id 1goxtY-0005CU-ER
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1goxpr-0006Kb-HC
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:55:56 -0500
+	(envelope-from <crosa@redhat.com>) id 1goxtU-0000rY-6R
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 16:59:42 -0500
 References: <20190117185628.21862-1-crosa@redhat.com>
 	<20190117185628.21862-6-crosa@redhat.com>
 	<20190118142830.GB24013@localhost.localdomain>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <5a978376-1fdd-46eb-8876-fecf8497effa@redhat.com>
-Date: Wed, 30 Jan 2019 16:49:35 -0500
+Message-ID: <44bc8e84-6690-0c34-3acb-5d017ec3a89a@redhat.com>
+Date: Wed, 30 Jan 2019 16:59:15 -0500
 MIME-Version: 1.0
 In-Reply-To: <20190118142830.GB24013@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
@@ -77,5 +77,68 @@ On 1/18/19 9:28 AM, Caio Carrara wrote:
 > system architecture? Just like you did in the docstrings of
 > pick_default_qemu_bin().
 > 
+>> +
+>>  qemu_bin
+>>  ~~~~~~~~
+>>  
+>> @@ -711,6 +722,13 @@ like the following:
+>>  
+>>    PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
+>>  
+>> +arch
+>> +~~~~
+>> +
+>> +The architecture that will be used on a number of different scenarios.
+>> +This parameter has a direct relation with the ``arch`` attribute.  If
+>> +not given, it will default to None.
+>> +
+>>  qemu_bin
+>>  ~~~~~~~~
+>>  
+>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+>> index d8d5b48dac..7a38851753 100644
+>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>> @@ -23,16 +23,22 @@ def is_readable_executable_file(path):
+>>      return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
+>>  
+>>  
+>> -def pick_default_qemu_bin():
+>> +def pick_default_qemu_bin(arch=None):
+>>      """
+>>      Picks the path of a QEMU binary, starting either in the current working
+>>      directory or in the source tree root directory.
+>>  
+>> +    :param arch: the arch to use when looking for a QEMU binary (the target
+>> +                 will match the arch given).  If None (the default) arch
+>> +                 will be the current host system arch (as given by
+>> +                 :func:`os.uname`).
+>> +    :type arch: str
+>>      :returns: the path to the default QEMU binary or None if one could not
+>>                be found
+>>      :rtype: str or None
+>>      """
+>> -    arch = os.uname()[4]
+>> +    if arch is None:
+>> +        arch = os.uname()[4]
+>>      qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
+>>                                            "qemu-system-%s" % arch)
+>>      if is_readable_executable_file(qemu_bin_relative_path):
+>> @@ -47,8 +53,9 @@ def pick_default_qemu_bin():
+>>  class Test(avocado.Test):
+>>      def setUp(self):
+>>          self.vm = None
+>> +        self.arch = self.params.get('arch')
+>>          self.qemu_bin = self.params.get('qemu_bin',
+>> -                                        default=pick_default_qemu_bin())
+>> +                                        default=pick_default_qemu_bin(self.arch))
+> 
+> Since it was used the named argument in function declaration I think
+> it's more consistent also use the argument name here in the function
+> call: `pick_default_qemu_bin(arch=self.arch)`
+> 
 
-Yes, you're right.  Adding that.
+Oops, I missed this part of your review in the previous message.
+Anyway, I don't see a problem with either approach, so I'm fine changing it.
+
+- Cleber.
