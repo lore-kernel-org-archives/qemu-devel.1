@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43311)
+Received: from eggs.gnu.org ([209.51.188.92]:45500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gokCD-00013r-IV
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:22:06 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gokOS-0004v4-QG
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gokCA-0002Mk-Pn
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:22:05 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 30 Jan 2019 15:21:31 +0800
-Message-Id: <20190130072131.13247-4-stefanha@redhat.com>
-In-Reply-To: <20190130072131.13247-1-stefanha@redhat.com>
-References: <20190130072131.13247-1-stefanha@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1gokOR-00077v-Lp
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:34:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gokOR-000749-E1
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 02:34:43 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 30 Jan 2019 08:34:18 +0100
+Message-Id: <20190130073426.11525-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/3] tests/microbit-test: Add tests for
- nRF51 NVMC
+Subject: [Qemu-devel] [PULL 0/8] Usb 20190130 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,154 +25,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, jim@groklearning.com, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, jusual@mail.ru, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+The following changes since commit b4fbe1f65a4769c09e6bf2d79fc84360f840f4=
+0e:
 
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
----
- tests/microbit-test.c | 108 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90129' into staging (2019-01-29 12:00:19 +0000)
 
-diff --git a/tests/microbit-test.c b/tests/microbit-test.c
-index 3bad947b6c..04e199ec33 100644
---- a/tests/microbit-test.c
-+++ b/tests/microbit-test.c
-@@ -21,6 +21,7 @@
- #include "hw/arm/nrf51.h"
- #include "hw/char/nrf51_uart.h"
- #include "hw/gpio/nrf51_gpio.h"
-+#include "hw/nvram/nrf51_nvm.h"
- #include "hw/timer/nrf51_timer.h"
- #include "hw/i2c/microbit_i2c.h"
-=20
-@@ -156,6 +157,112 @@ static void test_microbit_i2c(void)
-     qtest_quit(qts);
- }
-=20
-+#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
-+
-+static void fill_and_erase(QTestState *qts, hwaddr base, hwaddr size,
-+                           uint32_t address_reg)
-+{
-+    hwaddr i;
-+
-+    /* Erase Page */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + address_reg, base);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    /* Check memory */
-+    for (i =3D 0; i < size / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, base + i * 4), =3D=3D, 0xFFFFF=
-FFF);
-+    }
-+
-+    /* Fill memory */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < size / 4; i++) {
-+        qtest_writel(qts, base + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, base + i * 4), =3D=3D, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+}
-+
-+static void test_nrf51_nvmc(void)
-+{
-+    uint32_t value;
-+    hwaddr i;
-+    QTestState *qts =3D qtest_init("-M microbit");
-+
-+    /* Test always ready */
-+    value =3D qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_READY);
-+    g_assert_cmpuint(value & 0x01, =3D=3D, 0x01);
-+
-+    /* Test write-read config register */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x03);
-+    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFI=
-G),
-+                     =3D=3D, 0x03);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFI=
-G),
-+                     =3D=3D, 0x00);
-+
-+    /* Test PCR0 */
-+    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
-+                   NRF51_NVMC_ERASEPCR0);
-+    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR0);
-+
-+    /* Test PCR1 */
-+    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
-+                   NRF51_NVMC_ERASEPCR1);
-+    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR1);
-+
-+    /* Erase all */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        qtest_writel(qts, NRF51_FLASH_BASE + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4), =3D=
-=3D, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    /* Erase UICR */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        qtest_writel(qts, NRF51_UICR_BASE + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4), =3D=3D=
-, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    qtest_quit(qts);
-+}
-+
- static void test_nrf51_gpio(void)
- {
-     size_t i;
-@@ -392,6 +499,7 @@ int main(int argc, char **argv)
-=20
-     qtest_add_func("/microbit/nrf51/uart", test_nrf51_uart);
-     qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
-+    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
-     qtest_add_func("/microbit/nrf51/timer", test_nrf51_timer);
-     qtest_add_func("/microbit/microbit/i2c", test_microbit_i2c);
-=20
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/usb-20190130-pull-request
+
+for you to fetch changes up to 49f9e8d660d41cbe325d554e742d7100d59a7abf:
+
+  usb-mtp: replace the homebrew write with qemu_write_full (2019-01-30 06=
+:47:52 +0100)
+
+----------------------------------------------------------------
+usb: xhci: fix iso transfers.
+usb: mtp: break up writes, bugfixes.
+usb: fix lgpl info in headers.
+usb: hid: unique serials.
+
+----------------------------------------------------------------
+
+Bandan Das (3):
+  usb-mtp: Reallocate buffer in multiples of MTP_WRITE_BUF_SZ
+  usb-mtp: breakup MTP write into smaller chunks
+  usb-mtp: replace the homebrew write with qemu_write_full
+
+Gerd Hoffmann (1):
+  usb: assign unique serial numbers to hid devices
+
+Li Qiang (1):
+  usb: dev-mtp: close fd in usb_mtp_object_readdir()
+
+Thomas Huth (1):
+  hw/usb: Fix LGPL information in the file headers
+
+Yuri Benditovich (2):
+  usb: XHCI shall not halt isochronous endpoints
+  usb: implement XHCI underrun/overrun events
+
+ hw/usb/hcd-ehci.h        |   4 +-
+ hw/usb/hcd-xhci.h        |   1 +
+ hw/core/machine.c        |   3 +
+ hw/usb/combined-packet.c |   4 +-
+ hw/usb/dev-hid.c         |  26 ++++----
+ hw/usb/dev-mtp.c         | 168 +++++++++++++++++++++++++++++------------=
+------
+ hw/usb/hcd-ehci-pci.c    |   4 +-
+ hw/usb/hcd-ehci-sysbus.c |   4 +-
+ hw/usb/hcd-ehci.c        |   5 +-
+ hw/usb/hcd-xhci.c        |  22 ++++++-
+ 10 files changed, 153 insertions(+), 88 deletions(-)
+
 --=20
-2.20.1
+2.9.3
