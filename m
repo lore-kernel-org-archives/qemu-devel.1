@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37557)
+Received: from eggs.gnu.org ([209.51.188.92]:37626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gopqJ-00020A-G0
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:55 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gopqU-00029X-BZ
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gopqH-0007El-TI
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:51 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 30 Jan 2019 14:22:12 +0100
-Message-Id: <20190130132214.25493-12-laurent@vivier.eu>
-In-Reply-To: <20190130132214.25493-1-laurent@vivier.eu>
-References: <20190130132214.25493-1-laurent@vivier.eu>
+	(envelope-from <mreitz@redhat.com>) id 1gopqR-0007KO-NO
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:24:02 -0500
+References: <20190123144610.8842-1-mreitz@redhat.com>
+	<20190123144610.8842-7-mreitz@redhat.com>
+	<d1590928-5836-6630-ca30-02ee9d5c6efd@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c47ce928-de73-f333-efdc-cc8f412cd746@redhat.com>
+Date: Wed, 30 Jan 2019 14:23:47 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/13] target/m68k: Fix LGPL information in the
- file headers
+In-Reply-To: <d1590928-5836-6630-ca30-02ee9d5c6efd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="M7A6mHMuGjVjs1d5FgU5jSQGO5wgmSSDy"
+Subject: Re: [Qemu-devel] [PATCH 6/9] iotests.py: Add is_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,167 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Hajnoczi <stefanha@redhat.com>, Stafford Horne <shorne@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Thomas Huth <thuth@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--M7A6mHMuGjVjs1d5FgU5jSQGO5wgmSSDy
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c47ce928-de73-f333-efdc-cc8f412cd746@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/9] iotests.py: Add is_str()
+References: <20190123144610.8842-1-mreitz@redhat.com>
+ <20190123144610.8842-7-mreitz@redhat.com>
+ <d1590928-5836-6630-ca30-02ee9d5c6efd@redhat.com>
+In-Reply-To: <d1590928-5836-6630-ca30-02ee9d5c6efd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It's either "GNU *Library* General Public License version 2" or
-"GNU Lesser General Public License version *2.1*", but there was
-no "version 2.0" of the "Lesser" license. So assume that version
-2.1 is meant here.
-Also some files mention the GPL instead of the LGPL after declaring
-that the files are licensed under the LGPL, so change these spots to
-use LGPL, too.
+On 29.01.19 22:35, John Snow wrote:
+>=20
+>=20
+> On 1/23/19 9:46 AM, Max Reitz wrote:
+>> Strings can have various representations, this helper function checks
+>> whether a given value is in any of them.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/qemu-iotests/iotests.py | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index f51456fa63..29e4e3306f 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -221,6 +221,12 @@ def image_size(img):
+>>      r =3D qemu_img_pipe('info', '--output=3Djson', '-f', imgfmt, img)=
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1548769438-28942-1-git-send-email-thuth@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/m68k/target_cpu.h     | 4 ++--
- linux-user/m68k/target_structs.h | 2 +-
- target/m68k/cpu.h                | 4 ++--
- target/m68k/fpu_helper.c         | 4 ++--
- target/m68k/gdbstub.c            | 2 +-
- target/m68k/helper.c             | 4 ++--
- target/m68k/op_helper.c          | 2 +-
- target/m68k/translate.c          | 4 ++--
- 8 files changed, 13 insertions(+), 13 deletions(-)
+>>      return json.loads(r)['virtual-size']
+>> =20
+>> +def is_str(val):
+>> +    if sys.version_info.major >=3D 3:
+>> +        return isinstance(val, str) or isinstance(val, bytes)
+>> +    else:
+>> +        return isinstance(val, str) or isinstance(val, unicode)
+>> +
+>=20
+> conflating bytes with strings under a function named "is_str()" makes m=
+e
+> nervous, but... I have no concrete objections beyond hypothetically
+> "What if people take this function name literally?"
 
-diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
-index 611df065ca..7a26f3c3fc 100644
---- a/linux-user/m68k/target_cpu.h
-+++ b/linux-user/m68k/target_cpu.h
-@@ -7,12 +7,12 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * General Public License for more details.
-+ * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-diff --git a/linux-user/m68k/target_structs.h b/linux-user/m68k/target_structs.h
-index a003676548..e373d481e1 100644
---- a/linux-user/m68k/target_structs.h
-+++ b/linux-user/m68k/target_structs.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index b288a3864e..f154565117 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -7,12 +7,12 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * General Public License for more details.
-+ * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 6eeffdf9bb..b35489ba4e 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -7,12 +7,12 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * General Public License for more details.
-+ * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-diff --git a/target/m68k/gdbstub.c b/target/m68k/gdbstub.c
-index 99e5be8132..fd2bb46c42 100644
---- a/target/m68k/gdbstub.c
-+++ b/target/m68k/gdbstub.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 917d46efcc..3e26d337bf 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -7,12 +7,12 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * General Public License for more details.
-+ * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 8d09ed91c4..76f439985a 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 752e46ef63..6217a683f1 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -7,12 +7,12 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * General Public License for more details.
-+ * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
--- 
-2.20.1
+Hm.  Well, the strings from 2.x are byte strings in 3.x, so.
+
+But then there's this:
+
+$ python2
+[...]
+>>> 'foo'.replace('f', 'g')
+'goo'
+>>> u'foo'.replace('f', 'g')
+u'goo'
+
+$ python3
+[...]
+>>> 'foo'.replace('f', 'g')
+'goo'
+>>> b'foo'.replace('f', 'g')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: a bytes-like object is required, not 'str'
+
+So that just doesn't work for the next patch.  How about I just drop the
+bytes test and if at some point someone feels the need to add it, we can
+think about it again?
+
+Max
+
+> *prays for 2.x support to get dropped*
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+
+
+
+--M7A6mHMuGjVjs1d5FgU5jSQGO5wgmSSDy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRpWMACgkQ9AfbAGHV
+z0CADggAvPPGrP4OSFG4/a4d36GOOC/AgbNDqLOoa1RW5HLKc9U9e9gmJ2jtv7BV
+GffOR+vsUgtWUJxZGnq2XloT+IIJe123lQwh8ZHnuSLWUPNgQ5/etvAgU+E1qV+N
+q3ZFZZqzzJnWiW/owPqwvv1d//Uo36UtURZP64UhGISj5dGpyjGj/da21fiazbeX
+A9p+16WOeV/74NNeJoRXBc7raH4QwIx08v8Loy5FTgWtqCDmvc31m7ifzeAw7QBO
+9OyajEzqloP/Vss3p/0ggovkf3fIusD8PBdjADO2pOT4ajqIGifuAT2yNUoOHfJW
+hl6RxqSGhVI6nRnZcGskJjUV1sHUGg==
+=u3K6
+-----END PGP SIGNATURE-----
+
+--M7A6mHMuGjVjs1d5FgU5jSQGO5wgmSSDy--
