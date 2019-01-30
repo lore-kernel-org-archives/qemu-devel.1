@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45758)
+Received: from eggs.gnu.org ([209.51.188.92]:46240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gosAD-0004ZB-KN
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:52:34 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gosDH-00064t-Lb
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gosA4-0004iR-80
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:52:28 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 30 Jan 2019 15:52:21 +0000
-Message-ID: <83a4c4f0-345b-bf6f-9412-05cdbf2efcb0@virtuozzo.com>
-References: <20190129143800.88563-1-vsementsov@virtuozzo.com>
-	<20190129143800.88563-2-vsementsov@virtuozzo.com>
-	<0cc0ace6-c260-85db-3e0b-21d8f7e39005@redhat.com>
-	<1152f912-5912-29c3-cf75-1656293f5891@virtuozzo.com>
-	<eeb11886-51ec-2749-5451-29f8a382b63a@redhat.com>
-In-Reply-To: <eeb11886-51ec-2749-5451-29f8a382b63a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AF4F7415693DCA4DA3D7EFF4D4ED71C3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <balaton@eik.bme.hu>) id 1gosDG-000710-90
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:43 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:45892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gosDF-0006se-4t
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:42 -0500
+Date: Wed, 30 Jan 2019 16:55:27 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190130125526.GC3384@yangzhon-Virtual>
+Message-ID: <alpine.BSF.2.21.9999.1901301644150.17768@zero.eik.bme.hu>
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-3-git-send-email-pbonzini@redhat.com>
+	<f4208837-83e7-a090-91d5-fc978490da9c@redhat.com>
+	<a56cfb65-55a6-5c0d-8e86-d2e71d233d78@redhat.com>
+	<20190130125526.GC3384@yangzhon-Virtual>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: enhance QEMUIOVector structure
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 02/52] ide: split ioport registration to a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>
 
-MzAuMDEuMjAxOSAxNzo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8zMC8xOSAzOjE0IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMzAuMDEuMjAxOSAwOjM1
-LCBFcmljIEJsYWtlIHdyb3RlOg0KPj4+IE9uIDEvMjkvMTkgODozNyBBTSwgVmxhZGltaXIgU2Vt
-ZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gQWRkIGEgcG9zc2liaWxpdHkgb2YgZW1iZWRk
-ZWQgaW92ZWMsIGZvciBjYXNlcyB3aGVuIHdlIG5lZWQgb25seSBvbmUNCj4+Pj4gbG9jYWwgaW92
-Lg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
-IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICBpbmNsdWRlL3Fl
-bXUvaW92LmggfCA0MSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0K
-Pj4+PiAgICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0K
-PiANCj4+PiBQT1NJWCBkb2VzIG5vdCBndWFyYW50ZWUgdGhhdCBpb3ZfYmFzZSBvY2N1cnMgcHJp
-b3IgdG8gaW92X2xlbiBpbiBzdHJ1Y3QNCj4+PiBpb3ZlYzsgeW91ciBjb2RlIGlzIHRoZXJlZm9y
-ZSByYXRoZXIgZnJhZ2lsZSBhbmQgd291bGQgZmFpbCB0byBjb21waWxlDQo+Pj4gaWYgd2UgZW5j
-b3VudGVyIGEgbGliYyB3aGVyZSBpb3ZfbGVuIGlzIHBvc2l0aW9uZWQgZGlmZmVyZW50bHkgdGhh
-biBpbg0KPj4+IGdsaWJjLCB0cmlwcGluZyB0aGUgZmlyc3QgYXNzZXJ0aW9uLiAgRm9yIGFuIG9m
-ZnNldCBvdGhlciB0aGFuIDAsIHlvdQ0KPj4+IGNvdWxkIGRlY2xhcmU6DQo+Pj4gICAgIGNoYXIg
-W29mZnNldG9mKHN0cnVjdCBpb3ZlYywgaW92X2xlbildIF9fcGFkOw0KPj4+IHRvIGJlIG1vcmUg
-cm9idXN0OyBidXQgc2luY2UgQyBkb2Vzbid0IGxpa2UgMC1sZW5ndGggYXJyYXkgZGVjbGFyYXRp
-b25zLA0KPj4+IEknbSBub3Qgc3VyZSBob3cgeW91IHdvdWxkIGNhdGVyIHRvIGEgbGliYyB3aGVy
-ZSBpb3ZfbGVuIGlzIGF0IG9mZnNldCAwLA0KPj4NCj4+IEhtbSwgdGVzdGVkIGEgYml0LCBhbmQg
-dGhlIG9ubHkgY29tcGxhaW4gSSBjYW4gZ2V0IGlzIGEgd2FybmluZyBhYm91dCAwLXNpemVkDQo+
-PiBhcnJheSB3aGVuIG9wdGlvbiAtcGVkYW50aWMgaXMgc2V0LiBTbywgaXMgaXQgYSByZWFsIHBy
-b2JsZW0/DQo+IA0KPiBFdmVuIGlmIHdlIHJlcXVpcmUgdGhlIHVzZSBvZiBnY2MgZXh0ZW5zaW9u
-cyBlbHNld2hlcmUsIGl0IGRvZXNuJ3QgaHVydA0KPiB0byBhdm9pZCB0aGVtIHdoZXJlIGl0IGlz
-IGVhc3kuDQo+IA0KPj4NCj4+IEFuZCB3ZSBhbHJlYWR5IGhhdmUgYSBsb3Qgb2YgemVyby1zaXpl
-ZCBhcnJheXMgaW4gUWVtdSwganVzdCBsb29rIGF0DQo+PiAgICBnaXQgZ3JlcCAnXHdcK1xzXCtc
-d1wrXFswXF07JyB8IGdyZXAgLXYgcmV0dXJuDQo+IA0KPiBBbmQgaG93IG1hbnkgb2YgdGhvc2Ug
-YXJlIHRoZSBsYXN0IGVudHJ5IGluIGEgc3RydWN0PyAgQSAwLXNpemUgYXJyYXkgYXQNCj4gdGhl
-IGVuZCBpcyBhIGNvbW1vbiBpZGlvbSBmb3IgYSBmbGV4LXNpemVkIHN0cnVjdCAod2l0aG91dCBy
-ZWx5aW5nIG9uDQo+IEM5OSBWTEEpOyBhIDAtc2l6ZSBhcnJheSBpbiB0aGUgbWlkZGxlIG9mIGEg
-c3RydWN0IGlzIHVudXN1YWwuDQoNClJlYXNvbmFibGUsIHNvIC4uLg0KDQo+IA0KPj4NCj4+DQo+
-PiBobSwgb3Igd2UgY2FuIGRvIGxpa2UgdGhpczoNCj4+DQo+PiB0eXBlZGVmIHN0cnVjdCBRRU1V
-SU9WZWN0b3Igew0KPj4gICAgICAgc3RydWN0IGlvdmVjICppb3Y7DQo+PiAgICAgICBpbnQgbmlv
-djsNCj4+ICAgICAgIHVuaW9uIHsNCj4+ICAgICAgICAgICBzdHJ1Y3Qgew0KPj4gICAgICAgICAg
-ICAgICBpbnQgbmFsbG9jOw0KPj4gICAgICAgICAgICAgICBzdHJ1Y3QgaW92ZWMgbG9jYWxfaW92
-Ow0KPj4gICAgICAgICAgIH07DQo+PiAgICAgICAgICAgc3RydWN0IHsNCj4+ICAgICAgICAgICAg
-ICAgY2hhciBfX3BhZFtzaXplb2YoaW50KSArIG9mZnNldG9mKHN0cnVjdCBpb3ZlYywgaW92X2xl
-bildOw0KPj4gICAgICAgICAgICAgICBzaXplX3Qgc2l6ZTsNCj4+ICAgICAgICAgICB9Ow0KPj4g
-ICAgICAgfTsNCj4+IH0gUUVNVUlPVmVjdG9yOw0KPiANCj4gWWVzLCB0aGF0J3MgYSByZWFzb25h
-YmxlIHdheSB0byBkbyBpdC4NCg0KLi4uIHdpbGwgdHJ5IHRoaXMgaW4gdjIsIGlmIG5vIG1vcmUg
-Y29tbWVudHMuDQoNCj4gDQo+Pg0KPj4NCj4+PiBzaG9ydCBvZiBhIGNvbmZpZ3VyZSBwcm9iZSBh
-bmQgI2lmZGVmZmVyeSwgd2hpY2ggZmVlbHMgbGlrZSBhIGJpdCBtdWNoDQo+Pj4gdG8gbWFuYWdl
-IChyZWFsbHksIHRoZSBwb2ludCBvZiB0aGUgYXNzZXJ0IGlzIHRoYXQgd2UgZG9uJ3QgaGF2ZSB0
-bw0KPj4+IHdvcnJ5IGFib3V0IGFuIHVudXN1YWwgbGliYyBoYXZpbmcgYSBkaWZmZXJlbnQgb2Zm
-c2V0IFVOTEVTUyB0aGUgYnVpbGQNCj4+PiBmYWlscywgc28gbm8gbmVlZCB0byBhZGRyZXNzIGEg
-cHJvYmxlbSB3ZSBhcmVuJ3QgaGl0dGluZyB5ZXQpLg0KPj4NCj4+IEhvd2V2ZXIsIGNoYXIgX19w
-YWRbb2Zmc2V0b2Yoc3RydWN0IGlvdmVjLCBpb3ZfbGVuKV07IHNlZW1zIHVzZWZ1bCBhbmQgZXZl
-bg0KPj4gbW9yZSBzZWxmLWRvY3VtZW50ZWQsIHNvIEknbGwgdXNlIGl0IGluIHYyLCBpZiBub2Jv
-ZHkgbWluZHMuDQo+Pg0KPiANCj4gV2UnbGwgc2VlIGhvdyBpdCBsb29rcywgdGhlbi4NCj4gDQo+
-IA0KPj4+PiArICAgICAgICAuaW92X2Jhc2UgPSAodm9pZCAqKShidWYpLCAgICAgICAgICBcDQo+
-Pj4NCj4+PiBXaHkgaXMgdGhlIGNhc3QgbmVjZXNzYXJ5PyAgQXJlIHdlIGNhc3RpbmcgYXdheSBj
-b25zdD8NCj4gDQo+IEFuc3dlcmVkIGluIDIvMiAtIHllcy4gQnV0IGEgY29tbWVudCBhYm91dCAv
-KiBjYXN0IGF3YXkgY29uc3QgKi8gaXMgdXNlZnVsLg0KPiANCj4+PiAgIFNpbmNlIEMgYWxyZWFk
-eQ0KPj4+IGFsbG93cyBhc3NpZ25tZW50IG9mIGFueSBvdGhlciAobm9uLWNvbnN0KSBwb2ludGVy
-IHRvIHZvaWQqIHdpdGhvdXQgYQ0KPj4+IGNhc3QsIGl0IGxvb2tzIHN1cGVyZmx1b3VzLg0KPj4+
-DQo+Pj4+ICsgICAgICAgIC5pb3ZfbGVuID0gbGVuICAgICAgICAgICAgICAgICAgICAgIFwNCj4+
-Pg0KPj4+IE1pc3NpbmcgKCkgYXJvdW5kIGxlbi4NCj4+DQo+PiBGb3Igc3R5bGU/IFdoYXQgdGhl
-IHRoaW5nIGxlbiBzaG91bGQgYmUgdG8gYnJlYWsgaXQgd2l0aG91dCAoKT8NCj4gDQo+IEFsdGhv
-dWdoIHdlIGFyZSB1bmxpa2VseSB0byBoaXQgdGhpcyBnaXZlbiBvdXIgY29kaW5nIGNvbnZlbnRp
-b25zLA0KPiByZW1lbWJlciB0aGF0ICc9JyBoYXMgaGlnaGVyIHByZWNlZGVuY2UgdGhhbiAnLCcs
-IGZvciB0aGlzIGNvbnRvcnRlZA0KPiBleGFtcGxlIChhbmQgeWVzLCBpdCdzIGNvbnRvcnRlZCBi
-ZWNhdXNlIHlvdSBjYW4ndCBwYXNzIHRoZSBjb21tYQ0KPiBvcGVyYXRvciB0aHJvdWdoIHRvIGEg
-bWFjcm8gd2l0aG91dCBlaXRoZXIgc3VwcGx5aW5nIHlvdXIgb3duICgpLCB3aGljaA0KPiBkZWZl
-YXRzIHRoZSBkZW1vbnN0cmF0aW9uLCBvciByZWx5aW5nIG9uIGEgaGVscGVyIG1hY3JvIHN1Y2gg
-YXMNCj4gcmF3X3BhaXIoKSBoZXJlKToNCj4gDQo+ICQgY2F0IGZvby5jDQo+IHN0cnVjdCBzIHsN
-Cj4gICAgICBpbnQgaTsNCj4gfTsNCj4gI2RlZmluZSByYXdfcGFpcihhLCBiKSBhLCBiDQo+ICNk
-ZWZpbmUgQShhcmcpIHsgLmkgPSAoYXJnKSB9DQo+ICNkZWZpbmUgQihhcmcpIHsgLmkgPSBhcmcg
-fQ0KPiANCj4gaW50DQo+IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiB7DQo+ICAgICAg
-c3RydWN0IHMgczEgPSBBKHJhd19wYWlyKDEsIDIpKTsNCj4gICAgICBzdHJ1Y3QgcyBzMiA9IEIo
-cmF3X3BhaXIoNCwgOCkpOw0KPiAgICAgIHJldHVybiBzMS5pICsgczIuaTsNCj4gfQ0KPiAkIGdj
-YyAtbyBmb28gZm9vLmMNCj4gZm9vLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6DQo+IGZvby5j
-OjEyOjMzOiB3YXJuaW5nOiBleGNlc3MgZWxlbWVudHMgaW4gc3RydWN0IGluaXRpYWxpemVyDQo+
-ICAgICAgIHN0cnVjdCBzIHMyID0gQihyYXdfcGFpcig0LCA4KSk7DQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBeDQo+IGZvby5jOjY6MjM6IG5vdGU6IGluIGRlZmluaXRpb24g
-b2YgbWFjcm8g4oCYQuKAmQ0KPiAgICNkZWZpbmUgQihhcmcpIHsgLmkgPSBhcmcgfQ0KPiAgICAg
-ICAgICAgICAgICAgICAgICAgICBefn4NCj4gZm9vLmM6MTI6MjE6IG5vdGU6IGluIGV4cGFuc2lv
-biBvZiBtYWNybyDigJhyYXdfcGFpcuKAmQ0KPiAgICAgICBzdHJ1Y3QgcyBzMiA9IEIocmF3X3Bh
-aXIoNCwgOCkpOw0KPiAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn4NCj4gZm9vLmM6MTI6
-MzM6IG5vdGU6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciDigJhzMuKAmSkNCj4gICAgICAgc3Ry
-dWN0IHMgczIgPSBCKHJhd19wYWlyKDQsIDgpKTsNCj4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4NCj4gZm9vLmM6NjoyMzogbm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyDi
-gJhC4oCZDQo+ICAgI2RlZmluZSBCKGFyZykgeyAuaSA9IGFyZyB9DQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgIF5+fg0KPiBmb28uYzoxMjoyMTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3Jv
-IOKAmHJhd19wYWly4oCZDQo+ICAgICAgIHN0cnVjdCBzIHMyID0gQihyYXdfcGFpcig0LCA4KSk7
-DQo+ICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fg0KPiAkIC4vZm9vOyBlY2hvICQ/DQo+
-IDYNCj4gDQo+IHdoaWNoIHNheXMgdGhhdCBmb3IgQSgpIHVzaW5nIHRoZSAoKSwgdGhlcmUgd2Vy
-ZSBubyB3YXJuaW5ncyBhbmQgdGhlDQo+IHNlY29uZCB2YWx1ZSB3YXMgYXNzaWduZWQgKC1XYWxs
-IGNoYW5nZXMgdGhhdCwgY29tcGxhaW5pbmcgYWJvdXQgdW51c2VkDQo+IHZhbHVlIG9mIHRoZSBs
-ZWZ0IHNpZGUgb2YgdGhlIGNvbW1hIG9wZXJhdG9yIC0gYnV0IHRoYXQncyBva2F5KTsgYnV0IGZv
-cg0KPiBCKCkgd2l0aG91dCAoKSwgdGhlcmUgd2FzIGEgZGlhZ25vc3RpYyBldmVuIHdpdGhvdXQg
-LVdhbGwgYWJvdXQgdG9vIG1hbnkNCj4gaW5pdGlhbGl6ZXJzLCBhbmQgdGhlIGZpcnN0IHZhbHVl
-IHdhcyBhc3NpZ25lZC4NCg0KT2gsIHRoYXQncyBjb29sIQ0KDQo+IA0KPj4+IFdoeSBib3RoIGEg
-bWFjcm8gYW5kIGEgZnVuY3Rpb24gdGhhdCB1c2VzIHRoZSBtYWNybz8NCj4gDQo+IEFsc28gYW5z
-d2VyZWQgaW4gMi8yIC0gdGhlIG1hY3JvIGlzIGZvciB2YXJpYWJsZSBkZWNsYXJhdGlvbnM7IHRo
-ZQ0KPiBmdW5jdGlvbiBpcyBmb3IgcnVudGltZSBjb2RlIHN1Y2ggYXMgZm9yLWxvb3BzIHRoYXQg
-c3RhcnQgd2l0aCBhbg0KPiB1bmluaXRpYWxpemVkIGRlY2xhcmF0aW9uIGFuZCBoYXZlIHRvIHJl
-aW5pdGlhbGl6ZSB0aGluZ3MuIFRoZXkgYWxzbw0KPiBkaWZmZXIgaW4gdGhhdCBvbmUgdGFrZXMg
-YSBzdHJ1Y3QsIHRoZSBvdGhlciB0YWtlcyBhIHBvaW50ZXIgdG8gYSBzdHJ1Y3QuDQo+IA0KPiAN
-Cg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, 30 Jan 2019, Yang Zhong wrote:
+> On Wed, Jan 30, 2019 at 01:20:42PM +0100, Paolo Bonzini wrote:
+>> On 30/01/19 13:07, Thomas Huth wrote:
+>>> I think adding ioport.o to IDE_PCI and IDE_VIA is wrong. The
+>>> ide_init_ioport() function is only used by isa.c and piix.c, so it
+>>> should only be added for IDE_ISA and IDE_PIIX here.
+>>
+>> Good idea, another one for Yang. :)
+>>
+>  Yes, for ioport.o, i will add as below:
+>
+>  +common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
+>  +common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
+>
+>  The newest hw/ide/via.c has removed ide_init_ioport() call.
+
+This was my change. I've changed via.c to implement PCI IDE instead of ISA 
+legacy mode that it used to do before (as that's what clients use more). 
+However it still needs isa_get_irq() and thus ISA. This IDE controller is 
+usually part of VIA superio chips (such as VT82C686 and similar) that have 
+ISA and the IRQ seems to be wired to that. This could probably be 
+separated further but since device has a register to set IRQ number it 
+probably does not worth the added complexity. So it's still not completely 
+independent of ISA. (But don't make it dependent on vt82c686 either 
+because I'll add another such chip which will also use it later. The 
+vt82c686 should depend on via-ide.)
+
+Regards,
+BALATON Zoltan
