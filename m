@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40175)
+Received: from eggs.gnu.org ([209.51.188.92]:40241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gogt9-0005IW-I6
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:12 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gogtW-0005Yz-C9
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gogt7-0003fz-V3
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:11 -0500
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:45224)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gogt7-0003b3-MR
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:09 -0500
-Received: by mail-yw1-xc44.google.com with SMTP id d190so9088897ywd.12
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 19:50:08 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1gogtV-0003wM-9I
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gogtV-0003wB-3f
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:33 -0500
+Date: Wed, 30 Jan 2019 11:50:29 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190130035029.GD20241@stefanha-x1.localdomain>
+References: <20190129121817.7109-1-jusual@mail.ru>
 MIME-Version: 1.0
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-2-xieyongji@baidu.com>
-	<20190129041155.GG3264@stefanha-x1.localdomain>
-	<20190128232025-mutt-send-email-mst@kernel.org>
-	<CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
-	<20190129091012-mutt-send-email-mst@kernel.org>
-	<CAONzpcaHJZj8w-nK_AjEJ9vxHFkZauV0FH_4Oa66_qZBWE9aiw@mail.gmail.com>
-	<20190129212835-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190129212835-mutt-send-email-mst@kernel.org>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 30 Jan 2019 11:49:56 +0800
-Message-ID: <CAONzpcZWmmVYzzAbS4HYTpAaNn6Xo+nG9XoRut9N_ro6NfRzLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
- inflight buffer between qemu and backend
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bjuZg6miEcdLYP6q"
+Content-Disposition: inline
+In-Reply-To: <20190129121817.7109-1-jusual@mail.ru>
+Subject: Re: [Qemu-devel] [PATCH] arm: Clarify the logic of set_pc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,161 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, 30 Jan 2019 at 10:30, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Jan 30, 2019 at 10:07:28AM +0800, Yongji Xie wrote:
-> > On Tue, 29 Jan 2019 at 22:15, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Tue, Jan 29, 2019 at 02:15:35PM +0800, Yongji Xie wrote:
-> > > > On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
-> > > > > > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
-> > > > > > > +typedef struct DescState {
-> > > > > > > +    uint8_t inuse;
-> > > > > > > +    uint8_t version;
-> > > > > > > +    uint16_t used_idx;
-> > > > > > > +    uint16_t avail_idx;
-> > > > > > > +    uint16_t reserved;
-> > > > > > > +} DescState;
-> > > > > > > +
-> > > > > > > +typedef struct QueueRegion {
-> > > > > > > +    uint8_t valid;
-> > > > >
-> > > > > what's this?
-> > > > >
-> > > >
-> > > > We can use this to check whether this buffer is reset by qemu.
-> > >
-> > >
-> > > I'd use version here. Document that it's 1 currently.
-> >
-> > If we put version into the shared buffer, QEMU will reset it when vm
-> > reset. Then if backend restart at the same time, the version of this
-> > buffer will be lost. So I still let QEMU maintain it and send it back
-> > through message's payload.
->
-> I don't get it. If it's reset there's no contents.
-> If there's no contents then who cares what the version is?
->
 
-What I thought before is that we should not update the buffer when vm
-reset. But now seems like it's unnecessary. I will update this patch
-as you said. Thank you!
+--bjuZg6miEcdLYP6q
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > Or do we want feature flags so we can support downgrades too?
-> > >
-> >
-> > We faced the same problem that the feature flags will be lost if QEMU
-> > do not maintain it. So maybe we should put this into message's
-> > payload?
->
-> I don't understand why we care. We only maintain inflight so we
-> don't need to reset the device. if device is reset we don't
-> need to maintain them at all.
->
-> > >
-> > > > > > > +    uint16_t desc_num;
-> > > > >
-> > > > > there's padding before this field. Pls make it explicit.
-> > > > >
-> > > >
-> > > > Will do it.
-> > > >
-> > > > > > > +    DescState desc[0];
-> > > > > > > +} QueueRegion;
-> > > > > > > +
-> > > > > > > +The struct DescState is used to describe one head-descriptor's state. The
-> > > > > > > +fields have following meanings:
-> > > > > > > +
-> > > > > > > +    inuse: Indicate whether the descriptor is inuse or not.
-> > > > >
-> > > > > inuse by what?
-> > > > >
-> > > >
-> > > > Maybe inflight is better?
-> > > >
-> > > > > > > +
-> > > > > > > +    version: Indicate whether we have an atomic update to used ring and
-> > > > > > > +    inflight buffer when slave crash at that point. This field should be
-> > > > > > > +    increased by one before and after this two updates. An odd version
-> > > > > > > +    indicates an in-progress update.
-> > > > >
-> > > > > I'm not sure I understand what does the above say. Also does this
-> > > > > require two atomics? Seems pretty expensive. And why is it called
-> > > > > version?
-> > > > >
-> > > > > > > +
-> > > > > > > +    used_idx: Store old index of used ring before we update used ring and
-> > > > > > > +    inflight buffer so that slave can know whether an odd version inflight
-> > > > > > > +    head-descriptor in inflight buffer is processed or not.
-> > > > >
-> > > > > Here too.
-> > > > >
-> > > >
-> > > > Sorry, the above description may be not clear. This two fields are
-> > > > used to indicate whether we have an in-progress update to used ring
-> > > > and inflight buffer. If slave crash before the update to used_ring and
-> > > > after the update to inflight buffer, the version should be odd and
-> > > > used_idx should be equal to used_ring.idx. Then we need to roll back
-> > > > the update to inflight buffer. As for the name of the version filed,
-> > > > actually I didn't find a good one, so I just copy it from struct
-> > > > kvm_steal_time...
-> > > >
-> > > > > > > +
-> > > > > > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
-> > > > > > > +    slave can resubmit descriptors in order.
-> > > > >
-> > > > > Why would that be necessary?
-> > > > >
-> > > >
-> > > > Maybe some devices will be able to use it to preserve order after
-> > > > reconnecting in future?
-> > >
-> > > If buffers are used in order then old entries in the ring
-> > > are not overwritten so inflight tracking is not
-> > > necessary. This is exactly the case with vhost user net today.
-> > >
-> >
-> > OK, looks reasonable to me.
-> >
-> > > > > >
-> > > > > > Will a completely new "packed vring" inflight shm layout be necessary to
-> > > > > > support the packed vring layout in VIRTIO 1.1?
-> > > > > >
-> > > > > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
-> > > > >
-> > > > > Probably.
-> > > > >
-> > > >
-> > > > How about supporting packed virtqueue in guest driver?
-> > > >
-> > > > Thanks,
-> > > > Yongji
-> > >
-> > > Depends on the guest right? Linux has it:
-> > >
-> >
-> > Sorry, actually I mean I prefer to support inflight tracking for
-> > packed virtqueue in guest driver. This feature is only used by legacy
-> > virtio 1.0 or virtio 0.9 device. What do you think about it?
-> >
-> > Thanks,
-> > Yongji
->
-> I don't see what does one have to do with the other.  Either we do or we
-> don't want to do it without downtime and retries. If we don't mind
-> resets then let's do it by making guest changes.
->
+On Tue, Jan 29, 2019 at 03:18:17PM +0300, Julia Suvorova wrote:
+> Until now, the set_pc logic was unclear, which raised questions about
+> whether it should be used directly, applying a value to PC or adding
+> additional checks, for example, set the Thumb bit in Arm cpu. Let's set
+> the set_pc logic for =E2=80=9CConfigure the PC, as was done in the ELF fi=
+le=E2=80=9D
+> and implement synchronize_with_tb hook for preserving PC to cpu_tb_exec.
+>=20
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  hw/arm/boot.c             |  4 ----
+>  include/qom/cpu.h         | 16 ++++++++++++++--
+>  target/arm/arm-powerctl.c |  3 ---
+>  target/arm/cpu.c          | 26 +++++++++++++++++++++++++-
+>  target/arm/cpu64.c        | 15 ---------------
+>  5 files changed, 39 insertions(+), 25 deletions(-)
 
-OK, I see. But seems like now we don't support packed virtqueue in
-qemu. Is it better to do that in a splited patchset? Add packed
-virtqueue implenment in contrib/libvhost-user.c, then document the
-inflight I/O tracking behavior.
+I'm not familiar enough with ARM TCG to review this properly but it
+looks like what I would expect:
 
-Thanks,
-Yongji
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--bjuZg6miEcdLYP6q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcUR8FAAoJEJykq7OBq3PIiFMH/jVGu7WyqoGCWt9Ear8pnbdN
+yeoaKZIreJ+71s9AtUOYNErrB7FFi2tb9HB6IU5KvchUooJDM5b6ZEK1xIyzc4n9
+6+a7YRxNYOChkp/wdmLg0YHXrDuospAdrFEaSUo+iaFV/LBrPdEMfHG0nddm0fBH
+mcOK49GYBZqgI561xXgwld0DTxJf7pZuIyTeJQgFixR2clQNj2fNaFAFXnsSLtSu
+uM/7z06SAhTYzS0xkNt+hRN9XTgFA7bzlWX6eNJZgsYtXr20fjyuryo3Kf022srw
+WyuyQxWN6fu3hYLvb2Hj0ePeenIO+N5Q/CVMRS1X/rwYya2O6s4hnDKldXCqZNs=
+=hgUT
+-----END PGP SIGNATURE-----
+
+--bjuZg6miEcdLYP6q--
