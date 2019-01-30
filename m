@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35372)
+Received: from eggs.gnu.org ([209.51.188.92]:35609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1golz8-00024u-PV
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:16:43 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gom08-0002d7-DN
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1golz6-0004cF-9i
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:16:42 -0500
-References: <20190124144606.4352-1-sourav.jb1988@gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1gom06-0005Ax-Do
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:17:44 -0500
+References: <20190125094047.22276-1-dgilbert@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7363e637-7a98-31d9-c08a-3a829b7303bd@vivier.eu>
-Date: Wed, 30 Jan 2019 10:16:15 +0100
+Message-ID: <7c6b541c-ed1d-0de2-29fe-76ca56c05640@vivier.eu>
+Date: Wed, 30 Jan 2019 10:17:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190124144606.4352-1-sourav.jb1988@gmail.com>
+In-Reply-To: <20190125094047.22276-1-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw: edu: set category of
- the edu device
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] typo: apci->acpi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: thuth@redhat.com, jslaby@suse.cz, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com
+Cc: qemu-trivial@nongnu.org
 
-On 24/01/2019 15:46, kumar sourav wrote:
-> Sets the category of edu device as DEVICE_CATEGORY_MISC.
-> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
+On 25/01/2019 10:40, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+> apci_1_compatible should be acpi_1_compatible.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  hw/misc/edu.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/acpi/cpu.c         | 2 +-
+>  hw/i386/acpi-build.c  | 2 +-
+>  include/hw/acpi/cpu.h | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> index ceaf688bfb..91af452c9e 100644
-> --- a/hw/misc/edu.c
-> +++ b/hw/misc/edu.c
-> @@ -399,6 +399,7 @@ static void edu_instance_init(Object *obj)
+> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> index f10b190019..a0a43fe6b5 100644
+> --- a/hw/acpi/cpu.c
+> +++ b/hw/acpi/cpu.c
+> @@ -508,7 +508,7 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>              GArray *madt_buf = g_array_new(0, 1, 1);
+>              int arch_id = arch_ids->cpus[i].arch_id;
 >  
->  static void edu_class_init(ObjectClass *class, void *data)
->  {
-> +    DeviceClass *dc = DEVICE_CLASS(class);
->      PCIDeviceClass *k = PCI_DEVICE_CLASS(class);
+> -            if (opts.apci_1_compatible && arch_id < 255) {
+> +            if (opts.acpi_1_compatible && arch_id < 255) {
+>                  dev = aml_processor(i, 0, 0, CPU_NAME_FMT, i);
+>              } else {
+>                  dev = aml_device(CPU_NAME_FMT, i);
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2e21a31f82..d60603abd7 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1847,7 +1847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+>          CPUHotplugFeatures opts = {
+> -            .apci_1_compatible = true, .has_legacy_cphp = true
+> +            .acpi_1_compatible = true, .has_legacy_cphp = true
+>          };
+>          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+>                         "\\_SB.PCI0", "\\_GPE._E02");
+> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
+> index 89ce172941..62f0278ba2 100644
+> --- a/include/hw/acpi/cpu.h
+> +++ b/include/hw/acpi/cpu.h
+> @@ -48,7 +48,7 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
+>                           CPUHotplugState *state, hwaddr base_addr);
 >  
->      k->realize = pci_edu_realize;
-> @@ -407,6 +408,7 @@ static void edu_class_init(ObjectClass *class, void *data)
->      k->device_id = 0x11e8;
->      k->revision = 0x10;
->      k->class_id = PCI_CLASS_OTHERS;
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->  }
+>  typedef struct CPUHotplugFeatures {
+> -    bool apci_1_compatible;
+> +    bool acpi_1_compatible;
+>      bool has_legacy_cphp;
+>  } CPUHotplugFeatures;
 >  
->  static void pci_edu_register_types(void)
 > 
 
 
