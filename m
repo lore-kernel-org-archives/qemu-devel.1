@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32985)
+Received: from eggs.gnu.org ([209.51.188.92]:33607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopa3-000571-Qt
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:07:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gopci-0006PC-B1
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopa3-000464-6b
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:07:03 -0500
-References: <20190123144610.8842-1-mreitz@redhat.com>
-	<20190123144610.8842-6-mreitz@redhat.com>
-	<4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8a72a636-9998-ea66-e6a5-9b32e89dd739@redhat.com>
-Date: Wed, 30 Jan 2019 14:06:50 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gopcf-0005QT-Ji
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:09:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:16688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gopcb-0005M1-31
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:09:42 -0500
+References: <20181212095707.19358-1-david@redhat.com>
+	<a26a687a-5098-1715-9fee-8374bdd30268@redhat.com>
+	<c646ce74-7ecd-325f-3cb9-421af6d8a9b8@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a0441fd2-cfbc-83ef-2543-7d34530875cf@redhat.com>
+Date: Wed, 30 Jan 2019 14:09:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h"
-Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Fix 237 for Python 2.x
+In-Reply-To: <c646ce74-7ecd-325f-3cb9-421af6d8a9b8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] pc: Use
+ hotplug_handler_(plug|unplug|unplug_request)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +30,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <8a72a636-9998-ea66-e6a5-9b32e89dd739@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Fix 237 for Python 2.x
-References: <20190123144610.8842-1-mreitz@redhat.com>
- <20190123144610.8842-6-mreitz@redhat.com>
- <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
-In-Reply-To: <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 29.01.19 22:21, John Snow wrote:
->=20
-> On 1/23/19 9:46 AM, Max Reitz wrote:
->> It is not quite clear whether we want to support Python 2.x for any
->> prolonged time, but this may as well be fixed along with the other
->> issues some iotests have right now.
+On 30/01/19 13:35, David Hildenbrand wrote:
+> On 14.12.18 10:58, Paolo Bonzini wrote:
+>> On 12/12/18 10:57, David Hildenbrand wrote:
+>>> Let's avoid manually looking up the hotplug handler class. Use the
+>>> existing wrappers instead.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  hw/i386/pc.c | 30 ++++++++----------------------
+>>>  1 file changed, 8 insertions(+), 22 deletions(-)
+>>>
+>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>> index 4cd2fbca4d..c8857138f9 100644
+>>> --- a/hw/i386/pc.c
+>>> +++ b/hw/i386/pc.c
+>>> @@ -1711,7 +1711,6 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>>>                             DeviceState *dev, Error **errp)
+>>>  {
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>>> @@ -1725,8 +1724,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>>>          nvdimm_plug(&pcms->acpi_nvdimm_state);
+>>>      }
+>>>  
+>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -    hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
+>>> +    hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
+>>>  out:
+>>>      error_propagate(errp, local_err);
+>>>  }
+>>> @@ -1734,7 +1732,6 @@ out:
+>>>  static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
+>>>                                       DeviceState *dev, Error **errp)
+>>>  {
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>  
+>>> @@ -1755,9 +1752,8 @@ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
+>>>          goto out;
+>>>      }
+>>>  
+>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>> -
+>>> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
+>>> +                                   &local_err);
+>>>  out:
+>>>      error_propagate(errp, local_err);
+>>>  }
+>>> @@ -1766,12 +1762,9 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+>>>                               DeviceState *dev, Error **errp)
+>>>  {
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>  
+>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>> -
+>>> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>>      if (local_err) {
+>>>          goto out;
+>>>      }
+>>> @@ -1813,14 +1806,12 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
+>>>                          DeviceState *dev, Error **errp)
+>>>  {
+>>>      CPUArchId *found_cpu;
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>      X86CPU *cpu = X86_CPU(dev);
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>  
+>>>      if (pcms->acpi_dev) {
+>>> -        hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -        hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>> +        hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>>          if (local_err) {
+>>>              goto out;
+>>>          }
+>>> @@ -1844,7 +1835,6 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+>>>                                       DeviceState *dev, Error **errp)
+>>>  {
+>>>      int idx = -1;
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>      X86CPU *cpu = X86_CPU(dev);
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>> @@ -1861,9 +1851,8 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+>>>          goto out;
+>>>      }
+>>>  
+>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>> -
+>>> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
+>>> +                                   &local_err);
+>>>      if (local_err) {
+>>>          goto out;
+>>>      }
+>>> @@ -1877,14 +1866,11 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
+>>>                               DeviceState *dev, Error **errp)
+>>>  {
+>>>      CPUArchId *found_cpu;
+>>> -    HotplugHandlerClass *hhc;
+>>>      Error *local_err = NULL;
+>>>      X86CPU *cpu = X86_CPU(dev);
+>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>>>  
+>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+>>> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>> -
+>>> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+>>>      if (local_err) {
+>>>          goto out;
+>>>      }
+>>>
 >>
->=20
-> I'd have shuffled this above patch 01 (or immediately below) with a not=
-e
-> in either commit saying that the test is still broken without both patc=
-hes.
+>> Queued, thanks.
+> 
+> Paolo, just wondering, is this still on your queue or fell of the wagon?
 
-It's only broken for Python 2.x. :-)
+I had some issues with the previous pull request and also have to really
+spend some time on KVM.  But it's still queued.
 
-I don't have any real order in this series, though, so whatever makes
-someone happy makes me happy, too.
-
-> I'd also say what you're actually fixing in the commit
-> (range wants ints, not floats.)
-
-Sure, I can add that.
-
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
-> But, like, that's just my opinion, man,,
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
-
-Thanks!
-
-Max
-
-
---RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRoWoACgkQ9AfbAGHV
-z0BP3Af/R56l+ROkC7LPOWdLdMkFKER7XnsaqUeTklG/cbxW8iq5mUk3g/Gv2k+M
-eNbB3ZCOHF0vP/YFt1tnX24DzqOTCv5wZLA3cKmJZC5vUw17PVNruxyl7WYgOMHd
-4AANQ+45RszDjKU5rdmsHKrMwKT92tN4TMUM8H+sbAPhFMF1pWH1fxn5qS2e81WV
-fSkJmtonAaDIwOD4fY02Y7JYmkruVaFk3OTHamAJroNEfyIZk9tWG03IgSiAhC4W
-Sodr3XL/QcqqiR3XMp9QN5G/5D7/wwdMB1KrH/J/WZj7NBjIzGWZpxK5xamHswMk
-QdqT44s5gsJ3HzprbatcmRXAvxO2og==
-=qVHA
------END PGP SIGNATURE-----
-
---RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h--
+Paolo
