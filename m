@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36235)
+Received: from eggs.gnu.org ([209.51.188.92]:49088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1goe4E-0000WP-6U
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:26 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1goetT-0003i1-NB
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 20:42:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1goe4D-0001iw-A1
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:26 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 29 Jan 2019 19:48:03 -0500
-Message-Id: <20190130004811.27372-66-cota@braap.org>
-In-Reply-To: <20190130004811.27372-1-cota@braap.org>
-References: <20190130004811.27372-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v6 65/73] s390x: convert to
- cpu_has_work_with_iothread_lock
+	(envelope-from <aik@ozlabs.ru>) id 1goetS-0000ja-Ci
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 20:42:23 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed, 30 Jan 2019 12:42:16 +1100
+Message-Id: <20190130014216.98287-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] spapr: Drop unused parameters from fdt
+ building helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +19,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Soon we will call cpu_has_work without the BQL.
+spapr_load_rtas() handles now RTAS address and size information in the FDT
+so drop them from spapr_build_fdt().
 
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
+While we are here, fix a small typo.
+
+Fixes: 2cac78c12ade9 "pseries: Consolidate RTAS loading"
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- target/s390x/cpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index d1594c90d9..5c38abaa49 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -59,6 +59,8 @@ static bool s390_cpu_has_work(CPUState *cs)
- {
-     S390CPU *cpu = S390_CPU(cs);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a217c7f..fa12723 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1225,9 +1225,7 @@ static void spapr_dt_hypervisor(sPAPRMachineState *spapr, void *fdt)
+     }
+ }
  
-+    g_assert(qemu_mutex_iothread_locked());
-+
-     /* STOPPED cpus can never wake up */
-     if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
-         s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
-@@ -473,7 +475,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     scc->initial_cpu_reset = s390_cpu_initial_reset;
-     cc->reset = s390_cpu_full_reset;
-     cc->class_by_name = s390_cpu_class_by_name,
--    cc->has_work = s390_cpu_has_work;
-+    cc->has_work_with_iothread_lock = s390_cpu_has_work;
- #ifdef CONFIG_TCG
-     cc->do_interrupt = s390_cpu_do_interrupt;
- #endif
+-static void *spapr_build_fdt(sPAPRMachineState *spapr,
+-                             hwaddr rtas_addr,
+-                             hwaddr rtas_size)
++static void *spapr_build_fdt(sPAPRMachineState *spapr)
+ {
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+@@ -1644,14 +1642,14 @@ static void spapr_machine_reset(void)
+ 
+     /*
+      * We place the device tree and RTAS just below either the top of the RMA,
+-     * or just below 2GB, whichever is lowere, so that it can be
++     * or just below 2GB, whichever is lower, so that it can be
+      * processed with 32-bit real mode code if necessary
+      */
+     rtas_limit = MIN(spapr->rma_size, RTAS_MAX_ADDR);
+     rtas_addr = rtas_limit - RTAS_MAX_SIZE;
+     fdt_addr = rtas_addr - FDT_MAX_SIZE;
+ 
+-    fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
++    fdt = spapr_build_fdt(spapr);
+ 
+     spapr_load_rtas(spapr, fdt, rtas_addr);
+ 
 -- 
 2.17.1
