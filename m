@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34909)
+Received: from eggs.gnu.org ([209.51.188.92]:35370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1golxW-0001IM-6C
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:15:03 -0500
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1golz8-00024s-PO
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:16:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1golxU-0003o6-6s
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:15:02 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 30 Jan 2019 09:14:54 +0000
-Message-ID: <1152f912-5912-29c3-cf75-1656293f5891@virtuozzo.com>
-References: <20190129143800.88563-1-vsementsov@virtuozzo.com>
-	<20190129143800.88563-2-vsementsov@virtuozzo.com>
-	<0cc0ace6-c260-85db-3e0b-21d8f7e39005@redhat.com>
-In-Reply-To: <0cc0ace6-c260-85db-3e0b-21d8f7e39005@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CE7B86E9F026E9448172EE618AC249D0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bala24@linux.vnet.ibm.com>) id 1golz6-0004cd-Es
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:16:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
+	id 1golz4-0004a0-9a
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:16:40 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0U9AoUZ132370
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 04:16:33 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qb6vqp6fs-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 04:16:33 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
+	Wed, 30 Jan 2019 09:16:31 -0000
+Date: Wed, 30 Jan 2019 14:46:20 +0530
+From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+References: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
+	<20190122150543.16889-2-bala24@linux.vnet.ibm.com>
+	<875zuf9vt4.fsf@trasno.org> <20190124071822.GK18231@xz-x1>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] block: enhance QEMUIOVector structure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124071822.GK18231@xz-x1>
+Message-Id: <20190130091620.GA27001@dhcp-9-109-195-155.in.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] migration: calculate expected_downtime
+ considering redirtied ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +43,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-MzAuMDEuMjAxOSAwOjM1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxLzI5LzE5IDg6MzcgQU0s
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBBZGQgYSBwb3NzaWJpbGl0
-eSBvZiBlbWJlZGRlZCBpb3ZlYywgZm9yIGNhc2VzIHdoZW4gd2UgbmVlZCBvbmx5IG9uZQ0KPj4g
-bG9jYWwgaW92Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBpbmNsdWRlL3Fl
-bXUvaW92LmggfCA0MSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0K
-Pj4gICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4N
-Cj4gDQo+PiAgIA0KPj4gK0dfU1RBVElDX0FTU0VSVChvZmZzZXRvZihRRU1VSU9WZWN0b3IsIHNp
-emUpID09DQo+PiArICAgICAgICAgICAgICAgIG9mZnNldG9mKFFFTVVJT1ZlY3RvciwgbG9jYWxf
-aW92Lmlvdl9sZW4pKTsNCj4+ICtHX1NUQVRJQ19BU1NFUlQoc2l6ZW9mKCgoUUVNVUlPVmVjdG9y
-ICopTlVMTCktPnNpemUpID09DQo+PiArICAgICAgICAgICAgICAgIHNpemVvZigoKFFFTVVJT1Zl
-Y3RvciAqKU5VTEwpLT5sb2NhbF9pb3YuaW92X2xlbikpOw0KPiANCj4gV2UgZG9uJ3QgdXNlIEdf
-U1RBVElDX0FTU0VSVCgpIGVsc2V3aGVyZSAoc2xpcnAgZXhjZXB0ZWQsIGFzIHRoYXQgaXMNCj4g
-dHJ5aW5nIHRvIHNwbGl0IG9mZiB0byBhIHNlcGFyYXRlIHByb2plY3QpOyBzbyB0aGVzZSBzaG91
-bGQgYmU6DQo+IA0KPiBRRU1VX0JVSUxEX0JVR19PTihvZmZzZXRvZihRRU1VSU9WZWN0b3IsIHNp
-emUpICE9DQo+ICAgICAgICAgICAgICAgICAgICBvZmZzZXRvZihRRU1VSU9WZWN0b3IsIGxvY2Fs
-X2lvdi5pb3ZfbGVuKSk7DQo+IA0KPiBhbmQgc28gb24uDQo+IA0KPiBQT1NJWCBkb2VzIG5vdCBn
-dWFyYW50ZWUgdGhhdCBpb3ZfYmFzZSBvY2N1cnMgcHJpb3IgdG8gaW92X2xlbiBpbiBzdHJ1Y3QN
-Cj4gaW92ZWM7IHlvdXIgY29kZSBpcyB0aGVyZWZvcmUgcmF0aGVyIGZyYWdpbGUgYW5kIHdvdWxk
-IGZhaWwgdG8gY29tcGlsZQ0KPiBpZiB3ZSBlbmNvdW50ZXIgYSBsaWJjIHdoZXJlIGlvdl9sZW4g
-aXMgcG9zaXRpb25lZCBkaWZmZXJlbnRseSB0aGFuIGluDQo+IGdsaWJjLCB0cmlwcGluZyB0aGUg
-Zmlyc3QgYXNzZXJ0aW9uLiAgRm9yIGFuIG9mZnNldCBvdGhlciB0aGFuIDAsIHlvdQ0KPiBjb3Vs
-ZCBkZWNsYXJlOg0KPiAgICBjaGFyIFtvZmZzZXRvZihzdHJ1Y3QgaW92ZWMsIGlvdl9sZW4pXSBf
-X3BhZDsNCj4gdG8gYmUgbW9yZSByb2J1c3Q7IGJ1dCBzaW5jZSBDIGRvZXNuJ3QgbGlrZSAwLWxl
-bmd0aCBhcnJheSBkZWNsYXJhdGlvbnMsDQo+IEknbSBub3Qgc3VyZSBob3cgeW91IHdvdWxkIGNh
-dGVyIHRvIGEgbGliYyB3aGVyZSBpb3ZfbGVuIGlzIGF0IG9mZnNldCAwLA0KDQpIbW0sIHRlc3Rl
-ZCBhIGJpdCwgYW5kIHRoZSBvbmx5IGNvbXBsYWluIEkgY2FuIGdldCBpcyBhIHdhcm5pbmcgYWJv
-dXQgMC1zaXplZA0KYXJyYXkgd2hlbiBvcHRpb24gLXBlZGFudGljIGlzIHNldC4gU28sIGlzIGl0
-IGEgcmVhbCBwcm9ibGVtPw0KDQpBbmQgd2UgYWxyZWFkeSBoYXZlIGEgbG90IG9mIHplcm8tc2l6
-ZWQgYXJyYXlzIGluIFFlbXUsIGp1c3QgbG9vayBhdA0KICBnaXQgZ3JlcCAnXHdcK1xzXCtcd1wr
-XFswXF07JyB8IGdyZXAgLXYgcmV0dXJuDQoNCg0KaG0sIG9yIHdlIGNhbiBkbyBsaWtlIHRoaXM6
-DQoNCnR5cGVkZWYgc3RydWN0IFFFTVVJT1ZlY3RvciB7DQogICAgIHN0cnVjdCBpb3ZlYyAqaW92
-Ow0KICAgICBpbnQgbmlvdjsNCiAgICAgdW5pb24gew0KICAgICAgICAgc3RydWN0IHsNCiAgICAg
-ICAgICAgICBpbnQgbmFsbG9jOw0KICAgICAgICAgICAgIHN0cnVjdCBpb3ZlYyBsb2NhbF9pb3Y7
-DQogICAgICAgICB9Ow0KICAgICAgICAgc3RydWN0IHsNCiAgICAgICAgICAgICBjaGFyIF9fcGFk
-W3NpemVvZihpbnQpICsgb2Zmc2V0b2Yoc3RydWN0IGlvdmVjLCBpb3ZfbGVuKV07DQogICAgICAg
-ICAgICAgc2l6ZV90IHNpemU7DQogICAgICAgICB9Ow0KICAgICB9Ow0KfSBRRU1VSU9WZWN0b3I7
-DQoNCg0KPiBzaG9ydCBvZiBhIGNvbmZpZ3VyZSBwcm9iZSBhbmQgI2lmZGVmZmVyeSwgd2hpY2gg
-ZmVlbHMgbGlrZSBhIGJpdCBtdWNoDQo+IHRvIG1hbmFnZSAocmVhbGx5LCB0aGUgcG9pbnQgb2Yg
-dGhlIGFzc2VydCBpcyB0aGF0IHdlIGRvbid0IGhhdmUgdG8NCj4gd29ycnkgYWJvdXQgYW4gdW51
-c3VhbCBsaWJjIGhhdmluZyBhIGRpZmZlcmVudCBvZmZzZXQgVU5MRVNTIHRoZSBidWlsZA0KPiBm
-YWlscywgc28gbm8gbmVlZCB0byBhZGRyZXNzIGEgcHJvYmxlbSB3ZSBhcmVuJ3QgaGl0dGluZyB5
-ZXQpLg0KDQpIb3dldmVyLCBjaGFyIF9fcGFkW29mZnNldG9mKHN0cnVjdCBpb3ZlYywgaW92X2xl
-bildOyBzZWVtcyB1c2VmdWwgYW5kIGV2ZW4NCm1vcmUgc2VsZi1kb2N1bWVudGVkLCBzbyBJJ2xs
-IHVzZSBpdCBpbiB2MiwgaWYgbm9ib2R5IG1pbmRzLg0KDQo+IA0KPiBUaGUgc2Vjb25kIGFzc2Vy
-dGlvbiAoYWJvdXQgc2l6ZW9mIGJlaW5nIGlkZW50aWNhbCkgaXMgcmVkdW5kYW50DQoNCk9rLg0K
-DQo+IHNpbmNlDQo+IFBPU0lYIHJlcXVpcmVzIHNpemVfdCBpb3ZfbGVuLCBhbmQgd2UgdXNlZCBz
-aXplX3Qgc2l6ZSAod2hpbGUgYSBsaWJjDQo+IG1pZ2h0IHJlb3JkZXIgdGhlIGZpZWxkcyBvZiBz
-dHJ1Y3QgaW92ZWMsIHRoZXkgc2hvdWxkbid0IGJlIHVzaW5nIHRoZQ0KPiB3cm9uZyB0eXBlcyk7
-IGJ1dCBwZXJoYXBzIHlvdSBjb3VsZCB1c2U6DQo+ICAgdHlwZW9mKHN0cnVjdCBpb3ZlYy5pb3Zf
-bGVuKSBzaXplOw0KPiBpbiB0aGUgZGVjbGFyYXRpb24gdG8gYXZvaWQgZXZlbiB0aGF0IHBvc3Np
-YmlsaXR5IChJJ20gbm90IHN1cmUgaXQgaXMNCj4gd29ydGggaXQsIHRob3VnaCkuDQo+IA0KPj4g
-Kw0KPj4gKyNkZWZpbmUgUUVNVV9JT1ZFQ19JTklUX0JVRihzZWxmLCBidWYsIGxlbikgXA0KPj4g
-K3sgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPj4gKyAgICAu
-aW92ID0gJihzZWxmKS5sb2NhbF9pb3YsICAgICAgICAgICAgICAgXA0KPj4gKyAgICAubmlvdiA9
-IDEsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPj4gKyAgICAubmFsbG9jID0gLTEs
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPj4gKyAgICAubG9jYWxfaW92ID0geyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXA0KPj4gKyAgICAgICAgLmlvdl9iYXNlID0gKHZvaWQgKiko
-YnVmKSwgICAgICAgICAgXA0KPiANCj4gV2h5IGlzIHRoZSBjYXN0IG5lY2Vzc2FyeT8gIEFyZSB3
-ZSBjYXN0aW5nIGF3YXkgY29uc3Q/ICBTaW5jZSBDIGFscmVhZHkNCj4gYWxsb3dzIGFzc2lnbm1l
-bnQgb2YgYW55IG90aGVyIChub24tY29uc3QpIHBvaW50ZXIgdG8gdm9pZCogd2l0aG91dCBhDQo+
-IGNhc3QsIGl0IGxvb2tzIHN1cGVyZmx1b3VzLg0KPiANCj4+ICsgICAgICAgIC5pb3ZfbGVuID0g
-bGVuICAgICAgICAgICAgICAgICAgICAgIFwNCj4gDQo+IE1pc3NpbmcgKCkgYXJvdW5kIGxlbi4N
-Cg0KRm9yIHN0eWxlPyBXaGF0IHRoZSB0aGluZyBsZW4gc2hvdWxkIGJlIHRvIGJyZWFrIGl0IHdp
-dGhvdXQgKCk/DQoNCj4gSSBtaWdodCBhbHNvIGhhdmUgdXNlZCBhIHRyYWlsaW5nIGNvbW1hIChJ
-IGZpbmQNCj4gaXQgZWFzaWVyIHRvIGFsd2F5cyB1c2UgdHJhaWxpbmcgY29tbWE7IHdoaWxlIHdl
-J3JlIHVubGlrZWx5IHRvIGFkZCBtb3JlDQo+IG1lbWJlcnMgaGVyZSwgaXQgZG9lcyBtYWtlIGZv
-ciBsZXNzIGNodXJuIGluIG90aGVyIHBsYWNlcyB3aGVyZSBhIHN0cnVjdA0KPiBtYXkgZ3Jvdyku
-DQo+IA0KPj4gKyAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0K
-Pj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgaW5saW5lIHZvaWQgcWVtdV9pb3ZlY19pbml0X2J1ZihR
-RU1VSU9WZWN0b3IgKnFpb3YsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdm9pZCAqYnVmLCBzaXplX3QgbGVuKQ0KPj4gK3sNCj4+ICsgICAgKnFpb3YgPSAoUUVN
-VUlPVmVjdG9yKSBRRU1VX0lPVkVDX0lOSVRfQlVGKCpxaW92LCBidWYsIGxlbik7DQo+PiArfQ0K
-PiANCj4gV2h5IGJvdGggYSBtYWNybyBhbmQgYSBmdW5jdGlvbiB0aGF0IHVzZXMgdGhlIG1hY3Jv
-PyBEbyB5b3UgZXhwZWN0IGFueQ0KPiBvdGhlciBjb2RlIHRvIGFjdHVhbGx5IHVzZSB0aGUgbWFj
-cm8sIG9yIHdpbGwgdGhlIGZ1bmN0aW9uIGFsd2F5cyBiZQ0KPiBzdWZmaWNpZW50LCBpbiB3aGlj
-aCBjYXNlIHlvdSBjb3VsZCBpbmxpbmUgdGhlIGluaXRpYWxpemVyIHdpdGhvdXQgdGhlDQo+IHVz
-ZSBvZiBhIG1hY3JvLg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Thu, Jan 24, 2019 at 03:18:22PM +0800, Peter Xu wrote:
+> On Wed, Jan 23, 2019 at 05:35:03PM +0100, Juan Quintela wrote:
+> > bala24@linux.vnet.ibm.com wrote:
+> > > From: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > >
+> > > currently we calculate expected_downtime by time taken to transfer
+> > > remaining ram, but during the time we had transferred remaining ram
+> > > few pages of ram might be redirtied and we need to retransfer it,
+> > > so it is better to consider them for calculating expected_downtime
+> > > for getting more accurate values.
+> > >
+> > > Total ram to be transferred = remaining ram + (redirtied ram at the
+> > >                                                time when the remaining
+> > >                                                ram gets transferred)
+> > >
+> > > redirtied ram = dirty_pages_rate * time taken to transfer remaining ram
+> > >
+> > > redirtied ram = dirty_pages_rate * (remaining ram / bandwidth)
+> > >
+> > > expected_downtime = (remaining ram + redirtied ram) / bandwidth
+> > >
+> > > Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > > ---
+> > >  migration/migration.c | 8 +++++++-
+> > >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index ffc4d9e556..dc38e9a380 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -2903,7 +2903,13 @@ static void migration_update_counters(MigrationState *s,
+> > >       * recalculate. 10000 is a small enough number for our purposes
+> > >       */
+> > >      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+> > > -        s->expected_downtime = ram_counters.remaining / bandwidth;
+> > > +        /* Time required to transfer remaining ram */
+> > > +        remaining_ram_transfer_time = ram_counters.remaining / bandwidth
+> > 
+> > missing semicolon
+> > 
+> > > +
+> > > +        /* redirty of ram at the time remaining ram gets transferred*/
+> > > +        newly_dirtied_ram = ram_counters.dirty_pages_rate * remaining_ram_transfer_time
+> > 
+> > the same.
+> > 
+> > Declaration of the new variables is also missing.
+> > 
+> > > +        s->expected_downtime = (ram_counters.remaining + newly_dirtied_ram) / bandwidth;
+> > >      }
+> > >  
+> > >      qemu_file_reset_rate_limit(s->to_dst_file);
+> > 
+> > About the numbers, I am not against it.  It is an heuristic.  Without
+> > numbers (and it is very load dependent) it is not clear that this one is
+> > going to be much worse/better than previous one (this should be a bit
+> > better, though).
+> 
+> Actually I have had a question on how expected_downtime is defined and
+> how it will be used by users.
+> 
+> My understanding is that the expected_downtime is defined as: how long
+> time the guest will be down if we stop the VM right now and migrate
+> all the rest of pages.
+> 
+> This definition makes sense in that it helps the customer to
+> dynamically decide whether it's a good point to go into the last phase
+> of migration.  Currently we should be able to achieve that by setting
+> a very high target downtime.
+> 
+> And if that definition is the thing we want, the current calculation
+> seems exactly the number we want, since if we stop the VM right now
+> then there won't be any more data to be dirtied as well.
+
+Thank you Peter, I thought about your definition and it makes sense
+with your definition that existing calculation is appropriate and
+correct.
+
+-- Bala
+> 
+> Regards,
+> 
+> -- 
+> Peter Xu
+> 
