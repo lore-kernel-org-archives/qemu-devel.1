@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50051)
+Received: from eggs.gnu.org ([209.51.188.92]:50194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomjg-0007Yg-V0
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:04:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1gomjz-0007jC-F8
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomjf-0006wt-J8
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:04:48 -0500
-References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <50d1cba5-c759-9dd4-af28-52893d7b7e26@vivier.eu>
-Date: Wed, 30 Jan 2019 11:04:32 +0100
+	(envelope-from <thuth@redhat.com>) id 1gomjy-00076W-Ly
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:05:07 -0500
+References: <20190130095231.42081-1-sgarzare@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <367f74db-6341-df75-fc99-1b5326bfba78@redhat.com>
+Date: Wed, 30 Jan 2019 11:04:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20190130095231.42081-1-sgarzare@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] target/s390x: Fix LGPL
- version in the file header comments
+Subject: Re: [Qemu-devel] [PATCH] virtio-blk: remove duplicate definition of
+ VirtIOBlock *s pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 29/01/2019 14:37, Thomas Huth wrote:
-> It's either "GNU *Library* General Public License version 2" or
-> "GNU Lesser General Public License version *2.1*", but there was
-> no "version 2.0" of the "Lesser" license. So assume that version
-> 2.1 is meant here.
+On 2019-01-30 10:52, Stefano Garzarella wrote:
+> VirtIOBlock *s is already defined and initialized with req->dev
+> on top of virtio_blk_handle_request(), so we can remove it from
+> the code block of VIRTIO_BLK_T_GET_ID case.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  target/s390x/cc_helper.c   | 2 +-
->  target/s390x/excp_helper.c | 2 +-
->  target/s390x/fpu_helper.c  | 2 +-
->  target/s390x/gdbstub.c     | 2 +-
->  target/s390x/helper.c      | 2 +-
->  target/s390x/int_helper.c  | 2 +-
->  target/s390x/mem_helper.c  | 2 +-
->  target/s390x/misc_helper.c | 2 +-
->  target/s390x/translate.c   | 2 +-
->  9 files changed, 9 insertions(+), 9 deletions(-)
+>  hw/block/virtio-blk.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
-> index 5d91e45..307ad61 100644
-> --- a/target/s390x/cc_helper.c
-> +++ b/target/s390x/cc_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 2a33222..a758649 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-> index 1b662d2..e921172 100644
-> --- a/target/s390x/fpu_helper.c
-> +++ b/target/s390x/fpu_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-> index b8c81da..df14759 100644
-> --- a/target/s390x/gdbstub.c
-> +++ b/target/s390x/gdbstub.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index 2546316..3d74836 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-> index abf77a9..abbbc20 100644
-> --- a/target/s390x/int_helper.c
-> +++ b/target/s390x/int_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 490c43e..a506d9e 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 3f91579..52262f6 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index b5bd56b..6249c70 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index f208c6ddb9..9a87b3bfac 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -569,8 +569,6 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+>          break;
+>      case VIRTIO_BLK_T_GET_ID:
+>      {
+> -        VirtIOBlock *s = req->dev;
+> -
+>          /*
+>           * NB: per existing s/n string convention the string is
+>           * terminated by '\0' only when shorter than buffer.
 > 
 
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
+Reviewed-by: Thomas Huth <thuth@redhat.com>
