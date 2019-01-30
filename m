@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46585)
+Received: from eggs.gnu.org ([209.51.188.92]:49095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <me@halfdog.net>) id 1gouGK-0006ik-FZ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:07:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1gouRi-0001Zx-2g
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:18:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <me@halfdog.net>) id 1gouGI-0007sr-Ls
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:07:00 -0500
-Received: from mail.halfdog.net ([37.186.9.82]:63165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <me@halfdog.net>) id 1gouGH-0007pm-MM
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:06:57 -0500
-Received: from [169.254.0.1] (helo=localhost) by mail.halfdog.net with esmtpsa
-	(TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92-RC4)
-	(envelope-from <me@halfdog.net>) id 1gouG9-0006hQ-5J
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:06:49 +0000
-From: halfdog <me@halfdog.net>
-In-reply-to: <154835963658.2045.2300981728946163161.malonedeb@wampee.canonical.com>
-References: <154835963658.2045.2300981728946163161.malonedeb@wampee.canonical.com>
+	(envelope-from <berrange@redhat.com>) id 1gouRb-0004FO-Tp
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:18:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gouRW-0004Dl-Ep
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:18:36 -0500
+Date: Wed, 30 Jan 2019 18:18:22 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190130181822.GB15904@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190123132212.GA20002@beluga.usersys.redhat.com>
+	<20190123132413.GG27270@redhat.com>
+	<20190123133301.GB20002@beluga.usersys.redhat.com>
+	<20190123133614.GH27270@redhat.com>
+	<25dd3d83-dbf9-5b8d-59d4-79501fe03f3c@amd.com>
+	<20190129161542.GG5315@beluga.usersys.redhat.com>
+	<20190129184008.GM30796@redhat.com>
+	<20190130080630.GI5315@beluga.usersys.redhat.com>
+	<20190130103719.GF15904@redhat.com>
+	<20190130133954.GA30553@beluga.usersys.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Jan 2019 18:06:12 +0000
-Message-ID: <2372-1548871572.684811@Aewj.Tnvx.bGcG>
-Subject: Re: [Qemu-devel] [Bug 1813201] [NEW] QEMU TCG i386 / x86_64 system
- emulation crash when executing int instruction
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190130133954.GA30553@beluga.usersys.redhat.com>
+Subject: Re: [Qemu-devel] AMD SEV's /dev/sev permissions and probing QEMU
+ for capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1813201 <1813201@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: Erik Skultety <eskultet@redhat.com>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dinechin@redhat.com" <dinechin@redhat.com>, "mkletzan@redhat.com" <mkletzan@redhat.com>
 
-Alberto Ortega writes:
-> Public bug reported:
->
-> QEMU version:
-> -------------
->
-> qemu from git, master branch commit
-> d058a37a6e8daa8d71a6f2b613eb415b69363755
->
-> Release versions are also affected.
->
-> Summary:
-> --------
->
-> QEMU i386 and x86_64 system emulation crash when executing the following
-> "int" instruction:
->
-> cd08  int 8
->
-> This generates a kernel NULL pointer dereference error in Linux, and a
-> BSOD error in Windows.
->
-> No special permissions are required to execute the instruction, any
-> unprivileged user can execute it.
-> ...
+On Wed, Jan 30, 2019 at 02:39:54PM +0100, Erik Skultety wrote:
+> > > > though, we need a #ifdef check for existance of PR_CAP_AMBIENT
+> > > >
+> > > > > An alternative question I've been playing ever since we exchanged the last few
+> > > > > emails is that can't we wait until the ioctls are compared against permissions
+> > > > > in kernel so that upstream libvirt (and downstream too for that matter) doesn't
+> > > > > have to work around it and stick with that workaround for eternity?
+> > > >
+> > > > IIUC, the SEV feature has already shipped with distros, so we'd effectively
+> > > > be saying that what we already shipped is unusable to libvirt. This doesn't
+> > > > feel like a desirable story to me.
+> > >
+> > > It was, but it never worked, it always has been broken in this way. When we
+> > > were merging this upstream, we had a terrible shortage of machines and we had
+> > > to share, so the first person to provision the machine had already taken care
+> > > of the permissions in order to test so that led to this issue having been
+> > > overlooked until now. If it ever worked as expected and then we broke it, then
+> > > any fix from our side would make sense but otherwise I believe we should fix
+> > > this bottom up.
+> >
+> > Well technically it would work if libvirt was configured to run as
+> > root:root, but yes, that is not a normal or recommended configuration.
+> >
+> > Personally I have a preference for userspace solutions, as those are
+> > pretty straightforward to roll out to people as patches in existing
+> > releases. Deploying kernel updates is a higher bar to cross for an
+> > existing release.
+> 
+> So, can you compile the prctl stuff in kernel conditionally? If so, then that's
+> a problem because you may end up with a platform where SEV is supported within
+> kernel, but you don't have the ambient stuff we have to conditionally compile
+> in libvirt, so you end up with broken SEV support anyway, I wanted to argue
+> with centos 7, but the ambient set support was backported to 3.10, so the only
+> distro where we'd have a problem from userspace POV would be debian 8, but then
+> again the kernel there is so old that neither SEV is supported there.
+> 
+> I understand your point, but it also sounds very agile and I don't think that
+> compensating with "something that is fast" for "something that is right" is the
+> way to go in the long term. Especially since we almost never deprecate stuff
+> and we can't break compatibility. Trying to work around every issue coming
+> from your dependencies in your project is highly unsustainable.
 
-Funny. Does Qemu share code with VirtualBox? If so, a similar
-missing CPL=3D=3D0 check was fixed in Virtualbox 7 years ago.
+With the launching of VMs we've got to a place where libvirt is pretty
+robust about being able to grant access regardless of what the host OS
+has done for permissions in /dev.  I think its desirable that this same
+flexibility extends to capabilities probing, which is somethign the
+dac_override approach allows. IOW, even if the kernel changes /dev/sev
+as previously discussed, I would keep the dac_override stuff for probing
+capabilities forever. This makes sure we'll work even if the distro in
+question has strictly locked down permissions on /dev/kvm or /dev/sev,
+diverging from the default udev settup
 
-https://www.halfdog.net/Security/2012/VirtualBoxSoftwareInterrupt0x8GuestC=
-rash/
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
