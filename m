@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51993)
+Received: from eggs.gnu.org ([209.51.188.92]:52705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gomrH-0003A9-6Y
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:12:39 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gomtp-0004Iz-2W
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gomrG-0002nw-DQ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:12:39 -0500
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-7-philmd@redhat.com>
-	<f2462ab2-4579-aad1-99e8-a474587ec409@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <450d58b6-f6af-4714-6b47-832d7a7564b2@redhat.com>
-Date: Wed, 30 Jan 2019 11:11:59 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gomto-0004qB-Ao
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:15:17 -0500
+References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+	<1548841387-7670-1-git-send-email-thuth@redhat.com>
+	<1548841387-7670-2-git-send-email-thuth@redhat.com>
+	<567dfcac-165d-5b8b-8179-6a981973111f@redhat.com>
+	<723095a0-c4ac-29e4-c540-8bf195789516@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a7a79eb-b824-eac0-0685-77d0d4e6b79f@redhat.com>
+Date: Wed, 30 Jan 2019 11:15:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <f2462ab2-4579-aad1-99e8-a474587ec409@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="OUvCPsnW4dVK22evODaN67tLPftANjm65"
-Subject: Re: [Qemu-devel] [PATCH v2 06/18] qemu-iotests: Improve portability
- by searching bash in the $PATH
+In-Reply-To: <723095a0-c4ac-29e4-c540-8bf195789516@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 1/5] ppc64: Express dependencies of
+ 'pseries' and 'powernv' machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OUvCPsnW4dVK22evODaN67tLPftANjm65
-From: Thomas Huth <thuth@redhat.com>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Fam Zheng <fam@euphon.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-Message-ID: <450d58b6-f6af-4714-6b47-832d7a7564b2@redhat.com>
-Subject: Re: [PATCH v2 06/18] qemu-iotests: Improve portability by searching
- bash in the $PATH
-References: <20190129175403.18017-1-philmd@redhat.com>
- <20190129175403.18017-7-philmd@redhat.com>
- <f2462ab2-4579-aad1-99e8-a474587ec409@redhat.com>
-In-Reply-To: <f2462ab2-4579-aad1-99e8-a474587ec409@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2019-01-29 23:15, Eric Blake wrote:
-[...]
-> Why a space between #! and /usr/bin/env? That's not our prevailing styl=
+On 30/01/19 11:02, Thomas Huth wrote:
+>> I think the two approaches are more or less equivalent, but
+>> "#CONFIG_FOO=3Dn" has a small advantage when the feature has a build-t=
+ime
+>> dependency, such as CONFIG_MILKYMIST_TMU2's dependency on OpenGL.  In
+>> that case,
+>>
+>>    CONFIG_MILKYMIST_TMU2=3Dy
+>>
+>> would report a contradiction if OpenGL is not available at build time,=
+ while
+>>
+>>    default y
+>>    ...
+>>    #CONFIG_MILKYMIST_TMU2=3Dn
+>>
+>> would not.
+> I somehow dislike the idea of adding lines that are commented out by
+> default. For example, if someone later renames or removes the config
+> switch in the Kconfig files, the comment could stay there without being
+> noticed, while a CONFIG_XXX=3Dy would cause a clean build failure if th=
 e
-There is an urban legend that this was required on certain old Unix
-systems, but as far as I know, it's only wrong information:
+> option is not available anymore.
 
- https://www.in-ulm.de/~mascheck/various/shebang/#blankrequired
+I agree.  On the other hand I don't see another solution for the
+MILKYMIST_TMU2 and QXL cases, and consistency is a plus too.
 
-Anyway, the blank is certainly not required anymore in the 21st century,
-so I'd also suggest to remove it in these patches here.
+How often are config switches renamed or removed, especially
+user-visible optional devices though?  I see CONFIG_MEM_DEVICE,
+CONFIG_PCI_APB, CONFIG_LIBDECNUMBER, CONFIG_XEN_I386,
+CONFIG_MIPS_BOSTON, CONFIG_PIIX_PCI, CONFIG_ISA_MMIO, CONFIG_ICC_BUS
+over the last few years but none probably would have been optional
+devices in default-configs/ but rather in Kconfig files.
 
- Thomas
+(Long term default-configs/ should probably be built automatically,
+possibly by adding a description field to the Kconfig files, and that
+would also ameliorate the issue you describe).
 
-
---OUvCPsnW4dVK22evODaN67tLPftANjm65
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJcUXh1AAoJEC7Z13T+cC21K3UQAIfpXIDPD0FVDYorAgSMrrub
-iWvwqaTHSAiDaVI5S5nxIRukC5k6/kHWbCxJgb2E5M6gTjUi2j+xQS2FeMr96JI3
-XhNo/sYl7/mhvjnpl7uQJec6RiUoyXC+TAmCbREONmDAFyD2WQVJLhLLIlqUY3LW
-eoJ1x/fULLSsakmk8RNmEYv2UDE2YS47DtNSuMEu94nH8LLQj5QB4tytcjOWhKmp
-XsP1L9ZESViZOIdK9woKGEg8vB0WT8k4e8OX/sBkAs582VJ3jTYq5d7B3CYYD4eb
-wkai63/n/D3O69blWS735mLsj4Hv8WLh2Icvxeg6VX8fgJFmD7j6MC4o0tKSzXuw
-bRNf9Sm4UBY2WY95eSGvjkD99uQfw6ryY5mNB2584x+oCcWCFR/i5h5rYdalDvV3
-m2dpXJTq343hsmlqRVLFLIBxw5Y3fdg47XnbiFQqvSo3si5ScdP7HeP+vc5cu5ti
-Kcy0TZT3mOCpPTn4Nlb5M0/wFpv07ky47SqACh5DN12jtB8uT2u/j6AocjgvQzzw
-eLjTYRT84e/W+niFFcXTnvwKDCB1ZBHoZ5Z5B9pnUSqVKJ0KH8iT/4CGSdATJxzZ
-dL0XQ7LdCKHU8/ogxsCjgg6hcuaY8EYLN4JArO1YIus7xbH37ebgXRFhJC/q7Bix
-B5OoxIsBZLeZS0vXg75O
-=Wsqr
------END PGP SIGNATURE-----
-
---OUvCPsnW4dVK22evODaN67tLPftANjm65--
+Paolo
