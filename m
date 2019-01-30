@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35833)
+Received: from eggs.gnu.org ([209.51.188.92]:35960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1goe42-0000Go-EW
+	(envelope-from <cota@braap.org>) id 1goe44-0000Lt-V8
 	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1goe41-0001Vg-7K
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:14 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50457)
+	(envelope-from <cota@braap.org>) id 1goe42-0001YI-UC
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:16 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45365)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1goe40-00010a-Vu
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:13 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1goe42-0001Bs-Na
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 19:49:14 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 29 Jan 2019 19:47:41 -0500
-Message-Id: <20190130004811.27372-44-cota@braap.org>
+Date: Tue, 29 Jan 2019 19:47:57 -0500
+Message-Id: <20190130004811.27372-60-cota@braap.org>
 In-Reply-To: <20190130004811.27372-1-cota@braap.org>
 References: <20190130004811.27372-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v6 43/73] i386/hvf: convert to
- cpu_request_interrupt
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 59/73] accel/tcg: convert to
+ cpu_interrupt_request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +31,106 @@ To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/i386/hvf/hvf.c    |  8 +++++---
- target/i386/hvf/x86hvf.c | 26 +++++++++++++++-----------
- 2 files changed, 20 insertions(+), 14 deletions(-)
+ accel/tcg/cpu-exec.c      | 15 ++++++++-------
+ accel/tcg/tcg-all.c       | 12 +++++++++---
+ accel/tcg/translate-all.c |  2 +-
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index c1ff220985..619a4dd565 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -249,7 +249,7 @@ void update_apic_tpr(CPUState *cpu)
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index e3d72897e8..e4ae04f72c 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -431,7 +431,7 @@ static inline bool cpu_handle_halt_locked(CPUState *cpu)
  
- static void hvf_handle_interrupt(CPUState * cpu, int mask)
+     if (cpu_halted(cpu)) {
+ #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
++        if ((cpu_interrupt_request(cpu) & CPU_INTERRUPT_POLL)
+             && replay_interrupt()) {
+             X86CPU *x86_cpu = X86_CPU(cpu);
+ 
+@@ -544,16 +544,17 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+      */
+     atomic_mb_set(&cpu->icount_decr.u16.high, 0);
+ 
+-    if (unlikely(atomic_read(&cpu->interrupt_request))) {
++    if (unlikely(cpu_interrupt_request(cpu))) {
+         int interrupt_request;
++
+         qemu_mutex_lock_iothread();
+-        interrupt_request = cpu->interrupt_request;
++        interrupt_request = cpu_interrupt_request(cpu);
+         if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+             /* Mask out external interrupts for this step. */
+             interrupt_request &= ~CPU_INTERRUPT_SSTEP_MASK;
+         }
+         if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_DEBUG;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+             cpu->exception_index = EXCP_DEBUG;
+             qemu_mutex_unlock_iothread();
+             return true;
+@@ -562,7 +563,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             /* Do nothing */
+         } else if (interrupt_request & CPU_INTERRUPT_HALT) {
+             replay_interrupt();
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_HALT;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+             cpu_halted_set(cpu, 1);
+             cpu->exception_index = EXCP_HLT;
+             qemu_mutex_unlock_iothread();
+@@ -599,10 +600,10 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             }
+             /* The target hook may have updated the 'cpu->interrupt_request';
+              * reload the 'interrupt_request' value */
+-            interrupt_request = cpu->interrupt_request;
++            interrupt_request = cpu_interrupt_request(cpu);
+         }
+         if (interrupt_request & CPU_INTERRUPT_EXITTB) {
+-            cpu->interrupt_request &= ~CPU_INTERRUPT_EXITTB;
++            cpu_reset_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+             /* ensure that no TB jump will be modified as
+                the program flow was changed */
+             *last_tb = NULL;
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 3d25bdcc17..4e2fe70350 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -39,10 +39,16 @@ unsigned long tcg_tb_size;
+ static void tcg_handle_interrupt(CPUState *cpu, int mask)
  {
+     int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
+ 
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
++    if (!cpu_mutex_locked(cpu)) {
++        cpu_mutex_lock(cpu);
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++        cpu_mutex_unlock(cpu);
++    } else {
++        old_mask = cpu_interrupt_request(cpu);
++        cpu_interrupt_request_or(cpu, mask);
++    }
+ 
+     /*
+      * If called from iothread context, wake the target cpu in
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 7364e8a071..ec708208b6 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2343,7 +2343,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf)
+ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
 -    cpu->interrupt_request |= mask;
 +    cpu_interrupt_request_or(cpu, mask);
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
-     }
-@@ -706,10 +706,12 @@ int hvf_vcpu_exec(CPUState *cpu)
-         ret = 0;
-         switch (exit_reason) {
-         case EXIT_REASON_HLT: {
-+            uint32_t interrupt_request = cpu_interrupt_request(cpu);
-+
-             macvm_set_rip(cpu, rip + ins_len);
--            if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+            if (!((interrupt_request & CPU_INTERRUPT_HARD) &&
-                 (EFLAGS(env) & IF_MASK))
--                && !(cpu->interrupt_request & CPU_INTERRUPT_NMI) &&
-+                && !(interrupt_request & CPU_INTERRUPT_NMI) &&
-                 !(idtvec_info & VMCS_IDT_VEC_VALID)) {
-                 cpu_halted_set(cpu, 1);
-                 ret = EXCP_HLT;
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index e8b13ed534..91feafeedc 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -358,6 +358,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
- 
-     uint8_t vector;
-     uint64_t intr_type;
-+    uint32_t interrupt_request;
-     bool have_event = true;
-     if (env->interrupt_injected != -1) {
-         vector = env->interrupt_injected;
-@@ -400,7 +401,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-         };
-     }
- 
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_NMI) {
-         if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
-             cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_NMI);
-             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
-@@ -411,7 +412,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-     }
- 
-     if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
--        (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-+        (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
-         int line = cpu_get_pic_interrupt(&x86cpu->env);
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_HARD);
-@@ -420,39 +421,42 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
-                   VMCS_INTR_VALID | VMCS_INTR_T_HWINTR);
-         }
-     }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_HARD) {
-         vmx_set_int_window_exiting(cpu_state);
-     }
--    return (cpu_state->interrupt_request
--            & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR));
-+    return cpu_interrupt_request(cpu_state) & (CPU_INTERRUPT_INIT |
-+                                               CPU_INTERRUPT_TPR);
+     atomic_set(&cpu->icount_decr.u16.high, -1);
  }
  
- int hvf_process_events(CPUState *cpu_state)
- {
-     X86CPU *cpu = X86_CPU(cpu_state);
-     CPUX86State *env = &cpu->env;
-+    uint32_t interrupt_request;
- 
-     EFLAGS(env) = rreg(cpu_state->hvf_fd, HV_X86_RFLAGS);
- 
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_INIT) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_INIT) {
-         hvf_cpu_synchronize_state(cpu_state);
-         do_cpu_init(cpu);
-     }
- 
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_POLL) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_POLL) {
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_POLL);
-         apic_poll_irq(cpu->apic_state);
-     }
--    if (((cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
-+
-+    interrupt_request = cpu_interrupt_request(cpu_state);
-+    if (((interrupt_request & CPU_INTERRUPT_HARD) &&
-         (EFLAGS(env) & IF_MASK)) ||
--        (cpu_state->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        (interrupt_request & CPU_INTERRUPT_NMI)) {
-         cpu_halted_set(cpu_state, 0);
-     }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_SIPI) {
-+    if (interrupt_request & CPU_INTERRUPT_SIPI) {
-         hvf_cpu_synchronize_state(cpu_state);
-         do_cpu_sipi(cpu);
-     }
--    if (cpu_state->interrupt_request & CPU_INTERRUPT_TPR) {
-+    if (cpu_interrupt_request(cpu_state) & CPU_INTERRUPT_TPR) {
-         cpu_reset_interrupt(cpu_state, CPU_INTERRUPT_TPR);
-         hvf_cpu_synchronize_state(cpu_state);
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip,
 -- 
 2.17.1
