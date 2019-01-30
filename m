@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42535)
+Received: from eggs.gnu.org ([209.51.188.92]:42557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1X-0006OZ-BJ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:51:45 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1Z-0006Of-0S
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1V-0000AE-9s
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1V-0000AA-9s
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:51:43 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 30 Jan 2019 20:51:28 +0300
-Message-Id: <1548870690-647481-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v10 1/3] bdrv_query_image_info Error parameter
- added
+Date: Wed, 30 Jan 2019 20:51:27 +0300
+Message-Id: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v10 0/3] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +21,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Inform a user in case qcow2_get_specific_info fails to obtain
-QCOW2 image specific information. This patch is preliminary to
-the print of bitmap information in the 'qemu-img info' output.
+v10:
+The 'struct Error' parameter was added to the function prototype
+bdrv_query_image_info().
+The code refactoring of the function get_bitmap_info_flags().
+The comments to the structures ImageInfoSpecificQCow2 and
+Qcow2BitmapInfo in the file qapi/block-core.json were corrected.
+The changes in the *.out files of the tests 060, 065 082, 198
+and 206 were discarded. The new test 239 was enriched by adding human
+readable format output and by checking the output with bitmap extra
+parameters, such as  non-persistent and disabled.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block.c                   |  5 +++--
- block/crypto.c            |  4 ++--
- block/qapi.c              |  7 ++++++-
- block/qcow2.c             | 10 ++++++++--
- block/vmdk.c              |  3 ++-
- include/block/block.h     |  3 ++-
- include/block/block_int.h |  3 ++-
- qemu-io-cmds.c            |  7 ++++++-
- 8 files changed, 31 insertions(+), 11 deletions(-)
+v9:
+The new test 239 of the qemu-iotests set was amended to show the bitmaps
+being added and to demonstrate the bitmap flag "in-use".
+The version #9 was discussed with the message ID:
+<1548705688-1027522-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 
-diff --git a/block.c b/block.c
-index 4f5ff2c..1eb35ef 100644
---- a/block.c
-+++ b/block.c
-@@ -4307,11 +4307,12 @@ int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     return drv->bdrv_get_info(bs, bdi);
- }
- 
--ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs)
-+ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs,
-+                                          Error **errp)
- {
-     BlockDriver *drv = bs->drv;
-     if (drv && drv->bdrv_get_specific_info) {
--        return drv->bdrv_get_specific_info(bs);
-+        return drv->bdrv_get_specific_info(bs, errp);
-     }
-     return NULL;
- }
-diff --git a/block/crypto.c b/block/crypto.c
-index f0a5f6b..4ede833 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -594,13 +594,13 @@ static int block_crypto_get_info_luks(BlockDriverState *bs,
- }
- 
- static ImageInfoSpecific *
--block_crypto_get_specific_info_luks(BlockDriverState *bs)
-+block_crypto_get_specific_info_luks(BlockDriverState *bs, Error **errp)
- {
-     BlockCrypto *crypto = bs->opaque;
-     ImageInfoSpecific *spec_info;
-     QCryptoBlockInfo *info;
- 
--    info = qcrypto_block_get_info(crypto->block, NULL);
-+    info = qcrypto_block_get_info(crypto->block, errp);
-     if (!info) {
-         return NULL;
-     }
-diff --git a/block/qapi.c b/block/qapi.c
-index c66f949..f53f100 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -282,7 +282,12 @@ void bdrv_query_image_info(BlockDriverState *bs,
-         info->dirty_flag = bdi.is_dirty;
-         info->has_dirty_flag = true;
-     }
--    info->format_specific     = bdrv_get_specific_info(bs);
-+    info->format_specific     = bdrv_get_specific_info(bs, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        qapi_free_ImageInfo(info);
-+        goto out;
-+    }
-     info->has_format_specific = info->format_specific != NULL;
- 
-     backing_filename = bs->backing_file;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4897aba..27e5a2c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4367,14 +4367,20 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-     return 0;
- }
- 
--static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-+static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-+                                                  Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     ImageInfoSpecific *spec_info;
-     QCryptoBlockInfo *encrypt_info = NULL;
-+    Error *local_err = NULL;
- 
-     if (s->crypto != NULL) {
--        encrypt_info = qcrypto_block_get_info(s->crypto, &error_abort);
-+        encrypt_info = qcrypto_block_get_info(s->crypto, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return NULL;
-+        }
-     }
- 
-     spec_info = g_new(ImageInfoSpecific, 1);
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 2c9e86d..544c10d 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2314,7 +2314,8 @@ static int coroutine_fn vmdk_co_check(BlockDriverState *bs,
-     return ret;
- }
- 
--static ImageInfoSpecific *vmdk_get_specific_info(BlockDriverState *bs)
-+static ImageInfoSpecific *vmdk_get_specific_info(BlockDriverState *bs,
-+                                                 Error **errp)
- {
-     int i;
-     BDRVVmdkState *s = bs->opaque;
-diff --git a/include/block/block.h b/include/block/block.h
-index f70a843..9899c24 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -477,7 +477,8 @@ const char *bdrv_get_device_name(const BlockDriverState *bs);
- const char *bdrv_get_device_or_node_name(const BlockDriverState *bs);
- int bdrv_get_flags(BlockDriverState *bs);
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi);
--ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs);
-+ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs,
-+                                          Error **errp);
- void bdrv_round_to_clusters(BlockDriverState *bs,
-                             int64_t offset, int64_t bytes,
-                             int64_t *cluster_offset,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f605622..0075baf 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -319,7 +319,8 @@ struct BlockDriver {
-                                   const char *name,
-                                   Error **errp);
-     int (*bdrv_get_info)(BlockDriverState *bs, BlockDriverInfo *bdi);
--    ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs);
-+    ImageInfoSpecific *(*bdrv_get_specific_info)(BlockDriverState *bs,
-+                                                 Error **errp);
- 
-     int coroutine_fn (*bdrv_save_vmstate)(BlockDriverState *bs,
-                                           QEMUIOVector *qiov,
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 2c39124..2187036 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1661,6 +1661,7 @@ static int info_f(BlockBackend *blk, int argc, char **argv)
-     BlockDriverState *bs = blk_bs(blk);
-     BlockDriverInfo bdi;
-     ImageInfoSpecific *spec_info;
-+    Error *local_err = NULL;
-     char s1[64], s2[64];
-     int ret;
- 
-@@ -1682,7 +1683,11 @@ static int info_f(BlockBackend *blk, int argc, char **argv)
-     printf("cluster size: %s\n", s1);
-     printf("vm state offset: %s\n", s2);
- 
--    spec_info = bdrv_get_specific_info(bs);
-+    spec_info = bdrv_get_specific_info(bs, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return -EIO;
-+    }
-     if (spec_info) {
-         printf("Format specific information:\n");
-         bdrv_image_info_specific_dump(fprintf, stdout, spec_info);
+v8:
+The output benchmark files for the qemu-iotests, namely 060, 065 082, 198
+and 206, were modified to show the bitmap extension for the qemu specific
+information. A new test file 239 was added to the test set that checks the
+output for the fields of the bitmap section.
+The backward compatibility of the output for images of the version 2
+of qcow2 was added.
+
+v7:
+A description was added to the function qcow2_get_bitmap_info_list().
+In the function qcow2_get_specific_info(), the comment was modified
+so that we ignore any error in obtaining the list of bitmaps to
+pass the rest of QCOW2 specific information to a caller.
+
+v6:
+'[PATCH v6] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was reversed.
+
+v5:
+'[PATCH v5] qemu-img info lists bitmap directory entries'.
+The error handling logic for the bitmaps empty list was fixed and documented.
+
+v4:
+'[PATCH v4] qemu-img info lists bitmap directory entries'.
+Unknown flags are checked with the mask BME_RESERVED_FLAGS.
+The code minor refactoring was made.
+
+v3:
+'[PATCH v3] qemu-img info lists bitmap directory entries'.
+Now, qcow2_get_bitmap_info_list() is invoked under the condition of QCOW
+version #3 to avoid memory leaks in case of QCOW version #2.
+Furthermore, qcow2_get_bitmap_info_list() checks the number of existing bitmaps.
+So, if no bitmap exists, no bitmap error message is printed in the output.
+The data type of the bitmap 'granularity' parameter was left as 'uint32'
+because bitmap_list_load() returns error if granularity_bits is grater than 31.
+
+v2:
+'[PATCH v2] qemu-img info lists bitmap directory entries'.
+The targeted version of the release at 'Since' word of the comments to the new
+structures changed to 4.0 in the file qapi/block-core.json.
+A comment to the 'bitmaps' new member was supplied.
+The 'unknown flags' parameter was introduced to indicate presence of QCOW2
+bitmap unknown flags, if any.
+The word 'dirty' was removed from the code and from the comments as we list all
+the bitmaps.
+The 'bitmaps' printed parameter was removed for the release versions earlier
+than 3.x.
+The example of the output was moved above the 'Signed-off-by' line.
+
+The first version was '[PATCH] qemu-img info lists bitmap directory entries'.
+
+Andrey Shinkevich (3):
+  bdrv_query_image_info Error parameter added
+  qemu-img info lists bitmap directory entries
+  qemu-img info: bitmaps extension new test 239
+
+ block.c                    |   5 +-
+ block/crypto.c             |   4 +-
+ block/qapi.c               |   7 ++-
+ block/qcow2-bitmap.c       |  77 +++++++++++++++++++++++++++
+ block/qcow2.c              |  20 ++++++-
+ block/qcow2.h              |   2 +
+ block/vmdk.c               |   3 +-
+ include/block/block.h      |   3 +-
+ include/block/block_int.h  |   3 +-
+ qapi/block-core.json       |  40 +++++++++++++-
+ qemu-io-cmds.c             |   7 ++-
+ tests/qemu-iotests/239     |  74 ++++++++++++++++++++++++++
+ tests/qemu-iotests/239.out | 130 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 14 files changed, 364 insertions(+), 12 deletions(-)
+ create mode 100755 tests/qemu-iotests/239
+ create mode 100644 tests/qemu-iotests/239.out
+
 -- 
 1.8.3.1
