@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55439)
+Received: from eggs.gnu.org ([209.51.188.92]:56683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gop6A-0003OQ-Hz
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:36:11 -0500
+	(envelope-from <groug@kaod.org>) id 1gopDS-0005G3-4C
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:43:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gop69-0002Xm-Ff
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:36:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50818)
+	(envelope-from <groug@kaod.org>) id 1gopDG-0006bo-El
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:43:34 -0500
+Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:36358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gop69-0002Vf-74
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:36:09 -0500
-References: <20181212095707.19358-1-david@redhat.com>
-	<a26a687a-5098-1715-9fee-8374bdd30268@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c646ce74-7ecd-325f-3cb9-421af6d8a9b8@redhat.com>
-Date: Wed, 30 Jan 2019 13:35:45 +0100
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gopDA-0006QY-TV
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:43:26 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.146.50])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 524301CDF1B
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 13:43:10 +0100 (CET)
+Date: Wed, 30 Jan 2019 13:43:03 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190130134303.754a43ab@bahia.lan>
+In-Reply-To: <20190130014216.98287-1-aik@ozlabs.ru>
+References: <20190130014216.98287-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <a26a687a-5098-1715-9fee-8374bdd30268@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] pc: Use
- hotplug_handler_(plug|unplug|unplug_request)
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] spapr: Drop unused
+ parameters from fdt building helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 14.12.18 10:58, Paolo Bonzini wrote:
-> On 12/12/18 10:57, David Hildenbrand wrote:
->> Let's avoid manually looking up the hotplug handler class. Use the
->> existing wrappers instead.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/i386/pc.c | 30 ++++++++----------------------
->>  1 file changed, 8 insertions(+), 22 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 4cd2fbca4d..c8857138f9 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1711,7 +1711,6 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
->>                             DeviceState *dev, Error **errp)
->>  {
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> @@ -1725,8 +1724,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
->>          nvdimm_plug(&pcms->acpi_nvdimm_state);
->>      }
->>  
->> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -    hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
->> +    hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
->>  out:
->>      error_propagate(errp, local_err);
->>  }
->> @@ -1734,7 +1732,6 @@ out:
->>  static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
->>                                       DeviceState *dev, Error **errp)
->>  {
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>  
->> @@ -1755,9 +1752,8 @@ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
->>          goto out;
->>      }
->>  
->> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->> -
->> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->> +                                   &local_err);
->>  out:
->>      error_propagate(errp, local_err);
->>  }
->> @@ -1766,12 +1762,9 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
->>                               DeviceState *dev, Error **errp)
->>  {
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>  
->> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->> -
->> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>      if (local_err) {
->>          goto out;
->>      }
->> @@ -1813,14 +1806,12 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
->>                          DeviceState *dev, Error **errp)
->>  {
->>      CPUArchId *found_cpu;
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>      X86CPU *cpu = X86_CPU(dev);
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>  
->>      if (pcms->acpi_dev) {
->> -        hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -        hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->> +        hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>          if (local_err) {
->>              goto out;
->>          }
->> @@ -1844,7 +1835,6 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
->>                                       DeviceState *dev, Error **errp)
->>  {
->>      int idx = -1;
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>      X86CPU *cpu = X86_CPU(dev);
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->> @@ -1861,9 +1851,8 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
->>          goto out;
->>      }
->>  
->> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->> -
->> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->> +                                   &local_err);
->>      if (local_err) {
->>          goto out;
->>      }
->> @@ -1877,14 +1866,11 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
->>                               DeviceState *dev, Error **errp)
->>  {
->>      CPUArchId *found_cpu;
->> -    HotplugHandlerClass *hhc;
->>      Error *local_err = NULL;
->>      X86CPU *cpu = X86_CPU(dev);
->>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>  
->> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->> -
->> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>      if (local_err) {
->>          goto out;
->>      }
->>
+On Wed, 30 Jan 2019 12:42:16 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> spapr_load_rtas() handles now RTAS address and size information in the FDT
+> so drop them from spapr_build_fdt().
 > 
-> Queued, thanks.
-
-Paolo, just wondering, is this still on your queue or fell of the wagon?
-
-Thanks!
-
+> While we are here, fix a small typo.
 > 
-> Paolo
+> Fixes: 2cac78c12ade9 "pseries: Consolidate RTAS loading"
+
+One nit. The last rtas_* user in spapr_build_fdt() was removed by the
+following hunk:
+
+@@ -949,12 +966,6 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+         }
+     }
+ 
+-    /* RTAS */
+-    ret = spapr_rtas_device_tree_setup(fdt, rtas_addr, rtas_size);
+-    if (ret < 0) {
+-        error_report("Couldn't set up RTAS device tree properties");
+-    }
+-
+     /* cpus */
+     spapr_populate_cpus_dt_node(fdt, spapr);
+ 
+from commit:
+
+3f5dabceba24 "pseries: Consolidate construction of /rtas device tree node"
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  hw/ppc/spapr.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 > 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a217c7f..fa12723 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1225,9 +1225,7 @@ static void spapr_dt_hypervisor(sPAPRMachineState *spapr, void *fdt)
+>      }
+>  }
+>  
+> -static void *spapr_build_fdt(sPAPRMachineState *spapr,
+> -                             hwaddr rtas_addr,
+> -                             hwaddr rtas_size)
+> +static void *spapr_build_fdt(sPAPRMachineState *spapr)
+>  {
+>      MachineState *machine = MACHINE(spapr);
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+> @@ -1644,14 +1642,14 @@ static void spapr_machine_reset(void)
+>  
+>      /*
+>       * We place the device tree and RTAS just below either the top of the RMA,
+> -     * or just below 2GB, whichever is lowere, so that it can be
+> +     * or just below 2GB, whichever is lower, so that it can be
+>       * processed with 32-bit real mode code if necessary
+>       */
+>      rtas_limit = MIN(spapr->rma_size, RTAS_MAX_ADDR);
+>      rtas_addr = rtas_limit - RTAS_MAX_SIZE;
+>      fdt_addr = rtas_addr - FDT_MAX_SIZE;
+>  
+> -    fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+> +    fdt = spapr_build_fdt(spapr);
+>  
+>      spapr_load_rtas(spapr, fdt, rtas_addr);
+>  
