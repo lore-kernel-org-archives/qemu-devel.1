@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36150)
+Received: from eggs.gnu.org ([209.51.188.92]:39457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gom2D-00047w-JD
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:19:54 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gomA1-0006nP-TI
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:28:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gom2C-000719-SP
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:19:53 -0500
-References: <20190125151440.13794-1-sourav.jb1988@gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1gom9t-0004Sd-UD
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:27:57 -0500
+References: <20190124162045.10474-1-sourav.jb1988@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9a14a8b4-b0c5-c5bd-9563-c8e6f73e9c03@vivier.eu>
-Date: Wed, 30 Jan 2019 10:19:45 +0100
+Message-ID: <bec07d22-d33f-ed5b-8b96-deb431f2d189@vivier.eu>
+Date: Wed, 30 Jan 2019 10:27:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190125151440.13794-1-sourav.jb1988@gmail.com>
+In-Reply-To: <20190124162045.10474-1-sourav.jb1988@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw: input: set category of
- the i8042 device
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw: sd: set category of the
+ sd memory card
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +25,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+Cc: thuth@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org
 
-On 25/01/2019 16:14, kumar sourav wrote:
-> Sets the category of i8042 device as DEVICE_CATEGORY_INPUT
+On 24/01/2019 17:20, kumar sourav wrote:
+> Sets the category of the sd memory card as DEVICE_CATEGORY_STORAGE.
 > Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
 > 
 > Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
 > ---
->  hw/input/pckbd.c | 1 +
+>  hw/sd/sd.c | 1 +
 >  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-> index 3e66713b47..72e7d5f6cc 100644
-> --- a/hw/input/pckbd.c
-> +++ b/hw/input/pckbd.c
-> @@ -574,6 +574,7 @@ static void i8042_class_initfn(ObjectClass *klass, void *data)
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index d4356e9b73..aaab15f386 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -2121,6 +2121,7 @@ static void sd_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &sd_vmstate;
+>      dc->reset = sd_reset;
+>      dc->bus_type = TYPE_SD_BUS;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
 >  
->      dc->realize = i8042_realizefn;
->      dc->vmsd = &vmstate_kbd_isa;
-> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->  }
->  
->  static const TypeInfo i8042_info = {
+>      sc->set_voltage = sd_set_voltage;
+>      sc->get_dat_lines = sd_get_dat_lines;
 > 
 
 Applied to my trivial-patches branch.
