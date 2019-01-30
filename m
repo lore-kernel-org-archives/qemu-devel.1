@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34457)
+Received: from eggs.gnu.org ([209.51.188.92]:35638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gotRi-0006nC-UU
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:44 -0500
+	(envelope-from <philmd@redhat.com>) id 1gotYA-0008RV-EL
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:21:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gotRh-0005OY-DN
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60278)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gotRh-0005Ms-4Z
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:41 -0500
-References: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <9b791496-fa11-a3e2-4dc4-1254da6589ba@redhat.com>
-Date: Wed, 30 Jan 2019 15:14:23 -0200
+	(envelope-from <philmd@redhat.com>) id 1gotY8-0000pe-Kp
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:21:22 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gotY8-0000on-Ch
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:21:20 -0500
+Received: by mail-wm1-f65.google.com with SMTP id m22so357914wml.3
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 09:21:19 -0800 (PST)
+References: <1548866382-14488-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4e8dcc26-7e62-c79d-c354-8ade5db33f26@redhat.com>
+Date: Wed, 30 Jan 2019 18:21:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1548866382-14488-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] Acceptance tests: use linux-3.6 and
- set vm memory to 4GiB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc: Don't include m48t59.h if it is
+ not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 01/27/2019 11:15 PM, Li Zhijian wrote:
-> QEMU have already supported to load up to 4G initrd if the sepcified me=
-mory is
-> enough and XLF_CAN_BE_LOADED_ABOVE_4G is set by guest kernel
->
-> linux-3.6 kernel shipped by Fedora-18 cannot support xldflags so that i=
-t
-> cannot support loading more than 2GiB initrd
->
-> CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> CC: Caio Carrara <ccarrara@redhat.com>
-> CC: Cleber Rosa <crosa@redhat.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->
+On 1/30/19 5:39 PM, Thomas Huth wrote:
+> These files don't use anything from m48t59.h, so no need to include
+> this header here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> V2: fix typos
-> ---
->   tests/acceptance/linux_initrd.py | 14 ++++++++------
->   1 file changed, 8 insertions(+), 6 deletions(-)
+>  hw/ppc/mac_newworld.c | 1 -
+>  hw/ppc/mac_oldworld.c | 1 -
+>  hw/ppc/ppc.c          | 2 --
+>  hw/ppc/ppc_booke.c    | 1 -
+>  4 files changed, 5 deletions(-)
+> 
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index bb19eab..f1c8400 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -53,7 +53,6 @@
+>  #include "hw/ppc/mac.h"
+>  #include "hw/input/adb.h"
+>  #include "hw/ppc/mac_dbdma.h"
+> -#include "hw/timer/m48t59.h"
+>  #include "hw/pci/pci.h"
+>  #include "net/net.h"
+>  #include "sysemu/sysemu.h"
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 817f70e..98d531d 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -30,7 +30,6 @@
+>  #include "hw/ppc/ppc.h"
+>  #include "mac.h"
+>  #include "hw/input/adb.h"
+> -#include "hw/timer/m48t59.h"
+>  #include "sysemu/sysemu.h"
+>  #include "net/net.h"
+>  #include "hw/isa/isa.h"
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index 98b409f..cffdc39 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -30,10 +30,8 @@
+>  #include "qemu/timer.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/cpus.h"
+> -#include "hw/timer/m48t59.h"
+>  #include "qemu/log.h"
+>  #include "qemu/error-report.h"
+> -#include "hw/loader.h"
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+I supposed the "hw/loader.h" change slipped in by mistake.
 
-Note to maintainers: the patch 02 implements a test case for=20
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg588166.html which=20
-is in Paolo's queue already.
+For m48t59.h:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-- Wainer
-
-
->
-> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_=
-initrd.py
-> index 737355c..b283715 100644
-> --- a/tests/acceptance/linux_initrd.py
-> +++ b/tests/acceptance/linux_initrd.py
-> @@ -24,14 +24,16 @@ class LinuxInitrd(Test):
->  =20
->       timeout =3D 60
->  =20
-> -    def test_with_2gib_file_should_exit_error_msg(self):
-> +    def test_with_2gib_file_should_exit_error_msg_with_linux_v3_6(self=
-):
->           """
->           Pretends to boot QEMU with an initrd file with size of 2GiB
->           and expect it exits with error message.
-> +        Fedora-18 shipped with linux-3.6 which have not supported xloa=
-dflags
-> +        cannot support more than 2GiB initrd.
->           """
-> -        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28=
-/'
-> -                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-> -        kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
-> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
-e/fedora/li'
-> +                      'nux/releases/18/Fedora/x86_64/os/images/pxeboot=
-/vmlinuz')
-> +        kernel_hash =3D '41464f68efe42b9991250bed86c7081d2ccdbb21'
->           kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dker=
-nel_hash)
->           max_size =3D 2 * (1024 ** 3) - 1
->  =20
-> @@ -39,8 +41,8 @@ class LinuxInitrd(Test):
->               initrd.seek(max_size)
->               initrd.write(b'\0')
->               initrd.flush()
-> -            cmd =3D "%s -kernel %s -initrd %s" % (self.qemu_bin, kerne=
-l_path,
-> -                                                initrd.name)
-> +            cmd =3D "%s -kernel %s -initrd %s -m 4096" % (
-> +                  self.qemu_bin, kernel_path, initrd.name)
->               res =3D run(cmd, ignore_status=3DTrue)
->               self.assertEqual(res.exit_status, 1)
->               expected_msg =3D r'.*initrd is too large.*max: \d+, need =
-%s.*' % (
+>  #include "sysemu/kvm.h"
+>  #include "kvm_ppc.h"
+>  #include "trace.h"
+> diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
+> index 23bcf1b..4f11e00 100644
+> --- a/hw/ppc/ppc_booke.c
+> +++ b/hw/ppc/ppc_booke.c
+> @@ -28,7 +28,6 @@
+>  #include "hw/ppc/ppc.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/sysemu.h"
+> -#include "hw/timer/m48t59.h"
+>  #include "qemu/log.h"
+>  #include "hw/loader.h"
+>  #include "kvm_ppc.h"
+> 
