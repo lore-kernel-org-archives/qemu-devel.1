@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48688)
+Received: from eggs.gnu.org ([209.51.188.92]:48749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomfU-0004Ir-Gl
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:00:32 -0500
+	(envelope-from <berrange@redhat.com>) id 1gomfo-0004SK-N1
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomfM-0004yL-CA
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:00:26 -0500
-References: <1548252536-6242-1-git-send-email-thuth@redhat.com>
-	<1548252536-6242-4-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <eadb5ca9-213a-55b2-6f5d-4202375e5ff4@vivier.eu>
-Date: Wed, 30 Jan 2019 10:59:54 +0100
+	(envelope-from <berrange@redhat.com>) id 1gomfn-0005Dj-N1
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:00:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gomfn-0005CI-H7
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:00:47 -0500
+Date: Wed, 30 Jan 2019 10:00:34 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190130100034.GC15904@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190130031427.13129-1-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1548252536-6242-4-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 3/4] target/tricore: Fix
- LGPL version number
+Content-Disposition: inline
+In-Reply-To: <20190130031427.13129-1-jasowang@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain
+ socket through fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,162 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>
 
-On 23/01/2019 15:08, Thomas Huth wrote:
-> It's either "GNU *Library* General Public version 2" or "GNU Lesser
-> General Public version *2.1*", but there was no "version 2.0" of the
-> "Lesser" library. So assume that version 2.1 is meant here.
-> 
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Wed, Jan 30, 2019 at 11:14:27AM +0800, Jason Wang wrote:
+> The tests tries to let qemu server mode to process the connection
+> which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
+> "x-oob", offer capability "oob" unconditionally"). This is because the
+> filter may try to mirror the packets before UNIX socket object is
+> ready (connected was set to true) from the view of qemu. In this case
+> the packet will be dropped silently.
+>=20
+> Fixing this by passing pre-connected socket created by socketpair() to
+> qemu through fd.
+>=20
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Zhang Chen <zhangckid@gmail.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  target/tricore/cpu-qom.h         | 2 +-
->  target/tricore/cpu.c             | 2 +-
->  target/tricore/cpu.h             | 2 +-
->  target/tricore/fpu_helper.c      | 2 +-
->  target/tricore/helper.c          | 2 +-
->  target/tricore/helper.h          | 2 +-
->  target/tricore/op_helper.c       | 2 +-
->  target/tricore/translate.c       | 2 +-
->  target/tricore/tricore-defs.h    | 2 +-
->  target/tricore/tricore-opcodes.h | 2 +-
->  10 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/target/tricore/cpu-qom.h b/target/tricore/cpu-qom.h
-> index 6a69756..93c9d77 100644
-> --- a/target/tricore/cpu-qom.h
-> +++ b/target/tricore/cpu-qom.h
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-> index 2edaef1..e8d37e4 100644
-> --- a/target/tricore/cpu.c
-> +++ b/target/tricore/cpu.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-> index c3665c6..00e69dc 100644
-> --- a/target/tricore/cpu.h
-> +++ b/target/tricore/cpu.h
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
-> index 31df462..d8a6c0d 100644
-> --- a/target/tricore/fpu_helper.c
-> +++ b/target/tricore/fpu_helper.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/helper.c b/target/tricore/helper.c
-> index dad7eea..0769046 100644
-> --- a/target/tricore/helper.c
-> +++ b/target/tricore/helper.c
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/helper.h b/target/tricore/helper.h
-> index e634d0c..f60e810 100644
-> --- a/target/tricore/helper.h
-> +++ b/target/tricore/helper.h
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/op_helper.c b/target/tricore/op_helper.c
-> index b57f353..ed9dc0c 100644
-> --- a/target/tricore/op_helper.c
-> +++ b/target/tricore/op_helper.c
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-> index b5ab40d..14f0ddf 100644
-> --- a/target/tricore/translate.c
-> +++ b/target/tricore/translate.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/tricore-defs.h b/target/tricore/tricore-defs.h
-> index 40abfaa..e871aa1 100644
-> --- a/target/tricore/tricore-defs.h
-> +++ b/target/tricore/tricore-defs.h
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/tricore/tricore-opcodes.h b/target/tricore/tricore-opcodes.h
-> index 2c3baab..40bc121 100644
-> --- a/target/tricore/tricore-opcodes.h
-> +++ b/target/tricore/tricore-opcodes.h
-> @@ -4,7 +4,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> 
+> Changes from v1:
+> - close the socket pairs in the end of test
+> ---
+>  tests/test-filter-mirror.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
 
-Applied to my trivial-patches branch.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Thanks,
-Laurent
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
