@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33512)
+Received: from eggs.gnu.org ([209.51.188.92]:34246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gotMz-0004wG-Df
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:54 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gotQc-00060Q-4c
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gotMy-0002ua-Ge
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42338)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gotMx-0002rB-DI
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:48 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0UGxRoC004408
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:09:40 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qbfv4rsp7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:09:40 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 30 Jan 2019 17:09:38 -0000
-Date: Wed, 30 Jan 2019 18:09:31 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20190130132212.7376-7-cohuck@redhat.com>
-References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-7-cohuck@redhat.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gotQb-0004sW-8T
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:13:34 -0500
+References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+	<1548841387-7670-1-git-send-email-thuth@redhat.com>
+	<1548841387-7670-4-git-send-email-thuth@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
+Date: Wed, 30 Jan 2019 17:13:15 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190130180931.4fd4b6a9@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] vfio-ccw: add handling for async
- channel instructions
+In-Reply-To: <1548841387-7670-4-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/5] ppc: Express dependencies of the
+ Mac machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,51 +26,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
+Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org
 
-On Wed, 30 Jan 2019 14:22:12 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 30/01/2019 09:43, Thomas Huth wrote:
 
-> +static void fsm_async_retry(struct vfio_ccw_private *private,
-> +			    enum vfio_ccw_event event)
-> +{
-> +	private->cmd_region->ret_code = -EAGAIN;
-> +}
-> +
+> This will make it for example easier if the users want to disable
+> one of the two machines for their builds.
+> 
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  default-configs/ppc-softmmu.mak | 15 ---------------
+>  hw/misc/Kconfig                 |  8 ++++++++
+>  hw/net/Kconfig                  |  2 ++
+>  hw/pci-host/Kconfig             |  4 +++-
+>  hw/ppc/Kconfig                  |  7 +++++++
+>  5 files changed, 20 insertions(+), 16 deletions(-)
+> 
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+> index 422f1b7..513a8e9 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -37,21 +37,6 @@ CONFIG_VGA_CIRRUS=y
+>  CONFIG_SMBUS_EEPROM=y
+>  
+>  # For Macs
+> -CONFIG_ESCC=y
+> -CONFIG_MACIO=y
+> -CONFIG_MACIO_GPIO=y
+> -CONFIG_SUNGEM=y
+> -CONFIG_MOS6522=y
+> -CONFIG_CUDA=y
+> -CONFIG_ADB=y
+> -CONFIG_MAC_NVRAM=y
+> -CONFIG_MAC_DBDMA=y
+> -CONFIG_MAC_PMU=y
+> -CONFIG_HEATHROW_PIC=y
+> -CONFIG_GRACKLE_PCI=y
+> -CONFIG_UNIN_PCI=y
+> -CONFIG_DEC_PCI=y
+> -CONFIG_IDE_MACIO=y
+>  CONFIG_MAC_OLDWORLD=y
+>  CONFIG_MAC_NEWWORLD=y
+>  
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index 3ebe30f..f392502 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -59,6 +59,14 @@ config MOS6522
+>  
+>  config MACIO
+>      bool
+> +    select CUDA
+> +    select ESCC
+> +    select IDE_MACIO
+> +    select MACIO_GPIO
+> +    select MAC_DBDMA
+> +    select MAC_NVRAM
+> +    select MAC_PMU
+> +    select MOS6522
 
-This is essentially dead code at the moment, isn't it? I mean we hold the
-io_mutex whenever we are in state VFIO_CCW_STATE_CP_PROCESSING, and we
-call vfio_ccw_fsm_event() with the very same mutex held.
+Technically MACIO_GPIO and MAC_PMU are MAC_NEWWORLD only, so we might want to split
+this down further?
 
-> @@ -213,26 +323,31 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
->  	[VFIO_CCW_STATE_NOT_OPER] = {
->  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_nop,
->  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
-> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
->  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
->  	},
->  	[VFIO_CCW_STATE_STANDBY] = {
->  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
->  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
-> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
->  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
->  	},
->  	[VFIO_CCW_STATE_IDLE] = {
->  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
->  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
-> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
->  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
->  	},
->  	[VFIO_CCW_STATE_CP_PROCESSING] = {
->  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
->  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_retry,
-> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_retry,
+>  config IVSHMEM_DEVICE
+>      bool
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index 47368d7..9047f6d 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -85,6 +85,8 @@ config FTGMAC100
+>  
+>  config SUNGEM
+>      bool
+> +    default y if (MAC_OLDWORLD || MAC_NEWWORLD)
+> +    depends on PCI
+>  
+>  config COLDFIRE
+>      bool
+> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+> index ff4080c..b39ea29 100644
+> --- a/hw/pci-host/Kconfig
+> +++ b/hw/pci-host/Kconfig
+> @@ -10,8 +10,10 @@ config GRACKLE_PCI
+>      bool
+>  
+>  config UNIN_PCI
+> -    select PCI
+>      bool
+> +    select PCI
+> +    select DEC_PCI
+> +    select OPENPIC
+>  
+>  config PPCE500_PCI
+>      select PCI
+> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
+> index 809830e..f6b4206 100644
+> --- a/hw/ppc/Kconfig
+> +++ b/hw/ppc/Kconfig
+> @@ -44,9 +44,16 @@ config RS6000_MC
+>  
+>  config MAC_OLDWORLD
+>      bool
+> +    select ADB
+> +    select GRACKLE_PCI
+> +    select HEATHROW_PIC
+> +    select MACIO
+>  
+>  config MAC_NEWWORLD
+>      bool
+> +    select ADB
+> +    select MACIO
+> +    select UNIN_PCI
 
-Used here.
+Also MAC_NEWWORLD has an in-built USB PCI bridge (OHCI) which populates with a USB
+keyboard/mouse rather than ADB when using -M mac99,via=pmu, but I presume USB is
+handled elsewhere?
 
-Regards,
-Halil
+>  config E500
+>      bool
+> 
 
->  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
->  	},
+
+ATB,
+
+Mark.
