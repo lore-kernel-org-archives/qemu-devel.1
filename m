@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60850)
+Received: from eggs.gnu.org ([209.51.188.92]:33419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gonPK-0007Ix-GB
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:47:51 -0500
+	(envelope-from <thuth@redhat.com>) id 1gonUR-00007Q-E5
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:53:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gonPI-0000t1-PH
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:47:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56712)
+	(envelope-from <thuth@redhat.com>) id 1gonUQ-0002N0-Dp
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:53:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gonPI-0000lP-Fi
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:47:48 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E79CC804F4
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 10:47:27 +0000 (UTC)
-Date: Wed, 30 Jan 2019 10:47:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190130104717.GH15904@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190130103236.18302-1-dgilbert@redhat.com>
-	<20190130103236.18302-5-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gonUQ-0002Mq-5G
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:53:06 -0500
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <815dd9b2-f2fb-40d1-67c1-9862e05f6b22@redhat.com>
+Date: Wed, 30 Jan 2019 11:53:02 +0100
 MIME-Version: 1.0
+In-Reply-To: <1548410831-19553-42-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190130103236.18302-5-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/9] migration: Switch to using announce
- timer
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
+ kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +29,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, quintela@redhat.com, mst@redhat.com, eblake@redhat.com, armbru@redhat.com, germano@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com
 
-On Wed, Jan 30, 2019 at 10:32:31AM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Switch the announcements to using the new announce timer.
-> Move the code that does it to announce.c rather than savevm
-> because it really has nothing to do with the actual migration.
-> 
-> Migration starts the announce from bh's and so they're all
-> in the main thread/bql, and so there's never any racing with
-> the timers themselves.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 2019-01-25 11:07, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/migration/misc.h | 10 ------
->  include/net/announce.h   |  2 ++
->  include/sysemu/sysemu.h  |  2 --
->  migration/migration.c    |  2 +-
->  migration/migration.h    |  4 +++
->  migration/savevm.c       | 72 ++--------------------------------------
->  migration/trace-events   |  1 -
->  net/announce.c           | 67 +++++++++++++++++++++++++++++++++++++
->  net/trace-events         |  4 +++
->  9 files changed, 81 insertions(+), 83 deletions(-)
+>  default-configs/i386-softmmu.mak | 9 ---------
+>  hw/audio/Kconfig                 | 2 ++
+>  hw/block/Kconfig                 | 2 ++
+>  hw/char/Kconfig                  | 6 ++++++
+>  hw/display/Kconfig               | 3 +++
+>  hw/dma/Kconfig                   | 1 +
+>  hw/i386/Kconfig                  | 1 +
+>  hw/ide/Kconfig                   | 1 +
+>  hw/input/Kconfig                 | 2 ++
+>  hw/isa/Kconfig                   | 7 +++++++
+>  hw/misc/Kconfig                  | 4 ++++
+>  hw/net/Kconfig                   | 3 +++
+>  hw/sparc64/Kconfig               | 1 +
+>  hw/watchdog/Kconfig              | 2 ++
+>  14 files changed, 35 insertions(+), 9 deletions(-)
+> 
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index 4073c62..8e6a810 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -8,19 +8,12 @@ CONFIG_VGA_ISA=y
+>  CONFIG_VMWARE_VGA=y
+>  CONFIG_VMXNET3_PCI=y
+>  CONFIG_VIRTIO_VGA=y
+> -CONFIG_VMMOUSE=y
+>  CONFIG_IPMI=y
+>  CONFIG_IPMI_LOCAL=y
+>  CONFIG_IPMI_EXTERN=y
+>  CONFIG_ISA_IPMI_KCS=y
+>  CONFIG_ISA_IPMI_BT=y
+> -CONFIG_SERIAL=y
+> -CONFIG_SERIAL_ISA=y
+> -CONFIG_PARALLEL=y
+>  CONFIG_I8254=y
+> -CONFIG_PCSPK=y
+> -CONFIG_PCKBD=y
+> -CONFIG_FDC=y
+>  CONFIG_ACPI=y
+>  CONFIG_ACPI_X86=y
+>  CONFIG_ACPI_X86_ICH=y
+> @@ -30,14 +23,12 @@ CONFIG_APM=y
+>  CONFIG_I8257=y
+>  CONFIG_IDE_ISA=y
+>  CONFIG_IDE_PIIX=y
+> -CONFIG_NE2000_ISA=y
+>  CONFIG_HPET=y
+>  CONFIG_APPLESMC=y
+>  CONFIG_I8259=y
+>  CONFIG_PFLASH_CFI01=y
+>  CONFIG_MC146818RTC=y
+>  CONFIG_PCI_PIIX=y
+> -CONFIG_WDT_IB700=y
+>  CONFIG_ISA_DEBUG=y
+>  CONFIG_ISA_TESTDEV=y
+>  CONFIG_VMPORT=y
+> diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
+> index dedb513..01aea55 100644
+> --- a/hw/audio/Kconfig
+> +++ b/hw/audio/Kconfig
+> @@ -35,6 +35,8 @@ config HDA
+>  
+>  config PCSPK
+>      bool
+> +    default y
+> +    depends on I8254
+>  
+>  config WM8750
+>      bool
+> diff --git a/hw/block/Kconfig b/hw/block/Kconfig
+> index f7b9d3a..dc91e67 100644
+> --- a/hw/block/Kconfig
+> +++ b/hw/block/Kconfig
+> @@ -1,5 +1,7 @@
+>  config FDC
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+>  
+>  config SSI_M25P80
+>      bool
+> diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+> index 6eba69a..fc18481 100644
+> --- a/hw/char/Kconfig
+> +++ b/hw/char/Kconfig
+> @@ -3,6 +3,8 @@ config ESCC
+>  
+>  config PARALLEL
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+>  
+>  config PL011
+>      bool
+> @@ -12,11 +14,15 @@ config SERIAL
+>  
+>  config SERIAL_ISA
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+> +    select SERIAL
+>  
+>  config SERIAL_PCI
+>      bool
+>      default y if PCI_DEVICES
+>      depends on PCI
+> +    select SERIAL
+>  
+>  config VIRTIO_SERIAL
+>      bool
+> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+> index f8d63c6..64a5764 100644
+> --- a/hw/display/Kconfig
+> +++ b/hw/display/Kconfig
+> @@ -39,9 +39,12 @@ config VGA_PCI
+>  
+>  config VGA_ISA
+>      bool
+> +    depends on ISA_BUS
+> +    select VGA
+>  
+>  config VGA_ISA_MM
+>      bool
+> +    select VGA
+>  
+>  config VMWARE_VGA
+>      bool
+> diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
+> index b9ce1c5..751dec5 100644
+> --- a/hw/dma/Kconfig
+> +++ b/hw/dma/Kconfig
+> @@ -9,6 +9,7 @@ config PL330
+>  
+>  config I82374
+>      bool
+> +    select I8257
+>  
+>  config I8257
+>      bool
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index 9a0e559..ff41be3 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -10,6 +10,7 @@ config I440FX
+>  
+>  config ISAPC
+>      bool
+> +    select ISA_BUS
+>  
+>  config Q35
+>      bool
+> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+> index 246e27b..ab47b6a 100644
+> --- a/hw/ide/Kconfig
+> +++ b/hw/ide/Kconfig
+> @@ -12,6 +12,7 @@ config IDE_PCI
+>  
+>  config IDE_ISA
+>      bool
+> +    depends on ISA_BUS
+>      select IDE_QDEV
+>  
+>  config IDE_PIIX
+> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
+> index 98a18a1..bdb4237 100644
+> --- a/hw/input/Kconfig
+> +++ b/hw/input/Kconfig
+> @@ -6,6 +6,8 @@ config LM832X
+>  
+>  config PCKBD
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+>  
+>  config PL050
+>      bool
+> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+> index b59d074..af68af9 100644
+> --- a/hw/isa/Kconfig
+> +++ b/hw/isa/Kconfig
+> @@ -6,18 +6,25 @@ config APM
+>  
+>  config I82378
+>      bool
+> +    select ISA_BUS
+>  
+>  config PC87312
+>      bool
+> +    select ISA_BUS
+>  
+>  config PIIX4
+>      bool
+> +    select ISA_BUS
+>  
+>  config VT82C686
+>      bool
+> +    select ISA_BUS
+>  
+>  config SMC37C669
+>      bool
+> +    select ISA_BUS
+>  
+>  config LPC_ICH9
+>      bool
+> +    select ISA_BUS
+> +    select ACPI_X86_ICH
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index c85c085..ca051fb 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -1,5 +1,6 @@
+>  config APPLESMC
+>      bool
+> +    depends on ISA_BUS
+>  
+>  config MAX111X
+>      bool
+> @@ -12,9 +13,11 @@ config TMP421
+>  
+>  config ISA_DEBUG
+>      bool
+> +    depends on ISA_BUS
+>  
+>  config SGA
+>      bool
+> +    depends on ISA_BUS
+>  
+>  config ISA_TESTDEV
+>      bool
+> @@ -93,6 +96,7 @@ config IOTKIT_SYSINFO
+>  
+>  config PVPANIC
+>      bool
+> +    depends on ISA_BUS
+>  
+>  config AUX
+>      bool
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index d50e301..6d15720 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -48,6 +48,9 @@ config LAN9118
+>  
+>  config NE2000_ISA
+>      bool
+> +    default y
+> +    depends on ISA_BUS
+> +    depends on PCI # for NE2000State
+>  
+>  config OPENCORES_ETH
+>      bool
+> diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
+> index 8c13345..41f7295 100644
+> --- a/hw/sparc64/Kconfig
+> +++ b/hw/sparc64/Kconfig
+> @@ -1,5 +1,6 @@
+>  config SUN4U
+>      bool
+> +    select ISA_BUS
+>  
+>  config NIAGARA
+>      bool
+> diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
+> index edb3d42..35ccb72 100644
+> --- a/hw/watchdog/Kconfig
+> +++ b/hw/watchdog/Kconfig
+> @@ -8,6 +8,8 @@ config WDT_IB6300ESB
+>  
+>  config WDT_IB700
+>      bool
+> +    default y
+> +    depends on ISA_BUS
 
+By the way, for pluggable ISA devices (like NE2000_ISA or WDT_IB700), it
+would be great to have a ISA_DEVICES config switch, just like the
+"PCI_DEVICES" switch, which the ISA devices should then depend on
+instead of "ISA_BUS". Then it would be easier for the users to disable
+optional devices in their builds.
 
-> +#ifndef ETH_P_RARP
-> +#define ETH_P_RARP 0x8035
-> +#endif
-> +#define ARP_HTYPE_ETH 0x0001
-> +#define ARP_PTYPE_IP 0x0800
-> +#define ARP_OP_REQUEST_REV 0x3
-> +
-> +static int announce_self_create(uint8_t *buf,
-> +                                uint8_t *mac_addr)
-> +{
-> +    /* Ethernet header. */
-> +    memset(buf, 0xff, 6);         /* destination MAC addr */
-> +    memcpy(buf + 6, mac_addr, 6); /* source MAC addr */
-> +    *(uint16_t *)(buf + 12) = htons(ETH_P_RARP); /* ethertype */
-> +
-> +    /* RARP header. */
-> +    *(uint16_t *)(buf + 14) = htons(ARP_HTYPE_ETH); /* hardware addr space */
-> +    *(uint16_t *)(buf + 16) = htons(ARP_PTYPE_IP); /* protocol addr space */
-> +    *(buf + 18) = 6; /* hardware addr length (ethernet) */
-> +    *(buf + 19) = 4; /* protocol addr length (IPv4) */
-> +    *(uint16_t *)(buf + 20) = htons(ARP_OP_REQUEST_REV); /* opcode */
-> +    memcpy(buf + 22, mac_addr, 6); /* source hw addr */
-> +    memset(buf + 28, 0x00, 4);     /* source protocol addr */
-> +    memcpy(buf + 32, mac_addr, 6); /* target hw addr */
-> +    memset(buf + 38, 0x00, 4);     /* target protocol addr */
-> +
-> +    /* Padding to get up to 60 bytes (ethernet min packet size, minus FCS). */
-> +    memset(buf + 42, 0x00, 18);
-> +
-> +    return 60; /* len (FCS will be added by hardware) */
-> +}
-
-I think I would suggest defining a packed struct for the ethernet
-packet we're sending, so we can just reference named fields instead
-of magic offsets. Then I realized this patch is just moving some
-pre-existing code, so it is probably better to leave it as it is
-in this patch, as mixing code movement with refactoring is bad
-practice. If anyone fancies doing a latter patch to use a struct
-though, it might be nice.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+ Thomas
