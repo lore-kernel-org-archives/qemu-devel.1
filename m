@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40317)
+Received: from eggs.gnu.org ([209.51.188.92]:42151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gow0S-0006RD-72
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 14:58:44 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gowBW-0000St-45
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gow0R-00084X-EQ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 14:58:44 -0500
-References: <1de57808-bd1d-e8a7-89b3-a08873c77346@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1gowBU-0002sc-A6
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:10:10 -0500
+References: <20190130152434.17283-1-mreitz@redhat.com>
+	<20190130152434.17283-7-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <4e3bec22-47f6-12b2-ba64-b9d310c6e0d6@redhat.com>
-Date: Wed, 30 Jan 2019 14:58:35 -0500
+Message-ID: <a3951f34-de0c-b2be-d2eb-5d3fc2df3173@redhat.com>
+Date: Wed, 30 Jan 2019 15:10:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <1de57808-bd1d-e8a7-89b3-a08873c77346@virtuozzo.com>
+In-Reply-To: <20190130152434.17283-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] job_pause_point
+Subject: Re: [Qemu-devel] [PATCH v2 06/10] iotests.py: Add is_str()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 
 
-On 1/30/19 8:58 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi!
+On 1/30/19 10:24 AM, Max Reitz wrote:
+> On Python 2.x, strings are not always unicode strings.  This function
+> checks whether a given value is a plain string, or a unicode string (if
+> there is a difference).
 > 
-> I have a question about job_pause_point. Now a good job of moving generic things about
-> block-jobs to job.c is done..
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> job_pause_point do visible job-state change, as changing job->status and job->paused.
-> 
-> Is it assumed, that job don't do anything after that state change? Iotests are written
-> exactly with this assumption. On the other hand, code don't guarantee, that all in-flight
-> requests are finished to this point.
-> 
-
-Oh, right. The job being paused only certifies that the coroutine
-driving the job isn't running. It has no real idea about mirror's
-asynchronous children.
-
-> Moreover, only the job itself knows about it's in-flight requests, therefore we can't
-> handle it in generic job_pause_point(). So, should not job do something like
-> 
-> if (job_should_pause()) {
->     don't create more requests
->     wait all in-flight requests to complete
-> }
-> job_pause_point()
-> 
-> Or didn't I miss these things already discussed?
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index f51456fa63..3e91444b79 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -221,6 +221,12 @@ def image_size(img):
+>      r = qemu_img_pipe('info', '--output=json', '-f', imgfmt, img)
+>      return json.loads(r)['virtual-size']
+>  
+> +def is_str(val):
+> +    if sys.version_info.major >= 3:
+> +        return isinstance(val, str)
+> +    else:
+> +        return isinstance(val, str) or isinstance(val, unicode)
+> +
+>  test_dir_re = re.compile(r"%s" % test_dir)
+>  def filter_test_dir(msg):
+>      return test_dir_re.sub("TEST_DIR", msg)
 > 
 
-Well, mirror's pause callback does this:
+Scares me less.
 
-static void coroutine_fn mirror_pause(Job *job)
-{
-    MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
-
-    mirror_wait_for_all_io(s);
-}
-
-That's invoked BEFORE we change our status. That ought to be sufficient,
-is it not?
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
