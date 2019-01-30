@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53796)
+Received: from eggs.gnu.org ([209.51.188.92]:54758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gomxK-0006YO-MI
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:55 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gon18-0000SP-CG
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gomxJ-0006uz-TK
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:54 -0500
-References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
-	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-	<1548841387-7670-6-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fddbc441-0085-c5c2-18c3-ab2eeaae1376@redhat.com>
-Date: Wed, 30 Jan 2019 11:18:48 +0100
+	(envelope-from <laurent@vivier.eu>) id 1gon17-0001zr-Hg
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:22:50 -0500
+References: <20190104181208.7809-1-philmd@redhat.com>
+	<20190104181208.7809-2-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <56ccdced-739b-49f9-7251-ec75aba01f92@vivier.eu>
+Date: Wed, 30 Jan 2019 11:22:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548841387-7670-6-git-send-email-thuth@redhat.com>
+In-Reply-To: <20190104181208.7809-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 5/5] ppc: Express dependencies of the
- embedded machines with kconfig
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 1/3] util/cutils: Move
+ size_to_str() from "qemu-common.h" to "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +25,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: qemu-ppc@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 30/01/19 10:43, Thomas Huth wrote:
-> This makes it much easier if the users want to disable some of
-> the embedded machines for their builds.
+On 04/01/2019 19:12, Philippe Mathieu-Daudé wrote:
+> The size_to_str() function doesn't need to be in a generic header.
 > 
-> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
+> It makes also sens to find this function in the same header than
+> the opposite string to size functions: qemu_strtosz*().
+> Note than this function is already implemented in util/cutils.c.
+> 
+> Since we introduce a new function in a header, we document it,
+> using the previous comment from the source file.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  default-configs/ppc-softmmu.mak | 18 ++++--------------
->  hw/ppc/Kconfig                  | 12 ++++++++++++
->  2 files changed, 16 insertions(+), 14 deletions(-)
+>  include/qemu-common.h        |  1 -
+>  include/qemu/cutils.h        | 13 +++++++++++++
+>  qapi/string-output-visitor.c |  2 +-
+>  util/cutils.c                |  6 ------
+>  4 files changed, 14 insertions(+), 8 deletions(-)
 > 
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 5265d8a..5192aca 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -1,27 +1,17 @@
->  # Default configuration for ppc-softmmu
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index ed60ba251d..760527294f 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -153,7 +153,6 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+>  int parse_debug_env(const char *name, int max, int initial);
 >  
-> -CONFIG_PCI=y
->  CONFIG_PCI_DEVICES=y
-> -CONFIG_ISA_BUS=y
->  CONFIG_TEST_DEVICES=y
+>  const char *qemu_ether_ntoa(const MACAddr *mac);
+> -char *size_to_str(uint64_t val);
+>  void page_size_init(void);
 >  
-> -# For embedded PPCs:
-> -CONFIG_PPC4XX=y
-> -CONFIG_M48T59=y
-> +# FIXME: CONFIG_SERIAL is currently still required to link all of the
-> +# ppc machines (due to the usage of serial_mm_init() in ppc405_uc.c).
->  CONFIG_SERIAL=y
-> -CONFIG_OPENPIC=y
-> -CONFIG_PPCE500_PCI=y
-> -CONFIG_PFLASH_CFI01=y
-> -CONFIG_PFLASH_CFI02=y
-> -CONFIG_XILINX=y
-> -CONFIG_XILINX_ETHLITE=y
+>  /* returns non-zero if dump is in progress, otherwise zero is
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index d2dad3057c..9ee40470e3 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -157,6 +157,19 @@ int qemu_strtosz(const char *nptr, const char **end, uint64_t *result);
+>  int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result);
+>  int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
+>  
+> +/**
+> + * size_to_str:
+> + *
+> + * Return human readable string for size @val.
+> + * Use IEC binary units like KiB, MiB, and so forth.
+> + *
+> + * @val: The value to format.
+> + *       Can be anything that uint64_t allows (no more than "16 EiB").
+> + *
+> + * Caller is responsible for passing it to g_free().
+> + */
+> +char *size_to_str(uint64_t val);
 > +
-> +# For embedded PPCs:
->  CONFIG_E500=y
-> -CONFIG_PLATFORM_BUS=y
-> -CONFIG_ETSEC=y
->  CONFIG_PPC405=y
->  CONFIG_PPC440=y
->  CONFIG_VIRTEX=y
-> -CONFIG_PCI_EXPRESS=y
+>  /* used to print char* safely */
+>  #define STR_OR_NULL(str) ((str) ? (str) : "null")
 >  
->  # For Sam460ex
->  CONFIG_SAM460EX=y
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index 8bd25ed..ab9b828 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -18,9 +18,14 @@ config POWERNV
+> diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+> index 7ab64468d9..edf268b373 100644
+> --- a/qapi/string-output-visitor.c
+> +++ b/qapi/string-output-visitor.c
+> @@ -11,9 +11,9 @@
+>   */
 >  
->  config PPC405
->      bool
-> +    select M48T59
-> +    select PFLASH_CFI02
-> +    select PPC4XX
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+>  #include "qapi/string-output-visitor.h"
+>  #include "qapi/visitor-impl.h"
+> +#include "qemu/cutils.h"
+>  #include "qemu/host-utils.h"
+>  #include <math.h>
+>  #include "qemu/range.h"
+> diff --git a/util/cutils.c b/util/cutils.c
+> index e098debdc0..a8a3a3ba3b 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -816,12 +816,6 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+>      return ret;
+>  }
 >  
->  config PPC440
->      bool
-> +    select PCI_EXPRESS
-> +    select PPC4XX
->  
->  config PPC4XX
->      bool
-> @@ -69,9 +74,16 @@ config MAC_NEWWORLD
->  
->  config E500
->      bool
-> +    select ETSEC
-> +    select OPENPIC
-> +    select PLATFORM_BUS
-> +    select PPCE500_PCI
->  
->  config VIRTEX
->      bool
-> +    select PFLASH_CFI01
-> +    select XILINX
-> +    select XILINX_ETHLITE
->  
->  config MAC_DBDMA
->      bool
+> -/*
+> - * Return human readable string for size @val.
+> - * @val can be anything that uint64_t allows (no more than "16 EiB").
+> - * Use IEC binary units like KiB, MiB, and so forth.
+> - * Caller is responsible for passing it to g_free().
+> - */
+>  char *size_to_str(uint64_t val)
+>  {
+>      static const char *suffixes[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
 > 
+
+Applied to my trivial-patches branch with updated patch description.
+
+Thanks,
+Laurent
