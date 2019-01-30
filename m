@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39763)
+Received: from eggs.gnu.org ([209.51.188.92]:39813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gorja-0006Ri-Cu
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:25:08 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gorji-0006Wg-HF
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gorjZ-0005GO-MU
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:25:02 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gorjh-0005K6-NI
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:25:10 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 30 Jan 2019 16:24:28 +0100
-Message-Id: <20190130152434.17283-5-mreitz@redhat.com>
+Date: Wed, 30 Jan 2019 16:24:29 +0100
+Message-Id: <20190130152434.17283-6-mreitz@redhat.com>
 In-Reply-To: <20190130152434.17283-1-mreitz@redhat.com>
 References: <20190130152434.17283-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 04/10] iotests: Fix 232 for LUKS
+Subject: [Qemu-devel] [PATCH v2 05/10] iotests: Fix 207 to use QMP filters
+ for qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +25,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-With IMGOPTSSYNTAX, $TEST_IMG is useless for this test (it only tests
-the file-posix protocol driver).  Therefore, if $TEST_IMG_FILE is set,
-use that instead.
-
-Because this test requires the file protocol, $TEST_IMG_FILE will always
-be set if $IMGOPTSSYNTAX is true.
-
+Fixes: 08fcd6111e1949f456e1b232ebeeb0cc17019a92
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/232 | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/qemu-iotests/207     | 10 +++++++---
+ tests/qemu-iotests/207.out |  4 ++--
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
-index 93e5d641a3..e48bc8f5db 100755
---- a/tests/qemu-iotests/232
-+++ b/tests/qemu-iotests/232
-@@ -69,6 +69,10 @@ size=3D128M
+diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+index c617ee7453..dfd3c51bd1 100755
+--- a/tests/qemu-iotests/207
++++ b/tests/qemu-iotests/207
+@@ -27,12 +27,16 @@ import re
+ iotests.verify_image_format(supported_fmts=3D['raw'])
+ iotests.verify_protocol(supported=3D['ssh'])
 =20
- _make_test_img $size
+-def filter_hash(msg):
+-    return re.sub('"hash": "[0-9a-f]+"', '"hash": HASH', msg)
++def filter_hash(qmsg):
++    def _filter(key, value):
++        if key =3D=3D 'hash' and re.match('[0-9a-f]+', value):
++            return 'HASH'
++        return value
++    return iotests.filter_qmp(qmsg, _filter)
 =20
-+if [ -n "$TEST_IMG_FILE" ]; then
-+    TEST_IMG=3D$TEST_IMG_FILE
-+fi
-+
- echo
- echo "=3D=3D=3D -drive with read-write image: read-only/auto-read-only c=
-ombinations =3D=3D=3D"
- echo
+ def blockdev_create(vm, options):
+     result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
+options,
+-                        filters=3D[iotests.filter_testfiles, filter_hash=
+])
++                        filters=3D[iotests.filter_qmp_testfiles, filter_=
+hash])
+=20
+     if 'return' in result:
+         assert result['return'] =3D=3D {}
+diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
+index 45ac7c2a8f..88d2240f54 100644
+--- a/tests/qemu-iotests/207.out
++++ b/tests/qemu-iotests/207.out
+@@ -40,7 +40,7 @@ Job failed: remote host key does not match host_key_che=
+ck 'wrong'
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "ssh", "location": {"host-key-check": {"hash": HASH, "mode":=
+ "hash", "type": "md5"}, "path": "TEST_DIR/PID-t.img", "server": {"host":=
+ "127.0.0.1", "port": "22"}}, "size": 8388608}}}
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "ssh", "location": {"host-key-check": {"hash": "HASH", "mode=
+": "hash", "type": "md5"}, "path": "TEST_DIR/PID-t.img", "server": {"host=
+": "127.0.0.1", "port": "22"}}, "size": 8388608}}}
+ {"return": {}}
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+@@ -55,7 +55,7 @@ Job failed: remote host key does not match host_key_che=
+ck 'wrong'
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "ssh", "location": {"host-key-check": {"hash": HASH, "mode":=
+ "hash", "type": "sha1"}, "path": "TEST_DIR/PID-t.img", "server": {"host"=
+: "127.0.0.1", "port": "22"}}, "size": 4194304}}}
++{"execute": "blockdev-create", "arguments": {"job_id": "job0", "options"=
+: {"driver": "ssh", "location": {"host-key-check": {"hash": "HASH", "mode=
+": "hash", "type": "sha1"}, "path": "TEST_DIR/PID-t.img", "server": {"hos=
+t": "127.0.0.1", "port": "22"}}, "size": 4194304}}}
+ {"return": {}}
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 --=20
 2.20.1
