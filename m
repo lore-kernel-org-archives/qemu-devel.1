@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47484)
+Received: from eggs.gnu.org ([209.51.188.92]:47507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbP-0007q8-Ud
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:56 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbR-0007qJ-TX
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbO-0006ew-0m
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:55 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbQ-0006fe-3K
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:57 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 30 Jan 2019 20:36:30 +0000
-Message-Id: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v5 0/8] target/ppc: remove various endian hacks
- from int_helper.c
+Date: Wed, 30 Jan 2019 20:36:32 +0000
+Message-Id: <20190130203638.21179-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
+References: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH v5 2/8] target/ppc: rework vmrg{l, h}{b, h,
+ w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,75 +22,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
->From working on the TCG vector operations patchset, it is apparent that there
-are a large number of endian-based hacks in int_helper.c which can be removed by
-making use of the various Vsr* macros.
+The current implementations make use of the endian-specific macros MRGLO/MRGHI
+and also reference HI_IDX and LO_IDX directly to calculate array offsets.
 
-Patch 1 is simple enough, and implements the complete set of Vsr* macros for
-both big endian and little endian hosts.
-
-Patches 2 and 3 rework the vector merge and multiply algorithms so that they
-no longer require the endian-dependent HI_IDX and LO_IDX macros.
-
-Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macros by
-replacing the element accesses with their equivalent Vsr* macro instead.
-
-Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift bug
-in the ROTRu32 and ROTRu64 macros pointed out by Richard during the review of
-v1.
-
-Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGENDIAN
-hacks in int_helper.c, again replacing accesses with the relevant Vsr* macro
-instead.
-
-Note that there are still some endian hacks left in int_helper.c after this
-patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro still
-remains in places where the index variable was used for purposes other than
-accessing elements within the vector.
-
-There were also some parts where additional conversion could be done, but I
-wasn't confident enough to make the change without access to PPC64 test images
-or real big-endian host hardware.
+Rework the implementation to use the Vsr* macros so that these per-endian
+references can be removed.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/ppc/int_helper.c | 54 +++++++++++++++++--------------------------------
+ 1 file changed, 19 insertions(+), 35 deletions(-)
 
-
-v5:
-- Rebase onto master
-- Update vmrg{l,h} algorithm macros in patch 2 as per Richard's suggestion
-
-v4:
-- Rebase onto master
-- Add R-B tag from Richard for patch 4
-- Use Richard's improved vmrg{l,h} algorithm in patch 2
-
-v3:
-- Rebase onto master
-- Add R-B tags from Richard
-
-v2:
-- Add R-B tags from Richard
-- Add patches 6 and 7 to simplify the VEXT_SIGNED macro and fix a potential
-  shift bug in the ROTRu32 and ROTRu64 macros
-- Don't require ordered access for VNEG and VGENERIC_DO macros as pointed out
-  by Richard
-
-
-Mark Cave-Ayland (8):
-  target/ppc: implement complete set of Vsr* macros
-  target/ppc: rework vmrg{l,h}{b,h,w} instructions to use Vsr* macros
-  target/ppc: rework vmul{e,o}{s,u}{b,h,w} instructions to use Vsr*
-    macros
-  target/ppc: eliminate use of HI_IDX and LO_IDX macros from
-    int_helper.c
-  target/ppc: eliminate use of EL_IDX macros from int_helper.c
-  target/ppc: simplify VEXT_SIGNED macro in int_helper.c
-  target/ppc: remove ROTRu32 and ROTRu64 macros from int_helper.c
-  target/ppc: remove various HOST_WORDS_BIGENDIAN hacks in int_helper.c
-
- target/ppc/int_helper.c | 523 +++++++++++++++++++-----------------------------
- target/ppc/internal.h   |   9 +-
- 2 files changed, 217 insertions(+), 315 deletions(-)
-
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 598731d47a..fe418b3393 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -976,43 +976,27 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+     }
+ }
+ 
+-#define VMRG_DO(name, element, highp)                                   \
+-    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+-    {                                                                   \
+-        ppc_avr_t result;                                               \
+-        int i;                                                          \
+-        size_t n_elems = ARRAY_SIZE(r->element);                        \
+-                                                                        \
+-        for (i = 0; i < n_elems / 2; i++) {                             \
+-            if (highp) {                                                \
+-                result.element[i*2+HI_IDX] = a->element[i];             \
+-                result.element[i*2+LO_IDX] = b->element[i];             \
+-            } else {                                                    \
+-                result.element[n_elems - i * 2 - (1 + HI_IDX)] =        \
+-                    b->element[n_elems - i - 1];                        \
+-                result.element[n_elems - i * 2 - (1 + LO_IDX)] =        \
+-                    a->element[n_elems - i - 1];                        \
+-            }                                                           \
+-        }                                                               \
+-        *r = result;                                                    \
+-    }
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define MRGHI 0
+-#define MRGLO 1
+-#else
+-#define MRGHI 1
+-#define MRGLO 0
+-#endif
+-#define VMRG(suffix, element)                   \
+-    VMRG_DO(mrgl##suffix, element, MRGHI)       \
+-    VMRG_DO(mrgh##suffix, element, MRGLO)
+-VMRG(b, u8)
+-VMRG(h, u16)
+-VMRG(w, u32)
++#define VMRG_DO(name, element, access, ofs)                                  \
++    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)            \
++    {                                                                        \
++        ppc_avr_t result;                                                    \
++        int i, half = ARRAY_SIZE(r->element) / 2;                            \
++                                                                             \
++        for (i = 0; i < half; i++) {                                         \
++            result.access(i * 2 + 0) = a->access(i + ofs);                   \
++            result.access(i * 2 + 1) = b->access(i + ofs);                   \
++        }                                                                    \
++        *r = result;                                                         \
++    }
++
++#define VMRG(suffix, element, access)          \
++    VMRG_DO(mrgl##suffix, element, access, half)   \
++    VMRG_DO(mrgh##suffix, element, access, 0)
++VMRG(b, u8, VsrB)
++VMRG(h, u16, VsrH)
++VMRG(w, u32, VsrW)
+ #undef VMRG_DO
+ #undef VMRG
+-#undef MRGHI
+-#undef MRGLO
+ 
+ void helper_vmsummbm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+                      ppc_avr_t *b, ppc_avr_t *c)
 -- 
 2.11.0
