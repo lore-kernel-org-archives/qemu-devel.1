@@ -1,39 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40538)
+Received: from eggs.gnu.org ([209.51.188.92]:41256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1goyH1-0005GN-3j
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:23:59 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1goyKp-0006RM-AR
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1goyH0-0006Hn-Cg
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:23:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39968)
+	(envelope-from <alifm@linux.ibm.com>) id 1goyKn-0000Km-8I
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:27:55 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44692
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1goyH0-0006H6-1t
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:23:58 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1goyKj-000088-ES
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 17:27:51 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0UMKM3t087719
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 17:23:56 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qbkv92144-1
+	x0UML452078358
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 17:27:35 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qbjtycxdb-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 17:23:56 -0500
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 17:27:35 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Wed, 30 Jan 2019 22:23:55 -0000
+	Wed, 30 Jan 2019 22:27:34 -0000
 References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-3-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-4-git-send-email-jjherne@linux.ibm.com>
 From: Farhan Ali <alifm@linux.ibm.com>
-Date: Wed, 30 Jan 2019 17:23:49 -0500
+Date: Wed, 30 Jan 2019 17:27:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <1548768562-20007-3-git-send-email-jjherne@linux.ibm.com>
+In-Reply-To: <1548768562-20007-4-git-send-email-jjherne@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <122a2e16-b5ca-b666-d080-4afdfd0f6d34@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 02/15] s390-bios: decouple cio setup from
- virtio
+Message-Id: <4d5bd187-56d6-0f23-f9a5-698e8ccd819b@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 03/15] s390-bios: decouple common boot
+ logic from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,59 +48,88 @@ To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@
 
 
 On 01/29/2019 08:29 AM, Jason J. Herne wrote:
-> Move channel i/o setup code out to a separate function. This decouples cio
-> setup from the virtio code path and allows us to make use of it for booting
-> dasd devices.
+> Create a boot_setup function to handle getting boot information from
+> the machine/hypervisor. This decouples common boot logic from the
+> virtio code path and allows us to make use of it for the real dasd boot
+> scenario.
 > 
 > Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 > Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: Collin Walling <walling@linux.ibm.com
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->   pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
->   1 file changed, 13 insertions(+), 7 deletions(-)
+>   pc-bios/s390-ccw/main.c | 28 ++++++++++++++++++++--------
+>   1 file changed, 20 insertions(+), 8 deletions(-)
 > 
 > diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 544851d..e82fe2c 100644
+> index e82fe2c..67df421 100644
 > --- a/pc-bios/s390-ccw/main.c
 > +++ b/pc-bios/s390-ccw/main.c
-> @@ -99,6 +99,18 @@ static void menu_setup(void)
->       }
+> @@ -14,16 +14,17 @@
+>   
+>   char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>   static SubChannelId blk_schid = { .one = 1 };
+> -IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>   static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>   QemuIplParameters qipl;
+> +IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> +static bool have_iplb;
+>   
+>   #define LOADPARM_PROMPT "PROMPT  "
+>   #define LOADPARM_EMPTY  "        "
+>   #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+>   
+>   /*
+> - * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+> + * Principles of Operations (SA22-7832-09) chapter 17 requires that
+>    * a subsystem-identification is at 184-187 and bytes 188-191 are zero
+>    * after list-directed-IPL and ccw-IPL.
+>    */
+> @@ -111,23 +112,33 @@ static void css_setup(void)
+>       enable_mss_facility();
 >   }
 >   
 > +/*
-> + * Initialize the channel I/O subsystem so we can talk to our ipl/boot device.
+> + * Collect various pieces of information from the hypervisor/hardware that
+> + * we'll use to determine exactly how we'll boot.
 > + */
-> +static void css_setup(void)
+> +static void boot_setup(void)
 > +{
-> +    /*
-> +     * Unconditionally enable mss support. In every sane configuration this
-> +     * will succeed; and even if it doesn't, stsch_err() can handle it.
-> +     */
-> +    enable_mss_facility();
+> +    char lpmsg[] = "LOADPARM=[________]\n";
+> +
+> +    sclp_get_loadparm_ascii(loadparm_str);
+> +    memcpy(lpmsg + 10, loadparm_str, 8);
+> +    sclp_print(lpmsg);
+> +
+> +    have_iplb = store_iplb(&iplb);
 > +}
 > +
 >   static void virtio_setup(void)
 >   {
 >       Schib schib;
-> @@ -109,13 +121,6 @@ static void virtio_setup(void)
+>       int ssid;
+>       bool found = false;
+>       uint16_t dev_no;
+> -    char ldp[] = "LOADPARM=[________]\n";
 >       VDev *vdev = virtio_get_device();
 >       QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
 >   
-> -    /*
-> -     * We unconditionally enable mss support. In every sane configuration,
-> -     * this will succeed; and even if it doesn't, stsch_err() can deal
-> -     * with the consequences.
-> -     */
-> -    enable_mss_facility();
+> -    sclp_get_loadparm_ascii(loadparm_str);
+> -    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+> -    sclp_print(ldp);
 > -
->       sclp_get_loadparm_ascii(loadparm_str);
->       memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
->       sclp_print(ldp);
-> @@ -168,6 +173,7 @@ static void virtio_setup(void)
->   int main(void)
+>       memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+>   
+> -    if (store_iplb(&iplb)) {
+> +    if (have_iplb) {
+>           switch (iplb.pbt) {
+>           case S390_IPL_TYPE_CCW:
+>               dev_no = iplb.ccw.devno;
+> @@ -174,6 +185,7 @@ int main(void)
 >   {
 >       sclp_setup();
-> +    css_setup();
+>       css_setup();
+> +    boot_setup();
 >       virtio_setup();
 >   
 >       zipl_load(); /* no return */
