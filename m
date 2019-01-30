@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33935)
+Received: from eggs.gnu.org ([209.51.188.92]:34413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gogHE-0002Mz-0n
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:11:00 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gogKo-0003Rc-AU
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gogHD-0003bP-91
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:11:00 -0500
-Date: Wed, 30 Jan 2019 11:10:53 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190130031053.GB20241@stefanha-x1.localdomain>
-References: <20190125164601.130556-1-vsementsov@virtuozzo.com>
-	<20190129033155.GD3264@stefanha-x1.localdomain>
-	<fa3cc31b-937c-a22c-4079-2ad7d968aac5@virtuozzo.com>
-	<CAJSP0QUCeM2wHA5Z4wnBYHoE9=sLxxAqyDMZ5-i4g12v2DQEiQ@mail.gmail.com>
-	<49f1af0b-a245-3b17-7e74-6b3837e42406@virtuozzo.com>
-	<20190129123448.GD4467@dhcp-200-176.str.redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DBIVS5p969aUjpLe"
-Content-Disposition: inline
-In-Reply-To: <20190129123448.GD4467@dhcp-200-176.str.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH] block: local qiov helper
+	(envelope-from <jasowang@redhat.com>) id 1gogKm-0004u2-Kb
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44836)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gogKm-0004t2-D6
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:14:40 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 30 Jan 2019 11:14:27 +0800
+Message-Id: <20190130031427.13129-1-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain socket
+ through fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +22,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
+The tests tries to let qemu server mode to process the connection
+which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
+"x-oob", offer capability "oob" unconditionally"). This is because the
+filter may try to mirror the packets before UNIX socket object is
+ready (connected was set to true) from the view of qemu. In this case
+the packet will be dropped silently.
 
---DBIVS5p969aUjpLe
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixing this by passing pre-connected socket created by socketpair() to
+qemu through fd.
 
-On Tue, Jan 29, 2019 at 01:34:48PM +0100, Kevin Wolf wrote:
-> Am 29.01.2019 um 12:18 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > 29.01.2019 13:32, Stefan Hajnoczi wrote:
-> > > On Tue, Jan 29, 2019 at 6:24 PM Vladimir Sementsov-Ogievskiy
-> > > <vsementsov@virtuozzo.com> wrote:
-> > >> 29.01.2019 6:31, Stefan Hajnoczi wrote:
-> > >>> On Fri, Jan 25, 2019 at 07:46:01PM +0300, Vladimir Sementsov-Ogievs=
-kiy wrote:
-> > >> Hmm. In this case we definitely will have tiny extra memory usage, b=
-ut we gain beautiful
-> > >> readability.
-> > >>
-> > >> So, like this:
-> > >>
-> > >> diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-> > >> index 5f433c7768..53de1b38bb 100644
-> > >> --- a/include/qemu/iov.h
-> > >> +++ b/include/qemu/iov.h
-> > >> @@ -134,9 +134,31 @@ typedef struct QEMUIOVector {
-> > >>        struct iovec *iov;
-> > >>        int niov;
-> > >>        int nalloc;
-> > >> -    size_t size;
-> > >> +    union {
-> > >> +        struct {
-> > >> +            void *__unused_iov_base;
-> > >=20
-> > > This could be struct iovec *iov for nalloc > 0 users.  Must resist ha=
-ckiness! :)
-> >=20
-> > can't be iov, gcc complains:
-> > include/qemu/iov.h:139:27: error: duplicate member =E2=80=98iov=E2=80=99
-> >               struct iovec *iov;
->=20
-> I think Stefan meant moving the existing iov here. But then we would
-> have to make sure that it's never used for local qiovs, which would
-> probably involve touching a lot more code.
->=20
-> Your original suggestion to put nalloc there looks a bit more practical
-> if we want to save those bytes.
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+Changes from v1:
+- close the socket pairs in the end of test
+---
+ tests/test-filter-mirror.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-Sounds good.
-
-Stefan
-
---DBIVS5p969aUjpLe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcURW9AAoJEJykq7OBq3PItdgH/19P3eFuILEt3aQhn5D9/8qe
-brbnPUInpNzTENLxt855eVxN4teiznW4SJ2BgqEzmL+x+V39jnNITpbwHvPogSPV
-jSiX9iWwGJOSSxBhNU37MNsRU58U688vZBChoN7aNVjw7+VKmdsRxXeUpsrYk74l
-ghN+5P2kLbBN3mJkx8iCKOGiJBSqHbFxdValPH52h9ARH+93MrvCfN8C/p+WCHL7
-IGWQg7yIWMHW/3vlkcYPmOYoOyYg5OONgB5/XQrI+4O+uoOAJruSRTNYmiMJd8Ft
-23LafoOan7pTibfPLvn4sMnDI5y0pftJBZ5O1QGIYxYElstXLNL8Rkb9GAXopPM=
-=Ym7T
------END PGP SIGNATURE-----
-
---DBIVS5p969aUjpLe--
+diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+index 7ab2aed8a0..d942c74a3f 100644
+--- a/tests/test-filter-mirror.c
++++ b/tests/test-filter-mirror.c
+@@ -21,10 +21,9 @@
+ 
+ static void test_mirror(void)
+ {
+-    int send_sock[2], recv_sock;
++    int send_sock[2], recv_sock[2];
+     uint32_t ret = 0, len = 0;
+     char send_buf[] = "Hello! filter-mirror~";
+-    char sock_path[] = "filter-mirror.XXXXXX";
+     char *recv_buf;
+     uint32_t size = sizeof(send_buf);
+     size = htonl(size);
+@@ -38,18 +37,15 @@ static void test_mirror(void)
+     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
+     g_assert_cmpint(ret, !=, -1);
+ 
+-    ret = mkstemp(sock_path);
++    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
+     g_assert_cmpint(ret, !=, -1);
+ 
+     qts = qtest_initf(
+         "-netdev socket,id=qtest-bn0,fd=%d "
+         "-device %s,netdev=qtest-bn0,id=qtest-e0 "
+-        "-chardev socket,id=mirror0,path=%s,server,nowait "
++        "-chardev socket,id=mirror0,fd=%d "
+         "-object filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
+-        , send_sock[1], devstr, sock_path);
+-
+-    recv_sock = unix_connect(sock_path, NULL);
+-    g_assert_cmpint(recv_sock, !=, -1);
++        , send_sock[1], devstr, recv_sock[1]);
+ 
+     struct iovec iov[] = {
+         {
+@@ -67,18 +63,20 @@ static void test_mirror(void)
+     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
+     close(send_sock[0]);
+ 
+-    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
++    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
+     g_assert_cmpint(ret, ==, sizeof(len));
+     len = ntohl(len);
+ 
+     g_assert_cmpint(len, ==, sizeof(send_buf));
+     recv_buf = g_malloc(len);
+-    ret = qemu_recv(recv_sock, recv_buf, len, 0);
++    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
+     g_assert_cmpstr(recv_buf, ==, send_buf);
+ 
+     g_free(recv_buf);
+-    close(recv_sock);
+-    unlink(sock_path);
++    close(send_sock[0]);
++    close(send_sock[1]);
++    close(recv_sock[0]);
++    close(recv_sock[1]);
+     qtest_quit(qts);
+ }
+ 
+-- 
+2.17.1
