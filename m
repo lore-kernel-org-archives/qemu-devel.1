@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56544)
+Received: from eggs.gnu.org ([209.51.188.92]:56930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gon8z-0004BZ-K7
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:30:58 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gonAq-0004qI-09
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:32:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gon8y-00024v-T2
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:30:57 -0500
-Date: Wed, 30 Jan 2019 11:30:46 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190130113046.24c07704.cohuck@redhat.com>
-In-Reply-To: <20190130004811.27372-26-cota@braap.org>
-References: <20190130004811.27372-1-cota@braap.org>
-	<20190130004811.27372-26-cota@braap.org>
+	(envelope-from <dgilbert@redhat.com>) id 1gonAo-0003BC-0c
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:32:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gonAn-0003AZ-Pn
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:32:49 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EAC83C079C5E
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 10:32:48 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 30 Jan 2019 10:32:27 +0000
+Message-Id: <20190130103236.18302-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 25/73] s390x: convert to cpu_halted
+Subject: [Qemu-devel] [PATCH v2 0/9] Network announce changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org, jasowang@redhat.com, quintela@redhat.com, mst@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
+Cc: germano@redhat.com
 
-On Tue, 29 Jan 2019 19:47:23 -0500
-"Emilio G. Cota" <cota@braap.org> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  hw/intc/s390_flic.c        |  2 +-
->  target/s390x/cpu.c         | 22 +++++++++++++++-------
->  target/s390x/excp_helper.c |  2 +-
->  target/s390x/kvm.c         |  2 +-
->  target/s390x/sigp.c        |  8 ++++----
->  5 files changed, 22 insertions(+), 14 deletions(-)
+Hi,
+  This is a reworking of a few sets of patches from 2017
+that were put together by myself, Germano and Vlad that make
+the network announce system more flexible.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+  Firstly, it's parameterised, so that you can change the number
+of packets and the gap between them; the number can be set to 0
+to disable announce completely.
+
+  Secondly, you can force an announce by a qmp or hmp command at
+any time.  This is useful if you need the guest to do an announce
+for a different reason; for example if the management layer
+has just juggled some bonding configuration around.
+
+  The packet creation and timing also moves to net/ from migration/
+
+  The previous set was:
+     https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05594.html
+
+Dave
+
+v2
+  Fix the qmp example
+  Typo fixes=20
+
+Dr. David Alan Gilbert (9):
+  net: Introduce announce timer
+  migration: Add announce parameters
+  virtio-net: Switch to using announce timer
+  migration: Switch to using announce timer
+  net: Add a network device specific self-announcement ability
+  virtio-net: Allow qemu_announce_self to trigger virtio announcements
+  qmp: Add announce-self command
+  hmp: Add hmp_announce_self
+  tests: Add a test for qemu self announcements
+
+ hmp-commands.hx                |  14 ++++
+ hmp.c                          |  33 ++++++++
+ hmp.h                          |   1 +
+ hw/net/trace-events            |   8 ++
+ hw/net/virtio-net.c            |  69 ++++++++++++----
+ include/hw/virtio/virtio-net.h |   4 +-
+ include/migration/misc.h       |  12 +--
+ include/net/announce.h         |  41 ++++++++++
+ include/net/net.h              |   2 +
+ include/qemu/typedefs.h        |   2 +
+ include/sysemu/sysemu.h        |   2 -
+ migration/migration.c          | 103 +++++++++++++++++++++++-
+ migration/migration.h          |   4 +
+ migration/savevm.c             |  72 +----------------
+ migration/trace-events         |   1 -
+ net/Makefile.objs              |   1 +
+ net/announce.c                 | 141 +++++++++++++++++++++++++++++++++
+ net/trace-events               |   4 +
+ qapi/migration.json            |  54 ++++++++++++-
+ qapi/net.json                  |  44 ++++++++++
+ tests/Makefile.include         |   2 +
+ tests/test-announce-self.c     |  83 +++++++++++++++++++
+ tests/test-hmp.c               |   1 +
+ 23 files changed, 595 insertions(+), 103 deletions(-)
+ create mode 100644 include/net/announce.h
+ create mode 100644 net/announce.c
+ create mode 100644 tests/test-announce-self.c
+
+--=20
+2.20.1
