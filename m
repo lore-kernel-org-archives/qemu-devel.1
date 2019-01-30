@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56050)
+Received: from eggs.gnu.org ([209.51.188.92]:56352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gofc1-0004d6-46
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:28:26 -0500
+	(envelope-from <mst@redhat.com>) id 1gofeW-0005Xm-KU
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gofbz-0007no-NG
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:28:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56786)
+	(envelope-from <mst@redhat.com>) id 1gofeU-0000Dy-Pj
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:31:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gofbz-0007nc-BF
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:28:23 -0500
-Date: Tue, 29 Jan 2019 21:28:17 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gofeS-0000Bw-1r
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 21:30:56 -0500
+Date: Tue, 29 Jan 2019 21:30:46 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190129212747-mutt-send-email-mst@kernel.org>
-References: <cover.1548771590.git.yi.z.zhang@linux.intel.com>
-	<ef9d5d6128b853449fda6221a67894de48a09c3c.1548771590.git.yi.z.zhang@linux.intel.com>
-	<20190129083952-mutt-send-email-mst@kernel.org>
-	<20190130103646.GA53874@tiger-server>
+Message-ID: <20190129212835-mutt-send-email-mst@kernel.org>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-2-xieyongji@baidu.com>
+	<20190129041155.GG3264@stefanha-x1.localdomain>
+	<20190128232025-mutt-send-email-mst@kernel.org>
+	<CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
+	<20190129091012-mutt-send-email-mst@kernel.org>
+	<CAONzpcaHJZj8w-nK_AjEJ9vxHFkZauV0FH_4Oa66_qZBWE9aiw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190130103646.GA53874@tiger-server>
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <CAONzpcaHJZj8w-nK_AjEJ9vxHFkZauV0FH_4Oa66_qZBWE9aiw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,170 +33,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, richardw.yang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Yongji Xie <elohimes@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On Wed, Jan 30, 2019 at 06:36:46PM +0800, Yi Zhang wrote:
-> On 2019-01-29 at 08:50:46 -0500, Michael S. Tsirkin wrote:
-> > On Tue, Jan 29, 2019 at 10:49:09PM +0800, Zhang, Yi wrote:
-> > > From: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > 
-> > > When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> > > MAP_SYNC flag in addition which can ensure file system metadata
-> > > synced in each guest writes to the backend file, without other QEMU
-> > > actions (e.g., periodic fsync() by QEMU).
-> > > 
-> > > Current, We have below different possible use cases:
-> > > 
-> > > 1. pmem=on is set, shared=on is set, MAP_SYNC supported:
-> > >    a: backend is a dax supporting file.
-> > >     - MAP_SYNC will active.
-> > >    b: backend is not a dax supporting file.
-> > >     - mmap will trigger a warning. then MAP_SYNC flag will be ignored
-> > > 
-> > > 2. The rest of cases:
-> > >    - we will never pass the MAP_SYNC to mmap2
-> > > 
-> > > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> > > Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> > > ---
-> > >  include/qemu/osdep.h | 21 +++++++++++++++++++++
-> > >  util/mmap-alloc.c    | 28 +++++++++++++++++++++++++++-
-> > >  2 files changed, 48 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > > index 457d24e..96209bb 100644
-> > > --- a/include/qemu/osdep.h
-> > > +++ b/include/qemu/osdep.h
-> > > @@ -419,6 +419,27 @@ void qemu_anon_ram_free(void *ptr, size_t size);
-> > >  #  define QEMU_VMALLOC_ALIGN getpagesize()
-> > >  #endif
-> > >  
-> > > +/*
-> > > + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
-> > > + * 4.15, so they may not be defined when compiling on older kernels.
-> > > + */
-> > > +#ifdef CONFIG_LINUX
-> > > +
-> > > +#include <linux/mman.h>
-> > > +
-> > > +#ifndef MAP_SYNC
-> > > +#define MAP_SYNC 0x80000
-> > > +#endif
-> > > +
-> > > +#ifndef MAP_SHARED_VALIDATE
-> > > +#define MAP_SHARED_VALIDATE 0x03
-> > > +#endif
-> > > +
-> > 
-> > I commented on this part in v7. That's a wrong way to handle
-> > compatibility.
-> MAP_SYNC and MAP_SHARED_VALIDATE have not defined at pre 4.15 kernel.
-> to handle the compatibility we should defined it, Right?, That is Why I
-> changed the value to run time handle the compatibility.
+On Wed, Jan 30, 2019 at 10:07:28AM +0800, Yongji Xie wrote:
+> On Tue, 29 Jan 2019 at 22:15, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jan 29, 2019 at 02:15:35PM +0800, Yongji Xie wrote:
+> > > On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
+> > > > > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
+> > > > > > +typedef struct DescState {
+> > > > > > +    uint8_t inuse;
+> > > > > > +    uint8_t version;
+> > > > > > +    uint16_t used_idx;
+> > > > > > +    uint16_t avail_idx;
+> > > > > > +    uint16_t reserved;
+> > > > > > +} DescState;
+> > > > > > +
+> > > > > > +typedef struct QueueRegion {
+> > > > > > +    uint8_t valid;
+> > > >
+> > > > what's this?
+> > > >
+> > >
+> > > We can use this to check whether this buffer is reset by qemu.
+> >
+> >
+> > I'd use version here. Document that it's 1 currently.
 > 
-> in previous version, you comments that we shouldn't direct define that
-> in our own headers to avoid duplicated code.
-> 
-> So we add #include <linux/mman.h> Right?
-> 
-> Then shouldn't consider build qemu on pre 4.15 kernel header? won't
-> failed?
-> 
-> #ifndef MAP_SYNC
-> #define MAP_SYNC 0x80000
-> #endif
-> 
-> #ifndef MAP_SHARED_VALIDATE
-> #define MAP_SHARED_VALIDATE 0x03
-> #endif
-> 
-> forgive my poor understanding, I'm getting more confused.
+> If we put version into the shared buffer, QEMU will reset it when vm
+> reset. Then if backend restart at the same time, the version of this
+> buffer will be lost. So I still let QEMU maintain it and send it back
+> through message's payload.
 
-Look at how we handle other such defines such as e.g. kvm ioctl values.
+I don't get it. If it's reset there's no contents.
+If there's no contents then who cares what the version is?
 
 
+> > Or do we want feature flags so we can support downgrades too?
+> >
 > 
-> > 
-> > We had this discussion several times in the past. commit log doesn't
-> > mention any reasons to ignore this.  All for setting a single bit in a
-> > single system call.  This is getting discouraging.
-> > 
-> > 
-> > > +#else  /* !CONFIG_LINUX */
-> > > +#define MAP_SYNC              0x0
-> > > +#define MAP_SHARED_VALIDATE   0x0
-> > > +#endif /* CONFIG_LINUX */
-> > > +
-> > >  #ifdef CONFIG_POSIX
-> > >  struct qemu_signalfd_siginfo {
-> > >      uint32_t ssi_signo;   /* Signal number */
-> > > diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> > > index 97bbeed..2c86ad2 100644
-> > > --- a/util/mmap-alloc.c
-> > > +++ b/util/mmap-alloc.c
-> > > @@ -101,6 +101,7 @@ void *qemu_ram_mmap(int fd,
-> > >  #else
-> > >      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-> > >  #endif
-> > > +    int mmap_xflags = 0;
-> > 
-> > That's not a good variable name. It's extra for you since
-> > you are writing the patch but it makes no sense
-> > in the context of the function. Just mmap_flags
-> > will do - and I would put all flags there, not just
-> > the "extra" that this patch is adding.
-> > 
-> > 
-> > >      size_t offset;
-> > >      void *ptr1;
-> > >  
-> > > @@ -111,13 +112,38 @@ void *qemu_ram_mmap(int fd,
-> > >      assert(is_power_of_2(align));
-> > >      /* Always align to host page size */
-> > >      assert(align >= getpagesize());
-> > > +    if (shared && is_pmem) {
-> > > +        mmap_xflags = MAP_SYNC | MAP_SHARED_VALIDATE;
-> > > +    }
-> > >  
-> > >      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
-> > > +retry_mmap:
-> > >      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
-> > >                  MAP_FIXED |
-> > >                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> > > -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> > > +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
-> > >                  fd, 0);
-> > > +
-> > > +    /* if map failed with MAP_SHARED_VALIDATE | MAP_SYNC,
-> > > +     * we try with MAP_SHARED_VALIDATE without MAP_SYNC
-> > > +     */
-> > > +    if (ptr1 == MAP_FAILED &&
-> > > +        mmap_xflags == (MAP_SYNC | MAP_SHARED_VALIDATE)) {
-> > > +        if (errno == ENOTSUP) {
-> > > +            perror("failed to validate with mapping flags");
-> > > +        }
-> > > +        mmap_xflags = MAP_SHARED_VALIDATE;
-> > > +        goto retry_mmap;
-> > 
-> > Have you read
-> > https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf
-> > 
-> > Please just call the function twice. You don't need goto
-> > to repeat a single line.
-> > 
-> > 
-> > > +    }
-> > > +    /* MAP_SHARED_VALIDATE flag is available since Linux 4.15
-> > > +     * Test only with MAP_SHARED_VALIDATE flag for compatibility.
-> > > +     * Then ignore the MAP_SHARED_VALIDATE flag and retry again
-> > > +     */
-> > > +    if (mmap_xflags == MAP_SHARED_VALIDATE &&
-> > > +        ptr1 == MAP_FAILED) {
-> > > +            mmap_xflags &= ~MAP_SHARED_VALIDATE;
-> > > +            goto retry_mmap;
-> > > +    }
-> > >      if (ptr1 == MAP_FAILED) {
-> > >          munmap(ptr, total);
-> > >          return MAP_FAILED;
-> > > -- 
-> > > 2.7.4
+> We faced the same problem that the feature flags will be lost if QEMU
+> do not maintain it. So maybe we should put this into message's
+> payload?
+
+I don't understand why we care. We only maintain inflight so we
+don't need to reset the device. if device is reset we don't
+need to maintain them at all.
+
+> >
+> > > > > > +    uint16_t desc_num;
+> > > >
+> > > > there's padding before this field. Pls make it explicit.
+> > > >
+> > >
+> > > Will do it.
+> > >
+> > > > > > +    DescState desc[0];
+> > > > > > +} QueueRegion;
+> > > > > > +
+> > > > > > +The struct DescState is used to describe one head-descriptor's state. The
+> > > > > > +fields have following meanings:
+> > > > > > +
+> > > > > > +    inuse: Indicate whether the descriptor is inuse or not.
+> > > >
+> > > > inuse by what?
+> > > >
+> > >
+> > > Maybe inflight is better?
+> > >
+> > > > > > +
+> > > > > > +    version: Indicate whether we have an atomic update to used ring and
+> > > > > > +    inflight buffer when slave crash at that point. This field should be
+> > > > > > +    increased by one before and after this two updates. An odd version
+> > > > > > +    indicates an in-progress update.
+> > > >
+> > > > I'm not sure I understand what does the above say. Also does this
+> > > > require two atomics? Seems pretty expensive. And why is it called
+> > > > version?
+> > > >
+> > > > > > +
+> > > > > > +    used_idx: Store old index of used ring before we update used ring and
+> > > > > > +    inflight buffer so that slave can know whether an odd version inflight
+> > > > > > +    head-descriptor in inflight buffer is processed or not.
+> > > >
+> > > > Here too.
+> > > >
+> > >
+> > > Sorry, the above description may be not clear. This two fields are
+> > > used to indicate whether we have an in-progress update to used ring
+> > > and inflight buffer. If slave crash before the update to used_ring and
+> > > after the update to inflight buffer, the version should be odd and
+> > > used_idx should be equal to used_ring.idx. Then we need to roll back
+> > > the update to inflight buffer. As for the name of the version filed,
+> > > actually I didn't find a good one, so I just copy it from struct
+> > > kvm_steal_time...
+> > >
+> > > > > > +
+> > > > > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
+> > > > > > +    slave can resubmit descriptors in order.
+> > > >
+> > > > Why would that be necessary?
+> > > >
+> > >
+> > > Maybe some devices will be able to use it to preserve order after
+> > > reconnecting in future?
+> >
+> > If buffers are used in order then old entries in the ring
+> > are not overwritten so inflight tracking is not
+> > necessary. This is exactly the case with vhost user net today.
+> >
+> 
+> OK, looks reasonable to me.
+> 
+> > > > >
+> > > > > Will a completely new "packed vring" inflight shm layout be necessary to
+> > > > > support the packed vring layout in VIRTIO 1.1?
+> > > > >
+> > > > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
+> > > >
+> > > > Probably.
+> > > >
+> > >
+> > > How about supporting packed virtqueue in guest driver?
+> > >
+> > > Thanks,
+> > > Yongji
+> >
+> > Depends on the guest right? Linux has it:
+> >
+> 
+> Sorry, actually I mean I prefer to support inflight tracking for
+> packed virtqueue in guest driver. This feature is only used by legacy
+> virtio 1.0 or virtio 0.9 device. What do you think about it?
+> 
+> Thanks,
+> Yongji
+
+I don't see what does one have to do with the other.  Either we do or we
+don't want to do it without downtime and retries. If we don't mind
+resets then let's do it by making guest changes.
+
+-- 
+MST
