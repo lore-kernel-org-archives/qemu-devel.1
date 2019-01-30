@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55943)
+Received: from eggs.gnu.org ([209.51.188.92]:56699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gosty-0000pa-Tg
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:39:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1gosxr-00029i-AY
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gostx-0002V8-Sc
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:39:50 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 30 Jan 2019 17:39:42 +0100
-Message-Id: <1548866382-14488-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc: Don't include m48t59.h if it is not
- necessary
+	(envelope-from <philmd@redhat.com>) id 1gosxq-0004T7-Cw
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:43:51 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gosxo-0004Py-E7
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:43:50 -0500
+Received: by mail-wr1-f67.google.com with SMTP id z5so155734wrt.11
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 08:43:47 -0800 (PST)
+References: <20190130014216.98287-1-aik@ozlabs.ru>
+	<20190130134303.754a43ab@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ff95d376-1253-a5eb-0a71-02b8b4b76013@redhat.com>
+Date: Wed, 30 Jan 2019 17:43:44 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190130134303.754a43ab@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] spapr: Drop unused
+ parameters from fdt building helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,70 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-These files don't use anything from m48t59.h, so no need to include
-this header here.
+Hi Alexey,
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/mac_newworld.c | 1 -
- hw/ppc/mac_oldworld.c | 1 -
- hw/ppc/ppc.c          | 2 --
- hw/ppc/ppc_booke.c    | 1 -
- 4 files changed, 5 deletions(-)
+On 1/30/19 1:43 PM, Greg Kurz wrote:
+> On Wed, 30 Jan 2019 12:42:16 +1100
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> spapr_load_rtas() handles now RTAS address and size information in the FDT
+>> so drop them from spapr_build_fdt().
+>>
+>> While we are here, fix a small typo.
+>>
+>> Fixes: 2cac78c12ade9 "pseries: Consolidate RTAS loading"
+> 
+> One nit. The last rtas_* user in spapr_build_fdt() was removed by the
+> following hunk:
+> 
+> @@ -949,12 +966,6 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+>          }
+>      }
+>  
+> -    /* RTAS */
+> -    ret = spapr_rtas_device_tree_setup(fdt, rtas_addr, rtas_size);
+> -    if (ret < 0) {
+> -        error_report("Couldn't set up RTAS device tree properties");
+> -    }
+> -
+>      /* cpus */
+>      spapr_populate_cpus_dt_node(fdt, spapr);
+>  
+> from commit:
+> 
+> 3f5dabceba24 "pseries: Consolidate construction of /rtas device tree node"
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index bb19eab..f1c8400 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -53,7 +53,6 @@
- #include "hw/ppc/mac.h"
- #include "hw/input/adb.h"
- #include "hw/ppc/mac_dbdma.h"
--#include "hw/timer/m48t59.h"
- #include "hw/pci/pci.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 817f70e..98d531d 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -30,7 +30,6 @@
- #include "hw/ppc/ppc.h"
- #include "mac.h"
- #include "hw/input/adb.h"
--#include "hw/timer/m48t59.h"
- #include "sysemu/sysemu.h"
- #include "net/net.h"
- #include "hw/isa/isa.h"
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index 98b409f..cffdc39 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -30,10 +30,8 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpus.h"
--#include "hw/timer/m48t59.h"
- #include "qemu/log.h"
- #include "qemu/error-report.h"
--#include "hw/loader.h"
- #include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "trace.h"
-diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-index 23bcf1b..4f11e00 100644
---- a/hw/ppc/ppc_booke.c
-+++ b/hw/ppc/ppc_booke.c
-@@ -28,7 +28,6 @@
- #include "hw/ppc/ppc.h"
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
--#include "hw/timer/m48t59.h"
- #include "qemu/log.h"
- #include "hw/loader.h"
- #include "kvm_ppc.h"
--- 
-1.8.3.1
+Can you (or David if he agrees) add a line about since when/why it is no
+more required?
+
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>> ---
+>>  hw/ppc/spapr.c | 8 +++-----
+>>  1 file changed, 3 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index a217c7f..fa12723 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1225,9 +1225,7 @@ static void spapr_dt_hypervisor(sPAPRMachineState *spapr, void *fdt)
+>>      }
+>>  }
+>>  
+>> -static void *spapr_build_fdt(sPAPRMachineState *spapr,
+>> -                             hwaddr rtas_addr,
+>> -                             hwaddr rtas_size)
+>> +static void *spapr_build_fdt(sPAPRMachineState *spapr)
+>>  {
+>>      MachineState *machine = MACHINE(spapr);
+>>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>> @@ -1644,14 +1642,14 @@ static void spapr_machine_reset(void)
+>>  
+>>      /*
+>>       * We place the device tree and RTAS just below either the top of the RMA,
+>> -     * or just below 2GB, whichever is lowere, so that it can be
+>> +     * or just below 2GB, whichever is lower, so that it can be
+>>       * processed with 32-bit real mode code if necessary
+>>       */
+>>      rtas_limit = MIN(spapr->rma_size, RTAS_MAX_ADDR);
+>>      rtas_addr = rtas_limit - RTAS_MAX_SIZE;
+>>      fdt_addr = rtas_addr - FDT_MAX_SIZE;
+>>  
+>> -    fdt = spapr_build_fdt(spapr, rtas_addr, spapr->rtas_size);
+>> +    fdt = spapr_build_fdt(spapr);
+>>  
+>>      spapr_load_rtas(spapr, fdt, rtas_addr);
+>>  
+> 
+> 
