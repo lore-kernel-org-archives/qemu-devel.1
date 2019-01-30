@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37263)
+Received: from eggs.gnu.org ([209.51.188.92]:37423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gopq8-0001pW-8H
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:41 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gopqC-0001vY-WC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gopq4-0006ry-7G
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:38 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gopqC-00075H-10
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:23:44 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 30 Jan 2019 14:22:08 +0100
-Message-Id: <20190130132214.25493-8-laurent@vivier.eu>
+Date: Wed, 30 Jan 2019 14:22:13 +0100
+Message-Id: <20190130132214.25493-13-laurent@vivier.eu>
 In-Reply-To: <20190130132214.25493-1-laurent@vivier.eu>
 References: <20190130132214.25493-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/13] target/openrisc: Fix LGPL version number
+Subject: [Qemu-devel] [PULL 12/13] hw/block: clean up stale xen_disk trace
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +24,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Hajnoczi <stefanha@redhat.com>, Stafford Horne <shorne@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Stefan Hajnoczi <stefanha@redhat.com>, Stafford Horne <shorne@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Paul Durrant <paul.durrant@citrix.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Paul Durrant <paul.durrant@citrix.com>
 
-It's either "GNU *Library* General Public version 2" or "GNU Lesser
-General Public version *2.1*", but there was no "version 2.0" of the
-"Lesser" library. So assume that version 2.1 is meant here.
+This should have been removed then xen_disk.c was removed but I missed them.
 
-Cc: Stafford Horne <shorne@gmail.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Stafford Horne <shorne@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <1548252536-6242-3-git-send-email-thuth@redhat.com>
+Fixes: 19f87870baa570bcd7e80e7657e030bf427f16be
+       xen: remove the legacy 'xen_disk' backend
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190122145132.12571-1-paul.durrant@citrix.com>
+[lv: s/stake/stale/ and add "Fixes" tag]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/openrisc/cpu.c              | 2 +-
- target/openrisc/exception.h        | 2 +-
- target/openrisc/gdbstub.c          | 2 +-
- target/openrisc/helper.h           | 2 +-
- target/openrisc/interrupt_helper.c | 2 +-
- target/openrisc/sys_helper.c       | 2 +-
- target/openrisc/translate.c        | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ hw/block/trace-events | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index fb7cb5c507..541b2a66c7 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/exception.h b/target/openrisc/exception.h
-index 4ec56b4653..c9c4e471d2 100644
---- a/target/openrisc/exception.h
-+++ b/target/openrisc/exception.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/gdbstub.c b/target/openrisc/gdbstub.c
-index f9af6507f3..43b1a18d4b 100644
---- a/target/openrisc/gdbstub.c
-+++ b/target/openrisc/gdbstub.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-index 9db9bf3963..96d79a8113 100644
---- a/target/openrisc/helper.h
-+++ b/target/openrisc/helper.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-index 9c5489f5f7..ab4ea88b69 100644
---- a/target/openrisc/interrupt_helper.c
-+++ b/target/openrisc/interrupt_helper.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index b66a45c1e0..05f66c455b 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index c089914d6a..89680f882d 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 55e5a5500c..d0851953c5 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -121,13 +121,6 @@ nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue
+ nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
+ nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
+ 
+-# hw/block/xen_disk.c
+-xen_disk_alloc(char *name) "%s"
+-xen_disk_init(char *name) "%s"
+-xen_disk_connect(char *name) "%s"
+-xen_disk_disconnect(char *name) "%s"
+-xen_disk_free(char *name) "%s"
+-
+ # hw/block/xen-block.c
+ xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
+ xen_block_connect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
 -- 
 2.20.1
