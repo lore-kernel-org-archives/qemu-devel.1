@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46953)
+Received: from eggs.gnu.org ([209.51.188.92]:49039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gosFP-00079D-0a
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:57:55 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gosNP-0003se-MD
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:06:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gosFO-00009q-5b
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:57:54 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 30 Jan 2019 16:57:33 +0100
-Message-Id: <20190130155733.32742-7-david@redhat.com>
-In-Reply-To: <20190130155733.32742-1-david@redhat.com>
-References: <20190130155733.32742-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] s390x/pci: Unplug remaining requested
- devices on pcihost reset
+	(envelope-from <balaton@eik.bme.hu>) id 1gosNO-0007sV-Nb
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:06:11 -0500
+Date: Wed, 30 Jan 2019 17:06:08 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <da262783-d354-7e8a-e8d7-650f624066bb@ilande.co.uk>
+Message-ID: <alpine.BSF.2.21.9999.1901301655390.17768@zero.eik.bme.hu>
+References: <20190129191746.14868-1-mark.cave-ayland@ilande.co.uk>
+	<20190129191746.14868-3-mark.cave-ayland@ilande.co.uk>
+	<6cb56e8a-384b-03b9-1e83-04bfe3157ee0@linaro.org>
+	<cb9beaa4-7235-9d28-aac3-fdd55529e004@ilande.co.uk>
+	<4c457307-939a-93c6-6f91-66e501d5d265@linaro.org>
+	<da262783-d354-7e8a-e8d7-650f624066bb@ilande.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/8] target/ppc: rework
+ vmrg{l, h}{b, h, w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,54 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-When resetting the guest we should unplug and remove all devices that
-are still pending.
+On Wed, 30 Jan 2019, Mark Cave-Ayland wrote:
+> On 30/01/2019 12:51, Richard Henderson wrote:
+>
+>>
+>> Why are you over-complicating things?  I thought I'd explicitly said this
+>> twice, but perhaps not:
+>>
+>> Pass the symbol "half" directly to VMRG_DO:
+>>
+>> #define VMRG(suffix, element, access)          \
+>>     VMRG_DO(mrgl##suffix, element, access, 0)  \
+>>     VMRG_DO(mrgh##suffix, element, access, half)
+>>
+>> You do not need another conditional within VMRG_DO.
+>
+> I'm sorry - I think I got confused by your original macro definitions which used ofs
+> as both the macro parameter and variable name, which is why I thought you wanted ofs
+> passed in by value. Based upon the above I now have this which appears to work:
+>
+>
+> #define VMRG_DO(name, element, access, sofs)                                 \
+>    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)            \
+>    {                                                                        \
+>        ppc_avr_t result;                                                    \
+>        int ofs, half = ARRAY_SIZE(r->element) / 2;                          \
+>        int i;                                                               \
+>                                                                             \
+>        ofs = sofs;                                                          \
 
-With this patch, the requested device will be unpluged on reboot
-(S390_RESET_EXTERNAL and S390_RESET_REIPL, which reset the pcihost bridge
-via qemu_devices_reset()).
+I think you don't need the ofs local variable, you can just use the macro 
+parameter (in paranthesis but in this case that does not matter, just 
+usual precaution in case expression is passed to macro instead of 
+constant). This is a macro so it will be literal replace, that's the trick 
+we were missing from Richard's suggestion I think so don't look at it as 
+a function parameter.
 
-This approach is similar to what's done for acpi PCI hotplug in
-acpi_pcihp_reset() -> acpi_pcihp_update() ->
-acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+Also I wonder if you really need the result local? Can't it just access 
+the result via *r directly and save a copy at the end? (Although 
+that probably would be optimised out by the compiler anyway.)
 
-s390_pci_generate_plug_event()'s will still be generated, I guess this
-is not an issue. The same thing would happen right now when unplugging
-a device just before starting the guest.
+By the way, thanks a lot for doing this and sorry that my comment caused 
+so much trouble but your benchmark has proven my suspicion that it would 
+have been two times slower with your first version.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-pci-bus.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Regards,
+BALATON Zoltan
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 867801ccf9..b9b0f44087 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -1092,6 +1092,21 @@ static void s390_pcihost_reset(DeviceState *dev)
- {
-     S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
-     PCIBus *bus = s->parent_obj.bus;
-+    S390PCIBusDevice *pbdev, *next;
-+
-+    /* Process all pending unplug requests */
-+    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
-+        if (pbdev->unplug_requested) {
-+            if (pbdev->summary_ind) {
-+                pci_dereg_irqs(pbdev);
-+            }
-+            if (pbdev->iommu->enabled) {
-+                pci_dereg_ioat(pbdev->iommu);
-+            }
-+            pbdev->state = ZPCI_FS_STANDBY;
-+            s390_pci_perform_unplug(pbdev);
-+        }
-+    }
- 
-     /*
-      * When resetting a PCI bridge, the assigned numbers are set to 0. So
--- 
-2.17.2
+>        for (i = 0; i < half; i++) {                                         \
+>            result.access(i * 2 + 0) = a->access(i + ofs);                   \
+>            result.access(i * 2 + 1) = b->access(i + ofs);                   \
+>        }                                                                    \
+>        *r = result;                                                         \
+>    }
+>
+> #define VMRG(suffix, element, access)          \
+>    VMRG_DO(mrgl##suffix, element, access, half)   \
+>    VMRG_DO(mrgh##suffix, element, access, 0)
+> VMRG(b, u8, VsrB)
+> VMRG(h, u16, VsrH)
+> VMRG(w, u32, VsrW)
+> #undef VMRG_DO
+> #undef VMRG
+>
+>
+> Is this what you were intending? If this looks better then I'll resubmit a v5 later
+> this evening.
+>
+>> Also, I'm pretty sure it's the "low" merge that wants the "ofs" to be non-zero,
+>> since all of the Vsr* symbols implement big-endian indexing.
+>
+> I've just tried swapping them around as you suggested, but then all my OS X
+> background fills appear with corrupted colors. So to the best of my knowledge without
+> dumping the register contents directly, the above version with low = half and high =
+> 0 still seems correct.
+>
+>
+> ATB,
+>
+> Mark.
+>
+>
