@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59218)
+Received: from eggs.gnu.org ([209.51.188.92]:60041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gotAT-0007TG-BV
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:56:54 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gotEO-0000lw-Oy
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gotAS-0004Tx-IB
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 11:56:53 -0500
-Date: Wed, 30 Jan 2019 17:56:47 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190130175647.6a99ed62.cohuck@redhat.com>
-In-Reply-To: <1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-2-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <pasic@linux.ibm.com>) id 1gotEN-0006aW-Rz
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60856
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gotEN-0006aO-Nq
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:55 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0UGxPxI034138
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:00:55 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qbfmms3wk-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:00:54 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 30 Jan 2019 17:00:52 -0000
+Date: Wed, 30 Jan 2019 18:00:45 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190130132212.7376-7-cohuck@redhat.com>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-7-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/15] s390 vfio-ccw: Add bootindex
- property and IPLB data
+Message-Id: <20190130180045.419b1a23@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v3 6/6] vfio-ccw: add handling for async
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +42,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Tue, 29 Jan 2019 08:29:08 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+On Wed, 30 Jan 2019 14:22:12 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Add bootindex property and iplb data for vfio-ccw devices. This allows us to
-> forward boot information into the bios for vfio-ccw devices.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  hw/s390x/ipl.c              | 14 ++++++++++++++
->  hw/s390x/s390-ccw.c         |  9 +++++++++
->  hw/vfio/ccw.c               | 13 +------------
->  include/hw/s390x/s390-ccw.h |  1 +
->  include/hw/s390x/vfio-ccw.h | 38 ++++++++++++++++++++++++++++++++++++++
->  5 files changed, 63 insertions(+), 12 deletions(-)
->  create mode 100644 include/hw/s390x/vfio-ccw.h
+> +static void fsm_async_retry(struct vfio_ccw_private *private,
+> +			    enum vfio_ccw_event event)
+> +{
+> +	private->cmd_region->ret_code = -EAGAIN;
+> +}
+> +
 
-> diff --git a/include/hw/s390x/vfio-ccw.h b/include/hw/s390x/vfio-ccw.h
-> new file mode 100644
-> index 0000000..a7d699d
-> --- /dev/null
-> +++ b/include/hw/s390x/vfio-ccw.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * vfio based subchannel assignment support
-> + *
-> + * Copyright 2018 IBM Corp.
+This is essentially dead code at the moment, isn't it? I mean we hold the
+io_mutex whenever we are in state VFIO_CCW_STATE_CP_PROCESSING. And we
+call vfio_ccw_fsm_event() under the very same mutex.
 
-Why 2018? Should either be 2017 (the original date for hw/vfio/ccw.c)
-or 2019.
 
-> + * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> + *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-> + *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_VFIO_CCW_H
-> +#define HW_VFIO_CCW_H
-> +
-> +#include "hw/vfio/vfio-common.h"
-> +#include "hw/s390x/s390-ccw.h"
-> +#include "hw/s390x/ccw-device.h"
-> +
-> +#define TYPE_VFIO_CCW "vfio-ccw"
-> +#define VFIO_CCW(obj) \
-> +        OBJECT_CHECK(VFIOCCWDevice, (obj), TYPE_VFIO_CCW)
-> +
-> +
-> +#define TYPE_VFIO_CCW "vfio-ccw"
-> +typedef struct VFIOCCWDevice {
-> +    S390CCWDevice cdev;
-> +    VFIODevice vdev;
-> +    uint64_t io_region_size;
-> +    uint64_t io_region_offset;
-> +    struct ccw_io_region *io_region;
-> +    EventNotifier io_notifier;
-> +    bool force_orb_pfch;
-> +    bool warned_orb_pfch;
-> +} VFIOCCWDevice;
-> +
-> +#endif
+
+> @@ -213,26 +323,31 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
+>  	[VFIO_CCW_STATE_NOT_OPER] = {
+>  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_nop,
+>  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
+>  	},
+>  	[VFIO_CCW_STATE_STANDBY] = {
+>  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
+> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
+>  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+>  	},
+>  	[VFIO_CCW_STATE_IDLE] = {
+>  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
+> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_request,
+>  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+>  	},
+>  	[VFIO_CCW_STATE_CP_PROCESSING] = {
+>  		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
+>  		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_retry,
+> +		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_retry,
+
+Used here.
+
+Regards,
+Halil
+
+>  		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
+>  	},
