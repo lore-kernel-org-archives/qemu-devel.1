@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51506)
+Received: from eggs.gnu.org ([209.51.188.92]:51924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gookr-0006LA-1T
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:14:10 -0500
+	(envelope-from <quintela@redhat.com>) id 1goomk-0007AL-Tc
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:16:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gookp-0006ZG-Ri
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:14:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49916)
+	(envelope-from <quintela@redhat.com>) id 1goomh-0007xx-6F
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:16:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38752)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gookp-0006Y4-Jz
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:14:07 -0500
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1goomf-0007t5-7L
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:16:03 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DC76285B3
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:07:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1C7E132699
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:07:22 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 30 Jan 2019 13:06:14 +0100
-Message-Id: <20190130120616.5260-3-quintela@redhat.com>
-In-Reply-To: <20190130120616.5260-1-quintela@redhat.com>
-References: <20190130120616.5260-1-quintela@redhat.com>
+Date: Wed, 30 Jan 2019 13:06:12 +0100
+Message-Id: <20190130120616.5260-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 2/4] migration: Create socket-address
- parameter
+Subject: [Qemu-devel] [PATCH v11 0/4] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,261 +32,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-It will be used to store the uri parameters. We want this only for
-tcp, so we don't set it for other uris.  We need it to know what port
-is migration running.
+Iv v11:
+- Rebase to lastest
+- Remove the compress test.  It didin't worked really.
+  See my next series.
+- Only patch missing review-by is the second one.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Please, consider them.
 
---
+In v10:
+- rebase to latest upstream
+- code changed quite a bit with qmp refactorings
+  apllied them
+- make it work again
+- compress threads test, continue working there, not trivial.
 
-This used to be uri parameter, but it has so many troubles to
-reproduce that it don't just make sense.
+Two question-:
+- should we integrate them on this cycle?
+  they are tests
+- should we enable them only on baremetal, and not on emulation?
+  There is still a problem on TCG that sometimes fails the migration
+  thread
 
-This used to be a port parameter.  I was asked to move to
-SocketAddress, done.
-I also merged the setting of the migration tcp port in this one
-because now I need to free the address, and this makes it easier.
-This used to be x-socket-address with a single direction, now it is a
-list of addresses.
-Move SocketAddress_to_str here.  I used to try to generalize the one
-in chardev/char-socket.c, but it is not worth it.
+ToDo:
+- Finish debug compress test
+  Still stuck why the test wonk when I launch qemu by hand but not
+  trough qtest.  Creatuve uses of launching gdb through launched
+  guests have not help so far.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- hmp.c                 | 31 +++++++++++++++++++++++++++++++
- migration/migration.c | 24 ++++++++++++++++++++++++
- migration/migration.h |  4 ++++
- migration/socket.c    | 11 +++++++++++
- qapi/migration.json   |  6 +++++-
- qapi/sockets.json     | 13 +++++++++++++
- 6 files changed, 88 insertions(+), 1 deletion(-)
+- Finish fd transport test
+  Not very difficult in principle, need more checking to see if it
+  don't fail in other setups.
 
-diff --git a/hmp.c b/hmp.c
-index b2a2b1f84e..95d5063e5d 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -166,6 +166,26 @@ void hmp_info_mice(Monitor *mon, const QDict *qdict)
-     qapi_free_MouseInfoList(mice_list);
- }
-=20
-+static char *SocketAddress_to_str(SocketAddress *addr)
-+{
-+    switch (addr->type) {
-+    case SOCKET_ADDRESS_TYPE_INET:
-+        return g_strdup_printf("tcp:%s:%s",
-+                               addr->u.inet.host,
-+                               addr->u.inet.port);
-+        break;
-+    case SOCKET_ADDRESS_TYPE_UNIX:
-+        return g_strdup_printf("unix:%s",
-+                               addr->u.q_unix.path);
-+        break;
-+    case SOCKET_ADDRESS_TYPE_FD:
-+        return g_strdup_printf("fd:%s", addr->u.fd.str);
-+        break;
-+    default:
-+        abort();
-+    }
-+}
-+
- void hmp_info_migrate(Monitor *mon, const QDict *qdict)
- {
-     MigrationInfo *info;
-@@ -306,6 +326,17 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdi=
-ct)
-         g_free(str);
-         visit_free(v);
-     }
-+    if (info->has_socket_address) {
-+        SocketAddressList *addr;
-+
-+        monitor_printf(mon, "socket address: [\n");
-+
-+        for (addr =3D info->socket_address; addr; addr =3D addr->next) {
-+            char *s =3D SocketAddress_to_str(addr->value);
-+            monitor_printf(mon, "\t%s\n", s);
-+        }
-+        monitor_printf(mon, "]\n");
-+    }
-     qapi_free_MigrationInfo(info);
-     qapi_free_MigrationCapabilityStatusList(caps);
- }
-diff --git a/migration/migration.c b/migration/migration.c
-index 37e06b76dc..ef1d53cde2 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -31,6 +31,8 @@
- #include "migration/vmstate.h"
- #include "block/block.h"
- #include "qapi/error.h"
-+#include "qapi/clone-visitor.h"
-+#include "qapi/qapi-visit-sockets.h"
- #include "qapi/qapi-commands-migration.h"
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
-@@ -197,6 +199,11 @@ void migration_incoming_state_destroy(void)
-     }
-=20
-     qemu_event_reset(&mis->main_thread_load_event);
-+
-+    if (mis->socket_address) {
-+        qapi_free_SocketAddressList(mis->socket_address);
-+        mis->socket_address =3D NULL;
-+    }
- }
-=20
- static void migrate_generate_event(int new_state)
-@@ -312,6 +319,17 @@ void migration_incoming_enable_colo(void)
-     migration_colo_enabled =3D true;
- }
-=20
-+void migrate_add_address(SocketAddress *address)
-+{
-+    MigrationIncomingState *mis =3D migration_incoming_get_current();
-+    SocketAddressList *addrs;
-+
-+    addrs =3D g_new0(SocketAddressList, 1);
-+    addrs->next =3D mis->socket_address;
-+    mis->socket_address =3D addrs;
-+    addrs->value =3D QAPI_CLONE(SocketAddress, address);
-+}
-+
- void qemu_start_incoming_migration(const char *uri, Error **errp)
- {
-     const char *p;
-@@ -966,6 +984,12 @@ static void fill_destination_migration_info(Migratio=
-nInfo *info)
- {
-     MigrationIncomingState *mis =3D migration_incoming_get_current();
-=20
-+    if (mis->socket_address) {
-+        info->has_socket_address =3D true;
-+        info->socket_address =3D
-+            QAPI_CLONE(SocketAddressList, mis->socket_address);
-+    }
-+
-     switch (mis->state) {
-     case MIGRATION_STATUS_NONE:
-         return;
-diff --git a/migration/migration.h b/migration/migration.h
-index dcd05d9f87..bd41b57af9 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -80,6 +80,9 @@ struct MigrationIncomingState {
-     bool postcopy_recover_triggered;
-     QemuSemaphore postcopy_pause_sem_dst;
-     QemuSemaphore postcopy_pause_sem_fault;
-+
-+    /* List of listening socket addresses  */
-+    SocketAddressList *socket_address;
- };
-=20
- MigrationIncomingState *migration_incoming_get_current(void);
-@@ -300,6 +303,7 @@ void migrate_send_rp_resume_ack(MigrationIncomingStat=
-e *mis, uint32_t value);
-=20
- void dirty_bitmap_mig_before_vm_start(void);
- void init_dirty_bitmap_incoming_migration(void);
-+void migrate_add_address(SocketAddress *address);
-=20
- #define qemu_ram_foreach_block \
-   #warning "Use qemu_ram_foreach_block_migratable in migration code"
-diff --git a/migration/socket.c b/migration/socket.c
-index f4c8174400..239527fb1f 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -15,6 +15,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-=20
- #include "qemu-common.h"
- #include "qemu/error-report.h"
-@@ -177,6 +178,7 @@ static void socket_start_incoming_migration(SocketAdd=
-ress *saddr,
-                                             Error **errp)
- {
-     QIONetListener *listener =3D qio_net_listener_new();
-+    size_t i;
-=20
-     qio_net_listener_set_name(listener, "migration-socket-listener");
-=20
-@@ -189,6 +191,15 @@ static void socket_start_incoming_migration(SocketAd=
-dress *saddr,
-                                           socket_accept_incoming_migrati=
-on,
-                                           NULL, NULL,
-                                           g_main_context_get_thread_defa=
-ult());
-+
-+    for (i =3D 0; i < listener->nsioc; i++)  {
-+        SocketAddress *address =3D
-+            qio_channel_socket_get_local_address(listener->sioc[i], errp=
-);
-+        if (!address) {
-+            return;
-+        }
-+        migrate_add_address(address);
-+    }
- }
-=20
- void tcp_start_incoming_migration(const char *host_port, Error **errp)
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 7a795ecc16..d7b5b3f6e7 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -6,6 +6,7 @@
- ##
-=20
- { 'include': 'common.json' }
-+{ 'include': 'sockets.json' }
-=20
- ##
- # @MigrationStats:
-@@ -199,6 +200,8 @@
- # @compression: migration compression statistics, only returned if compr=
-ession
- #           feature is on and status is 'active' or 'completed' (Since 3=
-.1)
- #
-+# @socket-address: Only used for tcp, to know what the real port is (Sin=
-ce 3.1)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationInfo',
-@@ -213,7 +216,8 @@
-            '*error-desc': 'str',
-            '*postcopy-blocktime' : 'uint32',
-            '*postcopy-vcpu-blocktime': ['uint32'],
--           '*compression': 'CompressionStats'} }
-+           '*compression': 'CompressionStats',
-+           '*socket-address': ['SocketAddress'] } }
-=20
- ##
- # @query-migrate:
-diff --git a/qapi/sockets.json b/qapi/sockets.json
-index fc81d8d5e8..d7f77984af 100644
---- a/qapi/sockets.json
-+++ b/qapi/sockets.json
-@@ -152,3 +152,16 @@
-             'unix': 'UnixSocketAddress',
-             'vsock': 'VsockSocketAddress',
-             'fd': 'String' } }
-+
-+##
-+# @DummyStruct:
-+#
-+# Both block-core and migration needs SocketAddressList
-+# I am open to comments about how to share it
-+#
-+# @dummy-list: A dummy list
-+#
-+# Since: 3.1
-+##
-+{ 'struct': 'DummyStruct',
-+  'data': { 'dummy-list': ['SocketAddress'] } }
+- Finish tl trasport test
+  I already knew that I hate certificates, but this is too much.  Trying
+  to understand how to use them.
+
+Please commet, Juan.
+
+In v9:
+- Dropp Export SocketAddress_to_str
+  just create the functions where I need them.
+- drop precopy test and xbzrle (on pull requset)
+  Use 100M for cache as dave suggests
+- drop ppc improvemnet (on pull request)
+- drop RFH, will work on tha later
+- move socket_address to info migrate
+
+Please, review.
+
+Later, Juan.
+
+v8:
+- just rebase to make things continue to wonk
+
+New in the other v7:
+- SocketAddress is now a list (a.k.a make happy danp)
+- Rebase on top of upstream
+  network listener is *interesting*
+- *HACK* to make SocketAddress list in common
+  see patch: create-socket-paramenter
+
+Please review, Juan.
+
+CC: berrange@redhat.com
+
+[v7]
+This is v6, it differest from the patches that I sent with previous
+multifd post:
+- Rename x-tcp-port to x-socket-address
+  This is more *complicated* that it looks as:
+
+  * it is a pointer, so I need to use QAPI_CLONE() to make info
+    migrate work
+
+  * this is an union of structs.  In QAPI. So, a dict of strings.  The
+    only way that I was able to make things work is parsing the qdict
+    to a SocketAddress and then output a SocketAddress as an str.  It
+    needs to be an easier way, for sure.
+
+  * Cleanups here andthere.
+
+Please, review, Juan.
+
+[v5]
+- Several patches moved to pull request
+- merge info_migrate and migration_tests
+  only missing bit is tcp_port, needed for tcp tests
+- Rename tcp-port to x-tcp-port
+  We will get better naming from David at some point, and we will use tha=
+t bit
+- ppc: use inline code as suggested by lvivier
+
+Please, review.
+
+It is based on my previous pull request
+
+Based-on: 20180129120932.12874-1-quintela@redhat.com
+
+[v4]
+- rebase on top on v4 info_migrate patches
+- Tune sleeps to make patches fast
+- Create a deprecated test for deprecated commands (i.e. make peterxu hap=
+py)
+- create migrate_start_postcopy function
+- fix naming/sizes between power and x86
+- cleanup comments to match code
+
+[v3]
+
+- No more tests for deprecated parameters. Now I only use
+  migrate_set_parameter.  If there is a deprecated command for that,
+  we tests it there.
+- free "result" string, always good to return memory (Peter found it)
+- use the new tcp_port parameter from info migrate.  So we are
+  handling well the tcp case.
+- lots of code movement around to make everything consistent.
+- Several patches already integrated upstream.
+
+[v2]
+- to make review easier, I started renaming postcopy-test.c to migration-=
+test.c
+- Did cleanups/refactoring there
+- Don't use global-qtest anymore
+- check that the parameters that we sent got really set
+- RFH: comrpress threads tests is not working for some weird reason.  Usi=
+ng the same code on command line works.
+  still investigating why.
+
+ToDoo:
+
+- tcp: after discussions with dave, we ended in conclusion that we
+  need to use the 0 port and let the system gives us a free one
+
+  But .... that means that we need to be able to get that port back someh=
+ow.
+  "info migrate" woring on destination side?
+
+- compression threads.  There is some weird interaction with the test
+  hardness and every migration thread get waiting in a different
+  semaphore.  Investigating if it is a race/bug/whateverr
+
+- deprecated commands: There was a suggestion to make
+  migrate_set_parameter look at the parameter name and test old/new
+  depending on something.  Not sure what to do here.
+
+- testing commands: Is there a way to launch qemu and just sent
+  qmp/hmp commands without having to really run anything else?
+
+[v1]
+- add test for precopy for unix/tcp
+  exec and fd to came, don't know how to test rdma without hardware
+- add tests using deprecated interfaces
+- add test for xbzrle
+  Note to myself, there is no way to set the cache size with migraton_set=
+_parameters
+- Add test for compress threads
+  disabled on the series, right now it appears that compression is not wo=
+rking at all
+- Move postcopy to use new results
+  Idea is to move it on top of migration-test.c, but first I want some re=
+views on basic idea
+
+Juan Quintela (4):
+  tests: Add migration xbzrle test
+  migration: Create socket-address parameter
+  tests: Add basic migration precopy tcp test
+  tests: Add migration multifd test
+
+ hmp.c                  |  31 ++++++
+ migration/migration.c  |  24 +++++
+ migration/migration.h  |   4 +
+ migration/socket.c     |  11 ++
+ qapi/migration.json    |   6 +-
+ qapi/sockets.json      |  13 +++
+ tests/migration-test.c | 224 ++++++++++++++++++++++++++++++++++++++++-
+ 7 files changed, 307 insertions(+), 6 deletions(-)
+
 --=20
 2.20.1
