@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59319)
+Received: from eggs.gnu.org ([209.51.188.92]:59384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gopSN-0000Rg-Aq
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:08 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gopSV-0000Yb-GH
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gopSM-00067Y-HW
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:07 -0500
-Date: Wed, 30 Jan 2019 12:59:03 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190130125903.bewxhjvlyud5mdqh@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190130030207.6770-1-richardw.yang@linux.intel.com>
-	<3e847da2-8ced-fefd-b566-30093d9fe331@redhat.com>
+	(envelope-from <yang.zhong@intel.com>) id 1gopSU-0006F5-Pt
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:15 -0500
+Received: from mga04.intel.com ([192.55.52.120]:19558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gopSU-0006Br-HF
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:14 -0500
+Date: Wed, 30 Jan 2019 20:55:26 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190130125526.GC3384@yangzhon-Virtual>
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-3-git-send-email-pbonzini@redhat.com>
+	<f4208837-83e7-a090-91d5-fc978490da9c@redhat.com>
+	<a56cfb65-55a6-5c0d-8e86-d2e71d233d78@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3e847da2-8ced-fefd-b566-30093d9fe331@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386,
- acpi: cleanup build_facs by removing second unused argument
+In-Reply-To: <a56cfb65-55a6-5c0d-8e86-d2e71d233d78@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/52] ide: split ioport registration to a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, imammedo@redhat.com, mst@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, yang.zhong@intel.com
 
-On Wed, Jan 30, 2019 at 12:15:57PM +0100, Philippe Mathieu-Daudé wrote:
->On 1/30/19 4:02 AM, Wei Yang wrote:
->> The second argument of build_facs() is not used, just remove it.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+On Wed, Jan 30, 2019 at 01:20:42PM +0100, Paolo Bonzini wrote:
+> On 30/01/19 13:07, Thomas Huth wrote:
+> > I think adding ioport.o to IDE_PCI and IDE_VIA is wrong. The
+> > ide_init_ioport() function is only used by isa.c and piix.c, so it
+> > should only be added for IDE_ISA and IDE_PIIX here.
+> 
+> Good idea, another one for Yang. :)
 >
->Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+  Yes, for ioport.o, i will add as below: 
 
-Thanks :-)
+  +common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
+  +common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
 
->
->> ---
->>  hw/i386/acpi-build.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 236a20eaa8..023729c1f2 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -292,7 +292,7 @@ static void acpi_align_size(GArray *blob, unsigned align)
->>  
->>  /* FACS */
->>  static void
->> -build_facs(GArray *table_data, BIOSLinker *linker)
->> +build_facs(GArray *table_data)
->>  {
->>      AcpiFacsDescriptorRev1 *facs = acpi_data_push(table_data, sizeof *facs);
->>      memcpy(&facs->signature, "FACS", 4);
->> @@ -2643,7 +2643,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->>       * requirements.
->>       */
->>      facs = tables_blob->len;
->> -    build_facs(tables_blob, tables->linker);
->> +    build_facs(tables_blob);
->>  
->>      /* DSDT is pointed to by FADT */
->>      dsdt = tables_blob->len;
->> 
+  The newest hw/ide/via.c has removed ide_init_ioport() call.
 
--- 
-Wei Yang
-Help you, Help me
+  By the way, i plan to send non-RFC patches 1-27 tomorrow if there is not any new comments. thanks!
+
+  Yang 
+ 
+> Paolo
