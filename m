@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54901)
+Received: from eggs.gnu.org ([209.51.188.92]:55992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gol9t-0007vK-Fj
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:23:46 -0500
+	(envelope-from <imammedo@redhat.com>) id 1golGz-0000rv-Ub
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gol9p-00018U-OB
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:23:43 -0500
-Date: Wed, 30 Jan 2019 09:23:21 +0100
+	(envelope-from <imammedo@redhat.com>) id 1golGy-00053W-8z
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:31:05 -0500
+Date: Wed, 30 Jan 2019 09:30:38 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190130092321.1ddbd29a@Igors-MacBook-Pro.local>
-In-Reply-To: <CAFEAcA_+UhU56D7Yx5K8+=DbtUiiV8V7sX2UgxFKSkScUypxFg@mail.gmail.com>
-References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
-	<1544173675-14217-3-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA9mF+WiPLW4yyv1aEMLTg2QK2krZvxyjCSsMziJtzx3Ug@mail.gmail.com>
-	<CAHmQWvCw5ndod93WqLXDgGxDERtRM3ee_qiLA+S34Y9X2JFvVQ@mail.gmail.com>
-	<CAFEAcA_+UhU56D7Yx5K8+=DbtUiiV8V7sX2UgxFKSkScUypxFg@mail.gmail.com>
+Message-ID: <20190130093038.60b10743@Igors-MacBook-Pro.local>
+In-Reply-To: <20190129175403.18017-9-philmd@redhat.com>
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-9-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] hw/arm: add Arm SBSA reference
- machine, devices part
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 08/18] tests/bios-tables: Improve
+ portability by searching bash in the $PATH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?UTF-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex =?UTF-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
-On Tue, 29 Jan 2019 15:26:29 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Tue, 29 Jan 2019 18:53:53 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> On Mon, 28 Jan 2019 at 09:46, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> >
-> > On Tue, 22 Jan 2019 at 19:49, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >
-> > > On Fri, 7 Dec 2018 at 09:08, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> > > > +static void sbsa_ref_machine_done(Notifier *notifier, void *data)
-> > > > +{
-> > > > +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> > > > +                                         machine_done);
-> > > > +    ARMCPU *cpu = ARM_CPU(first_cpu);
-> > > > +    struct arm_boot_info *info = &vms->bootinfo;
-> > > > +    AddressSpace *as = arm_boot_address_space(cpu, info);
-> > > > +
-> > > > +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
-> > > > +        exit(1);
-> > > > +    }
-> > > > +}
-> > >
-> > > I still don't understand why we need this -- it doesn't seem
-> > > to be doing anything different from the default behaviour that
-> > > boot.c implements if skip_dtb_autoload is false.
-> > >
-> >
-> > According to the process of arm_load_kernel() in boot.c, If only
-> > kernel loaded via -kernel but without any firmware, it works fine.
-> > While in this case, we have have firmware loaded but no kernel (eg
-> > firmware loads kernel from storage, firmware never come back to qemu
-> > again), so the arm_load_kernel() returns in the middle before calling
-> > arm_load_dtb(),  because arm_load_dtb() is the final step in
-> > arm_load_kernel(), so there is no chance for the arm_load_dtb() to be
-> > called, then we get error message and qemu quits.
-> 
-> Oh, I see now. I think this is a bug in boot.c and we should
-> fix it by making the "this is a firmware boot" code path also
-> do the arm_load_dtb() call. I'll send a patch.
-pls, CC me on it as well.
+> Bash is not always installed as /bin/bash. In particular on OpenBSD,
+> the package installs it in /usr/local/bin.
+> Use the 'env' shebang to search bash in the $PATH.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-I'm interested in it from hotplug + reboot perspective,
-where we have a changed/bigger DTB on reboot as it contains new devices (cpus|memory)
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-loading rom like now doesn't work nice in case of reboot.
-
-> 
-> thanks
-> -- PMM
-> 
+> ---
+>  tests/data/acpi/rebuild-expected-aml.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/re=
+build-expected-aml.sh
+> index bf9ba242ad..ff77a751c8 100755
+> --- a/tests/data/acpi/rebuild-expected-aml.sh
+> +++ b/tests/data/acpi/rebuild-expected-aml.sh
+> @@ -1,4 +1,4 @@
+> -#! /bin/bash
+> +#! /usr/bin/env bash
+> =20
+>  #
+>  # Rebuild expected AML files for acpi unit-test
