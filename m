@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34388)
+Received: from eggs.gnu.org ([209.51.188.92]:34765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gophc-0007UO-C6
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:14:53 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gopj2-0008CC-3b
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:16:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gophb-00081Z-ED
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:14:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gophb-00080F-5S
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:14:51 -0500
-References: <20190129221928.11522-1-huth@tuxfamily.org>
-	<4fb7e672-2572-15e4-598e-5ea6378006c2@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fd280788-5f28-e2cf-85f6-595a6142062b@redhat.com>
-Date: Wed, 30 Jan 2019 14:14:43 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gopj0-0000uO-7H
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:16:20 -0500
+References: <20190123144610.8842-1-mreitz@redhat.com>
+	<20190123144610.8842-5-mreitz@redhat.com>
+	<9cdec140-f130-6e4c-738b-0b2dd69ca714@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9e96eb3e-c35a-2a3f-2276-bf78bf9890a9@redhat.com>
+Date: Wed, 30 Jan 2019 14:16:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <4fb7e672-2572-15e4-598e-5ea6378006c2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/m68k/mcf5208: Support loading of bios
- images
+In-Reply-To: <9cdec140-f130-6e4c-738b-0b2dd69ca714@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3ar6HJzl8ZdPZ2snqREO6rHoZVfolFCuG"
+Subject: Re: [Qemu-devel] [PATCH 4/9] iotests: Fix 207 to use QMP filters
+ for qmp_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +26,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 2019-01-30 12:15, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3ar6HJzl8ZdPZ2snqREO6rHoZVfolFCuG
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <9e96eb3e-c35a-2a3f-2276-bf78bf9890a9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] iotests: Fix 207 to use QMP filters for
+ qmp_log
+References: <20190123144610.8842-1-mreitz@redhat.com>
+ <20190123144610.8842-5-mreitz@redhat.com>
+ <9cdec140-f130-6e4c-738b-0b2dd69ca714@redhat.com>
+In-Reply-To: <9cdec140-f130-6e4c-738b-0b2dd69ca714@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 29.01.19 22:31, John Snow wrote:
 >=20
-> On 1/29/19 11:19 PM, Thomas Huth wrote:
->> The MCF5208EVB supports 2 MiB of flash at address 0. Add support
->> for this memory region and some code to load the file that can
->> be specified with the "-bios" command line option.
->> This can be used for example to load U-Boot images for the
->> MCF5208EVB (we still lack some features in the CPU emulation for
->> this firmware, though, so it can not be run successfully yet).
->>
->> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+>=20
+> On 1/23/19 9:46 AM, Max Reitz wrote:
+>> Fixes: 08fcd6111e1949f456e1b232ebeeb0cc17019a92
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+> Commit message is a bit barren, feel free to blame me for not realizing=
+
+> that non-qcow2 tests used the feature I was rewriting. I may have chose=
+n
+> to rewrite it differently if I had seen all the other callers. :\
+
+I felt like all I wanted to say fit into the title.
+
+> Any opinions on how it shook out, now that you've had to fix things in
+> its wake? It felt like a lot of work to do not much to be honest, but
+> also it seemed like we were being too cavalier about the differences
+> between rich/qmp filters and text ones.
+
+Well...  I felt like it was good enough before.  These are tests, so
+whatever works, works.
+
+In theory it's nice that filters can now see the real objects, but in
+practice filtering for a certain key wasn't impossible, as it was done
+in this test before this patch; and in other cases, it turns out we
+probably don't want to filter for a certain key at all (like when
+filtering the filename).
+
+So all in all I'd have to say to me it mostly makes things more
+complicated than necessary.  But OTOH I wouldn't say it's
+overcomplicated because I can see the theoretical purpose, at least.  It
+makes sense to give objects to the filters -- but it doesn't seem too
+useful in the end.
+
+Also, when in doubt, it's probably better to really work on objects
+instead of having just simple text filters.  After all, at least I write
+Python tests to get away from those text filters we have in the bash test=
+s.
+
+Max
+
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
 >> ---
->>  hw/m68k/mcf5208.c | 29 ++++++++++++++++++++++++++++-
->>  1 file changed, 28 insertions(+), 1 deletion(-)
+>>  tests/qemu-iotests/207     | 10 +++++++---
+>>  tests/qemu-iotests/207.out |  4 ++--
+>>  2 files changed, 9 insertions(+), 5 deletions(-)
 >>
->> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
->> index 0f2245dd81..021194498d 100644
->> --- a/hw/m68k/mcf5208.c
->> +++ b/hw/m68k/mcf5208.c
->> @@ -27,6 +27,8 @@
+>> diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+>> index c617ee7453..dfd3c51bd1 100755
+>> --- a/tests/qemu-iotests/207
+>> +++ b/tests/qemu-iotests/207
+>> @@ -27,12 +27,16 @@ import re
+>>  iotests.verify_image_format(supported_fmts=3D['raw'])
+>>  iotests.verify_protocol(supported=3D['ssh'])
 >> =20
->>  #define SYS_FREQ 166666666
+>> -def filter_hash(msg):
+>> -    return re.sub('"hash": "[0-9a-f]+"', '"hash": HASH', msg)
+>> +def filter_hash(qmsg):
+>> +    def _filter(key, value):
+>> +        if key =3D=3D 'hash' and re.match('[0-9a-f]+', value):
+>> +            return 'HASH'
+>> +        return value
+>> +    return iotests.filter_qmp(qmsg, _filter)
 >> =20
->> +#define ROM_SIZE 0x200000
->> +
->>  #define PCSR_EN         0x0001
->>  #define PCSR_RLD        0x0002
->>  #define PCSR_PIF        0x0004
->> @@ -227,6 +229,7 @@ static void mcf5208evb_init(MachineState *machine)
->>      hwaddr entry;
->>      qemu_irq *pic;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->> +    MemoryRegion *rom =3D g_new(MemoryRegion, 1);
->>      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
->>      MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+>>  def blockdev_create(vm, options):
+>>      result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=
+=3Doptions,
+>> -                        filters=3D[iotests.filter_testfiles, filter_h=
+ash])
+>> +                        filters=3D[iotests.filter_qmp_testfiles, filt=
+er_hash])
 >> =20
->> @@ -237,6 +240,10 @@ static void mcf5208evb_init(MachineState *machine=
-)
->>      env->vbr =3D 0;
->>      /* TODO: Configure BARs.  */
+>>      if 'return' in result:
+>>          assert result['return'] =3D=3D {}
+>> diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
+>> index 45ac7c2a8f..88d2240f54 100644
+>> --- a/tests/qemu-iotests/207.out
+>> +++ b/tests/qemu-iotests/207.out
+>> @@ -40,7 +40,7 @@ Job failed: remote host key does not match host_key_=
+check 'wrong'
+>>  {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+>>  {"return": {}}
 >> =20
->> +    /* ROM at 0x00000000 */
->> +    memory_region_init_rom(rom, NULL, "mcf5208.rom", ROM_SIZE, &error=
-_fatal);
->> +    memory_region_add_subregion(address_space_mem, 0x0, rom);
->=20
-> I'd use 0x00000000 here as in the comment.
->=20
->> +
->>      /* DRAM at 0x40000000 */
->>      memory_region_allocate_system_memory(ram, NULL, "mcf5208.ram", ra=
-m_size);
->>      memory_region_add_subregion(address_space_mem, 0x40000000, ram);
->> @@ -285,9 +292,29 @@ static void mcf5208evb_init(MachineState *machine=
-)
->>      /*  0xfc0a4000 GPIO.  */
->>      /* 0xfc0a8000 SDRAM controller.  */
+>> -{"execute": "blockdev-create", "arguments": {"job_id": "job0", "optio=
+ns": {"driver": "ssh", "location": {"host-key-check": {"hash": HASH, "mod=
+e": "hash", "type": "md5"}, "path": "TEST_DIR/PID-t.img", "server": {"hos=
+t": "127.0.0.1", "port": "22"}}, "size": 8388608}}}
+>> +{"execute": "blockdev-create", "arguments": {"job_id": "job0", "optio=
+ns": {"driver": "ssh", "location": {"host-key-check": {"hash": "HASH", "m=
+ode": "hash", "type": "md5"}, "path": "TEST_DIR/PID-t.img", "server": {"h=
+ost": "127.0.0.1", "port": "22"}}, "size": 8388608}}}
+>>  {"return": {}}
+>>  {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+>>  {"return": {}}
+>> @@ -55,7 +55,7 @@ Job failed: remote host key does not match host_key_=
+check 'wrong'
+>>  {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+>>  {"return": {}}
 >> =20
->> +    /* Load firmware */
->> +    if (bios_name) {
->> +        char *fn;
->> +        uint8_t *ptr;
->> +
->> +        fn =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->> +        if (!fn) {
->> +            error_report("Could not find ROM image '%s'", bios_name);
->> +            exit(1);
->> +        }
->> +        if (load_image_targphys(fn, 0x0, ROM_SIZE) < 8) {
->> +            error_report("Could not load ROM image '%s'", bios_name);
->> +            exit(1);
->> +        }
->> +        g_free(fn);
->=20
-> Can you add a comment about the 3 next lines?
-> As this doesn't seem m68k specific but firmware specific
+>> -{"execute": "blockdev-create", "arguments": {"job_id": "job0", "optio=
+ns": {"driver": "ssh", "location": {"host-key-check": {"hash": HASH, "mod=
+e": "hash", "type": "sha1"}, "path": "TEST_DIR/PID-t.img", "server": {"ho=
+st": "127.0.0.1", "port": "22"}}, "size": 4194304}}}
+>> +{"execute": "blockdev-create", "arguments": {"job_id": "job0", "optio=
+ns": {"driver": "ssh", "location": {"host-key-check": {"hash": "HASH", "m=
+ode": "hash", "type": "sha1"}, "path": "TEST_DIR/PID-t.img", "server": {"=
+host": "127.0.0.1", "port": "22"}}, "size": 4194304}}}
+>>  {"return": {}}
+>>  {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+>>  {"return": {}}
+>>
 
-It's m68k specific: At the very bottom of the address map, the first
-4-byte value is always the initial stack, the next four bytes are always
-the initial value for the program counter. But, ok, I can add a comment
-here to make it clearer.
 
-> shouldn't you
-> magic check for the image loaded to be your particular firmware (if thi=
-s
-> is possible) or check $pc is within sane range?
 
-We don't do this in any of our other boards, do we? At least I can not
-remember any examples for such a check right now.
+--3ar6HJzl8ZdPZ2snqREO6rHoZVfolFCuG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->> +        ptr =3D rom_ptr(0x4, 4);
->> +        assert(ptr !=3D NULL);
->> +        env->pc =3D ldl_p(ptr);
->> +    }
->> +
->>      /* Load kernel.  */
->>      if (!kernel_filename) {
->> -        if (qtest_enabled()) {
->> +        if (qtest_enabled() || bios_name) {
->>              return;
->>          }
->>          error_report("Kernel image must be specified");
+-----BEGIN PGP SIGNATURE-----
 
- Thomas
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRo5UACgkQ9AfbAGHV
+z0D+rwf+JtB98uvWpvfKuo8AN2XfV4tj58TvTYY/csHxB6F89f6BJPotCPLIaeDe
+N/lBWad7HaWzobzKvSkf6EgzeXyI2Qg7tYvAy33sR/VS+hiZpVpe2QLxpnq1Bfoe
+BXAq0r4Oupn6nTYpOCaAn++vIanrxqYNbC84S6lqEhINZtvH1FGzqUdDvKuZEAa6
+rrU3AOHTvO+AJsQjPJPSZmp3cMq6BAPy/YTOXBemRueT8E1lhtT7xzZKKYljdOgG
+Dlys1RsA2rqSddHuilbxWJdkBtPQO478Pqo0zLj1ebeICHS6athFM9EpkBiOZ0m2
+RLXp/WbqOKTh+QRrya5sDC68Q1VmGQ==
+=iAqu
+-----END PGP SIGNATURE-----
+
+--3ar6HJzl8ZdPZ2snqREO6rHoZVfolFCuG--
