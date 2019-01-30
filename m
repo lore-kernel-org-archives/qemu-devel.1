@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34246)
+Received: from eggs.gnu.org ([209.51.188.92]:34457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gotQc-00060Q-4c
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:13:35 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gotRi-0006nC-UU
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gotQb-0004sW-8T
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:13:34 -0500
-References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
-	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-	<1548841387-7670-4-git-send-email-thuth@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
-Date: Wed, 30 Jan 2019 17:13:15 +0000
+	(envelope-from <wainersm@redhat.com>) id 1gotRh-0005OY-DN
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gotRh-0005Ms-4Z
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:14:41 -0500
+References: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <9b791496-fa11-a3e2-4dc4-1254da6589ba@redhat.com>
+Date: Wed, 30 Jan 2019 15:14:23 -0200
 MIME-Version: 1.0
-In-Reply-To: <1548841387-7670-4-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/5] ppc: Express dependencies of the
- Mac machines with kconfig
+In-Reply-To: <1548638112-31101-1-git-send-email-lizhijian@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Acceptance tests: use linux-3.6 and
+ set vm memory to 4GiB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,129 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org
+To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: Caio Carrara <ccarrara@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 30/01/2019 09:43, Thomas Huth wrote:
 
-> This will make it for example easier if the users want to disable
-> one of the two machines for their builds.
-> 
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+On 01/27/2019 11:15 PM, Li Zhijian wrote:
+> QEMU have already supported to load up to 4G initrd if the sepcified me=
+mory is
+> enough and XLF_CAN_BE_LOADED_ABOVE_4G is set by guest kernel
+>
+> linux-3.6 kernel shipped by Fedora-18 cannot support xldflags so that i=
+t
+> cannot support loading more than 2GiB initrd
+>
+> CC: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> CC: Caio Carrara <ccarrara@redhat.com>
+> CC: Cleber Rosa <crosa@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>
 > ---
->  default-configs/ppc-softmmu.mak | 15 ---------------
->  hw/misc/Kconfig                 |  8 ++++++++
->  hw/net/Kconfig                  |  2 ++
->  hw/pci-host/Kconfig             |  4 +++-
->  hw/ppc/Kconfig                  |  7 +++++++
->  5 files changed, 20 insertions(+), 16 deletions(-)
-> 
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 422f1b7..513a8e9 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -37,21 +37,6 @@ CONFIG_VGA_CIRRUS=y
->  CONFIG_SMBUS_EEPROM=y
->  
->  # For Macs
-> -CONFIG_ESCC=y
-> -CONFIG_MACIO=y
-> -CONFIG_MACIO_GPIO=y
-> -CONFIG_SUNGEM=y
-> -CONFIG_MOS6522=y
-> -CONFIG_CUDA=y
-> -CONFIG_ADB=y
-> -CONFIG_MAC_NVRAM=y
-> -CONFIG_MAC_DBDMA=y
-> -CONFIG_MAC_PMU=y
-> -CONFIG_HEATHROW_PIC=y
-> -CONFIG_GRACKLE_PCI=y
-> -CONFIG_UNIN_PCI=y
-> -CONFIG_DEC_PCI=y
-> -CONFIG_IDE_MACIO=y
->  CONFIG_MAC_OLDWORLD=y
->  CONFIG_MAC_NEWWORLD=y
->  
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 3ebe30f..f392502 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -59,6 +59,14 @@ config MOS6522
->  
->  config MACIO
->      bool
-> +    select CUDA
-> +    select ESCC
-> +    select IDE_MACIO
-> +    select MACIO_GPIO
-> +    select MAC_DBDMA
-> +    select MAC_NVRAM
-> +    select MAC_PMU
-> +    select MOS6522
+> V2: fix typos
+> ---
+>   tests/acceptance/linux_initrd.py | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
 
-Technically MACIO_GPIO and MAC_PMU are MAC_NEWWORLD only, so we might want to split
-this down further?
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
->  config IVSHMEM_DEVICE
->      bool
-> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-> index 47368d7..9047f6d 100644
-> --- a/hw/net/Kconfig
-> +++ b/hw/net/Kconfig
-> @@ -85,6 +85,8 @@ config FTGMAC100
->  
->  config SUNGEM
->      bool
-> +    default y if (MAC_OLDWORLD || MAC_NEWWORLD)
-> +    depends on PCI
->  
->  config COLDFIRE
->      bool
-> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-> index ff4080c..b39ea29 100644
-> --- a/hw/pci-host/Kconfig
-> +++ b/hw/pci-host/Kconfig
-> @@ -10,8 +10,10 @@ config GRACKLE_PCI
->      bool
->  
->  config UNIN_PCI
-> -    select PCI
->      bool
-> +    select PCI
-> +    select DEC_PCI
-> +    select OPENPIC
->  
->  config PPCE500_PCI
->      select PCI
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index 809830e..f6b4206 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -44,9 +44,16 @@ config RS6000_MC
->  
->  config MAC_OLDWORLD
->      bool
-> +    select ADB
-> +    select GRACKLE_PCI
-> +    select HEATHROW_PIC
-> +    select MACIO
->  
->  config MAC_NEWWORLD
->      bool
-> +    select ADB
-> +    select MACIO
-> +    select UNIN_PCI
+Note to maintainers: the patch 02 implements a test case for=20
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg588166.html which=20
+is in Paolo's queue already.
 
-Also MAC_NEWWORLD has an in-built USB PCI bridge (OHCI) which populates with a USB
-keyboard/mouse rather than ADB when using -M mac99,via=pmu, but I presume USB is
-handled elsewhere?
-
->  config E500
->      bool
-> 
+- Wainer
 
 
-ATB,
-
-Mark.
+>
+> diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_=
+initrd.py
+> index 737355c..b283715 100644
+> --- a/tests/acceptance/linux_initrd.py
+> +++ b/tests/acceptance/linux_initrd.py
+> @@ -24,14 +24,16 @@ class LinuxInitrd(Test):
+>  =20
+>       timeout =3D 60
+>  =20
+> -    def test_with_2gib_file_should_exit_error_msg(self):
+> +    def test_with_2gib_file_should_exit_error_msg_with_linux_v3_6(self=
+):
+>           """
+>           Pretends to boot QEMU with an initrd file with size of 2GiB
+>           and expect it exits with error message.
+> +        Fedora-18 shipped with linux-3.6 which have not supported xloa=
+dflags
+> +        cannot support more than 2GiB initrd.
+>           """
+> -        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28=
+/'
+> -                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
+> -        kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
+> +        kernel_url =3D ('https://archives.fedoraproject.org/pub/archiv=
+e/fedora/li'
+> +                      'nux/releases/18/Fedora/x86_64/os/images/pxeboot=
+/vmlinuz')
+> +        kernel_hash =3D '41464f68efe42b9991250bed86c7081d2ccdbb21'
+>           kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dker=
+nel_hash)
+>           max_size =3D 2 * (1024 ** 3) - 1
+>  =20
+> @@ -39,8 +41,8 @@ class LinuxInitrd(Test):
+>               initrd.seek(max_size)
+>               initrd.write(b'\0')
+>               initrd.flush()
+> -            cmd =3D "%s -kernel %s -initrd %s" % (self.qemu_bin, kerne=
+l_path,
+> -                                                initrd.name)
+> +            cmd =3D "%s -kernel %s -initrd %s -m 4096" % (
+> +                  self.qemu_bin, kernel_path, initrd.name)
+>               res =3D run(cmd, ignore_status=3DTrue)
+>               self.assertEqual(res.exit_status, 1)
+>               expected_msg =3D r'.*initrd is too large.*max: \d+, need =
+%s.*' % (
