@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34492)
+Received: from eggs.gnu.org ([209.51.188.92]:34899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gogLE-0003fJ-9K
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:09 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gogOX-0004w7-9w
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gogLD-00055h-OK
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48506)
+	(envelope-from <stefanha@redhat.com>) id 1gogOW-0006aS-Kk
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:18:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gogLD-00054t-Fy
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:15:07 -0500
-Date: Tue, 29 Jan 2019 22:14:56 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190129213617-mutt-send-email-mst@kernel.org>
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-4-xieyongji@baidu.com>
-	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gogOW-0006Zf-FU
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:18:32 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 30 Jan 2019 11:18:11 +0800
+Message-Id: <20190130031817.27780-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
- inflight I/O in shared memory
+Subject: [Qemu-devel] [PULL 0/6] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Jan 30, 2019 at 10:31:49AM +0800, Jason Wang wrote:
->=20
-> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
-> > +static int
-> > +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
-> > +{
-> > +    if (!has_feature(dev->protocol_features,
-> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    if (unlikely(!vq->inflight)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    vq->inflight->desc[desc_idx].inuse =3D 1;
-> > +
-> > +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static int
-> > +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
-> > +{
-> > +    if (!has_feature(dev->protocol_features,
-> > +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
-> > +        return 0;
-> > +    }
-> > +
-> > +    if (unlikely(!vq->inflight)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
-> > +
-> > +    barrier();
-> > +
-> > +    vq->inflight->desc[desc_idx].version++;
-> > +
-> > +    return 0;
-> > +}
->=20
->=20
-> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure the
-> value reach memory.
->=20
-> Thanks
->=20
+The following changes since commit f6b06fcceef465de0cf2514c9f76fe01928967=
+81:
 
-WRITE_ONCE is literally volatile + dependency memory barrier.
-So unless compiler is a very agressive one, it does not
-buy you much.
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-requ=
+est' into staging (2019-01-23 17:57:47 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
+
+for you to fetch changes up to 57b7bdf426445d8356171135308dfe6d7d5fb612:
+
+  trace: rerun tracetool after ./configure changes (2019-01-30 10:57:03 +=
+0800)
+
+----------------------------------------------------------------
+Pull request
+
+User-visible changes:
+ * The new qemu-trace-stap script makes it convenient to collect traces w=
+ithout
+   writing SystemTap scripts.  See "man qemu-trace-stap" for details.
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (4):
+  display: ensure qxl log_buf is a nul terminated string
+  trace: enforce that every trace-events file has a final newline
+  trace: forbid use of %m in trace event format strings
+  trace: add ability to do simple printf logging via systemtap
+
+Stefan Hajnoczi (1):
+  trace: rerun tracetool after ./configure changes
+
+Vladimir Sementsov-Ogievskiy (1):
+  trace: improve runstate tracing
+
+ MAINTAINERS                          |   1 +
+ docs/devel/tracing.txt               |   4 +
+ Makefile                             |  26 ++--
+ Makefile.target                      |  11 +-
+ hw/display/qxl.c                     |  14 ++-
+ hw/vfio/pci.c                        |   2 +-
+ vl.c                                 |   7 +-
+ hw/display/trace-events              |   2 +-
+ hw/gpio/trace-events                 |   2 +-
+ hw/vfio/trace-events                 |   2 +-
+ scripts/qemu-trace-stap              | 175 +++++++++++++++++++++++++++
+ scripts/qemu-trace-stap.texi         | 140 +++++++++++++++++++++
+ scripts/tracetool/__init__.py        |   6 +
+ scripts/tracetool/format/log_stap.py | 127 +++++++++++++++++++
+ trace-events                         |   4 +-
+ 15 files changed, 502 insertions(+), 21 deletions(-)
+ create mode 100755 scripts/qemu-trace-stap
+ create mode 100644 scripts/qemu-trace-stap.texi
+ create mode 100644 scripts/tracetool/format/log_stap.py
 
 --=20
-MST
+2.20.1
