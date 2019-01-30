@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55821)
+Received: from eggs.gnu.org ([209.51.188.92]:55934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gouy2-0000CO-Fg
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:52:11 -0500
+	(envelope-from <chouteau@adacore.com>) id 1gouyw-0000n2-Bq
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gouy0-0000k4-F7
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:52:10 -0500
-Received: from 9.mo5.mail-out.ovh.net ([178.32.96.204]:47813)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gouxy-0000X4-Na
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:52:08 -0500
-Received: from player774.ha.ovh.net (unknown [10.109.143.246])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9309F213338
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 19:52:02 +0100 (CET)
-References: <1548863140-31975-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c814b36e-a813-f0da-6fe6-e80a52bc21e6@kaod.org>
-Date: Wed, 30 Jan 2019 19:51:56 +0100
-MIME-Version: 1.0
-In-Reply-To: <1548863140-31975-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: XIVE is an interrupt
- controller, not a machine
+	(envelope-from <chouteau@adacore.com>) id 1gouyv-0002lm-GW
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 13:53:06 -0500
+From: Fabien Chouteau <chouteau@adacore.com>
+Date: Wed, 30 Jan 2019 19:52:42 +0100
+Message-Id: <20190130185242.12490-1-chouteau@adacore.com>
+Subject: [Qemu-devel] [PATCH] hw/riscv/sifive_clint.c: avoid integer
+ overflow in timecmp write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +18,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org
+Cc: Fabien Chouteau <chouteau@adacore.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "open list:RISC-V" <qemu-riscv@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On 1/30/19 4:45 PM, Thomas Huth wrote:
-> The "XIVE" section is currently listed in the "PowerPC Machines"
-> section, which is weird, since this is an interrupt controller
-> device.=20
+Writing a high value in timecmp leads to an integer overflow. This patch
+modifies the code to detect such case, and use the maximum integer value
+as the next trigger for the timer.
 
-( I wonder how XIVE should be classified, the logic is as big as=20
-  a core on the POWER9 processor. )
+Signed-off-by: Fabien Chouteau <chouteau@adacore.com>
+---
+ hw/riscv/sifive_clint.c | 31 ++++++++++++++++++++++++++-----
+ 1 file changed, 26 insertions(+), 5 deletions(-)
 
-> Move it to the "Devices" section instead.
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-yes, looks good me.
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> ---
->  MAINTAINERS | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b334b53..eac36b6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1038,14 +1038,6 @@ F: tests/libqos/*spapr*
->  F: tests/rtas*
->  F: tests/libqos/rtas*
-> =20
-> -XIVE
-> -M: David Gibson <david@gibson.dropbear.id.au>
-> -M: C=C3=A9dric Le Goater <clg@kaod.org>
-> -L: qemu-ppc@nongnu.org
-> -S: Supported
-> -F: hw/*/*xive*
-> -F: include/hw/*/*xive*
-> -
->  virtex_ml507
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  L: qemu-ppc@nongnu.org
-> @@ -1645,6 +1637,14 @@ F: tests/libqos/fw_cfg.c
->  F: tests/fw_cfg-test.c
->  T: git https://github.com/philmd/qemu.git fw_cfg-next
-> =20
-> +XIVE
-> +M: David Gibson <david@gibson.dropbear.id.au>
-> +M: C=C3=A9dric Le Goater <clg@kaod.org>
-> +L: qemu-ppc@nongnu.org
-> +S: Supported
-> +F: hw/*/*xive*
-> +F: include/hw/*/*xive*
-> +
->  Subsystems
->  ----------
->  Audio
->=20
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index d4c159e937..1ca1f8c75e 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -38,8 +38,10 @@ static uint64_t cpu_riscv_read_rtc(void)
+  */
+ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+ {
+-    uint64_t next;
+     uint64_t diff;
++    uint64_t lapse_ns;
++    uint64_t clock_ns;
++    int64_t  next_ns;
+ 
+     uint64_t rtc_r = cpu_riscv_read_rtc();
+ 
+@@ -54,10 +56,29 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+     /* otherwise, set up the future timer interrupt */
+     riscv_cpu_update_mip(cpu, MIP_MTIP, BOOL_TO_MASK(0));
+     diff = cpu->env.timecmp - rtc_r;
+-    /* back to ns (note args switched in muldiv64) */
+-    next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
+-    timer_mod(cpu->env.timer, next);
++
++    /*
++     * How many nanoseconds until the next trigger (note args switched in
++     * muldiv64)
++     */
++    lapse_ns = muldiv64(diff,
++                        NANOSECONDS_PER_SECOND,
++                        SIFIVE_CLINT_TIMEBASE_FREQ);
++
++    /* Current time in nanoseconds */
++    clock_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++
++    if ((G_MAXINT64 - clock_ns) <= lapse_ns) {
++        /*
++         * clock + lapse would overflow on 64bit. The highest 64bit value is
++         * used as the next trigger time.
++         */
++        next_ns = G_MAXINT64;
++    } else {
++        next_ns = clock_ns + lapse_ns;
++    }
++
++    timer_mod(cpu->env.timer, next_ns);
+ }
+ 
+ /*
+-- 
+2.17.1
