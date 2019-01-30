@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38511)
+Received: from eggs.gnu.org ([209.51.188.92]:40175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gogkB-0003sc-Fu
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:56 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gogt9-0005IW-I6
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gogk9-0008Fg-O3
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gogk9-0008FC-Fm
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:53 -0500
-Date: Tue, 29 Jan 2019 22:40:42 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190129223831-mutt-send-email-mst@kernel.org>
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<30a4a533-042e-0f54-1449-ecd7ed26aa1b@redhat.com>
+	(envelope-from <elohimes@gmail.com>) id 1gogt7-0003fz-V3
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:11 -0500
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:45224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gogt7-0003b3-MR
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:50:09 -0500
+Received: by mail-yw1-xc44.google.com with SMTP id d190so9088897ywd.12
+	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 19:50:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <30a4a533-042e-0f54-1449-ecd7ed26aa1b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] vhost-user-blk: Add support for
- backend reconnecting
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-2-xieyongji@baidu.com>
+	<20190129041155.GG3264@stefanha-x1.localdomain>
+	<20190128232025-mutt-send-email-mst@kernel.org>
+	<CAONzpcadLr2YHzWgBiqX3nuq=KPneTOKiNZ9bdwO1p4Ni7pUcg@mail.gmail.com>
+	<20190129091012-mutt-send-email-mst@kernel.org>
+	<CAONzpcaHJZj8w-nK_AjEJ9vxHFkZauV0FH_4Oa66_qZBWE9aiw@mail.gmail.com>
+	<20190129212835-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190129212835-mutt-send-email-mst@kernel.org>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Wed, 30 Jan 2019 11:49:56 +0800
+Message-ID: <CAONzpcZWmmVYzzAbS4HYTpAaNn6Xo+nG9XoRut9N_ro6NfRzLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] vhost-user: Support transferring
+ inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +35,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On Wed, Jan 30, 2019 at 10:29:10AM +0800, Jason Wang wrote:
->=20
-> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >=20
-> > This patchset is aimed at supporting qemu to reconnect
-> > vhost-user-blk backend after vhost-user-blk backend crash or
-> > restart.
-> >=20
-> > The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD to support support transferring shared
-> > buffer between qemu and backend.
-> >=20
-> > The patch 2,3 are the corresponding libvhost-user patches of
-> > patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD.
-> >=20
-> > The patch 4 allows vhost-user-blk to use the two new messages
-> > to get/set inflight buffer from/to backend.
-> >=20
-> > The patch 5 supports vhost-user-blk to reconnect backend when
-> > connection closed.
-> >=20
-> > The patch 6 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
-> > to vhost-user-blk backend which is used to tell qemu that
-> > we support reconnecting now.
-> >=20
-> > This series is based on Daniel P. Berrang=C3=A9's patchset:
-> >=20
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
-> >=20
-> > To use it, we could start qemu with:
-> >=20
-> > qemu-system-x86_64 \
-> >          -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,reconne=
-ct=3D1, \
-> >          -device vhost-user-blk-pci,chardev=3Dchar0 \
-> >=20
-> > and start vhost-user-blk backend with:
-> >=20
-> > vhost-user-blk -b /path/file -s /path/vhost.socket
-> >=20
-> > Then we can restart vhost-user-blk at any time during VM running.
-> >=20
-> > V4 to V5:
-> > - Drop patch that enables "nowait" option on client sockets
-> > - Support resubmitting inflight I/O in order
-> > - Make inflight I/O tracking more robust
-> > - Remove align field and add queue size field in VhostUserInflight
-> > - Document more details in vhost-user.txt
->=20
->=20
-> I'm still not convinced about this approach. If the maintainer decide t=
-o
-> merge, at least two things needs to be added besides the correctness of=
- the
-> code:
->=20
-> - you need prove that this approach can work for packed ring
+On Wed, 30 Jan 2019 at 10:30, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jan 30, 2019 at 10:07:28AM +0800, Yongji Xie wrote:
+> > On Tue, 29 Jan 2019 at 22:15, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Tue, Jan 29, 2019 at 02:15:35PM +0800, Yongji Xie wrote:
+> > > > On Tue, 29 Jan 2019 at 12:26, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Tue, Jan 29, 2019 at 12:11:55PM +0800, Stefan Hajnoczi wrote:
+> > > > > > On Tue, Jan 22, 2019 at 04:31:47PM +0800, elohimes@gmail.com wrote:
+> > > > > > > +typedef struct DescState {
+> > > > > > > +    uint8_t inuse;
+> > > > > > > +    uint8_t version;
+> > > > > > > +    uint16_t used_idx;
+> > > > > > > +    uint16_t avail_idx;
+> > > > > > > +    uint16_t reserved;
+> > > > > > > +} DescState;
+> > > > > > > +
+> > > > > > > +typedef struct QueueRegion {
+> > > > > > > +    uint8_t valid;
+> > > > >
+> > > > > what's this?
+> > > > >
+> > > >
+> > > > We can use this to check whether this buffer is reset by qemu.
+> > >
+> > >
+> > > I'd use version here. Document that it's 1 currently.
+> >
+> > If we put version into the shared buffer, QEMU will reset it when vm
+> > reset. Then if backend restart at the same time, the version of this
+> > buffer will be lost. So I still let QEMU maintain it and send it back
+> > through message's payload.
+>
+> I don't get it. If it's reset there's no contents.
+> If there's no contents then who cares what the version is?
+>
 
-Or rather document how it's used.
+What I thought before is that we should not update the buffer when vm
+reset. But now seems like it's unnecessary. I will update this patch
+as you said. Thank you!
 
-> -=C2=A0 an unit-test to test the crash during logging in-flight descrip=
-tor.
->=20
-> Thanks
+> > > Or do we want feature flags so we can support downgrades too?
+> > >
+> >
+> > We faced the same problem that the feature flags will be lost if QEMU
+> > do not maintain it. So maybe we should put this into message's
+> > payload?
+>
+> I don't understand why we care. We only maintain inflight so we
+> don't need to reset the device. if device is reset we don't
+> need to maintain them at all.
+>
+> > >
+> > > > > > > +    uint16_t desc_num;
+> > > > >
+> > > > > there's padding before this field. Pls make it explicit.
+> > > > >
+> > > >
+> > > > Will do it.
+> > > >
+> > > > > > > +    DescState desc[0];
+> > > > > > > +} QueueRegion;
+> > > > > > > +
+> > > > > > > +The struct DescState is used to describe one head-descriptor's state. The
+> > > > > > > +fields have following meanings:
+> > > > > > > +
+> > > > > > > +    inuse: Indicate whether the descriptor is inuse or not.
+> > > > >
+> > > > > inuse by what?
+> > > > >
+> > > >
+> > > > Maybe inflight is better?
+> > > >
+> > > > > > > +
+> > > > > > > +    version: Indicate whether we have an atomic update to used ring and
+> > > > > > > +    inflight buffer when slave crash at that point. This field should be
+> > > > > > > +    increased by one before and after this two updates. An odd version
+> > > > > > > +    indicates an in-progress update.
+> > > > >
+> > > > > I'm not sure I understand what does the above say. Also does this
+> > > > > require two atomics? Seems pretty expensive. And why is it called
+> > > > > version?
+> > > > >
+> > > > > > > +
+> > > > > > > +    used_idx: Store old index of used ring before we update used ring and
+> > > > > > > +    inflight buffer so that slave can know whether an odd version inflight
+> > > > > > > +    head-descriptor in inflight buffer is processed or not.
+> > > > >
+> > > > > Here too.
+> > > > >
+> > > >
+> > > > Sorry, the above description may be not clear. This two fields are
+> > > > used to indicate whether we have an in-progress update to used ring
+> > > > and inflight buffer. If slave crash before the update to used_ring and
+> > > > after the update to inflight buffer, the version should be odd and
+> > > > used_idx should be equal to used_ring.idx. Then we need to roll back
+> > > > the update to inflight buffer. As for the name of the version filed,
+> > > > actually I didn't find a good one, so I just copy it from struct
+> > > > kvm_steal_time...
+> > > >
+> > > > > > > +
+> > > > > > > +    avail_idx: Used to preserve the descriptor's order in avail ring so that
+> > > > > > > +    slave can resubmit descriptors in order.
+> > > > >
+> > > > > Why would that be necessary?
+> > > > >
+> > > >
+> > > > Maybe some devices will be able to use it to preserve order after
+> > > > reconnecting in future?
+> > >
+> > > If buffers are used in order then old entries in the ring
+> > > are not overwritten so inflight tracking is not
+> > > necessary. This is exactly the case with vhost user net today.
+> > >
+> >
+> > OK, looks reasonable to me.
+> >
+> > > > > >
+> > > > > > Will a completely new "packed vring" inflight shm layout be necessary to
+> > > > > > support the packed vring layout in VIRTIO 1.1?
+> > > > > >
+> > > > > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html#x1-610007
+> > > > >
+> > > > > Probably.
+> > > > >
+> > > >
+> > > > How about supporting packed virtqueue in guest driver?
+> > > >
+> > > > Thanks,
+> > > > Yongji
+> > >
+> > > Depends on the guest right? Linux has it:
+> > >
+> >
+> > Sorry, actually I mean I prefer to support inflight tracking for
+> > packed virtqueue in guest driver. This feature is only used by legacy
+> > virtio 1.0 or virtio 0.9 device. What do you think about it?
+> >
+> > Thanks,
+> > Yongji
+>
+> I don't see what does one have to do with the other.  Either we do or we
+> don't want to do it without downtime and retries. If we don't mind
+> resets then let's do it by making guest changes.
+>
 
-For contrib/vhost-user-blk? Well I don't think it's used by unit
-tests right now, it is? So it's a worthwhile goal but not
-necessarily a requirement for any specific patch I think.
+OK, I see. But seems like now we don't support packed virtqueue in
+qemu. Is it better to do that in a splited patchset? Add packed
+virtqueue implenment in contrib/libvhost-user.c, then document the
+inflight I/O tracking behavior.
 
-
->=20
-> >=20
-> > V3 to V4:
-> > - Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
-> > - Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
-> >    and VHOST_USER_SET_INFLIGHT_FD
-> > - Allocate inflight buffer in backend rather than in qemu
-> > - Document a recommended format for inflight buffer
-> >=20
-> > V2 to V3:
-> > - Using exisiting wait/nowait options to control connection on
-> >    client sockets instead of introducing "disconnected" option.
-> > - Support the case that vhost-user backend restart during initialzati=
-on
-> >    of vhost-user-blk device.
-> >=20
-> > V1 to V2:
-> > - Introduce "disconnected" option for chardev instead of reuse "wait"
-> >    option
-> > - Support the case that QEMU starts before vhost-user backend
-> > - Drop message VHOST_USER_SET_VRING_INFLIGHT
-> > - Introduce two new messages VHOST_USER_GET_SHM_SIZE
-> >    and VHOST_USER_SET_SHM_FD
-> >=20
-> > Xie Yongji (6):
-> >    vhost-user: Support transferring inflight buffer between qemu and
-> >      backend
-> >    libvhost-user: Introduce vu_queue_map_desc()
-> >    libvhost-user: Support tracking inflight I/O in shared memory
-> >    vhost-user-blk: Add support to get/set inflight buffer
-> >    vhost-user-blk: Add support to reconnect backend
-> >    contrib/vhost-user-blk: enable inflight I/O tracking
-> >=20
-> >   Makefile                                |   2 +-
-> >   contrib/libvhost-user/libvhost-user.c   | 402 ++++++++++++++++++++-=
----
-> >   contrib/libvhost-user/libvhost-user.h   |  40 +++
-> >   contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
-> >   docs/interop/vhost-user.txt             | 101 ++++++
-> >   hw/block/vhost-user-blk.c               | 227 ++++++++++---
-> >   hw/virtio/vhost-user.c                  | 110 +++++++
-> >   hw/virtio/vhost.c                       | 105 +++++++
-> >   include/hw/virtio/vhost-backend.h       |  10 +
-> >   include/hw/virtio/vhost-user-blk.h      |   5 +
-> >   include/hw/virtio/vhost.h               |  19 ++
-> >   11 files changed, 925 insertions(+), 99 deletions(-)
-> >=20
+Thanks,
+Yongji
