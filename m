@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36235)
+Received: from eggs.gnu.org ([209.51.188.92]:37404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gorSj-0001lf-Ox
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:07:38 -0500
+	(envelope-from <berrange@redhat.com>) id 1gorXA-0002u0-MS
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gorSh-0004Nk-75
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:07:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33404)
+	(envelope-from <berrange@redhat.com>) id 1gorX7-0006sV-J8
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53737)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gorSg-0004Fh-Tt
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:07:35 -0500
-References: <20181212095707.19358-1-david@redhat.com>
-	<a26a687a-5098-1715-9fee-8374bdd30268@redhat.com>
-	<c646ce74-7ecd-325f-3cb9-421af6d8a9b8@redhat.com>
-	<a0441fd2-cfbc-83ef-2543-7d34530875cf@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0fb48298-a01b-0f0b-dc89-73e14f09f6f9@redhat.com>
-Date: Wed, 30 Jan 2019 16:07:06 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gorX3-0006kc-QP
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:07 -0500
+Date: Wed, 30 Jan 2019 15:11:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190130151154.GS15904@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190125140017.6092-1-alex.bennee@linaro.org>
+	<20190125140017.6092-5-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a0441fd2-cfbc-83ef-2543-7d34530875cf@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] pc: Use
- hotplug_handler_(plug|unplug|unplug_request)
+Content-Disposition: inline
+In-Reply-To: <20190125140017.6092-5-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 04/14] archive-source.sh: Clone the
+ submodules locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On 30.01.19 14:09, Paolo Bonzini wrote:
-> On 30/01/19 13:35, David Hildenbrand wrote:
->> On 14.12.18 10:58, Paolo Bonzini wrote:
->>> On 12/12/18 10:57, David Hildenbrand wrote:
->>>> Let's avoid manually looking up the hotplug handler class. Use the
->>>> existing wrappers instead.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  hw/i386/pc.c | 30 ++++++++----------------------
->>>>  1 file changed, 8 insertions(+), 22 deletions(-)
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 4cd2fbca4d..c8857138f9 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -1711,7 +1711,6 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
->>>>                             DeviceState *dev, Error **errp)
->>>>  {
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->>>> @@ -1725,8 +1724,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
->>>>          nvdimm_plug(&pcms->acpi_nvdimm_state);
->>>>      }
->>>>  
->>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -    hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
->>>> +    hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &error_abort);
->>>>  out:
->>>>      error_propagate(errp, local_err);
->>>>  }
->>>> @@ -1734,7 +1732,6 @@ out:
->>>>  static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
->>>>                                       DeviceState *dev, Error **errp)
->>>>  {
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>>  
->>>> @@ -1755,9 +1752,8 @@ static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
->>>>          goto out;
->>>>      }
->>>>  
->>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>> -
->>>> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->>>> +                                   &local_err);
->>>>  out:
->>>>      error_propagate(errp, local_err);
->>>>  }
->>>> @@ -1766,12 +1762,9 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
->>>>                               DeviceState *dev, Error **errp)
->>>>  {
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>  
->>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>> -
->>>> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>>      if (local_err) {
->>>>          goto out;
->>>>      }
->>>> @@ -1813,14 +1806,12 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
->>>>                          DeviceState *dev, Error **errp)
->>>>  {
->>>>      CPUArchId *found_cpu;
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>      X86CPU *cpu = X86_CPU(dev);
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>>  
->>>>      if (pcms->acpi_dev) {
->>>> -        hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -        hhc->plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>> +        hotplug_handler_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>>          if (local_err) {
->>>>              goto out;
->>>>          }
->>>> @@ -1844,7 +1835,6 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
->>>>                                       DeviceState *dev, Error **errp)
->>>>  {
->>>>      int idx = -1;
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>      X86CPU *cpu = X86_CPU(dev);
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>> @@ -1861,9 +1851,8 @@ static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
->>>>          goto out;
->>>>      }
->>>>  
->>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -    hhc->unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>> -
->>>> +    hotplug_handler_unplug_request(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->>>> +                                   &local_err);
->>>>      if (local_err) {
->>>>          goto out;
->>>>      }
->>>> @@ -1877,14 +1866,11 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
->>>>                               DeviceState *dev, Error **errp)
->>>>  {
->>>>      CPUArchId *found_cpu;
->>>> -    HotplugHandlerClass *hhc;
->>>>      Error *local_err = NULL;
->>>>      X86CPU *cpu = X86_CPU(dev);
->>>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->>>>  
->>>> -    hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->>>> -    hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>> -
->>>> +    hotplug_handler_unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->>>>      if (local_err) {
->>>>          goto out;
->>>>      }
->>>>
->>>
->>> Queued, thanks.
->>
->> Paolo, just wondering, is this still on your queue or fell of the wagon?
-> 
-> I had some issues with the previous pull request and also have to really
-> spend some time on KVM.  But it's still queued.
-> 
+On Fri, Jan 25, 2019 at 02:00:07PM +0000, Alex Benn=C3=A9e wrote:
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> We cloned the QEMU repository from the local storage. Since the
+> submodules are also available there, clone them too. This is
+> quicker and reduce network use.
 
-No worries, I have some qdev patches based on this, but will simply send
-this patch along with that series. Whatever hits upstream first :)
+FYI there's another attempt at solving it here:
 
-> Paolo
-> 
+  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07710.html
+
+though that has some problems, so I prefer what you've done
+here.  There's still scope for replacing the git ls-tree + tar
+command with a git archive command, but that's tangential to
+the problem of reducing network usage.
+
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  scripts/archive-source.sh | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> index 6eed2a29bd..ce31be67b0 100755
+> --- a/scripts/archive-source.sh
+> +++ b/scripts/archive-source.sh
+> @@ -38,6 +38,10 @@ else
+>  fi
+>  git clone --shared . "$vroot_dir"
+>  test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+> +for sm in $submodules; do
+> +    git clone --shared "$sm" "$vroot_dir/$sm"
+> +    test $? -ne 0 && error "failed to clone submodule $sm"
+> +done
+
+I don't think this is reliable. Notice the message further up
+where we define $submodules
+
+  # We want a predictable list of submodules for builds, that is
+  # independent of what the developer currently has initialized
+  # in their checkout, because the build environment is completely
+  # different to the host OS.
 
 
--- 
+IOW, if the developers host build does not require 'dtc', then
+the 'dtc' directory will be an empty directory, not a git
+submodule checkout. At which point "git clone" has nothing
+available.
 
-Thanks,
+Second, even if 'dtc' is checked out, we can't assume that
+it is checked out at the right commit hash - 'git clone' will
+match whatever is currently checked out.
 
-David / dhildenb
+So this needs to be wrapped
+
+   if test -d "$sm/.git"
+   then
+       git clone --shared "$sm" "$vroot_dir/$sm"
+       test $? -ne 0 && error "failed to clone submodule $sm"
+   fi
+
+
+> =20
+>  cd "$vroot_dir"
+>  test $? -ne 0 && error "failed to change into '$vroot_dir'"
+> @@ -45,11 +49,6 @@ test $? -ne 0 && error "failed to change into '$vroo=
+t_dir'"
+>  git checkout $HEAD
+>  test $? -ne 0 && error "failed to checkout $HEAD revision"
+> =20
+> -for sm in $submodules; do
+> -    git submodule update --init $sm
+> -    test $? -ne 0 && error "failed to init submodule $sm"
+> -done
+
+This should not be deleted. It ensures that the checkout we
+just cloned gets moved to the correct HEAD. It might still
+use the network, but that is genuinely neccessary in some
+cases. At least the network usage will be minimized if the
+developers host already had an updated submodule set.
+
+> -
+>  if test -n "$submodules"; then
+>      {
+>          git ls-files || error "git ls-files failed"
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
