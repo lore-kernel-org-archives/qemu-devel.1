@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38095)
+Received: from eggs.gnu.org ([209.51.188.92]:38579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gono4-0001Cb-89
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:13:24 -0500
+	(envelope-from <philmd@redhat.com>) id 1gonpw-0002Jy-Ed
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:15:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gono2-0002ic-76
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:13:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gono1-0002hR-R5
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:13:22 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
-	<815dd9b2-f2fb-40d1-67c1-9862e05f6b22@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0390e138-dc06-f82b-7867-c29e9be2e4fb@redhat.com>
-Date: Wed, 30 Jan 2019 12:13:16 +0100
+	(envelope-from <philmd@redhat.com>) id 1gonpv-0004X8-El
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:15:20 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gonpv-0004WS-8C
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:15:19 -0500
+Received: by mail-wr1-f66.google.com with SMTP id u4so25589751wrp.3
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 03:15:18 -0800 (PST)
+References: <20190129221928.11522-1-huth@tuxfamily.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4fb7e672-2572-15e4-598e-5ea6378006c2@redhat.com>
+Date: Wed, 30 Jan 2019 12:15:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <815dd9b2-f2fb-40d1-67c1-9862e05f6b22@redhat.com>
+In-Reply-To: <20190129221928.11522-1-huth@tuxfamily.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
- kconfig
+Subject: Re: [Qemu-devel] [PATCH] hw/m68k/mcf5208: Support loading of bios
+ images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com
+To: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-On 30/01/19 11:53, Thomas Huth wrote:
->> diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
->> index edb3d42..35ccb72 100644
->> --- a/hw/watchdog/Kconfig
->> +++ b/hw/watchdog/Kconfig
->> @@ -8,6 +8,8 @@ config WDT_IB6300ESB
->>  
->>  config WDT_IB700
->>      bool
->> +    default y
->> +    depends on ISA_BUS
-> By the way, for pluggable ISA devices (like NE2000_ISA or WDT_IB700), it
-> would be great to have a ISA_DEVICES config switch, just like the
-> "PCI_DEVICES" switch, which the ISA devices should then depend on
-> instead of "ISA_BUS". Then it would be easier for the users to disable
-> optional devices in their builds.
+Hi Thomas,
 
-Note that the only reason for PCI_DEVICES's existence is that s390x does
-not want _all_ PCI devices.  Is there a use case for disabling
-CONFIG_ISA_DEVICES but not wanting to base your configuration on
-"allnoconfig"?
+On 1/29/19 11:19 PM, Thomas Huth wrote:
+> The MCF5208EVB supports 2 MiB of flash at address 0. Add support
+> for this memory region and some code to load the file that can
+> be specified with the "-bios" command line option.
+> This can be used for example to load U-Boot images for the
+> MCF5208EVB (we still lack some features in the CPU emulation for
+> this firmware, though, so it can not be run successfully yet).
+> 
+> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+> ---
+>  hw/m68k/mcf5208.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+> index 0f2245dd81..021194498d 100644
+> --- a/hw/m68k/mcf5208.c
+> +++ b/hw/m68k/mcf5208.c
+> @@ -27,6 +27,8 @@
+>  
+>  #define SYS_FREQ 166666666
+>  
+> +#define ROM_SIZE 0x200000
+> +
+>  #define PCSR_EN         0x0001
+>  #define PCSR_RLD        0x0002
+>  #define PCSR_PIF        0x0004
+> @@ -227,6 +229,7 @@ static void mcf5208evb_init(MachineState *machine)
+>      hwaddr entry;
+>      qemu_irq *pic;
+>      MemoryRegion *address_space_mem = get_system_memory();
+> +    MemoryRegion *rom = g_new(MemoryRegion, 1);
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      MemoryRegion *sram = g_new(MemoryRegion, 1);
+>  
+> @@ -237,6 +240,10 @@ static void mcf5208evb_init(MachineState *machine)
+>      env->vbr = 0;
+>      /* TODO: Configure BARs.  */
+>  
+> +    /* ROM at 0x00000000 */
+> +    memory_region_init_rom(rom, NULL, "mcf5208.rom", ROM_SIZE, &error_fatal);
+> +    memory_region_add_subregion(address_space_mem, 0x0, rom);
 
-Paolo
+I'd use 0x00000000 here as in the comment.
+
+> +
+>      /* DRAM at 0x40000000 */
+>      memory_region_allocate_system_memory(ram, NULL, "mcf5208.ram", ram_size);
+>      memory_region_add_subregion(address_space_mem, 0x40000000, ram);
+> @@ -285,9 +292,29 @@ static void mcf5208evb_init(MachineState *machine)
+>      /*  0xfc0a4000 GPIO.  */
+>      /* 0xfc0a8000 SDRAM controller.  */
+>  
+> +    /* Load firmware */
+> +    if (bios_name) {
+> +        char *fn;
+> +        uint8_t *ptr;
+> +
+> +        fn = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> +        if (!fn) {
+> +            error_report("Could not find ROM image '%s'", bios_name);
+> +            exit(1);
+> +        }
+> +        if (load_image_targphys(fn, 0x0, ROM_SIZE) < 8) {
+> +            error_report("Could not load ROM image '%s'", bios_name);
+> +            exit(1);
+> +        }
+> +        g_free(fn);
+
+Can you add a comment about the 3 next lines?
+As this doesn't seem m68k specific but firmware specific, shouldn't you
+magic check for the image loaded to be your particular firmware (if this
+is possible) or check $pc is within sane range?
+
+> +        ptr = rom_ptr(0x4, 4);
+> +        assert(ptr != NULL);
+> +        env->pc = ldl_p(ptr);
+> +    }
+> +
+>      /* Load kernel.  */
+>      if (!kernel_filename) {
+> -        if (qtest_enabled()) {
+> +        if (qtest_enabled() || bios_name) {
+>              return;
+>          }
+>          error_report("Kernel image must be specified");
+> 
