@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44361)
+Received: from eggs.gnu.org ([209.51.188.92]:45276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gooH9-00014m-BI
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:43:28 -0500
+	(envelope-from <catherine.hecx@gmail.com>) id 1gooLR-0002i8-SW
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gooH7-0000bT-J2
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:43:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gooH7-0000Z5-7K
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:43:25 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
-	<815dd9b2-f2fb-40d1-67c1-9862e05f6b22@redhat.com>
-	<0390e138-dc06-f82b-7867-c29e9be2e4fb@redhat.com>
-	<819e9476-cb5d-e4c8-71b8-de22c8d2e6a2@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <86830f34-d777-61b4-474e-053a97dfc718@redhat.com>
-Date: Wed, 30 Jan 2019 12:43:20 +0100
-MIME-Version: 1.0
-In-Reply-To: <819e9476-cb5d-e4c8-71b8-de22c8d2e6a2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
- kconfig
+	(envelope-from <catherine.hecx@gmail.com>) id 1gooLQ-00032y-WE
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:53 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42859)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+	id 1gooLQ-0002xa-Mk
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:47:52 -0500
+Received: by mail-pg1-x544.google.com with SMTP id d72so10224756pga.9
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 03:47:43 -0800 (PST)
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Wed, 30 Jan 2019 06:43:26 -0500
+Message-Id: <1548848606-23864-1-git-send-email-catherine.hecx@gmail.com>
+Subject: [Qemu-devel] [PATCH RESEND] tcg: add early clober modifier in
+ atomic16_cmpxchg on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com
+To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>
 
-On 30/01/19 12:32, Thomas Huth wrote:
-> Oh, I thought this was for convenience. So for s390x, the main problem is
-> AFAIK that the architecture does not support LSI, so all devices that
-> require LSI can not work here. Maybe we should introduce a "LSI" switch
-> instead, so that the boards which provide LSI can select it, and all normal
-> PCI devices (at least the ones that do not work with MSI only) would
-> "depend on LSI", too?
+Without this patch, gcc might mess up the Input/Output registers and
+cause unpredictable error.
 
-Makes sense (I would call it "depends on PCI_INTX", or even make it a
-negative "depends on !NO_PCI_INTX" that would only be selected by s390).
+Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
 
-Another idea is to provide an alternative way
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+---
+Resend: sent previous patch before subscribing maillist
 
-    config X
-        imply Y
+ include/qemu/atomic128.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-to write
-
-    config Y
-        default y if X
-
-("imply" was added a year or two ago to Kconfig).  This would simplify
-writing the configuration for variables such as CONFIG_PCI_DEVICES, and
-it would also be useful to express soft dependencies such as
-
-    config PC
-        imply PCI_DEVICES
-        imply QXL
-
-    config Q35
-        imply VTD
-
-etc.  This can be left for future work though.
-
->> Is there a use case for disabling
->> CONFIG_ISA_DEVICES but not wanting to base your configuration on
->> "allnoconfig"?
-> 
-> "make allnoconfig" is not working for me yet:
-> 
-> make MINIKCONF="python -B /home/thuth/devel/qemu/scripts/minikconf.py  --" config-all-devices.mak
-> make[1]: Entering directory `/tmp/qemu-kconfig'
->   GEN     x86_64-softmmu/config-devices.mak.tmp
-> /home/thuth/devel/qemu/scripts/minikconf.py: invalid option --
-> 
-> So I disabled PCI_DEVICES here intead for my tests for the hard
-> requirements, and then I ran into this error:
-> 
-> hw/net/ne2000-isa.c:65: undefined reference to `ne2000_setup_io'
-> hw/net/ne2000-isa.c:71: undefined reference to `ne2000_reset'
-> ../hw/net/ne2000-isa.o:(.data.rel+0x1d0): undefined reference to `vmstate_ne2000'
-> ../hw/net/ne2000-isa.o:(.data.rel+0x270): undefined reference to `ne2000_receive'
-> 
-> That's why I thought a CONFIG_ISA_DEVICES switch would be good, too.
-> But we likely should simply fix the dependency of the NE2000_ISA switch
-> instead.
-
-Ok!
-
-Paolo
+diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
+index a6af22ff10..ddd0d55d31 100644
+--- a/include/qemu/atomic128.h
++++ b/include/qemu/atomic128.h
+@@ -68,7 +68,7 @@ static inline Int128 atomic16_cmpxchg(Int128 *ptr, Int128 cmp, Int128 new)
+         "cbnz %w[tmp], 0b\n"
+         "1:"
+         : [mem] "+m"(*ptr), [tmp] "=&r"(tmp),
+-          [oldl] "=&r"(oldl), [oldh] "=r"(oldh)
++          [oldl] "=&r"(oldl), [oldh] "=&r"(oldh)
+         : [cmpl] "r"(cmpl), [cmph] "r"(cmph),
+           [newl] "r"(newl), [newh] "r"(newh)
+         : "memory", "cc");
+-- 
+2.17.1
