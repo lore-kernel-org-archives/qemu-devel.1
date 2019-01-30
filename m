@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39650)
+Received: from eggs.gnu.org ([209.51.188.92]:39656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gorjM-0006EX-AZ
+	(envelope-from <mreitz@redhat.com>) id 1gorjM-0006Ei-J6
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gorjL-0005B5-4A
+	(envelope-from <mreitz@redhat.com>) id 1gorjL-0005BD-Bd
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:48 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gorjK-00059x-Fd
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:47 -0500
-Received: by mail-oi1-x243.google.com with SMTP id m6so19462124oig.11
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 07:24:44 -0800 (PST)
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 30 Jan 2019 16:24:24 +0100
+Message-Id: <20190130152434.17283-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<871s4uobf0.fsf@dusky.pond.sub.org>
-In-Reply-To: <871s4uobf0.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Jan 2019 15:24:31 +0000
-Message-ID: <CAFEAcA_t2707yp5cz+rbMVE3nhLk288iFgK=vUgzFyCw79uX5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/10] iotests: Fix some issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +20,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, 30 Jan 2019 at 07:24, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Let me reply to the "why is the cfi.pflash01 device so weird" part
-> first, because that's relatively quick, and because it could easily
-> distract us from the more important "how do we want to configure OVMF"
-> part.  I'll reply to that part later.
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> > On Fri, 25 Jan 2019 at 15:11, Markus Armbruster <armbru@redhat.com> wrote:
-> [...]
-> >> To solve (2), we first have to understand the magic.  Device
-> >> cfi.pflash01 has the following properties:
-> >>
-> >>     num-blocks                  Size of the device in blocks
-> >>     sector-length               Size of a block
-> >>                                 (admire the choice of names)
-> >>     width                       Bank width
-> >>     big-endian                  Endianess (d'oh)
-> >>     id0, id1, id2, id3          Some kind of device ID, guest-visible,
-> >>                                 default to zero, few boards change it
-> >
-> > Note that most of this is stuff that the hardware has.
-> > A lot of boards set these to garbage values which happened
-> > to be what the very old implementation of pflash hardcoded,
-> > because most guests don't care. This is strictly speaking
-> > wrong and they should use whatever the hardware really has,
-> > but most of these cases are for old not-very-maintained dev
-> > boards where probably nobody even has the relevant hardware
-> > even if they cared enough to find out what its ID values are.
->
-> Why are we emulating (badly) stuff nobody cares about enough to find out
-> what exactly we should be emulating, the world wonders...
+A couple of iotests for not-so-common formats/protocols are broken for
+me, so this series fixes them.
 
-Usual reason -- we don't change stuff unless we're reasonably
-sure it doesn't actually break guests that used to work.
+The last patch in this series is not required, but it seemed like a good
+thing to do to me.
 
-> >>     name                        Memory region name
-> >>                                 (why is this even configurable?)
-> >
-> > (a) for debug purposes, so a machine can create two flash
-> > devices and give them names which make them easier to tell
-> > apart in monitor "info mem" and similar command output
->
-> That's what we have qdev IDs for.
 
-The property setup here is basically maintaining compat
-with the way the old pre-qdev implementation worked.
-If there's a nicer way to do this that doesn't change
-the memory region name and break migration compat, that's
-great.
+There are more issues, but those should be fixed separately (and these
+are only the ones I know of):
+- 093 and 136 are flaky if the system is under load, I=E2=80=99ve reporte=
+d this
+  to Berto, and he seems to be working on it O:-)
 
-> > See above about "old not-very-maintained dev boards". A
-> > board which does use this is one that's doing it for
-> > back-compat because nobody's cared to fix and test.
->
-> Boards that seem to care:
->
->     hw/arm/vexpress.c:    qdev_prop_set_uint8(dev, "device-width", 2);
->     hw/arm/virt.c:    qdev_prop_set_uint8(dev, "device-width", 2);
+- I=E2=80=99ve seen aborts in 169; Vladimir has sent patches for this, I=E2=
+=80=99m just
+  not sure yet who=E2=80=99s going to take them (the iotest patch is good=
+, the
+  QMP patch, well, is a QMP patch, so it isn=E2=80=99t my immediate terri=
+torry)
 
-Yes. vexpress was the board where the broken pflash implementation
-was first reported, so we fixed the pflash device and made
-vexpress set things correctly. virt also gets a fixed device
-because it postdates things being fixed.
+- 129 is broken because it uses BB throttling underneath block jobs;
+  unfortunately at least the mirror job completely ignores that
+  throttling (and has done so for a while), so we need to get something
+  working with a filter node there.  But that=E2=80=99s not so easy, for =
+a
+  couple of reasons:
+  (1) The commit job doesn=E2=80=99t work with that right now because it =
+cannot
+      deal with such a filter in the commit chain (I have to look at
+      this in the context of my =E2=80=9CDeal with filters=E2=80=9D serie=
+s)
+  (2) Also, such a change results in a failed assertion:
+      http://lists.nongnu.org/archive/html/qemu-block/2019-01/msg01006.ht=
+ml
 
-> Boards that seem not to care:
->
->     hw/arm/collie.c:    pflash_cfi01_register(SA_CS0, NULL, "collie.fl1", 0x02000000,
->     hw/arm/collie.c:    pflash_cfi01_register(SA_CS1, NULL, "collie.fl2", 0x02000000,
->     hw/arm/gumstix.c:    if (!pflash_cfi01_register(0x00000000, NULL, "connext.rom", connex_rom,
->     hw/arm/gumstix.c:    if (!pflash_cfi01_register(0x00000000, NULL, "verdex.rom", verdex_rom,
->     hw/arm/mainstone.c:        if (!pflash_cfi01_register(mainstone_flash_base[i], NULL,
->     hw/arm/omap_sx1.c:        if (!pflash_cfi01_register(OMAP_CS0_BASE, NULL,
->     hw/arm/omap_sx1.c:        if (!pflash_cfi01_register(OMAP_CS1_BASE, NULL,
->     hw/arm/versatilepb.c:    if (!pflash_cfi01_register(VERSATILE_FLASH_ADDR, NULL, "versatile.flash",
->     hw/arm/vexpress.c:static pflash_t *ve_pflash_cfi01_register(hwaddr base, const char *name,
->     hw/arm/vexpress.c:    pflash0 = ve_pflash_cfi01_register(map[VE_NORFLASH0], "vexpress.flash0",
->     hw/arm/vexpress.c:    if (!ve_pflash_cfi01_register(map[VE_NORFLASH1], "vexpress.flash1",
+Finally, note that tcp_chr_disconnect() has a bit of a problem with
+running concurrently, so that causes tests to fail, too:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html
 
-...vexpress can't be both fixed and not...
 
->     hw/arm/z2.c:    if (!pflash_cfi01_register(Z2_FLASH_BASE,
->     hw/i386/pc_sysfw.c:        /* pflash_cfi01_register() creates a deep copy of the name */
->     hw/i386/pc_sysfw.c:        system_flash = pflash_cfi01_register(phys_addr, NULL /* qdev */, name,
->     hw/lm32/milkymist.c:    pflash_cfi01_register(flash_base, NULL, "milkymist.flash", flash_size,
->     hw/microblaze/petalogix_ml605_mmu.c:    pflash_cfi01_register(FLASH_BASEADDR,
->     hw/microblaze/petalogix_s3adsp1800_mmu.c:    pflash_cfi01_register(FLASH_BASEADDR,
->     hw/mips/mips_malta.c:    fl = pflash_cfi01_register(FLASH_ADDRESS, NULL, "mips_malta.bios",
->     hw/mips/mips_r4k.c:        if (!pflash_cfi01_register(0x1fc00000, NULL, "mips_r4k.bios", mips_rom,
->     hw/ppc/sam460ex.c:    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
->     hw/ppc/virtex_ml507.c:    pflash_cfi01_register(PFLASH_BASEADDR, NULL, "virtex.flash", FLASH_SIZE,
->
-> At least PC can't be characterized as "not-very-maintaned dev board".
+v2:
+- Added a note to patch 1 that even with this patch, 237 will fail on
+  Python 2.x [John]
+- Put patch 5 (which fixes that) right after patch 1 [John]
+- Added a note to patch 2 (which used to be patch 5) on what the exact
+  issue is [John]
+- Patch 6: Dropped the test for =E2=80=9Cbytes=E2=80=9D, because you cann=
+ot use such
+  objects like normal strings anyway [John?]
+- Patch 9: Added
 
-Well, nobody who does anything with x86 has cared enough to
-make the pflash implementation actually correct. The
-weird "behave like a buggy implementation" default is there
-pretty much exactly because x86 uses it and I didn't
-want to change the x86 behaviour.
 
-thanks
--- PMM
+git-backport-diff against v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/10:[----] [--] 'iotests: Re-add filename filters'
+002/10:[----] [--] 'iotests: Fix 237 for Python 2.x'
+003/10:[----] [--] 'iotests: Remove superfluous rm from 232'
+004/10:[----] [--] 'iotests: Fix 232 for LUKS'
+005/10:[----] [--] 'iotests: Fix 207 to use QMP filters for qmp_log'
+006/10:[0002] [FC] 'iotests.py: Add is_str()'
+007/10:[----] [--] 'iotests.py: Filter filename in any string value'
+008/10:[----] [--] 'iotests: Filter SSH paths'
+009/10:[down] 'iotests: Let 045 be run concurrently'
+010/10:[----] [--] 'iotests.py: s/_/-/g on keys in qmp_log()'
+
+
+Max Reitz (10):
+  iotests: Re-add filename filters
+  iotests: Fix 237 for Python 2.x
+  iotests: Remove superfluous rm from 232
+  iotests: Fix 232 for LUKS
+  iotests: Fix 207 to use QMP filters for qmp_log
+  iotests.py: Add is_str()
+  iotests.py: Filter filename in any string value
+  iotests: Filter SSH paths
+  iotests: Let 045 be run concurrently
+  iotests.py: s/_/-/g on keys in qmp_log()
+
+ scripts/qemu.py               |  5 ++--
+ tests/qemu-iotests/045        |  2 +-
+ tests/qemu-iotests/206.out    | 56 +++++++++++++++++------------------
+ tests/qemu-iotests/207        | 10 +++++--
+ tests/qemu-iotests/207.out    | 18 +++++------
+ tests/qemu-iotests/210        |  5 ++--
+ tests/qemu-iotests/210.out    | 28 +++++++++---------
+ tests/qemu-iotests/211        |  5 ++--
+ tests/qemu-iotests/211.out    | 26 ++++++++--------
+ tests/qemu-iotests/212        |  5 ++--
+ tests/qemu-iotests/212.out    | 44 +++++++++++++--------------
+ tests/qemu-iotests/213        |  5 ++--
+ tests/qemu-iotests/213.out    | 46 ++++++++++++++--------------
+ tests/qemu-iotests/232        |  5 +++-
+ tests/qemu-iotests/237        |  7 +++--
+ tests/qemu-iotests/237.out    | 54 ++++++++++++++++-----------------
+ tests/qemu-iotests/common.rc  |  1 +
+ tests/qemu-iotests/iotests.py | 14 +++++++--
+ 18 files changed, 178 insertions(+), 158 deletions(-)
+
+--=20
+2.20.1
