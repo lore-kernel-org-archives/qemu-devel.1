@@ -1,20 +1,37 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51822)
+Received: from eggs.gnu.org ([209.51.188.92]:52550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gozMW-0004AA-4W
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:33:44 -0500
+	(envelope-from <muriloo@linux.ibm.com>) id 1gozPU-0005R2-5W
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:36:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gozMV-0005RQ-2J
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:33:44 -0500
-Date: Thu, 31 Jan 2019 09:54:00 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190130225400.GF1771@umbus.fritz.box>
-References: <20190128212157.424-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <muriloo@linux.ibm.com>) id 1gozPT-000796-Bn
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:36:48 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40734
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1gozPT-00078A-5p
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 18:36:47 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0UNZveP123904
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 18:36:46 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qbjqp7b93-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 18:36:45 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Wed, 30 Jan 2019 23:36:45 -0000
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Date: Wed, 30 Jan 2019 21:36:03 -0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
-Content-Disposition: inline
-In-Reply-To: <20190128212157.424-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-macppc patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20190130233605.22163-1-muriloo@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/2] mmap-alloc: fix hugetlbfs misaligned
+ length in ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +40,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, David Gibson <david@gibson.dropbear.id.au>, Fabiano Rosas <farosas@linux.ibm.com>, Greg Kurz <groug@kaod.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, mopsfelder@gmail.com
 
+The first patch unfolds parts of qemu_ram_mmap() to make it clearer.
+No changes in the function behaviour.
 
---MZf7D3rAEoQgPanC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The second one fixes the alignment of the length given to munmap().
 
-On Mon, Jan 28, 2019 at 09:21:55PM +0000, Mark Cave-Ayland wrote:
-> Here's the contents of my qemu-macppc branch: just two minor patches cons=
-isting of
-> an update to MAINTAINERS, plus bringing in updated binaries containing bu=
-gfixes
-> for Ben's MacOS NDRV VGA driver.
+I am pretty sure there is room for improvement, so I would love to
+hear your feedback.
 
-Applied to ppc-for-4.0, thanks.
+Thank you!
 
-Sorry for the delay, I had been intending to merge this in from your
-git tree as discussed, but hit some conflicts that I didn't get around
-to resolving.
+Murilo Opsfelder Araujo (2):
+  mmap-alloc: unfold qemu_ram_mmap()
+  mmap-alloc: fix hugetlbfs misaligned length in ppc64
 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->=20
-> Mark Cave-Ayland (2):
->   MAINTAINERS: add myself as maintainer for Mac Old World and New World
->     machines
->   QemuMacDrivers: update qemu_vga.ndrv to 90c488d built from submodule
->=20
->  MAINTAINERS           |   6 ++++--
->  pc-bios/qemu_vga.ndrv | Bin 14752 -> 18752 bytes
->  roms/QemuMacDrivers   |   2 +-
->  3 files changed, 5 insertions(+), 3 deletions(-)
->=20
+ exec.c                    |  4 +--
+ include/qemu/mmap-alloc.h |  2 +-
+ util/mmap-alloc.c         | 73 ++++++++++++++++++++++++++-------------
+ util/oslib-posix.c        |  2 +-
+ 4 files changed, 53 insertions(+), 28 deletions(-)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---MZf7D3rAEoQgPanC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxSKwcACgkQbDjKyiDZ
-s5LdIRAAguV39oLc6uCp/0DIJj2WhReys5tsJunkPCGIrO2BCR17Wqz20amKngT5
-2p9ycsDK8TuSY2hKTyegUC88wcGMM871Wld8MK0vzsXV7hc9LLST4gTEZz27wQVN
-4fBbCYZkgCB3V5WFugt992xfRcJ51d/ZM95h+zxC9EaWrbrzie6gff0fIh7O6GgX
-eSmf6PzxbxvjHAZ+A++PDd0umZjljeicKuc5hFuas6nkiEQ0PmrmYUX6xDy1PeXA
-XlEiYlW+JdntmXZfURNQqrPTOiscWVcIyRCQ5AHLeFGZ7c0s4T4v1Fw6pts74hDe
-k4ObuZcKTIVs7bF6K9L/UHyxCrwAo2gqB756vtrVNy3UkuYPOn88PFS6rezutKBy
-bnczbdVgXx4f9tTM+gkRrgQ+xtHlR1XEU4r1FywFu6Rqdf4+wpI+0HxyLacUVeLQ
-/8TUwUDjc/AxsNnJzdq3lp29h0WA4rkWIsvoIO8YN3c+WSVbDFbFfZebGvo5Ltof
-gmExu8gGepQYo9XshR5dsROBTWGZrueyKz/0Hac4cPVdKK3ymjA4ifQ30pYCT1EF
-iJUb4Al31CXTHTbxahnAcTuE9OeT6bMLYlFc6KFxTD3cj9JwWg8aIHHB5PwCYQ+e
-QbyNSshoFBb+d2QDnM9ABEXoAYgQZYXVUtjb2DlUGTw7jFHW/U8=
-=JTX0
------END PGP SIGNATURE-----
-
---MZf7D3rAEoQgPanC--
+--
+2.20.1
