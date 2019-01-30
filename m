@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37404)
+Received: from eggs.gnu.org ([209.51.188.92]:38334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gorXA-0002u0-MS
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1gordN-0004RH-Pu
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:18:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gorX7-0006sV-J8
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53737)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gorX3-0006kc-QP
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:12:07 -0500
-Date: Wed, 30 Jan 2019 15:11:54 +0000
+	(envelope-from <berrange@redhat.com>) id 1gordM-0002iR-T4
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:18:37 -0500
+Date: Wed, 30 Jan 2019 15:18:29 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190130151154.GS15904@redhat.com>
+Message-ID: <20190130151829.GT15904@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190125140017.6092-1-alex.bennee@linaro.org>
-	<20190125140017.6092-5-alex.bennee@linaro.org>
+References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+	<20190129145156.6719b8a4.cohuck@redhat.com>
+	<e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190125140017.6092-5-alex.bennee@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 04/14] archive-source.sh: Clone the
- submodules locally
+In-Reply-To: <e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
+ header comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Jan 25, 2019 at 02:00:07PM +0000, Alex Benn=C3=A9e wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> We cloned the QEMU repository from the local storage. Since the
-> submodules are also available there, clone them too. This is
-> quicker and reduce network use.
+On Wed, Jan 30, 2019 at 09:01:01AM -0600, Eric Blake wrote:
+> On 1/29/19 7:51 AM, Cornelia Huck wrote:
+> > On Tue, 29 Jan 2019 14:37:47 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> > 
+> >> It's either "GNU *Library* General Public License version 2" or
+> >> "GNU Lesser General Public License version *2.1*", but there was
+> >> no "version 2.0" of the "Lesser" license. So assume that version
+> >> 2.1 is meant here.
+> > 
+> > I think we can assume that.
+> > 
+> > Given that there have been several of these cases (and that there's a
+> > lot of boilerplate in general): Should we adopt SPDX license
+> > identifiers for QEMU, as the Linux kernel did? They also discovered and
+> > fixed some problems/oddities while at it.
+> 
+> I'm also in favor of SPDX license identifiers - their brevity and
+> machine-parsability favors more accurate usage and fewer copy/paste
+> mistake propagation.
 
-FYI there's another attempt at solving it here:
+I'm curious if the kernel developers actually ended up removing the
+current boilerplate license text from files they added SPDX tags
+to ?
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07710.html
+The original work only added SPDX tags to files which lacked any
+pre-existing license text
 
-though that has some problems, so I prefer what you've done
-here.  There's still scope for replacing the git ls-tree + tar
-command with a git archive command, but that's tangential to
-the problem of reducing network usage.
+  https://lwn.net/Articles/739183/
 
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  scripts/archive-source.sh | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
->=20
-> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-> index 6eed2a29bd..ce31be67b0 100755
-> --- a/scripts/archive-source.sh
-> +++ b/scripts/archive-source.sh
-> @@ -38,6 +38,10 @@ else
->  fi
->  git clone --shared . "$vroot_dir"
->  test $? -ne 0 && error "failed to clone into '$vroot_dir'"
-> +for sm in $submodules; do
-> +    git clone --shared "$sm" "$vroot_dir/$sm"
-> +    test $? -ne 0 && error "failed to clone submodule $sm"
-> +done
-
-I don't think this is reliable. Notice the message further up
-where we define $submodules
-
-  # We want a predictable list of submodules for builds, that is
-  # independent of what the developer currently has initialized
-  # in their checkout, because the build environment is completely
-  # different to the host OS.
+Although its from 2017, the LWN article indicates there was
+some uncertainty about whether they'd actually go through with
+removing license text, especially for files where the person
+removing the text is not the exclusive copyright holder:
 
 
-IOW, if the developers host build does not require 'dtc', then
-the 'dtc' directory will be an empty directory, not a git
-submodule checkout. At which point "git clone" has nothing
-available.
+  "An additional goal is to eventually get rid of the other license
+   texts; the consensus seems to be that the SPDX identifier is a 
+   sufficient declaration of the license on its own. But removing
+   license text from source files must be done with a great deal 
+   of care, so it may be a long time before anybody works up the 
+   courage to attempt that on any files that they do not themselves 
+   own the copyright for. "
 
-Second, even if 'dtc' is checked out, we can't assume that
-it is checked out at the right commit hash - 'git clone' will
-match whatever is currently checked out.
+I can understand the sentiment that SPDX identifier alone should be
+sufficient, but I think I'd want to see an explicit legal opinion from
+a lawyer who works with open source before removing any license text.
 
-So this needs to be wrapped
-
-   if test -d "$sm/.git"
-   then
-       git clone --shared "$sm" "$vroot_dir/$sm"
-       test $? -ne 0 && error "failed to clone submodule $sm"
-   fi
-
-
-> =20
->  cd "$vroot_dir"
->  test $? -ne 0 && error "failed to change into '$vroot_dir'"
-> @@ -45,11 +49,6 @@ test $? -ne 0 && error "failed to change into '$vroo=
-t_dir'"
->  git checkout $HEAD
->  test $? -ne 0 && error "failed to checkout $HEAD revision"
-> =20
-> -for sm in $submodules; do
-> -    git submodule update --init $sm
-> -    test $? -ne 0 && error "failed to init submodule $sm"
-> -done
-
-This should not be deleted. It ensures that the checkout we
-just cloned gets moved to the correct HEAD. It might still
-use the network, but that is genuinely neccessary in some
-cases. At least the network usage will be minimized if the
-developers host already had an updated submodule set.
-
-> -
->  if test -n "$submodules"; then
->      {
->          git ls-files || error "git ls-files failed"
-
+Any one know if anything changed in this respect since that 2017
+lwn article ?
 
 Regards,
 Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
