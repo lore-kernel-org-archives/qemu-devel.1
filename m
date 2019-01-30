@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59744)
+Received: from eggs.gnu.org ([209.51.188.92]:60110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopU8-0001ti-CF
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:00:58 -0500
+	(envelope-from <jing2.liu@linux.intel.com>) id 1gopVW-0002mA-3N
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:02:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopU2-0007sR-GC
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:00:56 -0500
-References: <20181217224348.14922-1-mreitz@redhat.com>
-	<c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <180509a6-ed6b-1d02-49d6-805309f5e02b@redhat.com>
-Date: Wed, 30 Jan 2019 14:00:36 +0100
+	(envelope-from <jing2.liu@linux.intel.com>) id 1gopVV-0000iW-56
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:02:22 -0500
+Received: from mga02.intel.com ([134.134.136.20]:25585)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+	id 1gopVU-0000eg-T4
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:02:21 -0500
+From: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <49127da6-814d-4675-21a5-48a8aa764e34@linux.intel.com>
+Date: Wed, 30 Jan 2019 21:02:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v12 00/31] block: Fix some
- filename generation issues
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [Issues] PCI hotplug does not work well on pc platform?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: yang.zhong@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <180509a6-ed6b-1d02-49d6-805309f5e02b@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v12 00/31] block: Fix some filename
- generation issues
-References: <20181217224348.14922-1-mreitz@redhat.com>
- <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
-In-Reply-To: <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi everyone,
 
-On 29.01.19 21:51, John Snow wrote:
->=20
->=20
-> On 12/17/18 5:43 PM, Max Reitz wrote:
->> Once more, I=E2=80=99ll spare both me and you another iteration of the=
- cover
->> letter, so I direct you to the previous version=E2=80=99s cover letter=
- (which
->> will direct you further):
->>
->> http://lists.nongnu.org/archive/html/qemu-block/2018-10/msg00229.html
->>
->> There are only minor changes in this version.  Provided no major
->> complaints arise, I intend to merge this series in the next month.
->>
->=20
-> It looked like this got a full set of reviews by Berto, should we not
-> just merge it and see who cries?
->=20
-> Would you like additional eyes on it?
+I have two questions.
+1. PCI hotplug on pci.0 must manually rescan in guest. The ACPI hotplug 
+handler sends the GPE event to guest but it seems guest doesn't receive 
+it? I tried to open ACPI debug level/layer to 0xffffffff, in order to 
+see if there is any message after device_add in monitor, but no message 
+comes out until I manually rescan. Also tried printk in 
+acpi_ev_gpe_xrupt_handler() and acpi_ev_sci_xrupt_handler(). No output 
+in dmesg.
+(I'm sure that CONFIG_HOTPLUG_PCI_PCIE=y, CONFIG_HOTPLUG_PCI_CPCI=y, 
+CONFIG_HOTPLUG_PCI=y, CONFIG_HOTPLUG_PCI_ACPI=y)
 
-I was about to rebase it (and send it again with a shorter "I will merge
-this" period), but then I found that a non-non-significant number of
-iotests failed, so I wanted to fix those first.
+Whether this is a kind of design or a known issue? Does guest receive 
+the request, where can I find the
 
-Max
+2. I want to try hotplugging on pci-bridge on pc platform, using shpc. I 
+set shpc=on, but when I do device_add, qemu still calls 
+acpi_pcihp_device_plug_cb? Why it does not call pci_bridge_dev_hotplug_cb?
+(CONFIG_HOTPLUG_PCI_SHPC=y)
 
-
---3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRn/QACgkQ9AfbAGHV
-z0CORggAk1pBggVRD9vWxEMOWo7S7IQXUkSv6eT/lOfwpnwoc97vaSQldVD4nC4P
-mKdw4SMt2+bF2ZpFUw5eitx/FvUJUbUiR0aOSBVmr0MhmMU1fVY57IaaTnR9Ocrg
-iHMStl95ocMuDEr2xI/wBejmRLL5vDACqEyfC1SMM6RyQ5ateKvf2lWV8i9+0Lqm
-rEl5PvAoQlaDx/NU78QgZs/MF0P/bpPUqK3jreWmJRqeel5GBNOkQDkxuMmVt0DJ
-BGLOuTORkOQLbSuKEmDAWmGx8snYXMa13ToV0ewxFuaDdY85t7Nmfrcm3v4WPEnZ
-+eiln8MFzTfyl0/iP2zMO4fD5b8JDw==
-=ULcz
------END PGP SIGNATURE-----
-
---3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0--
+Thanks very much!
+Jing
