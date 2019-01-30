@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37211)
+Received: from eggs.gnu.org ([209.51.188.92]:38511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gogXt-0001Hu-PV
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:28:14 -0500
+	(envelope-from <mst@redhat.com>) id 1gogkB-0003sc-Fu
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gogXs-0001iN-OJ
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:28:13 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gogXs-0001iC-Hm
-	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:28:12 -0500
-Received: by mail-pl1-x643.google.com with SMTP id e5so10393601plb.5
-	for <qemu-devel@nongnu.org>; Tue, 29 Jan 2019 19:28:12 -0800 (PST)
-Date: Wed, 30 Jan 2019 11:28:07 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190130032807.GC20241@stefanha-x1.localdomain>
-References: <20190129051432.22023-1-peterx@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gogk9-0008Fg-O3
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gogk9-0008FC-Fm
+	for qemu-devel@nongnu.org; Tue, 29 Jan 2019 22:40:53 -0500
+Date: Tue, 29 Jan 2019 22:40:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190129223831-mutt-send-email-mst@kernel.org>
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<30a4a533-042e-0f54-1449-ecd7ed26aa1b@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7gGkHNMELEOhSGF6"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190129051432.22023-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iothread: fix iothread hang when stop too
- soon
+In-Reply-To: <30a4a533-042e-0f54-1449-ecd7ed26aa1b@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/6] vhost-user-blk: Add support for
+ backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Thomas Huth <thuth@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+
+On Wed, Jan 30, 2019 at 10:29:10AM +0800, Jason Wang wrote:
+>=20
+> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
+> > From: Xie Yongji <xieyongji@baidu.com>
+> >=20
+> > This patchset is aimed at supporting qemu to reconnect
+> > vhost-user-blk backend after vhost-user-blk backend crash or
+> > restart.
+> >=20
+> > The patch 1 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+> > and VHOST_USER_SET_INFLIGHT_FD to support support transferring shared
+> > buffer between qemu and backend.
+> >=20
+> > The patch 2,3 are the corresponding libvhost-user patches of
+> > patch 1. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
+> > and VHOST_USER_SET_INFLIGHT_FD.
+> >=20
+> > The patch 4 allows vhost-user-blk to use the two new messages
+> > to get/set inflight buffer from/to backend.
+> >=20
+> > The patch 5 supports vhost-user-blk to reconnect backend when
+> > connection closed.
+> >=20
+> > The patch 6 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
+> > to vhost-user-blk backend which is used to tell qemu that
+> > we support reconnecting now.
+> >=20
+> > This series is based on Daniel P. Berrang=C3=A9's patchset:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
+> >=20
+> > To use it, we could start qemu with:
+> >=20
+> > qemu-system-x86_64 \
+> >          -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,reconne=
+ct=3D1, \
+> >          -device vhost-user-blk-pci,chardev=3Dchar0 \
+> >=20
+> > and start vhost-user-blk backend with:
+> >=20
+> > vhost-user-blk -b /path/file -s /path/vhost.socket
+> >=20
+> > Then we can restart vhost-user-blk at any time during VM running.
+> >=20
+> > V4 to V5:
+> > - Drop patch that enables "nowait" option on client sockets
+> > - Support resubmitting inflight I/O in order
+> > - Make inflight I/O tracking more robust
+> > - Remove align field and add queue size field in VhostUserInflight
+> > - Document more details in vhost-user.txt
+>=20
+>=20
+> I'm still not convinced about this approach. If the maintainer decide t=
+o
+> merge, at least two things needs to be added besides the correctness of=
+ the
+> code:
+>=20
+> - you need prove that this approach can work for packed ring
+
+Or rather document how it's used.
+
+> -=C2=A0 an unit-test to test the crash during logging in-flight descrip=
+tor.
+>=20
+> Thanks
+
+For contrib/vhost-user-blk? Well I don't think it's used by unit
+tests right now, it is? So it's a worthwhile goal but not
+necessarily a requirement for any specific patch I think.
 
 
---7gGkHNMELEOhSGF6
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jan 29, 2019 at 01:14:32PM +0800, Peter Xu wrote:
-> Lukas reported an hard to reproduce QMP iothread hang on s390 that
-> QEMU might hang at pthread_join() of the QMP monitor iothread before
-> quitting:
 >=20
->   Thread 1
->   #0  0x000003ffad10932c in pthread_join
->   #1  0x0000000109e95750 in qemu_thread_join
->       at /home/thuth/devel/qemu/util/qemu-thread-posix.c:570
->   #2  0x0000000109c95a1c in iothread_stop
->   #3  0x0000000109bb0874 in monitor_cleanup
->   #4  0x0000000109b55042 in main
->=20
-> While the iothread is still in the main loop:
->=20
->   Thread 4
->   #0  0x000003ffad0010e4 in ??
->   #1  0x000003ffad553958 in g_main_context_iterate.isra.19
->   #2  0x000003ffad553d90 in g_main_loop_run
->   #3  0x0000000109c9585a in iothread_run
->       at /home/thuth/devel/qemu/iothread.c:74
->   #4  0x0000000109e94752 in qemu_thread_start
->       at /home/thuth/devel/qemu/util/qemu-thread-posix.c:502
->   #5  0x000003ffad10825a in start_thread
->   #6  0x000003ffad00dcf2 in thread_start
->=20
-> IMHO it's because there's a race between the main thread and iothread
-> when stopping the thread in following sequence:
->=20
->     main thread                       iothread
->     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                       =3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->                                       aio_poll()
->     iothread_get_g_main_context
->       set iothread->worker_context
->     iothread_stop
->       schedule iothread_stop_bh
->                                         execute iothread_stop_bh [1]
->                                           set iothread->running=3Dfalse
->                                           (since main_loop=3D=3DNULL so
->                                            skip to quit main loop.
->                                            Note: although main_loop is
->                                            NULL but worker_context is
->                                            not!)
->                                       atomic_read(&iothread->worker_conte=
-xt) [2]
->                                         create main_loop object
->                                         g_main_loop_run() [3]
->     pthread_join() [4]
->=20
-> We can see that when execute iothread_stop_bh() at [1] it's possible
-> that main_loop is still NULL because it's only created until the first
-> check of the worker_context later at [2].  Then the iothread will hang
-> in the main loop [3] and it'll starve the main thread too [4].
->=20
-> Here the simple solution should be that we check again the "running"
-> variable before check against worker_context.
->=20
-> CC: Thomas Huth <thuth@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->=20
-> This hasn't yet been verified on the initial s390 systems, but since I
-> can reproduce it locally with this code clip:
->=20
->         IOThread *iothread =3D iothread_create("test", NULL);
->         iothread_get_g_main_context(iothread);
->         iothread_stop(iothread);
->=20
-> so I'm still posting this out for review first in case it was hit by
-> other users.
-> ---
->  iothread.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---7gGkHNMELEOhSGF6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcURnHAAoJEJykq7OBq3PIyU8H/RhtFVZDU0YzX2g13duAqK7u
-RPza+hv1OoaauQRsI6sdtNWmxSE1e8C1TSIISE1DU89ItYk+MmRRaHZrwHQLQ446
-QVnnaG9nOMu+LFq/RJIVCCBgP1m5vHKurg7cXVibQV3bo6McUWnMkkV/LJNkPt2R
-GYWsh1e/6DXuPDgzhG5gU+BUt3TBZzYds92u8lL+Np4mafPCZ2Mapf9auiUuL+mu
-hsiz2IZ9Q656S1W8IRiuuzz46lTCMJMjzezCqaiw8DSbR/4CIM5WdLIdQ45va9Fz
-InCPjz8AQXBHEb7RKMNHAQYuNBHxnskznYezv/YzcbTlcXUQYlbkOlLkhrnTumw=
-=5Qi9
------END PGP SIGNATURE-----
-
---7gGkHNMELEOhSGF6--
+> >=20
+> > V3 to V4:
+> > - Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
+> > - Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
+> >    and VHOST_USER_SET_INFLIGHT_FD
+> > - Allocate inflight buffer in backend rather than in qemu
+> > - Document a recommended format for inflight buffer
+> >=20
+> > V2 to V3:
+> > - Using exisiting wait/nowait options to control connection on
+> >    client sockets instead of introducing "disconnected" option.
+> > - Support the case that vhost-user backend restart during initialzati=
+on
+> >    of vhost-user-blk device.
+> >=20
+> > V1 to V2:
+> > - Introduce "disconnected" option for chardev instead of reuse "wait"
+> >    option
+> > - Support the case that QEMU starts before vhost-user backend
+> > - Drop message VHOST_USER_SET_VRING_INFLIGHT
+> > - Introduce two new messages VHOST_USER_GET_SHM_SIZE
+> >    and VHOST_USER_SET_SHM_FD
+> >=20
+> > Xie Yongji (6):
+> >    vhost-user: Support transferring inflight buffer between qemu and
+> >      backend
+> >    libvhost-user: Introduce vu_queue_map_desc()
+> >    libvhost-user: Support tracking inflight I/O in shared memory
+> >    vhost-user-blk: Add support to get/set inflight buffer
+> >    vhost-user-blk: Add support to reconnect backend
+> >    contrib/vhost-user-blk: enable inflight I/O tracking
+> >=20
+> >   Makefile                                |   2 +-
+> >   contrib/libvhost-user/libvhost-user.c   | 402 ++++++++++++++++++++-=
+---
+> >   contrib/libvhost-user/libvhost-user.h   |  40 +++
+> >   contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
+> >   docs/interop/vhost-user.txt             | 101 ++++++
+> >   hw/block/vhost-user-blk.c               | 227 ++++++++++---
+> >   hw/virtio/vhost-user.c                  | 110 +++++++
+> >   hw/virtio/vhost.c                       | 105 +++++++
+> >   include/hw/virtio/vhost-backend.h       |  10 +
+> >   include/hw/virtio/vhost-user-blk.h      |   5 +
+> >   include/hw/virtio/vhost.h               |  19 ++
+> >   11 files changed, 925 insertions(+), 99 deletions(-)
+> >=20
