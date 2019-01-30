@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44384)
+Received: from eggs.gnu.org ([209.51.188.92]:47483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mathew1800@gmail.com>) id 1gowNu-0004KO-G1
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:22:59 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbQ-0007q7-0d
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mathew1800@gmail.com>) id 1gowNr-0008MW-DI
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:22:57 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mathew1800@gmail.com>)
-	id 1gowNq-0008LP-5g
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:22:55 -0500
-Received: by mail-io1-xd43.google.com with SMTP id f4so716800ion.2
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:22:52 -0800 (PST)
-From: Mathew Maidment <mathew1800@gmail.com>
-Date: Wed, 30 Jan 2019 15:22:43 -0500
-Message-Id: <20190130202243.79545-2-mathew1800@gmail.com>
-In-Reply-To: <20190130202243.79545-1-mathew1800@gmail.com>
-References: <20190130202243.79545-1-mathew1800@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/1] target/arm: Amend erroneous BRAA/BLRAA
- opcode check
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gowbO-0006f2-1i
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 15:36:55 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Wed, 30 Jan 2019 20:36:31 +0000
+Message-Id: <20190130203638.21179-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
+References: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH v5 1/8] target/ppc: implement complete set of
+ Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +20,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-Amends a small logical mistake that would always result in the branch to
-do_unallocated being taken.
+This prepares us for eliminating the use of direct array access within the VMX
+instruction implementations.
 
-Signed-off-by: Mathew Maidment <mathew1800@gmail.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/ppc/internal.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 4d28a27c3b..350deae32b 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2036,7 +2036,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         if (!dc_isar_feature(aa64_pauth, s)) {
-             goto do_unallocated;
-         }
--        if (op3 != 2 || op3 != 3) {
-+        if (op3 != 2 && op3 != 3) {
-             goto do_unallocated;
-         }
-         if (s->pauth_active) {
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index c7c0f77dd6..f26a71ffcf 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -206,16 +206,23 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
+ 
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define VsrB(i) u8[i]
++#define VsrSB(i) s8[i]
+ #define VsrH(i) u16[i]
++#define VsrSH(i) s16[i]
+ #define VsrW(i) u32[i]
++#define VsrSW(i) s32[i]
+ #define VsrD(i) u64[i]
++#define VsrSD(i) s64[i]
+ #else
+ #define VsrB(i) u8[15 - (i)]
++#define VsrSB(i) s8[15 - (i)]
+ #define VsrH(i) u16[7 - (i)]
++#define VsrSH(i) s16[7 - (i)]
+ #define VsrW(i) u32[3 - (i)]
++#define VsrSW(i) s32[3 - (i)]
+ #define VsrD(i) u64[1 - (i)]
++#define VsrSD(i) s64[1 - (i)]
+ #endif
+-
+ static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+ {
+     vsr->VsrD(0) = env->vsr[n].u64[0];
 -- 
-2.17.2 (Apple Git-113)
+2.11.0
