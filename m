@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46655)
+Received: from eggs.gnu.org ([209.51.188.92]:47902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gomYl-0000Ty-TT
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gomdB-0002a6-Mn
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:58:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gomYd-00019F-DH
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gomYY-00015k-VP
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:19 -0500
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-4-xieyongji@baidu.com>
-	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
-	<20190129213617-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <04be58b8-03c2-82b3-3a02-260f24768350@redhat.com>
-Date: Wed, 30 Jan 2019 17:52:52 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1gomd9-0003Nm-QX
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:58:05 -0500
+References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+	<1548841387-7670-1-git-send-email-thuth@redhat.com>
+	<1548841387-7670-2-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <567dfcac-165d-5b8b-8179-6a981973111f@redhat.com>
+Date: Wed, 30 Jan 2019 10:57:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190129213617-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1548841387-7670-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
- inflight I/O in shared memory
+Subject: Re: [Qemu-devel] [RFC PATCH 1/5] ppc64: Express dependencies of
+ 'pseries' and 'powernv' machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
+On 30/01/19 10:43, Thomas Huth wrote:
+> CONFIG_SPAPR_RNG should stay in the ppc-softmmu.mak file since this
+> is a completely optional device.
 
-On 2019/1/30 =E4=B8=8A=E5=8D=8811:14, Michael S. Tsirkin wrote:
-> On Wed, Jan 30, 2019 at 10:31:49AM +0800, Jason Wang wrote:
->> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
->>> +static int
->>> +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
->>> +{
->>> +    if (!has_feature(dev->protocol_features,
->>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    if (unlikely(!vq->inflight)) {
->>> +        return -1;
->>> +    }
->>> +
->>> +    vq->inflight->desc[desc_idx].inuse =3D 1;
->>> +
->>> +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int
->>> +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
->>> +{
->>> +    if (!has_feature(dev->protocol_features,
->>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    if (unlikely(!vq->inflight)) {
->>> +        return -1;
->>> +    }
->>> +
->>> +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
->>> +
->>> +    barrier();
->>> +
->>> +    vq->inflight->desc[desc_idx].version++;
->>> +
->>> +    return 0;
->>> +}
->>
->> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure th=
-e
->> value reach memory.
->>
->> Thanks
->>
-> WRITE_ONCE is literally volatile + dependency memory barrier.
-> So unless compiler is a very agressive one, it does not
-> buy you much.
+What about making it
 
+    default y
 
-Well, since version is increased twice, if compiler decide the inline=20
-both vu_queue_inflight_pre_put() and vu_queue_inflight_post_put(), can=20
-we make sure it always generate instructions that write to memory=20
-instead of registers?
+and adding to the .mak file this:
 
-Thanks
+#CONFIG_SPAPR_RNG=3Dn
+
+I think the two approaches are more or less equivalent, but
+"#CONFIG_FOO=3Dn" has a small advantage when the feature has a build-time
+dependency, such as CONFIG_MILKYMIST_TMU2's dependency on OpenGL.  In
+that case,
+
+   CONFIG_MILKYMIST_TMU2=3Dy
+
+would report a contradiction if OpenGL is not available at build time, wh=
+ile
+
+   default y
+   ...
+   #CONFIG_MILKYMIST_TMU2=3Dn
+
+would not.
+
+In any case, there are many many such cases in x86 (QXL, HYPERV, FDC,
+SEV, ISA_IPMI_*, APPLESMC, SGA, HPET, VTD, AMD_IOMMU, PVPANIC, TPM_TIS,
+TPM_CRB) and they should be handled in the same way---and especially
+they should be mentioned in the default-configs/ file under "Optional
+devices".  So thanks for noticing this case!
+
+Paolo
