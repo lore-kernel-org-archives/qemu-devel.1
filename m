@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39679)
+Received: from eggs.gnu.org ([209.51.188.92]:39706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gorjO-0006Fs-55
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gorjT-0006Kc-2H
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gorjN-0005CD-5G
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:50 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gorjS-0005Di-Fi
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:24:55 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 30 Jan 2019 16:24:25 +0100
-Message-Id: <20190130152434.17283-2-mreitz@redhat.com>
+Date: Wed, 30 Jan 2019 16:24:26 +0100
+Message-Id: <20190130152434.17283-3-mreitz@redhat.com>
 In-Reply-To: <20190130152434.17283-1-mreitz@redhat.com>
 References: <20190130152434.17283-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 01/10] iotests: Re-add filename filters
+Subject: [Qemu-devel] [PATCH v2 02/10] iotests: Fix 237 for Python 2.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +24,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-A previous commit removed the default filters for qmp_log with the
-intention to make them explicit; but this happened only for test 206.
-There are more tests (for more exotic image formats than qcow2) which
-require the filename filter, though.
+math.ceil() returns an integer on Python 3.x, but a float on Python 2.x.
+range() always needs integers, so we need an explicit conversion on 2.x
+(which does not hurt on 3.x).
 
-Note that 237 is still broken for Python 2.x, which is fixed in the next
-commit.
+It is not quite clear whether we want to support Python 2.x for any
+prolonged time, but this may as well be fixed along with the other
+issues some iotests have right now.
 
-Fixes: f8ca8609d8549def45b28e82ecac64adaeee9f12
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/210 | 5 +++--
- tests/qemu-iotests/211 | 5 +++--
- tests/qemu-iotests/212 | 5 +++--
- tests/qemu-iotests/213 | 5 +++--
- tests/qemu-iotests/237 | 5 +++--
- 5 files changed, 15 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/237 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
-index d142841e2b..565e3b7b9b 100755
---- a/tests/qemu-iotests/210
-+++ b/tests/qemu-iotests/210
-@@ -27,7 +27,8 @@ iotests.verify_image_format(supported_fmts=3D['luks'])
- iotests.verify_protocol(supported=3D['file'])
-=20
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options,
-+                        filters=3D[iotests.filter_qmp_testfiles])
-=20
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -53,7 +54,7 @@ with iotests.FilePath('t.luks') as disk_path, \
-                           'size': 0 })
-=20
-     vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
--               node_name=3D'imgfile')
-+               node_name=3D'imgfile', filters=3D[iotests.filter_qmp_test=
-files])
-=20
-     blockdev_create(vm, { 'driver': imgfmt,
-                           'file': 'imgfile',
-diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
-index 7b7985db6c..5d285450b5 100755
---- a/tests/qemu-iotests/211
-+++ b/tests/qemu-iotests/211
-@@ -27,7 +27,8 @@ iotests.verify_image_format(supported_fmts=3D['vdi'])
- iotests.verify_protocol(supported=3D['file'])
-=20
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options,
-+                        filters=3D[iotests.filter_qmp_testfiles])
-=20
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -51,7 +52,7 @@ with iotests.FilePath('t.vdi') as disk_path, \
-                           'size': 0 })
-=20
-     vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
--               node_name=3D'imgfile')
-+               node_name=3D'imgfile', filters=3D[iotests.filter_qmp_test=
-files])
-=20
-     blockdev_create(vm, { 'driver': imgfmt,
-                           'file': 'imgfile',
-diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
-index 95c8810d83..42b74f208b 100755
---- a/tests/qemu-iotests/212
-+++ b/tests/qemu-iotests/212
-@@ -27,7 +27,8 @@ iotests.verify_image_format(supported_fmts=3D['parallel=
-s'])
- iotests.verify_protocol(supported=3D['file'])
-=20
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options,
-+                        filters=3D[iotests.filter_qmp_testfiles])
-=20
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -51,7 +52,7 @@ with iotests.FilePath('t.parallels') as disk_path, \
-                           'size': 0 })
-=20
-     vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
--               node_name=3D'imgfile')
-+               node_name=3D'imgfile', filters=3D[iotests.filter_qmp_test=
-files])
-=20
-     blockdev_create(vm, { 'driver': imgfmt,
-                           'file': 'imgfile',
-diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
-index 4054439e3c..5604f3cebb 100755
---- a/tests/qemu-iotests/213
-+++ b/tests/qemu-iotests/213
-@@ -27,7 +27,8 @@ iotests.verify_image_format(supported_fmts=3D['vhdx'])
- iotests.verify_protocol(supported=3D['file'])
-=20
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options,
-+                        filters=3D[iotests.filter_qmp_testfiles])
-=20
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -51,7 +52,7 @@ with iotests.FilePath('t.vhdx') as disk_path, \
-                           'size': 0 })
-=20
-     vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
--               node_name=3D'imgfile')
-+               node_name=3D'imgfile', filters=3D[iotests.filter_qmp_test=
-files])
-=20
-     blockdev_create(vm, { 'driver': imgfmt,
-                           'file': 'imgfile',
 diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
-index 251771d7fb..fe0dd0f461 100755
+index fe0dd0f461..06897f8c87 100755
 --- a/tests/qemu-iotests/237
 +++ b/tests/qemu-iotests/237
-@@ -27,7 +27,8 @@ from iotests import imgfmt
- iotests.verify_image_format(supported_fmts=3D['vmdk'])
+@@ -224,7 +224,7 @@ with iotests.FilePath('t.vmdk') as disk_path, \
+             iotests.log("=3D %s %d =3D" % (subfmt, size))
+             iotests.log("")
 =20
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options,
-+                        filters=3D[iotests.filter_qmp_testfiles])
+-            num_extents =3D math.ceil(size / 2.0**31)
++            num_extents =3D int(math.ceil(size / 2.0**31))
+             extents =3D [ "ext%d" % (i) for i in range(1, num_extents + =
+1) ]
 =20
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -54,7 +55,7 @@ with iotests.FilePath('t.vmdk') as disk_path, \
-                           'size': 0 })
-=20
-     vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
--               node_name=3D'imgfile')
-+               node_name=3D'imgfile', filters=3D[iotests.filter_qmp_test=
-files])
-=20
-     blockdev_create(vm, { 'driver': imgfmt,
-                           'file': 'imgfile',
+             vm.launch()
 --=20
 2.20.1
