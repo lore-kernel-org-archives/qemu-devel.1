@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59281)
+Received: from eggs.gnu.org ([209.51.188.92]:59319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gopSB-0000Kn-IO
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:58:56 -0500
+	(envelope-from <richard.weiyang@gmail.com>) id 1gopSN-0000Rg-Aq
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1gopSA-0005ul-NP
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:58:55 -0500
-Date: Wed, 30 Jan 2019 12:58:20 +0000
+	(envelope-from <richard.weiyang@gmail.com>) id 1gopSM-00067Y-HW
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:07 -0500
+Date: Wed, 30 Jan 2019 12:59:03 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190130125820.n7py34wx2oojsaex@master>
+Message-ID: <20190130125903.bewxhjvlyud5mdqh@master>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190130000653.16267-1-richardw.yang@linux.intel.com>
-	<20190130000653.16267-2-richardw.yang@linux.intel.com>
-	<69177d59-02c9-c6cd-be5a-092bf2476af1@redhat.com>
-	<0dcf35c6-1b12-9e20-a0f5-b3fe2ea0ae74@redhat.com>
+References: <20190130030207.6770-1-richardw.yang@linux.intel.com>
+	<3e847da2-8ced-fefd-b566-30093d9fe331@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0dcf35c6-1b12-9e20-a0f5-b3fe2ea0ae74@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] hw/i386/pc.c: remove unused
- function pc_acpi_init()
+In-Reply-To: <3e847da2-8ced-fefd-b566-30093d9fe331@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] i386,
+ acpi: cleanup build_facs by removing second unused argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +27,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Wei Yang <richardw.yang@linux.intel.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com, laurent@vivier.eu, mst@redhat.com
+Cc: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, imammedo@redhat.com, mst@redhat.com
 
-On Wed, Jan 30, 2019 at 12:07:02PM +0100, Philippe Mathieu-DaudÃ© wrote:
->On 1/30/19 10:50 AM, Thomas Huth wrote:
->> On 2019-01-30 01:06, Wei Yang wrote:
->>> Function pc_acpi_init() is not used anymore.
->>>
->>> Remove the definition and declaration.
->>>
->>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>> Reviewed-by: Philippe Mathieu-DaudèŒ… <philmd@redhat.com>
->>> Tested-by: Philippe Mathieu-DaudèŒ… <philmd@redhat.com>
+On Wed, Jan 30, 2019 at 12:15:57PM +0100, Philippe Mathieu-Daudé wrote:
+>On 1/30/19 4:02 AM, Wei Yang wrote:
+>> The second argument of build_facs() is not used, just remove it.
 >> 
->>  Hi,
->> 
->> at least in my e-mail client here, it looks like Philippe's last name
->> got mojibaked here. It should be "DaudÃ©", not "DaudèŒ…", as far as I know.
->> Same thing also happened in patch 2 and 3.
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 >
->Thanks!
+>Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Thanks :-)
+
 >
-
-Opps, sorry for that.
-
-Not sure which part changes the encoding.
-
+>> ---
+>>  hw/i386/acpi-build.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
 >> 
->> Apart from that:
->> 
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 236a20eaa8..023729c1f2 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -292,7 +292,7 @@ static void acpi_align_size(GArray *blob, unsigned align)
+>>  
+>>  /* FACS */
+>>  static void
+>> -build_facs(GArray *table_data, BIOSLinker *linker)
+>> +build_facs(GArray *table_data)
+>>  {
+>>      AcpiFacsDescriptorRev1 *facs = acpi_data_push(table_data, sizeof *facs);
+>>      memcpy(&facs->signature, "FACS", 4);
+>> @@ -2643,7 +2643,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>       * requirements.
+>>       */
+>>      facs = tables_blob->len;
+>> -    build_facs(tables_blob, tables->linker);
+>> +    build_facs(tables_blob);
+>>  
+>>      /* DSDT is pointed to by FADT */
+>>      dsdt = tables_blob->len;
 >> 
 
 -- 
