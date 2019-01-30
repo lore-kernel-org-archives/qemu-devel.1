@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41520)
+Received: from eggs.gnu.org ([209.51.188.92]:42368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1goo3W-0005tu-8l
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:29:23 -0500
+	(envelope-from <thuth@redhat.com>) id 1goo6x-0006mz-Hd
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1goo3V-0002x4-CL
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:29:22 -0500
-Date: Wed, 30 Jan 2019 12:29:09 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <1548841387-7670-5-git-send-email-thuth@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1901301224420.42161@zero.eik.bme.hu>
-References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
-	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-	<1548841387-7670-5-git-send-email-thuth@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1goo6w-0004RH-Pc
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:32:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1goo6w-0004Qv-IC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 06:32:54 -0500
+References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
+	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
+	<815dd9b2-f2fb-40d1-67c1-9862e05f6b22@redhat.com>
+	<0390e138-dc06-f82b-7867-c29e9be2e4fb@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <819e9476-cb5d-e4c8-71b8-de22c8d2e6a2@redhat.com>
+Date: Wed, 30 Jan 2019 12:32:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [RFC PATCH 4/5] ppc: Express dependencies of the
- Sam460EX machines with kconfig
+In-Reply-To: <0390e138-dc06-f82b-7867-c29e9be2e4fb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
+ kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, yang.zhong@intel.com, pbonzini@redhat.com, qemu-ppc@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: yang.zhong@intel.com
 
-Hello,
+On 2019-01-30 12:13, Paolo Bonzini wrote:
+> On 30/01/19 11:53, Thomas Huth wrote:
+>>> diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
+>>> index edb3d42..35ccb72 100644
+>>> --- a/hw/watchdog/Kconfig
+>>> +++ b/hw/watchdog/Kconfig
+>>> @@ -8,6 +8,8 @@ config WDT_IB6300ESB
+>>> =20
+>>>  config WDT_IB700
+>>>      bool
+>>> +    default y
+>>> +    depends on ISA_BUS
+>> By the way, for pluggable ISA devices (like NE2000_ISA or WDT_IB700), =
+it
+>> would be great to have a ISA_DEVICES config switch, just like the
+>> "PCI_DEVICES" switch, which the ISA devices should then depend on
+>> instead of "ISA_BUS". Then it would be easier for the users to disable
+>> optional devices in their builds.
+>=20
+> Note that the only reason for PCI_DEVICES's existence is that s390x doe=
+s
+> not want _all_ PCI devices.
 
-On Wed, 30 Jan 2019, Thomas Huth wrote:
-> Most of the dependencies are now directly selected by the SAM460EX
-> switch. We can drop CONFIG_VGA_CIRRUS since this device is already
-> selected automatically when CONFIG_PCI_DEVICES is set.
->
-> Cc: BALATON Zoltan <balaton@eik.bme.hu>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
-> default-configs/ppc-softmmu.mak | 10 ----------
-> hw/display/Kconfig              |  1 +
-> hw/ppc/Kconfig                  | 12 ++++++++++++
-> hw/usb/Kconfig                  |  2 +-
-> 4 files changed, 14 insertions(+), 11 deletions(-)
->
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 513a8e9..5265d8a 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -25,16 +25,6 @@ CONFIG_PCI_EXPRESS=y
->
-> # For Sam460ex
-> CONFIG_SAM460EX=y
-> -CONFIG_USB_EHCI_SYSBUS=y
-> -CONFIG_SM501=y
-> -CONFIG_DDC=y
-> -CONFIG_IDE_SII3112=y
-> -CONFIG_I2C=y
-> -CONFIG_AT24C=y
-> -CONFIG_BITBANG_I2C=y
-> -CONFIG_M41T80=y
-> -CONFIG_VGA_CIRRUS=y
-> -CONFIG_SMBUS_EEPROM=y
->
-> # For Macs
-> CONFIG_MAC_OLDWORLD=y
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index c784fe8..f8e6136 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -76,6 +76,7 @@ config MILKYMIST_TMU2
-> config SM501
->     bool
->     depends on I2C
-> +    select DDC
->
-> config TCX
->     bool
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index f6b4206..8bd25ed 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -24,9 +24,21 @@ config PPC440
->
-> config PPC4XX
->     bool
-> +    select BITBANG_I2C
-> +    select PCI
->
-> config SAM460EX
->     bool
-> +    select AT24C
+Oh, I thought this was for convenience. So for s390x, the main problem is
+AFAIK that the architecture does not support LSI, so all devices that
+require LSI can not work here. Maybe we should introduce a "LSI" switch
+instead, so that the boards which provide LSI can select it, and all norm=
+al
+PCI devices (at least the ones that do not work with MSI only) would
+"depend on LSI", too?
 
-I don't recognise this as needed. Is it for dependency of something?
+> Is there a use case for disabling
+> CONFIG_ISA_DEVICES but not wanting to base your configuration on
+> "allnoconfig"?
 
-> +    select PFLASH_CFI01
-> +    select IDE_SII3112
-> +    select ISA_BUS          # FIXME: Currently required for IDE_SII3112
+"make allnoconfig" is not working for me yet:
 
-This is not really a dependency of SII3112 but of ide/core so this maybe 
-this belongs to IDE config?
+make MINIKCONF=3D"python -B /home/thuth/devel/qemu/scripts/minikconf.py  =
+--" config-all-devices.mak
+make[1]: Entering directory `/tmp/qemu-kconfig'
+  GEN     x86_64-softmmu/config-devices.mak.tmp
+/home/thuth/devel/qemu/scripts/minikconf.py: invalid option --
 
-Otherwise I don't care much if it still compiles so
+So I disabled PCI_DEVICES here intead for my tests for the hard
+requirements, and then I ran into this error:
 
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+hw/net/ne2000-isa.c:65: undefined reference to `ne2000_setup_io'
+hw/net/ne2000-isa.c:71: undefined reference to `ne2000_reset'
+../hw/net/ne2000-isa.o:(.data.rel+0x1d0): undefined reference to `vmstate=
+_ne2000'
+../hw/net/ne2000-isa.o:(.data.rel+0x270): undefined reference to `ne2000_=
+receive'
 
-Regards,
-BALATON Zoltan
+That's why I thought a CONFIG_ISA_DEVICES switch would be good, too.
+But we likely should simply fix the dependency of the NE2000_ISA switch
+instead.
 
-> +    select M41T80
-> +    select PPC440
-> +    select SM501
-> +    select SMBUS_EEPROM
-> +    select USB_EHCI_SYSBUS
-> +    select USB_OHCI
->
-> config PREP
->     bool
-> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-> index a1b7acb..871ea47 100644
-> --- a/hw/usb/Kconfig
-> +++ b/hw/usb/Kconfig
-> @@ -21,7 +21,7 @@ config USB_EHCI
->
-> config USB_EHCI_SYSBUS
->     bool
-> -    select USB
-> +    select USB_EHCI
->
-> config USB_XHCI
->     bool
->
+ Thomas
