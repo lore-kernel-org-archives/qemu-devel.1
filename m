@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42536)
+Received: from eggs.gnu.org ([209.51.188.92]:43497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1X-0006Oa-BS
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:51:45 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou4z-0000Yj-Io
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:55:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou1V-0000A7-9w
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:51:43 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gou4y-0002jz-20
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:55:17 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Wed, 30 Jan 2019 20:51:29 +0300
-Message-Id: <1548870690-647481-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1548870690-647481-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v10 2/3] qemu-img info lists bitmap directory
- entries
+Date: Wed, 30 Jan 2019 17:55:05 +0000
+Message-ID: <d4e16554-ebbb-2e2d-112b-b7d55edba125@virtuozzo.com>
+References: <1548705688-1027522-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<20190129095224.GA4467@dhcp-200-176.str.redhat.com>
+	<9741099f-c0b2-5337-f313-255d8aa95ab6@virtuozzo.com>
+	<20190129123851.GE4467@dhcp-200-176.str.redhat.com>
+	<829cb522-05bf-57cc-b81e-4c028eea6821@virtuozzo.com>
+	<20190129131740.GF4467@dhcp-200-176.str.redhat.com>
+	<57eb5708-3e21-25b1-a559-d77fc3a11e2f@virtuozzo.com>
+	<20190129142355.GG4467@dhcp-200-176.str.redhat.com>
+	<b065edfa-f997-4e58-dc8d-12cda093fe8c@virtuozzo.com>
+	<e90bc249-b7d3-baec-30ae-1b92503d6db1@virtuozzo.com>
+	<20190129154937.GH4467@dhcp-200-176.str.redhat.com>
+In-Reply-To: <20190129154937.GH4467@dhcp-200-176.str.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <10EB487B2B00E4429847615AB85AA66F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v9 1/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,240 +35,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-In the 'Format specific information' section of the 'qemu-img info'
-command output, the supplemental information about existing QCOW2
-bitmaps will be shown, such as a bitmap name, flags and granularity:
-
-image: /vz/vmprivate/VM1/harddisk.hdd
-file format: qcow2
-virtual size: 64G (68719476736 bytes)
-disk size: 3.0M
-cluster_size: 1048576
-Format specific information:
-    compat: 1.1
-    lazy refcounts: true
-    bitmaps:
-        [0]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: back-up1
-            unknown flags: 4
-            granularity: 65536
-        [1]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: back-up2
-            unknown flags: 8
-            granularity: 65536
-    refcount bits: 16
-    corrupt: false
-
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block/qcow2-bitmap.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        | 10 +++++++
- block/qcow2.h        |  2 ++
- qapi/block-core.json | 40 ++++++++++++++++++++++++++-
- 4 files changed, 128 insertions(+), 1 deletion(-)
-
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b946301..17651cb 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1006,6 +1006,83 @@ fail:
-     return false;
- }
- 
-+
-+static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
-+{
-+    Qcow2BitmapInfoFlagsList *list = NULL;
-+    Qcow2BitmapInfoFlagsList **plist = &list;
-+    int i;
-+
-+    static const struct {
-+        int bme;  /* Bitmap directory entry flags */
-+        int info; /* The flags to report to the user */
-+    } map[] = {
-+        { BME_FLAG_IN_USE, QCOW2_BITMAP_INFO_FLAGS_IN_USE },
-+        { BME_FLAG_AUTO,   QCOW2_BITMAP_INFO_FLAGS_AUTO },
-+    };
-+
-+    int map_size = sizeof(map) / sizeof(map[0]);
-+
-+    for (i = 0; i < map_size; ++i) {
-+        if (flags & map[i].bme) {
-+            Qcow2BitmapInfoFlagsList *entry =
-+                g_new0(Qcow2BitmapInfoFlagsList, 1);
-+            entry->value = map[i].info;
-+            *plist = entry;
-+            plist = &entry->next;
-+        }
-+    }
-+
-+    *plist = NULL;
-+
-+    return list;
-+}
-+
-+/*
-+ * qcow2_get_bitmap_info_list()
-+ * Returns a list of QCOW2 bitmap details.
-+ * In case of no bitmaps, the function returns NULL and
-+ * the @errp parameter is not set (for a 0-length list in the QMP).
-+ * When bitmap information can not be obtained, the function returns
-+ * NULL and the @errp parameter is set (for omitting the list in QMP).
-+ */
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+    Qcow2BitmapInfoList *list = NULL;
-+    Qcow2BitmapInfoList **plist = &list;
-+
-+    if (s->nb_bitmaps == 0) {
-+        return NULL;
-+    }
-+
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
-+    if (bm_list == NULL) {
-+        return NULL;
-+    }
-+
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
-+        Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
-+        info->granularity = 1U << bm->granularity_bits;
-+        info->name = g_strdup(bm->name);
-+        info->flags = get_bitmap_info_flags(bm->flags);
-+        info->unknown_flags = bm->flags & BME_RESERVED_FLAGS;
-+        info->has_unknown_flags = !!info->unknown_flags;
-+        obj->value = info;
-+        *plist = obj;
-+        plist = &obj->next;
-+    }
-+
-+    bitmap_list_free(bm_list);
-+
-+    return list;
-+}
-+
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp)
- {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 27e5a2c..4824ca8 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4394,6 +4394,14 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-             .refcount_bits      = s->refcount_bits,
-         };
-     } else if (s->qcow_version == 3) {
-+        Qcow2BitmapInfoList *bitmaps;
-+        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            g_free(spec_info->u.qcow2.data);
-+            g_free(spec_info);
-+            return NULL;
-+        }
-         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
-             .compat             = g_strdup("1.1"),
-             .lazy_refcounts     = s->compatible_features &
-@@ -4403,6 +4411,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-                                   QCOW2_INCOMPAT_CORRUPT,
-             .has_corrupt        = true,
-             .refcount_bits      = s->refcount_bits,
-+            .has_bitmaps        = !!bitmaps,
-+            .bitmaps            = bitmaps,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 438a1de..13e8964 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -684,6 +684,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp);
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 91685be..271e0df 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -69,6 +69,8 @@
- # @encrypt: details about encryption parameters; only set if image
- #           is encrypted (since 2.10)
- #
-+# @bitmaps: A list of qcow2 bitmap details (since 4.0)
-+#
- # Since: 1.7
- ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -77,7 +79,8 @@
-       '*lazy-refcounts': 'bool',
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
--      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-+      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-+      '*bitmaps': ['Qcow2BitmapInfo']
-   } }
- 
- ##
-@@ -454,6 +457,41 @@
-            'status': 'DirtyBitmapStatus'} }
- 
- ##
-+# @Qcow2BitmapInfoFlags:
-+#
-+# An enumeration of flags that a bitmap can report to the user.
-+#
-+# @in-use: The bitmap was not saved correctly and may be inconsistent.
-+#
-+# @auto: The bitmap must reflect all changes of the virtual disk by any
-+#        application that would write to this qcow2 file.
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'Qcow2BitmapInfoFlags',
-+  'data': ['in-use', 'auto'] }
-+
-+##
-+# @Qcow2BitmapInfo:
-+#
-+# Qcow2 bitmap information.
-+#
-+# @name: the name of the bitmap
-+#
-+# @granularity: granularity of the bitmap in bytes
-+#
-+# @flags: recognized flags of the bitmap
-+#
-+# @unknown-flags: any remaining flags not recognized by the current qemu version
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'Qcow2BitmapInfo',
-+  'data': {'name': 'str', 'granularity': 'uint32',
-+           'flags': ['Qcow2BitmapInfoFlags'],
-+           '*unknown-flags': 'uint32' } }
-+
-+##
- # @BlockLatencyHistogramInfo:
- #
- # Block latency histogram.
--- 
-1.8.3.1
+DQoNCk9uIDI5LzAxLzIwMTkgMTg6NDksIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDI5LjAxLjIw
+MTkgdW0gMTY6MjkgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46
+DQo+PiAyOS4wMS4yMDE5IDE3OjM1LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPj4+IDI5LjAxLjIwMTkgMTc6MjMsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4+IEFtIDI5LjAx
+LjIwMTkgdW0gMTU6MDYgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWVi
+ZW46DQo+Pj4+PiAyOS4wMS4yMDE5IDE2OjE3LCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4+Pj4+IEFt
+IDI5LjAxLjIwMTkgdW0gMTM6NTAgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2Vz
+Y2hyaWViZW46DQo+Pj4+Pj4+IDI5LjAxLjIwMTkgMTU6MzgsIEtldmluIFdvbGYgd3JvdGU6DQo+
+Pj4+Pj4+PiBBbSAyOS4wMS4yMDE5IHVtIDEzOjA0IGhhdCBBbmRyZXkgU2hpbmtldmljaCBnZXNj
+aHJpZWJlbjoNCj4+Pj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWFw
+aS5jIGIvYmxvY2svcWFwaS5jDQo+Pj4+Pj4+Pj4+PiBpbmRleCBjNjZmOTQ5Li4wZmRlOThjIDEw
+MDY0NA0KPj4+Pj4+Pj4+Pj4gLS0tIGEvYmxvY2svcWFwaS5jDQo+Pj4+Pj4+Pj4+PiArKysgYi9i
+bG9jay9xYXBpLmMNCj4+Pj4+Pj4+Pj4+IEBAIC0zOCw2ICszOCw3IEBADQo+Pj4+Pj4+Pj4+PiAg
+wqDCoMKgwqAgI2luY2x1ZGUgInFhcGkvcW1wL3FzdHJpbmcuaCINCj4+Pj4+Pj4+Pj4+ICDCoMKg
+wqDCoCAjaW5jbHVkZSAic3lzZW11L2Jsb2NrLWJhY2tlbmQuaCINCj4+Pj4+Pj4+Pj4+ICDCoMKg
+wqDCoCAjaW5jbHVkZSAicWVtdS9jdXRpbHMuaCINCj4+Pj4+Pj4+Pj4+ICsjaW5jbHVkZSAicWVt
+dS9lcnJvci1yZXBvcnQuaCINCj4+Pj4+Pj4+Pj4+ICDCoMKgwqDCoCBCbG9ja0RldmljZUluZm8g
+KmJkcnZfYmxvY2tfZGV2aWNlX2luZm8oQmxvY2tCYWNrZW5kICpibGssDQo+Pj4+Pj4+Pj4+PiAg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBCbG9ja0RyaXZlclN0YXRlICpicywgRXJy
+b3IgKiplcnJwKQ0KPj4+Pj4+Pj4+Pj4gQEAgLTg2OCw2ICs4NjksMTEgQEAgdm9pZCBiZHJ2X2lt
+YWdlX2luZm9fZHVtcChmcHJpbnRmX2Z1bmN0aW9uIGZ1bmNfZnByaW50Ziwgdm9pZCAqZiwNCj4+
+Pj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgIGlmIChpbmZvLT5oYXNfZm9ybWF0X3NwZWNpZmlj
+KSB7DQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGZ1bmNfZnByaW50Zihm
+LCAiRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uOlxuIik7DQo+Pj4+Pj4+Pj4+PiArwqDCoMKg
+wqDCoMKgwqAgaWYgKGluZm8tPmZvcm1hdF9zcGVjaWZpYyAmJg0KPj4+Pj4+Pj4+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgaW5mby0+Zm9ybWF0X3NwZWNpZmljLT50eXBlID09IElNQUdFX0lO
+Rk9fU1BFQ0lGSUNfS0lORF9RQ09XMiAmJg0KPj4+Pj4+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgaW5mby0+Zm9ybWF0X3NwZWNpZmljLT51LnFjb3cyLmRhdGEtPmhhc19iaXRtYXBzID09
+IGZhbHNlKSB7DQo+Pj4+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3YXJuX3JlcG9y
+dCgiRmFpbGVkIHRvIGxvYWQgYml0bWFwIGxpc3QiKTsNCj4+Pj4+Pj4+Pj4+ICvCoMKgwqDCoMKg
+wqDCoCB9DQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJkcnZfaW1hZ2Vf
+aW5mb19zcGVjaWZpY19kdW1wKGZ1bmNfZnByaW50ZiwgZiwgaW5mby0+Zm9ybWF0X3NwZWNpZmlj
+KTsNCj4+Pj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+Pj4+Pj4+Pj4+ICDCoMKgwqDC
+oCB9DQo+Pj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+IElzIGl0IHJlYWxseSBuZWNlc3NhcnkgdG8gaW50
+cm9kdWNlIHFjb3cyIHNwZWNpZmljIGtub3dsZWRnZSBpbg0KPj4+Pj4+Pj4+PiBibG9jay9xYXBp
+LmMgKHdoZXJlIGl0IGRlZmluaXRlbHkgZG9lc24ndCBiZWxvbmcpLCBqdXN0IHRvIGVtaXQgYQ0K
+Pj4+Pj4+Pj4+PiB3YXJuaW5nPw0KPj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+PiBXaHkgY2FuJ3QgeW91
+IHByaW50IHRoZSB3YXJuaW5nIGluIHFjb3cyX2dldF9zcGVjaWZpY19pbmZvKCk/DQo+Pj4+Pj4+
+Pj4NCj4+Pj4+Pj4+PiBEZWFyIEtldmluLA0KPj4+Pj4+Pj4+IFRoZSByZWFzb24gYmVoaW5kIHRo
+ZSBpZGVhIHRvIG1vdmUgdGhlIHdhcm5pbmcgdG8gcWFwaSBpcyB0aGF0IHdlDQo+Pj4+Pj4+Pj4g
+d291bGRuJ3QgbGlrZSB0byBwcmludCB0aGF0IGluIGNhc2Ugb2YgSlNPTiBmb3JtYXQuDQo+Pj4+
+Pj4+Pj4NCj4+Pj4+Pj4+Pj4NCj4+Pj4+Pj4+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5j
+IGIvYmxvY2svcWNvdzIuYw0KPj4+Pj4+Pj4+Pj4gaW5kZXggNDg5N2FiYS4uMDdiOTllZSAxMDA2
+NDQNCj4+Pj4+Pj4+Pj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4+Pj4+Pj4+Pj4+ICsrKyBiL2Js
+b2NrL3Fjb3cyLmMNCj4+Pj4+Pj4+Pj4+IEBAIC00Mzg2LDggKzQzODYsMTQgQEAgc3RhdGljIElt
+YWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRl
+ICpicykNCj4+Pj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKnNwZWNfaW5mby0+
+dS5xY293Mi5kYXRhID0gKEltYWdlSW5mb1NwZWNpZmljUUNvdzIpew0KPj4+Pj4+Pj4+Pj4gIMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5jb21wYXTCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgPSBnX3N0cmR1cCgiMC4xMCIpLA0KPj4+Pj4+Pj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIC5yZWZjb3VudF9iaXRzwqDCoMKgwqDCoCA9IHMtPnJlZmNvdW50X2Jp
+dHMsDQo+Pj4+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAuaGFzX2JpdG1hcHPCoMKg
+wqDCoMKgwqDCoCA9IHRydWUsIC8qIFRvIGhhbmRsZSBlcnJvciBjaGVjayBwcm9wZXJseSAqLw0K
+Pj4+Pj4+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLmJpdG1hcHPCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgID0gTlVMTCwgLyogVW5zdXBwb3J0ZWQgZm9yIHZlcnNpb24gMiAqLw0KPj4+Pj4+
+Pj4+Pg0KPj4+Pj4+Pj4+PiAuaGFzX2JpdG1hcHMgPSBmYWxzZSB3b3VsZCBiZSBuaWNlciBpZiB0
+aGUgZm9ybWF0IGRvZXNuJ3QgZXZlbiBzdXBwb3J0DQo+Pj4+Pj4+Pj4+IGJpdG1hcHMuIFlvdSBv
+bmx5IG5lZWQgdGhpcyBoZXJlIGJlY2F1c2UgeW91IHB1dCB0aGUgd2FybmluZyBpbiB0aGUNCj4+
+Pj4+Pj4+Pj4gd3JvbmcgcGxhY2UuDQo+Pj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIH07DQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoCB9IGVsc2Ug
+aWYgKHMtPnFjb3dfdmVyc2lvbiA9PSAzKSB7DQo+Pj4+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAg
+UWNvdzJCaXRtYXBJbmZvTGlzdCAqYml0bWFwczsNCj4+Pj4+Pj4+Pj4+ICvCoMKgwqDCoMKgwqDC
+oCBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4+Pj4+Pj4+Pj4+ICsNCj4+Pj4+Pj4+Pj4+ICvC
+oMKgwqDCoMKgwqDCoCBiaXRtYXBzID0gcWNvdzJfZ2V0X2JpdG1hcF9pbmZvX2xpc3QoYnMsICZs
+b2NhbF9lcnIpOw0KPj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+PiBIZXJlIHlvdSBldmVuIGhhZCBhIGdv
+b2QgZXJyb3IgbWVzc2FnZSB0byBwcmludC4uLg0KPj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+Pj4gIMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqc3BlY19pbmZvLT51LnFjb3cyLmRhdGEgPSAoSW1hZ2VJ
+bmZvU3BlY2lmaWNRQ293Mil7DQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgLmNvbXBhdMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCA9IGdfc3RyZHVwKCIxLjEi
+KSwNCj4+Pj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAubGF6eV9y
+ZWZjb3VudHPCoMKgwqDCoCA9IHMtPmNvbXBhdGlibGVfZmVhdHVyZXMgJg0KPj4+Pj4+Pj4+Pj4g
+QEAgLTQzOTcsNyArNDQwMywxNCBAQCBzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgKnFjb3cyX2dl
+dF9zcGVjaWZpY19pbmZvKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPj4+Pj4+Pj4+Pj4gIMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgUUNPVzJfSU5DT01QQVRfQ09SUlVQVCwNCj4+Pj4+Pj4+Pj4+ICDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAuaGFzX2NvcnJ1cHTCoMKgwqDCoMKgwqDCoCA9
+IHRydWUsDQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLnJl
+ZmNvdW50X2JpdHPCoMKgwqDCoMKgID0gcy0+cmVmY291bnRfYml0cywNCj4+Pj4+Pj4+Pj4+ICvC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5oYXNfYml0bWFwc8KgwqDCoMKgwqDCoMKgID0gIWxvY2Fs
+X2VyciwNCj4+Pj4+Pj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5iaXRtYXBzwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCA9IGJpdG1hcHMsDQo+Pj4+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIH07DQo+Pj4+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgLyoNCj4+Pj4+Pj4+Pj4+
+ICvCoMKgwqDCoMKgwqDCoMKgICogSWYgYW4gZXJyb3Igb2NjdXJzIGluIG9idGFpbmluZyBiaXRt
+YXBzLCBpZ25vcmUNCj4+Pj4+Pj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogaXQgdG8gc2hvdyBv
+dGhlciBRQ09XMiBzcGVjaWZpYyBpbmZvcm1hdGlvbi4NCj4+Pj4+Pj4+Pj4+ICvCoMKgwqDCoMKg
+wqDCoMKgICovDQo+Pj4+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgZXJyb3JfZnJlZShsb2NhbF9l
+cnIpOw0KPj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+PiAuLi5idXQgeW91IGRlY2lkZWQgdG8gZGlzY2Fy
+ZCBpdC4NCj4+Pj4+Pj4+Pj4NCj4+Pj4+Pj4+Pj4gSG93IGFib3V0IHlvdSBkbyB0aGlzIGhlcmU6
+DQo+Pj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoCB3YXJuX3JlcG9ydGZfZXJy
+KGxvY2FsX2VyciwgIkZhaWxlZCB0byBsb2FkIGJpdG1hcCBsaXN0OiAiKTsNCj4+Pj4+Pj4+Pg0K
+Pj4+Pj4+Pj4+IEluIGNhc2Ugb2YgSlNPTiBmb3JtYXQsIHdlIGNhbiBmYWlsIGhlcmUuDQo+Pj4+
+Pj4+Pj4gSXQgd2lsbCBoYXBwZW4gaW4gdGhlIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2YgdGhl
+IG5ldyB0ZXN0ICMyMzkuDQo+Pj4+Pj4+Pg0KPj4+Pj4+Pj4gV2h5IGRvIHlvdSB3YW50IHRvIHNp
+bGVudGx5IGxlYXZlIG91dCB0aGUgYml0bWFwIGxpc3QgZm9yIEpTT04gb3V0cHV0Pw0KPj4+Pj4+
+Pj4NCj4+Pj4+Pj4+IEVzc2VudGlhbGx5LCB0aGlzIGlzIHRoZSBzYW1lIHF1ZXN0aW9uIEkgYXNr
+ZWQgaGVyZToNCj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4+IEFuZCB0aGVuIGdldCByaWQgb2YgdGhlIGNv
+ZGUgaW4gYmxvY2svcWFwaS5jIGFuZCB0aGUgdmVyc2lvbiAyIHBhdGg/DQo+Pj4+Pj4+Pj4+DQo+
+Pj4+Pj4+Pj4+IEFjdHVhbGx5LCBzaG91bGQgdGhpcyByZWFsbHkgb25seSBiZSBhIHdhcm5pbmcs
+IG9yIGluIGZhY3QgYW4gZXJyb3I/DQo+Pj4+Pj4+Pj4+IFdoYXQncyB0aGUgY2FzZSB3aGVyZSB3
+ZSBleHBlY3QgdGhhdCBsb2FkaW5nIHRoZSBiaXRtYXAgbGlzdCBjYW4gZmFpbCwNCj4+Pj4+Pj4+
+Pj4gYnV0IHRoZSBtYW5hZ2VtZW50IHRvb2wgZG9lc24ndCBuZWVkIHRvIGtub3cgdGhhdCBhbmQg
+d2UganVzdCB3YW50IHRvDQo+Pj4+Pj4+Pj4+IGxvZyBhIG1lc3NhZ2U/DQo+Pj4+Pj4+Pg0KPj4+
+Pj4+Pj4gSSBkb24ndCB1bmRlcnN0YW5kIHdoeSBpdCdzIG9rYXkgbm90IHRvIHByaW50IGJpdG1h
+cHMgd2l0aG91dCBtYWtpbmcgaXQNCj4+Pj4+Pj4+IGFuIGVycm9yLiBEbyB5b3UgaGF2ZSBhIHNw
+ZWNpZmljIHVzZSBjYXNlIGluIG1pbmQgZm9yIHRoaXMgYmVoYXZpb3VyPw0KPj4+Pj4+Pj4NCj4+
+Pj4+Pj4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gV2UganVzdCBjYW4ndCBwcmludCBhbnl0aGluZyBoZXJl
+LCBhcyB0aGlzIGNvZGUgaXMgZXhlY3V0ZWQgZnJvbSBxbXAgY29tbWFuZC4NCj4+Pj4+Pj4NCj4+
+Pj4+Pj4gSXQgd2FzIGRpc2N1c3NlZCwgdGhhdCB3ZSBkb24ndCB3YW50IHRvIGZhaWwgdGhlIHdo
+b2xlIHF1ZXJ5LCBpZiBmYWlsZWQgdG8NCj4+Pj4+Pj4gb2J0YWluIGJpdG1hcHMuDQo+Pj4+Pj4N
+Cj4+Pj4+PiBJdCdzIG9idmlvdXMgdGhhdCB5b3UgZG9uJ3Qgd2FudCB0byBmYWlsIHRoZSBxdWVy
+eSBjb21tYW5kLCBidXQgSQ0KPj4+Pj4+IGhhdmVuJ3QgZm91bmQgYW55IGV4cGxhbmF0aW9uIGZv
+ciBfd2h5XyB5b3Ugd2FudCB0aGlzLg0KPj4+Pj4+DQo+Pj4+Pj4gVGhlIHRoaW5nIHRoYXQgaXMg
+Y2xvc2VzdCB0byBhbiBleHBsYW5hdGlvbiBpcyAiaXQgbWF5IGJlIHNhZCB0byBmYWlsDQo+Pj4+
+Pj4gZ2V0IGFueSBpbmZvcm1hdGlvbiBiZWNhdXNlIG9mIHJlcGVhdGluZyBzb21lIGRpc2svcWNv
+dzIgZXJyb3IiLCB3cml0dGVuDQo+Pj4+Pj4gYnkgeW91IGluIHRoZSB2NCB0aHJlYWQuDQo+Pj4+
+Pj4NCj4+Pj4+PiBJIGRvbid0IHRoaW5rICJtYXkgYmUgc2FkIiBpcyBhIGdvb2QganVzdGlmaWNh
+dGlvbiBmb3Igbm9uLXN0YW5kYXJkDQo+Pj4+Pj4gYmVoYXZpb3VyLiBJZiB3ZSBjYW4ndCBsb2Fk
+IHRoZSBiaXRtYXBzLCB0aGUgaW1hZ2UgaXMgYnJva2VuLiBBbmQgaWYgdGhlDQo+Pj4+Pj4gaW1h
+Z2UgaXMgYnJva2VuLCB0aGUgcmVzdCBvZiB0aGUgaW5mb3JtYXRpb24gbWF5IGJlIGludmFsaWQs
+IHRvby4NCj4+Pj4+DQo+Pj4+PiBTbywgeW91IG1lYW4gdGhhdCB3ZSBnbyB3cm9uZyB3YXkuIEFu
+ZCBpdCB3YXMgbXkgaWRlYS4gVGhhdCBpcyBzYWQgdG9vLg0KPj4+Pj4NCj4+Pj4+IFRoYW4sIHNl
+ZW1zIGxpa2Ugd2Ugc2hvdWxkIGFkZCBlcnJwIHRvIHRoZSBmdW5jdGlvbiBhbmQgdG8gdGhlIGZ1
+bGwgc3RhY2sNCj4+Pj4+IGRvd24gdG8gcW1wX3F1ZXJ5X2Jsb2NrLiBBbmQgZHJvcCBleHRyYSBw
+YXJ0aWFsLXN1Y2Nlc3MgcWFwaSBsb2dpYy4NCj4+Pj4NCj4+Pj4gSSdtIG5vdCBuZWNlc3Nhcmls
+eSBzYXlpbmcgdGhhdCBpdCdzIHRoZSB3cm9uZyB3YXksIHRob3VnaCBwb3NzaWJseSBpdA0KPj4+
+PiBpcyB3cm9uZyBpbmRlZWQuDQo+Pj4+DQo+Pj4+IEJ1dCBpZ25vcmluZyBzb21lIGtpbmQgb2Yg
+ZmFpbHVyZXMgaXMgc3BlY2lhbCwgc28gd2hhdCBJIHdhcyBsb29raW5nIGZvcg0KPj4+PiB3ZXJl
+IGNvbW1lbnRzIG9yIGRvY3VtZW50YXRpb24gdG8gZXhwbGFpbiB0aGUgcmVhc29uIGJlaGluZCBp
+dCBhdCBsZWFzdC4NCj4+Pj4gTm93IGZyb20gdGhlIHJlcGxpZXMgSSBnb3Qgc28gZmFyIGl0IGxv
+b2tzIHRvIG1lIHRoYXQgcG9zc2libHkgdGhlDQo+Pj4+IHJlYXNvbnMgYXJlIG5vdCBvbmx5IHVu
+ZG9jdW1lbnRlZCwgYnV0IHdlIG1pZ2h0IGFjdHVhbGx5IG5vdCBoYXZlIGFueS4NCj4+Pj4NCj4+
+Pj4+Pj4gU28sIHRvIHNob3csIHRoYXQgdGhlcmUgd2VyZSBlcnJvciBkdXJpbmcgYml0bWFwcyBx
+dWVyeWluZw0KPj4+Pj4+PiB3ZSBkZWNpZGVkIHRvIHVzZSB0aGUgZm9sbG93aW5nIHNlbWFudGlj
+czoNCj4+Pj4+Pj4NCj4+Pj4+Pj4gZW1wdHkgbGlzdCAoaGFzX2JpdG1hcHM9dHJ1ZSkgbWVhbnMg
+dGhhdCB0aGVyZSBubyBiaXRtYXBzLCBhbmQgdGhlcmUgd2VyZQ0KPj4+Pj4+PiBubyBlcnJvcnMg
+ZHVyaW5nIGJpdG1hcHMgcXVlcmluZyAoaWYgaXQgd2FzKQ0KPj4+Pj4+Pg0KPj4+Pj4+PiBhYnNl
+bmNlIG9mIHRoZSBmaWVsZCAoaGFzX2JpdG1hcHM9ZmFsc2UpIG1lYW5zIHRoYXQgdGhlcmUgX3dl
+cmVfIGVycm9ycyBkdXJpbmcNCj4+Pj4+Pj4gYml0bWFwcyBxdWVyeWluZy4NCj4+Pj4+Pg0KPj4+
+Pj4+IC4uLm9yIHRoYXQgeW91J3JlIHJ1bm5pbmcgYW4gb2xkIFFFTVUgdmVyc2lvbi4gSSdtIG5v
+dCBzdXJlIGlmIG1ha2luZw0KPj4+Pj4+IG9sZCBRRU1VIHZlcnNpb25zIGFuZCBpbWFnZSBlcnJv
+cnMgbG9vayB0aGUgc2FtZSBpcyBhIGdvb2QgbW92ZS4NCj4+Pj4+DQo+Pj4+PiBObywgZm9yIG9s
+ZCB2ZXJzaW9ucyB3ZSByZXR1cm4gZW1wdHkgbGlzdCwgdG8gc2hvdyB0aGF0IHRoZXJlIHdlcmUg
+bm8gZXJyb3JzLg0KPj4+Pg0KPj4+PiBZb3UgbWVhbiBvbGQgaW1hZ2UgZm9ybWF0IHZlcnNpb25z
+Pw0KPj4+DQo+Pj4geWVzLg0KPj4+DQo+Pj4gSSdtIHRhbGtpbmcgYWJvdXQgb2xkIFFFTVUgdmVy
+c2lvbnMNCj4+Pj4gdGhhdCBkb24ndCBldmVuIGtub3cgdGhlICdiaXRtYXBzJyBmaWVsZC4NCj4+
+Pg0KPj4+IGhtbS4gWWVzLCB0aGF0J3MgYSBwcm9ibGVtLCB3aGljaCB3ZSBkaWRuJ3QgY29uc2lk
+ZXJlZC4NCj4+Pg0KPj4+Pg0KPj4+PiBBIFFNUCBjbGllbnQgd291bGQgaGF2ZSB0byBwYXJzZSB0
+aGUgc2NoZW1hIHRvIHVuZGVyc3RhbmQgd2hldGhlciBhDQo+Pj4+IG1pc3NpbmcgJ2JpdG1hcHMn
+IGZpZWxkIG1lYW5zIHRoYXQgaXQncyB0YWxraW5nIHRvIGFuIG9sZCBRRU1VICh0aGVuDQo+Pj4+
+ICdiaXRtYXBzJyBkb2Vzbid0IGV4aXN0IGluIHRoZSBzY2hlbWEpLCBvciB0aGF0IGFuIGVycm9y
+IGhhcHBlbmVkICh0aGVuDQo+Pj4+IHRoZSBmaWVsZCBkb2VzIGV4aXN0IGluIHRoZSBzY2hlbWEp
+Lg0KPj4+Pg0KPj4+PiBMb29raW5nIGF0IHRoZSBzY2hlbWEgaXMgbm90IGltcG9zc2libGUsIHNv
+IGlmIHdlIHJlcXVpcmUgdGhpcyBmb3IgYQ0KPj4+PiBnb29kIHJlYXNvbiwgaXQncyBva2F5LiBC
+dXQgaXQncyBub3QgdHJpdmlhbCBlaXRoZXIuIElmIHdlIHJlYWxseSB3YW50DQo+Pj4+IHRvIGdv
+IHdpdGggdGhpcyBzZW1hbnRpY3MsIHdlIHNob3VsZCBwcm9iYWJseSBtZW50aW9uIGJvdGggdGhl
+IG9sZCBhbmQNCj4+Pj4gdGhlIG5ldyBtZWFuaW5nIGluIHRoZSBRQVBJIGRvY3VtZW50YXRpb24s
+IHdpdGggdGhlIHJlY29tbWVuZGF0aW9uIHRoYXQNCj4+Pj4geW91IHBhcnNlIHRoZSBzY2hlbWEg
+dG8gZGV0ZXJtaW5lIHRoZSBtZWFuaW5nIG9mIGEgbWlzc2luZyAnYml0bWFwcycNCj4+Pj4gZmll
+bGQuDQo+Pj4NCj4+PiBIbSwgbm93IEkgdGhpbmsgdGhhdCBpZiB3ZSByZWFsbHkgZmFjZSB0aGUg
+Y2FzZSB3aGVuIHdlIG5lZWQgcGFydGlhbCBzdWNjZXNzDQo+Pj4gb2YgaW5mbyBxdWVyeWluZywg
+aXQgc2hvdWxkIGJlIGFkZGl0aW9uYWwgb3B0aW9uYWwgcGFyYW1ldGVyIHdoaWNoIGVuYWJsZXMg
+aXQsIGxpa2UNCj4+PiBza2lwLWZhaWxlZD10cnVlIChkZWZhdWx0IGZhbHNlKSBvciBzb21ldGhp
+bmcsIHdoaWNoIGlzIG1vcmUgY2xlYXIgdGhhbiBwYXJzaW5nIHRoZQ0KPj4+IHNjaGVtYS4gQW5k
+LCB3aGljaCB3ZSBjYW4gYWRkIGxhdGVyIGlmIG5lZWRlZC4NCj4+DQo+PiBOb3RlIGFsc28sIHRo
+YXQgd2UgYWxyZWFkeSBza2lwIHNvbWUgZXJyb3JzLCBmb3IgZXhhbXBsZSwgYmxvY2tfY3J5cHRv
+X2dldF9zcGVjaWZpY19pbmZvX2x1a3MNCj4+IHdpbGwgcmV0dXJuIE5VTEwgb24gZXJyb3JzICh1
+bmxpa2UgcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8sIHdoaWNoIGFib3J0cyksIGFuZA0KPj4gYmRy
+dl9xdWVyeV9pbWFnZV9pbmZvIHNraXAgdGhlc2UgZXJyb3JzLCBpbiBzYW1lIG1hbm5lciBhcyBm
+b3IgZm9ybWF0cyB3aGljaCBkb24ndCBzdXBwb3J0DQo+PiBiZHJ2X2dldF9zcGVjaWZpY19pbmZv
+Lg0KPj4NCj4+IExvb2tzIGxpa2UgYSBnb29kIG1vbWVudCB0byBmaXggdGhpcyB0b28sIGRvIHlv
+dSBhZ3JlZT8NCj4gDQo+IFllcywgb25jZSB3ZSBhZGQgYW4gRXJyb3IgKiplcnJwIHRvIC5iZHJ2
+X2dldF9zcGVjaWZpY19pbmZvLCByZXR1cm5pbmcNCj4gZXJyb3JzIGZvciBmYWlsaW5nIHFjcnlw
+dG9fYmxvY2tfZ2V0X2luZm8oKSBjYWxscyBhcyB3ZWxsIChib3RoIGluDQo+IGNyeXB0byBhbmQg
+cWNvdzIpIG1ha2VzIHNlbnNlIHRvIG1lLg0KPiANCj4gT3IgaW4gZmFjdCwgcmVtb3ZlIHRoZSBl
+cnJwIHBhcmFtZXRlciBmcm9tIHFjcnlwdG9fYmxvY2tfZ2V0X2luZm8oKS4gSXQNCj4gc2VlbXMg
+dG8gbmV2ZXIgcmV0dXJuIGVycm9ycy4NCj4gDQo+IEtldmluDQo+IA0KDQpEZWFyIEtldmluLA0K
+DQpUaGFuayB5b3UgdmVyeSBtdWNoIGZvciB5b3VyIGNvbGxhYm9yYXRpb24uDQpZb3VyIHN1Z2dl
+c3Rpb24gbWFrZXMgdGhlIGNvZGUgY2hhbmdlIGV2ZW4gc2ltcGxlci4NCkkgaGF2ZSBtb2RpZmll
+ZCB0aGUgcGF0Y2hlcy4NClBsZWFzZSByZXZpZXcgYSBuZXcgdmVyc2lvbiAjMTAuDQoNCi0tIA0K
+V2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg0K
