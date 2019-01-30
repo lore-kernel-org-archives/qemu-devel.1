@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38914)
+Received: from eggs.gnu.org ([209.51.188.92]:39225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gopvC-0006EO-1U
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:28:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gopwM-0007K5-7p
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:30:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gopvB-0001hM-2P
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:28:54 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 30 Jan 2019 13:28:46 +0000
-Message-ID: <7ca3ef2e-513f-da52-d037-ede07c5aadf1@virtuozzo.com>
-References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<00c8b4b9-77ca-159e-4554-3311695fe3db@redhat.com>
-	<8e49d7d5-9608-9e40-a997-1d423f86fab1@virtuozzo.com>
-	<982d9998-e9d5-9c41-9ab6-74f893254b33@redhat.com>
-In-Reply-To: <982d9998-e9d5-9c41-9ab6-74f893254b33@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AA8BB3A5048B454EA818A18078AAC0A5@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gopwL-0002Es-C1
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:30:06 -0500
+Date: Wed, 30 Jan 2019 14:29:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190130142956.57f9eff3.cohuck@redhat.com>
+In-Reply-To: <20190129203933.4e57cd91@oc2783563651>
+References: <20190121110354.2247-1-cohuck@redhat.com>
+	<20190121110354.2247-3-cohuck@redhat.com>
+	<2dac6201-9e71-b188-0385-d09d05071a1c@linux.ibm.com>
+	<5627cb78-22b3-0557-7972-256bc9560d86@linux.ibm.com>
+	<20190125112437.2c06fac6.cohuck@redhat.com>
+	<20190125135835.2d59b511.cohuck@redhat.com>
+	<20190125150101.3b61f0a1@oc2783563651>
+	<20190125152154.05120461.cohuck@redhat.com>
+	<20190125170404.28c61eab@oc2783563651>
+	<20190128181355.2d79cae7.cohuck@redhat.com>
+	<20190128203000.6dbf7ba3@oc2783563651>
+	<20190129105840.1bf46c3b.cohuck@redhat.com>
+	<20190129203933.4e57cd91@oc2783563651>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 0/2] qemu-img info lists bitmap
- directory entries
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] vfio-ccw: concurrent I/O handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, John Snow <jsnow@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-MzAuMDEuMjAxOSAxNTo0MywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8zMC8xOSAyOjAwIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiANCj4+PiBTbywgSSdtIHRy
-eWluZyB0byB0ZXN0IHRoaXMsIGFuZCBJJ3ZlIGRpc2NvdmVyZWQgc29tZXRoaW5nIHJhdGhlcg0K
-Pj4+IGFubm95aW5nIGFib3V0IHBlcnNpc3RlbnQgc25hcHNob3RzOiB0aGV5IERPTidUIGdldCB3
-cml0dGVuIHRvIGRpc2sNCj4+PiB1bnRpbCB0aGUgcWVtdSBwcm9jZXNzIGV4aXRzLiAgSW4gb3Ro
-ZXIgd29yZHMsIGV2ZW4gYWZ0ZXIgY3JlYXRpbmcgYQ0KPj4+IHBlcnNpc3RlbnQgYml0bWFwIHZp
-YSBRTVAgKEknbSB0cnlpbmcgdG8gZGVidWcgbXkgbGlidmlydCBBUEkgZm9yDQo+Pj4gaW5jcmVt
-ZW50YWwgc25hcHNob3RzLCBzbyBJIGRpZCB0aGlzIHZpYSAndmlyc2ggc25hcHNob3QtY3JlYXRl
-LWFzICRkb20NCj4+PiBuYW1lJywgYnV0IGl0IGJvaWxzIGRvd24gdG8gYSBRTVAgdHJhbnNhY3Rp
-b24gd2l0aA0KPj4+ICdibG9jay1kaXJ0eS1iaXRtYXAtYWRkJyBhcyBvbmUgb2YgdGhlIGNvbW1h
-bmRzKSwgcnVubmluZzoNCj4+Pg0KPj4+ICQgcWVtdS1pbWcgaW5mbyAtVSBBY3RpdmUxLnFjb3cy
-DQo+Pj4NCj4+PiBzaG93cw0KPj4+ICAgICAgIGJpdG1hcHM6DQo+Pj4gICAgICAgcmVmY291bnQg
-Yml0czogMTYNCj4+Pg0KPj4+IGZvciBhcyBsb25nIGFzIHRoZSBxZW11IHByb2Nlc3MgaXMgcnVu
-bmluZy4NCj4gDQo+Pg0KPj4gQnV0IHdoYXQgaXMgdGhlIGJlbmVmaXQgb2YgaXQsIGV4Y2VwdCBx
-ZW11LWltZyBpbmZvIHdpdGggLS1mb3JjZS1zaGFyZSBvcHRpb24sDQo+PiB3aGljaCBvZiBjb3Vy
-c2UgaXMgbm90IGd1YXJhbnRlZWQgdG8gc2hvdyB2YWxpZCBtZXRhZGF0YT8NCj4+DQo+PiBXaGls
-ZSBxZW11IGlzIHJ1bm5pbmcgdmFsaWQgd2F5IHRvIG9idGFpbiBpbmZvIGlzIHFtcC4gRG8gbGli
-dmlydCBjYWxsIHFlbXUtaW1nDQo+PiAtLWZvcmUtc2hhcmU/DQo+IA0KPiBZb3UncmUgcmlnaHQg
-dGhhdCBsaWJ2aXJ0IHdpbGwgYmUgdXNpbmcgUU1QIGFuZCBub3QgcWVtdS1pbWcuIEJ1dCB0aGF0
-DQo+IGRvZXMgbm90IHByZXZlbnQgb3RoZXIgY2xpZW50cyBmcm9tIHVzaW5nIHFlbXUtaW1nIG9u
-IGEgZmlsZQ0KDQpJIGp1c3QgdGhpbmcgdGhhdCB1c2luZyAtLWZvcmNlLXNoYXJlIGluIHByb2R1
-Y3Rpb24gaXMgd3JvbmcgdGhpbmcgdG8gZG8uIFNvLA0KaXQgaXMgbmVlZGVkIG9ubHkgZm9yIGRl
-YnVnZ2luZy4uIEFuZCwgdGhlbiwgZmx1c2hpbmcgYml0bWFwcyBtYXkgYmUgbmVlZGVkDQpvbmx5
-IGZvciBkZWJ1Z2dpbmcuIFNvLCB3aHkgdG8gZmx1c2ggaW4gcHJvZHVjdGlvbj8NCg0KPiwgcmVn
-YXJkbGVzcw0KPiBvZiB3aGV0aGVyIHRoZSBmaWxlIGlzIGluIHVzZSBieSBhIGd1ZXN0LiBUaGVy
-ZSdzIGFsc28gdGhlIGFyZ3VtZW50IHRoYXQNCj4gaWYgcWVtdSBkaWVzIHN1ZGRlbmx5IChtb3N0
-IGxpa2VseSBkdWUgdG8gYSBidWcgb3IgdG8gYSBob3N0IGJlaW5nDQo+IGZlbmNlZCksIGtub3dp
-bmcgd2hhdCBiaXRtYXBzIHdlcmUgcHJlc2VudCBpbiB0aGUgaW1hZ2UNCg0KYWN0dWFsbHksIHRo
-ZXkgZGlkbid0LiBUaGV5J3ZlIG5ldmVyIGJlZW4gaW4gdGhlIGltYWdlLCBvbmx5IGluIFJBTS4u
-IExpa2UNCm5vbi1wZXJzaXN0ZW50IGJpdG1hcHMuDQoNCiAgaXMgYmV0dGVyIHRoYW4NCj4gaGF2
-aW5nIG5vdGhpbmcgYXQgYWxsIChidXQgY29udmVyc2VseSwgaWYgcWVtdSBkaWVzIHN1ZGRlbmx5
-LCB5b3UgYXJlDQo+IGxpa2VseSBtaXNzaW5nIHRoZSBiaXRtYXAgZGF0YSBmb3IgdGhlIG1vc3Qg
-cmVjZW50IGNoYW5nZXMsIHNvIGV2ZW4gaWYNCj4gZGlzYWJsZWQgYml0bWFwcyBhcmUgZmx1c2hl
-ZCBhbmQgbm8gbG9uZ2VyIG1hcmtlZCBpbi11c2UsIHRoZXkgc3RpbGwNCj4gd29uJ3QgYmUgc3Vm
-ZmljaWVudCB0byBhbGxvdyBhbiBpbmNyZW1lbnRhbCBiYWNrdXAsIGFuZCBhIGZ1bGwgYmFja3Vw
-DQo+IHdpbGwgYmUgbmVjZXNzYXJ5IHJlZ2FyZGxlc3Mgb2YgaG93IG11Y2ggb3IgbGl0dGxlIGJp
-dG1hcCBpbmZvcm1hdGlvbg0KPiBnb3QgcGVyc2lzdGVkKS4NCg0KZXhhY3RseS4gQnV0IHllcywg
-Zmx1c2hpbmcgZGlzYWJsZWQgYml0bWFwcyBtYXkgdGhlb3JldGljYWxseSBtYWtlIHNlbnNlLCBh
-cw0KdGhleSBhcmUgYXQgbGVhc3QgdmFsaWQuIEJ1dCBhYm91dCBkaXNhYmxlZCBiaXRtYXBzLCBJ
-IHRoaW5rIGl0IHdvdWxkIGJlIG1vcmUNCnVzZWZ1bCB0byB0ZWFjaCBRZW11IGxvYWQvdW5sb2Fk
-IHRoZW0gb24gZGVtYW5kLCB0byBub3QgdXNlIGV4dHJhIFJBTSB3aGVuDQp0aGV5IGFyZSBub3Qg
-bmVlZGVkIChtb3N0IG9mIHRoZSB0aW1lIHRoZXkgZG9uJ3QpLg0KDQo+IA0KPiBXaGlsZSB5b3Un
-cmUgcmlnaHQgdGhhdCAtLWZvcmNlLXNoYXJlIGlzIG5vdCByZXF1aXJlZCB0byBzaG93IHVwLXRv
-LWRhdGUNCj4gbWV0YWRhdGEsIGl0IGFsc28gaXMgbm90IHJlcXVpcmVkIHRvIHNob3cgbm90aGlu
-ZyBhdCBhbGwuICBBbmQgYXQgbGVhc3QNCj4ga25vd2luZyB0aGF0IGEgcGVyc2lzdGVudCBiaXRt
-YXAgaXMgYXNzb2NpYXRlZCB3aXRoIGEgcWNvdzIgZmlsZSBtYXkNCj4gbWFrZSBvdGhlciB0aGlu
-Z3Mgb2J2aW91cyAtIHN1Y2ggYXMgdGhlIGZhY3QgdGhhdCB0aGUgaW1hZ2UgY2FuJ3QgYmUNCj4g
-cmVzaXplZCAodW50aWwgd2UgaW1wbGVtZW50IHRoZSBmdW5jdGlvbmFsaXR5IHRvIHN1cHBvcnQg
-cmVzaXplIGFuZA0KPiBiaXRtYXBzIGluIHRoZSBzYW1lIGltYWdlKS4NCg0KSG0sIHllcywgaWYg
-d2UgaGF2ZSBpbnZhbGlkIElOX1VTRSBiaXRtYXBzIGluIHRoZSBpbWFnZSwgd2UgY2FuJ3QgcmVz
-aXplIGl0Li4NCkJ1dCBpcyBpdCBhIGdvb2QgcmVhc29uIHRvIHN0b3JlIHRoZXNlIGJpdG1hcHM/
-IElmIHdlIGRvbid0IHN0b3JlIHRoZW0sDQppbWFnZSBjb3VsZCBiZSByZXNpemVkLCB3aHkgbm90
-IChvZiBjb3Vyc2UsIGlmIGl0IGlzIG5vdCBjb3JydXB0ZWQsIGFzDQppbWFnZSB3YXMgbm90IGNs
-b3NlZCBwcm9wZXJseSkuLg0KDQoNCkl0IGFsbCBkZXBlbmRzIG9uIHRoZSBtZWFuaW5nIG9mIHRo
-ZSAncGVyc2lzdGVudCcgYml0bWFwLiBGb3IgbWUsDQpwZXJzaXN0ZW50IG1lYW5zICdiaXRtYXAg
-d2lsbCBiZSBzYXZlZCB0byB0aGUgaW1hZ2Ugb24gY2xvc2UnLg0KQW5kIHRoZXkgYXJlIGltcGxl
-bWVudGVkIGluIHRoaXMgd2F5LiBBbmQgZG9jdW1lbnRlZCBpbiB0aGlzIHdheSB0b286DQojIEBw
-ZXJzaXN0ZW50OiB0aGUgYml0bWFwIGlzIHBlcnNpc3RlbnQsIGkuZS4gaXQgd2lsbCBiZSBzYXZl
-ZCB0byB0aGUNCiMgICAgICAgICAgICAgIGNvcnJlc3BvbmRpbmcgYmxvY2sgZGV2aWNlIGltYWdl
-IGZpbGUgb24gaXRzIGNsb3NlLg0KDQpCdXQgeW91IHNlZSB0aGVtIGFzICJiaXRtYXBzIHdoaWNo
-IGV4aXN0IGluIHRoZSBpbWFnZSIuDQoNCkkgZG9uJ3Qgc2VlIHJlYWwgcmVhc29uIHRvIGZsdXNo
-IHRoZW0gd2hpbGUgUWVtdSBydW5uaW5nLiAtLWZvcmNlLXNoYXJlIGlzIGEgYmFjay1kb29yLA0K
-aXQgc2hvdWxkIG5vdCBiZSB1c2VkLCBhbmQgSSBkb3VidCB0aGF0IGltcGxlbWVudGluZyBzb21l
-dGhpbmcNCmVzcGVjaWFsbHkgZm9yIC0tZm9yY2Utc2hhcmUgaXMgYSBnb29kIGlkZWEuDQpUaGVu
-LCB0aGUgb25seSBkaWZmZXJlbmNlLCBpcyB0aGF0IHdlJ2xsIHNlZSBJTl9VU0UgYml0bWFwcyBp
-biB0aGUNCmltYWdlIGlmIHFlbXUgc3RvcHBlZCB1bmV4cGVjdGVkbHkuIEFuZCB0aGUgb25seSBt
-ZWFuaW5nZnVsIHRoaW5nIHRvDQpkbyB3aXRoIHRoZXNlIGludmFsaWQgYml0bWFwcyBpcyByZW1v
-dmluZyB0aGVtLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Tue, 29 Jan 2019 20:39:33 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Tue, 29 Jan 2019 10:58:40 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>=20
+> > > > > The problem I see with the let the hardware sort it out is that, =
+for
+> > > > > that to work, we need to juggle multiple translations simultaneou=
+sly
+> > > > > (or am I wrong?). Doing that does not appear particularly simple =
+to
+> > > > > me.     =20
+> > > >=20
+> > > > None in the first stage, at most two in the second stage, I guess.
+> > > >      =20
+> > >=20
+> > > Expected benefit of the second stage over the first stage? (I see non=
+e.)   =20
+> >=20
+> > Making something possible that is allowed by the architecture. Not
+> > really important, though.
+> >  =20
+>=20
+> I had a chat with Farhan, and he suggested that by 'allowed by
+> architecture' you mean " You can submit a new request if the subchannel
+> is pending with primary, but not with secondary state." (from Message-ID:
+> <20190125152154.05120461.cohuck@redhat.com>).
+
+Yes. I might have mixed things up, though.
+
+>=20
+> So I re-read the PoP.
+>=20
+> From the description of the start subchannel instruction:
+> """
+> Special Conditions
+>=20
+> Condition code 1 is set, and no other action is
+> taken, when the subchannel is status pending when
+> START SUBCHANNEL is executed. On some mod-
+> els, condition code 1 is not set when the subchannel
+> is status pending with only secondary status; instead,
+> the status-pending condition is discarded.
+>=20
+> Condition code 2 is set, and no other action is
+> taken, when a start, halt, or clear function is currently
+> in progress at the subchannel (see =E2=80=9CFunction Control
+> (FC)=E2=80=9D on page 13).
+>=20
+> """
+>=20
+> So I guess you mixed primary and secondary up and wanted to say:
+> "You can submit a new request if the subchannel
+> is pending with _secondary_, but not with _primary_ _status_."
+>=20
+> But does that really mean architecture allows the subchannel
+> to accept multiple ssch() instructions so that it ends up processing
+> two or more channel programs in parallel.
+
+That's not what I meant. The vfio-ccw driver still holds on to one cp,
+while a second one could be submitted.
+
+But let's just end discussing this here, and continue with discussing
+the reworked state machine, ok? It's not really relevant for going
+forward with halt/clear.
