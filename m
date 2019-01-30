@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60041)
+Received: from eggs.gnu.org ([209.51.188.92]:33512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gotEO-0000lw-Oy
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:57 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gotMz-0004wG-Df
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gotEN-0006aW-Rz
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:56 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60856
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pasic@linux.ibm.com>) id 1gotMy-0002ua-Ge
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42338)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gotEN-0006aO-Nq
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:00:55 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0UGxPxI034138
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:00:55 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qbfmms3wk-1
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gotMx-0002rB-DI
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 12:09:48 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0UGxRoC004408
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:09:40 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qbfv4rsp7-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:00:54 -0500
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 12:09:40 -0500
 Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 30 Jan 2019 17:00:52 -0000
-Date: Wed, 30 Jan 2019 18:00:45 +0100
+	Wed, 30 Jan 2019 17:09:38 -0000
+Date: Wed, 30 Jan 2019 18:09:31 +0100
 From: Halil Pasic <pasic@linux.ibm.com>
 In-Reply-To: <20190130132212.7376-7-cohuck@redhat.com>
 References: <20190130132212.7376-1-cohuck@redhat.com>
@@ -31,7 +30,7 @@ References: <20190130132212.7376-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20190130180045.419b1a23@oc2783563651>
+Message-Id: <20190130180931.4fd4b6a9@oc2783563651>
 Subject: Re: [Qemu-devel] [PATCH v3 6/6] vfio-ccw: add handling for async
  channel instructions
 List-Id: <qemu-devel.nongnu.org>
@@ -56,10 +55,8 @@ Cornelia Huck <cohuck@redhat.com> wrote:
 > +
 
 This is essentially dead code at the moment, isn't it? I mean we hold the
-io_mutex whenever we are in state VFIO_CCW_STATE_CP_PROCESSING. And we
-call vfio_ccw_fsm_event() under the very same mutex.
-
-
+io_mutex whenever we are in state VFIO_CCW_STATE_CP_PROCESSING, and we
+call vfio_ccw_fsm_event() with the very same mutex held.
 
 > @@ -213,26 +323,31 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
 >  	[VFIO_CCW_STATE_NOT_OPER] = {
