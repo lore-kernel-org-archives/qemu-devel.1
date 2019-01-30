@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53733)
+Received: from eggs.gnu.org ([209.51.188.92]:53796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gomxC-0006Qk-PC
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gomxK-0006YO-MI
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gomxB-0006qO-KD
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:46 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gomxJ-0006uz-TK
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 05:18:54 -0500
 References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
 	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-	<1548841387-7670-5-git-send-email-thuth@redhat.com>
+	<1548841387-7670-6-git-send-email-thuth@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f3d5ba09-66a2-987b-c976-29e191b97cff@redhat.com>
-Date: Wed, 30 Jan 2019 11:18:39 +0100
+Message-ID: <fddbc441-0085-c5c2-18c3-ab2eeaae1376@redhat.com>
+Date: Wed, 30 Jan 2019 11:18:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548841387-7670-5-git-send-email-thuth@redhat.com>
+In-Reply-To: <1548841387-7670-6-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/5] ppc: Express dependencies of the
- Sam460EX machines with kconfig
+Subject: Re: [Qemu-devel] [RFC PATCH 5/5] ppc: Express dependencies of the
+ embedded machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +27,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-ppc@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 On 30/01/19 10:43, Thomas Huth wrote:
-> Most of the dependencies are now directly selected by the SAM460EX
-> switch. We can drop CONFIG_VGA_CIRRUS since this device is already
-> selected automatically when CONFIG_PCI_DEVICES is set.
+> This makes it much easier if the users want to disable some of
+> the embedded machines for their builds.
 > 
-> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 > ---
->  default-configs/ppc-softmmu.mak | 10 ----------
->  hw/display/Kconfig              |  1 +
+>  default-configs/ppc-softmmu.mak | 18 ++++--------------
 >  hw/ppc/Kconfig                  | 12 ++++++++++++
->  hw/usb/Kconfig                  |  2 +-
->  4 files changed, 14 insertions(+), 11 deletions(-)
+>  2 files changed, 16 insertions(+), 14 deletions(-)
 > 
 > diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 513a8e9..5265d8a 100644
+> index 5265d8a..5192aca 100644
 > --- a/default-configs/ppc-softmmu.mak
 > +++ b/default-configs/ppc-softmmu.mak
-> @@ -25,16 +25,6 @@ CONFIG_PCI_EXPRESS=y
+> @@ -1,27 +1,17 @@
+>  # Default configuration for ppc-softmmu
+>  
+> -CONFIG_PCI=y
+>  CONFIG_PCI_DEVICES=y
+> -CONFIG_ISA_BUS=y
+>  CONFIG_TEST_DEVICES=y
+>  
+> -# For embedded PPCs:
+> -CONFIG_PPC4XX=y
+> -CONFIG_M48T59=y
+> +# FIXME: CONFIG_SERIAL is currently still required to link all of the
+> +# ppc machines (due to the usage of serial_mm_init() in ppc405_uc.c).
+>  CONFIG_SERIAL=y
+> -CONFIG_OPENPIC=y
+> -CONFIG_PPCE500_PCI=y
+> -CONFIG_PFLASH_CFI01=y
+> -CONFIG_PFLASH_CFI02=y
+> -CONFIG_XILINX=y
+> -CONFIG_XILINX_ETHLITE=y
+> +
+> +# For embedded PPCs:
+>  CONFIG_E500=y
+> -CONFIG_PLATFORM_BUS=y
+> -CONFIG_ETSEC=y
+>  CONFIG_PPC405=y
+>  CONFIG_PPC440=y
+>  CONFIG_VIRTEX=y
+> -CONFIG_PCI_EXPRESS=y
 >  
 >  # For Sam460ex
 >  CONFIG_SAM460EX=y
-> -CONFIG_USB_EHCI_SYSBUS=y
-> -CONFIG_SM501=y
-> -CONFIG_DDC=y
-> -CONFIG_IDE_SII3112=y
-> -CONFIG_I2C=y
-> -CONFIG_AT24C=y
-> -CONFIG_BITBANG_I2C=y
-> -CONFIG_M41T80=y
-> -CONFIG_VGA_CIRRUS=y
-> -CONFIG_SMBUS_EEPROM=y
->  
->  # For Macs
->  CONFIG_MAC_OLDWORLD=y
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index c784fe8..f8e6136 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -76,6 +76,7 @@ config MILKYMIST_TMU2
->  config SM501
->      bool
->      depends on I2C
-> +    select DDC
->  
->  config TCX
->      bool
 > diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index f6b4206..8bd25ed 100644
+> index 8bd25ed..ab9b828 100644
 > --- a/hw/ppc/Kconfig
 > +++ b/hw/ppc/Kconfig
-> @@ -24,9 +24,21 @@ config PPC440
+> @@ -18,9 +18,14 @@ config POWERNV
+>  
+>  config PPC405
+>      bool
+> +    select M48T59
+> +    select PFLASH_CFI02
+> +    select PPC4XX
+>  
+>  config PPC440
+>      bool
+> +    select PCI_EXPRESS
+> +    select PPC4XX
 >  
 >  config PPC4XX
 >      bool
-> +    select BITBANG_I2C
-> +    select PCI
+> @@ -69,9 +74,16 @@ config MAC_NEWWORLD
 >  
->  config SAM460EX
+>  config E500
 >      bool
-> +    select AT24C
+> +    select ETSEC
+> +    select OPENPIC
+> +    select PLATFORM_BUS
+> +    select PPCE500_PCI
+>  
+>  config VIRTEX
+>      bool
 > +    select PFLASH_CFI01
-> +    select IDE_SII3112
-> +    select ISA_BUS          # FIXME: Currently required for IDE_SII3112
-> +    select M41T80
-> +    select PPC440
-> +    select SM501
-> +    select SMBUS_EEPROM
-> +    select USB_EHCI_SYSBUS
-> +    select USB_OHCI
+> +    select XILINX
+> +    select XILINX_ETHLITE
 >  
->  config PREP
->      bool
-> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-> index a1b7acb..871ea47 100644
-> --- a/hw/usb/Kconfig
-> +++ b/hw/usb/Kconfig
-> @@ -21,7 +21,7 @@ config USB_EHCI
->  
->  config USB_EHCI_SYSBUS
->      bool
-> -    select USB
-> +    select USB_EHCI
->  
->  config USB_XHCI
+>  config MAC_DBDMA
 >      bool
 > 
