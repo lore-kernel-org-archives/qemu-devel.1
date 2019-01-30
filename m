@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39457)
+Received: from eggs.gnu.org ([209.51.188.92]:39491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomA1-0006nP-TI
+	(envelope-from <sgarzare@redhat.com>) id 1gomA3-0006nU-Br
 	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:28:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gom9t-0004Sd-UD
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:27:57 -0500
-References: <20190124162045.10474-1-sourav.jb1988@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <bec07d22-d33f-ed5b-8b96-deb431f2d189@vivier.eu>
-Date: Wed, 30 Jan 2019 10:27:40 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1gom9x-0004Ux-13
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:27:58 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36249)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gom9w-0004T6-Kn
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:27:52 -0500
+Received: by mail-wr1-f67.google.com with SMTP id u4so25202674wrp.3
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 01:27:51 -0800 (PST)
+Date: Wed, 30 Jan 2019 10:27:47 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190130092747.ft6q5hl7mcggimri@steredhat>
+References: <20190129221928.11522-1-huth@tuxfamily.org>
 MIME-Version: 1.0
-In-Reply-To: <20190124162045.10474-1-sourav.jb1988@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw: sd: set category of the
- sd memory card
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190129221928.11522-1-huth@tuxfamily.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/m68k/mcf5208: Support loading of bios
+ images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kumar sourav <sourav.jb1988@gmail.com>, qemu-trivial@nongnu.org
-Cc: thuth@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-On 24/01/2019 17:20, kumar sourav wrote:
-> Sets the category of the sd memory card as DEVICE_CATEGORY_STORAGE.
-> Devices should be assigned to one of DEVICE_CATEGORY_XXXX.
+On Tue, Jan 29, 2019 at 11:19:28PM +0100, Thomas Huth wrote:
+> The MCF5208EVB supports 2 MiB of flash at address 0. Add support
+> for this memory region and some code to load the file that can
+> be specified with the "-bios" command line option.
+> This can be used for example to load U-Boot images for the
+> MCF5208EVB (we still lack some features in the CPU emulation for
+> this firmware, though, so it can not be run successfully yet).
 > 
-> Signed-off-by: kumar sourav <sourav.jb1988@gmail.com>
+> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
 > ---
->  hw/sd/sd.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index d4356e9b73..aaab15f386 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -2121,6 +2121,7 @@ static void sd_class_init(ObjectClass *klass, void *data)
->      dc->vmsd = &sd_vmstate;
->      dc->reset = sd_reset;
->      dc->bus_type = TYPE_SD_BUS;
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->  
->      sc->set_voltage = sd_set_voltage;
->      sc->get_dat_lines = sd_get_dat_lines;
-> 
+>  hw/m68k/mcf5208.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
 
-Applied to my trivial-patches branch.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 Thanks,
-Laurent
+Stefano
