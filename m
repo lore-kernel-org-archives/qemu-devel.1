@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59384)
+Received: from eggs.gnu.org ([209.51.188.92]:59744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gopSV-0000Yb-GH
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gopU8-0001ti-CF
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gopSU-0006F5-Pt
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:15 -0500
-Received: from mga04.intel.com ([192.55.52.120]:19558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gopSU-0006Br-HF
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 07:59:14 -0500
-Date: Wed, 30 Jan 2019 20:55:26 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190130125526.GC3384@yangzhon-Virtual>
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-3-git-send-email-pbonzini@redhat.com>
-	<f4208837-83e7-a090-91d5-fc978490da9c@redhat.com>
-	<a56cfb65-55a6-5c0d-8e86-d2e71d233d78@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1gopU2-0007sR-GC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:00:56 -0500
+References: <20181217224348.14922-1-mreitz@redhat.com>
+	<c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <180509a6-ed6b-1d02-49d6-805309f5e02b@redhat.com>
+Date: Wed, 30 Jan 2019 14:00:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a56cfb65-55a6-5c0d-8e86-d2e71d233d78@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/52] ide: split ioport registration to a
- separate file
+In-Reply-To: <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v12 00/31] block: Fix some
+ filename generation issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, yang.zhong@intel.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Jan 30, 2019 at 01:20:42PM +0100, Paolo Bonzini wrote:
-> On 30/01/19 13:07, Thomas Huth wrote:
-> > I think adding ioport.o to IDE_PCI and IDE_VIA is wrong. The
-> > ide_init_ioport() function is only used by isa.c and piix.c, so it
-> > should only be added for IDE_ISA and IDE_PIIX here.
-> 
-> Good idea, another one for Yang. :)
->
-  Yes, for ioport.o, i will add as below: 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <180509a6-ed6b-1d02-49d6-805309f5e02b@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v12 00/31] block: Fix some filename
+ generation issues
+References: <20181217224348.14922-1-mreitz@redhat.com>
+ <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
+In-Reply-To: <c62e3c26-de97-6af2-85ae-ba75a3e4956a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  +common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
-  +common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
+On 29.01.19 21:51, John Snow wrote:
+>=20
+>=20
+> On 12/17/18 5:43 PM, Max Reitz wrote:
+>> Once more, I=E2=80=99ll spare both me and you another iteration of the=
+ cover
+>> letter, so I direct you to the previous version=E2=80=99s cover letter=
+ (which
+>> will direct you further):
+>>
+>> http://lists.nongnu.org/archive/html/qemu-block/2018-10/msg00229.html
+>>
+>> There are only minor changes in this version.  Provided no major
+>> complaints arise, I intend to merge this series in the next month.
+>>
+>=20
+> It looked like this got a full set of reviews by Berto, should we not
+> just merge it and see who cries?
+>=20
+> Would you like additional eyes on it?
 
-  The newest hw/ide/via.c has removed ide_init_ioport() call.
+I was about to rebase it (and send it again with a shorter "I will merge
+this" period), but then I found that a non-non-significant number of
+iotests failed, so I wanted to fix those first.
 
-  By the way, i plan to send non-RFC patches 1-27 tomorrow if there is not any new comments. thanks!
+Max
 
-  Yang 
- 
-> Paolo
+
+--3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRn/QACgkQ9AfbAGHV
+z0CORggAk1pBggVRD9vWxEMOWo7S7IQXUkSv6eT/lOfwpnwoc97vaSQldVD4nC4P
+mKdw4SMt2+bF2ZpFUw5eitx/FvUJUbUiR0aOSBVmr0MhmMU1fVY57IaaTnR9Ocrg
+iHMStl95ocMuDEr2xI/wBejmRLL5vDACqEyfC1SMM6RyQ5ateKvf2lWV8i9+0Lqm
+rEl5PvAoQlaDx/NU78QgZs/MF0P/bpPUqK3jreWmJRqeel5GBNOkQDkxuMmVt0DJ
+BGLOuTORkOQLbSuKEmDAWmGx8snYXMa13ToV0ewxFuaDdY85t7Nmfrcm3v4WPEnZ
++eiln8MFzTfyl0/iP2zMO4fD5b8JDw==
+=ULcz
+-----END PGP SIGNATURE-----
+
+--3GKVKuOhDvInXFXLzMsCoAXDSFN13lml0--
