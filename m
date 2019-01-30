@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47983)
+Received: from eggs.gnu.org ([209.51.188.92]:48466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomdV-0002lq-3I
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:58:26 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gomeo-0003gD-4r
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomdP-0003Wv-10
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:58:20 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gomem-0004Ut-CK
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:59:46 -0500
 References: <1548252536-6242-1-git-send-email-thuth@redhat.com>
-	<1548252536-6242-2-git-send-email-thuth@redhat.com>
+	<1548252536-6242-3-git-send-email-thuth@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9b30d086-7006-1345-32d5-b998f96d67af@vivier.eu>
-Date: Wed, 30 Jan 2019 10:58:09 +0100
+Message-ID: <e62b7f84-780c-6e4b-00da-a4fc7b33d474@vivier.eu>
+Date: Wed, 30 Jan 2019 10:59:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548252536-6242-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1548252536-6242-3-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/4] COPYING.LIB:
- Synchronize the LGPL 2.1 with the version from gnu.org
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 2/4] target/openrisc: Fix
+ LGPL version number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,109 +26,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-trivial@nongnu.org, Stafford Horne <shorne@gmail.com>
 
 On 23/01/2019 15:08, Thomas Huth wrote:
-> The current version of the LGPL 2.1 from gnu.org (see the URL
-> https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt ) slightly
-> differs from the old one that we use in our repository. Especially
-> the recommendation to use "either version 2 of the License, or [...]
-> any later version" is somewhat misleading, since there was never a
-> "version 2" of the "Lesser GPL" license - the "version 2" was still
-> called "Library GPL" instead.
+> It's either "GNU *Library* General Public version 2" or "GNU Lesser
+> General Public version *2.1*", but there was no "version 2.0" of the
+> "Lesser" library. So assume that version 2.1 is meant here.
 > 
+> Cc: Stafford Horne <shorne@gmail.com>
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  COPYING.LIB | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+>  target/openrisc/cpu.c              | 2 +-
+>  target/openrisc/exception.h        | 2 +-
+>  target/openrisc/gdbstub.c          | 2 +-
+>  target/openrisc/helper.h           | 2 +-
+>  target/openrisc/interrupt_helper.c | 2 +-
+>  target/openrisc/sys_helper.c       | 2 +-
+>  target/openrisc/translate.c        | 2 +-
+>  7 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/COPYING.LIB b/COPYING.LIB
-> index 48afc2e..4362b49 100644
-> --- a/COPYING.LIB
-> +++ b/COPYING.LIB
-> @@ -1,8 +1,8 @@
-> -		  GNU LESSER GENERAL PUBLIC LICENSE
-> -		       Version 2.1, February 1999
-> +                  GNU LESSER GENERAL PUBLIC LICENSE
-> +                       Version 2.1, February 1999
->  
->   Copyright (C) 1991, 1999 Free Software Foundation, Inc.
-> -	51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
->   Everyone is permitted to copy and distribute verbatim copies
->   of this license document, but changing it is not allowed.
->  
-> @@ -10,7 +10,7 @@
->   as the successor of the GNU Library Public License, version 2, hence
->   the version number 2.1.]
->  
-> -			    Preamble
-> +                            Preamble
->  
->    The licenses for most software are designed to take away your
->  freedom to share and change it.  By contrast, the GNU General Public
-> @@ -112,7 +112,7 @@ modification follow.  Pay close attention to the difference between a
->  former contains code derived from the library, whereas the latter must
->  be combined with the library in order to run.
->  
-
-> -		  GNU LESSER GENERAL PUBLIC LICENSE
-> +                  GNU LESSER GENERAL PUBLIC LICENSE
->     TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
->  
->    0. This License Agreement applies to any software library or other
-> @@ -146,7 +146,7 @@ such a program is covered only if its contents constitute a work based
->  on the Library (independent of the use of the Library in a tool for
->  writing it).  Whether that is true depends on what the Library does
->  and what the program that uses the Library does.
-> -  
-> +
->    1. You may copy and distribute verbatim copies of the Library's
->  complete source code as you receive it, in any medium, provided that
->  you conspicuously and appropriately publish on each copy an
-> @@ -432,7 +432,7 @@ decision will be guided by the two goals of preserving the free status
->  of all derivatives of our free software and of promoting the sharing
->  and reuse of software generally.
->  
-> -			    NO WARRANTY
-> +                            NO WARRANTY
->  
->    15. BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
->  WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
-> @@ -455,7 +455,7 @@ FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
->  SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
->  DAMAGES.
->  
-> -		     END OF TERMS AND CONDITIONS
-> +                     END OF TERMS AND CONDITIONS
->  
-
->             How to Apply These Terms to Your New Libraries
->  
-> @@ -476,7 +476,7 @@ convey the exclusion of warranty; and each file should have at least the
->      This library is free software; you can redistribute it and/or
->      modify it under the terms of the GNU Lesser General Public
->      License as published by the Free Software Foundation; either
-> -    version 2 of the License, or (at your option) any later version.
-> +    version 2.1 of the License, or (at your option) any later version.
->  
->      This library is distributed in the hope that it will be useful,
->      but WITHOUT ANY WARRANTY; without even the implied warranty of
-> @@ -485,7 +485,7 @@ convey the exclusion of warranty; and each file should have at least the
->  
->      You should have received a copy of the GNU Lesser General Public
->      License along with this library; if not, write to the Free Software
-> -    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> +    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
->  
->  Also add information on how to contact you by electronic and paper mail.
->  
-> @@ -500,5 +500,3 @@ necessary.  Here is a sample; alter the names:
->    Ty Coon, President of Vice
->  
->  That's all there is to it!
-> -
-> -
+> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+> index fb7cb5c..541b2a6 100644
+> --- a/target/openrisc/cpu.c
+> +++ b/target/openrisc/cpu.c
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/exception.h b/target/openrisc/exception.h
+> index 4ec56b4..c9c4e47 100644
+> --- a/target/openrisc/exception.h
+> +++ b/target/openrisc/exception.h
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/gdbstub.c b/target/openrisc/gdbstub.c
+> index f9af650..43b1a18 100644
+> --- a/target/openrisc/gdbstub.c
+> +++ b/target/openrisc/gdbstub.c
+> @@ -7,7 +7,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
+> index 9db9bf3..96d79a8 100644
+> --- a/target/openrisc/helper.h
+> +++ b/target/openrisc/helper.h
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
+> index 9c5489f..ab4ea88 100644
+> --- a/target/openrisc/interrupt_helper.c
+> +++ b/target/openrisc/interrupt_helper.c
+> @@ -7,7 +7,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+> index b66a45c..05f66c4 100644
+> --- a/target/openrisc/sys_helper.c
+> +++ b/target/openrisc/sys_helper.c
+> @@ -7,7 +7,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+> index c089914..89680f8 100644
+> --- a/target/openrisc/translate.c
+> +++ b/target/openrisc/translate.c
+> @@ -7,7 +7,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
 > 
 
 Applied to my trivial-patches branch.
