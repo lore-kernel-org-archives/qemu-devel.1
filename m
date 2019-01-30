@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46563)
+Received: from eggs.gnu.org ([209.51.188.92]:46655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomYB-0008UF-93
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:52:56 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gomYl-0000Ty-TT
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gomY9-0000zm-R0
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:52:55 -0500
-References: <1548255083-8190-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ad237f21-f9f8-85f3-b444-3917fdcc0744@vivier.eu>
-Date: Wed, 30 Jan 2019 10:52:46 +0100
+	(envelope-from <jasowang@redhat.com>) id 1gomYd-00019F-DH
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gomYY-00015k-VP
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 04:53:19 -0500
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-4-xieyongji@baidu.com>
+	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+	<20190129213617-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <04be58b8-03c2-82b3-3a02-260f24768350@redhat.com>
+Date: Wed, 30 Jan 2019 17:52:52 +0800
 MIME-Version: 1.0
-In-Reply-To: <1548255083-8190-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190129213617-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] Don't talk about the LGPL
- if the file is licensed under the GPL
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
+ inflight I/O in shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,193 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: elohimes@gmail.com, stefanha@gmail.com, marcandre.lureau@redhat.com, berrange@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, nixun@baidu.com, qemu-devel@nongnu.org, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 23/01/2019 15:51, Thomas Huth wrote:
-> Some files claim that the code is licensed under the GPL, but then
-> suddenly suggest that the user should have a look at the LGPL.
-> That's of course non-sense, replace it with the correct GPL wording
-> instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  crypto/afsplit.c           | 11 +++++------
->  include/crypto/afsplit.h   | 11 +++++------
->  include/hw/pci-host/gpex.h |  4 ++--
->  include/hw/pci-host/q35.h  |  4 ++--
->  include/qemu/range.h       | 11 +++++------
->  target/i386/hvf/hvf.c      |  6 +++---
->  util/range.c               | 11 +++++------
->  7 files changed, 27 insertions(+), 31 deletions(-)
-> 
-> diff --git a/crypto/afsplit.c b/crypto/afsplit.c
-> index 825e2cf..328d68c 100644
-> --- a/crypto/afsplit.c
-> +++ b/crypto/afsplit.c
-> @@ -8,19 +8,18 @@
->   * Copyright (C) 2004, Clemens Fruhwirth <clemens@endorphin.org>
->   * Copyright (C) 2009-2012, Red Hat, Inc. All rights reserved.
->   *
-> - * This library is free software; you can redistribute it and/or
-> + * This program is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU General Public License
->   * as published by the Free Software Foundation; either version 2
->   * of the License, or (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * General Public License for more details.
->   *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #include "qemu/osdep.h"
-> diff --git a/include/crypto/afsplit.h b/include/crypto/afsplit.h
-> index 7dd21f0..4894d64 100644
-> --- a/include/crypto/afsplit.h
-> +++ b/include/crypto/afsplit.h
-> @@ -3,19 +3,18 @@
->   *
->   * Copyright (c) 2015-2016 Red Hat, Inc.
->   *
-> - * This library is free software; you can redistribute it and/or
-> + * This program is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU General Public License
->   * as published by the Free Software Foundation; either version 2
->   * of the License, or (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * General Public License for more details.
->   *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #ifndef QCRYPTO_AFSPLIT_H
-> diff --git a/include/hw/pci-host/gpex.h b/include/hw/pci-host/gpex.h
-> index aef38b8..2af1c4a 100644
-> --- a/include/hw/pci-host/gpex.h
-> +++ b/include/hw/pci-host/gpex.h
-> @@ -13,8 +13,8 @@
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->   * GNU General Public License for more details.
->   *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>
->   */
->  
->  #ifndef HW_GPEX_H
-> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> index 8f4ddde..5ed77fa 100644
-> --- a/include/hw/pci-host/q35.h
-> +++ b/include/hw/pci-host/q35.h
-> @@ -15,8 +15,8 @@
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->   * GNU General Public License for more details.
->   *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>
->   */
->  
->  #ifndef HW_Q35_H
-> diff --git a/include/qemu/range.h b/include/qemu/range.h
-> index ba606c6..71b8b21 100644
-> --- a/include/qemu/range.h
-> +++ b/include/qemu/range.h
-> @@ -3,19 +3,18 @@
->   *
->   * Copyright (c) 2015-2016 Red Hat, Inc.
->   *
-> - * This library is free software; you can redistribute it and/or
-> + * This program is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU General Public
->   * License as published by the Free Software Foundation; either
->   * version 2 of the License, or (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * General Public License for more details.
->   *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #ifndef QEMU_RANGE_H
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index e193022..689b585 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -13,10 +13,10 @@
->   * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> + * General Public License for more details.
->   *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   *
->   * This file contain code under public domain from the hvdos project:
->   * https://github.com/mist64/hvdos
-> diff --git a/util/range.c b/util/range.c
-> index 416df7c..098d9d2 100644
-> --- a/util/range.c
-> +++ b/util/range.c
-> @@ -3,19 +3,18 @@
->   *
->   * Copyright (c) 2015-2016 Red Hat, Inc.
->   *
-> - * This library is free software; you can redistribute it and/or
-> + * This program is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU General Public
->   * License as published by the Free Software Foundation; either
->   * version 2 of the License, or (at your option) any later version.
->   *
-> - * This library is distributed in the hope that it will be useful,
-> + * This program is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public
-> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-> + * General Public License for more details.
->   *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  
->  #include "qemu/osdep.h"
-> 
 
-Applied to my trivial-patches branch.
+On 2019/1/30 =E4=B8=8A=E5=8D=8811:14, Michael S. Tsirkin wrote:
+> On Wed, Jan 30, 2019 at 10:31:49AM +0800, Jason Wang wrote:
+>> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
+>>> +static int
+>>> +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
+>>> +{
+>>> +    if (!has_feature(dev->protocol_features,
+>>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    if (unlikely(!vq->inflight)) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    vq->inflight->desc[desc_idx].inuse =3D 1;
+>>> +
+>>> +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static int
+>>> +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
+>>> +{
+>>> +    if (!has_feature(dev->protocol_features,
+>>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    if (unlikely(!vq->inflight)) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
+>>> +
+>>> +    barrier();
+>>> +
+>>> +    vq->inflight->desc[desc_idx].version++;
+>>> +
+>>> +    return 0;
+>>> +}
+>>
+>> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure th=
+e
+>> value reach memory.
+>>
+>> Thanks
+>>
+> WRITE_ONCE is literally volatile + dependency memory barrier.
+> So unless compiler is a very agressive one, it does not
+> buy you much.
 
-Thanks,
-Laurent
+
+Well, since version is increased twice, if compiler decide the inline=20
+both vu_queue_inflight_pre_put() and vu_queue_inflight_post_put(), can=20
+we make sure it always generate instructions that write to memory=20
+instead of registers?
+
+Thanks
