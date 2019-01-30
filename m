@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46258)
+Received: from eggs.gnu.org ([209.51.188.92]:46774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gosDI-00064w-AW
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:45 -0500
+	(envelope-from <david@redhat.com>) id 1gosFJ-00074G-Ez
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:57:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gosDG-00071N-LN
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gosDG-0006vC-9U
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:55:42 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6614C80E7B
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 15:55:32 +0000 (UTC)
-References: <20190130120616.5260-1-quintela@redhat.com>
-	<20190130120616.5260-3-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <711166e7-e8de-9335-5a7f-63cf86a62524@redhat.com>
-Date: Wed, 30 Jan 2019 09:55:30 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190130120616.5260-3-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sF49psVAnr7pphIn36DfQJvQ9HbkJxP0Y"
-Subject: Re: [Qemu-devel] [PATCH v11 2/4] migration: Create socket-address
- parameter
+	(envelope-from <david@redhat.com>) id 1gosFH-0008Tg-Ez
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:57:49 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 30 Jan 2019 16:57:28 +0100
+Message-Id: <20190130155733.32742-2-david@redhat.com>
+In-Reply-To: <20190130155733.32742-1-david@redhat.com>
+References: <20190130155733.32742-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] s390x/pci: Fix primary bus number for
+ PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,180 +20,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sF49psVAnr7pphIn36DfQJvQ9HbkJxP0Y
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <711166e7-e8de-9335-5a7f-63cf86a62524@redhat.com>
-Subject: Re: [PATCH v11 2/4] migration: Create socket-address parameter
-References: <20190130120616.5260-1-quintela@redhat.com>
- <20190130120616.5260-3-quintela@redhat.com>
-In-Reply-To: <20190130120616.5260-3-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The primary bus number corresponds always to the bus number of the
+bus the bridge is attached to.
 
-On 1/30/19 6:06 AM, Juan Quintela wrote:
-> It will be used to store the uri parameters. We want this only for
-> tcp, so we don't set it for other uris.  We need it to know what port
-> is migration running.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
->=20
-> --
->=20
+Right now, if we have two bridges attached to the same bus (e.g. root
+bus) this is however not the case. The first bridge will have primary
+bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
 
-> +++ b/hmp.c
-> @@ -166,6 +166,26 @@ void hmp_info_mice(Monitor *mon, const QDict *qdic=
-t)
->      qapi_free_MouseInfoList(mice_list);
->  }
-> =20
-> +static char *SocketAddress_to_str(SocketAddress *addr)
-> +{
-> +    switch (addr->type) {
-> +    case SOCKET_ADDRESS_TYPE_INET:
-> +        return g_strdup_printf("tcp:%s:%s",
-> +                               addr->u.inet.host,
-> +                               addr->u.inet.port);
-> +        break;
-> +    case SOCKET_ADDRESS_TYPE_UNIX:
-> +        return g_strdup_printf("unix:%s",
-> +                               addr->u.q_unix.path);
-> +        break;
-> +    case SOCKET_ADDRESS_TYPE_FD:
-> +        return g_strdup_printf("fd:%s", addr->u.fd.str);
-> +        break;
-> +    default:
-> +        abort();
+While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+Setting it temporarily to that value (as discussed e.g. in [1]), is
+only relevant for a running system that probes the buses. The value is
+effectively unused for us just doing a DFS.
 
-Is abort()ing on SOCKET_ADDRESS_TYPE_VSOCK intentional?
+Also add a comment why we have to reassign during every reset (which I
+found to be surprising.
 
-> +    }
-> +}
-> +
->  void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->  {
->      MigrationInfo *info;
-> @@ -306,6 +326,17 @@ void hmp_info_migrate(Monitor *mon, const QDict *q=
-dict)
->          g_free(str);
->          visit_free(v);
->      }
-> +    if (info->has_socket_address) {
-> +        SocketAddressList *addr;
-> +
-> +        monitor_printf(mon, "socket address: [\n");
-> +
-> +        for (addr =3D info->socket_address; addr; addr =3D addr->next)=
+Please note that hotplugging of bridges is in general still broken, will
+be fixed next.
+
+[1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index f017c1ded0..b7c4613fde 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -862,7 +862,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         qbus_set_hotplug_handler(bus, DEVICE(s), errp);
+ 
+         if (dev->hotplugged) {
+-            pci_default_write_config(pdev, PCI_PRIMARY_BUS, s->bus_no, 1);
++            pci_default_write_config(pdev, PCI_PRIMARY_BUS,
++                                     pci_dev_bus_num(pdev), 1);
+             s->bus_no += 1;
+             pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
+             do {
+@@ -1016,8 +1017,6 @@ static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+                                       void *opaque)
  {
-> +            char *s =3D SocketAddress_to_str(addr->value);
-> +            monitor_printf(mon, "\t%s\n", s);
-> +        }
-> +        monitor_printf(mon, "]\n");
-> +    }
-
-Leaks 's'.
-
->      qapi_free_MigrationInfo(info);
->      qapi_free_MigrationCapabilityStatusList(caps);
->  }
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 37e06b76dc..ef1d53cde2 100644
-> --- a/migration/migration.c
-
-> +++ b/qapi/migration.json
-> @@ -6,6 +6,7 @@
->  ##
-> =20
->  { 'include': 'common.json' }
-> +{ 'include': 'sockets.json' }
-> =20
->  ##
->  # @MigrationStats:
-> @@ -199,6 +200,8 @@
->  # @compression: migration compression statistics, only returned if com=
-pression
->  #           feature is on and status is 'active' or 'completed' (Since=
- 3.1)
->  #
-> +# @socket-address: Only used for tcp, to know what the real port is (S=
-ince 3.1)
-> +#
-
-s/3.1/4.0/
-
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationInfo',
-> @@ -213,7 +216,8 @@
->             '*error-desc': 'str',
->             '*postcopy-blocktime' : 'uint32',
->             '*postcopy-vcpu-blocktime': ['uint32'],
-> -           '*compression': 'CompressionStats'} }
-> +           '*compression': 'CompressionStats',
-> +           '*socket-address': ['SocketAddress'] } }
-> =20
->  ##
->  # @query-migrate:
-> diff --git a/qapi/sockets.json b/qapi/sockets.json
-> index fc81d8d5e8..d7f77984af 100644
-> --- a/qapi/sockets.json
-> +++ b/qapi/sockets.json
-> @@ -152,3 +152,16 @@
->              'unix': 'UnixSocketAddress',
->              'vsock': 'VsockSocketAddress',
->              'fd': 'String' } }
-> +
-> +##
-> +# @DummyStruct:
-> +#
-> +# Both block-core and migration needs SocketAddressList
-> +# I am open to comments about how to share it
-> +#
-> +# @dummy-list: A dummy list
-> +#
-> +# Since: 3.1
-
-s/3.1/4.0/
-This matches how we force list types elsewhere for use in C code even
-when the type is not exposed through QMP. But do you still need to force
-the generation, given that ['SocketAddress'] used in MigrationInfo is
-visible through QMP?
-
-> +##
-> +{ 'struct': 'DummyStruct',
-> +  'data': { 'dummy-list': ['SocketAddress'] } }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---sF49psVAnr7pphIn36DfQJvQ9HbkJxP0Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxRyPIACgkQp6FrSiUn
-Q2ozIQf9FmemOGZPY/GlCpjn/B5G3mF0ParIBWdidy9VActd7xi0oyHibbTeN7wn
-FrNOaTerXrZ5AdpKUay9bnqFJrBdx4Pidzj2FMndMD6lrp6OCYF/EFFq5tjSr6ox
-pYSbTI1aVMFxdq2pHlXi+31lGoX4EjufWMaybUAmXQ+3j1dqkA403WLeEzrYMtwZ
-75FWj4qRh+/H3qs/QIFXcwfQuIHzr/9sVqZYePDHXXzftisbtizMMGXOGO7t/xYj
-jbsqYSEv1pjt2TqMxYRiJKMONpYTxU564iKaJD0/+7PCAK45sgaQWua2jz8ejWdG
-1lDIJZSPlx0rqQmMSeBBiXXomOkaWQ==
-=pc70
------END PGP SIGNATURE-----
-
---sF49psVAnr7pphIn36DfQJvQ9HbkJxP0Y--
+     S390pciState *s = opaque;
+-    unsigned int primary = s->bus_no;
+-    unsigned int subordinate = 0xff;
+     PCIBus *sec_bus = NULL;
+ 
+     if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=
+@@ -1026,7 +1025,7 @@ static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+     }
+ 
+     (s->bus_no)++;
+-    pci_default_write_config(pdev, PCI_PRIMARY_BUS, primary, 1);
++    pci_default_write_config(pdev, PCI_PRIMARY_BUS, pci_dev_bus_num(pdev), 1);
+     pci_default_write_config(pdev, PCI_SECONDARY_BUS, s->bus_no, 1);
+     pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, s->bus_no, 1);
+ 
+@@ -1035,7 +1034,7 @@ static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+         return;
+     }
+ 
+-    pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, subordinate, 1);
++    /* Assign numbers to all child bridges. The last is the highest number. */
+     pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
+                         s390_pci_enumerate_bridge, s);
+     pci_default_write_config(pdev, PCI_SUBORDINATE_BUS, s->bus_no, 1);
+@@ -1046,6 +1045,10 @@ static void s390_pcihost_reset(DeviceState *dev)
+     S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+     PCIBus *bus = s->parent_obj.bus;
+ 
++    /*
++     * When resetting a PCI bridge, the assigned numbers are set to 0. So
++     * on every system reset, we also have to reassign numbers.
++     */
+     s->bus_no = 0;
+     pci_for_each_device(bus, pci_bus_num(bus), s390_pci_enumerate_bridge, s);
+ }
+-- 
+2.17.2
