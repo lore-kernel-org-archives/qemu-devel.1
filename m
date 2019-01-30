@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33768)
+Received: from eggs.gnu.org ([209.51.188.92]:34995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gorIT-0005RU-0i
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 09:57:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1gorMZ-0000DH-TC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gorIR-00082G-QZ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 09:57:00 -0500
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:54976
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1gorIR-000814-Gb
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 09:56:59 -0500
-References: <20190129203219.6473-1-jcmvbkbc@gmail.com>
-	<cfc9fee5-9f8b-2fb2-d58e-f8e08f5a0a52@adacore.com>
-	<d7469a28-716d-5054-cba6-fc3a3001ea6c@greensocs.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <8577ec49-8503-313d-47a0-531163a3e490@adacore.com>
-Date: Wed, 30 Jan 2019 15:56:54 +0100
+	(envelope-from <eblake@redhat.com>) id 1gorMY-0001LS-0z
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 10:01:15 -0500
+References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+	<20190129145156.6719b8a4.cohuck@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
+Date: Wed, 30 Jan 2019 09:01:01 -0600
 MIME-Version: 1.0
-In-Reply-To: <d7469a28-716d-5054-cba6-fc3a3001ea6c@greensocs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: allow killing QEMU via vKill
- command
+In-Reply-To: <20190129145156.6719b8a4.cohuck@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uJpQ5UZ3pVQDnBqqqV75RfYNJwrtZo6J4"
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
+ header comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,158 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>, Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uJpQ5UZ3pVQDnBqqqV75RfYNJwrtZo6J4
+From: Eric Blake <eblake@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
+ header comments
+References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+ <20190129145156.6719b8a4.cohuck@redhat.com>
+In-Reply-To: <20190129145156.6719b8a4.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/29/19 7:51 AM, Cornelia Huck wrote:
+> On Tue, 29 Jan 2019 14:37:47 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+>> It's either "GNU *Library* General Public License version 2" or
+>> "GNU Lesser General Public License version *2.1*", but there was
+>> no "version 2.0" of the "Lesser" license. So assume that version
+>> 2.1 is meant here.
+>=20
+> I think we can assume that.
+>=20
+> Given that there have been several of these cases (and that there's a
+> lot of boilerplate in general): Should we adopt SPDX license
+> identifiers for QEMU, as the Linux kernel did? They also discovered and=
+
+> fixed some problems/oddities while at it.
+
+I'm also in favor of SPDX license identifiers - their brevity and
+machine-parsability favors more accurate usage and fewer copy/paste
+mistake propagation.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
+--uJpQ5UZ3pVQDnBqqqV75RfYNJwrtZo6J4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Le 1/30/19 =C3=A0 3:31 PM, Luc Michel a =C3=A9crit=C2=A0:
-> Hi,
->=20
-> On 1/30/19 2:37 PM, KONRAD Frederic wrote:
->> Hi,
->>
->> Le 1/29/19 =C3=A0 9:32 PM, Max Filippov a =C3=A9crit=C2=A0:
->>> With multiprocess extensions gdb uses 'vKill' packet instead of 'k' t=
-o
->>> kill the inferior. Handle 'vKill' the same way 'k' was handled in the
->>> presence of single process.
->>>
->>> Fixes: 7cf48f6752e5 ("gdbstub: add multiprocess support to
->>> (f|s)ThreadInfo and ThreadExtraInfo")
-> Thanks for the patch.
->=20
->>>
->>> Cc: Luc Michel <luc.michel@greensocs.com>
->>> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
->>> ---
->>>  =C2=A0 gdbstub.c | 22 ++++++++++++++++++++++
->>>  =C2=A0 1 file changed, 22 insertions(+)
->>>
->>> diff --git a/gdbstub.c b/gdbstub.c
->>> index bfc7afb50968..1ef31240c055 100644
->>> --- a/gdbstub.c
->>> +++ b/gdbstub.c
->>> @@ -1383,6 +1383,28 @@ static int gdb_handle_packet(GDBState *s, cons=
-t
->>> char *line_buf)
->>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 put_packet(s, buf);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 break;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (strncmp(p, "Ki=
-ll;", 5) =3D=3D 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u=
-nsigned long pid;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
- +=3D 5;
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (qemu_strtoul(p, &p, 16, &pid)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 put_packet(s, "E22");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rocess =3D gdb_get_process(s, pid);
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (process =3D=3D NULL) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 put_packet(s, "E22");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (s->process_num <=3D 1) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 /* Kill the target */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report("QEMU: Terminated via GDBstub");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 exit(0);
->>
->> I suggest:
->>
->> #ifdef CONFIG_USER_ONLY
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(0);
->> #else
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_system_shutdown_reque=
-st(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-> You are missing a `break;' here.
->=20
-> Regarding the cause, I think it's more an 'host' cause than a 'guest' o=
-ne.
->> #endif
->>
->> instead of exit(0);
-> I just tested, this is not ideal in the current shape. Not quitting
-> immediately makes the stub sends a "W00" packet. It's better if we send
-> nothing because GDB interprets that as the connection was closed (which
-> is effectively the case). Otherwise in multiprocess mode, GDB thinks th=
-e
-> other processes are still alive (see below).
->=20
-> with exit(0):
-> (gdb) k
-> Kill the program being debugged? (y or n) y
-> Sending packet: $vKill;1#6e...Ack
-> Remote connection closed
->=20
-> with qemu_system_shutdown_request:
-> (gdb) k
-> Kill the program being debugged? (y or n) y
-> Sending packet: $vKill;1#6e...Ack
-> Packet received: W00
-> Packet vKill (kill) is supported
-> [Inferior 1 (process 1) killed]
+-----BEGIN PGP SIGNATURE-----
 
-Ok makes sense. I didn't think of that.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxRvC0ACgkQp6FrSiUn
+Q2pjyQf8CXc1r8WFH52ZnS4sAhopLr9EEQ+HPopE9PFv43DEj/Q2a3zRCHIYZrr4
+7QzOt5LioTM+IA9zzzOkWsFeznJTxzqrdaRxcStk+6d9fWXZaxhacdfrQ4UNcLaP
+JBJQwUWu1sc8yY093UyOOG6aJdskM/nHKx6/PX/+rQP185PClQYO8owrbyyAXDbo
+5q6lMcYynTdL5Uz5Et6dG0r7UcAsZ+sChZtsi40ubhzjyHCFvjiI7c2/0e9de8WK
+pt/euGLgnP48EsvRc6sauwfboJZPqdmPyL4mW2kjYO3GmbQaLofrPPKxyMeP0E90
+Zri4rP9IIXb5TuLpngVtCWjUTa4Ssg==
+=mzN6
+-----END PGP SIGNATURE-----
 
->=20
-> So maybe a solution (for another patch) would be to send a 'W' packet
-> for each attached process (using the multiprocess format). Another is t=
-o
-> prevent 'W' packets to be sent at all... they are not required in this =
-case.
->=20
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=
-* TODO: handle multiprocess case */
-> About the multiprocess case, I would vote to adopt the same behaviour
-> (i.e. terminate QEMU), whatever the PID is or how many processes are
-> attached. Otherwise we would have different behaviour for the GDB `kill=
-`
-> command, whether the simulated board exposes multiple processes or not.
-> Moreover, I think considering just one PID for a kill command does not
-> make much sense in our case.
->=20
-> I just tested, GDB is fine with QEMU closing the connection when having
-> multiple processes attached if we do exit(0) directly (i.e. do not send
-> a 'W00' packet).
-
-Yes I see the same behavior with Linux but it makes GDB crashes with MinG=
-W
-at least before this patch and the multiprocess one (eg: v3.0.0).
-
-I'll wait for this patch to land and send some trace if I can still repro=
-duce.
-
-Cheers,
-Fred
-
->=20
-> Thanks.
->=20
-> Luc
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g=
-oto unknown_command;
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 goto unknown_command;
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>
->=20
+--uJpQ5UZ3pVQDnBqqqV75RfYNJwrtZo6J4--
