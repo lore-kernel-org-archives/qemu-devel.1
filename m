@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60950)
+Received: from eggs.gnu.org ([209.51.188.92]:32985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopYe-0004UW-SP
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:05:37 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gopa3-000571-Qt
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gopYR-0003S4-5W
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:05:27 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gopa3-000464-6b
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 08:07:03 -0500
 References: <20190123144610.8842-1-mreitz@redhat.com>
-	<20190123144610.8842-4-mreitz@redhat.com>
-	<468692a4-a2e2-55f0-eb49-6dee6be6aee7@redhat.com>
+	<20190123144610.8842-6-mreitz@redhat.com>
+	<4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <33e33681-a95a-40e9-4b37-4633e3f72ae3@redhat.com>
-Date: Wed, 30 Jan 2019 14:05:13 +0100
+Message-ID: <8a72a636-9998-ea66-e6a5-9b32e89dd739@redhat.com>
+Date: Wed, 30 Jan 2019 14:06:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <468692a4-a2e2-55f0-eb49-6dee6be6aee7@redhat.com>
+In-Reply-To: <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="dbkgwQPtPjt87PE8WlG1MbOQsgQe4gAcQ"
-Subject: Re: [Qemu-devel] [PATCH 3/9] iotests: Fix 232 for LUKS
+	boundary="RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h"
+Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Fix 237 for Python 2.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +29,68 @@ To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dbkgwQPtPjt87PE8WlG1MbOQsgQe4gAcQ
+--RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <33e33681-a95a-40e9-4b37-4633e3f72ae3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/9] iotests: Fix 232 for LUKS
+Message-ID: <8a72a636-9998-ea66-e6a5-9b32e89dd739@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/9] iotests: Fix 237 for Python 2.x
 References: <20190123144610.8842-1-mreitz@redhat.com>
- <20190123144610.8842-4-mreitz@redhat.com>
- <468692a4-a2e2-55f0-eb49-6dee6be6aee7@redhat.com>
-In-Reply-To: <468692a4-a2e2-55f0-eb49-6dee6be6aee7@redhat.com>
+ <20190123144610.8842-6-mreitz@redhat.com>
+ <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
+In-Reply-To: <4c417f84-3c3e-1fa4-7d69-987e5f6a17fe@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 29.01.19 22:26, John Snow wrote:
->=20
+On 29.01.19 22:21, John Snow wrote:
 >=20
 > On 1/23/19 9:46 AM, Max Reitz wrote:
->> With IMGOPTSSYNTAX, $TEST_IMG is useless for this test (it only tests
->> the file-posix protocol driver).  Therefore, if $TEST_IMG_FILE is set,=
+>> It is not quite clear whether we want to support Python 2.x for any
+>> prolonged time, but this may as well be fixed along with the other
+>> issues some iotests have right now.
+>>
+>=20
+> I'd have shuffled this above patch 01 (or immediately below) with a not=
+e
+> in either commit saying that the test is still broken without both patc=
+hes.
 
->> use that instead.
->>
->> Because this test requires the file protocol, $TEST_IMG_FILE will alwa=
-ys
->> be set if $IMGOPTSSYNTAX is true.
->>
+It's only broken for Python 2.x. :-)
+
+I don't have any real order in this series, though, so whatever makes
+someone happy makes me happy, too.
+
+> I'd also say what you're actually fixing in the commit
+> (range wants ints, not floats.)
+
+Sure, I can add that.
+
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >=20
-> This keeps biting us. Or at least, it bit me once and then it has bitte=
-n
-> someone else. It's not obvious that you need to accommodate this when
-> writing a new test.
+> But, like, that's just my opinion, man,,
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-No, it isn't. :-)
-
-But I think at least me running ./check -luks from time to time should
-be sufficient, usually.  It's just that I had basically given up on a
-clean iotests run for a month or two now...
+Thanks!
 
 Max
 
 
---dbkgwQPtPjt87PE8WlG1MbOQsgQe4gAcQ
+--RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRoQkACgkQ9AfbAGHV
-z0BLTAf9GcpY9tLUJS9PJN9RW4R4fZJlQ25Vx8JZzteSViRvkkpSwSVHTb7Wi7kU
-IuH42YvLSxRlME3GWaKrBKEm/FRd4HGhMFg7FFQlV/HGJ6GdKJs6B8EdjUpm1ijR
-/AUbXkYLmPXNh5749raiNQnz/Emf4VL1ZGWoRcCdvcSSZB3MlNLQ/OZx7bv8Rt0B
-cxN6q1AGpmzAowRa39UGsHaVc0fMVW+2Eq5/V+sjVML+xaSHtXOYw+6rMIWuDQ7e
-lzstkrf/1CVrfKAvqitHeYhb3NDOEyZrFOfkcu5XhkW06q/+SzYBfcQgrm2Ae/W3
-2R0AOkvxHps8GnNVUgcj0FeI0F71SA==
-=CLsi
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxRoWoACgkQ9AfbAGHV
+z0BP3Af/R56l+ROkC7LPOWdLdMkFKER7XnsaqUeTklG/cbxW8iq5mUk3g/Gv2k+M
+eNbB3ZCOHF0vP/YFt1tnX24DzqOTCv5wZLA3cKmJZC5vUw17PVNruxyl7WYgOMHd
+4AANQ+45RszDjKU5rdmsHKrMwKT92tN4TMUM8H+sbAPhFMF1pWH1fxn5qS2e81WV
+fSkJmtonAaDIwOD4fY02Y7JYmkruVaFk3OTHamAJroNEfyIZk9tWG03IgSiAhC4W
+Sodr3XL/QcqqiR3XMp9QN5G/5D7/wwdMB1KrH/J/WZj7NBjIzGWZpxK5xamHswMk
+QdqT44s5gsJ3HzprbatcmRXAvxO2og==
+=qVHA
 -----END PGP SIGNATURE-----
 
---dbkgwQPtPjt87PE8WlG1MbOQsgQe4gAcQ--
+--RdWf7Tk6daFRWQipSkX6GeB5OdaUgJ20h--
