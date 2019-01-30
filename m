@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51139)
+Received: from eggs.gnu.org ([209.51.188.92]:51350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1goknW-0008H9-Dy
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:00:39 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goknv-00006z-Sz
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:01:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1goknS-00012K-Go
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:00:37 -0500
-Date: Wed, 30 Jan 2019 09:00:12 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190130080012.pc3swshuknpoknzy@sirius.home.kraxel.org>
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<20190128124027.776wwcqrckalvr7x@sirius.home.kraxel.org>
-	<CAFEAcA-jwBhBXQb-SHT=b_Vy5Sq+M2iaMP2XtVn_2HQvzaEoVQ@mail.gmail.com>
-	<87wommmwa8.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1goknk-00019J-8k
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 03:01:03 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 30 Jan 2019 08:00:37 +0000
+Message-ID: <8e49d7d5-9608-9e40-a997-1d423f86fab1@virtuozzo.com>
+References: <1548700805-1016533-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<00c8b4b9-77ca-159e-4554-3311695fe3db@redhat.com>
+In-Reply-To: <00c8b4b9-77ca-159e-4554-3311695fe3db@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <43CDBA8385D8F64BAEB722DEA49184DF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wommmwa8.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [libvirt] Configuring pflash devices for OVMF
- firmware
+Subject: Re: [Qemu-devel] [PATCH v8 0/2] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, John Snow <jsnow@redhat.com>
 
-  Hi,
-
-> > (Migration compat is left as an exercise for the reader :-))
-> 
-> It's not just migration compatibility, it's also guest ABI: "the guest
-> can tell the difference".
-
-Is that actually the case on x86?  I don't think so.
-
-Note: arm is different, because the flash is listed in the device tree
-which is guest visible.
-
-> So, old machine types continue to get two flash devices, and new
-> machine types get one.  In other words, we're stuck maintaining (a)
-> even if we decide to switch to (b).
-
-I think that'll be true nevertheless for live migration compatibility.
-
-cheers,
-  Gerd
+MzAuMDEuMjAxOSA3OjAxLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxLzI4LzE5IDEyOjQwIFBN
+LCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4+IEhlcmUgaXMgdGhlIHVwZGF0ZSBmb3IgdGhl
+IGJpdG1hcCBleHRlbnNpb24gb2YgdGhlIHFjb3cyIHNwZWNpZmljDQo+PiBpbmZvcm1hdGlvbiBh
+cyB0aGUgb3V0cHV0IG9mIHRoZSAncWVtdS1pbWcgaW5mbycgY29tbWFuZC4NCj4+IFRoZSB2ZXJz
+aW9uICM3IHdhcyBpbiBlbWFpbCB3aXRoIHRoZSBtZXNzYWdlIElEOg0KPj4gPDE1NDQ2OTg3ODgt
+NTI4OTMtMS1naXQtc2VuZC1lbWFpbC1hbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0K
+Pj4NCj4+IHY4Og0KPj4gVGhlIG91dHB1dCBiZW5jaG1hcmsgZmlsZXMgZm9yIHRoZSBxZW11LWlv
+dGVzdHMsIG5hbWVseSAwNjAsIDA2NSAwODIsIDE5OA0KPj4gYW5kIDIwNiwgd2VyZSBtb2RpZmll
+ZCB0byBzaG93IHRoZSBiaXRtYXAgZXh0ZW5zaW9uIGZvciB0aGUgcWVtdSBzcGVjaWZpYw0KPj4g
+aW5mb3JtYXRpb24uIEEgbmV3IHRlc3QgZmlsZSAyMzkgd2FzIGFkZGVkIHRvIHRoZSB0ZXN0IHNl
+dCB0aGF0IGNoZWNrcyB0aGUNCj4+IG91dHB1dCBmb3IgdGhlIGZpZWxkcyBvZiB0aGUgYml0bWFw
+IHNlY3Rpb24uDQo+PiBUaGUgYmFja3dhcmQgY29tcGF0aWJpbGl0eSBvZiB0aGUgb3V0cHV0IGZv
+ciBpbWFnZXMgb2YgdGhlIHZlcnNpb24gMg0KPj4gb2YgcWNvdzIgd2FzIGFkZGVkLg0KPiANCj4g
+U28sIEknbSB0cnlpbmcgdG8gdGVzdCB0aGlzLCBhbmQgSSd2ZSBkaXNjb3ZlcmVkIHNvbWV0aGlu
+ZyByYXRoZXINCj4gYW5ub3lpbmcgYWJvdXQgcGVyc2lzdGVudCBzbmFwc2hvdHM6IHRoZXkgRE9O
+J1QgZ2V0IHdyaXR0ZW4gdG8gZGlzaw0KPiB1bnRpbCB0aGUgcWVtdSBwcm9jZXNzIGV4aXRzLiAg
+SW4gb3RoZXIgd29yZHMsIGV2ZW4gYWZ0ZXIgY3JlYXRpbmcgYQ0KPiBwZXJzaXN0ZW50IGJpdG1h
+cCB2aWEgUU1QIChJJ20gdHJ5aW5nIHRvIGRlYnVnIG15IGxpYnZpcnQgQVBJIGZvcg0KPiBpbmNy
+ZW1lbnRhbCBzbmFwc2hvdHMsIHNvIEkgZGlkIHRoaXMgdmlhICd2aXJzaCBzbmFwc2hvdC1jcmVh
+dGUtYXMgJGRvbQ0KPiBuYW1lJywgYnV0IGl0IGJvaWxzIGRvd24gdG8gYSBRTVAgdHJhbnNhY3Rp
+b24gd2l0aA0KPiAnYmxvY2stZGlydHktYml0bWFwLWFkZCcgYXMgb25lIG9mIHRoZSBjb21tYW5k
+cyksIHJ1bm5pbmc6DQo+IA0KPiAkIHFlbXUtaW1nIGluZm8gLVUgQWN0aXZlMS5xY293Mg0KPiAN
+Cj4gc2hvd3MNCj4gICAgICBiaXRtYXBzOg0KPiAgICAgIHJlZmNvdW50IGJpdHM6IDE2DQo+IA0K
+PiBmb3IgYXMgbG9uZyBhcyB0aGUgcWVtdSBwcm9jZXNzIGlzIHJ1bm5pbmcuIFdoYXQgZG9lcyBp
+dCB0YWtlIHRvIGZvcmNlIGENCj4gcWNvdzIgaW1hZ2UgdG8gd3JpdGUgb3V0IGl0cyBjdXJyZW50
+IHNldCBvZiBrbm93biBiaXRtYXBzIHRvIGRpc2ssIGV2ZW4NCj4gaWYgdGhleSBhcmUga25vd24g
+dG8gYmUgcG90ZW50aWFsbHkgZGlydHk/IFNob3VsZCBpdCBoYXBwZW4gYW55IHRpbWUgd2UNCj4g
+Zmx1c2ggTDEvTDIvcmVmY291bnQgdGFibGVzPyAgT24gYSBwZXJpb2RpYyBidXQgc2xvdyB0aW1l
+ciAoc2F5IG9uY2UNCj4gZXZlcnkgNSBtaW51dGVzKT8gT3RoZXIgaWRlYXM/ICBJIGtub3cgd2Ug
+ZG9uJ3Qgd2FudCB0byBiZSBmbHVzaGluZyB0aGUNCj4gZnVsbCBiaXRtYXAgY29udGVudHMgb24g
+ZXZlcnkgY2hhbmdlIHRvIHRoZSBpbi1tZW1vcnkgaW50ZXJuYWwgYml0bWFwLA0KPiBidXQgbWV0
+YS1jaGFuZ2VzIChzdWNoIGFzIGFkZGluZyBhIGJpdG1hcCkgc2VlbSBsaWtlIHRoZSBzb3J0IG9m
+IHRoaW5nDQo+IHdoZXJlIGl0J3Mgd29ydGggZmx1c2hpbmcgdGhlIHFjb3cyIGZpbGU7IHBhcnRp
+Y3VsYXJseSB3aGVuIGFkZGluZyB0aGUNCj4gYml0bWFwIHZpYSBRTVAgJ3RyYW5zYWN0aW9uJyB3
+aGljaCBnb2VzIHRvIHRoZSBib3RoZXIgb2YgZmx1c2hpbmcgYWxsDQo+IHBlbmRpbmcgSS9PIGlu
+IG9yZGVyIHRvIHByb3Blcmx5IHJvbGwgYmFjayBvbiBmYWlsdXJlICh3aGljaCBtZWFucyBvbg0K
+PiBzdWNjZXNzLCBpdCB3b3VsZCBiZSBuaWNlIGZvciB0aGUgbmV3IGJpdG1hcCBuYW1lIHRvIHNo
+b3cgdXAgaW4gdGhlDQo+IHFjb3cyIGhlYWRlciwgZXZlbiBpZiB0aGUgY29udGVudHMgb2YgdGhl
+IGJpdG1hcCBhcmUgbm90IHVwLXRvLWRhdGUpLg0KPiANCg0KQnV0IHdoYXQgaXMgdGhlIGJlbmVm
+aXQgb2YgaXQsIGV4Y2VwdCBxZW11LWltZyBpbmZvIHdpdGggLS1mb3JjZS1zaGFyZSBvcHRpb24s
+DQp3aGljaCBvZiBjb3Vyc2UgaXMgbm90IGd1YXJhbnRlZWQgdG8gc2hvdyB2YWxpZCBtZXRhZGF0
+YT8NCg0KV2hpbGUgcWVtdSBpcyBydW5uaW5nIHZhbGlkIHdheSB0byBvYnRhaW4gaW5mbyBpcyBx
+bXAuIERvIGxpYnZpcnQgY2FsbCBxZW11LWltZw0KLS1mb3JlLXNoYXJlPw0KDQoNCi0tIA0KQmVz
+dCByZWdhcmRzLA0KVmxhZGltaXINCg==
