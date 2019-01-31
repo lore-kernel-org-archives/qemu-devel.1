@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37814)
+Received: from eggs.gnu.org ([209.51.188.92]:38450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gpDGG-0000rS-69
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:24:14 -0500
+	(envelope-from <lersek@redhat.com>) id 1gpDJZ-00026V-EG
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:27:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gpDGE-0000Ry-RP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:24:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:5327)
+	(envelope-from <lersek@redhat.com>) id 1gpDJR-0001c7-BL
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:27:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gpDGE-0000Ri-Js
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:24:10 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gpDJK-0001ax-50
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 09:27:23 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01D50A4046
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 14:27:19 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
-References: <20190124203959.30875-1-lersek@redhat.com>
-Message-ID: <d4db23b5-8b6d-999f-d127-466a8acf040c@redhat.com>
-Date: Thu, 31 Jan 2019 15:23:50 +0100
+References: <20190118223152.24183-1-lersek@redhat.com>
+Message-ID: <e4370e19-04f8-d14b-4f7e-bce22f722805@redhat.com>
+Date: Thu, 31 Jan 2019 15:27:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190124203959.30875-1-lersek@redhat.com>
+In-Reply-To: <20190118223152.24183-1-lersek@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] add the BiosTablesTest UEFI app,
- build it with the new roms/edk2 submodule
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix the life cycle and the name of
+ "qemu_extra_params_fw"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel list <qemu-devel@nongnu.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 01/24/19 21:39, Laszlo Ersek wrote:
-> Previous version (v1):
-> http://mid.mail-archive.com/20190118223400.24311-1-lersek@redhat.com
+On 01/18/19 23:31, Laszlo Ersek wrote:
+> Commit 19bcc4bc3213 ("fw_cfg: Make qemu_extra_params_fw locally",
+> 2019-01-04) changed the storage duration of the "qemu_extra_params_fw"
+> array from static to automatic. This broke the interface contract on th=
+e
+> fw_cfg_add_file() function, which is documented as follows, in
+> "include/hw/nvram/fw_cfg.h":
 >=20
-> Updates in v2 have been noted on each patch in the series.
-
-ping
-
+>> [...] The data referenced by the starting pointer is only linked, NOT
+>> copied, into the data structure of the fw_cfg device. [...]
 >=20
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> As a result, when guest firmware fetches the "etc/boot-menu-wait" fw_cf=
+g
+> file, it now sees garbage. Fix the regression by changing the storage
+> duration to allocated. (The call is reached at most once, on the realiz=
+e
+> path of the board-specific fw_cfg sysbus device.)
+>=20
+> While at it, clean up the name and the assignment of the object as well=
+.
+>=20
 > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
 > Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Fixes: 19bcc4bc3213e78c303ad480a7a578f62258252d
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>  hw/nvram/fw_cfg.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >=20
-> Thanks
-> Laszlo
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 53e8e010a8b7..7fdf04adc97f 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -118,7 +118,6 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>  {
+>      const char *boot_splash_filename =3D NULL;
+>      const char *boot_splash_time =3D NULL;
+> -    uint8_t qemu_extra_params_fw[2];
+>      char *filename, *file_data;
+>      gsize file_size;
+>      int file_type;
+> @@ -132,6 +131,8 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>      /* insert splash time if user configurated */
+>      if (boot_splash_time) {
+>          int64_t bst_val =3D qemu_opt_get_number(opts, "splash-time", -=
+1);
+> +        uint16_t bst_le16;
+> +
+>          /* validate the input */
+>          if (bst_val < 0 || bst_val > 0xffff) {
+>              error_report("splash-time is invalid,"
+> @@ -139,9 +140,9 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>              exit(1);
+>          }
+>          /* use little endian format */
+> -        qemu_extra_params_fw[0] =3D (uint8_t)(bst_val & 0xff);
+> -        qemu_extra_params_fw[1] =3D (uint8_t)((bst_val >> 8) & 0xff);
+> -        fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_fw,=
+ 2);
+> +        bst_le16 =3D cpu_to_le16(bst_val);
+> +        fw_cfg_add_file(s, "etc/boot-menu-wait",
+> +                        g_memdup(&bst_le16, sizeof bst_le16), sizeof b=
+st_le16);
+>      }
+> =20
+>      /* insert splash file if user configurated */
 >=20
-> Laszlo Ersek (5):
->   roms: add the edk2 project as a git submodule
->   roms: build the EfiRom utility from the roms/edk2 submodule
->   tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
->   tests/uefi-test-tools: add build scripts
->   tests/data: introduce "uefi-boot-images" with the "bios-tables-test"
->     ISOs
->=20
->  .gitmodules                                                           =
-   |   3 +
->  Makefile                                                              =
-   |   6 +-
->  roms/Makefile                                                         =
-   |  13 +-
->  roms/edk2                                                             =
-   |   1 +
->  tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2        =
-   | Bin 0 -> 11776 bytes
->  tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2            =
-   | Bin 0 -> 11776 bytes
->  tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2           =
-   | Bin 0 -> 12800 bytes
->  tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2         =
-   | Bin 0 -> 13312 bytes
->  tests/uefi-test-tools/.gitignore                                      =
-   |   3 +
->  tests/uefi-test-tools/LICENSE                                         =
-   |  25 ++++
->  tests/uefi-test-tools/Makefile                                        =
-   |  97 +++++++++++++
->  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c=
-   | 130 ++++++++++++++++++
->  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.i=
-nf |  41 ++++++
->  tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h  =
-   |  67 +++++++++
->  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec           =
-   |  27 ++++
->  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc           =
-   |  69 ++++++++++
->  tests/uefi-test-tools/build.sh                                        =
-   | 145 ++++++++++++++++++++
->  17 files changed, 619 insertions(+), 8 deletions(-)
->  create mode 160000 roms/edk2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch6=
-4.iso.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.is=
-o.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.i=
-so.qcow2
->  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64=
-.iso.qcow2
->  create mode 100644 tests/uefi-test-tools/.gitignore
->  create mode 100644 tests/uefi-test-tools/LICENSE
->  create mode 100644 tests/uefi-test-tools/Makefile
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTe=
-st/BiosTablesTest.c
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTe=
-st/BiosTablesTest.inf
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid=
-/BiosTablesTest.h
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestTool=
-sPkg.dec
->  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestTool=
-sPkg.dsc
->  create mode 100755 tests/uefi-test-tools/build.sh
->=20
+
+I hope a polite ping can't hurt; can we get this merged please?
+
+Thanks
+LAszlo
