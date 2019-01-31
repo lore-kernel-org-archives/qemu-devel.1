@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49322)
+Received: from eggs.gnu.org ([209.51.188.92]:50961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <voltagex@voltagex.org>) id 1gpA00-0000TH-Rp
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:55:13 -0500
+	(envelope-from <philmd@redhat.com>) id 1gpA7K-0001w7-AQ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:02:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <voltagex@voltagex.org>) id 1gp9zz-0005Gv-Nq
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:55:12 -0500
-Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:39222)
+	(envelope-from <philmd@redhat.com>) id 1gpA7I-0008Pc-Ut
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:02:46 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36517)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <voltagex@voltagex.org>)
-	id 1gp9zz-0005El-Cs
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:55:11 -0500
-Received: by mail-ua1-x944.google.com with SMTP id c12so864429uas.6
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:55:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gpA7I-0008PD-PC
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:02:44 -0500
+Received: by mail-wm1-f68.google.com with SMTP id p6so2071855wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 03:02:44 -0800 (PST)
+References: <20190125140017.6092-1-alex.bennee@linaro.org>
+	<20190125140017.6092-13-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <21071b28-7cc9-e57e-b3a8-3597e51318b8@redhat.com>
+Date: Thu, 31 Jan 2019 12:02:42 +0100
 MIME-Version: 1.0
-References: <CAChFQ9RNaHyROB47QeLwc6cLCCnFx4SmXKV7rbs1MYjk7S0sbw@mail.gmail.com>
-	<20190131104911.GF19982@redhat.com>
-In-Reply-To: <20190131104911.GF19982@redhat.com>
-From: Adam Baxter <voltagex@voltagex.org>
-Date: Thu, 31 Jan 2019 21:54:58 +1100
-Message-ID: <CAChFQ9TJNqWHiGzjeAxYCJhj9RXxn0WAG3M1YhMguNcQpV7w7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] NSIS - including DLL dependencies for Windows
+In-Reply-To: <20190125140017.6092-13-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 12/14] tests/vm: add --build-target
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>
 
-My extremely embarassing script for getting the DLLs is as follows,
-but at least it avoids a WINE dependency:
+On 1/25/19 3:00 PM, Alex Bennée wrote:
+> This allows us to invoke the build with a custom target (for the VMs
+> that use the {target} format string specifier). Currently OpenBSD is
+> still hardwired due to problems running check.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-STAGING=3D/tmp/myqemu/
-make install prefix=3D$STAGING
-#todo: probably better to walk these dependencies in a loop, and not
-use grep (but seriously, where's the mingw dumpbin)
-FIRST=3D$(strings $STAGING/*.exe | grep '\.dll' | sort -u | xargs -I{}
-readlink -e /usr/x86_64-w64-mingw32/sys-root/mingw/bin/{})
-SECOND=3D$(for d in $FIRST; do strings $d | grep '\.dll' | sort -u |
-xargs -I{} readlink -e /usr/x86_64-w64-mingw32/sys-root/mingw/bin/{};
-done)
-THIRD=3D$(for d in $SECOND; do strings $d | grep '\.dll' | sort -u |
-xargs -I{} readlink -e /usr/x86_64-w64-mingw32/sys-root/mingw/bin/{};
-done)
-echo $FIRST $SECOND $THIRD | sed 's/ /\n/g' | sort -u | xargs -I{} cp
--v {} $STAGING
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
---Adam
-
-On Thu, 31 Jan 2019 at 21:49, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
->
-> On Thu, Jan 31, 2019 at 02:45:13PM +1100, Adam Baxter wrote:
-> > Hi,
-> > How do I gather and include the required DLLs (SDL, zlib etc) in the NS=
-IS
-> > installer? (and also in a standalone build to be zipped up, but that's =
-less
-> > important)
-> >
-> > I noticed the wiki doesn't really mention bundling dependencies anywher=
-e.
-> >
-> > The official unofficial windows builds are documented at
-> > https://qemu.weilnetz.de/FAQ but this doesn't cover building the actual
-> > installer.
->
-> Yeah, this is a pretty major ommision in QEMU's build rules for the NSIS
-> installer making it pretty much useless as is. We really need to expand
-> it so that it can resolve the dlls that qemu .exe's need, locate them
-> on the host and bundle them into the installer automatically.
->
-> It seems we can get a list of deps for an .exe using
->
-> $ winedump  -j import /path/to/binary.exe  | grep offset | grep dll | awk=
- '{print $3}'
->
-> We would need to run that for each .exe we're bundling. I think we might
-> need to also then run that recursively for each .dll to get the transitiv=
-e
-> set of required dlls.
->
-> Even this is not entirely satisfactory though, as it is blindly assuming
-> that the only thing we need in the QEMU installer is the dlls themselves.
-> GTK at least has other resources used at runtime besides the dll that
-> should be bundled.
->
-> This kind of problem is why the GNOME project created the msitools projec=
-t
-> for creating .msi installers, to relpace nsis. With msitools there is a
-> metadata file for each package listing all the files that need it needs
-> to have bundled into an installer:
->
->   https://gitlab.gnome.org/GNOME/msitools/tree/master/data/wixl
->
-> This is not without its own downsides though. It bundles all the .wxi
-> files itself, with their content based on current mingw packages present
-> in the most recent Fedora release. This means it won't work on any other
-> distro :-(
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  tests/vm/basevm.py   | 3 +++
+>  tests/vm/freebsd     | 2 +-
+>  tests/vm/netbsd      | 2 +-
+>  tests/vm/ubuntu.i386 | 2 +-
+>  4 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 5caf77d6b8..bdca6cb2fc 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -228,6 +228,8 @@ def parse_args(vmcls):
+>                        help="build image")
+>      parser.add_option("--build-qemu",
+>                        help="build QEMU from source in guest")
+> +    parser.add_option("--build-target",
+> +                      help="QEMU build target", default="check")
+>      parser.add_option("--interactive", "-I", action="store_true",
+>                        help="Interactively run command")
+>      parser.add_option("--snapshot", "-s", action="store_true",
+> @@ -255,6 +257,7 @@ def main(vmcls):
+>              cmd = [vm.BUILD_SCRIPT.format(
+>                     configure_opts = " ".join(argv),
+>                     jobs=args.jobs,
+> +                   target=args.build_target,
+>                     verbose = "V=1" if args.verbose else "")]
+>          else:
+>              cmd = argv
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index a85c866c30..1d64c31b7c 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -25,7 +25,7 @@ class FreeBSDVM(basevm.BaseVM):
+>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>          tar -xf /dev/vtbd1;
+>          ./configure {configure_opts};
+> -        gmake --output-sync -j{jobs} check {verbose};
+> +        gmake --output-sync -j{jobs} {target} {verbose};
+>      """
+>  
+>      def build_image(self, img):
+> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> index edea113bb5..a2c3d13af4 100755
+> --- a/tests/vm/netbsd
+> +++ b/tests/vm/netbsd
+> @@ -25,7 +25,7 @@ class NetBSDVM(basevm.BaseVM):
+>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>          tar -xf /dev/rld1a;
+>          ./configure --python=python2.7 {configure_opts};
+> -        gmake --output-sync -j{jobs} check {verbose};
+> +        gmake --output-sync -j{jobs} {target} {verbose};
+>      """
+>  
+>      def build_image(self, img):
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> index 252e514859..a22d137e76 100755
+> --- a/tests/vm/ubuntu.i386
+> +++ b/tests/vm/ubuntu.i386
+> @@ -26,7 +26,7 @@ class UbuntuX86VM(basevm.BaseVM):
+>          sudo chmod a+r /dev/vdb;
+>          tar -xf /dev/vdb;
+>          ./configure {configure_opts};
+> -        make --output-sync check -j{jobs} {verbose};
+> +        make --output-sync {target} -j{jobs} {verbose};
+>      """
+>  
+>      def _gen_cloud_init_iso(self):
+> 
