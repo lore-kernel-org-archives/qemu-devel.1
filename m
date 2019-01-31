@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47440)
+Received: from eggs.gnu.org ([209.51.188.92]:53197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=92777afac=atish.patra@wdc.com>)
-	id 1gpI4b-0008UI-OX
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:32:30 -0500
+	(envelope-from <lersek@redhat.com>) id 1gpITe-00083q-UZ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:58:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=92777afac=atish.patra@wdc.com>)
-	id 1gpHy0-0006iu-2v
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:25:42 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:6797)
+	(envelope-from <lersek@redhat.com>) id 1gpITe-0003mK-7f
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:58:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=92777afac=atish.patra@wdc.com>)
-	id 1gpHxt-0006aF-QL
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:25:37 -0500
-From: Atish Patra <atish.patra@wdc.com>
-Message-ID: <17ecfa78-7098-8cdd-7318-68a997cd685d@wdc.com>
-Date: Thu, 31 Jan 2019 11:25:20 -0800
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gpITe-0003ll-2E
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:58:22 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+References: <20190124203959.30875-1-lersek@redhat.com>
+	<20190124203959.30875-5-lersek@redhat.com>
+	<6d5868f5-70b4-71e2-3495-8d47156148c1@redhat.com>
+	<f39b4b89-bd10-de9c-d3d2-c38411594f70@redhat.com>
+Message-ID: <2dc8ea0f-047c-efa7-78d7-18eccf6a3148@redhat.com>
+Date: Thu, 31 Jan 2019 20:58:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <f39b4b89-bd10-de9c-d3d2-c38411594f70@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] RISC-V Open source Supervisor Binary Interface
- (OpenSBI) Version 0.1 Released
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tests/uefi-test-tools: add build
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, U-Boot Mailing List <u-boot@lists.denx.de>, qemu-devel@nongnu.org, "sw-dev@groups.riscv.org" <sw-dev@groups.riscv.org>
-Cc: Anup Patel <Anup.Patel@wdc.com>, Damien Le Moal <Damien.LeMoal@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>, Jorge Campello De Souza <jorge.campello@wdc.com>, Palmer Dabbelt <palmer@sifive.com>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, Christoph Hellwig <hch@infradead.org>, "David.Abdurachmanov@cern.ch" <David.Abdurachmanov@cern.ch>, Bin Meng <bmeng.cn@gmail.com>, Alexander Graf <agraf@suse.de>, "olof.johansson@gmail.com" <olof.johansson@gmail.com>, "rminnich@gmail.com" <rminnich@gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-OpenSBI version 0.1 is now publicly available in GitHub at
-https://github.com/riscv/opensbi.
+On 01/31/19 19:55, Laszlo Ersek wrote:
 
-OpenSBI is an open source implementation of the RISC-V Supervisor Binary
-Interface (SBI). RISC-V SBI specifications are maintained as an 
-independent project by the RISC-V Foundation in [Github].
+> (4) IMPORTANT: did you make sure you didn't have an earlier *mis-built*
+> BaseTools directory in the submodule? For that, run "make clean" in the
+> QEMU project root.
 
-This initial release of OpenSBI provides an implementation of the RISC-V 
-SBI specifications version 0.1. These specifications define the legacy 
-SBI interface currently in use by various products as well as by RISC-V 
-QEMU virtual machines.
+Sorry, thinko above; the command to run is
 
-OpenSBI also implements SBI compliant early boot firmwares capable of 
-handling various boot flows and payloads on various environments. 
-OpenSBI firmwares have been tested with payloads such as U-Boot and 
-Linux kernel, showing that these open firmwares can fully replace the 
-legacy non-standard BBL intermediate boot loader.
+  make -C tests/uefi-test-tools clean
 
-The platforms supported with this first release are as follows.
-* Sifive HiFive Unleashed board
-* RISC-V QEMU *virt* and *sifive_u* virtual machines
-* Kendryte K210 SoC based boards.
+> Note that "git clean -ffdx" will *not* clean
+> submodules, when issued from the QEMU project root.
 
-OpenSBI implementation can be easily extended by RISC-V platform vendors 
-and System-on-Chip vendors to fit new hardware configurations.
-
-As SBI specifications evolve and extend beyond the current base legacy
-features, OpenSBI will be modified to provide a reference implementation 
-for new SBI specifications.
-
-More information on OpenSBI capabilities as well as a contribution 
-guideline are available in OpenSBI documentation included with the 
-source code in GitHub.
-
-[Github]: https://github.com/riscv/riscv-sbi-doc
+Thanks
+Laszlo
