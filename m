@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43690)
+Received: from eggs.gnu.org ([209.51.188.92]:43796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gp9YT-0007NS-8S
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1gp9YZ-0007TL-Df
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gp9YR-00013k-5p
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:45 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52323)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gp9YQ-00012K-Qh
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:42 -0500
-Received: by mail-wm1-f65.google.com with SMTP id m1so1887091wml.2
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:26:42 -0800 (PST)
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-14-crosa@redhat.com>
-	<3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
-	<79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <781af7d9-8e76-f431-ede3-549a69e01f1e@redhat.com>
-Date: Thu, 31 Jan 2019 11:26:39 +0100
+	(envelope-from <berrange@redhat.com>) id 1gp9YX-000186-3y
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51152)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gp9YV-00015t-9q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:47 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C3A189AE2
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 10:26:45 +0000 (UTC)
+Date: Thu, 31 Jan 2019 10:26:36 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190131102636.GE19982@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190130065530.6371-1-kraxel@redhat.com>
+	<20190130120422.GK15904@redhat.com>
+	<20190131074143.qw6thiywzrgq7etd@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test
- for mips64el + malta
+Content-Disposition: inline
+In-Reply-To: <20190131074143.qw6thiywzrgq7etd@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH] scripts: use git archive in archive-source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 
-On 1/31/19 2:34 AM, Cleber Rosa wrote:
-> On 1/22/19 5:57 AM, Philippe Mathieu-Daudé wrote:
->> On 1/17/19 7:56 PM, Cleber Rosa wrote:
->>> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
->>> board and verify the serial is working.
->>>
->>> If mips64el is a target being built, "make check-acceptance" will
->>> automatically include this test by the use of the "arch:mips" tags.
->>>
->>> Alternatively, this test can be run using:
->>>
->>>     $ avocado run -t arch:mips64el tests/acceptance
->>>     $ avocado run -t machine:malta tests/acceptance
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>> ---
->>>  .travis.yml                            |  2 +-
->>>  tests/acceptance/boot_linux_console.py | 39 ++++++++++++++++++++++++++
->>>  2 files changed, 40 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/.travis.yml b/.travis.yml
->>> index 49f9016e6a..28648f7a61 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -187,7 +187,7 @@ matrix:
->>>  
->>>      # Acceptance (Functional) tests
->>>      - env:
->>> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu"
->>> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu"
->>>          - TEST_CMD="make check-acceptance"
->>>        addons:
->>>          apt:
->>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->>> index 0678ec91d2..20b845fce1 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->>> @@ -9,8 +9,11 @@
->>>  # later.  See the COPYING file in the top-level directory.
->>>  
->>>  import logging
->>> +import os
->>>  
->>>  from avocado_qemu import Test
->>> +from avocado.utils import process
->>> +from avocado.utils import archive
->>>  
->>>  
->>>  class BootLinuxConsole(Test):
->>> @@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
->>>          self.vm.launch()
->>>          console_pattern = 'Kernel command line: %s' % kernel_command_line
->>>          self.wait_for_console_pattern(console_pattern)
->>> +
->>> +    def test_mips64el_malta(self):
->>> +        """
->>> +        This test requires the ar tool to extract "data.tar.gz" from
->>> +        the Debian package.
->>> +
->>> +        The kernel can be rebuilt using this Debian kernel source [1] and
->>> +        following the instructions on [2].
->>> +
->>> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
->>> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/#linux-source-2.6.32_2.6.32-48
->>> +
->>> +        :avocado: tags=arch:mips64el
->>> +        :avocado: tags=machine:malta
->>> +        """
->>> +        deb_url = ('http://snapshot.debian.org/archive/debian/20130217T032700Z/'
->>> +                   'pool/main/l/linux-2.6/'
->>> +                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb')
->>> +        deb_hash = '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
->>> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
->>> +
->>> +        cwd = os.getcwd()
->>> +        os.chdir(self.workdir)
->>> +        process.run("ar x %s data.tar.gz" % deb_path)
->>> +        archive.extract("data.tar.gz", self.workdir)
->>> +        os.chdir(cwd)
->>> +        kernel_path = self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta'
->>> +
->>> +        self.vm.set_machine('malta')
->>> +        self.vm.set_console()
->>> +        kernel_command_line = 'console=ttyS0 printk.time=0'
->>
->> What about having a generic KERNEL_COMMON_COMMAND_LINE='printk.time=0 '
->> then using
->>   kernel_command_line = KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
->> in each tests of this series?
->>
+On Thu, Jan 31, 2019 at 08:41:43AM +0100, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Not sure... I do like the fact that it's more uniform, but I don't like
-> the locality aspect.  Having to refer back to something defined either
-> in the module or class level for something so small is a big con, IMO.
+> > > +git archive --format tar $HEAD > "$tar_file"
+> > > +test $? -ne 0 && error "failed to archive qemu"
+> > >  for sm in $submodules; do
+> > > -    git submodule update --init $sm
+> > > -    test $? -ne 0 && error "failed to init submodule $sm"
+> > > +	git submodule update --init "$sm"
+> > 
+> > The current archive-source.sh code is careful to not touch the
+> > developer's current git checkout, because it runs  submodule
+> > update in a clone'd tree. The earlier patch hunk gets rid of the
+> > clone, so now submodule update is touching the developer's master
+> > git checkout. IMHO this is not acceptable - running tests (which
+> > use archive-source.sh) must never alter the developer's git checkout
+> > status in any way.
 > 
-> I'll keep it AS IS for now, and if more people feel like it's a good
-> idea, or you feel stronger that it's a good idea, I can add it in the
-> next version.
+> Can easily be fixed, the sha1 can be pulled out of "git submodule
+> status" instead of updating the submodules & use HEAD.
+> 
+> The only question is what to do best on uninitialized submodules.
+> Options are:
+>  * fetch the submodule into the developer tree (once).
 
-I'm fine with that, however I'd really like all the Linux tests to use
-"printk.time=0" in their kernel cmdline, it really simplify
-parsing/diffing the console output.
+As above, we shouldn't ever touch the developer's git state.
 
->>> +        self.vm.add_args('-kernel', kernel_path,
->>> +                         '-append', kernel_command_line)
->>> +        self.vm.launch()
->>> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
->>> +        self.wait_for_console_pattern(console_pattern)
->>>
-> 
+>  * clone the submodule into a temporary directory (each run).
+
+IMHO this is the only option
+
+>  * throw an error.
+
+Definitely don't want this, as an uninitialized submodule is going to
+be a common case for the 'dtc' module when people have the suitable
+version already on their host, so this would break the CI scripts.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
