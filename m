@@ -1,14 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42235)
+Received: from eggs.gnu.org ([209.51.188.92]:44331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gpBcf-0007w3-KI
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:39:14 -0500
+	(envelope-from <hsp.cat7@gmail.com>) id 1gpBmy-0001ct-Hy
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gpBcR-0005N5-Az
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:39:05 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 31 Jan 2019 14:38:10 +0200
-Message-Id: <20190131123810.10233-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] qtest.py: Wait for the result of qtest commands
+	(envelope-from <hsp.cat7@gmail.com>) id 1gpBmx-0008Pm-Ao
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:49:52 -0500
+MIME-Version: 1.0
+References: <56F356E9-04E0-4419-91BD-55CC91C853E1@gmail.com>
+In-Reply-To: <56F356E9-04E0-4419-91BD-55CC91C853E1@gmail.com>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Thu, 31 Jan 2019 13:49:12 +0100
+Message-ID: <CABLmASGpih1TTWS4eCuckv12RvExs_UaQ=rPU+danJTSXR8grg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-ppc] qemu_vga.drv missing 256 colors support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,67 +21,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The cmd() method of the QEMUQtestProtocol class sends a qtest command
-to QEMU but doesn't wait for the return message ("OK", "FAIL", "ERR").
-Because of this, it can return control to the caller before the
-command has actually finished.
+On Thu, Jan 31, 2019 at 12:12 PM Programmingkid <programmingkidx@gmail.com>
+wrote:
 
-In cases like clock_step or clock_set this means that cmd() can return
-before all the timers triggered by the clock change have been fired.
-This can be fixed by making cmd() wait for the output of the qtest
-command.
+> After testing a recent commit of QEMU I noticed that 256 color support is
+> missing in Mac OS 9's color options. A lot of games refuse to run without
+> being able to set the monitor to 256 colors. Could we have this option
+> added?
+>
+> Thank you.
+>
 
-This fixes iotests 093 and 136, which are flaky since commit
-8258292e18c39480b64eba9f3551 when the machine is under heavy workload.
+Hi,
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- scripts/qtest.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+An updated vga driver that supports 256 colours and reads edid info has
+been committed to dgibson's ppc-for-4.0 branch:
+https://github.com/dgibson/qemu/commit/4c693a81dbab9cecbf101c4c24e4b8af819df46c
 
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index adf1fe3f26..afac3fe900 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -31,6 +31,7 @@ class QEMUQtestProtocol(object):
-         """
-         self._address = address
-         self._sock = self._get_sock()
-+        self._sockfile = None
-         if server:
-             self._sock.bind(self._address)
-             self._sock.listen(1)
-@@ -49,6 +50,7 @@ class QEMUQtestProtocol(object):
-         @raise socket.error on socket connection errors
-         """
-         self._sock.connect(self._address)
-+        self._sockfile = self._sock.makefile()
- 
-     def accept(self):
-         """
-@@ -57,6 +59,7 @@ class QEMUQtestProtocol(object):
-         @raise socket.error on socket connection errors
-         """
-         self._sock, _ = self._sock.accept()
-+        self._sockfile = self._sock.makefile()
- 
-     def cmd(self, qtest_cmd):
-         """
-@@ -65,9 +68,12 @@ class QEMUQtestProtocol(object):
-         @param qtest_cmd: qtest command text to be sent
-         """
-         self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
-+        resp = self._sockfile.readline()
-+        return resp
- 
-     def close(self):
-         self._sock.close()
-+        self._sockfile.close()
- 
-     def settimeout(self, timeout):
-         self._sock.settimeout(timeout)
--- 
-2.11.0
+Best,
+Howard
