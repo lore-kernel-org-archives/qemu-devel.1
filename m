@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37886)
+Received: from eggs.gnu.org ([209.51.188.92]:39242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gp6z0-00052K-AM
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:41:58 -0500
+	(envelope-from <mahaocong@didiglobal.com>) id 1gp75I-0001oF-Em
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gp6yv-0000m5-W6
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:41:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gp6yv-0000kB-QR
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:41:53 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B681804F3
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 07:41:50 +0000 (UTC)
-Date: Thu, 31 Jan 2019 08:41:43 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190131074143.qw6thiywzrgq7etd@sirius.home.kraxel.org>
-References: <20190130065530.6371-1-kraxel@redhat.com>
-	<20190130120422.GK15904@redhat.com>
+	(envelope-from <mahaocong@didiglobal.com>) id 1gp75G-0006NE-Ie
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:28 -0500
+Received: from mx1.didichuxing.com ([111.202.154.82]:4557
+	helo=bsf02.didichuxing.com) by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <mahaocong@didiglobal.com>) id 1gp75F-0006HF-R7
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:26 -0500
+From: =?utf-8?B?6ams5piK6aqiKOa7tOa7tOS6kSk=?= <mahaocong@didiglobal.com>
+Date: Thu, 31 Jan 2019 07:48:11 +0000
+Message-ID: <4336BB25-5F66-482F-AC0F-38E07342D727@didichuxing.com>
+References: <20190131040154.3770-1-mahaocong_work@163.com>
+	<20190131040154.3770-2-mahaocong_work@163.com>
+	<38fb8b6a-25e1-f5fd-8921-edecbf4a21b9@redhat.com>
+In-Reply-To: <38fb8b6a-25e1-f5fd-8921-edecbf4a21b9@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <47EBDD6EF1910A42A263F37C31B0428D@didichuxing.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190130120422.GK15904@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scripts: use git archive in archive-source
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/1] drive-mirror: add
+ incremental mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-  Hi,
-
-> > +git archive --format tar $HEAD > "$tar_file"
-> > +test $? -ne 0 && error "failed to archive qemu"
-> >  for sm in $submodules; do
-> > -    git submodule update --init $sm
-> > -    test $? -ne 0 && error "failed to init submodule $sm"
-> > +	git submodule update --init "$sm"
-> 
-> The current archive-source.sh code is careful to not touch the
-> developer's current git checkout, because it runs  submodule
-> update in a clone'd tree. The earlier patch hunk gets rid of the
-> clone, so now submodule update is touching the developer's master
-> git checkout. IMHO this is not acceptable - running tests (which
-> use archive-source.sh) must never alter the developer's git checkout
-> status in any way.
-
-Can easily be fixed, the sha1 can be pulled out of "git submodule
-status" instead of updating the submodules & use HEAD.
-
-The only question is what to do best on uninitialized submodules.
-Options are:
- * fetch the submodule into the developer tree (once).
- * clone the submodule into a temporary directory (each run).
- * throw an error.
-
-cheers,
-  Gerd
+IEkgYW0gc28gc29ycnkgdGhhdCB0aGUgZm9ybWF0IHByb2JsZW0gaGFzIGNhdXNlZCB0cm91Ymxl
+IGZvciByZXZpZXdlcnMuIEkgYW0gdmVyeSB1bmZhbWlsaWFyIHdpdGggdGhlIHNwZWNpZmljYXRp
+b24sIGJ1dCBJIHdpbGwgdHJ5IG15IGJlc3QgdG8gY29ycmVjdCBpdC4gDQogQXMgZm9yIOKAmFNp
+Z25lZC1vZmYtYnnigJksIEkgZGlkbid0IHVuZGVyc3RhbmQgdGhlIG1lYW5pbmcgb2YgJ3NpZ25l
+ZC1vZmYtYnknIGF0IGZpcnN0LiBCdXQgbm93IEkgaGF2ZSBjcmVhdGVkIGFuIElEIG9mIG15c2Vs
+ZiBieSB1c2luZyBncGcsIGFuZCBhZGQgaXQgdG8gZ2l0IGNvbmZpZy4NCg0K5ZyoIDIwMTkvMS8z
+MSDkuIvljYgxMjozMu+8jOKAnEVyaWMgQmxha2XigJ08ZWJsYWtlQHJlZGhhdC5jb20+IOWGmeWF
+pToNCg0KICAgIE9uIDEvMzAvMTkgMTA6MDEgUE0sIG1haGFvY29uZyB3cm90ZToNCiAgICA+IEZy
+b206IG1haGFvY29uZyA8bWFoYW9jb25nQGRpZGljaHV4aW5nLmNvbT4NCiAgICA+IA0KICAgIA0K
+ICAgIFlvdSBhcmUgU1RJTEwgbWlzc2luZyB0aGUgY29tbWl0IG1lc3NhZ2UgYm9keSwgZXZlbiB0
+aG91Z2ggSSByZXF1ZXN0ZWQNCiAgICBpdCBbMV0uICBQbGVhc2UgJ2dpdCBjb21taXQgLS1hbWVu
+ZCcsIGFuZCBwYXN0ZSBpbiB0aGUgY29udGVudHMgdGhhdCB5b3UNCiAgICBhcmUgc3RpY2tpbmcg
+aW4geW91ciAwLzEgY292ZXIgbGV0dGVyIHRoYXQgYWN0dWFsbHkgZGVzY3JpYmUgdGhlIGRldGFp
+bHMNCiAgICBiZWhpbmQgdGhpcyBwYXRjaC4gQWxzbywgc2luY2UgeW91IGFyZSBzZW5kaW5nIGEg
+c2luZ2xlIHBhdGNoLCB5b3UgZG9uJ3QNCiAgICBuZWVkIGEgMC8xIGNvdmVyIGxldHRlciAodGhl
+eSBhcmUgbWFuZGF0b3J5IGlmIHlvdSBzZW5kIDIgb3IgbW9yZQ0KICAgIHBhdGNoZXMgaW4gc2Vy
+aWVzOyBidXQgZG9uJ3QgYWRkIGFueXRoaW5nIHdoZW4geW91IHNlbmQganVzdCBvbmUgcGF0Y2gs
+DQogICAgYWx0aG91Z2ggdGhleSBkb24ndCBodXJ0LCBhcyBsb25nIGFzIHlvdSBkbyBhIGNvcnJl
+Y3QgZGl2aXNpb24gYmV0d2Vlbg0KICAgIGNvdmVyIGxldHRlciBoYXZpbmcgaW5mb3JtYXRpb24g
+Zm9yIHRoZSByZXZpZXdlciBhbmQgcGF0Y2ggaXRzZWxmIGhhdmluZw0KICAgIGEgc2VsZi1jb250
+YWluZWQgY29tbWl0IG1lc3NhZ2UpLg0KICAgIA0KICAgIFsxXSBodHRwczovL2xpc3RzLmdudS5v
+cmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOS0wMS9tc2cwMDEyMi5odG1sDQogICAgDQog
+ICAgPiBTaWduZWQtb2ZmLWJ5OiBtYWhhb2NvbmcgPG1haGFvY29uZ0BkaWRpY2h1eGluZy5jb20+
+DQogICAgDQogICAgSSBwcmV2aW91c2x5IG1lbnRpb25lZCBbMl0gdGhhdCB5b3UgcHJvYmFibHkg
+d2FudCB0byB1c2UgYSBwcm9wZXIgbmFtZQ0KICAgICh0eXBpY2FsbHkgbW9yZSB0aGFuIG9uZSB3
+b3JkKSwgbm90IGEgdXNlcm5hbWUuIFdoaWxlIEkgYW0gbm90IGluIGENCiAgICBwb3NpdGlvbiB0
+byBhcmd1ZSB3aGV0aGVyICdtYWhhb2NvbmcnIGlzIGhvdyB5b3Ugc2lnbiBsZWdhbCBkb2N1bWVu
+dHMsDQogICAgb3Igd2hhdCB5b3UgbWF5IHVzZSBpbiBvdGhlciBvcGVuIHNvdXJjZSBwcm9qZWN0
+cywgaXQgaXMgYXQgbGVhc3QNCiAgICBjb3VydGVvdXMgdG8gcmVwbHkgdG8gYSByZXZpZXdlcidz
+IHJlcXVlc3Qgd2hlbiBzdGF0aW5nIHRoYXQgeW91IGFyZQ0KICAgIGludGVudGlvbmFsbHkgbm90
+IGdvaW5nIHRvIGRvIHNvbWV0aGluZyBhYm91dCB0aGUgcmVxdWVzdC4NCiAgICANCiAgICBbMl0g
+aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNn
+MDA0MDcuaHRtbA0KICAgIA0KICAgID4gLS0tDQogICAgDQogICAgSGVyZSwgYWZ0ZXIgdGhlIC0t
+LSBtYXJrZXIsIGlzIGEgZ29vZCBwbGFjZSB0byBkZXNjcmliZSBob3cgdjMgZGlmZmVycw0KICAg
+IGZyb20gdjIsIHRvIHNwZWVkIHVwIHJldmlld2VycyBlZmZvcnRzIGlmIHRoZXkgaGF2ZSBhbHJl
+YWR5IGxvb2tlZCBhdA0KICAgIHRoZSBlYXJsaWVyIHZlcnNpb24sIGFuZCB3YW50IHRvIHNlZSB3
+aGF0IHlvdSBjaGFuZ2VkIGluIHJlc3BvbnNlIHRvDQogICAgdGhlaXIgY29tbWVudHMuDQogICAg
+DQogICAgSnVzdCBhIFVJIHJldmlldyBvbiBteSBwYXJ0IChJIGhhdmVuJ3QgbG9va2VkIGF0IHRo
+ZSBjb2RlIHByb3BlciwgaW4NCiAgICBwYXJ0IGJlY2F1c2UgSSdtIHN0aWxsIHdhaXRpbmcgZm9y
+IHlvdSB0byBmaXggdGhlIGNvbW1pdCBtZXNzYWdlIHByb2JsZW0NCiAgICAtIGl0J3MgdG91Z2gg
+dG8ganVzdGlmeSByZXZpZXdpbmcgaW4gbW9yZSBkZXB0aCB3aGVuIHRoZXJlIGFyZSB0aGluZ3MN
+CiAgICBmcm9tIHRoZSBlYXJsaWVyIHZlcnNpb24gdGhhdCBhcmUgc3RpbGwgbm90IGNvcnJlY3Rl
+ZCkNCiAgICANCiAgICA+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQogICAgPiBAQCAtMTcy
+Nyw2ICsxNzI3LDExIEBADQogICAgPiAgIyAgICAgICAgKGFsbCB0aGUgZGlzaywgb25seSB0aGUg
+c2VjdG9ycyBhbGxvY2F0ZWQgaW4gdGhlIHRvcG1vc3QgaW1hZ2UsIG9yDQogICAgPiAgIyAgICAg
+ICAgb25seSBuZXcgSS9PKS4NCiAgICA+ICAjDQogICAgPiArIyBAYml0bWFwOiB0aGUgbmFtZSBv
+ZiB1c2VyLWNyZWF0ZWQtYml0bWFwIHdoaWNoIGlzIHVzZWQgb24gaW5jcmVtZW50YWwgbW9kZQ0K
+ICAgID4gKyMgICAgICAgICAgZHJpdmUtbWlycm9yLiBJZiB1c2VyIHNlbGVjdCBpbmNyZW1lbnRh
+bCBtb2RlLCBiaXRtYXAgc2hvdWxkIG5vdCBiZQ0KICAgID4gKyMgICAgICAgICAgbnVsbCwgYW5k
+IGNhbiBub3Qgc2V0IGdyYW51bGFyaXR5LCBiZWNhdXNlIHRoZSBtaXJyb3IgYml0bWFwIHNob3Vs
+ZA0KICAgID4gKyMgICAgICAgICAgaGF2ZSB0aGUgc2FtZSBncmFudWxhcml0eSB3aXRoIHVzZXIt
+Y3JlYXRlZC1iaXRtYXAuDQogICAgDQogICAgTWlzc2luZyBhICcoc2luY2UgNC4wKScgdGFnLiBU
+aGUgZ3JhbW1hciBpcyBhd2t3YXJkOyBtYXliZToNCiAgICANCiAgICBAYml0bWFwOiB0aGUgbmFt
+ZSBvZiBhIHByZS1leGlzdGluZyBiaXRtYXAgdG8gdXNlIGluIGluY3JlbWVudGFsIG1vZGU7DQog
+ICAgbXVzdCBiZSBwcmVzZW50IGZvciBpbmNyZW1lbnRhbCBtb2RlIGFuZCBhYnNlbnQgb3RoZXJ3
+aXNlLiBJbg0KICAgIGluY3JlbWVudGFsIG1vZGUsIGdyYW51bGFyaXR5IHNob3VsZCBub3QgYmUg
+c2V0LCBiZWNhdXNlIHRoZSBiaXRtYXAncw0KICAgIGdyYW51bGFyaXR5IGlzIHVzZWQgaW5zdGVh
+ZC4NCiAgICANCiAgICAtLSANCiAgICBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5n
+aW5lZXINCiAgICBSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyMjYNCiAgICBW
+aXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCiAgICANCiAgICANCg0K
