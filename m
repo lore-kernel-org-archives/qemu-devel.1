@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46187)
+Received: from eggs.gnu.org ([209.51.188.92]:46422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpGHA-00046y-99
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:37:20 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gpGIj-0004qV-Bk
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpGH8-0003Xq-SK
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:37:19 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54086)
+	(envelope-from <sgarzare@redhat.com>) id 1gpGIi-0004Lq-HG
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:57 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34605)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gpGH8-0003Wx-5v
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:37:18 -0500
-Received: by mail-wm1-f65.google.com with SMTP id d15so3405113wmb.3
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 09:37:17 -0800 (PST)
-Date: Thu, 31 Jan 2019 18:37:13 +0100
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gpGIi-0004LC-A5
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:56 -0500
+Received: by mail-wr1-f66.google.com with SMTP id f7so4321783wrp.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 09:38:56 -0800 (PST)
+Date: Thu, 31 Jan 2019 18:38:52 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190131173713.rmhunuvbhhnbjc2r@steredhat>
+Message-ID: <20190131173852.dxv44lcv2ql2mbam@steredhat>
 References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-3-sgarzare@redhat.com>
-	<20190131154038.GH2870@work-vm>
-	<20190131155046.djju3av73ufzfj6p@steredhat>
-	<20190131114139-mutt-send-email-mst@kernel.org>
+	<20190131121412-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190131114139-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
- boolean property
+In-Reply-To: <20190131121412-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] virtio-blk: add DISCARD and WRITE
+ ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +31,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 
-On Thu, Jan 31, 2019 at 11:43:07AM -0500, Michael S. Tsirkin wrote:
-> On Thu, Jan 31, 2019 at 04:50:46PM +0100, Stefano Garzarella wrote:
-> > On Thu, Jan 31, 2019 at 03:40:38PM +0000, Dr. David Alan Gilbert wrote:
-> > > * Stefano Garzarella (sgarzare@redhat.com) wrote:
-> > > > In order to avoid migration issues, we enable DISCARD and
-> > > > WRITE ZEROES features only for machine type >= 4.0
-> > > > 
-> > > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > ---
-> > > >  hw/block/virtio-blk.c          | 2 ++
-> > > >  hw/core/machine.c              | 1 +
-> > > >  include/hw/virtio/virtio-blk.h | 1 +
-> > > >  3 files changed, 4 insertions(+)
-> > > > 
-> > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > > > index 8a6754d9a2..542ec52536 100644
-> > > > --- a/hw/block/virtio-blk.c
-> > > > +++ b/hw/block/virtio-blk.c
-> > > > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
-> > > >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-> > > >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-> > > >                       IOThread *),
-> > > > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
-> > > > +                     true),
-> > > 
-> > > I think that's OK, but do you really want a DEFINE_PROP_BOOL and
-> > > a bool discard_wzeroes?
-> > > I think DEFINE_PROP_BIT is mostly used for a flag word where each
-> > > property is one more bit in the field.
-> > > 
-> > > Dave
-> > > 
+On Thu, Jan 31, 2019 at 12:15:17PM -0500, Michael S. Tsirkin wrote:
+> On Thu, Jan 31, 2019 at 04:19:09PM +0100, Stefano Garzarella wrote:
+> > This series adds the support of DISCARD and WRITE ZEROES commands
+> > and extends the virtio-blk-test to test WRITE_ZEROES command when
+> > the feature is enabled.
 > > 
-> > Hi Dave,
-> > I was in doubt if to use DEFINE_PROP_BIT or DEFINE_PROP_BOOL, but
-> > looking in the virtio-blk.c, I found that also other boolean like
-> > "config-wce", "scsi", and "request-merging" was defined with
-> > DEFINE_PROP_BIT, so I followed this trand.
+> > v2:
+> > - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
+> > - added patch 2 to make those new features machine-type dependent (thanks David)
+> > - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_start()
+> >                 for WRITE_ZEROES requests, and configurable parameters to
+> >                 initialize the limits (max_sectors, wzeroes_may_unmap).
+> >                 (thanks Stefan)
+> >                 I moved in a new function the code to handle a single segment,
+> >                 in order to simplify the support of multiple segments in the
+> >                 future.
+> > - added patch 4 to change the assert on data_size following the discussion with
+> >                 Thomas, Changpeng, Michael, and Stefan (thanks all)
+> > - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable instead of
+> >                 dynamic allocation (thanks Thomas)
 > > 
-> > But I agree with you, DEFINE_PROP_BOOL should be better, so I will change it!
+> > This series requires the new virtio headers from linux v5.0-rc1
+> > already imported by Paolo:
+> > 
+> > Based-on: <20190104082731.24967-1-pbonzini@redhat.com>
 > > 
 > > Thanks,
 > > Stefano
 > 
-> I wonder why doesn't virtio-blk set bits directly in host_features?
-> For example this is how virtio-net does it.
-> This would remove the need for virtio_add_feature calls.
+> series:
+> 
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> 
+> merge through block tree I guess?
+> 
 
-Maybe this should be the best approach!
+I guess too.
 
-What do you think if I send a trivial patch to add host_features
-variable like for virtio-net and change the "config_wce" and "scsi" definition?
-Then I will change also this patch to set directly the bits.
+Thanks for the review!
 
-Thanks,
 Stefano
