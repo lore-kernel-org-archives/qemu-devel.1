@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37112)
+Received: from eggs.gnu.org ([209.51.188.92]:37298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpHJm-00053A-1l
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpHKU-0005iZ-Oj
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpHJk-0003H7-6A
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:05 -0500
-Resent-Message-Id: <E1gpHJk-0003H7-6A@eggs.gnu.org>
-Message-ID: <154896022558.23946.4116317329810492122@ebba9967afc0>
-In-Reply-To: <20190121170731.2500692-1-stefanb@linux.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gpHKT-0003rG-0S
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:50 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-9-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5c615324-9f4d-9a7d-b659-84185574a750@redhat.com>
+Date: Thu, 31 Jan 2019 12:44:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 10:43:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] TPM patches for stable-3.0.0 (v3.0.1)
+In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X"
+Subject: Re: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanb@linux.ibm.com
-Cc: fam@euphon.net, qemu-stable@nongnu.org, mdroth@linux.ibm.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMTE3MDczMS4yNTAw
-NjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gVFBNIHBh
-dGNoZXMgZm9yIHN0YWJsZS0zLjAuMCAodjMuMC4xKQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDog
-MjAxOTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxOTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbSAtPiBwYXRj
-aGV3LzIwMTkwMTIxMTcwNzMxLjI1MDA2OTItMS1zdGVmYW5iQGxpbnV4LmlibS5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyZWUzY2E5MDhjIE1lcmdlIHJlbW90ZS10cmFja2lu
-ZyBicmFuY2ggJ3JlbW90ZXMva3JheGVsL3RhZ3MvdXNiLTIwMTkwMTMwLXB1bGwtcmVxdWVzdCcg
-aW50byBzdGFnaW5nCmRjNWUwNDE5NzYgdXNiLW10cDogcmVwbGFjZSB0aGUgaG9tZWJyZXcgd3Jp
-dGUgd2l0aCBxZW11X3dyaXRlX2Z1bGwKODhmYTQwMjhjNyB1c2ItbXRwOiBicmVha3VwIE1UUCB3
-cml0ZSBpbnRvIHNtYWxsZXIgY2h1bmtzCmE4ZjUyYWEyOTYgdXNiLW10cDogUmVhbGxvY2F0ZSBi
-dWZmZXIgaW4gbXVsdGlwbGVzIG9mIE1UUF9XUklURV9CVUZfU1oKYzg2NDdlNTliZiB1c2I6IGlt
-cGxlbWVudCBYSENJIHVuZGVycnVuL292ZXJydW4gZXZlbnRzCmE3ZDEwNTQ2MzMgdXNiOiBYSENJ
-IHNoYWxsIG5vdCBoYWx0IGlzb2Nocm9ub3VzIGVuZHBvaW50cwo1MTUyOGMzNjFlIGh3L3VzYjog
-Rml4IExHUEwgaW5mb3JtYXRpb24gaW4gdGhlIGZpbGUgaGVhZGVycwowZjY5YjA1Y2M3IHVzYjog
-ZGV2LW10cDogY2xvc2UgZmQgaW4gdXNiX210cF9vYmplY3RfcmVhZGRpcigpCjFhMzRlY2U5NWQg
-dXNiOiBhc3NpZ24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IDFhMzRlY2U5NWQzMyAodXNiOiBhc3Np
-Z24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzKQoyLzggQ2hlY2tpbmcgY29t
-bWl0IDBmNjliMDVjYzc3YyAodXNiOiBkZXYtbXRwOiBjbG9zZSBmZCBpbiB1c2JfbXRwX29iamVj
-dF9yZWFkZGlyKCkpCjMvOCBDaGVja2luZyBjb21taXQgNTE1MjhjMzYxZTI4IChody91c2I6IEZp
-eCBMR1BMIGluZm9ybWF0aW9uIGluIHRoZSBmaWxlIGhlYWRlcnMpCjQvOCBDaGVja2luZyBjb21t
-aXQgYTdkMTA1NDYzMzYwICh1c2I6IFhIQ0kgc2hhbGwgbm90IGhhbHQgaXNvY2hyb25vdXMgZW5k
-cG9pbnRzKQo1LzggQ2hlY2tpbmcgY29tbWl0IGM4NjQ3ZTU5YmYzMyAodXNiOiBpbXBsZW1lbnQg
-WEhDSSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cykKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
-bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzODogRklMRTogaHcvdXNiL2hjZC14aGNpLmM6MTk2MDoK
-KyAgICAgICAgICAgICAgICB4aGNpX2V2ZW50KHhoY2ksICZldiwgeGhjaS0+c2xvdHNbZXBjdHgt
-PnNsb3RpZC0xXS5pbnRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJy0nIChjdHg6VnhWKQojNDc6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIwNDE6Cisg
-ICAgeGhjaS0+c2xvdHNbc2xvdGlkLTFdLmludHIgPSAwOwogICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjY6
-IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIzMTY6CisgICAgICAgIHhoY2ktPnNsb3RzW3Nsb3Rp
-ZC0xXS5pbnRyID0gZ2V0X2ZpZWxkKGlzbG90X2N0eFsyXSwgVFJCX0lOVFIpOwogICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICct
-JyAoY3R4OlZ4VikKIzY3OiBGSUxFOiBody91c2IvaGNkLXhoY2kuYzoyMzE3OgorICAgICAgICBz
-ZXRfZmllbGQoJnNsb3RfY3R4WzJdLCB4aGNpLT5zbG90c1tzbG90aWQtMV0uaW50ciwgVFJCX0lO
-VFIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-Cgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUv
-OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi84IENoZWNraW5nIGNvbW1pdCBhOGY1MmFh
-Mjk2ZTcgKHVzYi1tdHA6IFJlYWxsb2NhdGUgYnVmZmVyIGluIG11bHRpcGxlcyBvZiBNVFBfV1JJ
-VEVfQlVGX1NaKQo3LzggQ2hlY2tpbmcgY29tbWl0IDg4ZmE0MDI4YzcyMCAodXNiLW10cDogYnJl
-YWt1cCBNVFAgd3JpdGUgaW50byBzbWFsbGVyIGNodW5rcykKOC84IENoZWNraW5nIGNvbW1pdCBk
-YzVlMDQxOTc2OWUgKHVzYi1tdHA6IHJlcGxhY2UgdGhlIGhvbWVicmV3IHdyaXRlIHdpdGggcWVt
-dV93cml0ZV9mdWxsKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDE5MDEyMTE3MDczMS4yNTAwNjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tL3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <5c615324-9f4d-9a7d-b659-84185574a750@redhat.com>
+Subject: Re: [RFC PATCH 08/11] qcow2: Add basic data-file infrastructure
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-9-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/31/19 11:55 AM, Kevin Wolf wrote:
+> This adds a .bdrv_open option to specify the external data file node.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json |  3 ++-
+>  block/qcow2.h        |  4 +++-
+>  block/qcow2.c        | 25 +++++++++++++++++++++++--
+>  3 files changed, 28 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 7f6b4b3ddd..fc46396079 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2928,7 +2928,8 @@
+>              '*l2-cache-entry-size': 'int',
+>              '*refcount-cache-size': 'int',
+>              '*cache-clean-interval': 'int',
+> -            '*encrypt': 'BlockdevQcow2Encryption' } }
+> +            '*encrypt': 'BlockdevQcow2Encryption',
+> +            '*data-file': 'BlockdevRef' } }
+
+Missing docs and a '(since 4.0)' tag. Then again, it's still RFC, so
+that's understandable for this draft.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxTQgYACgkQp6FrSiUn
+Q2qkXgf+JiBAL788JDlaZXMokpyr1x++HJ3NJtkR6lwMRZcLuGAM1xPQfWdp2Xqf
+wkCttwcY8pBzLnuqXwOT4rWC/zs94QzUyfyMC1cMUnPxl7kH3lA8JPWe6DFN0Sfv
+6q3hzm67zBXyFPYJCsXlFy7mti/tFTZbPAEQ2lUCzzt18sOcnUPuF+0y20/sdYZ3
+QZshVERhQ38f183OnM2ZzognSd5YeQpwuLZDP989s5id3n2u4XWtxZf9C/LqBaED
+29JY9UzC7i/peFHK2qwUhbawKQUfOFdoPDapBi+79FIraMBIRrZ3LbfeEaVJMYQC
+x+S9Wlpda0hsSEM5eD3SMV2TtGOqyA==
+=NAzP
+-----END PGP SIGNATURE-----
+
+--YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X--
