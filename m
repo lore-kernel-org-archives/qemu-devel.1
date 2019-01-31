@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39905)
+Received: from eggs.gnu.org ([209.51.188.92]:40036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gp78R-0004QA-MT
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gp79R-00058E-KW
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gp78Q-0008OH-Od
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gp78Q-0008NT-H9
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:42 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8678288E5A
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 07:51:40 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 31 Jan 2019 08:51:32 +0100
-Message-Id: <20190131075132.17706-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] scripts: use git archive in archive-source
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gp79Q-0000T2-TF
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:52:45 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 31 Jan 2019 07:52:34 +0000
+Message-ID: <6873a89c-125a-267c-a0b1-da6594891eb6@virtuozzo.com>
+References: <1de57808-bd1d-e8a7-89b3-a08873c77346@virtuozzo.com>
+	<4e3bec22-47f6-12b2-ba64-b9d310c6e0d6@redhat.com>
+In-Reply-To: <4e3bec22-47f6-12b2-ba64-b9d310c6e0d6@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D61014779D4B7541B9312C1CF1BC970D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] job_pause_point
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-Use git archive to create tarballs of qemu and submodules instead of
-cloning the repository and the submodules.  This is a order of magnitude
-faster because it doesn't fetch the submodules from the internet each
-time the script runs.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
-
-Notes:
-    v2: don't run git submodule update (except for uninitialized submodules)
-
- scripts/archive-source.sh | 58 ++++++++++++++++++-----------------------------
- 1 file changed, 22 insertions(+), 36 deletions(-)
-
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 6eed2a29bd..b9711059f9 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -19,8 +19,7 @@ if test $# -lt 1; then
- fi
- 
- tar_file=$(realpath "$1")
--list_file="${tar_file}.list"
--vroot_dir="${tar_file}.vroot"
-+sub_file=$(mktemp "${tar_file%.tar}.sub.XXXXXXXX.tar")
- 
- # We want a predictable list of submodules for builds, that is
- # independent of what the developer currently has initialized
-@@ -28,7 +27,7 @@ vroot_dir="${tar_file}.vroot"
- # different to the host OS.
- submodules="dtc ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
- 
--trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
-+trap "status=$?; rm -rf \"$sub_file\" ; exit \$status" 0 1 2 3 15
- 
- if git diff-index --quiet HEAD -- &>/dev/null
- then
-@@ -36,38 +35,25 @@ then
- else
-     HEAD=$(git stash create)
- fi
--git clone --shared . "$vroot_dir"
--test $? -ne 0 && error "failed to clone into '$vroot_dir'"
--
--cd "$vroot_dir"
--test $? -ne 0 && error "failed to change into '$vroot_dir'"
--
--git checkout $HEAD
--test $? -ne 0 && error "failed to checkout $HEAD revision"
--
-+git archive --format tar $HEAD > "$tar_file"
-+test $? -ne 0 && error "failed to archive qemu"
- for sm in $submodules; do
--    git submodule update --init $sm
--    test $? -ne 0 && error "failed to init submodule $sm"
-+	status="$(git submodule status "$sm")"
-+	smhash="${status# }"
-+	smhash="${smhash#+}"
-+	smhash="${smhash#-}"
-+	smhash="${smhash%% *}"
-+	case "$status" in
-+	    -*)
-+		echo "NOTICE: fetching submodule $sm"
-+		git submodule update --init "$sm"
-+		;;
-+	    +*)
-+		echo "WARNING: submodule $sm is out of sync"
-+		;;
-+	esac
-+	(cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
-+	test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
-+	tar --concatenate --file "$tar_file" "$sub_file"
-+	test $? -ne 0 && error "failed append submodule $sm to $tar_file"
- done
--
--if test -n "$submodules"; then
--    {
--        git ls-files || error "git ls-files failed"
--        for sm in $submodules; do
--            (cd $sm; git ls-files) | sed "s:^:$sm/:"
--            if test "${PIPESTATUS[*]}" != "0 0"; then
--                error "git ls-files in submodule $sm failed"
--            fi
--        done
--    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
--else
--    git ls-files > "$list_file"
--fi
--
--if test $? -ne 0; then
--    error "failed to generate list file"
--fi
--
--tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
--
--exit 0
--- 
-2.9.3
+MzAuMDEuMjAxOSAyMjo1OCwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDEvMzAvMTkg
+ODo1OCBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEhpIQ0KPj4N
+Cj4+IEkgaGF2ZSBhIHF1ZXN0aW9uIGFib3V0IGpvYl9wYXVzZV9wb2ludC4gTm93IGEgZ29vZCBq
+b2Igb2YgbW92aW5nIGdlbmVyaWMgdGhpbmdzIGFib3V0DQo+PiBibG9jay1qb2JzIHRvIGpvYi5j
+IGlzIGRvbmUuLg0KPj4NCj4+IGpvYl9wYXVzZV9wb2ludCBkbyB2aXNpYmxlIGpvYi1zdGF0ZSBj
+aGFuZ2UsIGFzIGNoYW5naW5nIGpvYi0+c3RhdHVzIGFuZCBqb2ItPnBhdXNlZC4NCj4+DQo+PiBJ
+cyBpdCBhc3N1bWVkLCB0aGF0IGpvYiBkb24ndCBkbyBhbnl0aGluZyBhZnRlciB0aGF0IHN0YXRl
+IGNoYW5nZT8gSW90ZXN0cyBhcmUgd3JpdHRlbg0KPj4gZXhhY3RseSB3aXRoIHRoaXMgYXNzdW1w
+dGlvbi4gT24gdGhlIG90aGVyIGhhbmQsIGNvZGUgZG9uJ3QgZ3VhcmFudGVlLCB0aGF0IGFsbCBp
+bi1mbGlnaHQNCj4+IHJlcXVlc3RzIGFyZSBmaW5pc2hlZCB0byB0aGlzIHBvaW50Lg0KPj4NCj4g
+DQo+IE9oLCByaWdodC4gVGhlIGpvYiBiZWluZyBwYXVzZWQgb25seSBjZXJ0aWZpZXMgdGhhdCB0
+aGUgY29yb3V0aW5lDQo+IGRyaXZpbmcgdGhlIGpvYiBpc24ndCBydW5uaW5nLiBJdCBoYXMgbm8g
+cmVhbCBpZGVhIGFib3V0IG1pcnJvcidzDQo+IGFzeW5jaHJvbm91cyBjaGlsZHJlbi4NCj4gDQo+
+PiBNb3Jlb3Zlciwgb25seSB0aGUgam9iIGl0c2VsZiBrbm93cyBhYm91dCBpdCdzIGluLWZsaWdo
+dCByZXF1ZXN0cywgdGhlcmVmb3JlIHdlIGNhbid0DQo+PiBoYW5kbGUgaXQgaW4gZ2VuZXJpYyBq
+b2JfcGF1c2VfcG9pbnQoKS4gU28sIHNob3VsZCBub3Qgam9iIGRvIHNvbWV0aGluZyBsaWtlDQo+
+Pg0KPj4gaWYgKGpvYl9zaG91bGRfcGF1c2UoKSkgew0KPj4gICAgICBkb24ndCBjcmVhdGUgbW9y
+ZSByZXF1ZXN0cw0KPj4gICAgICB3YWl0IGFsbCBpbi1mbGlnaHQgcmVxdWVzdHMgdG8gY29tcGxl
+dGUNCj4+IH0NCj4+IGpvYl9wYXVzZV9wb2ludCgpDQo+Pg0KPj4gT3IgZGlkbid0IEkgbWlzcyB0
+aGVzZSB0aGluZ3MgYWxyZWFkeSBkaXNjdXNzZWQ/DQo+Pg0KPiANCj4gV2VsbCwgbWlycm9yJ3Mg
+cGF1c2UgY2FsbGJhY2sgZG9lcyB0aGlzOg0KPiANCj4gc3RhdGljIHZvaWQgY29yb3V0aW5lX2Zu
+IG1pcnJvcl9wYXVzZShKb2IgKmpvYikNCj4gew0KPiAgICAgIE1pcnJvckJsb2NrSm9iICpzID0g
+Y29udGFpbmVyX29mKGpvYiwgTWlycm9yQmxvY2tKb2IsIGNvbW1vbi5qb2IpOw0KPiANCj4gICAg
+ICBtaXJyb3Jfd2FpdF9mb3JfYWxsX2lvKHMpOw0KPiB9DQo+IA0KPiBUaGF0J3MgaW52b2tlZCBC
+RUZPUkUgd2UgY2hhbmdlIG91ciBzdGF0dXMuIFRoYXQgb3VnaHQgdG8gYmUgc3VmZmljaWVudCwN
+Cj4gaXMgaXQgbm90Pw0KPiANCj4gLS1qcw0KPiANCg0KT2gsIHllcywgc2VlbXMgdGhhdCBpdCBp
+cyB3aGF0IEkgbWlzc2VkLCB0aGFuayB5b3UuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
+aXINCg==
