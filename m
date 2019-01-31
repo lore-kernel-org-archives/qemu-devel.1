@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37572)
+Received: from eggs.gnu.org ([209.51.188.92]:37702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0i8-00083E-7w
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0iW-0008UW-CU
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0i5-0007kL-UD
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:07 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0iR-0008Oj-R7
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:29 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 31 Jan 2019 01:59:37 +0100
-Message-Id: <20190131005945.20149-6-mreitz@redhat.com>
+Date: Thu, 31 Jan 2019 01:59:39 +0100
+Message-Id: <20190131005945.20149-8-mreitz@redhat.com>
 In-Reply-To: <20190131005945.20149-1-mreitz@redhat.com>
 References: <20190131005945.20149-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/13] block/file-posix: Convert from DPRINTF()
- macro to trace events
+Subject: [Qemu-devel] [PULL 07/13] qemu-io: Add generic function for
+ reinitializing optind.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +26,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20181213162727.17438-4-lvivier@redhat.com
+On FreeBSD 11.2:
+
+  $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512" =
+$nbd'
+  Parsing error: non-numeric argument, or extraneous/unrecognized suffix =
+-- aio_write
+
+After main option parsing, we reinitialize optind so we can parse each
+command.  However reinitializing optind to 0 does not work on FreeBSD.
+What happens when you do this is optind remains 0 after the option
+parsing loop, and the result is we try to parse argv[optind] =3D=3D
+argv[0] =3D=3D "aio_write" as if it was the first parameter.
+
+The FreeBSD manual page says:
+
+  In order to use getopt() to evaluate multiple sets of arguments, or to
+  evaluate a single set of arguments multiple times, the variable optrese=
+t
+  must be set to 1 before the second and each additional set of calls to
+  getopt(), and the variable optind must be reinitialized.
+
+(From the rest of the man page it is clear that optind must be
+reinitialized to 1).
+
+The glibc man page says:
+
+  A program that scans multiple argument vectors,  or  rescans  the  same
+  vector  more than once, and wants to make use of GNU extensions such as
+  '+' and '-' at  the  start  of  optstring,  or  changes  the  value  of
+  POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetting
+  optind to 0, rather than the traditional value of 1.  (Resetting  to  0
+  forces  the  invocation  of  an  internal  initialization  routine that
+  rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)
+
+This commit introduces an OS-portability function called
+qemu_reset_optind which provides a way of resetting optind that works
+on FreeBSD and platforms that use optreset, while keeping it the same
+as now on other platforms.
+
+Note that the qemu codebase sets optind in many other places, but in
+those other places it's setting a local variable and not using getopt.
+This change is only needed in places where we are using getopt and the
+associated global variable optind.
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Message-id: 20190118101114.11759-2-rjones@redhat.com
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/file-posix.c | 25 ++++++-------------------
- block/trace-events |  7 +++++++
- 2 files changed, 13 insertions(+), 19 deletions(-)
+ configure            | 14 ++++++++++++++
+ include/qemu/osdep.h | 16 ++++++++++++++++
+ qemu-img.c           |  2 +-
+ qemu-io-cmds.c       |  2 +-
+ 4 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 8aee7a3fb8..ba6ab62a38 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -102,19 +102,7 @@
- #include <xfs/xfs.h>
- #endif
+diff --git a/configure b/configure
+index b18281c61f..831d26d4ae 100755
+--- a/configure
++++ b/configure
+@@ -4269,6 +4269,17 @@ if compile_prog "" "" ; then
+   signalfd=3Dyes
+ fi
 =20
--//#define DEBUG_BLOCK
--
--#ifdef DEBUG_BLOCK
--# define DEBUG_BLOCK_PRINT 1
--#else
--# define DEBUG_BLOCK_PRINT 0
--#endif
--#define DPRINTF(fmt, ...) \
--do { \
--    if (DEBUG_BLOCK_PRINT) { \
--        printf(fmt, ## __VA_ARGS__); \
--    } \
--} while (0)
-+#include "trace.h"
-=20
- /* OS X does not have O_DSYNC */
- #ifndef O_DSYNC
-@@ -1411,7 +1399,7 @@ static int xfs_write_zeroes(BDRVRawState *s, int64_=
-t offset, uint64_t bytes)
-=20
-     if (xfsctl(NULL, s->fd, XFS_IOC_ZERO_RANGE, &fl) < 0) {
-         err =3D errno;
--        DPRINTF("cannot write zero range (%s)\n", strerror(errno));
-+        trace_file_xfs_write_zeroes(strerror(errno));
-         return -err;
-     }
-=20
-@@ -1430,7 +1418,7 @@ static int xfs_discard(BDRVRawState *s, int64_t off=
-set, uint64_t bytes)
-=20
-     if (xfsctl(NULL, s->fd, XFS_IOC_UNRESVSP64, &fl) < 0) {
-         err =3D errno;
--        DPRINTF("cannot punch hole (%s)\n", strerror(errno));
-+        trace_file_xfs_discard(strerror(errno));
-         return -err;
-     }
-=20
-@@ -2819,7 +2807,7 @@ static char *FindEjectableOpticalMedia(io_iterator_=
-t *mediaIterator)
-=20
-         /* If a match was found, leave the loop */
-         if (*mediaIterator !=3D 0) {
--            DPRINTF("Matching using %s\n", matching_array[index]);
-+            trace_file_FindEjectableOpticalMedia(matching_array[index]);
-             mediaType =3D g_strdup(matching_array[index]);
-             break;
-         }
-@@ -2879,7 +2867,7 @@ static bool setup_cdrom(char *bsd_path, Error **err=
-p)
-     if (partition_found =3D=3D false) {
-         error_setg(errp, "Failed to find a working partition on disc");
-     } else {
--        DPRINTF("Using %s as optical disc\n", test_partition);
-+        trace_file_setup_cdrom(test_partition);
-         pstrcpy(bsd_path, MAXPATHLEN, test_partition);
-     }
-     return partition_found;
-@@ -2974,8 +2962,7 @@ static bool hdev_is_sg(BlockDriverState *bs)
-=20
-     ret =3D ioctl(s->fd, SG_GET_SCSI_ID, &scsiid);
-     if (ret >=3D 0) {
--        DPRINTF("SG device found: type=3D%d, version=3D%d\n",
--            scsiid.scsi_type, sg_version);
-+        trace_file_hdev_is_sg(scsiid.scsi_type, sg_version);
-         return true;
-     }
-=20
-diff --git a/block/trace-events b/block/trace-events
-index 8ea8d1eaeb..41b998b7eb 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -186,3 +186,10 @@ curl_open(const char *file) "opening %s"
- curl_open_size(uint64_t size) "size =3D %" PRIu64
- curl_setup_preadv(uint64_t bytes, uint64_t start, const char *range) "re=
-ading %" PRIu64 " at %" PRIu64 " (%s)"
- curl_close(void) "close"
++# check if optreset global is declared by <getopt.h>
++optreset=3D"no"
++cat > $TMPC << EOF
++#include <getopt.h>
++int main(void) { return optreset; }
++EOF
 +
-+# block/file-posix.c
-+file_xfs_write_zeroes(const char *error) "cannot write zero range (%s)"
-+file_xfs_discard(const char *error) "cannot punch hole (%s)"
-+file_FindEjectableOpticalMedia(const char *media) "Matching using %s"
-+file_setup_cdrom(const char *partition) "Using %s as optical disc"
-+file_hdev_is_sg(int type, int version) "SG device found: type=3D%d, vers=
-ion=3D%d"
++if compile_prog "" "" ; then
++  optreset=3Dyes
++fi
++
+ # check if eventfd is supported
+ eventfd=3Dno
+ cat > $TMPC << EOF
+@@ -6643,6 +6654,9 @@ fi
+ if test "$signalfd" =3D "yes" ; then
+   echo "CONFIG_SIGNALFD=3Dy" >> $config_host_mak
+ fi
++if test "$optreset" =3D "yes" ; then
++  echo "HAVE_OPTRESET=3Dy" >> $config_host_mak
++fi
+ if test "$tcg" =3D "yes"; then
+   echo "CONFIG_TCG=3Dy" >> $config_host_mak
+   if test "$tcg_interpreter" =3D "yes" ; then
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 80df7253db..840af09cb0 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -109,6 +109,7 @@ extern int daemon(int, int);
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <getopt.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+ #include <assert.h>
+@@ -604,4 +605,19 @@ extern int qemu_icache_linesize_log;
+ extern int qemu_dcache_linesize;
+ extern int qemu_dcache_linesize_log;
+=20
++/*
++ * After using getopt or getopt_long, if you need to parse another set
++ * of options, then you must reset optind.  Unfortunately the way to
++ * do this varies between implementations of getopt.
++ */
++static inline void qemu_reset_optind(void)
++{
++#ifdef HAVE_OPTRESET
++    optind =3D 1;
++    optreset =3D 1;
++#else
++    optind =3D 0;
++#endif
++}
++
+ #endif
+diff --git a/qemu-img.c b/qemu-img.c
+index ad04f59565..25288c4d18 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4962,7 +4962,7 @@ int main(int argc, char **argv)
+         return 0;
+     }
+     argv +=3D optind;
+-    optind =3D 0;
++    qemu_reset_optind();
+=20
+     if (!trace_init_backends()) {
+         exit(1);
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 2c39124036..ee8f56e46a 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -114,7 +114,7 @@ static int command(BlockBackend *blk, const cmdinfo_t=
+ *ct, int argc,
+         }
+     }
+=20
+-    optind =3D 0;
++    qemu_reset_optind();
+     return ct->cfunc(blk, argc, argv);
+ }
+=20
 --=20
 2.20.1
