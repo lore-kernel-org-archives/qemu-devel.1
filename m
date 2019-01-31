@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57104)
+Received: from eggs.gnu.org ([209.51.188.92]:57222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGr2-0005Ch-N2
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:14:26 -0500
+	(envelope-from <lersek@redhat.com>) id 1gpGrO-0005Z2-Or
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGqy-0003my-M8
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:14:22 -0500
-Resent-Message-Id: <E1gpGqy-0003my-M8@eggs.gnu.org>
-Message-ID: <154895842559.23946.14158002776565045572@ebba9967afc0>
-In-Reply-To: <20190128173901.3357-1-antonkuchin@yandex-team.ru>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <lersek@redhat.com>) id 1gpGrN-0003wU-GF
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:14:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gpGrN-0003s0-87
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:14:45 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01FA2A171C
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 18:14:39 +0000 (UTC)
+References: <20190118223152.24183-1-lersek@redhat.com>
+	<e4370e19-04f8-d14b-4f7e-bce22f722805@redhat.com>
+	<20190131100526-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d592822b-acb5-ea99-2a27-e3686152d0e9@redhat.com>
+Date: Thu, 31 Jan 2019 19:14:27 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 10:13:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] block: split block/qapi.c to avoid linking
- utilities with qapi
+In-Reply-To: <20190131100526-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix the life cycle and the name of
+ "qemu_extra_params_fw"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +36,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: antonkuchin@yandex-team.ru
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, mreitz@redhat.com, wrfsh@yandex-team.ru
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODE3MzkwMS4zMzU3
-LTEtYW50b25rdWNoaW5AeWFuZGV4LXRlYW0ucnUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGJsb2NrOiBz
-cGxpdCBibG9jay9xYXBpLmMgdG8gYXZvaWQgbGlua2luZyB1dGlsaXRpZXMgd2l0aCBxYXBpCk1l
-c3NhZ2UtaWQ6IDIwMTkwMTI4MTczOTAxLjMzNTctMS1hbnRvbmt1Y2hpbkB5YW5kZXgtdGVhbS5y
-dQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2NhcHN0
-b25lLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAnZHRjJyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0
-YycKU3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9RZW11TWFj
-RHJpdmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-U0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxlICdyb21z
-L2lweGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvaXB4ZScKU3VibW9kdWxlICdyb21zL29wZW5iaW9zJyAoaHR0cHM6Ly9naXQu
-cWVtdS5vcmcvZ2l0L29wZW5iaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVu
-YmlvcycKU3VibW9kdWxlICdyb21zL29wZW5oYWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9vcGVuaGFja3dhcmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5oYWNr
-d2FyZScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29kZScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3FlbXUtcGFs
-Y29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-c2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MnClN1Ym1vZHVs
-ZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dpdGh1Yi5jb20vaGRlbGxlci9zZWFiaW9z
-LWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9k
-dWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJv
-b3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0
-LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9v
-dCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9v
-dC1zYW00NjBleCcKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0
-dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXNvZnRmbG9hdC0zKSByZWdpc3RlcmVkIGZv
-ciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9m
-cC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5
-LXRlc3RmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0
-ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1h
-cGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUn
-OiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicK
-Q2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAn
-ODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdy
-b21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVy
-cyc6IGNoZWNrZWQgb3V0ICdkNGU3ZDdhYzY2M2ZjYjU1ZjFiOTM1NzU0NDVmY2JjYTM3MmYxN2E3
-JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6
-IGNoZWNrZWQgb3V0ICc5YjdhYjJmYTAyMDM0MWRlZThiZjlkZjZjOWNmNDAwMDNlMDEzNmRmJwpD
-bG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNo
-ZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9u
-aW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5iaW9z
-JzogY2hlY2tlZCBvdXQgJzQ0MWE4NGQzYTY0MmExMGI5NDgzNjljNjNmMzIzNjdlOGZmNjM5NWIn
-CkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
-L29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3
-YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnNTFjMjM3ZDdlMjBkMDUx
-MDBlYWNhZGVlMmY2MWFiYzE3ZTZiYzA5NycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTY5OGM4OTk1ZmZi
-MjgzODI5NmVjMjg0ZmUzYzRhZDMzZGZjYTMwNycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3Mt
-aHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tlZCBvdXQg
-JzFlZjk5YTAxNTcyYzI1ODFjMzBlMTZlNmZlNjllOWVhMmVmOTJjZTAnCkNsb25pbmcgaW50byAn
-cm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBv
-dXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25pbmcgaW50
-byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290JzogY2hlY2tl
-ZCBvdXQgJ2UwZWUyNGMyN2ExNzJiY2Y0ODJmNmYyYmM5MDVlNjIxMWMxMzRiY2MnCkNsb25pbmcg
-aW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6IGNoZWNr
-ZWQgb3V0ICdkODVjYTAyOWYyNTdiNTNhOTZkYTZjMmZiNDIxZTc4YTAwM2E5OTQzJwpDbG9uaW5n
-IGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJv
-b3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVhNmRmNzcw
-NTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycu
-Li4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tl
-ZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcg
-aW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0
-ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1YTU5ZGNlYzE5MzI3
-Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3VpL2tleWNvZGVtYXBk
-YicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc2YjNk
-NzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjBmNjgxZDIgYmxvY2s6IHNwbGl0IGJsb2NrL3FhcGkuYyB0byBhdm9pZCBs
-aW5raW5nIHV0aWxpdGllcyB3aXRoIHFhcGkKCj09PSBPVVRQVVQgQkVHSU4gPT09CldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzUwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IEJsb2NrIGNvbW1l
-bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMyMTI6IEZJTEU6IGJsb2Nr
-L2JkcnZfaW5mby5jOjE1ODoKKyAgICAgICAgLyogU2tpcCBhdXRvbWF0aWNhbGx5IGluc2VydGVk
-IG5vZGVzIHRoYXQgdGhlIHVzZXIgaXNuJ3QgYXdhcmUgb2YgZm9yCgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzIxMzogRklMRTog
-YmxvY2svYmRydl9pbmZvLmM6MTU5OgorICAgICAgICAgKiBxdWVyeS1ibG9jayAoYmxrICE9IE5V
-TEwpLCBidXQgbm90IGZvciBxdWVyeS1uYW1lZC1ibG9jay1ub2RlcyAqLwoKV0FSTklORzogQmxv
-Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzI4NTogRklM
-RTogYmxvY2svYmRydl9pbmZvLmM6MjMxOgorLyoqCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
-c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzQ4OiBGSUxFOiBibG9jay9iZHJ2
-X2luZm8uYzoyOTQ6CisgICAgICAgICAgICAvKiBDYW4ndCByZWNvbnN0cnVjdCB0aGUgZnVsbCBi
-YWNraW5nIGZpbGVuYW1lLCBzbyB3ZSBtdXN0IG9taXQKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMzQ5OiBGSUxFOiBibG9jay9i
-ZHJ2X2luZm8uYzoyOTU6CisgICAgICAgICAgICAgKiB0aGlzIGZpZWxkIGFuZCBhcHBseSBhIEJl
-c3QgRWZmb3J0IHRvIHRoaXMgcXVlcnkuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
-YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMzU2OiBGSUxFOiBibG9jay9iZHJ2X2lu
-Zm8uYzozMDI6CisgICAgICAgIC8qIEFsd2F5cyByZXBvcnQgdGhlIGZ1bGxfYmFja2luZ19maWxl
-bmFtZSBpZiBwcmVzZW50LCBldmVuIGlmIGl0J3MgdGhlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzM1NzogRklMRTogYmxvY2sv
-YmRydl9pbmZvLmM6MzAzOgorICAgICAgICAgKiBzYW1lIGFzIGJhY2tpbmdfZmlsZW5hbWUuIFRo
-YXQgdGhleSBhcmUgc2FtZSBpcyB1c2VmdWwgaW5mby4gKi8KCkVSUk9SOiBzd2l0Y2ggYW5kIGNh
-c2Ugc2hvdWxkIGJlIGF0IHRoZSBzYW1lIGluZGVudAojNDY2OiBGSUxFOiBibG9jay9iZHJ2X2lu
-Zm8uYzo0MTI6CisgICAgc3dpdGNoIChxb2JqZWN0X3R5cGUob2JqKSkgewpbLi4uXQorICAgICAg
-ICBkZWZhdWx0OgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzYxMjogRklMRTogYmxvY2svYmRydl9pbmZvLmM6NTU4OgorICAgICAg
-ICAvKiBJZGVhbGx5IGJkcnZfc25hcHNob3RfZHVtcCgpIHdvdWxkIG9wZXJhdGUgb24gU25hcHNo
-b3RJbmZvTGlzdCBidXQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTI0NTog
-RklMRTogaW5jbHVkZS9ibG9jay9iZHJ2X2luZm8uaDo0NjoKKyNlbmRpZiAvLyBCRFJWX0lORk9f
-SAoKdG90YWw6IDIgZXJyb3JzLCA5IHdhcm5pbmdzLCA5NzYgbGluZXMgY2hlY2tlZAoKQ29tbWl0
-IDBmNjgxZDIxZjJhMiAoYmxvY2s6IHNwbGl0IGJsb2NrL3FhcGkuYyB0byBhdm9pZCBsaW5raW5n
-IHV0aWxpdGllcyB3aXRoIHFhcGkpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTI4MTczOTAx
-LjMzNTctMS1hbnRvbmt1Y2hpbkB5YW5kZXgtdGVhbS5ydS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 01/31/19 16:06, Michael S. Tsirkin wrote:
+> On Thu, Jan 31, 2019 at 03:27:01PM +0100, Laszlo Ersek wrote:
+>> On 01/18/19 23:31, Laszlo Ersek wrote:
+>>> Commit 19bcc4bc3213 ("fw_cfg: Make qemu_extra_params_fw locally",
+>>> 2019-01-04) changed the storage duration of the "qemu_extra_params_fw=
+"
+>>> array from static to automatic. This broke the interface contract on =
+the
+>>> fw_cfg_add_file() function, which is documented as follows, in
+>>> "include/hw/nvram/fw_cfg.h":
+>>>
+>>>> [...] The data referenced by the starting pointer is only linked, NO=
+T
+>>>> copied, into the data structure of the fw_cfg device. [...]
+>>>
+>>> As a result, when guest firmware fetches the "etc/boot-menu-wait" fw_=
+cfg
+>>> file, it now sees garbage. Fix the regression by changing the storage
+>>> duration to allocated. (The call is reached at most once, on the real=
+ize
+>>> path of the board-specific fw_cfg sysbus device.)
+>>>
+>>> While at it, clean up the name and the assignment of the object as we=
+ll.
+>>>
+>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> Fixes: 19bcc4bc3213e78c303ad480a7a578f62258252d
+>>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>>> ---
+>>>  hw/nvram/fw_cfg.c | 9 +++++----
+>>>  1 file changed, 5 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index 53e8e010a8b7..7fdf04adc97f 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -118,7 +118,6 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>>>  {
+>>>      const char *boot_splash_filename =3D NULL;
+>>>      const char *boot_splash_time =3D NULL;
+>>> -    uint8_t qemu_extra_params_fw[2];
+>>>      char *filename, *file_data;
+>>>      gsize file_size;
+>>>      int file_type;
+>>> @@ -132,6 +131,8 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>>>      /* insert splash time if user configurated */
+>>>      if (boot_splash_time) {
+>>>          int64_t bst_val =3D qemu_opt_get_number(opts, "splash-time",=
+ -1);
+>>> +        uint16_t bst_le16;
+>>> +
+>>>          /* validate the input */
+>>>          if (bst_val < 0 || bst_val > 0xffff) {
+>>>              error_report("splash-time is invalid,"
+>>> @@ -139,9 +140,9 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>>>              exit(1);
+>>>          }
+>>>          /* use little endian format */
+>>> -        qemu_extra_params_fw[0] =3D (uint8_t)(bst_val & 0xff);
+>>> -        qemu_extra_params_fw[1] =3D (uint8_t)((bst_val >> 8) & 0xff)=
+;
+>>> -        fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_f=
+w, 2);
+>>> +        bst_le16 =3D cpu_to_le16(bst_val);
+>>> +        fw_cfg_add_file(s, "etc/boot-menu-wait",
+>>> +                        g_memdup(&bst_le16, sizeof bst_le16), sizeof=
+ bst_le16);
+>>>      }
+>>> =20
+>>>      /* insert splash file if user configurated */
+>>>
+>>
+>> I hope a polite ping can't hurt; can we get this merged please?
+>>
+>> Thanks
+>> LAszlo
+>=20
+> Sure it does not hurt. I have it tagged  for the next pull.
+>=20
+
+Thanks!
+Laszlo
