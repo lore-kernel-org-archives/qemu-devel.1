@@ -1,41 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33710)
+Received: from eggs.gnu.org ([209.51.188.92]:34306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gpJ8Z-0007aK-EH
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:40:40 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gpJBP-0008PN-9y
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:43:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gpJ8T-0005bk-Pp
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:40:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37744
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <walling@linux.ibm.com>) id 1gpJBO-0006dl-7x
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:43:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gpJ8S-0005ZG-4q
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:40:33 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0VKdLA3096094
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:40:24 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qc65t5she-1
+	id 1gpJBN-0006aK-RK
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:43:34 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0VKdKZT038068
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:43:21 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qc60cpmxa-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:40:23 -0500
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:43:21 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Thu, 31 Jan 2019 20:40:23 -0000
+	Thu, 31 Jan 2019 20:43:20 -0000
 References: <20190130155733.32742-1-david@redhat.com>
-	<20190130155733.32742-5-david@redhat.com>
 From: Collin Walling <walling@linux.ibm.com>
-Date: Thu, 31 Jan 2019 15:40:17 -0500
+Date: Thu, 31 Jan 2019 15:43:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190130155733.32742-5-david@redhat.com>
+In-Reply-To: <20190130155733.32742-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <189454f3-61d4-cfff-5449-ae6510fd963a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] s390x/pci: Introduce unplug
- requests and split unplug handler
+Message-Id: <4fec7d60-1d09-ba37-c66a-1d86088a1c0e@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 0/6] s390x/pci: remaining
+ hot/un)plug patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,51 +46,36 @@ To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 On 1/30/19 10:57 AM, David Hildenbrand wrote:
-> PCI on s390x is really weird and how it was modeled in QEMU might not have
-> been the right choice. Anyhow, right now it is the case that:
-> - Hotplugging a PCI device will silently create a zPCI device
->    (if none is provided)
-> - Hotunplugging a zPCI device will unplug the PCI device (if any)
-> - Hotunplugging a PCI device will unplug also the zPCI device
-> As far as I can see, we can no longer change this behavior. But we
-> should fix it.
+> These are all the patches that are not yet upstream (@Conny you might
+> already picked some, including them for the full picture) and after
+> a good discussion yesterday, including a patch t get rid of the release
+> timer. I ran a couple of sanity tests on this series.
 > 
-> Both device types are handled via a single hotplug handler call. This
-> is problematic for various reasons:
-> 1. Unplugging via the zPCI device allows to unplug devices that are not
->     hot removable. (check performed in qdev_unplug()) - bad.
-> 2. Hotplug handler chains are not possible for the unplug case. In the
->     future, the machine might want to override hotplug handlers, to
->     process device specific stuff and to then branch off to the actual
->     hotplug handler. We need separate hotplug handler calls for both the
->     PCI and zPCI device to make this work reliably. All other PCI
->     implementations are already prepared to handle this correctly, only
->     s390x is missing.
+> #1 and #2 fix hotplugging of PCI bridges.
+> #3 warns when "zpci=off"
+> #4 refactors unplugging
+> #5 get's rid of the release timer
+> #6 processes all unplug requests on reboot
 > 
-> Therefore, introduce the unplug_request handler and properly perform
-> unplug checks by redirecting to the separate unplug_request handlers.
-> When finally unplugging, perform two separate hotplug_handler_unplug()
-> calls, first for the PCI device, followed by the zPCI device. This now
-> nicely splits unplugging paths for both devices.
+> @Colin, can you review/ack? Especially Patch #4 is needed for qdev
+> patches already on the list. ("[PATCH RFCv2 0/9] qdev: Hotplug handler
+> chaining + virtio-pmem")
+
+I've given my r-b for 4, 5, and 6. IIRC, the other patches in this
+series looked fine from previous versions, but I'd like to look at them
+more carefully before ack'ing. Please allow me some time to devote to
+them in the near future. Trying my best to balance things :)
+
 > 
-> The redirect part is a little hairy, as the user is allowed to trigger
-> unplug either via the PCI or the zPCI device. So redirect always to the
-> PCI unplug request handler first and remember if that check has been
-> performed in the zPCI device. Redirect then to the zPCI device unplug
-> request handler to perform the magic. Remembering that we already
-> checked the PCI device breaks the redirect loop.
+> David Hildenbrand (6):
+>    s390x/pci: Fix primary bus number for PCI bridges
+>    s390x/pci: Fix hotplugging of PCI bridges
+>    s390x/pci: Warn when adding PCI devices without the 'zpci' feature
+>    s390x/pci: Introduce unplug requests and split unplug handler
+>    s390x/pci: Drop release timer and replace it with a flag
+>    s390x/pci: Unplug remaining requested devices on pcihost reset
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-
-Thanks for clearing up some of the areas I was having troubles following
-during the last post. I think this looks a lot better than what we had
-before. Patches 4, 5, and 6 make the code a lot easier to understand
-what is going on here.
-
-I assume you were able to squeeze in an easy test? At least making sure
-we can still hot unplug a device from a guest successfully?
-
- From the code perspective:
-
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
+>   hw/s390x/s390-pci-bus.c | 233 ++++++++++++++++++++++++++--------------
+>   hw/s390x/s390-pci-bus.h |   4 +-
+>   2 files changed, 152 insertions(+), 85 deletions(-)
+> 
