@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42233)
+Received: from eggs.gnu.org ([209.51.188.92]:42512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpHas-0001qc-7Q
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:01:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpHbt-0002NZ-1Q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpHaq-0000Nb-Qk
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:01:46 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-6-crosa@redhat.com>
-	<17c4d1e9-b837-1931-1ddf-fafaf075a902@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <418df945-3e0e-a160-c68e-bd1c24168717@redhat.com>
-Date: Thu, 31 Jan 2019 14:01:32 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpHbq-00019Z-8h
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:02:48 -0500
+Resent-Message-Id: <E1gpHbq-00019Z-8h@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21703)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpHbp-00017Y-Tj
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:02:46 -0500
+Message-ID: <154896043945.23946.5087839727868300691@ebba9967afc0>
+In-Reply-To: <20190121170731.2500692-1-stefanb@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <17c4d1e9-b837-1931-1ddf-fafaf075a902@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/18] Acceptance tests: introduce arch
- parameter and attribute
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 10:47:20 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] TPM patches for stable-3.0.0 (v3.0.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,219 +28,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-s390x@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: stefanb@linux.ibm.com
+Cc: fam@euphon.net, qemu-stable@nongnu.org, mdroth@linux.ibm.com, qemu-devel@nongnu.org
 
-
-
-On 1/31/19 8:55 AM, Wainer dos Santos Moschetta wrote:
-> Hi Cleber,
->=20
-> On 01/17/2019 04:56 PM, Cleber Rosa wrote:
->> It's useful to define the architecture that should be used in
->> situations such as:
->> =C2=A0 * the intended target of the QEMU binary to be used on tests
->> =C2=A0 * the architecture of code to be run within the QEMU binary, su=
-ch
->> =C2=A0=C2=A0=C2=A0 as a kernel image or a full blown guest OS image
->>
->> This commit introduces both a test parameter and a test instance
->> attribute, that will contain such a value.
->>
->> Now, when the "arch" test parameter is given, it will influence the
->> selection of the default QEMU binary, if one is not given explicitly
->> by means of the "qemu_img" parameter.
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->> =C2=A0 docs/devel/testing.rst=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-| 18 ++++++++++++++++++
->> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
->> =C2=A0 2 files changed, 28 insertions(+), 3 deletions(-)
->>
->> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
->> index 44c9b3ae74..60a16c5834 100644
->> --- a/docs/devel/testing.rst
->> +++ b/docs/devel/testing.rst
->> @@ -689,6 +689,17 @@ vm
->> =C2=A0 A QEMUMachine instance, initially configured according to the g=
-iven
->> =C2=A0 ``qemu_bin`` parameter.
->> =C2=A0 +arch
->> +~~~~
->> +
->> +The architecture that will be used on a number of different
->> +scenarios.=C2=A0 For instance, when a QEMU binary is not explicitly g=
-iven,
->> +the one selected will depend on this attribute.
->> +
->> +The ``arch`` attribute will be set to the test parameter of the same
->> +name, and if one is not given explicitly, it will default to the
->> +system architecture (as given by ``uname``).
->=20
-> Unless I'm missing something, the arch attribute will be None if I don'=
-t
-> pass the arch parameter nor set the arch tag.
->=20
-
-I think you're not missing anything, but I was.  Thanks for catching that=
-.
-
-- Cleber.
-
-> ------
-> [root@xxx qemu]# cat tests/acceptance/arch.py
-> from avocado_qemu import Test
->=20
-> class Arch(Test):
-> =C2=A0=C2=A0=C2=A0 """
-> =C2=A0=C2=A0=C2=A0 :avocado: enable
-> =C2=A0=C2=A0=C2=A0 """
-> =C2=A0=C2=A0=C2=A0 def test(self):
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertEqual(self.arch, =
-"x86_64")
-> [root@xxx qemu]# ./tests/venv/bin/avocado run tests/acceptance/arch.py
-> JOB ID=C2=A0=C2=A0=C2=A0=C2=A0 : 032aabb8ec2364944d0e29df3b61931b42f458=
-7c
-> JOB LOG=C2=A0=C2=A0=C2=A0 : /root/avocado/job-results/job-2019-01-31T08=
-.42-032aabb/job.log
-> =C2=A0(1/1) tests/acceptance/arch.py:Arch.test: FAIL: None !=3D 'x86_64=
-' (0.03 s)
-> RESULTS=C2=A0=C2=A0=C2=A0 : PASS 0 | ERROR 0 | FAIL 1 | SKIP 0 | WARN 0=
- | INTERRUPT 0 |
-> CANCEL 0
-> JOB TIME=C2=A0=C2=A0 : 0.20 s
-> [root@xxx qemu]# ./tests/venv/bin/avocado run -p arch=3Dx86_64
-> tests/acceptance/arch.py
-> JOB ID=C2=A0=C2=A0=C2=A0=C2=A0 : 1913a73510cab4b6b118bd7e94e27460113686=
-28
-> JOB LOG=C2=A0=C2=A0=C2=A0 : /root/avocado/job-results/job-2019-01-31T08=
-.42-1913a73/job.log
-> =C2=A0(1/1) tests/acceptance/arch.py:Arch.test: PASS (0.01 s)
-> RESULTS=C2=A0=C2=A0=C2=A0 : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0=
- | INTERRUPT 0 |
-> CANCEL 0
-> JOB TIME=C2=A0=C2=A0 : 0.19 s
-> [root@xxx qemu]# cat tests/acceptance/arch_tag.py
-> from avocado_qemu import Test
->=20
-> class Arch(Test):
-> =C2=A0=C2=A0=C2=A0 """
-> =C2=A0=C2=A0=C2=A0 :avocado: enable
-> =C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:x86_64
-> =C2=A0=C2=A0=C2=A0 """
-> =C2=A0=C2=A0=C2=A0 def test(self):
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertEqual(self.arch, =
-"x86_64")
-> [root@xxx qemu]# ./tests/venv/bin/avocado run tests/acceptance/arch_tag=
-.py
-> JOB ID=C2=A0=C2=A0=C2=A0=C2=A0 : bc85be065586b8e9cf371489e1801489910e41=
-b0
-> JOB LOG=C2=A0=C2=A0=C2=A0 : /root/avocado/job-results/job-2019-01-31T08=
-.43-bc85be0/job.log
-> =C2=A0(1/1) tests/acceptance/arch_tag.py:Arch.test: PASS (0.01 s)
-> RESULTS=C2=A0=C2=A0=C2=A0 : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0=
- | INTERRUPT 0 |
-> CANCEL 0
-> JOB TIME=C2=A0=C2=A0 : 0.19 s
-> ------
->=20
-> - Wainer
->=20
->> +
->> =C2=A0 qemu_bin
->> =C2=A0 ~~~~~~~~
->> =C2=A0 @@ -711,6 +722,13 @@ like the following:
->> =C2=A0 =C2=A0=C2=A0=C2=A0 PARAMS (key=3Dqemu_bin, path=3D*,
->> default=3Dx86_64-softmmu/qemu-system-x86_64) =3D>
->> 'x86_64-softmmu/qemu-system-x86_64
->> =C2=A0 +arch
->> +~~~~
->> +
->> +The architecture that will be used on a number of different scenarios=
-.
->> +This parameter has a direct relation with the ``arch`` attribute.=C2=A0=
- If
->> +not given, it will default to None.
->> +
->> =C2=A0 qemu_bin
->> =C2=A0 ~~~~~~~~
->> =C2=A0 diff --git a/tests/acceptance/avocado_qemu/__init__.py
->> b/tests/acceptance/avocado_qemu/__init__.py
->> index d8d5b48dac..7a38851753 100644
->> --- a/tests/acceptance/avocado_qemu/__init__.py
->> +++ b/tests/acceptance/avocado_qemu/__init__.py
->> @@ -23,16 +23,22 @@ def is_readable_executable_file(path):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return os.path.isfile(path) and os.acce=
-ss(path, os.R_OK | os.X_OK)
->> =C2=A0 =C2=A0 -def pick_default_qemu_bin():
->> +def pick_default_qemu_bin(arch=3DNone):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Picks the path of a QEMU binary, starti=
-ng either in the current
->> working
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 directory or in the source tree root di=
-rectory.
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 :param arch: the arch to use when looking f=
-or a QEMU binary
->> (the target
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 will match the arch given).=C2=A0 If None (th=
-e default) arch
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 will be the current host system arch (as give=
-n by
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 :func:`os.uname`).
->> +=C2=A0=C2=A0=C2=A0 :type arch: str
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :returns: the path to the default QEMU =
-binary or None if one
->> could not
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 be found
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :rtype: str or None
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> -=C2=A0=C2=A0=C2=A0 arch =3D os.uname()[4]
->> +=C2=A0=C2=A0=C2=A0 if arch is None:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arch =3D os.uname()[4]
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_bin_relative_path =3D os.path.join=
-("%s-softmmu" % arch,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "qemu-system-%s" % arch)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if is_readable_executable_file(qemu_bin=
-_relative_path):
->> @@ -47,8 +53,9 @@ def pick_default_qemu_bin():
->> =C2=A0 class Test(avocado.Test):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def setUp(self):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm =3D Non=
-e
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.arch =3D self.params.=
-get('arch')
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.qemu_bin =3D=
- self.params.get('qemu_bin',
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 default=3Dpick_default_qemu_bin())
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0
->> default=3Dpick_default_qemu_bin(self.arch))
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.qemu_bi=
-n is None:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 self.cancel("No QEMU binary defined or found in the
->> source tree")
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm =3D QEM=
-UMachine(self.qemu_bin)
->=20
-
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMTE3MDczMS4yNTAw
+NjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gVFBNIHBh
+dGNoZXMgZm9yIHN0YWJsZS0zLjAuMCAodjMuMC4xKQpNZXNzYWdlLWlkOiAyMDE5MDEyMTE3MDcz
+MS4yNTAwNjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAx
+OTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbSAtPiBwYXRjaGV3LzIw
+MTkwMTIxMTcwNzMxLjI1MDA2OTItMS1zdGVmYW5iQGxpbnV4LmlibS5jb20KU3VibW9kdWxlICdj
+YXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1vZHVsZSAncm9t
+cy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11TWFjRHJpdmVy
+cy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnClN1Ym1vZHVs
+ZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9n
+aXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUn
+ClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVu
+Ymlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAn
+cm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJl
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAn
+cm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2Rl
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAn
+cm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVn
+aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1o
+cHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdpdCkgcmVnaXN0
+ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9tcy9zZ2FiaW9z
+JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBw
+YXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0cHM6Ly9naXQu
+cWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NraWJv
+b3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1i
+b290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1vZHVsZSAncm9t
+cy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2
+MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnClN1Ym1v
+ZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20v
+Y290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAv
+YmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZs
+b2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS10ZXN0ZmxvYXQtMykgcmVn
+aXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnClN1Ym1vZHVs
+ZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tleWNvZGVtYXBk
+Yi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xvbmluZyBpbnRv
+ICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hlY2tlZCBvdXQgJzIy
+ZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcgaW50byAnZHRj
+Jy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5ZGI3MzFhNjI3
+NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9RZW11TWFjRHJpdmVy
+cycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVja2VkIG91dCAn
+ZDRlN2Q3YWM2NjNmY2I1NWYxYjkzNTc1NDQ1ZmNiY2EzNzJmMTdhNycKQ2xvbmluZyBpbnRvICdy
+b21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVja2VkIG91dCAnOWI3
+YWIyZmEwMjAzNDFkZWU4YmY5ZGY2YzljZjQwMDAzZTAxMzZkZicKQ2xvbmluZyBpbnRvICdyb21z
+L2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAnZGU0NTY1
+Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdyb21zL29w
+ZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQgb3V0ICc0
+NDFhODRkM2E2NDJhMTBiOTQ4MzY5YzYzZjMyMzY3ZThmZjYzOTViJwpDbG9uaW5nIGludG8gJ3Jv
+bXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnOiBj
+aGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZmNScKQ2xv
+bmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvcWVt
+dS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRlZTJmNjFhYmMx
+N2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+cm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5NWZmYjI4MzgyOTZlYzI4NGZlM2M0
+YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEwMTU3MmMyNTgx
+YzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dhYmlvcycuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFlZTUyMjg3ZTVm
+MzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMvc2tpYm9vdCcu
+Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdlMGVlMjRjMjdh
+MTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290
+Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAnZDg1Y2EwMjlm
+MjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9v
+dC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JzogY2hl
+Y2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1ODgnCkNsb25p
+bmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRo
+ICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdiNjRhZjQxYzMy
+NzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2Jl
+cmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXkt
+dGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFhMTdmZDkyNGFl
+ZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBw
+YXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0NzJlYjcxODlk
+MzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyZWUz
+Y2E5IE1lcmdlIHJlbW90ZS10cmFja2luZyBicmFuY2ggJ3JlbW90ZXMva3JheGVsL3RhZ3MvdXNi
+LTIwMTkwMTMwLXB1bGwtcmVxdWVzdCcgaW50byBzdGFnaW5nCmRjNWUwNDEgdXNiLW10cDogcmVw
+bGFjZSB0aGUgaG9tZWJyZXcgd3JpdGUgd2l0aCBxZW11X3dyaXRlX2Z1bGwKODhmYTQwMiB1c2It
+bXRwOiBicmVha3VwIE1UUCB3cml0ZSBpbnRvIHNtYWxsZXIgY2h1bmtzCmE4ZjUyYWEgdXNiLW10
+cDogUmVhbGxvY2F0ZSBidWZmZXIgaW4gbXVsdGlwbGVzIG9mIE1UUF9XUklURV9CVUZfU1oKYzg2
+NDdlNSB1c2I6IGltcGxlbWVudCBYSENJIHVuZGVycnVuL292ZXJydW4gZXZlbnRzCmE3ZDEwNTQg
+dXNiOiBYSENJIHNoYWxsIG5vdCBoYWx0IGlzb2Nocm9ub3VzIGVuZHBvaW50cwo1MTUyOGMzIGh3
+L3VzYjogRml4IExHUEwgaW5mb3JtYXRpb24gaW4gdGhlIGZpbGUgaGVhZGVycwowZjY5YjA1IHVz
+YjogZGV2LW10cDogY2xvc2UgZmQgaW4gdXNiX210cF9vYmplY3RfcmVhZGRpcigpCjFhMzRlY2Ug
+dXNiOiBhc3NpZ24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IDFhMzRlY2U5NWQzMyAodXNiOiBhc3Np
+Z24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzKQoyLzggQ2hlY2tpbmcgY29t
+bWl0IDBmNjliMDVjYzc3YyAodXNiOiBkZXYtbXRwOiBjbG9zZSBmZCBpbiB1c2JfbXRwX29iamVj
+dF9yZWFkZGlyKCkpCjMvOCBDaGVja2luZyBjb21taXQgNTE1MjhjMzYxZTI4IChody91c2I6IEZp
+eCBMR1BMIGluZm9ybWF0aW9uIGluIHRoZSBmaWxlIGhlYWRlcnMpCjQvOCBDaGVja2luZyBjb21t
+aXQgYTdkMTA1NDYzMzYwICh1c2I6IFhIQ0kgc2hhbGwgbm90IGhhbHQgaXNvY2hyb25vdXMgZW5k
+cG9pbnRzKQo1LzggQ2hlY2tpbmcgY29tbWl0IGM4NjQ3ZTU5YmYzMyAodXNiOiBpbXBsZW1lbnQg
+WEhDSSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cykKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzODogRklMRTogaHcvdXNiL2hjZC14aGNpLmM6MTk2MDoK
+KyAgICAgICAgICAgICAgICB4aGNpX2V2ZW50KHhoY2ksICZldiwgeGhjaS0+c2xvdHNbZXBjdHgt
+PnNsb3RpZC0xXS5pbnRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJy0nIChjdHg6VnhWKQojNDc6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIwNDE6Cisg
+ICAgeGhjaS0+c2xvdHNbc2xvdGlkLTFdLmludHIgPSAwOwogICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjY6
+IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIzMTY6CisgICAgICAgIHhoY2ktPnNsb3RzW3Nsb3Rp
+ZC0xXS5pbnRyID0gZ2V0X2ZpZWxkKGlzbG90X2N0eFsyXSwgVFJCX0lOVFIpOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICct
+JyAoY3R4OlZ4VikKIzY3OiBGSUxFOiBody91c2IvaGNkLXhoY2kuYzoyMzE3OgorICAgICAgICBz
+ZXRfZmllbGQoJnNsb3RfY3R4WzJdLCB4aGNpLT5zbG90c1tzbG90aWQtMV0uaW50ciwgVFJCX0lO
+VFIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+Cgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUv
+OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi84IENoZWNraW5nIGNvbW1pdCBhOGY1MmFh
+Mjk2ZTcgKHVzYi1tdHA6IFJlYWxsb2NhdGUgYnVmZmVyIGluIG11bHRpcGxlcyBvZiBNVFBfV1JJ
+VEVfQlVGX1NaKQo3LzggQ2hlY2tpbmcgY29tbWl0IDg4ZmE0MDI4YzcyMCAodXNiLW10cDogYnJl
+YWt1cCBNVFAgd3JpdGUgaW50byBzbWFsbGVyIGNodW5rcykKOC84IENoZWNraW5nIGNvbW1pdCBk
+YzVlMDQxOTc2OWUgKHVzYi1tdHA6IHJlcGxhY2UgdGhlIGhvbWVicmV3IHdyaXRlIHdpdGggcWVt
+dV93cml0ZV9mdWxsKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDE5MDEyMTE3MDczMS4yNTAwNjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
