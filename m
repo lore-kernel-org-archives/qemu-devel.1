@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60404)
+Received: from eggs.gnu.org ([209.51.188.92]:33999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpH0P-0004tK-Rc
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:24:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpH6u-00035R-26
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpH0I-0001Ee-4G
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:24:01 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190123195527.29575-8-david@redhat.com>
-	<20190125175818.GG2695@work-vm>
-Date: Thu, 31 Jan 2019 19:23:54 +0100
-In-Reply-To: <20190125175818.GG2695@work-vm> (David Alan Gilbert's message of
-	"Fri, 25 Jan 2019 17:58:19 +0000")
-Message-ID: <87ef8svg79.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gpH6s-00060f-BV
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:30:47 -0500
+Resent-Message-Id: <E1gpH6s-00060f-BV@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21096)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpH6m-0005uJ-P6
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:30:42 -0500
+Message-ID: <154895942102.23946.7565378348060232005@ebba9967afc0>
+In-Reply-To: <20190128223118.5255-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFCv2 7/9] hmp: Handle virtio-pmem when
- printing memory device infos
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 10:30:22 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 00/12] target/arm: Implement ARMv8.5-BTI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-
-> * David Hildenbrand (david@redhat.com) wrote:
->> Print the memory device info just like for PCDIMM/NVDIMM.
->> 
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hmp.c | 27 +++++++++++++++------------
->>  1 file changed, 15 insertions(+), 12 deletions(-)
->> 
->> diff --git a/hmp.c b/hmp.c
->> index 8da5fd8760..25c32e0810 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -2553,6 +2553,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
->>      Error *err = NULL;
->>      MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
->>      MemoryDeviceInfoList *info;
->> +    VirtioPMEMDeviceInfo *vpi;
->>      MemoryDeviceInfo *value;
->>      PCDIMMDeviceInfo *di;
->>  
->> @@ -2562,19 +2563,9 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
->>          if (value) {
->>              switch (value->type) {
->>              case MEMORY_DEVICE_INFO_KIND_DIMM:
->> -                di = value->u.dimm.data;
->> -                break;
->> -
->>              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
->> -                di = value->u.nvdimm.data;
->> -                break;
->> -
->> -            default:
->> -                di = NULL;
->> -                break;
->> -            }
->> -
->> -            if (di) {
->> +                di = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
->> +                     value->u.dimm.data : value->u.nvdimm.data;
->>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
->>                                 MemoryDeviceInfoKind_str(value->type),
->>                                 di->id ? di->id : "");
->> @@ -2587,6 +2578,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
->>                                 di->hotplugged ? "true" : "false");
->>                  monitor_printf(mon, "  hotpluggable: %s\n",
->>                                 di->hotpluggable ? "true" : "false");
->> +                break;
->> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
->> +                vpi = value->u.virtio_pmem.data;
->> +                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
->> +                               MemoryDeviceInfoKind_str(value->type),
->> +                               vpi->id ? vpi->id : "");
->> +                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vpi->memaddr);
->> +                monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
->> +                monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
->> +                break;
->> +            default:
->> +                g_assert_not_reached();
->
->
-> Although I'd prefer if that assert was replaced by a print
-> saying it was an unknown type.
-
-I would not.  If we reach this, something must have scribbled over
-value->type and who knows what else.  Continuing is unsafe.  Looks like
-a textbook use of assertions to me.
-
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
->>              }
->>          }
->>      }
->> -- 
->> 2.17.2
->> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODIyMzExOC41MjU1
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
+Ml0gdGFyZ2V0L2FybTogSW1wbGVtZW50IEFSTXY4LjUtQlRJClR5cGU6IHNlcmllcwpNZXNzYWdl
+LWlkOiAyMDE5MDEyODIyMzExOC41MjU1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxOTAxMjgyMjMxMTguNTI1NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmcgLT4gcGF0Y2hldy8yMDE5MDEyODIyMzExOC41MjU1LTEtcmljaGFyZC5oZW5kZXJzb25A
+bGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmVkZjI1MWU1NjAgdGVz
+dHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21va2UgdGVzdAo3YTc2NDYyODRmIGxpbnV4LXVzZXIv
+YWFyY2g2NDogUmVzZXQgYnR5cGUgZm9yIHN5c2NhbGxzIGFuZCBzaWduYWxzCjU5ZDZkY2ZkY2Eg
+dGFyZ2V0L2FybTogRW5hYmxlIEJUSSBmb3IgLWNwdSBtYXgKZjczNzdmY2RjMSB0YXJnZXQvYXJt
+OiBBZGQgeC1ndWFyZGVkLXBhZ2VzIGNwdSBwcm9wZXJ0eSBmb3IgdXNlci1vbmx5CjIzNjkwYWU4
+MmYgdGFyZ2V0L2FybTogU2V0IGJ0eXBlIGZvciBpbmRpcmVjdCBicmFuY2hlcwoxMGRlMmEyNDYx
+IHRhcmdldC9hcm06IFJlc2V0IGJ0eXBlIGZvciBkaXJlY3QgYnJhbmNoZXMKYTEyYmFkOTY2NiB0
+YXJnZXQvYXJtOiBEZWZhdWx0IGhhbmRsaW5nIG9mIEJUWVBFIGR1cmluZyB0cmFuc2xhdGlvbgpk
+MGYwODAzMGVmIHRhcmdldC9hcm06IENhY2hlIHRoZSBHUCBiaXQgZm9yIGEgcGFnZSBpbiBNZW1U
+eEF0dHJzCmIyMjYxMjhjZTMgZXhlYzogQWRkIHRhcmdldC1zcGVjaWZpYyB0bGIgYml0cyB0byBN
+ZW1UeEF0dHJzCjdlYWIzMDU4MTAgdGFyZ2V0L2FybTogQWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+
+ZmxhZ3MKNDlmMzZhNWMyMCB0YXJnZXQvYXJtOiBBZGQgUFNUQVRFLkJUWVBFCmVmNTE1MjQ2NGUg
+dGFyZ2V0L2FybTogSW50cm9kdWNlIGlzYXJfZmVhdHVyZV9hYTY0X2J0aQoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgZWY1MTUyNDY0ZTczICh0YXJnZXQvYXJtOiBJ
+bnRyb2R1Y2UgaXNhcl9mZWF0dXJlX2FhNjRfYnRpKQoyLzEyIENoZWNraW5nIGNvbW1pdCA0OWYz
+NmE1YzIwODYgKHRhcmdldC9hcm06IEFkZCBQU1RBVEUuQlRZUEUpCjMvMTIgQ2hlY2tpbmcgY29t
+bWl0IDdlYWIzMDU4MTAyNiAodGFyZ2V0L2FybTogQWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+Zmxh
+Z3MpCjQvMTIgQ2hlY2tpbmcgY29tbWl0IGIyMjYxMjhjZTMyMCAoZXhlYzogQWRkIHRhcmdldC1z
+cGVjaWZpYyB0bGIgYml0cyB0byBNZW1UeEF0dHJzKQpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQg
+YXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMjg6IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1hdHRy
+cy5oOjQ3OgorICAgIHVuc2lnbmVkIGludCB0YXJnZXRfdGxiX2JpdDAgOiAxOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3Vu
+ZCB0aGF0ICc6JyAoY3R4Old4VykKIzI5OiBGSUxFOiBpbmNsdWRlL2V4ZWMvbWVtYXR0cnMuaDo0
+ODoKKyAgICB1bnNpZ25lZCBpbnQgdGFyZ2V0X3RsYl9iaXQxIDogMTsKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhh
+dCAnOicgKGN0eDpXeFcpCiMzMDogRklMRTogaW5jbHVkZS9leGVjL21lbWF0dHJzLmg6NDk6Cisg
+ICAgdW5zaWduZWQgaW50IHRhcmdldF90bGJfYml0MiA6IDE7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDQvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvMTIgQ2hlY2tp
+bmcgY29tbWl0IGQwZjA4MDMwZWYxZCAodGFyZ2V0L2FybTogQ2FjaGUgdGhlIEdQIGJpdCBmb3Ig
+YSBwYWdlIGluIE1lbVR4QXR0cnMpCjYvMTIgQ2hlY2tpbmcgY29tbWl0IGExMmJhZDk2NjZlNSAo
+dGFyZ2V0L2FybTogRGVmYXVsdCBoYW5kbGluZyBvZiBCVFlQRSBkdXJpbmcgdHJhbnNsYXRpb24p
+CkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVx
+dWlyZWQKIzk3OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMzc1NzoKKyAgICBy
+ZXR1cm4gKHRsYl9oaXQoZW50cnktPmFkZHJfY29kZSwgYWRkcikgJiYKCnRvdGFsOiAxIGVycm9y
+cywgMCB3YXJuaW5ncywgMTk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTIgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCjcvMTIgQ2hlY2tpbmcgY29tbWl0IDEwZGUyYTI0NjE5NCAodGFyZ2V0
+L2FybTogUmVzZXQgYnR5cGUgZm9yIGRpcmVjdCBicmFuY2hlcykKOC8xMiBDaGVja2luZyBjb21t
+aXQgMjM2OTBhZTgyZjIwICh0YXJnZXQvYXJtOiBTZXQgYnR5cGUgZm9yIGluZGlyZWN0IGJyYW5j
+aGVzKQo5LzEyIENoZWNraW5nIGNvbW1pdCBmNzM3N2ZjZGMxMjEgKHRhcmdldC9hcm06IEFkZCB4
+LWd1YXJkZWQtcGFnZXMgY3B1IHByb3BlcnR5IGZvciB1c2VyLW9ubHkpCjEwLzEyIENoZWNraW5n
+IGNvbW1pdCA1OWQ2ZGNmZGNhNzEgKHRhcmdldC9hcm06IEVuYWJsZSBCVEkgZm9yIC1jcHUgbWF4
+KQoxMS8xMiBDaGVja2luZyBjb21taXQgN2E3NjQ2Mjg0ZjI5IChsaW51eC11c2VyL2FhcmNoNjQ6
+IFJlc2V0IGJ0eXBlIGZvciBzeXNjYWxscyBhbmQgc2lnbmFscykKMTIvMTIgQ2hlY2tpbmcgY29t
+bWl0IGVkZjI1MWU1NjA5ZSAodGVzdHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21va2UgdGVzdCkK
+V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
+UyBuZWVkIHVwZGF0aW5nPwojMzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVy
+bnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzExNjogRklMRTogdGVzdHMvdGNnL2Fh
+cmNoNjQvYnRpLWNydC5pbmMuYzoxMzoKK2ludCBtYWluKHZvaWQpOwoKdG90YWw6IDEgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCAxMjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTIgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMTkwMTI4MjIzMTE4LjUyNTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
