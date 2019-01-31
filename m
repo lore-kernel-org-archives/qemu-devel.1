@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35713)
+Received: from eggs.gnu.org ([209.51.188.92]:35735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gp6qM-00067r-Ic
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:04 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gp6qP-000692-Qv
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gp6qL-0002fd-Sc
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:02 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gp6qP-0002hN-1q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:05 -0500
 Received: from mga07.intel.com ([134.134.136.100]:60061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gp6qL-0002Yq-Jz
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:01 -0500
+	id 1gp6qO-0002Yq-Q1
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:33:04 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 31 Jan 2019 15:32:16 +0800
-Message-Id: <20190131073234.18037-10-yang.zhong@intel.com>
+Date: Thu, 31 Jan 2019 15:32:18 +0800
+Message-Id: <20190131073234.18037-12-yang.zhong@intel.com>
 In-Reply-To: <20190131073234.18037-1-yang.zhong@intel.com>
 References: <20190131073234.18037-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 09/27] hw/microblaze/Makefile.objs: Create
- configs for petalogix and xilinx boards
+Subject: [Qemu-devel] [PATCH v1 11/27] hw/ppc/Makefile.objs: Build all
+ boards conditinally with CONFIG_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,80 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, yang.zhong@intel.com, =?UTF-8?q?=C3=8
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_PETALOGIX_* and CONFIG_XLNX_*  configs added to
-default-configs/microblaze-softmmu.mak and
-default-configs/microblazeel-softmmu.mak.
+CONFIG_PPC405, CONFIG_PPC440, CONFIG_MAC_OLDWORLD, CONFIG_MAX_NEWWORLD
+and CONFIG_VIRTEX configuration options created for
+default-configs/ppc*-softmmu.mak.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/microblaze-softmmu.mak | 3 +++
- hw/microblaze/Makefile.objs            | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ default-configs/ppc-softmmu.mak |  7 ++++++-
+ hw/ppc/Makefile.objs            | 11 ++++++-----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
-index 7fca8e4c99..14837cf74a 100644
---- a/default-configs/microblaze-softmmu.mak
-+++ b/default-configs/microblaze-softmmu.mak
-@@ -10,3 +10,6 @@ CONFIG_XILINX_ETHLITE=y
- CONFIG_SSI=y
- CONFIG_SSI_M25P80=y
- CONFIG_XLNX_ZYNQMP=y
-+CONFIG_PETALOGIX_S3ADSP1800=y
-+CONFIG_PETALOGIX_ML605=y
-+CONFIG_XLNX_ZYNQMP_PMU=y
-diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
-index ae9fd40de7..8595a62f6c 100644
---- a/hw/microblaze/Makefile.objs
-+++ b/hw/microblaze/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += petalogix_s3adsp1800_mmu.o
--obj-y += petalogix_ml605_mmu.o
--obj-y += xlnx-zynqmp-pmu.o
-+obj-$(CONFIG_PETALOGIX_S3ADSP1800) += petalogix_s3adsp1800_mmu.o
-+obj-$(CONFIG_PETALOGIX_ML605) += petalogix_ml605_mmu.o
-+obj-$(CONFIG_XLNX_ZYNQMP_PMU) += xlnx-zynqmp-pmu.o
- obj-y += boot.o
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 23d871fb3e..7f80f0ccba 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -21,6 +21,10 @@ CONFIG_E500=y
+ CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
++CONFIG_PPC405=y
++CONFIG_PPC440=y
++CONFIG_VIRTEX=y
++
+ # For Sam460ex
+ CONFIG_SAM460EX=y
+ CONFIG_USB_EHCI_SYSBUS=y
+@@ -34,7 +38,6 @@ CONFIG_M41T80=y
+ CONFIG_VGA_CIRRUS=y
+ 
+ # For Macs
+-CONFIG_MAC=y
+ CONFIG_ESCC=y
+ CONFIG_MACIO=y
+ CONFIG_MACIO_GPIO=y
+@@ -50,6 +53,8 @@ CONFIG_GRACKLE_PCI=y
+ CONFIG_UNIN_PCI=y
+ CONFIG_DEC_PCI=y
+ CONFIG_IDE_MACIO=y
++CONFIG_MAC_OLDWORLD=y
++CONFIG_MAC_NEWWORLD=y
+ 
+ # For PReP
+ CONFIG_PREP=y
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 4e0c1c0941..7d815b7d57 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -14,19 +14,20 @@ endif
+ obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+ # PowerPC 4xx boards
+ obj-y += ppc4xx_devs.o ppc405_uc.o
+-obj-$(CONFIG_PPC4XX) += ppc4xx_pci.o ppc405_boards.o
+-obj-$(CONFIG_PPC4XX) += ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
++obj-$(CONFIG_PPC405) += ppc405_boards.o
++obj-$(CONFIG_PPC440) += ppc440_bamboo.o ppc440_pcix.o ppc440_uc.o
++obj-$(CONFIG_PPC4XX) += ppc4xx_pci.o
+ obj-$(CONFIG_SAM460EX) += sam460ex.o
+ # PReP
+ obj-$(CONFIG_PREP) += prep.o
+ obj-$(CONFIG_PREP) += prep_systemio.o
+ obj-${CONFIG_RS6000_MC} += rs6000_mc.o
+ # OldWorld PowerMac
+-obj-$(CONFIG_MAC) += mac_oldworld.o
++obj-$(CONFIG_MAC_OLDWORLD) += mac_oldworld.o
+ # NewWorld PowerMac
+-obj-$(CONFIG_MAC) += mac_newworld.o
++obj-$(CONFIG_MAC_NEWWORLD) += mac_newworld.o
+ # e500
+ obj-$(CONFIG_E500) += e500.o mpc8544ds.o e500plat.o
+ obj-$(CONFIG_E500) += mpc8544_guts.o ppce500_spin.o
+ # PowerPC 440 Xilinx ML507 reference board.
+-obj-$(CONFIG_XILINX) += virtex_ml507.o
++obj-$(CONFIG_VIRTEX) += virtex_ml507.o
 -- 
 2.17.1
