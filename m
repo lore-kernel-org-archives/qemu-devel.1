@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48217)
+Received: from eggs.gnu.org ([209.51.188.92]:48197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5o-0007Iy-2i
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:21 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5m-0000Lz-VH
+	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5n-0007IE-AY
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:20 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:39254)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5m-0000Ln-I6
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:19 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:32920)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gpC5m-0000Lf-MG
+	id 1gpC5m-0000LM-9M
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:18 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 31 Jan 2019 15:08:46 +0200
-Message-Id: <20190131130850.6850-7-yuval.shaia@oracle.com>
+Date: Thu, 31 Jan 2019 15:08:48 +0200
+Message-Id: <20190131130850.6850-9-yuval.shaia@oracle.com>
 In-Reply-To: <20190131130850.6850-1-yuval.shaia@oracle.com>
 References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH 06/10] hw/pvrdma: Dump device statistics
- counters to file
+Subject: [Qemu-devel] [PATCH 08/10] hw/rdma: Free all MAD receive buffers
+ when device is closed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +27,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
+When device is going down free all saved MAD buffers.
+
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/vmw/pvrdma.h      |  1 +
- hw/rdma/vmw/pvrdma_main.c | 72 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 73 insertions(+)
+ hw/rdma/rdma_backend.c | 32 ++++++++++++++++++++++++++++++++
+ hw/rdma/rdma_backend.h |  1 +
+ 2 files changed, 33 insertions(+)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index 167706ec2c..dc10f21ca0 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -133,5 +133,6 @@ static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index d43fb1e677..65b28aa5b2 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -64,6 +64,32 @@ static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
+     comp_handler(ctx, &wc);
  }
  
- int pvrdma_exec_cmd(PVRDMADev *dev);
-+void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func);
- 
- #endif
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index cf82e78f08..79900076ec 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -14,6 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
-@@ -36,6 +37,8 @@
- #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
- #include "pvrdma_qp_ops.h"
- 
-+GSList *devices;
-+
- static Property pvrdma_dev_properties[] = {
-     DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
-     DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
-@@ -55,6 +58,72 @@ static Property pvrdma_dev_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static void pvrdma_dump_device_statistics(gpointer data, gpointer user_data)
++static void free_cqe_ctx(gpointer data, gpointer user_data)
 +{
-+    CPUListState *s = user_data;
-+    PCIDevice *pdev = data;
-+    PVRDMADev *dev = PVRDMA_DEV(pdev);
++    BackendCtx *bctx;
++    RdmaDeviceResources *rdma_dev_res = user_data;
++    unsigned long cqe_ctx_id = GPOINTER_TO_INT(data);
 +
-+    (*s->cpu_fprintf)(s->file, "%s_%x.%x\n", pdev->name,
-+                 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
-+    (*s->cpu_fprintf)(s->file, "\tcommands         : %" PRId64 "\n",
-+                      dev->stats.commands);
-+    (*s->cpu_fprintf)(s->file, "\ttx               : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.tx);
-+    (*s->cpu_fprintf)(s->file, "\ttx_len           : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.tx_len);
-+    (*s->cpu_fprintf)(s->file, "\ttx_err           : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.tx_err);
-+    (*s->cpu_fprintf)(s->file, "\trx_bufs          : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.rx_bufs);
-+    (*s->cpu_fprintf)(s->file, "\trx_bufs_len      : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.rx_bufs_len);
-+    (*s->cpu_fprintf)(s->file, "\trx_bufs_err      : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.rx_bufs_err);
-+    (*s->cpu_fprintf)(s->file, "\tcompletions      : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.completions);
-+    (*s->cpu_fprintf)(s->file, "\tpoll_cq (bk)     : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.poll_cq_from_bk);
-+    (*s->cpu_fprintf)(s->file, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.poll_cq_ppoll_to);
-+    (*s->cpu_fprintf)(s->file, "\tpoll_cq (fe)     : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.poll_cq_from_guest);
-+    (*s->cpu_fprintf)(s->file, "\tmad_tx           : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_tx);
-+    (*s->cpu_fprintf)(s->file, "\tmad_tx_err       : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_tx_err);
-+    (*s->cpu_fprintf)(s->file, "\tmad_rx           : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_rx);
-+    (*s->cpu_fprintf)(s->file, "\tmad_rx_err       : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_rx_err);
-+    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs      : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_rx_bufs);
-+    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs_err  : %" PRId64 "\n",
-+                      dev->rdma_dev_res.stats.mad_rx_bufs_err);
-+    (*s->cpu_fprintf)(s->file, "\tPDs              : %" PRId32 "\n",
-+                      dev->rdma_dev_res.pd_tbl.used);
-+    (*s->cpu_fprintf)(s->file, "\tMRs              : %" PRId32 "\n",
-+                      dev->rdma_dev_res.mr_tbl.used);
-+    (*s->cpu_fprintf)(s->file, "\tUCs              : %" PRId32 "\n",
-+                      dev->rdma_dev_res.uc_tbl.used);
-+    (*s->cpu_fprintf)(s->file, "\tQPs              : %" PRId32 "\n",
-+                      dev->rdma_dev_res.qp_tbl.used);
-+    (*s->cpu_fprintf)(s->file, "\tCQs              : %" PRId32 "\n",
-+                      dev->rdma_dev_res.cq_tbl.used);
-+    (*s->cpu_fprintf)(s->file, "\tCEQ_CTXs         : %" PRId32 "\n",
-+                      dev->rdma_dev_res.cqe_ctx_tbl.used);
++    bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, cqe_ctx_id);
++    if (bctx) {
++        rdma_rm_dealloc_cqe_ctx(rdma_dev_res, cqe_ctx_id);
++    }
++    g_free(bctx);
 +}
 +
-+void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func)
++static void clean_recv_mads(RdmaBackendDev *backend_dev)
 +{
-+    CPUListState s = {
-+        .file = f,
-+        .cpu_fprintf = fprintf_func,
-+    };
++    unsigned long cqe_ctx_id;
 +
-+    g_slist_foreach(devices, pvrdma_dump_device_statistics, &s);
++    do {
++        cqe_ctx_id = rdma_locked_list_pop_int64(&backend_dev->recv_mads_list);
++        if (cqe_ctx_id != -ENOENT) {
++            free_cqe_ctx(GINT_TO_POINTER(cqe_ctx_id),
++                         backend_dev->rdma_dev_res);
++        }
++    } while (cqe_ctx_id != -ENOENT);
 +}
 +
- static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
-                           void *ring_state)
+ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
  {
-@@ -618,6 +687,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-     dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-     qemu_register_shutdown_notifier(&dev->shutdown_notifier);
- 
-+    devices = g_slist_append(devices, pdev);
-+
- out:
-     if (rc) {
-         pvrdma_fini(pdev);
-@@ -627,6 +698,7 @@ out:
- 
- static void pvrdma_exit(PCIDevice *pdev)
- {
-+    devices = g_slist_remove(devices, pdev);
-     pvrdma_fini(pdev);
+     int i, ne, total_ne = 0;
+@@ -1029,6 +1055,11 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+     return 0;
  }
  
++static void mad_stop(RdmaBackendDev *backend_dev)
++{
++    clean_recv_mads(backend_dev);
++}
++
+ static void mad_fini(RdmaBackendDev *backend_dev)
+ {
+     disable_rdmacm_mux_async(backend_dev);
+@@ -1216,6 +1247,7 @@ void rdma_backend_start(RdmaBackendDev *backend_dev)
+ 
+ void rdma_backend_stop(RdmaBackendDev *backend_dev)
+ {
++    mad_stop(backend_dev);
+     stop_backend_thread(&backend_dev->comp_thread);
+ }
+ 
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index 36305cd148..6abc367a52 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -33,6 +33,7 @@
+ #define VENDOR_ERR_MR_SMALL         0x208
+ #define VENDOR_ERR_INV_MAD_BUFF     0x209
+ #define VENDOR_ERR_INV_GID_IDX      0x210
++#define VENDOR_ERR_DEV_GOING_DOWN   0x211
+ 
+ /* Add definition for QP0 and QP1 as there is no userspace enums for them */
+ enum ibv_special_qp_type {
 -- 
 2.17.2
