@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42138)
+Received: from eggs.gnu.org ([209.51.188.92]:42470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpJmn-0001bE-Bv
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:22:14 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpJnx-0002e5-Mk
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpJmm-00049l-A1
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:22:13 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gpJmm-00049Z-47
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:22:12 -0500
-Received: by mail-wm1-f67.google.com with SMTP id d15so4000639wmb.3
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 13:22:11 -0800 (PST)
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-42-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1bd28f71-6c37-2739-f181-4d8796fedb2c@redhat.com>
-Date: Thu, 31 Jan 2019 22:22:09 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gpJnv-0004SW-Ul
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:23:25 -0500
+Resent-Message-Id: <E1gpJnv-0004SW-Ul@eggs.gnu.org>
+Message-ID: <154896977228.23946.1276666356495831150@ebba9967afc0>
+In-Reply-To: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1548410831-19553-42-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 41/52] isa: express dependencies with
- kconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 13:22:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
+ decodetree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,322 +24,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, thuth@redhat.com
+To: kbastian@mail.uni-paderborn.de
+Cc: fam@euphon.net, sagark@eecs.berkeley.edu, palmer@sifive.com, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
 
-Hi Paolo,
-
-On 1/25/19 11:07 AM, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Message-Id: <20190123065618.3520-36-yang.zhong@intel.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/i386-softmmu.mak | 9 ---------
->  hw/audio/Kconfig                 | 2 ++
->  hw/block/Kconfig                 | 2 ++
->  hw/char/Kconfig                  | 6 ++++++
->  hw/display/Kconfig               | 3 +++
->  hw/dma/Kconfig                   | 1 +
->  hw/i386/Kconfig                  | 1 +
->  hw/ide/Kconfig                   | 1 +
->  hw/input/Kconfig                 | 2 ++
->  hw/isa/Kconfig                   | 7 +++++++
->  hw/misc/Kconfig                  | 4 ++++
->  hw/net/Kconfig                   | 3 +++
->  hw/sparc64/Kconfig               | 1 +
->  hw/watchdog/Kconfig              | 2 ++
->  14 files changed, 35 insertions(+), 9 deletions(-)
-> 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index 4073c62..8e6a810 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -8,19 +8,12 @@ CONFIG_VGA_ISA=y
->  CONFIG_VMWARE_VGA=y
->  CONFIG_VMXNET3_PCI=y
->  CONFIG_VIRTIO_VGA=y
-> -CONFIG_VMMOUSE=y
->  CONFIG_IPMI=y
->  CONFIG_IPMI_LOCAL=y
->  CONFIG_IPMI_EXTERN=y
->  CONFIG_ISA_IPMI_KCS=y
->  CONFIG_ISA_IPMI_BT=y
-> -CONFIG_SERIAL=y
-> -CONFIG_SERIAL_ISA=y
-> -CONFIG_PARALLEL=y
->  CONFIG_I8254=y
-> -CONFIG_PCSPK=y
-> -CONFIG_PCKBD=y
-> -CONFIG_FDC=y
->  CONFIG_ACPI=y
->  CONFIG_ACPI_X86=y
->  CONFIG_ACPI_X86_ICH=y
-> @@ -30,14 +23,12 @@ CONFIG_APM=y
->  CONFIG_I8257=y
->  CONFIG_IDE_ISA=y
->  CONFIG_IDE_PIIX=y
-> -CONFIG_NE2000_ISA=y
->  CONFIG_HPET=y
->  CONFIG_APPLESMC=y
->  CONFIG_I8259=y
->  CONFIG_PFLASH_CFI01=y
->  CONFIG_MC146818RTC=y
->  CONFIG_PCI_PIIX=y
-> -CONFIG_WDT_IB700=y
->  CONFIG_ISA_DEBUG=y
->  CONFIG_ISA_TESTDEV=y
->  CONFIG_VMPORT=y
-> diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-> index dedb513..01aea55 100644
-> --- a/hw/audio/Kconfig
-> +++ b/hw/audio/Kconfig
-> @@ -35,6 +35,8 @@ config HDA
->  
->  config PCSPK
->      bool
-> +    default y
-> +    depends on I8254
->  
->  config WM8750
->      bool
-> diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-> index f7b9d3a..dc91e67 100644
-> --- a/hw/block/Kconfig
-> +++ b/hw/block/Kconfig
-> @@ -1,5 +1,7 @@
->  config FDC
->      bool
-> +    default y
-> +    depends on ISA_BUS
->  
->  config SSI_M25P80
->      bool
-> diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-> index 6eba69a..fc18481 100644
-> --- a/hw/char/Kconfig
-> +++ b/hw/char/Kconfig
-> @@ -3,6 +3,8 @@ config ESCC
->  
->  config PARALLEL
->      bool
-> +    default y
-> +    depends on ISA_BUS
->  
->  config PL011
->      bool
-> @@ -12,11 +14,15 @@ config SERIAL
->  
->  config SERIAL_ISA
->      bool
-> +    default y
-> +    depends on ISA_BUS
-> +    select SERIAL
->  
->  config SERIAL_PCI
->      bool
->      default y if PCI_DEVICES
->      depends on PCI
-> +    select SERIAL
->  
->  config VIRTIO_SERIAL
->      bool
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index f8d63c6..64a5764 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -39,9 +39,12 @@ config VGA_PCI
->  
->  config VGA_ISA
->      bool
-> +    depends on ISA_BUS
-> +    select VGA
->  
->  config VGA_ISA_MM
->      bool
-> +    select VGA
->  
->  config VMWARE_VGA
->      bool
-> diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
-> index b9ce1c5..751dec5 100644
-> --- a/hw/dma/Kconfig
-> +++ b/hw/dma/Kconfig
-> @@ -9,6 +9,7 @@ config PL330
->  
->  config I82374
->      bool
-> +    select I8257
->  
->  config I8257
->      bool
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index 9a0e559..ff41be3 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -10,6 +10,7 @@ config I440FX
->  
->  config ISAPC
->      bool
-> +    select ISA_BUS
->  
->  config Q35
->      bool
-> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-> index 246e27b..ab47b6a 100644
-> --- a/hw/ide/Kconfig
-> +++ b/hw/ide/Kconfig
-> @@ -12,6 +12,7 @@ config IDE_PCI
->  
->  config IDE_ISA
->      bool
-> +    depends on ISA_BUS
->      select IDE_QDEV
->  
->  config IDE_PIIX
-> diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-> index 98a18a1..bdb4237 100644
-> --- a/hw/input/Kconfig
-> +++ b/hw/input/Kconfig
-> @@ -6,6 +6,8 @@ config LM832X
->  
->  config PCKBD
->      bool
-> +    default y
-> +    depends on ISA_BUS
->  
->  config PL050
->      bool
-> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-> index b59d074..af68af9 100644
-> --- a/hw/isa/Kconfig
-> +++ b/hw/isa/Kconfig
-> @@ -6,18 +6,25 @@ config APM
->  
->  config I82378
->      bool
-> +    select ISA_BUS
->  
->  config PC87312
->      bool
-> +    select ISA_BUS
->  
->  config PIIX4
->      bool
-> +    select ISA_BUS
->  
->  config VT82C686
->      bool
-> +    select ISA_BUS
->  
->  config SMC37C669
->      bool
-> +    select ISA_BUS
-
-I kinda disagree with the SuperIO generated configs here, but partly my
-fault because the previous Makefile.objs missed the CONFIG_ISA_SUPERIO
-(I missed to review eae2e2e96bf from Thomas where is introduced
-CONFIG_SMC37C669).
-So introducing ISA_SUPERIO simplifies this files and SouthBridge
-devices. I'm not sure how to provide this patch:
-
- # generic SuperIO
- config ISA_SUPERIO
-     bool
-     select ISA_BUS
-     select SERIAL_ISA
-     select PARALLEL
-     select FDC
-     select IDE_ISA
-
- config PC87312
-     bool
-     select ISA_SUPERIO
-     select I8259
-     select I8254
-     select I8257
-     select MC146818RTC
-
- config SMC37C669
-     bool
-     select ISA_SUPERIO
-
-I'll see, if the changes are trivial you can cherry-pick at the correct
-place in your branch.
-
->  
->  config LPC_ICH9
->      bool
-> +    select ISA_BUS
-> +    select ACPI_X86_ICH
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index c85c085..ca051fb 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -1,5 +1,6 @@
->  config APPLESMC
->      bool
-> +    depends on ISA_BUS
->  
->  config MAX111X
->      bool
-> @@ -12,9 +13,11 @@ config TMP421
->  
->  config ISA_DEBUG
->      bool
-> +    depends on ISA_BUS
->  
->  config SGA
->      bool
-> +    depends on ISA_BUS
->  
->  config ISA_TESTDEV
->      bool
-> @@ -93,6 +96,7 @@ config IOTKIT_SYSINFO
->  
->  config PVPANIC
->      bool
-> +    depends on ISA_BUS
->  
->  config AUX
->      bool
-> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-> index d50e301..6d15720 100644
-> --- a/hw/net/Kconfig
-> +++ b/hw/net/Kconfig
-> @@ -48,6 +48,9 @@ config LAN9118
->  
->  config NE2000_ISA
->      bool
-> +    default y
-> +    depends on ISA_BUS
-> +    depends on PCI # for NE2000State
->  
->  config OPENCORES_ETH
->      bool
-> diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
-> index 8c13345..41f7295 100644
-> --- a/hw/sparc64/Kconfig
-> +++ b/hw/sparc64/Kconfig
-> @@ -1,5 +1,6 @@
->  config SUN4U
->      bool
-> +    select ISA_BUS
->  
->  config NIAGARA
->      bool
-> diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-> index edb3d42..35ccb72 100644
-> --- a/hw/watchdog/Kconfig
-> +++ b/hw/watchdog/Kconfig
-> @@ -8,6 +8,8 @@ config WDT_IB6300ESB
->  
->  config WDT_IB700
->      bool
-> +    default y
-> +    depends on ISA_BUS
->  
->  config WDT_DIAG288
->      bool
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMjA5MjkwOS41MzQx
+LTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAw
+LzM1XSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgdG8gZGVjb2RldHJlZQpUeXBlOiBzZXJpZXMKTWVz
+c2FnZS1pZDogMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9y
+bi5kZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5p
+LXBhZGVyYm9ybi5kZSAtPiBwYXRjaGV3LzIwMTkwMTIyMDkyOTA5LjUzNDEtMS1rYmFzdGlhbkBt
+YWlsLnVuaS1wYWRlcmJvcm4uZGUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplZDVk
+MjliNGUyIHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMyIGJpdCB0cmFu
+c2xhdG9ycwpiNTQwMzFhNmUxIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmluZyBjb21wcmVz
+c2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NAo5Yjk2M2ExOTFkIHRhcmdldC9y
+aXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJpc2N2NjQKZWI1
+Y2MzZDg5ZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3NfZCwgQGNzX3cg
+aW5zbnMKZjMxZGY0ODI3MCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5zbnMgdG8gc2hh
+cmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjg0OTkxNTk4Y2QgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUg
+ZGVjb2RlX1JWMzJfNjRHKCkKM2FjNzViMDRlOSB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBnZW5fc3lz
+dGVtKCkKMjhiNzAxOTJmZSB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5f
+YXJpdGgKYzY5Y2VmODkwNiB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2Rpbmcgb2Yg
+UlYzMi82NE0gaW5zbgowZmVlNmM3Nzc4IHRhcmdldC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBz
+bHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKM2U4YTA1ZjY1YyB0YXJnZXQvcmlzY3Y6IG1ha2UgQURE
+L1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwoyODA1OTU0ZjY5IHRhcmdldC9yaXNj
+djogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucwo0
+Y2EwZjcyMDhmIHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9z
+dG9yZSgpCmJiYTVlYjAzZDcgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZy
+b20gZ2VuX2xvYWQoKQoyMzgyMDc4YzM3IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNv
+ZGluZyBmcm9tIGdlbl9icmFuY2goKQo1MTcyMGU3ODcxIHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
+bl9qYWxyKCkKNzZmZTc3Mzc0YSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMiBvZiBS
+VlhDIGluc25zIHRvIGRlY29kZXRyZWUKY2JkYmZlNGNlNiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQg
+cXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKYTg0NWFkOTE2NyB0YXJnZXQv
+cmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNDc1
+N2Y4ODdkMyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBkZWNvZGV0cmVl
+CmE0NWRjNjRiMTQgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRvIGRlY29kZXRy
+ZWUKODFkNDMzYTM1NSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMgdG8gZGVjb2Rl
+dHJlZQphMjgxN2I4MjhlIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNucyB0byBkZWNv
+ZGV0cmVlCmE0YjNhYTUxMTMgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGluc25zIHRvIGRl
+Y29kZXRyZWUKZjU3MWM3MzFhMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEgaW5zbnMgdG8g
+ZGVjb2RldHJlZQozMDk5ZWQ5ZjJhIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyQSBpbnNucyB0
+byBkZWNvZGV0cmVlCmU1Y2ZmNTcxY2YgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWE0gaW5zbnMg
+dG8gZGVjb2RldHJlZQozZTg3OTYxNjNlIHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBp
+bnNucyB0byBkZWNvZGV0cmVlCmE5ZmYyYTE5Y2IgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkg
+ZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQpmYzFkNGU0YjZmIHRhcmdldC9yaXNjdjogQ29udmVy
+dCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQo0MGViNzQ2MjM0IHRhcmdldC9y
+aXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRyZWUKMThiZTcy
+MTEzMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNv
+ZGV0cmVlCjNhNGEwZjI2YWIgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJhbmNoIGluc25z
+IHRvIGRlY29kZXRyZWUKYjQ0YjRjYzgwMCB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRlIGRlY29kZXRy
+ZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCjI1N2Q3YTM1NDUgdGFyZ2V0L3Jpc2N2OiBNb3Zl
+IENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IDI1N2Q3YTM1NDVlNCAodGFyZ2V0L3Jpc2N2OiBNb3Zl
+IENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hlY2tpbmcgY29t
+bWl0IGI0NGI0Y2M4MDA3OCAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0cmVlIGFuZCBp
+bXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzEy
+NTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE2ODc6Citib29sIGRlY29kZV9pbnNu
+MzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAx
+IHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgM2E0YTBmMjZhYmQxICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8zNSBDaGVja2lu
+ZyBjb21taXQgMThiZTcyMTEzMTcyICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9z
+dG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCA0MGViNzQ2MjM0
+YWUgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29k
+ZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
+TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
+OiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8zNSBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCBmYzFkNGU0YjZmZGMg
+KHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJl
+ZSkKNy8zNSBDaGVja2luZyBjb21taXQgYTlmZjJhMTljYmI0ICh0YXJnZXQvcmlzY3Y6IENvbnZl
+cnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5nIGNvbW1pdCAz
+ZTg3OTYxNjNlOTYgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNucyB0byBkZWNv
+ZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBlNWNmZjU3MWNmNTIgKHRhcmdldC9yaXNjdjog
+Q29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
+ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ4OiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ1IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMzUg
+Q2hlY2tpbmcgY29tbWl0IDMwOTllZDlmMmFmZSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJB
+IGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENoZWNraW5nIGNv
+bW1pdCBmNTcxYzczMWExY2YgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBpbnNucyB0byBk
+ZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgYTRiM2FhNTExMzdkICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1v
+dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
+Nzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAz
+OTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+MTMvMzUgQ2hlY2tpbmcgY29tbWl0IGEyODE3YjgyOGVmNyAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0
+IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1pdCA4MWQ0MzNh
+MzU1NWMgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNvZGV0cmVlKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
+cnMsIDEgd2FybmluZ3MsIDM1MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgYTQ1ZGM2NGIxNDdjICh0YXJn
+ZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYvMzUgQ2hlY2tp
+bmcgY29tbWl0IDQ3NTdmODg3ZDM5ZiAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWIHByaXYgaW5z
+bnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
+KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEw
+MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hlY2tlZAoKUGF0
+Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tpbmcgY29tbWl0
+IGE4NDVhZDkxNjc5NiAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAgb2YgUlZYQyBp
+bnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjQ2
+OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6OTgzOgorYm9vbCBkZWNvZGVfaW5zbjE2
+KERpc2FzQ29udGV4dCAqY3R4LCB1aW50MTZfdCBpbnNuKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3
+YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzM1IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgoxOC8zNSBDaGVja2luZyBjb21taXQgY2JkYmZlNGNlNjIzICh0YXJnZXQvcmlz
+Y3Y6IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjE5LzM1
+IENoZWNraW5nIGNvbW1pdCA3NmZlNzczNzRhNjAgKHRhcmdldC9yaXNjdjogQ29udmVydCBxdWFk
+cmFudCAyIG9mIFJWWEMgaW5zbnMgdG8gZGVjb2RldHJlZSkKMjAvMzUgQ2hlY2tpbmcgY29tbWl0
+IDUxNzIwZTc4NzE0OSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX2phbHIoKSkKMjEvMzUgQ2hl
+Y2tpbmcgY29tbWl0IDIzODIwNzhjMzdiYiAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
+Y29kaW5nIGZyb20gZ2VuX2JyYW5jaCgpKQoyMi8zNSBDaGVja2luZyBjb21taXQgYmJhNWViMDNk
+NzBmICh0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fbG9hZCgp
+KQoyMy8zNSBDaGVja2luZyBjb21taXQgNGNhMGY3MjA4ZjlmICh0YXJnZXQvcmlzY3Y6IFJlbW92
+ZSBtYW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fc3RvcmUoKSkKMjQvMzUgQ2hlY2tpbmcgY29tbWl0
+IDI4MDU5NTRmNjllYSAodGFyZ2V0L3Jpc2N2OiBNb3ZlIGdlbl9hcml0aF9pbW0oKSBkZWNvZGlu
+ZyBpbnRvIHRyYW5zXyogZnVuY3Rpb25zKQoyNS8zNSBDaGVja2luZyBjb21taXQgM2U4YTA1ZjY1
+Y2I1ICh0YXJnZXQvcmlzY3Y6IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBs
+aXN0cykKMjYvMzUgQ2hlY2tpbmcgY29tbWl0IDBmZWU2Yzc3NzgxNCAodGFyZ2V0L3Jpc2N2OiBS
+ZW1vdmUgc2hpZnQgYW5kIHNsdCBpbnNuIG1hbnVhbCBkZWNvZGluZykKMjcvMzUgQ2hlY2tpbmcg
+Y29tbWl0IGM2OWNlZjg5MDZiNyAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5n
+IG9mIFJWMzIvNjRNIGluc24pCjI4LzM1IENoZWNraW5nIGNvbW1pdCAyOGI3MDE5MmZlYjMgKHRh
+cmdldC9yaXNjdjogUmVuYW1lIHRyYW5zX2FyaXRoIHRvIGdlbl9hcml0aCkKMjkvMzUgQ2hlY2tp
+bmcgY29tbWl0IDNhYzc1YjA0ZTkyZCAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX3N5c3RlbSgp
+KQozMC8zNSBDaGVja2luZyBjb21taXQgODQ5OTE1OThjZDE3ICh0YXJnZXQvcmlzY3Y6IFJlbW92
+ZSBkZWNvZGVfUlYzMl82NEcoKSkKMzEvMzUgQ2hlY2tpbmcgY29tbWl0IGYzMWRmNDgyNzA5YyAo
+dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IEBjc18yIGluc25zIHRvIHNoYXJlIHRyYW5zbGF0aW9uIGZ1
+bmN0aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
+QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJS
+T1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzE4MjogRklMRTogdGFy
+Z2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjQ5NzoKK2Jvb2wgZGVjb2RlX2luc24xNihEaXNhc0NvbnRl
+eHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE2
+NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzMS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+MzIvMzUgQ2hlY2tpbmcgY29tbWl0IGViNWNjM2Q4OWY3MSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0
+IEBjbF9kLCBAY2xfdywgQGNzX2QsIEBjc193IGluc25zKQozMy8zNSBDaGVja2luZyBjb21taXQg
+OWI5NjNhMTkxZDdiICh0YXJnZXQvcmlzY3Y6IFNwbGljZSBmc3dfc2QgYW5kIGZsd19sZCBmb3Ig
+cmlzY3YzMiB2cyByaXNjdjY0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyODogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI4NyBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCAzMy8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozNC8zNSBDaGVja2luZyBjb21t
+aXQgYjU0MDMxYTZlMWM1ICh0YXJnZXQvcmlzY3Y6IFNwbGljZSByZW1haW5pbmcgY29tcHJlc3Nl
+ZCBpbnNuIHBhaXJzIGZvciByaXNjdjMyIHZzIHJpc2N2NjQpCjM1LzM1IENoZWNraW5nIGNvbW1p
+dCBlZDVkMjliNGUyYjYgKHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
+IGJpdCB0cmFuc2xhdG9ycykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVy
+Ym9ybi5kZS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
