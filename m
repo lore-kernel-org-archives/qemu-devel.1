@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37470)
+Received: from eggs.gnu.org ([209.51.188.92]:37489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0hw-0007sW-Hb
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 19:59:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0hy-0007uQ-N3
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 19:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0hv-0007bC-2u
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 19:59:56 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0hx-0007ca-E9
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 19:59:58 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 31 Jan 2019 01:59:33 +0100
-Message-Id: <20190131005945.20149-2-mreitz@redhat.com>
+Date: Thu, 31 Jan 2019 01:59:34 +0100
+Message-Id: <20190131005945.20149-3-mreitz@redhat.com>
 In-Reply-To: <20190131005945.20149-1-mreitz@redhat.com>
 References: <20190131005945.20149-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/13] qapi: add x-debug-query-block-graph
+Subject: [Qemu-devel] [PULL 02/13] scripts: add render_block_graph function
+ for QEMUMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,387 +27,147 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Add a new command, returning block nodes (and their users) graph.
+Render block nodes graph with help of graphviz. This new function is
+for debugging, so there is no sense to put it into qemu.py as a method
+of QEMUMachine. Let's instead put it separately.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20181221170909.25584-2-vsementsov@virtuozzo.com
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20181221170909.25584-3-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json           | 108 ++++++++++++++++++++++++
- include/block/block.h          |   1 +
- include/sysemu/block-backend.h |   2 +
- block.c                        | 148 +++++++++++++++++++++++++++++++++
- block/block-backend.c          |   5 ++
- blockdev.c                     |   5 ++
- 6 files changed, 269 insertions(+)
+ scripts/render_block_graph.py | 120 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 120 insertions(+)
+ create mode 100755 scripts/render_block_graph.py
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 91685be6c2..cde1b53708 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1665,6 +1665,114 @@
- ##
- { 'command': 'query-named-block-nodes', 'returns': [ 'BlockDeviceInfo' ]=
- }
-=20
-+##
-+# @XDbgBlockGraphNodeType:
+diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.p=
+y
+new file mode 100755
+index 0000000000..ed7e581b4f
+--- /dev/null
++++ b/scripts/render_block_graph.py
+@@ -0,0 +1,120 @@
++#!/usr/bin/env python
 +#
-+# @block-backend: corresponds to BlockBackend
++# Render Qemu Block Graph
 +#
-+# @block-job: corresonds to BlockJob
++# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
 +#
-+# @block-driver: corresponds to BlockDriverState
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# Since: 4.0
-+##
-+{ 'enum': 'XDbgBlockGraphNodeType',
-+  'data': [ 'block-backend', 'block-job', 'block-driver' ] }
-+
-+##
-+# @XDbgBlockGraphNode:
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
-+# @id: Block graph node identifier. This @id is generated only for
-+#      x-debug-query-block-graph and does not relate to any other identi=
-fiers in
-+#      Qemu.
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
-+# @type: Type of graph node. Can be one of block-backend, block-job or
-+#        block-driver-state.
-+#
-+# @name: Human readable name of the node. Corresponds to node-name for
-+#        block-driver-state nodes; is not guaranteed to be unique in the=
- whole
-+#        graph (with block-jobs and block-backends).
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'XDbgBlockGraphNode',
-+  'data': { 'id': 'uint64', 'type': 'XDbgBlockGraphNodeType', 'name': 's=
-tr' } }
 +
-+##
-+# @BlockPermission:
-+#
-+# Enum of base block permissions.
-+#
-+# @consistent-read: A user that has the "permission" of consistent reads=
- is
-+#                   guaranteed that their view of the contents of the bl=
-ock
-+#                   device is complete and self-consistent, representing=
- the
-+#                   contents of a disk at a specific point.
-+#                   For most block devices (including their backing file=
-s) this
-+#                   is true, but the property cannot be maintained in a =
-few
-+#                   situations like for intermediate nodes of a commit b=
-lock
-+#                   job.
-+#
-+# @write: This permission is required to change the visible disk content=
-s.
-+#
-+# @write-unchanged: This permission (which is weaker than BLK_PERM_WRITE=
-) is
-+#                   both enough and required for writes to the block nod=
-e when
-+#                   the caller promises that the visible disk content do=
-esn't
-+#                   change.
-+#                   As the BLK_PERM_WRITE permission is strictly stronge=
-r,
-+#                   either is sufficient to perform an unchanging write.
-+#
-+# @resize: This permission is required to change the size of a block nod=
-e.
-+#
-+# @graph-mod: This permission is required to change the node that this
-+#             BdrvChild points to.
-+#
-+# Since: 4.0
-+##
-+  { 'enum': 'BlockPermission',
-+    'data': [ 'consistent-read', 'write', 'write-unchanged', 'resize',
-+              'graph-mod' ] }
-+##
-+# @XDbgBlockGraphEdge:
-+#
-+# Block Graph edge description for x-debug-query-block-graph.
-+#
-+# @parent: parent id
-+#
-+# @child: child id
-+#
-+# @name: name of the relation (examples are 'file' and 'backing')
-+#
-+# @perm: granted permissions for the parent operating on the child
-+#
-+# @shared-perm: permissions that can still be granted to other users of =
-the
-+#               child while it is still attached to this parent
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'XDbgBlockGraphEdge',
-+  'data': { 'parent': 'uint64', 'child': 'uint64',
-+            'name': 'str', 'perm': [ 'BlockPermission' ],
-+            'shared-perm': [ 'BlockPermission' ] } }
-+
-+##
-+# @XDbgBlockGraph:
-+#
-+# Block Graph - list of nodes and list of edges.
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'XDbgBlockGraph',
-+  'data': { 'nodes': ['XDbgBlockGraphNode'], 'edges': ['XDbgBlockGraphEd=
-ge'] } }
-+
-+##
-+# @x-debug-query-block-graph:
-+#
-+# Get the block graph.
-+#
-+# Since: 4.0
-+##
-+{ 'command': 'x-debug-query-block-graph', 'returns': 'XDbgBlockGraph' }
-+
- ##
- # @drive-mirror:
- #
-diff --git a/include/block/block.h b/include/block/block.h
-index f70a843b72..57233cf2c0 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -448,6 +448,7 @@ void bdrv_eject(BlockDriverState *bs, bool eject_flag=
-);
- const char *bdrv_get_format_name(BlockDriverState *bs);
- BlockDriverState *bdrv_find_node(const char *node_name);
- BlockDeviceInfoList *bdrv_named_nodes_list(Error **errp);
-+XDbgBlockGraph *bdrv_get_xdbg_block_graph(Error **errp);
- BlockDriverState *bdrv_lookup_bs(const char *device,
-                                  const char *node_name,
-                                  Error **errp);
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
-d.h
-index c96bcdee14..c8f816a200 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -237,4 +237,6 @@ int coroutine_fn blk_co_copy_range(BlockBackend *blk_=
-in, int64_t off_in,
-                                    int bytes, BdrvRequestFlags read_flag=
-s,
-                                    BdrvRequestFlags write_flags);
-=20
-+const BdrvChild *blk_root(BlockBackend *blk);
-+
- #endif
-diff --git a/block.c b/block.c
-index 4f5ff2cc12..e795a7c5de 100644
---- a/block.c
-+++ b/block.c
-@@ -4119,6 +4119,154 @@ BlockDeviceInfoList *bdrv_named_nodes_list(Error =
-**errp)
-     return list;
- }
-=20
-+#define QAPI_LIST_ADD(list, element) do { \
-+    typeof(list) _tmp =3D g_new(typeof(*(list)), 1); \
-+    _tmp->value =3D (element); \
-+    _tmp->next =3D (list); \
-+    (list) =3D _tmp; \
-+} while (0)
-+
-+typedef struct XDbgBlockGraphConstructor {
-+    XDbgBlockGraph *graph;
-+    GHashTable *graph_nodes;
-+} XDbgBlockGraphConstructor;
-+
-+static XDbgBlockGraphConstructor *xdbg_graph_new(void)
-+{
-+    XDbgBlockGraphConstructor *gr =3D g_new(XDbgBlockGraphConstructor, 1=
-);
-+
-+    gr->graph =3D g_new0(XDbgBlockGraph, 1);
-+    gr->graph_nodes =3D g_hash_table_new(NULL, NULL);
-+
-+    return gr;
-+}
-+
-+static XDbgBlockGraph *xdbg_graph_finalize(XDbgBlockGraphConstructor *gr=
-)
-+{
-+    XDbgBlockGraph *graph =3D gr->graph;
-+
-+    g_hash_table_destroy(gr->graph_nodes);
-+    g_free(gr);
-+
-+    return graph;
-+}
-+
-+static uintptr_t xdbg_graph_node_num(XDbgBlockGraphConstructor *gr, void=
- *node)
-+{
-+    uintptr_t ret =3D (uintptr_t)g_hash_table_lookup(gr->graph_nodes, no=
-de);
-+
-+    if (ret !=3D 0) {
-+        return ret;
-+    }
-+
-+    /*
-+     * Start counting from 1, not 0, because 0 interferes with not-found=
- (NULL)
-+     * answer of g_hash_table_lookup.
-+     */
-+    ret =3D g_hash_table_size(gr->graph_nodes) + 1;
-+    g_hash_table_insert(gr->graph_nodes, node, (void *)ret);
-+
-+    return ret;
-+}
-+
-+static void xdbg_graph_add_node(XDbgBlockGraphConstructor *gr, void *nod=
-e,
-+                                XDbgBlockGraphNodeType type, const char =
-*name)
-+{
-+    XDbgBlockGraphNode *n;
-+
-+    n =3D g_new0(XDbgBlockGraphNode, 1);
-+
-+    n->id =3D xdbg_graph_node_num(gr, node);
-+    n->type =3D type;
-+    n->name =3D g_strdup(name);
-+
-+    QAPI_LIST_ADD(gr->graph->nodes, n);
-+}
-+
-+static void xdbg_graph_add_edge(XDbgBlockGraphConstructor *gr, void *par=
-ent,
-+                                const BdrvChild *child)
-+{
-+    typedef struct {
-+        unsigned int flag;
-+        BlockPermission num;
-+    } PermissionMap;
-+
-+    static const PermissionMap permissions[] =3D {
-+        { BLK_PERM_CONSISTENT_READ, BLOCK_PERMISSION_CONSISTENT_READ },
-+        { BLK_PERM_WRITE,           BLOCK_PERMISSION_WRITE },
-+        { BLK_PERM_WRITE_UNCHANGED, BLOCK_PERMISSION_WRITE_UNCHANGED },
-+        { BLK_PERM_RESIZE,          BLOCK_PERMISSION_RESIZE },
-+        { BLK_PERM_GRAPH_MOD,       BLOCK_PERMISSION_GRAPH_MOD },
-+        { 0, 0 }
-+    };
-+    const PermissionMap *p;
-+    XDbgBlockGraphEdge *edge;
-+
-+    QEMU_BUILD_BUG_ON(1UL << (ARRAY_SIZE(permissions) - 1) !=3D BLK_PERM=
-_ALL + 1);
-+
-+    edge =3D g_new0(XDbgBlockGraphEdge, 1);
-+
-+    edge->parent =3D xdbg_graph_node_num(gr, parent);
-+    edge->child =3D xdbg_graph_node_num(gr, child->bs);
-+    edge->name =3D g_strdup(child->name);
-+
-+    for (p =3D permissions; p->flag; p++) {
-+        if (p->flag & child->perm) {
-+            QAPI_LIST_ADD(edge->perm, p->num);
-+        }
-+        if (p->flag & child->shared_perm) {
-+            QAPI_LIST_ADD(edge->shared_perm, p->num);
-+        }
-+    }
-+
-+    QAPI_LIST_ADD(gr->graph->edges, edge);
-+}
++import os
++import sys
++import subprocess
++import json
++from graphviz import Digraph
++from qemu import MonitorResponseError
 +
 +
-+XDbgBlockGraph *bdrv_get_xdbg_block_graph(Error **errp)
-+{
-+    BlockBackend *blk;
-+    BlockJob *job;
-+    BlockDriverState *bs;
-+    BdrvChild *child;
-+    XDbgBlockGraphConstructor *gr =3D xdbg_graph_new();
++def perm(arr):
++    s =3D 'w' if 'write' in arr else '_'
++    s +=3D 'r' if 'consistent-read' in arr else '_'
++    s +=3D 'u' if 'write-unchanged' in arr else '_'
++    s +=3D 'g' if 'graph-mod' in arr else '_'
++    s +=3D 's' if 'resize' in arr else '_'
++    return s
 +
-+    for (blk =3D blk_all_next(NULL); blk; blk =3D blk_all_next(blk)) {
-+        char *allocated_name =3D NULL;
-+        const char *name =3D blk_name(blk);
 +
-+        if (!*name) {
-+            name =3D allocated_name =3D blk_get_attached_dev_id(blk);
-+        }
-+        xdbg_graph_add_node(gr, blk, X_DBG_BLOCK_GRAPH_NODE_TYPE_BLOCK_B=
-ACKEND,
-+                           name);
-+        g_free(allocated_name);
-+        if (blk_root(blk)) {
-+            xdbg_graph_add_edge(gr, blk, blk_root(blk));
-+        }
-+    }
++def render_block_graph(qmp, filename, format=3D'png'):
++    '''
++    Render graph in text (dot) representation into "@filename" and
++    representation in @format into "@filename.@format"
++    '''
 +
-+    for (job =3D block_job_next(NULL); job; job =3D block_job_next(job))=
- {
-+        GSList *el;
++    bds_nodes =3D qmp.command('query-named-block-nodes')
++    bds_nodes =3D {n['node-name']: n for n in bds_nodes}
 +
-+        xdbg_graph_add_node(gr, job, X_DBG_BLOCK_GRAPH_NODE_TYPE_BLOCK_J=
-OB,
-+                           job->job.id);
-+        for (el =3D job->nodes; el; el =3D el->next) {
-+            xdbg_graph_add_edge(gr, job, (BdrvChild *)el->data);
-+        }
-+    }
++    job_nodes =3D qmp.command('query-block-jobs')
++    job_nodes =3D {n['device']: n for n in job_nodes}
 +
-+    QTAILQ_FOREACH(bs, &graph_bdrv_states, node_list) {
-+        xdbg_graph_add_node(gr, bs, X_DBG_BLOCK_GRAPH_NODE_TYPE_BLOCK_DR=
-IVER,
-+                           bs->node_name);
-+        QLIST_FOREACH(child, &bs->children, next) {
-+            xdbg_graph_add_edge(gr, bs, child);
-+        }
-+    }
++    block_graph =3D qmp.command('x-debug-query-block-graph')
 +
-+    return xdbg_graph_finalize(gr);
-+}
++    graph =3D Digraph(comment=3D'Block Nodes Graph')
++    graph.format =3D format
++    graph.node('permission symbols:\l'
++               '  w - Write\l'
++               '  r - consistent-Read\l'
++               '  u - write - Unchanged\l'
++               '  g - Graph-mod\l'
++               '  s - reSize\l'
++               'edge label scheme:\l'
++               '  <child type>\l'
++               '  <perm>\l'
++               '  <shared_perm>\l', shape=3D'none')
 +
- BlockDriverState *bdrv_lookup_bs(const char *device,
-                                  const char *node_name,
-                                  Error **errp)
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 60d37a0c3d..cf05abd89d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2249,3 +2249,8 @@ int coroutine_fn blk_co_copy_range(BlockBackend *bl=
-k_in, int64_t off_in,
-                               blk_out->root, off_out,
-                               bytes, read_flags, write_flags);
- }
++    for n in block_graph['nodes']:
++        if n['type'] =3D=3D 'block-driver':
++            info =3D bds_nodes[n['name']]
++            label =3D n['name'] + ' [' + info['drv'] + ']'
++            if info['drv'] =3D=3D 'file':
++                label +=3D '\n' + os.path.basename(info['file'])
++            shape =3D 'ellipse'
++        elif n['type'] =3D=3D 'block-job':
++            info =3D job_nodes[n['name']]
++            label =3D info['type'] + ' job (' + n['name'] + ')'
++            shape =3D 'box'
++        else:
++            assert n['type'] =3D=3D 'block-backend'
++            label =3D n['name'] if n['name'] else 'unnamed blk'
++            shape =3D 'box'
 +
-+const BdrvChild *blk_root(BlockBackend *blk)
-+{
-+    return blk->root;
-+}
-diff --git a/blockdev.c b/blockdev.c
-index a8fa8748a9..fb18e9c975 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3582,6 +3582,11 @@ BlockDeviceInfoList *qmp_query_named_block_nodes(E=
-rror **errp)
-     return bdrv_named_nodes_list(errp);
- }
-=20
-+XDbgBlockGraph *qmp_x_debug_query_block_graph(Error **errp)
-+{
-+    return bdrv_get_xdbg_block_graph(errp);
-+}
++        graph.node(str(n['id']), label, shape=3Dshape)
 +
- BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
-                              Error **errp)
- {
++    for e in block_graph['edges']:
++        label =3D '%s\l%s\l%s\l' % (e['name'], perm(e['perm']),
++                                  perm(e['shared-perm']))
++        graph.edge(str(e['parent']), str(e['child']), label=3Dlabel)
++
++    graph.render(filename)
++
++
++class LibvirtGuest():
++    def __init__(self, name):
++        self.name =3D name
++
++    def command(self, cmd):
++        # only supports qmp commands without parameters
++        m =3D {'execute': cmd}
++        ar =3D ['virsh', 'qemu-monitor-command', self.name, json.dumps(m=
+)]
++
++        reply =3D json.loads(subprocess.check_output(ar))
++
++        if 'error' in reply:
++            raise MonitorResponseError(reply)
++
++        return reply['return']
++
++
++if __name__ =3D=3D '__main__':
++    obj =3D sys.argv[1]
++    out =3D sys.argv[2]
++
++    if os.path.exists(obj):
++        # assume unix socket
++        qmp =3D QEMUMonitorProtocol(obj)
++        qmp.connect()
++    else:
++        # assume libvirt guest name
++        qmp =3D LibvirtGuest(obj)
++
++    render_block_graph(qmp, out)
 --=20
 2.20.1
