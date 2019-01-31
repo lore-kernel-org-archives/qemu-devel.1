@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47634)
+Received: from eggs.gnu.org ([209.51.188.92]:47984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpC3d-0006Bj-OY
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:07:11 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gpC5H-0006vq-I5
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:08:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpC3c-00082j-RA
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:07:05 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38331)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpC3c-00082D-L4
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:07:04 -0500
-Received: by mail-wm1-x344.google.com with SMTP id m22so2488677wml.3
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 05:07:04 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 13:07:00 +0000
-Message-Id: <20190131130700.28392-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target/arm: Make FPSCR/FPCR trapped-exception
- bits RAZ/WI
+	(envelope-from <kraxel@redhat.com>) id 1gpC5F-0000AA-Ho
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:08:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:27840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpC5F-00009V-5l
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:08:45 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D13D2498C
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 13:08:44 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 31 Jan 2019 14:00:16 +0100
+Message-Id: <20190131130016.17337-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] scripts: use git archive in archive-source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Martin Husemann <martin@netbsd.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-The {IOE, DZE, OFE, UFE, IXE, IDE} bits in the FPSCR/FPCR are for
-enabling trapped IEEE floating point exceptions (where IEEE exception
-conditions cause a CPU exception rather than updating the FPSR status
-bits). QEMU doesn't implement this (and nor does the hardware we're
-modelling), but for implementations which don't implement trapped
-exception handling these control bits are supposed to be RAZ/WI.
-This allows guest code to test for whether the feature is present
-by trying to write to the bit and checking whether it sticks.
+Use git archive to create tarballs of qemu and submodules instead of
+cloning the repository and the submodules.  This is a order of magnitude
+faster because it doesn't fetch the submodules from the internet each
+time the script runs.
 
-QEMU is incorrectly making these bits read as written. Make them
-RAZ/WI as the architecture requires.
-
-In particular this was causing problems for the NetBSD automatic
-test suite.
-
-Reported-by: Martin Husemann <martin@netbsd.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
-Martin: this is a different fix to the one I suggested you test,
-because I realized we need to make these bits RAZ/WI in the aarch32
-FPSCR as well as the aarch64 FPCR, but it should have the same effect.
+ scripts/archive-source.sh | 63 ++++++++++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 36 deletions(-)
 
-General note: the difference between "RAZ/WI" and "RES0" is a bit
-subtle (see the Arm ARM glossary), but the main distinction is that
-RES0 bits can often be implemented as reads-as-written whilst
-RAZ/WI bits never can.
----
- target/arm/cpu.h    | 6 ++++++
- target/arm/helper.c | 6 ++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index b8161cb6d73..15e1464460f 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1404,6 +1404,12 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
- #define FPSR_MASK 0xf800009f
- #define FPCR_MASK 0x07ff9f00
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+index 6eed2a29bd..38d53986d7 100755
+--- a/scripts/archive-source.sh
++++ b/scripts/archive-source.sh
+@@ -19,8 +19,8 @@ if test $# -lt 1; then
+ fi
  
-+#define FPCR_IOE    (1 << 8)    /* Invalid Operation exception trap enable */
-+#define FPCR_DZE    (1 << 9)    /* Divide by Zero exception trap enable */
-+#define FPCR_OFE    (1 << 10)   /* Overflow exception trap enable */
-+#define FPCR_UFE    (1 << 11)   /* Underflow exception trap enable */
-+#define FPCR_IXE    (1 << 12)   /* Inexact exception trap enable */
-+#define FPCR_IDE    (1 << 15)   /* Input Denormal exception trap enable */
- #define FPCR_FZ16   (1 << 19)   /* ARMv8.2+, FP16 flush-to-zero */
- #define FPCR_FZ     (1 << 24)   /* Flush-to-zero enable bit */
- #define FPCR_DN     (1 << 25)   /* Default NaN enable bit */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 66faebea8ec..c5f10ddbe92 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12508,6 +12508,12 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
-         val &= ~FPCR_FZ16;
-     }
+ tar_file=$(realpath "$1")
+-list_file="${tar_file}.list"
+-vroot_dir="${tar_file}.vroot"
++sub_file=$(mktemp "${tar_file%.tar}.sub.XXXXXXXX.tar")
++sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
  
-+    /*
-+     * We don't implement trapped exception handling, so the
-+     * trap enable bits are all RAZ/WI (not RES0!)
-+     */
-+    val &= ~(FPCR_IDE | FPCR_IXE | FPCR_UFE | FPCR_OFE | FPCR_DZE | FPCR_IOE);
-+
-     changed = env->vfp.xregs[ARM_VFP_FPSCR];
-     env->vfp.xregs[ARM_VFP_FPSCR] = (val & 0xffc8ffff);
-     env->vfp.vec_len = (val >> 16) & 7;
+ # We want a predictable list of submodules for builds, that is
+ # independent of what the developer currently has initialized
+@@ -28,7 +28,7 @@ vroot_dir="${tar_file}.vroot"
+ # different to the host OS.
+ submodules="dtc ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
+ 
+-trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
++trap "status=$?; rm -rf \"$sub_file\" \"$sub_tdir\" ; exit \$status" 0 1 2 3 15
+ 
+ if git diff-index --quiet HEAD -- &>/dev/null
+ then
+@@ -36,38 +36,29 @@ then
+ else
+     HEAD=$(git stash create)
+ fi
+-git clone --shared . "$vroot_dir"
+-test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+-
+-cd "$vroot_dir"
+-test $? -ne 0 && error "failed to change into '$vroot_dir'"
+-
+-git checkout $HEAD
+-test $? -ne 0 && error "failed to checkout $HEAD revision"
+-
++git archive --format tar $HEAD > "$tar_file"
++test $? -ne 0 && error "failed to archive qemu"
+ for sm in $submodules; do
+-    git submodule update --init $sm
+-    test $? -ne 0 && error "failed to init submodule $sm"
++	status="$(git submodule status "$sm")"
++	smhash="${status# }"
++	smhash="${smhash#+}"
++	smhash="${smhash#-}"
++	smhash="${smhash%% *}"
++	smdir="$sm"
++	case "$status" in
++	    -*)
++		smdir="$sub_tdir/$sm"
++		smurl="$(git config -f .gitmodules submodule.${sm}.url)"
++		echo "NOTICE: using temporary clone for submodule $sm"
++		git clone "$smurl" "$smdir"
++		test $? -ne 0 && error "failed to clone submodule $sm"
++		;;
++	    +*)
++		echo "WARNING: submodule $sm is out of sync"
++		;;
++	esac
++	(cd $smdir; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
++	test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
++	tar --concatenate --file "$tar_file" "$sub_file"
++	test $? -ne 0 && error "failed append submodule $sm to $tar_file"
+ done
+-
+-if test -n "$submodules"; then
+-    {
+-        git ls-files || error "git ls-files failed"
+-        for sm in $submodules; do
+-            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+-            if test "${PIPESTATUS[*]}" != "0 0"; then
+-                error "git ls-files in submodule $sm failed"
+-            fi
+-        done
+-    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
+-else
+-    git ls-files > "$list_file"
+-fi
+-
+-if test $? -ne 0; then
+-    error "failed to generate list file"
+-fi
+-
+-tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
+-
+-exit 0
 -- 
-2.20.1
+2.9.3
