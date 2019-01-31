@@ -1,26 +1,19 @@
 Received: from eggs.gnu.org ([209.51.188.92]:51646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGaL-0006ls-Aq
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:57:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpGaN-0006ls-At
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGaJ-0005RB-Hd
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:57:09 -0500
-Resent-Message-Id: <E1gpGaJ-0005RB-Hd@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpGaA-0005Ov-60
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:57:01 -0500
-Message-ID: <154895739828.23946.16187193217686522777@ebba9967afc0>
-In-Reply-To: <20190122215016.18697-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpGa2-0005Mj-0W
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:51 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 31 Jan 2019 18:55:49 +0100
+Message-Id: <20190131175549.11691-12-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-1-kwolf@redhat.com>
+References: <20190131175549.11691-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 09:56:39 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] current fpu/next queue (tests &
- build fix)
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 11/11] qcow2: Add data file to
+ ImageInfoSpecificQCow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMjIxNTAxNi4xODY5
-Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTIyMjE1MDE2LjE4Njk3LTEtYWxleC5i
-ZW5uZWVAbGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzExXSBj
-dXJyZW50IGZwdS9uZXh0IHF1ZXVlICh0ZXN0cyAmIGJ1aWxkIGZpeCkKVHlwZTogc2VyaWVzCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwoxYzNkMTcwIHRlc3RzL01ha2ZpbGU6IGFkZCBjaGVjay1zb2Z0
-ZmxvYXQgcnVsZQplZTIyMTViIHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2U6IGluY2x1ZGUgc29mdGZs
-b2F0IHRlc3RzCmQzYjJmNmIgdGVzdHMvTWFrZWZpbGU6IGFkZCBmbG9hdGluZyBwb2ludCB0ZXN0
-cwo0ZTM1NTQyIGluY2x1ZGUvZnB1L3NvZnRmbG9hdDogRml4IGNvbXBpbGF0aW9uIHdpdGggQ2xh
-bmcgb24gczM5MHgKYTMxZjNlMiBzb2Z0ZmxvYXQ6IGVuZm9yY2Ugc29mdGZsb2F0IGlmIHRoZSBo
-b3N0J3MgRk1BIGlzIGJyb2tlbgo2ZWM1ZDBmIHRlc3RzL2ZwL3BsYXRmb3JtLmg6IGluY2x1ZGUg
-Y29uZmlnLWhvc3QuaAoyMTI4ZGYzIGZwLXRlc3Q6IGZpeCBzaWduYXR1cmUgb2Ygc2xvd19jbGVh
-cl9mbGFncyBhbmQgcWVtdV9jbGVhcl9mbGFncwo2MmM2YmI5IHRlc3RzL2ZwL01ha2VmaWxlOiBk
-byBub3QgdXNlIGdjYy1vbmx5IC1XIGZsYWdzCjA0ZmZhN2MgYmVya2VsZXktdGVzdGZsb2F0LTM6
-IHB1bGwgY2hhbmdlcwpjOGQ4OWVkIGZwLWJlbmNoOiByZW1vdmUgd3JvbmcgZXhwb25lbnQgcmFp
-c2UgaW4gZmlsbF9yYW5kb20KM2QyNDI4NSBmcC1iZW5jaDogZml4IHVwZGF0ZV9yYW5kb21fb3Bz
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzExIENoZWNraW5nIGNvbW1pdCAzZDI0Mjg1OGVjNjIg
-KGZwLWJlbmNoOiBmaXggdXBkYXRlX3JhbmRvbV9vcHMpCjIvMTEgQ2hlY2tpbmcgY29tbWl0IGM4
-ZDg5ZWRiNDgwMCAoZnAtYmVuY2g6IHJlbW92ZSB3cm9uZyBleHBvbmVudCByYWlzZSBpbiBmaWxs
-X3JhbmRvbSkKMy8xMSBDaGVja2luZyBjb21taXQgMDRmZmE3YzU2MjhlIChiZXJrZWxleS10ZXN0
-ZmxvYXQtMzogcHVsbCBjaGFuZ2VzKQo0LzExIENoZWNraW5nIGNvbW1pdCA2MmM2YmI5NjkyMmYg
-KHRlc3RzL2ZwL01ha2VmaWxlOiBkbyBub3QgdXNlIGdjYy1vbmx5IC1XIGZsYWdzKQo1LzExIENo
-ZWNraW5nIGNvbW1pdCAyMTI4ZGYzYTkzNzcgKGZwLXRlc3Q6IGZpeCBzaWduYXR1cmUgb2Ygc2xv
-d19jbGVhcl9mbGFncyBhbmQgcWVtdV9jbGVhcl9mbGFncykKNi8xMSBDaGVja2luZyBjb21taXQg
-NmVjNWQwZmI4YTkzICh0ZXN0cy9mcC9wbGF0Zm9ybS5oOiBpbmNsdWRlIGNvbmZpZy1ob3N0Lmgp
-CjcvMTEgQ2hlY2tpbmcgY29tbWl0IGEzMWYzZTI4ZDkxNCAoc29mdGZsb2F0OiBlbmZvcmNlIHNv
-ZnRmbG9hdCBpZiB0aGUgaG9zdCdzIEZNQSBpcyBicm9rZW4pCjgvMTEgQ2hlY2tpbmcgY29tbWl0
-IDRlMzU1NDJmMGQ2MiAoaW5jbHVkZS9mcHUvc29mdGZsb2F0OiBGaXggY29tcGlsYXRpb24gd2l0
-aCBDbGFuZyBvbiBzMzkweCkKOS8xMSBDaGVja2luZyBjb21taXQgZDNiMmY2YjkxYTZkICh0ZXN0
-cy9NYWtlZmlsZTogYWRkIGZsb2F0aW5nIHBvaW50IHRlc3RzKQoxMC8xMSBDaGVja2luZyBjb21t
-aXQgZWUyMjE1YjBhZTA5IChzY3JpcHRzL2FyY2hpdmUtc291cmNlOiBpbmNsdWRlIHNvZnRmbG9h
-dCB0ZXN0cykKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyMzogRklMRTogc2NyaXB0
-cy9hcmNoaXZlLXNvdXJjZS5zaDoyOToKK3N1Ym1vZHVsZXM9ImR0YyB1aS9rZXljb2RlbWFwZGIg
-dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMgdGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0
-LTMiCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-MTAvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjExLzExIENoZWNraW5nIGNvbW1pdCAx
-YzNkMTcwZDdhZTMgKHRlc3RzL01ha2ZpbGU6IGFkZCBjaGVjay1zb2Z0ZmxvYXQgcnVsZSkKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMjIy
-MTUwMTYuMTg2OTctMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEByZWRoYXQuY29t
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qapi/block-core.json | 1 +
+ block/qcow2.c        | 6 +++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 060df28797..0eb0637b64 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -74,6 +74,7 @@
+ { 'struct': 'ImageInfoSpecificQCow2',
+   'data': {
+       'compat': 'str',
++      '*data-file': 'str',
+       '*lazy-refcounts': 'bool',
+       '*corrupt': 'bool',
+       'refcount-bits': 'int',
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4959bf16a4..e3427f9fcd 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1459,7 +1459,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverSt=
+ate *bs, QDict *options,
+     if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+         s->data_file =3D bdrv_open_child(NULL, options, "data-file", bs,
+                                        &child_file, false, &local_err);
+-        if (!s->data_file) {
++        if (s->data_file) {
++            s->image_data_file =3D g_strdup(s->data_file->bs->filename);
++        } else {
+             if (s->image_data_file) {
+                 error_free(local_err);
+                 local_err =3D NULL;
+@@ -4533,6 +4535,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(B=
+lockDriverState *bs)
+                                   QCOW2_INCOMPAT_CORRUPT,
+             .has_corrupt        =3D true,
+             .refcount_bits      =3D s->refcount_bits,
++            .has_data_file      =3D !!s->image_data_file,
++            .data_file          =3D g_strdup(s->image_data_file),
+         };
+     } else {
+         /* if this assertion fails, this probably means a new version wa=
+s
+--=20
+2.20.1
