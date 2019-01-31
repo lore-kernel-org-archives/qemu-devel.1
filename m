@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33404)
+Received: from eggs.gnu.org ([209.51.188.92]:33401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1gp6cd-0006xT-He
+	(envelope-from <tao3.xu@intel.com>) id 1gp6cd-0006x9-8c
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:18:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1gp6cc-00038x-Dc
+	(envelope-from <tao3.xu@intel.com>) id 1gp6cb-00038K-95
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:18:51 -0500
-Received: from mga07.intel.com ([134.134.136.100]:58189)
+Received: from mga07.intel.com ([134.134.136.100]:58179)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gp6cc-00032N-3G
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:18:50 -0500
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gp6ca-0002vB-RG
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:18:49 -0500
 From: Tao Xu <tao3.xu@intel.com>
-Date: Thu, 31 Jan 2019 15:16:52 +0800
-Message-Id: <20190131071658.29120-3-tao3.xu@intel.com>
+Date: Thu, 31 Jan 2019 15:16:54 +0800
+Message-Id: <20190131071658.29120-5-tao3.xu@intel.com>
 In-Reply-To: <20190131071658.29120-1-tao3.xu@intel.com>
 References: <20190131071658.29120-1-tao3.xu@intel.com>
-Subject: [Qemu-devel] [PATCH v3 2/8] hmat acpi: Build System Locality
- Latency and Bandwidth Information Structure(s) in ACPI HMAT
+Subject: [Qemu-devel] [PATCH v3 4/8] Extend the command-line to provide
+ memory latency and bandwidth information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,232 +29,344 @@ Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, karl.heubaum@orac
 
 From: Liu Jingqi <jingqi.liu@intel.com>
 
-This structure describes the memory access latency and bandwidth
-information from various memory access initiator proximity domains.
-The latency and bandwidth numbers represented in this structure
-correspond to rated latency and bandwidth for the platform.
-The software could use this information as hint for optimization.
+Add -numa hmat-lb option to provide System Locality Latency and
+Bandwidth Information. These memory attributes help to build
+System Locality Latency and Bandwidth Information Structure(s)
+in ACPI Heterogeneous Memory Attribute Table (HMAT).
 
 Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- hw/acpi/hmat.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h | 76 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 174 insertions(+)
+ numa.c          | 124 ++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json  |  94 +++++++++++++++++++++++++++++++++++-
+ qemu-options.hx |  28 ++++++++++-
+ 3 files changed, 243 insertions(+), 3 deletions(-)
 
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index 7e0fc0a9ae..e3deeaa36b 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -29,6 +29,11 @@
- #include "hw/acpi/hmat.h"
- #include "hw/nvram/fw_cfg.h"
+diff --git a/numa.c b/numa.c
+index 9ee4f6f258..97b77356ad 100644
+--- a/numa.c
++++ b/numa.c
+@@ -40,6 +40,7 @@
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
++#include "hw/acpi/hmat.h"
  
-+struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES] = {0};
-+
-+static uint32_t initiator_pxm[MAX_NODES], target_pxm[MAX_NODES];
-+static uint32_t num_initiator, num_target;
-+
- /* Build Memory Subsystem Address Range Structure */
- static void build_hmat_spa(GArray *table_data,
-                                 uint64_t base, uint64_t length, int node)
-@@ -110,10 +115,103 @@ static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
-     }
+ QemuOptsList qemu_numa_opts = {
+     .name = "numa",
+@@ -180,6 +181,123 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
+     have_numa_distance = true;
  }
  
-+static void classify_proximity_domains(void)
++static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
++                               Error **errp)
 +{
-+    int node;
++    struct numa_hmat_lb_info *hmat_lb = 0;
 +
-+    for (node = 0; node < nb_numa_nodes; node++) {
-+        if (numa_info[node].is_initiator) {
-+            initiator_pxm[num_initiator++] = node;
++    if (node->data_type <= HMATLB_DATA_TYPE_WRITE_LATENCY) {
++        if (!node->has_latency) {
++            error_setg(errp, "Please specify the latency.");
++            return;
 +        }
-+        if (numa_info[node].is_target) {
-+            target_pxm[num_target++] = node;
++        if (node->has_bandwidth) {
++            error_setg(errp, "Please do not specify the bandwidth "
++                       "since the data type is latency.");
++            return;
++        }
++        if (node->has_base_bw) {
++            error_setg(errp, "Please do not specify the base-bw "
++                       "since the data type is latency.");
++            return;
 +        }
 +    }
-+}
 +
-+static void hmat_build_lb(GArray *table_data)
-+{
-+    AcpiHmatLBInfo *hmat_lb;
-+    struct numa_hmat_lb_info *numa_hmat_lb;
-+    int i, j, hrchy, type;
-+
-+    if (!num_initiator && !num_target) {
-+        classify_proximity_domains();
++    if (node->data_type >= HMATLB_DATA_TYPE_ACCESS_BANDWIDTH) {
++        if (!node->has_bandwidth) {
++            error_setg(errp, "Please specify the bandwidth.");
++            return;
++        }
++        if (node->has_latency) {
++            error_setg(errp, "Please do not specify the latency "
++                       "since the data type is bandwidth.");
++            return;
++        }
++        if (node->has_base_lat) {
++            error_setg(errp, "Please do not specify the base-lat "
++                       "since the data type is bandwidth.");
++            return;
++        }
 +    }
 +
-+    for (hrchy = HMAT_LB_MEM_MEMORY;
-+         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
-+        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
-+             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-+            numa_hmat_lb = hmat_lb_info[hrchy][type];
++    if (node->initiator >= nb_numa_nodes) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->initiator, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->initiator].is_initiator) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it isn't an initiator proximity domain.",
++                   node->initiator);
++        return;
++    }
 +
-+            if (numa_hmat_lb) {
-+                uint64_t start;
-+                uint32_t *list_entry;
-+                uint16_t *entry, *entry_start;
-+                uint32_t size;
-+                uint8_t m, n;
++    if (node->target >= nb_numa_nodes) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->target, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->target].is_target) {
++        error_setg(errp, "Invalid target=%"
++                   PRIu16 ", it isn't a target proximity domain.",
++                   node->target);
++        return;
++    }
 +
-+                start = table_data->len;
-+                hmat_lb = acpi_data_push(table_data, sizeof(*hmat_lb));
++    if (node->has_latency) {
++        hmat_lb = hmat_lb_info[node->hierarchy][node->data_type];
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            hmat_lb_info[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->latency[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the latency for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
 +
-+                hmat_lb->type          = cpu_to_le16(ACPI_HMAT_LB_INFO);
-+                hmat_lb->flags         = numa_hmat_lb->hierarchy;
-+                hmat_lb->data_type     = numa_hmat_lb->data_type;
-+                hmat_lb->num_initiator = cpu_to_le32(num_initiator);
-+                hmat_lb->num_target    = cpu_to_le32(num_target);
++        /* Only the first time of setting the base unit is valid. */
++        if ((hmat_lb->base_lat == 0) && (node->has_base_lat)) {
++            hmat_lb->base_lat = node->base_lat;
++        }
 +
-+                if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
-+                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_lat);
-+                } else {
-+                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_bw);
-+                }
-+                if (!hmat_lb->base_unit) {
-+                    hmat_lb->base_unit = cpu_to_le32(1);
-+                }
++        hmat_lb->latency[node->initiator][node->target] = node->latency;
++    }
 +
-+                /* the initiator proximity domain list */
-+                for (i = 0; i < num_initiator; i++) {
-+                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
-+                    *list_entry = cpu_to_le32(initiator_pxm[i]);
-+                }
++    if (node->has_bandwidth) {
++        hmat_lb = hmat_lb_info[node->hierarchy][node->data_type];
 +
-+                /* the target proximity domain list */
-+                for (i = 0; i < num_target; i++) {
-+                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
-+                    *list_entry = cpu_to_le32(target_pxm[i]);
-+                }
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            hmat_lb_info[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->bandwidth[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the bandwidth for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
 +
-+                /* latency or bandwidth entries */
-+                size = sizeof(uint16_t) * num_initiator * num_target;
-+                entry_start = acpi_data_push(table_data, size);
-+
-+                for (i = 0; i < num_initiator; i++) {
-+                    m = initiator_pxm[i];
-+                    for (j = 0; j < num_target; j++) {
-+                        n = target_pxm[j];
-+                        entry = entry_start + i * num_target + j;
-+                        if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
-+                            *entry = cpu_to_le16(numa_hmat_lb->latency[m][n]);
-+                        } else {
-+                            *entry = cpu_to_le16(numa_hmat_lb->bandwidth[m][n]);
-+                        }
-+                    }
-+                }
-+                hmat_lb = (AcpiHmatLBInfo *)(table_data->data + start);
-+                hmat_lb->length = cpu_to_le16(table_data->len - start);
++        /* Only the first time of setting the base unit is valid. */
++        if (hmat_lb->base_bw == 0) {
++            if (!node->has_base_bw) {
++                error_setg(errp, "Please provide the base-bw!");
++                return;
++            } else {
++                hmat_lb->base_bw = node->base_bw;
 +            }
 +        }
++
++        hmat_lb->bandwidth[node->initiator][node->target] = node->bandwidth;
++    }
++
++    if (hmat_lb) {
++        hmat_lb->hierarchy = node->hierarchy;
++        hmat_lb->data_type = node->data_type;
 +    }
 +}
 +
- static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
+ static
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
  {
-     /* Build HMAT Memory Subsystem Address Range. */
-     hmat_build_spa(hma, pcms);
-+
-+    /* Build HMAT System Locality Latency and Bandwidth Information. */
-+    hmat_build_lb(hma);
- }
+@@ -213,6 +331,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+         machine_set_cpu_numa_node(ms, qapi_NumaCpuOptions_base(&object->u.cpu),
+                                   &err);
+         break;
++    case NUMA_OPTIONS_TYPE_HMAT_LB:
++        parse_numa_hmat_lb(ms, &object->u.hmat_lb, &err);
++        if (err) {
++            goto end;
++        }
++        break;
+     default:
+         abort();
+     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 426274ecf8..10ba90bb39 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2782,10 +2782,12 @@
+ #
+ # @cpu: property based CPU(s) to node mapping (Since: 2.10)
+ #
++# @hmat-lb: memory latency and bandwidth information (Since: 4.0)
++#
+ # Since: 2.1
+ ##
+ { 'enum': 'NumaOptionsType',
+-  'data': [ 'node', 'dist', 'cpu' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
  
- void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-index f216e658c4..ffef9f6243 100644
---- a/hw/acpi/hmat.h
-+++ b/hw/acpi/hmat.h
-@@ -32,6 +32,7 @@
- #include "hw/acpi/aml-build.h"
+ ##
+ # @NumaOptions:
+@@ -2800,7 +2802,8 @@
+   'data': {
+     'node': 'NumaNodeOptions',
+     'dist': 'NumaDistOptions',
+-    'cpu': 'NumaCpuOptions' }}
++    'cpu': 'NumaCpuOptions',
++    'hmat-lb': 'NumaHmatLBOptions' }}
  
- #define ACPI_HMAT_SPA               0
-+#define ACPI_HMAT_LB_INFO           1
+ ##
+ # @NumaNodeOptions:
+@@ -2863,6 +2866,93 @@
+    'base': 'CpuInstanceProperties',
+    'data' : {} }
  
- /* ACPI HMAT sub-structure header */
- #define ACPI_HMAT_SUB_HEADER_DEF    \
-@@ -46,6 +47,81 @@ enum {
-     HMAT_SPA_RESERVATION_HINT = 0x4,
- };
++##
++# @HmatLBMemoryHierarchy:
++#
++# The memory hierarchy in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
++#
++# @memory: the structure represents the memory performance
++#
++# @last-level: last level memory of memory side cached memory
++#
++# @first-level: first level memory of memory side cached memory
++#
++# @second-level: second level memory of memory side cached memory
++#
++# @third-level: third level memory of memory side cached memory
++#
++# Since: 4.0
++##
++{ 'enum': 'HmatLBMemoryHierarchy',
++  'data': [ 'memory', 'last-level', 'first-level',
++            'second-level', 'third-level' ] }
++
++##
++# @HmatLBDataType:
++#
++# Data type in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
++#
++# @access-latency: access latency (nanoseconds)
++#
++# @read-latency: read latency (nanoseconds)
++#
++# @write-latency: write latency (nanoseconds)
++#
++# @access-bandwidth: access bandwidth (MB/s)
++#
++# @read-bandwidth: read bandwidth (MB/s)
++#
++# @write-bandwidth: write bandwidth (MB/s)
++#
++# Since: 4.0
++##
++{ 'enum': 'HmatLBDataType',
++  'data': [ 'access-latency', 'read-latency', 'write-latency',
++            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
++
++##
++# @NumaHmatLBOptions:
++#
++# Set the system locality latency and bandwidth information
++# between Initiator and Target proximity Domains.
++#
++# @initiator: the Initiator Proximity Domain.
++#
++# @target: the Target Proximity Domain.
++#
++# @hierarchy: the Memory Hierarchy. Indicates the performance
++#             of memory or side cache.
++#
++# @data-type: presents the type of data, access/read/write
++#             latency or hit latency.
++#
++# @base-lat: the base unit for latency in nanoseconds.
++#
++# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
++#
++# @latency: the value of latency based on Base Unit from @initiator
++#           to @target proximity domain.
++#
++# @bandwidth: the value of bandwidth based on Base Unit between
++#             @initiator and @target proximity domain.
++#
++# Since: 4.0
++##
++{ 'struct': 'NumaHmatLBOptions',
++  'data': {
++   'initiator': 'uint16',
++   'target': 'uint16',
++   'hierarchy': 'HmatLBMemoryHierarchy',
++   'data-type': 'HmatLBDataType',
++   '*base-lat': 'uint64',
++   '*base-bw': 'uint64',
++   '*latency': 'uint16',
++   '*bandwidth': 'uint16' }}
++
+ ##
+ # @HostMemPolicy:
+ #
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 521511ec13..fec20a93e7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -163,16 +163,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+     "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+     "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+     "-numa dist,src=source,dst=destination,val=distance\n"
+-    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
++    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
++    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|last-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+ @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+ @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+ @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
++@itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
+ @findex -numa
+ Define a NUMA node and assign RAM and VCPUs to it.
+ Set the NUMA distance from a source node to a destination node.
++Set the ACPI Heterogeneous Memory Attribute for the given nodes.
  
-+/* the value of AcpiHmatLBInfo flags */
-+enum {
-+    HMAT_LB_MEM_MEMORY           = 0,
-+    HMAT_LB_MEM_CACHE_LAST_LEVEL = 1,
-+    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 2,
-+    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 3,
-+    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 4,
-+};
-+
-+/* the value of AcpiHmatLBInfo data type */
-+enum {
-+    HMAT_LB_DATA_ACCESS_LATENCY = 0,
-+    HMAT_LB_DATA_READ_LATENCY = 1,
-+    HMAT_LB_DATA_WRITE_LATENCY = 2,
-+    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
-+    HMAT_LB_DATA_READ_BANDWIDTH = 4,
-+    HMAT_LB_DATA_WRITE_BANDWIDTH = 5,
-+};
-+
-+#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
-+#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
-+
-+struct AcpiHmatLBInfo {
-+    ACPI_HMAT_SUB_HEADER_DEF
-+    uint8_t     flags;
-+    uint8_t     data_type;
-+    uint16_t    reserved1;
-+    uint32_t    num_initiator;
-+    uint32_t    num_target;
-+    uint32_t    reserved2;
-+    uint64_t    base_unit;
-+} QEMU_PACKED;
-+typedef struct AcpiHmatLBInfo AcpiHmatLBInfo;
-+
-+struct numa_hmat_lb_info {
-+    /*
-+     * Indicates total number of Proximity Domains
-+     * that can initiate memory access requests.
-+     */
-+    uint32_t    num_initiator;
-+    /*
-+     * Indicates total number of Proximity Domains
-+     * that can act as target.
-+     */
-+    uint32_t    num_target;
-+    /*
-+     * Indicates it's memory or
-+     * the specified level memory side cache.
-+     */
-+    uint8_t     hierarchy;
-+    /*
-+     * Present the type of data,
-+     * access/read/write latency or bandwidth.
-+     */
-+    uint8_t     data_type;
-+    /* The base unit for latency in nanoseconds. */
-+    uint64_t    base_lat;
-+    /* The base unit for bandwidth in megabytes per second(MB/s). */
-+    uint64_t    base_bw;
-+    /*
-+     * latency[i][j]:
-+     * Indicates the latency based on base_lat
-+     * from Initiator Proximity Domain i to Target Proximity Domain j.
-+     */
-+    uint16_t    latency[MAX_NODES][MAX_NODES];
-+    /*
-+     * bandwidth[i][j]:
-+     * Indicates the bandwidth based on base_bw
-+     * from Initiator Proximity Domain i to Target Proximity Domain j.
-+     */
-+    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
-+};
-+
-+extern struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES];
-+
- void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
-                      MachineState *machine);
+ Legacy VCPU assignment uses @samp{cpus} option where
+ @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+@@ -230,6 +233,29 @@ specified resources, it just assigns existing resources to NUMA
+ nodes. This means that one still has to use the @option{-m},
+ @option{-smp} options to allocate RAM and VCPUs respectively.
  
++Use 'hmat-lb' to set System Locality Latency and Bandwidth Information
++between initiator NUMA node and target NUMA node to build ACPI Heterogeneous Attribute Memory Table (HMAT).
++Initiator NUMA node can create memory requests, usually including one or more processors.
++Target NUMA node contains addressable memory.
++
++For example:
++@example
++-m 2G \
++-smp 3,sockets=2,maxcpus=3 \
++-numa node,cpus=0-1,nodeid=0 \
++-numa node,mem=1G,cpus=2,nodeid=1 \
++-numa node,mem=1G,nodeid=2 \
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,base-bw=20,latency=10,bandwidth=10 \
++-numa hmat-lb,initiator=1,target=2,hierarchy=first-level,data-type=access-latency,base-bw=10,bandwidth=20
++@end example
++
++When the processors in NUMA node 0 access memory in NUMA node 1,
++the first line containing 'hmat-lb' sets the latency and bandwidth information.
++The latency is @var{lat} multiplied by @var{blat} and the bandwidth is @var{bw} multiplied by @var{bbw}.
++
++When the processors in NUMA node 1 access memory in NUMA node 2 that acts as 2nd level memory side cache,
++the second line containing 'hmat-lb' sets the access hit bandwidth information.
++
+ ETEXI
+ 
+ DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
 -- 
 2.17.1
