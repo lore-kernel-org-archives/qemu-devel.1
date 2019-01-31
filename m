@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53198)
+Received: from eggs.gnu.org ([209.51.188.92]:53340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=927b0d5b4=Paul.Durrant@citrix.com>)
-	id 1gpEa4-0000vi-Mn
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:48:45 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gpEaZ-0001Cf-B3
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=927b0d5b4=Paul.Durrant@citrix.com>)
-	id 1gpEa3-0003BQ-PP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:48:44 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Thu, 31 Jan 2019 15:26:17 +0000
-Message-ID: <92d40894a4d244a5868fad1dae3df452@AMSPEX02CL03.citrite.net>
-References: <20190130161948.15888-1-paul.durrant@citrix.com>
-	<20190131152042.GF2306@perard.uk.xensource.com>
-	<b94b7583a3e14fec9b86a9cec13a1385@AMSPEX02CL03.citrite.net>
-	<20190131152502.GG2306@perard.uk.xensource.com>
-In-Reply-To: <20190131152502.GG2306@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgilbert@redhat.com>) id 1gpEaU-0003MF-VL
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:49:12 -0500
+Date: Thu, 31 Jan 2019 15:40:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190131154038.GH2870@work-vm>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-3-sgarzare@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] xen-block: handle resize callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190131151914.164903-3-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 31 January 2019 15:25
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> devel@lists.xenproject.org; Stefan Hajnoczi <stefanha@redhat.com>; Stefan=
-o
-> Stabellini <sstabellini@kernel.org>; Kevin Wolf <kwolf@redhat.com>; Max
-> Reitz <mreitz@redhat.com>
-> Subject: Re: [PATCH v2] xen-block: handle resize callback
->=20
-> On Thu, Jan 31, 2019 at 03:22:18PM +0000, Paul Durrant wrote:
-> > > -----Original Message-----
-> > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > > Sent: 31 January 2019 15:21
-> > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> > > devel@lists.xenproject.org; Stefan Hajnoczi <stefanha@redhat.com>;
-> Stefano
-> > > Stabellini <sstabellini@kernel.org>; Kevin Wolf <kwolf@redhat.com>;
-> Max
-> > > Reitz <mreitz@redhat.com>
-> > > Subject: Re: [PATCH v2] xen-block: handle resize callback
-> > >
-> > > On Wed, Jan 30, 2019 at 04:19:48PM +0000, Paul Durrant wrote:
-> > > > Some frontend drivers will handle dynamic resizing of PV disks, so
-> set
-> > > up
-> > > > the BlockDevOps resize_cb() method during xen_block_realize() to
-> allow
-> > > > this to be done.
-> > > >
-> > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > > > ---
-> > >
-> > >
-> > > > +    /*
-> > > > +     * Mimic the behaviour of Linux xen-blkback and re-write the
-> state
-> > > > +     * to trigger the frontend watch.
-> > > > +     */
-> > > > +    xen_device_backend_set_state(xendev, backend_state);
-> > >
-> > > :(, that function doesn't write the state again if it hasn't changed.
-> > > So in my testing, Linux never did anything.
-> >
-> > Gah! I forgot about that. Alright, it's going to have to be a bit more
-> crude.
->=20
-> more crude > Yes, I tried to ignore the check in _set_state and end-up
-> with an infinit loop.
+* Stefano Garzarella (sgarzare@redhat.com) wrote:
+> In order to avoid migration issues, we enable DISCARD and
+> WRITE ZEROES features only for machine type >= 4.0
+> 
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  hw/block/virtio-blk.c          | 2 ++
+>  hw/core/machine.c              | 1 +
+>  include/hw/virtio/virtio-blk.h | 1 +
+>  3 files changed, 4 insertions(+)
+> 
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 8a6754d9a2..542ec52536 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
+>      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+>      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+>                       IOThread *),
+> +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
+> +                     true),
 
-Yes, you would. That check is there for a reason :-) I'll replace the call =
-in xen-block.c with a call to xen_device_backend_printf().
+I think that's OK, but do you really want a DEFINE_PROP_BOOL and
+a bool discard_wzeroes?
+I think DEFINE_PROP_BIT is mostly used for a flag word where each
+property is one more bit in the field.
 
-  Paul
+Dave
 
->=20
-> --
-> Anthony PERARD
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 2629515363..ce98857af0 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -30,6 +30,7 @@ GlobalProperty hw_compat_3_1[] = {
+>      { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "true" },
+>      { "tpm-crb", "ppi", "false" },
+>      { "tpm-tis", "ppi", "false" },
+> +    { "virtio-blk-device", "discard-wzeroes", "false" },
+>  };
+>  const size_t hw_compat_3_1_len = G_N_ELEMENTS(hw_compat_3_1);
+>  
+> diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+> index 5117431d96..c336afb4cd 100644
+> --- a/include/hw/virtio/virtio-blk.h
+> +++ b/include/hw/virtio/virtio-blk.h
+> @@ -40,6 +40,7 @@ struct VirtIOBlkConf
+>      uint32_t request_merging;
+>      uint16_t num_queues;
+>      uint16_t queue_size;
+> +    uint32_t discard_wzeroes;
+>  };
+>  
+>  struct VirtIOBlockDataPlane;
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
