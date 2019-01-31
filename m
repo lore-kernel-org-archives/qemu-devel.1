@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59506)
+Received: from eggs.gnu.org ([209.51.188.92]:59593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpCmp-0001wW-6P
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1gpCmu-00021P-58
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpCmo-0006Qh-8c
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1gpCmt-0006Th-DP
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:52 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 31 Jan 2019 14:53:26 +0100
-Message-Id: <1548942810-22942-2-git-send-email-thuth@redhat.com>
+Date: Thu, 31 Jan 2019 14:53:27 +0100
+Message-Id: <1548942810-22942-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1548942810-22942-1-git-send-email-thuth@redhat.com>
 References: <1548942810-22942-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/5] ppc64: Express dependencies of
- 'pseries' and 'powernv' machines with kconfig
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/5] ppc: Express dependencies of the 'prep'
+ and '40p' machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,121 +24,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, yang.zhong@intel.com
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, yang.zhong@intel.com, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-The POWERNV switch should always select ISA_IPMI_BT, then the other
-IPMI options are turned on automatically now.
-CONFIG_DIMM should always be selected by the pseries machine,
-which in turn depends on CONFIG_MEM_DEVICE since DIMM implements
-this interface.
-CONFIG_VIRTIO_VGA can be dropped from default-configs/ppc64-softmmu.mak
-completely since this device is already automatically enabled via
-hw/display/Kconfig now.
+Select the required devices in hw/ppc/Kconfig instead, so that
+ppc-softmmu.mak only contains the user-selectable PREP switch.
+Plug-in devices like NE2000_ISA are pulled in automatically by the
+Kconfig build system now.
 
+Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/ppc64-softmmu.mak |  8 --------
- hw/intc/Kconfig                   |  6 ++----
- hw/mem/Kconfig                    |  1 +
- hw/ppc/Kconfig                    | 18 ++++++++++++++----
- 4 files changed, 17 insertions(+), 16 deletions(-)
+ default-configs/ppc-softmmu.mak | 8 --------
+ hw/ppc/Kconfig                  | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index a0a9151..cca5266 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -5,14 +5,6 @@ include ppc-softmmu.mak
- 
- # For PowerNV
- CONFIG_POWERNV=y
--CONFIG_IPMI=y
--CONFIG_IPMI_LOCAL=y
--CONFIG_IPMI_EXTERN=y
--CONFIG_ISA_IPMI_BT=y
- 
- # For pSeries
- CONFIG_PSERIES=y
--CONFIG_VIRTIO_VGA=y
--CONFIG_MEM_DEVICE=y
--CONFIG_DIMM=y
--CONFIG_SPAPR_RNG=y
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index 6eea14e..de10a6b 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -31,13 +31,11 @@ config OPENPIC_KVM
- 
- config XICS
-     bool
--    default y
--    depends on PSERIES
-+    depends on POWERNV || PSERIES
- 
- config XICS_SPAPR
-     bool
--    default y
--    depends on PSERIES
-+    select XICS
- 
- config XICS_KVM
-     bool
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index d1e635c..620fd4c 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -1,5 +1,6 @@
- config DIMM
-     bool
-+    select MEM_DEVICE
- 
- config MEM_DEVICE
-     bool
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
+u.mak
+index 05ba726..422f1b7 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -57,11 +57,3 @@ CONFIG_MAC_NEWWORLD=3Dy
+=20
+ # For PReP
+ CONFIG_PREP=3Dy
+-CONFIG_PREP_PCI=3Dy
+-CONFIG_RS6000_MC=3Dy
+-CONFIG_I82374=3Dy
+-CONFIG_I82378=3Dy
+-CONFIG_PCKBD=3Dy
+-CONFIG_NE2000_ISA=3Dy
+-CONFIG_PC87312=3Dy
+-CONFIG_CS4231A=3Dy
 diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index b0095e1..4dbf866 100644
+index 4dbf866..b1c3a30 100644
 --- a/hw/ppc/Kconfig
 +++ b/hw/ppc/Kconfig
-@@ -1,11 +1,23 @@
- config PSERIES
+@@ -33,6 +33,14 @@ config SAM460EX
+=20
+ config PREP
      bool
-+    select DIMM
-+    select PCI
-+    select VFIO
-+    select XICS_SPAPR
-+    select XIVE_SPAPR
- 
- config SPAPR_RNG
++    select CS4231A
++    select PREP_PCI
++    select I82374
++    select I82378
++    select LSI_SCSI_PCI
++    select M48T59
++    select PC87312
++    select RS6000_MC
+=20
+ config RS6000_MC
      bool
-+    default y
-+    depends on PSERIES
- 
- config POWERNV
-     bool
-+    select ISA_IPMI_BT
-+    select ISA_BUS
-+    select MC146818RTC
-+    select XICS
-+    select XIVE
- 
- config PPC405
-     bool
-@@ -45,16 +57,14 @@ config MAC_PMU
- 
- config XIVE
-     bool
--    default y
--    depends on PSERIES
-+    depends on POWERNV || PSERIES
- 
- config MACIO_GPIO
-     bool
- 
- config XIVE_SPAPR
-     bool
--    default y
--    depends on PSERIES
-+    select XIVE
- 
- config CUDA
-     bool
--- 
+--=20
 1.8.3.1
