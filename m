@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47994)
+Received: from eggs.gnu.org ([209.51.188.92]:48049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpE7t-0004FD-L0
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:38 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gpE7x-0004Ia-LH
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpE7r-0007a3-Kz
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:37 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gpE7v-0007fS-IU
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:41 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 31 Jan 2019 16:19:09 +0100
-Message-Id: <20190131151914.164903-1-sgarzare@redhat.com>
+Date: Thu, 31 Jan 2019 16:19:11 +0100
+Message-Id: <20190131151914.164903-3-sgarzare@redhat.com>
+In-Reply-To: <20190131151914.164903-1-sgarzare@redhat.com>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/5] virtio-blk: add DISCARD and WRITE
- ZEROES features
+Subject: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-This series adds the support of DISCARD and WRITE ZEROES commands
-and extends the virtio-blk-test to test WRITE_ZEROES command when
-the feature is enabled.
+In order to avoid migration issues, we enable DISCARD and
+WRITE ZEROES features only for machine type >=3D 4.0
 
-v2:
-- added patch 1 to use virtio_blk_handle_rw_error() with discard operatio=
-n
-- added patch 2 to make those new features machine-type dependent (thanks=
- David)
-- fixed patch 3 (previously patch 1/2) adding more checks, block_acct_sta=
-rt()
-                for WRITE_ZEROES requests, and configurable parameters to
-                initialize the limits (max_sectors, wzeroes_may_unmap).
-                (thanks Stefan)
-                I moved in a new function the code to handle a single seg=
-ment,
-                in order to simplify the support of multiple segments in =
-the
-                future.
-- added patch 4 to change the assert on data_size following the discussio=
-n with
-                Thomas, Changpeng, Michael, and Stefan (thanks all)
-- fixed patch 5 (previously patch 2/2) using local dwz_hdr variable inste=
-ad of
-                dynamic allocation (thanks Thomas)
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ hw/block/virtio-blk.c          | 2 ++
+ hw/core/machine.c              | 1 +
+ include/hw/virtio/virtio-blk.h | 1 +
+ 3 files changed, 4 insertions(+)
 
-This series requires the new virtio headers from linux v5.0-rc1
-already imported by Paolo:
-
-Based-on: <20190104082731.24967-1-pbonzini@redhat.com>
-
-Thanks,
-Stefano
-
-Stefano Garzarella (5):
-  virtio-blk: add acct_failed param to virtio_blk_handle_rw_error()
-  virtio-blk: add "discard-wzeroes" boolean property
-  virtio-blk: add DISCARD and WRITE ZEROES features
-  tests/virtio-blk: change assert on data_size in virtio_blk_request()
-  tests/virtio-blk: add test for WRITE_ZEROES command
-
- hw/block/virtio-blk.c          | 185 ++++++++++++++++++++++++++++++++-
- hw/core/machine.c              |   1 +
- include/hw/virtio/virtio-blk.h |   3 +
- tests/virtio-blk-test.c        |  75 ++++++++++++-
- 4 files changed, 259 insertions(+), 5 deletions(-)
-
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 8a6754d9a2..542ec52536 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] =3D {
+     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHRE=
+AD,
+                      IOThread *),
++    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes=
+, 0,
++                     true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 2629515363..ce98857af0 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -30,6 +30,7 @@ GlobalProperty hw_compat_3_1[] =3D {
+     { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "t=
+rue" },
+     { "tpm-crb", "ppi", "false" },
+     { "tpm-tis", "ppi", "false" },
++    { "virtio-blk-device", "discard-wzeroes", "false" },
+ };
+ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+=20
+diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
+k.h
+index 5117431d96..c336afb4cd 100644
+--- a/include/hw/virtio/virtio-blk.h
++++ b/include/hw/virtio/virtio-blk.h
+@@ -40,6 +40,7 @@ struct VirtIOBlkConf
+     uint32_t request_merging;
+     uint16_t num_queues;
+     uint16_t queue_size;
++    uint32_t discard_wzeroes;
+ };
+=20
+ struct VirtIOBlockDataPlane;
 --=20
 2.20.1
