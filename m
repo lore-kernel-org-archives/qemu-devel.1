@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51472)
+Received: from eggs.gnu.org ([209.51.188.92]:51521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGZw-0006J6-DK
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpGa0-0006PG-Ta
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGZp-0005FN-NK
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:38 -0500
-Resent-Message-Id: <E1gpGZp-0005FN-NK@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21147)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpGZe-0005AZ-BW
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:31 -0500
-Message-ID: <154895735984.23946.3842399831769514791@ebba9967afc0>
-In-Reply-To: <20190129121817.7109-1-jusual@mail.ru>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpGZz-0005JN-PT
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:48 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 31 Jan 2019 18:55:47 +0100
+Message-Id: <20190131175549.11691-10-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-1-kwolf@redhat.com>
+References: <20190131175549.11691-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 09:56:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] arm: Clarify the logic of set_pc()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 09/11] qcow2: Creating images with external
+ data file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +22,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, jusual@mail.ru, stefanha@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyOTEyMTgxNy43MTA5
-LTEtanVzdWFsQG1haWwucnUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
-IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
-dGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGFybTogQ2xhcmlmeSB0aGUgbG9n
-aWMgb2Ygc2V0X3BjKCkKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMTI5MTIxODE3Ljcx
-MDktMS1qdXN1YWxAbWFpbC5ydQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWViMmJmYjY3ZiBhcm06
-IENsYXJpZnkgdGhlIGxvZ2ljIG9mIHNldF9wYygpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJP
-UjogQXV0aG9yIGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMy
-OiAKQXV0aG9yOiBKdWxpYSBTdXZvcm92YSB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25n
-bnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTAgbGluZXMgY2hlY2tlZAoK
-Q29tbWl0IGVlYjJiZmI2N2Y4ZCAoYXJtOiBDbGFyaWZ5IHRoZSBsb2dpYyBvZiBzZXRfcGMoKSkg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMjkxMjE4MTcuNzEwOS0xLWp1c3VhbEBtYWlsLnJ1
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This adds a .bdrv_create option to use an external data file.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qapi/block-core.json      |  1 +
+ include/block/block_int.h |  1 +
+ block/qcow2.c             | 26 ++++++++++++++++++++++++++
+ 3 files changed, 28 insertions(+)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index fc46396079..060df28797 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3980,6 +3980,7 @@
+ ##
+ { 'struct': 'BlockdevCreateOptionsQcow2',
+   'data': { 'file':             'BlockdevRef',
++            '*data-file':       'BlockdevRef',
+             'size':             'size',
+             '*version':         'BlockdevQcow2Version',
+             '*backing-file':    'str',
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f605622216..c5b70b3109 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -56,6 +56,7 @@
+ #define BLOCK_OPT_NOCOW             "nocow"
+ #define BLOCK_OPT_OBJECT_SIZE       "object_size"
+ #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
++#define BLOCK_OPT_DATA_FILE         "data_file"
+=20
+ #define BLOCK_PROBE_BUF_SIZE        512
+=20
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 376232d3f0..6cf862e8b9 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2855,6 +2855,7 @@ qcow2_co_create(BlockdevCreateOptions *create_optio=
+ns, Error **errp)
+      */
+     BlockBackend *blk =3D NULL;
+     BlockDriverState *bs =3D NULL;
++    BlockDriverState *data_bs =3D NULL;
+     QCowHeader *header;
+     size_t cluster_size;
+     int version;
+@@ -2951,6 +2952,20 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
+     }
+     refcount_order =3D ctz32(qcow2_opts->refcount_bits);
+=20
++    if (qcow2_opts->data_file) {
++        if (version < 3) {
++            error_setg(errp, "External data files are only supported wit=
+h "
++                       "compatibility level 1.1 and above (use version=3D=
+v3 or "
++                       "greater)");
++            ret =3D -EINVAL;
++            goto out;
++        }
++        data_bs =3D bdrv_open_blockdev_ref(qcow2_opts->data_file, errp);
++        if (bs =3D=3D NULL) {
++            ret =3D -EIO;
++            goto out;
++        }
++    }
+=20
+     /* Create BlockBackend to write to the image */
+     blk =3D blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
+@@ -3002,6 +3017,10 @@ qcow2_co_create(BlockdevCreateOptions *create_opti=
+ons, Error **errp)
+         header->compatible_features |=3D
+             cpu_to_be64(QCOW2_COMPAT_LAZY_REFCOUNTS);
+     }
++    if (data_bs) {
++        header->incompatible_features |=3D
++            cpu_to_be64(QCOW2_INCOMPAT_DATA_FILE);
++    }
+=20
+     ret =3D blk_pwrite(blk, 0, header, cluster_size, 0);
+     g_free(header);
+@@ -3032,6 +3051,9 @@ qcow2_co_create(BlockdevCreateOptions *create_optio=
+ns, Error **errp)
+     options =3D qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+     qdict_put_str(options, "file", bs->node_name);
++    if (data_bs) {
++        qdict_put_str(options, "data-file", data_bs->node_name);
++    }
+     blk =3D blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
+                        &local_err);
+@@ -3117,6 +3139,9 @@ qcow2_co_create(BlockdevCreateOptions *create_optio=
+ns, Error **errp)
+     options =3D qdict_new();
+     qdict_put_str(options, "driver", "qcow2");
+     qdict_put_str(options, "file", bs->node_name);
++    if (data_bs) {
++        qdict_put_str(options, "data-file", data_bs->node_name);
++    }
+     blk =3D blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
+                        &local_err);
+@@ -3130,6 +3155,7 @@ qcow2_co_create(BlockdevCreateOptions *create_optio=
+ns, Error **errp)
+ out:
+     blk_unref(blk);
+     bdrv_unref(bs);
++    bdrv_unref(data_bs);
+     return ret;
+ }
+=20
+--=20
+2.20.1
