@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44331)
+Received: from eggs.gnu.org ([209.51.188.92]:44757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1gpBmy-0001ct-Hy
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:49:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpBp7-0002Uw-HZ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1gpBmx-0008Pm-Ao
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:49:52 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpBp5-0000dF-GQ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:05 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
+	<87o97yi67d.fsf@dusky.pond.sub.org>
+	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
+	<9dc7c83c-a63c-9cde-1267-43bc62e73436@redhat.com>
+	<87imy5dy5v.fsf@dusky.pond.sub.org>
+	<703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com>
+	<87bm3xcgll.fsf@dusky.pond.sub.org>
+	<0871cdaf-6a78-1dd7-d18b-ae1337a1a54e@redhat.com>
+Date: Thu, 31 Jan 2019 13:51:50 +0100
+In-Reply-To: <0871cdaf-6a78-1dd7-d18b-ae1337a1a54e@redhat.com> (Paolo
+	Bonzini's message of "Thu, 31 Jan 2019 13:10:33 +0100")
+Message-ID: <87y3717zx5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <56F356E9-04E0-4419-91BD-55CC91C853E1@gmail.com>
-In-Reply-To: <56F356E9-04E0-4419-91BD-55CC91C853E1@gmail.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Thu, 31 Jan 2019 13:49:12 +0100
-Message-ID: <CABLmASGpih1TTWS4eCuckv12RvExs_UaQ=rPU+danJTSXR8grg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu_vga.drv missing 256 colors support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,25 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
 
-On Thu, Jan 31, 2019 at 12:12 PM Programmingkid <programmingkidx@gmail.com>
-wrote:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> After testing a recent commit of QEMU I noticed that 256 color support is
-> missing in Mac OS 9's color options. A lot of games refuse to run without
-> being able to set the monitor to 256 colors. Could we have this option
-> added?
+> On 31/01/19 10:37, Markus Armbruster wrote:
+>>>
+>>>> Hmm, why is it okay to treat all pfl->cmd values the same when
+>>>> secure=on?
+>>> But doesn't matter.  You just don't want MMIO mode to be active outside
+>>> SMM: all that non-SMM code want to do with the flash is read and execute
+>>> it, as far as they're concerned it's just ROM and the command mode is
+>>> nonexistent.
+>> Out of curiosity: what effect does secure=on have when the device is
+>> read-only (pflash_t member ro non-zero)?
 >
-> Thank you.
+> Non-SMM code cannot execute commands.  This means two things:
 >
+> First, in addition to writes, there are nondestructive commands such as
+> read device id.  Those are also inaccessible to non-SMM if secure=on.
+> Again, for non-SMM code it looks like your old ROM.  This is not
+> important but...
+>
+> ... CFI commands, even commands that are nondestructive or writes that
+> fail because of readonly-ness, consist of multiple writes to the flash
+> device.  If non-SMM code could issue a partial command, the SMM flash
+> driver would likely end up confused.  Therefore it's probably a good
+> idea to make all parallel flash devices have secure=on even if the
+> content of the flash cannot be damaged, and that's why I never
+> considered anything but -global to configure the property.
 
-Hi,
-
-An updated vga driver that supports 256 colours and reads edid info has
-been committed to dgibson's ppc-for-4.0 branch:
-https://github.com/dgibson/qemu/commit/4c693a81dbab9cecbf101c4c24e4b8af819df46c
-
-Best,
-Howard
+Makes sense now, thanks!
