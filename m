@@ -1,23 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:47440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpI4Q-0008UI-Pr
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:32:19 -0500
+	(envelope-from <prvs=92777afac=atish.patra@wdc.com>)
+	id 1gpI4b-0008UI-OX
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:32:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpI2z-0008DV-MB
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:30:50 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-11-crosa@redhat.com>
-	<9a116fb9-5e69-ab8e-1fb0-38f3e4c97186@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <a0653a3b-da8b-c2a3-c60f-b60e277f1ef7@redhat.com>
-Date: Thu, 31 Jan 2019 14:29:52 -0500
+	(envelope-from <prvs=92777afac=atish.patra@wdc.com>)
+	id 1gpHy0-0006iu-2v
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:25:42 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:6797)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=92777afac=atish.patra@wdc.com>)
+	id 1gpHxt-0006aF-QL
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 14:25:37 -0500
+From: Atish Patra <atish.patra@wdc.com>
+Message-ID: <17ecfa78-7098-8cdd-7318-68a997cd685d@wdc.com>
+Date: Thu, 31 Jan 2019 11:25:20 -0800
 MIME-Version: 1.0
-In-Reply-To: <9a116fb9-5e69-ab8e-1fb0-38f3e4c97186@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/18] Boot Linux Console Test: refactor
- the console watcher into utility method
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] RISC-V Open source Supervisor Binary Interface
+ (OpenSBI) Version 0.1 Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, U-Boot Mailing List <u-boot@lists.denx.de>, qemu-devel@nongnu.org, "sw-dev@groups.riscv.org" <sw-dev@groups.riscv.org>
+Cc: Anup Patel <Anup.Patel@wdc.com>, Damien Le Moal <Damien.LeMoal@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>, Jorge Campello De Souza <jorge.campello@wdc.com>, Palmer Dabbelt <palmer@sifive.com>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, Christoph Hellwig <hch@infradead.org>, "David.Abdurachmanov@cern.ch" <David.Abdurachmanov@cern.ch>, Bin Meng <bmeng.cn@gmail.com>, Alexander Graf <agraf@suse.de>, "olof.johansson@gmail.com" <olof.johansson@gmail.com>, "rminnich@gmail.com" <rminnich@gmail.com>
 
+OpenSBI version 0.1 is now publicly available in GitHub at
+https://github.com/riscv/opensbi.
 
+OpenSBI is an open source implementation of the RISC-V Supervisor Binary
+Interface (SBI). RISC-V SBI specifications are maintained as an 
+independent project by the RISC-V Foundation in [Github].
 
-On 1/31/19 12:46 PM, Wainer dos Santos Moschetta wrote:
-> Hi Cleber,
->=20
-> On 01/17/2019 04:56 PM, Cleber Rosa wrote:
->> This introduces a utility method that monitors the console device and
->> looks for either a message that signals the test success or failure.
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->> =C2=A0 tests/acceptance/boot_linux_console.py | 30 ++++++++++++++++++-=
--------
->> =C2=A0 1 file changed, 21 insertions(+), 9 deletions(-)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py
->> b/tests/acceptance/boot_linux_console.py
->> index 35b31162d4..278bb2be3d 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -23,6 +23,25 @@ class BootLinuxConsole(Test):
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 timeout =3D 60
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 def wait_for_console_pattern(self, success_=
-message,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 failure_message=3D'Kerne=
-l panic - not
->> syncing'):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Waits for messages to appe=
-ar on the console, while logging
->> the content
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :param success_message: if=
- this message appears, test succeeds
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :param failure_message: if=
- this message appears, test fails
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->=20
-> What's the docstring format used here? I am wondering if :type is optio=
-nal.
->=20
-> - Wainer
->=20
+This initial release of OpenSBI provides an implementation of the RISC-V 
+SBI specifications version 0.1. These specifications define the legacy 
+SBI interface currently in use by various products as well as by RISC-V 
+QEMU virtual machines.
 
-I've been using the same Sphinx-based docstring statements we've been
-using in Avocado, for the sake of cross reference.  So yes, type is
-optional, and go on the same line, or on a different one with ":type
-<name of parame>".
+OpenSBI also implements SBI compliant early boot firmwares capable of 
+handling various boot flows and payloads on various environments. 
+OpenSBI firmwares have been tested with payloads such as U-Boot and 
+Linux kernel, showing that these open firmwares can fully replace the 
+legacy non-standard BBL intermediate boot loader.
 
-But, there may be issues that we don't know as we're not building those
-API docs.  IIRC Eduardo Habkost is going to propose a GSOC project
-related to building API docs.
+The platforms supported with this first release are as follows.
+* Sifive HiFive Unleashed board
+* RISC-V QEMU *virt* and *sifive_u* virtual machines
+* Kendryte K210 SoC based boards.
 
-- Cleber.
+OpenSBI implementation can be easily extended by RISC-V platform vendors 
+and System-on-Chip vendors to fit new hardware configurations.
+
+As SBI specifications evolve and extend beyond the current base legacy
+features, OpenSBI will be modified to provide a reference implementation 
+for new SBI specifications.
+
+More information on OpenSBI capabilities as well as a contribution 
+guideline are available in OpenSBI documentation included with the 
+source code in GitHub.
+
+[Github]: https://github.com/riscv/riscv-sbi-doc
