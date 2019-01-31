@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42905)
+Received: from eggs.gnu.org ([209.51.188.92]:42903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gp9Wi-0006Aa-Lw
+	(envelope-from <philmd@redhat.com>) id 1gp9Wi-0006AZ-IZ
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gp9Wh-0008HW-Q7
+	(envelope-from <philmd@redhat.com>) id 1gp9Wh-0008HD-Dt
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:56 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<871s4uobf0.fsf@dusky.pond.sub.org>
-	<CAFEAcA_t2707yp5cz+rbMVE3nhLk288iFgK=vUgzFyCw79uX5g@mail.gmail.com>
-	<75629302-84bb-ba19-cb2c-5edc34cffadb@redhat.com>
-	<CAFEAcA-jp=k5-jHeY_ziMbgYBo5U7-ZKSRtU8nfPyAFh9jYUQg@mail.gmail.com>
-	<877eeldx9p.fsf@dusky.pond.sub.org>
-	<CAFEAcA-AYVgigihO5LF3EgfOo5=uaB5Gx3b8Eh3it2QvZkomYg@mail.gmail.com>
-Date: Thu, 31 Jan 2019 11:24:48 +0100
-In-Reply-To: <CAFEAcA-AYVgigihO5LF3EgfOo5=uaB5Gx3b8Eh3it2QvZkomYg@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 31 Jan 2019 10:01:53 +0000")
-Message-ID: <87bm3xazv3.fsf@dusky.pond.sub.org>
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gp9Wh-0008GF-8M
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:55 -0500
+Received: by mail-wm1-f65.google.com with SMTP id n190so1896216wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:24:55 -0800 (PST)
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-14-crosa@redhat.com>
+	<e05b1d30-1a44-171a-02f7-d77e182ab90c@redhat.com>
+	<eb914790-ce08-df18-941b-bc93be89822d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b33a492f-e55e-5ec3-1ab8-f78dff564854@redhat.com>
+Date: Thu, 31 Jan 2019 11:24:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+In-Reply-To: <eb914790-ce08-df18-941b-bc93be89822d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test
+ for mips64el + malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +33,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 1/31/19 2:26 AM, Cleber Rosa wrote:
+> On 1/22/19 5:19 AM, Philippe Mathieu-Daudé wrote:
+>> Hi Cleber,
+>>
+>> On 1/17/19 7:56 PM, Cleber Rosa wrote:
+>>> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
+>>> board and verify the serial is working.
+>>>
+>>> If mips64el is a target being built, "make check-acceptance" will
+>>> automatically include this test by the use of the "arch:mips" tags.
+>>>
+>>> Alternatively, this test can be run using:
+>>>
+>>>     $ avocado run -t arch:mips64el tests/acceptance
+>>>     $ avocado run -t machine:malta tests/acceptance
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>  .travis.yml                            |  2 +-
+>>>  tests/acceptance/boot_linux_console.py | 39 ++++++++++++++++++++++++++
+>>>  2 files changed, 40 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index 49f9016e6a..28648f7a61 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -187,7 +187,7 @@ matrix:
+>>>  
+>>>      # Acceptance (Functional) tests
+>>>      - env:
+>>> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu"
+>>> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu"
+>>>          - TEST_CMD="make check-acceptance"
+>>>        addons:
+>>>          apt:
+>>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+>>> index 0678ec91d2..20b845fce1 100644
+>>> --- a/tests/acceptance/boot_linux_console.py
+>>> +++ b/tests/acceptance/boot_linux_console.py
+>>> @@ -9,8 +9,11 @@
+>>>  # later.  See the COPYING file in the top-level directory.
+>>>  
+>>>  import logging
+>>> +import os
+>>>  
+>>>  from avocado_qemu import Test
+>>> +from avocado.utils import process
+>>> +from avocado.utils import archive
+>>>  
+>>>  
+>>>  class BootLinuxConsole(Test):
+>>> @@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
+>>>          self.vm.launch()
+>>>          console_pattern = 'Kernel command line: %s' % kernel_command_line
+>>>          self.wait_for_console_pattern(console_pattern)
+>>> +
+>>> +    def test_mips64el_malta(self):
+>>> +        """
+>>> +        This test requires the ar tool to extract "data.tar.gz" from
+>>> +        the Debian package.
+>>> +
+>>> +        The kernel can be rebuilt using this Debian kernel source [1] and
+>>> +        following the instructions on [2].
+>>> +
+>>> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-common-tasks.html#s-common-official
+>>> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/#linux-source-2.6.32_2.6.32-48
+>>> +
+>>> +        :avocado: tags=arch:mips64el
+>>> +        :avocado: tags=machine:malta
+>>> +        """
+>>> +        deb_url = ('http://snapshot.debian.org/archive/debian/20130217T032700Z/'
+>>> +                   'pool/main/l/linux-2.6/'
+>>> +                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb')
+>>> +        deb_hash = '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
+>>> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
+>>> +
+>>
+>> Can you refactor this code ...
+>>
+>>> +        cwd = os.getcwd()
+>>> +        os.chdir(self.workdir)
+>>> +        process.run("ar x %s data.tar.gz" % deb_path)
+>>> +        archive.extract("data.tar.gz", self.workdir)
+>>> +        os.chdir(cwd)
+>>> +        kernel_path = self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta'
+>>
+>> ... as an helper function?
+>>
+> 
+> Yes.  In fact, because of the kernel change in the previous patch, I've
+> added it there.
+> 
+>> Can be follow-up patch, so:
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+> 
+> In the longer term, I expect to add deb (and RPM, etc) support to the
+> avocado.utils.archive module:
+> 
+> https://trello.com/c/bQBnvkjv/1437-avocadoutilsarchive-support-rpm-deb-etc
 
-> On Thu, 31 Jan 2019 at 08:52, Markus Armbruster <armbru@redhat.com> wrote:
->> Lesson for the future: when we correct something, but don't dare to
->> touch (some) existing uses (being not "reasonably sure it doesn't
->> actually break guests that used to work"), we should at least have
->> enough sense to make "incorrect" opt-in rather than opt-out!  People
->> adding new uses will be blissfully unaware of the need to opt-out, and
->> the problem will multiply, just like it did here.
->
-> The theory was that pflash_cfi01_register() is the legacy
-> back-compat API, and new board models use new style
-> "create the device and set its properties longhand", I think.
-> (This is part of a wider issue that the preferred QOM APIs
-> tend to be more longwinded than the old obsolete helper
-> functions.) It's definitely unfortunate that we didn't
-> at least comment that that function shouldn't be used in
-> new boards.
->
-> The problem hasn't multiplied very much -- almost all the
-> users of pflash_cfi01_register() predate the change.
->
-> I'm not sure what an API that defaulted to 'correct' would
-> look like here, though.
-
-What about this:
-
-1. Make the device model default to some "correct" configuration, even
-if that setting is kind of arbitrary.  That way, any code using new
-style gets an "incorrect" configuration only if it actively selects one.
-
-2. Won't help with pflash_cfi01_register(), which actively selects
-whatever configuration it gets passed.  Not a serious problem as long as
-it doesn't get used by new code, so rename it to
-pflash_cfi01_create_legacy() and give it a fat comment.
-
-3. Convert one or more of its users to the new style, so we have good
-examples, not just bad ones.
+Awesome, thanks!
