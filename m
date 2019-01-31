@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47649)
+Received: from eggs.gnu.org ([209.51.188.92]:49717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gp1hT-0001EI-9T
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:03:32 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gp1yh-0005cS-Kk
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:21:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gp1hM-0003N0-Oz
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:03:26 -0500
-References: <20190114162605.5330-1-eblake@redhat.com>
-	<20190114162605.5330-12-eblake@redhat.com>
-	<20190130172734.GB892@localhost.localdomain>
+	(envelope-from <jsnow@redhat.com>) id 1gp1yg-0003FM-Fd
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:21:19 -0500
+References: <20190130235251.17911-1-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <1ec3a905-2e8c-6248-7204-32f30a8c8ca1@redhat.com>
-Date: Wed, 30 Jan 2019 21:03:15 -0500
+Message-ID: <2a6ece79-0e51-4707-2427-57825f957990@redhat.com>
+Date: Wed, 30 Jan 2019 21:21:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190130172734.GB892@localhost.localdomain>
+In-Reply-To: <20190130235251.17911-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 11/20] iotests: add iotest 236 for testing
- bitmap merge
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Filter second
+ BLOCK_JOB_ERROR from 229
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
 
 
-On 1/30/19 12:27 PM, Kevin Wolf wrote:
-> Am 14.01.2019 um 17:25 hat Eric Blake geschrieben:
->> From: John Snow <jsnow@redhat.com>
->>
->> New interface, new smoke test.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Message-Id: <20181221093529.23855-12-jsnow@redhat.com>
->> [eblake: fix last-minute change to echo text]
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 1/30/19 6:52 PM, Max Reitz wrote:
+> Without this filter, this test sometimes fails.
 > 
-> This test fails for me (with Python 3) because I get a different dict
-> order.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> I intended to send this as part of my iotest fixes series, but it ended
+> up on the wrong branch...  Doesn't really matter, though, as there is no
+> functional dependency.
+> ---
+>  tests/qemu-iotests/229     | 6 +++++-
+>  tests/qemu-iotests/229.out | 1 -
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 > 
-> Probably related to the OrderedDict that qmp_log() uses, so log() uses
-> sort_keys=False and the unordered dicts that are contained in the outer
-> OrderedDict stay unordered.
-> 
-> Kevin
+> diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
+> index 893d098ad2..b0d4885fa6 100755
+> --- a/tests/qemu-iotests/229
+> +++ b/tests/qemu-iotests/229
+> @@ -81,11 +81,15 @@ echo
+>  echo '=== Force cancel job paused in error state  ==='
+>  echo
+>  
+> +# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
+> +# Cancelling the job means resuming it for a bit before it is actually
+> +# aborted, and in that time it may or may not re-encounter the error.
+
+Oh, because the job is "paused" and cancelling it involves job_enter,
+which we then allow the job to gracefully fail through it's own pathways
+-- but depending on where it failed originally, it may-or-may-not wind
+up trying something else that fails before it finds the "exit
+gracefully" signal, is that right?
+
+I guess there's no real way to adjust that behavior.
+
+>  success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
+>      "{'execute': 'block-job-cancel',
+>                   'arguments': { 'device': 'testdisk',
+>                                  'force': true}}" \
+> -     "BLOCK_JOB_CANCELLED" "Assertion"
+> +     "BLOCK_JOB_CANCELLED" "Assertion" \
+> +    | grep -v '"BLOCK_JOB_ERROR"'
+>  
+>  # success, all done
+>  echo "*** done"
+> diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
+> index 4c4112805f..a3eb33788a 100644
+> --- a/tests/qemu-iotests/229.out
+> +++ b/tests/qemu-iotests/229.out
+> @@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
+>  
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
+>  {"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
+>  *** done
 > 
 
-OK, the problem is that ordered_kwargs() is not recursively ordering
-those kwargs beneath list entries, so transactions are avoiding the sort.
+I think this is fine, if we cannot help to make this any more
+deterministic, so I'm fine with:
 
-Patch coming up, thank you for the report and my apologies for breaking
-iotests so often this cycle.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-(While I'm here, how do you configure iotests to use your python3
-binary? I tried at configure time but that breaks the build for me with
-some "magic number" errors. I could toy with it after by editing
-common.env, but should the build work with python3?)
+but I am curious to know if this poses any theoretical problems for
+libvirt having to deal with possibly an extra hiccup before the cancel
+registers.
