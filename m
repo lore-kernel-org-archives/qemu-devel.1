@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45504)
+Received: from eggs.gnu.org ([209.51.188.92]:48134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gp9gD-0002aT-Vn
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:34:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1gp9uL-0007VN-QR
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gp9gD-0005UL-Du
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:34:45 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:38781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gp9gD-0005Tf-7v
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:34:45 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id e12so2374817otl.5
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:34:44 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gp9uJ-0003J0-Rl
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:49:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gp9uJ-0003IB-I7
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:49:19 -0500
+Date: Thu, 31 Jan 2019 10:49:11 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190131104911.GF19982@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAChFQ9RNaHyROB47QeLwc6cLCCnFx4SmXKV7rbs1MYjk7S0sbw@mail.gmail.com>
 MIME-Version: 1.0
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<871s4uobf0.fsf@dusky.pond.sub.org>
-	<CAFEAcA_t2707yp5cz+rbMVE3nhLk288iFgK=vUgzFyCw79uX5g@mail.gmail.com>
-	<75629302-84bb-ba19-cb2c-5edc34cffadb@redhat.com>
-	<CAFEAcA-jp=k5-jHeY_ziMbgYBo5U7-ZKSRtU8nfPyAFh9jYUQg@mail.gmail.com>
-	<877eeldx9p.fsf@dusky.pond.sub.org>
-	<CAFEAcA-AYVgigihO5LF3EgfOo5=uaB5Gx3b8Eh3it2QvZkomYg@mail.gmail.com>
-	<87bm3xazv3.fsf@dusky.pond.sub.org>
-In-Reply-To: <87bm3xazv3.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 10:34:32 +0000
-Message-ID: <CAFEAcA_hsh+tAUhUX+xD4KDLFBZszmcnu=rrxVYfumHPsz5Wow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAChFQ9RNaHyROB47QeLwc6cLCCnFx4SmXKV7rbs1MYjk7S0sbw@mail.gmail.com>
+Subject: Re: [Qemu-devel] NSIS - including DLL dependencies for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Adam Baxter <voltagex@voltagex.org>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 31 Jan 2019 at 10:24, Markus Armbruster <armbru@redhat.com> wrote:
-> 1. Make the device model default to some "correct" configuration, even
-> if that setting is kind of arbitrary.  That way, any code using new
-> style gets an "incorrect" configuration only if it actively selects one.
+On Thu, Jan 31, 2019 at 02:45:13PM +1100, Adam Baxter wrote:
+> Hi,
+> How do I gather and include the required DLLs (SDL, zlib etc) in the NSIS
+> installer? (and also in a standalone build to be zipped up, but that's less
+> important)
+> 
+> I noticed the wiki doesn't really mention bundling dependencies anywhere.
+> 
+> The official unofficial windows builds are documented at
+> https://qemu.weilnetz.de/FAQ but this doesn't cover building the actual
+> installer.
 
-I don't think that's much better, because it will still
-probably be wrong for the board. People writing board models
-should define what their pflash device is, not plug in something
-that's not what the hardware is.
+Yeah, this is a pretty major ommision in QEMU's build rules for the NSIS
+installer making it pretty much useless as is. We really need to expand
+it so that it can resolve the dlls that qemu .exe's need, locate them
+on the host and bundle them into the installer automatically.
 
-thanks
--- PMM
+It seems we can get a list of deps for an .exe using 
+
+$ winedump  -j import /path/to/binary.exe  | grep offset | grep dll | awk '{print $3}'
+
+We would need to run that for each .exe we're bundling. I think we might
+need to also then run that recursively for each .dll to get the transitive
+set of required dlls.
+
+Even this is not entirely satisfactory though, as it is blindly assuming
+that the only thing we need in the QEMU installer is the dlls themselves.
+GTK at least has other resources used at runtime besides the dll that
+should be bundled.
+
+This kind of problem is why the GNOME project created the msitools project
+for creating .msi installers, to relpace nsis. With msitools there is a
+metadata file for each package listing all the files that need it needs
+to have bundled into an installer:
+
+  https://gitlab.gnome.org/GNOME/msitools/tree/master/data/wixl
+
+This is not without its own downsides though. It bundles all the .wxi
+files itself, with their content based on current mingw packages present
+in the most recent Fedora release. This means it won't work on any other
+distro :-(
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
