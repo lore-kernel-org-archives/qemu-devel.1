@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37466)
+Received: from eggs.gnu.org ([209.51.188.92]:37914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpJSD-000539-6M
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:00:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpJUm-0005qi-BD
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:03:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpJSB-0004WM-EP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:00:57 -0500
-Resent-Message-Id: <E1gpJSB-0004WM-EP@eggs.gnu.org>
-Message-ID: <154896841888.23946.7770464385614301150@ebba9967afc0>
-In-Reply-To: <20190122092909.5341-1-kbastian@mail.uni-paderborn.de>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gpJUg-0005Ok-LQ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:03:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gpJUd-0005Nh-01
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:03:28 -0500
+References: <20190131202637.4062-1-jusual@mail.ru>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d21f68cf-31fa-db62-1d20-66f75e5a05b4@redhat.com>
+Date: Thu, 31 Jan 2019 15:03:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 13:00:20 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/riscv: Convert to
- decodetree
+In-Reply-To: <20190131202637.4062-1-jusual@mail.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UAzAYuQedQK8J7M0BfmSbAKU56Xt3trWq"
+Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,183 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kbastian@mail.uni-paderborn.de
-Cc: fam@euphon.net, sagark@eecs.berkeley.edu, palmer@sifive.com, qemu-riscv@nongnu.org, peer.adelt@hni.uni-paderborn.de, richard.henderson@linaro.org, qemu-devel@nongnu.org
+To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
+Cc: Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMjA5MjkwOS41MzQx
-LTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
-ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
-Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAw
-LzM1XSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgdG8gZGVjb2RldHJlZQpUeXBlOiBzZXJpZXMKTWVz
-c2FnZS1pZDogMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9y
-bi5kZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5p
-LXBhZGVyYm9ybi5kZSAtPiBwYXRjaGV3LzIwMTkwMTIyMDkyOTA5LjUzNDEtMS1rYmFzdGlhbkBt
-YWlsLnVuaS1wYWRlcmJvcm4uZGUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMGQ5
-MWQ1Yzk1IHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMyIGJpdCB0cmFu
-c2xhdG9ycwo3MjA2ZGNjODRjIHRhcmdldC9yaXNjdjogU3BsaWNlIHJlbWFpbmluZyBjb21wcmVz
-c2VkIGluc24gcGFpcnMgZm9yIHJpc2N2MzIgdnMgcmlzY3Y2NApiMjUwM2M0YTVkIHRhcmdldC9y
-aXNjdjogU3BsaWNlIGZzd19zZCBhbmQgZmx3X2xkIGZvciByaXNjdjMyIHZzIHJpc2N2NjQKOGEy
-OWM4ZDczZiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNsX2QsIEBjbF93LCBAY3NfZCwgQGNzX3cg
-aW5zbnMKZGZmZjUyMjFiYiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgQGNzXzIgaW5zbnMgdG8gc2hh
-cmUgdHJhbnNsYXRpb24gZnVuY3Rpb25zCjZiZDE4MDZlNDYgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUg
-ZGVjb2RlX1JWMzJfNjRHKCkKNWQ4NDg2OTg0ZCB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBnZW5fc3lz
-dGVtKCkKOTM5OGQyMjRkYSB0YXJnZXQvcmlzY3Y6IFJlbmFtZSB0cmFuc19hcml0aCB0byBnZW5f
-YXJpdGgKZjQ2ZjlkM2I3ZSB0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2Rpbmcgb2Yg
-UlYzMi82NE0gaW5zbgo0Zjk5YjE2NDAzIHRhcmdldC9yaXNjdjogUmVtb3ZlIHNoaWZ0IGFuZCBz
-bHQgaW5zbiBtYW51YWwgZGVjb2RpbmcKNGI3YTM3YmY1MCB0YXJnZXQvcmlzY3Y6IG1ha2UgQURE
-L1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBsaXN0cwpkNWRmZjViYjRmIHRhcmdldC9yaXNj
-djogTW92ZSBnZW5fYXJpdGhfaW1tKCkgZGVjb2RpbmcgaW50byB0cmFuc18qIGZ1bmN0aW9ucwpj
-ZGQxOGI1ZmQzIHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNvZGluZyBmcm9tIGdlbl9z
-dG9yZSgpCjAyNjYyMzYwYjIgdGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5nIGZy
-b20gZ2VuX2xvYWQoKQpiZDE2NTYwMTE3IHRhcmdldC9yaXNjdjogUmVtb3ZlIG1hbnVhbCBkZWNv
-ZGluZyBmcm9tIGdlbl9icmFuY2goKQozOGRkMDQ0NzlkIHRhcmdldC9yaXNjdjogUmVtb3ZlIGdl
-bl9qYWxyKCkKZjYwYjZlNTg1ZCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMiBvZiBS
-VlhDIGluc25zIHRvIGRlY29kZXRyZWUKNjY5NjUwM2MwYiB0YXJnZXQvcmlzY3Y6IENvbnZlcnQg
-cXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNzk4ZWY3NmM5NiB0YXJnZXQv
-cmlzY3Y6IENvbnZlcnQgcXVhZHJhbnQgMCBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUKNWEz
-OWZjMmEwZSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYgcHJpdiBpbnNucyB0byBkZWNvZGV0cmVl
-CjFmMWY4YzliYzMgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWNjREIGluc25zIHRvIGRlY29kZXRy
-ZWUKZDFjMGFiN2ZlMSB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkQgaW5zbnMgdG8gZGVjb2Rl
-dHJlZQpjNmUyNzRhNGQ1IHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0RiBpbnNucyB0byBkZWNv
-ZGV0cmVlCjZjNTFmZWVjZGQgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJGIGluc25zIHRvIGRl
-Y29kZXRyZWUKNTc3ZTM5OWJkNCB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEEgaW5zbnMgdG8g
-ZGVjb2RldHJlZQpjNGZlZjU1YThkIHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyQSBpbnNucyB0
-byBkZWNvZGV0cmVlCmZkYmVjNmNmZmEgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWE0gaW5zbnMg
-dG8gZGVjb2RldHJlZQpkOWVkMjdhNjUxIHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBp
-bnNucyB0byBkZWNvZGV0cmVlCjU5MWI0YTM2NGMgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkg
-ZmVuY2UgaW5zbnMgdG8gZGVjb2RldHJlZQozZmNiYTZhODY5IHRhcmdldC9yaXNjdjogQ29udmVy
-dCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJlZQpkZTI2NDEwMzgwIHRhcmdldC9y
-aXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29kZXRyZWUKMTVlZGZh
-N2I1MyB0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9zdG9yZSBpbnNucyB0byBkZWNv
-ZGV0cmVlCmFlZGQyMzBiYTIgdGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWWEkgYnJhbmNoIGluc25z
-IHRvIGRlY29kZXRyZWUKNTJmNGMyNDRjNiB0YXJnZXQvcmlzY3Y6IEFjdGl2YXRlIGRlY29kZXRy
-ZWUgYW5kIGltcGxlbW50IExVSSAmIEFVSVBDCjY2OWY3YzIwODYgdGFyZ2V0L3Jpc2N2OiBNb3Zl
-IENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMzUgQ2hlY2tpbmcgY29tbWl0IDY2OWY3YzIwODZkNSAodGFyZ2V0L3Jpc2N2OiBNb3Zl
-IENQVVJJU0NWU3RhdGUgcG9pbnRlciB0byBEaXNhc0NvbnRleHQpCjIvMzUgQ2hlY2tpbmcgY29t
-bWl0IDUyZjRjMjQ0YzZiYiAodGFyZ2V0L3Jpc2N2OiBBY3RpdmF0ZSBkZWNvZGV0cmVlIGFuZCBp
-bXBsZW1udCBMVUkgJiBBVUlQQykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzEy
-NTogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjE2ODc6Citib29sIGRlY29kZV9pbnNu
-MzIoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IGluc24pOwoKdG90YWw6IDEgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAxMjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zNSBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKMy8zNSBDaGVja2luZyBjb21taXQgYWVkZDIzMGJhMjU3ICh0YXJnZXQvcmlz
-Y3Y6IENvbnZlcnQgUlZYSSBicmFuY2ggaW5zbnMgdG8gZGVjb2RldHJlZSkKNC8zNSBDaGVja2lu
-ZyBjb21taXQgMTVlZGZhN2I1M2QyICh0YXJnZXQvcmlzY3Y6IENvbnZlcnQgUlYzMkkgbG9hZC9z
-dG9yZSBpbnNucyB0byBkZWNvZGV0cmVlKQo1LzM1IENoZWNraW5nIGNvbW1pdCBkZTI2NDEwMzgw
-Y2QgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0SSBsb2FkL3N0b3JlIGluc25zIHRvIGRlY29k
-ZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
-TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8zNSBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzM1IENoZWNraW5nIGNvbW1pdCAzZmNiYTZhODY5Yzgg
-KHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGFyaXRobWV0aWMgaW5zbnMgdG8gZGVjb2RldHJl
-ZSkKNy8zNSBDaGVja2luZyBjb21taXQgNTkxYjRhMzY0YzcyICh0YXJnZXQvcmlzY3Y6IENvbnZl
-cnQgUlZYSSBmZW5jZSBpbnNucyB0byBkZWNvZGV0cmVlKQo4LzM1IENoZWNraW5nIGNvbW1pdCBk
-OWVkMjdhNjUxYjAgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVlhJIGNzciBpbnNucyB0byBkZWNv
-ZGV0cmVlKQo5LzM1IENoZWNraW5nIGNvbW1pdCBmZGJlYzZjZmZhYTUgKHRhcmdldC9yaXNjdjog
-Q29udmVydCBSVlhNIGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ4OiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ1IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDkvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMzUg
-Q2hlY2tpbmcgY29tbWl0IGM0ZmVmNTVhOGRmMSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWMzJB
-IGluc25zIHRvIGRlY29kZXRyZWUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzU0OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDEwLzM1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjExLzM1IENoZWNraW5nIGNv
-bW1pdCA1NzdlMzk5YmQ0ZTYgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjY0QSBpbnNucyB0byBk
-ZWNvZGV0cmVlKQoxMi8zNSBDaGVja2luZyBjb21taXQgNmM1MWZlZWNkZGI3ICh0YXJnZXQvcmlz
-Y3Y6IENvbnZlcnQgUlYzMkYgaW5zbnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-Nzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAz
-OTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTMvMzUgQ2hlY2tpbmcgY29tbWl0IGM2ZTI3NGE0ZDU0OSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0
-IFJWNjRGIGluc25zIHRvIGRlY29kZXRyZWUpCjE0LzM1IENoZWNraW5nIGNvbW1pdCBkMWMwYWI3
-ZmUxMDQgKHRhcmdldC9yaXNjdjogQ29udmVydCBSVjMyRCBpbnNucyB0byBkZWNvZGV0cmVlKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiM1MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDM1MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8zNSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoxNS8zNSBDaGVja2luZyBjb21taXQgMWYxZjhjOWJjMzIxICh0YXJn
-ZXQvcmlzY3Y6IENvbnZlcnQgUlY2NEQgaW5zbnMgdG8gZGVjb2RldHJlZSkKMTYvMzUgQ2hlY2tp
-bmcgY29tbWl0IDVhMzlmYzJhMGVkMCAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IFJWIHByaXYgaW5z
-bnMgdG8gZGVjb2RldHJlZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
-KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEw
-MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTQgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMTYvMzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMzUgQ2hlY2tpbmcgY29tbWl0
-IDc5OGVmNzZjOTY1MiAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IHF1YWRyYW50IDAgb2YgUlZYQyBp
-bnNucyB0byBkZWNvZGV0cmVlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjQ2
-OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6OTgzOgorYm9vbCBkZWNvZGVfaW5zbjE2
-KERpc2FzQ29udGV4dCAqY3R4LCB1aW50MTZfdCBpbnNuKTsKCnRvdGFsOiAxIGVycm9ycywgMSB3
-YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE3LzM1IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgoxOC8zNSBDaGVja2luZyBjb21taXQgNjY5NjUwM2MwYjJiICh0YXJnZXQvcmlz
-Y3Y6IENvbnZlcnQgcXVhZHJhbnQgMSBvZiBSVlhDIGluc25zIHRvIGRlY29kZXRyZWUpCjE5LzM1
-IENoZWNraW5nIGNvbW1pdCBmNjBiNmU1ODVkZjYgKHRhcmdldC9yaXNjdjogQ29udmVydCBxdWFk
-cmFudCAyIG9mIFJWWEMgaW5zbnMgdG8gZGVjb2RldHJlZSkKMjAvMzUgQ2hlY2tpbmcgY29tbWl0
-IDM4ZGQwNDQ3OWQzYSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX2phbHIoKSkKMjEvMzUgQ2hl
-Y2tpbmcgY29tbWl0IGJkMTY1NjAxMTdlMyAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRl
-Y29kaW5nIGZyb20gZ2VuX2JyYW5jaCgpKQoyMi8zNSBDaGVja2luZyBjb21taXQgMDI2NjIzNjBi
-MmEwICh0YXJnZXQvcmlzY3Y6IFJlbW92ZSBtYW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fbG9hZCgp
-KQoyMy8zNSBDaGVja2luZyBjb21taXQgY2RkMThiNWZkM2YzICh0YXJnZXQvcmlzY3Y6IFJlbW92
-ZSBtYW51YWwgZGVjb2RpbmcgZnJvbSBnZW5fc3RvcmUoKSkKMjQvMzUgQ2hlY2tpbmcgY29tbWl0
-IGQ1ZGZmNWJiNGY5NSAodGFyZ2V0L3Jpc2N2OiBNb3ZlIGdlbl9hcml0aF9pbW0oKSBkZWNvZGlu
-ZyBpbnRvIHRyYW5zXyogZnVuY3Rpb25zKQoyNS8zNSBDaGVja2luZyBjb21taXQgNGI3YTM3YmY1
-MGNjICh0YXJnZXQvcmlzY3Y6IG1ha2UgQUREL1NVQi9PUi9YT1IvQU5EIGluc24gdXNlIGFyZyBs
-aXN0cykKMjYvMzUgQ2hlY2tpbmcgY29tbWl0IDRmOTliMTY0MDNjZCAodGFyZ2V0L3Jpc2N2OiBS
-ZW1vdmUgc2hpZnQgYW5kIHNsdCBpbnNuIG1hbnVhbCBkZWNvZGluZykKMjcvMzUgQ2hlY2tpbmcg
-Y29tbWl0IGY0NmY5ZDNiN2U5MSAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgbWFudWFsIGRlY29kaW5n
-IG9mIFJWMzIvNjRNIGluc24pCjI4LzM1IENoZWNraW5nIGNvbW1pdCA5Mzk4ZDIyNGRhOTAgKHRh
-cmdldC9yaXNjdjogUmVuYW1lIHRyYW5zX2FyaXRoIHRvIGdlbl9hcml0aCkKMjkvMzUgQ2hlY2tp
-bmcgY29tbWl0IDVkODQ4Njk4NGQyNiAodGFyZ2V0L3Jpc2N2OiBSZW1vdmUgZ2VuX3N5c3RlbSgp
-KQozMC8zNSBDaGVja2luZyBjb21taXQgNmJkMTgwNmU0NmU1ICh0YXJnZXQvcmlzY3Y6IFJlbW92
-ZSBkZWNvZGVfUlYzMl82NEcoKSkKMzEvMzUgQ2hlY2tpbmcgY29tbWl0IGRmZmY1MjIxYmIyYyAo
-dGFyZ2V0L3Jpc2N2OiBDb252ZXJ0IEBjc18yIGluc25zIHRvIHNoYXJlIHRyYW5zbGF0aW9uIGZ1
-bmN0aW9ucykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJS
-T1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzE4MjogRklMRTogdGFy
-Z2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjQ5NzoKK2Jvb2wgZGVjb2RlX2luc24xNihEaXNhc0NvbnRl
-eHQgKmN0eCwgdWludDE2X3QgaW5zbik7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE2
-NCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzMS8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-MzIvMzUgQ2hlY2tpbmcgY29tbWl0IDhhMjljOGQ3M2ZiYSAodGFyZ2V0L3Jpc2N2OiBDb252ZXJ0
-IEBjbF9kLCBAY2xfdywgQGNzX2QsIEBjc193IGluc25zKQozMy8zNSBDaGVja2luZyBjb21taXQg
-YjI1MDNjNGE1ZDJmICh0YXJnZXQvcmlzY3Y6IFNwbGljZSBmc3dfc2QgYW5kIGZsd19sZCBmb3Ig
-cmlzY3YzMiB2cyByaXNjdjY0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
-KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyODogCm5ldyBmaWxlIG1vZGUg
-MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI4NyBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCAzMy8zNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozNC8zNSBDaGVja2luZyBjb21t
-aXQgNzIwNmRjYzg0YzEzICh0YXJnZXQvcmlzY3Y6IFNwbGljZSByZW1haW5pbmcgY29tcHJlc3Nl
-ZCBpbnNuIHBhaXJzIGZvciByaXNjdjMyIHZzIHJpc2N2NjQpCjM1LzM1IENoZWNraW5nIGNvbW1p
-dCBiMGQ5MWQ1Yzk1MTAgKHRhcmdldC9yaXNjdjogUmVtYWluaW5nIHJ2YyBpbnNuIHJldXNlIDMy
-IGJpdCB0cmFuc2xhdG9ycykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMjAxOTAxMjIwOTI5MDkuNTM0MS0xLWtiYXN0aWFuQG1haWwudW5pLXBhZGVy
-Ym9ybi5kZS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UAzAYuQedQK8J7M0BfmSbAKU56Xt3trWq
+From: Eric Blake <eblake@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org
+Cc: Jim Mussared <jim@groklearning.com>,
+ =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>,
+ Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d21f68cf-31fa-db62-1d20-66f75e5a05b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
+ commands
+References: <20190131202637.4062-1-jusual@mail.ru>
+In-Reply-To: <20190131202637.4062-1-jusual@mail.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/31/19 2:26 PM, Julia Suvorova via Qemu-devel wrote:
+> The whitelist option allows to run a reduced monitor with a subset of
+> QMP commands. This allows the monitor to run in secure mode, which is
+> convenient for sending commands via the WebSocket monitor using the
+> web UI. This is planned to be done on micro:bit board.
+>=20
+> The list of allowed commands should be written to a file, one per line.=
+
+> The command line will look like this:
+>     -mon chardev_name,mode=3Dcontrol,whitelist=3Dpath_to_file
+>=20
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+
+> =20
+> -void monitor_init(Chardev *chr, int flags)
+> +static void process_whitelist_file(Monitor *mon, const char *whitelist=
+_file)
+> +{
+> +    char cmd_name[256];
+> +    FILE *fd =3D fopen(whitelist_file, "r");
+
+If you use qemu_open() here (followed by fdopen if you still prefer
+fscanf over read), then you can support "/dev/fdset/NNN" to
+auto-magically support someone passing in the whitelist via an inherited
+file descriptor, rather than having to be somewhere on disk that qemu
+can directly open().
+
+> +
+> +    if (fd =3D=3D NULL) {
+> +        error_report("Could not open whitelist file: %s", strerror(err=
+no));
+> +        exit(1);
+> +    }
+> +
+> +    mon->whitelist =3D g_hash_table_new_full(g_str_hash,
+> +                                           g_str_equal,
+> +                                           g_free,
+> +                                           NULL);
+> +
+> +    g_hash_table_add(mon->whitelist, g_strdup("qmp_capabilities"));
+> +    g_hash_table_add(mon->whitelist, g_strdup("query-commands"));
+> +
+> +    while (fscanf(fd, "%255s", cmd_name) =3D=3D 1) {
+
+%255s fits your cmd_name array declaration and stops consuming at either
+255 bytes or at the first whitespace encountered, but where do you check
+for overflow from a file that passes more than 255 non-whitespace bytes
+without a newline?  Also, this is a bit sloppy in that it skips all
+leading whitespace, rather than ensuring that the user actually passed
+newline-separated command names.  Does glib provide any interfaces for
+more easily reading in an array of lines from a file?
+
+
+> +++ b/qemu-options.hx
+> @@ -3195,12 +3195,16 @@ Like -qmp but uses pretty JSON formatting.
+>  ETEXI
+> =20
+>  DEF("mon", HAS_ARG, QEMU_OPTION_mon, \
+> -    "-mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off=
+]]\n", QEMU_ARCH_ALL)
+> +    "-mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off=
+]]" \
+> +    "[,whitelist=3Dfile]\n", QEMU_ARCH_ALL)
+>  STEXI
+> -@item -mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|of=
+f]]
+> +@item -mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|of=
+f]][,whitelist=3D@var{file}]
+>  @findex -mon
+>  Setup monitor on chardev @var{name}. @code{pretty} turns on JSON prett=
+y printing
+>  easing human reading and debugging.
+> +The @code{whitelist} option disables all commands except those specifi=
+ed in
+> +@var{file}. The file must contain one command name per line. This opti=
+on is only
+> +avaliable in 'control' mode.
+
+s/avaliable/available/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--UAzAYuQedQK8J7M0BfmSbAKU56Xt3trWq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxTYpkACgkQp6FrSiUn
+Q2oqBwf+IgOKCrKjATETstRRP7uM1ilgTZzQBYeJ2CdI3WOK0JJMrdh7qIQ6wWyp
+i/7CxLuvGaqIgjrxDNWS+rRO3uJb1A0/Ti4NX1rhuQszDb/D2XVOlQMlMyXjm3NZ
+2Nd7twnmyjaEg6V3BanKscmCWP8x6bLOj/yaJ/n+n5pbsUhQrcTgygCib3nRDLrJ
+Odb3AxnELTGr2zMfh+gWrN5IWvicRx8CRP0LZw/+fkvKLGoMNNI8QHE83211sNd+
+zl/JOKRqWGM2cWZ9BeAno2VpNpvxSgmeXuWKqodlXBAQq1L3V+XaDAtf6rywVaOc
+YSkf9SKSsPsEQ3MnO5j/AsP/oqV57A==
+=jU9h
+-----END PGP SIGNATURE-----
+
+--UAzAYuQedQK8J7M0BfmSbAKU56Xt3trWq--
