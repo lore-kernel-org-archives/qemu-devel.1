@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39242)
+Received: from eggs.gnu.org ([209.51.188.92]:39768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gp75I-0001oF-Em
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1gp77o-0003uU-EA
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gp75G-0006NE-Ie
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:28 -0500
-Received: from mx1.didichuxing.com ([111.202.154.82]:4557
-	helo=bsf02.didichuxing.com) by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gp75F-0006HF-R7
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:48:26 -0500
-From: =?utf-8?B?6ams5piK6aqiKOa7tOa7tOS6kSk=?= <mahaocong@didiglobal.com>
-Date: Thu, 31 Jan 2019 07:48:11 +0000
-Message-ID: <4336BB25-5F66-482F-AC0F-38E07342D727@didichuxing.com>
-References: <20190131040154.3770-1-mahaocong_work@163.com>
-	<20190131040154.3770-2-mahaocong_work@163.com>
-	<38fb8b6a-25e1-f5fd-8921-edecbf4a21b9@redhat.com>
-In-Reply-To: <38fb8b6a-25e1-f5fd-8921-edecbf4a21b9@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <47EBDD6EF1910A42A263F37C31B0428D@didichuxing.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gp77m-0007xT-Hm
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gp77m-0007gw-8C
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:51:02 -0500
+References: <20190131073234.18037-1-yang.zhong@intel.com>
+	<20190131073234.18037-3-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b6653b69-5f29-2759-1bf1-00ae3c98674e@redhat.com>
+Date: Thu, 31 Jan 2019 08:50:34 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/1] drive-mirror: add
- incremental mode
+In-Reply-To: <20190131073234.18037-3-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 02/27] ide: split ioport registration to
+ a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-IEkgYW0gc28gc29ycnkgdGhhdCB0aGUgZm9ybWF0IHByb2JsZW0gaGFzIGNhdXNlZCB0cm91Ymxl
-IGZvciByZXZpZXdlcnMuIEkgYW0gdmVyeSB1bmZhbWlsaWFyIHdpdGggdGhlIHNwZWNpZmljYXRp
-b24sIGJ1dCBJIHdpbGwgdHJ5IG15IGJlc3QgdG8gY29ycmVjdCBpdC4gDQogQXMgZm9yIOKAmFNp
-Z25lZC1vZmYtYnnigJksIEkgZGlkbid0IHVuZGVyc3RhbmQgdGhlIG1lYW5pbmcgb2YgJ3NpZ25l
-ZC1vZmYtYnknIGF0IGZpcnN0LiBCdXQgbm93IEkgaGF2ZSBjcmVhdGVkIGFuIElEIG9mIG15c2Vs
-ZiBieSB1c2luZyBncGcsIGFuZCBhZGQgaXQgdG8gZ2l0IGNvbmZpZy4NCg0K5ZyoIDIwMTkvMS8z
-MSDkuIvljYgxMjozMu+8jOKAnEVyaWMgQmxha2XigJ08ZWJsYWtlQHJlZGhhdC5jb20+IOWGmeWF
-pToNCg0KICAgIE9uIDEvMzAvMTkgMTA6MDEgUE0sIG1haGFvY29uZyB3cm90ZToNCiAgICA+IEZy
-b206IG1haGFvY29uZyA8bWFoYW9jb25nQGRpZGljaHV4aW5nLmNvbT4NCiAgICA+IA0KICAgIA0K
-ICAgIFlvdSBhcmUgU1RJTEwgbWlzc2luZyB0aGUgY29tbWl0IG1lc3NhZ2UgYm9keSwgZXZlbiB0
-aG91Z2ggSSByZXF1ZXN0ZWQNCiAgICBpdCBbMV0uICBQbGVhc2UgJ2dpdCBjb21taXQgLS1hbWVu
-ZCcsIGFuZCBwYXN0ZSBpbiB0aGUgY29udGVudHMgdGhhdCB5b3UNCiAgICBhcmUgc3RpY2tpbmcg
-aW4geW91ciAwLzEgY292ZXIgbGV0dGVyIHRoYXQgYWN0dWFsbHkgZGVzY3JpYmUgdGhlIGRldGFp
-bHMNCiAgICBiZWhpbmQgdGhpcyBwYXRjaC4gQWxzbywgc2luY2UgeW91IGFyZSBzZW5kaW5nIGEg
-c2luZ2xlIHBhdGNoLCB5b3UgZG9uJ3QNCiAgICBuZWVkIGEgMC8xIGNvdmVyIGxldHRlciAodGhl
-eSBhcmUgbWFuZGF0b3J5IGlmIHlvdSBzZW5kIDIgb3IgbW9yZQ0KICAgIHBhdGNoZXMgaW4gc2Vy
-aWVzOyBidXQgZG9uJ3QgYWRkIGFueXRoaW5nIHdoZW4geW91IHNlbmQganVzdCBvbmUgcGF0Y2gs
-DQogICAgYWx0aG91Z2ggdGhleSBkb24ndCBodXJ0LCBhcyBsb25nIGFzIHlvdSBkbyBhIGNvcnJl
-Y3QgZGl2aXNpb24gYmV0d2Vlbg0KICAgIGNvdmVyIGxldHRlciBoYXZpbmcgaW5mb3JtYXRpb24g
-Zm9yIHRoZSByZXZpZXdlciBhbmQgcGF0Y2ggaXRzZWxmIGhhdmluZw0KICAgIGEgc2VsZi1jb250
-YWluZWQgY29tbWl0IG1lc3NhZ2UpLg0KICAgIA0KICAgIFsxXSBodHRwczovL2xpc3RzLmdudS5v
-cmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOS0wMS9tc2cwMDEyMi5odG1sDQogICAgDQog
-ICAgPiBTaWduZWQtb2ZmLWJ5OiBtYWhhb2NvbmcgPG1haGFvY29uZ0BkaWRpY2h1eGluZy5jb20+
-DQogICAgDQogICAgSSBwcmV2aW91c2x5IG1lbnRpb25lZCBbMl0gdGhhdCB5b3UgcHJvYmFibHkg
-d2FudCB0byB1c2UgYSBwcm9wZXIgbmFtZQ0KICAgICh0eXBpY2FsbHkgbW9yZSB0aGFuIG9uZSB3
-b3JkKSwgbm90IGEgdXNlcm5hbWUuIFdoaWxlIEkgYW0gbm90IGluIGENCiAgICBwb3NpdGlvbiB0
-byBhcmd1ZSB3aGV0aGVyICdtYWhhb2NvbmcnIGlzIGhvdyB5b3Ugc2lnbiBsZWdhbCBkb2N1bWVu
-dHMsDQogICAgb3Igd2hhdCB5b3UgbWF5IHVzZSBpbiBvdGhlciBvcGVuIHNvdXJjZSBwcm9qZWN0
-cywgaXQgaXMgYXQgbGVhc3QNCiAgICBjb3VydGVvdXMgdG8gcmVwbHkgdG8gYSByZXZpZXdlcidz
-IHJlcXVlc3Qgd2hlbiBzdGF0aW5nIHRoYXQgeW91IGFyZQ0KICAgIGludGVudGlvbmFsbHkgbm90
-IGdvaW5nIHRvIGRvIHNvbWV0aGluZyBhYm91dCB0aGUgcmVxdWVzdC4NCiAgICANCiAgICBbMl0g
-aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNn
-MDA0MDcuaHRtbA0KICAgIA0KICAgID4gLS0tDQogICAgDQogICAgSGVyZSwgYWZ0ZXIgdGhlIC0t
-LSBtYXJrZXIsIGlzIGEgZ29vZCBwbGFjZSB0byBkZXNjcmliZSBob3cgdjMgZGlmZmVycw0KICAg
-IGZyb20gdjIsIHRvIHNwZWVkIHVwIHJldmlld2VycyBlZmZvcnRzIGlmIHRoZXkgaGF2ZSBhbHJl
-YWR5IGxvb2tlZCBhdA0KICAgIHRoZSBlYXJsaWVyIHZlcnNpb24sIGFuZCB3YW50IHRvIHNlZSB3
-aGF0IHlvdSBjaGFuZ2VkIGluIHJlc3BvbnNlIHRvDQogICAgdGhlaXIgY29tbWVudHMuDQogICAg
-DQogICAgSnVzdCBhIFVJIHJldmlldyBvbiBteSBwYXJ0IChJIGhhdmVuJ3QgbG9va2VkIGF0IHRo
-ZSBjb2RlIHByb3BlciwgaW4NCiAgICBwYXJ0IGJlY2F1c2UgSSdtIHN0aWxsIHdhaXRpbmcgZm9y
-IHlvdSB0byBmaXggdGhlIGNvbW1pdCBtZXNzYWdlIHByb2JsZW0NCiAgICAtIGl0J3MgdG91Z2gg
-dG8ganVzdGlmeSByZXZpZXdpbmcgaW4gbW9yZSBkZXB0aCB3aGVuIHRoZXJlIGFyZSB0aGluZ3MN
-CiAgICBmcm9tIHRoZSBlYXJsaWVyIHZlcnNpb24gdGhhdCBhcmUgc3RpbGwgbm90IGNvcnJlY3Rl
-ZCkNCiAgICANCiAgICA+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQogICAgPiBAQCAtMTcy
-Nyw2ICsxNzI3LDExIEBADQogICAgPiAgIyAgICAgICAgKGFsbCB0aGUgZGlzaywgb25seSB0aGUg
-c2VjdG9ycyBhbGxvY2F0ZWQgaW4gdGhlIHRvcG1vc3QgaW1hZ2UsIG9yDQogICAgPiAgIyAgICAg
-ICAgb25seSBuZXcgSS9PKS4NCiAgICA+ICAjDQogICAgPiArIyBAYml0bWFwOiB0aGUgbmFtZSBv
-ZiB1c2VyLWNyZWF0ZWQtYml0bWFwIHdoaWNoIGlzIHVzZWQgb24gaW5jcmVtZW50YWwgbW9kZQ0K
-ICAgID4gKyMgICAgICAgICAgZHJpdmUtbWlycm9yLiBJZiB1c2VyIHNlbGVjdCBpbmNyZW1lbnRh
-bCBtb2RlLCBiaXRtYXAgc2hvdWxkIG5vdCBiZQ0KICAgID4gKyMgICAgICAgICAgbnVsbCwgYW5k
-IGNhbiBub3Qgc2V0IGdyYW51bGFyaXR5LCBiZWNhdXNlIHRoZSBtaXJyb3IgYml0bWFwIHNob3Vs
-ZA0KICAgID4gKyMgICAgICAgICAgaGF2ZSB0aGUgc2FtZSBncmFudWxhcml0eSB3aXRoIHVzZXIt
-Y3JlYXRlZC1iaXRtYXAuDQogICAgDQogICAgTWlzc2luZyBhICcoc2luY2UgNC4wKScgdGFnLiBU
-aGUgZ3JhbW1hciBpcyBhd2t3YXJkOyBtYXliZToNCiAgICANCiAgICBAYml0bWFwOiB0aGUgbmFt
-ZSBvZiBhIHByZS1leGlzdGluZyBiaXRtYXAgdG8gdXNlIGluIGluY3JlbWVudGFsIG1vZGU7DQog
-ICAgbXVzdCBiZSBwcmVzZW50IGZvciBpbmNyZW1lbnRhbCBtb2RlIGFuZCBhYnNlbnQgb3RoZXJ3
-aXNlLiBJbg0KICAgIGluY3JlbWVudGFsIG1vZGUsIGdyYW51bGFyaXR5IHNob3VsZCBub3QgYmUg
-c2V0LCBiZWNhdXNlIHRoZSBiaXRtYXAncw0KICAgIGdyYW51bGFyaXR5IGlzIHVzZWQgaW5zdGVh
-ZC4NCiAgICANCiAgICAtLSANCiAgICBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5n
-aW5lZXINCiAgICBSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyMjYNCiAgICBW
-aXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCiAgICANCiAgICANCg0K
+On 2019-01-31 08:32, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> This is not needed on ARM, and brings in ISA bus code which is otherwise not
+> necessary.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/ide/Makefile.objs |  4 +--
+>  hw/ide/core.c        | 25 -----------------
+>  hw/ide/ioport.c      | 66 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 68 insertions(+), 27 deletions(-)
+>  create mode 100644 hw/ide/ioport.c
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
