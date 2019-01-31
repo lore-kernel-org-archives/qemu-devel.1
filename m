@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40562)
+Received: from eggs.gnu.org ([209.51.188.92]:41417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gp9LF-0002Bz-Ul
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:13:07 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gp9Pe-00046S-01
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gp9LF-0003M4-4s
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:13:05 -0500
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<87o97yi67d.fsf@dusky.pond.sub.org>
-	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<87d0oddxu2.fsf@dusky.pond.sub.org>
-	<f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com>
-	<877eelcgf9.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9c4e222f-3941-426e-3195-5598b2af1501@redhat.com>
-Date: Thu, 31 Jan 2019 11:12:45 +0100
-MIME-Version: 1.0
-In-Reply-To: <877eelcgf9.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gp9PZ-00050Z-AA
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:17:36 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 31 Jan 2019 10:17:17 +0000
+Message-ID: <3844320b-32ba-b025-f68d-4cbfd299c202@virtuozzo.com>
+References: <20190131022648.14264-1-jsnow@redhat.com>
+In-Reply-To: <20190131022648.14264-1-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <173EE0BE9EE1C945852D5AE7DDDC0D6C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] iotests/236: fix transaction kwarg order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 31/01/19 10:41, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->=20
->> On 31/01/19 09:40, Markus Armbruster wrote:
->>>> Maybe we should just add pflash block properties to the machine?  An=
-d
->>>> then it can create the devices if the properties are set to a non-em=
-pty
->>>> value.
->>> What exactly do you have in mind?  Something like
->>>
->>>     -machine q35,ovmf-code=3DOVMF-CODE-NODE,ovmf-data=3DOVMF-DATA-NOD=
-E
->>>
->>> where OVMF-CODE-NODE and OVMF-DATA-NODE are block backend node names,
->>> i.e.
->>>
->>>     -blockdev file,node-name=3DOVMF-CODE-NODE,read-only=3Don,filename=
-=3D/usr/share/edk2/ovmf/OVMF_CODE.fd
->>>     -blockdev file,node-name=3DOVMF-DATA-NODE,read-only=3Don,filename=
-=3D...
->>
->> Yes, though I would call it pflash0 and pflash1.
->=20
-> Digression... should we put traditional BIOS in flash as well?  Only fo=
-r
-> new machine types, obviously.
-
-The blocker was that very old KVM didn't support ROMD memory regions.
-Now on one hand we don't support those old kernel versions anymore; on
-the other hand we have HAX and WHPX that do not support ROMD at all.
-
-Paolo
+MzEuMDEuMjAxOSA1OjI2LCBKb2huIFNub3cgd3JvdGU6DQo+IEl0J3Mgbm90IGVub3VnaCB0byBv
+cmRlciB0aGUga3dhcmdzIGZvciBjb25zaXN0ZW50IFFNUCBsb2cgb3V0cHV0LA0KPiB3ZSBtdXN0
+IGFsc28gc29ydCBhbnkgc3ViLWRpY3Rpb25hcmllcyBpbiBsaXN0cyB0aGF0IGFwcGVhciBhcyB2
+YWx1ZXMuDQo+IA0KPiBSZXBvcnRlZC1ieTogS2V2aW4gV29sZiA8a3dvbGZAcmVkaGF0LmNvbT4N
+Cj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4g
+ICB0ZXN0cy9xZW11LWlvdGVzdHMvMjM2Lm91dCAgICB8IDU2ICsrKysrKysrKysrKysrKysrLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAyMSAr
+KysrKystLS0tLS0tDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspLCAzOCBk
+ZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvMjM2Lm91
+dCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0DQo+IGluZGV4IDFkYWQyNGRiMGQuLmJiMmQ3
+MWVhNWUgMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0DQo+ICsrKyBi
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzYub3V0DQo+IEBAIC00NSwyMyArNDUsMjMgQEAgd3JpdGUg
+LVAweGNkIDB4M2ZmMDAwMCA2NGsNCj4gICAgICAgImFjdGlvbnMiOiBbDQo+ICAgICAgICAgew0K
+PiAgICAgICAgICAgImRhdGEiOiB7DQo+IC0gICAgICAgICAgIm5vZGUiOiAiZHJpdmUwIiwNCj4g
+LSAgICAgICAgICAibmFtZSI6ICJiaXRtYXBCIg0KDQpXZSBjb3VsZCBub3RpY2UgZHVyaW5nIHJl
+dmlldywgdGhhdCB0aGluZ3Mgd2UgYXJlIHRyeWluZyB0byBvcmRlciBzbyBoYXJkDQphcmUganVz
+dCBub3Qgb3JkZXJlZCBpbiByZXN1bHQgOikpKQ0KDQo+ICsgICAgICAgICAgIm5hbWUiOiAiYml0
+bWFwQiIsDQo+ICsgICAgICAgICAgIm5vZGUiOiAiZHJpdmUwIg0KPiAgICAgICAgICAgfSwNCg0K
+Wy4uXQ0KDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSBiL3Rl
+c3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+IGluZGV4IGNiZWRmYWYxZGYuLjc2YWQ1MmIz
+NTggMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+ICsrKyBi
+L3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+IEBAIC03NiwxNSArNzYsMTYgQEAgZGVm
+IHFlbXVfaW1nKCphcmdzKToNCj4gICAgICAgICAgIHN5cy5zdGRlcnIud3JpdGUoJ3FlbXUtaW1n
+IHJlY2VpdmVkIHNpZ25hbCAlaTogJXNcbicgJSAoLWV4aXRjb2RlLCAnICcuam9pbihxZW11X2lt
+Z19hcmdzICsgbGlzdChhcmdzKSkpKQ0KPiAgICAgICByZXR1cm4gZXhpdGNvZGUNCj4gICANCj4g
+LWRlZiBvcmRlcmVkX2t3YXJncyhrd2FyZ3MpOg0KPiAtICAgICMga3dhcmdzIHByaW9yIHRvIDMu
+NiBhcmUgbm90IG9yZGVyZWQsIHNvOg0KPiAtICAgIG9kID0gT3JkZXJlZERpY3QoKQ0KPiAtICAg
+IGZvciBrLCB2IGluIHNvcnRlZChrd2FyZ3MuaXRlbXMoKSk6DQo+IC0gICAgICAgIGlmIGlzaW5z
+dGFuY2UodiwgZGljdCk6DQo+IC0gICAgICAgICAgICBvZFtrXSA9IG9yZGVyZWRfa3dhcmdzKHYp
+DQo+IC0gICAgICAgIGVsc2U6DQo+IC0gICAgICAgICAgICBvZFtrXSA9IHYNCj4gLSAgICByZXR1
+cm4gb2QNCj4gK2RlZiBvcmRlcmVkX3FtcChxbXNnKToNCj4gKyAgICAjIERpY3Rpb25hcmllcyBh
+cmUgbm90IG9yZGVyZWQgcHJpb3IgdG8gMy42LCB0aGVyZWZvcmU6DQo+ICsgICAgaWYgaXNpbnN0
+YW5jZShxbXNnLCBsaXN0KToNCj4gKyAgICAgICAgcmV0dXJuIFtvcmRlcmVkX3FtcChhdG9tKSBm
+b3IgYXRvbSBpbiBxbXNnXQ0KPiArICAgIGlmIGlzaW5zdGFuY2UocW1zZywgZGljdCk6DQo+ICsg
+ICAgICAgIG9kID0gT3JkZXJlZERpY3QoKQ0KPiArICAgICAgICBmb3IgaywgdiBpbiBzb3J0ZWQo
+cW1zZy5pdGVtcygpKToNCj4gKyAgICAgICAgICAgIG9kW2tdID0gb3JkZXJlZF9xbXAodikNCj4g
+KyAgICAgICAgcmV0dXJuIG9kDQoNCm9yIGlmIHlvdSB3YW50Og0KcGFpcnMgPSAoKGssIG9yZGVy
+ZWRfcW1wKHYpKSBmb3IgaywgdiBpbiBzb3J0ZWQocW1zZy5pdGVtcygpKSkNCnJldHVybiBPcmRl
+cmVkRGljdChwYWlycykNCg0KPiArICAgIHJldHVybiBxbXNnDQo+ICAgDQo+ICAgZGVmIHFlbXVf
+aW1nX2NyZWF0ZSgqYXJncyk6DQo+ICAgICAgIGFyZ3MgPSBsaXN0KGFyZ3MpDQo+IEBAIC00OTEs
+NyArNDkyLDcgQEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+ICAgICAgIGRl
+ZiBxbXBfbG9nKHNlbGYsIGNtZCwgZmlsdGVycz1bXSwgaW5kZW50PU5vbmUsICoqa3dhcmdzKToN
+Cj4gICAgICAgICAgIGZ1bGxfY21kID0gT3JkZXJlZERpY3QoKA0KPiAgICAgICAgICAgICAgICgi
+ZXhlY3V0ZSIsIGNtZCksDQo+IC0gICAgICAgICAgICAoImFyZ3VtZW50cyIsIG9yZGVyZWRfa3dh
+cmdzKGt3YXJncykpDQo+ICsgICAgICAgICAgICAoImFyZ3VtZW50cyIsIG9yZGVyZWRfcW1wKGt3
+YXJncykpDQo+ICAgICAgICAgICApKQ0KPiAgICAgICAgICAgbG9nKGZ1bGxfY21kLCBmaWx0ZXJz
+LCBpbmRlbnQ9aW5kZW50KQ0KPiAgICAgICAgICAgcmVzdWx0ID0gc2VsZi5xbXAoY21kLCAqKmt3
+YXJncykNCj4gDQoNCmFueXdheSwNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
+ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
