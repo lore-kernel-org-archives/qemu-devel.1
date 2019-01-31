@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48244)
+Received: from eggs.gnu.org ([209.51.188.92]:49569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5r-0007MM-Dj
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:24 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gpCBz-0004Kg-Ei
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gpC5q-0000N6-FE
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:23 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:32998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gpC5q-0000Mz-6X
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:09:22 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 31 Jan 2019 15:08:50 +0200
-Message-Id: <20190131130850.6850-11-yuval.shaia@oracle.com>
-In-Reply-To: <20190131130850.6850-1-yuval.shaia@oracle.com>
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH 10/10] hw/pvrdma: Delete unneeded function
- argument
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gpCBy-0002PQ-Fb
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:15:43 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:51930)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gpCBw-0002M0-Kf
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:15:42 -0500
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Thu, 31 Jan 2019 16:15:39 +0300
+Message-ID: <20190131131539.23264.29247.stgit@pasha-VirtualBox>
+In-Reply-To: <20190131131520.23264.75724.stgit@pasha-VirtualBox>
+References: <20190131131520.23264.75724.stgit@pasha-VirtualBox>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v11 03/25] replay: disable default snapshot for
+ record/replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com, yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-The function argument rdma_dev_res is not needed as it is stored in the
-backend_dev object at init.
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+This patch disables setting '-snapshot' option on by default
+in record/replay mode. This is needed for creating vmstates in record
+and replay modes.
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- hw/rdma/rdma_backend.c      | 13 ++++++-------
- hw/rdma/rdma_backend.h      |  1 -
- hw/rdma/vmw/pvrdma_qp_ops.c |  3 +--
- 3 files changed, 7 insertions(+), 10 deletions(-)
+ vl.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index 3283461b15..544b7d6148 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -586,7 +586,6 @@ static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev,
- }
- 
- void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
--                            RdmaDeviceResources *rdma_dev_res,
-                             RdmaBackendQP *qp, uint8_t qp_type,
-                             struct ibv_sge *sge, uint32_t num_sge, void *ctx)
- {
-@@ -605,9 +604,9 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-             rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
-             if (rc) {
-                 complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
--                rdma_dev_res->stats.mad_rx_bufs_err++;
-+                backend_dev->rdma_dev_res->stats.mad_rx_bufs_err++;
-             } else {
--                rdma_dev_res->stats.mad_rx_bufs++;
-+                backend_dev->rdma_dev_res->stats.mad_rx_bufs++;
-             }
-         }
-         return;
-@@ -617,7 +616,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     bctx->up_ctx = ctx;
-     bctx->backend_qp = qp;
- 
--    rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
-+    rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
-     if (unlikely(rc)) {
-         complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-         goto err_free_bctx;
-@@ -626,7 +625,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-     qp->cqe_ctx_list = g_slist_append(qp->cqe_ctx_list,
-                                       GINT_TO_POINTER(bctx_id));
- 
--    rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge,
-+    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-                               &backend_dev->rdma_dev_res->stats.rx_bufs_len);
-     if (rc) {
-         complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-@@ -644,13 +643,13 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
-         goto err_dealloc_cqe_ctx;
+diff --git a/vl.c b/vl.c
+index bc9fbec..bea05cd 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3196,7 +3196,13 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
+                 break;
+             case QEMU_OPTION_snapshot:
+-                snapshot = 1;
++                {
++                    Error *blocker = NULL;
++                    snapshot = 1;
++                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
++                               "-snapshot");
++                    replay_add_blocker(blocker);
++                }
+                 break;
+             case QEMU_OPTION_numa:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+@@ -4465,7 +4471,7 @@ int main(int argc, char **argv, char **envp)
+         qapi_free_BlockdevOptions(bdo->bdo);
+         g_free(bdo);
      }
- 
--    rdma_dev_res->stats.rx_bufs++;
-+    backend_dev->rdma_dev_res->stats.rx_bufs++;
- 
-     return;
- 
- err_dealloc_cqe_ctx:
-     backend_dev->rdma_dev_res->stats.rx_bufs_err++;
--    rdma_rm_dealloc_cqe_ctx(rdma_dev_res, bctx_id);
-+    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, bctx_id);
- 
- err_free_bctx:
-     g_free(bctx);
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-index 798a12f28f..160b9e74db 100644
---- a/hw/rdma/rdma_backend.h
-+++ b/hw/rdma/rdma_backend.h
-@@ -112,7 +112,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-                             union ibv_gid *dgid, uint32_t dqpn, uint32_t dqkey,
-                             void *ctx);
- void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
--                            RdmaDeviceResources *rdma_dev_res,
-                             RdmaBackendQP *qp, uint8_t qp_type,
-                             struct ibv_sge *sge, uint32_t num_sge, void *ctx);
- 
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 5d650a4943..4ec1dacfd1 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -241,8 +241,7 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-         }
- 
-         atomic_inc(&cq->missing_cqe);
--        rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
--                               &qp->backend_qp, qp->qp_type,
-+        rdma_backend_post_recv(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
-                                (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
-                                comp_ctx);
- 
--- 
-2.17.2
+-    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
++    if (snapshot) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
+     }
