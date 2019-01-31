@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35214)
+Received: from eggs.gnu.org ([209.51.188.92]:35366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gpB3R-0006UN-C5
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:02:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpB4M-00072V-0L
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:03:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gpB3Q-0004I5-F6
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:02:49 -0500
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<87o97yi67d.fsf@dusky.pond.sub.org>
-	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<9dc7c83c-a63c-9cde-1267-43bc62e73436@redhat.com>
-	<87imy5dy5v.fsf@dusky.pond.sub.org>
-	<703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com>
-	<87bm3xcgll.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3f866256-7733-b4a1-40e9-2ab62843137a@redhat.com>
-Date: Thu, 31 Jan 2019 13:02:30 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gpB4G-0004aw-08
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:03:45 -0500
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:39369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpB4C-0004XY-Nn
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:03:38 -0500
+Received: by mail-ot1-x336.google.com with SMTP id n8so2570428otl.6
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 04:03:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87bm3xcgll.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+References: <20190128194351.14679-1-ehabkost@redhat.com>
+In-Reply-To: <20190128194351.14679-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Jan 2019 12:03:19 +0000
+Message-ID: <CAFEAcA8qi6_GuYOnzGwyXGP0_4rW3tNE07zzF0FSWyk+DKBEFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Machine queue, 2019-01-28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Libvirt <libvir-list@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 01/31/19 10:37, Markus Armbruster wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 31/01/19 09:33, Markus Armbruster wrote:
->>> I thought secure=on affected only writes (and so wouldn't matter with
->>> readonly=on), but I was wrong:
->>>
->>>     static MemTxResult pflash_mem_read_with_attrs(void *opaque, hwaddr addr, uint64_t *value,
->>>                                                   unsigned len, MemTxAttrs attrs)
->>>     {
->>>         pflash_t *pfl = opaque;
->>>         bool be = !!(pfl->features & (1 << PFLASH_BE));
->>>
->>>         if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
->>>             *value = pflash_data_read(opaque, addr, len, be);
->>>         } else {
->>>             *value = pflash_read(opaque, addr, len, be);
->>>         }
->>>         return MEMTX_OK;
->>>     }
->>>
->>> pflash_data_read() is what pflash_read() does when pfl->cmd is 0.
->>
->> Reads from flash actually do not go through here; this function executes
->> if the flash chip is already in MMIO mode, which happens after you
->> *write* a command to the memory area.  With secure=on, you just cannot
->> do a command write unless you're in SMM, in other words the flash chip
->> can only ever go in MMIO mode if you're in SMM.
->>
->>> Hmm, why is it okay to treat all pfl->cmd values the same when
->>> secure=on?
->>
->> But doesn't matter.  You just don't want MMIO mode to be active outside
->> SMM: all that non-SMM code want to do with the flash is read and execute
->> it, as far as they're concerned it's just ROM and the command mode is
->> nonexistent.
-> 
-> Out of curiosity: what effect does secure=on have when the device is
-> read-only (pflash_t member ro non-zero)?
-> 
+On Mon, 28 Jan 2019 at 19:43, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit 5f39a91dbd9a186edb999afd4d17524f4b1da14f:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2019-01-28 12:54:06 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to 21d1683690e048663855dd6feb3034ab7c5039bc:
+>
+>   hostmem: add more information in error messages (2019-01-28 15:52:05 -0200)
+>
+> ----------------------------------------------------------------
+> Machine queue, 2019-01-28
+>
+> * Fix small leak on NUMA code
+> * Improve memory backend error messages
+>
 
-It's hard to theorize about this comprehensively. What action and which
-pflash unit do you have in mind?
+Applied, thanks.
 
-(Interpreting your question as "what does the firmware see if...".
-Another interpretation would be possible too, "what does QEMU do if...".)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Thanks
-Laszlo
+-- PMM
