@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59593)
+Received: from eggs.gnu.org ([209.51.188.92]:59645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpCmu-00021P-58
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gpCmz-00025q-3V
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpCmt-0006Th-DP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gpCmx-0006Vc-PN
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:57 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 31 Jan 2019 14:53:27 +0100
-Message-Id: <1548942810-22942-3-git-send-email-thuth@redhat.com>
+Date: Thu, 31 Jan 2019 14:53:29 +0100
+Message-Id: <1548942810-22942-5-git-send-email-thuth@redhat.com>
 In-Reply-To: <1548942810-22942-1-git-send-email-thuth@redhat.com>
 References: <1548942810-22942-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/5] ppc: Express dependencies of the 'prep'
- and '40p' machines with kconfig
+Subject: [Qemu-devel] [PATCH v2 4/5] ppc: Express dependencies of the
+ Sam460EX machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +21,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, yang.zhong@intel.com, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, yang.zhong@intel.com
 
-Select the required devices in hw/ppc/Kconfig instead, so that
-ppc-softmmu.mak only contains the user-selectable PREP switch.
-Plug-in devices like NE2000_ISA are pulled in automatically by the
-Kconfig build system now.
+Most of the dependencies are now directly selected by the SAM460EX
+switch. We can drop CONFIG_VGA_CIRRUS since this device is already
+selected automatically when CONFIG_PCI_DEVICES is set.
 
-Cc: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/ppc-softmmu.mak | 8 --------
- hw/ppc/Kconfig                  | 8 ++++++++
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ default-configs/ppc-softmmu.mak | 10 ----------
+ hw/display/Kconfig              |  1 +
+ hw/ppc/Kconfig                  | 10 ++++++++++
+ hw/usb/Kconfig                  |  2 +-
+ 4 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-index 05ba726..422f1b7 100644
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 513a8e9..5265d8a 100644
 --- a/default-configs/ppc-softmmu.mak
 +++ b/default-configs/ppc-softmmu.mak
-@@ -57,11 +57,3 @@ CONFIG_MAC_NEWWORLD=3Dy
-=20
- # For PReP
- CONFIG_PREP=3Dy
--CONFIG_PREP_PCI=3Dy
--CONFIG_RS6000_MC=3Dy
--CONFIG_I82374=3Dy
--CONFIG_I82378=3Dy
--CONFIG_PCKBD=3Dy
--CONFIG_NE2000_ISA=3Dy
--CONFIG_PC87312=3Dy
--CONFIG_CS4231A=3Dy
+@@ -25,16 +25,6 @@ CONFIG_PCI_EXPRESS=y
+ 
+ # For Sam460ex
+ CONFIG_SAM460EX=y
+-CONFIG_USB_EHCI_SYSBUS=y
+-CONFIG_SM501=y
+-CONFIG_DDC=y
+-CONFIG_IDE_SII3112=y
+-CONFIG_I2C=y
+-CONFIG_AT24C=y
+-CONFIG_BITBANG_I2C=y
+-CONFIG_M41T80=y
+-CONFIG_VGA_CIRRUS=y
+-CONFIG_SMBUS_EEPROM=y
+ 
+ # For Macs
+ CONFIG_MAC_OLDWORLD=y
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index c784fe8..f8e6136 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -76,6 +76,7 @@ config MILKYMIST_TMU2
+ config SM501
+     bool
+     depends on I2C
++    select DDC
+ 
+ config TCX
+     bool
 diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-index 4dbf866..b1c3a30 100644
+index 2956c86..35e3704 100644
 --- a/hw/ppc/Kconfig
 +++ b/hw/ppc/Kconfig
-@@ -33,6 +33,14 @@ config SAM460EX
-=20
+@@ -27,9 +27,19 @@ config PPC440
+ 
+ config PPC4XX
+     bool
++    select BITBANG_I2C
++    select PCI
+ 
+ config SAM460EX
+     bool
++    select PFLASH_CFI01
++    select IDE_SII3112
++    select M41T80
++    select PPC440
++    select SM501
++    select SMBUS_EEPROM
++    select USB_EHCI_SYSBUS
++    select USB_OHCI
+ 
  config PREP
      bool
-+    select CS4231A
-+    select PREP_PCI
-+    select I82374
-+    select I82378
-+    select LSI_SCSI_PCI
-+    select M48T59
-+    select PC87312
-+    select RS6000_MC
-=20
- config RS6000_MC
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index a1b7acb..871ea47 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -21,7 +21,7 @@ config USB_EHCI
+ 
+ config USB_EHCI_SYSBUS
      bool
---=20
+-    select USB
++    select USB_EHCI
+ 
+ config USB_XHCI
+     bool
+-- 
 1.8.3.1
