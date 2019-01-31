@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44757)
+Received: from eggs.gnu.org ([209.51.188.92]:44939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpBp7-0002Uw-HZ
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpBpn-0002t4-Ud
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpBp5-0000dF-GQ
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:05 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<87o97yi67d.fsf@dusky.pond.sub.org>
-	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<9dc7c83c-a63c-9cde-1267-43bc62e73436@redhat.com>
-	<87imy5dy5v.fsf@dusky.pond.sub.org>
-	<703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com>
-	<87bm3xcgll.fsf@dusky.pond.sub.org>
-	<0871cdaf-6a78-1dd7-d18b-ae1337a1a54e@redhat.com>
-Date: Thu, 31 Jan 2019 13:51:50 +0100
-In-Reply-To: <0871cdaf-6a78-1dd7-d18b-ae1337a1a54e@redhat.com> (Paolo
-	Bonzini's message of "Thu, 31 Jan 2019 13:10:33 +0100")
-Message-ID: <87y3717zx5.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gpBpm-00011d-Sc
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:47 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:42450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpBpm-0000xl-Iv
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:52:46 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id w13so2588823oiw.9
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 04:52:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+References: <20190130031817.27780-1-stefanha@redhat.com>
+In-Reply-To: <20190130031817.27780-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Jan 2019 12:52:28 +0000
+Message-ID: <CAFEAcA80pfRr7FKFu+0X0MqM5c08O5p88jm_5tRFLxXoNu7-YQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Wed, 30 Jan 2019 at 03:18, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit f6b06fcceef465de0cf2514c9f76fe0192896781:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190121-pull-request' into staging (2019-01-23 17:57:47 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to 57b7bdf426445d8356171135308dfe6d7d5fb612:
+>
+>   trace: rerun tracetool after ./configure changes (2019-01-30 10:57:03 +0800)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> User-visible changes:
+>  * The new qemu-trace-stap script makes it convenient to collect traces without
+>    writing SystemTap scripts.  See "man qemu-trace-stap" for details.
+>
 
-> On 31/01/19 10:37, Markus Armbruster wrote:
->>>
->>>> Hmm, why is it okay to treat all pfl->cmd values the same when
->>>> secure=on?
->>> But doesn't matter.  You just don't want MMIO mode to be active outside
->>> SMM: all that non-SMM code want to do with the flash is read and execute
->>> it, as far as they're concerned it's just ROM and the command mode is
->>> nonexistent.
->> Out of curiosity: what effect does secure=on have when the device is
->> read-only (pflash_t member ro non-zero)?
->
-> Non-SMM code cannot execute commands.  This means two things:
->
-> First, in addition to writes, there are nondestructive commands such as
-> read device id.  Those are also inaccessible to non-SMM if secure=on.
-> Again, for non-SMM code it looks like your old ROM.  This is not
-> important but...
->
-> ... CFI commands, even commands that are nondestructive or writes that
-> fail because of readonly-ness, consist of multiple writes to the flash
-> device.  If non-SMM code could issue a partial command, the SMM flash
-> driver would likely end up confused.  Therefore it's probably a good
-> idea to make all parallel flash devices have secure=on even if the
-> content of the flash cannot be damaged, and that's why I never
-> considered anything but -global to configure the property.
+Applied, thanks.
 
-Makes sense now, thanks!
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
