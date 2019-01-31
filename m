@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35159)
+Received: from eggs.gnu.org ([209.51.188.92]:36928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpHAq-0005wa-Fh
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:34:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpHIw-00048G-6d
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:43:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpHAn-0007pq-HP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:34:52 -0500
-Resent-Message-Id: <E1gpHAn-0007pq-HP@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21755)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpHAn-0007g3-7z
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:34:49 -0500
-Message-ID: <154895966057.23946.16323718244275516637@ebba9967afc0>
-In-Reply-To: <20190128223118.5255-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gpHIv-0002nA-9V
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:43:14 -0500
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d887367f-053e-6541-a6d7-cc84b23db841@redhat.com>
+Date: Thu, 31 Jan 2019 12:43:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 10:34:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] target/arm: Implement ARMv8.5-BTI
+In-Reply-To: <20190131175549.11691-2-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1XB9jy5kyIhlYMcsWzE4xmu9PNsnkTYem"
+Subject: Re: [Qemu-devel] [RFC PATCH 01/11] qcow2: Extend spec for external
+ data files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODIyMzExOC41MjU1
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8x
-Ml0gdGFyZ2V0L2FybTogSW1wbGVtZW50IEFSTXY4LjUtQlRJCk1lc3NhZ2UtaWQ6IDIwMTkwMTI4
-MjIzMTE4LjUyNTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClR5cGU6IHNlcmllcwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
-dGNoZXcvMjAxOTAxMjgyMjMxMTguNTI1NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcg
-LT4gcGF0Y2hldy8yMDE5MDEyODIyMzExOC41MjU1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2NhcHN0
-b25lLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAnZHRjJyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0
-YycKU3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
-Z2l0L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9RZW11TWFj
-RHJpdmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-U0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxlICdyb21z
-L2lweGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvaXB4ZScKU3VibW9kdWxlICdyb21zL29wZW5iaW9zJyAoaHR0cHM6Ly9naXQu
-cWVtdS5vcmcvZ2l0L29wZW5iaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVu
-YmlvcycKU3VibW9kdWxlICdyb21zL29wZW5oYWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9vcGVuaGFja3dhcmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5oYWNr
-d2FyZScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29kZScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3FlbXUtcGFs
-Y29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
-c2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MnClN1Ym1vZHVs
-ZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dpdGh1Yi5jb20vaGRlbGxlci9zZWFiaW9z
-LWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9k
-dWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJv
-b3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0
-LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9v
-dCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9v
-dC1zYW00NjBleCcKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycgKGh0
-dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXNvZnRmbG9hdC0zKSByZWdpc3RlcmVkIGZv
-ciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9m
-cC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5
-LXRlc3RmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0
-ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1h
-cGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUn
-OiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicK
-Q2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAn
-ODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdy
-b21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVy
-cyc6IGNoZWNrZWQgb3V0ICdkNGU3ZDdhYzY2M2ZjYjU1ZjFiOTM1NzU0NDVmY2JjYTM3MmYxN2E3
-JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6
-IGNoZWNrZWQgb3V0ICc5YjdhYjJmYTAyMDM0MWRlZThiZjlkZjZjOWNmNDAwMDNlMDEzNmRmJwpD
-bG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNo
-ZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9u
-aW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5iaW9z
-JzogY2hlY2tlZCBvdXQgJzQ0MWE4NGQzYTY0MmExMGI5NDgzNjljNjNmMzIzNjdlOGZmNjM5NWIn
-CkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
-L29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3
-YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnNTFjMjM3ZDdlMjBkMDUx
-MDBlYWNhZGVlMmY2MWFiYzE3ZTZiYzA5NycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTY5OGM4OTk1ZmZi
-MjgzODI5NmVjMjg0ZmUzYzRhZDMzZGZjYTMwNycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3Mt
-aHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tlZCBvdXQg
-JzFlZjk5YTAxNTcyYzI1ODFjMzBlMTZlNmZlNjllOWVhMmVmOTJjZTAnCkNsb25pbmcgaW50byAn
-cm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBv
-dXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25pbmcgaW50
-byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290JzogY2hlY2tl
-ZCBvdXQgJ2UwZWUyNGMyN2ExNzJiY2Y0ODJmNmYyYmM5MDVlNjIxMWMxMzRiY2MnCkNsb25pbmcg
-aW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6IGNoZWNr
-ZWQgb3V0ICdkODVjYTAyOWYyNTdiNTNhOTZkYTZjMmZiNDIxZTc4YTAwM2E5OTQzJwpDbG9uaW5n
-IGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJv
-b3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVhNmRmNzcw
-NTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycu
-Li4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tl
-ZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcg
-aW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0
-ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1YTU5ZGNlYzE5MzI3
-Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3VpL2tleWNvZGVtYXBk
-YicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0ICc2YjNk
-NzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCmVkZjI1MWUgdGVzdHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21va2UgdGVz
-dAo3YTc2NDYyIGxpbnV4LXVzZXIvYWFyY2g2NDogUmVzZXQgYnR5cGUgZm9yIHN5c2NhbGxzIGFu
-ZCBzaWduYWxzCjU5ZDZkY2YgdGFyZ2V0L2FybTogRW5hYmxlIEJUSSBmb3IgLWNwdSBtYXgKZjcz
-NzdmYyB0YXJnZXQvYXJtOiBBZGQgeC1ndWFyZGVkLXBhZ2VzIGNwdSBwcm9wZXJ0eSBmb3IgdXNl
-ci1vbmx5CjIzNjkwYWUgdGFyZ2V0L2FybTogU2V0IGJ0eXBlIGZvciBpbmRpcmVjdCBicmFuY2hl
-cwoxMGRlMmEyIHRhcmdldC9hcm06IFJlc2V0IGJ0eXBlIGZvciBkaXJlY3QgYnJhbmNoZXMKYTEy
-YmFkOSB0YXJnZXQvYXJtOiBEZWZhdWx0IGhhbmRsaW5nIG9mIEJUWVBFIGR1cmluZyB0cmFuc2xh
-dGlvbgpkMGYwODAzIHRhcmdldC9hcm06IENhY2hlIHRoZSBHUCBiaXQgZm9yIGEgcGFnZSBpbiBN
-ZW1UeEF0dHJzCmIyMjYxMjggZXhlYzogQWRkIHRhcmdldC1zcGVjaWZpYyB0bGIgYml0cyB0byBN
-ZW1UeEF0dHJzCjdlYWIzMDUgdGFyZ2V0L2FybTogQWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+Zmxh
-Z3MKNDlmMzZhNSB0YXJnZXQvYXJtOiBBZGQgUFNUQVRFLkJUWVBFCmVmNTE1MjQgdGFyZ2V0L2Fy
-bTogSW50cm9kdWNlIGlzYXJfZmVhdHVyZV9hYTY0X2J0aQoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-MS8xMiBDaGVja2luZyBjb21taXQgZWY1MTUyNDY0ZTczICh0YXJnZXQvYXJtOiBJbnRyb2R1Y2Ug
-aXNhcl9mZWF0dXJlX2FhNjRfYnRpKQoyLzEyIENoZWNraW5nIGNvbW1pdCA0OWYzNmE1YzIwODYg
-KHRhcmdldC9hcm06IEFkZCBQU1RBVEUuQlRZUEUpCjMvMTIgQ2hlY2tpbmcgY29tbWl0IDdlYWIz
-MDU4MTAyNiAodGFyZ2V0L2FybTogQWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+ZmxhZ3MpCjQvMTIg
-Q2hlY2tpbmcgY29tbWl0IGIyMjYxMjhjZTMyMCAoZXhlYzogQWRkIHRhcmdldC1zcGVjaWZpYyB0
-bGIgYml0cyB0byBNZW1UeEF0dHJzKQpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRo
-YXQgJzonIChjdHg6V3hXKQojMjg6IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1hdHRycy5oOjQ3Ogor
-ICAgIHVuc2lnbmVkIGludCB0YXJnZXRfdGxiX2JpdDAgOiAxOwogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6
-JyAoY3R4Old4VykKIzI5OiBGSUxFOiBpbmNsdWRlL2V4ZWMvbWVtYXR0cnMuaDo0ODoKKyAgICB1
-bnNpZ25lZCBpbnQgdGFyZ2V0X3RsYl9iaXQxIDogMTsKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0
-eDpXeFcpCiMzMDogRklMRTogaW5jbHVkZS9leGVjL21lbWF0dHJzLmg6NDk6CisgICAgdW5zaWdu
-ZWQgaW50IHRhcmdldF90bGJfYml0MiA6IDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDQvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvMTIgQ2hlY2tpbmcgY29tbWl0
-IGQwZjA4MDMwZWYxZCAodGFyZ2V0L2FybTogQ2FjaGUgdGhlIEdQIGJpdCBmb3IgYSBwYWdlIGlu
-IE1lbVR4QXR0cnMpCjYvMTIgQ2hlY2tpbmcgY29tbWl0IGExMmJhZDk2NjZlNSAodGFyZ2V0L2Fy
-bTogRGVmYXVsdCBoYW5kbGluZyBvZiBCVFlQRSBkdXJpbmcgdHJhbnNsYXRpb24pCkVSUk9SOiBy
-ZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzk3
-OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMzc1NzoKKyAgICByZXR1cm4gKHRs
-Yl9oaXQoZW50cnktPmFkZHJfY29kZSwgYWRkcikgJiYKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMTk2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCjcvMTIgQ2hlY2tpbmcgY29tbWl0IDEwZGUyYTI0NjE5NCAodGFyZ2V0L2FybTogUmVz
-ZXQgYnR5cGUgZm9yIGRpcmVjdCBicmFuY2hlcykKOC8xMiBDaGVja2luZyBjb21taXQgMjM2OTBh
-ZTgyZjIwICh0YXJnZXQvYXJtOiBTZXQgYnR5cGUgZm9yIGluZGlyZWN0IGJyYW5jaGVzKQo5LzEy
-IENoZWNraW5nIGNvbW1pdCBmNzM3N2ZjZGMxMjEgKHRhcmdldC9hcm06IEFkZCB4LWd1YXJkZWQt
-cGFnZXMgY3B1IHByb3BlcnR5IGZvciB1c2VyLW9ubHkpCjEwLzEyIENoZWNraW5nIGNvbW1pdCA1
-OWQ2ZGNmZGNhNzEgKHRhcmdldC9hcm06IEVuYWJsZSBCVEkgZm9yIC1jcHUgbWF4KQoxMS8xMiBD
-aGVja2luZyBjb21taXQgN2E3NjQ2Mjg0ZjI5IChsaW51eC11c2VyL2FhcmNoNjQ6IFJlc2V0IGJ0
-eXBlIGZvciBzeXNjYWxscyBhbmQgc2lnbmFscykKMTIvMTIgQ2hlY2tpbmcgY29tbWl0IGVkZjI1
-MWU1NjA5ZSAodGVzdHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21va2UgdGVzdCkKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMgc2hvdWxk
-IGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzExNjogRklMRTogdGVzdHMvdGNnL2FhcmNoNjQvYnRp
-LWNydC5pbmMuYzoxMzoKK2ludCBtYWluKHZvaWQpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5p
-bmdzLCAxMjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTIvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMTkwMTI4MjIzMTE4LjUyNTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1XB9jy5kyIhlYMcsWzE4xmu9PNsnkTYem
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <d887367f-053e-6541-a6d7-cc84b23db841@redhat.com>
+Subject: Re: [RFC PATCH 01/11] qcow2: Extend spec for external data files
+References: <20190131175549.11691-1-kwolf@redhat.com>
+ <20190131175549.11691-2-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-2-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/31/19 11:55 AM, Kevin Wolf wrote:
+> This adds external data file to the qcow2 spec as a new incompatible
+> feature.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  docs/interop/qcow2.txt | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
+>=20
+
+> @@ -148,6 +158,7 @@ be stored. Each extension has a structure like the =
+following:
+>                          0x6803f857 - Feature name table
+>                          0x23852875 - Bitmaps extension
+>                          0x0537be77 - Full disk encryption header point=
+er
+> +                        0x44415441 - External data file name
+>                          other      - Unknown header extension, can be =
+safely
+>                                       ignored
+
+Missing a section describing the new header.
+
+> =20
+> @@ -450,8 +461,10 @@ Standard Cluster Descriptor:
+>           1 -  8:    Reserved (set to 0)
+> =20
+>           9 - 55:    Bits 9-55 of host cluster offset. Must be aligned =
+to a
+> -                    cluster boundary. If the offset is 0, the cluster =
+is
+> -                    unallocated.
+> +                    cluster boundary. If the offset is 0 and bit 63 is=
+ clear,
+> +                    the cluster is unallocated. The offset may only be=
+ 0 with
+> +                    bit 63 set (indicating a host cluster offset of 0)=
+ when an
+> +                    external data file is used.
+
+Does that mean that the value 0x00000000 is invalid for external data
+files, and that 0x00000001 is special-cased to mean read the contents of
+the external file (and NOT that the cluster reads as all zeroes)?  Is
+bit 0 allowed to be set for any other clusters when there is an external
+data file?  And if so, are we requiring that it only be set when the
+external file is known to read as zero, or can we run into the situation
+where qcow2 says the cluster reads as 0 but the host file contains
+garbage?  Should the external file header contain a flag that states
+whether writes to the image should wipe vs. leave unchanged a cluster in
+the external file when the qcow2 metadata prefers to grab that cluster's
+contents as all-0s or by reading from the backing file?  There are
+security vs. speed implications - security insists on wiping the host
+file to NOT leave stale data, but that slows things down compared to
+just leaving garbage if the qcow2 metadata can effectively ignore those
+parts of the external file - hence a knob may be worth exposing?
+
+Should we preserve the meaning of bit 0 SOLELY for its 'reads-as-zeroes'
+meaning, and instead make bit 1 (currently reserved) as the special
+marker that MUST be set for clusters read from the external file,
+keeping the two ideas orthogonal?
+
+Worth a mention on the reftable section that when an external file is
+used, metadata clusters (in the qcow2 file) are still refcounted (and
+thus, offsets in the refcount table point to the qcow2 file, not the
+external file)?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--1XB9jy5kyIhlYMcsWzE4xmu9PNsnkTYem
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxTQbwACgkQp6FrSiUn
+Q2rmegf+Oxd/9/tB4db32PdsofmPPLyL2dhuuvd3BX8bzAgCikIiUpuEAggi+TFs
+VzGZu+4hxh5VlmYg3GG9lwgPcsEloqLhVpIk6C/6svLbCsc9YpIxBmFIMb/W1MnC
+7BkRgmrRt0DkKLZdIvGqoVPJSNBWaWUOeWwOUNSwyZ7eiVewgjFFgufijTjtgpE3
+ihDhfcL7bnDhevhU0Xy3w02qxHAj8BQn9AysJDHCbvoZSDuyXcKoxF8Xl+L0HtPv
+/Keyrv9UgjDPznQmy8kwAZoPqA6bmX44mhs3G23Jg4tTmiBwmTIazF1ZlD1wXtzP
+n5VRgDeZV/MqlkmSdfxk1Y+AOAzejQ==
+=niXR
+-----END PGP SIGNATURE-----
+
+--1XB9jy5kyIhlYMcsWzE4xmu9PNsnkTYem--
