@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53477)
+Received: from eggs.gnu.org ([209.51.188.92]:53581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGfd-0003ER-7a
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpGfm-0003ME-84
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGfS-0007fW-7I
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:29 -0500
-Resent-Message-Id: <E1gpGfS-0007fW-7I@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
+	(envelope-from <no-reply@patchew.org>) id 1gpGfj-0007nI-2x
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:44 -0500
+Resent-Message-Id: <E1gpGfj-0007nI-2x@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21051)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpGfP-0007dy-EI
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:24 -0500
-Message-ID: <154895770979.23946.13777842004324918683@ebba9967afc0>
-In-Reply-To: <1548859760-10654-1-git-send-email-liam.merwick@oracle.com>
+	id 1gpGfi-0007m6-OV
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:02:42 -0500
+Message-ID: <154895772074.23946.4967706850027450915@ebba9967afc0>
+In-Reply-To: <20190128200444.5128-1-yuri.benditovich@janustech.com>
 Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 10:01:51 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] kvm: Potential NULL pointer dereference in
- kvm_arch_init_vcpu()
+Date: Thu, 31 Jan 2019 10:02:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix XHCI errors with isochronous
+ transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liam.merwick@oracle.com
-Cc: fam@euphon.net, rth@twiddle.net, ehabkost@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com
+To: yuri.benditovich@janustech.com
+Cc: fam@euphon.net, kraxel@redhat.com, qemu-devel@nongnu.org, dmitry.fleytman@janustech.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ4ODU5NzYwLTEwNjU0LTEt
-Z2l0LXNlbmQtZW1haWwtbGlhbS5tZXJ3aWNrQG9yYWNsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
-ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
-ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hd
-IGt2bTogUG90ZW50aWFsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBpbiBrdm1fYXJjaF9pbml0
-X3ZjcHUoKQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU0ODg1OTc2MC0xMDY1NC0xLWdpdC1z
-ZW5kLWVtYWlsLWxpYW0ubWVyd2lja0BvcmFjbGUuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpm
-MDE1MzliMjJiIGt2bTogUG90ZW50aWFsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBpbiBrdm1f
-YXJjaF9pbml0X3ZjcHUoKQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjY6IEZJTEU6IHRhcmdldC9pMzg2L2t2bS5jOjEzMTM6
-CiteSX0kCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEwIGxpbmVzIGNoZWNrZWQKCkNv
-bW1pdCBmMDE1MzliMjJiZGEgKGt2bTogUG90ZW50aWFsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5j
-ZSBpbiBrdm1fYXJjaF9pbml0X3ZjcHUoKSkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0ODg1OTc2
-MC0xMDY1NC0xLWdpdC1zZW5kLWVtYWlsLWxpYW0ubWVyd2lja0BvcmFjbGUuY29tL3Rlc3Rpbmcu
-Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODIwMDQ0NC41MTI4
+LTEteXVyaS5iZW5kaXRvdmljaEBqYW51c3RlY2guY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvMl0g
+Rml4IFhIQ0kgZXJyb3JzIHdpdGggaXNvY2hyb25vdXMgdHJhbnNmZXIKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTkwMTI4MjAwNDQ0LjUxMjgtMS15dXJpLmJlbmRpdG92aWNoQGphbnVzdGVj
+aC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmUyZDEwMzU5YTggdXNiOiBpbXBsZW1lbnQgWEhD
+SSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cwoyZTYwYmM0OGVhIHVzYjogWEhDSSBzaGFsbCBub3Qg
+aGFsdCBpc29jaHJvbm91cyBlbmRwb2ludHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMiBDaGVj
+a2luZyBjb21taXQgMmU2MGJjNDhlYThjICh1c2I6IFhIQ0kgc2hhbGwgbm90IGhhbHQgaXNvY2hy
+b25vdXMgZW5kcG9pbnRzKQoyLzIgQ2hlY2tpbmcgY29tbWl0IGUyZDEwMzU5YTgxYyAodXNiOiBp
+bXBsZW1lbnQgWEhDSSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cykKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzNjogRklMRTogaHcvdXNiL2hjZC14aGNp
+LmM6MTk2MDoKKyAgICAgICAgICAgICAgICB4aGNpX2V2ZW50KHhoY2ksICZldiwgeGhjaS0+c2xv
+dHNbZXBjdHgtPnNsb3RpZC0xXS5pbnRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNDU6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5j
+OjIwNDE6CisgICAgeGhjaS0+c2xvdHNbc2xvdGlkLTFdLmludHIgPSAwOwogICAgICAgICAgICAg
+ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6
+VnhWKQojNjQ6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIzMTY6CisgICAgICAgIHhoY2ktPnNs
+b3RzW3Nsb3RpZC0xXS5pbnRyID0gZ2V0X2ZpZWxkKGlzbG90X2N0eFsyXSwgVFJCX0lOVFIpOwog
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICctJyAoY3R4OlZ4VikKIzY1OiBGSUxFOiBody91c2IvaGNkLXhoY2kuYzoyMzE3Ogor
+ICAgICAgICBzZXRfZmllbGQoJnNsb3RfY3R4WzJdLCB4aGNpLT5zbG90c1tzbG90aWQtMV0uaW50
+ciwgVFJCX0lOVFIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDIvMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09
+CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
+bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMjgyMDA0NDQuNTEyOC0xLXl1
+cmkuYmVuZGl0b3ZpY2hAamFudXN0ZWNoLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
+c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
