@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38701)
+Received: from eggs.gnu.org ([209.51.188.92]:39283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gpHPa-0001oD-J3
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:50:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpHRU-0003II-1q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gpHPZ-0007pP-OB
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:50:06 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-12-crosa@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <dca0df17-749f-a94a-c036-4b60b4814a46@redhat.com>
-Date: Thu, 31 Jan 2019 16:49:55 -0200
+	(envelope-from <no-reply@patchew.org>) id 1gpHRS-0001EX-SU
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:52:04 -0500
+Resent-Message-Id: <E1gpHRS-0001EX-SU@eggs.gnu.org>
+Message-ID: <154896070761.23946.17769845399707257886@ebba9967afc0>
+In-Reply-To: <20190121170731.2500692-1-stefanb@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190117185628.21862-12-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 11/18] scripts/qemu.py: support adding a
- console with the default serial device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 10:51:48 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] TPM patches for stable-3.0.0 (v3.0.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: stefanb@linux.ibm.com
+Cc: fam@euphon.net, qemu-stable@nongnu.org, mdroth@linux.ibm.com, qemu-devel@nongnu.org
 
-Hi Cleber,
-
-me again. :)
-
-On 01/17/2019 04:56 PM, Cleber Rosa wrote:
-> The set_console() utility function traditionally adds a device either
-> based on the explicitly given device type, or based on the machine type,
-> a known good type of device.
->
-> But, for a number of machine types, it may be impossible or
-> inconvenient to add the devices my means of "-device" command line
-> options, and then it may better to just use the "-serial" option and
-> let QEMU itself, based on the machine type, set the device
-> accordingly.
->
-> To achieve that, the behavior of set_console() now flags the intention
-> to add a console device on launch(), and if no explicit device type is
-> given, and there's no definition on CONSOLE_DEV_TYPES, the "-serial"
-> is going to be added to the QEMU command line, instead of raising
-> exceptions.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   scripts/qemu.py | 28 +++++++++++++++-------------
->   1 file changed, 15 insertions(+), 13 deletions(-)
->
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index ec3567d4e2..88e1608b42 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -121,6 +121,7 @@ class QEMUMachine(object):
->           self._temp_dir = None
->           self._launched = False
->           self._machine = None
-> +        self._console_set = False
->           self._console_device_type = None
->           self._console_address = None
->           self._console_socket = None
-> @@ -240,13 +241,17 @@ class QEMUMachine(object):
->                   '-display', 'none', '-vga', 'none']
->           if self._machine is not None:
->               args.extend(['-machine', self._machine])
-> -        if self._console_device_type is not None:
-> +        if self._console_set:
->               self._console_address = os.path.join(self._temp_dir,
->                                                    self._name + "-console.sock")
->               chardev = ('socket,id=console,path=%s,server,nowait' %
->                          self._console_address)
-> -            device = '%s,chardev=console' % self._console_device_type
-> -            args.extend(['-chardev', chardev, '-device', device])
-> +            args.extend(['-chardev', chardev])
-> +            if self._console_device_type is None:
-> +                args.extend(['-serial', 'chardev:console'])
-> +            else:
-> +                device = '%s,chardev=console' % self._console_device_type
-> +                args.extend(['-device', device])
->           return args
->   
->       def _pre_launch(self):
-> @@ -479,23 +484,20 @@ class QEMUMachine(object):
->           machine launch time, as it depends on the temporary directory
->           to be created.
->   
-> -        @param device_type: the device type, such as "isa-serial"
-> +        @param device_type: the device type, such as "isa-serial".  If
-> +                            None is given (the default value) a "-serial
-> +                            chardev:console" command line argument will
-> +                            be used instead, resorting to the machine's
-> +                            default device type.
-
-Shouldn't you mention it will look for device type on CONSOLE_DEV_TYPES 
-if device_type is None and machine is not None?
-
-The description on set_console()'s docstring is out-of-sync with current 
-implementation too.
-
-- Wainer
-
->           @raises: QEMUMachineAddDeviceError if the device type is not given
->                    and can not be determined.
->           """
-> -        if device_type is None:
-> -            if self._machine is None:
-> -                raise QEMUMachineAddDeviceError("Can not add a console device:"
-> -                                                " QEMU instance without a "
-> -                                                "defined machine type")
-> +        self._console_set = True
-> +        if device_type is None and self._machine is not None:
->               for regex, device in CONSOLE_DEV_TYPES.items():
->                   if re.match(regex, self._machine):
->                       device_type = device
->                       break
-> -            if device_type is None:
-> -                raise QEMUMachineAddDeviceError("Can not add a console device:"
-> -                                                " no matching console device "
-> -                                                "type definition")
->           self._console_device_type = device_type
->   
->       @property
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMTE3MDczMS4yNTAw
+NjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gVFBNIHBh
+dGNoZXMgZm9yIHN0YWJsZS0zLjAuMCAodjMuMC4xKQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDog
+MjAxOTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbQoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
+ZXcvMjAxOTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbSAtPiBwYXRj
+aGV3LzIwMTkwMTIxMTcwNzMxLjI1MDA2OTItMS1zdGVmYW5iQGxpbnV4LmlibS5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozNGU1NjgwYmVmIE1lcmdlIHJlbW90ZS10cmFja2lu
+ZyBicmFuY2ggJ3JlbW90ZXMva3JheGVsL3RhZ3MvdXNiLTIwMTkwMTMwLXB1bGwtcmVxdWVzdCcg
+aW50byBzdGFnaW5nCjgzODdkNWM2MTcgdXNiLW10cDogcmVwbGFjZSB0aGUgaG9tZWJyZXcgd3Jp
+dGUgd2l0aCBxZW11X3dyaXRlX2Z1bGwKY2E3MGFhYzQ4ZSB1c2ItbXRwOiBicmVha3VwIE1UUCB3
+cml0ZSBpbnRvIHNtYWxsZXIgY2h1bmtzCmMxZDk0OGE4ZjMgdXNiLW10cDogUmVhbGxvY2F0ZSBi
+dWZmZXIgaW4gbXVsdGlwbGVzIG9mIE1UUF9XUklURV9CVUZfU1oKYjZlZDdmZmM5MiB1c2I6IGlt
+cGxlbWVudCBYSENJIHVuZGVycnVuL292ZXJydW4gZXZlbnRzCjBjZmJmMmI3ZTQgdXNiOiBYSENJ
+IHNoYWxsIG5vdCBoYWx0IGlzb2Nocm9ub3VzIGVuZHBvaW50cwo2N2I0NjNiNjM0IGh3L3VzYjog
+Rml4IExHUEwgaW5mb3JtYXRpb24gaW4gdGhlIGZpbGUgaGVhZGVycwpmMzE1NDQ3MzM3IHVzYjog
+ZGV2LW10cDogY2xvc2UgZmQgaW4gdXNiX210cF9vYmplY3RfcmVhZGRpcigpCmQ0MTU4NDU0YjEg
+dXNiOiBhc3NpZ24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQoxLzggQ2hlY2tpbmcgY29tbWl0IGQ0MTU4NDU0YjFjMSAodXNiOiBhc3Np
+Z24gdW5pcXVlIHNlcmlhbCBudW1iZXJzIHRvIGhpZCBkZXZpY2VzKQoyLzggQ2hlY2tpbmcgY29t
+bWl0IGYzMTU0NDczMzcyMyAodXNiOiBkZXYtbXRwOiBjbG9zZSBmZCBpbiB1c2JfbXRwX29iamVj
+dF9yZWFkZGlyKCkpCjMvOCBDaGVja2luZyBjb21taXQgNjdiNDYzYjYzNDJlIChody91c2I6IEZp
+eCBMR1BMIGluZm9ybWF0aW9uIGluIHRoZSBmaWxlIGhlYWRlcnMpCjQvOCBDaGVja2luZyBjb21t
+aXQgMGNmYmYyYjdlNDA0ICh1c2I6IFhIQ0kgc2hhbGwgbm90IGhhbHQgaXNvY2hyb25vdXMgZW5k
+cG9pbnRzKQo1LzggQ2hlY2tpbmcgY29tbWl0IGI2ZWQ3ZmZjOTJhOCAodXNiOiBpbXBsZW1lbnQg
+WEhDSSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cykKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMzOTogRklMRTogaHcvdXNiL2hjZC14aGNpLmM6MTk2MDoK
+KyAgICAgICAgICAgICAgICB4aGNpX2V2ZW50KHhoY2ksICZldiwgeGhjaS0+c2xvdHNbZXBjdHgt
+PnNsb3RpZC0xXS5pbnRyKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJy0nIChjdHg6VnhWKQojNDg6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIwNDE6Cisg
+ICAgeGhjaS0+c2xvdHNbc2xvdGlkLTFdLmludHIgPSAwOwogICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjc6
+IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjIzMTY6CisgICAgICAgIHhoY2ktPnNsb3RzW3Nsb3Rp
+ZC0xXS5pbnRyID0gZ2V0X2ZpZWxkKGlzbG90X2N0eFsyXSwgVFJCX0lOVFIpOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICct
+JyAoY3R4OlZ4VikKIzY4OiBGSUxFOiBody91c2IvaGNkLXhoY2kuYzoyMzE3OgorICAgICAgICBz
+ZXRfZmllbGQoJnNsb3RfY3R4WzJdLCB4aGNpLT5zbG90c1tzbG90aWQtMV0uaW50ciwgVFJCX0lO
+VFIpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+Cgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUv
+OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi84IENoZWNraW5nIGNvbW1pdCBjMWQ5NDhh
+OGYzNWUgKHVzYi1tdHA6IFJlYWxsb2NhdGUgYnVmZmVyIGluIG11bHRpcGxlcyBvZiBNVFBfV1JJ
+VEVfQlVGX1NaKQo3LzggQ2hlY2tpbmcgY29tbWl0IGNhNzBhYWM0OGUwZCAodXNiLW10cDogYnJl
+YWt1cCBNVFAgd3JpdGUgaW50byBzbWFsbGVyIGNodW5rcykKOC84IENoZWNraW5nIGNvbW1pdCA4
+Mzg3ZDVjNjE3OGMgKHVzYi1tdHA6IHJlcGxhY2UgdGhlIGhvbWVicmV3IHdyaXRlIHdpdGggcWVt
+dV93cml0ZV9mdWxsKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDE5MDEyMTE3MDczMS4yNTAwNjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
