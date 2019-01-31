@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48936)
+Received: from eggs.gnu.org ([209.51.188.92]:49202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gp7sO-0006EZ-Ko
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 03:39:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1gp7tl-0007NP-Q4
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 03:40:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gp7sN-0002qx-Re
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 03:39:12 -0500
-References: <20190131073234.18037-1-yang.zhong@intel.com>
-	<20190131073234.18037-14-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7d6919f6-5f99-551b-aafa-e1aabf5303a6@redhat.com>
-Date: Thu, 31 Jan 2019 09:39:08 +0100
+	(envelope-from <armbru@redhat.com>) id 1gp7tl-0003YD-0R
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 03:40:37 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
+	<87o97yi67d.fsf@dusky.pond.sub.org>
+	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
+Date: Thu, 31 Jan 2019 09:40:21 +0100
+In-Reply-To: <300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com> (Paolo
+	Bonzini's message of "Wed, 30 Jan 2019 15:33:58 +0100")
+Message-ID: <87d0oddxu2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190131073234.18037-14-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 13/27] hw/s390/Makefile.objs: Create new
- CONFIG_* variables for s390x boards and devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On 2019-01-31 08:32, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Make hw/s390x configurable and add new CONFIG_* to the
-> default-configs/s390x*-softmmu.mak. This will be used to
-> enable/disable vfio-ccw.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/s390x-softmmu.mak | 1 +
->  hw/s390x/Makefile.objs            | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-> index 5eef375924..8bb7e438c8 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -8,3 +8,4 @@ CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
->  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
->  CONFIG_WDT_DIAG288=y
->  CONFIG_VFIO_AP=$(CONFIG_LINUX)
-> +CONFIG_S390_CCW_VIRTIO=y
-> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-> index ca68806e44..a18c471913 100644
-> --- a/hw/s390x/Makefile.objs
-> +++ b/hw/s390x/Makefile.objs
-> @@ -5,7 +5,7 @@ obj-y += sclpquiesce.o
->  obj-y += sclpcpu.o
->  obj-y += ipl.o
->  obj-y += css.o
-> -obj-y += s390-virtio-ccw.o
-> +obj-$(CONFIG_S390_CCW_VIRTIO) += s390-virtio-ccw.o
->  obj-y += 3270-ccw.o
->  obj-y += virtio-ccw.o
->  obj-$(CONFIG_VIRTIO_SERIAL) += virtio-ccw-serial.o
-> 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On 30/01/19 15:13, Markus Armbruster wrote:
+>>     -global driver=cfi.pflash01,property=secure,value=on
+>> 
+>> Affects *all* such devices, but fortunately we have at most two, and the
+>> one we don't want to affect happens to ignore the property value.
+>
+> Is this true?  I think both need secure=on, at least on x86.
+>
+>> For libvirt, plumbing the base address from the firmware's descriptor to
+>> QEMU would be the lesser mess (for the firmware, providing the base
+>> address there would be no mess at all).
+>> 
+>> For human users, it's perhaps the greater mess.  They can continue to
+>> use -drive if=pflash.
+>> 
+>> Perhaps we *should* redo board configuration from the ground up.
+>> Perhaps a board should be a composite object that exposes properties of
+>> its own and its part, just like other composite devices, and so that
+>> "create, set properties, realize" works.  That would extend our common
+>> device configuration mechanism naturally to onboard devices.
+>> 
+>> Of course, "we should" doesn't imply "I could".
+>
+> Maybe we should just add pflash block properties to the machine?  And
+> then it can create the devices if the properties are set to a non-empty
+> value.
+
+What exactly do you have in mind?  Something like
+
+    -machine q35,ovmf-code=OVMF-CODE-NODE,ovmf-data=OVMF-DATA-NODE
+
+where OVMF-CODE-NODE and OVMF-DATA-NODE are block backend node names,
+i.e.
+
+    -blockdev file,node-name=OVMF-CODE-NODE,read-only=on,filename=/usr/share/edk2/ovmf/OVMF_CODE.fd
+    -blockdev file,node-name=OVMF-DATA-NODE,read-only=on,filename=...
+
+perhaps?
+
+[...]
