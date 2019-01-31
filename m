@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37298)
+Received: from eggs.gnu.org ([209.51.188.92]:37730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpHKU-0005iZ-Oj
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:51 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpHLi-0006xk-R6
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:46:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpHKT-0003rG-0S
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:44:50 -0500
-References: <20190131175549.11691-1-kwolf@redhat.com>
-	<20190131175549.11691-9-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5c615324-9f4d-9a7d-b659-84185574a750@redhat.com>
-Date: Thu, 31 Jan 2019 12:44:22 -0600
+	(envelope-from <no-reply@patchew.org>) id 1gpHLh-0004xe-Mt
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:46:06 -0500
+Resent-Message-Id: <E1gpHLh-0004xe-Mt@eggs.gnu.org>
+Message-ID: <154896034900.23946.16837852965808157146@ebba9967afc0>
+In-Reply-To: <20190121170731.2500692-1-stefanb@linux.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X"
-Subject: Re: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
- infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 10:45:50 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] TPM patches for stable-3.0.0 (v3.0.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: stefanb@linux.ibm.com
+Cc: fam@euphon.net, qemu-stable@nongnu.org, mdroth@linux.ibm.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <5c615324-9f4d-9a7d-b659-84185574a750@redhat.com>
-Subject: Re: [RFC PATCH 08/11] qcow2: Add basic data-file infrastructure
-References: <20190131175549.11691-1-kwolf@redhat.com>
- <20190131175549.11691-9-kwolf@redhat.com>
-In-Reply-To: <20190131175549.11691-9-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/31/19 11:55 AM, Kevin Wolf wrote:
-> This adds a .bdrv_open option to specify the external data file node.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-core.json |  3 ++-
->  block/qcow2.h        |  4 +++-
->  block/qcow2.c        | 25 +++++++++++++++++++++++--
->  3 files changed, 28 insertions(+), 4 deletions(-)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 7f6b4b3ddd..fc46396079 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2928,7 +2928,8 @@
->              '*l2-cache-entry-size': 'int',
->              '*refcount-cache-size': 'int',
->              '*cache-clean-interval': 'int',
-> -            '*encrypt': 'BlockdevQcow2Encryption' } }
-> +            '*encrypt': 'BlockdevQcow2Encryption',
-> +            '*data-file': 'BlockdevRef' } }
-
-Missing docs and a '(since 4.0)' tag. Then again, it's still RFC, so
-that's understandable for this draft.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxTQgYACgkQp6FrSiUn
-Q2qkXgf+JiBAL788JDlaZXMokpyr1x++HJ3NJtkR6lwMRZcLuGAM1xPQfWdp2Xqf
-wkCttwcY8pBzLnuqXwOT4rWC/zs94QzUyfyMC1cMUnPxl7kH3lA8JPWe6DFN0Sfv
-6q3hzm67zBXyFPYJCsXlFy7mti/tFTZbPAEQ2lUCzzt18sOcnUPuF+0y20/sdYZ3
-QZshVERhQ38f183OnM2ZzognSd5YeQpwuLZDP989s5id3n2u4XWtxZf9C/LqBaED
-29JY9UzC7i/peFHK2qwUhbawKQUfOFdoPDapBi+79FIraMBIRrZ3LbfeEaVJMYQC
-x+S9Wlpda0hsSEM5eD3SMV2TtGOqyA==
-=NAzP
------END PGP SIGNATURE-----
-
---YZNGiDYKeGp5rli2uyBdOCJNGksAkEU6X--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMTE3MDczMS4yNTAw
+NjkyLTEtc3RlZmFuYkBsaW51eC5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAxMjExNzA3MzEu
+MjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BB
+VENIIDAvNF0gVFBNIHBhdGNoZXMgZm9yIHN0YWJsZS0zLjAuMCAodjMuMC4xKQoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAx
+OTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbSAtPiBwYXRjaGV3LzIw
+MTkwMTIxMTcwNzMxLjI1MDA2OTItMS1zdGVmYW5iQGxpbnV4LmlibS5jb20KIC0gW3RhZyB1cGRh
+dGVdICAgICAgcGF0Y2hldy8yMDE5MDEyODIyMzExOC41MjU1LTEtcmljaGFyZC5oZW5kZXJzb25A
+bGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMTI4MjIzMTE4LjUyNTUtMS1yaWNoYXJkLmhlbmRl
+cnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmVlM2NhOSBN
+ZXJnZSByZW1vdGUtdHJhY2tpbmcgYnJhbmNoICdyZW1vdGVzL2tyYXhlbC90YWdzL3VzYi0yMDE5
+MDEzMC1wdWxsLXJlcXVlc3QnIGludG8gc3RhZ2luZwpkYzVlMDQxIHVzYi1tdHA6IHJlcGxhY2Ug
+dGhlIGhvbWVicmV3IHdyaXRlIHdpdGggcWVtdV93cml0ZV9mdWxsCjg4ZmE0MDIgdXNiLW10cDog
+YnJlYWt1cCBNVFAgd3JpdGUgaW50byBzbWFsbGVyIGNodW5rcwphOGY1MmFhIHVzYi1tdHA6IFJl
+YWxsb2NhdGUgYnVmZmVyIGluIG11bHRpcGxlcyBvZiBNVFBfV1JJVEVfQlVGX1NaCmM4NjQ3ZTUg
+dXNiOiBpbXBsZW1lbnQgWEhDSSB1bmRlcnJ1bi9vdmVycnVuIGV2ZW50cwphN2QxMDU0IHVzYjog
+WEhDSSBzaGFsbCBub3QgaGFsdCBpc29jaHJvbm91cyBlbmRwb2ludHMKNTE1MjhjMyBody91c2I6
+IEZpeCBMR1BMIGluZm9ybWF0aW9uIGluIHRoZSBmaWxlIGhlYWRlcnMKMGY2OWIwNSB1c2I6IGRl
+di1tdHA6IGNsb3NlIGZkIGluIHVzYl9tdHBfb2JqZWN0X3JlYWRkaXIoKQoxYTM0ZWNlIHVzYjog
+YXNzaWduIHVuaXF1ZSBzZXJpYWwgbnVtYmVycyB0byBoaWQgZGV2aWNlcwoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KMS84IENoZWNraW5nIGNvbW1pdCAxYTM0ZWNlOTVkMzMgKHVzYjogYXNzaWduIHVu
+aXF1ZSBzZXJpYWwgbnVtYmVycyB0byBoaWQgZGV2aWNlcykKMi84IENoZWNraW5nIGNvbW1pdCAw
+ZjY5YjA1Y2M3N2MgKHVzYjogZGV2LW10cDogY2xvc2UgZmQgaW4gdXNiX210cF9vYmplY3RfcmVh
+ZGRpcigpKQozLzggQ2hlY2tpbmcgY29tbWl0IDUxNTI4YzM2MWUyOCAoaHcvdXNiOiBGaXggTEdQ
+TCBpbmZvcm1hdGlvbiBpbiB0aGUgZmlsZSBoZWFkZXJzKQo0LzggQ2hlY2tpbmcgY29tbWl0IGE3
+ZDEwNTQ2MzM2MCAodXNiOiBYSENJIHNoYWxsIG5vdCBoYWx0IGlzb2Nocm9ub3VzIGVuZHBvaW50
+cykKNS84IENoZWNraW5nIGNvbW1pdCBjODY0N2U1OWJmMzMgKHVzYjogaW1wbGVtZW50IFhIQ0kg
+dW5kZXJydW4vb3ZlcnJ1biBldmVudHMpCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
+YXQgJy0nIChjdHg6VnhWKQojMzg6IEZJTEU6IGh3L3VzYi9oY2QteGhjaS5jOjE5NjA6CisgICAg
+ICAgICAgICAgICAgeGhjaV9ldmVudCh4aGNpLCAmZXYsIHhoY2ktPnNsb3RzW2VwY3R4LT5zbG90
+aWQtMV0uaW50cik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICctJyAoY3R4OlZ4VikKIzQ3OiBGSUxFOiBody91c2IvaGNkLXhoY2kuYzoyMDQxOgorICAgIHho
+Y2ktPnNsb3RzW3Nsb3RpZC0xXS5pbnRyID0gMDsKICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzY2OiBGSUxF
+OiBody91c2IvaGNkLXhoY2kuYzoyMzE2OgorICAgICAgICB4aGNpLT5zbG90c1tzbG90aWQtMV0u
+aW50ciA9IGdldF9maWVsZChpc2xvdF9jdHhbMl0sIFRSQl9JTlRSKTsKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0
+eDpWeFYpCiM2NzogRklMRTogaHcvdXNiL2hjZC14aGNpLmM6MjMxNzoKKyAgICAgICAgc2V0X2Zp
+ZWxkKCZzbG90X2N0eFsyXSwgeGhjaS0+c2xvdHNbc2xvdGlkLTFdLmludHIsIFRSQl9JTlRSKTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
+YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzggaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvOCBDaGVja2luZyBjb21taXQgYThmNTJhYTI5NmU3
+ICh1c2ItbXRwOiBSZWFsbG9jYXRlIGJ1ZmZlciBpbiBtdWx0aXBsZXMgb2YgTVRQX1dSSVRFX0JV
+Rl9TWikKNy84IENoZWNraW5nIGNvbW1pdCA4OGZhNDAyOGM3MjAgKHVzYi1tdHA6IGJyZWFrdXAg
+TVRQIHdyaXRlIGludG8gc21hbGxlciBjaHVua3MpCjgvOCBDaGVja2luZyBjb21taXQgZGM1ZTA0
+MTk3NjllICh1c2ItbXRwOiByZXBsYWNlIHRoZSBob21lYnJldyB3cml0ZSB3aXRoIHFlbXVfd3Jp
+dGVfZnVsbCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMjAxOTAxMjExNzA3MzEuMjUwMDY5Mi0xLXN0ZWZhbmJAbGludXguaWJtLmNvbS90ZXN0aW5n
+LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
