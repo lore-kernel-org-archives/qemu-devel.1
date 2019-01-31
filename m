@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47674)
+Received: from eggs.gnu.org ([209.51.188.92]:47807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gpK6h-000108-Cb
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:42:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpK74-0001HG-Rf
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:43:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.ibm.com>) id 1gpK6g-0003GB-65
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:42:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39214
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
-	id 1gpK6g-0003A3-0J
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:42:46 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x0VLZUVj106328
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 16:42:31 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qc78bcyy0-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 16:42:31 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.ibm.com>;
-	Thu, 31 Jan 2019 21:42:30 -0000
-References: <154896070761.23946.17769845399707257886@ebba9967afc0>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Date: Thu, 31 Jan 2019 16:42:25 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpK74-0003Nq-0d
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:43:10 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gpK73-0003Mw-9a
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:43:09 -0500
+Received: by mail-pl1-x644.google.com with SMTP id y1so2070487plp.9
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 13:43:08 -0800 (PST)
+References: <1548838794-23757-1-git-send-email-catherine.hecx@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1a825a83-3140-0723-74ee-6b74149e4325@linaro.org>
+Date: Thu, 31 Jan 2019 13:43:04 -0800
 MIME-Version: 1.0
-In-Reply-To: <154896070761.23946.17769845399707257886@ebba9967afc0>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1548838794-23757-1-git-send-email-catherine.hecx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Language: en-MW
-Message-Id: <ecf8bffc-0014-8ec7-6260-1f46ddff42f4@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] TPM patches for stable-3.0.0 (v3.0.1)
+Subject: Re: [Qemu-devel] [PATCH] tcg: add early clober modifier in
+ atomic16_cmpxchg on aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,11 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-stable@nongnu.org, mdroth@linux.ibm.com
+To: Catherine Ho <catherine.hecx@gmail.com>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-On 1/31/19 1:51 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190121170731.2500692-1-stefanb@linux.ibm.com/
+On 1/30/19 12:59 AM, Catherine Ho wrote:
+> Without this patch, gcc might up the Input/Output registers and
+> cause unpredictable error.
+> 
+> Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
+> 
+> Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+
+Queued, thanks.
 
 
-Seems unrelated to the series I sent...
+r~
