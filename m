@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35616)
+Received: from eggs.gnu.org ([209.51.188.92]:35626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gp6qC-0005yk-6z
+	(envelope-from <yang.zhong@intel.com>) id 1gp6qC-0005yy-Iv
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gp6qB-0002ZB-6X
+	(envelope-from <yang.zhong@intel.com>) id 1gp6qB-0002ZW-J5
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:32:52 -0500
-Received: from mga07.intel.com ([134.134.136.100]:60053)
+Received: from mga07.intel.com ([134.134.136.100]:60061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gp6qA-0002Vv-TO
+	id 1gp6qB-0002Yq-BG
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 02:32:51 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 31 Jan 2019 15:32:07 +0800
-Message-Id: <20190131073234.18037-1-yang.zhong@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 00/27] make qemu configurable for Kconfig
+Date: Thu, 31 Jan 2019 15:32:09 +0800
+Message-Id: <20190131073234.18037-3-yang.zhong@intel.com>
+In-Reply-To: <20190131073234.18037-1-yang.zhong@intel.com>
+References: <20190131073234.18037-1-yang.zhong@intel.com>
+Subject: [Qemu-devel] [PATCH v1 02/27] ide: split ioport registration to a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +28,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, thuth@redhat.com, yang.zhong@intel.com
 
-This patch set is part of Kconfig task, and our target is to make
-all platform's code file configurable for Kconfig, which is suitable
-for add "config XXX" for all platforms.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-As for Kconfig patch set(RFC v5), please ref below thread:
-http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg06466.html
+This is not needed on ARM, and brings in ISA bus code which is otherwise not
+necessary.
 
-The change list:
-
-non-rfc v5 --> v1:
-       patch 1 : update the commit message(Thomas Huth)
-       patch 2 : add ioport.o to ide isa and ide piix(Thomas Huth)
-       patch 7 : CONFIG_ARM_VIRT to replace CONFIG_VIRT(Thomas Huth)
-       patch 13: CONFIG_S390_CCW_VIRTIO is only for s390-virtio-ccw.o(Thomas Huth)
-       patch 23: CONFIG_MOXIESIM to replace CONFIG_MOXIE(Thomas Huth)
-       patch 24: CONFIG_OR1K_SIM to replace CONFIG_OPENRISC(Thomas Huth)
-
-Paolo Bonzini (8):
-  arm: disable CONFIG_SERIAL_ISA
-  ide: split ioport registration to a separate file
-  vfio: move conditional up to hw/Makefile.objs
-  build: actually use CONFIG_PAM
-  hw/i386/Makefile.objs: Build pc_piix* and pc_q35 boards
-  hw/s390/Makefile.objs: Create new CONFIG_* variables for s390x boards
-    and devices
-  hw/i2c/Makefile.objs: Create new CONFIG_* variables for EEPROM and
-    ACPI controller
-  hw/vfio/Makefile.objs: Create new CONFIG_* variables for VFIO core and
-    PCI
-
-Yang Zhong (11):
-  hw/pci-host/Makefile.objs: make CONFIGS clear for PCI EXPRESS
-  hw/arm/Makefile.objs: CONFIG_VIRT created for virt board
-  hw/nios2/Makefile.objs: Conditionally build nios2
-  hw/riscv/Makefile.objs: Create CONFIG_* for riscv boards
-  hw/sparc64/Makefile.objs: Create CONFIG_* for sparc64
-  hw/alpha/Makefile.objs: Create CONFIG_* for alpha
-  hw/cris/Makefile.objs: Create CONFIG_* for cris
-  hw/hppa/Makefile.objs: Create CONFIG_* for hppa
-  hw/moxie/Makefile.objs: Conditionally build moxie
-  hw/openrisc/Makefile.objs: Create CONFIG_* for openrisc
-  hw/tricore/Makefile.objs: Create CONFIG_* for tricore
-
-Ákos Kovács (8):
-  hw/m68k/Makefile.objs: Conditionally build boards
-  hw/microblaze/Makefile.objs: Create configs for petalogix and xilinx
-    boards
-  hw/mips/Makefile.objs: Create CONFIG_* for r4k, malta, mipssim boards
-  hw/ppc/Makefile.objs: Build all boards conditinally with CONFIG_*
-  hw/sh4/Makefile.objs: New CONFIG_* varibales created for sh4 boards
-    and device
-  hw/sparc/Makefile.objs: CONFIG_* for sun4m and leon3 created
-  hw/lm32/Makefile.objs: Conditionally build lm32 and milkmyst
-  hw/xtensa/Makefile.objs: Build xtensa_sim and xtensa_fpga
-    conditionally
-
- default-configs/alpha-softmmu.mak       |  1 +
- default-configs/arm-softmmu.mak         |  9 ++--
- default-configs/cris-softmmu.mak        |  1 +
- default-configs/hppa-softmmu.mak        |  1 +
- default-configs/i386-softmmu.mak        |  7 ++-
- default-configs/m68k-softmmu.mak        |  2 +
- default-configs/microblaze-softmmu.mak  |  3 ++
- default-configs/mips-softmmu-common.mak |  5 ++
- default-configs/mips64el-softmmu.mak    |  2 +-
- default-configs/moxie-softmmu.mak       |  1 +
- default-configs/nios2-softmmu.mak       |  1 +
- default-configs/or1k-softmmu.mak        |  1 +
- default-configs/pci.mak                 |  4 +-
- default-configs/ppc-softmmu.mak         |  8 ++-
- default-configs/ppc64-softmmu.mak       |  1 +
- default-configs/riscv32-softmmu.mak     |  9 +++-
- default-configs/riscv64-softmmu.mak     |  9 +++-
- default-configs/s390x-softmmu.mak       |  6 ++-
- default-configs/sh4-softmmu.mak         |  2 +
- default-configs/sh4eb-softmmu.mak       |  2 +
- default-configs/sparc-softmmu.mak       |  2 +
- default-configs/sparc64-softmmu.mak     |  2 +
- default-configs/tricore-softmmu.mak     |  1 +
- default-configs/xtensa-softmmu.mak      |  3 ++
- default-configs/xtensaeb-softmmu.mak    |  3 ++
- hw/Makefile.objs                        |  2 +-
- hw/alpha/Makefile.objs                  |  2 +-
- hw/arm/Makefile.objs                    |  3 +-
- hw/cris/Makefile.objs                   |  2 +-
- hw/hppa/Makefile.objs                   |  2 +-
- hw/i2c/Makefile.objs                    |  5 +-
- hw/i386/Makefile.objs                   |  4 +-
- hw/ide/Makefile.objs                    |  4 +-
- hw/ide/core.c                           | 25 ----------
- hw/ide/ioport.c                         | 66 +++++++++++++++++++++++++
- hw/lm32/Makefile.objs                   |  4 +-
- hw/m68k/Makefile.objs                   |  4 +-
- hw/microblaze/Makefile.objs             |  6 +--
- hw/mips/Makefile.objs                   |  5 +-
- hw/moxie/Makefile.objs                  |  2 +-
- hw/net/Makefile.objs                    |  4 +-
- hw/nios2/Makefile.objs                  |  3 +-
- hw/openrisc/Makefile.objs               |  2 +-
- hw/pci-host/Makefile.objs               | 10 ++--
- hw/ppc/Makefile.objs                    | 11 +++--
- hw/riscv/Makefile.objs                  | 22 ++++-----
- hw/s390x/Makefile.objs                  |  2 +-
- hw/sh4/Makefile.objs                    |  4 +-
- hw/sparc/Makefile.objs                  |  4 +-
- hw/sparc64/Makefile.objs                |  6 +--
- hw/tricore/Makefile.objs                |  2 +-
- hw/vfio/Makefile.objs                   |  9 ++--
- hw/xtensa/Makefile.objs                 |  4 +-
- 53 files changed, 208 insertions(+), 97 deletions(-)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/ide/Makefile.objs |  4 +--
+ hw/ide/core.c        | 25 -----------------
+ hw/ide/ioport.c      | 66 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 68 insertions(+), 27 deletions(-)
  create mode 100644 hw/ide/ioport.c
 
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+index fc328ffbe8..a142add90e 100644
+--- a/hw/ide/Makefile.objs
++++ b/hw/ide/Makefile.objs
+@@ -1,8 +1,8 @@
+ common-obj-$(CONFIG_IDE_CORE) += core.o atapi.o
+ common-obj-$(CONFIG_IDE_QDEV) += qdev.o
+ common-obj-$(CONFIG_IDE_PCI) += pci.o
+-common-obj-$(CONFIG_IDE_ISA) += isa.o
+-common-obj-$(CONFIG_IDE_PIIX) += piix.o
++common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
++common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
+ common-obj-$(CONFIG_IDE_CMD646) += cmd646.o
+ common-obj-$(CONFIG_IDE_MACIO) += macio.o
+ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index c3d779db6e..84832008b8 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -2686,31 +2686,6 @@ void ide_exit(IDEState *s)
+     qemu_vfree(s->io_buffer);
+ }
+ 
+-static const MemoryRegionPortio ide_portio_list[] = {
+-    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
+-    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
+-    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
+-    PORTIO_END_OF_LIST(),
+-};
+-
+-static const MemoryRegionPortio ide_portio2_list[] = {
+-    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
+-    PORTIO_END_OF_LIST(),
+-};
+-
+-void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
+-{
+-    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
+-       bridge has been setup properly to always register with ISA.  */
+-    isa_register_portio_list(dev, &bus->portio_list,
+-                             iobase, ide_portio_list, bus, "ide");
+-
+-    if (iobase2) {
+-        isa_register_portio_list(dev, &bus->portio2_list,
+-                                 iobase2, ide_portio2_list, bus, "ide");
+-    }
+-}
+-
+ static bool is_identify_set(void *opaque, int version_id)
+ {
+     IDEState *s = opaque;
+diff --git a/hw/ide/ioport.c b/hw/ide/ioport.c
+new file mode 100644
+index 0000000000..a0b3c1f6a1
+--- /dev/null
++++ b/hw/ide/ioport.c
+@@ -0,0 +1,66 @@
++/*
++ * QEMU IDE disk and CD/DVD-ROM Emulator
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (c) 2006 Openedhand Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/isa/isa.h"
++#include "qemu/error-report.h"
++#include "qemu/timer.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/dma.h"
++#include "hw/block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++#include "qemu/cutils.h"
++#include "sysemu/replay.h"
++
++#include "hw/ide/internal.h"
++#include "trace.h"
++
++static const MemoryRegionPortio ide_portio_list[] = {
++    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
++    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
++    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
++    PORTIO_END_OF_LIST(),
++};
++
++static const MemoryRegionPortio ide_portio2_list[] = {
++    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
++    PORTIO_END_OF_LIST(),
++};
++
++void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
++{
++    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
++       bridge has been setup properly to always register with ISA.  */
++    isa_register_portio_list(dev, &bus->portio_list,
++                             iobase, ide_portio_list, bus, "ide");
++
++    if (iobase2) {
++        isa_register_portio_list(dev, &bus->portio2_list,
++                                 iobase2, ide_portio2_list, bus, "ide");
++    }
++}
 -- 
 2.17.1
