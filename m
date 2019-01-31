@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42903)
+Received: from eggs.gnu.org ([209.51.188.92]:43690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gp9Wi-0006AZ-IZ
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gp9YT-0007NS-8S
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gp9Wh-0008HD-Dt
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:56 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50304)
+	(envelope-from <philmd@redhat.com>) id 1gp9YR-00013k-5p
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:45 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52323)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gp9Wh-0008GF-8M
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:24:55 -0500
-Received: by mail-wm1-f65.google.com with SMTP id n190so1896216wmd.0
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:24:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gp9YQ-00012K-Qh
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 05:26:42 -0500
+Received: by mail-wm1-f65.google.com with SMTP id m1so1887091wml.2
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 02:26:42 -0800 (PST)
 References: <20190117185628.21862-1-crosa@redhat.com>
 	<20190117185628.21862-14-crosa@redhat.com>
-	<e05b1d30-1a44-171a-02f7-d77e182ab90c@redhat.com>
-	<eb914790-ce08-df18-941b-bc93be89822d@redhat.com>
+	<3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
+	<79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b33a492f-e55e-5ec3-1ab8-f78dff564854@redhat.com>
-Date: Thu, 31 Jan 2019 11:24:51 +0100
+Message-ID: <781af7d9-8e76-f431-ede3-549a69e01f1e@redhat.com>
+Date: Thu, 31 Jan 2019 11:26:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <eb914790-ce08-df18-941b-bc93be89822d@redhat.com>
+In-Reply-To: <79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -36,10 +36,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On 1/31/19 2:26 AM, Cleber Rosa wrote:
-> On 1/22/19 5:19 AM, Philippe Mathieu-Daudé wrote:
->> Hi Cleber,
->>
+On 1/31/19 2:34 AM, Cleber Rosa wrote:
+> On 1/22/19 5:57 AM, Philippe Mathieu-Daudé wrote:
 >> On 1/17/19 7:56 PM, Cleber Rosa wrote:
 >>> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
 >>> board and verify the serial is working.
@@ -113,29 +111,39 @@ On 1/31/19 2:26 AM, Cleber Rosa wrote:
 >>> +        deb_hash = '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
 >>> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
 >>> +
->>
->> Can you refactor this code ...
->>
 >>> +        cwd = os.getcwd()
 >>> +        os.chdir(self.workdir)
 >>> +        process.run("ar x %s data.tar.gz" % deb_path)
 >>> +        archive.extract("data.tar.gz", self.workdir)
 >>> +        os.chdir(cwd)
 >>> +        kernel_path = self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta'
+>>> +
+>>> +        self.vm.set_machine('malta')
+>>> +        self.vm.set_console()
+>>> +        kernel_command_line = 'console=ttyS0 printk.time=0'
 >>
->> ... as an helper function?
+>> What about having a generic KERNEL_COMMON_COMMAND_LINE='printk.time=0 '
+>> then using
+>>   kernel_command_line = KERNEL_COMMON_COMMAND_LINE + 'console=ttyS0'
+>> in each tests of this series?
 >>
 > 
-> Yes.  In fact, because of the kernel change in the previous patch, I've
-> added it there.
+> Not sure... I do like the fact that it's more uniform, but I don't like
+> the locality aspect.  Having to refer back to something defined either
+> in the module or class level for something so small is a big con, IMO.
 > 
->> Can be follow-up patch, so:
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
-> 
-> In the longer term, I expect to add deb (and RPM, etc) support to the
-> avocado.utils.archive module:
-> 
-> https://trello.com/c/bQBnvkjv/1437-avocadoutilsarchive-support-rpm-deb-etc
+> I'll keep it AS IS for now, and if more people feel like it's a good
+> idea, or you feel stronger that it's a good idea, I can add it in the
+> next version.
 
-Awesome, thanks!
+I'm fine with that, however I'd really like all the Linux tests to use
+"printk.time=0" in their kernel cmdline, it really simplify
+parsing/diffing the console output.
+
+>>> +        self.vm.add_args('-kernel', kernel_path,
+>>> +                         '-append', kernel_command_line)
+>>> +        self.vm.launch()
+>>> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
+>>> +        self.wait_for_console_pattern(console_pattern)
+>>>
+> 
