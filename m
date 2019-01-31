@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51602)
+Received: from eggs.gnu.org ([209.51.188.92]:51781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1gpKV6-0000cg-Vx
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:08:01 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpKVA-0000qT-1x
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1gpKL2-0002x7-0m
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:57:36 -0500
-Received: from ssl.serverraum.org ([176.9.125.105]:37467)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1gpKL1-0002pp-Kj
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:57:35 -0500
-From: Michael Walle <michael@walle.cc>
-Date: Thu, 31 Jan 2019 22:56:08 +0100
-Message-Id: <20190131215611.29341-1-michael@walle.cc>
-Subject: [Qemu-devel] [RFC PATCH 0/3] lm32: convert to new common tcg
- infrastructure
+	(envelope-from <richard.henderson@linaro.org>) id 1gpKIt-0001vT-R9
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:55:24 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gpKIt-0001ub-BQ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:55:23 -0500
+Received: by mail-pl1-x643.google.com with SMTP id e11so2079213plt.11
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 13:55:23 -0800 (PST)
+References: <1548769067-20792-1-git-send-email-thuth@redhat.com>
+	<20190129145156.6719b8a4.cohuck@redhat.com>
+	<e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <509e6dca-8c78-947f-cf91-15ad02510bba@linaro.org>
+Date: Thu, 31 Jan 2019 13:55:19 -0800
+MIME-Version: 1.0
+In-Reply-To: <e3dfae55-8733-bd01-1f13-422f343fb258@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x: Fix LGPL version in the file
+ header comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Michael Walle <michael@walle.cc>
+To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-The main problem here is, that there is no prebuilt compiler packages. Thus
-I have to build the toolchain from scratch. I don't know if this is OK in
-the docker image. For now only binutils is built. But then, I'll have to
-pass the LD and AS environment variables, too. And it won't work with the
-native host cross toolchain - unless we'll probe for the assembler and
-linker, too.
+On 1/30/19 7:01 AM, Eric Blake wrote:
+> On 1/29/19 7:51 AM, Cornelia Huck wrote:
+>> Given that there have been several of these cases (and that there's a
+>> lot of boilerplate in general): Should we adopt SPDX license
+>> identifiers for QEMU, as the Linux kernel did? They also discovered and
+>> fixed some problems/oddities while at it.
+> 
+> I'm also in favor of SPDX license identifiers - their brevity and
+> machine-parsability favors more accurate usage and fewer copy/paste
+> mistake propagation.
 
-Any ideas?
++1.
 
-Michael Walle (3):
-  tests/docker: add debian-lm32-cross image
-  tests/tcg: also pass AS and LD variables
-  tests/tcg/lm32: enable system tests
 
- tests/docker/Makefile.include                     |   5 +-
- tests/docker/dockerfiles/debian-lm32-cross.docker |  31 +++++++
- tests/tcg/Makefile.include                        |  13 ++-
- tests/tcg/lm32/Makefile                           | 106 ----------------------
- tests/tcg/lm32/Makefile.include                   |   8 ++
- tests/tcg/lm32/Makefile.softmmu-target            |  33 +++++++
- 6 files changed, 86 insertions(+), 110 deletions(-)
- create mode 100644 tests/docker/dockerfiles/debian-lm32-cross.docker
- delete mode 100644 tests/tcg/lm32/Makefile
- create mode 100644 tests/tcg/lm32/Makefile.include
- create mode 100644 tests/tcg/lm32/Makefile.softmmu-target
-
--- 
-2.11.0
+r~
