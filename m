@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45751)
+Received: from eggs.gnu.org ([209.51.188.92]:45809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gpDvT-000866-B2
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:06:48 -0500
+	(envelope-from <crosa@redhat.com>) id 1gpDvj-0008E8-9q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:07:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gpDvR-0002GR-EU
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:06:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54982)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gpDvR-0002GC-6A
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:06:45 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 70B8B32691A
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:06:44 +0000 (UTC)
-Date: Thu, 31 Jan 2019 10:06:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190131100526-mutt-send-email-mst@kernel.org>
-References: <20190118223152.24183-1-lersek@redhat.com>
-	<e4370e19-04f8-d14b-4f7e-bce22f722805@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1gpDvi-0002MF-6Y
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:07:03 -0500
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-14-crosa@redhat.com>
+	<3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
+	<79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
+	<781af7d9-8e76-f431-ede3-549a69e01f1e@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <0bf0bab7-7d05-4a46-19cb-e025e46a8969@redhat.com>
+Date: Thu, 31 Jan 2019 10:06:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <e4370e19-04f8-d14b-4f7e-bce22f722805@redhat.com>
+In-Reply-To: <781af7d9-8e76-f431-ede3-549a69e01f1e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fw_cfg: fix the life cycle and the name of
- "qemu_extra_params_fw"
+Subject: Re: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test
+ for mips64el + malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,85 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Jan 31, 2019 at 03:27:01PM +0100, Laszlo Ersek wrote:
-> On 01/18/19 23:31, Laszlo Ersek wrote:
-> > Commit 19bcc4bc3213 ("fw_cfg: Make qemu_extra_params_fw locally",
-> > 2019-01-04) changed the storage duration of the "qemu_extra_params_fw=
-"
-> > array from static to automatic. This broke the interface contract on =
-the
-> > fw_cfg_add_file() function, which is documented as follows, in
-> > "include/hw/nvram/fw_cfg.h":
-> >=20
-> >> [...] The data referenced by the starting pointer is only linked, NO=
-T
-> >> copied, into the data structure of the fw_cfg device. [...]
-> >=20
-> > As a result, when guest firmware fetches the "etc/boot-menu-wait" fw_=
-cfg
-> > file, it now sees garbage. Fix the regression by changing the storage
-> > duration to allocated. (The call is reached at most once, on the real=
-ize
-> > path of the board-specific fw_cfg sysbus device.)
-> >=20
-> > While at it, clean up the name and the assignment of the object as we=
-ll.
-> >=20
-> > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > Cc: Markus Armbruster <armbru@redhat.com>
-> > Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > Fixes: 19bcc4bc3213e78c303ad480a7a578f62258252d
-> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> > ---
-> >  hw/nvram/fw_cfg.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> > index 53e8e010a8b7..7fdf04adc97f 100644
-> > --- a/hw/nvram/fw_cfg.c
-> > +++ b/hw/nvram/fw_cfg.c
-> > @@ -118,7 +118,6 @@ static void fw_cfg_bootsplash(FWCfgState *s)
-> >  {
-> >      const char *boot_splash_filename =3D NULL;
-> >      const char *boot_splash_time =3D NULL;
-> > -    uint8_t qemu_extra_params_fw[2];
-> >      char *filename, *file_data;
-> >      gsize file_size;
-> >      int file_type;
-> > @@ -132,6 +131,8 @@ static void fw_cfg_bootsplash(FWCfgState *s)
-> >      /* insert splash time if user configurated */
-> >      if (boot_splash_time) {
-> >          int64_t bst_val =3D qemu_opt_get_number(opts, "splash-time",=
- -1);
-> > +        uint16_t bst_le16;
-> > +
-> >          /* validate the input */
-> >          if (bst_val < 0 || bst_val > 0xffff) {
-> >              error_report("splash-time is invalid,"
-> > @@ -139,9 +140,9 @@ static void fw_cfg_bootsplash(FWCfgState *s)
-> >              exit(1);
-> >          }
-> >          /* use little endian format */
-> > -        qemu_extra_params_fw[0] =3D (uint8_t)(bst_val & 0xff);
-> > -        qemu_extra_params_fw[1] =3D (uint8_t)((bst_val >> 8) & 0xff)=
-;
-> > -        fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_f=
-w, 2);
-> > +        bst_le16 =3D cpu_to_le16(bst_val);
-> > +        fw_cfg_add_file(s, "etc/boot-menu-wait",
-> > +                        g_memdup(&bst_le16, sizeof bst_le16), sizeof=
- bst_le16);
-> >      }
-> > =20
-> >      /* insert splash file if user configurated */
-> >=20
->=20
-> I hope a polite ping can't hurt; can we get this merged please?
->=20
-> Thanks
-> LAszlo
 
-Sure it does not hurt. I have it tagged  for the next pull.
+
+On 1/31/19 5:26 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/31/19 2:34 AM, Cleber Rosa wrote:
+>> On 1/22/19 5:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 1/17/19 7:56 PM, Cleber Rosa wrote:
+>>>> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
+>>>> board and verify the serial is working.
+>>>>
+>>>> If mips64el is a target being built, "make check-acceptance" will
+>>>> automatically include this test by the use of the "arch:mips" tags.
+>>>>
+>>>> Alternatively, this test can be run using:
+>>>>
+>>>>     $ avocado run -t arch:mips64el tests/acceptance
+>>>>     $ avocado run -t machine:malta tests/acceptance
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>>> ---
+>>>>  .travis.yml                            |  2 +-
+>>>>  tests/acceptance/boot_linux_console.py | 39 +++++++++++++++++++++++=
++++
+>>>>  2 files changed, 40 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/.travis.yml b/.travis.yml
+>>>> index 49f9016e6a..28648f7a61 100644
+>>>> --- a/.travis.yml
+>>>> +++ b/.travis.yml
+>>>> @@ -187,7 +187,7 @@ matrix:
+>>>> =20
+>>>>      # Acceptance (Functional) tests
+>>>>      - env:
+>>>> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86=
+_64-softmmu,mips-softmmu"
+>>>> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86=
+_64-softmmu,mips-softmmu,mips64el-softmmu"
+>>>>          - TEST_CMD=3D"make check-acceptance"
+>>>>        addons:
+>>>>          apt:
+>>>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptan=
+ce/boot_linux_console.py
+>>>> index 0678ec91d2..20b845fce1 100644
+>>>> --- a/tests/acceptance/boot_linux_console.py
+>>>> +++ b/tests/acceptance/boot_linux_console.py
+>>>> @@ -9,8 +9,11 @@
+>>>>  # later.  See the COPYING file in the top-level directory.
+>>>> =20
+>>>>  import logging
+>>>> +import os
+>>>> =20
+>>>>  from avocado_qemu import Test
+>>>> +from avocado.utils import process
+>>>> +from avocado.utils import archive
+>>>> =20
+>>>> =20
+>>>>  class BootLinuxConsole(Test):
+>>>> @@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
+>>>>          self.vm.launch()
+>>>>          console_pattern =3D 'Kernel command line: %s' % kernel_comm=
+and_line
+>>>>          self.wait_for_console_pattern(console_pattern)
+>>>> +
+>>>> +    def test_mips64el_malta(self):
+>>>> +        """
+>>>> +        This test requires the ar tool to extract "data.tar.gz" fro=
+m
+>>>> +        the Debian package.
+>>>> +
+>>>> +        The kernel can be rebuilt using this Debian kernel source [=
+1] and
+>>>> +        following the instructions on [2].
+>>>> +
+>>>> +        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch=
+-common-tasks.html#s-common-official
+>>>> +        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/=
+#linux-source-2.6.32_2.6.32-48
+>>>> +
+>>>> +        :avocado: tags=3Darch:mips64el
+>>>> +        :avocado: tags=3Dmachine:malta
+>>>> +        """
+>>>> +        deb_url =3D ('http://snapshot.debian.org/archive/debian/201=
+30217T032700Z/'
+>>>> +                   'pool/main/l/linux-2.6/'
+>>>> +                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel=
+.deb')
+>>>> +        deb_hash =3D '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
+>>>> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_has=
+h)
+>>>> +
+>>>> +        cwd =3D os.getcwd()
+>>>> +        os.chdir(self.workdir)
+>>>> +        process.run("ar x %s data.tar.gz" % deb_path)
+>>>> +        archive.extract("data.tar.gz", self.workdir)
+>>>> +        os.chdir(cwd)
+>>>> +        kernel_path =3D self.workdir + '/boot/vmlinux-2.6.32-5-5kc-=
+malta'
+>>>> +
+>>>> +        self.vm.set_machine('malta')
+>>>> +        self.vm.set_console()
+>>>> +        kernel_command_line =3D 'console=3DttyS0 printk.time=3D0'
+>>>
+>>> What about having a generic KERNEL_COMMON_COMMAND_LINE=3D'printk.time=
+=3D0 '
+>>> then using
+>>>   kernel_command_line =3D KERNEL_COMMON_COMMAND_LINE + 'console=3Dtty=
+S0'
+>>> in each tests of this series?
+>>>
+>>
+>> Not sure... I do like the fact that it's more uniform, but I don't lik=
+e
+>> the locality aspect.  Having to refer back to something defined either
+>> in the module or class level for something so small is a big con, IMO.
+>>
+>> I'll keep it AS IS for now, and if more people feel like it's a good
+>> idea, or you feel stronger that it's a good idea, I can add it in the
+>> next version.
+>=20
+> I'm fine with that, however I'd really like all the Linux tests to use
+> "printk.time=3D0" in their kernel cmdline, it really simplify
+> parsing/diffing the console output.
+>=20
+
+OK, I'll include that in v2.
+
+Thanks!
+- Cleber.
+
+>>>> +        self.vm.add_args('-kernel', kernel_path,
+>>>> +                         '-append', kernel_command_line)
+>>>> +        self.vm.launch()
+>>>> +        console_pattern =3D 'Kernel command line: %s' % kernel_comm=
+and_line
+>>>> +        self.wait_for_console_pattern(console_pattern)
+>>>>
+>>
