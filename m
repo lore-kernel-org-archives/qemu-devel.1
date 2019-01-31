@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49717)
+Received: from eggs.gnu.org ([209.51.188.92]:50179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gp1yh-0005cS-Kk
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:21:20 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1gp22e-00075m-2i
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gp1yg-0003FM-Fd
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:21:19 -0500
-References: <20190130235251.17911-1-mreitz@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2a6ece79-0e51-4707-2427-57825f957990@redhat.com>
-Date: Wed, 30 Jan 2019 21:21:12 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1gp22a-0004yy-AJ
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:22 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:38668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gp22Y-0004xO-Ml
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:19 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id v13so1574073wrw.5
+	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 18:25:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190130235251.17911-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Filter second
- BLOCK_JOB_ERROR from 229
+References: <20190130031427.13129-1-jasowang@redhat.com>
+In-Reply-To: <20190130031427.13129-1-jasowang@redhat.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Thu, 31 Jan 2019 10:25:04 +0800
+Message-ID: <CAK3tnvKVBthFyYSc+kummftPUCQwCpaYVF7H8HHhOUmmoB0GGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain
+ socket through fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+
+On Wed, Jan 30, 2019 at 11:14 AM Jason Wang <jasowang@redhat.com> wrote:
+
+> The tests tries to let qemu server mode to process the connection
+> which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
+> "x-oob", offer capability "oob" unconditionally"). This is because the
+> filter may try to mirror the packets before UNIX socket object is
+> ready (connected was set to true) from the view of qemu. In this case
+> the packet will be dropped silently.
+>
+> Fixing this by passing pre-connected socket created by socketpair() to
+> qemu through fd.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Zhang Chen <zhangckid@gmail.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>
+
+Looks good for me.
+Reviewed-by: Zhang Chen <zhangckid@gmail.com>
+
+By the way: Do we need add ASCII diagram to explain data flow in this file
+or commit log?
+
+Thanks
+Zhang Chen
 
 
-
-On 1/30/19 6:52 PM, Max Reitz wrote:
-> Without this filter, this test sometimes fails.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> I intended to send this as part of my iotest fixes series, but it ended
-> up on the wrong branch...  Doesn't really matter, though, as there is no
-> functional dependency.
+> Changes from v1:
+> - close the socket pairs in the end of test
 > ---
->  tests/qemu-iotests/229     | 6 +++++-
->  tests/qemu-iotests/229.out | 1 -
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-> index 893d098ad2..b0d4885fa6 100755
-> --- a/tests/qemu-iotests/229
-> +++ b/tests/qemu-iotests/229
-> @@ -81,11 +81,15 @@ echo
->  echo '=== Force cancel job paused in error state  ==='
->  echo
->  
-> +# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
-> +# Cancelling the job means resuming it for a bit before it is actually
-> +# aborted, and in that time it may or may not re-encounter the error.
-
-Oh, because the job is "paused" and cancelling it involves job_enter,
-which we then allow the job to gracefully fail through it's own pathways
--- but depending on where it failed originally, it may-or-may-not wind
-up trying something else that fails before it finds the "exit
-gracefully" signal, is that right?
-
-I guess there's no real way to adjust that behavior.
-
->  success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
->      "{'execute': 'block-job-cancel',
->                   'arguments': { 'device': 'testdisk',
->                                  'force': true}}" \
-> -     "BLOCK_JOB_CANCELLED" "Assertion"
-> +     "BLOCK_JOB_CANCELLED" "Assertion" \
-> +    | grep -v '"BLOCK_JOB_ERROR"'
->  
->  # success, all done
->  echo "*** done"
-> diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-> index 4c4112805f..a3eb33788a 100644
-> --- a/tests/qemu-iotests/229.out
-> +++ b/tests/qemu-iotests/229.out
-> @@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
->  
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
->  {"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
->  *** done
-> 
-
-I think this is fine, if we cannot help to make this any more
-deterministic, so I'm fine with:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-but I am curious to know if this poses any theoretical problems for
-libvirt having to deal with possibly an extra hiccup before the cancel
-registers.
+>  tests/test-filter-mirror.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
+>
+> diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+> index 7ab2aed8a0..d942c74a3f 100644
+> --- a/tests/test-filter-mirror.c
+> +++ b/tests/test-filter-mirror.c
+> @@ -21,10 +21,9 @@
+>
+>  static void test_mirror(void)
+>  {
+> -    int send_sock[2], recv_sock;
+> +    int send_sock[2], recv_sock[2];
+>      uint32_t ret = 0, len = 0;
+>      char send_buf[] = "Hello! filter-mirror~";
+> -    char sock_path[] = "filter-mirror.XXXXXX";
+>      char *recv_buf;
+>      uint32_t size = sizeof(send_buf);
+>      size = htonl(size);
+> @@ -38,18 +37,15 @@ static void test_mirror(void)
+>      ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
+>      g_assert_cmpint(ret, !=, -1);
+>
+> -    ret = mkstemp(sock_path);
+> +    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
+>      g_assert_cmpint(ret, !=, -1);
+>
+>      qts = qtest_initf(
+>          "-netdev socket,id=qtest-bn0,fd=%d "
+>          "-device %s,netdev=qtest-bn0,id=qtest-e0 "
+> -        "-chardev socket,id=mirror0,path=%s,server,nowait "
+> +        "-chardev socket,id=mirror0,fd=%d "
+>          "-object
+> filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
+> -        , send_sock[1], devstr, sock_path);
+> -
+> -    recv_sock = unix_connect(sock_path, NULL);
+> -    g_assert_cmpint(recv_sock, !=, -1);
+> +        , send_sock[1], devstr, recv_sock[1]);
+>
+>      struct iovec iov[] = {
+>          {
+> @@ -67,18 +63,20 @@ static void test_mirror(void)
+>      g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
+>      close(send_sock[0]);
+>
+> -    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
+> +    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
+>      g_assert_cmpint(ret, ==, sizeof(len));
+>      len = ntohl(len);
+>
+>      g_assert_cmpint(len, ==, sizeof(send_buf));
+>      recv_buf = g_malloc(len);
+> -    ret = qemu_recv(recv_sock, recv_buf, len, 0);
+> +    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
+>      g_assert_cmpstr(recv_buf, ==, send_buf);
+>
+>      g_free(recv_buf);
+> -    close(recv_sock);
+> -    unlink(sock_path);
+> +    close(send_sock[0]);
+> +    close(send_sock[1]);
+> +    close(recv_sock[0]);
+> +    close(recv_sock[1]);
+>      qtest_quit(qts);
+>  }
+>
+> --
+> 2.17.1
+>
+>
