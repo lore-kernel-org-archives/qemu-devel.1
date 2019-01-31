@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33668)
+Received: from eggs.gnu.org ([209.51.188.92]:34422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gp8ng-00085U-PD
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:38:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1gp8r7-0000hR-V2
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:41:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gp8nc-0007po-5f
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:38:23 -0500
+	(envelope-from <armbru@redhat.com>) id 1gp8r6-0002E4-6x
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:41:57 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <87y378n5iy.fsf@dusky.pond.sub.org>
 	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
 	<87o97yi67d.fsf@dusky.pond.sub.org>
 	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<9dc7c83c-a63c-9cde-1267-43bc62e73436@redhat.com>
-	<87imy5dy5v.fsf@dusky.pond.sub.org>
-	<703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com>
-Date: Thu, 31 Jan 2019 10:37:58 +0100
-In-Reply-To: <703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com> (Paolo
-	Bonzini's message of "Thu, 31 Jan 2019 10:19:15 +0100")
-Message-ID: <87bm3xcgll.fsf@dusky.pond.sub.org>
+	<87d0oddxu2.fsf@dusky.pond.sub.org>
+	<f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com>
+Date: Thu, 31 Jan 2019 10:41:46 +0100
+In-Reply-To: <f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com> (Paolo
+	Bonzini's message of "Thu, 31 Jan 2019 10:19:52 +0100")
+Message-ID: <877eelcgf9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
@@ -29,43 +28,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Libvirt <libvir-list@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>
 
 Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 31/01/19 09:33, Markus Armbruster wrote:
->> I thought secure=on affected only writes (and so wouldn't matter with
->> readonly=on), but I was wrong:
+> On 31/01/19 09:40, Markus Armbruster wrote:
+>>> Maybe we should just add pflash block properties to the machine?  And
+>>> then it can create the devices if the properties are set to a non-empty
+>>> value.
+>> What exactly do you have in mind?  Something like
 >> 
->>     static MemTxResult pflash_mem_read_with_attrs(void *opaque, hwaddr addr, uint64_t *value,
->>                                                   unsigned len, MemTxAttrs attrs)
->>     {
->>         pflash_t *pfl = opaque;
->>         bool be = !!(pfl->features & (1 << PFLASH_BE));
+>>     -machine q35,ovmf-code=OVMF-CODE-NODE,ovmf-data=OVMF-DATA-NODE
 >> 
->>         if ((pfl->features & (1 << PFLASH_SECURE)) && !attrs.secure) {
->>             *value = pflash_data_read(opaque, addr, len, be);
->>         } else {
->>             *value = pflash_read(opaque, addr, len, be);
->>         }
->>         return MEMTX_OK;
->>     }
+>> where OVMF-CODE-NODE and OVMF-DATA-NODE are block backend node names,
+>> i.e.
 >> 
->> pflash_data_read() is what pflash_read() does when pfl->cmd is 0.
+>>     -blockdev file,node-name=OVMF-CODE-NODE,read-only=on,filename=/usr/share/edk2/ovmf/OVMF_CODE.fd
+>>     -blockdev file,node-name=OVMF-DATA-NODE,read-only=on,filename=...
 >
-> Reads from flash actually do not go through here; this function executes
-> if the flash chip is already in MMIO mode, which happens after you
-> *write* a command to the memory area.  With secure=on, you just cannot
-> do a command write unless you're in SMM, in other words the flash chip
-> can only ever go in MMIO mode if you're in SMM.
->
->> Hmm, why is it okay to treat all pfl->cmd values the same when
->> secure=on?
->
-> But doesn't matter.  You just don't want MMIO mode to be active outside
-> SMM: all that non-SMM code want to do with the flash is read and execute
-> it, as far as they're concerned it's just ROM and the command mode is
-> nonexistent.
+> Yes, though I would call it pflash0 and pflash1.
 
-Out of curiosity: what effect does secure=on have when the device is
-read-only (pflash_t member ro non-zero)?
+Digression... should we put traditional BIOS in flash as well?  Only for
+new machine types, obviously.
