@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53940)
+Received: from eggs.gnu.org ([209.51.188.92]:54669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGge-00042Y-OB
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:03:41 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpGiz-000661-9u
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGgc-00086e-OF
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:03:39 -0500
-Resent-Message-Id: <E1gpGgc-00086e-OF@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpGgX-00083z-4d
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:03:36 -0500
-Message-ID: <154895778937.23946.9365231089589251635@ebba9967afc0>
-In-Reply-To: <20190131130016.17337-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <armbru@redhat.com>) id 1gpGix-0000Yc-Ch
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gpGiv-0000So-Da
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:03 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190128141506.12731-1-lifei1214@126.com>
+Date: Thu, 31 Jan 2019 19:05:40 +0100
+In-Reply-To: <20190128141506.12731-1-lifei1214@126.com> (Fei Li's message of
+	"Mon, 28 Jan 2019 22:14:43 +0800")
+Message-ID: <87womkvh1n.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 10:03:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3] scripts: use git archive in
- archive-source
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/11] qemu_thread_create:
+ propagate the error to callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, famz@redhat.com
+To: Fei Li <lifei1214@126.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEzMTEzMDAxNi4xNzMz
-Ny0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDEzMTEzMDAxNi4xNzMzNy0xLWtyYXhlbEByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjNdIHNjcmlwdHM6IHVzZSBnaXQg
-YXJjaGl2ZSBpbiBhcmNoaXZlLXNvdXJjZQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMTIzMDky
-NTM4LjgwMDQtMS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4uZGUgLT4gcGF0Y2hldy8yMDE5
-MDEyMzA5MjUzOC44MDA0LTEta2Jhc3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKY2ZlOTY2NCBzY3JpcHRzOiB1c2UgZ2l0IGFyY2hpdmUg
-aW4gYXJjaGl2ZS1zb3VyY2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU3OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNl
-LnNoOjQyOgorXklzdGF0dXM9IiQoZ2l0IHN1Ym1vZHVsZSBzdGF0dXMgIiRzbSIpIiQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU4OiBGSUxFOiBzY3JpcHRzL2Fy
-Y2hpdmUtc291cmNlLnNoOjQzOgorXklzbWhhc2g9IiR7c3RhdHVzIyB9IiQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU5OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUt
-c291cmNlLnNoOjQ0OgorXklzbWhhc2g9IiR7c21oYXNoIyt9IiQKCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzYwOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNl
-LnNoOjQ1OgorXklzbWhhc2g9IiR7c21oYXNoIy19IiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzYxOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjQ2
-OgorXklzbWhhc2g9IiR7c21oYXNoJSUgKn0iJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojNjI6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NDc6Cite
-SXNtZGlyPSIkc20iJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-NjM6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NDg6CiteSWNhc2UgIiRzdGF0dXMi
-IGluJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNjQ6IEZJTEU6
-IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NDk6CiteSSAgICAtKikkCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NTogRklMRTogc2NyaXB0cy9hcmNoaXZlLXNv
-dXJjZS5zaDo1MDoKK15JXklzbWRpcj0iJHN1Yl90ZGlyLyRzbSIkCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NjogRklMRTogc2NyaXB0cy9hcmNoaXZlLXNvdXJj
-ZS5zaDo1MToKK15JXklzbXVybD0iJChnaXQgY29uZmlnIC1mIC5naXRtb2R1bGVzIHN1Ym1vZHVs
-ZS4ke3NtfS51cmwpIiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzY3OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjUyOgorXkleSWVjaG8gIk5PVElD
-RTogdXNpbmcgdGVtcG9yYXJ5IGNsb25lIGZvciBzdWJtb2R1bGUgJHNtIiQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY4OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUt
-c291cmNlLnNoOjUzOgorXkleSWdpdCBjbG9uZSAiJHNtdXJsIiAiJHNtZGlyIiQKCkVSUk9SOiBj
-b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzY5OiBGSUxFOiBzY3JpcHRzL2FyY2hp
-dmUtc291cmNlLnNoOjU0OgorXkleSXRlc3QgJD8gLW5lIDAgJiYgZXJyb3IgImZhaWxlZCB0byBj
-bG9uZSBzdWJtb2R1bGUgJHNtIiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzcwOiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjU1OgorXkleSTs7JAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzE6IEZJTEU6IHNjcmlw
-dHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NTY6CiteSSAgICArKikkCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3MjogRklMRTogc2NyaXB0cy9hcmNoaXZlLXNvdXJjZS5z
-aDo1NzoKK15JXkllY2hvICJXQVJOSU5HOiBzdWJtb2R1bGUgJHNtIGlzIG91dCBvZiBzeW5jIiQK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzczOiBGSUxFOiBzY3Jp
-cHRzL2FyY2hpdmUtc291cmNlLnNoOjU4OgorXkleSTs7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojNzQ6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6
-NTk6CiteSWVzYWMkCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzU6IEZJTEU6
-IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6NjA6CisgICAgICAgKGNkICRzbWRpcjsgZ2l0IGFy
-Y2hpdmUgLS1mb3JtYXQgdGFyIC0tcHJlZml4ICIkc20vIiAkc21oYXNoKSA+ICIkc3ViX2ZpbGUi
-CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3NTogRklMRTogc2Ny
-aXB0cy9hcmNoaXZlLXNvdXJjZS5zaDo2MDoKK15JKGNkICRzbWRpcjsgZ2l0IGFyY2hpdmUgLS1m
-b3JtYXQgdGFyIC0tcHJlZml4ICIkc20vIiAkc21oYXNoKSA+ICIkc3ViX2ZpbGUiJAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNzY6IEZJTEU6IHNjcmlwdHMvYXJj
-aGl2ZS1zb3VyY2Uuc2g6NjE6CiteSXRlc3QgJD8gLW5lIDAgJiYgZXJyb3IgImZhaWxlZCB0byBh
-cmNoaXZlIHN1Ym1vZHVsZSAkc20gKCRzbWhhc2gpIiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzc3OiBGSUxFOiBzY3JpcHRzL2FyY2hpdmUtc291cmNlLnNoOjYy
-OgorXkl0YXIgLS1jb25jYXRlbmF0ZSAtLWZpbGUgIiR0YXJfZmlsZSIgIiRzdWJfZmlsZSIkCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3ODogRklMRTogc2NyaXB0
-cy9hcmNoaXZlLXNvdXJjZS5zaDo2MzoKK15JdGVzdCAkPyAtbmUgMCAmJiBlcnJvciAiZmFpbGVk
-IGFwcGVuZCBzdWJtb2R1bGUgJHNtIHRvICR0YXJfZmlsZSIkCgp0b3RhbDogMjIgZXJyb3JzLCAx
-IHdhcm5pbmdzLCA1OCBsaW5lcyBjaGVja2VkCgpDb21taXQgY2ZlOTY2NDViYzQ3IChzY3JpcHRz
-OiB1c2UgZ2l0IGFyY2hpdmUgaW4gYXJjaGl2ZS1zb3VyY2UpIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMTkwMTMxMTMwMDE2LjE3MzM3LTEta3JheGVsQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3Bh
-dGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+I'm afraid you made a bit of a mess :)
+
+"[PATCH for-4.0 00/11]" suggests this is v1 of eleven patches.
+
+Fei Li <lifei1214@126.com> writes:
+
+> Hi,
+>
+> This idea comes from BiteSizedTasks, and this patch series implement
+> the error checking of qemu_thread_create: make qemu_thread_create
+> return a flag to indicate if it succeeded rather than failing with
+> an error; make all callers check it.
+>
+> The first patch modifies the qemu_thread_create() by passing
+> &error_abort and returing a value to indicate if it succeeds. The next
+> 10 patches will improve on &error_abort for callers who could handle
+> more properly.
+>
+> Please help to review, thanks a lot! 
+>
+> v10:
+> - Make qemu_thread_create() return -errno instead of a Boolean.
+> - Add more cleanup for pci_edu_realize()/emulated_realize(). 
+> - Polish for iothread_complete()/compress_threads_save_cleanup()/
+>   vnc_start_worker_thread()/touch_all_pages.
+> - Change to return H_HARDWARE for h_resize_hpt_prepare().
+> - Remove five derivative patches as they have been merged.
+
+It's actually v10.
+
+[...]
+> Fei Li (11):
+>   qemu_thread: make qemu_thread_create() take Error ** argument
+>   qemu_thread: supplement error handling for qemu_X_start_vcpu
+>   qemu_thread: supplement error handling for qmp_dump_guest_memory
+>   qemu_thread: supplement error handling for pci_edu_realize
+>   qemu_thread: supplement error handling for h_resize_hpt_prepare
+>   qemu_thread: supplement error handling for emulated_realize
+>   qemu_thread: supplement error handling for iothread_complete
+>   qemu_thread: supplement error handling for qemu_signalfd_compat
+>   qemu_thread: supplement error handling for migration
+>   qemu_thread: supplement error handling for vnc_start_worker_thread
+>   qemu_thread: supplement error handling for touch_all_pages
+
+It is eleven patches.  However, I got only 01-07/11 with this cover
+letter.  A later batch (no cover letter) has 07-11/11 and 07-09/11
+again.
+
+I could guess which of the duplicates I should review, but that's work.
+Just resend the whole thing as v11, please.
+
+[...]
