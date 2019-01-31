@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48049)
+Received: from eggs.gnu.org ([209.51.188.92]:48051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpE7x-0004Ia-LH
+	(envelope-from <sgarzare@redhat.com>) id 1gpE7x-0004Ic-LM
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpE7v-0007fS-IU
+	(envelope-from <sgarzare@redhat.com>) id 1gpE7v-0007fT-IW
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 10:19:41 -0500
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 31 Jan 2019 16:19:11 +0100
-Message-Id: <20190131151914.164903-3-sgarzare@redhat.com>
+Date: Thu, 31 Jan 2019 16:19:10 +0100
+Message-Id: <20190131151914.164903-2-sgarzare@redhat.com>
 In-Reply-To: <20190131151914.164903-1-sgarzare@redhat.com>
 References: <20190131151914.164903-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
- boolean property
+Subject: [Qemu-devel] [PATCH v2 1/5] virtio-blk: add acct_failed param to
+ virtio_blk_handle_rw_error()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-In order to avoid migration issues, we enable DISCARD and
-WRITE ZEROES features only for machine type >=3D 4.0
+We add acct_failed param in order to use virtio_blk_handle_rw_error()
+also when is not required to call block_acct_failed(). (eg. a discard
+operation is failed)
 
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/block/virtio-blk.c          | 2 ++
- hw/core/machine.c              | 1 +
- include/hw/virtio/virtio-blk.h | 1 +
- 3 files changed, 4 insertions(+)
+ hw/block/virtio-blk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 8a6754d9a2..542ec52536 100644
+index f208c6ddb9..8a6754d9a2 100644
 --- a/hw/block/virtio-blk.c
 +++ b/hw/block/virtio-blk.c
-@@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] =3D {
-     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHRE=
-AD,
-                      IOThread *),
-+    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes=
-, 0,
-+                     true),
-     DEFINE_PROP_END_OF_LIST(),
- };
+@@ -61,7 +61,7 @@ static void virtio_blk_req_complete(VirtIOBlockReq *req=
+, unsigned char status)
+ }
 =20
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 2629515363..ce98857af0 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -30,6 +30,7 @@ GlobalProperty hw_compat_3_1[] =3D {
-     { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "t=
-rue" },
-     { "tpm-crb", "ppi", "false" },
-     { "tpm-tis", "ppi", "false" },
-+    { "virtio-blk-device", "discard-wzeroes", "false" },
- };
- const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+ static int virtio_blk_handle_rw_error(VirtIOBlockReq *req, int error,
+-    bool is_read)
++    bool is_read, bool acct_failed)
+ {
+     BlockErrorAction action =3D blk_get_error_action(req->dev->blk,
+                                                    is_read, error);
+@@ -75,7 +75,9 @@ static int virtio_blk_handle_rw_error(VirtIOBlockReq *r=
+eq, int error,
+         s->rq =3D req;
+     } else if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
+         virtio_blk_req_complete(req, VIRTIO_BLK_S_IOERR);
+-        block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        if (acct_failed) {
++            block_acct_failed(blk_get_stats(s->blk), &req->acct);
++        }
+         virtio_blk_free_request(req);
+     }
 =20
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-bl=
-k.h
-index 5117431d96..c336afb4cd 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -40,6 +40,7 @@ struct VirtIOBlkConf
-     uint32_t request_merging;
-     uint16_t num_queues;
-     uint16_t queue_size;
-+    uint32_t discard_wzeroes;
- };
+@@ -113,7 +115,7 @@ static void virtio_blk_rw_complete(void *opaque, int =
+ret)
+              * the memory until the request is completed (which will
+              * happen on the other side of the migration).
+              */
+-            if (virtio_blk_handle_rw_error(req, -ret, is_read)) {
++            if (virtio_blk_handle_rw_error(req, -ret, is_read, true)) {
+                 continue;
+             }
+         }
+@@ -132,7 +134,7 @@ static void virtio_blk_flush_complete(void *opaque, i=
+nt ret)
 =20
- struct VirtIOBlockDataPlane;
+     aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+     if (ret) {
+-        if (virtio_blk_handle_rw_error(req, -ret, 0)) {
++        if (virtio_blk_handle_rw_error(req, -ret, 0, true)) {
+             goto out;
+         }
+     }
 --=20
 2.20.1
