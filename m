@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54669)
+Received: from eggs.gnu.org ([209.51.188.92]:54706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpGiz-000661-9u
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpGj0-00067O-Rv
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpGix-0000Yc-Ch
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gpGiv-0000So-Da
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:03 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190128141506.12731-1-lifei1214@126.com>
-Date: Thu, 31 Jan 2019 19:05:40 +0100
-In-Reply-To: <20190128141506.12731-1-lifei1214@126.com> (Fei Li's message of
-	"Mon, 28 Jan 2019 22:14:43 +0800")
-Message-ID: <87womkvh1n.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gpGiz-0000Zi-DM
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:06 -0500
+Resent-Message-Id: <E1gpGiz-0000Zi-DM@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpGiy-0000YG-8r
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 13:06:05 -0500
+Message-ID: <154895794991.23946.112125876234712049@ebba9967afc0>
+In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-4.0 00/11] qemu_thread_create:
- propagate the error to callers to handle
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 10:05:50 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] target/arm: Implement ARMv8.5-BTI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <lifei1214@126.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-I'm afraid you made a bit of a mess :)
-
-"[PATCH for-4.0 00/11]" suggests this is v1 of eleven patches.
-
-Fei Li <lifei1214@126.com> writes:
-
-> Hi,
->
-> This idea comes from BiteSizedTasks, and this patch series implement
-> the error checking of qemu_thread_create: make qemu_thread_create
-> return a flag to indicate if it succeeded rather than failing with
-> an error; make all callers check it.
->
-> The first patch modifies the qemu_thread_create() by passing
-> &error_abort and returing a value to indicate if it succeeds. The next
-> 10 patches will improve on &error_abort for callers who could handle
-> more properly.
->
-> Please help to review, thanks a lot! 
->
-> v10:
-> - Make qemu_thread_create() return -errno instead of a Boolean.
-> - Add more cleanup for pci_edu_realize()/emulated_realize(). 
-> - Polish for iothread_complete()/compress_threads_save_cleanup()/
->   vnc_start_worker_thread()/touch_all_pages.
-> - Change to return H_HARDWARE for h_resize_hpt_prepare().
-> - Remove five derivative patches as they have been merged.
-
-It's actually v10.
-
-[...]
-> Fei Li (11):
->   qemu_thread: make qemu_thread_create() take Error ** argument
->   qemu_thread: supplement error handling for qemu_X_start_vcpu
->   qemu_thread: supplement error handling for qmp_dump_guest_memory
->   qemu_thread: supplement error handling for pci_edu_realize
->   qemu_thread: supplement error handling for h_resize_hpt_prepare
->   qemu_thread: supplement error handling for emulated_realize
->   qemu_thread: supplement error handling for iothread_complete
->   qemu_thread: supplement error handling for qemu_signalfd_compat
->   qemu_thread: supplement error handling for migration
->   qemu_thread: supplement error handling for vnc_start_worker_thread
->   qemu_thread: supplement error handling for touch_all_pages
-
-It is eleven patches.  However, I got only 01-07/11 with this cover
-letter.  A later batch (no cover letter) has 07-11/11 and 07-09/11
-again.
-
-I could guess which of the duplicates I should review, but that's work.
-Just resend the whole thing as v11, please.
-
-[...]
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMDEyMTczNi4yMzQ0
+OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTFd
+IHRhcmdldC9hcm06IEltcGxlbWVudCBBUk12OC41LUJUSQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1p
+ZDogMjAxOTAxMTAxMjE3MzYuMjM0NDgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwoxY2YyYzA3OGFjIHRlc3RzL3RjZy9hYXJjaDY0OiBBZGQgYnRp
+IHNtb2tlIHRlc3QKYThjZGZlMTUwMSBsaW51eC11c2VyL2FhcmNoNjQ6IFJlc2V0IGJ0eXBlIGZv
+ciBzaWduYWwgaGFuZGxlcnMKZDdjZGUyNmUzZCB0YXJnZXQvYXJtOiBFbmFibGUgQlRJIGZvciAt
+Y3B1IG1heAo2NWU5NTc4YzFmIHRhcmdldC9hcm06IEFkZCBndWFyZGVkX3BhZ2VzIGNwdSBwcm9w
+ZXJ0eSBmb3IgdXNlci1vbmx5CmJjNGY3YmQ0NzggdGFyZ2V0L2FybTogU2V0IGJ0eXBlIGZvciBp
+bmRpcmVjdCBicmFuY2hlcwpiM2Q3YjFlZjYwIHRhcmdldC9hcm06IFJlc2V0IGJ0eXBlIGZvciBk
+aXJlY3QgYnJhbmNoZXMgYW5kIHN5c2NhbGxzCmJkYjk0NTZiOGQgdGFyZ2V0L2FybTogRGVmYXVs
+dCBoYW5kbGluZyBvZiBCVFlQRSBkdXJpbmcgdHJhbnNsYXRpb24KYzYzNjE3YjY3MSB0YXJnZXQv
+YXJtOiBSZWNvcmQgdGhlIEdQIGJpdCBmb3IgYSBwYWdlIGluIE1lbVR4QXR0cnMKZmE1NzZhMThk
+ZiB0YXJnZXQvYXJtOiBBZGQgQlQgYW5kIEJUWVBFIHRvIHRiLT5mbGFncwplM2NjOTNiNjkwIHRh
+cmdldC9hcm06IEFkZCBQU1RBVEUuQlRZUEUKM2I1ODhjMjg4ZSB0YXJnZXQvYXJtOiBJbnRyb2R1
+Y2UgaXNhcl9mZWF0dXJlX2FhNjRfYnRpCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzExIENoZWNr
+aW5nIGNvbW1pdCAzYjU4OGMyODhlNDIgKHRhcmdldC9hcm06IEludHJvZHVjZSBpc2FyX2ZlYXR1
+cmVfYWE2NF9idGkpCjIvMTEgQ2hlY2tpbmcgY29tbWl0IGUzY2M5M2I2OTA1OCAodGFyZ2V0L2Fy
+bTogQWRkIFBTVEFURS5CVFlQRSkKMy8xMSBDaGVja2luZyBjb21taXQgZmE1NzZhMThkZjFmICh0
+YXJnZXQvYXJtOiBBZGQgQlQgYW5kIEJUWVBFIHRvIHRiLT5mbGFncykKNC8xMSBDaGVja2luZyBj
+b21taXQgYzYzNjE3YjY3MTU5ICh0YXJnZXQvYXJtOiBSZWNvcmQgdGhlIEdQIGJpdCBmb3IgYSBw
+YWdlIGluIE1lbVR4QXR0cnMpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IGJkYjk0NTZiOGRiMSAodGFy
+Z2V0L2FybTogRGVmYXVsdCBoYW5kbGluZyBvZiBCVFlQRSBkdXJpbmcgdHJhbnNsYXRpb24pCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
+CiM3MDogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6MTM3MzA6CisvKioKCkVSUk9S
+OiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQK
+Izk3OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMzc1NzoKKyAgICByZXR1cm4g
+KHRsYl9oaXQoZW50cnktPmFkZHJfY29kZSwgYWRkcikgJiYKCldBUk5JTkc6IEJsb2NrIGNvbW1l
+bnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMDI6IEZJTEU6IHRhcmdl
+dC9hcm0vdHJhbnNsYXRlLWE2NC5jOjEzNzYyOgorLyoqCgp0b3RhbDogMSBlcnJvcnMsIDIgd2Fy
+bmluZ3MsIDE5NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzExIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo2LzExIENoZWNraW5nIGNvbW1pdCBiM2Q3YjFlZjYwMmEgKHRhcmdldC9hcm06IFJl
+c2V0IGJ0eXBlIGZvciBkaXJlY3QgYnJhbmNoZXMgYW5kIHN5c2NhbGxzKQo3LzExIENoZWNraW5n
+IGNvbW1pdCBiYzRmN2JkNDc4MTkgKHRhcmdldC9hcm06IFNldCBidHlwZSBmb3IgaW5kaXJlY3Qg
+YnJhbmNoZXMpCjgvMTEgQ2hlY2tpbmcgY29tbWl0IDY1ZTk1NzhjMWZkMyAodGFyZ2V0L2FybTog
+QWRkIGd1YXJkZWRfcGFnZXMgY3B1IHByb3BlcnR5IGZvciB1c2VyLW9ubHkpCjkvMTEgQ2hlY2tp
+bmcgY29tbWl0IGQ3Y2RlMjZlM2RkMiAodGFyZ2V0L2FybTogRW5hYmxlIEJUSSBmb3IgLWNwdSBt
+YXgpCjEwLzExIENoZWNraW5nIGNvbW1pdCBhOGNkZmUxNTAxNWYgKGxpbnV4LXVzZXIvYWFyY2g2
+NDogUmVzZXQgYnR5cGUgZm9yIHNpZ25hbCBoYW5kbGVycykKMTEvMTEgQ2hlY2tpbmcgY29tbWl0
+IDFjZjJjMDc4YWMzMSAodGVzdHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21va2UgdGVzdCkKV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojMzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGV4dGVybnMg
+c2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzExNjogRklMRTogdGVzdHMvdGNnL2FhcmNo
+NjQvYnRpLWNydC5pbmMuYzoxMzoKK2ludCBtYWluKHZvaWQpOwoKdG90YWw6IDEgZXJyb3JzLCAx
+IHdhcm5pbmdzLCAxMjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTEgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwMTEwMTIxNzM2LjIzNDQ4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
+Zy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
