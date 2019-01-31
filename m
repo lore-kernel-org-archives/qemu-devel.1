@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41410)
+Received: from eggs.gnu.org ([209.51.188.92]:45889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gp4HZ-00017q-Bj
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 23:48:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1gp4pV-00068k-6k
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 00:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1gp4HY-0005yr-GL
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 23:48:57 -0500
-Received: from sonic304-19.consmr.mail.sg3.yahoo.com ([106.10.242.209]:37613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
-	id 1gp4HX-0005xI-ND
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 23:48:56 -0500
-From: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
-Date: Thu, 31 Jan 2019 13:48:37 +0900
-Message-Id: <20190131044837.9542-1-lucienmp_antispam@yahoo.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix for RSP vCont packet
+	(envelope-from <thuth@redhat.com>) id 1gp4pT-0007GK-A0
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 00:24:01 -0500
+References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
+	<1548841387-7670-1-git-send-email-thuth@redhat.com>
+	<1548841387-7670-4-git-send-email-thuth@redhat.com>
+	<630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d6ccc706-5268-e393-33c3-386770af89f3@redhat.com>
+Date: Thu, 31 Jan 2019 06:23:47 +0100
+MIME-Version: 1.0
+In-Reply-To: <630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 3/5] ppc: Express dependencies of the
+ Mac machines with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,65 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Luc Michel <luc.michel@greensocs.com>, Eric Blake <eblake@redhat.com>, lucienmp_antispam@yahoo.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, yang.zhong@intel.com
+Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org
 
-The result is that vCont now does not recognise the case where no process/thread is provided after the action.
+On 2019-01-30 18:13, Mark Cave-Ayland wrote:
+> On 30/01/2019 09:43, Thomas Huth wrote:
+>=20
+>> This will make it for example easier if the users want to disable
+>> one of the two machines for their builds.
+>>
+>> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+[...]
+>> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+>> index 3ebe30f..f392502 100644
+>> --- a/hw/misc/Kconfig
+>> +++ b/hw/misc/Kconfig
+>> @@ -59,6 +59,14 @@ config MOS6522
+>> =20
+>>  config MACIO
+>>      bool
+>> +    select CUDA
+>> +    select ESCC
+>> +    select IDE_MACIO
+>> +    select MACIO_GPIO
+>> +    select MAC_DBDMA
+>> +    select MAC_NVRAM
+>> +    select MAC_PMU
+>> +    select MOS6522
+>=20
+> Technically MACIO_GPIO and MAC_PMU are MAC_NEWWORLD only, so we might w=
+ant to split
+> this down further?
 
-This may not show up with GDB, but using Lauterbach Trace32, and Hexrays IDA Pro this issue is immediately seen.
-The response is a "$#00" empty packet, showing it is unsupported packet.
+I can also change the lines into:
 
-This is defined in the RSP document as "An action with no thread-id matches all threads."
-(https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#vCont-packet )
+    select MACIO_GPIO if MAC_NEWWORLD
+    select MAC_PMU if MAC_NEWWORLD
 
-Thus the valid vCont packets now are as below, however parsing is still not very strict.
-  vCont;c/s                 - Step/Continue all threads
-  vCont;c/s:[pX.]Y          - Step/Continue optional process X, thread Y
-  vCont;C##/S##:[pX.]Y      - Step/Continue with signal ## on optional process X, thread Y
-  * If X or Y are -1 then it applies the action to all processes/threads.
+>> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
+>> index 809830e..f6b4206 100644
+>> --- a/hw/ppc/Kconfig
+>> +++ b/hw/ppc/Kconfig
+>> @@ -44,9 +44,16 @@ config RS6000_MC
+>> =20
+>>  config MAC_OLDWORLD
+>>      bool
+>> +    select ADB
+>> +    select GRACKLE_PCI
+>> +    select HEATHROW_PIC
+>> +    select MACIO
+>> =20
+>>  config MAC_NEWWORLD
+>>      bool
+>> +    select ADB
+>> +    select MACIO
+>> +    select UNIN_PCI
+>=20
+> Also MAC_NEWWORLD has an in-built USB PCI bridge (OHCI) which populates=
+ with a USB
+> keyboard/mouse rather than ADB when using -M mac99,via=3Dpmu, but I pre=
+sume USB is
+> handled elsewhere?
 
-Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
----
- gdbstub.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+Yes, in hw/usb/Kconfig we have:
 
-diff --git a/gdbstub.c b/gdbstub.c
-index bfc7afb509..ce0dde2e24 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1169,6 +1169,7 @@ static int is_query_packet(const char *p, const char *query, char separator)
-  */
- static int gdb_handle_vcont(GDBState *s, const char *p)
- {
-+    GDBThreadIdKind vcontThreadType ;
-     int res, signal = 0;
-     char cur_action;
-     char *newstates;
-@@ -1218,12 +1219,23 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
-             goto out;
-         }
- 
--        if (*p++ != ':') {
-+        /*
-+         * In the case we have vCont;c or vCont;s - action is on all threads
-+         * Alternatively vCont;c;s:p1.1 is a possible, but meaningless format,
-+         * And in the else the "vCont;c:p1.1;... format is supported.
-+         */
-+        if (*p == '\0' || *p == ';') {
-+            vcontThreadType = GDB_ALL_THREADS ;
-+            pid = 1 ;
-+            tid = 1 ;
-+        } else if (*p++ == ':') {
-+            vcontThreadType = read_thread_id(p, &p, &pid, &tid) ;
-+        } else {
-             res = -ENOTSUP;
-             goto out;
-         }
- 
--        switch (read_thread_id(p, &p, &pid, &tid)) {
-+        switch (vcontThreadType) {
-         case GDB_READ_THREAD_ERR:
-             res = -EINVAL;
-             goto out;
--- 
-2.17.2
+config USB_OHCI
+    bool
+    default y if PCI_DEVICES
+    depends on PCI
+    select USB
+
+ Thomas
