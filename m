@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37794)
+Received: from eggs.gnu.org ([209.51.188.92]:37813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0io-0000DQ-AL
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0iq-0000Eo-AC
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gp0im-0000BK-Bl
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gp0io-0000Kv-9K
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:00:52 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Thu, 31 Jan 2019 01:59:42 +0100
-Message-Id: <20190131005945.20149-11-mreitz@redhat.com>
+Date: Thu, 31 Jan 2019 01:59:43 +0100
+Message-Id: <20190131005945.20149-12-mreitz@redhat.com>
 In-Reply-To: <20190131005945.20149-1-mreitz@redhat.com>
 References: <20190131005945.20149-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/13] nvme: use pci_dev directly in nvme_realize
+Subject: [Qemu-devel] [PULL 11/13] iotests.py: Add qemu_nbd_pipe()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +24,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-From: Li Qiang <liq3ea@163.com>
+In some cases, we may want to deal with qemu-nbd errors (e.g. by
+launching it in a different configuration until it no longer throws
+any).  In that case, we do not want its output ending up in the test
+output.
 
-There is no need to make another reference.
+It may still be useful for handling the error, though, so add a new
+function that works basically like qemu_nbd(), only that it returns the
+qemu-nbd output instead of making it end up in the log.  In contrast to
+qemu_img_pipe(), it does still return the exit code as well, though,
+because that is even more important for error handling.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190120055558.32984-4-liq3ea@163.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20181221234750.23577-2-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/block/nvme.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/iotests.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 0b77b49b36..8325b5e88a 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1238,7 +1238,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-     pci_conf[PCI_INTERRUPT_PIN] =3D 1;
-     pci_config_set_prog_interface(pci_dev->config, 0x2);
-     pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
--    pcie_endpoint_cap_init(&n->parent_obj, 0x80);
-+    pcie_endpoint_cap_init(pci_dev, 0x80);
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index cbedfaf1df..009c614ef7 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -201,6 +201,20 @@ def qemu_nbd(*args):
+     '''Run qemu-nbd in daemon mode and return the parent's exit code'''
+     return subprocess.call(qemu_nbd_args + ['--fork'] + list(args))
 =20
-     n->num_namespaces =3D 1;
-     n->reg_size =3D pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-@@ -1250,10 +1250,10 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
-r **errp)
-=20
-     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-                           "nvme", n->reg_size);
--    pci_register_bar(&n->parent_obj, 0,
-+    pci_register_bar(pci_dev, 0,
-         PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-         &n->iomem);
--    msix_init_exclusive_bar(&n->parent_obj, n->num_queues, 4, NULL);
-+    msix_init_exclusive_bar(pci_dev, n->num_queues, 4, NULL);
-=20
-     id->vid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VEND=
-OR_ID));
-@@ -1308,7 +1308,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-         n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-         memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-                               "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbs=
-z));
--        pci_register_bar(&n->parent_obj, NVME_CMBLOC_BIR(n->bar.cmbloc),
-+        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
-             PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64=
- |
-             PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
-=20
++def qemu_nbd_pipe(*args):
++    '''Run qemu-nbd in daemon mode and return both the parent's exit cod=
+e
++       and its output'''
++    subp =3D subprocess.Popen(qemu_nbd_args + ['--fork'] + list(args),
++                            stdout=3Dsubprocess.PIPE,
++                            stderr=3Dsubprocess.STDOUT,
++                            universal_newlines=3DTrue)
++    exitcode =3D subp.wait()
++    if exitcode < 0:
++        sys.stderr.write('qemu-nbd received signal %i: %s\n' %
++                         (-exitcode,
++                          ' '.join(qemu_nbd_args + ['--fork'] + list(arg=
+s))))
++    return exitcode, subp.communicate()[0]
++
+ def compare_images(img1, img2, fmt1=3Dimgfmt, fmt2=3Dimgfmt):
+     '''Return True if two image files are identical'''
+     return qemu_img('compare', '-f', fmt1,
 --=20
 2.20.1
