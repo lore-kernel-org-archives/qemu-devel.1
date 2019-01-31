@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50812)
+Received: from eggs.gnu.org ([209.51.188.92]:51222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGYB-0004e0-1q
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:54:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpGZK-0005jq-6i
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpGY8-0003mf-DV
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:54:54 -0500
-Resent-Message-Id: <E1gpGY8-0003mf-DV@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpGY8-0003kz-2H
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:54:52 -0500
-Message-ID: <154895724034.23946.8819614031885380390@ebba9967afc0>
-In-Reply-To: <20190131131520.23264.75724.stgit@pasha-VirtualBox>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpGZJ-00054b-6Y
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:06 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 31 Jan 2019 18:55:38 +0100
+Message-Id: <20190131175549.11691-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 09:54:03 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v11 00/25] Fixing record/replay and adding
- reverse debugging
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 00/11] qcow2: External data files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +19,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel.Dovgaluk@ispras.ru
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.comdovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEzMTEzMTUyMC4yMzI2
-NC43NTcyNC5zdGdpdEBwYXNoYS1WaXJ0dWFsQm94LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxMSAwMC8y
-NV0gRml4aW5nIHJlY29yZC9yZXBsYXkgYW5kIGFkZGluZyByZXZlcnNlIGRlYnVnZ2luZwpUeXBl
-OiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAxMzExMzE1MjAuMjMyNjQuNzU3MjQuc3RnaXRAcGFz
-aGEtVmlydHVhbEJveAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFt
-Ci4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjhiNDQ4MDhlZiBpY291bnQ6IGNs
-ZWFuIHVwIGNwdV9jYW5faW8gYmVmb3JlIGp1bXBpbmcgdG8gdGhlIG5leHQgYmxvY2sKMmY3ZDk0
-YjAxMCByZXBsYXk6IHJlbmFtZSBzdGVwLXJlbGF0ZWQgdmFyaWFibGVzIGFuZCBmdW5jdGlvbnMK
-ZTJiMjYxZmQ0ZCByZXBsYXk6IGZpeCByZXBsYXkgc2h1dGRvd24KMGEwODQzMDMwNiB1dGlsL3Fl
-bXUtdGltZXI6IHJlZmFjdG9yIGRlYWRsaW5lIGNhbGN1bGF0aW9uIGZvciBleHRlcm5hbCB0aW1l
-cnMKZDBjNmZkOGFiMCByZXBsYXk6IGRvY3VtZW50IGRldmVsb3BtZW50IHJ1bGVzCjIxZjE3MDk5
-OTIgcmVwbGF5OiBpbml0IHJ0YyBhZnRlciBlbmFibGluZyB0aGUgcmVwbGF5CjM4YWFjNjVkODcg
-cmVwbGF5OiBhZGQgQkggb25lc2hvdCBldmVudCBmb3IgYmxvY2sgbGF5ZXIKMDg3ZmM1NTYxZiBy
-ZXBsYXk6IGRlc2NyaWJlIHJldmVyc2UgZGVidWdnaW5nIGluIGRvY3MvcmVwbGF5LnR4dAozZmFh
-MzljMjA3IGdkYnN0dWI6IGFkZCByZXZlcnNlIGNvbnRpbnVlIHN1cHBvcnQgaW4gcmVwbGF5IG1v
-ZGUKMWVjYTJiZDNkMSBnZGJzdHViOiBhZGQgcmV2ZXJzZSBzdGVwIHN1cHBvcnQgaW4gcmVwbGF5
-IG1vZGUKYjZjNmVjMjZjYyByZXBsYXk6IGZsdXNoIHJyIHF1ZXVlIGJlZm9yZSBsb2FkaW5nIHRo
-ZSB2bXN0YXRlCmI4YTQ0OGQ3YTcgcmVwbGF5OiByZWZpbmUgcmVwbGF5LXRpbWUgbW9kdWxlCjQ2
-Yzc4MjAyNjggcmVwbGF5OiBpbXBsZW1lbnQgcmVwbGF5LXNlZWsgY29tbWFuZAo5ODJlMGRhYTM1
-IHJlcGxheTogaW50cm9kdWNlIGJyZWFrcG9pbnQgYXQgdGhlIHNwZWNpZmllZCBzdGVwCjRiODk1
-ZTkwOGQgcmVwbGF5OiBpbnRyb2R1Y2UgaW5mbyBobXAvcW1wIGNvbW1hbmQKMTZlYTE2ZmY0YiBx
-YXBpOiBpbnRyb2R1Y2UgcmVwbGF5Lmpzb24gZm9yIHJlY29yZC9yZXBsYXktcmVsYXRlZCBzdHVm
-ZgpiMDY4ZGM4Yzg4IHJlcGxheTogcHJvdmlkZSBhbiBhY2Nlc3NvciBmb3IgcnIgZmlsZW5hbWUK
-YmI4Yzk1NDgxYiBtaWdyYXRpb246IGludHJvZHVjZSBpY291bnQgZmllbGQgZm9yIHNuYXBzaG90
-cwplODFiNGI2MTU5IHFjb3cyOiBpbnRyb2R1Y2UgaWNvdW50IGZpZWxkIGZvciBzbmFwc2hvdHMK
-OTliNTg2NjkxMiByZXBsYXk6IGZpbmlzaCByZWNvcmQvcmVwbGF5IGJlZm9yZSBjbG9zaW5nIHRo
-ZSBkaXNrcwozYzhiZDUxYjU5IHJlcGxheTogZG9uJ3QgZHJhaW4vZmx1c2ggYmRydiBxdWV1ZSB3
-aGlsZSBSUiBpcyB3b3JraW5nCjVhZGQwN2ZiMjEgcmVwbGF5OiB1cGRhdGUgZG9jcyBmb3IgcmVj
-b3JkL3JlcGxheSB3aXRoIGJsb2NrIGRldmljZXMKMzZhOGU3OWJhMCByZXBsYXk6IGRpc2FibGUg
-ZGVmYXVsdCBzbmFwc2hvdCBmb3IgcmVjb3JkL3JlcGxheQo3ZDNhNTQ1YjdmIGJsb2NrOiBpbXBs
-ZW1lbnQgYmRydl9zbmFwc2hvdF9nb3RvIGZvciBibGtyZXBsYXkKZTA3ZTA1MjQ4OCByZXBsYXk6
-IGFkZCBtaXNzaW5nIGZpeCBmb3IgaW50ZXJuYWwgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMjUgQ2hlY2tpbmcgY29tbWl0IGUwN2UwNTI0ODhlNSAocmVwbGF5OiBhZGQgbWlzc2lu
-ZyBmaXggZm9yIGludGVybmFsIGZ1bmN0aW9uKQoyLzI1IENoZWNraW5nIGNvbW1pdCA3ZDNhNTQ1
-YjdmMjAgKGJsb2NrOiBpbXBsZW1lbnQgYmRydl9zbmFwc2hvdF9nb3RvIGZvciBibGtyZXBsYXkp
-CjMvMjUgQ2hlY2tpbmcgY29tbWl0IDM2YThlNzliYTAxNiAocmVwbGF5OiBkaXNhYmxlIGRlZmF1
-bHQgc25hcHNob3QgZm9yIHJlY29yZC9yZXBsYXkpCjQvMjUgQ2hlY2tpbmcgY29tbWl0IDVhZGQw
-N2ZiMjE5YyAocmVwbGF5OiB1cGRhdGUgZG9jcyBmb3IgcmVjb3JkL3JlcGxheSB3aXRoIGJsb2Nr
-IGRldmljZXMpCjUvMjUgQ2hlY2tpbmcgY29tbWl0IDNjOGJkNTFiNTk1OSAocmVwbGF5OiBkb24n
-dCBkcmFpbi9mbHVzaCBiZHJ2IHF1ZXVlIHdoaWxlIFJSIGlzIHdvcmtpbmcpCjYvMjUgQ2hlY2tp
-bmcgY29tbWl0IDk5YjU4NjY5MTJiMiAocmVwbGF5OiBmaW5pc2ggcmVjb3JkL3JlcGxheSBiZWZv
-cmUgY2xvc2luZyB0aGUgZGlza3MpCjcvMjUgQ2hlY2tpbmcgY29tbWl0IGU4MWI0YjYxNTk1NSAo
-cWNvdzI6IGludHJvZHVjZSBpY291bnQgZmllbGQgZm9yIHNuYXBzaG90cykKOC8yNSBDaGVja2lu
-ZyBjb21taXQgYmI4Yzk1NDgxYmVlIChtaWdyYXRpb246IGludHJvZHVjZSBpY291bnQgZmllbGQg
-Zm9yIHNuYXBzaG90cykKOS8yNSBDaGVja2luZyBjb21taXQgYjA2OGRjOGM4OGEyIChyZXBsYXk6
-IHByb3ZpZGUgYW4gYWNjZXNzb3IgZm9yIHJyIGZpbGVuYW1lKQoxMC8yNSBDaGVja2luZyBjb21t
-aXQgMTZlYTE2ZmY0YjZmIChxYXBpOiBpbnRyb2R1Y2UgcmVwbGF5Lmpzb24gZm9yIHJlY29yZC9y
-ZXBsYXktcmVsYXRlZCBzdHVmZikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojOTc6IApuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA3OCBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCAxMC8yNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8yNSBDaGVja2luZyBjb21t
-aXQgNGI4OTVlOTA4ZGVkIChyZXBsYXk6IGludHJvZHVjZSBpbmZvIGhtcC9xbXAgY29tbWFuZCkK
-V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
-UyBuZWVkIHVwZGF0aW5nPwojMTQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgMTI3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzI1IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjEyLzI1IENoZWNraW5nIGNvbW1pdCA5ODJlMGRhYTM1MjIgKHJl
-cGxheTogaW50cm9kdWNlIGJyZWFrcG9pbnQgYXQgdGhlIHNwZWNpZmllZCBzdGVwKQoxMy8yNSBD
-aGVja2luZyBjb21taXQgNDZjNzgyMDI2OGU1IChyZXBsYXk6IGltcGxlbWVudCByZXBsYXktc2Vl
-ayBjb21tYW5kKQpFUlJPUjogImZvbyogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojMTE4OiBG
-SUxFOiByZXBsYXkvcmVwbGF5LWRlYnVnZ2luZy5jOjEzNDoKKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGludDY0X3QqIHNuYXBzaG90X2ljb3VudCkKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMTU1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzI1IGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxNC8yNSBDaGVja2luZyBjb21taXQgYjhhNDQ4ZDdhNzBm
-IChyZXBsYXk6IHJlZmluZSByZXBsYXktdGltZSBtb2R1bGUpCjE1LzI1IENoZWNraW5nIGNvbW1p
-dCBiNmM2ZWMyNmNjYTUgKHJlcGxheTogZmx1c2ggcnIgcXVldWUgYmVmb3JlIGxvYWRpbmcgdGhl
-IHZtc3RhdGUpCjE2LzI1IENoZWNraW5nIGNvbW1pdCAxZWNhMmJkM2QxZTMgKGdkYnN0dWI6IGFk
-ZCByZXZlcnNlIHN0ZXAgc3VwcG9ydCBpbiByZXBsYXkgbW9kZSkKMTcvMjUgQ2hlY2tpbmcgY29t
-bWl0IDNmYWEzOWMyMDc2YiAoZ2Ric3R1YjogYWRkIHJldmVyc2UgY29udGludWUgc3VwcG9ydCBp
-biByZXBsYXkgbW9kZSkKMTgvMjUgQ2hlY2tpbmcgY29tbWl0IDA4N2ZjNTU2MWY4NiAocmVwbGF5
-OiBkZXNjcmliZSByZXZlcnNlIGRlYnVnZ2luZyBpbiBkb2NzL3JlcGxheS50eHQpCjE5LzI1IENo
-ZWNraW5nIGNvbW1pdCAzOGFhYzY1ZDg3OWQgKHJlcGxheTogYWRkIEJIIG9uZXNob3QgZXZlbnQg
-Zm9yIGJsb2NrIGxheWVyKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMTY6IApuZXcgZmlsZSBtb2RlIDEw
-MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMjQgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMTkvMjUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjAvMjUgQ2hlY2tpbmcgY29tbWl0
-IDIxZjE3MDk5OTJkNSAocmVwbGF5OiBpbml0IHJ0YyBhZnRlciBlbmFibGluZyB0aGUgcmVwbGF5
-KQoyMS8yNSBDaGVja2luZyBjb21taXQgZDBjNmZkOGFiMDg4IChyZXBsYXk6IGRvY3VtZW50IGRl
-dmVsb3BtZW50IHJ1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxODogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ2IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDIxLzI1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIyLzI1IENoZWNraW5nIGNvbW1pdCAw
-YTA4NDMwMzA2NzAgKHV0aWwvcWVtdS10aW1lcjogcmVmYWN0b3IgZGVhZGxpbmUgY2FsY3VsYXRp
-b24gZm9yIGV4dGVybmFsIHRpbWVycykKMjMvMjUgQ2hlY2tpbmcgY29tbWl0IGUyYjI2MWZkNGRh
-MyAocmVwbGF5OiBmaXggcmVwbGF5IHNodXRkb3duKQoyNC8yNSBDaGVja2luZyBjb21taXQgMmY3
-ZDk0YjAxMGMxIChyZXBsYXk6IHJlbmFtZSBzdGVwLXJlbGF0ZWQgdmFyaWFibGVzIGFuZCBmdW5j
-dGlvbnMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTc6IEZJTEU6IHJlcGxh
-eS9yZXBsYXktZGVidWdnaW5nLmM6MjQ2OgorICAgICAgICByZXBsYXlfc2VlayhyZXBsYXlfZ2V0
-X2N1cnJlbnRfaWNvdW50KCkgLSAxLCByZXBsYXlfc3RvcF92bV9kZWJ1ZywgJmVycik7Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI4MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAyNC8yNSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyNS8yNSBDaGVja2luZyBjb21taXQgZjhiNDQ4MDhl
-ZmYxIChpY291bnQ6IGNsZWFuIHVwIGNwdV9jYW5faW8gYmVmb3JlIGp1bXBpbmcgdG8gdGhlIG5l
-eHQgYmxvY2spCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMTkwMTMxMTMxNTIwLjIzMjY0Ljc1NzI0LnN0Z2l0QHBhc2hhLVZpcnR1YWxCb3gvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+There are use cases where raw images are given (e.g. existing physical
+disks), but advanced features like dirty bitmaps or backing files are
+wanted that require use of a proper image format like qcow2.
+
+This series adds an incompatible feature bit to qcow2 which allows to
+use an external data file: Metadata is kept in the qcow2 file like
+usual, but guest data is written to an external file. Clusters in the
+data file are not reference counted, instead we use a flat layout where
+host cluster offset =3D=3D guest cluster offset. The external data file i=
+s
+therefore readable as a raw image (though writing to it invalidates the
+associated qcow2 metadata). Features that require refcounting such as
+internal snapshots or compression are not supposed in such setups.
+
+There are a few reasons why this is still RFC:
+
+- The resulting code passes qemu-iotests, so we don't regress on normal
+  qcow2 files, but testing with external data files is still minimal
+  (converting an existing image and confirming it reads back unmodified;
+  installing a guest OS and making sure it boots). We need at least some
+  qemu-iotests cases.
+
+- QAPI documentation is missing
+
+- Discard isn't passed through to the data file yet
+
+- s->image_data_file isn't correct, it gets the value from the attached
+  node rather than just from the image file. This means that on header
+  updates we might be writing "back" a path that wasn't there before.
+
+- Probably something else I just can't remember now :-)
+
+Kevin Wolf (11):
+  qcow2: Extend spec for external data files
+  qcow2: Basic definitions for external data files
+  qcow2: Pass bs to qcow2_get_cluster_type()
+  qcow2: Prepare qcow2_get_cluster_type() for external data file
+  qcow2: Prepare count_contiguous_clusters() for external data file
+  qcow2: Don't assume 0 is an invalid cluster offset
+  qcow2: External file I/O
+  qcow2: Add basic data-file infrastructure
+  qcow2: Creating images with external data file
+  qcow2: Store data file name in the image
+  qcow2: Add data file to ImageInfoSpecificQCow2
+
+ qapi/block-core.json       |   5 +-
+ docs/interop/qcow2.txt     |  19 ++++-
+ block/qcow2.h              |  40 +++++++--
+ include/block/block_int.h  |   1 +
+ block/qcow2-bitmap.c       |   7 +-
+ block/qcow2-cache.c        |   6 +-
+ block/qcow2-cluster.c      | 144 +++++++++++++++++++-------------
+ block/qcow2-refcount.c     |  40 ++++++---
+ block/qcow2-snapshot.c     |   7 +-
+ block/qcow2.c              | 166 ++++++++++++++++++++++++++++++++++---
+ tests/qemu-iotests/031.out |   8 +-
+ tests/qemu-iotests/036.out |   4 +-
+ tests/qemu-iotests/061.out |  14 ++--
+ tests/qemu-iotests/082.out |  27 ++++++
+ 14 files changed, 372 insertions(+), 116 deletions(-)
+
+--=20
+2.20.1
