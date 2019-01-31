@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51461)
+Received: from eggs.gnu.org ([209.51.188.92]:51472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpGZu-0006HT-Hk
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpGZw-0006J6-DK
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpGZm-0005EY-Ip
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:37 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 31 Jan 2019 18:55:46 +0100
-Message-Id: <20190131175549.11691-9-kwolf@redhat.com>
-In-Reply-To: <20190131175549.11691-1-kwolf@redhat.com>
-References: <20190131175549.11691-1-kwolf@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gpGZp-0005FN-NK
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:38 -0500
+Resent-Message-Id: <E1gpGZp-0005FN-NK@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpGZe-0005AZ-BW
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:56:31 -0500
+Message-ID: <154895735984.23946.3842399831769514791@ebba9967afc0>
+In-Reply-To: <20190129121817.7109-1-jusual@mail.ru>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 08/11] qcow2: Add basic data-file
- infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 Jan 2019 09:56:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] arm: Clarify the logic of set_pc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, jusual@mail.ru, stefanha@redhat.com
 
-This adds a .bdrv_open option to specify the external data file node.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/block-core.json |  3 ++-
- block/qcow2.h        |  4 +++-
- block/qcow2.c        | 25 +++++++++++++++++++++++--
- 3 files changed, 28 insertions(+), 4 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7f6b4b3ddd..fc46396079 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2928,7 +2928,8 @@
-             '*l2-cache-entry-size': 'int',
-             '*refcount-cache-size': 'int',
-             '*cache-clean-interval': 'int',
--            '*encrypt': 'BlockdevQcow2Encryption' } }
-+            '*encrypt': 'BlockdevQcow2Encryption',
-+            '*data-file': 'BlockdevRef' } }
-=20
- ##
- # @SshHostKeyCheckMode:
-diff --git a/block/qcow2.h b/block/qcow2.h
-index c161970882..e2114900b4 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -91,6 +91,7 @@
-=20
- #define DEFAULT_CLUSTER_SIZE 65536
-=20
-+#define QCOW2_OPT_DATA_FILE "data-file"
- #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
- #define QCOW2_OPT_DISCARD_REQUEST "pass-discard-request"
- #define QCOW2_OPT_DISCARD_SNAPSHOT "pass-discard-snapshot"
-@@ -205,7 +206,8 @@ enum {
-     QCOW2_INCOMPAT_DATA_FILE        =3D 1 << QCOW2_INCOMPAT_DATA_FILE_BI=
-TNR,
-=20
-     QCOW2_INCOMPAT_MASK          =3D QCOW2_INCOMPAT_DIRTY
--                                 | QCOW2_INCOMPAT_CORRUPT,
-+                                 | QCOW2_INCOMPAT_CORRUPT
-+                                 | QCOW2_INCOMPAT_DATA_FILE,
- };
-=20
- /* Compatible feature bits */
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ac9934b3ed..376232d3f0 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1441,8 +1441,22 @@ static int coroutine_fn qcow2_do_open(BlockDriverS=
-tate *bs, QDict *options,
-         goto fail;
-     }
-=20
--    /* TODO Open external data file */
--    s->data_file =3D bs->file;
-+    /* Open external data file */
-+    if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
-+        s->data_file =3D bdrv_open_child(NULL, options, "data-file", bs,
-+                                       &child_file, false, errp);
-+        if (!s->data_file) {
-+            ret =3D -EINVAL;
-+            goto fail;
-+        }
-+    } else if (qdict_get(options, QCOW2_OPT_DATA_FILE)) {
-+        error_setg(errp, "'data-file' can only be set for images with an=
- "
-+                         "external data file");
-+        ret =3D -EINVAL;
-+        goto fail;
-+    } else {
-+        s->data_file =3D bs->file;
-+    }
-=20
-     /* qcow2_read_extension may have set up the crypto context
-      * if the crypt method needs a header region, some methods
-@@ -1613,6 +1627,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverSt=
-ate *bs, QDict *options,
-     return ret;
-=20
-  fail:
-+    if (has_data_file(bs)) {
-+        bdrv_unref_child(bs, s->data_file);
-+    }
-     g_free(s->unknown_header_fields);
-     cleanup_unknown_header_ext(bs);
-     qcow2_free_snapshots(bs);
-@@ -2232,6 +2249,10 @@ static void qcow2_close(BlockDriverState *bs)
-     g_free(s->image_backing_file);
-     g_free(s->image_backing_format);
-=20
-+    if (has_data_file(bs)) {
-+        bdrv_unref_child(bs, s->data_file);
-+    }
-+
-     qcow2_refcount_close(bs);
-     qcow2_free_snapshots(bs);
- }
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyOTEyMTgxNy43MTA5
+LTEtanVzdWFsQG1haWwucnUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
+IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
+dGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGFybTogQ2xhcmlmeSB0aGUgbG9n
+aWMgb2Ygc2V0X3BjKCkKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMTI5MTIxODE3Ljcx
+MDktMS1qdXN1YWxAbWFpbC5ydQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZWViMmJmYjY3ZiBhcm06
+IENsYXJpZnkgdGhlIGxvZ2ljIG9mIHNldF9wYygpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJP
+UjogQXV0aG9yIGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMy
+OiAKQXV0aG9yOiBKdWxpYSBTdXZvcm92YSB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25n
+bnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTAgbGluZXMgY2hlY2tlZAoK
+Q29tbWl0IGVlYjJiZmI2N2Y4ZCAoYXJtOiBDbGFyaWZ5IHRoZSBsb2dpYyBvZiBzZXRfcGMoKSkg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMjkxMjE4MTcuNzEwOS0xLWp1c3VhbEBtYWlsLnJ1
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
