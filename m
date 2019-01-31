@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57212)
+Received: from eggs.gnu.org ([209.51.188.92]:58103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpEuz-0000Hs-8D
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:10:23 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gpEzg-0001Vk-JQ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpEuq-0002PB-PN
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:10:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gpEuo-0002Ib-M9
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:10:10 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DE8E7AE99
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 16:10:06 +0000 (UTC)
-References: <1548946740-28714-1-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b63a1205-e71b-d90a-f7c5-78dac7bd32b1@redhat.com>
-Date: Thu, 31 Jan 2019 17:10:03 +0100
+	(envelope-from <luc.michel@greensocs.com>) id 1gpEzf-0005wL-Mc
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:15:12 -0500
+Received: from greensocs.com ([193.104.36.180]:49017)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <luc.michel@greensocs.com>) id 1gpEzf-0005rH-4p
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 11:15:11 -0500
+References: <20190130192403.13754-1-jcmvbkbc@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <ff956174-0839-0034-b659-a1e6e5096493@greensocs.com>
+Date: Thu, 31 Jan 2019 17:15:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <1548946740-28714-1-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio: PCI proxy devices should depend on
- CONFIG_VIRTIO_PCI
+In-Reply-To: <20190130192403.13754-1-jcmvbkbc@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wh9AAC8EZHxXjBVqs4sbUlnEwDcpjG3XY"
+Subject: Re: [Qemu-devel] [PATCH v2] gdbstub: allow killing QEMU via vKill
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>
 
-On 2019-01-31 15:59, Paolo Bonzini wrote:
-> ... otherwise, they break the build in the rare case where
-> CONFIG_VIRTIO_PCI is disabled (which will not be so rare
-> once kconfig goes in).
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wh9AAC8EZHxXjBVqs4sbUlnEwDcpjG3XY
+From: Luc Michel <luc.michel@greensocs.com>
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <ff956174-0839-0034-b659-a1e6e5096493@greensocs.com>
+Subject: Re: [PATCH v2] gdbstub: allow killing QEMU via vKill command
+References: <20190130192403.13754-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20190130192403.13754-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/30/19 8:24 PM, Max Filippov wrote:
+> With multiprocess extensions gdb uses 'vKill' packet instead of 'k' to
+> kill the inferior. Handle 'vKill' the same way 'k' was handled in the
+> presence of single process.
+>=20
+> Fixes: 7cf48f6752e5 ("gdbstub: add multiprocess support to
+> (f|s)ThreadInfo and ThreadExtraInfo")
+>=20
+> Cc: Luc Michel <luc.michel@greensocs.com>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+
 > ---
->  hw/virtio/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index ea7913d..d335dd0 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -11,7 +11,7 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-p
->  
->  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
->  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
-> -ifeq ($(CONFIG_PCI),y)
-> +ifeq ($(CONFIG_VIRTIO_PCI),y)
->  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
->  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
->  obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+> Changes v1->v2:
+> - terminate QEMU in the vKill packet handler regardless of whatever the=
 
-Miroslav hit this already, too:
+>   PID is or how many processes are attached [Luc Michel]
+>=20
+>  gdbstub.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/gdbstub.c b/gdbstub.c
+> index bfc7afb50968..96ffcd9d9d1d 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1383,6 +1383,10 @@ static int gdb_handle_packet(GDBState *s, const =
+char *line_buf)
+> =20
+>              put_packet(s, buf);
+>              break;
+> +        } else if (strncmp(p, "Kill;", 5) =3D=3D 0) {
+> +            /* Kill the target */
+> +            error_report("QEMU: Terminated via GDBstub");
+> +            exit(0);
+>          } else {
+>              goto unknown_command;
+>          }
+>=20
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06552.html
 
- Thomas
+--wh9AAC8EZHxXjBVqs4sbUlnEwDcpjG3XY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlxTHwoACgkQd8knW3Qn
+Tr5Evw//dFuyrnneRkz5D8FGLKW8W2medqlK/bhh3x8OvheOw4jzhbnzDvLo8hSe
+XhpdRzvJJCe0t6Ap68wFHcaY7cbLvfbBkUEteNeOGIwWNXfW49DE4TiCOA3DEEN/
+sSHCHnvWsZnLtx5NGjY4hifmgNyFKTXh1uAM7nb3kOO68m4KL26XiVCJat5AaT3d
+Y48DG0c6wi6ikFYMyZp2d9Du03C4rr4jNJ5HQgCzYeLQDyatmWfwf8QXscEol0cm
+QrZyqah9Os7/BHtMgdFeux7fNsGO1vI4y2aUyHXF4DSvf6lufm+FvnLrqEd7pMS/
+TjFN1GGjJ69DyiXSs1C5riUG/vsARFag2OtgXIyxUOK8abC9c4yVNB23ULFLmPGL
+X2IUYoNJwLOyXDY8q798Vp90Q8Fs/CmnBa4YuWsIhwy1TXFZSA48ilB5ADKmvx2X
+M6e++kwnO6o7FLyRA+1eBcsUu+IN/yn/ZsRFc0wsErqsrVn7qFYYIjeolr6eIRay
+1Wql9I1cj0tFmsR9xuQCDsEEzrBPyn7gQErBfsmfgNoAaEpYY+Lgy/nBhL+RaHwD
+Yu7VwxPfs72hSoJ+ZOyM6Hy2uMAHPFEJtHm/Cyq+DbzgcO4ynT8yQDfzgpCn5oO2
+4E1uZgKpMAU2i4ERD1MsF/2/iYpKiyLYsZLRyh1IfaWFGFuHm+Y=
+=XYMj
+-----END PGP SIGNATURE-----
+
+--wh9AAC8EZHxXjBVqs4sbUlnEwDcpjG3XY--
