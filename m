@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58575)
+Received: from eggs.gnu.org ([209.51.188.92]:59277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpIsH-0000Yc-Bu
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:23:50 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gpIv4-0002Vf-9K
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpIsF-0006jW-Qb
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:23:49 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<20190117185628.21862-19-crosa@redhat.com>
-	<f0426dd5-fd7a-daf0-9c0d-bd48bb36d8a7@redhat.com>
-	<af8f29c0-0b2b-ef65-2242-6b2c8ea08a3f@redhat.com>
-	<9400afcf-7c67-fd69-0b0d-1f7449ffc35c@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <b8de91bf-ee43-058a-850c-efa79577ac49@redhat.com>
-Date: Thu, 31 Jan 2019 15:23:31 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gpIv2-0008DT-9d
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:26:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43554
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gpIv1-0008B4-On
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 15:26:40 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0VKPwXh017478
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:26:37 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qc5umxc1s-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 15:26:36 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Thu, 31 Jan 2019 20:26:36 -0000
+References: <20190130155733.32742-1-david@redhat.com>
+	<20190130155733.32742-7-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Thu, 31 Jan 2019 15:26:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <9400afcf-7c67-fd69-0b0d-1f7449ffc35c@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190130155733.32742-7-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 18/18] Boot Linux Console Test: add a test
- for alpha + clipper
+Content-Transfer-Encoding: 7bit
+Message-Id: <81a84f89-218f-f51b-67cc-37d2c0c05aad@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] s390x/pci: Unplug remaining
+ requested devices on pcihost reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +44,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
+On 1/30/19 10:57 AM, David Hildenbrand wrote:
+> When resetting the guest we should unplug and remove all devices that
+> are still pending.
+> 
+> With this patch, the requested device will be unpluged on reboot
+> (S390_RESET_EXTERNAL and S390_RESET_REIPL, which reset the pcihost bridge
+> via qemu_devices_reset()).
+> 
+> This approach is similar to what's done for acpi PCI hotplug in
+> acpi_pcihp_reset() -> acpi_pcihp_update() ->
+> acpi_pcihp_update_hotplug_bus() -> acpi_pcihp_eject_slot().
+> 
+> s390_pci_generate_plug_event()'s will still be generated, I guess this
+> is not an issue. The same thing would happen right now when unplugging
+> a device just before starting the guest.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   hw/s390x/s390-pci-bus.c | 15 +++++++++++++++
+>   1 file changed, 15 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 867801ccf9..b9b0f44087 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -1092,6 +1092,21 @@ static void s390_pcihost_reset(DeviceState *dev)
+>   {
+>       S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+>       PCIBus *bus = s->parent_obj.bus;
+> +    S390PCIBusDevice *pbdev, *next;
+> +
+> +    /* Process all pending unplug requests */
+> +    QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
+> +        if (pbdev->unplug_requested) {
+> +            if (pbdev->summary_ind) {
+> +                pci_dereg_irqs(pbdev);
+> +            }
+> +            if (pbdev->iommu->enabled) {
+> +                pci_dereg_ioat(pbdev->iommu);
+> +            }
+> +            pbdev->state = ZPCI_FS_STANDBY;
+> +            s390_pci_perform_unplug(pbdev);
+> +        }
+> +    }
+>   
+>       /*
+>        * When resetting a PCI bridge, the assigned numbers are set to 0. So
+> 
 
+Just "talking out loud" to reaffirm my understanding:
 
-On 1/31/19 5:30 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/31/19 3:53 AM, Cleber Rosa wrote:
->> On 1/22/19 5:52 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 1/17/19 7:56 PM, Cleber Rosa wrote:
->>>> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
->>>> board and verify the serial is working.  One extra command added to
->>>> the QEMU command line is '-vga std', because the kernel used is
->>>> known to crash without it.
->>>>
->>>> If alpha is a target being built, "make check-acceptance" will
->>>> automatically include this test by the use of the "arch:alpha" tags.
->>>>
->>>> Alternatively, this test can be run using:
->>>>
->>>>     $ avocado run -t arch:alpha tests/acceptance
->>>>     $ avocado run -t machine:clipper tests/acceptance
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>>> ---
->>>>  .travis.yml                            |  2 +-
->>>>  scripts/qemu.py                        |  1 -
->>>>  tests/acceptance/boot_linux_console.py | 22 ++++++++++++++++++++++
->>>>  3 files changed, 23 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/.travis.yml b/.travis.yml
->>>> index 0d5a4b104b..73a113af87 100644
->>>> --- a/.travis.yml
->>>> +++ b/.travis.yml
->>>> @@ -187,7 +187,7 @@ matrix:
->>>> =20
->>>>      # Acceptance (Functional) tests
->>>>      - env:
->>>> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86=
-_64-softmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,a=
-rm-softmmu,s390x-softmmu"
->>>> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86=
-_64-softmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,a=
-rm-softmmu,s390x-softmmu,alpha-softmmu"
->>>>          - TEST_CMD=3D"make check-acceptance"
->>>>        addons:
->>>>          apt:
->>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>>> index 1531e28fc1..a704da418a 100644
->>>> --- a/scripts/qemu.py
->>>> +++ b/scripts/qemu.py
->>>> @@ -34,7 +34,6 @@ def kvm_available(target_arch=3DNone):
->>>> =20
->>>>  #: Maps machine types to the preferred console device types
->>>>  CONSOLE_DEV_TYPES =3D {
->>>> -    r'^clipper$': 'isa-serial',
->>>
->>> Why this change?
->>>
->>
->> Because we've come to conclusion (I believe :) that's better, whenever
->> possible, to let QEMU pick the default device type by machine.  The
->> discussion happened here:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg04582.html
->=20
-> I was expecting this change to be global (in a single patch previous to
-> the target-specific patches). If you prefer to do it a target at a time
-> I'm OK with it but you should add a comment about it in the commit IMHO=
-.
->=20
-> Regards,
->=20
-> Phil.
->=20
+The ..._unplug_request function will have already generated the
+deconfigure unplug event, and the unplug_requested flag will be set.
+Makes sense -- easy to follow. :)
 
-You're right, that's a better approach.  I've made this change part of
-the set_console() changes.
+The callback that this code is essentially replacing used to generate a
+CONFIGURED_TO_STBRES plug event, but as I recall from a previous
+conversation regarding PCI states, we can skip this event because we're
+removing the device from the guest during a reset here (there are a few
+reasons why we'd do this, but no sense in listing them here). Also makes
+sense to me.
 
-Thanks!
-- Cleber.
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
