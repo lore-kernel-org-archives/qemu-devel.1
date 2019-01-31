@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36008)
+Received: from eggs.gnu.org ([209.51.188.92]:36360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gp8xp-0003ab-1W
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:48:53 -0500
+	(envelope-from <groug@kaod.org>) id 1gp8yt-0004DC-Sb
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gp8xm-0006gt-88
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:48:50 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40229)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gp8xm-0006f5-2I
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:48:50 -0500
-Received: by mail-ot1-x344.google.com with SMTP id s5so2264299oth.7
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 01:48:49 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1gp8ys-0007NW-Cg
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:49:59 -0500
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:49587)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gp8ys-0007La-0q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 04:49:58 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.143.249])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 7C3AB14FDA6
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 10:49:55 +0100 (CET)
+Date: Thu, 31 Jan 2019 10:49:42 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190131104942.77053099@bahia.lan>
+In-Reply-To: <20190130233605.22163-2-muriloo@linux.ibm.com>
+References: <20190130233605.22163-1-muriloo@linux.ibm.com>
+	<20190130233605.22163-2-muriloo@linux.ibm.com>
 MIME-Version: 1.0
-References: <1544173675-14217-1-git-send-email-hongbo.zhang@linaro.org>
-	<1544173675-14217-3-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA9mF+WiPLW4yyv1aEMLTg2QK2krZvxyjCSsMziJtzx3Ug@mail.gmail.com>
-	<CAHmQWvCw5ndod93WqLXDgGxDERtRM3ee_qiLA+S34Y9X2JFvVQ@mail.gmail.com>
-	<CAFEAcA_+UhU56D7Yx5K8+=DbtUiiV8V7sX2UgxFKSkScUypxFg@mail.gmail.com>
-	<20190130092321.1ddbd29a@Igors-MacBook-Pro.local>
-In-Reply-To: <20190130092321.1ddbd29a@Igors-MacBook-Pro.local>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 09:48:37 +0000
-Message-ID: <CAFEAcA_i0dXNUfzKGBgn=riupWtBa=pGYYtY8LUqHdrf6YzbvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] hw/arm: add Arm SBSA reference
- machine, devices part
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] mmap-alloc: unfold qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cao jin <caoj.fnst@cn.fujitsu.com>, David Gibson <david@gibson.dropbear.id.au>, Fabiano Rosas <farosas@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, mopsfelder@gmail.com
 
-On Wed, 30 Jan 2019 at 08:23, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Tue, 29 Jan 2019 15:26:29 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Oh, I see now. I think this is a bug in boot.c and we should
-> > fix it by making the "this is a firmware boot" code path also
-> > do the arm_load_dtb() call. I'll send a patch.
-> pls, CC me on it as well.
->
-> I'm interested in it from hotplug + reboot perspective,
-> where we have a changed/bigger DTB on reboot as it contains new devices (cpus|memory)
->
-> loading rom like now doesn't work nice in case of reboot.
+On Wed, 30 Jan 2019 21:36:04 -0200
+Murilo Opsfelder Araujo <muriloo@linux.ibm.com> wrote:
 
-OK, but I don't think it will help you there, because all it
-does (after a pile of refactoring) is make the firmware-boot
-code path go through the if() clause at the bottom of
-arm_load_kernel() that calls arm_load_dtb().
+> Unfold parts of qemu_ram_mmap() for the sake of understanding, moving
+> declarations to the top, and keeping architecture-specifics in the
+> ifdef-else blocks.  No changes in the function behaviour.
+> 
+> Give ptr and ptr1 meaningful names:
+>   ptr  -> guardptr : pointer to the PROT_NONE guard region
+>   ptr1 -> ptr      : pointer to the mapped memory returned to caller
+> 
+> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> ---
 
-thanks
--- PMM
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  util/mmap-alloc.c | 53 ++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 34 insertions(+), 19 deletions(-)
+> 
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index fd329eccd8..f71ea038c8 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -77,11 +77,19 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>  
+>  void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>  {
+> +    int flags;
+> +    int guardfd;
+> +    size_t offset;
+> +    size_t total;
+> +    void *guardptr;
+> +    void *ptr;
+> +
+>      /*
+>       * Note: this always allocates at least one extra page of virtual address
+>       * space, even if size is already aligned.
+>       */
+> -    size_t total = size + align;
+> +    total = size + align;
+> +
+>  #if defined(__powerpc64__) && defined(__linux__)
+>      /* On ppc64 mappings in the same segment (aka slice) must share the same
+>       * page size. Since we will be re-allocating part of this segment
+> @@ -91,16 +99,22 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       * We do this unless we are using the system page size, in which case
+>       * anonymous memory is OK.
+>       */
+> -    int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
+> -    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+> -    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
+> +    flags = MAP_PRIVATE;
+> +    if (fd == -1 || qemu_fd_getpagesize(fd) == getpagesize()) {
+> +        guardfd = -1;
+> +        flags |= MAP_ANONYMOUS;
+> +    } else {
+> +        guardfd = fd;
+> +        flags |= MAP_NORESERVE;
+> +    }
+>  #else
+> -    void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+> +    guardfd = -1;
+> +    flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>  #endif
+> -    size_t offset;
+> -    void *ptr1;
+>  
+> -    if (ptr == MAP_FAILED) {
+> +    guardptr = mmap(0, total, PROT_NONE, flags, guardfd, 0);
+> +
+> +    if (guardptr == MAP_FAILED) {
+>          return MAP_FAILED;
+>      }
+>  
+> @@ -108,19 +122,20 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>      /* Always align to host page size */
+>      assert(align >= getpagesize());
+>  
+> -    offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
+> -    ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
+> -                MAP_FIXED |
+> -                (fd == -1 ? MAP_ANONYMOUS : 0) |
+> -                (shared ? MAP_SHARED : MAP_PRIVATE),
+> -                fd, 0);
+> -    if (ptr1 == MAP_FAILED) {
+> -        munmap(ptr, total);
+> +    flags = MAP_FIXED;
+> +    flags |= fd == -1 ? MAP_ANONYMOUS : 0;
+> +    flags |= shared ? MAP_SHARED : MAP_PRIVATE;
+> +    offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
+> +
+> +    ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE, flags, fd, 0);
+> +
+> +    if (ptr == MAP_FAILED) {
+> +        munmap(guardptr, total);
+>          return MAP_FAILED;
+>      }
+>  
+>      if (offset > 0) {
+> -        munmap(ptr, offset);
+> +        munmap(guardptr, offset);
+>      }
+>  
+>      /*
+> @@ -129,10 +144,10 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       */
+>      total -= offset;
+>      if (total > size + getpagesize()) {
+> -        munmap(ptr1 + size + getpagesize(), total - size - getpagesize());
+> +        munmap(ptr + size + getpagesize(), total - size - getpagesize());
+>      }
+>  
+> -    return ptr1;
+> +    return ptr;
+>  }
+>  
+>  void qemu_ram_munmap(void *ptr, size_t size)
