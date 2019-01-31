@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56602)
+Received: from eggs.gnu.org ([209.51.188.92]:58566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpKnI-0007p9-US
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:26:51 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gpL09-0002ks-Lm
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:40:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpKnF-0000rE-RP
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:26:48 -0500
-Resent-Message-Id: <E1gpKnF-0000rE-RP@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpKnD-0000kk-VR
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:26:44 -0500
-Message-ID: <154897357508.23946.17724296313152502738@ebba9967afc0>
-In-Reply-To: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <nsoffer@redhat.com>) id 1gpL05-00076U-S8
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:40:05 -0500
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:45868)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gpL05-00076I-JZ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 17:40:01 -0500
+Received: by mail-vk1-f193.google.com with SMTP id n126so1129114vke.12
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 14:40:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Jan 2019 14:26:16 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH v5 00/52] Support Kconfig in QEMU
+References: <20190131175549.11691-1-kwolf@redhat.com>
+	<20190131175549.11691-11-kwolf@redhat.com>
+In-Reply-To: <20190131175549.11691-11-kwolf@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Fri, 1 Feb 2019 00:39:47 +0200
+Message-ID: <CAMRbyyuzFfRgRLiKthXNXvnZ1fBbh=x-=F+xUYQDp+EbT2go6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH 10/11] qcow2: Store data file name in
+ the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,317 +29,439 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, yang.zhong@intel.com, thuth@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ4NDEwODMxLTE5NTUzLTEt
-Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0gg
-djUgMDAvNTJdIFN1cHBvcnQgS2NvbmZpZyBpbiBRRU1VCk1lc3NhZ2UtaWQ6IDE1NDg0MTA4MzEt
-MTk1NTMtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNlcmllcwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
-dGNoZXcvMTU0ODQxMDgzMS0xOTU1My0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5j
-b20gLT4gcGF0Y2hldy8xNTQ4NDEwODMxLTE5NTUzLTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlA
-cmVkaGF0LmNvbQpTdWJtb2R1bGUgJ2NhcHN0b25lJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L2NhcHN0b25lLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnY2Fwc3RvbmUnClN1Ym1vZHVsZSAn
-ZHRjJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
-dGggJ2R0YycKU3VibW9kdWxlICdyb21zL1FlbXVNYWNEcml2ZXJzJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L1FlbXVNYWNEcml2ZXJzLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9R
-ZW11TWFjRHJpdmVycycKU3VibW9kdWxlICdyb21zL1NMT0YnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvU0xPRi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvU0xPRicKU3VibW9kdWxl
-ICdyb21zL2lweGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvaXB4ZS5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3JvbXMvaXB4ZScKU3VibW9kdWxlICdyb21zL29wZW5iaW9zJyAoaHR0cHM6
-Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5iaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9t
-cy9vcGVuYmlvcycKU3VibW9kdWxlICdyb21zL29wZW5oYWNrd2FyZScgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9vcGVuaGFja3dhcmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29w
-ZW5oYWNrd2FyZScKU3VibW9kdWxlICdyb21zL3FlbXUtcGFsY29kZScgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC9xZW11LXBhbGNvZGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3Fl
-bXUtcGFsY29kZScKU3VibW9kdWxlICdyb21zL3NlYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvc2VhYmlvcy5naXQvKSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MnClN1
-Ym1vZHVsZSAncm9tcy9zZWFiaW9zLWhwcGEnIChodHRwczovL2dpdGh1Yi5jb20vaGRlbGxlci9z
-ZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScK
-U3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlv
-cy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21z
-L3NraWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVy
-ZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBz
-Oi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
-L3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFl
-bXUub3JnL2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
-L3UtYm9vdC1zYW00NjBleCcKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQt
-MycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2JlcmtlbGV5LXNvZnRmbG9hdC0zKSByZWdpc3Rl
-cmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0
-ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0aHViLmNvbS9jb3RhL2Jl
-cmtlbGV5LXRlc3RmbG9hdC0zKSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxl
-eS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5x
-ZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5
-Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fw
-c3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2Iw
-NjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2Vk
-IG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBp
-bnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFj
-RHJpdmVycyc6IGNoZWNrZWQgb3V0ICdkNGU3ZDdhYzY2M2ZjYjU1ZjFiOTM1NzU0NDVmY2JjYTM3
-MmYxN2E3JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
-U0xPRic6IGNoZWNrZWQgb3V0ICc5YjdhYjJmYTAyMDM0MWRlZThiZjlkZjZjOWNmNDAwMDNlMDEz
-NmRmJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvaXB4
-ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2VlOTAxYmI2ZTE3
-JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29w
-ZW5iaW9zJzogY2hlY2tlZCBvdXQgJzQ0MWE4NGQzYTY0MmExMGI5NDgzNjljNjNmMzIzNjdlOGZm
-NjM5NWInCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1vZHVsZSBwYXRo
-ICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1ZTQ1ZWYxZjY3
-OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1wYWxjb2RlJy4uLgpT
-dWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91dCAnNTFjMjM3ZDdl
-MjBkMDUxMDBlYWNhZGVlMmY2MWFiYzE3ZTZiYzA5NycKQ2xvbmluZyBpbnRvICdyb21zL3NlYWJp
-b3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2VkIG91dCAnYTY5OGM4
-OTk1ZmZiMjgzODI5NmVjMjg0ZmUzYzRhZDMzZGZjYTMwNycKQ2xvbmluZyBpbnRvICdyb21zL3Nl
-YWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJzogY2hlY2tl
-ZCBvdXQgJzFlZjk5YTAxNTcyYzI1ODFjMzBlMTZlNmZlNjllOWVhMmVmOTJjZTAnCkNsb25pbmcg
-aW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZ2FiaW9zJzogY2hl
-Y2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFjOTAxNWEnCkNsb25p
-bmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9za2lib290Jzog
-Y2hlY2tlZCBvdXQgJ2UwZWUyNGMyN2ExNzJiY2Y0ODJmNmYyYmM5MDVlNjIxMWMxMzRiY2MnCkNs
-b25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdCc6
-IGNoZWNrZWQgb3V0ICdkODVjYTAyOWYyNTdiNTNhOTZkYTZjMmZiNDIxZTc4YTAwM2E5OTQzJwpD
-bG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
-cy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBiMzkxNmYzM2U2MTdhODE1OTczYzVh
-NmRmNzcwNTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0Zmxv
-YXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzog
-Y2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNs
-b25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBw
-YXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1YTU5ZGNl
-YzE5MzI3Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3VpL2tleWNv
-ZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNrZWQgb3V0
-ICc2YjNkNzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCmE3OTc1MmEga2NvbmZpZzogaW50cm9kdWNlIENPTkZJR19URVNU
-X0RFVklDRVMKYzlkMGZlNiBpMzg2LXNvZnRtbXUubWFrOiByZW1vdmUgYWxsIENPTkZJR18qIGV4
-Y2VwdCBib2FyZHMgZGVmaW5pdGlvbnMKNmYxZTZhZiBpc2E6IGV4cHJlc3MgU3VwZXJJTyBkZXBl
-bmRlbmNpZXMgd2l0aCBLY29uZmlnCmRjOTU4MTEgdHBtOiBleHByZXNzIGRlcGVuZGVuY2llcyB3
-aXRoIEtjb25maWcKYWYyM2YxMSB2aXJ0aW86IGV4cHJlc3MgdmlydGlvIGRlcGVuZGVuY2llcyB3
-aXRoIEtjb25maWcKZmMyNTNhMCB2ZmlvOiBleHByZXNzIHZmaW8gZGVwZW5kZW5jaWVzIHdpdGgg
-S2NvbmZpZwowNDk2NGNhIGh5cGVydjogZXhwcmVzcyBkZXBlbmRlbmNpZXMgd2l0aCBrY29uZmln
-CjBlMjNhMWUgZGlzcGxheTogZXhwcmVzcyBkZXBlbmRlbmNpZXMgd2l0aCBrY29uZmlnCjhkMGU0
-N2QgcHRpbWVyOiBleHByZXNzIGRlcGVuZGVuY2llcyB3aXRoIEtjb25maWcKNzBmZmM2MyBpMmM6
-IGV4cHJlc3MgZGVwZW5kZW5jaWVzIHdpdGggS2NvbmZpZwoxYjEwMjcxIGkzODY6IGV4cHJlc3Mg
-ZGVwZW5kZW5jaWVzIHdpdGggS2NvbmZpZwo0ZDMwYTQ5IGlzYTogZXhwcmVzcyBkZXBlbmRlbmNp
-ZXMgd2l0aCBrY29uZmlnCmY0ZDUyMGYgc2NzaTogZXhwcmVzcyBkZXBlbmRlbmNpZXMgd2l0aCBL
-Y29uZmlnCjM2NDY1NjIgYnVpbGQ6IGNvbnZlcnQgdXNiLm1hayB0byBLY29uZmlnCjQ3NTg5YmQg
-YnVpbGQ6IGNvbnZlcnQgc291bmQubWFrIHRvIEtjb25maWcKYjk2NTc0ZSBidWlsZDogY29udmVy
-dCBwY2kubWFrIHRvIEtjb25maWcKOGNjNDM4YyBody9wY2kvTWFrZWZpbGUub2JqczogbWFrZSBw
-Y2llIGNvbmZpZ3VyYWJsZQpmY2M4YmI1IGlkZTogZXhwcmVzcyBkZXBlbmRlbmNpZXMgd2l0aCBL
-Y29uZmlnCjg2MGVmM2EgbWluaWtjb25mOiBpbXBsZW1lbnQgYWxsbm9jb25maWcgYW5kIGRlZmNv
-bmZpZwo5MzRlNDg1IGJ1aWxkOiBzd2l0Y2ggdG8gS2NvbmZpZwpkMjUzOTMzIGtjb25maWc6IGlu
-dHJvZHVjZSBrY29uZmlnIGZpbGVzCjQ3YzVlNWQgaHcvZGlzcGxheTogbWFrZSBlZGlkIGNvbmZp
-Z3VyYWJsZQozYzdmOTM1IG1pbmlrY29uZmlnOiBhZGQgc2VtYW50aWMgYW5hbHlzaXMKMzZiMDhm
-MiBtaW5pa2NvbmZpZzogYWRkIEFTVAoxYWQwYTI1IG1pbmlrY29uZmlnOiBhZGQgcGFyc2VyIHNr
-ZWxldG9uCjE3MzNkYmYgaHcvdmZpby9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgbmV3IENPTkZJR18q
-IHZhcmlhYmxlcyBmb3IgVkZJTyBjb3JlIGFuZCBQQ0kKYjg2Mzg5NyBody9pMmMvTWFrZWZpbGUu
-b2JqczogQ3JlYXRlIG5ldyBDT05GSUdfKiB2YXJpYWJsZXMgZm9yIEVFUFJPTSBhbmQgQUNQSSBj
-b250cm9sbGVyCmM5MWRkZDQgaHcvdHJpY29yZS9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgQ09ORklH
-XyogZm9yIHRyaWNvcmUKYTliZjhiZSBody9vcGVucmlzYy9NYWtlZmlsZS5vYmpzOiBDcmVhdGUg
-Q09ORklHXyogZm9yIG9wZW5yaXNjCmQyY2RkMmEgaHcvbW94aWUvTWFrZWZpbGUub2JqczogQ29u
-ZGl0aW9uYWxseSBidWlsZCBtb3hpZQo4OTI0MTBjIGh3L2hwcGEvTWFrZWZpbGUub2JqczogQ3Jl
-YXRlIENPTkZJR18qIGZvciBocHBhCmFlNjMzM2QgaHcvY3Jpcy9NYWtlZmlsZS5vYmpzOiBDcmVh
-dGUgQ09ORklHXyogZm9yIGNyaXMKYjlkMjkxMSBody9hbHBoYS9NYWtlZmlsZS5vYmpzOiBDcmVh
-dGUgQ09ORklHXyogZm9yIGFscGhhCjNjM2FjYWUgaHcvc3BhcmM2NC9NYWtlZmlsZS5vYmpzOiBD
-cmVhdGUgQ09ORklHXyogZm9yIHNwYXJjNjQKMGE5Njc4OCBody9yaXNjdi9NYWtlZmlsZS5vYmpz
-OiBDcmVhdGUgQ09ORklHXyogZm9yIHJpc2N2IGJvYXJkcwo1MzAxNjVlIGh3L25pb3MyL01ha2Vm
-aWxlLm9ianM6IENvbmRpdGlvbmFsbHkgYnVpbGQgbmlvczIKZmJhZWYwNCBody94dGVuc2EvTWFr
-ZWZpbGUub2JqczogQnVpbGQgeHRlbnNhX3NpbSBhbmQgeHRlbnNhX2ZwZ2EgY29uZGl0aW9uYWxs
-eQo5MDQzYmEyIGh3L2xtMzIvTWFrZWZpbGUub2JqczogQ29uZGl0aW9uYWxseSBidWlsZCBsbTMy
-IGFuZCBtaWxrbXlzdAo4MTEzMDNhIGh3L3NwYXJjL01ha2VmaWxlLm9ianM6IENPTkZJR18qIGZv
-ciBzdW40bSBhbmQgbGVvbjMgY3JlYXRlZAoyZjcxMzVmIGh3L3MzOTAvTWFrZWZpbGUub2Jqczog
-Q3JlYXRlIG5ldyBDT05GSUdfKiB2YXJpYWJsZXMgZm9yIHMzOTB4IGJvYXJkcyBhbmQgZGV2aWNl
-cwphZjhiNTY2IGh3L3NoNC9NYWtlZmlsZS5vYmpzOiBOZXcgQ09ORklHXyogdmFyaWJhbGVzIGNy
-ZWF0ZWQgZm9yIHNoNCBib2FyZHMgYW5kIGRldmljZQpjZWNjNDYxIGh3L3BwYy9NYWtlZmlsZS5v
-YmpzOiBCdWlsZCBhbGwgYm9hcmRzIGNvbmRpdGluYWxseSB3aXRoIENPTkZJR18qCjRiZjcxNzMg
-aHcvbWlwcy9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgQ09ORklHXyogZm9yIHI0aywgbWFsdGEsIG1p
-cHNzaW0gYm9hcmRzCjZhZWQ3OTkgaHcvbWljcm9ibGF6ZS9NYWtlZmlsZS5vYmpzOiBDcmVhdGUg
-Y29uZmlncyBmb3IgcGV0YWxvZ2l4IGFuZCB4aWxpbnggYm9hcmRzCjM5OTcxNTIgaHcvbTY4ay9N
-YWtlZmlsZS5vYmpzOiBDb25kaXRpb25hbGx5IGJ1aWxkIGJvYXJkcwo1MzBhODY2IGh3L2FybS9N
-YWtlZmlsZS5vYmpzOiBDT05GSUdfVklSVCBjcmVhdGVkIGZvciB2aXJ0IGJvYXJkCmZhNTQzNzMg
-aHcvaTM4Ni9NYWtlZmlsZS5vYmpzOiBCdWlsZCBwY19waWl4KiBhbmQgcGNfcTM1IGJvYXJkcwox
-YjZhYmI3IGJ1aWxkOiBhY3R1YWxseSB1c2UgQ09ORklHX1BBTQpmNmIxMmZiIGh3L3BjaS1ob3N0
-L01ha2VmaWxlLm9ianM6IG1ha2UgQ09ORklHUyBjbGVhciBmb3IgUENJIEVYUFJFU1MKMTRkOTY3
-YyB2ZmlvOiBtb3ZlIGNvbmRpdGlvbmFsIHVwIHRvIGh3L01ha2VmaWxlLm9ianMKYmZhNDQyOCBp
-ZGU6IHNwbGl0IGlvcG9ydCByZWdpc3RyYXRpb24gdG8gYSBzZXBhcmF0ZSBmaWxlCjMwNTkxMmQg
-YXJtOiBkaXNhYmxlIENPTkZJR19TRVJJQUxfSVNBCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzUy
-IENoZWNraW5nIGNvbW1pdCAzMDU5MTJkMjVlMWMgKGFybTogZGlzYWJsZSBDT05GSUdfU0VSSUFM
-X0lTQSkKMi81MiBDaGVja2luZyBjb21taXQgYmZhNDQyOGE0ZmE1IChpZGU6IHNwbGl0IGlvcG9y
-dCByZWdpc3RyYXRpb24gdG8gYSBzZXBhcmF0ZSBmaWxlKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM3MTog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
-aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTMyOiBGSUxFOiBody9pZGUvaW9wb3J0LmM6NTc6
-CisgICAgLyogPz8/IEFzc3VtZSBvbmx5IElTQSBhbmQgUENJIGNvbmZpZ3VyYXRpb25zLCBhbmQg
-dGhhdCB0aGUgUENJLUlTQQoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlICogb24gc3Vic2Vx
-dWVudCBsaW5lcwojMTMzOiBGSUxFOiBody9pZGUvaW9wb3J0LmM6NTg6CisgICAgLyogPz8/IEFz
-c3VtZSBvbmx5IElTQSBhbmQgUENJIGNvbmZpZ3VyYXRpb25zLCBhbmQgdGhhdCB0aGUgUENJLUlT
-QQorICAgICAgIGJyaWRnZSBoYXMgYmVlbiBzZXR1cCBwcm9wZXJseSB0byBhbHdheXMgcmVnaXN0
-ZXIgd2l0aCBJU0EuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcg
-Ki8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxMzM6IEZJTEU6IGh3L2lkZS9pb3BvcnQuYzo1ODoKKyAg
-ICAgICBicmlkZ2UgaGFzIGJlZW4gc2V0dXAgcHJvcGVybHkgdG8gYWx3YXlzIHJlZ2lzdGVyIHdp
-dGggSVNBLiAgKi8KCnRvdGFsOiAwIGVycm9ycywgNCB3YXJuaW5ncywgMTEzIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDIvNTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy81MiBDaGVja2luZyBj
-b21taXQgMTRkOTY3YzBiZDA2ICh2ZmlvOiBtb3ZlIGNvbmRpdGlvbmFsIHVwIHRvIGh3L01ha2Vm
-aWxlLm9ianMpCjQvNTIgQ2hlY2tpbmcgY29tbWl0IGY2YjEyZmIxNjJhMCAoaHcvcGNpLWhvc3Qv
-TWFrZWZpbGUub2JqczogbWFrZSBDT05GSUdTIGNsZWFyIGZvciBQQ0kgRVhQUkVTUykKNS81MiBD
-aGVja2luZyBjb21taXQgMWI2YWJiNzFkNTE1IChidWlsZDogYWN0dWFsbHkgdXNlIENPTkZJR19Q
-QU0pCjYvNTIgQ2hlY2tpbmcgY29tbWl0IGZhNTQzNzMyMTk4MyAoaHcvaTM4Ni9NYWtlZmlsZS5v
-YmpzOiBCdWlsZCBwY19waWl4KiBhbmQgcGNfcTM1IGJvYXJkcykKNy81MiBDaGVja2luZyBjb21t
-aXQgNTMwYTg2NjgzNzNkIChody9hcm0vTWFrZWZpbGUub2JqczogQ09ORklHX1ZJUlQgY3JlYXRl
-ZCBmb3IgdmlydCBib2FyZCkKOC81MiBDaGVja2luZyBjb21taXQgMzk5NzE1MmYyN2U1IChody9t
-NjhrL01ha2VmaWxlLm9ianM6IENvbmRpdGlvbmFsbHkgYnVpbGQgYm9hcmRzKQo5LzUyIENoZWNr
-aW5nIGNvbW1pdCA2YWVkNzk5ZGM1ZjcgKGh3L21pY3JvYmxhemUvTWFrZWZpbGUub2JqczogQ3Jl
-YXRlIGNvbmZpZ3MgZm9yIHBldGFsb2dpeCBhbmQgeGlsaW54IGJvYXJkcykKMTAvNTIgQ2hlY2tp
-bmcgY29tbWl0IDRiZjcxNzNhMWMzYiAoaHcvbWlwcy9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgQ09O
-RklHXyogZm9yIHI0aywgbWFsdGEsIG1pcHNzaW0gYm9hcmRzKQoxMS81MiBDaGVja2luZyBjb21t
-aXQgY2VjYzQ2MWFiMmZmIChody9wcGMvTWFrZWZpbGUub2JqczogQnVpbGQgYWxsIGJvYXJkcyBj
-b25kaXRpbmFsbHkgd2l0aCBDT05GSUdfKikKMTIvNTIgQ2hlY2tpbmcgY29tbWl0IGFmOGI1NjY5
-MmM4MiAoaHcvc2g0L01ha2VmaWxlLm9ianM6IE5ldyBDT05GSUdfKiB2YXJpYmFsZXMgY3JlYXRl
-ZCBmb3Igc2g0IGJvYXJkcyBhbmQgZGV2aWNlKQoxMy81MiBDaGVja2luZyBjb21taXQgMmY3MTM1
-ZjAxZWE4IChody9zMzkwL01ha2VmaWxlLm9ianM6IENyZWF0ZSBuZXcgQ09ORklHXyogdmFyaWFi
-bGVzIGZvciBzMzkweCBib2FyZHMgYW5kIGRldmljZXMpCjE0LzUyIENoZWNraW5nIGNvbW1pdCA4
-MTEzMDNhOTg0YjYgKGh3L3NwYXJjL01ha2VmaWxlLm9ianM6IENPTkZJR18qIGZvciBzdW40bSBh
-bmQgbGVvbjMgY3JlYXRlZCkKMTUvNTIgQ2hlY2tpbmcgY29tbWl0IDkwNDNiYTJkYTk1YSAoaHcv
-bG0zMi9NYWtlZmlsZS5vYmpzOiBDb25kaXRpb25hbGx5IGJ1aWxkIGxtMzIgYW5kIG1pbGtteXN0
-KQoxNi81MiBDaGVja2luZyBjb21taXQgZmJhZWYwNDMzNGMxIChody94dGVuc2EvTWFrZWZpbGUu
-b2JqczogQnVpbGQgeHRlbnNhX3NpbSBhbmQgeHRlbnNhX2ZwZ2EgY29uZGl0aW9uYWxseSkKMTcv
-NTIgQ2hlY2tpbmcgY29tbWl0IDUzMDE2NWUyZWY3NSAoaHcvbmlvczIvTWFrZWZpbGUub2Jqczog
-Q29uZGl0aW9uYWxseSBidWlsZCBuaW9zMikKMTgvNTIgQ2hlY2tpbmcgY29tbWl0IDBhOTY3ODgw
-NzkxZSAoaHcvcmlzY3YvTWFrZWZpbGUub2JqczogQ3JlYXRlIENPTkZJR18qIGZvciByaXNjdiBi
-b2FyZHMpCjE5LzUyIENoZWNraW5nIGNvbW1pdCAzYzNhY2FlOGNkNDAgKGh3L3NwYXJjNjQvTWFr
-ZWZpbGUub2JqczogQ3JlYXRlIENPTkZJR18qIGZvciBzcGFyYzY0KQoyMC81MiBDaGVja2luZyBj
-b21taXQgYjlkMjkxMWM5ZGQ2IChody9hbHBoYS9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgQ09ORklH
-XyogZm9yIGFscGhhKQoyMS81MiBDaGVja2luZyBjb21taXQgYWU2MzMzZDM3MzU0IChody9jcmlz
-L01ha2VmaWxlLm9ianM6IENyZWF0ZSBDT05GSUdfKiBmb3IgY3JpcykKMjIvNTIgQ2hlY2tpbmcg
-Y29tbWl0IDg5MjQxMGM1ZTliZCAoaHcvaHBwYS9NYWtlZmlsZS5vYmpzOiBDcmVhdGUgQ09ORklH
-XyogZm9yIGhwcGEpCjIzLzUyIENoZWNraW5nIGNvbW1pdCBkMmNkZDJhZjgyZDIgKGh3L21veGll
-L01ha2VmaWxlLm9ianM6IENvbmRpdGlvbmFsbHkgYnVpbGQgbW94aWUpCjI0LzUyIENoZWNraW5n
-IGNvbW1pdCBhOWJmOGJlNzVhMTAgKGh3L29wZW5yaXNjL01ha2VmaWxlLm9ianM6IENyZWF0ZSBD
-T05GSUdfKiBmb3Igb3BlbnJpc2MpCjI1LzUyIENoZWNraW5nIGNvbW1pdCBjOTFkZGQ0ZWFhZWYg
-KGh3L3RyaWNvcmUvTWFrZWZpbGUub2JqczogQ3JlYXRlIENPTkZJR18qIGZvciB0cmljb3JlKQoy
-Ni81MiBDaGVja2luZyBjb21taXQgYjg2Mzg5N2RlMzYyIChody9pMmMvTWFrZWZpbGUub2Jqczog
-Q3JlYXRlIG5ldyBDT05GSUdfKiB2YXJpYWJsZXMgZm9yIEVFUFJPTSBhbmQgQUNQSSBjb250cm9s
-bGVyKQoyNy81MiBDaGVja2luZyBjb21taXQgMTczM2RiZjVhYjEzIChody92ZmlvL01ha2VmaWxl
-Lm9ianM6IENyZWF0ZSBuZXcgQ09ORklHXyogdmFyaWFibGVzIGZvciBWRklPIGNvcmUgYW5kIFBD
-SSkKMjgvNTIgQ2hlY2tpbmcgY29tbWl0IDFhZDBhMjUzMzdjYyAobWluaWtjb25maWc6IGFkZCBw
-YXJzZXIgc2tlbGV0b24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTE6IEZJTEU6IHNjcmlwdHMv
-bWluaWtjb25mLnB5OjIxMjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICdFeHBlY3RlZCBp
-ZGVudGlmaWVyIHN0YXJ0aW5nIHdpdGggIkNPTkZJR18iJywgVE9LX05PTkUpCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzQ0OiBGSUxFOiBzY3JpcHRzL21pbmlrY29uZi5weToz
-MDU6CisgICAgICAgICAgICByYWlzZSBLY29uZmlnUGFyc2VyRXJyb3Ioc2VsZiwgJ2V4cGVjdGVk
-ICJzb3VyY2UiLCAiY29uZmlnIiwgaWRlbnRpZmllciwgJwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzM3MDogRklMRTogc2NyaXB0cy9taW5pa2NvbmYucHk6MzMxOgorICAgICAg
-ICAgICAgcmFpc2UgS2NvbmZpZ1BhcnNlckVycm9yKHNlbGYsICdleHBlY3RlZCAic291cmNlIiwg
-ImNvbmZpZyIgb3IgaWRlbnRpZmllcicpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzM5NTogRklMRTogc2NyaXB0cy9taW5pa2NvbmYucHk6MzU2OgorICAgICAgICBpZiBzZWxmLnNy
-Y1tzZWxmLmN1cnNvciArIGxlbmd0aF0uaXNhbG51bSgpIG9yIHNlbGYuc3JjW3NlbGYuY3Vyc29y
-ICsgbGVuZ3RoXSA9PSAnfCc6CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDQ4
-OiBGSUxFOiBzY3JpcHRzL21pbmlrY29uZi5weTo0MDk6CisgICAgICAgICAgICB3aGlsZSBzZWxm
-LnNyY1tzZWxmLmN1cnNvcl0uaXNhbG51bSgpIG9yIHNlbGYuc3JjW3NlbGYuY3Vyc29yXSA9PSAn
-Xyc6Cgp0b3RhbDogMSBlcnJvcnMsIDUgd2FybmluZ3MsIDQyNSBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAyOC81MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjkvNTIgQ2hlY2tpbmcgY29tbWl0
-IDM2YjA4ZjJlN2E3OSAobWluaWtjb25maWc6IGFkZCBBU1QpCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM4OTogRklMRTogc2NyaXB0cy9taW5pa2NvbmYucHk6ODY6CisgICAgICAg
-ICAgICAgICAgcmV0dXJuICJjb25maWcgJXMgZGVmYXVsdCAlcyBpZiAlcyIgJSAoc2VsZi5kZXN0
-LCB2YWx1ZSwgc2VsZi5jb25kKQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNzAgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMjkvNTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzAvNTIg
-Q2hlY2tpbmcgY29tbWl0IDNjN2Y5MzVhZmE5MSAobWluaWtjb25maWc6IGFkZCBzZW1hbnRpYyBh
-bmFseXNpcykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExMjogRklMRTogc2Ny
-aXB0cy9taW5pa2NvbmYucHk6MTAyOgorICAgICAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbign
-Y29udHJhZGljdGlvbiBiZXR3ZWVuIGNsYXVzZXMgd2hlbiBzZXR0aW5nICVzJyAlIHNlbGYpCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE1OiBGSUxFOiBzY3JpcHRzL21pbmlr
-Y29uZi5weToyMTQ6CisgICAgICAgICAgICBkZWJ1Z19wcmludChpLCAiLT4iLCBbc3RyKHgpIGZv
-ciB4IGluIHNlbGYucmVmZXJlbmNlZF92YXJzW2ldLm91dGdvaW5nXSkKCnRvdGFsOiAwIGVycm9y
-cywgMiB3YXJuaW5ncywgMjIzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDMwLzUyIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCjMxLzUyIENoZWNraW5nIGNvbW1pdCA0N2M1ZTVkMjUwNDAgKGh3L2Rp
-c3BsYXk6IG1ha2UgZWRpZCBjb25maWd1cmFibGUpCjMyLzUyIENoZWNraW5nIGNvbW1pdCBkMjUz
-OTMzODE1N2MgKGtjb25maWc6IGludHJvZHVjZSBrY29uZmlnIGZpbGVzKQpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiM0NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMTc2MjogRklMRTogc2NyaXB0cy9taW5pa2NvbmYucHk6NjM2OgorICAgICAgICBw
-cmludCAoIiVzOiBhdCBsZWFzdCBvbmUgYXJndW1lbnQgaXMgcmVxdWlyZWQiICUgYXJndlswXSwg
-ZmlsZT1zeXMuc3RkZXJyKQoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMzYzIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDMyLzUyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMzLzUyIENo
-ZWNraW5nIGNvbW1pdCA5MzRlNDg1NjljMTEgKGJ1aWxkOiBzd2l0Y2ggdG8gS2NvbmZpZykKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojNDgxOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDMyNSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzMy81MiBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgozNC81MiBDaGVja2luZyBjb21taXQgODYwZWYzYTcwOWM4ICht
-aW5pa2NvbmY6IGltcGxlbWVudCBhbGxub2NvbmZpZyBhbmQgZGVmY29uZmlnKQozNS81MiBDaGVj
-a2luZyBjb21taXQgZmNjOGJiNTBjZTQwIChpZGU6IGV4cHJlc3MgZGVwZW5kZW5jaWVzIHdpdGgg
-S2NvbmZpZykKMzYvNTIgQ2hlY2tpbmcgY29tbWl0IDhjYzQzOGNhMTIwOCAoaHcvcGNpL01ha2Vm
-aWxlLm9ianM6IG1ha2UgcGNpZSBjb25maWd1cmFibGUpCjM3LzUyIENoZWNraW5nIGNvbW1pdCBi
-OTY1NzRlOTU1MDAgKGJ1aWxkOiBjb252ZXJ0IHBjaS5tYWsgdG8gS2NvbmZpZykKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTIwOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
-IDEgd2FybmluZ3MsIDQ3MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzNy81MiBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgozOC81MiBDaGVja2luZyBjb21taXQgNDc1ODliZGJmMjZiIChidWlsZDog
-Y29udmVydCBzb3VuZC5tYWsgdG8gS2NvbmZpZykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzA6IApkZWxl
-dGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTEgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMzgvNTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzkvNTIg
-Q2hlY2tpbmcgY29tbWl0IDM2NDY1NjI2YTMxYSAoYnVpbGQ6IGNvbnZlcnQgdXNiLm1hayB0byBL
-Y29uZmlnKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNTg6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDM5
-LzUyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQwLzUyIENoZWNraW5nIGNvbW1pdCBmNGQ1
-MjBmMWY3ZmMgKHNjc2k6IGV4cHJlc3MgZGVwZW5kZW5jaWVzIHdpdGggS2NvbmZpZykKNDEvNTIg
-Q2hlY2tpbmcgY29tbWl0IDRkMzBhNDllMjY2MCAoaXNhOiBleHByZXNzIGRlcGVuZGVuY2llcyB3
-aXRoIGtjb25maWcpCjQyLzUyIENoZWNraW5nIGNvbW1pdCAxYjEwMjcxZGZiMTAgKGkzODY6IGV4
-cHJlc3MgZGVwZW5kZW5jaWVzIHdpdGggS2NvbmZpZykKNDMvNTIgQ2hlY2tpbmcgY29tbWl0IDcw
-ZmZjNjNjODYyMyAoaTJjOiBleHByZXNzIGRlcGVuZGVuY2llcyB3aXRoIEtjb25maWcpCjQ0LzUy
-IENoZWNraW5nIGNvbW1pdCA4ZDBlNDdkNWIwNDMgKHB0aW1lcjogZXhwcmVzcyBkZXBlbmRlbmNp
-ZXMgd2l0aCBLY29uZmlnKQo0NS81MiBDaGVja2luZyBjb21taXQgMGUyM2ExZTk5YTY3IChkaXNw
-bGF5OiBleHByZXNzIGRlcGVuZGVuY2llcyB3aXRoIGtjb25maWcpCjQ2LzUyIENoZWNraW5nIGNv
-bW1pdCAwNDk2NGNhYzgzOTcgKGh5cGVydjogZXhwcmVzcyBkZXBlbmRlbmNpZXMgd2l0aCBrY29u
-ZmlnKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5U
-QUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNSBsaW5lcyBjaGVja2VkCgpQYXRjaCA0Ni81MiBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0Ny81MiBDaGVja2luZyBjb21taXQgZmMyNTNhMDc0
-NzU1ICh2ZmlvOiBleHByZXNzIHZmaW8gZGVwZW5kZW5jaWVzIHdpdGggS2NvbmZpZykKNDgvNTIg
-Q2hlY2tpbmcgY29tbWl0IGFmMjNmMTFhYjk5YiAodmlydGlvOiBleHByZXNzIHZpcnRpbyBkZXBl
-bmRlbmNpZXMgd2l0aCBLY29uZmlnKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNzogCmRlbGV0ZWQgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDkgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNDgvNTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNDkvNTIgQ2hlY2tp
-bmcgY29tbWl0IGRjOTU4MTE0NzNhMSAodHBtOiBleHByZXNzIGRlcGVuZGVuY2llcyB3aXRoIEtj
-b25maWcpCjUwLzUyIENoZWNraW5nIGNvbW1pdCA2ZjFlNmFmNGQ5OTcgKGlzYTogZXhwcmVzcyBT
-dXBlcklPIGRlcGVuZGVuY2llcyB3aXRoIEtjb25maWcpCjUxLzUyIENoZWNraW5nIGNvbW1pdCBj
-OWQwZmU2ZTY3YWIgKGkzODYtc29mdG1tdS5tYWs6IHJlbW92ZSBhbGwgQ09ORklHXyogZXhjZXB0
-IGJvYXJkcyBkZWZpbml0aW9ucykKNTIvNTIgQ2hlY2tpbmcgY29tbWl0IGE3OTc1MmE4MDI0OSAo
-a2NvbmZpZzogaW50cm9kdWNlIENPTkZJR19URVNUX0RFVklDRVMpCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NDg0MTA4MzEtMTk1NTMtMS1naXQt
-c2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEByZWRoYXQuY29t
+On Thu, Jan 31, 2019 at 8:20 PM Kevin Wolf <kwolf@redhat.com> wrote:
+
+> Rather than requiring that the external data file node is passed
+> explicitly when creating the qcow2 node, store the filename in the
+> designated header extension during .bdrv_create and read it from there
+> as a default during .bdrv_open.
+>
+
+If the data file is the backing file, we don't need this change.
+
+
+
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qcow2.h              |  1 +
+>  block/qcow2.c              | 69 +++++++++++++++++++++++++++++++++++++-
+>  tests/qemu-iotests/082.out | 27 +++++++++++++++
+>  3 files changed, 96 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index e2114900b4..a1e2600643 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -341,6 +341,7 @@ typedef struct BDRVQcow2State {
+>       * override) */
+>      char *image_backing_file;
+>      char *image_backing_format;
+> +    char *image_data_file;
+>
+>      CoQueue compress_wait_queue;
+>      int nb_compress_threads;
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6cf862e8b9..4959bf16a4 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -398,6 +398,20 @@ static int qcow2_read_extensions(BlockDriverState
+> *bs, uint64_t start_offset,
+>  #endif
+>              break;
+>
+> +        case QCOW2_EXT_MAGIC_DATA_FILE:
+> +        {
+> +            s->image_data_file = g_malloc0(ext.len + 1);
+> +            ret = bdrv_pread(bs->file, offset, s->image_data_file,
+> ext.len);
+> +            if (ret < 0) {
+> +                error_setg_errno(errp, -ret, "ERROR: Could not data file
+> name");
+> +                return ret;
+> +            }
+> +#ifdef DEBUG_EXT
+> +            printf("Qcow2: Got external data file %s\n",
+> s->image_data_file);
+> +#endif
+> +            break;
+> +        }
+> +
+>          default:
+>              /* unknown magic - save it in case we need to rewrite the
+> header */
+>              /* If you add a new feature, make sure to also update the fast
+> @@ -1444,7 +1458,18 @@ static int coroutine_fn
+> qcow2_do_open(BlockDriverState *bs, QDict *options,
+>      /* Open external data file */
+>      if (s->incompatible_features & QCOW2_INCOMPAT_DATA_FILE) {
+>          s->data_file = bdrv_open_child(NULL, options, "data-file", bs,
+> -                                       &child_file, false, errp);
+> +                                       &child_file, false, &local_err);
+> +        if (!s->data_file) {
+> +            if (s->image_data_file) {
+> +                error_free(local_err);
+> +                local_err = NULL;
+> +                s->data_file = bdrv_open_child(s->image_data_file,
+> options,
+> +                                               "data-file", bs,
+> &child_file,
+> +                                               false, errp);
+> +            } else {
+> +                error_propagate(errp, local_err);
+> +            }
+> +        }
+>          if (!s->data_file) {
+>              ret = -EINVAL;
+>              goto fail;
+> @@ -1627,6 +1652,7 @@ static int coroutine_fn
+> qcow2_do_open(BlockDriverState *bs, QDict *options,
+>      return ret;
+>
+>   fail:
+> +    g_free(s->image_data_file);
+>      if (has_data_file(bs)) {
+>          bdrv_unref_child(bs, s->data_file);
+>      }
+> @@ -2246,6 +2272,7 @@ static void qcow2_close(BlockDriverState *bs)
+>      g_free(s->unknown_header_fields);
+>      cleanup_unknown_header_ext(bs);
+>
+> +    g_free(s->image_data_file);
+>      g_free(s->image_backing_file);
+>      g_free(s->image_backing_format);
+>
+> @@ -2422,6 +2449,19 @@ int qcow2_update_header(BlockDriverState *bs)
+>          buflen -= ret;
+>      }
+>
+> +    /* External data file header extension */
+> +    if (has_data_file(bs) && s->image_data_file) {
+> +        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_DATA_FILE,
+> +                             s->image_data_file,
+> strlen(s->image_data_file),
+> +                             buflen);
+> +        if (ret < 0) {
+> +            goto fail;
+> +        }
+> +
+> +        buf += ret;
+> +        buflen -= ret;
+> +    }
+> +
+>      /* Full disk encryption header pointer extension */
+>      if (s->crypto_header.offset != 0) {
+>          s->crypto_header.offset = cpu_to_be64(s->crypto_header.offset);
+> @@ -3166,6 +3206,7 @@ static int coroutine_fn qcow2_co_create_opts(const
+> char *filename, QemuOpts *opt
+>      QDict *qdict;
+>      Visitor *v;
+>      BlockDriverState *bs = NULL;
+> +    BlockDriverState *data_bs = NULL;
+>      Error *local_err = NULL;
+>      const char *val;
+>      int ret;
+> @@ -3229,6 +3270,26 @@ static int coroutine_fn qcow2_co_create_opts(const
+> char *filename, QemuOpts *opt
+>          goto finish;
+>      }
+>
+> +    /* Create and open an external data file (protocol layer) */
+> +    val = qdict_get_try_str(qdict, BLOCK_OPT_DATA_FILE);
+> +    if (val) {
+> +        ret = bdrv_create_file(val, opts, errp);
+> +        if (ret < 0) {
+> +            goto finish;
+> +        }
+> +
+> +        data_bs = bdrv_open(val, NULL, NULL,
+> +                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+> +                            errp);
+> +        if (data_bs == NULL) {
+> +            ret = -EIO;
+> +            goto finish;
+> +        }
+> +
+> +        qdict_del(qdict, BLOCK_OPT_DATA_FILE);
+> +        qdict_put_str(qdict, "data-file", data_bs->node_name);
+> +    }
+> +
+>      /* Set 'driver' and 'node' options */
+>      qdict_put_str(qdict, "driver", "qcow2");
+>      qdict_put_str(qdict, "file", bs->node_name);
+> @@ -3263,6 +3324,7 @@ static int coroutine_fn qcow2_co_create_opts(const
+> char *filename, QemuOpts *opt
+>  finish:
+>      qobject_unref(qdict);
+>      bdrv_unref(bs);
+> +    bdrv_unref(data_bs);
+>      qapi_free_BlockdevCreateOptions(create_options);
+>      return ret;
+>  }
+> @@ -4943,6 +5005,11 @@ static QemuOptsList qcow2_create_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "Image format of the base image"
+>          },
+> +        {
+> +            .name = BLOCK_OPT_DATA_FILE,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "File name of an external data file"
+> +        },
+>          {
+>              .name = BLOCK_OPT_ENCRYPT,
+>              .type = QEMU_OPT_BOOL,
+> diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+> index 0ce18c075b..7dc59f6075 100644
+> --- a/tests/qemu-iotests/082.out
+> +++ b/tests/qemu-iotests/082.out
+> @@ -48,6 +48,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -69,6 +70,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -90,6 +92,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -111,6 +114,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -132,6 +136,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -153,6 +158,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -174,6 +180,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -195,6 +202,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -231,6 +239,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -304,6 +313,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -325,6 +335,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -346,6 +357,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -367,6 +379,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -388,6 +401,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -409,6 +423,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -430,6 +445,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -451,6 +467,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -487,6 +504,7 @@ Supported options:
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -568,6 +586,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -590,6 +609,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -612,6 +632,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -634,6 +655,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -656,6 +678,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -678,6 +701,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -700,6 +724,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -722,6 +747,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> @@ -761,6 +787,7 @@ Creation options for 'qcow2':
+>    backing_fmt=<str>      - Image format of the base image
+>    cluster_size=<size>    - qcow2 cluster size
+>    compat=<str>           - Compatibility level (0.10 or 1.1)
+> +  data_file=<str>        - File name of an external data file
+>    encrypt.cipher-alg=<str> - Name of encryption cipher algorithm
+>    encrypt.cipher-mode=<str> - Name of encryption cipher mode
+>    encrypt.format=<str>   - Encrypt the image, format choices: 'aes',
+> 'luks'
+> --
+> 2.20.1
+>
+>
+>
