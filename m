@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50179)
+Received: from eggs.gnu.org ([209.51.188.92]:50408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gp22e-00075m-2i
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:25 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gp248-0007rE-S2
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:26:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1gp22a-0004yy-AJ
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:22 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:38668)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gp22Y-0004xO-Ml
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:25:19 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id v13so1574073wrw.5
-	for <qemu-devel@nongnu.org>; Wed, 30 Jan 2019 18:25:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20190130031427.13129-1-jasowang@redhat.com>
-In-Reply-To: <20190130031427.13129-1-jasowang@redhat.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Thu, 31 Jan 2019 10:25:04 +0800
-Message-ID: <CAK3tnvKVBthFyYSc+kummftPUCQwCpaYVF7H8HHhOUmmoB0GGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain
- socket through fd
+	(envelope-from <jsnow@redhat.com>) id 1gp247-0005pA-Qm
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 21:26:56 -0500
+From: John Snow <jsnow@redhat.com>
+Date: Wed, 30 Jan 2019 21:26:48 -0500
+Message-Id: <20190131022648.14264-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests/236: fix transaction kwarg order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +17,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, Jan 30, 2019 at 11:14 AM Jason Wang <jasowang@redhat.com> wrote:
+It's not enough to order the kwargs for consistent QMP log output,
+we must also sort any sub-dictionaries in lists that appear as values.
 
-> The tests tries to let qemu server mode to process the connection
-> which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
-> "x-oob", offer capability "oob" unconditionally"). This is because the
-> filter may try to mirror the packets before UNIX socket object is
-> ready (connected was set to true) from the view of qemu. In this case
-> the packet will be dropped silently.
->
-> Fixing this by passing pre-connected socket created by socketpair() to
-> qemu through fd.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Zhang Chen <zhangckid@gmail.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
->
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ tests/qemu-iotests/236.out    | 56 +++++++++++++++++------------------
+ tests/qemu-iotests/iotests.py | 21 ++++++-------
+ 2 files changed, 39 insertions(+), 38 deletions(-)
 
-Looks good for me.
-Reviewed-by: Zhang Chen <zhangckid@gmail.com>
-
-By the way: Do we need add ASCII diagram to explain data flow in this file
-or commit log?
-
-Thanks
-Zhang Chen
-
-
-> ---
-> Changes from v1:
-> - close the socket pairs in the end of test
-> ---
->  tests/test-filter-mirror.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
->
-> diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-> index 7ab2aed8a0..d942c74a3f 100644
-> --- a/tests/test-filter-mirror.c
-> +++ b/tests/test-filter-mirror.c
-> @@ -21,10 +21,9 @@
->
->  static void test_mirror(void)
->  {
-> -    int send_sock[2], recv_sock;
-> +    int send_sock[2], recv_sock[2];
->      uint32_t ret = 0, len = 0;
->      char send_buf[] = "Hello! filter-mirror~";
-> -    char sock_path[] = "filter-mirror.XXXXXX";
->      char *recv_buf;
->      uint32_t size = sizeof(send_buf);
->      size = htonl(size);
-> @@ -38,18 +37,15 @@ static void test_mirror(void)
->      ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
->      g_assert_cmpint(ret, !=, -1);
->
-> -    ret = mkstemp(sock_path);
-> +    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, recv_sock);
->      g_assert_cmpint(ret, !=, -1);
->
->      qts = qtest_initf(
->          "-netdev socket,id=qtest-bn0,fd=%d "
->          "-device %s,netdev=qtest-bn0,id=qtest-e0 "
-> -        "-chardev socket,id=mirror0,path=%s,server,nowait "
-> +        "-chardev socket,id=mirror0,fd=%d "
->          "-object
-> filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0 "
-> -        , send_sock[1], devstr, sock_path);
-> -
-> -    recv_sock = unix_connect(sock_path, NULL);
-> -    g_assert_cmpint(recv_sock, !=, -1);
-> +        , send_sock[1], devstr, recv_sock[1]);
->
->      struct iovec iov[] = {
->          {
-> @@ -67,18 +63,20 @@ static void test_mirror(void)
->      g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
->      close(send_sock[0]);
->
-> -    ret = qemu_recv(recv_sock, &len, sizeof(len), 0);
-> +    ret = qemu_recv(recv_sock[0], &len, sizeof(len), 0);
->      g_assert_cmpint(ret, ==, sizeof(len));
->      len = ntohl(len);
->
->      g_assert_cmpint(len, ==, sizeof(send_buf));
->      recv_buf = g_malloc(len);
-> -    ret = qemu_recv(recv_sock, recv_buf, len, 0);
-> +    ret = qemu_recv(recv_sock[0], recv_buf, len, 0);
->      g_assert_cmpstr(recv_buf, ==, send_buf);
->
->      g_free(recv_buf);
-> -    close(recv_sock);
-> -    unlink(sock_path);
-> +    close(send_sock[0]);
-> +    close(send_sock[1]);
-> +    close(recv_sock[0]);
-> +    close(recv_sock[1]);
->      qtest_quit(qts);
->  }
->
-> --
-> 2.17.1
->
->
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index 1dad24db0d..bb2d71ea5e 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -45,23 +45,23 @@ write -P0xcd 0x3ff0000 64k
+     "actions": [
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapB"
++          "name": "bitmapB",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-disable"
+       },
+       {
+         "data": {
+-          "node": "drive0",
++          "granularity": 65536,
+           "name": "bitmapC",
+-          "granularity": 65536
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-add"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapA"
++          "name": "bitmapA",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-clear"
+       },
+@@ -105,30 +105,30 @@ write -P0xcd 0x3ff0000 64k
+     "actions": [
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapB"
++          "name": "bitmapB",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-disable"
+       },
+       {
+         "data": {
+-          "node": "drive0",
++          "granularity": 65536,
+           "name": "bitmapC",
+-          "granularity": 65536
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-add"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapC"
++          "name": "bitmapC",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-disable"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapC"
++          "name": "bitmapC",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-enable"
+       }
+@@ -158,15 +158,15 @@ write -P0xea 0x3fe0000 64k
+     "actions": [
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapA"
++          "name": "bitmapA",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-disable"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "name": "bitmapC"
++          "name": "bitmapC",
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-disable"
+       }
+@@ -209,21 +209,21 @@ write -P0xea 0x3fe0000 64k
+     "actions": [
+       {
+         "data": {
+-          "node": "drive0",
+           "disabled": true,
++          "granularity": 65536,
+           "name": "bitmapD",
+-          "granularity": 65536
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-add"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "target": "bitmapD",
+           "bitmaps": [
+             "bitmapB",
+             "bitmapC"
+-          ]
++          ],
++          "node": "drive0",
++          "target": "bitmapD"
+         },
+         "type": "block-dirty-bitmap-merge"
+       },
+@@ -273,21 +273,21 @@ write -P0xea 0x3fe0000 64k
+     "actions": [
+       {
+         "data": {
+-          "node": "drive0",
+           "disabled": true,
++          "granularity": 65536,
+           "name": "bitmapD",
+-          "granularity": 65536
++          "node": "drive0"
+         },
+         "type": "block-dirty-bitmap-add"
+       },
+       {
+         "data": {
+-          "node": "drive0",
+-          "target": "bitmapD",
+           "bitmaps": [
+             "bitmapB",
+             "bitmapC"
+-          ]
++          ],
++          "node": "drive0",
++          "target": "bitmapD"
+         },
+         "type": "block-dirty-bitmap-merge"
+       }
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index cbedfaf1df..76ad52b358 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -76,15 +76,16 @@ def qemu_img(*args):
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+     return exitcode
+ 
+-def ordered_kwargs(kwargs):
+-    # kwargs prior to 3.6 are not ordered, so:
+-    od = OrderedDict()
+-    for k, v in sorted(kwargs.items()):
+-        if isinstance(v, dict):
+-            od[k] = ordered_kwargs(v)
+-        else:
+-            od[k] = v
+-    return od
++def ordered_qmp(qmsg):
++    # Dictionaries are not ordered prior to 3.6, therefore:
++    if isinstance(qmsg, list):
++        return [ordered_qmp(atom) for atom in qmsg]
++    if isinstance(qmsg, dict):
++        od = OrderedDict()
++        for k, v in sorted(qmsg.items()):
++            od[k] = ordered_qmp(v)
++        return od
++    return qmsg
+ 
+ def qemu_img_create(*args):
+     args = list(args)
+@@ -491,7 +492,7 @@ class VM(qtest.QEMUQtestMachine):
+     def qmp_log(self, cmd, filters=[], indent=None, **kwargs):
+         full_cmd = OrderedDict((
+             ("execute", cmd),
+-            ("arguments", ordered_kwargs(kwargs))
++            ("arguments", ordered_qmp(kwargs))
+         ))
+         log(full_cmd, filters, indent=indent)
+         result = self.qmp(cmd, **kwargs)
+-- 
+2.17.2
