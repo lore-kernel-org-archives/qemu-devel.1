@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57508)
+Received: from eggs.gnu.org ([209.51.188.92]:57515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gpCg9-0004ux-Eg
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:46:55 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gpCg9-0004vF-R3
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:46:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gpCg7-0003YI-0l
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gpCg7-0003Yf-6N
 	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:46:53 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Thu, 31 Jan 2019 16:46:44 +0300
-Message-Id: <1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Thu, 31 Jan 2019 16:46:45 +0300
+Message-Id: <1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 In-Reply-To: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap directory
- entries
+Subject: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension new
+ test 239
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,246 +23,243 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-In the 'Format specific information' section of the 'qemu-img info'
-command output, the supplemental information about existing QCOW2
-bitmaps will be shown, such as a bitmap name, flags and granularity:
-
-image: /vz/vmprivate/VM1/harddisk.hdd
-file format: qcow2
-virtual size: 64G (68719476736 bytes)
-disk size: 3.0M
-cluster_size: 1048576
-Format specific information:
-    compat: 1.1
-    lazy refcounts: true
-    bitmaps:
-        [0]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: back-up1
-            unknown flags: 4
-            granularity: 65536
-        [1]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: back-up2
-            unknown flags: 8
-            granularity: 65536
-    refcount bits: 16
-    corrupt: false
+A new test file 239 added to the qemu-iotests set. It checks
+the output format of 'qemu-img info' for bitmaps extension of
+qcow2 specific information.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/qcow2-bitmap.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        | 11 +++++++-
- block/qcow2.h        |  2 ++
- qapi/block-core.json | 40 ++++++++++++++++++++++++++-
- 4 files changed, 129 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/239     |  74 ++++++++++++++++++++++++++
+ tests/qemu-iotests/239.out | 130 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 205 insertions(+)
+ create mode 100755 tests/qemu-iotests/239
+ create mode 100644 tests/qemu-iotests/239.out
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b946301..516994e 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1006,6 +1006,84 @@ fail:
-     return false;
- }
- 
-+
-+static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
-+{
-+    Qcow2BitmapInfoFlagsList *list = NULL;
-+    Qcow2BitmapInfoFlagsList **plist = &list;
-+    int i;
-+
-+    static const struct {
-+        int bme;  /* Bitmap directory entry flags */
-+        int info; /* The flags to report to the user */
-+    } map[] = {
-+        { BME_FLAG_IN_USE, QCOW2_BITMAP_INFO_FLAGS_IN_USE },
-+        { BME_FLAG_AUTO,   QCOW2_BITMAP_INFO_FLAGS_AUTO },
-+    };
-+
-+    int map_size = sizeof(map) / sizeof(map[0]);
-+
-+    for (i = 0; i < map_size; ++i) {
-+        if (flags & map[i].bme) {
-+            Qcow2BitmapInfoFlagsList *entry =
-+                g_new0(Qcow2BitmapInfoFlagsList, 1);
-+            entry->value = map[i].info;
-+            *plist = entry;
-+            plist = &entry->next;
-+            flags &= ~map[i].bme;
-+        }
-+    }
-+    /* Check if the BME_* mapping above is complete */
-+    assert(!flags);
-+
-+    return list;
-+}
-+
-+/*
-+ * qcow2_get_bitmap_info_list()
-+ * Returns a list of QCOW2 bitmap details.
-+ * In case of no bitmaps, the function returns NULL and
-+ * the @errp parameter is not set.
-+ * When bitmap information can not be obtained, the function returns
-+ * NULL and the @errp parameter is set.
-+ */
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+    Qcow2BitmapInfoList *list = NULL;
-+    Qcow2BitmapInfoList **plist = &list;
-+
-+    if (s->nb_bitmaps == 0) {
-+        return NULL;
-+    }
-+
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
-+    if (bm_list == NULL) {
-+        return NULL;
-+    }
-+
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
-+        Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
-+        info->granularity = 1U << bm->granularity_bits;
-+        info->name = g_strdup(bm->name);
-+        info->flags = get_bitmap_info_flags(bm->flags & ~BME_RESERVED_FLAGS);
-+        info->unknown_flags = bm->flags & BME_RESERVED_FLAGS;
-+        info->has_unknown_flags = !!info->unknown_flags;
-+        obj->value = info;
-+        *plist = obj;
-+        plist = &obj->next;
-+    }
-+
-+    bitmap_list_free(bm_list);
-+
-+    return list;
-+}
-+
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp)
- {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 27e5a2c..a5607f1 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4386,7 +4386,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-     spec_info = g_new(ImageInfoSpecific, 1);
-     *spec_info = (ImageInfoSpecific){
-         .type  = IMAGE_INFO_SPECIFIC_KIND_QCOW2,
--        .u.qcow2.data = g_new(ImageInfoSpecificQCow2, 1),
-+        .u.qcow2.data = g_new0(ImageInfoSpecificQCow2, 1),
-     };
-     if (s->qcow_version == 2) {
-         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
-@@ -4394,6 +4394,13 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-             .refcount_bits      = s->refcount_bits,
-         };
-     } else if (s->qcow_version == 3) {
-+        Qcow2BitmapInfoList *bitmaps;
-+        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            qapi_free_ImageInfoSpecific(spec_info);
-+            return NULL;
-+        }
-         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
-             .compat             = g_strdup("1.1"),
-             .lazy_refcounts     = s->compatible_features &
-@@ -4403,6 +4410,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-                                   QCOW2_INCOMPAT_CORRUPT,
-             .has_corrupt        = true,
-             .refcount_bits      = s->refcount_bits,
-+            .has_bitmaps        = !!bitmaps,
-+            .bitmaps            = bitmaps,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 438a1de..13e8964 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -684,6 +684,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp);
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 91685be..271e0df 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -69,6 +69,8 @@
- # @encrypt: details about encryption parameters; only set if image
- #           is encrypted (since 2.10)
- #
-+# @bitmaps: A list of qcow2 bitmap details (since 4.0)
+diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
+new file mode 100755
+index 0000000..bee7943
+--- /dev/null
++++ b/tests/qemu-iotests/239
+@@ -0,0 +1,74 @@
++#!/usr/bin/env python
 +#
- # Since: 1.7
- ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -77,7 +79,8 @@
-       '*lazy-refcounts': 'bool',
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
--      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-+      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-+      '*bitmaps': ['Qcow2BitmapInfo']
-   } }
- 
- ##
-@@ -454,6 +457,41 @@
-            'status': 'DirtyBitmapStatus'} }
- 
- ##
-+# @Qcow2BitmapInfoFlags:
++# Test for qcow2 bitmap printed information
 +#
-+# An enumeration of flags that a bitmap can report to the user.
++# Copyright (c) 2018 Virtuozzo International GmbH
 +#
-+# @in-use: The bitmap was not saved correctly and may be inconsistent.
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# @auto: The bitmap must reflect all changes of the virtual disk by any
-+#        application that would write to this qcow2 file.
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
 +#
-+# Since: 4.0
-+##
-+{ 'enum': 'Qcow2BitmapInfoFlags',
-+  'data': ['in-use', 'auto'] }
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+##
-+# @Qcow2BitmapInfo:
-+#
-+# Qcow2 bitmap information.
-+#
-+# @name: the name of the bitmap
-+#
-+# @granularity: granularity of the bitmap in bytes
-+#
-+# @flags: recognized flags of the bitmap
-+#
-+# @unknown-flags: any remaining flags not recognized by the current qemu version
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'Qcow2BitmapInfo',
-+  'data': {'name': 'str', 'granularity': 'uint32',
-+           'flags': ['Qcow2BitmapInfoFlags'],
-+           '*unknown-flags': 'uint32' } }
++import iotests
++import json
++from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
++                    file_path, log
 +
-+##
- # @BlockLatencyHistogramInfo:
- #
- # Block latency histogram.
++iotests.verify_image_format(supported_fmts=['qcow2'])
++
++disk = file_path('disk')
++chunk = 256
++
++def print_bitmap():
++    log('qemu-img info dump:\n')
++    iotests.img_info_log(disk, extra_args=['--force-share'])
++    result = json.loads(qemu_img_pipe('info', '--force-share',
++                                      '--output=json', disk))
++    if 'bitmaps' in result['format-specific']['data']:
++        bitmaps = result['format-specific']['data']['bitmaps']
++        log('The same bitmaps in JSON format:')
++        log(bitmaps, indent=2)
++    else:
++        log('No bitmap in JSON format output')
++
++def add_bitmap(bitmap_number, persistent, disabled):
++    granularity = 2**(13 + bitmap_number)
++    bitmap_name = 'bitmap-' + str(bitmap_number-1)
++    vm = iotests.VM().add_drive(disk)
++    vm.launch()
++    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name=bitmap_name,
++               granularity=granularity, persistent=persistent,
++               disabled=disabled)
++    vm.shutdown()
++
++def write_to_disk(offset, size):
++    write = 'write {} {}K'.format(offset, size)
++    qemu_io('-f', iotests.imgfmt, '-c', write, disk)
++    log('Write ' + str(size) + 'K to disk at offset ' + str(hex(offset)))
++
++
++qemu_img_create('-f', iotests.imgfmt, disk, '1M')
++
++for num in range(1, 4):
++    disabled = False
++    if num == 2:
++        disabled = True
++    add_bitmap(num, bool(num-1), disabled)
++    write_to_disk((num-1)*chunk, chunk)
++    print_bitmap()
++    log('')
++
++vm = iotests.VM().add_drive(disk)
++vm.launch()
++log('Checking \"in-use\" flag...')
++print_bitmap()
++vm.shutdown()
+diff --git a/tests/qemu-iotests/239.out b/tests/qemu-iotests/239.out
+new file mode 100644
+index 0000000..0abcac7
+--- /dev/null
++++ b/tests/qemu-iotests/239.out
+@@ -0,0 +1,130 @@
++{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "granularity": 16384, "name": "bitmap-0", "node": "drive0", "persistent": false}}
++{"return": {}}
++Write 256K to disk at offset 0x0
++qemu-img info dump:
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0M (1048576 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    refcount bits: 16
++    corrupt: false
++
++No bitmap in JSON format output
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": true, "granularity": 32768, "name": "bitmap-1", "node": "drive0", "persistent": true}}
++{"return": {}}
++Write 256K to disk at offset 0x100
++qemu-img info dump:
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0M (1048576 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    bitmaps:
++        [0]:
++            flags:
++            name: bitmap-1
++            granularity: 32768
++    refcount bits: 16
++    corrupt: false
++
++The same bitmaps in JSON format:
++[
++  {
++    "flags": [],
++    "granularity": 32768,
++    "name": "bitmap-1"
++  }
++]
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "granularity": 65536, "name": "bitmap-2", "node": "drive0", "persistent": true}}
++{"return": {}}
++Write 256K to disk at offset 0x200
++qemu-img info dump:
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0M (1048576 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    bitmaps:
++        [0]:
++            flags:
++            name: bitmap-1
++            granularity: 32768
++        [1]:
++            flags:
++                [0]: auto
++            name: bitmap-2
++            granularity: 65536
++    refcount bits: 16
++    corrupt: false
++
++The same bitmaps in JSON format:
++[
++  {
++    "flags": [],
++    "granularity": 32768,
++    "name": "bitmap-1"
++  },
++  {
++    "flags": [
++      "auto"
++    ],
++    "granularity": 65536,
++    "name": "bitmap-2"
++  }
++]
++
++Checking "in-use" flag...
++qemu-img info dump:
++
++image: TEST_IMG
++file format: IMGFMT
++virtual size: 1.0M (1048576 bytes)
++cluster_size: 65536
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    bitmaps:
++        [0]:
++            flags:
++                [0]: in-use
++            name: bitmap-1
++            granularity: 32768
++        [1]:
++            flags:
++                [0]: in-use
++                [1]: auto
++            name: bitmap-2
++            granularity: 65536
++    refcount bits: 16
++    corrupt: false
++
++The same bitmaps in JSON format:
++[
++  {
++    "flags": [
++      "in-use"
++    ],
++    "granularity": 32768,
++    "name": "bitmap-1"
++  },
++  {
++    "flags": [
++      "in-use",
++      "auto"
++    ],
++    "granularity": 65536,
++    "name": "bitmap-2"
++  }
++]
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0f1c3f9..3e310c7 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -235,3 +235,4 @@
+ 235 auto quick
+ 236 auto quick
+ 238 auto quick
++239 rw auto quick
 -- 
 1.8.3.1
