@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35853)
+Received: from eggs.gnu.org ([209.51.188.92]:36803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpB6D-0008DX-2s
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:05:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gpBBE-000213-J2
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpB6A-0005Lt-DV
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:05:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gpBBC-0006ko-JT
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 07:10:52 -0500
 References: <87y378n5iy.fsf@dusky.pond.sub.org>
 	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<871s4uobf0.fsf@dusky.pond.sub.org>
-	<CAFEAcA_t2707yp5cz+rbMVE3nhLk288iFgK=vUgzFyCw79uX5g@mail.gmail.com>
-	<75629302-84bb-ba19-cb2c-5edc34cffadb@redhat.com>
-	<CAFEAcA-jp=k5-jHeY_ziMbgYBo5U7-ZKSRtU8nfPyAFh9jYUQg@mail.gmail.com>
-	<877eeldx9p.fsf@dusky.pond.sub.org>
-	<CAFEAcA-AYVgigihO5LF3EgfOo5=uaB5Gx3b8Eh3it2QvZkomYg@mail.gmail.com>
-	<87bm3xazv3.fsf@dusky.pond.sub.org>
-	<CAFEAcA_hsh+tAUhUX+xD4KDLFBZszmcnu=rrxVYfumHPsz5Wow@mail.gmail.com>
-Date: Thu, 31 Jan 2019 13:05:11 +0100
-In-Reply-To: <CAFEAcA_hsh+tAUhUX+xD4KDLFBZszmcnu=rrxVYfumHPsz5Wow@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 31 Jan 2019 10:34:32 +0000")
-Message-ID: <87sgx99gnc.fsf@dusky.pond.sub.org>
+	<87o97yi67d.fsf@dusky.pond.sub.org>
+	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
+	<9dc7c83c-a63c-9cde-1267-43bc62e73436@redhat.com>
+	<87imy5dy5v.fsf@dusky.pond.sub.org>
+	<703ad7c6-e8bb-2b62-41a9-1a15a7634f1e@redhat.com>
+	<87bm3xcgll.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0871cdaf-6a78-1dd7-d18b-ae1337a1a54e@redhat.com>
+Date: Thu, 31 Jan 2019 13:10:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <87bm3xcgll.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,20 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Libvirt <libvir-list@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Libvirt <libvir-list@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 31/01/19 10:37, Markus Armbruster wrote:
+>>
+>>> Hmm, why is it okay to treat all pfl->cmd values the same when
+>>> secure=3Don?
+>> But doesn't matter.  You just don't want MMIO mode to be active outsid=
+e
+>> SMM: all that non-SMM code want to do with the flash is read and execu=
+te
+>> it, as far as they're concerned it's just ROM and the command mode is
+>> nonexistent.
+> Out of curiosity: what effect does secure=3Don have when the device is
+> read-only (pflash_t member ro non-zero)?
 
-> On Thu, 31 Jan 2019 at 10:24, Markus Armbruster <armbru@redhat.com> wrote:
->> 1. Make the device model default to some "correct" configuration, even
->> if that setting is kind of arbitrary.  That way, any code using new
->> style gets an "incorrect" configuration only if it actively selects one.
->
-> I don't think that's much better, because it will still
-> probably be wrong for the board. People writing board models
-> should define what their pflash device is, not plug in something
-> that's not what the hardware is.
+Non-SMM code cannot execute commands.  This means two things:
 
-If you want to force people to select a sane configuration, set the
-default to some suitable nonsense the realize() method rejects.
+First, in addition to writes, there are nondestructive commands such as
+read device id.  Those are also inaccessible to non-SMM if secure=3Don.
+Again, for non-SMM code it looks like your old ROM.  This is not
+important but...
+
+... CFI commands, even commands that are nondestructive or writes that
+fail because of readonly-ness, consist of multiple writes to the flash
+device.  If non-SMM code could issue a partial command, the SMM flash
+driver would likely end up confused.  Therefore it's probably a good
+idea to make all parallel flash devices have secure=3Don even if the
+content of the flash cannot be damaged, and that's why I never
+considered anything but -global to configure the property.
+
+Paolo
