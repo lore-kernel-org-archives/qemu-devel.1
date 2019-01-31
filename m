@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42438)
+Received: from eggs.gnu.org ([209.51.188.92]:43659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gp182-00048Q-N6
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:26:55 -0500
+	(envelope-from <crosa@redhat.com>) id 1gp1FZ-0005bV-32
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gp181-0002MZ-L5
-	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:26:54 -0500
+	(envelope-from <crosa@redhat.com>) id 1gp1FX-0006bR-TH
+	for qemu-devel@nongnu.org; Wed, 30 Jan 2019 20:34:41 -0500
 References: <20190117185628.21862-1-crosa@redhat.com>
 	<20190117185628.21862-14-crosa@redhat.com>
-	<e05b1d30-1a44-171a-02f7-d77e182ab90c@redhat.com>
+	<3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <eb914790-ce08-df18-941b-bc93be89822d@redhat.com>
-Date: Wed, 30 Jan 2019 20:26:43 -0500
+Message-ID: <79c6806a-f722-3847-0dcb-23f20c70570b@redhat.com>
+Date: Wed, 30 Jan 2019 20:34:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <e05b1d30-1a44-171a-02f7-d77e182ab90c@redhat.com>
+In-Reply-To: <3b057e17-7e51-e547-69fb-fbdd4f3ecca3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -31,9 +31,7 @@ Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Markovic <smar
 
 
 
-On 1/22/19 5:19 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Cleber,
->=20
+On 1/22/19 5:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 > On 1/17/19 7:56 PM, Cleber Rosa wrote:
 >> Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
 >> board and verify the serial is working.
@@ -117,9 +115,6 @@ eb')
 >> +        deb_hash =3D '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
 >> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
 >> +
->=20
-> Can you refactor this code ...
->=20
 >> +        cwd =3D os.getcwd()
 >> +        os.chdir(self.workdir)
 >> +        process.run("ar x %s data.tar.gz" % deb_path)
@@ -127,23 +122,34 @@ eb')
 >> +        os.chdir(cwd)
 >> +        kernel_path =3D self.workdir + '/boot/vmlinux-2.6.32-5-5kc-ma=
 lta'
+>> +
+>> +        self.vm.set_machine('malta')
+>> +        self.vm.set_console()
+>> +        kernel_command_line =3D 'console=3DttyS0 printk.time=3D0'
 >=20
-> ... as an helper function?
->=20
+> What about having a generic KERNEL_COMMON_COMMAND_LINE=3D'printk.time=3D=
+0 '
+> then using
+>   kernel_command_line =3D KERNEL_COMMON_COMMAND_LINE + 'console=3DttyS0=
+'
+> in each tests of this series?
+>
 
-Yes.  In fact, because of the kernel change in the previous patch, I've
-added it there.
+Not sure... I do like the fact that it's more uniform, but I don't like
+the locality aspect.  Having to refer back to something defined either
+in the module or class level for something so small is a big con, IMO.
 
-> Can be follow-up patch, so:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-
-In the longer term, I expect to add deb (and RPM, etc) support to the
-avocado.utils.archive module:
-
-https://trello.com/c/bQBnvkjv/1437-avocadoutilsarchive-support-rpm-deb-et=
-c
-
+I'll keep it AS IS for now, and if more people feel like it's a good
+idea, or you feel stronger that it's a good idea, I can add it in the
+next version.
 
 Thanks!
 - Cleber.
+
+>> +        self.vm.add_args('-kernel', kernel_path,
+>> +                         '-append', kernel_command_line)
+>> +        self.vm.launch()
+>> +        console_pattern =3D 'Kernel command line: %s' % kernel_comman=
+d_line
+>> +        self.wait_for_console_pattern(console_pattern)
+>>
