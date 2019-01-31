@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58409)
+Received: from eggs.gnu.org ([209.51.188.92]:59364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpCis-00077P-Ox
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:49:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpCmU-0001dY-Ft
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpCip-0004cT-OA
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:49:42 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38238)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpCmS-0006GB-Cj
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:26 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42717)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpCik-0004Wg-2J
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:49:36 -0500
-Received: by mail-ot1-x342.google.com with SMTP id e12so2831591otl.5
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 05:49:25 -0800 (PST)
+	id 1gpCmS-0006DU-3B
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:53:24 -0500
+Received: by mail-oi1-x241.google.com with SMTP id w13so2740940oiw.9
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 05:53:16 -0800 (PST)
 MIME-Version: 1.0
-References: <20190129143511.12311-1-richard.henderson@linaro.org>
-In-Reply-To: <20190129143511.12311-1-richard.henderson@linaro.org>
+References: <20190129121817.7109-1-jusual@mail.ru>
+In-Reply-To: <20190129121817.7109-1-jusual@mail.ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 13:49:13 +0000
-Message-ID: <CAFEAcA9Brck3P0BYDDDj2cKiRP0Z-P6AX_4MMLMjRL5t-+eN2Q@mail.gmail.com>
+Date: Thu, 31 Jan 2019 13:53:03 +0000
+Message-ID: <CAFEAcA_XuPneKXWftxjkqDn4CVTPXD1M4jSh8tM0HjnrR5tkGg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Enable API, APK bits in SCR,
- HCR
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] arm: Clarify the logic of set_pc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 29 Jan 2019 at 14:35, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Tue, 29 Jan 2019 at 12:18, Julia Suvorova <jusual@mail.ru> wrote:
 >
-> These bits become writable with the ARMv8.3-PAuth extension.
+> Until now, the set_pc logic was unclear, which raised questions about
+> whether it should be used directly, applying a value to PC or adding
+> additional checks, for example, set the Thumb bit in Arm cpu. Let's set
+> the set_pc logic for =E2=80=9CConfigure the PC, as was done in the ELF fi=
+le=E2=80=9D
+> and implement synchronize_with_tb hook for preserving PC to cpu_tb_exec.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
 
 
 Applied to target-arm.next, thanks.
