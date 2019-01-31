@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56585)
+Received: from eggs.gnu.org ([209.51.188.92]:57050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpCcQ-0001sR-B5
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:43:02 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gpCeQ-0003bt-Jc
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:45:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpCcP-0002A3-Nq
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:43:02 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpCcP-00029s-HK
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:43:01 -0500
-Received: by mail-oi1-x241.google.com with SMTP id y1so2688114oie.12
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 05:43:01 -0800 (PST)
+	(envelope-from <alifm@linux.ibm.com>) id 1gpCeO-0002sP-0v
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:45:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gpCeI-0002lQ-U3
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 08:45:00 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x0VDilQO128985
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 08:44:52 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qc1pq1m9c-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 08:44:51 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 31 Jan 2019 13:44:49 -0000
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-6-git-send-email-jjherne@linux.ibm.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 31 Jan 2019 08:44:45 -0500
 MIME-Version: 1.0
-References: <20190124162401.5111-1-aaron@os.amperecomputing.com>
-In-Reply-To: <20190124162401.5111-1-aaron@os.amperecomputing.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 13:42:48 +0000
-Message-ID: <CAFEAcA-5X8SL5kSCztpEr7dR5Nz8h3QSrYVJs_1+MVZiEdFhxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v12 0/2] More fully implement ARM PMUv3
+In-Reply-To: <1548768562-20007-6-git-send-email-jjherne@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <01ee6bb0-d59e-da07-5e87-4d918dc47bc1@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 05/15] s390-bios: Factor finding boot
+ device out of virtio code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +42,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
-
-On Thu, 24 Jan 2019 at 16:24, Aaron Lindsay OS
-<aaron@os.amperecomputing.com> wrote:
->
-> Most of this patchset implementing the PMU has been merged already, but
-> the interrupt-on-overflow behavior had some additional review comments.
-> This most recent version fixes a type promotion issue and adds Richard's
-> Reviewed-by's.
->
-> Aaron Lindsay (2):
->   target/arm: Send interrupts on PMU counter overflow
->   target/arm: Add a timer to predict PMU counter overflow
->
+To: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com
 
 
 
-Applied to target-arm.next, thanks.
+On 01/29/2019 08:29 AM, Jason J. Herne wrote:
+> Make a new routine find_boot_device to locate the boot device for all
+> cases. not just virtio.
+> 
+> In one case no boot device is specified and a suitable boot device can not
+> be auto detected. The error message for this case was specific to virtio
+> devices. We update this message to remove virtio specific wording.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>   pc-bios/s390-ccw/main.c  | 87 ++++++++++++++++++++++++++----------------------
+>   tests/boot-serial-test.c |  2 +-
+>   2 files changed, 49 insertions(+), 40 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 7e3f65e..2457752 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -55,17 +55,18 @@ unsigned int get_loadparm_index(void)
+>    * NOTE: The global variable blk_schid is updated to contain the subchannel
+>    * information.
+>    */
+> -static bool find_dev(Schib *schib, int dev_no)
+> +static bool find_subch(int dev_no)
+>   {
+> +    Schib schib;
+>       int i, r;
+>   
+>       for (i = 0; i < 0x10000; i++) {
+>           blk_schid.sch_no = i;
+> -        r = stsch_err(blk_schid, schib);
+> +        r = stsch_err(blk_schid, &schib);
+>           if ((r == 3) || (r == -EIO)) {
+>               break;
+>           }
+> -        if (!schib->pmcw.dnv) {
+> +        if (!schib.pmcw.dnv) {
+>               continue;
+>           }
+>   
+> @@ -77,7 +78,7 @@ static bool find_dev(Schib *schib, int dev_no)
+>               continue;
+>           }
+>   
+> -        if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
+> +        if ((dev_no < 0) || (schib.pmcw.dev == dev_no)) {
+>               return true;
+>           }
+>       }
+> @@ -133,56 +134,63 @@ static void boot_setup(void)
+>       have_iplb = store_iplb(&iplb);
+>   }
+>   
+> -static void virtio_setup(void)
+> +static void find_boot_device(void)
+>   {
+> -    Schib schib;
+> -    int ssid;
+> -    bool found = false;
+> -    uint16_t dev_no;
+>       VDev *vdev = virtio_get_device();
+> -    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+> -
+> -    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> +    int ssid;
+> +    bool found;
+>   
+> -    if (have_iplb) {
+> -        switch (iplb.pbt) {
+> -        case S390_IPL_TYPE_CCW:
+> -            dev_no = iplb.ccw.devno;
+> -            debug_print_int("device no. ", dev_no);
+> -            blk_schid.ssid = iplb.ccw.ssid & 0x3;
+> -            debug_print_int("ssid ", blk_schid.ssid);
+> -            found = find_dev(&schib, dev_no);
+> -            break;
+> -        case S390_IPL_TYPE_QEMU_SCSI:
+> -            vdev->scsi_device_selected = true;
+> -            vdev->selected_scsi_device.channel = iplb.scsi.channel;
+> -            vdev->selected_scsi_device.target = iplb.scsi.target;
+> -            vdev->selected_scsi_device.lun = iplb.scsi.lun;
+> -            blk_schid.ssid = iplb.scsi.ssid & 0x3;
+> -            found = find_dev(&schib, iplb.scsi.devno);
+> -            break;
+> -        default:
+> -            panic("List-directed IPL not supported yet!\n");
+> -        }
+> -        menu_setup();
+> -    } else {
+> +    if (!have_iplb) {
+>           for (ssid = 0; ssid < 0x3; ssid++) {
+>               blk_schid.ssid = ssid;
+> -            found = find_dev(&schib, -1);
+> +            found = find_subch(-1);
+>               if (found) {
+> -                break;
+> +                return;
+>               }
+>           }
+> +        panic("Could not find a suitable boot device (none specified)\n");
+>       }
+>   
+> -    IPL_assert(found, "No virtio device found");
+> +    switch (iplb.pbt) {
+> +    case S390_IPL_TYPE_CCW:
+> +        debug_print_int("device no. ", iplb.ccw.devno);
+> +        blk_schid.ssid = iplb.ccw.ssid & 0x3;
+> +        debug_print_int("ssid ", blk_schid.ssid);
+> +        found = find_subch(iplb.ccw.devno);
+> +        break;
+> +    case S390_IPL_TYPE_QEMU_SCSI:
+> +        vdev->scsi_device_selected = true;
+> +        vdev->selected_scsi_device.channel = iplb.scsi.channel;
+> +        vdev->selected_scsi_device.target = iplb.scsi.target;
+> +        vdev->selected_scsi_device.lun = iplb.scsi.lun;
+> +        blk_schid.ssid = iplb.scsi.ssid & 0x3;
+> +        found = find_subch(iplb.scsi.devno);
+> +        break;
+> +    default:
+> +        panic("List-directed IPL not supported yet!\n");
+> +    }
+> +
+> +    if (!found) {
+> +        IPL_assert(found, "Boot device not found\n");
+> +    }
+> +}
+> +
+> +static void virtio_setup(void)
+> +{
+> +    VDev *vdev = virtio_get_device();
+> +    QemuIplParameters *early_qipl = (QemuIplParameters *)QIPL_ADDRESS;
+> +
+> +    memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> +
+> +    if (have_iplb) {
+> +        menu_setup();
+> +    }
+>   
+>       if (virtio_get_device_type() == VIRTIO_ID_NET) {
+>           sclp_print("Network boot device detected\n");
+>           vdev->netboot_start_addr = qipl.netboot_start_addr;
+>       } else {
+>           virtio_blk_setup_device(blk_schid);
+> -
+>           IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
+>       }
+>   }
+> @@ -192,8 +200,9 @@ int main(void)
+>       sclp_setup();
+>       css_setup();
+>       boot_setup();
+> -    virtio_setup();
+> +    find_boot_device();
+>   
+> +    virtio_setup();
+>       zipl_load(); /* no return */
+>   
+>       panic("Failed to load OS from hard disk\n");
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 58a48f3..9daf2cb 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -112,7 +112,7 @@ static testdef_t tests[] = {
+>       { "sparc", "SS-4", "", "MB86904" },
+>       { "sparc", "SS-600MP", "", "TMS390Z55" },
+>       { "sparc64", "sun4u", "", "UltraSPARC" },
+> -    { "s390x", "s390-ccw-virtio", "", "virtio device" },
+> +    { "s390x", "s390-ccw-virtio", "", "device" },
+>       { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
+>       { "microblaze", "petalogix-s3adsp1800", "", "TT",
+>         sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
+> 
 
--- PMM
+
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
