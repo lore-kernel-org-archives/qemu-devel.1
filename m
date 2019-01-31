@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45889)
+Received: from eggs.gnu.org ([209.51.188.92]:56139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gp4pV-00068k-6k
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 00:24:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1gp61B-0000nI-6Z
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 01:40:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gp4pT-0007GK-A0
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 00:24:01 -0500
-References: <3f01a301-d639-dbe7-f522-42a50e2d443e@redhat.com>
-	<1548841387-7670-1-git-send-email-thuth@redhat.com>
-	<1548841387-7670-4-git-send-email-thuth@redhat.com>
-	<630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
+	(envelope-from <thuth@redhat.com>) id 1gp618-0003Yo-QN
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 01:40:07 -0500
+References: <mhng-a324878c-b61d-4d8d-80bf-e15404469ef7@palmer-si-x1c4>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d6ccc706-5268-e393-33c3-386770af89f3@redhat.com>
-Date: Thu, 31 Jan 2019 06:23:47 +0100
+Message-ID: <547f1afb-cce5-e456-5466-87ba333859b8@redhat.com>
+Date: Thu, 31 Jan 2019 07:39:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <630e6520-5860-bbd2-f480-07ba367d65a8@ilande.co.uk>
+In-Reply-To: <mhng-a324878c-b61d-4d8d-80bf-e15404469ef7@palmer-si-x1c4>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/5] ppc: Express dependencies of the
- Mac machines with kconfig
+Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, yang.zhong@intel.com
-Cc: pbonzini@redhat.com, qemu-ppc@nongnu.org
+To: Palmer Dabbelt <palmer@sifive.com>, eblake@redhat.com
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 2019-01-30 18:13, Mark Cave-Ayland wrote:
-> On 30/01/2019 09:43, Thomas Huth wrote:
->=20
->> This will make it for example easier if the users want to disable
->> one of the two machines for their builds.
+On 2019-01-30 20:01, Palmer Dabbelt wrote:
+> On Wed, 30 Jan 2019 09:45:33 PST (-0800), eblake@redhat.com wrote:
+>> On 1/30/19 11:35 AM, Palmer Dabbelt wrote:
+>>> The following changes since commit
+>>> 5385a5988c8a55bebdc878c05b96648579b5d6e0:
+>>>
+>>> =C2=A0 hw/virtio/virtio-balloon: zero-initialize the virtio_balloon_c=
+onfig
+>>> struct (2019-01-21 17:20:36 +0000)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>> =C2=A0 git://github.com/palmer-dabbelt/qemu.git
+>>> tags/riscv-for-master-3.2-part3
+>>>
+>>> for you to fetch changes up to 461ab9de46d085a37b0da6f096aadc4e0dda4d=
+4c:
+>>>
+>>> =C2=A0 target/riscv: fix counter-enable checks in ctr() (2019-01-29
+>>> 11:33:38 -0800)
+>>>
+>>> ----------------------------------------------------------------
+>>> RISC-V Patches for 3.2, Part 3
 >>
->> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
-[...]
->> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
->> index 3ebe30f..f392502 100644
->> --- a/hw/misc/Kconfig
->> +++ b/hw/misc/Kconfig
->> @@ -59,6 +59,14 @@ config MOS6522
->> =20
->>  config MACIO
->>      bool
->> +    select CUDA
->> +    select ESCC
->> +    select IDE_MACIO
->> +    select MACIO_GPIO
->> +    select MAC_DBDMA
->> +    select MAC_NVRAM
->> +    select MAC_PMU
->> +    select MOS6522
+>> There is no 3.2 release; the next release is named 4.0.=C2=A0 However,=
+ if you
+>> don't want to bother with sending a v2 pull request just to fix the
+>> merge commit message, that's okay with me.
 >=20
-> Technically MACIO_GPIO and MAC_PMU are MAC_NEWWORLD only, so we might w=
-ant to split
-> this down further?
+> Ah, sorry.=C2=A0 I think I'm just going to leave it as is, I'll get it =
+right
+> next time.
 
-I can also change the lines into:
-
-    select MACIO_GPIO if MAC_NEWWORLD
-    select MAC_PMU if MAC_NEWWORLD
-
->> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
->> index 809830e..f6b4206 100644
->> --- a/hw/ppc/Kconfig
->> +++ b/hw/ppc/Kconfig
->> @@ -44,9 +44,16 @@ config RS6000_MC
->> =20
->>  config MAC_OLDWORLD
->>      bool
->> +    select ADB
->> +    select GRACKLE_PCI
->> +    select HEATHROW_PIC
->> +    select MACIO
->> =20
->>  config MAC_NEWWORLD
->>      bool
->> +    select ADB
->> +    select MACIO
->> +    select UNIN_PCI
->=20
-> Also MAC_NEWWORLD has an in-built USB PCI bridge (OHCI) which populates=
- with a USB
-> keyboard/mouse rather than ADB when using -M mac99,via=3Dpmu, but I pre=
-sume USB is
-> handled elsewhere?
-
-Yes, in hw/usb/Kconfig we have:
-
-config USB_OHCI
-    bool
-    default y if PCI_DEVICES
-    depends on PCI
-    select USB
+Also note that you used "PR RFC" in the title ... so not sure whether
+Peter's scripts will catch this PR as a valid one...
 
  Thomas
