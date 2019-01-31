@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55505)
+Received: from eggs.gnu.org ([209.51.188.92]:57038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpAQk-0002G3-MX
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:22:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1gpAWh-0006af-08
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpAQj-0008F4-Ug
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:22:50 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpAQj-0008E8-NY
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:22:49 -0500
-Received: by mail-wr1-x444.google.com with SMTP id f7so2898380wrp.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 03:22:49 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Jan 2019 11:22:39 +0000
-Message-Id: <20190131112240.8395-5-peter.maydell@linaro.org>
-In-Reply-To: <20190131112240.8395-1-peter.maydell@linaro.org>
-References: <20190131112240.8395-1-peter.maydell@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1gpAWf-0002I2-UN
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:28:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gpAWf-0002HE-JX
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 06:28:57 -0500
+Date: Thu, 31 Jan 2019 11:28:53 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190131112853.GG19982@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAChFQ9RNaHyROB47QeLwc6cLCCnFx4SmXKV7rbs1MYjk7S0sbw@mail.gmail.com>
+	<20190131104911.GF19982@redhat.com>
+	<CAFEAcA_TYKmG+gfm1gUw-xjM3VFXUebCD22rGSPyBuZ9ugWVPQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 4/5] hw/arm/boot: Clarify why
- arm_setup_firmware_boot() doesn't set env->boot_info
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_TYKmG+gfm1gUw-xjM3VFXUebCD22rGSPyBuZ9ugWVPQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] NSIS - including DLL dependencies for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Igor Mammedov <imammedo@redhat.com>, Hongbo Zhang <hongbo.zhang@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Adam Baxter <voltagex@voltagex.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The code path for booting firmware doesn't set env->boot_info. At
-first sight this looks odd, so add a comment saying why we don't.
+On Thu, Jan 31, 2019 at 11:19:04AM +0000, Peter Maydell wrote:
+> On Thu, 31 Jan 2019 at 10:50, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> >
+> > On Thu, Jan 31, 2019 at 02:45:13PM +1100, Adam Baxter wrote:
+> > > Hi,
+> > > How do I gather and include the required DLLs (SDL, zlib etc) in th=
+e NSIS
+> > > installer? (and also in a standalone build to be zipped up, but tha=
+t's less
+> > > important)
+> > >
+> > > I noticed the wiki doesn't really mention bundling dependencies any=
+where.
+> > >
+> > > The official unofficial windows builds are documented at
+> > > https://qemu.weilnetz.de/FAQ but this doesn't cover building the ac=
+tual
+> > > installer.
+> >
+> > Yeah, this is a pretty major ommision in QEMU's build rules for the N=
+SIS
+> > installer making it pretty much useless as is. We really need to expa=
+nd
+> > it so that it can resolve the dlls that qemu .exe's need, locate them
+> > on the host and bundle them into the installer automatically.
+>=20
+> I think my concern here potentially is a licensing one -- if we don't
+> actually ship installer binaries then that's fine for us, but an
+> installer script that automatically pulls in DLLs for glib and others
+> is a bit of a footgun for anybody that uses it since it will very likel=
+y
+> create an installer binary that is very difficult to ship to anybody
+> whilst remaining compliant with the licenses for our dependencies.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/boot.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I don't see this situation as much different in terms of licensing risk
+from building & hosting / distributing a docker container image. In both
+cases the person is bundling up a huge set of dependancies and need to
+ensure they are compliant with licenses. The only difference is the file
+format that the bundled content is in.
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index a2e724ac68a..cfcfdf421cf 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -1186,7 +1186,8 @@ static void arm_setup_firmware_boot(ARMCPU *cpu, struct arm_boot_info *info)
- 
-     /*
-      * We will start from address 0 (typically a boot ROM image) in the
--     * same way as hardware.
-+     * same way as hardware. Leave env->boot_info NULL, so that
-+     * do_cpu_reset() knows it does not need to alter the PC on reset.
-      */
- }
- 
--- 
-2.20.1
+Essentially it is relying on the fact that the distro used as input for
+the docker image (or nsis installer) is providing full source + build
+tool chain, as the way to achieve license compliance.
+
+So if anything I'd say that providing a fully scripted way to pick up
+the DLLs from distro packages is a better way to help users achieve
+license compliance than letting them copy around DLLs manually from
+unknown sources.=20
+
+I can understand that QEMU project doesn't want to get into the business
+of providing binary packages as it certainly simplifies our life from the
+POV of licensing by not having to think about it at all. I think it is
+reasonable to allow users to have an easy way to build an installer for
+their own usage though.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
