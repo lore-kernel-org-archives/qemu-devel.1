@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49330)
+Received: from eggs.gnu.org ([209.51.188.92]:49596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpKEQ-00059g-KA
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:50:47 -0500
+	(envelope-from <jusual@mail.ru>) id 1gpKFd-0005tJ-G7
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpKEO-0007ut-Ln
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:50:46 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gpKEM-0007sO-Io
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:50:42 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y139so4021793wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 13:50:40 -0800 (PST)
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-6-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <92632491-d7b5-1995-d9e9-bf5edc9045f9@redhat.com>
-Date: Thu, 31 Jan 2019 22:50:38 +0100
+	(envelope-from <jusual@mail.ru>) id 1gpKFa-00005A-H5
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:52:00 -0500
+Received: from smtp17.mail.ru ([94.100.176.154]:50404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gpKFX-0008VA-CZ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 16:51:56 -0500
+References: <20190131202637.4062-1-jusual@mail.ru>
+	<d21f68cf-31fa-db62-1d20-66f75e5a05b4@redhat.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <58da4f48-a29e-e22d-c4b3-756379e10298@mail.ru>
+Date: Fri, 1 Feb 2019 00:51:50 +0300
 MIME-Version: 1.0
-In-Reply-To: <1548410831-19553-6-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <d21f68cf-31fa-db62-1d20-66f75e5a05b4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/52] build: actually use CONFIG_PAM
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: yang.zhong@intel.com, thuth@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1/25/19 11:06 AM, Paolo Bonzini wrote:
-> Do not link it unconditionally into all binaries.
-
-Nice :)
-
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Message-Id: <20190123065618.3520-3-yang.zhong@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  default-configs/i386-softmmu.mak | 1 +
->  hw/pci-host/Makefile.objs        | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+On 01.02.2019 0:03, Eric Blake wrote:
+> On 1/31/19 2:26 PM, Julia Suvorova via Qemu-devel wrote:
+>> The whitelist option allows to run a reduced monitor with a subset of
+>> QMP commands. This allows the monitor to run in secure mode, which is
+>> convenient for sending commands via the WebSocket monitor using the
+>> web UI. This is planned to be done on micro:bit board.
+>>
+>> The list of allowed commands should be written to a file, one per line.
+>> The command line will look like this:
+>>      -mon chardev_name,mode=control,whitelist=path_to_file
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> ---
 > 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index 2f919df..48da996 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -67,3 +67,4 @@ CONFIG_I2C=y
->  CONFIG_SEV=$(CONFIG_KVM)
->  CONFIG_VTD=y
->  CONFIG_AMD_IOMMU=y
-> +CONFIG_PAM=y
-> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-> index 073d512..a9cd3e0 100644
-> --- a/hw/pci-host/Makefile.objs
-> +++ b/hw/pci-host/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-y += pam.o
-> +common-obj-$(CONFIG_PAM) += pam.o
->  
->  # PPC devices
->  common-obj-$(CONFIG_PREP_PCI) += prep.o
+>>   
+>> -void monitor_init(Chardev *chr, int flags)
+>> +static void process_whitelist_file(Monitor *mon, const char *whitelist_file)
+>> +{
+>> +    char cmd_name[256];
+>> +    FILE *fd = fopen(whitelist_file, "r");
 > 
+> If you use qemu_open() here (followed by fdopen if you still prefer
+> fscanf over read), then you can support "/dev/fdset/NNN" to
+> auto-magically support someone passing in the whitelist via an inherited
+> file descriptor, rather than having to be somewhere on disk that qemu
+> can directly open().
+
+Cool, thanks!
+
+>> +
+>> +    if (fd == NULL) {
+>> +        error_report("Could not open whitelist file: %s", strerror(errno));
+>> +        exit(1);
+>> +    }
+>> +
+>> +    mon->whitelist = g_hash_table_new_full(g_str_hash,
+>> +                                           g_str_equal,
+>> +                                           g_free,
+>> +                                           NULL);
+>> +
+>> +    g_hash_table_add(mon->whitelist, g_strdup("qmp_capabilities"));
+>> +    g_hash_table_add(mon->whitelist, g_strdup("query-commands"));
+>> +
+>> +    while (fscanf(fd, "%255s", cmd_name) == 1) {
+> 
+> %255s fits your cmd_name array declaration and stops consuming at either
+> 255 bytes or at the first whitespace encountered, but where do you check
+> for overflow from a file that passes more than 255 non-whitespace bytes
+> without a newline?  Also, this is a bit sloppy in that it skips all
+> leading whitespace, rather than ensuring that the user actually passed
+> newline-separated command names.  Does glib provide any interfaces for
+> more easily reading in an array of lines from a file?
+
+With glib it would be something like that:
+
+   g_mapped_file_new_from_fd()  : fd -> GMappedFile
+   g_mapped_file_get_contents() : GMappedFile -> char *
+   g_strsplit_set()             : char * -> char **
+
+All this would need to be released afterwards.
+Do you think it would be better?
+
+Best regards, Julia Suvorova.
