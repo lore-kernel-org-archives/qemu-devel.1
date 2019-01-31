@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46422)
+Received: from eggs.gnu.org ([209.51.188.92]:48098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpGIj-0004qV-Bk
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:58 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gpGPp-0007IZ-68
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpGIi-0004Lq-HG
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:57 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34605)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gpGIi-0004LC-A5
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:38:56 -0500
-Received: by mail-wr1-f66.google.com with SMTP id f7so4321783wrp.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 09:38:56 -0800 (PST)
-Date: Thu, 31 Jan 2019 18:38:52 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190131173852.dxv44lcv2ql2mbam@steredhat>
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131121412-mutt-send-email-mst@kernel.org>
+	(envelope-from <wainersm@redhat.com>) id 1gpGPo-0007vF-DJ
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 12:46:17 -0500
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-11-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <9a116fb9-5e69-ab8e-1fb0-38f3e4c97186@redhat.com>
+Date: Thu, 31 Jan 2019 15:46:01 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190131121412-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] virtio-blk: add DISCARD and WRITE
- ZEROES features
+In-Reply-To: <20190117185628.21862-11-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 10/18] Boot Linux Console Test: refactor
+ the console watcher into utility method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Thu, Jan 31, 2019 at 12:15:17PM -0500, Michael S. Tsirkin wrote:
-> On Thu, Jan 31, 2019 at 04:19:09PM +0100, Stefano Garzarella wrote:
-> > This series adds the support of DISCARD and WRITE ZEROES commands
-> > and extends the virtio-blk-test to test WRITE_ZEROES command when
-> > the feature is enabled.
-> > 
-> > v2:
-> > - added patch 1 to use virtio_blk_handle_rw_error() with discard operation
-> > - added patch 2 to make those new features machine-type dependent (thanks David)
-> > - fixed patch 3 (previously patch 1/2) adding more checks, block_acct_start()
-> >                 for WRITE_ZEROES requests, and configurable parameters to
-> >                 initialize the limits (max_sectors, wzeroes_may_unmap).
-> >                 (thanks Stefan)
-> >                 I moved in a new function the code to handle a single segment,
-> >                 in order to simplify the support of multiple segments in the
-> >                 future.
-> > - added patch 4 to change the assert on data_size following the discussion with
-> >                 Thomas, Changpeng, Michael, and Stefan (thanks all)
-> > - fixed patch 5 (previously patch 2/2) using local dwz_hdr variable instead of
-> >                 dynamic allocation (thanks Thomas)
-> > 
-> > This series requires the new virtio headers from linux v5.0-rc1
-> > already imported by Paolo:
-> > 
-> > Based-on: <20190104082731.24967-1-pbonzini@redhat.com>
-> > 
-> > Thanks,
-> > Stefano
-> 
-> series:
-> 
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> 
-> merge through block tree I guess?
-> 
+Hi Cleber,
 
-I guess too.
+On 01/17/2019 04:56 PM, Cleber Rosa wrote:
+> This introduces a utility method that monitors the console device and
+> looks for either a message that signals the test success or failure.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/acceptance/boot_linux_console.py | 30 ++++++++++++++++++--------
+>   1 file changed, 21 insertions(+), 9 deletions(-)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 35b31162d4..278bb2be3d 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -23,6 +23,25 @@ class BootLinuxConsole(Test):
+>   
+>       timeout = 60
+>   
+> +    def wait_for_console_pattern(self, success_message,
+> +                                 failure_message='Kernel panic - not syncing'):
+> +        """
+> +        Waits for messages to appear on the console, while logging the content
+> +
+> +        :param success_message: if this message appears, test succeeds
+> +        :param failure_message: if this message appears, test fails
+> +        """
 
-Thanks for the review!
+What's the docstring format used here? I am wondering if :type is optional.
 
-Stefano
+- Wainer
+
+> +        console = self.vm.console_socket.makefile()
+> +        console_logger = logging.getLogger('console')
+> +        while True:
+> +            msg = console.readline()
+> +            console_logger.debug(msg.strip())
+> +            if success_message in msg:
+> +                break
+> +            if failure_message in msg:
+> +                fail = 'Failure message found in console: %s' % failure_message
+> +                self.fail(fail)
+> +
+>       def test_x86_64_pc(self):
+>           """
+>           :avocado: tags=arch:x86_64
+> @@ -39,12 +58,5 @@ class BootLinuxConsole(Test):
+>           self.vm.add_args('-kernel', kernel_path,
+>                            '-append', kernel_command_line)
+>           self.vm.launch()
+> -        console = self.vm.console_socket.makefile()
+> -        console_logger = logging.getLogger('console')
+> -        while True:
+> -            msg = console.readline()
+> -            console_logger.debug(msg.strip())
+> -            if 'Kernel command line: %s' % kernel_command_line in msg:
+> -                break
+> -            if 'Kernel panic - not syncing' in msg:
+> -                self.fail("Kernel panic reached")
+> +        console_pattern = 'Kernel command line: %s' % kernel_command_line
+> +        self.wait_for_console_pattern(console_pattern)
