@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55414)
+Received: from eggs.gnu.org ([209.51.188.92]:33480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdeM-00069R-R6
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:34:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpdx1-000106-TB
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdeL-00084o-VY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:34:50 -0500
-References: <20190128165830.165170-1-vsementsov@virtuozzo.com>
-	<eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gpdnS-0006Ub-P6
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:44:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gpdnS-0006Tm-FH
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:44:14 -0500
+References: <20190123114220.16972-1-alex.bennee@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a24a7b8b-83ce-3787-162f-ace7c09d362c@redhat.com>
-Date: Fri, 1 Feb 2019 12:34:36 -0600
+Message-ID: <39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
+Date: Fri, 1 Feb 2019 12:44:12 -0600
 MIME-Version: 1.0
-In-Reply-To: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
+In-Reply-To: <20190123114220.16972-1-alex.bennee@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG"
-Subject: Re: [Qemu-devel] [PATCH] nbd: generalize usage of nbd_read
+	boundary="pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K"
+Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat,
+ fp-bench and clang compile fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG
+--pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com
-Message-ID: <a24a7b8b-83ce-3787-162f-ace7c09d362c@redhat.com>
-Subject: Re: [PATCH] nbd: generalize usage of nbd_read
-References: <20190128165830.165170-1-vsementsov@virtuozzo.com>
- <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
-In-Reply-To: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
+Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat, fp-bench and clang
+ compile fixes
+References: <20190123114220.16972-1-alex.bennee@linaro.org>
+In-Reply-To: <20190123114220.16972-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2/1/19 12:27 PM, Eric Blake wrote:
+On 1/23/19 5:42 AM, Alex Benn=C3=A9e wrote:
+> The following changes since commit 952bc8b3c2cbba78261923a1e8ca55cda261=
+dee9:
+>=20
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-21'=
+ into staging (2019-01-22 17:56:21 +0000)
+>=20
+> are available in the Git repository at:
+>=20
+>   https://github.com/stsquad/qemu.git tags/pull-fpu-next-230119-2
+>=20
+> for you to fetch changes up to 7617010250822677348af2bd98f048be10e7f334=
+:
+>=20
+>   tests/Makefile: add check-softfloat rule (2019-01-23 08:30:01 +0000)
+>=20
+> ----------------------------------------------------------------
+> Some more softfloat/fpu fixes
+>=20
+>    - make check-softfloat
+>    - fixes for fp-bench
+>    - workaround broken host fma
+>    - compile fix for s390x/clang
+>    - fixed for bigendian (v2)
+>    - minor makefile tweaks (v2)
 
->=20
->=20
->> +
->> +#define DEF_NBD_READ(bits) \
->> +static inline int nbd_read ## bits(QIOChannel *ioc, uint ## bits ## _=
-t * val, \
->=20
-> checkpatch didn't flag it, but I think our style is '*val', not '* val'=
-=2E
+I think this series is the reason that an in-tree 'make && make check &&
+git status' is now showing a bunch of untracked files:
 
-But it DOES flag '*val' as a false positive.  Oh well.
+	tests/fp/add.out
+	tests/fp/div.out
+	tests/fp/eq.out
+=2E..
+
+I suggest a followup patch to amend a .gitignore for tests/fp/*.out
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -61,21 +87,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG
+--pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUkTwACgkQp6FrSiUn
-Q2oNsQf/VJumbwljAw8Yq+UAezZYIaZf9yVOP3yGhbiodGwqoT/eYmnqrzIrcV5V
-ArG1wKhNrw035Yuy0o5P0GUwSrI20uQ1RQeZ+WOYZSMnIzW9HDkHreStiowWd/t/
-S1wlHZKXHpRI/VPNkSyu7TROA5QiIJtoAt7/O34SHQ9/zIUg/b0bL7MfSQYdYu89
-uozc+UBuxKQlqUHyc+30K1iTCI+BTQRpgxkOwMnHnBvzn0CmzRE4UqiEJD+RDIV/
-1qQpGv1MWG6oxFKuAXRWeCxQ6W+cz3T6gtLkixOF5thJV7lTSx4DybAcGyy3MfiP
-KvjJo+atf8GXbEKglbP4d8SsOUoFzQ==
-=hYOa
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUk3wACgkQp6FrSiUn
+Q2pUWwf/W7l45azzfTLIiK61GtpovoOkAyOzCqYQQjqXCAv1kJUG+VIPE9u21ghI
+SNhr6p5Qwpn7OBiRBkaVR70YpzoAEIuzj/156X1CM7PUACjza5LbKajwlsuiSSAd
+T2Xqn0T0p7+4BnXrZ2mgHXV9LqrU7qklF9w6/zv1n+73ntWe1OWBQTARVfM7skK1
+WERAqiQokPXqG1NlOSn6DIFH1/2ktpLOcn65CzA1TVzkQ76a1ROcPNc5wB4US2nQ
+GR9aG27yXNuiZ4Gai9N9LAR5LCwySO5qs9zbVyjmgC6Zbsz4xjA7xVWDP/JGouby
+IhfPYEEXDBAWyn63842o3+i890gb9w==
+=mmHO
 -----END PGP SIGNATURE-----
 
---S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG--
+--pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K--
