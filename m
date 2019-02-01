@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47143)
+Received: from eggs.gnu.org ([209.51.188.92]:47195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWO-0006MV-2w
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:41 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeWS-0006S5-57
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWL-0002rt-PQ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:39 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeWO-0002tb-1A
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:42 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  1 Feb 2019 20:29:19 +0100
-Message-Id: <20190201192935.18394-16-mreitz@redhat.com>
+Date: Fri,  1 Feb 2019 20:29:22 +0100
+Message-Id: <20190201192935.18394-19-mreitz@redhat.com>
 In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 References: <20190201192935.18394-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 15/31] blkverify: Make bdrv_dirname()
- return NULL
+Subject: [Qemu-devel] [PATCH v13 18/31] block/nfs: Implement bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +24,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-blkverify's BDSs have a file BDS, but we do not want this to be
-preferred over the raw node. There is no way to decide between the two
-(and not really a reason to, either), so just return NULL in blkverify's
-implementation of bdrv_dirname().
+While the basic idea is obvious and could be handled by the default
+bdrv_dirname() implementation, we cannot generate a directory name if
+the gid or uid are set, so we have to explicitly return NULL in those
+cases.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/blkverify.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/nfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 035d77b64a..3c7d4c8729 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -313,6 +313,15 @@ static void blkverify_refresh_filename(BlockDriverSt=
-ate *bs, QDict *options)
-     }
+diff --git a/block/nfs.c b/block/nfs.c
+index eab1a2c408..19ee07c321 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -855,6 +855,20 @@ static void nfs_refresh_filename(BlockDriverState *b=
+s, QDict *options)
+     bs->full_open_options =3D opts;
  }
 =20
-+static char *blkverify_dirname(BlockDriverState *bs, Error **errp)
++static char *nfs_dirname(BlockDriverState *bs, Error **errp)
 +{
-+    /* In general, there are two BDSs with different dirnames below this=
- one;
-+     * so there is no unique dirname we could return (unless both are eq=
-ual by
-+     * chance). Therefore, to be consistent, just always return NULL. */
-+    error_setg(errp, "Cannot generate a base directory for blkverify nod=
-es");
-+    return NULL;
++    NFSClient *client =3D bs->opaque;
++
++    if (client->uid || client->gid) {
++        bdrv_refresh_filename(bs);
++        error_setg(errp, "Cannot generate a base directory for NFS node =
+'%s'",
++                   bs->filename);
++        return NULL;
++    }
++
++    return g_strdup_printf("nfs://%s%s/", client->server->host, client->=
+path);
 +}
 +
- static BlockDriver bdrv_blkverify =3D {
-     .format_name                      =3D "blkverify",
-     .protocol_name                    =3D "blkverify",
-@@ -324,6 +333,7 @@ static BlockDriver bdrv_blkverify =3D {
-     .bdrv_child_perm                  =3D bdrv_filter_default_perms,
-     .bdrv_getlength                   =3D blkverify_getlength,
-     .bdrv_refresh_filename            =3D blkverify_refresh_filename,
-+    .bdrv_dirname                     =3D blkverify_dirname,
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+ static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
+                                                  Error **errp)
+@@ -889,6 +903,7 @@ static BlockDriver bdrv_nfs =3D {
+     .bdrv_detach_aio_context        =3D nfs_detach_aio_context,
+     .bdrv_attach_aio_context        =3D nfs_attach_aio_context,
+     .bdrv_refresh_filename          =3D nfs_refresh_filename,
++    .bdrv_dirname                   =3D nfs_dirname,
 =20
-     .bdrv_co_preadv                   =3D blkverify_co_preadv,
-     .bdrv_co_pwritev                  =3D blkverify_co_pwritev,
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+     .bdrv_co_invalidate_cache       =3D nfs_co_invalidate_cache,
 --=20
 2.20.1
