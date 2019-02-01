@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37781)
+Received: from eggs.gnu.org ([209.51.188.92]:41557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpOf5-00082V-Jp
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:36 -0500
+	(envelope-from <yu.ning@intel.com>) id 1gpOtm-0004d3-WC
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:49:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpOez-0002rK-4F
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:32 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  1 Feb 2019 10:33:57 +0800
-Message-Id: <20190201023357.22596-4-stefanha@redhat.com>
-In-Reply-To: <20190201023357.22596-1-stefanha@redhat.com>
-References: <20190201023357.22596-1-stefanha@redhat.com>
+	(envelope-from <yu.ning@intel.com>) id 1gpOtl-0008Bg-SW
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:49:46 -0500
+From: "Ning, Yu" <yu.ning@intel.com>
+Date: Fri, 1 Feb 2019 02:49:24 +0000
+Message-ID: <C29659EAAA3E0143B583467412621C605E408079@SHSMSX101.ccr.corp.intel.com>
+References: <87y378n5iy.fsf@dusky.pond.sub.org>
+	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
+	<87o97yi67d.fsf@dusky.pond.sub.org>
+	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
+	<87d0oddxu2.fsf@dusky.pond.sub.org>
+	<f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com>
+	<877eelcgf9.fsf@dusky.pond.sub.org>
+	<9c4e222f-3941-426e-3195-5598b2af1501@redhat.com>
+	<87munh9gb6.fsf@dusky.pond.sub.org>
+	<cb465eba-8c54-af8e-fe0e-ce90f71d213a@redhat.com>
+	<002701d4b9bc$b1fe72e0$15fb58a0$@phi.nz>
+	<3ace3624-893b-82e1-3132-0dcd1896ec94@redhat.com>
+In-Reply-To: <3ace3624-893b-82e1-3132-0dcd1896ec94@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 3/3] tests/microbit-test: Add tests for
- nRF51 NVMC
+Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,156 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, jusual@mail.ru, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jim@groklearning.com, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <alexandro@phi.nz>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Peter Krempa' <pkrempa@redhat.com>, 'Qemu-block' <qemu-block@nongnu.org>, 'Libvirt' <libvir-list@redhat.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, =?utf-8?B?J0zDoXN6bMOzIMOJcnNlayc=?= <lersek@redhat.com>, "'Justin Terry
+	(VM)'" <juterry@microsoft.com>, 'Markus Armbruster' <armbru@redhat.com>
 
-From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- tests/microbit-test.c | 108 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
-
-diff --git a/tests/microbit-test.c b/tests/microbit-test.c
-index 3bad947b6c..04e199ec33 100644
---- a/tests/microbit-test.c
-+++ b/tests/microbit-test.c
-@@ -21,6 +21,7 @@
- #include "hw/arm/nrf51.h"
- #include "hw/char/nrf51_uart.h"
- #include "hw/gpio/nrf51_gpio.h"
-+#include "hw/nvram/nrf51_nvm.h"
- #include "hw/timer/nrf51_timer.h"
- #include "hw/i2c/microbit_i2c.h"
-=20
-@@ -156,6 +157,112 @@ static void test_microbit_i2c(void)
-     qtest_quit(qts);
- }
-=20
-+#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
-+
-+static void fill_and_erase(QTestState *qts, hwaddr base, hwaddr size,
-+                           uint32_t address_reg)
-+{
-+    hwaddr i;
-+
-+    /* Erase Page */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + address_reg, base);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    /* Check memory */
-+    for (i =3D 0; i < size / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, base + i * 4), =3D=3D, 0xFFFFF=
-FFF);
-+    }
-+
-+    /* Fill memory */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < size / 4; i++) {
-+        qtest_writel(qts, base + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, base + i * 4), =3D=3D, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+}
-+
-+static void test_nrf51_nvmc(void)
-+{
-+    uint32_t value;
-+    hwaddr i;
-+    QTestState *qts =3D qtest_init("-M microbit");
-+
-+    /* Test always ready */
-+    value =3D qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_READY);
-+    g_assert_cmpuint(value & 0x01, =3D=3D, 0x01);
-+
-+    /* Test write-read config register */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x03);
-+    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFI=
-G),
-+                     =3D=3D, 0x03);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFI=
-G),
-+                     =3D=3D, 0x00);
-+
-+    /* Test PCR0 */
-+    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
-+                   NRF51_NVMC_ERASEPCR0);
-+    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR0);
-+
-+    /* Test PCR1 */
-+    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
-+                   NRF51_NVMC_ERASEPCR1);
-+    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
-+                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR1);
-+
-+    /* Erase all */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        qtest_writel(qts, NRF51_FLASH_BASE + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4), =3D=
-=3D, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < FLASH_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    /* Erase UICR */
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        qtest_writel(qts, NRF51_UICR_BASE + i * 4, i);
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4), =3D=3D=
-, i);
-+    }
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
-+    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
-+
-+    for (i =3D 0; i < NRF51_UICR_SIZE / 4; i++) {
-+        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
-+                         =3D=3D, 0xFFFFFFFF);
-+    }
-+
-+    qtest_quit(qts);
-+}
-+
- static void test_nrf51_gpio(void)
- {
-     size_t i;
-@@ -392,6 +499,7 @@ int main(int argc, char **argv)
-=20
-     qtest_add_func("/microbit/nrf51/uart", test_nrf51_uart);
-     qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
-+    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
-     qtest_add_func("/microbit/nrf51/timer", test_nrf51_timer);
-     qtest_add_func("/microbit/microbit/i2c", test_microbit_i2c);
-=20
---=20
-2.20.1
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
+bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgRmVicnVhcnkgMSwg
+MjAxOSA3OjU1DQo+IFRvOiBBbGV4YW5kcm8gU2FuY2hleiBCYWNoIDxhbGV4YW5kcm9AcGhpLm56
+PjsgJ01hcmt1cyBBcm1icnVzdGVyJw0KPiA8YXJtYnJ1QHJlZGhhdC5jb20+DQo+IENjOiAnUGV0
+ZXIgTWF5ZGVsbCcgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47ICdQZXRlciBLcmVtcGEnDQo+
+IDxwa3JlbXBhQHJlZGhhdC5jb20+OyAnUWVtdS1ibG9jaycgPHFlbXUtYmxvY2tAbm9uZ251Lm9y
+Zz47ICdMaWJ2aXJ0Jw0KPiA8bGlidmlyLWxpc3RAcmVkaGF0LmNvbT47ICdRRU1VIERldmVsb3Bl
+cnMnIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Ow0KPiAnTMOhc3psw7Mgw4lyc2VrJyA8bGVyc2Vr
+QHJlZGhhdC5jb20+OyAnSnVzdGluIFRlcnJ5IChWTSknDQo+IDxqdXRlcnJ5QG1pY3Jvc29mdC5j
+b20+OyBOaW5nLCBZdSA8eXUubmluZ0BpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
+ZXZlbF0gQ29uZmlndXJpbmcgcGZsYXNoIGRldmljZXMgZm9yIE9WTUYgZmlybXdhcmUNCj4gDQo+
+IE9uIDAxLzAyLzE5IDAwOjI4LCBBbGV4YW5kcm8gU2FuY2hleiBCYWNoIHdyb3RlOg0KPiA+IChD
+QydkIFl1IE5pbmcgQCBJbnRlbCdzIEhBWE0gdGVhbSkNCj4gPg0KPiA+IE5vdCBzdXJlLCBpZiBJ
+J20gdW5kZXJzdGFuZGluZyB0aGUgaXNzdWUgY29ycmVjdGx5LCBidXQgaXNuJ3QNCj4gPiBgSEFY
+X1ZNX0lPQ1RMX1NFVF9SQU0yYCB3aXRoIHRoZSBgSEFYX1JBTV9JTkZPX1JPTWAgZmxhZyBwcmVj
+aXNlbHkNCj4gPiB3aGF0IHlvdSBhcmUgbG9va2luZyBmb3I/DQo+ID4NCj4gPiBNb3JlIHByZWNp
+c2VseSwgSEFYX1ZNX0lPQ1RMX1NFVF9SQU0yIG1hcHMgYW4gSFZBIHJhbmdlIHRvIGEgR1BBDQo+
+ID4gcmFuZ2UsIHRoZSBIQVhfUkFNX0lORk9fUk9NIGZsYWcgc2hvdWxkIGFsbG93IG9ubHkgZ3Vl
+c3QgbWVtb3J5IHJlYWRzDQo+ID4gdG8gdGhhdCByYW5nZSBbMV0uIFdoZW4gdGhlIGd1ZXN0IGF0
+dGVtcHRzIHRvIHdyaXRlLCB0aGlzIHNob3VsZA0KPiA+IHRyaWdnZXIgYSBWTSBleGl0IHRoYXQg
+d2lsbCBiZSBoYW5kbGVkIGJ5IFFFTVUuDQo+IA0KPiBUaGUgbWlzc2luZyBoYW5kbGluZyBpcyBp
+biB0aGUgaHlwZXJ2aXNvcjoNCj4gDQo+ICAgICBpZiAocmV0ID09IC1FQUNDRVMpIHsNCj4gICAg
+ICAgICAvKg0KPiAgICAgICAgICAqIEZvciBzb21lIHJlYXNvbiwgZHVyaW5nIGJvb3QtdXAsIENo
+cm9tZSBPUyBndWVzdHMgbWFrZQ0KPiBodW5kcmVkcyBvZg0KPiAgICAgICAgICAqIGF0dGVtcHRz
+IHRvIHdyaXRlIHRvIEdQQXMgY2xvc2UgdG8gNEdCLCB3aGljaCBhcmUgbWFwcGVkIGludG8NCj4g
+QklPUw0KPiAgICAgICAgICAqIChyZWFkLW9ubHkpIGFuZCB0aHVzIHJlc3VsdCBpbiBFUFQgdmlv
+bGF0aW9ucy4NCj4gICAgICAgICAgKiBUT0RPOiBIYW5kbGUgdGhpcyBjYXNlIHByb3Blcmx5Lg0K
+PiAgICAgICAgICAqLw0KPiAgICAgICAgIGhheF93YXJuaW5nKCIlczogVW5leHBlY3RlZCBFUFQg
+dmlvbGF0aW9uIGNhdXNlLiBTa2lwcGluZw0KPiBpbnN0cnVjdGlvbiINCj4gICAgICAgICAgICAg
+ICAgICAgICAiIChsZW49JXUpXG4iLCBfX2Z1bmNfXywNCj4gdmNwdS0+dm14LmV4aXRfaW5zdHJf
+bGVuZ3RoKTsNCj4gICAgICAgICBhZHZhbmNlX3JpcCh2Y3B1KTsNCj4gICAgICAgICByZXR1cm4g
+SEFYX0VYSVQ7DQo+IH0NCj4gDQo+ID4gQWxzbywgdGhpcyBzZWVtcyB0byBiZSBoYW5kbGVkIGhl
+cmU6DQo+ID4NCj4gaHR0cHM6Ly9naXRodWIuY29tL3FlbXUvcWVtdS9ibG9iLzE1YmVkZTU1NDE2
+MmRkYTgyMmNkNzYyYzY4OWVkYjZmYTMNCj4gMmINCj4gPiA2ZTNiL3RhcmdldC9pMzg2L2hheC1t
+ZW0uYyNMMjA1LUwyMDcNCj4gDQo+IFJpZ2h0LCB0aG91Z2ggdG8gYmUgcHJlY2lzZSBpdCBzaG91
+bGQgYmUgY2hhbmdlZCB0bw0KPiANCj4gICAgICBpZiAobWVtb3J5X3JlZ2lvbl9pc19yb20oc2Vj
+dGlvbi0+bXIpIHx8DQo+IAkgbWVtb3J5X3JlZ2lvbl9pc19yb21kKHNlY3Rpb24tPm1yKSkgeyAg
+ICAgICAgIGZsYWdzIHw9DQo+IEhBWF9SQU1fSU5GT19ST007DQo+ICAgICAgfQ0KPiANCj4gZm9y
+IHRoYXQgdG8gd29yay4NCj4gDQoNClRoYW5rIHlvdSBib3RoIGZvciBvdXRsaW5pbmcgdGhlIGNo
+YW5nZXMgd2UgaGF2ZSB0byBtYWtlIGluIG9yZGVyIHRvIHN1cHBvcnQgUk9NRCBtZW1vcnkgcmVn
+aW9ucyEgIFRoZSBvbmx5IHF1ZXN0aW9uIGlzIHdoZXRoZXIgd2Ugc2hvdWxkIHBhc3MgYSBuZXcg
+ZmxhZyB0byBIQVhfVk1fSU9DVExfU0VUX1JBTTIgZm9yIFJPTUQsIHNvIHRoZSBoeXBlcnZpc29y
+IGNvdWxkIHJlc3BvbmQgZGlmZmVyZW50bHkgdG8gd3JpdGVzIHRvIFJPTSBhbmQgUk9NRCByZWdp
+b25zLiAgV291bGQgdGhhdCBiZSB1c2VmdWwgYXQgYWxsPyAgV2hhdCB3b3VsZCBoYXBwZW4gaWYg
+SEFYTSBhc2tlZCBRRU1VIHRvIGVtdWxhdGUgYSB3cml0ZSB0byBST00/DQoNCkhBWE0gZGlkbid0
+IGltcGxlbWVudCBST01EIHN1cHBvcnQgYXQgZmlyc3QsIGJlY2F1c2UgdGhlIGd1ZXN0cyB3ZSB0
+ZXN0ZWQgY291bGQgYm9vdCB3aXRob3V0IGl0IChpbmNsdWRpbmcgQ2hyb21lIE9TKS4gIE5vdyB0
+aGF0IHRoaXMgZmVhdHVyZSBoYXMgYmVjb21lIG1vcmUgcG9wdWxhciAoYW5kIHdlIHdhbnQgdG8g
+YmUgYWJsZSB0byBib290IE9WTUYpLCBJIHRoaW5rIGl0J3MgdGltZSB0byBnZXQgaXQgZG9uZS4g
+IEknZCBsaWtlIHRvIGdldCB0byBpdCBhZnRlciB0aGUgTHVuYXIgTmV3IFllYXIgaG9saWRheXMs
+IGJ1dCBpZiBhbnlvbmUgY2FuIGZpbmlzaCBpdCBzb29uZXIsIEknbGwgYmUgaGFwcHkgdG8gbWVy
+Z2UgdGhlaXIgcGF0Y2ggaW50byBIQVhNLg0KDQotWXUNCg==
