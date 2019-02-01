@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59111)
+Received: from eggs.gnu.org ([209.51.188.92]:59226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMG-0008Iu-0n
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMJ-0008LD-RD
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003jp-2z
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:59 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39803)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0003mz-16
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:03 -0500
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003N2-Ix
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id y8so6725845wmi.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:23 -0800 (PST)
+	id 1gpbMC-0003lp-PH
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:56 -0500
+Received: by mail-wm1-x329.google.com with SMTP id t200so6823395wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:56 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.21
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.53
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:21 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:54 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:26 +0000
-Message-Id: <20190201160653.13829-21-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:53 +0000
+Message-Id: <20190201160653.13829-48-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 20/47] hw/misc/armsse-cpuid: Implement SSE-200
- CPU_IDENTITY register block
+Subject: [Qemu-devel] [PULL 47/47] tests/microbit-test: Add tests for nRF51
+ NVMC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,260 +37,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The SSE-200 has a CPU_IDENTITY register block, which is a set of
-read-only registers. As well as the usual PID/CID registers, there
-is a single CPUID register which indicates whether the CPU is CPU 0
-or CPU 1. Implement a model of this register block.
+From: Steffen Görtz <contrib@steffen-goertz.de>
 
+Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190201023357.22596-4-stefanha@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-20-peter.maydell@linaro.org
 ---
- hw/misc/Makefile.objs           |   1 +
- include/hw/misc/armsse-cpuid.h  |  41 ++++++++++
- hw/misc/armsse-cpuid.c          | 134 ++++++++++++++++++++++++++++++++
- MAINTAINERS                     |   2 +
- default-configs/arm-softmmu.mak |   1 +
- hw/misc/trace-events            |   4 +
- 6 files changed, 183 insertions(+)
- create mode 100644 include/hw/misc/armsse-cpuid.h
- create mode 100644 hw/misc/armsse-cpuid.c
+ tests/microbit-test.c | 108 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 04f3bfa516e..74c91d250c8 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -69,6 +69,7 @@ obj-$(CONFIG_TZ_PPC) += tz-ppc.o
- obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
- obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
- obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
-+obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
+diff --git a/tests/microbit-test.c b/tests/microbit-test.c
+index 3bad947b6cd..04e199ec33f 100644
+--- a/tests/microbit-test.c
++++ b/tests/microbit-test.c
+@@ -21,6 +21,7 @@
+ #include "hw/arm/nrf51.h"
+ #include "hw/char/nrf51_uart.h"
+ #include "hw/gpio/nrf51_gpio.h"
++#include "hw/nvram/nrf51_nvm.h"
+ #include "hw/timer/nrf51_timer.h"
+ #include "hw/i2c/microbit_i2c.h"
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_AUX) += auxbus.o
-diff --git a/include/hw/misc/armsse-cpuid.h b/include/hw/misc/armsse-cpuid.h
-new file mode 100644
-index 00000000000..0ef33fcaba2
---- /dev/null
-+++ b/include/hw/misc/armsse-cpuid.h
-@@ -0,0 +1,41 @@
-+/*
-+ * ARM SSE-200 CPU_IDENTITY register block
-+ *
-+ * Copyright (c) 2019 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
+@@ -156,6 +157,112 @@ static void test_microbit_i2c(void)
+     qtest_quit(qts);
+ }
+ 
++#define FLASH_SIZE          (256 * NRF51_PAGE_SIZE)
 +
-+/*
-+ * This is a model of the "CPU_IDENTITY" register block which is part of the
-+ * Arm SSE-200 and documented in
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.101104_0100_00_en/corelink_sse200_subsystem_for_embedded_technical_reference_manual_101104_0100_00_en.pdf
-+ *
-+ * QEMU interface:
-+ *  + QOM property "CPUID": the value to use for the CPUID register
-+ *  + sysbus MMIO region 0: the system information register bank
-+ */
-+
-+#ifndef HW_MISC_ARMSSE_CPUID_H
-+#define HW_MISC_ARMSSE_CPUID_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_ARMSSE_CPUID "armsse-cpuid"
-+#define ARMSSE_CPUID(obj) OBJECT_CHECK(ARMSSECPUID, (obj), TYPE_ARMSSE_CPUID)
-+
-+typedef struct ARMSSECPUID {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem;
-+
-+    /* Properties */
-+    uint32_t cpuid;
-+} ARMSSECPUID;
-+
-+#endif
-diff --git a/hw/misc/armsse-cpuid.c b/hw/misc/armsse-cpuid.c
-new file mode 100644
-index 00000000000..7788f6ced6a
---- /dev/null
-+++ b/hw/misc/armsse-cpuid.c
-@@ -0,0 +1,134 @@
-+/*
-+ * ARM SSE-200 CPU_IDENTITY register block
-+ *
-+ * Copyright (c) 2019 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the "CPU_IDENTITY" register block which is part of the
-+ * Arm SSE-200 and documented in
-+ * http://infocenter.arm.com/help/topic/com.arm.doc.101104_0100_00_en/corelink_sse200_subsystem_for_embedded_technical_reference_manual_101104_0100_00_en.pdf
-+ *
-+ * It consists of one read-only CPUID register (set by QOM property), plus the
-+ * usual ID registers.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/armsse-cpuid.h"
-+
-+REG32(CPUID, 0x0)
-+REG32(PID4, 0xfd0)
-+REG32(PID5, 0xfd4)
-+REG32(PID6, 0xfd8)
-+REG32(PID7, 0xfdc)
-+REG32(PID0, 0xfe0)
-+REG32(PID1, 0xfe4)
-+REG32(PID2, 0xfe8)
-+REG32(PID3, 0xfec)
-+REG32(CID0, 0xff0)
-+REG32(CID1, 0xff4)
-+REG32(CID2, 0xff8)
-+REG32(CID3, 0xffc)
-+
-+/* PID/CID values */
-+static const int sysinfo_id[] = {
-+    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
-+    0x58, 0xb8, 0x0b, 0x00, /* PID0..PID3 */
-+    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-+};
-+
-+static uint64_t armsse_cpuid_read(void *opaque, hwaddr offset,
-+                                    unsigned size)
++static void fill_and_erase(QTestState *qts, hwaddr base, hwaddr size,
++                           uint32_t address_reg)
 +{
-+    ARMSSECPUID *s = ARMSSE_CPUID(opaque);
-+    uint64_t r;
++    hwaddr i;
 +
-+    switch (offset) {
-+    case A_CPUID:
-+        r = s->cpuid;
-+        break;
-+    case A_PID4 ... A_CID3:
-+        r = sysinfo_id[(offset - A_PID4) / 4];
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "SSE CPU_IDENTITY read: bad offset 0x%x\n", (int)offset);
-+        r = 0;
-+        break;
++    /* Erase Page */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + address_reg, base);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    /* Check memory */
++    for (i = 0; i < size / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, base + i * 4), ==, 0xFFFFFFFF);
 +    }
-+    trace_armsse_cpuid_read(offset, r, size);
-+    return r;
++
++    /* Fill memory */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < size / 4; i++) {
++        qtest_writel(qts, base + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, base + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
 +}
 +
-+static void armsse_cpuid_write(void *opaque, hwaddr offset,
-+                                 uint64_t value, unsigned size)
++static void test_nrf51_nvmc(void)
 +{
-+    trace_armsse_cpuid_write(offset, value, size);
++    uint32_t value;
++    hwaddr i;
++    QTestState *qts = qtest_init("-M microbit");
 +
-+    qemu_log_mask(LOG_GUEST_ERROR,
-+                  "SSE CPU_IDENTITY: write to RO offset 0x%x\n", (int)offset);
++    /* Test always ready */
++    value = qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_READY);
++    g_assert_cmpuint(value & 0x01, ==, 0x01);
++
++    /* Test write-read config register */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x03);
++    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG),
++                     ==, 0x03);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++    g_assert_cmpuint(qtest_readl(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG),
++                     ==, 0x00);
++
++    /* Test PCR0 */
++    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
++                   NRF51_NVMC_ERASEPCR0);
++    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
++                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR0);
++
++    /* Test PCR1 */
++    fill_and_erase(qts, NRF51_FLASH_BASE, NRF51_PAGE_SIZE,
++                   NRF51_NVMC_ERASEPCR1);
++    fill_and_erase(qts, NRF51_FLASH_BASE + NRF51_PAGE_SIZE,
++                   NRF51_PAGE_SIZE, NRF51_NVMC_ERASEPCR1);
++
++    /* Erase all */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < FLASH_SIZE / 4; i++) {
++        qtest_writel(qts, NRF51_FLASH_BASE + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEALL, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < FLASH_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_FLASH_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    /* Erase UICR */
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x01);
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        qtest_writel(qts, NRF51_UICR_BASE + i * 4, i);
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4), ==, i);
++    }
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x02);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_ERASEUICR, 0x01);
++    qtest_writel(qts, NRF51_NVMC_BASE + NRF51_NVMC_CONFIG, 0x00);
++
++    for (i = 0; i < NRF51_UICR_SIZE / 4; i++) {
++        g_assert_cmpuint(qtest_readl(qts, NRF51_UICR_BASE + i * 4),
++                         ==, 0xFFFFFFFF);
++    }
++
++    qtest_quit(qts);
 +}
 +
-+static const MemoryRegionOps armsse_cpuid_ops = {
-+    .read = armsse_cpuid_read,
-+    .write = armsse_cpuid_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    /* byte/halfword accesses are just zero-padded on reads and writes */
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+};
-+
-+static Property armsse_cpuid_props[] = {
-+    DEFINE_PROP_UINT32("CPUID", ARMSSECPUID, cpuid, 0),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void armsse_cpuid_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    ARMSSECPUID *s = ARMSSE_CPUID(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &armsse_cpuid_ops,
-+                          s, "armsse-cpuid", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static void armsse_cpuid_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    /*
-+     * This device has no guest-modifiable state and so it
-+     * does not need a reset function or VMState.
-+     */
-+
-+    dc->props = armsse_cpuid_props;
-+}
-+
-+static const TypeInfo armsse_cpuid_info = {
-+    .name = TYPE_ARMSSE_CPUID,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ARMSSECPUID),
-+    .instance_init = armsse_cpuid_init,
-+    .class_init = armsse_cpuid_class_init,
-+};
-+
-+static void armsse_cpuid_register_types(void)
-+{
-+    type_register_static(&armsse_cpuid_info);
-+}
-+
-+type_init(armsse_cpuid_register_types);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c2ad4e52c9d..a70ecb1a696 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -631,6 +631,8 @@ F: hw/misc/iotkit-sysctl.c
- F: include/hw/misc/iotkit-sysctl.h
- F: hw/misc/iotkit-sysinfo.c
- F: include/hw/misc/iotkit-sysinfo.h
-+F: hw/misc/armsse-cpuid.c
-+F: include/hw/misc/armsse-cpuid.h
+ static void test_nrf51_gpio(void)
+ {
+     size_t i;
+@@ -392,6 +499,7 @@ int main(int argc, char **argv)
  
- Musicpal
- M: Jan Kiszka <jan.kiszka@web.de>
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 3f200157879..be88870799c 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -118,6 +118,7 @@ CONFIG_ARMSSE=y
- CONFIG_IOTKIT_SECCTL=y
- CONFIG_IOTKIT_SYSCTL=y
- CONFIG_IOTKIT_SYSINFO=y
-+CONFIG_ARMSSE_CPUID=y
+     qtest_add_func("/microbit/nrf51/uart", test_nrf51_uart);
+     qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
++    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
+     qtest_add_func("/microbit/nrf51/timer", test_nrf51_timer);
+     qtest_add_func("/microbit/microbit/i2c", test_microbit_i2c);
  
- CONFIG_VERSATILE=y
- CONFIG_VERSATILE_PCI=y
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 52466c77c4e..b0701bddd3c 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -132,3 +132,7 @@ iotkit_sysinfo_write(uint64_t offset, uint64_t data, unsigned size) "IoTKit SysI
- iotkit_sysctl_read(uint64_t offset, uint64_t data, unsigned size) "IoTKit SysCtl read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- iotkit_sysctl_write(uint64_t offset, uint64_t data, unsigned size) "IoTKit SysCtl write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- iotkit_sysctl_reset(void) "IoTKit SysCtl: reset"
-+
-+# hw/misc/armsse-cpuid.c
-+armsse_cpuid_read(uint64_t offset, uint64_t data, unsigned size) "SSE-200 CPU_IDENTITY read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+armsse_cpuid_write(uint64_t offset, uint64_t data, unsigned size) "SSE-200 CPU_IDENTITY write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
 -- 
 2.20.1
