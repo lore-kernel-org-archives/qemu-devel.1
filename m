@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33766)
+Received: from eggs.gnu.org ([209.51.188.92]:37714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gphTi-00083s-Kc
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:07 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gphd7-0001Xa-BF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leozinho29_eu@hotmail.com>) id 1gphTd-0000Eb-Rc
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:04 -0500
-Received: from mail-oln040092012065.outbound.protection.outlook.com
-	([40.92.12.65]:26112
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
-	id 1gphTd-0000Cy-EY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:01 -0500
-From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
-Date: Fri, 1 Feb 2019 22:39:59 +0000
-Message-ID: <RO1P152MB14835BC3FB1EB24158F9FC7F97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190128121331.GB2939@work-vm>
-	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190128173536.GE2585@work-vm>
-	<RO1P152MB14834BE5D9747719CD493C5297960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190201133639.GE3150@work-vm>
-	<RO1P152MB148380E67D93DAB6C8093EFE97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190201202807.GH3150@work-vm>
-In-Reply-To: <20190201202807.GH3150@work-vm>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <67629B5FC7BBB44496F9F5096C718CE2@LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1gphd5-0002HL-A4
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:49:49 -0500
+References: <20190131010136.12007-1-jsnow@redhat.com>
+	<bd72a7c8-e283-dd3a-66e8-ba50873a8717@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <25c4dfd9-9aa9-9eb0-88c0-58df87e17c25@redhat.com>
+Date: Fri, 1 Feb 2019 17:49:32 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
+In-Reply-To: <bd72a7c8-e283-dd3a-66e8-ba50873a8717@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] block/dirty-bitmap: Documentation and
+ Comment fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,114 +25,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Max Reitz <mreitz@redhat.com>
 
-VGhhbmsgeW91IGZvciB0ZXN0aW5nIHRoaXMsIHRoZSBsYXN0IHVwZGF0ZSBncmVhdGx5IGltcHJv
-dmVkIHRoZQ0Kc2l0dWF0aW9uLiBsaWJzcGljZS1zZXJ2ZXIxIHVwZGF0ZWQsIHNvIEkgcmVidWls
-dCBRRU1VLiBUaGUNCmxpYnNwaWNlLXNlcnZlcjEgMC4xNC4wLTF1YnVudHUyLjQgY2hhbmdlIGxv
-ZyBpczoNCg0KICAqIFNFQ1VSSVRZIFVQREFURTogb2ZmLWJ5LW9uZSBlcnJvciBpbiBtZW1zbG90
-X2dldF92aXJ0DQogICAgLSBkZWJpYW4vcGF0Y2hlcy9DVkUtMjAxOS0zODEzLnBhdGNoOiBmaXgg
-Y2hlY2tzIGluIHNlcnZlci9tZW1zbG90LmMsDQogICAgICBhZGQgdGVzdHMgdG8gc2VydmVyL3Rl
-c3RzL3Rlc3QtcXhsLXBhcnNpbmcuYy4NCiAgICAtIENWRS0yMDE5LTM4MTMNCiAgKiBkZWJpYW4v
-dGVzdHMvYXV0b21hdGVkLXRlc3RzOiBmaXggaW5jb3JyZWN0IHRlc3QgbmFtZSwgZG9uJ3QgZmFp
-bCBvbg0KICAgIGJ1aWxkIHdyaXRpbmcgdG8gc3RkZXJyLg0KDQpUaGUgZXJyb3JzIG9uIHRlcm1p
-bmFsIGFyZToNCg0KKHFlbXU6MTE2ODMpOiBTcGljZS1DUklUSUNBTCAqKjogMTg6Mzk6NDAuNzQ3
-Og0KbWVtc2xvdC5jOjExMTptZW1zbG90X2dldF92aXJ0OiBzbG90X2lkIDI1NSB0b28gYmlnLCBh
-ZGRyPWZmMDAwMDAwZmYwMDAwMDANCkFib3J0YWRvIChpbWFnZW0gZG8gbsO6Y2xlbyBncmF2YWRh
-KQ0KDQpUaGUgZnVuY3Rpb24gdGhhdCB3YXMgY2hhbmdlZCB3aXRoIHRoZSBsYXN0IHVwZGF0ZSBz
-ZWVtcyB0byBiZSB0aGUgZXhhY3QNCnNhbWUgZnVuY3Rpb24gdGhhdCB3YXMgY2F1c2luZyB0aGUg
-Y3Jhc2guIE5vdyB0aGUgY3Jhc2ggaGFwcGVucyBPTkxZIGluDQp0aGUgZmlyc3QgZXhlY3V0aW9u
-LiBBbGwgc3Vic2VxdWVudCBleGVjdXRpb25zIHdvcmsgY29ycmVjdGx5Lg0KDQpXaGlsZSB0aGUg
-Z3Vlc3QgY3Jhc2hlcyBvbiB0aGUgZmlyc3QgZXhlY3V0aW9uLCBpdCBzZWVtcyB0aGUgZ3Vlc3Qg
-ZmlsZQ0Kc3lzdGVtIGlzIHJlc2lsaWVudCBlbm91Z2ggdG8gc3VmZmVyIG5vIGRhbWFnZXMgZnJv
-bSB0aGUgY3Jhc2ggb24gdGhlDQpmaXJzdCBib290IGFuZCBzdWJzZXF1ZW50IGJvb3RzIGFsbCBz
-ZWVtIHBlcmZlY3QuDQoNCkkgaW5zdGFsbGVkIHRoZSBkZWJ1ZyBzeW1ib2xzIGZvciBsaWJnbGli
-LTIuMCB0b28sIGhvcGVmdWxseSB0aGUNCmFkZGl0aW9uYWwgZGVidWcgbWVzc2FnZXMgaGF2ZSBz
-b21lIHVzZWZ1bCBpbmZvcm1hdGlvbi4gRnJvbSB0aGUgZmlyc3QNCmV4ZWN1dGlvbiB0aGF0IGNy
-YXNoZXMgKGd0ayxnbD1vbiBhbmQgZ3RrIGhhZCB0aGUgc2FtZSByZXN1bHQpOg0KDQpxZW11LXN5
-c3RlbS14ODZfNjQgLWFjY2VsIGt2bSAtY3B1IGhvc3QgLXNtcCBjb3Jlcz0yLHRocmVhZHM9MSAt
-bSAyMDQ4DQotaGRhIG5lb25icm9rZW4ucWNvdzIgLWRldmljZSBxeGwtdmdhLHhyZXM9MTM2Nix5
-cmVzPTc2OCxhZGRyPTIgLWRpc3BsYXkNCmd0ayxnbD1vbiAtbW9uaXRvciB2YyAtc2VyaWFsIHZj
-IC1kZXZpY2UgcWVtdS14aGNpLGFkZHI9MyAtbmV0ZGV2DQp1c2VyLGlkPW5ldDAgLWRldmljZSBl
-MTAwMCxuZXRkZXY9bmV0MCxhZGRyPTQgLWJpb3MgL3Vzci9zaGFyZS9vdm1mL09WTUYuZmQNCg0K
-aWQgMCwgZ3JvdXAgMCwgdmlydCBzdGFydCAwLCB2aXJ0IGVuZCBmZmZmZmZmZmZmZmZmZmZmLCBn
-ZW5lcmF0aW9uIDAsDQpkZWx0YSAwDQppZCAxLCBncm91cCAxLCB2aXJ0IHN0YXJ0IDdmZmYxZmUw
-MDAwMCwgdmlydCBlbmQgN2ZmZjIzZGZlMDAwLA0KZ2VuZXJhdGlvbiAwLCBkZWx0YSA3ZmZmMWZl
-MDAwMDANCmlkIDIsIGdyb3VwIDEsIHZpcnQgc3RhcnQgN2ZmZjFiYzAwMDAwLCB2aXJ0IGVuZCA3
-ZmZmMWZjMDAwMDAsDQpnZW5lcmF0aW9uIDAsIGRlbHRhIDdmZmYxYmMwMDAwMA0KDQoocWVtdTox
-OTM3KTogU3BpY2UtQ1JJVElDQUwgKio6IDIwOjE3OjIxLjYyMzoNCm1lbXNsb3QuYzoxMTE6bWVt
-c2xvdF9nZXRfdmlydDogc2xvdF9pZCAyNTUgdG9vIGJpZywgYWRkcj1mZjAwMDAwMGZmMDAwMDAw
-DQoNCihnZGIpIGJ0DQojMCAgMHgwMDAwN2ZmZmYwMzcxZTk3IGluIF9fR0lfcmFpc2UgKHNpZz1z
-aWdAZW50cnk9NikgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4L3JhaXNlLmM6NTENCiMx
-ICAweDAwMDA3ZmZmZjAzNzM4MDEgaW4gX19HSV9hYm9ydCAoKSBhdCBhYm9ydC5jOjc5DQojMiAg
-MHgwMDAwN2ZmZmYxMTZmY2M5IGluIHNwaWNlX2xvZ3YgKGxvZ19kb21haW49MHg3ZmZmZjExZGE5
-ZjUgIlNwaWNlIiwNCmFyZ3M9MHg3ZmZmMzYwMjhjYjAsIGZvcm1hdD0weDdmZmZmMTFlMWM1YiAi
-c2xvdF9pZCAlZCB0b28gYmlnLA0KYWRkcj0lbHgiLCBmdW5jdGlvbj0weDdmZmZmMTFlMWQ5MCA8
-X19GVU5DVElPTl9fLjE1NTk0Pg0KIm1lbXNsb3RfZ2V0X3ZpcnQiLCBzdHJsb2M9MHg3ZmZmZjEx
-ZTFjNzggIm1lbXNsb3QuYzoxMTEiLA0KbG9nX2xldmVsPUdfTE9HX0xFVkVMX0NSSVRJQ0FMKSBh
-dCBsb2cuYzoxODMNCiMzICAweDAwMDA3ZmZmZjExNmZjYzkgaW4gc3BpY2VfbG9nDQoobG9nX2xl
-dmVsPWxvZ19sZXZlbEBlbnRyeT1HX0xPR19MRVZFTF9DUklUSUNBTCwNCnN0cmxvYz1zdHJsb2NA
-ZW50cnk9MHg3ZmZmZjExZTFjNzggIm1lbXNsb3QuYzoxMTEiLA0KZnVuY3Rpb249ZnVuY3Rpb25A
-ZW50cnk9MHg3ZmZmZjExZTFkOTAgPF9fRlVOQ1RJT05fXy4xNTU5ND4NCiJtZW1zbG90X2dldF92
-aXJ0IiwgZm9ybWF0PWZvcm1hdEBlbnRyeT0weDdmZmZmMTFlMWM1YiAic2xvdF9pZCAlZCB0b28N
-CmJpZywgYWRkcj0lbHgiKSBhdCBsb2cuYzoxOTYNCiM0ICAweDAwMDA3ZmZmZjExMzUzYjggaW4g
-bWVtc2xvdF9nZXRfdmlydA0KKGluZm89aW5mb0BlbnRyeT0weDU1NTU1NzliY2UxMCwgYWRkcj1h
-ZGRyQGVudHJ5PTE4Mzc0Njg2NDgzOTQ5ODEzNzYwLA0KYWRkX3NpemU9YWRkX3NpemVAZW50cnk9
-MTAsIGdyb3VwX2lkPWdyb3VwX2lkQGVudHJ5PTEsDQplcnJvcj1lcnJvckBlbnRyeT0weDdmZmYz
-NjAyOGUwOCkgYXQgbWVtc2xvdC5jOjExMQ0KIzUgIDB4MDAwMDdmZmZmMTEzZTdkMCBpbiByZWRf
-Z2V0X2ltYWdlDQooc2xvdHM9c2xvdHNAZW50cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPWdy
-b3VwX2lkQGVudHJ5PTEsDQphZGRyPTxvcHRpbWl6ZWQgb3V0PiwgZmxhZ3M9ZmxhZ3NAZW50cnk9
-MCwgaXNfbWFzaz1pc19tYXNrQGVudHJ5PWZhbHNlKQ0KYXQgcmVkLXBhcnNlLXF4bC5jOjUxMg0K
-IzYgIDB4MDAwMDdmZmZmMTEzZWE3NiBpbiByZWRfZ2V0X2NvcHlfcHRyDQooc2xvdHM9c2xvdHNA
-ZW50cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPWdyb3VwX2lkQGVudHJ5PTEsDQpyZWQ9cmVk
-QGVudHJ5PTB4N2ZmZjE0MDlmMzMwLCBxeGw9MHg3ZmZmMWZlMDEwN2IsIGZsYWdzPWZsYWdzQGVu
-dHJ5PTApDQphdCByZWQtcGFyc2UtcXhsLmM6NjgwDQojNyAgMHgwMDAwN2ZmZmYxMTNmOWExIGlu
-IHJlZF9nZXRfbmF0aXZlX2RyYXdhYmxlIChmbGFncz08b3B0aW1pemVkDQpvdXQ+LCBhZGRyPTxv
-cHRpbWl6ZWQgb3V0PiwgcmVkPTxvcHRpbWl6ZWQgb3V0PiwgZ3JvdXBfaWQ9PG9wdGltaXplZA0K
-b3V0Piwgc2xvdHM9PG9wdGltaXplZCBvdXQ+KSBhdCByZWQtcGFyc2UtcXhsLmM6MTA3Mg0KIzgg
-IDB4MDAwMDdmZmZmMTEzZjlhMSBpbiByZWRfZ2V0X2RyYXdhYmxlDQooc2xvdHM9c2xvdHNAZW50
-cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPTEsDQpyZWQ9cmVkQGVudHJ5PTB4N2ZmZjE0MDlm
-MjkwLCBhZGRyPTxvcHRpbWl6ZWQgb3V0PiwgZmxhZ3M9MCkgYXQNCnJlZC1wYXJzZS1xeGwuYzox
-MjA2DQojOSAgMHgwMDAwN2ZmZmYxMTUyM2NkIGluIHJlZF9wcm9jZXNzX2Rpc3BsYXkgKHdvcmtl
-cj0weDU1NTU1NzliY2Q4MCwNCnJpbmdfaXNfZW1wdHk9MHg3ZmZmMzYwMjhmOWMpIGF0IHJlZC13
-b3JrZXIuYzoyMjQNCiMxMCAweDAwMDA3ZmZmZjExNTBkMjEgaW4gZmx1c2hfY29tbWFuZHMNCih3
-b3JrZXI9d29ya2VyQGVudHJ5PTB4NTU1NTU3OWJjZDgwLCByZWRfY2hhbm5lbD0weDU1NTU1Nzli
-OTIxMA0KW0Rpc3BsYXlDaGFubmVsXSwgcHJvY2Vzcz1wcm9jZXNzQGVudHJ5PTB4N2ZmZmYxMTUy
-MjIwDQo8cmVkX3Byb2Nlc3NfZGlzcGxheT4pIGF0IHJlZC13b3JrZXIuYzozMTUNCiMxMSAweDAw
-MDA3ZmZmZjExNTBlNTggaW4gZmx1c2hfZGlzcGxheV9jb21tYW5kcw0KKHdvcmtlcj13b3JrZXJA
-ZW50cnk9MHg1NTU1NTc5YmNkODApIGF0IHJlZC13b3JrZXIuYzozNTINCiMxMiAweDAwMDA3ZmZm
-ZjExNTE0YmYgaW4gZmx1c2hfYWxsX3F4bF9jb21tYW5kcyAod29ya2VyPTB4NTU1NTU3OWJjZDgw
-KQ0KYXQgcmVkLXdvcmtlci5jOjM2Nw0KIzEzIDB4MDAwMDdmZmZmMTE1MTRiZiBpbiBkZXN0cm95
-X3ByaW1hcnlfc3VyZmFjZQ0KKHdvcmtlcj0weDU1NTU1NzliY2Q4MCwgc3VyZmFjZV9pZD0wKSBh
-dCByZWQtd29ya2VyLmM6NTU4DQojMTQgMHgwMDAwN2ZmZmYxMTFmNGYxIGluIGRpc3BhdGNoZXJf
-aGFuZGxlX3NpbmdsZV9yZWFkDQooZGlzcGF0Y2hlcj0weDU1NTU1NmExZDFjMCBbRGlzcGF0Y2hl
-cl0pIGF0IGRpc3BhdGNoZXIuYzoyODQNCiMxNSAweDAwMDA3ZmZmZjExMWY0ZjEgaW4gZGlzcGF0
-Y2hlcl9oYW5kbGVfcmVjdl9yZWFkDQooZGlzcGF0Y2hlcj0weDU1NTU1NmExZDFjMCBbRGlzcGF0
-Y2hlcl0pIGF0IGRpc3BhdGNoZXIuYzozMDQNCiMxNiAweDAwMDA3ZmZmZjExMjVkN2IgaW4gd2F0
-Y2hfZnVuYyAoc291cmNlPTxvcHRpbWl6ZWQgb3V0PiwNCmNvbmRpdGlvbj08b3B0aW1pemVkIG91
-dD4sIGRhdGE9MHg1NTU1NTc5YmNmNjApIGF0IGV2ZW50LWxvb3AuYzoxMjgNCiMxNyAweDAwMDA3
-ZmZmZjQ3OTExZjUgaW4gZ19tYWluX2Rpc3BhdGNoIChjb250ZXh0PTB4NTU1NTU3OWJjZTcwKSBh
-dA0KLi4vLi4vLi4vLi4vZ2xpYi9nbWFpbi5jOjMxNzYNCiMxOCAweDAwMDA3ZmZmZjQ3OTExZjUg
-aW4gZ19tYWluX2NvbnRleHRfZGlzcGF0Y2gNCihjb250ZXh0PWNvbnRleHRAZW50cnk9MHg1NTU1
-NTc5YmNlNzApIGF0IC4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzozODI5DQojMTkgMHgwMDAwN2Zm
-ZmY0NzkxNWMwIGluIGdfbWFpbl9jb250ZXh0X2l0ZXJhdGUNCihjb250ZXh0PTB4NTU1NTU3OWJj
-ZTcwLCBibG9jaz1ibG9ja0BlbnRyeT0xLCBkaXNwYXRjaD1kaXNwYXRjaEBlbnRyeT0xLA0Kc2Vs
-Zj08b3B0aW1pemVkIG91dD4pIGF0IC4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzozOTAyDQojMjAg
-MHgwMDAwN2ZmZmY0NzkxOGQyIGluIGdfbWFpbl9sb29wX3J1biAobG9vcD0weDdmZmYxNDAwMjUz
-MCkgYXQNCi4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzo0MDk4DQojMjEgMHgwMDAwN2ZmZmYxMTUx
-YjNhIGluIHJlZF93b3JrZXJfbWFpbiAoYXJnPTB4NTU1NTU3OWJjZDgwKSBhdA0KcmVkLXdvcmtl
-ci5jOjEzNzINCiMyMiAweDAwMDA3ZmZmZjA3MmI2ZGIgaW4gc3RhcnRfdGhyZWFkIChhcmc9MHg3
-ZmZmMzYwMmM3MDApIGF0DQpwdGhyZWFkX2NyZWF0ZS5jOjQ2Mw0KIzIzIDB4MDAwMDdmZmZmMDQ1
-NDg4ZiBpbiBjbG9uZSAoKSBhdA0KLi4vc3lzZGVwcy91bml4L3N5c3YvbGludXgveDg2XzY0L2Ns
-b25lLlM6OTUNCg0Kw4BzIDE4OjI4IGRlIDAxLzAyLzIwMTksIERyLiBEYXZpZCBBbGFuIEdpbGJl
-cnQgZXNjcmV2ZXU6DQo+IA0KPiBSaWdodCB5ZXM7IGFzIHlvdSBzYXkgd2l0aCBoZGEgaXQncyBm
-aW5lOyAgSSd2ZSBwb2ludGVkIFBhb2xvIGF0DQo+IHRoaXMgb25lLg0KPiANCj4gQXMgZm9yIHRo
-ZSBvcmlnaW5hbCBjcmFzaDsgSSBjYW4ndCByZXByb2R1Y2UgaXQgaGVyZSAoT24gRmVkb3JhIDI5
-LA0KPiBoZWFkIHFlbXUpOg0KPiAuL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLXg4Nl82NCAt
-Y3B1IGhvc3QgIC1NIHBjLGFjY2VsPWt2bSAtc21wIDMgLW0gOEcgLWRyaXZlIGlmPWlkZSxmaWxl
-PS9ob21lL3ZtaW1hZ2VzL2tkZS1uZW9uLnFjb3cyIC1kaXNwbGF5IGd0ayxnbD1vbiAtZGV2aWNl
-IHFlbXUteGhjaSxhZGRyPTMgLWRldmljZSBxeGwtdmdhLHhyZXM9MTM2Nix5cmVzPTc2OCxhZGRy
-PTQgLWJpb3MgL3Vzci9zaGFyZS9PVk1GL09WTUZfQ09ERS5mZA0KPiANCj4gRGF2ZQ0KPiANCj4g
-LS0NCj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRnaWxiZXJ0QHJlZGhhdC5jb20gLyBNYW5j
-aGVzdGVyLCBVSw0KPiANCg==
+
+
+On 1/31/19 3:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 31.01.2019 4:01, John Snow wrote:
+>> The meaning of the states has changed subtly over time,
+>> this should bring the understanding more in-line with the
+>> current, actual usages.
+>>
+>> Reported-by: Eric Blake <eblake@redhat.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   block/dirty-bitmap.c | 19 +++++++++++++------
+>>   qapi/block-core.json | 17 ++++++++++++-----
+>>   2 files changed, 25 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 00ea36f554..e2adf54dd3 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -29,12 +29,19 @@
+>>   #include "block/blockjob.h"
+>>   
+>>   /**
+>> - * A BdrvDirtyBitmap can be in three possible states:
+>> - * (1) successor is NULL and disabled is false: full r/w mode
+>> - * (2) successor is NULL and disabled is true: read only mode ("disabled")
+>> - * (3) successor is set: frozen mode.
+>> - *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared, set,
+>> - *     or enabled. A frozen bitmap can only abdicate() or reclaim().
+>> + * A BdrvDirtyBitmap can be in four possible user-visible states:
+>> + * (1) Active:   successor is NULL, and disabled is false: full r/w mode
+>> + * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
+>> + *               guest writes are dropped, but monitor writes are possible,
+>> + *               through commands like merge and clear.
+>> + * (3) Frozen:   successor is not null.
+>> + *               A frozen bitmap cannot be renamed, deleted, cleared, set,
+>> + *               enabled, merged to, etc. A frozen bitmap can only abdicate()
+>> + *               or reclaim().
+>> + *               In this state, the successor bitmap is Active and will
+>> + *               generally be recording writes from the guest for us.
+> 
+> Not necessarily. Frozen bitmap may be disabled in the same time, and successor is then
+> disabled too.
+> 
+> So, disabled/enabled is orthogonal to normal/frozen/locked..
+> 
+
+Ah, yeah, I was trying to communicate this but I failed. I shouldn't use
+wiggly language like "generally." I'll clean this up to be more explicit.
+
+> Hm, while looking at this, I see that we don't check in _create_successor for locked
+> state, so we theoretically could create frozen-locked..
+> 
+> Also, I remember there was an idea of deprecating Frozen and reporting Locked for
+> backup too, didn't you think about it? So, successors becomes internal and invisible by
+> user in any sense, and we just say "Locked".
+> 
+
+That would be better. Would it cause any harm to clients that know about
+"Frozen" but not about "Locked"? This might have to be a 3-releases
+deprecation change.
+
+> Anyway patch is good, I'd just prefer to fix it here, to show that Frozen may be disabled too.
+> 
+> 
+>> + * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
+>> + *               in any way from the monitor.
+>>    */
+>>   struct BdrvDirtyBitmap {
+>>       QemuMutex *mutex;
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 91685be6c2..eba126c76e 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -418,10 +418,12 @@
+>>   # An enumeration of possible states that a dirty bitmap can report to the user.
+>>   #
+>>   # @frozen: The bitmap is currently in-use by a backup operation or block job,
+>> -#          and is immutable.
+>> +#          and is immutable. New writes by the guest are being recorded in a
+>> +#          cache, and are not lost.
+>>   #
+>> -# @disabled: The bitmap is currently in-use by an internal operation and is
+>> -#            read-only. It can still be deleted.
+>> +# @disabled: The bitmap is not currently recording new writes by the guest.
+>> +#            This is requested explicitly via @block-dirty-bitmap-disable.
+>> +#            It can still be cleared, deleted, or used for backup operations.
+>>   #
+>>   # @active: The bitmap is actively monitoring for new writes, and can be cleared,
+>>   #          deleted, or used for backup operations.
+>> @@ -1944,9 +1946,14 @@
+>>   # @block-dirty-bitmap-merge:
+>>   #
+>>   # Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
+>> -# The @bitmaps dirty bitmaps are unchanged.
+>> +# Dirty bitmaps in @bitmaps will be unchanged.
+> 
+> except the case when @target is in @bitmaps too? Not sure about should we mention this.
+> 
+
+Oh, right. I guess I'll try to be more careful about the phrasing.
+
+> About @frozen and @locked, we can also note that they can't be exported through NBD.
+> We can summarize, that @frozen and @locked means that user can't use them in any
+> command, and the only option is to list them. However even info->count information
+> should not be considered as something meaningful, as bitmaps are under some operations.
+> And we can also use same paragraph for @frozen and @locked, as a first step to @frozen
+> deprecation.
+> 
+
+Good suggestion.
+
+>> +# Any bits already set in @target will still be set after the merge.
+>>   # On error, @target is unchanged.
+>>   #
+>> +# The resulting bitmap will count as dirty any clusters that were dirty in any
+>> +# of the source bitmaps. This can be used to achieve backup checkpoints, or in
+>> +# simpler usages, to copy bitmaps.
+>> +#
+>>   # Returns: nothing on success
+>>   #          If @node is not a valid block device, DeviceNotFound
+>>   #          If any bitmap in @bitmaps or @target is not found, GenericError
+>> @@ -1981,7 +1988,7 @@
+>>   ##
+>>   # @x-debug-block-dirty-bitmap-sha256:
+>>   #
+>> -# Get bitmap SHA256
+>> +# Get bitmap SHA256.
+>>   #
+>>   # Returns: BlockDirtyBitmapSha256 on success
+>>   #          If @node is not a valid block device, DeviceNotFound
+>>
+> 
+> 
+
+Thanks!
