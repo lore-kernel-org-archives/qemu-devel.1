@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48934)
+Received: from eggs.gnu.org ([209.51.188.92]:49118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpcMG-0003UH-Tj
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gpcMy-00049c-AS
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpcMF-0008LJ-MP
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:04 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51434)
+	(envelope-from <alex.bennee@linaro.org>) id 1gpcMs-00007W-S6
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:45 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gpcMC-0008K3-K2
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:01 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b11so6897083wmj.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:11:59 -0800 (PST)
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<20190201145035.22739-10-peter.maydell@linaro.org>
-	<87r2crv5um.fsf@zen.linaroharston>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87r2crv5um.fsf@zen.linaroharston>
-Date: Fri, 01 Feb 2019 17:11:57 +0000
-Message-ID: <87a7jfv3fm.fsf@zen.linaroharston>
+	id 1gpcMq-000053-V8
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:41 -0500
+Received: by mail-wm1-x331.google.com with SMTP id g67so6962910wmd.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:12:39 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  1 Feb 2019 17:12:29 +0000
+Message-Id: <20190201171229.3361-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/11] Makefile,
- configure: Support building rST documentation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] .travis.yml: separate tools and docs into
+ another entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Re-building the tools and documents by default is a little wasteful as
+they are not really affected by the main build options. Split tools
+and documents into their own task with a minimal softmmu and
+linux-user target list just to check they don't interact badly.
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .travis.yml | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> Add support to our configure and makefile machinery for building
->> our rST docs into HTML files.
->>
->> Building the documentation now requires that sphinx-build is
->> available; this seems better than allowing half the docs to
->> be built if it is not present but having half of them missing.
->> (In particular it means that assuming that distros configured with
->> --enable-docs they'll get a helpful error from configure telling
->> them the new build dependency.)
->
-> Hmm we manage to break Travis CI:
->
->   https://travis-ci.org/stsquad/qemu/jobs/487512292#L902
->
-> It reports:
->
->   Documentation     no
->
-> But then proceeds to barf:
->
->   https://travis-ci.org/stsquad/qemu/jobs/487512292#L1395
->
-> with:
->
->   /bin/sh: 1: sphinx-build: not found
->   Makefile:871: recipe for target 'docs/devel/index.html' failed
->   make: *** [docs/devel/index.html] Error 127
-
-I did the following:
-
-modified   Makefile
-@@ -322,6 +322,7 @@ endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- DOCS+=3Dscripts/qemu-trace-stap.1
- endif
-+DOCS+=3Dsphinxdocs
- else
- DOCS=3D
- endif
-@@ -401,7 +402,7 @@ dummy :=3D $(call unnest-vars,, \
-
- include $(SRC_PATH)/tests/Makefile.include
-
--all: $(DOCS) sphinxdocs $(TOOLS) $(HELPERS-y) recurse-all modules
-+all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
-
- qemu-version.h: FORCE
- 	$(call quiet-command, \
-@@ -699,13 +700,7 @@ for d in $$(cd docs && find $1 -type d); do $(INSTALL_=
-DIR) "$(DESTDIR)$(qemu_doc
- for f in $$(cd docs && find $1 -type f); do $(INSTALL_DATA) "docs/$$f" "$(=
-DESTDIR)$(qemu_docdir)/$$f"; done
- endef
-
--# Note that we deliberately do not install the "devel" manual: it is
--# for QEMU developers, and not interesting to our users.
--.PHONY: install-sphinxdocs
--install-sphinxdocs: sphinxdocs
--	$(call install-manual,interop)
--
--install-doc: $(DOCS) install-sphinxdocs
-+install-doc: $(DOCS)
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
-@@ -737,6 +732,7 @@ ifdef CONFIG_VIRTFS
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
- endif
-+	$(call install-manual,interop)
-
- install-datadir:
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-
---
-Alex Benn=C3=A9e
+diff --git a/.travis.yml b/.travis.yml
+index 87d9fa971c..1c8effcf63 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -61,6 +61,7 @@ env:
+   global:
+     - SRC_DIR="."
+     - BUILD_DIR="."
++    - BASE_CONFIG="--disable-docs --disable-tools"
+     - TEST_CMD="make check -j3 V=1"
+ 
+ 
+@@ -71,7 +72,7 @@ git:
+ 
+ before_script:
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+-  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
++  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make -j3 && ${TEST_CMD}
+ 
+@@ -106,6 +107,15 @@ matrix:
+         - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
+ 
+ 
++    # Check we can build docs and tools
++    - env:
++        - BASE_CONFIG=""
++        - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
++      addons:
++        apt:
++          packages:
++            - python-sphinx
++
+     # Test out-of-tree builds
+     - env:
+         - CONFIG="--enable-debug --enable-debug-tcg"
+@@ -243,5 +253,5 @@ matrix:
+ 
+ 
+     - env:
+-        - CONFIG="--disable-system --disable-docs"
++        - CONFIG="--disable-system"
+         - TEST_CMD="make -j3 check-tcg V=1"
+-- 
+2.20.1
