@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39551)
+Received: from eggs.gnu.org ([209.51.188.92]:39537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboO-00085C-5L
+	(envelope-from <kwolf@redhat.com>) id 1gpboO-00084A-9y
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboL-0000Iv-LL
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpboK-0000I6-9y
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:02 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:35:17 +0100
-Message-Id: <20190201163518.31157-27-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:35:16 +0100
+Message-Id: <20190201163518.31157-26-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/27] scsi-disk: Don't use empty string as
- device id
+Subject: [Qemu-devel] [PULL 25/27] qtest.py: Wait for the result of qtest
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +25,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-scsi-disk includes in the Device Identification VPD page, depending on
-configuration amongst others, a vendor specific designator that consists
-either of the serial number if given or the BlockBackend name (which is
-a host detail that better shouldn't have been leaked to the guest, but
-now we have to maintain it for compatibility).
+From: Alberto Garcia <berto@igalia.com>
 
-With anonymous BlockBackends, i.e. scsi-disk devices constructed with
-drive=3D<node-name>, and no serial number explicitly specified, this ends
-up as an empty string. If this happens to more than one disk, we have
-accidentally signalled to the OS that this is a multipath setup, which
-is obviously not what was intended.
+The cmd() method of the QEMUQtestProtocol class sends a qtest command
+to QEMU but doesn't wait for the return message ("OK", "FAIL", "ERR").
+Because of this, it can return control to the caller before the
+command has actually finished.
 
-Instead of using an empty string for the vendor specific designator,
-simply leave out that designator, which makes Linux detect such setups
-as separate disks again.
+In cases like clock_step or clock_set this means that cmd() can return
+before all the timers triggered by the clock change have been fired.
+This can be fixed by making cmd() wait for the output of the qtest
+command.
 
+This fixes iotests 093 and 136, which are flaky since commit
+8258292e18c39480b64eba9f3551 when the machine is under heavy workload.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ scripts/qtest.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index b049026219..11392a8db8 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -652,12 +652,14 @@ static int scsi_disk_emulate_vpd_page(SCSIRequest *=
-req, uint8_t *outbuf)
-         DPRINTF("Inquiry EVPD[Device identification] "
-                 "buffer size %zd\n", req->cmd.xfer);
+diff --git a/scripts/qtest.py b/scripts/qtest.py
+index adf1fe3f26..afac3fe900 100644
+--- a/scripts/qtest.py
++++ b/scripts/qtest.py
+@@ -31,6 +31,7 @@ class QEMUQtestProtocol(object):
+         """
+         self._address =3D address
+         self._sock =3D self._get_sock()
++        self._sockfile =3D None
+         if server:
+             self._sock.bind(self._address)
+             self._sock.listen(1)
+@@ -49,6 +50,7 @@ class QEMUQtestProtocol(object):
+         @raise socket.error on socket connection errors
+         """
+         self._sock.connect(self._address)
++        self._sockfile =3D self._sock.makefile()
 =20
--        outbuf[buflen++] =3D 0x2; /* ASCII */
--        outbuf[buflen++] =3D 0;   /* not officially assigned */
--        outbuf[buflen++] =3D 0;   /* reserved */
--        outbuf[buflen++] =3D id_len; /* length of data following */
--        memcpy(outbuf + buflen, str, id_len);
--        buflen +=3D id_len;
-+        if (id_len) {
-+            outbuf[buflen++] =3D 0x2; /* ASCII */
-+            outbuf[buflen++] =3D 0;   /* not officially assigned */
-+            outbuf[buflen++] =3D 0;   /* reserved */
-+            outbuf[buflen++] =3D id_len; /* length of data following */
-+            memcpy(outbuf + buflen, str, id_len);
-+            buflen +=3D id_len;
-+        }
+     def accept(self):
+         """
+@@ -57,6 +59,7 @@ class QEMUQtestProtocol(object):
+         @raise socket.error on socket connection errors
+         """
+         self._sock, _ =3D self._sock.accept()
++        self._sockfile =3D self._sock.makefile()
 =20
-         if (s->qdev.wwn) {
-             outbuf[buflen++] =3D 0x1; /* Binary */
+     def cmd(self, qtest_cmd):
+         """
+@@ -65,9 +68,12 @@ class QEMUQtestProtocol(object):
+         @param qtest_cmd: qtest command text to be sent
+         """
+         self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
++        resp =3D self._sockfile.readline()
++        return resp
+=20
+     def close(self):
+         self._sock.close()
++        self._sockfile.close()
+=20
+     def settimeout(self, timeout):
+         self._sock.settimeout(timeout)
 --=20
 2.20.1
