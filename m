@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36845)
+Received: from eggs.gnu.org ([209.51.188.92]:37679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gpOYy-0006bp-MS
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:17 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gpOej-0007l7-77
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gpOYx-0001pk-TG
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gpOYx-0001pR-Ns
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:15 -0500
-References: <20190122083152.10705-1-xieyongji@baidu.com>
-	<20190122083152.10705-4-xieyongji@baidu.com>
-	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
-	<CAONzpcZ2fm11JdCA1aqaWTBjkHSagu5E_tquezJFGpWV4UT9fA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f1208a8b-463c-0f03-3987-d623425dd5f3@redhat.com>
-Date: Fri, 1 Feb 2019 10:27:56 +0800
+	(envelope-from <stefanha@redhat.com>) id 1gpOei-0002nG-Fq
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:13 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  1 Feb 2019 10:33:54 +0800
+Message-Id: <20190201023357.22596-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAONzpcZ2fm11JdCA1aqaWTBjkHSagu5E_tquezJFGpWV4UT9fA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
- inflight I/O in shared memory
+Subject: [Qemu-devel] [PATCH v4 0/3] arm: microbit Non-Volatile Memory
+ Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +21,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, jusual@mail.ru, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jim@groklearning.com, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
+v4:
+ * assert(offset + size <=3D s->flash_size) [Peter]
+v3:
+ * Fix endianness of s->storage[], tested by Joel Stanley <joel@jms.id.au=
+> on
+   big-endian ppc [Peter]
+ * Fix off-by-one that prevented clearing the last page of flash
+ * Add missing memory_region_flush_rom_device() call to flash_write()
+v2:
+ * Add Patch 2 to call memory_region_flush_rom_device() from pflash devic=
+es
+   [Peter]
 
-On 2019/1/30 =E4=B8=8B=E5=8D=881:48, Yongji Xie wrote:
-> On Wed, 30 Jan 2019 at 10:32, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
->>> +static int
->>> +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
->>> +{
->>> +    if (!has_feature(dev->protocol_features,
->>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    if (unlikely(!vq->inflight)) {
->>> +        return -1;
->>> +    }
->>> +
->>> +    vq->inflight->desc[desc_idx].inuse =3D 1;
->>> +
->>> +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int
->>> +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
->>> +{
->>> +    if (!has_feature(dev->protocol_features,
->>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    if (unlikely(!vq->inflight)) {
->>> +        return -1;
->>> +    }
->>> +
->>> +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
->>> +
->>> +    barrier();
->>> +
->>> +    vq->inflight->desc[desc_idx].version++;
->>> +
->>> +    return 0;
->>> +}
->>
->> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure th=
+This series adds the Non-Volatile Memory Controller, which controls acces=
+s to
+the User Information Control Registers (UICR), Factory Information Contro=
+l
+Registers (FICR), and flash memory.
+
+This is the last piece of microbit work needed to make basic programs lik=
 e
->> value reach memory.
->>
-> The cache line should have been flushed during crash. So we can see
-> the correct value when backend reconnecting. If so, compile barrier
-> should be enough here, right?
+Micropython "Hello world" work under QEMU.
 
+Originally sent as part of Steffen's longer microbit device emulation ser=
+ies, I
+extracted this and deferred it until later because cleanups were necessar=
+y:
 
-Maybe I worry too much but it's not about flushing cache, but about=20
-whether or not compiler can generate mov to memory instead of mov to=20
-registers.
+ * Use memory_region_flush_rom_device() to dirty/invalidate memory [Peter=
+]
+   ^--- Paolo: I CCed you on this new memory API
+ * Fix device-introspect-test segfault due to missing owner when initiali=
+zing
+   FICR and UICR memory regions [Peter]
+ * Fix off-by-one assertion checks [Peter]
+ * Fix missing whitespace at end of comment [Peter]
+ * Clear UICR on reset - we'd need a block device for true non-volatility
+   [Peter]
 
-Thanks
+Steffen G=C3=B6rtz (3):
+  hw/nvram/nrf51_nvm: Add nRF51 non-volatile memories
+  arm: Instantiate NRF51 special NVM's and NVMC
+  tests/microbit-test: Add tests for nRF51 NVMC
 
+ hw/nvram/Makefile.objs       |   1 +
+ include/hw/arm/nrf51_soc.h   |   2 +
+ include/hw/nvram/nrf51_nvm.h |  64 ++++++
+ hw/arm/nrf51_soc.c           |  41 ++--
+ hw/nvram/nrf51_nvm.c         | 388 +++++++++++++++++++++++++++++++++++
+ tests/microbit-test.c        | 108 ++++++++++
+ 6 files changed, 592 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/nvram/nrf51_nvm.h
+ create mode 100644 hw/nvram/nrf51_nvm.c
 
->
-> Thanks,
-> Yongji
+--=20
+2.20.1
