@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58926)
+Received: from eggs.gnu.org ([209.51.188.92]:58972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gpeto-0000tK-8B
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpetr-0000vx-WC
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gpetm-00028o-7Q
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:52 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:33958)
+	(envelope-from <richard.henderson@linaro.org>) id 1gpeto-00029Y-57
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:53 -0500
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:42334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gpeth-0001pR-VC
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:48 -0500
-Received: by mail-pl1-x643.google.com with SMTP id w4so3742425plz.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 11:54:09 -0800 (PST)
+	id 1gpetk-0001p5-A4
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:50 -0500
+Received: by mail-pl1-x636.google.com with SMTP id y1so3725491plp.9
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 11:54:08 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Feb 2019 11:54:03 -0800
-Message-Id: <20190201195404.30486-2-richard.henderson@linaro.org>
-In-Reply-To: <20190201195404.30486-1-richard.henderson@linaro.org>
-References: <20190201195404.30486-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 1/2] linux-user: Implement PR_PAC_RESET_KEYS
+Date: Fri,  1 Feb 2019 11:54:02 -0800
+Message-Id: <20190201195404.30486-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/2] target/arm: Complete ARMv8.3-PAuth
+ linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +31,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Check arg3-5 are zero.
----
+Most of the v1 patch set has been merged.
+Changes since v1:
+
+ * I've added the missing check against arg3 through arg5.
+ * I've removed the -O1 I had cribed from the MTE patch set.
+
+
+r~
+
+
+Richard Henderson (2):
+  linux-user: Implement PR_PAC_RESET_KEYS
+  tests/tcg/aarch64: Add pauth smoke test
+
  linux-user/aarch64/target_syscall.h |  7 ++++++
  linux-user/syscall.c                | 36 +++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ tests/tcg/aarch64/pauth-1.c         | 23 ++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target   |  6 ++++-
+ 4 files changed, 71 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tcg/aarch64/pauth-1.c
 
-diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
-index 937fd7989e..b595e5da82 100644
---- a/linux-user/aarch64/target_syscall.h
-+++ b/linux-user/aarch64/target_syscall.h
-@@ -22,6 +22,13 @@ struct target_pt_regs {
- #define TARGET_PR_SVE_SET_VL  50
- #define TARGET_PR_SVE_GET_VL  51
- 
-+#define TARGET_PR_PAC_RESET_KEYS 54
-+# define TARGET_PR_PAC_APIAKEY   (1 << 0)
-+# define TARGET_PR_PAC_APIBKEY   (1 << 1)
-+# define TARGET_PR_PAC_APDAKEY   (1 << 2)
-+# define TARGET_PR_PAC_APDBKEY   (1 << 3)
-+# define TARGET_PR_PAC_APGAKEY   (1 << 4)
-+
- void arm_init_pauth_key(ARMPACKey *key);
- 
- #endif /* AARCH64_TARGET_SYSCALL_H */
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b5786d4fc1..bf076cbf8c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9691,6 +9691,42 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 }
-             }
-             return ret;
-+        case TARGET_PR_PAC_RESET_KEYS:
-+            {
-+                CPUARMState *env = cpu_env;
-+                ARMCPU *cpu = arm_env_get_cpu(env);
-+
-+                if (arg3 || arg4 || arg5) {
-+                    return -TARGET_EINVAL;
-+                }
-+                if (cpu_isar_feature(aa64_pauth, cpu)) {
-+                    int all = (TARGET_PR_PAC_APIAKEY | TARGET_PR_PAC_APIBKEY |
-+                               TARGET_PR_PAC_APDAKEY | TARGET_PR_PAC_APDBKEY |
-+                               TARGET_PR_PAC_APGAKEY);
-+                    if (arg2 == 0) {
-+                        arg2 = all;
-+                    } else if (arg2 & ~all) {
-+                        return -TARGET_EINVAL;
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIAKEY) {
-+                        arm_init_pauth_key(&env->apia_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIBKEY) {
-+                        arm_init_pauth_key(&env->apib_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDAKEY) {
-+                        arm_init_pauth_key(&env->apda_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDBKEY) {
-+                        arm_init_pauth_key(&env->apdb_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APGAKEY) {
-+                        arm_init_pauth_key(&env->apga_key);
-+                    }
-+                    return 0;
-+                }
-+            }
-+            return -TARGET_EINVAL;
- #endif /* AARCH64 */
-         case PR_GET_SECCOMP:
-         case PR_SET_SECCOMP:
 -- 
 2.17.2
