@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59152)
+Received: from eggs.gnu.org ([209.51.188.92]:59021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMH-0008J1-41
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0008Gq-TK
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003ja-1f
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:01 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40185)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbM9-0003hB-Nc
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003Ki-Fr
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id f188so6725850wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:14 -0800 (PST)
+	id 1gpbM9-0003dJ-DA
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:53 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t200so6822773wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:45 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.10
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.42
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:11 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:43 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:18 +0000
-Message-Id: <20190201160653.13829-13-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:44 +0000
+Message-Id: <20190201160653.13829-39-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/47] hw/arm/armsse: Support dual-CPU
- configuration
+Subject: [Qemu-devel] [PULL 38/47] arm: Clarify the logic of set_pc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,408 +36,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The SSE-200 has two Cortex-M33 CPUs. These see the same view
-of memory, with the exception of the "private CPU region" which
-has per-CPU devices. Internal device interrupts for SSE-200
-devices are mostly wired up to both CPUs, with the exception of
-a few per-CPU devices. External GPIO inputs on the SSE-200
-device are provided for the second CPU's interrupts above 32,
-as is already the case for the first CPU.
+From: Julia Suvorova <jusual@mail.ru>
 
-Refactor the code to support creation of multiple CPUs.
-For the moment we leave all CPUs with the same view of
-memory: this will not work in the multiple-CPU case, but
-we will fix this in the following commit.
+Until now, the set_pc logic was unclear, which raised questions about
+whether it should be used directly, applying a value to PC or adding
+additional checks, for example, set the Thumb bit in Arm cpu. Let's set
+the set_pc logic for “Configure the PC, as was done in the ELF file”
+and implement synchronize_with_tb hook for preserving PC to cpu_tb_exec.
 
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20190129121817.7109-1-jusual@mail.ru
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-12-peter.maydell@linaro.org
 ---
- include/hw/arm/armsse.h |  21 +++-
- hw/arm/armsse.c         | 206 ++++++++++++++++++++++++++++++++--------
- 2 files changed, 180 insertions(+), 47 deletions(-)
+ include/qom/cpu.h         | 16 ++++++++++++++--
+ hw/arm/boot.c             |  4 ----
+ target/arm/arm-powerctl.c |  3 ---
+ target/arm/cpu.c          | 26 +++++++++++++++++++++++++-
+ target/arm/cpu64.c        | 15 ---------------
+ 5 files changed, 39 insertions(+), 25 deletions(-)
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index e4a05013316..faf5dfed252 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -28,9 +28,16 @@
-  *  + QOM property "memory" is a MemoryRegion containing the devices provided
-  *    by the board model.
-  *  + QOM property "MAINCLK" is the frequency of the main system clock
-- *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
-- *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
-- *    are wired to the NVIC lines 32 .. n+32
-+ *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts.
-+ *    (In hardware, the SSE-200 permits the number of expansion interrupts
-+ *    for the two CPUs to be configured separately, but we restrict it to
-+ *    being the same for both, to avoid having to have separate Property
-+ *    lists for different variants. This restriction can be relaxed later
-+ *    if necessary.)
-+ *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts for CPU 0,
-+ *    which are wired to its NVIC lines 32 .. n+32
-+ *  + Named GPIO inputs "EXP_CPU1_IRQ" 0..n are the expansion interrupts for
-+ *    CPU 1, which are wired to its NVIC lines 32 .. n+32
-  *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
-  *    bus master devices in the board model to make transactions into
-  *    all the devices and memory areas in the IoTKit
-@@ -95,12 +102,14 @@
- #error Too many SRAM banks
- #endif
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 4c2feb9c17b..1d6099e5d4b 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -103,9 +103,21 @@ struct TranslationBlock;
+  * @get_arch_id: Callback for getting architecture-dependent CPU ID.
+  * @get_paging_enabled: Callback for inquiring whether paging is enabled.
+  * @get_memory_mapping: Callback for obtaining the memory mappings.
+- * @set_pc: Callback for setting the Program Counter register.
++ * @set_pc: Callback for setting the Program Counter register. This
++ *       should have the semantics used by the target architecture when
++ *       setting the PC from a source such as an ELF file entry point;
++ *       for example on Arm it will also set the Thumb mode bit based
++ *       on the least significant bit of the new PC value.
++ *       If the target behaviour here is anything other than "set
++ *       the PC register to the value passed in" then the target must
++ *       also implement the synchronize_from_tb hook.
+  * @synchronize_from_tb: Callback for synchronizing state from a TCG
+- * #TranslationBlock.
++ *       #TranslationBlock. This is called when we abandon execution
++ *       of a TB before starting it, and must set all parts of the CPU
++ *       state which the previous TB in the chain may not have updated.
++ *       This always includes at least the program counter; some targets
++ *       will need to do more. If this hook is not implemented then the
++ *       default is to call @set_pc(tb->pc).
+  * @handle_mmu_fault: Callback for handling an MMU fault.
+  * @get_phys_page_debug: Callback for obtaining a physical address.
+  * @get_phys_page_attrs_debug: Callback for obtaining a physical address and the
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index c7a67af7a97..05762d0fc1b 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -697,10 +697,6 @@ static void do_cpu_reset(void *opaque)
+                 g_assert_not_reached();
+             }
  
-+#define SSE_MAX_CPUS 2
-+
- typedef struct ARMSSE {
-     /*< private >*/
-     SysBusDevice parent_obj;
+-            if (!env->aarch64) {
+-                env->thumb = info->entry & 1;
+-                entry &= 0xfffffffe;
+-            }
+             cpu_set_pc(cs, entry);
+         } else {
+             /* If we are booting Linux then we need to check whether we are
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index 2b856930fb7..f9de5164e55 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -120,11 +120,8 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
  
-     /*< public >*/
--    ARMv7MState armv7m;
-+    ARMv7MState armv7m[SSE_MAX_CPUS];
-     IoTKitSecCtl secctl;
-     TZPPC apb_ppc0;
-     TZPPC apb_ppc1;
-@@ -115,6 +124,8 @@ typedef struct ARMSSE {
-     qemu_or_irq mpc_irq_orgate;
-     qemu_or_irq nmi_orgate;
- 
-+    SplitIRQ cpu_irq_splitter[32];
-+
-     CMSDKAPBDualTimer dualtimer;
- 
-     CMSDKAPBWatchdog s32kwatchdog;
-@@ -130,7 +141,7 @@ typedef struct ARMSSE {
-     MemoryRegion alias3;
-     MemoryRegion sram[MAX_SRAM_BANKS];
- 
--    qemu_irq *exp_irqs;
-+    qemu_irq *exp_irqs[SSE_MAX_CPUS];
-     qemu_irq ppc0_irq;
-     qemu_irq ppc1_irq;
-     qemu_irq sec_resp_cfg;
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index a2ae5d3c4b9..5cb2b78b1fc 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -21,18 +21,35 @@
- struct ARMSSEInfo {
-     const char *name;
-     int sram_banks;
-+    int num_cpus;
- };
- 
- static const ARMSSEInfo armsse_variants[] = {
-     {
-         .name = TYPE_IOTKIT,
-         .sram_banks = 1,
-+        .num_cpus = 1,
-     },
- };
- 
- /* Clock frequency in HZ of the 32KHz "slow clock" */
- #define S32KCLK (32 * 1000)
- 
-+/* Is internal IRQ n shared between CPUs in a multi-core SSE ? */
-+static bool irq_is_common[32] = {
-+    [0 ... 5] = true,
-+    /* 6, 7: per-CPU MHU interrupts */
-+    [8 ... 12] = true,
-+    /* 13: per-CPU icache interrupt */
-+    /* 14: reserved */
-+    [15 ... 20] = true,
-+    /* 21: reserved */
-+    [22 ... 26] = true,
-+    /* 27: reserved */
-+    /* 28, 29: per-CPU CTI interrupts */
-+    /* 30, 31: reserved */
-+};
-+
- /* Create an alias region of @size bytes starting at @base
-  * which mirrors the memory starting at @orig.
-  */
-@@ -125,13 +142,18 @@ static void armsse_init(Object *obj)
-     int i;
- 
-     assert(info->sram_banks <= MAX_SRAM_BANKS);
-+    assert(info->num_cpus <= SSE_MAX_CPUS);
- 
-     memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
- 
--    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
--                          TYPE_ARMV7M);
--    qdev_prop_set_string(DEVICE(&s->armv7m), "cpu-type",
--                         ARM_CPU_TYPE_NAME("cortex-m33"));
-+    for (i = 0; i < info->num_cpus; i++) {
-+        char *name = g_strdup_printf("armv7m%d", i);
-+        sysbus_init_child_obj(obj, name, &s->armv7m[i], sizeof(s->armv7m),
-+                              TYPE_ARMV7M);
-+        qdev_prop_set_string(DEVICE(&s->armv7m[i]), "cpu-type",
-+                             ARM_CPU_TYPE_NAME("cortex-m33"));
-+        g_free(name);
-+    }
- 
-     sysbus_init_child_obj(obj, "secctl", &s->secctl, sizeof(s->secctl),
-                           TYPE_IOTKIT_SECCTL);
-@@ -192,13 +214,25 @@ static void armsse_init(Object *obj)
-                                 TYPE_SPLIT_IRQ, &error_abort, NULL);
-         g_free(name);
+     if (info->target_aa64) {
+         target_cpu->env.xregs[0] = info->context_id;
+-        target_cpu->env.thumb = false;
+     } else {
+         target_cpu->env.regs[0] = info->context_id;
+-        target_cpu->env.thumb = info->entry & 1;
+-        info->entry &= 0xfffffffe;
      }
-+    if (info->num_cpus > 1) {
-+        for (i = 0; i < ARRAY_SIZE(s->cpu_irq_splitter); i++) {
-+            if (irq_is_common[i]) {
-+                char *name = g_strdup_printf("cpu-irq-splitter%d", i);
-+                SplitIRQ *splitter = &s->cpu_irq_splitter[i];
-+
-+                object_initialize_child(obj, name, splitter, sizeof(*splitter),
-+                                        TYPE_SPLIT_IRQ, &error_abort, NULL);
-+                g_free(name);
-+            }
-+        }
-+    }
- }
  
- static void armsse_exp_irq(void *opaque, int n, int level)
+     /* Start the new CPU at the requested address */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 8a9cd0900d2..f00d450d0bd 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -40,8 +40,31 @@
+ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
  {
--    ARMSSE *s = ARMSSE(opaque);
-+    qemu_irq *irqarray = opaque;
+     ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
  
--    qemu_set_irq(s->exp_irqs[n], level);
-+    qemu_set_irq(irqarray[n], level);
- }
- 
- static void armsse_mpcexp_status(void *opaque, int n, int level)
-@@ -207,6 +241,26 @@ static void armsse_mpcexp_status(void *opaque, int n, int level)
-     qemu_set_irq(s->mpcexp_status_in[n], level);
- }
- 
-+static qemu_irq armsse_get_common_irq_in(ARMSSE *s, int irqno)
-+{
-+    /*
-+     * Return a qemu_irq which can be used to signal IRQ n to
-+     * all CPUs in the SSE.
-+     */
-+    ARMSSEClass *asc = ARMSSE_GET_CLASS(s);
-+    const ARMSSEInfo *info = asc->info;
-+
-+    assert(irq_is_common[irqno]);
-+
-+    if (info->num_cpus == 1) {
-+        /* Only one CPU -- just connect directly to it */
-+        return qdev_get_gpio_in(DEVICE(&s->armv7m[0]), irqno);
+-    cpu->env.regs[15] = value;
++    if (is_a64(env)) {
++        env->pc = value;
++        env->thumb = 0;
 +    } else {
-+        /* Connect to the splitter which feeds all CPUs */
-+        return qdev_get_gpio_in(DEVICE(&s->cpu_irq_splitter[irqno]), 0);
++        env->regs[15] = value & ~1;
++        env->thumb = value & 1;
 +    }
 +}
 +
- static void armsse_realize(DeviceState *dev, Error **errp)
++static void arm_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++
++    /*
++     * It's OK to look at env for the current mode here, because it's
++     * never possible for an AArch64 TB to chain to an AArch32 TB.
++     */
++    if (is_a64(env)) {
++        env->pc = tb->pc;
++    } else {
++        env->regs[15] = tb->pc;
++    }
+ }
+ 
+ static bool arm_cpu_has_work(CPUState *cs)
+@@ -2099,6 +2122,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+     cc->cpu_exec_interrupt = arm_cpu_exec_interrupt;
+     cc->dump_state = arm_cpu_dump_state;
+     cc->set_pc = arm_cpu_set_pc;
++    cc->synchronize_from_tb = arm_cpu_synchronize_from_tb;
+     cc->gdb_read_register = arm_cpu_gdb_read_register;
+     cc->gdb_write_register = arm_cpu_gdb_write_register;
+ #ifdef CONFIG_USER_ONLY
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index e9bc461c362..8653cecd032 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -480,20 +480,6 @@ static void aarch64_cpu_finalizefn(Object *obj)
  {
-     ARMSSE *s = ARMSSE(dev);
-@@ -280,37 +334,105 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+ }
  
-     memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
- 
--    qdev_prop_set_uint32(DEVICE(&s->armv7m), "num-irq", s->exp_numirq + 32);
--    /* In real hardware the initial Secure VTOR is set from the INITSVTOR0
--     * register in the IoT Kit System Control Register block, and the
--     * initial value of that is in turn specifiable by the FPGA that
--     * instantiates the IoT Kit. In QEMU we don't implement this wrinkle,
--     * and simply set the CPU's init-svtor to the IoT Kit default value.
+-static void aarch64_cpu_set_pc(CPUState *cs, vaddr value)
+-{
+-    ARMCPU *cpu = ARM_CPU(cs);
+-    /* It's OK to look at env for the current mode here, because it's
+-     * never possible for an AArch64 TB to chain to an AArch32 TB.
+-     * (Otherwise we would need to use synchronize_from_tb instead.)
 -     */
--    qdev_prop_set_uint32(DEVICE(&s->armv7m), "init-svtor", 0x10000000);
--    object_property_set_link(OBJECT(&s->armv7m), OBJECT(&s->container),
--                             "memory", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
+-    if (is_a64(&cpu->env)) {
+-        cpu->env.pc = value;
+-    } else {
+-        cpu->env.regs[15] = value;
 -    }
--    object_property_set_link(OBJECT(&s->armv7m), OBJECT(s), "idau", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    for (i = 0; i < info->num_cpus; i++) {
-+        DeviceState *cpudev = DEVICE(&s->armv7m[i]);
-+        Object *cpuobj = OBJECT(&s->armv7m[i]);
-+        int j;
-+        char *gpioname;
-+
-+        qdev_prop_set_uint32(cpudev, "num-irq", s->exp_numirq + 32);
-+        /*
-+         * In real hardware the initial Secure VTOR is set from the INITSVTOR0
-+         * register in the IoT Kit System Control Register block, and the
-+         * initial value of that is in turn specifiable by the FPGA that
-+         * instantiates the IoT Kit. In QEMU we don't implement this wrinkle,
-+         * and simply set the CPU's init-svtor to the IoT Kit default value.
-+         * In SSE-200 the situation is similar, except that the default value
-+         * is a reset-time signal input. Typically a board using the SSE-200
-+         * will have a system control processor whose boot firmware initializes
-+         * the INITSVTOR* registers before powering up the CPUs in any case,
-+         * so the hardware's default value doesn't matter. QEMU doesn't emulate
-+         * the control processor, so instead we behave in the way that the
-+         * firmware does. All boards currently known about have firmware that
-+         * sets the INITSVTOR0 and INITSVTOR1 registers to 0x10000000, like the
-+         * IoTKit default. We can make this more configurable if necessary.
-+         */
-+        qdev_prop_set_uint32(cpudev, "init-svtor", 0x10000000);
-+        /*
-+         * Start all CPUs except CPU0 powered down. In real hardware it is
-+         * a configurable property of the SSE-200 which CPUs start powered up
-+         * (via the CPUWAIT0_RST and CPUWAIT1_RST parameters), but since all
-+         * the boards we care about start CPU0 and leave CPU1 powered off,
-+         * we hard-code that for now. We can add QOM properties for this
-+         * later if necessary.
-+         */
-+        if (i > 0) {
-+            object_property_set_bool(cpuobj, true, "start-powered-off", &err);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
-+        }
-+        object_property_set_link(cpuobj, OBJECT(&s->container), "memory", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_link(cpuobj, OBJECT(s), "idau", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_bool(cpuobj, true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        /* Connect EXP_IRQ/EXP_CPUn_IRQ GPIOs to the NVIC's lines 32 and up */
-+        s->exp_irqs[i] = g_new(qemu_irq, s->exp_numirq);
-+        for (j = 0; j < s->exp_numirq; j++) {
-+            s->exp_irqs[i][j] = qdev_get_gpio_in(cpudev, i + 32);
-+        }
-+        if (i == 0) {
-+            gpioname = g_strdup("EXP_IRQ");
-+        } else {
-+            gpioname = g_strdup_printf("EXP_CPU%d_IRQ", i);
-+        }
-+        qdev_init_gpio_in_named_with_opaque(dev, armsse_exp_irq,
-+                                            s->exp_irqs[i],
-+                                            gpioname, s->exp_numirq);
-+        g_free(gpioname);
-     }
+-}
+-
+ static gchar *aarch64_gdb_arch_name(CPUState *cs)
+ {
+     return g_strdup("aarch64");
+@@ -504,7 +490,6 @@ static void aarch64_cpu_class_init(ObjectClass *oc, void *data)
+     CPUClass *cc = CPU_CLASS(oc);
  
--    /* Connect our EXP_IRQ GPIOs to the NVIC's lines 32 and up. */
--    s->exp_irqs = g_new(qemu_irq, s->exp_numirq);
--    for (i = 0; i < s->exp_numirq; i++) {
--        s->exp_irqs[i] = qdev_get_gpio_in(DEVICE(&s->armv7m), i + 32);
-+    /* Wire up the splitters that connect common IRQs to all CPUs */
-+    if (info->num_cpus > 1) {
-+        for (i = 0; i < ARRAY_SIZE(s->cpu_irq_splitter); i++) {
-+            if (irq_is_common[i]) {
-+                Object *splitter = OBJECT(&s->cpu_irq_splitter[i]);
-+                DeviceState *devs = DEVICE(splitter);
-+                int cpunum;
-+
-+                object_property_set_int(splitter, info->num_cpus,
-+                                        "num-lines", &err);
-+                if (err) {
-+                    error_propagate(errp, err);
-+                    return;
-+                }
-+                object_property_set_bool(splitter, true, "realized", &err);
-+                if (err) {
-+                    error_propagate(errp, err);
-+                    return;
-+                }
-+                for (cpunum = 0; cpunum < info->num_cpus; cpunum++) {
-+                    DeviceState *cpudev = DEVICE(&s->armv7m[cpunum]);
-+
-+                    qdev_connect_gpio_out(devs, cpunum,
-+                                          qdev_get_gpio_in(cpudev, i));
-+                }
-+            }
-+        }
-     }
--    qdev_init_gpio_in_named(dev, armsse_exp_irq, "EXP_IRQ", s->exp_numirq);
- 
-     /* Set up the big aliases first */
-     make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
-@@ -407,7 +529,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     qdev_connect_gpio_out(DEVICE(&s->mpc_irq_orgate), 0,
--                          qdev_get_gpio_in(DEVICE(&s->armv7m), 9));
-+                          armsse_get_common_irq_in(s, 9));
- 
-     /* Devices behind APB PPC0:
-      *   0x40000000: timer0
-@@ -424,7 +546,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer0), 0,
--                       qdev_get_gpio_in(DEVICE(&s->armv7m), 3));
-+                       armsse_get_common_irq_in(s, 3));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer0), 0);
-     object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[0]", &err);
-     if (err) {
-@@ -439,7 +561,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer1), 0,
--                       qdev_get_gpio_in(DEVICE(&s->armv7m), 4));
-+                       armsse_get_common_irq_in(s, 4));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->timer1), 0);
-     object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[1]", &err);
-     if (err) {
-@@ -455,7 +577,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dualtimer), 0,
--                       qdev_get_gpio_in(DEVICE(&s->armv7m), 5));
-+                       armsse_get_common_irq_in(s, 5));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dualtimer), 0);
-     object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr), "port[2]", &err);
-     if (err) {
-@@ -513,7 +635,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     qdev_connect_gpio_out(DEVICE(&s->ppc_irq_orgate), 0,
--                          qdev_get_gpio_in(DEVICE(&s->armv7m), 10));
-+                          armsse_get_common_irq_in(s, 10));
- 
-     /* 0x40010000 .. 0x4001ffff: private CPU region: unused in IoTKit */
- 
-@@ -528,7 +650,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->s32ktimer), 0,
--                       qdev_get_gpio_in(DEVICE(&s->armv7m), 2));
-+                       armsse_get_common_irq_in(s, 2));
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->s32ktimer), 0);
-     object_property_set_link(OBJECT(&s->apb_ppc1), OBJECT(mr), "port[0]", &err);
-     if (err) {
-@@ -609,7 +731,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->nswatchdog), 0,
--                       qdev_get_gpio_in(DEVICE(&s->armv7m), 1));
-+                       armsse_get_common_irq_in(s, 1));
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->nswatchdog), 0, 0x40081000);
- 
-     qdev_prop_set_uint32(DEVICE(&s->swatchdog), "wdogclk-frq", s->mainclk_frq);
-@@ -715,7 +837,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
-     qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
-     qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
--                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
-+                                armsse_get_common_irq_in(s, 11));
- 
-     /*
-      * Expose our container region to the board model; this corresponds
+     cc->cpu_exec_interrupt = arm_cpu_exec_interrupt;
+-    cc->set_pc = aarch64_cpu_set_pc;
+     cc->gdb_read_register = aarch64_cpu_gdb_read_register;
+     cc->gdb_write_register = aarch64_cpu_gdb_write_register;
+     cc->gdb_num_core_regs = 34;
 -- 
 2.20.1
