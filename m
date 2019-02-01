@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46542)
+Received: from eggs.gnu.org ([209.51.188.92]:46765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpaYY-0007G8-IQ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:16:41 -0500
+	(envelope-from <mst@redhat.com>) id 1gpaYy-0007X3-FO
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:17:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpaYW-0004Se-UD
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:16:38 -0500
-Date: Fri, 1 Feb 2019 15:15:14 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190201151513.GF3150@work-vm>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190123195527.29575-8-david@redhat.com>
-	<20190125175818.GG2695@work-vm> <87ef8svg79.fsf@dusky.pond.sub.org>
-	<20190201104906.GA3150@work-vm> <87munf61kp.fsf@dusky.pond.sub.org>
+	(envelope-from <mst@redhat.com>) id 1gpaYw-0004jP-8B
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:17:04 -0500
+Date: Fri, 1 Feb 2019 10:16:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190201101604-mutt-send-email-mst@kernel.org>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-3-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87munf61kp.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH RFCv2 7/9] hmp: Handle virtio-pmem when
- printing memory device infos
+In-Reply-To: <20190131151914.164903-3-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
+> In order to avoid migration issues, we enable DISCARD and
+> WRITE ZEROES features only for machine type >= 4.0
 > 
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> >> 
-> >> > * David Hildenbrand (david@redhat.com) wrote:
-> >> >> Print the memory device info just like for PCDIMM/NVDIMM.
-> >> >> 
-> >> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> >> ---
-> >> >>  hmp.c | 27 +++++++++++++++------------
-> >> >>  1 file changed, 15 insertions(+), 12 deletions(-)
-> >> >> 
-> >> >> diff --git a/hmp.c b/hmp.c
-> >> >> index 8da5fd8760..25c32e0810 100644
-> >> >> --- a/hmp.c
-> >> >> +++ b/hmp.c
-> >> >> @@ -2553,6 +2553,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >> >>      Error *err = NULL;
-> >> >>      MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
-> >> >>      MemoryDeviceInfoList *info;
-> >> >> +    VirtioPMEMDeviceInfo *vpi;
-> >> >>      MemoryDeviceInfo *value;
-> >> >>      PCDIMMDeviceInfo *di;
-> >> >>  
-> >> >> @@ -2562,19 +2563,9 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >> >>          if (value) {
-> >> >>              switch (value->type) {
-> >> >>              case MEMORY_DEVICE_INFO_KIND_DIMM:
-> >> >> -                di = value->u.dimm.data;
-> >> >> -                break;
-> >> >> -
-> >> >>              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-> >> >> -                di = value->u.nvdimm.data;
-> >> >> -                break;
-> >> >> -
-> >> >> -            default:
-> >> >> -                di = NULL;
-> >> >> -                break;
-> >> >> -            }
-> >> >> -
-> >> >> -            if (di) {
-> >> >> +                di = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
-> >> >> +                     value->u.dimm.data : value->u.nvdimm.data;
-> >> >>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-> >> >>                                 MemoryDeviceInfoKind_str(value->type),
-> >> >>                                 di->id ? di->id : "");
-> >> >> @@ -2587,6 +2578,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >> >>                                 di->hotplugged ? "true" : "false");
-> >> >>                  monitor_printf(mon, "  hotpluggable: %s\n",
-> >> >>                                 di->hotpluggable ? "true" : "false");
-> >> >> +                break;
-> >> >> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
-> >> >> +                vpi = value->u.virtio_pmem.data;
-> >> >> +                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-> >> >> +                               MemoryDeviceInfoKind_str(value->type),
-> >> >> +                               vpi->id ? vpi->id : "");
-> >> >> +                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vpi->memaddr);
-> >> >> +                monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
-> >> >> +                monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
-> >> >> +                break;
-> >> >> +            default:
-> >> >> +                g_assert_not_reached();
-> >> >
-> >> >
-> >> > Although I'd prefer if that assert was replaced by a print
-> >> > saying it was an unknown type.
-> >> 
-> >> I would not.  If we reach this, something must have scribbled over
-> >> value->type and who knows what else.  Continuing is unsafe.  Looks like
-> >> a textbook use of assertions to me.
-> >
-> > Or it could be that someone added a new type of memory device and forgot
-> > to update the hmp code.
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  hw/block/virtio-blk.c          | 2 ++
+>  hw/core/machine.c              | 1 +
+>  include/hw/virtio/virtio-blk.h | 1 +
+>  3 files changed, 4 insertions(+)
 > 
-> Programming error -> assert.  Nothing catches attention in testing like
-> an assertion failure.
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 8a6754d9a2..542ec52536 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
+>      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+>      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+>                       IOThread *),
+> +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
+> +                     true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
 
-I don't want to get back through that; we've had this argument before;
-but I'll still say in this case I'd prefer a clean error rather than
-abort.
+Thinking about it, are there security implications for discard?
+Should we make it default false?
 
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 2629515363..ce98857af0 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -30,6 +30,7 @@ GlobalProperty hw_compat_3_1[] = {
+>      { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "true" },
+>      { "tpm-crb", "ppi", "false" },
+>      { "tpm-tis", "ppi", "false" },
+> +    { "virtio-blk-device", "discard-wzeroes", "false" },
+>  };
+>  const size_t hw_compat_3_1_len = G_N_ELEMENTS(hw_compat_3_1);
+>  
+> diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
+> index 5117431d96..c336afb4cd 100644
+> --- a/include/hw/virtio/virtio-blk.h
+> +++ b/include/hw/virtio/virtio-blk.h
+> @@ -40,6 +40,7 @@ struct VirtIOBlkConf
+>      uint32_t request_merging;
+>      uint16_t num_queues;
+>      uint16_t queue_size;
+> +    uint32_t discard_wzeroes;
+>  };
+>  
+>  struct VirtIOBlockDataPlane;
+> -- 
+> 2.20.1
