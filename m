@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59012)
+Received: from eggs.gnu.org ([209.51.188.92]:59176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0008Gg-OF
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMH-0008J2-M0
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003j6-PN
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:44169)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMC-0003lz-87
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:01 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:46409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003a4-CL
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id z5so7630465wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:37 -0800 (PST)
+	id 1gpbMB-0003To-Uu
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:56 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id l9so7609865wrt.13
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:33 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.35
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.31
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:35 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:31 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:38 +0000
-Message-Id: <20190201160653.13829-33-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:34 +0000
+Message-Id: <20190201160653.13829-29-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 32/47] exec.c: Don't reallocate IOMMUNotifiers
- that are in use
+Subject: [Qemu-devel] [PULL 28/47] target/arm/translate-a64: Don't
+ underdecode SIMD ld/st single
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +36,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The tcg_register_iommu_notifier() code has a GArray of
-TCGIOMMUNotifier structs which it has registered by passing
-memory_region_register_iommu_notifier() a pointer to the embedded
-IOMMUNotifier field. Unfortunately, if we need to enlarge the
-array via g_array_set_size() this can cause a realloc(), which
-invalidates the pointer that memory_region_register_iommu_notifier()
-put into the MemoryRegion's iommu_notify list. This can result
-in segfaults.
+In the AdvSIMD load/store single structure encodings, the
+non-post-indexed case should have zeroes in [20:16] (which is the
+Rm field for the post-indexed case). Bit 31 must also be zero
+(a check we got right in ldst_multiple but not here). Correctly
+UNDEF these unallocated encodings.
 
-Switch the GArray to holding pointers to the TCGIOMMUNotifier
-structs, so that we can individually allocate and free them.
-
-Cc: qemu-stable@nongnu.org
-Fixes: 1f871c5e6b0f30644a60a ("exec.c: Handle IOMMUs in address_space_translate_for_iotlb()")
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190128174241.5860-1-peter.maydell@linaro.org
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20190125182626.9221-5-peter.maydell@linaro.org
 ---
- exec.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/arm/translate-a64.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index da3e635f91b..25f3938a271 100644
---- a/exec.c
-+++ b/exec.c
-@@ -665,7 +665,7 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
-     int i;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c1f0cad7691..2cade64ed25 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3409,6 +3409,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+ {
+     int rt = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
++    int rm = extract32(insn, 16, 5);
+     int size = extract32(insn, 10, 2);
+     int S = extract32(insn, 12, 1);
+     int opc = extract32(insn, 13, 3);
+@@ -3424,6 +3425,15 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     int ebytes, xs;
+     TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
  
-     for (i = 0; i < cpu->iommu_notifiers->len; i++) {
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i);
-         if (notifier->mr == mr && notifier->iommu_idx == iommu_idx) {
-             break;
-         }
-@@ -673,7 +673,8 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
-     if (i == cpu->iommu_notifiers->len) {
-         /* Not found, add a new entry at the end of the array */
-         cpu->iommu_notifiers = g_array_set_size(cpu->iommu_notifiers, i + 1);
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_new0(TCGIOMMUNotifier, 1);
-+        g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i) = notifier;
- 
-         notifier->mr = mr;
-         notifier->iommu_idx = iommu_idx;
-@@ -705,8 +706,9 @@ static void tcg_iommu_free_notifier_list(CPUState *cpu)
-     TCGIOMMUNotifier *notifier;
- 
-     for (i = 0; i < cpu->iommu_notifiers->len; i++) {
--        notifier = &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier, i);
-+        notifier = g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i);
-         memory_region_unregister_iommu_notifier(notifier->mr, &notifier->n);
-+        g_free(notifier);
-     }
-     g_array_free(cpu->iommu_notifiers, true);
- }
-@@ -976,7 +978,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-         vmstate_register(NULL, cpu->cpu_index, cc->vmsd, cpu);
++    if (extract32(insn, 31, 1)) {
++        unallocated_encoding(s);
++        return;
++    }
++    if (!is_postidx && rm != 0) {
++        unallocated_encoding(s);
++        return;
++    }
++
+     switch (scale) {
+     case 3:
+         if (!is_load || S) {
+@@ -3501,7 +3511,6 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
      }
  
--    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier));
-+    cpu->iommu_notifiers = g_array_new(false, true, sizeof(TCGIOMMUNotifier *));
- #endif
- }
- 
+     if (is_postidx) {
+-        int rm = extract32(insn, 16, 5);
+         if (rm == 31) {
+             tcg_gen_mov_i64(tcg_rn, tcg_addr);
+         } else {
 -- 
 2.20.1
