@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59042)
+Received: from eggs.gnu.org ([209.51.188.92]:60622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gpetu-0000xn-U6
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:55:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpexg-0003Ur-2g
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gpett-0002Cu-4b
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:58 -0500
-Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:40354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gpets-00027X-A7
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:56 -0500
-Received: by mail-pl1-x632.google.com with SMTP id u18so3729117plq.7
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 11:54:47 -0800 (PST)
-References: <20190125225714.10234-1-richard.henderson@linaro.org>
-	<20190125225714.10234-8-richard.henderson@linaro.org>
-	<871s4xnis9.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5e3ef919-74d2-4ad3-506f-172fe01848b7@linaro.org>
-Date: Fri, 1 Feb 2019 11:54:43 -0800
+	(envelope-from <no-reply@patchew.org>) id 1gpexe-0005ev-Ld
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:58:51 -0500
+Resent-Message-Id: <E1gpexe-0005ev-Ld@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpexa-0005Kk-AT
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:58:48 -0500
+Message-ID: <154905109016.29184.7201016046791429821@ebba9967afc0>
+In-Reply-To: <1548509635-15776-1-git-send-email-ptsneves@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <871s4xnis9.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] tests/tcg/aarch64: Add pauth smoke
- tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 11:58:11 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3] chardev: Allow for pty path passing.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: ptsneves@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-On 1/28/19 3:06 AM, Alex Bennée wrote:
-> We build all tests with:
-> 
->   CFLAGS+=-Wall -O0 -g -fno-strict-aliasing
-> 
-> mainly because the first thing you want to do when they fail is run them
-> through gdb to see what went wrong. Do you actually need optimisation on
-> for the build to work? Everything else looks good though:
-
-I needed optimization for the MemTag test to work, and I copied that.
-I'll remove it.
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ4NTA5NjM1LTE1Nzc2LTEt
+Z2l0LXNlbmQtZW1haWwtcHRzbmV2ZXNAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
+aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
+dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
+ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
+bWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTQ4
+NTA5NjM1LTE1Nzc2LTEtZ2l0LXNlbmQtZW1haWwtcHRzbmV2ZXNAZ21haWwuY29tL3Rlc3Rpbmcu
+ZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
