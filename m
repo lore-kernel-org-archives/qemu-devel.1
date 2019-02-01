@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51265)
+Received: from eggs.gnu.org ([209.51.188.92]:52095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpcU8-0001ye-IO
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:16 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpcWj-0004nk-DY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpcU7-0003MR-0z
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:12 -0500
-Date: Fri, 1 Feb 2019 18:19:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190201171936.GC31750@localhost.localdomain>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	(envelope-from <no-reply@patchew.org>) id 1gpcWi-0004wc-1a
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:53 -0500
+Resent-Message-Id: <E1gpcWi-0004wc-1a@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpcWg-0004ew-6Q
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:51 -0500
+Message-ID: <154904172581.29184.10652914247774232953@ebba9967afc0>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 09:22:07 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
+ docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-Am 31.01.2019 um 14:46 hat Andrey Shinkevich geschrieben:
-> In the 'Format specific information' section of the 'qemu-img info'
-> command output, the supplemental information about existing QCOW2
-> bitmaps will be shown, such as a bitmap name, flags and granularity:
-> 
-> image: /vz/vmprivate/VM1/harddisk.hdd
-> file format: qcow2
-> virtual size: 64G (68719476736 bytes)
-> disk size: 3.0M
-> cluster_size: 1048576
-> Format specific information:
->     compat: 1.1
->     lazy refcounts: true
->     bitmaps:
->         [0]:
->             flags:
->                 [0]: in-use
->                 [1]: auto
->             name: back-up1
->             unknown flags: 4
->             granularity: 65536
->         [1]:
->             flags:
->                 [0]: in-use
->                 [1]: auto
->             name: back-up2
->             unknown flags: 8
->             granularity: 65536
->     refcount bits: 16
->     corrupt: false
-> 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-
-I haven't reviewed the patch in detail, but I suggest that you change
-the subject line to make clear this is a qcow2 patch, not a qemu-img
-one. Maybe:
-
-    "qcow2: Add list of bitmaps to ImageInfoSpecificQCow2"
-
-Kevin
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
+OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
+YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
+ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCmI2OTZlZThlZmEgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJkLWNv
+ZGUgUUVNVSB2ZXJzaW9uCjI0NjA2ZDllNzYgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRp
+ZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUKZWY0NjBkMTRiYiBNYWtlZmlsZSwgY29uZmlndXJlOiBT
+dXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCmVlY2JiYmNjNjcgU2VwYXJhdGUgY29u
+Zi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudApiNmRkZmQ5OTY0IGRvY3MvY29uZi5weTogRGlz
+YWJsZSBvcHRpb24gd2FybmluZ3MKYjYxNzQwMzllNiBkb2NzL2NvbmYucHk6IERvbid0IGluY2x1
+ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZAplOGJmZjBlODM0IGRvY3MvY29uZi5weTogQ29u
+ZmlndXJlIHRoZSAnYWxhYmFzdGVyJyB0aGVtZQo2OGRlMDUzNmU5IGRvY3MvY29uZi5weTogRGlz
+YWJsZSB1bnVzZWQgX3N0YXRpYyBkaXJlY3RvcnkKOTNiNWQxZGJkOCBkb2NzOiBDb21taXQgaW5p
+dGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0CjczYWQ2M2NmM2QgZG9jczogQ29udmVy
+dCBtZW1vcnkudHh0IHRvIHJzdCBmb3JtYXQKY2YwYTgzNjRmNiBkb2NzL2NwdS1ob3RwbHVnLnJz
+dDogRml4IHJTVCBtYXJrdXAgaXNzdWVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzExIENoZWNr
+aW5nIGNvbW1pdCBjZjBhODM2NGY2ZWEgKGRvY3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNUIG1h
+cmt1cCBpc3N1ZXMpCjIvMTEgQ2hlY2tpbmcgY29tbWl0IDczYWQ2M2NmM2Q5NiAoZG9jczogQ29u
+dmVydCBtZW1vcnkudHh0IHRvIHJzdCBmb3JtYXQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIyOiAKcmVu
+YW1lIGZyb20gZG9jcy9kZXZlbC9tZW1vcnkudHh0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
+Z3MsIDE5NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCjMvMTEgQ2hlY2tpbmcgY29tbWl0IDkzYjVkMWRiZDg1ZiAoZG9jczogQ29tbWl0IGluaXRp
+YWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydCkKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9m
+Zi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODggbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggMy8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xMSBDaGVja2lu
+ZyBjb21taXQgNjhkZTA1MzZlOWM3IChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0
+aWMgZGlyZWN0b3J5KQo1LzExIENoZWNraW5nIGNvbW1pdCBlOGJmZjBlODM0ZWMgKGRvY3MvY29u
+Zi5weTogQ29uZmlndXJlIHRoZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMSBDaGVja2luZyBjb21t
+aXQgYjYxNzQwMzllNjg4IChkb2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMg
+aW4gSFRNTCBidWlsZCkKNy8xMSBDaGVja2luZyBjb21taXQgYjZkZGZkOTk2NGFiIChkb2NzL2Nv
+bmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzKQo4LzExIENoZWNraW5nIGNvbW1pdCBlZWNi
+YmJjYzY3MzcgKFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQpCkVSUk9S
+OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTYwOiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5w
+eToxNToKK2h0bWxfdGhlbWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxh
+dGlvbiBNYW5hZ2VtZW50IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKRVJST1I6IE1pc3Np
+bmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+MzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+OS8xMSBDaGVja2luZyBjb21taXQgZWY0NjBkMTRiYjA5IChNYWtlZmlsZSwgY29uZmlndXJlOiBT
+dXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMSBDaGVja2luZyBjb21taXQg
+MjQ2MDZkOWU3NmNhIChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVy
+c2lvbiIgY29kZSkKMTEvMTEgQ2hlY2tpbmcgY29tbWl0IGI2OTZlZThlZmEzNCAoZG9jcy9jb25m
+LnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwMTE0NTAzNS4yMjczOS0xLXBldGVy
+Lm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
