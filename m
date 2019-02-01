@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35533)
+Received: from eggs.gnu.org ([209.51.188.92]:36750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbcv-0006VK-Hm
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:25:14 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gpbhV-00026H-2n
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:29:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbcu-0002d7-IN
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:25:13 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35755)
+	(envelope-from <alex.bennee@linaro.org>) id 1gpbhR-0004hq-1j
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:29:55 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40723)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbcu-0002cW-Ds
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:25:12 -0500
-Received: by mail-oi1-x242.google.com with SMTP id v6so6281990oif.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:25:12 -0800 (PST)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gpbhN-0004dL-Eu
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:29:51 -0500
+Received: by mail-wr1-x442.google.com with SMTP id p4so7734275wrt.7
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:29:43 -0800 (PST)
 References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<20190201145035.22739-10-peter.maydell@linaro.org>
-	<87r2crv5um.fsf@zen.linaroharston>
-In-Reply-To: <87r2crv5um.fsf@zen.linaroharston>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Feb 2019 16:25:00 +0000
-Message-ID: <CAFEAcA-VehQaTNt=2Q1zGmBNyWhATs6JAak5TskKTBA4Or0xtA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20190201145035.22739-2-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190201145035.22739-2-peter.maydell@linaro.org>
+Date: Fri, 01 Feb 2019 16:29:41 +0000
+Message-ID: <87pnsbv5e2.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/11] Makefile,
- configure: Support building rST documentation
+Subject: Re: [Qemu-devel] [PATCH 01/11] docs/cpu-hotplug.rst: Fix rST markup
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Fri, 1 Feb 2019 at 16:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> It reports:
->
->   Documentation     no
->
-> But then proceeds to barf:
->
->   https://travis-ci.org/stsquad/qemu/jobs/487512292#L1395
->
-> with:
->
->   /bin/sh: 1: sphinx-build: not found
->   Makefile:871: recipe for target 'docs/devel/index.html' failed
->   make: *** [docs/devel/index.html] Error 127
 
-Oops, yes. We shouldn't be adding the sphinxdocs target to
-the all: list (or the sphinxdocs-install target to install:)
-unless BUILD_DOCS is defined.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-(Assuming we take this we should probably also add sphinx
-to the set of deps we install for Travis, but a no-sphinx
-build shouldn't break.)
+> sphinx-build complains:
+>
+> docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
+> docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
+> docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line; =
+unexpected unindent.
+> docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line; =
+unexpected unindent.
+> docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
+>
+> }
+> {
+> docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line; =
+unexpected unindent.
+>
+> These are the result of not indicating one of the literal
+> blocks by finishing the preceding paragraph with the "::" marker.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  docs/cpu-hotplug.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+> index 1c268e00b41..e2d4e893b01 100644
+> --- a/docs/cpu-hotplug.rst
+> +++ b/docs/cpu-hotplug.rst
+> @@ -60,7 +60,7 @@ vCPU hotplug
+>      hot-plugged (no "qom-path" member).  From its output in step (3), we
+>      can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
+>      while hot-plugging a CPU into socket 1 requires passing the listed
+> -    properties to QMP ``device_add``:
+> +    properties to QMP ``device_add``::
+>
+>        (QEMU) device_add id=3Dcpu-2 driver=3DIvyBridge-IBRS-x86_64-cpu so=
+cket-id=3D1 core-id=3D0 thread-id=3D0
+>        {
+
+
+--
+Alex Benn=C3=A9e
