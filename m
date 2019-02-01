@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33480)
+Received: from eggs.gnu.org ([209.51.188.92]:33664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdx1-000106-TB
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:54:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpdx9-00016j-9a
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:54:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdnS-0006Ub-P6
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:44:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gpdnS-0006Tm-FH
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:44:14 -0500
-References: <20190123114220.16972-1-alex.bennee@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
-Date: Fri, 1 Feb 2019 12:44:12 -0600
+	(envelope-from <armbru@redhat.com>) id 1gpdjD-0003im-Hq
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:39:53 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Fri, 01 Feb 2019 19:39:44 +0100
+In-Reply-To: <1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	(Andrey Shinkevich's message of "Thu, 31 Jan 2019 16:46:44 +0300")
+Message-ID: <87pnsbxsi7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190123114220.16972-1-alex.bennee@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K"
-Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat,
- fp-bench and clang compile fixes
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +24,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat, fp-bench and clang
- compile fixes
-References: <20190123114220.16972-1-alex.bennee@linaro.org>
-In-Reply-To: <20190123114220.16972-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
 
-On 1/23/19 5:42 AM, Alex Benn=C3=A9e wrote:
-> The following changes since commit 952bc8b3c2cbba78261923a1e8ca55cda261=
-dee9:
->=20
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-21'=
- into staging (2019-01-22 17:56:21 +0000)
->=20
-> are available in the Git repository at:
->=20
->   https://github.com/stsquad/qemu.git tags/pull-fpu-next-230119-2
->=20
-> for you to fetch changes up to 7617010250822677348af2bd98f048be10e7f334=
-:
->=20
->   tests/Makefile: add check-softfloat rule (2019-01-23 08:30:01 +0000)
->=20
-> ----------------------------------------------------------------
-> Some more softfloat/fpu fixes
->=20
->    - make check-softfloat
->    - fixes for fp-bench
->    - workaround broken host fma
->    - compile fix for s390x/clang
->    - fixed for bigendian (v2)
->    - minor makefile tweaks (v2)
+> In the 'Format specific information' section of the 'qemu-img info'
+> command output, the supplemental information about existing QCOW2
+> bitmaps will be shown, such as a bitmap name, flags and granularity:
+>
+> image: /vz/vmprivate/VM1/harddisk.hdd
+> file format: qcow2
+> virtual size: 64G (68719476736 bytes)
+> disk size: 3.0M
+> cluster_size: 1048576
+> Format specific information:
+>     compat: 1.1
+>     lazy refcounts: true
+>     bitmaps:
+>         [0]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up1
+>             unknown flags: 4
+>             granularity: 65536
+>         [1]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up2
+>             unknown flags: 8
+>             granularity: 65536
+>     refcount bits: 16
+>     corrupt: false
+>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+[...]
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 91685be..271e0df 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -69,6 +69,8 @@
+>  # @encrypt: details about encryption parameters; only set if image
+>  #           is encrypted (since 2.10)
+>  #
+> +# @bitmaps: A list of qcow2 bitmap details (since 4.0)
+> +#
+>  # Since: 1.7
+>  ##
+>  { 'struct': 'ImageInfoSpecificQCow2',
+> @@ -77,7 +79,8 @@
+>        '*lazy-refcounts': 'bool',
+>        '*corrupt': 'bool',
+>        'refcount-bits': 'int',
+> -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
+> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
+> +      '*bitmaps': ['Qcow2BitmapInfo']
+>    } }
+>  
+>  ##
+> @@ -454,6 +457,41 @@
+>             'status': 'DirtyBitmapStatus'} }
+>  
+>  ##
+> +# @Qcow2BitmapInfoFlags:
+> +#
+> +# An enumeration of flags that a bitmap can report to the user.
+> +#
+> +# @in-use: The bitmap was not saved correctly and may be inconsistent.
 
-I think this series is the reason that an in-tree 'make && make check &&
-git status' is now showing a bunch of untracked files:
+I doubt the casual reader could guess the meaning from the name.  What
+about @dirty?
 
-	tests/fp/add.out
-	tests/fp/div.out
-	tests/fp/eq.out
-=2E..
+> +#
+> +# @auto: The bitmap must reflect all changes of the virtual disk by any
+> +#        application that would write to this qcow2 file.
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'enum': 'Qcow2BitmapInfoFlags',
+> +  'data': ['in-use', 'auto'] }
+> +
+> +##
+> +# @Qcow2BitmapInfo:
+> +#
+> +# Qcow2 bitmap information.
+> +#
+> +# @name: the name of the bitmap
+> +#
+> +# @granularity: granularity of the bitmap in bytes
+> +#
+> +# @flags: recognized flags of the bitmap
+> +#
+> +# @unknown-flags: any remaining flags not recognized by the current qemu version
 
-I suggest a followup patch to amend a .gitignore for tests/fp/*.out
+Intended use cases for @unknown-flags?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUk3wACgkQp6FrSiUn
-Q2pUWwf/W7l45azzfTLIiK61GtpovoOkAyOzCqYQQjqXCAv1kJUG+VIPE9u21ghI
-SNhr6p5Qwpn7OBiRBkaVR70YpzoAEIuzj/156X1CM7PUACjza5LbKajwlsuiSSAd
-T2Xqn0T0p7+4BnXrZ2mgHXV9LqrU7qklF9w6/zv1n+73ntWe1OWBQTARVfM7skK1
-WERAqiQokPXqG1NlOSn6DIFH1/2ktpLOcn65CzA1TVzkQ76a1ROcPNc5wB4US2nQ
-GR9aG27yXNuiZ4Gai9N9LAR5LCwySO5qs9zbVyjmgC6Zbsz4xjA7xVWDP/JGouby
-IhfPYEEXDBAWyn63842o3+i890gb9w==
-=mmHO
------END PGP SIGNATURE-----
-
---pzAGQ8GYqhOUcpxyEwR81EewuvSu0Yw2K--
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'struct': 'Qcow2BitmapInfo',
+> +  'data': {'name': 'str', 'granularity': 'uint32',
+> +           'flags': ['Qcow2BitmapInfoFlags'],
+> +           '*unknown-flags': 'uint32' } }
+> +
+> +##
+>  # @BlockLatencyHistogramInfo:
+>  #
+>  # Block latency histogram.
