@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59143)
+Received: from eggs.gnu.org ([209.51.188.92]:60083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brendan@bslabs.net>) id 1gpT0T-0008N6-Gm
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:58 -0500
+	(envelope-from <sw@weilnetz.de>) id 1gpT5Y-00016M-BL
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:18:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brendan@bslabs.net>) id 1gpT0S-0007BV-No
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:57 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brendan@bslabs.net>) id 1gpT0S-0007Ag-Em
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:56 -0500
-Received: by mail-pg1-x544.google.com with SMTP id m1so2512792pgq.8
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 23:12:55 -0800 (PST)
-From: Brendan Shanks <brendan@bslabs.net>
-Date: Thu, 31 Jan 2019 23:12:25 -0800
-Message-Id: <20190201071225.20576-1-brendan@bslabs.net>
-Subject: [Qemu-devel] [PATCH] ui/cocoa.m: Fix macOS 10.14 deprecation
- warnings
+	(envelope-from <sw@weilnetz.de>) id 1gpT5X-0000zK-Im
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:18:12 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:44026
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1gpT5X-0000wr-9q
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:18:11 -0500
+References: <20190129113921.21599-1-berrange@redhat.com>
+	<20190129113921.21599-4-berrange@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <1760c7bb-12ca-31eb-ce69-ed5e68e6ca5d@weilnetz.de>
+Date: Fri, 1 Feb 2019 08:18:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190129113921.21599-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/5] nsis: ensure we always pass -W64 flag
+ to nsis installer script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Brendan Shanks <brendan@bslabs.net>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Adam Baxter <voltagex@voltagex.org>, Peter Maydell <peter.maydell@linaro.org>
 
-macOS 10.14 deprecated NSOnState/NSOffState in favour of
-NSControlStateValueOn/NSControlStateValueOff. Use the new constants,
-and #define them to the old ones when compiling against a pre-10.13 SDK.
-Also [NSGraphicsContext graphicsPort] is now deprecated, use
-[NSGraphicsContext CGContext] when available.
+On 29.01.19 12:39, Daniel P. Berrang=C3=A9 wrote:
+> The code to set the -W64 flag is inside a conditional block that only
+> executes when we are bundling DLLs with the installer. This results in
+> QEMU being installed in the wrong location on 64-bit hosts when DLLs
+> are not bundled.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 14a463564e..97a6727358 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -893,11 +893,14 @@ INSTALLER =3D qemu-setup-$(VERSION)$(EXESUF)
+> =20
+>  nsisflags =3D -V2 -NOCD
+> =20
+> +ifeq ($(ARCH),x86_64)
+> +nsisflags +=3D -DW64
+> +endif
+> +
+>  ifneq ($(wildcard $(SRC_PATH)/dll),)
+>  ifeq ($(ARCH),x86_64)
+>  # 64 bit executables
+>  DLL_PATH =3D $(SRC_PATH)/dll/w64
+> -nsisflags +=3D -DW64
+>  else
+>  # 32 bit executables
+>  DLL_PATH =3D $(SRC_PATH)/dll/w32
+>=20
 
-Signed-off-by: Brendan Shanks <brendan@bslabs.net>
----
- ui/cocoa.m | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+Technically this is fine, therefore
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index ddc058e76e..e2567d6946 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -54,6 +54,9 @@
- #ifndef MAC_OS_X_VERSION_10_12
- #define MAC_OS_X_VERSION_10_12 101200
- #endif
-+#ifndef MAC_OS_X_VERSION_10_13
-+#define MAC_OS_X_VERSION_10_13 101300
-+#endif
- 
- /* macOS 10.12 deprecated many constants, #define the new names for older SDKs */
- #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
-@@ -90,6 +93,14 @@
- #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
- #define NSModalResponseOK NSFileHandlingPanelOKButton
- #endif
-+/* 10.14 deprecates NSOnState and NSOffState in favor of
-+ * NSControlStateValueOn/Off, which were introduced in 10.13.
-+ * Define for older versions
-+ */
-+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_13
-+#define NSControlStateValueOn NSOnState
-+#define NSControlStateValueOff NSOffState
-+#endif
- 
- //#define DEBUG
- 
-@@ -377,7 +388,12 @@ - (void) drawRect:(NSRect) rect
-     COCOA_DEBUG("QemuCocoaView: drawRect\n");
- 
-     // get CoreGraphic context
-+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10
-     CGContextRef viewContextRef = [[NSGraphicsContext currentContext] graphicsPort];
-+#else
-+    CGContextRef viewContextRef = [[NSGraphicsContext currentContext] CGContext];
-+#endif
-+
-     CGContextSetInterpolationQuality (viewContextRef, kCGInterpolationNone);
-     CGContextSetShouldAntialias (viewContextRef, NO);
- 
-@@ -1147,9 +1163,9 @@ - (void)zoomToFit:(id) sender
- {
-     stretch_video = !stretch_video;
-     if (stretch_video == true) {
--        [sender setState: NSOnState];
-+        [sender setState: NSControlStateValueOn];
-     } else {
--        [sender setState: NSOffState];
-+        [sender setState: NSControlStateValueOff];
-     }
- }
- 
-@@ -1390,15 +1406,15 @@ - (void)adjustSpeed:(id)sender
-     {
-         /* Unselect the currently selected item */
-         for (NSMenuItem *item in [menu itemArray]) {
--            if (item.state == NSOnState) {
--                [item setState: NSOffState];
-+            if (item.state == NSControlStateValueOn) {
-+                [item setState: NSControlStateValueOff];
-                 break;
-             }
-         }
-     }
- 
-     // check the menu item
--    [sender setState: NSOnState];
-+    [sender setState: NSControlStateValueOn];
- 
-     // get the throttle percentage
-     throttle_pct = [sender tag];
-@@ -1502,7 +1518,7 @@ int main (int argc, const char * argv[]) {
-                    initWithTitle: [NSString stringWithFormat: @"%d%%", percentage] action:@selector(adjustSpeed:) keyEquivalent:@""] autorelease];
- 
-         if (percentage == 100) {
--            [menuItem setState: NSOnState];
-+            [menuItem setState: NSControlStateValueOn];
-         }
- 
-         /* Calculate the throttle percentage */
--- 
-2.17.2 (Apple Git-113)
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+
+But I wonder whether a Windows installer without bundled DLLs makes
+sense. If it doesn't, we could as well fail if the DLL path is empty.
+
+Regards
+Stefan
