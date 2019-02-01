@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56951)
+Received: from eggs.gnu.org ([209.51.188.92]:56968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpZZ7-0006Lf-62
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:13:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpZZ7-0006MD-Uo
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:13:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpZZ6-0003he-CV
+	(envelope-from <armbru@redhat.com>) id 1gpZZ7-0003im-6C
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:13:09 -0500
-References: <20190131123810.10233-1-berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <eff25a89-1e3f-6746-b384-5673cedaaa68@redhat.com>
-Date: Fri, 1 Feb 2019 15:12:55 +0100
+Received: from mx1.redhat.com ([209.132.183.28]:57865)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gpZZ6-0003gy-MB
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:13:08 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190201051806.53183-1-lifei1214@126.com>
+	<20190201051806.53183-9-lifei1214@126.com>
+Date: Fri, 01 Feb 2019 15:13:06 +0100
+In-Reply-To: <20190201051806.53183-9-lifei1214@126.com> (Fei Li's message of
+	"Fri, 1 Feb 2019 13:18:03 +0800")
+Message-ID: <87imy361hp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190131123810.10233-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ybDXXCZEYZnGcQydLc1GSnDsQSZpy197D"
-Subject: Re: [Qemu-devel] [PATCH] qtest.py: Wait for the result of qtest
- commands
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 08/11] qemu_thread: supplement
+ error handling for qemu_signalfd_compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Fei Li <lifei1214@126.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ybDXXCZEYZnGcQydLc1GSnDsQSZpy197D
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Peter Xu <peterx@redhat.com>
-Message-ID: <eff25a89-1e3f-6746-b384-5673cedaaa68@redhat.com>
-Subject: Re: [PATCH] qtest.py: Wait for the result of qtest commands
-References: <20190131123810.10233-1-berto@igalia.com>
-In-Reply-To: <20190131123810.10233-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Fei Li <lifei1214@126.com> writes:
 
-On 31.01.19 13:38, Alberto Garcia wrote:
-> The cmd() method of the QEMUQtestProtocol class sends a qtest command
-> to QEMU but doesn't wait for the return message ("OK", "FAIL", "ERR").
-> Because of this, it can return control to the caller before the
-> command has actually finished.
->=20
-> In cases like clock_step or clock_set this means that cmd() can return
-> before all the timers triggered by the clock change have been fired.
-> This can be fixed by making cmd() wait for the output of the qtest
-> command.
->=20
-> This fixes iotests 093 and 136, which are flaky since commit
-> 8258292e18c39480b64eba9f3551 when the machine is under heavy workload.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  scripts/qtest.py | 6 ++++++
->  1 file changed, 6 insertions(+)
+> From: Fei Li <shirley17fei@gmail.com>
+>
+> For qemu_signalfd_compat: set errno, do some cleanup, and return
 
-Thanks a lot!
+"For iothread_complete" is redundant, isn't it?
 
-Max
+> -1 to replace the temporary &error_abort when failing to create
+> sigwait_compat.
+>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Fei Li <shirley17fei@gmail.com>
 
-
---ybDXXCZEYZnGcQydLc1GSnDsQSZpy197D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlxUU+cACgkQ9AfbAGHV
-z0DkkAf+IG4E0qZxc7dh4tiMKanX1uK5W8m0LCGGaSWAjuqichTWhBk8ixPQpFCK
-rLQT+i5t1gwPxCn3b+/xbnHaYkvqoOA2qJWOWmdGeSrFHWDR+AX2d3fMkZIiHNU7
-cg2lLjWr0Fvi1ljnkFlUXeY936rsd1t0R7DUBLw6ev8F44vZPQ0NI5a4kZGP8F+Z
-ljYHcu145hrRHuB0B/RTGdIy6R0szvhENAB/E0fTrGrOufTtaXJwx0NHJfK9TQh0
-P250rAROQExEw9Jpi6PcR33CWJJct6BHm+TsR+tK/G2IhrWC6FSxE0x/Zi+I+bQU
-ddygOijPa39JGFj3yrB+FY+GjrGt7w==
-=ifhA
------END PGP SIGNATURE-----
-
---ybDXXCZEYZnGcQydLc1GSnDsQSZpy197D--
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
