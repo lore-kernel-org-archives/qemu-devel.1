@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50089)
+Received: from eggs.gnu.org ([209.51.188.92]:50910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gpUxn-0003Og-JZ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 04:18:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1gpV2f-0004bz-TD
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 04:23:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gpUxl-0007XP-6k
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 04:18:19 -0500
-References: <20190130155733.32742-1-david@redhat.com>
-	<4fec7d60-1d09-ba37-c66a-1d86088a1c0e@linux.ibm.com>
-	<20190201093524.321787a2.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2bcb9cac-d8af-bfd4-e080-9650492ab770@redhat.com>
-Date: Fri, 1 Feb 2019 10:18:12 +0100
+	(envelope-from <berrange@redhat.com>) id 1gpV2d-0000dc-QZ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 04:23:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gpV2d-0000dL-9n
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 04:23:19 -0500
+Date: Fri, 1 Feb 2019 09:23:13 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190201092313.GB12005@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190129113921.21599-1-berrange@redhat.com>
+	<90a3688e-12f9-3209-e0b5-618b1029e1a1@weilnetz.de>
 MIME-Version: 1.0
-In-Reply-To: <20190201093524.321787a2.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 0/6] s390x/pci: remaining
- hot/un)plug patches
+Content-Disposition: inline
+In-Reply-To: <90a3688e-12f9-3209-e0b5-618b1029e1a1@weilnetz.de>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] misc fixes to deal with icon location
+ changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org, Adam Baxter <voltagex@voltagex.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 01.02.19 09:35, Cornelia Huck wrote:
-> On Thu, 31 Jan 2019 15:43:16 -0500
-> Collin Walling <walling@linux.ibm.com> wrote:
-> 
->> On 1/30/19 10:57 AM, David Hildenbrand wrote:
->>> These are all the patches that are not yet upstream (@Conny you might
->>> already picked some, including them for the full picture) and after
->>> a good discussion yesterday, including a patch t get rid of the release
->>> timer. I ran a couple of sanity tests on this series.
->>>
->>> #1 and #2 fix hotplugging of PCI bridges.
->>> #3 warns when "zpci=off"
->>> #4 refactors unplugging
->>> #5 get's rid of the release timer
->>> #6 processes all unplug requests on reboot
->>>
->>> @Colin, can you review/ack? Especially Patch #4 is needed for qdev
->>> patches already on the list. ("[PATCH RFCv2 0/9] qdev: Hotplug handler
->>> chaining + virtio-pmem")  
->>
->> I've given my r-b for 4, 5, and 6. IIRC, the other patches in this
->> series looked fine from previous versions, but I'd like to look at them
->> more carefully before ack'ing. Please allow me some time to devote to
->> them in the near future. Trying my best to balance things :)
-> 
-> Great, thanks for looking. If patches 4-6 can be applied without
-> patches 1-3 (I think they can?), I'll go ahead and queue them.
+On Fri, Feb 01, 2019 at 08:52:25AM +0100, Stefan Weil wrote:
+> On 29.01.19 12:39, Daniel P. Berrang=C3=A9 wrote:
+> > This is a few misc fixes identified after the icon location changes
+> > were merged. Most importantly it deals with the nsis installer file
+> > manifest.
+> >=20
+> > Daniel P. Berrang=C3=A9 (5):
+> >   nsis: don't install files into /tmp
+> >   make: don't insert a '/' after $(DESTDIR)
+> >   nsis: ensure we always pass -W64 flag to nsis installer script
+> >   nsis: fix location of icons to be bundled in the installer
+> >   configure: stop trying to link non-existant bmp file from bios dir
+> >=20
+> >  Makefile  | 23 +++++++++++++----------
+> >  configure |  1 -
+> >  qemu.nsi  |  4 ++--
+> >  3 files changed, 15 insertions(+), 13 deletions(-)
+> >=20
+>=20
+> There was also a file rename which needs to be handled,
+> otherwise NSIS still fails:
+>=20
+> File: "/tmp/qemu-nsis\qemu_logo_no_text.svg" -> no files found.
 
-Yes, I think they can, patch 1-3 mainly deals with plugging, these ones
-with unplugging. Thanks Conny!
+I don't see that prolem - NSIS builds successfully for me, and I can't
+find any reference to .svg files in the qemu.nsi=20
 
-> 
-> (I'll probably send a pull request next week, will be happy to include
-> the other patches as well.)
-> 
+> The new qemu.svg still includes the old file name. That could be fixed,=
+ too.
 
+Oh, in its metadata I see.
 
--- 
-
-Thanks,
-
-David / dhildenb
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
