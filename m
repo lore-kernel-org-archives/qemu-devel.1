@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38688)
+Received: from eggs.gnu.org ([209.51.188.92]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gpYSH-0007Wv-0e
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:02:02 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gpYUS-0000cJ-RJ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gpYS9-0002zT-SW
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:02:00 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  1 Feb 2019 16:01:37 +0300
-Message-Id: <20190201130138.94525-6-vsementsov@virtuozzo.com>
-In-Reply-To: <20190201130138.94525-1-vsementsov@virtuozzo.com>
-References: <20190201130138.94525-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 5/6] block/nbd-client: don't check ioc
+	(envelope-from <balaton@eik.bme.hu>) id 1gpYUR-00043O-7H
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:04:16 -0500
+Date: Fri, 1 Feb 2019 14:03:39 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190126150102.7AABC74569F@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.9999.1902011402450.32600@zero.eik.bme.hu>
+References: <20190126150102.7AABC74569F@zero.eik.bme.hu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Fix msync to do
+ what hardware does
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,75 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-We have several paranoid checks for ioc != NULL. But ioc may become
-NULL only on close, which should not happen during requests handling.
-Also, we check ioc only sometimes, not after each yield, which is
-inconsistent. Let's drop these checks. However, for safety, let's leave
-asserts instead.
+On Sat, 26 Jan 2019, BALATON Zoltan wrote:
+> According to BookE docs, invalid bits (while undefined behaviour) should
+> not raise exception but be ignored. This seems to be implementation
+> dependent though and QEMU currently does what e500 CPUs do and raise
+> exception for invalid bits. Unfortunately some versions of libstdc++
+> (and so all programs compiled with it) have lwsync on PPC440 which is
+> invalid but on real hardware it's just executed as msync ignoring the
+> invalid bits (maybe that's why it got undetected) but they fail on QEMU.
+> This patch changes invalid mask of msync to allow these programs to run
+> but keep generating exception on e500 cores to follow what hardware does.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
+Ping? This seems to have been ignored so far.
 
-Notes:
-    v5: fix commit message a bit [Eric]
-
- block/nbd-client.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
-
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 8e9b3dbedd..d8bf1bbb8b 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -53,9 +53,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
- {
-     NBDClientSession *client = nbd_get_client_session(bs);
- 
--    if (!client->ioc) { /* Already closed */
--        return;
--    }
-+    assert(client->ioc);
- 
-     /* finish any pending coroutines */
-     qio_channel_shutdown(client->ioc,
-@@ -153,10 +151,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
-         rc = -EIO;
-         goto err;
-     }
--    if (!s->ioc) {
--        rc = -EPIPE;
--        goto err;
--    }
-+    assert(s->ioc);
- 
-     if (qiov) {
-         qio_channel_set_cork(s->ioc, true);
-@@ -429,10 +424,11 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
-     s->requests[i].receiving = true;
-     qemu_coroutine_yield();
-     s->requests[i].receiving = false;
--    if (!s->ioc || s->quit) {
-+    if (s->quit) {
-         error_setg(errp, "Connection closed");
-         return -EIO;
-     }
-+    assert(s->ioc);
- 
-     assert(s->reply.handle == handle);
- 
-@@ -982,9 +978,7 @@ void nbd_client_close(BlockDriverState *bs)
-     NBDClientSession *client = nbd_get_client_session(bs);
-     NBDRequest request = { .type = NBD_CMD_DISC };
- 
--    if (client->ioc == NULL) {
--        return;
--    }
-+    assert(client->ioc);
- 
-     nbd_send_request(client->ioc, &request);
- 
--- 
-2.18.0
+> ---
+> target/ppc/translate.c | 11 ++++++++---
+> 1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index e169c43643..5429ceb1ab 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -6476,7 +6476,12 @@ static void gen_mbar(DisasContext *ctx)
+> /* msync replaces sync on 440 */
+> static void gen_msync_4xx(DisasContext *ctx)
+> {
+> -    /* interpreted as no-op */
+> +    /* Only e500 seems to treat reserved bits as invalid */
+> +    if ((ctx->insns_flags2 & PPC2_BOOKE206) &&
+> +        (ctx->opcode & 0x03FFF801)) {
+> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+> +    }
+> +    /* otherwise interpreted as no-op */
+> }
+>
+> /* icbt */
+> @@ -7054,11 +7059,11 @@ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
+> GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
+> GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
+>               PPC_BOOKE, PPC2_BOOKE206),
+> -GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
+> +GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x039FF801, PPC_BOOKE),
+> GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+>                PPC_BOOKE, PPC2_BOOKE206),
+> GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
+> -               PPC_440_SPEC),
+> +             PPC_440_SPEC),
+> GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+> GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+> GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+>
