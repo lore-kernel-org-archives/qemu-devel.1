@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43290)
+Received: from eggs.gnu.org ([209.51.188.92]:43512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpaO9-0001yL-Mr
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:05:56 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpaOo-0002Wm-J3
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gpaO7-0004IO-Jm
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:05:53 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46167)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gpaO5-00048d-P9
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:05:50 -0500
-Received: by mail-wr1-f67.google.com with SMTP id l9so7383988wrt.13
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 07:05:37 -0800 (PST)
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-43-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a67e6380-daf5-62d1-0f37-45f7015cc0fa@redhat.com>
-Date: Fri, 1 Feb 2019 16:05:30 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gpaOc-0004Zr-DQ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:06:29 -0500
+Resent-Message-Id: <E1gpaOc-0004Zr-DQ@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpaOc-0004WU-4E
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:06:22 -0500
+Message-ID: <154903353884.29184.10758505864573918334@ebba9967afc0>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <1548410831-19553-43-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 42/52] i386: express dependencies with
- Kconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 07:05:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
+ docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,292 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: yang.zhong@intel.com, thuth@redhat.com
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-Hi Paolo,
-
-On 1/25/19 11:07 AM, Paolo Bonzini wrote:
-> This way, the default-configs file only need to specify the boards
-> and any optional devices.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Message-Id: <20190123065618.3520-37-yang.zhong@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/i386-softmmu.mak | 44 ++++++--------------------------
->  hw/acpi/Kconfig                  |  3 +++
->  hw/i2c/Makefile.objs             |  2 +-
->  hw/i386/Kconfig                  | 54 ++++++++++++++++++++++++++++++++++++++++
->  hw/isa/Kconfig                   |  1 +
->  hw/pci-host/Kconfig              |  4 +++
->  hw/tpm/Kconfig                   |  2 ++
->  7 files changed, 73 insertions(+), 37 deletions(-)
-> 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index 8e6a810..9eb9a5e 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -1,11 +1,6 @@
->  # Default configuration for i386-softmmu
->  
-> -CONFIG_PCI=y
-> -CONFIG_PCI_DEVICES=y
-> -CONFIG_ISA_BUS=y
->  include hyperv.mak
-> -CONFIG_VGA_ISA=y
-> -CONFIG_VMWARE_VGA=y
->  CONFIG_VMXNET3_PCI=y
->  CONFIG_VIRTIO_VGA=y
->  CONFIG_IPMI=y
-> @@ -13,49 +8,26 @@ CONFIG_IPMI_LOCAL=y
->  CONFIG_IPMI_EXTERN=y
->  CONFIG_ISA_IPMI_KCS=y
->  CONFIG_ISA_IPMI_BT=y
-> -CONFIG_I8254=y
-> -CONFIG_ACPI=y
-> -CONFIG_ACPI_X86=y
-> -CONFIG_ACPI_X86_ICH=y
-> -CONFIG_ACPI_MEMORY_HOTPLUG=y
-> -CONFIG_ACPI_CPU_HOTPLUG=y
-> -CONFIG_APM=y
-> -CONFIG_I8257=y
-> -CONFIG_IDE_ISA=y
-> -CONFIG_IDE_PIIX=y
-> +
-> +# Optional devices:
-> +#
->  CONFIG_HPET=y
->  CONFIG_APPLESMC=y
-> -CONFIG_I8259=y
->  CONFIG_PFLASH_CFI01=y
-> -CONFIG_MC146818RTC=y
-> -CONFIG_PCI_PIIX=y
-> -CONFIG_ISA_DEBUG=y
->  CONFIG_ISA_TESTDEV=y
-> -CONFIG_VMPORT=y
->  CONFIG_SGA=y
-> -CONFIG_LPC_ICH9=y
-> -CONFIG_PCI_EXPRESS=y
-> -CONFIG_PCI_EXPRESS_Q35=y
-> -CONFIG_APIC=y
-> -CONFIG_IOAPIC=y
->  CONFIG_PVPANIC=y
->  CONFIG_MEM_DEVICE=y
-> -CONFIG_DIMM=y
->  CONFIG_NVDIMM=y
->  CONFIG_ACPI_NVDIMM=y
-> -CONFIG_XIO3130=y
-> -CONFIG_IOH3420=y
-> -CONFIG_I82801B11=y
-> -CONFIG_SMBIOS=y
->  CONFIG_PXB=y
->  CONFIG_ACPI_VMGENID=y
-> -CONFIG_ACPI_SMBUS=y
->  CONFIG_SMBUS_EEPROM=y
-> -CONFIG_FW_CFG_DMA=y
->  CONFIG_I2C=y
-> -CONFIG_VTD=y
-> -CONFIG_AMD_IOMMU=y
-> -CONFIG_PAM=y
-> -CONFIG_PC=y
-> +CONFIG_PCI_DEVICES=y
-> +
-> +# Boards:
-> +#
-> +CONFIG_ISAPC=y
->  CONFIG_I440FX=y
->  CONFIG_Q35=y
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index c485a34..035a28f 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -3,15 +3,18 @@ config ACPI
->  
->  config ACPI_X86
->      bool
-> +    select ACPI
->  
->  config ACPI_X86_ICH
->      bool
-> +    select ACPI_X86
->  
->  config ACPI_CPU_HOTPLUG
->      bool
->  
->  config ACPI_MEMORY_HOTPLUG
->      bool
-> +    select MEM_DEVICE
->  
->  config ACPI_NVDIMM
->      bool
-> diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-> index 61ac50a..ff22aa6 100644
-> --- a/hw/i2c/Makefile.objs
-> +++ b/hw/i2c/Makefile.objs
-> @@ -2,7 +2,7 @@ common-obj-$(CONFIG_I2C) += core.o smbus.o
->  common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
->  common-obj-$(CONFIG_DDC) += i2c-ddc.o
->  common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
-> -common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
-> +common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
->  common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
->  common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
->  common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
-> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-> index ff41be3..8814b7c 100644
-> --- a/hw/i386/Kconfig
-> +++ b/hw/i386/Kconfig
-> @@ -5,20 +5,73 @@ config SEV
->  config PC
->      bool
->  
-> +config PC
-> +    bool
-> +    select ISA_DEBUG
-> +    select I8259
-> +    select I8254
-> +    select PCSPK
-> +    select I82374
-> +    select I8257
-> +    select MC146818RTC
-> +
-> +config PC_PCI
-> +    bool
-> +    select APIC
-> +    select IOAPIC
-> +    select APM
-> +    select PC
-> +
-> +config PC_ACPI
-> +    bool
-> +    select ACPI_X86
-> +    select ACPI_CPU_HOTPLUG
-> +    select ACPI_MEMORY_HOTPLUG
-> +    depends on ACPI_SMBUS
-> +
->  config I440FX
->      bool
-> +    select PC_PCI
-> +    select PC_ACPI
-> +    select ACPI_SMBUS
-> +    select PCI_PIIX
-> +    select FDC
-> +    select IDE_PIIX
-> +    select DIMM
-> +    select SMBIOS
-> +    select VMPORT
-> +    select VMMOUSE
-> +    select FW_CFG_DMA
->  
->  config ISAPC
->      bool
->      select ISA_BUS
-> +    select PC
-> +    select IDE_ISA
-> +    select VGA_ISA
-> +    # FIXME: it is in the same file as i440fx, and does not compile
-> +    # if separated
-> +    depends on I440FX
->  
->  config Q35
->      bool
-> +    select PC_PCI
-> +    select PC_ACPI
-> +    select PCI_EXPRESS_Q35
-> +    select LPC_ICH9
-> +    select AHCI
-> +    select DIMM
-> +    select SMBIOS
-> +    select VMPORT
-> +    select VMMOUSE
-> +    select FW_CFG_DMA
-
-This lacks a DISPLAY dependency?
-
-$ i386-softmmu/qemu-system-i386 -M q35
-qemu-system-i386: Unknown device 'VGA' for bus 'PCIE'
-Aborted (core dumped)
-
-PCIDevice *pci_vga_init(PCIBus *bus)
-{
-    switch (vga_interface_type) {
-    case VGA_CIRRUS:
-        return pci_create_simple(bus, -1, "cirrus-vga");
-    case VGA_QXL:
-        return pci_create_simple(bus, -1, "qxl-vga");
-    case VGA_STD:
-        return pci_create_simple(bus, -1, "VGA");
-    case VGA_VMWARE:
-        return pci_create_simple(bus, -1, "vmware-svga");
-    case VGA_VIRTIO:
-        return pci_create_simple(bus, -1, "virtio-vga");
-    case VGA_NONE:
-    default: /* Other non-PCI types. Checking for unsupported types is
-already
-                done in vl.c. */
-        return NULL;
-    }
-}
-
-If so, how to express "at least one of *TYPE"?
-
->  
->  config VTD
-> +    default y if Q35
->      bool
->  
->  config AMD_IOMMU
-> +    default y if Q35
->      bool
->  
->  config VMPORT
-> @@ -26,3 +79,4 @@ config VMPORT
->  
->  config VMMOUSE
->      bool
-> +    depends on VMPORT
-> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-> index af68af9..6f0812d 100644
-> --- a/hw/isa/Kconfig
-> +++ b/hw/isa/Kconfig
-> @@ -27,4 +27,5 @@ config SMC37C669
->  config LPC_ICH9
->      bool
->      select ISA_BUS
-> +    select ACPI_SMBUS
->      select ACPI_X86_ICH
-> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-> index c01812a..ff4080c 100644
-> --- a/hw/pci-host/Kconfig
-> +++ b/hw/pci-host/Kconfig
-> @@ -27,10 +27,14 @@ config PCI_SABRE
->  
->  config PCI_PIIX
->      bool
-> +    select PCI
-> +    select PAM
-> +    select ISA_BUS
->  
->  config PCI_EXPRESS_Q35
->      bool
->      select PCI_EXPRESS
-> +    select PAM
->  
->  config PCI_EXPRESS_GENERIC_BRIDGE
->      bool
-> diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-> index db57388..8a63597 100644
-> --- a/hw/tpm/Kconfig
-> +++ b/hw/tpm/Kconfig
-> @@ -8,6 +8,8 @@ config TPM_TIS
->  
->  config TPM_CRB
->      bool
-> +    default y
-> +    depends on TPM && PC
->  
->  config TPM_PASSTHROUGH
->      bool
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
+OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
+YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
+ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+IC0+IHBhdGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5v
+cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmZGNkZTgyZTk0IGRvY3MvY29uZi5w
+eTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbgo5NWZmNDk1MzQzIE1ha2VmaWxlOiBBYnN0
+cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCmVhNGUzNmY2NmYgTWFrZWZp
+bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgoyMDc2MTAw
+NmYxIFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKYWI4Y2FjZDI2NiBk
+b2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmE1ODU5MWM0NDMgZG9jcy9jb25m
+LnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQKYTVlMWZmZjMxOSBk
+b2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUKYjk5MTdkMGExYiBk
+b2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5CmZkNzY5MDk5YjMg
+ZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydAo5ODg4YWZl
+NGNlIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0CjdjNTk5ODM5NTcgZG9j
+cy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcwoKPT09IE9VVFBVVCBCRUdJ
+TiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgN2M1OTk4Mzk1N2VjIChkb2NzL2NwdS1ob3RwbHVn
+LnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNraW5nIGNvbW1pdCA5ODg4YWZl
+NGNlZGQgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0KQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMyMTogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVtb3J5LnR4dAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1pdCBmZDc2OTA5OWIzOGIgKGRv
+Y3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQpCkVSUk9SOiBN
+aXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGI5OTE3ZDBhMWJjZSAoZG9jcy9jb25mLnB5OiBEaXNh
+YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgYTVlMWZm
+ZjMxOWE2IChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYv
+MTEgQ2hlY2tpbmcgY29tbWl0IGE1ODU5MWM0NDMxNyAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNs
+dWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IGFiOGNh
+Y2QyNjYyNSAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVj
+a2luZyBjb21taXQgMjA3NjEwMDZmMWZmIChTZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVh
+bCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE2MDogRklMRTogZG9j
+cy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10g
+PSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlk
+ZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9y
+cywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IGVhNGUzNmY2NmY5YiAoTWFrZWZp
+bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEg
+Q2hlY2tpbmcgY29tbWl0IDk1ZmY0OTUzNDNiYSAoTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
+bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNraW5nIGNvbW1pdCBmZGNkZTgy
+ZTk0MzggKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExNDUw
+MzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
