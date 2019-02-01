@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39098)
+Received: from eggs.gnu.org ([209.51.188.92]:39396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gpYUS-0000cJ-RJ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:04:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpYVN-0001O9-4W
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gpYUR-00043O-7H
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:04:16 -0500
-Date: Fri, 1 Feb 2019 14:03:39 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190126150102.7AABC74569F@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.21.9999.1902011402450.32600@zero.eik.bme.hu>
-References: <20190126150102.7AABC74569F@zero.eik.bme.hu>
+	(envelope-from <armbru@redhat.com>) id 1gpYVG-0004Il-36
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:05:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gpYVF-0004Ib-UF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 08:05:06 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190201051806.53183-1-lifei1214@126.com>
+	<20190201051806.53183-7-lifei1214@126.com>
+Date: Fri, 01 Feb 2019 14:04:59 +0100
+In-Reply-To: <20190201051806.53183-7-lifei1214@126.com> (Fei Li's message of
+	"Fri, 1 Feb 2019 13:18:01 +0800")
+Message-ID: <87bm3v7j7o.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Fix msync to do
- what hardware does
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 06/11] qemu_thread: supplement
+ error handling for emulated_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Fei Li <lifei1214@126.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Gerd Hoffmann <kraxel@redhat.com>
 
-On Sat, 26 Jan 2019, BALATON Zoltan wrote:
-> According to BookE docs, invalid bits (while undefined behaviour) should
-> not raise exception but be ignored. This seems to be implementation
-> dependent though and QEMU currently does what e500 CPUs do and raise
-> exception for invalid bits. Unfortunately some versions of libstdc++
-> (and so all programs compiled with it) have lwsync on PPC440 which is
-> invalid but on real hardware it's just executed as msync ignoring the
-> invalid bits (maybe that's why it got undetected) but they fail on QEMU.
-> This patch changes invalid mask of msync to allow these programs to run
-> but keep generating exception on e500 cores to follow what hardware does.
+Fei Li <lifei1214@126.com> writes:
+
+> From: Fei Li <fli@suse.com>
 >
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-
-Ping? This seems to have been ignored so far.
-
+> Utilize the existed errp to propagate the error and do the
+> corresponding cleanup to replace the temporary &error_abort.
+>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Fei Li <fli@suse.com>
 > ---
-> target/ppc/translate.c | 11 ++++++++---
-> 1 file changed, 8 insertions(+), 3 deletions(-)
+>  hw/usb/ccid-card-emulated.c | 15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
 >
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index e169c43643..5429ceb1ab 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -6476,7 +6476,12 @@ static void gen_mbar(DisasContext *ctx)
-> /* msync replaces sync on 440 */
-> static void gen_msync_4xx(DisasContext *ctx)
-> {
-> -    /* interpreted as no-op */
-> +    /* Only e500 seems to treat reserved bits as invalid */
-> +    if ((ctx->insns_flags2 & PPC2_BOOKE206) &&
-> +        (ctx->opcode & 0x03FFF801)) {
-> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+> index 0b170f6328..19b4b9a8fa 100644
+> --- a/hw/usb/ccid-card-emulated.c
+> +++ b/hw/usb/ccid-card-emulated.c
+> @@ -544,11 +544,16 @@ static void emulated_realize(CCIDCardState *base, Error **errp)
+>          error_setg(errp, "%s: failed to initialize vcard", TYPE_EMULATED_CCID);
+>          goto out2;
+>      }
+> -    /* TODO: let the further caller handle the error instead of abort() here */
+> -    qemu_thread_create(&card->event_thread_id, "ccid/event", event_thread,
+> -                       card, QEMU_THREAD_JOINABLE, &error_abort);
+> -    qemu_thread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_thread,
+> -                       card, QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (qemu_thread_create(&card->event_thread_id, "ccid/event", event_thread,
+> +                           card, QEMU_THREAD_JOINABLE, errp) < 0) {
+> +        goto out2;
 > +    }
-> +    /* otherwise interpreted as no-op */
-> }
->
-> /* icbt */
-> @@ -7054,11 +7059,11 @@ GEN_HANDLER(wrteei, 0x1F, 0x03, 0x05, 0x000E7C01, PPC_WRTEE),
-> GEN_HANDLER(dlmzb, 0x1F, 0x0E, 0x02, 0x00000000, PPC_440_SPEC),
-> GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
->               PPC_BOOKE, PPC2_BOOKE206),
-> -GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
-> +GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x039FF801, PPC_BOOKE),
-> GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
->                PPC_BOOKE, PPC2_BOOKE206),
-> GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
-> -               PPC_440_SPEC),
-> +             PPC_440_SPEC),
-> GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
-> GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
-> GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
->
+> +    if (qemu_thread_create(&card->apdu_thread_id, "ccid/apdu",
+> +                           handle_apdu_thread, card,
+> +                           QEMU_THREAD_JOINABLE, errp) < 0) {
+> +        qemu_thread_join(&card->event_thread_id);
+
+What makes event_thread terminate here?
+
+I'm asking because if it doesn't, the join will hang.
+
+> +        goto out2;
+> +    }
+>  
+>      return;
