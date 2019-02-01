@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42197)
+Received: from eggs.gnu.org ([209.51.188.92]:43146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gpWJ8-0003XB-2a
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:44:26 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gpWNt-0005DT-2I
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1gpWIv-00045E-W8
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:44:20 -0500
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:59964
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1gpWIv-00043e-Dl
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:44:13 -0500
-References: <20190130192403.13754-1-jcmvbkbc@gmail.com>
-	<ff956174-0839-0034-b659-a1e6e5096493@greensocs.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <5469e5c2-b6f4-1435-055d-61a1ddc9633e@adacore.com>
-Date: Fri, 1 Feb 2019 11:44:07 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1gpWNs-000718-At
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:49:21 -0500
+Date: Fri, 1 Feb 2019 10:49:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190201104906.GA3150@work-vm>
+References: <20190123195527.29575-1-david@redhat.com>
+	<20190123195527.29575-8-david@redhat.com>
+	<20190125175818.GG2695@work-vm> <87ef8svg79.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <ff956174-0839-0034-b659-a1e6e5096493@greensocs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] gdbstub: allow killing QEMU via vKill
- command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ef8svg79.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH RFCv2 7/9] hmp: Handle virtio-pmem when
+ printing memory device infos
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> 
+> > * David Hildenbrand (david@redhat.com) wrote:
+> >> Print the memory device info just like for PCDIMM/NVDIMM.
+> >> 
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hmp.c | 27 +++++++++++++++------------
+> >>  1 file changed, 15 insertions(+), 12 deletions(-)
+> >> 
+> >> diff --git a/hmp.c b/hmp.c
+> >> index 8da5fd8760..25c32e0810 100644
+> >> --- a/hmp.c
+> >> +++ b/hmp.c
+> >> @@ -2553,6 +2553,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+> >>      Error *err = NULL;
+> >>      MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
+> >>      MemoryDeviceInfoList *info;
+> >> +    VirtioPMEMDeviceInfo *vpi;
+> >>      MemoryDeviceInfo *value;
+> >>      PCDIMMDeviceInfo *di;
+> >>  
+> >> @@ -2562,19 +2563,9 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+> >>          if (value) {
+> >>              switch (value->type) {
+> >>              case MEMORY_DEVICE_INFO_KIND_DIMM:
+> >> -                di = value->u.dimm.data;
+> >> -                break;
+> >> -
+> >>              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
+> >> -                di = value->u.nvdimm.data;
+> >> -                break;
+> >> -
+> >> -            default:
+> >> -                di = NULL;
+> >> -                break;
+> >> -            }
+> >> -
+> >> -            if (di) {
+> >> +                di = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
+> >> +                     value->u.dimm.data : value->u.nvdimm.data;
+> >>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+> >>                                 MemoryDeviceInfoKind_str(value->type),
+> >>                                 di->id ? di->id : "");
+> >> @@ -2587,6 +2578,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+> >>                                 di->hotplugged ? "true" : "false");
+> >>                  monitor_printf(mon, "  hotpluggable: %s\n",
+> >>                                 di->hotpluggable ? "true" : "false");
+> >> +                break;
+> >> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
+> >> +                vpi = value->u.virtio_pmem.data;
+> >> +                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+> >> +                               MemoryDeviceInfoKind_str(value->type),
+> >> +                               vpi->id ? vpi->id : "");
+> >> +                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vpi->memaddr);
+> >> +                monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
+> >> +                monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
+> >> +                break;
+> >> +            default:
+> >> +                g_assert_not_reached();
+> >
+> >
+> > Although I'd prefer if that assert was replaced by a print
+> > saying it was an unknown type.
+> 
+> I would not.  If we reach this, something must have scribbled over
+> value->type and who knows what else.  Continuing is unsafe.  Looks like
+> a textbook use of assertions to me.
 
+Or it could be that someone added a new type of memory device and forgot
+to update the hmp code.
 
-Le 1/31/19 =C3=A0 5:15 PM, Luc Michel a =C3=A9crit=C2=A0:
-> On 1/30/19 8:24 PM, Max Filippov wrote:
->> With multiprocess extensions gdb uses 'vKill' packet instead of 'k' to
->> kill the inferior. Handle 'vKill' the same way 'k' was handled in the
->> presence of single process.
->>
->> Fixes: 7cf48f6752e5 ("gdbstub: add multiprocess support to
->> (f|s)ThreadInfo and ThreadExtraInfo")
->>
->> Cc: Luc Michel <luc.michel@greensocs.com>
->> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Dave
 
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Tested-By: KONRAD Frederic <frederic.konrad@adacore.com>
-
-Thanks!
-Fred
-
->=20
->> ---
->> Changes v1->v2:
->> - terminate QEMU in the vKill packet handler regardless of whatever th=
-e
->>    PID is or how many processes are attached [Luc Michel]
->>
->>   gdbstub.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index bfc7afb50968..96ffcd9d9d1d 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -1383,6 +1383,10 @@ static int gdb_handle_packet(GDBState *s, const=
- char *line_buf)
->>  =20
->>               put_packet(s, buf);
->>               break;
->> +        } else if (strncmp(p, "Kill;", 5) =3D=3D 0) {
->> +            /* Kill the target */
->> +            error_report("QEMU: Terminated via GDBstub");
->> +            exit(0);
->>           } else {
->>               goto unknown_command;
->>           }
->>
->=20
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >
+> >>              }
+> >>          }
+> >>      }
+> >> -- 
+> >> 2.17.2
+> >> 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
