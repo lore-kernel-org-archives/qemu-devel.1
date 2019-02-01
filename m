@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35283)
+Received: from eggs.gnu.org ([209.51.188.92]:37024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpQrX-00047z-Hu
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:55:36 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gpQuW-000546-6X
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpQrU-0008FU-UO
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:55:35 -0500
-Received: from m50-112.126.com ([123.125.50.112]:33646)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpQrM-00087e-NJ
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:55:29 -0500
-References: <20190128141506.12731-1-lifei1214@126.com>
-	<87womkvh1n.fsf@dusky.pond.sub.org>
-From: Fei Li <lifei1214@126.com>
-Message-ID: <5b4bb02b-875e-91a5-440f-c50a90d5b761@126.com>
-Date: Fri, 1 Feb 2019 12:55:00 +0800
+	(envelope-from <stefanha@redhat.com>) id 1gpQuV-0001VJ-5Q
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:58:40 -0500
+Date: Fri, 1 Feb 2019 12:58:31 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190201045831.GD23131@stefanha-x1.localdomain>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-4-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87womkvh1n.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 00/11] qemu_thread_create:
- propagate the error to callers to handle
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="M38YqGLZlgb6RLPS"
+Content-Disposition: inline
+In-Reply-To: <20190131151914.164903-4-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] virtio-blk: add DISCARD and WRITE
+ ZEROES features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +25,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
 
-ÔÚ 2019/2/1 ÉÏÎç2:05, Markus Armbruster Ð´µÀ:
-> I'm afraid you made a bit of a mess :)
->
-> "[PATCH for-4.0 00/11]" suggests this is v1 of eleven patches.
-Awkward, I forgot the v10.. =-O
->
-> Fei Li <lifei1214@126.com> writes:
->
->> Hi,
->>
->> This idea comes from BiteSizedTasks, and this patch series implement
->> the error checking of qemu_thread_create: make qemu_thread_create
->> return a flag to indicate if it succeeded rather than failing with
->> an error; make all callers check it.
->>
->> The first patch modifies the qemu_thread_create() by passing
->> &error_abort and returing a value to indicate if it succeeds. The next
->> 10 patches will improve on &error_abort for callers who could handle
->> more properly.
->>
->> Please help to review, thanks a lot!
->>
->> v10:
->> - Make qemu_thread_create() return -errno instead of a Boolean.
->> - Add more cleanup for pci_edu_realize()/emulated_realize().
->> - Polish for iothread_complete()/compress_threads_save_cleanup()/
->>    vnc_start_worker_thread()/touch_all_pages.
->> - Change to return H_HARDWARE for h_resize_hpt_prepare().
->> - Remove five derivative patches as they have been merged.
-> It's actually v10.
-Yes.
->
-> [...]
->> Fei Li (11):
->>    qemu_thread: make qemu_thread_create() take Error ** argument
->>    qemu_thread: supplement error handling for qemu_X_start_vcpu
->>    qemu_thread: supplement error handling for qmp_dump_guest_memory
->>    qemu_thread: supplement error handling for pci_edu_realize
->>    qemu_thread: supplement error handling for h_resize_hpt_prepare
->>    qemu_thread: supplement error handling for emulated_realize
->>    qemu_thread: supplement error handling for iothread_complete
->>    qemu_thread: supplement error handling for qemu_signalfd_compat
->>    qemu_thread: supplement error handling for migration
->>    qemu_thread: supplement error handling for vnc_start_worker_thread
->>    qemu_thread: supplement error handling for touch_all_pages
-> It is eleven patches.  However, I got only 01-07/11 with this cover
-> letter.  A later batch (no cover letter) has 07-11/11 and 07-09/11
-> again.
->
-> I could guess which of the duplicates I should review, but that's work.
-> Just resend the whole thing as v11, please.
+--M38YqGLZlgb6RLPS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Ok, and sorry for the trouble.
+On Thu, Jan 31, 2019 at 04:19:12PM +0100, Stefano Garzarella wrote:
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 542ec52536..34ee676895 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -147,6 +147,30 @@ out:
+>      aio_context_release(blk_get_aio_context(s->conf.conf.blk));
+>  }
+> =20
+> +static void virtio_blk_discard_wzeroes_complete(void *opaque, int ret)
+> +{
+> +    VirtIOBlockReq *req =3D opaque;
+> +    VirtIOBlock *s =3D req->dev;
+> +    bool is_wzeroes =3D (virtio_ldl_p(VIRTIO_DEVICE(req->dev), &req->out=
+=2Etype) &
 
-Have a nice day, thanks
-Fei
->
-> [...]
+s/req->dev/s/
+
+> +                       ~VIRTIO_BLK_T_BARRIER) =3D=3D VIRTIO_BLK_T_WRITE_=
+ZEROES;
+> +
+> +    aio_context_acquire(blk_get_aio_context(s->conf.conf.blk));
+> +    if (ret) {
+> +        if (virtio_blk_handle_rw_error(req, -ret, 0, is_wzeroes)) {
+
+The third argument is bool, please use false instead of 0.
+
+> +            goto out;
+> +        }
+> +    }
+> +
+> +    virtio_blk_req_complete(req, VIRTIO_BLK_S_OK);
+> +    if (is_wzeroes) {
+> +        block_acct_done(blk_get_stats(req->dev->blk), &req->acct);
+
+s/req->dev->blk/s->blk/
+
+> +static uint8_t virtio_blk_handle_dwz(VirtIOBlockReq *req, bool is_wzeroe=
+s,
+> +    struct virtio_blk_discard_write_zeroes *dwz_hdr)
+> +{
+> +    VirtIOBlock *s =3D req->dev;
+> +    uint64_t sector;
+> +    uint32_t num_sectors, flags;
+> +    uint8_t err_status;
+> +    int bytes;
+> +
+> +    sector =3D virtio_ldq_p(VIRTIO_DEVICE(req->dev), &dwz_hdr->sector);
+
+Here and throughout the rest of the function:
+
+  VirtIODevice *vdev =3D VIRTIO_DEVICE(s);
+
+s/VIRTIO_DEVICE(req->dev)/vdev/
+
+and then to clean up the remaining instances:
+
+s/req->dev/s/
+
+> +    if (is_wzeroes) { /* VIRTIO_BLK_T_WRITE_ZEROES */
+> +        int blk_aio_flags =3D 0;
+> +
+> +        if (s->conf.wz_may_unmap &&
+
+The inconsistent naming is a bit messy and could confuse readers:
+write_zeroes vs wzeroes vs wz
+
+The VIRTIO spec and QEMU code uses write_zeroes, please stick to that
+even though it is longer.
+
+s/is_wzeroes/is_write_zeroes/
+s/wz_map_unmap/write_zeroes_may_unmap/
+s/virtio_blk_discard_wzeroes_complete/virtio_blk_discard_write_zeroes_compl=
+ete/
+
+This is a question of style and a local dwz_hdr variable does make the
+code easier to read, so I'm not totally against shortening the name, but
+please consistently use the long form in user-visible options, struct
+field names, and function names because these things have a large scope.
+
+> @@ -765,6 +904,22 @@ static void virtio_blk_update_config(VirtIODevice *v=
+dev, uint8_t *config)
+>      blkcfg.alignment_offset =3D 0;
+>      blkcfg.wce =3D blk_enable_write_cache(s->blk);
+>      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
+> +    if (s->conf.discard_wzeroes) {
+> +        virtio_stl_p(vdev, &blkcfg.max_discard_sectors,
+> +                     s->conf.dwz_max_sectors);
+> +        virtio_stl_p(vdev, &blkcfg.discard_sector_alignment,
+> +                     blk_size >> BDRV_SECTOR_BITS);
+> +        virtio_stl_p(vdev, &blkcfg.max_write_zeroes_sectors,
+> +                     s->conf.dwz_max_sectors);
+> +        blkcfg.write_zeroes_may_unmap =3D s->conf.wz_may_unmap;
+
+Does this need to be an option since MAY_UNMAP is advisory anyway?
+
+Another way of asking: what happens in the worst case if the guest sends
+MAY_UNMAP but the QEMU block device doesn't support unmap?
+
+Dropping this option would make the user interface simpler (no need to
+worry about the flag) and the implementation too.
+
+--M38YqGLZlgb6RLPS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcU9H3AAoJEJykq7OBq3PITqgH/ipd+vZSJnJr7QkTypWHZDr+
+EVJ8qy0UFi9NbODQgI8XGc4eMvkt/n4+jS0fE8Ug2EOe6+E6V8BDwvp4ux0aVPVv
+7RFGViUSyLh34LtIr41fzcfd8IHvCOyNxRgQQFBzR+DXI9bcJpDN3TO+BV3ORi8D
+JXANlHz+zlWs5ZsWRbYU01p3HVZ7mczD5J73iXP4mfvQQ0taDpqVbCbFpUxQzLUW
+aYhQq0CJres5w8G/mgwnTp5ZBMD3YogCRsFcCZpOCGa64fatYi926wQ+lN3Y9RDo
+904tTW0KqtRc+SAbX6mZKeUQgw7Seh4abpehkCykZuQ2TayPga6uSkMipHxrpPE=
+=1URE
+-----END PGP SIGNATURE-----
+
+--M38YqGLZlgb6RLPS--
