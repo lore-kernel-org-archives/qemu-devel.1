@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52103)
+Received: from eggs.gnu.org ([209.51.188.92]:52618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpatE-0006vI-7m
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:38:02 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gpauv-0007qL-OO
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpatD-0006QP-11
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:38:00 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45588)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpatA-0006O8-Vf
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:37:58 -0500
-Received: by mail-oi1-x244.google.com with SMTP id y1so6069485oie.12
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 07:37:55 -0800 (PST)
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gpauu-00070H-Kb
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:39:45 -0500
+Received: from mail-oln040092005049.outbound.protection.outlook.com
+	([40.92.5.49]:34016
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1gpauu-0006si-Ah
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:39:44 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Fri, 1 Feb 2019 15:39:20 +0000
+Message-ID: <RO1P152MB148380E67D93DAB6C8093EFE97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128121331.GB2939@work-vm>
+	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128173536.GE2585@work-vm>
+	<RO1P152MB14834BE5D9747719CD493C5297960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190201133639.GE3150@work-vm>
+In-Reply-To: <20190201133639.GE3150@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5873452FE4092E4DBC1E6882D0509322@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190201023357.22596-1-stefanha@redhat.com>
-In-Reply-To: <20190201023357.22596-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Feb 2019 15:37:42 +0000
-Message-ID: <CAFEAcA_EvJFyAW67=-9=bpVmnwO7vB88YH0BckNgPqiwOHX5FQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] arm: microbit Non-Volatile Memory
- Controller
+Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +36,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 1 Feb 2019 at 02:34, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> v4:
->  * assert(offset + size <=3D s->flash_size) [Peter]
-> v3:
->  * Fix endianness of s->storage[], tested by Joel Stanley <joel@jms.id.au=
-> on
->    big-endian ppc [Peter]
->  * Fix off-by-one that prevented clearing the last page of flash
->  * Add missing memory_region_flush_rom_device() call to flash_write()
-> v2:
->  * Add Patch 2 to call memory_region_flush_rom_device() from pflash devic=
-es
->    [Peter]
->
-> This series adds the Non-Volatile Memory Controller, which controls acces=
-s to
-> the User Information Control Registers (UICR), Factory Information Contro=
-l
-> Registers (FICR), and flash memory.
->
-> This is the last piece of microbit work needed to make basic programs lik=
-e
-> Micropython "Hello world" work under QEMU.
->
-> Originally sent as part of Steffen's longer microbit device emulation ser=
-ies, I
-> extracted this and deferred it until later because cleanups were necessar=
-y:
->
->  * Use memory_region_flush_rom_device() to dirty/invalidate memory [Peter=
-]
->    ^--- Paolo: I CCed you on this new memory API
->  * Fix device-introspect-test segfault due to missing owner when initiali=
-zing
->    FICR and UICR memory regions [Peter]
->  * Fix off-by-one assertion checks [Peter]
->  * Fix missing whitespace at end of comment [Peter]
->  * Clear UICR on reset - we'd need a block device for true non-volatility
->    [Peter]
->
-> Steffen G=C3=B6rtz (3):
->   hw/nvram/nrf51_nvm: Add nRF51 non-volatile memories
->   arm: Instantiate NRF51 special NVM's and NVMC
->   tests/microbit-test: Add tests for nRF51 NVMC
-
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+SSBjYW4gY29uZmlybSB0aGlzLCBLREUgTmVvbiB1c2luZyB0aGUgY29tbWFuZCBsaW5lIHNpbWls
+YXIgdG8geW91cnMNCmNyYXNoZXMgUUVNVSB0byBtZSB0b28uIEkgd2lsbCB0ZXN0IHdpdGggTWFn
+ZWlhIDcgbGF0ZXIgdG8gc2VlIGlmIGl0DQpiZWhhdmVzIGRpZmZlcmVudGx5Lg0KDQpCdXQgdGhp
+cyBpcyBhIGNvbXBsZXRlbHkgZGlmZmVyZW50IGNyYXNoLiBUaGlzIGNyYXNoIGlzIGhhcHBlbmlu
+Zw0KZWFybGllciwgd2hhdCBJIHJlcG9ydGVkIGZpcnN0IGlzIGEgY3Jhc2ggd2hlbiB0aGUgbG9n
+aW4gc2NyZWVuIHNob3VsZA0KbG9hZCwgdGhpcyBpcyBoYXBwZW5pbmcgZWFybGllciBvbiBib290
+Lg0KDQpUaGUgY29tbWFuZCBsaW5lIEkgdXNlZCB0aGlzIHRpbWU6DQoNCnFlbXUtc3lzdGVtLXg4
+Nl82NCAtTSBwYyxhY2NlbD1rdm0gLXNtcCAzIC1tIDRHIC1kcml2ZQ0KaWY9dmlydGlvLGZpbGU9
+bmVvbmJyb2tlbi5xY293MiAtdmdhIHF4bCAtYmlvcyAvdXNyL3NoYXJlL292bWYvT1ZNRi5mZA0K
+DQpUaGUgYmFja3RyYWNlOg0KDQooZ2RiKSBidA0KIzAgIDB4MDAwMDdmZmZmMDM3MWU5NyBpbiBf
+X0dJX3JhaXNlIChzaWc9c2lnQGVudHJ5PTYpIGF0DQouLi9zeXNkZXBzL3VuaXgvc3lzdi9saW51
+eC9yYWlzZS5jOjUxDQojMSAgMHgwMDAwN2ZmZmYwMzczODAxIGluIF9fR0lfYWJvcnQgKCkgYXQg
+YWJvcnQuYzo3OQ0KIzIgIDB4MDAwMDU1NTU1NTg5ZWFjOSBpbiBrdm1fbWVtX2lvZXZlbnRmZF9h
+ZGQNCihsaXN0ZW5lcj0weDU1NTU1NmExZmRjOCwgc2VjdGlvbj0weDdmZmZjN2ZmYmE5MCwgbWF0
+Y2hfZGF0YT1mYWxzZSwNCmRhdGE9MCwgZT0weDU1NTU1NzhjN2ZjOCkgYXQNCi9ob21lL3VzdWFy
+aW8vRG9jdW1lbnRvcy9xZW11L2FjY2VsL2t2bS9rdm0tYWxsLmM6ODY2DQojMyAgMHgwMDAwNTU1
+NTU1ODgzMDBhIGluIGFkZHJlc3Nfc3BhY2VfYWRkX2RlbF9pb2V2ZW50ZmRzDQooYXM9MHg1NTU1
+NTY3ZTVhMDAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PiwgZmRzX25ldz0weDdmZmZiYzAwMGQzMCwN
+CmZkc19uZXdfbmI9MSwgZmRzX29sZD0weDAsIGZkc19vbGRfbmI9MCkgYXQNCi9ob21lL3VzdWFy
+aW8vRG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjc5Mw0KIzQgIDB4MDAwMDU1NTU1NTg4MzJmNCBp
+biBhZGRyZXNzX3NwYWNlX3VwZGF0ZV9pb2V2ZW50ZmRzDQooYXM9MHg1NTU1NTY3ZTVhMDAgPGFk
+ZHJlc3Nfc3BhY2VfbWVtb3J5PikgYXQNCi9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L21l
+bW9yeS5jOjg0Mw0KIzUgIDB4MDAwMDU1NTU1NTg4NDE1YiBpbiBtZW1vcnlfcmVnaW9uX3RyYW5z
+YWN0aW9uX2NvbW1pdCAoKSBhdA0KL2hvbWUvdXN1YXJpby9Eb2N1bWVudG9zL3FlbXUvbWVtb3J5
+LmM6MTA5NA0KIzYgIDB4MDAwMDU1NTU1NTg4NzFjOCBpbiBtZW1vcnlfcmVnaW9uX2FkZF9ldmVu
+dGZkIChtcj0weDU1NTU1NzhiNjQyMCwNCmFkZHI9MCwgc2l6ZT0wLCBtYXRjaF9kYXRhPWZhbHNl
+LCBkYXRhPTAsIGU9MHg1NTU1NTc4YzdmYzgpIGF0DQovaG9tZS91c3VhcmlvL0RvY3VtZW50b3Mv
+cWVtdS9tZW1vcnkuYzoyMzAzDQojNyAgMHgwMDAwNTU1NTU1YzI2Y2QwIGluIHZpcnRpb19wY2lf
+aW9ldmVudGZkX2Fzc2lnbiAoZD0weDU1NTU1NzhiNTc1MCwNCm5vdGlmaWVyPTB4NTU1NTU3OGM3
+ZmM4LCBuPTAsIGFzc2lnbj10cnVlKSBhdCBody92aXJ0aW8vdmlydGlvLXBjaS5jOjI0Mw0KIzgg
+IDB4MDAwMDU1NTU1NWMyNGRkNSBpbiB2aXJ0aW9fYnVzX3NldF9ob3N0X25vdGlmaWVyDQooYnVz
+PTB4NTU1NTU3OGJkODQ4LCBuPTAsIGFzc2lnbj10cnVlKSBhdCBody92aXJ0aW8vdmlydGlvLWJ1
+cy5jOjI4Mw0KIzkgIDB4MDAwMDU1NTU1NThjZTY0OCBpbiB2aXJ0aW9fYmxrX2RhdGFfcGxhbmVf
+c3RhcnQNCih2ZGV2PTB4NTU1NTU3OGJkOGMwKSBhdA0KL2hvbWUvdXN1YXJpby9Eb2N1bWVudG9z
+L3FlbXUvaHcvYmxvY2svZGF0YXBsYW5lL3ZpcnRpby1ibGsuYzoyMDANCiMxMCAweDAwMDA1NTU1
+NTVjMjRhZjIgaW4gdmlydGlvX2J1c19zdGFydF9pb2V2ZW50ZmQNCihidXM9MHg1NTU1NTc4YmQ4
+NDgpIGF0IGh3L3ZpcnRpby92aXJ0aW8tYnVzLmM6MjIzDQojMTEgMHgwMDAwNTU1NTU1YzI2ZTU3
+IGluIHZpcnRpb19wY2lfc3RhcnRfaW9ldmVudGZkDQoocHJveHk9MHg1NTU1NTc4YjU3NTApIGF0
+IGh3L3ZpcnRpby92aXJ0aW8tcGNpLmM6MjgyDQojMTIgMHgwMDAwNTU1NTU1YzI5Mjg1IGluIHZp
+cnRpb19wY2lfY29tbW9uX3dyaXRlDQoob3BhcXVlPTB4NTU1NTU3OGI1NzUwLCBhZGRyPTIwLCB2
+YWw9MTUsIHNpemU9MSkgYXQNCmh3L3ZpcnRpby92aXJ0aW8tcGNpLmM6MTIzMw0KIzEzIDB4MDAw
+MDU1NTU1NTg4MWViZCBpbiBtZW1vcnlfcmVnaW9uX3dyaXRlX2FjY2Vzc29yDQoobXI9MHg1NTU1
+NTc4YjYxMjAsIGFkZHI9MjAsIHZhbHVlPTB4N2ZmZmM3ZmZiZjM4LCBzaXplPTEsIHNoaWZ0PTAs
+DQptYXNrPTI1NSwgYXR0cnM9Li4uKSBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3MvcWVtdS9t
+ZW1vcnkuYzo1MDINCiMxNCAweDAwMDA1NTU1NTU4ODIwY2QgaW4gYWNjZXNzX3dpdGhfYWRqdXN0
+ZWRfc2l6ZSAoYWRkcj0yMCwNCnZhbHVlPTB4N2ZmZmM3ZmZiZjM4LCBzaXplPTEsIGFjY2Vzc19z
+aXplX21pbj0xLCBhY2Nlc3Nfc2l6ZV9tYXg9NCwNCmFjY2Vzc19mbj0weDU1NTU1NTg4MWRkNCA8
+bWVtb3J5X3JlZ2lvbl93cml0ZV9hY2Nlc3Nvcj4sDQptcj0weDU1NTU1NzhiNjEyMCwgYXR0cnM9
+Li4uKSBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3MvcWVtdS9tZW1vcnkuYzo1NjgNCiMxNSAw
+eDAwMDA1NTU1NTU4ODUxMDAgaW4gbWVtb3J5X3JlZ2lvbl9kaXNwYXRjaF93cml0ZQ0KKG1yPTB4
+NTU1NTU3OGI2MTIwLCBhZGRyPTIwLCBkYXRhPTE1LCBzaXplPTEsIGF0dHJzPS4uLikgYXQNCi9o
+b21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjE0OTkNCiMxNiAweDAwMDA1NTU1
+NTU4MWJjYTkgaW4gZmxhdHZpZXdfd3JpdGVfY29udGludWUgKGZ2PTB4N2ZmZmNjNTBmNGYwLA0K
+YWRkcj0zNDM1OTczODM4OCwgYXR0cnM9Li4uLCBidWY9MHg3ZmZmZjdmZWUwMjggIlwwMTciLCBs
+ZW49MSwgYWRkcjE9MjAsDQpsPTEsIG1yPTB4NTU1NTU3OGI2MTIwKSBhdCAvaG9tZS91c3Vhcmlv
+L0RvY3VtZW50b3MvcWVtdS9leGVjLmM6MzIzNA0KIzE3IDB4MDAwMDU1NTU1NTgxYmRmMyBpbiBm
+bGF0dmlld193cml0ZSAoZnY9MHg3ZmZmY2M1MGY0ZjAsDQphZGRyPTM0MzU5NzM4Mzg4LCBhdHRy
+cz0uLi4sIGJ1Zj0weDdmZmZmN2ZlZTAyOCAiXDAxNyIsIGxlbj0xKSBhdA0KL2hvbWUvdXN1YXJp
+by9Eb2N1bWVudG9zL3FlbXUvZXhlYy5jOjMyNzMNCiMxOCAweDAwMDA1NTU1NTU4MWMwZjkgaW4g
+YWRkcmVzc19zcGFjZV93cml0ZSAoYXM9MHg1NTU1NTY3ZTVhMDANCjxhZGRyZXNzX3NwYWNlX21l
+bW9yeT4sIGFkZHI9MzQzNTk3MzgzODgsIGF0dHJzPS4uLiwgYnVmPTB4N2ZmZmY3ZmVlMDI4DQoi
+XDAxNyIsIGxlbj0xKSBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3MvcWVtdS9leGVjLmM6MzM2
+Mw0KIzE5IDB4MDAwMDU1NTU1NTgxYzE0YSBpbiBhZGRyZXNzX3NwYWNlX3J3IChhcz0weDU1NTU1
+NjdlNWEwMA0KPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PiwgYWRkcj0zNDM1OTczODM4OCwgYXR0cnM9
+Li4uLCBidWY9MHg3ZmZmZjdmZWUwMjgNCiJcMDE3IiwgbGVuPTEsIGlzX3dyaXRlPXRydWUpIGF0
+IC9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2V4ZWMuYzozMzc0DQojMjAgMHgwMDAwNTU1
+NTU1OGExNDZmIGluIGt2bV9jcHVfZXhlYyAoY3B1PTB4NTU1NTU2YWZlMTQwKSBhdA0KL2hvbWUv
+dXN1YXJpby9Eb2N1bWVudG9zL3FlbXUvYWNjZWwva3ZtL2t2bS1hbGwuYzoyMDMxDQojMjEgMHgw
+MDAwNTU1NTU1ODY1YTNlIGluIHFlbXVfa3ZtX2NwdV90aHJlYWRfZm4gKGFyZz0weDU1NTU1NmFm
+ZTE0MCkgYXQNCi9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2NwdXMuYzoxMjgxDQojMjIg
+MHgwMDAwNTU1NTU1ZTFiYTAyIGluIHFlbXVfdGhyZWFkX3N0YXJ0IChhcmdzPTB4NTU1NTU2YjIw
+NDQwKSBhdA0KdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjUwMg0KIzIzIDB4MDAwMDdmZmZmMDcy
+YjZkYiBpbiBzdGFydF90aHJlYWQgKGFyZz0weDdmZmZjN2ZmZjcwMCkgYXQNCnB0aHJlYWRfY3Jl
+YXRlLmM6NDYzDQojMjQgMHgwMDAwN2ZmZmYwNDU0ODhmIGluIGNsb25lICgpIGF0DQouLi9zeXNk
+ZXBzL3VuaXgvc3lzdi9saW51eC94ODZfNjQvY2xvbmUuUzo5NQ0KDQoNCsOAcyAxMTozNiBkZSAw
+MS8wMi8yMDE5LCBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IGVzY3JldmV1Og0KPiANCj4gSG1tLCBJ
+J20gYWxzbyBnZXR0aW5nIGEgY3Jhc2gsIGJ1dCBJIHRoaW5rIGl0J3MgdmVyeSBkaWZmZXJlbnQg
+ZnJvbQ0KPiB5b3VyczoNCj4gDQo+IC4veDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0
+IC1NIHBjLGFjY2VsPWt2bSAtc21wIDMgLW0gOEcgLWNkcm9tIC9ob21lL3ZtaW1hZ2VzL25lb24t
+dXNlcmVkaXRpb24tY3VycmVudC5pc28gLWRyaXZlIGlmPXZpcnRpbyxmaWxlPS9ob21lL3ZtaW1h
+Z2VzL2tkZS1uZW9uLnFjb3cyIC12Z2EgcXhsDQo+IA0KPiBrdm1fbWVtX2lvZXZlbnRmZF9hZGQ6
+IGVycm9yIGFkZGluZyBpb2V2ZW50ZmQ6IE5vIHNwYWNlIGxlZnQgb24gZGV2aWNlDQo+IEFib3J0
+ZWQgKGNvcmUgZHVtcGVkKQ0KPiAtLQ0KPiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJl
+cnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVLDQo+IA0K
