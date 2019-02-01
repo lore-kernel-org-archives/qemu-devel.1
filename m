@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39553)
+Received: from eggs.gnu.org ([209.51.188.92]:39557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboO-00085E-5g
+	(envelope-from <kwolf@redhat.com>) id 1gpboO-00085H-66
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboM-0000JG-6s
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpboL-0000Iu-LA
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:04 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:34:55 +0100
-Message-Id: <20190201163518.31157-5-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:35:00 +0100
+Message-Id: <20190201163518.31157-10-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/27] qemu-iotests: add test case for dmg
+Subject: [Qemu-devel] [PULL 09/27] vmdk: Implement .bdrv_co_create callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,209 +24,776 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: yuchenlin <npes87184@gmail.com>
+From: Fam Zheng <famz@redhat.com>
 
-Recently, some bugs in dmg file have been fixed. To prevent reading dmg
-is broken someday in the future, add a simple test which ensures the
-conversion from dmg to raw should not hang or face any I/O error.
+This makes VMDK support blockdev-create. The implementation reuses the
+image creation code in vmdk_co_create_opts which now acceptes a callback
+pointer to "retrieve" BlockBackend pointers from the caller. This way we
+separate the logic between file/extent acquisition and initialization.
 
-Signed-off-by: yuchenlin <npes87184@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The QAPI command parameters are mostly the same as the old create_opts
+except the dropped legacy @compat6 switch, which is redundant with
+@hwversion.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/239                        |  53 ++++++++++++++++++
- tests/qemu-iotests/239.out                    |   4 ++
- tests/qemu-iotests/check                      |   7 +++
- tests/qemu-iotests/group                      |   1 +
- .../sample_images/simple-dmg.dmg.bz2          | Bin 0 -> 3479 bytes
- 5 files changed, 65 insertions(+)
- create mode 100755 tests/qemu-iotests/239
- create mode 100644 tests/qemu-iotests/239.out
- create mode 100644 tests/qemu-iotests/sample_images/simple-dmg.dmg.bz2
+ qapi/block-core.json  |  70 +++++++
+ qapi/qapi-schema.json |  16 +-
+ block/vmdk.c          | 448 ++++++++++++++++++++++++++++++------------
+ 3 files changed, 400 insertions(+), 134 deletions(-)
 
-diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
-new file mode 100755
-index 0000000000..6f085d573d
---- /dev/null
-+++ b/tests/qemu-iotests/239
-@@ -0,0 +1,53 @@
-+#!/bin/bash
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index cde1b53708..a5924b40af 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4137,6 +4137,75 @@
+             'size':             'size',
+             '*cluster-size' :   'size' } }
+=20
++##
++# @BlockdevVmdkSubformat:
 +#
-+# Test case for dmg
++# Subformat options for VMDK images
 +#
-+# Copyright (C) 2019 yuchenlin <npes87184@gmail.com>
++# @monolithicSparse:     Single file image with sparse cluster allocatio=
+n
 +#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
++# @monolithicFlat:       Single flat data image and a descriptor file
 +#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
++# @twoGbMaxExtentSparse: Data is split into 2GB (per virtual LBA) sparse=
+ extent
++#                        files, in addition to a descriptor file
 +#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++# @twoGbMaxExtentFlat:   Data is split into 2GB (per virtual LBA) flat e=
+xtent
++#                        files, in addition to a descriptor file
 +#
++# @streamOptimized:      Single file image sparse cluster allocation, op=
+timized
++#                        for streaming over network.
++#
++# Since: 4.0
++##
++{ 'enum': 'BlockdevVmdkSubformat',
++  'data': [ 'monolithicSparse', 'monolithicFlat', 'twoGbMaxExtentSparse'=
+,
++            'twoGbMaxExtentFlat', 'streamOptimized'] }
 +
-+# creator
-+owner=3Dnpes87184@gmail.com
++##
++# @BlockdevVmdkAdapterType:
++#
++# Adapter type info for VMDK images
++#
++# Since: 4.0
++##
++{ 'enum': 'BlockdevVmdkAdapterType',
++  'data': [ 'ide', 'buslogic', 'lsilogic', 'legacyESX'] }
 +
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
++##
++# @BlockdevCreateOptionsVmdk:
++#
++# Driver specific image creation options for VMDK.
++#
++# @file         Where to store the new image file. This refers to the im=
+age
++#               file for monolithcSparse and streamOptimized format, or =
+the
++#               descriptor file for other formats.
++# @size         Size of the virtual disk in bytes
++# @extents      Where to store the data extents. Required for monolithcF=
+lat,
++#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
++#               monolithicFlat, only one entry is required; for
++#               twoGbMaxExtent* formats, the number of entries required =
+is
++#               calculated as extent_number =3D virtual_size / 2GB.
++# @subformat    The subformat of the VMDK image. Default: "monolithicSpa=
+rse".
++# @backing-file The path of backing file. Default: no backing file is us=
+ed.
++# @adapter-type The adapter type used to fill in the descriptor. Default=
+: ide.
++# @hwversion    Hardware version. The meaningful options are "4" or "6".
++#               Default: "4".
++# @zeroed-grain Whether to enable zeroed-grain feature for sparse subfor=
+mats.
++#               Default: false.
++#
++# Since: 4.0
++##
++{ 'struct': 'BlockdevCreateOptionsVmdk',
++  'data': { 'file':             'BlockdevRef',
++            'size':             'size',
++            '*extents':          ['BlockdevRef'],
++            '*subformat':       'BlockdevVmdkSubformat',
++            '*backing-file':    'str',
++            '*adapter-type':    'BlockdevVmdkAdapterType',
++            '*hwversion':       'str',
++            '*zeroed-grain':    'bool' } }
 +
-+status=3D1	# failure is the default!
 +
-+_cleanup()
+ ##
+ # @SheepdogRedundancyType:
+ #
+@@ -4331,6 +4400,7 @@
+       'ssh':            'BlockdevCreateOptionsSsh',
+       'vdi':            'BlockdevCreateOptionsVdi',
+       'vhdx':           'BlockdevCreateOptionsVhdx',
++      'vmdk':           'BlockdevCreateOptionsVmdk',
+       'vpc':            'BlockdevCreateOptionsVpc'
+   } }
+=20
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 3bbdfcee84..1845aa78ff 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -63,13 +63,15 @@
+         'query-tpm-types',
+         'ringbuf-read' ],
+     'name-case-whitelist': [
+-        'ACPISlotType',         # DIMM, visible through query-acpi-ospm-=
+status
+-        'CpuInfoMIPS',          # PC, visible through query-cpu
+-        'CpuInfoTricore',       # PC, visible through query-cpu
+-        'QapiErrorClass',       # all members, visible through errors
+-        'UuidInfo',             # UUID, visible through query-uuid
+-        'X86CPURegister32',     # all members, visible indirectly throug=
+h qom-get
+-        'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
++        'ACPISlotType',             # DIMM, visible through query-acpi-o=
+spm-status
++        'CpuInfoMIPS',              # PC, visible through query-cpu
++        'CpuInfoTricore',           # PC, visible through query-cpu
++        'BlockdevVmdkSubformat',    # all members, to match VMDK spec sp=
+ellings
++        'BlockdevVmdkAdapterType',  # legacyESX, to match VMDK spec spel=
+lings
++        'QapiErrorClass',           # all members, visible through error=
+s
++        'UuidInfo',                 # UUID, visible through query-uuid
++        'X86CPURegister32',         # all members, visible indirectly th=
+rough qom-get
++        'q_obj_CpuInfo-base'        # CPU, visible through query-cpu
+     ] } }
+=20
+ # Documentation generated with qapi-gen.py is in source order, with
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 32fc2c84b3..5a162ee85c 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1932,33 +1932,56 @@ static int filename_decompose(const char *filenam=
+e, char *path, char *prefix,
+     return VMDK_OK;
+ }
+=20
+-static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOp=
+ts *opts,
+-                                            Error **errp)
++/*
++ * idx =3D=3D 0: get or create the descriptor file (also the image file =
+if in a
++ *           non-split format.
++ * idx >=3D 1: get the n-th extent if in a split subformat
++ */
++typedef BlockBackend *(*vmdk_create_extent_fn)(int64_t size,
++                                               int idx,
++                                               bool flat,
++                                               bool split,
++                                               bool compress,
++                                               bool zeroed_grain,
++                                               void *opaque,
++                                               Error **errp);
++
++static void vmdk_desc_add_extent(GString *desc,
++                                 const char *extent_line_fmt,
++                                 int64_t size, const char *filename)
 +{
-+    rm -f "$TEST_IMG.raw"
-+    _cleanup_test_img
++    char *basename =3D g_path_get_basename(filename);
++
++    g_string_append_printf(desc, extent_line_fmt,
++                           DIV_ROUND_UP(size, BDRV_SECTOR_SIZE), basenam=
+e);
++    g_free(basename);
 +}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+# get standard environment, filters and checks
-+. ./common.rc
-+
-+_supported_fmt dmg
-+_supported_proto file
-+_supported_os Linux
-+
-+echo
-+echo "=3D=3D Testing conversion to raw should success =3D=3D"
-+_use_sample_img simple-dmg.dmg.bz2
-+if ! $QEMU_IMG convert -f $IMGFMT -O raw "$TEST_IMG" "$TEST_IMG.raw" ; t=
-hen
-+    exit 1
-+fi
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/239.out b/tests/qemu-iotests/239.out
-new file mode 100644
-index 0000000000..bedbad065b
---- /dev/null
-+++ b/tests/qemu-iotests/239.out
-@@ -0,0 +1,4 @@
-+QA output created by 239
-+
-+=3D=3D Testing conversion to raw should success =3D=3D
-+*** done
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 89ed275988..895e1e3dcb 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -237,6 +237,7 @@ image format options
-     -vhdx               test vhdx
-     -vmdk               test vmdk
-     -luks               test luks
-+    -dmg                test dmg
++static int coroutine_fn vmdk_co_do_create(int64_t size,
++                                          BlockdevVmdkSubformat subforma=
+t,
++                                          BlockdevVmdkAdapterType adapte=
+r_type,
++                                          const char *backing_file,
++                                          const char *hw_version,
++                                          bool compat6,
++                                          bool zeroed_grain,
++                                          vmdk_create_extent_fn extent_f=
+n,
++                                          void *opaque,
++                                          Error **errp)
+ {
+-    int idx =3D 0;
+-    BlockBackend *new_blk =3D NULL;
++    int extent_idx;
++    BlockBackend *blk =3D NULL;
+     Error *local_err =3D NULL;
+     char *desc =3D NULL;
+-    int64_t total_size =3D 0, filesize;
+-    char *adapter_type =3D NULL;
+-    char *backing_file =3D NULL;
+-    char *hw_version =3D NULL;
+-    char *fmt =3D NULL;
+     int ret =3D 0;
+     bool flat, split, compress;
+     GString *ext_desc_lines;
+-    char *path =3D g_malloc0(PATH_MAX);
+-    char *prefix =3D g_malloc0(PATH_MAX);
+-    char *postfix =3D g_malloc0(PATH_MAX);
+-    char *desc_line =3D g_malloc0(BUF_SIZE);
+-    char *ext_filename =3D g_malloc0(PATH_MAX);
+-    char *desc_filename =3D g_malloc0(PATH_MAX);
+     const int64_t split_size =3D 0x80000000;  /* VMDK has constant split=
+ size */
+-    const char *desc_extent_line;
++    int64_t extent_size;
++    int64_t created_size =3D 0;
++    const char *extent_line_fmt;
+     char *parent_desc_line =3D g_malloc0(BUF_SIZE);
+     uint32_t parent_cid =3D 0xffffffff;
+     uint32_t number_heads =3D 16;
+-    bool zeroed_grain =3D false;
+     uint32_t desc_offset =3D 0, desc_len;
+     const char desc_template[] =3D
+         "# Disk DescriptorFile\n"
+@@ -1982,71 +2005,35 @@ static int coroutine_fn vmdk_co_create_opts(const=
+ char *filename, QemuOpts *opts
 =20
- image protocol options
-     -file               test file (default)
-@@ -304,6 +305,12 @@ testlist options
-             xpand=3Dfalse
-             ;;
+     ext_desc_lines =3D g_string_new(NULL);
 =20
-+        -dmg)
-+            IMGFMT=3Ddmg
-+            IMGFMT_GENERIC=3Dfalse
-+            xpand=3Dfalse
-+            ;;
+-    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, er=
+rp)) {
+-        ret =3D -EINVAL;
+-        goto exit;
+-    }
+     /* Read out options */
+-    total_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, =
+0),
+-                          BDRV_SECTOR_SIZE);
+-    adapter_type =3D qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
+-    backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+-    hw_version =3D qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
+-    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false)) {
+-        if (strcmp(hw_version, "undefined")) {
++    if (compat6) {
++        if (hw_version) {
+             error_setg(errp,
+                        "compat6 cannot be enabled with hwversion set");
+             ret =3D -EINVAL;
+             goto exit;
+         }
+-        g_free(hw_version);
+-        hw_version =3D g_strdup("6");
+-    }
+-    if (strcmp(hw_version, "undefined") =3D=3D 0) {
+-        g_free(hw_version);
+-        hw_version =3D g_strdup("4");
++        hw_version =3D "6";
+     }
+-    fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
+-    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN, false)) {
+-        zeroed_grain =3D true;
++    if (!hw_version) {
++        hw_version =3D "4";
+     }
+=20
+-    if (!adapter_type) {
+-        adapter_type =3D g_strdup("ide");
+-    } else if (strcmp(adapter_type, "ide") &&
+-               strcmp(adapter_type, "buslogic") &&
+-               strcmp(adapter_type, "lsilogic") &&
+-               strcmp(adapter_type, "legacyESX")) {
+-        error_setg(errp, "Unknown adapter type: '%s'", adapter_type);
+-        ret =3D -EINVAL;
+-        goto exit;
+-    }
+-    if (strcmp(adapter_type, "ide") !=3D 0) {
++    if (adapter_type !=3D BLOCKDEV_VMDK_ADAPTER_TYPE_IDE) {
+         /* that's the number of heads with which vmware operates when
+            creating, exporting, etc. vmdk files with a non-ide adapter t=
+ype */
+         number_heads =3D 255;
+     }
+-    if (!fmt) {
+-        /* Default format to monolithicSparse */
+-        fmt =3D g_strdup("monolithicSparse");
+-    } else if (strcmp(fmt, "monolithicFlat") &&
+-               strcmp(fmt, "monolithicSparse") &&
+-               strcmp(fmt, "twoGbMaxExtentSparse") &&
+-               strcmp(fmt, "twoGbMaxExtentFlat") &&
+-               strcmp(fmt, "streamOptimized")) {
+-        error_setg(errp, "Unknown subformat: '%s'", fmt);
+-        ret =3D -EINVAL;
+-        goto exit;
+-    }
+-    split =3D !(strcmp(fmt, "twoGbMaxExtentFlat") &&
+-              strcmp(fmt, "twoGbMaxExtentSparse"));
+-    flat =3D !(strcmp(fmt, "monolithicFlat") &&
+-             strcmp(fmt, "twoGbMaxExtentFlat"));
+-    compress =3D !strcmp(fmt, "streamOptimized");
++    split =3D (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTFL=
+AT) ||
++            (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTSPAR=
+SE);
++    flat =3D (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICFLAT) |=
+|
++           (subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_TWOGBMAXEXTENTFLAT)=
+;
++    compress =3D subformat =3D=3D BLOCKDEV_VMDK_SUBFORMAT_STREAMOPTIMIZE=
+D;
 +
-         -qed)
-             IMGFMT=3Dqed
-             xpand=3Dfalse
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 0f1c3f9cdf..3e310c7f87 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -235,3 +235,4 @@
- 235 auto quick
- 236 auto quick
- 238 auto quick
-+239 rw auto quick
-diff --git a/tests/qemu-iotests/sample_images/simple-dmg.dmg.bz2 b/tests/=
-qemu-iotests/sample_images/simple-dmg.dmg.bz2
-new file mode 100644
-index 0000000000000000000000000000000000000000..05e719d03d48d6df4f0e995dd=
-8bae1ce54c9f5f0
-GIT binary patch
-literal 3479
-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
-U3k
-zK*%{w#OE;-n}5J@QnW~k0W^>q6Frr!p|88#+Wy;ioe~<*h=3Di%&J;)%alO@Pegg+7j
-zs``QTeEyD)x7p(92)N`E@8T8H#s^c%*24OW;aGvPuVQef*wBsRpU@6A_g9zdDt9$k
-z2zRm#rdLi0A^}Fb?sXZ{X@%WaZzShTNF-5=3DFu)3i@t^qa`TwT<VRADXi9j*Cww!Bk
-z$ofZn`qc*}gV@O>ucE88qh>EN`Jdw+s*<*u-@$9+o1#_6XJ989lqI=3Daz!E}P5riY*
-zHPwYH$BT`e?rVGc3nGpD(|bD_E!3{ti_*;NZZ0isXL2=3DSVRX$Ti~X!dedY#W1K<$#
-zh_IvD035p;=3DEk~DC$}ZJd(G3-dd#k6CG#xgT;mmS6+SLid1tQO-9<Sl@O^GuLUz-u
-z417&euHAlM4ypAfeUp|&``-9llf#`5`nX06abKLfN@~l%nAq{U{u*UfSI+fFc$+Nq
-zjSkQ*mer2Rs5nuStK%0w;knBzMKh|{QO!^DPwP)t^4~w3qnO*hZDo{4^>~P#9iv%f
-zd!`qvbczBF)AAe0yE+WI*}DYOL2J~*ZCc}JWiu0LShw&6`-5`^SkNJY!gsi|e-MHy
-zZlN9Lb5NbuT7S&4oY6v}13BpeQ|?u0c*7n)Ku*p%ZDF?$7zjKXj(9#K?tO1dMW=3D8&
-z;MDsGo0=3DCLWp{b5$Kk0kxAl*^l^ziX<28c4->Ed%#N16IrySH$q`4%gn}5ksr>_0H
-zs-;Y4Bb7U_pNGMK075wJ%DahB2ArR=3DjC`2UWMe`ID;mPgA25l6GVc9>Rqybi7N6(i
-z3BcjbfprP7Ivcy%+Vs~Z6Hw>JB!kJcD>mdTThTpO$(fg`Ds7pY<YTYWgmqU8=3DXlve
-zCriGy+iG;z+{{27v*;>N4BN<|%(+#T+h1sdgPjUAWN73ki+$-%j_&6PZ$I2$HnSEa
-zQ?n{BB*A3zmlLHvH@o+ZJm1NSC9(?ka<7OppIcAi{V`Nj+^8SL!ywYLI$v(ivC_){
-z5anb)=3DMQS%<PN>hUHR@_HKDhdDPf*Hm`w^E{GT!Yq<}Hg8Ia{?PyA70;yx8nD^~B|
-zjuGESS<A^!S2=3D(y_Dz2Z3)U+>*z1(bcT1?|;LuVOg&xLebEk(1uB(fZJN&W3!xADj
-zQD;ugVYYpOt=3DNBu$Bi07WcepgHm6q}1y>vxs^oJetK;=3Dix$9i9M#>O`?6X2pJoXi;
-z#0mlFG2eK~z-yqErVC2`l5B&)s}jKZMRZxCyQ0^?cp$L5J>4{eoCysx+#X0J?r^+C
-z#R8d5A5=3D5V#(QMr1?kT}qh|eQ8{a94K6_Sq=3DvcWz&WH@!TREj$F3%=3DNwMQ3YR-$or
-zlXmr#8-D_(N;#e;g#CE1WYh8byF-ojSdtGh>P8pbz39Ew5qWHa^1-M77ji{7P>_<c
-FP^-7hd6WPE
-
-literal 0
-HcmV?d00001
-
+     if (flat) {
+-        desc_extent_line =3D "RW %" PRId64 " FLAT \"%s\" 0\n";
++        extent_line_fmt =3D "RW %" PRId64 " FLAT \"%s\" 0\n";
+     } else {
+-        desc_extent_line =3D "RW %" PRId64 " SPARSE \"%s\"\n";
++        extent_line_fmt =3D "RW %" PRId64 " SPARSE \"%s\"\n";
+     }
+     if (flat && backing_file) {
+         error_setg(errp, "Flat image can't have backing file");
+@@ -2058,10 +2045,34 @@ static int coroutine_fn vmdk_co_create_opts(const=
+ char *filename, QemuOpts *opts
+         ret =3D -ENOTSUP;
+         goto exit;
+     }
++
++    /* Create extents */
++    if (split) {
++        extent_size =3D split_size;
++    } else {
++        extent_size =3D size;
++    }
++    if (!split && !flat) {
++        created_size =3D extent_size;
++    } else {
++        created_size =3D 0;
++    }
++    /* Get the descriptor file BDS */
++    blk =3D extent_fn(created_size, 0, flat, split, compress, zeroed_gra=
+in,
++                    opaque, errp);
++    if (!blk) {
++        ret =3D -EIO;
++        goto exit;
++    }
++    if (!split && !flat) {
++        vmdk_desc_add_extent(ext_desc_lines, extent_line_fmt, created_si=
+ze,
++                             blk_bs(blk)->filename);
++    }
++
+     if (backing_file) {
+-        BlockBackend *blk;
++        BlockBackend *backing;
+         char *full_backing =3D g_new0(char, PATH_MAX);
+-        bdrv_get_full_backing_filename_from_filename(filename, backing_f=
+ile,
++        bdrv_get_full_backing_filename_from_filename(blk_bs(blk)->filena=
+me, backing_file,
+                                                      full_backing, PATH_=
+MAX,
+                                                      &local_err);
+         if (local_err) {
+@@ -2071,106 +2082,211 @@ static int coroutine_fn vmdk_co_create_opts(con=
+st char *filename, QemuOpts *opts
+             goto exit;
+         }
+=20
+-        blk =3D blk_new_open(full_backing, NULL, NULL,
+-                           BDRV_O_NO_BACKING, errp);
++        backing =3D blk_new_open(full_backing, NULL, NULL,
++                               BDRV_O_NO_BACKING, errp);
+         g_free(full_backing);
+-        if (blk =3D=3D NULL) {
++        if (backing =3D=3D NULL) {
+             ret =3D -EIO;
+             goto exit;
+         }
+-        if (strcmp(blk_bs(blk)->drv->format_name, "vmdk")) {
+-            blk_unref(blk);
++        if (strcmp(blk_bs(backing)->drv->format_name, "vmdk")) {
++            error_setg(errp, "Invalid backing file format: %s. Must be v=
+mdk",
++                       blk_bs(backing)->drv->format_name);
++            blk_unref(backing);
+             ret =3D -EINVAL;
+             goto exit;
+         }
+-        ret =3D vmdk_read_cid(blk_bs(blk), 0, &parent_cid);
+-        blk_unref(blk);
++        ret =3D vmdk_read_cid(blk_bs(backing), 0, &parent_cid);
++        blk_unref(backing);
+         if (ret) {
++            error_setg(errp, "Failed to read parent CID");
+             goto exit;
+         }
+         snprintf(parent_desc_line, BUF_SIZE,
+                 "parentFileNameHint=3D\"%s\"", backing_file);
+     }
+-
+-    /* Create extents */
+-    filesize =3D total_size;
+-    while (filesize > 0) {
+-        int64_t size =3D filesize;
+-
+-        if (split && size > split_size) {
+-            size =3D split_size;
+-        }
+-        if (split) {
+-            snprintf(desc_filename, PATH_MAX, "%s-%c%03d%s",
+-                    prefix, flat ? 'f' : 's', ++idx, postfix);
+-        } else if (flat) {
+-            snprintf(desc_filename, PATH_MAX, "%s-flat%s", prefix, postf=
+ix);
+-        } else {
+-            snprintf(desc_filename, PATH_MAX, "%s%s", prefix, postfix);
+-        }
+-        snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
+-
+-        if (vmdk_create_extent(ext_filename, size,
+-                               flat, compress, zeroed_grain, NULL, opts,=
+ errp)) {
++    extent_idx =3D 1;
++    while (created_size < size) {
++        BlockBackend *extent_blk;
++        int64_t cur_size =3D MIN(size - created_size, extent_size);
++        extent_blk =3D extent_fn(cur_size, extent_idx, flat, split, comp=
+ress,
++                               zeroed_grain, opaque, errp);
++        if (!extent_blk) {
+             ret =3D -EINVAL;
+             goto exit;
+         }
+-        filesize -=3D size;
+-
+-        /* Format description line */
+-        snprintf(desc_line, BUF_SIZE,
+-                    desc_extent_line, size / BDRV_SECTOR_SIZE, desc_file=
+name);
+-        g_string_append(ext_desc_lines, desc_line);
++        vmdk_desc_add_extent(ext_desc_lines, extent_line_fmt, cur_size,
++                             blk_bs(extent_blk)->filename);
++        created_size +=3D cur_size;
++        extent_idx++;
++        blk_unref(extent_blk);
+     }
+     /* generate descriptor file */
+     desc =3D g_strdup_printf(desc_template,
+                            g_random_int(),
+                            parent_cid,
+-                           fmt,
++                           BlockdevVmdkSubformat_str(subformat),
+                            parent_desc_line,
+                            ext_desc_lines->str,
+                            hw_version,
+-                           total_size /
++                           size /
+                                (int64_t)(63 * number_heads * BDRV_SECTOR=
+_SIZE),
+                            number_heads,
+-                           adapter_type);
++                           BlockdevVmdkAdapterType_str(adapter_type));
+     desc_len =3D strlen(desc);
+     /* the descriptor offset =3D 0x200 */
+     if (!split && !flat) {
+         desc_offset =3D 0x200;
+-    } else {
+-        ret =3D bdrv_create_file(filename, opts, &local_err);
++    }
++
++    ret =3D blk_pwrite(blk, desc_offset, desc, desc_len, 0);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not write description");
++        goto exit;
++    }
++    /* bdrv_pwrite write padding zeros to align to sector, we don't need=
+ that
++     * for description file */
++    if (desc_offset =3D=3D 0) {
++        ret =3D blk_truncate(blk, desc_len, PREALLOC_MODE_OFF, errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             goto exit;
+         }
+     }
++    ret =3D 0;
++exit:
++    if (blk) {
++        blk_unref(blk);
++    }
++    g_free(desc);
++    g_free(parent_desc_line);
++    g_string_free(ext_desc_lines, true);
++    return ret;
++}
+=20
+-    new_blk =3D blk_new_open(filename, NULL, NULL,
+-                           BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL=
+,
+-                           &local_err);
+-    if (new_blk =3D=3D NULL) {
+-        error_propagate(errp, local_err);
+-        ret =3D -EIO;
++typedef struct {
++    char *path;
++    char *prefix;
++    char *postfix;
++    QemuOpts *opts;
++} VMDKCreateOptsData;
++
++static BlockBackend *vmdk_co_create_opts_cb(int64_t size, int idx,
++                                            bool flat, bool split, bool =
+compress,
++                                            bool zeroed_grain, void *opa=
+que,
++                                            Error **errp)
++{
++    BlockBackend *blk =3D NULL;
++    BlockDriverState *bs =3D NULL;
++    VMDKCreateOptsData *data =3D opaque;
++    char *ext_filename =3D NULL;
++    char *rel_filename =3D NULL;
++
++    if (idx =3D=3D 0) {
++        rel_filename =3D g_strdup_printf("%s%s", data->prefix, data->pos=
+tfix);
++    } else if (split) {
++        rel_filename =3D g_strdup_printf("%s-%c%03d%s",
++                                       data->prefix,
++                                       flat ? 'f' : 's', idx, data->post=
+fix);
++    } else {
++        assert(idx =3D=3D 1);
++        rel_filename =3D g_strdup_printf("%s-flat%s", data->prefix, data=
+->postfix);
++    }
++
++    ext_filename =3D g_strdup_printf("%s%s", data->path, rel_filename);
++    g_free(rel_filename);
++
++    if (vmdk_create_extent(ext_filename, size,
++                           flat, compress, zeroed_grain, &blk, data->opt=
+s,
++                           errp)) {
+         goto exit;
+     }
++    bdrv_unref(bs);
++exit:
++    g_free(ext_filename);
++    return blk;
++}
+=20
+-    blk_set_allow_write_beyond_eof(new_blk, true);
++static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOp=
+ts *opts,
++                                            Error **errp)
++{
++    Error *local_err =3D NULL;
++    char *desc =3D NULL;
++    int64_t total_size =3D 0;
++    char *adapter_type =3D NULL;
++    BlockdevVmdkAdapterType adapter_type_enum;
++    char *backing_file =3D NULL;
++    char *hw_version =3D NULL;
++    char *fmt =3D NULL;
++    BlockdevVmdkSubformat subformat;
++    int ret =3D 0;
++    char *path =3D g_malloc0(PATH_MAX);
++    char *prefix =3D g_malloc0(PATH_MAX);
++    char *postfix =3D g_malloc0(PATH_MAX);
++    char *desc_line =3D g_malloc0(BUF_SIZE);
++    char *ext_filename =3D g_malloc0(PATH_MAX);
++    char *desc_filename =3D g_malloc0(PATH_MAX);
++    char *parent_desc_line =3D g_malloc0(BUF_SIZE);
++    bool zeroed_grain;
++    bool compat6;
++    VMDKCreateOptsData data;
+=20
+-    ret =3D blk_pwrite(new_blk, desc_offset, desc, desc_len, 0);
+-    if (ret < 0) {
+-        error_setg_errno(errp, -ret, "Could not write description");
++    if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, er=
+rp)) {
++        ret =3D -EINVAL;
+         goto exit;
+     }
+-    /* bdrv_pwrite write padding zeros to align to sector, we don't need=
+ that
+-     * for description file */
+-    if (desc_offset =3D=3D 0) {
+-        ret =3D blk_truncate(new_blk, desc_len, PREALLOC_MODE_OFF, errp)=
+;
++    /* Read out options */
++    total_size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, =
+0),
++                          BDRV_SECTOR_SIZE);
++    adapter_type =3D qemu_opt_get_del(opts, BLOCK_OPT_ADAPTER_TYPE);
++    backing_file =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
++    hw_version =3D qemu_opt_get_del(opts, BLOCK_OPT_HWVERSION);
++    compat6 =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_COMPAT6, false);
++    if (strcmp(hw_version, "undefined") =3D=3D 0) {
++        g_free(hw_version);
++        hw_version =3D g_strdup("4");
+     }
+-exit:
+-    if (new_blk) {
+-        blk_unref(new_blk);
++    fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_SUBFMT);
++    zeroed_grain =3D qemu_opt_get_bool_del(opts, BLOCK_OPT_ZEROED_GRAIN,=
+ false);
++
++    if (adapter_type) {
++        adapter_type_enum =3D qapi_enum_parse(&BlockdevVmdkAdapterType_l=
+ookup,
++                                            adapter_type,
++                                            BLOCKDEV_VMDK_ADAPTER_TYPE_I=
+DE,
++                                            &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            ret =3D -EINVAL;
++            goto exit;
++        }
++    } else {
++        adapter_type_enum =3D BLOCKDEV_VMDK_ADAPTER_TYPE_IDE;
+     }
++
++    if (!fmt) {
++        /* Default format to monolithicSparse */
++        subformat =3D BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICSPARSE;
++    } else {
++        subformat =3D qapi_enum_parse(&BlockdevVmdkSubformat_lookup,
++                                    fmt,
++                                    BLOCKDEV_VMDK_SUBFORMAT_MONOLITHICSP=
+ARSE,
++                                    &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            ret =3D -EINVAL;
++            goto exit;
++        }
++    }
++    data =3D (VMDKCreateOptsData){
++        .prefix =3D prefix,
++        .postfix =3D postfix,
++        .path =3D path,
++        .opts =3D opts,
++    };
++    ret =3D vmdk_co_do_create(total_size, subformat, adapter_type_enum,
++                            backing_file, hw_version, compat6, zeroed_gr=
+ain,
++                            vmdk_co_create_opts_cb, &data, errp);
++
++exit:
+     g_free(adapter_type);
+     g_free(backing_file);
+     g_free(hw_version);
+@@ -2183,7 +2299,84 @@ exit:
+     g_free(ext_filename);
+     g_free(desc_filename);
+     g_free(parent_desc_line);
+-    g_string_free(ext_desc_lines, true);
++    return ret;
++}
++
++static BlockBackend *vmdk_co_create_cb(int64_t size, int idx,
++                                       bool flat, bool split, bool compr=
+ess,
++                                       bool zeroed_grain, void *opaque,
++                                       Error **errp)
++{
++    int ret;
++    BlockDriverState *bs;
++    BlockBackend *blk;
++    BlockdevCreateOptionsVmdk *opts =3D opaque;
++
++    if (idx =3D=3D 0) {
++        bs =3D bdrv_open_blockdev_ref(opts->file, errp);
++    } else {
++        int i;
++        BlockdevRefList *list =3D opts->extents;
++        for (i =3D 1; i < idx; i++) {
++            if (!list || !list->next) {
++                error_setg(errp, "Extent [%d] not specified", i);
++                return NULL;
++            }
++            list =3D list->next;
++        }
++        if (!list) {
++            error_setg(errp, "Extent [%d] not specified", idx - 1);
++            return NULL;
++        }
++        bs =3D bdrv_open_blockdev_ref(list->value, errp);
++    }
++    if (!bs) {
++        return NULL;
++    }
++    blk =3D blk_new(BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM=
+_RESIZE,
++                  BLK_PERM_ALL);
++    if (blk_insert_bs(blk, bs, errp)) {
++        bdrv_unref(bs);
++        return NULL;
++    }
++    blk_set_allow_write_beyond_eof(blk, true);
++    bdrv_unref(bs);
++
++    ret =3D vmdk_init_extent(blk, size, flat, compress, zeroed_grain, er=
+rp);
++    if (ret) {
++        blk_unref(blk);
++        blk =3D NULL;
++    }
++    return blk;
++}
++
++static int coroutine_fn vmdk_co_create(BlockdevCreateOptions *create_opt=
+ions,
++                                       Error **errp)
++{
++    int ret;
++    BlockdevCreateOptionsVmdk *opts;
++
++    opts =3D &create_options->u.vmdk;
++
++    /* Validate options */
++    if (!QEMU_IS_ALIGNED(opts->size, BDRV_SECTOR_SIZE)) {
++        error_setg(errp, "Image size must be a multiple of 512 bytes");
++        ret =3D -EINVAL;
++        goto out;
++    }
++
++    ret =3D vmdk_co_do_create(opts->size,
++                            opts->subformat,
++                            opts->adapter_type,
++                            opts->backing_file,
++                            opts->hwversion,
++                            false,
++                            opts->zeroed_grain,
++                            vmdk_co_create_cb,
++                            opts, errp);
++    return ret;
++
++out:
+     return ret;
+ }
+=20
+@@ -2451,6 +2644,7 @@ static BlockDriver bdrv_vmdk =3D {
+     .bdrv_co_pwrite_zeroes        =3D vmdk_co_pwrite_zeroes,
+     .bdrv_close                   =3D vmdk_close,
+     .bdrv_co_create_opts          =3D vmdk_co_create_opts,
++    .bdrv_co_create               =3D vmdk_co_create,
+     .bdrv_co_flush_to_disk        =3D vmdk_co_flush,
+     .bdrv_co_block_status         =3D vmdk_co_block_status,
+     .bdrv_get_allocated_file_size =3D vmdk_get_allocated_file_size,
 --=20
 2.20.1
