@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40448)
+Received: from eggs.gnu.org ([209.51.188.92]:40415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDs-0003hi-Pu
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:41 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDr-0007qI-Ob
+	(envelope-from <lifei1214@126.com>) id 1gpRDr-0003gm-OG
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:40 -0500
-Received: from m50-111.126.com ([123.125.50.111]:54117)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDr-0007mb-5W
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gpRDr-0007oj-1n
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:39 -0500
+Received: from m50-111.126.com ([123.125.50.111]:54039)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gpRDp-0007m9-C0
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:38 -0500
 From: Fei Li <lifei1214@126.com>
-Date: Fri,  1 Feb 2019 13:18:00 +0800
-Message-Id: <20190201051806.53183-6-lifei1214@126.com>
+Date: Fri,  1 Feb 2019 13:18:03 +0800
+Message-Id: <20190201051806.53183-9-lifei1214@126.com>
 In-Reply-To: <20190201051806.53183-1-lifei1214@126.com>
 References: <20190201051806.53183-1-lifei1214@126.com>
-Subject: [Qemu-devel] [PATCH v11 for-4.0 05/11] qemu_thread: supplement
- error handling for h_resize_hpt_prepare
+Subject: [Qemu-devel] [PATCH v11 for-4.0 08/11] qemu_thread: supplement
+ error handling for qemu_signalfd_compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, shirley17fei@gmail.com
-Cc: Fei Li <fli@suse.com>, Markus Armbruster <armbru@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-From: Fei Li <fli@suse.com>
+From: Fei Li <shirley17fei@gmail.com>
 
-Add a local_err to hold the error, and return the corresponding
-error code to replace the temporary &error_abort.
+For qemu_signalfd_compat: set errno, do some cleanup, and return
+-1 to replace the temporary &error_abort when failing to create
+sigwait_compat.
 
 Cc: Markus Armbruster <armbru@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Fei Li <fli@suse.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fei Li <shirley17fei@gmail.com>
 ---
- hw/ppc/spapr_hcall.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ util/compatfd.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index bee2895b94..5ef73bef0e 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -478,6 +478,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-     sPAPRPendingHPT *pending = spapr->pending_hpt;
-     uint64_t current_ram_size;
-     int rc;
-+    Error *local_err = NULL;
+diff --git a/util/compatfd.c b/util/compatfd.c
+index c3d8448264..9d642475fc 100644
+--- a/util/compatfd.c
++++ b/util/compatfd.c
+@@ -71,6 +71,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+     struct sigfd_compat_info *info;
+     QemuThread thread;
+     int fds[2];
++    int ret;
  
-     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-         return H_AUTHORITY;
-@@ -538,10 +539,13 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-     pending->shift = shift;
-     pending->ret = H_HARDWARE;
+     info = malloc(sizeof(*info));
+     if (info == NULL) {
+@@ -89,9 +90,15 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+     memcpy(&info->mask, mask, sizeof(*mask));
+     info->fd = fds[1];
  
 -    /* TODO: let the further caller handle the error instead of abort() here */
--    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
--                       hpt_prepare_thread, pending,
--                       QEMU_THREAD_DETACHED, &error_abort);
-+    if (qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
-+                           hpt_prepare_thread, pending,
-+                           QEMU_THREAD_DETACHED, &local_err) < 0) {
-+        error_reportf_err(local_err, "failed to create hpt_prepare_thread: ");
-+        g_free(pending);
-+        return H_HARDWARE;
+-    qemu_thread_create(&thread, "signalfd_compat", sigwait_compat,
+-                       info, QEMU_THREAD_DETACHED, &error_abort);
++    ret = qemu_thread_create(&thread, "signalfd_compat", sigwait_compat,
++                             info, QEMU_THREAD_DETACHED, NULL);
++    if (ret < 0) {
++        close(fds[0]);
++        close(fds[1]);
++        free(info);
++        errno = -ret;
++        return -1;
 +    }
  
-     spapr->pending_hpt = pending;
- 
+     return fds[0];
+ }
 -- 
 2.17.2 (Apple Git-113)
