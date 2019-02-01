@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58830)
+Received: from eggs.gnu.org ([209.51.188.92]:58888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM8-0008Bm-V2
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0008DX-Ol
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM7-0003fY-1a
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:52 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:38176)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbM9-0003gT-2Q
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:46409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbM4-0003Iz-VU
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:50 -0500
-Received: by mail-wm1-x336.google.com with SMTP id m22so6780141wml.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:07 -0800 (PST)
+	id 1gpbM7-0003Ny-8v
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:52 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id l9so7609362wrt.13
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:24 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.04
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.22
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:05 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:22 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:13 +0000
-Message-Id: <20190201160653.13829-8-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:27 +0000
+Message-Id: <20190201160653.13829-22-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/47] hw/arm/iotkit: Rename 'iotkit' local
- variables and functions
+Subject: [Qemu-devel] [PULL 21/47] hw/arm/armsse: Add CPU_IDENTITY block to
+ SSE-200
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,258 +36,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Rename various internal uses of 'iotkit' in hw/arm/iotkit.c to
-'armsse', for consistency. The remaining occurences are:
- * related to the devices TYPE_IOTKIT_SYSCTL, TYPE_IOTKIT_SYSINFO,
-   etc, which this refactor is not touching
- * references that apply specifically to the IoTKit (like
-   the lack of a private CPU region)
- * the vmstate, which keeps its old "iotkit" name for
-   migration compatibility reasons
+Instantiate a copy of the CPU_IDENTITY register block for each CPU
+in an SSE-200.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-7-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-21-peter.maydell@linaro.org
 ---
- hw/arm/iotkit.c | 68 ++++++++++++++++++++++++-------------------------
- 1 file changed, 34 insertions(+), 34 deletions(-)
+ include/hw/arm/armsse.h |  3 +++
+ hw/arm/armsse.c         | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index d5b172933c3..7ff14fd5aef 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -56,7 +56,7 @@ static void nsccfg_handler(void *opaque, int n, int level)
-     s->nsccfg = level;
- }
+diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
+index 961dbb3032a..3914e8e4bf2 100644
+--- a/include/hw/arm/armsse.h
++++ b/include/hw/arm/armsse.h
+@@ -78,6 +78,7 @@
+ #include "hw/watchdog/cmsdk-apb-watchdog.h"
+ #include "hw/misc/iotkit-sysctl.h"
+ #include "hw/misc/iotkit-sysinfo.h"
++#include "hw/misc/armsse-cpuid.h"
+ #include "hw/misc/unimp.h"
+ #include "hw/or-irq.h"
+ #include "hw/core/split-irq.h"
+@@ -153,6 +154,8 @@ typedef struct ARMSSE {
+     UnimplementedDeviceState cachectrl[SSE_MAX_CPUS];
+     UnimplementedDeviceState cpusecctrl[SSE_MAX_CPUS];
  
--static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
-+static void armsse_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
- {
-     /* Each of the 4 AHB and 4 APB PPCs that might be present in a
-      * system using the ARMSSE has a collection of control lines which
-@@ -65,22 +65,22 @@ static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
-      * code using the ARMSSE can wire them up to the PPCs.
-      */
-     SplitIRQ *splitter = &s->ppc_irq_splitter[ppcnum];
--    DeviceState *iotkitdev = DEVICE(s);
-+    DeviceState *armssedev = DEVICE(s);
-     DeviceState *dev_secctl = DEVICE(&s->secctl);
-     DeviceState *dev_splitter = DEVICE(splitter);
-     char *name;
++    ARMSSECPUID cpuid[SSE_MAX_CPUS];
++
+     /*
+      * 'container' holds all devices seen by all CPUs.
+      * 'cpu_container[i]' is the view that CPU i has: this has the
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 9c111ac6a40..eb691faf720 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -34,6 +34,7 @@ struct ARMSSEInfo {
+     bool has_ppus;
+     bool has_cachectrl;
+     bool has_cpusecctrl;
++    bool has_cpuid;
+ };
  
-     name = g_strdup_printf("%s_nonsec", ppcname);
--    qdev_pass_gpios(dev_secctl, iotkitdev, name);
-+    qdev_pass_gpios(dev_secctl, armssedev, name);
-     g_free(name);
-     name = g_strdup_printf("%s_ap", ppcname);
--    qdev_pass_gpios(dev_secctl, iotkitdev, name);
-+    qdev_pass_gpios(dev_secctl, armssedev, name);
-     g_free(name);
-     name = g_strdup_printf("%s_irq_enable", ppcname);
--    qdev_pass_gpios(dev_secctl, iotkitdev, name);
-+    qdev_pass_gpios(dev_secctl, armssedev, name);
-     g_free(name);
-     name = g_strdup_printf("%s_irq_clear", ppcname);
--    qdev_pass_gpios(dev_secctl, iotkitdev, name);
-+    qdev_pass_gpios(dev_secctl, armssedev, name);
-     g_free(name);
+ static const ARMSSEInfo armsse_variants[] = {
+@@ -47,6 +48,7 @@ static const ARMSSEInfo armsse_variants[] = {
+         .has_ppus = false,
+         .has_cachectrl = false,
+         .has_cpusecctrl = false,
++        .has_cpuid = false,
+     },
+ };
  
-     /* irq_status is a little more tricky, because we need to
-@@ -96,15 +96,15 @@ static void iotkit_forward_ppc(ARMSSE *s, const char *ppcname, int ppcnum)
-     qdev_connect_gpio_out(dev_splitter, 1,
-                           qdev_get_gpio_in(DEVICE(&s->ppc_irq_orgate), ppcnum));
-     s->irq_status_in[ppcnum] = qdev_get_gpio_in(dev_splitter, 0);
--    qdev_init_gpio_in_named_with_opaque(iotkitdev, irq_status_forwarder,
-+    qdev_init_gpio_in_named_with_opaque(armssedev, irq_status_forwarder,
-                                         s->irq_status_in[ppcnum], name, 1);
-     g_free(name);
- }
- 
--static void iotkit_forward_sec_resp_cfg(ARMSSE *s)
-+static void armsse_forward_sec_resp_cfg(ARMSSE *s)
- {
-     /* Forward the 3rd output from the splitter device as a
--     * named GPIO output of the iotkit object.
-+     * named GPIO output of the armsse object.
-      */
-     DeviceState *dev = DEVICE(s);
-     DeviceState *dev_splitter = DEVICE(&s->sec_resp_splitter);
-@@ -115,12 +115,12 @@ static void iotkit_forward_sec_resp_cfg(ARMSSE *s)
-     qdev_connect_gpio_out(dev_splitter, 2, s->sec_resp_cfg_in);
- }
- 
--static void iotkit_init(Object *obj)
-+static void armsse_init(Object *obj)
- {
-     ARMSSE *s = ARMSSE(obj);
-     int i;
- 
--    memory_region_init(&s->container, obj, "iotkit-container", UINT64_MAX);
-+    memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
- 
-     sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-                           TYPE_ARMV7M);
-@@ -160,9 +160,9 @@ static void iotkit_init(Object *obj)
-                           sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
-     sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
-                           sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
--    sysbus_init_child_obj(obj, "iotkit-sysctl", &s->sysctl,
-+    sysbus_init_child_obj(obj, "armsse-sysctl", &s->sysctl,
-                           sizeof(s->sysctl), TYPE_IOTKIT_SYSCTL);
--    sysbus_init_child_obj(obj, "iotkit-sysinfo", &s->sysinfo,
-+    sysbus_init_child_obj(obj, "armsse-sysinfo", &s->sysinfo,
-                           sizeof(s->sysinfo), TYPE_IOTKIT_SYSINFO);
+@@ -314,6 +316,16 @@ static void armsse_init(Object *obj)
+             g_free(name);
+         }
+     }
++    if (info->has_cpuid) {
++        for (i = 0; i < info->num_cpus; i++) {
++            char *name = g_strdup_printf("cpuid%d", i);
++
++            sysbus_init_child_obj(obj, name, &s->cpuid[i],
++                                  sizeof(s->cpuid[i]),
++                                  TYPE_ARMSSE_CPUID);
++            g_free(name);
++        }
++    }
      object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
                              sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-@@ -183,20 +183,20 @@ static void iotkit_init(Object *obj)
+                             &error_abort, NULL);
+@@ -864,6 +876,22 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+             memory_region_add_subregion(&s->cpu_container[i], 0x50011000, mr);
+         }
      }
- }
++    if (info->has_cpuid) {
++        for (i = 0; i < info->num_cpus; i++) {
++            MemoryRegion *mr;
++
++            qdev_prop_set_uint32(DEVICE(&s->cpuid[i]), "CPUID", i);
++            object_property_set_bool(OBJECT(&s->cpuid[i]), true,
++                                     "realized", &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
++
++            mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cpuid[i]), 0);
++            memory_region_add_subregion(&s->cpu_container[i], 0x4001F000, mr);
++        }
++    }
  
--static void iotkit_exp_irq(void *opaque, int n, int level)
-+static void armsse_exp_irq(void *opaque, int n, int level)
- {
-     ARMSSE *s = ARMSSE(opaque);
- 
-     qemu_set_irq(s->exp_irqs[n], level);
- }
- 
--static void iotkit_mpcexp_status(void *opaque, int n, int level)
-+static void armsse_mpcexp_status(void *opaque, int n, int level)
- {
-     ARMSSE *s = ARMSSE(opaque);
-     qemu_set_irq(s->mpcexp_status_in[n], level);
- }
- 
--static void iotkit_realize(DeviceState *dev, Error **errp)
-+static void armsse_realize(DeviceState *dev, Error **errp)
- {
-     ARMSSE *s = ARMSSE(dev);
-     int i;
-@@ -287,7 +287,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < s->exp_numirq; i++) {
-         s->exp_irqs[i] = qdev_get_gpio_in(DEVICE(&s->armv7m), i + 32);
-     }
--    qdev_init_gpio_in_named(dev, iotkit_exp_irq, "EXP_IRQ", s->exp_numirq);
-+    qdev_init_gpio_in_named(dev, armsse_exp_irq, "EXP_IRQ", s->exp_numirq);
- 
-     /* Set up the big aliases first */
-     make_alias(s, &s->alias1, "alias 1", 0x10000000, 0x10000000, 0x00000000);
-@@ -336,7 +336,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-                                 qdev_get_gpio_in(dev_splitter, 0));
- 
-     /* This RAM lives behind the Memory Protection Controller */
--    memory_region_init_ram(&s->sram0, NULL, "iotkit.sram0", 0x00008000, &err);
-+    memory_region_init_ram(&s->sram0, NULL, "armsse.sram0", 0x00008000, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -608,14 +608,14 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < IOTS_NUM_AHB_EXP_PPC; i++) {
-         char *ppcname = g_strdup_printf("ahb_ppcexp%d", i);
- 
--        iotkit_forward_ppc(s, ppcname, i);
-+        armsse_forward_ppc(s, ppcname, i);
-         g_free(ppcname);
-     }
- 
-     for (i = 0; i < IOTS_NUM_APB_EXP_PPC; i++) {
-         char *ppcname = g_strdup_printf("apb_ppcexp%d", i);
- 
--        iotkit_forward_ppc(s, ppcname, i + IOTS_NUM_AHB_EXP_PPC);
-+        armsse_forward_ppc(s, ppcname, i + IOTS_NUM_AHB_EXP_PPC);
-         g_free(ppcname);
-     }
- 
-@@ -672,10 +672,10 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-     /* Create GPIO inputs which will pass the line state for our
-      * mpcexp_irq inputs to the correct splitter devices.
-      */
--    qdev_init_gpio_in_named(dev, iotkit_mpcexp_status, "mpcexp_status",
-+    qdev_init_gpio_in_named(dev, armsse_mpcexp_status, "mpcexp_status",
-                             IOTS_NUM_EXP_MPC);
- 
--    iotkit_forward_sec_resp_cfg(s);
-+    armsse_forward_sec_resp_cfg(s);
- 
-     /* Forward the MSC related signals */
-     qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
-@@ -695,7 +695,7 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
- }
- 
--static void iotkit_idau_check(IDAUInterface *ii, uint32_t address,
-+static void armsse_idau_check(IDAUInterface *ii, uint32_t address,
-                               int *iregion, bool *exempt, bool *ns, bool *nsc)
- {
-     /*
-@@ -713,7 +713,7 @@ static void iotkit_idau_check(IDAUInterface *ii, uint32_t address,
-     *iregion = region;
- }
- 
--static const VMStateDescription iotkit_vmstate = {
-+static const VMStateDescription armsse_vmstate = {
-     .name = "iotkit",
-     .version_id = 1,
-     .minimum_version_id = 1,
-@@ -723,7 +723,7 @@ static const VMStateDescription iotkit_vmstate = {
-     }
- };
- 
--static Property iotkit_properties[] = {
-+static Property armsse_properties[] = {
-     DEFINE_PROP_LINK("memory", ARMSSE, board_memory, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
-     DEFINE_PROP_UINT32("EXP_NUMIRQ", ARMSSE, exp_numirq, 64),
-@@ -731,24 +731,24 @@ static Property iotkit_properties[] = {
-     DEFINE_PROP_END_OF_LIST()
- };
- 
--static void iotkit_reset(DeviceState *dev)
-+static void armsse_reset(DeviceState *dev)
- {
-     ARMSSE *s = ARMSSE(dev);
- 
-     s->nsccfg = 0;
- }
- 
--static void iotkit_class_init(ObjectClass *klass, void *data)
-+static void armsse_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
-     ARMSSEClass *asc = ARMSSE_CLASS(klass);
- 
--    dc->realize = iotkit_realize;
--    dc->vmsd = &iotkit_vmstate;
--    dc->props = iotkit_properties;
--    dc->reset = iotkit_reset;
--    iic->check = iotkit_idau_check;
-+    dc->realize = armsse_realize;
-+    dc->vmsd = &armsse_vmstate;
-+    dc->props = armsse_properties;
-+    dc->reset = armsse_reset;
-+    iic->check = armsse_idau_check;
-     asc->info = data;
- }
- 
-@@ -756,7 +756,7 @@ static const TypeInfo armsse_info = {
-     .name = TYPE_ARMSSE,
-     .parent = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(ARMSSE),
--    .instance_init = iotkit_init,
-+    .instance_init = armsse_init,
-     .abstract = true,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_IDAU_INTERFACE },
-@@ -774,7 +774,7 @@ static void armsse_register_types(void)
-         TypeInfo ti = {
-             .name = armsse_variants[i].name,
-             .parent = TYPE_ARMSSE,
--            .class_init = iotkit_class_init,
-+            .class_init = armsse_class_init,
-             .class_data = (void *)&armsse_variants[i],
-         };
-         type_register(&ti);
+     /* 0x40020000 .. 0x4002ffff : ARMSSE system control peripheral region */
+     /* Devices behind APB PPC1:
 -- 
 2.20.1
