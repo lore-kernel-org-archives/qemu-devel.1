@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45347)
+Received: from eggs.gnu.org ([209.51.188.92]:45538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpfVf-00063n-NY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:34:00 -0500
+	(envelope-from <philmd@redhat.com>) id 1gpfVq-00067z-6H
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:34:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpfQ9-0001r0-60
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:28:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gpfQ8-0001pO-QT
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:28:17 -0500
-Date: Fri, 1 Feb 2019 20:28:08 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190201202807.GH3150@work-vm>
-References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190128121331.GB2939@work-vm>
-	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190128173536.GE2585@work-vm>
-	<RO1P152MB14834BE5D9747719CD493C5297960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-	<20190201133639.GE3150@work-vm>
-	<RO1P152MB148380E67D93DAB6C8093EFE97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	(envelope-from <philmd@redhat.com>) id 1gpfKG-00042r-1h
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:22:15 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gpfKF-000410-SQ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 15:22:11 -0500
+Received: by mail-wr1-f68.google.com with SMTP id p4so8428260wrt.7
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 12:22:10 -0800 (PST)
+References: <20190121160002.731-1-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <90c617c0-7505-23db-142f-c9f63353c7d6@redhat.com>
+Date: Fri, 1 Feb 2019 21:22:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <RO1P152MB148380E67D93DAB6C8093EFE97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
+In-Reply-To: <20190121160002.731-1-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] m25p80: add basic support for the SFPD
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,136 +30,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonardo Soares =?iso-8859-1?Q?M=FCller?= <leozinho29_eu@hotmail.com>
-Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Max Reitz <mreitz@redhat.com>
 
-* Leonardo Soares M=FCller (leozinho29_eu@hotmail.com) wrote:
-> I can confirm this, KDE Neon using the command line similar to yours
-> crashes QEMU to me too. I will test with Mageia 7 later to see if it
-> behaves differently.
->=20
-> But this is a completely different crash. This crash is happening
-> earlier, what I reported first is a crash when the login screen should
-> load, this is happening earlier on boot.
->=20
-> The command line I used this time:
->=20
-> qemu-system-x86_64 -M pc,accel=3Dkvm -smp 3 -m 4G -drive
-> if=3Dvirtio,file=3Dneonbroken.qcow2 -vga qxl -bios /usr/share/ovmf/OVMF=
-.fd
+Hi Cédric,
 
-Right yes; as you say with hda it's fine;  I've pointed Paolo at
-this one.
+On 1/21/19 5:00 PM, Cédric Le Goater wrote:
+> JEDEC STANDARD JESD216 for Serial Flash Discovery Parameters (SFDP)
+> provides a mean to describe the features of a serial flash device
+> using a set of internal parameter tables.
+> 
+> This is the initial framework for the RDSFPD command which is given
+> access to a private SFPD area under the flash. This area now needs to
+> be populated with the flash device characteristics, presumingly with
+> the values from the FlashPartInfo array.
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> ---
+>  hw/block/m25p80.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+> 
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index e8dfa14b332f..581a9e1fb82e 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -340,6 +340,7 @@ typedef enum {
+>      BULK_ERASE = 0xc7,
+>      READ_FSR = 0x70,
+>      RDCR = 0x15,
+> +    RDSFPD = 0x5a,
+>  
+>      READ = 0x03,
+>      READ4 = 0x13,
+> @@ -405,6 +406,7 @@ typedef enum {
+>      STATE_COLLECTING_DATA,
+>      STATE_COLLECTING_VAR_LEN_DATA,
+>      STATE_READING_DATA,
+> +    STATE_READING_SFPD,
+>  } CMDState;
+>  
+>  typedef enum {
+> @@ -456,6 +458,8 @@ typedef struct Flash {
+>  
+>      int64_t dirty_page;
+>  
+> +#define M25P80_SFPD_AREA_SIZE 0x100
+> +    uint8_t sfpd_area[M25P80_SFPD_AREA_SIZE];
+>      const FlashPartInfo *pi;
+>  
+>  } Flash;
+> @@ -626,6 +630,8 @@ static inline int get_addr_length(Flash *s)
+>      }
+>  
+>     switch (s->cmd_in_progress) {
+> +   case RDSFPD:
+> +       return 3;
+>     case PP4:
+>     case PP4_4:
+>     case QPP_4:
+> @@ -748,11 +754,55 @@ static void complete_collecting_data(Flash *s)
+>                            " by device\n");
+>          }
+>          break;
+> +
+> +    case RDSFPD:
+> +        if (s->cur_addr < M25P80_SFPD_AREA_SIZE) {
+> +            s->state = STATE_READING_SFPD;
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "M25P80: Invalid SFPD address %#" PRIx32 "\n",
+> +                          s->cur_addr);
+> +        }
+> +        break;
+> +
+>      default:
+>          break;
+>      }
+>  }
+>  
+> +static void reset_memory_sfpd(Flash *s)
+> +{
+> +    s->sfpd_area[0x00] = 'S';
+> +    s->sfpd_area[0x01] = 'F';
+> +    s->sfpd_area[0x02] = 'P';
+> +    s->sfpd_area[0x03] = 'D';
+> +
+> +    s->sfpd_area[0x04] = 0x00; /* SFDP Minor Revision Number  */
+> +    s->sfpd_area[0x05] = 0x01; /* SFDP Major Revision Number  */
+> +    s->sfpd_area[0x06] = 0x01; /* Number of Parameter Headers */
+> +    s->sfpd_area[0x07] = 0xFF; /* Unused */
+> +
+> +    s->sfpd_area[0x08] = 0x00; /* ID Number. 0x0 : JEDEC */
+> +    s->sfpd_area[0x09] = 0x00; /* Parameter Table Minor Revision */
+> +    s->sfpd_area[0x0A] = 0x01; /* Parameter Table Major Revision */
+> +    s->sfpd_area[0x0B] = 0x09; /* Parameter Table Length (DWORD) */
+> +    s->sfpd_area[0x0C] = 0x30; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x0D] = 0x00; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x0E] = 0x00; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x0F] = 0xFF; /* Unused */
+> +
+> +    s->sfpd_area[0x10] = s->pi->id[0]; /* ID Number. Manufacturer */
+> +    s->sfpd_area[0x11] = 0x00; /* Parameter Table Minor Revision */
+> +    s->sfpd_area[0x12] = 0x01; /* Parameter Table Major Revision */
+> +    s->sfpd_area[0x13] = 0x04; /* Parameter Table Length (DWORD) */
+> +    s->sfpd_area[0x14] = 0x60; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x15] = 0x00; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x16] = 0x00; /* Parameter Table Pointer */
+> +    s->sfpd_area[0x17] = 0xFF; /* Unused */
+> +
+> +    /* TODO: populate accordingly to chip model */
 
-As for the original crash; I can't reproduce it here (On Fedora 29,
-head qemu):
-./x86_64-softmmu/qemu-system-x86_64 -cpu host  -M pc,accel=3Dkvm -smp 3 -=
-m 8G -drive if=3Dide,file=3D/home/vmimages/kde-neon.qcow2 -display gtk,gl=
-=3Don -device qemu-xhci,addr=3D3 -device qxl-vga,xres=3D1366,yres=3D768,a=
-ddr=3D4 -bios /usr/share/OVMF/OVMF_CODE.fd
+Shouldn't this be filled with 0xFF meanwhile?
 
-Dave
+> +}
+> +
+>  static void reset_memory(Flash *s)
+>  {
+>      s->cmd_in_progress = NOP;
+> @@ -822,6 +872,8 @@ static void reset_memory(Flash *s)
+>          break;
+>      }
+>  
+> +    reset_memory_sfpd(s);
 
-> The backtrace:
->=20
-> (gdb) bt
-> #0  0x00007ffff0371e97 in __GI_raise (sig=3Dsig@entry=3D6) at
-> ../sysdeps/unix/sysv/linux/raise.c:51
-> #1  0x00007ffff0373801 in __GI_abort () at abort.c:79
-> #2  0x000055555589eac9 in kvm_mem_ioeventfd_add
-> (listener=3D0x555556a1fdc8, section=3D0x7fffc7ffba90, match_data=3Dfals=
-e,
-> data=3D0, e=3D0x5555578c7fc8) at
-> /home/usuario/Documentos/qemu/accel/kvm/kvm-all.c:866
-> #3  0x000055555588300a in address_space_add_del_ioeventfds
-> (as=3D0x5555567e5a00 <address_space_memory>, fds_new=3D0x7fffbc000d30,
-> fds_new_nb=3D1, fds_old=3D0x0, fds_old_nb=3D0) at
-> /home/usuario/Documentos/qemu/memory.c:793
-> #4  0x00005555558832f4 in address_space_update_ioeventfds
-> (as=3D0x5555567e5a00 <address_space_memory>) at
-> /home/usuario/Documentos/qemu/memory.c:843
-> #5  0x000055555588415b in memory_region_transaction_commit () at
-> /home/usuario/Documentos/qemu/memory.c:1094
-> #6  0x00005555558871c8 in memory_region_add_eventfd (mr=3D0x5555578b642=
-0,
-> addr=3D0, size=3D0, match_data=3Dfalse, data=3D0, e=3D0x5555578c7fc8) a=
-t
-> /home/usuario/Documentos/qemu/memory.c:2303
-> #7  0x0000555555c26cd0 in virtio_pci_ioeventfd_assign (d=3D0x5555578b57=
-50,
-> notifier=3D0x5555578c7fc8, n=3D0, assign=3Dtrue) at hw/virtio/virtio-pc=
-i.c:243
-> #8  0x0000555555c24dd5 in virtio_bus_set_host_notifier
-> (bus=3D0x5555578bd848, n=3D0, assign=3Dtrue) at hw/virtio/virtio-bus.c:=
-283
-> #9  0x00005555558ce648 in virtio_blk_data_plane_start
-> (vdev=3D0x5555578bd8c0) at
-> /home/usuario/Documentos/qemu/hw/block/dataplane/virtio-blk.c:200
-> #10 0x0000555555c24af2 in virtio_bus_start_ioeventfd
-> (bus=3D0x5555578bd848) at hw/virtio/virtio-bus.c:223
-> #11 0x0000555555c26e57 in virtio_pci_start_ioeventfd
-> (proxy=3D0x5555578b5750) at hw/virtio/virtio-pci.c:282
-> #12 0x0000555555c29285 in virtio_pci_common_write
-> (opaque=3D0x5555578b5750, addr=3D20, val=3D15, size=3D1) at
-> hw/virtio/virtio-pci.c:1233
-> #13 0x0000555555881ebd in memory_region_write_accessor
-> (mr=3D0x5555578b6120, addr=3D20, value=3D0x7fffc7ffbf38, size=3D1, shif=
-t=3D0,
-> mask=3D255, attrs=3D...) at /home/usuario/Documentos/qemu/memory.c:502
-> #14 0x00005555558820cd in access_with_adjusted_size (addr=3D20,
-> value=3D0x7fffc7ffbf38, size=3D1, access_size_min=3D1, access_size_max=3D=
-4,
-> access_fn=3D0x555555881dd4 <memory_region_write_accessor>,
-> mr=3D0x5555578b6120, attrs=3D...) at /home/usuario/Documentos/qemu/memo=
-ry.c:568
-> #15 0x0000555555885100 in memory_region_dispatch_write
-> (mr=3D0x5555578b6120, addr=3D20, data=3D15, size=3D1, attrs=3D...) at
-> /home/usuario/Documentos/qemu/memory.c:1499
-> #16 0x000055555581bca9 in flatview_write_continue (fv=3D0x7fffcc50f4f0,
-> addr=3D34359738388, attrs=3D..., buf=3D0x7ffff7fee028 "\017", len=3D1, =
-addr1=3D20,
-> l=3D1, mr=3D0x5555578b6120) at /home/usuario/Documentos/qemu/exec.c:323=
-4
-> #17 0x000055555581bdf3 in flatview_write (fv=3D0x7fffcc50f4f0,
-> addr=3D34359738388, attrs=3D..., buf=3D0x7ffff7fee028 "\017", len=3D1) =
-at
-> /home/usuario/Documentos/qemu/exec.c:3273
-> #18 0x000055555581c0f9 in address_space_write (as=3D0x5555567e5a00
-> <address_space_memory>, addr=3D34359738388, attrs=3D..., buf=3D0x7ffff7=
-fee028
-> "\017", len=3D1) at /home/usuario/Documentos/qemu/exec.c:3363
-> #19 0x000055555581c14a in address_space_rw (as=3D0x5555567e5a00
-> <address_space_memory>, addr=3D34359738388, attrs=3D..., buf=3D0x7ffff7=
-fee028
-> "\017", len=3D1, is_write=3Dtrue) at /home/usuario/Documentos/qemu/exec=
-.c:3374
-> #20 0x00005555558a146f in kvm_cpu_exec (cpu=3D0x555556afe140) at
-> /home/usuario/Documentos/qemu/accel/kvm/kvm-all.c:2031
-> #21 0x0000555555865a3e in qemu_kvm_cpu_thread_fn (arg=3D0x555556afe140)=
- at
-> /home/usuario/Documentos/qemu/cpus.c:1281
-> #22 0x0000555555e1ba02 in qemu_thread_start (args=3D0x555556b20440) at
-> util/qemu-thread-posix.c:502
-> #23 0x00007ffff072b6db in start_thread (arg=3D0x7fffc7fff700) at
-> pthread_create.c:463
-> #24 0x00007ffff045488f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
->=20
->=20
-> =C0s 11:36 de 01/02/2019, Dr. David Alan Gilbert escreveu:
-> >=20
-> > Hmm, I'm also getting a crash, but I think it's very different from
-> > yours:
-> >=20
-> > ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=3Dkvm -smp 3 -m 8G -c=
-drom /home/vmimages/neon-useredition-current.iso -drive if=3Dvirtio,file=3D=
-/home/vmimages/kde-neon.qcow2 -vga qxl
-> >=20
-> > kvm_mem_ioeventfd_add: error adding ioeventfd: No space left on devic=
-e
-> > Aborted (core dumped)
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I understand this info is const, so we can move this to the realize()
+function to call it only once. Maybe you can rename it prepare_sfdp() or
+build_sfdp()?
+
+> +
+>      DB_PRINT_L(0, "Reset done.\n");
+>  }
+>  
+> @@ -1049,6 +1101,13 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>          s->state = STATE_READING_DATA;
+>          break;
+>  
+> +    case RDSFPD:
+> +        s->needed_bytes = get_addr_length(s) + 1 ; /* SFPD addr + dummy */
+> +        s->pos = 0;
+> +        s->len = 0;
+> +        s->state = STATE_COLLECTING_DATA;
+> +        break;
+> +
+>      case RDCR:
+>          s->data[0] = s->volatile_cfg & 0xFF;
+>          s->data[0] |= (!!s->four_bytes_address_mode) << 5;
+> @@ -1241,6 +1300,8 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+>          }
+>  
+>          r = s->data[s->pos];
+> +        DB_PRINT_L(1, "READ DATA 0x%" PRIx32 "=%" PRIx8 "\n", s->pos,
+> +                   (uint8_t)r);
+>          s->pos++;
+>          if (s->pos == s->len) {
+>              s->pos = 0;
+> @@ -1249,6 +1310,12 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+>              }
+>          }
+>          break;
+> +    case STATE_READING_SFPD:
+> +        r = s->sfpd_area[s->cur_addr];
+> +        DB_PRINT_L(1, "READ SFPD 0x%" PRIx32 "=%" PRIx8 "\n", s->cur_addr,
+> +                   (uint8_t)r);
+> +        s->cur_addr = (s->cur_addr + 1) & (M25P80_SFPD_AREA_SIZE - 1);
+> +        break;
+>  
+>      default:
+>      case STATE_IDLE:
+> 
