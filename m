@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59021)
+Received: from eggs.gnu.org ([209.51.188.92]:59279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0008Gq-TK
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbML-0008NC-AY
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM9-0003hB-Nc
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35370)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003kI-BF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:55101)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbM9-0003dJ-DA
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:53 -0500
-Received: by mail-wm1-x344.google.com with SMTP id t200so6822773wmt.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:45 -0800 (PST)
+	id 1gpbMA-0003gw-Vf
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:55 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id a62so6651455wmh.4
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:54 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.42
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.51
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:43 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:51 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:44 +0000
-Message-Id: <20190201160653.13829-39-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:51 +0000
+Message-Id: <20190201160653.13829-46-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 38/47] arm: Clarify the logic of set_pc()
+Subject: [Qemu-devel] [PULL 45/47] hw/nvram/nrf51_nvm: Add nRF51
+ non-volatile memories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,163 +37,509 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Julia Suvorova <jusual@mail.ru>
+From: Steffen Görtz <contrib@steffen-goertz.de>
 
-Until now, the set_pc logic was unclear, which raised questions about
-whether it should be used directly, applying a value to PC or adding
-additional checks, for example, set the Thumb bit in Arm cpu. Let's set
-the set_pc logic for “Configure the PC, as was done in the ELF file”
-and implement synchronize_with_tb hook for preserving PC to cpu_tb_exec.
+The nRF51 contains three regions of non-volatile memory (NVM):
+- CODE (R/W): contains code
+- FICR (R): Factory information like code size, chip id etc.
+- UICR (R/W): Changeable configuration data. Lock bits, Code
+  protection configuration, Bootloader address, Nordic SoftRadio
+  configuration, Firmware configuration.
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190129121817.7109-1-jusual@mail.ru
+Read and write access to the memories is managed by the
+Non-volatile memory controller.
+
+Memory schema:
+ [ CPU ] -+- [ NVM, either FICR, UICR or CODE ]
+          |      |
+          \- [ NVMC ]
+
+Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Tested-by: Joel Stanley <joel@jms.id.au>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20190201023357.22596-2-stefanha@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/qom/cpu.h         | 16 ++++++++++++++--
- hw/arm/boot.c             |  4 ----
- target/arm/arm-powerctl.c |  3 ---
- target/arm/cpu.c          | 26 +++++++++++++++++++++++++-
- target/arm/cpu64.c        | 15 ---------------
- 5 files changed, 39 insertions(+), 25 deletions(-)
+ hw/nvram/Makefile.objs       |   1 +
+ include/hw/nvram/nrf51_nvm.h |  64 ++++++
+ hw/nvram/nrf51_nvm.c         | 388 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 453 insertions(+)
+ create mode 100644 include/hw/nvram/nrf51_nvm.h
+ create mode 100644 hw/nvram/nrf51_nvm.c
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 4c2feb9c17b..1d6099e5d4b 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -103,9 +103,21 @@ struct TranslationBlock;
-  * @get_arch_id: Callback for getting architecture-dependent CPU ID.
-  * @get_paging_enabled: Callback for inquiring whether paging is enabled.
-  * @get_memory_mapping: Callback for obtaining the memory mappings.
-- * @set_pc: Callback for setting the Program Counter register.
-+ * @set_pc: Callback for setting the Program Counter register. This
-+ *       should have the semantics used by the target architecture when
-+ *       setting the PC from a source such as an ELF file entry point;
-+ *       for example on Arm it will also set the Thumb mode bit based
-+ *       on the least significant bit of the new PC value.
-+ *       If the target behaviour here is anything other than "set
-+ *       the PC register to the value passed in" then the target must
-+ *       also implement the synchronize_from_tb hook.
-  * @synchronize_from_tb: Callback for synchronizing state from a TCG
-- * #TranslationBlock.
-+ *       #TranslationBlock. This is called when we abandon execution
-+ *       of a TB before starting it, and must set all parts of the CPU
-+ *       state which the previous TB in the chain may not have updated.
-+ *       This always includes at least the program counter; some targets
-+ *       will need to do more. If this hook is not implemented then the
-+ *       default is to call @set_pc(tb->pc).
-  * @handle_mmu_fault: Callback for handling an MMU fault.
-  * @get_phys_page_debug: Callback for obtaining a physical address.
-  * @get_phys_page_attrs_debug: Callback for obtaining a physical address and the
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index c7a67af7a97..05762d0fc1b 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -697,10 +697,6 @@ static void do_cpu_reset(void *opaque)
-                 g_assert_not_reached();
-             }
- 
--            if (!env->aarch64) {
--                env->thumb = info->entry & 1;
--                entry &= 0xfffffffe;
--            }
-             cpu_set_pc(cs, entry);
-         } else {
-             /* If we are booting Linux then we need to check whether we are
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-index 2b856930fb7..f9de5164e55 100644
---- a/target/arm/arm-powerctl.c
-+++ b/target/arm/arm-powerctl.c
-@@ -120,11 +120,8 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
- 
-     if (info->target_aa64) {
-         target_cpu->env.xregs[0] = info->context_id;
--        target_cpu->env.thumb = false;
-     } else {
-         target_cpu->env.regs[0] = info->context_id;
--        target_cpu->env.thumb = info->entry & 1;
--        info->entry &= 0xfffffffe;
-     }
- 
-     /* Start the new CPU at the requested address */
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 8a9cd0900d2..f00d450d0bd 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -40,8 +40,31 @@
- static void arm_cpu_set_pc(CPUState *cs, vaddr value)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
- 
--    cpu->env.regs[15] = value;
-+    if (is_a64(env)) {
-+        env->pc = value;
-+        env->thumb = 0;
-+    } else {
-+        env->regs[15] = value & ~1;
-+        env->thumb = value & 1;
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+index b318e53a434..26f7b4ca357 100644
+--- a/hw/nvram/Makefile.objs
++++ b/hw/nvram/Makefile.objs
+@@ -5,3 +5,4 @@ common-obj-y += fw_cfg.o
+ common-obj-y += chrp_nvram.o
+ common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
+ obj-$(CONFIG_PSERIES) += spapr_nvram.o
++obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
+diff --git a/include/hw/nvram/nrf51_nvm.h b/include/hw/nvram/nrf51_nvm.h
+new file mode 100644
+index 00000000000..3792e4a9fec
+--- /dev/null
++++ b/include/hw/nvram/nrf51_nvm.h
+@@ -0,0 +1,64 @@
++/*
++ * Nordic Semiconductor nRF51 non-volatile memory
++ *
++ * It provides an interface to erase regions in flash memory.
++ * Furthermore it provides the user and factory information registers.
++ *
++ * QEMU interface:
++ * + sysbus MMIO regions 0: NVMC peripheral registers
++ * + sysbus MMIO regions 1: FICR peripheral registers
++ * + sysbus MMIO regions 2: UICR peripheral registers
++ * + flash-size property: flash size in bytes.
++ *
++ * Accuracy of the peripheral model:
++ * + Code regions (MPU configuration) are disregarded.
++ *
++ * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++#ifndef NRF51_NVM_H
++#define NRF51_NVM_H
++
++#include "hw/sysbus.h"
++#define TYPE_NRF51_NVM "nrf51_soc.nvm"
++#define NRF51_NVM(obj) OBJECT_CHECK(NRF51NVMState, (obj), TYPE_NRF51_NVM)
++
++#define NRF51_UICR_FIXTURE_SIZE 64
++
++#define NRF51_NVMC_SIZE         0x1000
++
++#define NRF51_NVMC_READY        0x400
++#define NRF51_NVMC_READY_READY  0x01
++#define NRF51_NVMC_CONFIG       0x504
++#define NRF51_NVMC_CONFIG_MASK  0x03
++#define NRF51_NVMC_CONFIG_WEN   0x01
++#define NRF51_NVMC_CONFIG_EEN   0x02
++#define NRF51_NVMC_ERASEPCR1    0x508
++#define NRF51_NVMC_ERASEPCR0    0x510
++#define NRF51_NVMC_ERASEALL     0x50C
++#define NRF51_NVMC_ERASEUICR    0x514
++#define NRF51_NVMC_ERASE        0x01
++
++#define NRF51_UICR_SIZE         0x100
++
++typedef struct NRF51NVMState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++    MemoryRegion ficr;
++    MemoryRegion uicr;
++    MemoryRegion flash;
++
++    uint32_t uicr_content[NRF51_UICR_FIXTURE_SIZE];
++    uint32_t flash_size;
++    uint8_t *storage;
++
++    uint32_t config;
++
++} NRF51NVMState;
++
++
++#endif
+diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
+new file mode 100644
+index 00000000000..7d94cef1db3
+--- /dev/null
++++ b/hw/nvram/nrf51_nvm.c
+@@ -0,0 +1,388 @@
++/*
++ * Nordic Semiconductor nRF51 non-volatile memory
++ *
++ * It provides an interface to erase regions in flash memory.
++ * Furthermore it provides the user and factory information registers.
++ *
++ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
++ *
++ * See nRF51 reference manual and product sheet sections:
++ * + Non-Volatile Memory Controller (NVMC)
++ * + Factory Information Configuration Registers (FICR)
++ * + User Information Configuration Registers (UICR)
++ *
++ * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/log.h"
++#include "exec/address-spaces.h"
++#include "hw/arm/nrf51.h"
++#include "hw/nvram/nrf51_nvm.h"
++
++/*
++ * FICR Registers Assignments
++ * CODEPAGESIZE      0x010
++ * CODESIZE          0x014
++ * CLENR0            0x028
++ * PPFC              0x02C
++ * NUMRAMBLOCK       0x034
++ * SIZERAMBLOCKS     0x038
++ * SIZERAMBLOCK[0]   0x038
++ * SIZERAMBLOCK[1]   0x03C
++ * SIZERAMBLOCK[2]   0x040
++ * SIZERAMBLOCK[3]   0x044
++ * CONFIGID          0x05C
++ * DEVICEID[0]       0x060
++ * DEVICEID[1]       0x064
++ * ER[0]             0x080
++ * ER[1]             0x084
++ * ER[2]             0x088
++ * ER[3]             0x08C
++ * IR[0]             0x090
++ * IR[1]             0x094
++ * IR[2]             0x098
++ * IR[3]             0x09C
++ * DEVICEADDRTYPE    0x0A0
++ * DEVICEADDR[0]     0x0A4
++ * DEVICEADDR[1]     0x0A8
++ * OVERRIDEEN        0x0AC
++ * NRF_1MBIT[0]      0x0B0
++ * NRF_1MBIT[1]      0x0B4
++ * NRF_1MBIT[2]      0x0B8
++ * NRF_1MBIT[3]      0x0BC
++ * NRF_1MBIT[4]      0x0C0
++ * BLE_1MBIT[0]      0x0EC
++ * BLE_1MBIT[1]      0x0F0
++ * BLE_1MBIT[2]      0x0F4
++ * BLE_1MBIT[3]      0x0F8
++ * BLE_1MBIT[4]      0x0FC
++ */
++static const uint32_t ficr_content[64] = {
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000400,
++    0x00000100, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000002, 0x00002000,
++    0x00002000, 0x00002000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000003,
++    0x12345678, 0x9ABCDEF1, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
++    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
++};
++
++static uint64_t ficr_read(void *opaque, hwaddr offset, unsigned int size)
++{
++    assert(offset < sizeof(ficr_content));
++    return ficr_content[offset / 4];
++}
++
++static void ficr_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned int size)
++{
++    /* Intentionally do nothing */
++}
++
++static const MemoryRegionOps ficr_ops = {
++    .read = ficr_read,
++    .write = ficr_write,
++    .impl.min_access_size = 4,
++    .impl.max_access_size = 4,
++    .endianness = DEVICE_LITTLE_ENDIAN
++};
++
++/*
++ * UICR Registers Assignments
++ * CLENR0           0x000
++ * RBPCONF          0x004
++ * XTALFREQ         0x008
++ * FWID             0x010
++ * BOOTLOADERADDR   0x014
++ * NRFFW[0]         0x014
++ * NRFFW[1]         0x018
++ * NRFFW[2]         0x01C
++ * NRFFW[3]         0x020
++ * NRFFW[4]         0x024
++ * NRFFW[5]         0x028
++ * NRFFW[6]         0x02C
++ * NRFFW[7]         0x030
++ * NRFFW[8]         0x034
++ * NRFFW[9]         0x038
++ * NRFFW[10]        0x03C
++ * NRFFW[11]        0x040
++ * NRFFW[12]        0x044
++ * NRFFW[13]        0x048
++ * NRFFW[14]        0x04C
++ * NRFHW[0]         0x050
++ * NRFHW[1]         0x054
++ * NRFHW[2]         0x058
++ * NRFHW[3]         0x05C
++ * NRFHW[4]         0x060
++ * NRFHW[5]         0x064
++ * NRFHW[6]         0x068
++ * NRFHW[7]         0x06C
++ * NRFHW[8]         0x070
++ * NRFHW[9]         0x074
++ * NRFHW[10]        0x078
++ * NRFHW[11]        0x07C
++ * CUSTOMER[0]      0x080
++ * CUSTOMER[1]      0x084
++ * CUSTOMER[2]      0x088
++ * CUSTOMER[3]      0x08C
++ * CUSTOMER[4]      0x090
++ * CUSTOMER[5]      0x094
++ * CUSTOMER[6]      0x098
++ * CUSTOMER[7]      0x09C
++ * CUSTOMER[8]      0x0A0
++ * CUSTOMER[9]      0x0A4
++ * CUSTOMER[10]     0x0A8
++ * CUSTOMER[11]     0x0AC
++ * CUSTOMER[12]     0x0B0
++ * CUSTOMER[13]     0x0B4
++ * CUSTOMER[14]     0x0B8
++ * CUSTOMER[15]     0x0BC
++ * CUSTOMER[16]     0x0C0
++ * CUSTOMER[17]     0x0C4
++ * CUSTOMER[18]     0x0C8
++ * CUSTOMER[19]     0x0CC
++ * CUSTOMER[20]     0x0D0
++ * CUSTOMER[21]     0x0D4
++ * CUSTOMER[22]     0x0D8
++ * CUSTOMER[23]     0x0DC
++ * CUSTOMER[24]     0x0E0
++ * CUSTOMER[25]     0x0E4
++ * CUSTOMER[26]     0x0E8
++ * CUSTOMER[27]     0x0EC
++ * CUSTOMER[28]     0x0F0
++ * CUSTOMER[29]     0x0F4
++ * CUSTOMER[30]     0x0F8
++ * CUSTOMER[31]     0x0FC
++ */
++
++static uint64_t uicr_read(void *opaque, hwaddr offset, unsigned int size)
++{
++    NRF51NVMState *s = NRF51_NVM(opaque);
++
++    assert(offset < sizeof(s->uicr_content));
++    return s->uicr_content[offset / 4];
++}
++
++static void uicr_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned int size)
++{
++    NRF51NVMState *s = NRF51_NVM(opaque);
++
++    assert(offset < sizeof(s->uicr_content));
++    s->uicr_content[offset / 4] = value;
++}
++
++static const MemoryRegionOps uicr_ops = {
++    .read = uicr_read,
++    .write = uicr_write,
++    .impl.min_access_size = 4,
++    .impl.max_access_size = 4,
++    .endianness = DEVICE_LITTLE_ENDIAN
++};
++
++
++static uint64_t io_read(void *opaque, hwaddr offset, unsigned int size)
++{
++    NRF51NVMState *s = NRF51_NVM(opaque);
++    uint64_t r = 0;
++
++    switch (offset) {
++    case NRF51_NVMC_READY:
++        r = NRF51_NVMC_READY_READY;
++        break;
++    case NRF51_NVMC_CONFIG:
++        r = s->config;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: bad read offset 0x%" HWADDR_PRIx "\n", __func__, offset);
++        break;
++    }
++
++    return r;
++}
++
++static void io_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned int size)
++{
++    NRF51NVMState *s = NRF51_NVM(opaque);
++
++    switch (offset) {
++    case NRF51_NVMC_CONFIG:
++        s->config = value & NRF51_NVMC_CONFIG_MASK;
++        break;
++    case NRF51_NVMC_ERASEPCR0:
++    case NRF51_NVMC_ERASEPCR1:
++        if (s->config & NRF51_NVMC_CONFIG_EEN) {
++            /* Mask in-page sub address */
++            value &= ~(NRF51_PAGE_SIZE - 1);
++            if (value <= (s->flash_size - NRF51_PAGE_SIZE)) {
++                memset(s->storage + value, 0xFF, NRF51_PAGE_SIZE);
++                memory_region_flush_rom_device(&s->flash, value,
++                                               NRF51_PAGE_SIZE);
++            }
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++            "%s: Flash erase at 0x%" HWADDR_PRIx" while flash not erasable.\n",
++            __func__, offset);
++        }
++        break;
++    case NRF51_NVMC_ERASEALL:
++        if (value == NRF51_NVMC_ERASE) {
++            if (s->config & NRF51_NVMC_CONFIG_EEN) {
++                memset(s->storage, 0xFF, s->flash_size);
++                memory_region_flush_rom_device(&s->flash, 0, s->flash_size);
++                memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
++            } else {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash not erasable.\n",
++                              __func__);
++            }
++        }
++        break;
++    case NRF51_NVMC_ERASEUICR:
++        if (value == NRF51_NVMC_ERASE) {
++            memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
++        }
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: bad write offset 0x%" HWADDR_PRIx "\n", __func__, offset);
 +    }
 +}
 +
-+static void arm_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
++static const MemoryRegionOps io_ops = {
++        .read = io_read,
++        .write = io_write,
++        .impl.min_access_size = 4,
++        .impl.max_access_size = 4,
++        .endianness = DEVICE_LITTLE_ENDIAN,
++};
 +
-+    /*
-+     * It's OK to look at env for the current mode here, because it's
-+     * never possible for an AArch64 TB to chain to an AArch32 TB.
-+     */
-+    if (is_a64(env)) {
-+        env->pc = tb->pc;
++
++static void flash_write(void *opaque, hwaddr offset, uint64_t value,
++        unsigned int size)
++{
++    NRF51NVMState *s = NRF51_NVM(opaque);
++
++    if (s->config & NRF51_NVMC_CONFIG_WEN) {
++        uint32_t oldval;
++
++        assert(offset + size <= s->flash_size);
++
++        /* NOR Flash only allows bits to be flipped from 1's to 0's on write */
++        oldval = ldl_le_p(s->storage + offset);
++        oldval &= value;
++        stl_le_p(s->storage + offset, oldval);
++
++        memory_region_flush_rom_device(&s->flash, offset, size);
 +    } else {
-+        env->regs[15] = tb->pc;
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: Flash write 0x%" HWADDR_PRIx" while flash not writable.\n",
++                __func__, offset);
 +    }
- }
- 
- static bool arm_cpu_has_work(CPUState *cs)
-@@ -2099,6 +2122,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
-     cc->cpu_exec_interrupt = arm_cpu_exec_interrupt;
-     cc->dump_state = arm_cpu_dump_state;
-     cc->set_pc = arm_cpu_set_pc;
-+    cc->synchronize_from_tb = arm_cpu_synchronize_from_tb;
-     cc->gdb_read_register = arm_cpu_gdb_read_register;
-     cc->gdb_write_register = arm_cpu_gdb_write_register;
- #ifdef CONFIG_USER_ONLY
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index e9bc461c362..8653cecd032 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -480,20 +480,6 @@ static void aarch64_cpu_finalizefn(Object *obj)
- {
- }
- 
--static void aarch64_cpu_set_pc(CPUState *cs, vaddr value)
--{
--    ARMCPU *cpu = ARM_CPU(cs);
--    /* It's OK to look at env for the current mode here, because it's
--     * never possible for an AArch64 TB to chain to an AArch32 TB.
--     * (Otherwise we would need to use synchronize_from_tb instead.)
--     */
--    if (is_a64(&cpu->env)) {
--        cpu->env.pc = value;
--    } else {
--        cpu->env.regs[15] = value;
--    }
--}
--
- static gchar *aarch64_gdb_arch_name(CPUState *cs)
- {
-     return g_strdup("aarch64");
-@@ -504,7 +490,6 @@ static void aarch64_cpu_class_init(ObjectClass *oc, void *data)
-     CPUClass *cc = CPU_CLASS(oc);
- 
-     cc->cpu_exec_interrupt = arm_cpu_exec_interrupt;
--    cc->set_pc = aarch64_cpu_set_pc;
-     cc->gdb_read_register = aarch64_cpu_gdb_read_register;
-     cc->gdb_write_register = aarch64_cpu_gdb_write_register;
-     cc->gdb_num_core_regs = 34;
++}
++
++
++
++static const MemoryRegionOps flash_ops = {
++    .write = flash_write,
++    .valid.min_access_size = 4,
++    .valid.max_access_size = 4,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
++static void nrf51_nvm_init(Object *obj)
++{
++    NRF51NVMState *s = NRF51_NVM(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->mmio, obj, &io_ops, s, "nrf51_soc.nvmc",
++                          NRF51_NVMC_SIZE);
++    sysbus_init_mmio(sbd, &s->mmio);
++
++    memory_region_init_io(&s->ficr, obj, &ficr_ops, s, "nrf51_soc.ficr",
++                          sizeof(ficr_content));
++    sysbus_init_mmio(sbd, &s->ficr);
++
++    memory_region_init_io(&s->uicr, obj, &uicr_ops, s, "nrf51_soc.uicr",
++                          sizeof(s->uicr_content));
++    sysbus_init_mmio(sbd, &s->uicr);
++}
++
++static void nrf51_nvm_realize(DeviceState *dev, Error **errp)
++{
++    NRF51NVMState *s = NRF51_NVM(dev);
++    Error *err = NULL;
++
++    memory_region_init_rom_device(&s->flash, OBJECT(dev), &flash_ops, s,
++        "nrf51_soc.flash", s->flash_size, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    s->storage = memory_region_get_ram_ptr(&s->flash);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->flash);
++}
++
++static void nrf51_nvm_reset(DeviceState *dev)
++{
++    NRF51NVMState *s = NRF51_NVM(dev);
++
++    s->config = 0x00;
++    memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
++}
++
++static Property nrf51_nvm_properties[] = {
++    DEFINE_PROP_UINT32("flash-size", NRF51NVMState, flash_size, 0x40000),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static const VMStateDescription vmstate_nvm = {
++    .name = "nrf51_soc.nvm",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(uicr_content, NRF51NVMState,
++                NRF51_UICR_FIXTURE_SIZE),
++        VMSTATE_UINT32(config, NRF51NVMState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void nrf51_nvm_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->props = nrf51_nvm_properties;
++    dc->vmsd = &vmstate_nvm;
++    dc->realize = nrf51_nvm_realize;
++    dc->reset = nrf51_nvm_reset;
++}
++
++static const TypeInfo nrf51_nvm_info = {
++    .name = TYPE_NRF51_NVM,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(NRF51NVMState),
++    .instance_init = nrf51_nvm_init,
++    .class_init = nrf51_nvm_class_init
++};
++
++static void nrf51_nvm_register_types(void)
++{
++    type_register_static(&nrf51_nvm_info);
++}
++
++type_init(nrf51_nvm_register_types)
 -- 
 2.20.1
