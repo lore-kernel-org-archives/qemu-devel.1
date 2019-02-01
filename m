@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47689)
+Received: from eggs.gnu.org ([209.51.188.92]:47686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeXZ-0007Hi-Bc
+	(envelope-from <mreitz@redhat.com>) id 1gpeXZ-0007Hh-91
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeXW-0003MY-9r
+	(envelope-from <mreitz@redhat.com>) id 1gpeXV-0003Kg-7c
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:53 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  1 Feb 2019 20:29:27 +0100
-Message-Id: <20190201192935.18394-24-mreitz@redhat.com>
+Date: Fri,  1 Feb 2019 20:29:35 +0100
+Message-Id: <20190201192935.18394-32-mreitz@redhat.com>
 In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 References: <20190201192935.18394-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 23/31] block: Generically refresh runtime
- options
+Subject: [Qemu-devel] [PATCH v13 31/31] iotests: Test json:{} filenames of
+ internal BDSs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,227 +25,225 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Instead of having every block driver which implements
-bdrv_refresh_filename() copy all of the strong runtime options over to
-bs->full_open_options, implement this process generically in
-bdrv_refresh_filename().
-
-This patch only adds this new generic implementation, it does not remove
-the old functionality. This is done in a follow-up patch.
-
-With this patch, some superfluous information (that should never have
-been there) may be removed from some JSON filenames, as can be seen in
-the change to iotests 110's and 228's reference outputs.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                    | 116 ++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/110.out |   2 +-
- tests/qemu-iotests/228     |   7 ++-
- tests/qemu-iotests/228.out |   2 +-
- 4 files changed, 121 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/224     | 139 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/224.out |  18 +++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 158 insertions(+)
+ create mode 100755 tests/qemu-iotests/224
+ create mode 100644 tests/qemu-iotests/224.out
 
-diff --git a/block.c b/block.c
-index 05135152d5..f7a0c78697 100644
---- a/block.c
-+++ b/block.c
-@@ -5474,6 +5474,92 @@ out:
-     return to_replace_bs;
- }
-=20
-+/**
-+ * Iterates through the list of runtime option keys that are said to
-+ * be "strong" for a BDS.  An option is called "strong" if it changes
-+ * a BDS's data.  For example, the null block driver's "size" and
-+ * "read-zeroes" options are strong, but its "latency-ns" option is
-+ * not.
-+ *
-+ * If a key returned by this function ends with a dot, all options
-+ * starting with that prefix are strong.
-+ */
-+static const char *const *strong_options(BlockDriverState *bs,
-+                                         const char *const *curopt)
-+{
-+    static const char *const global_options[] =3D {
-+        "driver", "filename", NULL
-+    };
+diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
+new file mode 100755
+index 0000000000..b4dfaa639f
+--- /dev/null
++++ b/tests/qemu-iotests/224
+@@ -0,0 +1,139 @@
++#!/usr/bin/env python
++#
++# Test json:{} filenames with qemu-internal BDSs
++# (the one of commit, to be precise)
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# Creator/Owner: Max Reitz <mreitz@redhat.com>
 +
-+    if (!curopt) {
-+        return &global_options[0];
-+    }
++import iotests
++from iotests import log, qemu_img, qemu_io_silent, filter_qmp_testfiles,=
+ \
++                    filter_qmp_imgfmt
++import json
 +
-+    curopt++;
-+    if (curopt =3D=3D &global_options[ARRAY_SIZE(global_options) - 1] &&=
- bs->drv) {
-+        curopt =3D bs->drv->strong_runtime_opts;
-+    }
++# Need backing file support (for arbitrary backing formats)
++iotests.verify_image_format(supported_fmts=3D['qcow2', 'qcow', 'qed'])
++iotests.verify_platform(['linux'])
 +
-+    return (curopt && *curopt) ? curopt : NULL;
-+}
 +
-+/**
-+ * Copies all strong runtime options from bs->options to the given
-+ * QDict.  The set of strong option keys is determined by invoking
-+ * strong_options().
-+ *
-+ * Returns true iff any strong option was present in bs->options (and
-+ * thus copied to the target QDict) with the exception of "filename"
-+ * and "driver".  The caller is expected to use this value to decide
-+ * whether the existence of strong options prevents the generation of
-+ * a plain filename.
-+ */
-+static bool append_strong_runtime_options(QDict *d, BlockDriverState *bs=
-)
-+{
-+    bool found_any =3D false;
-+    const char *const *option_name =3D NULL;
++# There are two variations of this test:
++# (1) We do not set filter_node_name.  In that case, the commit_top
++#     driver should not appear anywhere.
++# (2) We do set filter_node_name.  In that case, it should appear.
++#
++# This for loop executes both.
++for filter_node_name in False, True:
++    log('')
++    log('--- filter_node_name: %s ---' % filter_node_name)
++    log('')
 +
-+    if (!bs->drv) {
-+        return false;
-+    }
++    with iotests.FilePath('base.img') as base_img_path, \
++         iotests.FilePath('mid.img') as mid_img_path, \
++         iotests.FilePath('top.img') as top_img_path, \
++         iotests.VM() as vm:
 +
-+    while ((option_name =3D strong_options(bs, option_name))) {
-+        bool option_given =3D false;
++        assert qemu_img('create', '-f', iotests.imgfmt,
++                        base_img_path, '64M') =3D=3D 0
++        assert qemu_img('create', '-f', iotests.imgfmt, '-b', base_img_p=
+ath,
++                        mid_img_path) =3D=3D 0
++        assert qemu_img('create', '-f', iotests.imgfmt, '-b', mid_img_pa=
+th,
++                        top_img_path) =3D=3D 0
 +
-+        assert(strlen(*option_name) > 0);
-+        if ((*option_name)[strlen(*option_name) - 1] !=3D '.') {
-+            QObject *entry =3D qdict_get(bs->options, *option_name);
-+            if (!entry) {
-+                continue;
-+            }
++        # Something to commit
++        assert qemu_io_silent(mid_img_path, '-c', 'write -P 1 0 1M') =3D=
+=3D 0
 +
-+            qdict_put_obj(d, *option_name, qobject_ref(entry));
-+            option_given =3D true;
-+        } else {
-+            const QDictEntry *entry;
-+            for (entry =3D qdict_first(bs->options); entry;
-+                 entry =3D qdict_next(bs->options, entry))
-+            {
-+                if (strstart(qdict_entry_key(entry), *option_name, NULL)=
-) {
-+                    qdict_put_obj(d, qdict_entry_key(entry),
-+                                  qobject_ref(qdict_entry_value(entry)))=
-;
-+                    option_given =3D true;
-+                }
-+            }
-+        }
++        vm.launch()
 +
-+        /* While "driver" and "filename" need to be included in a JSON f=
-ilename,
-+         * their existence does not prohibit generation of a plain filen=
-ame. */
-+        if (!found_any && option_given &&
-+            strcmp(*option_name, "driver") && strcmp(*option_name, "file=
-name"))
-+        {
-+            found_any =3D true;
-+        }
-+    }
++        # Change the bottom-most image's backing file (to null-co://)
++        # to enforce json:{} filenames
++        vm.qmp_log('blockdev-add',
++                    node_name=3D'top',
++                    driver=3Diotests.imgfmt,
++                    file=3D{
++                        'driver': 'file',
++                        'filename': top_img_path
++                    },
++                    backing=3D{
++                        'node-name': 'mid',
++                        'driver': iotests.imgfmt,
++                        'file': {
++                            'driver': 'file',
++                            'filename': mid_img_path
++                        },
++                        'backing': {
++                            'node-name': 'base',
++                            'driver': iotests.imgfmt,
++                            'file': {
++                                'driver': 'file',
++                                'filename': base_img_path
++                            },
++                            'backing': {
++                                'driver': 'null-co'
++                            }
++                        }
++                    },
++                    filters=3D[filter_qmp_testfiles, filter_qmp_imgfmt])
 +
-+    return found_any;
-+}
++        # As long as block-commit does not accept node names, we have to
++        # get our mid/base filenames here
++        mid_name =3D vm.node_info('mid')['image']['filename']
++        base_name =3D vm.node_info('base')['image']['filename']
 +
- static bool append_open_options(QDict *d, BlockDriverState *bs)
- {
-     const QDictEntry *entry;
-@@ -5650,9 +5736,37 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-         bs->full_open_options =3D opts;
-     }
-=20
-+    /* Gather the options QDict */
-+    opts =3D qdict_new();
-+    append_strong_runtime_options(opts, bs);
++        assert mid_name[:5] =3D=3D 'json:'
++        assert base_name[:5] =3D=3D 'json:'
 +
-+    if (drv->bdrv_gather_child_options) {
-+        /* Some block drivers may not want to present all of their child=
-ren's
-+         * options, or name them differently from BdrvChild.name */
-+        drv->bdrv_gather_child_options(bs, opts, backing_overridden);
-+    } else {
-+        QLIST_FOREACH(child, &bs->children, next) {
-+            if (child->role =3D=3D &child_backing && !backing_overridden=
-) {
-+                /* We can skip the backing BDS if it has not been overri=
-dden */
-+                continue;
-+            }
++        # Start the block job
++        if filter_node_name:
++            vm.qmp_log('block-commit',
++                        job_id=3D'commit',
++                        device=3D'top',
++                        filter_node_name=3D'filter_node',
++                        top=3Dmid_name,
++                        base=3Dbase_name,
++                        speed=3D1,
++                        filters=3D[filter_qmp_testfiles, filter_qmp_imgf=
+mt])
++        else:
++            vm.qmp_log('block-commit',
++                        job_id=3D'commit',
++                        device=3D'top',
++                        top=3Dmid_name,
++                        base=3Dbase_name,
++                        speed=3D1,
++                        filters=3D[filter_qmp_testfiles, filter_qmp_imgf=
+mt])
 +
-+            qdict_put(opts, child->name,
-+                      qobject_ref(child->bs->full_open_options));
-+        }
++        vm.qmp_log('job-pause', id=3D'commit')
 +
-+        if (backing_overridden && !bs->backing) {
-+            /* Force no backing file */
-+            qdict_put_null(opts, "backing");
-+        }
-+    }
++        # Get and parse top's json:{} filename
++        top_name =3D vm.node_info('top')['image']['filename']
 +
-+    qobject_unref(bs->full_open_options);
-+    bs->full_open_options =3D opts;
++        vm.shutdown()
 +
-     if (bs->exact_filename[0]) {
-         pstrcpy(bs->filename, sizeof(bs->filename), bs->exact_filename);
--    } else if (bs->full_open_options) {
-+    } else {
-         QString *json =3D qobject_to_json(QOBJECT(bs->full_open_options)=
-);
-         snprintf(bs->filename, sizeof(bs->filename), "json:%s",
-                  qstring_get_str(json));
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 1d0b2475cc..46e6a60510 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D671=
-08864 backing_file=3Dt.IMGFMT.b
-=20
- =3D=3D=3D Nodes without a common directory =3D=3D=3D
-=20
--image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
-, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-co=
-rrupted": false, "vote-threshold": 1}}
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
-, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
-DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-threshold": 1}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
- backing file: t.IMGFMT.base (cannot determine actual path)
-diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
-index 2930f8442c..7a57c41e29 100755
---- a/tests/qemu-iotests/228
-+++ b/tests/qemu-iotests/228
-@@ -230,9 +230,10 @@ with iotests.FilePath('base.img') as base_img_path, =
-\
-                overlay=3D'node0')
-=20
-     # This should give us the original plain result
--    # FIXME: Currently, the block layer considers the runtime backing
--    #        file to be different from the image header, which is
--    #        wrong.  This is fixed by a future patch.
-+    # FIXME: Currently, it yields a json:{} filename even though it
-+    #        only contains a @driver and a @file entry, so a plain
-+    #        filename would obviously suffice.  This is fixed by a
-+    #        future patch.
-=20
-     log_node_info(vm.node_info('node0'))
-=20
-diff --git a/tests/qemu-iotests/228.out b/tests/qemu-iotests/228.out
-index 57fe97d4bc..393ab09164 100644
---- a/tests/qemu-iotests/228.out
-+++ b/tests/qemu-iotests/228.out
-@@ -74,7 +74,7 @@ bs->backing: (none)
- {"execute": "blockdev-snapshot", "arguments": {"node": "original-backing=
-", "overlay": "node0"}}
- {"return": {}}
-=20
--bs->filename: json:{"backing": {"driver": "IMGFMT", "file": {"driver": "=
-file", "filename": "TEST_DIR/PID-base.img"}}, "driver": "IMGFMT", "file":=
- {"driver": "file", "filename": "TEST_DIR/PID-top.img"}}
-+bs->filename: json:{"driver": "IMGFMT", "file": {"driver": "file", "file=
-name": "TEST_DIR/PID-top.img"}}
- bs->backing_file: TEST_DIR/PID-base.img
- bs->backing->bs->filename: TEST_DIR/PID-base.img
-=20
++        assert top_name[:5] =3D=3D 'json:'
++        top_options =3D json.loads(top_name[5:])
++
++        if filter_node_name:
++            # This should be present and set
++            assert top_options['backing']['driver'] =3D=3D 'commit_top'
++            # And the mid image is commit_top's backing image
++            mid_options =3D top_options['backing']['backing']
++        else:
++            # The mid image should appear as the immediate backing BDS
++            # of top
++            mid_options =3D top_options['backing']
++
++        assert mid_options['driver'] =3D=3D iotests.imgfmt
++        assert mid_options['file']['filename'] =3D=3D mid_img_path
+diff --git a/tests/qemu-iotests/224.out b/tests/qemu-iotests/224.out
+new file mode 100644
+index 0000000000..23374a1d29
+--- /dev/null
++++ b/tests/qemu-iotests/224.out
+@@ -0,0 +1,18 @@
++
++--- filter_node_name: False ---
++
++{"execute": "blockdev-add", "arguments": {"backing": {"backing": {"backi=
+ng": {"driver": "null-co"}, "driver": "IMGFMT", "file": {"driver": "file"=
+, "filename": "TEST_DIR/PID-base.img"}, "node-name": "base"}, "driver": "=
+IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-mid.img"}, =
+"node-name": "mid"}, "driver": "IMGFMT", "file": {"driver": "file", "file=
+name": "TEST_DIR/PID-top.img"}, "node-name": "top"}}
++{"return": {}}
++{"execute": "block-commit", "arguments": {"base": "json:{\"backing\": {\=
+"driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \=
+"file\", \"filename\": \"TEST_DIR/PID-base.img\"}}", "device": "top", "jo=
+b-id": "commit", "speed": 1, "top": "json:{\"backing\": {\"backing\": {\"=
+driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \"=
+file\", \"filename\": \"TEST_DIR/PID-base.img\"}}, \"driver\": \"IMGFMT\"=
+, \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/PID-mid.img\"=
+}}"}}
++{"return": {}}
++{"execute": "job-pause", "arguments": {"id": "commit"}}
++{"return": {}}
++
++--- filter_node_name: True ---
++
++{"execute": "blockdev-add", "arguments": {"backing": {"backing": {"backi=
+ng": {"driver": "null-co"}, "driver": "IMGFMT", "file": {"driver": "file"=
+, "filename": "TEST_DIR/PID-base.img"}, "node-name": "base"}, "driver": "=
+IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/PID-mid.img"}, =
+"node-name": "mid"}, "driver": "IMGFMT", "file": {"driver": "file", "file=
+name": "TEST_DIR/PID-top.img"}, "node-name": "top"}}
++{"return": {}}
++{"execute": "block-commit", "arguments": {"base": "json:{\"backing\": {\=
+"driver\": \"null-co\"}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \=
+"file\", \"filename\": \"TEST_DIR/PID-base.img\"}}", "device": "top", "fi=
+lter-node-name": "filter_node", "job-id": "commit", "speed": 1, "top": "j=
+son:{\"backing\": {\"backing\": {\"driver\": \"null-co\"}, \"driver\": \"=
+IMGFMT\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/PID-b=
+ase.img\"}}, \"driver\": \"IMGFMT\", \"file\": {\"driver\": \"file\", \"f=
+ilename\": \"TEST_DIR/PID-mid.img\"}}"}}
++{"return": {}}
++{"execute": "job-pause", "arguments": {"id": "commit"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 88a20fd17a..c4257152c5 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -224,6 +224,7 @@
+ 221 rw auto quick
+ 222 rw auto quick
+ 223 rw auto quick
++224 rw auto quick
+ 225 rw auto quick
+ 226 auto quick
+ 227 auto quick
 --=20
 2.20.1
