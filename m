@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50796)
+Received: from eggs.gnu.org ([209.51.188.92]:50889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcSw-0000wG-EE
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:18:59 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gpcT7-00017U-N5
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcSu-0002jG-GL
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:18:58 -0500
-Resent-Message-Id: <E1gpcSu-0002jG-GL@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpcSs-0002hb-DQ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:18:56 -0500
-Message-ID: <154904149289.29184.14869488787892446733@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <sgarzare@redhat.com>) id 1gpcT6-0002oh-TY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:09 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:34825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gpcT6-0002mo-Mm
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:08 -0500
+Received: by mail-oi1-f193.google.com with SMTP id v6so6436192oif.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:19:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:18:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-3-sgarzare@redhat.com>
+	<20190201101604-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190201101604-mutt-send-email-mst@kernel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 1 Feb 2019 18:18:52 +0100
+Message-ID: <CAGxU2F50t=OeuoJMn7q7iDYyy+mc=3vz7V8dVe77KtOu1hKHyw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
-YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpNZXNzYWdlLWlkOiAyMDE5MDIw
-MTE0NTAzNS4yMjczOS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
-aGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBh
-dGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3Vi
-bW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQp
-IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8v
-Z2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1v
-ZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11
-TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMn
-ClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0
-KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAo
-aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1
-Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
-bmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1
-Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVt
-dS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1
-Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3Mu
-Z2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMv
-c2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXRodWIuY29tL2hkZWxsZXIvc2VhYmlvcy1ocHBhLmdp
-dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zLWhwcGEnClN1Ym1vZHVsZSAncm9t
-cy9zZ2FiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NnYWJpb3MuZ2l0KSByZWdpc3Rl
-cmVkIGZvciBwYXRoICdyb21zL3NnYWJpb3MnClN1Ym1vZHVsZSAncm9tcy9za2lib290JyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NraWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
-b21zL3NraWJvb3QnClN1Ym1vZHVsZSAncm9tcy91LWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9y
-Zy9naXQvdS1ib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3QnClN1Ym1v
-ZHVsZSAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1i
-b290LXNhbTQ2MGV4LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYw
-ZXgnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dp
-dGh1Yi5jb20vY290YS9iZXJrZWxleS1zb2Z0ZmxvYXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
-dGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2Vs
-ZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdGh1Yi5jb20vY290YS9iZXJrZWxleS10ZXN0Zmxv
-YXQtMykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMn
-ClN1Ym1vZHVsZSAndWkva2V5Y29kZW1hcGRiJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2tl
-eWNvZGVtYXBkYi5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3VpL2tleWNvZGVtYXBkYicKQ2xv
-bmluZyBpbnRvICdjYXBzdG9uZScuLi4KU3VibW9kdWxlIHBhdGggJ2NhcHN0b25lJzogY2hlY2tl
-ZCBvdXQgJzIyZWFkM2UwYmZkYjg3NTE2NjU2NDUzMzM2MTYwZTBhMzdiMDY2YmYnCkNsb25pbmcg
-aW50byAnZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAnZHRjJzogY2hlY2tlZCBvdXQgJzg4ZjE4OTA5
-ZGI3MzFhNjI3NDU2ZjI2ZDc3OTQ0NWY4NGU0NDk1MzYnCkNsb25pbmcgaW50byAncm9tcy9RZW11
-TWFjRHJpdmVycycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnOiBjaGVj
-a2VkIG91dCAnZDRlN2Q3YWM2NjNmY2I1NWYxYjkzNTc1NDQ1ZmNiY2EzNzJmMTdhNycKQ2xvbmlu
-ZyBpbnRvICdyb21zL1NMT0YnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1NMT0YnOiBjaGVja2Vk
-IG91dCAnOWI3YWIyZmEwMjAzNDFkZWU4YmY5ZGY2YzljZjQwMDAzZTAxMzZkZicKQ2xvbmluZyBp
-bnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91
-dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRv
-ICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNr
-ZWQgb3V0ICc0NDFhODRkM2E2NDJhMTBiOTQ4MzY5YzYzZjMyMzY3ZThmZjYzOTViJwpDbG9uaW5n
-IGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFj
-a3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1
-NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJzUxYzIzN2Q3ZTIwZDA1MTAwZWFjYWRl
-ZTJmNjFhYmMxN2U2YmMwOTcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1
-bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E2OThjODk5NWZmYjI4MzgyOTZl
-YzI4NGZlM2M0YWQzM2RmY2EzMDcnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4u
-ClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcxZWY5OWEw
-MTU3MmMyNTgxYzMwZTE2ZTZmZTY5ZTllYTJlZjkyY2UwJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dh
-YmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFl
-ZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMv
-c2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICdl
-MGVlMjRjMjdhMTcyYmNmNDgyZjZmMmJjOTA1ZTYyMTFjMTM0YmNjJwpDbG9uaW5nIGludG8gJ3Jv
-bXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAn
-ZDg1Y2EwMjlmMjU3YjUzYTk2ZGE2YzJmYjQyMWU3OGEwMDNhOTk0MycKQ2xvbmluZyBpbnRvICdy
-b21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2
-MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1
-ODgnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1v
-ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdi
-NjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rl
-c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAv
-YmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFh
-MTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRvICd1aS9rZXljb2RlbWFwZGInLi4uClN1
-Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBjaGVja2VkIG91dCAnNmIzZDcxNmUyYjY0
-NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo1MGEwZjBkIGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbgo3
-YjVmYThkIE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBj
-b2RlCmU5NTY2ZWMgTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9j
-dW1lbnRhdGlvbgowOGRlODYxIFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdh
-bnQKNDI4MDZjNSBkb2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmU1MGExMDYg
-ZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQKMmUx
-YTY1MCBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUKMTRiN2Ix
-OCBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5CmQ5OTFiNDUg
-ZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydAo0ZjQyOWNk
-IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0CjU2ZjhlNGEgZG9jcy9jcHUt
-aG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-MS8xMSBDaGVja2luZyBjb21taXQgNTZmOGU0YTZjNzA4IChkb2NzL2NwdS1ob3RwbHVnLnJzdDog
-Rml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNraW5nIGNvbW1pdCA0ZjQyOWNkZGY0MjEg
-KGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwg
-bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
-CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVtb3J5LnR4dAoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMSBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1pdCBkOTkxYjQ1MDZiODYgKGRvY3M6IENv
-bW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQpCkVSUk9SOiBNaXNzaW5n
-IFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTg4
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQv
-MTEgQ2hlY2tpbmcgY29tbWl0IDE0YjdiMThiNzBjMyAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVu
-dXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgMmUxYTY1MDIyYmMx
-IChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYvMTEgQ2hl
-Y2tpbmcgY29tbWl0IGU1MGExMDZkN2RjNSAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJT
-VCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDQyODA2YzUwZTI0
-OCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVja2luZyBj
-b21taXQgMDhkZTg2MTczYjJlIChTZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3
-YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE2MDogRklMRTogZG9jcy9pbnRl
-cm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10gPSB1J1N5
-c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlkZScKCkVS
-Uk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9ycywgMCB3
-YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IGU5NTY2ZWNiYThlZCAoTWFrZWZpbGUsIGNv
-bmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tp
-bmcgY29tbWl0IDdiNWZhOGQ5NTM4NCAoTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRpZnkg
-dGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNraW5nIGNvbW1pdCA1MGEwZjBkNWNlMmQg
-KGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExNDUwMzUuMjI3
-MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1l
-c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+On Fri, Feb 1, 2019 at 4:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
+> > In order to avoid migration issues, we enable DISCARD and
+> > WRITE ZEROES features only for machine type >= 4.0
+> >
+> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  hw/block/virtio-blk.c          | 2 ++
+> >  hw/core/machine.c              | 1 +
+> >  include/hw/virtio/virtio-blk.h | 1 +
+> >  3 files changed, 4 insertions(+)
+> >
+> > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > index 8a6754d9a2..542ec52536 100644
+> > --- a/hw/block/virtio-blk.c
+> > +++ b/hw/block/virtio-blk.c
+> > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
+> >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+> >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+> >                       IOThread *),
+> > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
+> > +                     true),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+>
+> Thinking about it, are there security implications for discard?
+> Should we make it default false?
+
+Hi Michael,
+
+I'm not completely sure but if the guest can write on a specific sector,
+discard or write_zeroes operations should not have a security implication.
+
+Do I miss something?
+
+Thanks,
+Stefano
