@@ -1,14 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35330)
+Received: from eggs.gnu.org ([209.51.188.92]:36797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gpYCc-000206-Mr
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:45:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpYIG-0004Q3-J5
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:51:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gpYCb-0003mj-R9
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:45:50 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  1 Feb 2019 13:45:43 +0100
-Message-Id: <20190201124543.5945-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH] s390x/pci: mark zpci devices as unmigratable
+	(envelope-from <kwolf@redhat.com>) id 1gpYIF-0007Di-HF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:51:40 -0500
+Date: Fri, 1 Feb 2019 13:51:20 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190201125120.GF5730@localhost.localdomain>
+References: <20190125174653.4604-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190125174653.4604-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] scsi-disk: Device Identification fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,55 +22,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+To: qemu-block@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, berrange@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-We currently don't migrate any state for zpci devices, which are
-coupled with standard pci devices. This means funny things happen
-when we e.g. try to migrate with a virtio-pci device but the s390x-
-specific zpci state is not migrated (vfio-pci is not affected, as
-it is not migratable anyway.)
+Am 25.01.2019 um 18:46 hat Kevin Wolf geschrieben:
+> The vendor specific designator in the Device Identification VPD page has
+> two problems:
+> 
+> 1. It defaults to the BlockBackend name (-drive id=...), which everyone
+>    expected to be a host detail that the guest never sees
+> 
+> 2. With -blockdev based setups it defaults to an empty string; if this
+>    default is used with more than one disk, the guest OS will interpret
+>    this as a single multipath disk.
+> 
+> We can address problem 2 immediately, and start running the deprecation
+> clock for problem 1.
+> 
+> Related bug reports:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1669446
+> https://bugzilla.redhat.com/show_bug.cgi?id=1668248
 
-Until this is fixed, mark zpci devices as unmigratable.
+Applied patches 1 and 2 to the block branch so that the bug is fixed.
+I'll try to rewrite patch 3 along the lines Dan suggested.
 
-Reported-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
-
-This is just a stop-gap measure to give us time to implement the
-needed migration code properly.
-
----
- hw/s390x/s390-pci-bus.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index c96a7cba34..96c7c18f3f 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -1253,6 +1253,15 @@ static Property s390_pci_device_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static const VMStateDescription s390_pci_device_vmstate = {
-+    .name = TYPE_S390_PCI_DEVICE,
-+    /*
-+     * TODO: add state handling here, so migration works at least with
-+     * emulated pci devices on s390x
-+     */
-+    .unmigratable = 1,
-+};
-+
- static void s390_pci_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -1263,6 +1272,7 @@ static void s390_pci_device_class_init(ObjectClass *klass, void *data)
-     dc->bus_type = TYPE_S390_PCI_BUS;
-     dc->realize = s390_pci_device_realize;
-     dc->props = s390_pci_device_properties;
-+    dc->vmsd = &s390_pci_device_vmstate;
- }
- 
- static const TypeInfo s390_pci_device_info = {
--- 
-2.17.2
+Kevin
