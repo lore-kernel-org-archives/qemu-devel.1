@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58796)
+Received: from eggs.gnu.org ([209.51.188.92]:58832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM1-00085y-3n
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbM8-0008Bo-VC
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbLp-0003UB-4i
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:37 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40194)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbM7-0003fT-0v
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:52 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:43401)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbLf-0003If-Je
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:27 -0500
-Received: by mail-wm1-x336.google.com with SMTP id f188so6725360wmf.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:05 -0800 (PST)
+	id 1gpbM4-0003Vv-Vz
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:50 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id b4so751515wrq.10
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:34 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.02
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.32
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:02 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:32 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:12 +0000
-Message-Id: <20190201160653.13829-7-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:35 +0000
+Message-Id: <20190201160653.13829-30-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/47] hw/arm/iotkit: Refactor into abstract
- base class and subclass
+Subject: [Qemu-devel] [PULL 29/47] target/arm/translate-a64: Don't
+ underdecode add/sub extended register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +36,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The Arm SSE-200 Subsystem for Embedded is a revised and
-extended version of the older IoTKit SoC. Prepare for
-adding a model of it by refactoring the IoTKit code into
-an abstract base class which contains the functionality,
-driven by a class data block specific to each subclass.
-(This is the same approach used by the existing bcm283x
-SoC family implementation.)
+In the "add/subtract (extended register)" encoding group, the "opt"
+field in bits [23:22] must be zero. Correctly UNDEF the unallocated
+encodings where this field is not zero.
 
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-6-peter.maydell@linaro.org
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20190125182626.9221-6-peter.maydell@linaro.org
 ---
- include/hw/arm/iotkit.h | 22 +++++++++++++++++-----
- hw/arm/iotkit.c         | 34 +++++++++++++++++++++++++++++-----
- 2 files changed, 46 insertions(+), 10 deletions(-)
+ target/arm/translate-a64.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 9701738ec75..521d1f73757 100644
---- a/include/hw/arm/iotkit.h
-+++ b/include/hw/arm/iotkit.h
-@@ -74,15 +74,15 @@
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 2cade64ed25..94907f0ae97 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4201,6 +4201,7 @@ static void disas_add_sub_ext_reg(DisasContext *s, uint32_t insn)
+     int imm3 = extract32(insn, 10, 3);
+     int option = extract32(insn, 13, 3);
+     int rm = extract32(insn, 16, 5);
++    int opt = extract32(insn, 22, 2);
+     bool setflags = extract32(insn, 29, 1);
+     bool sub_op = extract32(insn, 30, 1);
+     bool sf = extract32(insn, 31, 1);
+@@ -4209,7 +4210,7 @@ static void disas_add_sub_ext_reg(DisasContext *s, uint32_t insn)
+     TCGv_i64 tcg_rd;
+     TCGv_i64 tcg_result;
  
--#define TYPE_ARMSSE "iotkit"
-+#define TYPE_ARMSSE "arm-sse"
- #define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARMSSE)
- 
- /*
-- * For the moment TYPE_IOTKIT is a synonym for TYPE_ARMSSE (and the
-- * latter's underlying name is left as "iotkit"); in a later
-- * commit it will become a subclass of TYPE_ARMSSE.
-+ * These type names are for specific IoTKit subsystems; other than
-+ * instantiating them, code using these devices should always handle
-+ * them via the ARMSSE base class, so they have no IOTKIT() etc macros.
-  */
--#define TYPE_IOTKIT TYPE_ARMSSE
-+#define TYPE_IOTKIT "iotkit"
- 
- /* We have an IRQ splitter and an OR gate input for each external PPC
-  * and the 2 internal PPCs
-@@ -143,4 +143,16 @@ typedef struct ARMSSE {
-     uint32_t mainclk_frq;
- } ARMSSE;
- 
-+typedef struct ARMSSEInfo ARMSSEInfo;
-+
-+typedef struct ARMSSEClass {
-+    DeviceClass parent_class;
-+    const ARMSSEInfo *info;
-+} ARMSSEClass;
-+
-+#define ARMSSE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(ARMSSEClass, (klass), TYPE_ARMSSE)
-+#define ARMSSE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(ARMSSEClass, (obj), TYPE_ARMSSE)
-+
- #endif
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index 9360053184e..d5b172933c3 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -18,6 +18,16 @@
- #include "hw/arm/iotkit.h"
- #include "hw/arm/arm.h"
- 
-+struct ARMSSEInfo {
-+    const char *name;
-+};
-+
-+static const ARMSSEInfo armsse_variants[] = {
-+    {
-+        .name = TYPE_IOTKIT,
-+    },
-+};
-+
- /* Clock frequency in HZ of the 32KHz "slow clock" */
- #define S32KCLK (32 * 1000)
- 
-@@ -732,29 +742,43 @@ static void iotkit_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
-+    ARMSSEClass *asc = ARMSSE_CLASS(klass);
- 
-     dc->realize = iotkit_realize;
-     dc->vmsd = &iotkit_vmstate;
-     dc->props = iotkit_properties;
-     dc->reset = iotkit_reset;
-     iic->check = iotkit_idau_check;
-+    asc->info = data;
- }
- 
--static const TypeInfo iotkit_info = {
-+static const TypeInfo armsse_info = {
-     .name = TYPE_ARMSSE,
-     .parent = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(ARMSSE),
-     .instance_init = iotkit_init,
--    .class_init = iotkit_class_init,
-+    .abstract = true,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_IDAU_INTERFACE },
-         { }
+-    if (imm3 > 4) {
++    if (imm3 > 4 || opt != 0) {
+         unallocated_encoding(s);
+         return;
      }
- };
- 
--static void iotkit_register_types(void)
-+static void armsse_register_types(void)
- {
--    type_register_static(&iotkit_info);
-+    int i;
-+
-+    type_register_static(&armsse_info);
-+
-+    for (i = 0; i < ARRAY_SIZE(armsse_variants); i++) {
-+        TypeInfo ti = {
-+            .name = armsse_variants[i].name,
-+            .parent = TYPE_ARMSSE,
-+            .class_init = iotkit_class_init,
-+            .class_data = (void *)&armsse_variants[i],
-+        };
-+        type_register(&ti);
-+    }
- }
- 
--type_init(iotkit_register_types);
-+type_init(armsse_register_types);
 -- 
 2.20.1
