@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47908)
+Received: from eggs.gnu.org ([209.51.188.92]:47285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpcKe-0001Wg-HD
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:10:26 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpcL1-0000vg-8M
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpc8j-0001gC-8q
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:58:06 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gpc8j-0001eX-04
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:58:05 -0500
-Received: by mail-wm1-x341.google.com with SMTP id m1so6836024wml.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:58:04 -0800 (PST)
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<20190201145035.22739-9-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190201145035.22739-9-peter.maydell@linaro.org>
-Date: Fri, 01 Feb 2019 16:58:01 +0000
-Message-ID: <87ef8rv42u.fsf@zen.linaroharston>
+	(envelope-from <no-reply@patchew.org>) id 1gpc7N-00018d-SE
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:56:43 -0500
+Resent-Message-Id: <E1gpc7N-00018d-SE@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpc7N-00014g-Kc
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:56:41 -0500
+Message-ID: <154904017279.29184.17269746570282330757@ebba9967afc0>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/11] Separate conf.py for each manual we
- want
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 08:56:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
+ docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,218 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> ---
->  docs/conf.py           | 37 +++++++++++++++++++++++++++++++------
->  docs/devel/conf.py     | 15 +++++++++++++++
->  docs/devel/index.rst   | 21 +++++++++++++++++++++
->  docs/index.rst         |  9 ++-------
->  docs/interop/conf.py   | 15 +++++++++++++++
->  docs/interop/index.rst | 18 ++++++++++++++++++
->  6 files changed, 102 insertions(+), 13 deletions(-)
->  create mode 100644 docs/devel/conf.py
->  create mode 100644 docs/devel/index.rst
->  create mode 100644 docs/interop/conf.py
->  create mode 100644 docs/interop/index.rst
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->
-> diff --git a/docs/conf.py b/docs/conf.py
-> index c04000e78e4..6a334f545ec 100644
-> --- a/docs/conf.py
-> +++ b/docs/conf.py
-> @@ -3,6 +3,20 @@
->  # QEMU documentation build configuration file, created by
->  # sphinx-quickstart on Thu Jan 31 16:40:14 2019.
->  #
-> +# This config file can be used in one of two ways:
-> +# (1) as a common config file which is included by the conf.py
-> +# for each of QEMU's manuals: in this case sphinx-build is run multiple
-> +# times, once per subdirectory.
-> +# (2) as a top level conf file which will result in building all
-> +# the manuals into a single document: in this case sphinx-build is
-> +# run once, on the top-level docs directory.
-> +#
-> +# QEMU's makefiles take option (1), which allows us to install
-> +# only the ones the user cares about (in particular we don't want
-> +# to ship the 'devel' manual to end-users).
-> +# Third-party sites such as readthedocs.org will take option (2).
-> +#
-> +#
->  # This file is execfile()d with the current directory set to its
->  # containing dir.
->  #
-> @@ -12,13 +26,22 @@
->  # All configuration values have a default; values that are commented out
->  # serve to show the default.
->
-> +import os
-> +import sys
-> +
-> +# The per-manual conf.py will set qemu_docdir for a single-manual build;
-> +# otherwise set it here if this is an entire-manual-set build.
-> +# This is always the absolute path of the docs/ directory in the source =
-tree.
-> +try:
-> +    qemu_docdir
-> +except NameError:
-> +    qemu_docdir =3D os.path.abspath(".")
-> +
->  # If extensions (or modules to document with autodoc) are in another dir=
-ectory,
->  # add these directories to sys.path here. If the directory is relative t=
-o the
-> -# documentation root, use os.path.abspath to make it absolute, like show=
-n here.
-> +# documentation root, use an absolute path starting from qemu_docdir.
->  #
-> -# import os
-> -# import sys
-> -# sys.path.insert(0, os.path.abspath('.'))
-> +# sys.path.insert(0, os.path.join(qemu_docdir, "my_subdir"))
->
->
->  # -- General configuration ---------------------------------------------=
----
-> @@ -90,8 +113,10 @@ html_theme =3D 'alabaster'
->  # Theme options are theme-specific and customize the look and feel of a =
-theme
->  # further.  For a list of options available for each theme, see the
->  # documentation.
-> -#
-> -# html_theme_options =3D {}
-> +# We initialize this to empty here, so the per-manual conf.py can just
-> +# add individual key/value entries.
-> +html_theme_options =3D {
-> +}
->
->  # Add any paths that contain custom static files (such as style sheets) =
-here,
->  # relative to this directory. They are copied after the builtin static f=
-iles,
-> diff --git a/docs/devel/conf.py b/docs/devel/conf.py
-> new file mode 100644
-> index 00000000000..7441f87e7f5
-> --- /dev/null
-> +++ b/docs/devel/conf.py
-> @@ -0,0 +1,15 @@
-> +# -*- coding: utf-8 -*-
-> +#
-> +# QEMU documentation build configuration file for the 'devel' manual.
-> +#
-> +# This includes the top level conf file and then makes any necessary twe=
-aks.
-> +import sys
-> +import os
-> +
-> +qemu_docdir =3D os.path.abspath("..")
-> +parent_config =3D os.path.join(qemu_docdir, "conf.py")
-> +exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
-> +
-> +# This slightly misuses the 'description', but is the best way to get
-> +# the manual title to appear in the sidebar.
-> +html_theme_options['description'] =3D u'Developer''s Guide'
-> diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-> new file mode 100644
-> index 00000000000..cd0fa6c9ba2
-> --- /dev/null
-> +++ b/docs/devel/index.rst
-> @@ -0,0 +1,21 @@
-> +.. This is the top level page for the 'devel' manual.
-> +
-> +
-> +QEMU Developer's Guide
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This manual documents various parts of the internals of QEMU.
-> +You only need to read it if you are interested in reading or
-> +modifying QEMU's source code.
-> +
-> +Contents:
-> +
-> +.. toctree::
-> +   :maxdepth: 2
-> +
-> +   loads-stores
-> +   memory
-> +   migration
-> +   stable-process
-> +   testing
-> +
-> diff --git a/docs/index.rst b/docs/index.rst
-> index 93f82228310..3690955dd1f 100644
-> --- a/docs/index.rst
-> +++ b/docs/index.rst
-> @@ -10,11 +10,6 @@ Welcome to QEMU's documentation!
->     :maxdepth: 2
->     :caption: Contents:
->
-> +   interop/index
-> +   devel/index
->
-> -
-> -Indices and tables
-> -=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> -
-> -* :ref:`genindex`
-> -* :ref:`modindex`
-> -* :ref:`search`
-> diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-> new file mode 100644
-> index 00000000000..cf3c69d4a7e
-> --- /dev/null
-> +++ b/docs/interop/conf.py
-> @@ -0,0 +1,15 @@
-> +# -*- coding: utf-8 -*-
-> +#
-> +# QEMU documentation build configuration file for the 'interop' manual.
-> +#
-> +# This includes the top level conf file and then makes any necessary twe=
-aks.
-> +import sys
-> +import os
-> +
-> +qemu_docdir =3D os.path.abspath("..")
-> +parent_config =3D os.path.join(qemu_docdir, "conf.py")
-> +exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
-> +
-> +# This slightly misuses the 'description', but is the best way to get
-> +# the manual title to appear in the sidebar.
-> +html_theme_options['description'] =3D u'System Emulation Management and =
-Interoperability Guide'
-> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-> new file mode 100644
-> index 00000000000..2df977dd529
-> --- /dev/null
-> +++ b/docs/interop/index.rst
-> @@ -0,0 +1,18 @@
-> +.. This is the top level page for the 'interop' manual.
-> +
-> +
-> +QEMU System Emulation Management and Interoperability Guide
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This manual contains documents and specifications that are useful
-> +for making QEMU interoperate with other software.
-> +
-> +Contents:
-> +
-> +.. toctree::
-> +   :maxdepth: 2
-> +
-> +   bitmaps
-> +   live-block-operations
-> +   pr-helper
-> +
-
-
---
-Alex Benn=C3=A9e
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
+OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjAxMTQ1MDM1
+LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggMDAvMTFdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBjZmU2YzU0Li5hMWJjM2U3ICBtYXN0
+ZXIgICAgIC0+IG1hc3RlcgogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjAxMTI0
+NTQzLjU5NDUtMS1jb2h1Y2tAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjAxMTI0NTQzLjU5
+NDUtMS1jb2h1Y2tAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkw
+MjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAx
+OTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWdd
+ICAgICAgICAgcGF0Y2hldy8yMDE5MDIwMTE2MDY1My4xMzgyOS0xLXBldGVyLm1heWRlbGxAbGlu
+YXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMjAxMTYwNjUzLjEzODI5LTEtcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTY2ZTMwOSBkb2NzL2Nv
+bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KMDk4ODdkZiBNYWtlZmlsZTogQWJz
+dHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQpjZmM1M2JjIE1ha2VmaWxl
+LCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KOGRkNDQ2NCBT
+ZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CmEwOGZjMzEgZG9jcy9jb25m
+LnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwoyZDIyYjk4IGRvY3MvY29uZi5weTogRG9uJ3Qg
+aW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCjBlMGMxYzIgZG9jcy9jb25mLnB5OiBD
+b25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCmZhMTkzNWIgZG9jcy9jb25mLnB5OiBEaXNh
+YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQphMzg0ZjgzIGRvY3M6IENvbW1pdCBpbml0aWFs
+IGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKOWQyYThjZSBkb2NzOiBDb252ZXJ0IG1lbW9y
+eS50eHQgdG8gcnN0IGZvcm1hdAo4NTg1NzNlIGRvY3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNU
+IG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0
+IDg1ODU3M2U0M2UxMCAoZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
+cykKMi8xMSBDaGVja2luZyBjb21taXQgOWQyYThjZTJlYTNjIChkb2NzOiBDb252ZXJ0IG1lbW9y
+eS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApyZW5hbWUgZnJvbSBk
+b2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk1IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMSBD
+aGVja2luZyBjb21taXQgYTM4NGY4M2M4NzVjIChkb2NzOiBDb21taXQgaW5pdGlhbCBmaWxlcyBm
+cm9tIHNwaGlueC1xdWlja3N0YXJ0KQpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5l
+KHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpQYXRj
+aCAzLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzExIENoZWNraW5nIGNvbW1pdCBm
+YTE5MzViZmFlNmMgKGRvY3MvY29uZi5weTogRGlzYWJsZSB1bnVzZWQgX3N0YXRpYyBkaXJlY3Rv
+cnkpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IDBlMGMxYzJiZGI1MyAoZG9jcy9jb25mLnB5OiBDb25m
+aWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lKQo2LzExIENoZWNraW5nIGNvbW1pdCAyZDIyYjk4
+MWExMmIgKGRvY3MvY29uZi5weTogRG9uJ3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1
+aWxkKQo3LzExIENoZWNraW5nIGNvbW1pdCBhMDhmYzMxMzkyYzkgKGRvY3MvY29uZi5weTogRGlz
+YWJsZSBvcHRpb24gd2FybmluZ3MpCjgvMTEgQ2hlY2tpbmcgY29tbWl0IDhkZDQ0NjQ5MzgzZiAo
+U2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMxNjA6IEZJTEU6IGRvY3MvaW50ZXJvcC9jb25mLnB5OjE1OgoraHRt
+bF90aGVtZV9vcHRpb25zWydkZXNjcmlwdGlvbiddID0gdSdTeXN0ZW0gRW11bGF0aW9uIE1hbmFn
+ZW1lbnQgYW5kIEludGVyb3BlcmFiaWxpdHkgR3VpZGUnCgpFUlJPUjogTWlzc2luZyBTaWduZWQt
+b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEzMyBsaW5lcyBj
+aGVja2VkCgpQYXRjaCA4LzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzExIENoZWNr
+aW5nIGNvbW1pdCBjZmM1M2JjNWQyZDEgKE1ha2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVp
+bGRpbmcgclNUIGRvY3VtZW50YXRpb24pCjEwLzExIENoZWNraW5nIGNvbW1pdCAwOTg4N2RmZDIy
+ZjkgKE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2Rl
+KQoxMS8xMSBDaGVja2luZyBjb21taXQgNTY2ZTMwOWEyMTFhIChkb2NzL2NvbmYucHk6IERvbid0
+IGhhcmQtY29kZSBRRU1VIHZlcnNpb24pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
+Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
