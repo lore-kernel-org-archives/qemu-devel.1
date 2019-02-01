@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40860)
+Received: from eggs.gnu.org ([209.51.188.92]:41607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpRGH-0005jr-Pl
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:21:10 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpRKg-0001BA-0n
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpRGH-0008UF-4o
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:21:09 -0500
-Date: Fri, 1 Feb 2019 13:15:52 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190201051552.GG23131@stefanha-x1.localdomain>
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-2-sgarzare@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gpRKe-0001TI-2S
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:25:41 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41032)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gpRKS-0001Fv-T4
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:25:32 -0500
+Received: by mail-pf1-x444.google.com with SMTP id b7so2591625pfi.8
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 21:25:19 -0800 (PST)
+References: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
+	<20190130203638.21179-3-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <91500162-f81f-e958-3bdf-eaee217e0a00@linaro.org>
+Date: Thu, 31 Jan 2019 21:25:15 -0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fCcDWlUEdh43YKr8"
-Content-Disposition: inline
-In-Reply-To: <20190131151914.164903-2-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] virtio-blk: add acct_failed param
- to virtio_blk_handle_rw_error()
+In-Reply-To: <20190130203638.21179-3-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/8] target/ppc: rework vmrg{l, h}{b, h,
+ w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-
---fCcDWlUEdh43YKr8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 31, 2019 at 04:19:10PM +0100, Stefano Garzarella wrote:
-> We add acct_failed param in order to use virtio_blk_handle_rw_error()
-> also when is not required to call block_acct_failed(). (eg. a discard
-> operation is failed)
->=20
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On 1/30/19 12:36 PM, Mark Cave-Ayland wrote:
+> The current implementations make use of the endian-specific macros MRGLO/MRGHI
+> and also reference HI_IDX and LO_IDX directly to calculate array offsets.
+> 
+> Rework the implementation to use the Vsr* macros so that these per-endian
+> references can be removed.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/block/virtio-blk.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  target/ppc/int_helper.c | 54 +++++++++++++++++--------------------------------
+>  1 file changed, 19 insertions(+), 35 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
---fCcDWlUEdh43YKr8
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcU9YIAAoJEJykq7OBq3PI1R4H/j76NrOGgjl74IX2gsusrZiC
-Yby2AYyFvr5wDzH6B9Aw0dKzsmzsBaR8qSrviwJsiob+YQ6imMmNL0p/hxvUtr4U
-hjaWTcyq1tZLeLq7jvLyxRh03xLRMHOFL7yDSGx7YUYrIKWWeA6xIRjyQW0VV2P/
-tTCmrrBndWi49Nrc+7aR7Cpfx5rb8g1ljGdp3QRC6S8HoMrBVBRm/bS85W8jOqB7
-gA4lWzQvd9Yqd5S8bce9y5ddmAu1ouL0rBlkv9Y885Ubjw1PXHN1f8PEBTSiARPD
-Q4XNqrTm9obH9szYrLoj/RKUIm2lcAP1+ejjRQWm8mtIxMmNMZWXcuawHcPz8VM=
-=Nt98
------END PGP SIGNATURE-----
-
---fCcDWlUEdh43YKr8--
+r~
