@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40094)
+Received: from eggs.gnu.org ([209.51.188.92]:40367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpRBH-0002pV-4n
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:15:59 -0500
+	(envelope-from <lifei1214@126.com>) id 1gpRDo-0003fF-Nq
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpRBG-0007Et-JL
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:15:59 -0500
-Date: Fri, 1 Feb 2019 13:15:47 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190201051547.GF23131@stefanha-x1.localdomain>
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-6-sgarzare@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/aVve/J9H4Wl5yVO"
-Content-Disposition: inline
-In-Reply-To: <20190131151914.164903-6-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] tests/virtio-blk: add test for
- WRITE_ZEROES command
+	(envelope-from <lifei1214@126.com>) id 1gpRDl-0007nP-8m
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:34 -0500
+Received: from m50-111.126.com ([123.125.50.111]:54031)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gpRDe-0007m6-0J
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:31 -0500
+From: Fei Li <lifei1214@126.com>
+Date: Fri,  1 Feb 2019 13:18:02 +0800
+Message-Id: <20190201051806.53183-8-lifei1214@126.com>
+In-Reply-To: <20190201051806.53183-1-lifei1214@126.com>
+References: <20190201051806.53183-1-lifei1214@126.com>
+Subject: [Qemu-devel] [PATCH v11 for-4.0 07/11] qemu_thread: supplement
+ error handling for iothread_complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, shirley17fei@gmail.com
+Cc: Fei Li <fli@suse.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
+From: Fei Li <fli@suse.com>
 
---/aVve/J9H4Wl5yVO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For iothread_complete: utilize the existed errp to propagate the
+error and do the corresponding cleanup to replace the temporary
+&error_abort.
 
-On Thu, Jan 31, 2019 at 04:19:14PM +0100, Stefano Garzarella wrote:
-> If the WRITE_ZEROES feature is enabled, we check this command
-> in the test_basic().
->=20
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  tests/virtio-blk-test.c | 60 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 60 insertions(+)
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fei Li <fli@suse.com>
+---
+ iothread.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---/aVve/J9H4Wl5yVO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcU9YDAAoJEJykq7OBq3PIRaEH/0masjU9/e9T9OeA+3OuLHB4
-LUwHRv8oiNmh3+B3BuWGKno42k269lrMw+mD4j4KK65coC8xhxCzOqBQ8s9T+mMm
-poLCfuGaEaRh39Yeu12J6glT6p+tYsOPCbO2qldUIP6TaOPHCr7neame6KvFDzpK
-z6zRcKxs1R7BiA8y/IyGz+JYz98+9koKRi5k2EKYD+ADMWWWhG/bjoYvAj6GoaFq
-vXlWiJVIL5xDChlqIKOUGWdLzSxfcXqNcsNEYKtXkCotLjOVNFEOfpPHauc+KQhF
-gk1OKs81x5lPR52HzQbb4495PPHW+mWNLX4DiR7umz/yZQp0TyhnaVilBrsgD3A=
-=QJ2t
------END PGP SIGNATURE-----
-
---/aVve/J9H4Wl5yVO--
+diff --git a/iothread.c b/iothread.c
+index 8e8aa01999..ea2e553dc5 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -148,6 +148,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+     Error *local_error = NULL;
+     IOThread *iothread = IOTHREAD(obj);
+     char *name, *thread_name;
++    int thread_ok;
+ 
+     iothread->stopping = false;
+     iothread->running = true;
+@@ -164,9 +165,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+                                 &local_error);
+     if (local_error) {
+         error_propagate(errp, local_error);
+-        aio_context_unref(iothread->ctx);
+-        iothread->ctx = NULL;
+-        return;
++        goto fail;
+     }
+ 
+     qemu_mutex_init(&iothread->init_done_lock);
+@@ -178,11 +177,15 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+      */
+     name = object_get_canonical_path_component(OBJECT(obj));
+     thread_name = g_strdup_printf("IO %s", name);
+-    /* TODO: let the further caller handle the error instead of abort() here */
+-    qemu_thread_create(&iothread->thread, thread_name, iothread_run,
+-                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
++    thread_ok = qemu_thread_create(&iothread->thread, thread_name, iothread_run,
++                                   iothread, QEMU_THREAD_JOINABLE, errp);
+     g_free(thread_name);
+     g_free(name);
++    if (thread_ok < 0) {
++        qemu_cond_destroy(&iothread->init_done_cond);
++        qemu_mutex_destroy(&iothread->init_done_lock);
++        goto fail;
++    }
+ 
+     /* Wait for initialization to complete */
+     qemu_mutex_lock(&iothread->init_done_lock);
+@@ -191,6 +194,10 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+                        &iothread->init_done_lock);
+     }
+     qemu_mutex_unlock(&iothread->init_done_lock);
++    return;
++fail:
++    aio_context_unref(iothread->ctx);
++    iothread->ctx = NULL;
+ }
+ 
+ typedef struct {
+-- 
+2.17.2 (Apple Git-113)
