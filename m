@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41838)
+Received: from eggs.gnu.org ([209.51.188.92]:42513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpbvc-0006F0-6P
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:44:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbyJ-000065-V7
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpbvb-0003qk-FU
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:44:32 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54305)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbyA-00056u-Sd
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:47:13 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41807)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gpbvX-0003oL-IO
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:44:31 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a62so6778719wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:44:20 -0800 (PST)
-References: <20190201145035.22739-1-peter.maydell@linaro.org>
-	<20190201145035.22739-8-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190201145035.22739-8-peter.maydell@linaro.org>
-Date: Fri, 01 Feb 2019 16:44:18 +0000
-Message-ID: <87ftt7v4pp.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpbyA-000565-NK
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:47:10 -0500
+Received: by mail-oi1-x241.google.com with SMTP id j21so6295109oii.8
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:47:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20190201145035.22739-1-peter.maydell@linaro.org>
+	<20190201145035.22739-4-peter.maydell@linaro.org>
+	<87lg2zv4un.fsf@zen.linaroharston>
+In-Reply-To: <87lg2zv4un.fsf@zen.linaroharston>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Feb 2019 16:46:57 +0000
+Message-ID: <CAFEAcA_fmEhCqTr_roPvKxY=R3rxqOcj9BKGyv5uoHfM-hT8MA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/11] docs/conf.py: Disable option warnings
+Subject: Re: [Qemu-devel] [PATCH 03/11] docs: Commit initial files from
+ sphinx-quickstart
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> sphinx-build complains about using :option: to mark up option
-> flags that it doesn't know about (because they were not defined
-> using the "option::" directive):
-> docs/pr-manager.rst:68: WARNING: unknown option: -d
+On Fri, 1 Feb 2019 at 16:41, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
 >
-> Suppress these warnings. This way we get the semantic markup
-> of the option flag but no cross-referencing hyperlink.
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Peter Maydell <peter.maydell@linaro.org> writes:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  docs/conf.py | 3 +++
->  1 file changed, 3 insertions(+)
+> > +# General information about the project.
+> > +project =3D u'QEMU'
+> > +copyright =3D u'2019, The QEMU Project Developers'
 >
-> diff --git a/docs/conf.py b/docs/conf.py
-> index 6ddaa549f28..c04000e78e4 100644
-> --- a/docs/conf.py
-> +++ b/docs/conf.py
-> @@ -76,6 +76,9 @@ pygments_style =3D 'sphinx'
->  # If true, `todo` and `todoList` produce output, else they produce nothi=
-ng.
->  todo_include_todos =3D False
->
-> +# Sphinx defaults to warning about use of :option: for options not defin=
-ed
-> +# with "option::" in the document being processed. Turn that off.
-> +suppress_warnings =3D ["ref.option"]
->
->  # -- Options for HTML output -------------------------------------------=
----
+> Hmm I bet we forget to update this date. Does it have to be the date the
+> text was last touched or could we just go from the last commit in the tre=
+e?
 
+Yeah, this isn't ideal, but the same applies to the
+string in QEMU_COPYRIGHT in qemu-common.h (as you can tell
+from the fact that still says 2018!). If we can fix that
+to be generated from something else we can fish it out when
+we do the docs build too.
 
---
-Alex Benn=C3=A9e
+> > +author =3D u'The QEMU Project Developers'
+> > +
+> > +# The version info for the project you're documenting, acts as replace=
+ment for
+> > +# |version| and |release|, also used in various other places throughou=
+t the
+> > +# built documents.
+> > +#
+> > +# The short X.Y version.
+> > +version =3D u'4.0'
+> > +# The full version, including alpha/beta/rc tags.
+> > +release =3D u'4.0'
+>
+> Surely these need to come from the build system the same way the
+> build-id does?
+
+Yes, see later patch in the series. The idea with the patchset
+structure here was that this patch is basically just the
+autogenerated stuff (sphinx-quickstart asks a few simple questions
+like project name and author which fills these in), and then
+the following patches customize that. That seemed to me like
+it would be easier to review than if I just squashed everything
+into a single patch.
+
+thanks
+-- PMM
