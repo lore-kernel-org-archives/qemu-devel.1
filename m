@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47285)
+Received: from eggs.gnu.org ([209.51.188.92]:48934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcL1-0000vg-8M
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:10:49 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gpcMG-0003UH-Tj
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpc7N-00018d-SE
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:56:43 -0500
-Resent-Message-Id: <E1gpc7N-00018d-SE@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpc7N-00014g-Kc
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:56:41 -0500
-Message-ID: <154904017279.29184.17269746570282330757@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gpcMF-0008LJ-MP
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:04 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gpcMC-0008K3-K2
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:12:01 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b11so6897083wmj.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:11:59 -0800 (PST)
+References: <20190201145035.22739-1-peter.maydell@linaro.org>
+	<20190201145035.22739-10-peter.maydell@linaro.org>
+	<87r2crv5um.fsf@zen.linaroharston>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87r2crv5um.fsf@zen.linaroharston>
+Date: Fri, 01 Feb 2019 17:11:57 +0000
+Message-ID: <87a7jfv3fm.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 08:56:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/11] Makefile,
+ configure: Support building rST documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjAxMTQ1MDM1
-LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggMDAvMTFdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBjZmU2YzU0Li5hMWJjM2U3ICBtYXN0
-ZXIgICAgIC0+IG1hc3RlcgogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwMjAxMTI0
-NTQzLjU5NDUtMS1jb2h1Y2tAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMjAxMTI0NTQzLjU5
-NDUtMS1jb2h1Y2tAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkw
-MjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAx
-OTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWdd
-ICAgICAgICAgcGF0Y2hldy8yMDE5MDIwMTE2MDY1My4xMzgyOS0xLXBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMjAxMTYwNjUzLjEzODI5LTEtcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTY2ZTMwOSBkb2NzL2Nv
-bmYucHk6IERvbid0IGhhcmQtY29kZSBRRU1VIHZlcnNpb24KMDk4ODdkZiBNYWtlZmlsZTogQWJz
-dHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVyc2lvbiIgY29kZQpjZmM1M2JjIE1ha2VmaWxl
-LCBjb25maWd1cmU6IFN1cHBvcnQgYnVpbGRpbmcgclNUIGRvY3VtZW50YXRpb24KOGRkNDQ2NCBT
-ZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50CmEwOGZjMzEgZG9jcy9jb25m
-LnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncwoyZDIyYjk4IGRvY3MvY29uZi5weTogRG9uJ3Qg
-aW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1aWxkCjBlMGMxYzIgZG9jcy9jb25mLnB5OiBD
-b25maWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lCmZhMTkzNWIgZG9jcy9jb25mLnB5OiBEaXNh
-YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeQphMzg0ZjgzIGRvY3M6IENvbW1pdCBpbml0aWFs
-IGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQKOWQyYThjZSBkb2NzOiBDb252ZXJ0IG1lbW9y
-eS50eHQgdG8gcnN0IGZvcm1hdAo4NTg1NzNlIGRvY3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNU
-IG1hcmt1cCBpc3N1ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0
-IDg1ODU3M2U0M2UxMCAoZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cykKMi8xMSBDaGVja2luZyBjb21taXQgOWQyYThjZTJlYTNjIChkb2NzOiBDb252ZXJ0IG1lbW9y
-eS50eHQgdG8gcnN0IGZvcm1hdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApyZW5hbWUgZnJvbSBk
-b2NzL2RldmVsL21lbW9yeS50eHQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk1IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDIvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMSBD
-aGVja2luZyBjb21taXQgYTM4NGY4M2M4NzVjIChkb2NzOiBDb21taXQgaW5pdGlhbCBmaWxlcyBm
-cm9tIHNwaGlueC1xdWlja3N0YXJ0KQpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5l
-KHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4OCBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAzLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzExIENoZWNraW5nIGNvbW1pdCBm
-YTE5MzViZmFlNmMgKGRvY3MvY29uZi5weTogRGlzYWJsZSB1bnVzZWQgX3N0YXRpYyBkaXJlY3Rv
-cnkpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IDBlMGMxYzJiZGI1MyAoZG9jcy9jb25mLnB5OiBDb25m
-aWd1cmUgdGhlICdhbGFiYXN0ZXInIHRoZW1lKQo2LzExIENoZWNraW5nIGNvbW1pdCAyZDIyYjk4
-MWExMmIgKGRvY3MvY29uZi5weTogRG9uJ3QgaW5jbHVkZSByU1Qgc291cmNlcyBpbiBIVE1MIGJ1
-aWxkKQo3LzExIENoZWNraW5nIGNvbW1pdCBhMDhmYzMxMzkyYzkgKGRvY3MvY29uZi5weTogRGlz
-YWJsZSBvcHRpb24gd2FybmluZ3MpCjgvMTEgQ2hlY2tpbmcgY29tbWl0IDhkZDQ0NjQ5MzgzZiAo
-U2VwYXJhdGUgY29uZi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudCkKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiMxNjA6IEZJTEU6IGRvY3MvaW50ZXJvcC9jb25mLnB5OjE1OgoraHRt
-bF90aGVtZV9vcHRpb25zWydkZXNjcmlwdGlvbiddID0gdSdTeXN0ZW0gRW11bGF0aW9uIE1hbmFn
-ZW1lbnQgYW5kIEludGVyb3BlcmFiaWxpdHkgR3VpZGUnCgpFUlJPUjogTWlzc2luZyBTaWduZWQt
-b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEzMyBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA4LzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzExIENoZWNr
-aW5nIGNvbW1pdCBjZmM1M2JjNWQyZDEgKE1ha2VmaWxlLCBjb25maWd1cmU6IFN1cHBvcnQgYnVp
-bGRpbmcgclNUIGRvY3VtZW50YXRpb24pCjEwLzExIENoZWNraW5nIGNvbW1pdCAwOTg4N2RmZDIy
-ZjkgKE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2Rl
-KQoxMS8xMSBDaGVja2luZyBjb21taXQgNTY2ZTMwOWEyMTFhIChkb2NzL2NvbmYucHk6IERvbid0
-IGhhcmQtY29kZSBRRU1VIHZlcnNpb24pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> Add support to our configure and makefile machinery for building
+>> our rST docs into HTML files.
+>>
+>> Building the documentation now requires that sphinx-build is
+>> available; this seems better than allowing half the docs to
+>> be built if it is not present but having half of them missing.
+>> (In particular it means that assuming that distros configured with
+>> --enable-docs they'll get a helpful error from configure telling
+>> them the new build dependency.)
+>
+> Hmm we manage to break Travis CI:
+>
+>   https://travis-ci.org/stsquad/qemu/jobs/487512292#L902
+>
+> It reports:
+>
+>   Documentation     no
+>
+> But then proceeds to barf:
+>
+>   https://travis-ci.org/stsquad/qemu/jobs/487512292#L1395
+>
+> with:
+>
+>   /bin/sh: 1: sphinx-build: not found
+>   Makefile:871: recipe for target 'docs/devel/index.html' failed
+>   make: *** [docs/devel/index.html] Error 127
+
+I did the following:
+
+modified   Makefile
+@@ -322,6 +322,7 @@ endif
+ ifdef CONFIG_TRACE_SYSTEMTAP
+ DOCS+=3Dscripts/qemu-trace-stap.1
+ endif
++DOCS+=3Dsphinxdocs
+ else
+ DOCS=3D
+ endif
+@@ -401,7 +402,7 @@ dummy :=3D $(call unnest-vars,, \
+
+ include $(SRC_PATH)/tests/Makefile.include
+
+-all: $(DOCS) sphinxdocs $(TOOLS) $(HELPERS-y) recurse-all modules
++all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
+
+ qemu-version.h: FORCE
+ 	$(call quiet-command, \
+@@ -699,13 +700,7 @@ for d in $$(cd docs && find $1 -type d); do $(INSTALL_=
+DIR) "$(DESTDIR)$(qemu_doc
+ for f in $$(cd docs && find $1 -type f); do $(INSTALL_DATA) "docs/$$f" "$(=
+DESTDIR)$(qemu_docdir)/$$f"; done
+ endef
+
+-# Note that we deliberately do not install the "devel" manual: it is
+-# for QEMU developers, and not interesting to our users.
+-.PHONY: install-sphinxdocs
+-install-sphinxdocs: sphinxdocs
+-	$(call install-manual,interop)
+-
+-install-doc: $(DOCS) install-sphinxdocs
++install-doc: $(DOCS)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+@@ -737,6 +732,7 @@ ifdef CONFIG_VIRTFS
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
+ endif
++	$(call install-manual,interop)
+
+ install-datadir:
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
+
+--
+Alex Benn=C3=A9e
