@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49128)
+Received: from eggs.gnu.org ([209.51.188.92]:50167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gpQ2S-0000jp-8a
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:49 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gpQ8S-0002VH-Ra
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gpQ2Q-0000fU-L0
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:48 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46961)
+	(envelope-from <aik@ozlabs.ru>) id 1gpQ8R-0002oT-5A
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:09:00 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41117)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gpQ2P-0000eF-9a
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:45 -0500
-Received: by mail-pg1-x542.google.com with SMTP id w7so2294627pgp.13
-	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 20:02:43 -0800 (PST)
-References: <20190122170112.8706-1-farosas@linux.ibm.com>
-	<20190122170112.8706-3-farosas@linux.ibm.com>
-	<30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
-	<20190126015006.GB22942@umbus> <878sz41rjx.fsf@linux.ibm.com>
-	<d06f8763-f994-5913-424a-542f33d6b09a@ozlabs.ru>
-	<874l9q152u.fsf@linux.ibm.com>
-	<c2c652ad-69af-5288-4861-aaf0e67e9b5b@ozlabs.ru>
-	<871s4s1odz.fsf@linux.ibm.com>
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gpQ8Q-0002nR-Tb
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:08:59 -0500
+Received: by mail-pl1-x644.google.com with SMTP id u6so2507533plm.8
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 20:08:58 -0800 (PST)
+References: <20190118140758.829-1-farosas@linux.ibm.com>
+	<20190118140758.829-3-farosas@linux.ibm.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <e5f9b8d3-1969-d75b-c4e2-e34efa932d3b@ozlabs.ru>
-Date: Fri, 1 Feb 2019 15:02:35 +1100
+Message-ID: <a17b4e11-3409-502d-f09b-2d129430be3a@ozlabs.ru>
+Date: Fri, 1 Feb 2019 15:08:47 +1100
 MIME-Version: 1.0
-In-Reply-To: <871s4s1odz.fsf@linux.ibm.com>
+In-Reply-To: <20190118140758.829-3-farosas@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
- callbacks for SPRs
+Subject: Re: [Qemu-devel] [RFC PATCH v3 2/7] target/ppc: Add
+ ppc_get_trace_int_handler_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,147 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-ppc@nongnu.org, groug@kaod.org, qemu-devel@nongnu.org
+To: Fabiano Rosas <farosas@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, philmd@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, david@gibson.dropbear.id.au, cohuck@redhat.com
 
 
 
-On 01/02/2019 08:57, Fabiano Rosas wrote:
-> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+On 19/01/2019 01:07, Fabiano Rosas wrote:
+> The upcoming single step functionality (KVM HV) needs to write to the
+> Trace Interrupt handler's address for its mechanism to work. The
+> address is calculated by applying an offset according to the value of
+> the Alternate Interrupt Location (AIL) bits in the LPCR register.
 > 
->> On 31/01/2019 03:30, Fabiano Rosas wrote:
->>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
->>>
->>>>
->>>> but this is a register which does not have endianness, the endianness
->>>> appears here because the interface between gdb and qemu is
->>>> uint8_t*==bytestream but this interface should have fixed endianness
->>>> imho (now it is bigendian afaict).
->>>>
->>>> Something is not right here...
->>>
->>> Having a fixed endianness would not work because GDB have no way of
->>> knowing how to represent what comes from the remote end.
->>
->> It definitely would. A register is stored as "unsigned long" in QEMU and
->> all gdb has to do is printf("%lx") and that is it. 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/cpu.h         |  1 +
+>  target/ppc/excp_helper.c | 12 ++++++++++++
+>  2 files changed, 13 insertions(+)
 > 
-> OK, but something is not clear to me. Even if GDB just printf("%lx") the
-> value, we would still have to bswap when the host is LE, right?
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 486abaf99b..2185ef5e67 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1256,6 +1256,7 @@ struct PPCVirtualHypervisorClass {
+>      OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
+>                       TYPE_PPC_VIRTUAL_HYPERVISOR)
+>  
+> +target_ulong ppc_get_trace_int_handler_addr(CPUState *cs);
+>  void ppc_cpu_do_interrupt(CPUState *cpu);
+>  bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+>  void ppc_cpu_dump_state(CPUState *cpu, FILE *f, fprintf_function cpu_fprintf,
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 337a3ef8bb..5d13d05c3b 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -746,6 +746,18 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+>      check_tlb_flush(env, false);
+>  }
+>  
+> +target_ulong ppc_get_trace_int_handler_addr(CPUState *cs)
+> +{
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    int ail;
+> +
+> +    ail = (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SHIFT;
+> +    return env->excp_vectors[POWERPC_EXCP_TRACE] |
+> +        ppc_excp_vector_offset(cs, ail);
 
-Not for %lx, this should just print a correct value.
 
-> QEMU BE:
->  (gdb) x/8xb &env->spr[287]
->  0x11391760: 0x00    0x00    0x00    0x00    0x00    0x4e    0x12    0x00
+This fails with:
+cpu_abort(cs, "Invalid AIL combination %d\n", ail)
+
+as @ail calculates as 0 when I am just about to start a guest and try to
+set breakpoint at the initial $nip (set here:
+https://git.qemu.org/?p=qemu.git;a=blob;f=hw/ppc/spapr_cpu_core.c;h=993759db47fa33b11a984c3043049297b06c0420;hb=38441756b70eec5807b5f60dad11a93a91199866#l90
+)
+
+This is long before h_set_mode is called.
+
+
+> +}
+> +
+> +
+>  void ppc_cpu_do_interrupt(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
 > 
-> QEMU LE:
->  (gdb) x/8xb &env->spr[287]
->  0x7ffff5bd98c0: 0x01    0x02    0x4b    0x00    0x00    0x00    0x00    0x00
-> 
->> The problem is that
->> we want to pass it as a byte stream from the gdb_read_register() hook
->> all the way to gdb and for some reason gdb does not define endianness of
->> that stream but rather tries guessing the endianness which is broken.
-> 
-> GDB does define the endianness of the stream (in a way):
-> 
->  "Each byte of register data is described by two hex digits. The bytes
->  with the register are transmitted in target byte order."
-> 
-> https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#Packets
-
-
-Target byte order changes all the time so we need a endian-agnostic way
-of knowing the current endianness.
-
-
-> 
->> Today I was debugging rtas/clientinterface calls which a little endian
->> kernel makes and these calls need to switch to the big endian first. And
->> gdb goes nuts when this switch happens (note that I did not give an ELF
->> to gdb this time so it picked LE itself). Even if it could fetch the
->> endianness from QEMU, it would fail as it is an LE bit in MSR which is a
->> register which is parsed according to the gdb's idea of endianness :)
-> 
-> I think it would be possible to define another packet for the remote
-> protocol that informs the endianness explicitly at each time the guest
-> stops. If you provide more info on how to reproduce that issue I could
-> put in my list or go bug GDB folks about it.
-> 
->>> It will
->>> always check the target endianness before printing a value, even if it
->>> refers to a register:
->>>
->>> https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=blob;f=gdb/findvar.c;hb=HEAD#l49
->>>
->>> So in our case the contents of mem_buf need to match both the guest
->>> endianness *and* what GDB has set for 'show endian' because it will
->>> detect it automatically from the ELF. If it guesses incorrectly because
->>> there is no ELF, we need to use the 'set endian' command.
->>>
->>> By the way, this is already the behavior for the registers that are
->>> already implemented (e.g. $msr). Here's the commit that introduced
->>> that:
->>>
->>> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=8a286ce4502356ce0b97a2424a2cb7
->>>
->>> Now, what might be a source of confusion here is the fact that we
->>> *always* do a bswap when the host is LE because QEMU thinks that the ppc
->>> guest is always BE. That requires the maybe_bswap function to make
->>> things right in the end.
->>>
->>> What I could do is try to improve this by only swapping when the
->>> guest's actual endianness (msr_le) is different from the host's.
->>
->> The bytestream for registers should have fixed endianness. But looking
->> at the gdb code makes me think it is not going to happen :(
-> 
-> Yes, I can't think of a way to fix that without changing the way GDB
-> exhibits the values or the remote protocol.
-> 
-> May I proceed with this series as it is with the bswaps?
-> 
->>> That
->>> is not entirely within the scope of this patch, though.
->>
->> True. But since you are touching this, may be you could fix gdb too :)
->>
->> Does gdb tell QEMU about what endianness it thinks that QEMU is using?
->> Or can it read it from QEMU? I cannot easily spot this in QEMU...
-> 
-> GDB currently does not tell and does not ask about endianness. So I
-> believe there is room for improvement here. I could not find it in the
-> documentation but I think that GDB supports file transfers and it asks
-> for the ELF in some scenarios. This approach could be one way of
-> informing it about the endianness, although it has its own shortcomings.
-
-
-There is no ELF in my scenario really. What I did was:
-
-1. hack qemu to not load slof.bin but load vmlinux instead and changed
-starting pc to where I loaded the kernel (I did not have to but it is a
-lot easier to ditch slof and set breakpoint in gdb before starting the
-guest).
-
-2. start a guest, connect external gdb and observe garbage in $pc and
-disassembly until the guest switched to LE.
-
-3. trace till here:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/kernel/entry_64.S?h=v4.20#n1299
-and set breakpoint to whatever $r4 was at this point; $r4 points to RTAS
-which executes in BE as we remove LE bit from SRR1 (lines 1296..1298).
-
-When we stop at this new breakpoint - we get same biteswapped garbage as
-in step2. Well, this is SLOF and there is an ELF somewhere but do we
-really want to load ELF and switch endianness every time the guest
-changes it and jumps to different chunks of code? :)
-
-
-It also seems like we cannot really debug slof via the gdb stub as it is
-big endian so it will be executing instructions but the UI will look
-byteswapped.
-
 
 -- 
 Alexey
