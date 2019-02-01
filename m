@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39174)
+Received: from eggs.gnu.org ([209.51.188.92]:39416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpbo7-0007nk-P1
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpboG-0007wW-IZ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpbo3-0008WA-Lg
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpboB-0000Cy-St
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:35:15 +0100
-Message-Id: <20190201163518.31157-25-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:35:06 +0100
+Message-Id: <20190201163518.31157-16-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 24/27] block: Fix invalidate_cache error path
- for parent activation
+Subject: [Qemu-devel] [PULL 15/27] uuid: Make qemu_uuid_bswap() take and
+ return a QemuUUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +26,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-bdrv_co_invalidate_cache() clears the BDRV_O_INACTIVE flag before
-actually activating a node so that the correct permissions etc. are
-taken. In case of errors, the flag must be restored so that the next
-call to bdrv_co_invalidate_cache() retries activation.
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Restoring the flag was missing in the error path for a failed
-parent->role->activate() call. The consequence is that this attempt to
-activate all images correctly fails because we still set errp, however
-on the next attempt BDRV_O_INACTIVE is already clear, so we return
-success without actually retrying the failed action.
+Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
+be byte-swapped. This means it can't be used when the UUID
+to be swapped is in a packed member of a struct. It's also
+out of line with the general bswap*() functions we provide
+in bswap.h, which take the value to be swapped and return it.
 
-An example where this is observable in practice is migration to a QEMU
-instance that has a raw format block node attached to a guest device
-with share-rw=3Doff (the default) while another process holds
-BLK_PERM_WRITE for the same image. In this case, all activation steps
-before parent->role->activate() succeed because raw can tolerate other
-writers to the image. Only the parent callback (in particular
-blk_root_activate()) tries to implement the share-rw=3Don property and
-requests exclusive write permissions. This fails when the migration
-completes and correctly displays an error. However, a manual 'cont' will
-incorrectly resume the VM without calling blk_root_activate() again.
+Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
 
-This case is described in more detail in the following bug report:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1531888
+This fixes some clang warnings about taking the address of
+a packed struct member in block/vdi.c.
 
-Fix this by correctly restoring the BDRV_O_INACTIVE flag in the error
-path.
-
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Tested-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/qemu/uuid.h  |  2 +-
+ block/vdi.c          | 16 ++++++++--------
+ hw/acpi/vmgenid.c    |  6 ++----
+ tests/vmgenid-test.c |  2 +-
+ util/uuid.c          | 10 +++++-----
+ 5 files changed, 17 insertions(+), 19 deletions(-)
 
-diff --git a/block.c b/block.c
-index 5a4d27173e..b67d9b7b65 100644
---- a/block.c
-+++ b/block.c
-@@ -4697,6 +4697,7 @@ static void coroutine_fn bdrv_co_invalidate_cache(B=
-lockDriverState *bs,
-         if (parent->role->activate) {
-             parent->role->activate(parent, &local_err);
-             if (local_err) {
-+                bs->open_flags |=3D BDRV_O_INACTIVE;
-                 error_propagate(errp, local_err);
-                 return;
-             }
+diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+index 09489ce5c5..037357d990 100644
+--- a/include/qemu/uuid.h
++++ b/include/qemu/uuid.h
+@@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+=20
+ int qemu_uuid_parse(const char *str, QemuUUID *uuid);
+=20
+-void qemu_uuid_bswap(QemuUUID *uuid);
++QemuUUID qemu_uuid_bswap(QemuUUID uuid);
+=20
+ #endif
+diff --git a/block/vdi.c b/block/vdi.c
+index 4cc726047c..0c34f6bae4 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
+     header->block_extra =3D le32_to_cpu(header->block_extra);
+     header->blocks_in_image =3D le32_to_cpu(header->blocks_in_image);
+     header->blocks_allocated =3D le32_to_cpu(header->blocks_allocated);
+-    qemu_uuid_bswap(&header->uuid_image);
+-    qemu_uuid_bswap(&header->uuid_last_snap);
+-    qemu_uuid_bswap(&header->uuid_link);
+-    qemu_uuid_bswap(&header->uuid_parent);
++    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
++    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
++    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
++    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
+ }
+=20
+ static void vdi_header_to_le(VdiHeader *header)
+@@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
+     header->block_extra =3D cpu_to_le32(header->block_extra);
+     header->blocks_in_image =3D cpu_to_le32(header->blocks_in_image);
+     header->blocks_allocated =3D cpu_to_le32(header->blocks_allocated);
+-    qemu_uuid_bswap(&header->uuid_image);
+-    qemu_uuid_bswap(&header->uuid_last_snap);
+-    qemu_uuid_bswap(&header->uuid_link);
+-    qemu_uuid_bswap(&header->uuid_parent);
++    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
++    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
++    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
++    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
+ }
+=20
+ static void vdi_header_print(VdiHeader *header)
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index d78b579a20..02717a8b0d 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *tabl=
+e_data, GArray *guid,
+      * first, since that's what the guest expects
+      */
+     g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data=
+));
+-    guid_le =3D vms->guid;
+-    qemu_uuid_bswap(&guid_le);
++    guid_le =3D qemu_uuid_bswap(vms->guid);
+     /* The GUID is written at a fixed offset into the fw_cfg file
+      * in order to implement the "OVMF SDT Header probe suppressor"
+      * see docs/specs/vmgenid.txt for more details
+@@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
+              * however, will expect the fields to be little-endian.
+              * Perform a byte swap immediately before writing.
+              */
+-            guid_le =3D vms->guid;
+-            qemu_uuid_bswap(&guid_le);
++            guid_le =3D qemu_uuid_bswap(vms->guid);
+             /* The GUID is written at a fixed offset into the fw_cfg fil=
+e
+              * in order to implement the "OVMF SDT Header probe suppress=
+or"
+              * see docs/specs/vmgenid.txt for more details.
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 52cdd83ec0..ae38ee5ac0 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -88,7 +88,7 @@ static void read_guid_from_memory(QTestState *qts, Qemu=
+UUID *guid)
+     /* The GUID is in little-endian format in the guest, while QEMU
+      * uses big-endian.  Swap after reading.
+      */
+-    qemu_uuid_bswap(guid);
++    *guid =3D qemu_uuid_bswap(*guid);
+ }
+=20
+ static void read_guid_from_monitor(QTestState *qts, QemuUUID *guid)
+diff --git a/util/uuid.c b/util/uuid.c
+index ebf06c049a..5787f0978c 100644
+--- a/util/uuid.c
++++ b/util/uuid.c
+@@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid=
+)
+=20
+ /* Swap from UUID format endian (BE) to the opposite or vice versa.
+  */
+-void qemu_uuid_bswap(QemuUUID *uuid)
++QemuUUID qemu_uuid_bswap(QemuUUID uuid)
+ {
+-    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
+-    bswap32s(&uuid->fields.time_low);
+-    bswap16s(&uuid->fields.time_mid);
+-    bswap16s(&uuid->fields.time_high_and_version);
++    bswap32s(&uuid.fields.time_low);
++    bswap16s(&uuid.fields.time_mid);
++    bswap16s(&uuid.fields.time_high_and_version);
++    return uuid;
+ }
 --=20
 2.20.1
