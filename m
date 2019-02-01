@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60619)
+Received: from eggs.gnu.org ([209.51.188.92]:33766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gphQV-00079I-O9
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:36:51 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gphTi-00083s-Kc
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gphQR-0005uO-LL
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:36:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gphQQ-0005M9-8Z
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:36:43 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20190124203959.30875-1-lersek@redhat.com>
-	<20190124203959.30875-5-lersek@redhat.com>
-	<6d5868f5-70b4-71e2-3495-8d47156148c1@redhat.com>
-	<f39b4b89-bd10-de9c-d3d2-c38411594f70@redhat.com>
-Message-ID: <74cf6f64-254f-1a15-4071-0b73daef02a6@redhat.com>
-Date: Fri, 1 Feb 2019 23:35:49 +0100
-MIME-Version: 1.0
-In-Reply-To: <f39b4b89-bd10-de9c-d3d2-c38411594f70@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gphTd-0000Eb-Rc
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:04 -0500
+Received: from mail-oln040092012065.outbound.protection.outlook.com
+	([40.92.12.65]:26112
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1gphTd-0000Cy-EY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:40:01 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Fri, 1 Feb 2019 22:39:59 +0000
+Message-ID: <RO1P152MB14835BC3FB1EB24158F9FC7F97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128121331.GB2939@work-vm>
+	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128173536.GE2585@work-vm>
+	<RO1P152MB14834BE5D9747719CD493C5297960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190201133639.GE3150@work-vm>
+	<RO1P152MB148380E67D93DAB6C8093EFE97920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190201202807.GH3150@work-vm>
+In-Reply-To: <20190201202807.GH3150@work-vm>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] tests/uefi-test-tools: add build
- scripts
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <67629B5FC7BBB44496F9F5096C718CE2@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,158 +38,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 01/31/19 19:55, Laszlo Ersek wrote:
-> On 01/31/19 18:07, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 1/24/19 9:39 PM, Laszlo Ersek wrote:
-
->>> +# "build.sh" invokes the "build" utility of edk2 BaseTools. In any g=
-iven edk2
->>> +# workspace, at most one "build" instance may be operating at a time=
-. Therefore
->>> +# we must serialize the rebuilding of targets in this Makefile.
->>> +.NOTPARALLEL:
->>
->> Well this doesn't seem to improve my case :|
->>
->> You can test with:
->>
->> $ alias make=3D'make -j8 -l7.5'
->>
->> So you get:
->>
->> $ make print-MAKEFLAGS
->> MAKEFLAGS=3DrR -j8 -l7.5 --jobserver-auth=3D3,4
->
-> I get something different (with make-3.82-23.el7.x86_64):
->
-> MAKEFLAGS=3DRrl 7.5 - --jobserver-fds=3D3,4 -j
->
-> Notably, the argument 8 of "-j" is dropped.
->
-> Anyway, I think this is a side topic.
->
->
->> and this command fails:
->>
->> $ make -C tests/uefi-test-tools Build/bios-tables-test.x86_64.efi
->
-> (1) How *exactly* does it fail for you?
->
-> (2) What operating system and "make" are you using?
->
-> Because, the command completes perfectly fine for me. (Just for this
-> test, I rebased the v2 branch on top of current master, i.e. commit
-> aefcd2836620, and re-tested there.)
->
-> (3) Also, did you update all submodules first? (git submodule update
-> --init --force)
->
-> (4) IMPORTANT: did you make sure you didn't have an earlier
-> *mis-built* BaseTools directory in the submodule? For that, run "make
-> clean" in the QEMU project root. Note that "git clean -ffdx" will
-> *not* clean submodules, when issued from the QEMU project root.
-
-I've found the issue myself, through using an up to date Fedora 29 guest
-for the build.
-
-(a) On RHEL7, I got "make-3.82-23.el7.x86_64". On Fedora 29, it's
-"make-4.2.1-10.fc29.x86_64". Note in particular "4.2", on Fedora.
-
-(b) In the earlier discussion on help-make
-<http://lists.gnu.org/archive/html/help-make/2019-01/msg00004.html>,
-Paul Smith responded to me,
-
-On 01/23/19 14:45, Paul Smith wrote:
-> On Wed, 2019-01-23 at 11:24 +0100, Laszlo Ersek wrote:
->> In particular, "--jobserver-fds" is not documented in end-user
->> documentation, apparently, so I get a feeling this option could
->> change at any time, as an implementation detail of distributing jobs.
->
-> In fact it DID change, in GNU make 4.2, to be --jobserver-auth.  At
-> the same time this new option was published in the documentation and
-> made an official part of the GNU make interface.
-
-(c) That is, the version bump from RHEL7's make to Fedora29's make
-triggered, in our testing, this change. This explains why
-
-  make print-MAKEFLAGS
-
-printed
-
-  MAKEFLAGS=3DrR -j8 -l7.5 --jobserver-auth=3D3,4
-
-for you, and returned
-
-  MAKEFLAGS=3DRrl 7.5 - --jobserver-fds=3D3,4 -j
-
-for me.
-
-(d) The build *indeed* fails on Fedora29, with the following obscure
-error:
-
-> make[1]: *** read jobs pipe: Bad file descriptor.  Stop.
-> make[1]: *** Waiting for unfinished jobs....
-
-(e) The documentation that Paul referenced, after I found it, provided
-the critical hint.
-
-https://www.gnu.org/software/make/manual/html_node/POSIX-Jobserver.html
-
-> If your tool determines that the --jobserver-auth option is available
-> in MAKEFLAGS but that the file descriptors specified are closed, this
-> means that the calling make process did not think that your tool was a
-> recursive make invocation (e.g., the command line was not prefixed
-> with a + character). [...]
-
-This means that the inner (=3D edk2's) make process inherits the
-"--jobserver-auth=3D3,4" option from the outer (=3D qemu's) make process,
-through the MAKEFLAGS variable. However, it does not inherit the file
-descriptors themselves! And the reason is that the outer make does not
-believe that the recipe that invokes "build.sh" is in fact an (indirect)
-recursive make invocation. Therefore the outer make never bothers
-passing down the file descriptors for the jobserver pipe.
-
-The documentation writes,
-
-> [...] only command lines that make understands to be recursive
-> invocations of make [...] will have access to the jobserver. When
-> writing makefiles you must be sure to mark the command as recursive
-> (most commonly by prefixing the command line with the + indicator
-> [...]
-
-(Also:
-
-> Using the MAKE variable has the same effect as using a '+' character
-> at the beginning of the recipe line.
-
-This is why an explicit "+" is needed only infrequently; most recursive
-invocations are performed via $(MAKE), and the outer make recognizes
-that automatically).
-
-(f) So, the solution is to prefix the "./build.sh" recipe with a "+"
-sign, to mark it as "recursive":
-
-> diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Mak=
-efile
-> index 61d263861e..449b81d8ba 100644
-> --- a/tests/uefi-test-tools/Makefile
-> +++ b/tests/uefi-test-tools/Makefile
-> @@ -87,7 +87,7 @@ Build/%.fat: Build/%.efi
->  .NOTPARALLEL:
->
->  Build/bios-tables-test.%.efi: build-edk2-tools
-> -	./build.sh $(edk2_dir) BiosTablesTest $* $@
-> +	+./build.sh $(edk2_dir) BiosTablesTest $* $@
->
->  build-edk2-tools:
->  	$(MAKE) -C $(edk2_dir)/BaseTools
-
-This fixes the issue for me on Fedora 29, without breaking the behavior
-on RHEL7.
-
-I'll submit v3 later. Thank you for catching this error.
-
-Laszlo
+VGhhbmsgeW91IGZvciB0ZXN0aW5nIHRoaXMsIHRoZSBsYXN0IHVwZGF0ZSBncmVhdGx5IGltcHJv
+dmVkIHRoZQ0Kc2l0dWF0aW9uLiBsaWJzcGljZS1zZXJ2ZXIxIHVwZGF0ZWQsIHNvIEkgcmVidWls
+dCBRRU1VLiBUaGUNCmxpYnNwaWNlLXNlcnZlcjEgMC4xNC4wLTF1YnVudHUyLjQgY2hhbmdlIGxv
+ZyBpczoNCg0KICAqIFNFQ1VSSVRZIFVQREFURTogb2ZmLWJ5LW9uZSBlcnJvciBpbiBtZW1zbG90
+X2dldF92aXJ0DQogICAgLSBkZWJpYW4vcGF0Y2hlcy9DVkUtMjAxOS0zODEzLnBhdGNoOiBmaXgg
+Y2hlY2tzIGluIHNlcnZlci9tZW1zbG90LmMsDQogICAgICBhZGQgdGVzdHMgdG8gc2VydmVyL3Rl
+c3RzL3Rlc3QtcXhsLXBhcnNpbmcuYy4NCiAgICAtIENWRS0yMDE5LTM4MTMNCiAgKiBkZWJpYW4v
+dGVzdHMvYXV0b21hdGVkLXRlc3RzOiBmaXggaW5jb3JyZWN0IHRlc3QgbmFtZSwgZG9uJ3QgZmFp
+bCBvbg0KICAgIGJ1aWxkIHdyaXRpbmcgdG8gc3RkZXJyLg0KDQpUaGUgZXJyb3JzIG9uIHRlcm1p
+bmFsIGFyZToNCg0KKHFlbXU6MTE2ODMpOiBTcGljZS1DUklUSUNBTCAqKjogMTg6Mzk6NDAuNzQ3
+Og0KbWVtc2xvdC5jOjExMTptZW1zbG90X2dldF92aXJ0OiBzbG90X2lkIDI1NSB0b28gYmlnLCBh
+ZGRyPWZmMDAwMDAwZmYwMDAwMDANCkFib3J0YWRvIChpbWFnZW0gZG8gbsO6Y2xlbyBncmF2YWRh
+KQ0KDQpUaGUgZnVuY3Rpb24gdGhhdCB3YXMgY2hhbmdlZCB3aXRoIHRoZSBsYXN0IHVwZGF0ZSBz
+ZWVtcyB0byBiZSB0aGUgZXhhY3QNCnNhbWUgZnVuY3Rpb24gdGhhdCB3YXMgY2F1c2luZyB0aGUg
+Y3Jhc2guIE5vdyB0aGUgY3Jhc2ggaGFwcGVucyBPTkxZIGluDQp0aGUgZmlyc3QgZXhlY3V0aW9u
+LiBBbGwgc3Vic2VxdWVudCBleGVjdXRpb25zIHdvcmsgY29ycmVjdGx5Lg0KDQpXaGlsZSB0aGUg
+Z3Vlc3QgY3Jhc2hlcyBvbiB0aGUgZmlyc3QgZXhlY3V0aW9uLCBpdCBzZWVtcyB0aGUgZ3Vlc3Qg
+ZmlsZQ0Kc3lzdGVtIGlzIHJlc2lsaWVudCBlbm91Z2ggdG8gc3VmZmVyIG5vIGRhbWFnZXMgZnJv
+bSB0aGUgY3Jhc2ggb24gdGhlDQpmaXJzdCBib290IGFuZCBzdWJzZXF1ZW50IGJvb3RzIGFsbCBz
+ZWVtIHBlcmZlY3QuDQoNCkkgaW5zdGFsbGVkIHRoZSBkZWJ1ZyBzeW1ib2xzIGZvciBsaWJnbGli
+LTIuMCB0b28sIGhvcGVmdWxseSB0aGUNCmFkZGl0aW9uYWwgZGVidWcgbWVzc2FnZXMgaGF2ZSBz
+b21lIHVzZWZ1bCBpbmZvcm1hdGlvbi4gRnJvbSB0aGUgZmlyc3QNCmV4ZWN1dGlvbiB0aGF0IGNy
+YXNoZXMgKGd0ayxnbD1vbiBhbmQgZ3RrIGhhZCB0aGUgc2FtZSByZXN1bHQpOg0KDQpxZW11LXN5
+c3RlbS14ODZfNjQgLWFjY2VsIGt2bSAtY3B1IGhvc3QgLXNtcCBjb3Jlcz0yLHRocmVhZHM9MSAt
+bSAyMDQ4DQotaGRhIG5lb25icm9rZW4ucWNvdzIgLWRldmljZSBxeGwtdmdhLHhyZXM9MTM2Nix5
+cmVzPTc2OCxhZGRyPTIgLWRpc3BsYXkNCmd0ayxnbD1vbiAtbW9uaXRvciB2YyAtc2VyaWFsIHZj
+IC1kZXZpY2UgcWVtdS14aGNpLGFkZHI9MyAtbmV0ZGV2DQp1c2VyLGlkPW5ldDAgLWRldmljZSBl
+MTAwMCxuZXRkZXY9bmV0MCxhZGRyPTQgLWJpb3MgL3Vzci9zaGFyZS9vdm1mL09WTUYuZmQNCg0K
+aWQgMCwgZ3JvdXAgMCwgdmlydCBzdGFydCAwLCB2aXJ0IGVuZCBmZmZmZmZmZmZmZmZmZmZmLCBn
+ZW5lcmF0aW9uIDAsDQpkZWx0YSAwDQppZCAxLCBncm91cCAxLCB2aXJ0IHN0YXJ0IDdmZmYxZmUw
+MDAwMCwgdmlydCBlbmQgN2ZmZjIzZGZlMDAwLA0KZ2VuZXJhdGlvbiAwLCBkZWx0YSA3ZmZmMWZl
+MDAwMDANCmlkIDIsIGdyb3VwIDEsIHZpcnQgc3RhcnQgN2ZmZjFiYzAwMDAwLCB2aXJ0IGVuZCA3
+ZmZmMWZjMDAwMDAsDQpnZW5lcmF0aW9uIDAsIGRlbHRhIDdmZmYxYmMwMDAwMA0KDQoocWVtdTox
+OTM3KTogU3BpY2UtQ1JJVElDQUwgKio6IDIwOjE3OjIxLjYyMzoNCm1lbXNsb3QuYzoxMTE6bWVt
+c2xvdF9nZXRfdmlydDogc2xvdF9pZCAyNTUgdG9vIGJpZywgYWRkcj1mZjAwMDAwMGZmMDAwMDAw
+DQoNCihnZGIpIGJ0DQojMCAgMHgwMDAwN2ZmZmYwMzcxZTk3IGluIF9fR0lfcmFpc2UgKHNpZz1z
+aWdAZW50cnk9NikgYXQNCi4uL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4L3JhaXNlLmM6NTENCiMx
+ICAweDAwMDA3ZmZmZjAzNzM4MDEgaW4gX19HSV9hYm9ydCAoKSBhdCBhYm9ydC5jOjc5DQojMiAg
+MHgwMDAwN2ZmZmYxMTZmY2M5IGluIHNwaWNlX2xvZ3YgKGxvZ19kb21haW49MHg3ZmZmZjExZGE5
+ZjUgIlNwaWNlIiwNCmFyZ3M9MHg3ZmZmMzYwMjhjYjAsIGZvcm1hdD0weDdmZmZmMTFlMWM1YiAi
+c2xvdF9pZCAlZCB0b28gYmlnLA0KYWRkcj0lbHgiLCBmdW5jdGlvbj0weDdmZmZmMTFlMWQ5MCA8
+X19GVU5DVElPTl9fLjE1NTk0Pg0KIm1lbXNsb3RfZ2V0X3ZpcnQiLCBzdHJsb2M9MHg3ZmZmZjEx
+ZTFjNzggIm1lbXNsb3QuYzoxMTEiLA0KbG9nX2xldmVsPUdfTE9HX0xFVkVMX0NSSVRJQ0FMKSBh
+dCBsb2cuYzoxODMNCiMzICAweDAwMDA3ZmZmZjExNmZjYzkgaW4gc3BpY2VfbG9nDQoobG9nX2xl
+dmVsPWxvZ19sZXZlbEBlbnRyeT1HX0xPR19MRVZFTF9DUklUSUNBTCwNCnN0cmxvYz1zdHJsb2NA
+ZW50cnk9MHg3ZmZmZjExZTFjNzggIm1lbXNsb3QuYzoxMTEiLA0KZnVuY3Rpb249ZnVuY3Rpb25A
+ZW50cnk9MHg3ZmZmZjExZTFkOTAgPF9fRlVOQ1RJT05fXy4xNTU5ND4NCiJtZW1zbG90X2dldF92
+aXJ0IiwgZm9ybWF0PWZvcm1hdEBlbnRyeT0weDdmZmZmMTFlMWM1YiAic2xvdF9pZCAlZCB0b28N
+CmJpZywgYWRkcj0lbHgiKSBhdCBsb2cuYzoxOTYNCiM0ICAweDAwMDA3ZmZmZjExMzUzYjggaW4g
+bWVtc2xvdF9nZXRfdmlydA0KKGluZm89aW5mb0BlbnRyeT0weDU1NTU1NzliY2UxMCwgYWRkcj1h
+ZGRyQGVudHJ5PTE4Mzc0Njg2NDgzOTQ5ODEzNzYwLA0KYWRkX3NpemU9YWRkX3NpemVAZW50cnk9
+MTAsIGdyb3VwX2lkPWdyb3VwX2lkQGVudHJ5PTEsDQplcnJvcj1lcnJvckBlbnRyeT0weDdmZmYz
+NjAyOGUwOCkgYXQgbWVtc2xvdC5jOjExMQ0KIzUgIDB4MDAwMDdmZmZmMTEzZTdkMCBpbiByZWRf
+Z2V0X2ltYWdlDQooc2xvdHM9c2xvdHNAZW50cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPWdy
+b3VwX2lkQGVudHJ5PTEsDQphZGRyPTxvcHRpbWl6ZWQgb3V0PiwgZmxhZ3M9ZmxhZ3NAZW50cnk9
+MCwgaXNfbWFzaz1pc19tYXNrQGVudHJ5PWZhbHNlKQ0KYXQgcmVkLXBhcnNlLXF4bC5jOjUxMg0K
+IzYgIDB4MDAwMDdmZmZmMTEzZWE3NiBpbiByZWRfZ2V0X2NvcHlfcHRyDQooc2xvdHM9c2xvdHNA
+ZW50cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPWdyb3VwX2lkQGVudHJ5PTEsDQpyZWQ9cmVk
+QGVudHJ5PTB4N2ZmZjE0MDlmMzMwLCBxeGw9MHg3ZmZmMWZlMDEwN2IsIGZsYWdzPWZsYWdzQGVu
+dHJ5PTApDQphdCByZWQtcGFyc2UtcXhsLmM6NjgwDQojNyAgMHgwMDAwN2ZmZmYxMTNmOWExIGlu
+IHJlZF9nZXRfbmF0aXZlX2RyYXdhYmxlIChmbGFncz08b3B0aW1pemVkDQpvdXQ+LCBhZGRyPTxv
+cHRpbWl6ZWQgb3V0PiwgcmVkPTxvcHRpbWl6ZWQgb3V0PiwgZ3JvdXBfaWQ9PG9wdGltaXplZA0K
+b3V0Piwgc2xvdHM9PG9wdGltaXplZCBvdXQ+KSBhdCByZWQtcGFyc2UtcXhsLmM6MTA3Mg0KIzgg
+IDB4MDAwMDdmZmZmMTEzZjlhMSBpbiByZWRfZ2V0X2RyYXdhYmxlDQooc2xvdHM9c2xvdHNAZW50
+cnk9MHg1NTU1NTc5YmNlMTAsIGdyb3VwX2lkPTEsDQpyZWQ9cmVkQGVudHJ5PTB4N2ZmZjE0MDlm
+MjkwLCBhZGRyPTxvcHRpbWl6ZWQgb3V0PiwgZmxhZ3M9MCkgYXQNCnJlZC1wYXJzZS1xeGwuYzox
+MjA2DQojOSAgMHgwMDAwN2ZmZmYxMTUyM2NkIGluIHJlZF9wcm9jZXNzX2Rpc3BsYXkgKHdvcmtl
+cj0weDU1NTU1NzliY2Q4MCwNCnJpbmdfaXNfZW1wdHk9MHg3ZmZmMzYwMjhmOWMpIGF0IHJlZC13
+b3JrZXIuYzoyMjQNCiMxMCAweDAwMDA3ZmZmZjExNTBkMjEgaW4gZmx1c2hfY29tbWFuZHMNCih3
+b3JrZXI9d29ya2VyQGVudHJ5PTB4NTU1NTU3OWJjZDgwLCByZWRfY2hhbm5lbD0weDU1NTU1Nzli
+OTIxMA0KW0Rpc3BsYXlDaGFubmVsXSwgcHJvY2Vzcz1wcm9jZXNzQGVudHJ5PTB4N2ZmZmYxMTUy
+MjIwDQo8cmVkX3Byb2Nlc3NfZGlzcGxheT4pIGF0IHJlZC13b3JrZXIuYzozMTUNCiMxMSAweDAw
+MDA3ZmZmZjExNTBlNTggaW4gZmx1c2hfZGlzcGxheV9jb21tYW5kcw0KKHdvcmtlcj13b3JrZXJA
+ZW50cnk9MHg1NTU1NTc5YmNkODApIGF0IHJlZC13b3JrZXIuYzozNTINCiMxMiAweDAwMDA3ZmZm
+ZjExNTE0YmYgaW4gZmx1c2hfYWxsX3F4bF9jb21tYW5kcyAod29ya2VyPTB4NTU1NTU3OWJjZDgw
+KQ0KYXQgcmVkLXdvcmtlci5jOjM2Nw0KIzEzIDB4MDAwMDdmZmZmMTE1MTRiZiBpbiBkZXN0cm95
+X3ByaW1hcnlfc3VyZmFjZQ0KKHdvcmtlcj0weDU1NTU1NzliY2Q4MCwgc3VyZmFjZV9pZD0wKSBh
+dCByZWQtd29ya2VyLmM6NTU4DQojMTQgMHgwMDAwN2ZmZmYxMTFmNGYxIGluIGRpc3BhdGNoZXJf
+aGFuZGxlX3NpbmdsZV9yZWFkDQooZGlzcGF0Y2hlcj0weDU1NTU1NmExZDFjMCBbRGlzcGF0Y2hl
+cl0pIGF0IGRpc3BhdGNoZXIuYzoyODQNCiMxNSAweDAwMDA3ZmZmZjExMWY0ZjEgaW4gZGlzcGF0
+Y2hlcl9oYW5kbGVfcmVjdl9yZWFkDQooZGlzcGF0Y2hlcj0weDU1NTU1NmExZDFjMCBbRGlzcGF0
+Y2hlcl0pIGF0IGRpc3BhdGNoZXIuYzozMDQNCiMxNiAweDAwMDA3ZmZmZjExMjVkN2IgaW4gd2F0
+Y2hfZnVuYyAoc291cmNlPTxvcHRpbWl6ZWQgb3V0PiwNCmNvbmRpdGlvbj08b3B0aW1pemVkIG91
+dD4sIGRhdGE9MHg1NTU1NTc5YmNmNjApIGF0IGV2ZW50LWxvb3AuYzoxMjgNCiMxNyAweDAwMDA3
+ZmZmZjQ3OTExZjUgaW4gZ19tYWluX2Rpc3BhdGNoIChjb250ZXh0PTB4NTU1NTU3OWJjZTcwKSBh
+dA0KLi4vLi4vLi4vLi4vZ2xpYi9nbWFpbi5jOjMxNzYNCiMxOCAweDAwMDA3ZmZmZjQ3OTExZjUg
+aW4gZ19tYWluX2NvbnRleHRfZGlzcGF0Y2gNCihjb250ZXh0PWNvbnRleHRAZW50cnk9MHg1NTU1
+NTc5YmNlNzApIGF0IC4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzozODI5DQojMTkgMHgwMDAwN2Zm
+ZmY0NzkxNWMwIGluIGdfbWFpbl9jb250ZXh0X2l0ZXJhdGUNCihjb250ZXh0PTB4NTU1NTU3OWJj
+ZTcwLCBibG9jaz1ibG9ja0BlbnRyeT0xLCBkaXNwYXRjaD1kaXNwYXRjaEBlbnRyeT0xLA0Kc2Vs
+Zj08b3B0aW1pemVkIG91dD4pIGF0IC4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzozOTAyDQojMjAg
+MHgwMDAwN2ZmZmY0NzkxOGQyIGluIGdfbWFpbl9sb29wX3J1biAobG9vcD0weDdmZmYxNDAwMjUz
+MCkgYXQNCi4uLy4uLy4uLy4uL2dsaWIvZ21haW4uYzo0MDk4DQojMjEgMHgwMDAwN2ZmZmYxMTUx
+YjNhIGluIHJlZF93b3JrZXJfbWFpbiAoYXJnPTB4NTU1NTU3OWJjZDgwKSBhdA0KcmVkLXdvcmtl
+ci5jOjEzNzINCiMyMiAweDAwMDA3ZmZmZjA3MmI2ZGIgaW4gc3RhcnRfdGhyZWFkIChhcmc9MHg3
+ZmZmMzYwMmM3MDApIGF0DQpwdGhyZWFkX2NyZWF0ZS5jOjQ2Mw0KIzIzIDB4MDAwMDdmZmZmMDQ1
+NDg4ZiBpbiBjbG9uZSAoKSBhdA0KLi4vc3lzZGVwcy91bml4L3N5c3YvbGludXgveDg2XzY0L2Ns
+b25lLlM6OTUNCg0Kw4BzIDE4OjI4IGRlIDAxLzAyLzIwMTksIERyLiBEYXZpZCBBbGFuIEdpbGJl
+cnQgZXNjcmV2ZXU6DQo+IA0KPiBSaWdodCB5ZXM7IGFzIHlvdSBzYXkgd2l0aCBoZGEgaXQncyBm
+aW5lOyAgSSd2ZSBwb2ludGVkIFBhb2xvIGF0DQo+IHRoaXMgb25lLg0KPiANCj4gQXMgZm9yIHRo
+ZSBvcmlnaW5hbCBjcmFzaDsgSSBjYW4ndCByZXByb2R1Y2UgaXQgaGVyZSAoT24gRmVkb3JhIDI5
+LA0KPiBoZWFkIHFlbXUpOg0KPiAuL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLXg4Nl82NCAt
+Y3B1IGhvc3QgIC1NIHBjLGFjY2VsPWt2bSAtc21wIDMgLW0gOEcgLWRyaXZlIGlmPWlkZSxmaWxl
+PS9ob21lL3ZtaW1hZ2VzL2tkZS1uZW9uLnFjb3cyIC1kaXNwbGF5IGd0ayxnbD1vbiAtZGV2aWNl
+IHFlbXUteGhjaSxhZGRyPTMgLWRldmljZSBxeGwtdmdhLHhyZXM9MTM2Nix5cmVzPTc2OCxhZGRy
+PTQgLWJpb3MgL3Vzci9zaGFyZS9PVk1GL09WTUZfQ09ERS5mZA0KPiANCj4gRGF2ZQ0KPiANCj4g
+LS0NCj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRnaWxiZXJ0QHJlZGhhdC5jb20gLyBNYW5j
+aGVzdGVyLCBVSw0KPiANCg==
