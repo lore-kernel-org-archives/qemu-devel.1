@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39537)
+Received: from eggs.gnu.org ([209.51.188.92]:39538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboO-00084A-9y
+	(envelope-from <kwolf@redhat.com>) id 1gpboO-00084C-07
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboK-0000I6-9y
+	(envelope-from <kwolf@redhat.com>) id 1gpboK-0000IM-Cw
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:02 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:35:16 +0100
-Message-Id: <20190201163518.31157-26-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:35:13 +0100
+Message-Id: <20190201163518.31157-23-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 25/27] qtest.py: Wait for the result of qtest
- commands
+Subject: [Qemu-devel] [PULL 22/27] iotests: Filter second BLOCK_JOB_ERROR
+ from 229
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Alberto Garcia <berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
 
-The cmd() method of the QEMUQtestProtocol class sends a qtest command
-to QEMU but doesn't wait for the return message ("OK", "FAIL", "ERR").
-Because of this, it can return control to the caller before the
-command has actually finished.
+Without this filter, this test sometimes fails.
 
-In cases like clock_step or clock_set this means that cmd() can return
-before all the timers triggered by the clock change have been fired.
-This can be fixed by making cmd() wait for the output of the qtest
-command.
-
-This fixes iotests 093 and 136, which are flaky since commit
-8258292e18c39480b64eba9f3551 when the machine is under heavy workload.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- scripts/qtest.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tests/qemu-iotests/229     | 6 +++++-
+ tests/qemu-iotests/229.out | 1 -
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index adf1fe3f26..afac3fe900 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -31,6 +31,7 @@ class QEMUQtestProtocol(object):
-         """
-         self._address =3D address
-         self._sock =3D self._get_sock()
-+        self._sockfile =3D None
-         if server:
-             self._sock.bind(self._address)
-             self._sock.listen(1)
-@@ -49,6 +50,7 @@ class QEMUQtestProtocol(object):
-         @raise socket.error on socket connection errors
-         """
-         self._sock.connect(self._address)
-+        self._sockfile =3D self._sock.makefile()
+diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
+index 893d098ad2..b0d4885fa6 100755
+--- a/tests/qemu-iotests/229
++++ b/tests/qemu-iotests/229
+@@ -81,11 +81,15 @@ echo
+ echo '=3D=3D=3D Force cancel job paused in error state  =3D=3D=3D'
+ echo
 =20
-     def accept(self):
-         """
-@@ -57,6 +59,7 @@ class QEMUQtestProtocol(object):
-         @raise socket.error on socket connection errors
-         """
-         self._sock, _ =3D self._sock.accept()
-+        self._sockfile =3D self._sock.makefile()
++# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
++# Cancelling the job means resuming it for a bit before it is actually
++# aborted, and in that time it may or may not re-encounter the error.
+ success_or_failure=3D"y" _send_qemu_cmd $QEMU_HANDLE \
+     "{'execute': 'block-job-cancel',
+                  'arguments': { 'device': 'testdisk',
+                                 'force': true}}" \
+-     "BLOCK_JOB_CANCELLED" "Assertion"
++     "BLOCK_JOB_CANCELLED" "Assertion" \
++    | grep -v '"BLOCK_JOB_ERROR"'
 =20
-     def cmd(self, qtest_cmd):
-         """
-@@ -65,9 +68,12 @@ class QEMUQtestProtocol(object):
-         @param qtest_cmd: qtest command text to be sent
-         """
-         self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
-+        resp =3D self._sockfile.readline()
-+        return resp
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
+index 4c4112805f..a3eb33788a 100644
+--- a/tests/qemu-iotests/229.out
++++ b/tests/qemu-iotests/229.out
+@@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
 =20
-     def close(self):
-         self._sock.close()
-+        self._sockfile.close()
-=20
-     def settimeout(self, timeout):
-         self._sock.settimeout(timeout)
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write=
+", "action": "stop"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}=
+}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152,=
+ "offset": 1048576, "speed": 0, "type": "mirror"}}
+ *** done
 --=20
 2.20.1
