@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41557)
+Received: from eggs.gnu.org ([209.51.188.92]:44171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.ning@intel.com>) id 1gpOtm-0004d3-WC
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:49:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gpPPf-000192-0D
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 22:22:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.ning@intel.com>) id 1gpOtl-0008Bg-SW
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:49:46 -0500
-From: "Ning, Yu" <yu.ning@intel.com>
-Date: Fri, 1 Feb 2019 02:49:24 +0000
-Message-ID: <C29659EAAA3E0143B583467412621C605E408079@SHSMSX101.ccr.corp.intel.com>
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<87o97yi67d.fsf@dusky.pond.sub.org>
-	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<87d0oddxu2.fsf@dusky.pond.sub.org>
-	<f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com>
-	<877eelcgf9.fsf@dusky.pond.sub.org>
-	<9c4e222f-3941-426e-3195-5598b2af1501@redhat.com>
-	<87munh9gb6.fsf@dusky.pond.sub.org>
-	<cb465eba-8c54-af8e-fe0e-ce90f71d213a@redhat.com>
-	<002701d4b9bc$b1fe72e0$15fb58a0$@phi.nz>
-	<3ace3624-893b-82e1-3132-0dcd1896ec94@redhat.com>
-In-Reply-To: <3ace3624-893b-82e1-3132-0dcd1896ec94@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1gpPIp-0000iD-HM
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 22:15:40 -0500
+Date: Fri, 1 Feb 2019 12:04:53 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190201010453.GC26425@umbus.fritz.box>
+References: <1548866382-14488-1-git-send-email-thuth@redhat.com>
+	<4e8dcc26-7e62-c79d-c354-8ade5db33f26@redhat.com>
+	<3c30472b-bc7f-d3cc-cf1f-1e5127205984@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Disposition: inline
+In-Reply-To: <3c30472b-bc7f-d3cc-cf1f-1e5127205984@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/ppc: Don't include m48t59.h
+ if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <alexandro@phi.nz>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Peter Krempa' <pkrempa@redhat.com>, 'Qemu-block' <qemu-block@nongnu.org>, 'Libvirt' <libvir-list@redhat.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, =?utf-8?B?J0zDoXN6bMOzIMOJcnNlayc=?= <lersek@redhat.com>, "'Justin Terry
-	(VM)'" <juterry@microsoft.com>, 'Markus Armbruster' <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
-bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgRmVicnVhcnkgMSwg
-MjAxOSA3OjU1DQo+IFRvOiBBbGV4YW5kcm8gU2FuY2hleiBCYWNoIDxhbGV4YW5kcm9AcGhpLm56
-PjsgJ01hcmt1cyBBcm1icnVzdGVyJw0KPiA8YXJtYnJ1QHJlZGhhdC5jb20+DQo+IENjOiAnUGV0
-ZXIgTWF5ZGVsbCcgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47ICdQZXRlciBLcmVtcGEnDQo+
-IDxwa3JlbXBhQHJlZGhhdC5jb20+OyAnUWVtdS1ibG9jaycgPHFlbXUtYmxvY2tAbm9uZ251Lm9y
-Zz47ICdMaWJ2aXJ0Jw0KPiA8bGlidmlyLWxpc3RAcmVkaGF0LmNvbT47ICdRRU1VIERldmVsb3Bl
-cnMnIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Ow0KPiAnTMOhc3psw7Mgw4lyc2VrJyA8bGVyc2Vr
-QHJlZGhhdC5jb20+OyAnSnVzdGluIFRlcnJ5IChWTSknDQo+IDxqdXRlcnJ5QG1pY3Jvc29mdC5j
-b20+OyBOaW5nLCBZdSA8eXUubmluZ0BpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
-ZXZlbF0gQ29uZmlndXJpbmcgcGZsYXNoIGRldmljZXMgZm9yIE9WTUYgZmlybXdhcmUNCj4gDQo+
-IE9uIDAxLzAyLzE5IDAwOjI4LCBBbGV4YW5kcm8gU2FuY2hleiBCYWNoIHdyb3RlOg0KPiA+IChD
-QydkIFl1IE5pbmcgQCBJbnRlbCdzIEhBWE0gdGVhbSkNCj4gPg0KPiA+IE5vdCBzdXJlLCBpZiBJ
-J20gdW5kZXJzdGFuZGluZyB0aGUgaXNzdWUgY29ycmVjdGx5LCBidXQgaXNuJ3QNCj4gPiBgSEFY
-X1ZNX0lPQ1RMX1NFVF9SQU0yYCB3aXRoIHRoZSBgSEFYX1JBTV9JTkZPX1JPTWAgZmxhZyBwcmVj
-aXNlbHkNCj4gPiB3aGF0IHlvdSBhcmUgbG9va2luZyBmb3I/DQo+ID4NCj4gPiBNb3JlIHByZWNp
-c2VseSwgSEFYX1ZNX0lPQ1RMX1NFVF9SQU0yIG1hcHMgYW4gSFZBIHJhbmdlIHRvIGEgR1BBDQo+
-ID4gcmFuZ2UsIHRoZSBIQVhfUkFNX0lORk9fUk9NIGZsYWcgc2hvdWxkIGFsbG93IG9ubHkgZ3Vl
-c3QgbWVtb3J5IHJlYWRzDQo+ID4gdG8gdGhhdCByYW5nZSBbMV0uIFdoZW4gdGhlIGd1ZXN0IGF0
-dGVtcHRzIHRvIHdyaXRlLCB0aGlzIHNob3VsZA0KPiA+IHRyaWdnZXIgYSBWTSBleGl0IHRoYXQg
-d2lsbCBiZSBoYW5kbGVkIGJ5IFFFTVUuDQo+IA0KPiBUaGUgbWlzc2luZyBoYW5kbGluZyBpcyBp
-biB0aGUgaHlwZXJ2aXNvcjoNCj4gDQo+ICAgICBpZiAocmV0ID09IC1FQUNDRVMpIHsNCj4gICAg
-ICAgICAvKg0KPiAgICAgICAgICAqIEZvciBzb21lIHJlYXNvbiwgZHVyaW5nIGJvb3QtdXAsIENo
-cm9tZSBPUyBndWVzdHMgbWFrZQ0KPiBodW5kcmVkcyBvZg0KPiAgICAgICAgICAqIGF0dGVtcHRz
-IHRvIHdyaXRlIHRvIEdQQXMgY2xvc2UgdG8gNEdCLCB3aGljaCBhcmUgbWFwcGVkIGludG8NCj4g
-QklPUw0KPiAgICAgICAgICAqIChyZWFkLW9ubHkpIGFuZCB0aHVzIHJlc3VsdCBpbiBFUFQgdmlv
-bGF0aW9ucy4NCj4gICAgICAgICAgKiBUT0RPOiBIYW5kbGUgdGhpcyBjYXNlIHByb3Blcmx5Lg0K
-PiAgICAgICAgICAqLw0KPiAgICAgICAgIGhheF93YXJuaW5nKCIlczogVW5leHBlY3RlZCBFUFQg
-dmlvbGF0aW9uIGNhdXNlLiBTa2lwcGluZw0KPiBpbnN0cnVjdGlvbiINCj4gICAgICAgICAgICAg
-ICAgICAgICAiIChsZW49JXUpXG4iLCBfX2Z1bmNfXywNCj4gdmNwdS0+dm14LmV4aXRfaW5zdHJf
-bGVuZ3RoKTsNCj4gICAgICAgICBhZHZhbmNlX3JpcCh2Y3B1KTsNCj4gICAgICAgICByZXR1cm4g
-SEFYX0VYSVQ7DQo+IH0NCj4gDQo+ID4gQWxzbywgdGhpcyBzZWVtcyB0byBiZSBoYW5kbGVkIGhl
-cmU6DQo+ID4NCj4gaHR0cHM6Ly9naXRodWIuY29tL3FlbXUvcWVtdS9ibG9iLzE1YmVkZTU1NDE2
-MmRkYTgyMmNkNzYyYzY4OWVkYjZmYTMNCj4gMmINCj4gPiA2ZTNiL3RhcmdldC9pMzg2L2hheC1t
-ZW0uYyNMMjA1LUwyMDcNCj4gDQo+IFJpZ2h0LCB0aG91Z2ggdG8gYmUgcHJlY2lzZSBpdCBzaG91
-bGQgYmUgY2hhbmdlZCB0bw0KPiANCj4gICAgICBpZiAobWVtb3J5X3JlZ2lvbl9pc19yb20oc2Vj
-dGlvbi0+bXIpIHx8DQo+IAkgbWVtb3J5X3JlZ2lvbl9pc19yb21kKHNlY3Rpb24tPm1yKSkgeyAg
-ICAgICAgIGZsYWdzIHw9DQo+IEhBWF9SQU1fSU5GT19ST007DQo+ICAgICAgfQ0KPiANCj4gZm9y
-IHRoYXQgdG8gd29yay4NCj4gDQoNClRoYW5rIHlvdSBib3RoIGZvciBvdXRsaW5pbmcgdGhlIGNo
-YW5nZXMgd2UgaGF2ZSB0byBtYWtlIGluIG9yZGVyIHRvIHN1cHBvcnQgUk9NRCBtZW1vcnkgcmVn
-aW9ucyEgIFRoZSBvbmx5IHF1ZXN0aW9uIGlzIHdoZXRoZXIgd2Ugc2hvdWxkIHBhc3MgYSBuZXcg
-ZmxhZyB0byBIQVhfVk1fSU9DVExfU0VUX1JBTTIgZm9yIFJPTUQsIHNvIHRoZSBoeXBlcnZpc29y
-IGNvdWxkIHJlc3BvbmQgZGlmZmVyZW50bHkgdG8gd3JpdGVzIHRvIFJPTSBhbmQgUk9NRCByZWdp
-b25zLiAgV291bGQgdGhhdCBiZSB1c2VmdWwgYXQgYWxsPyAgV2hhdCB3b3VsZCBoYXBwZW4gaWYg
-SEFYTSBhc2tlZCBRRU1VIHRvIGVtdWxhdGUgYSB3cml0ZSB0byBST00/DQoNCkhBWE0gZGlkbid0
-IGltcGxlbWVudCBST01EIHN1cHBvcnQgYXQgZmlyc3QsIGJlY2F1c2UgdGhlIGd1ZXN0cyB3ZSB0
-ZXN0ZWQgY291bGQgYm9vdCB3aXRob3V0IGl0IChpbmNsdWRpbmcgQ2hyb21lIE9TKS4gIE5vdyB0
-aGF0IHRoaXMgZmVhdHVyZSBoYXMgYmVjb21lIG1vcmUgcG9wdWxhciAoYW5kIHdlIHdhbnQgdG8g
-YmUgYWJsZSB0byBib290IE9WTUYpLCBJIHRoaW5rIGl0J3MgdGltZSB0byBnZXQgaXQgZG9uZS4g
-IEknZCBsaWtlIHRvIGdldCB0byBpdCBhZnRlciB0aGUgTHVuYXIgTmV3IFllYXIgaG9saWRheXMs
-IGJ1dCBpZiBhbnlvbmUgY2FuIGZpbmlzaCBpdCBzb29uZXIsIEknbGwgYmUgaGFwcHkgdG8gbWVy
-Z2UgdGhlaXIgcGF0Y2ggaW50byBIQVhNLg0KDQotWXUNCg==
+
+--IrhDeMKUP4DT/M7F
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jan 31, 2019 at 03:12:48PM +0100, Thomas Huth wrote:
+> On 2019-01-30 18:21, Philippe Mathieu-Daud=E9 wrote:
+> > On 1/30/19 5:39 PM, Thomas Huth wrote:
+> >> These files don't use anything from m48t59.h, so no need to include
+> >> this header here.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  hw/ppc/mac_newworld.c | 1 -
+> >>  hw/ppc/mac_oldworld.c | 1 -
+> >>  hw/ppc/ppc.c          | 2 --
+> >>  hw/ppc/ppc_booke.c    | 1 -
+> >>  4 files changed, 5 deletions(-)
+> >>
+> >> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> >> index bb19eab..f1c8400 100644
+> >> --- a/hw/ppc/mac_newworld.c
+> >> +++ b/hw/ppc/mac_newworld.c
+> >> @@ -53,7 +53,6 @@
+> >>  #include "hw/ppc/mac.h"
+> >>  #include "hw/input/adb.h"
+> >>  #include "hw/ppc/mac_dbdma.h"
+> >> -#include "hw/timer/m48t59.h"
+> >>  #include "hw/pci/pci.h"
+> >>  #include "net/net.h"
+> >>  #include "sysemu/sysemu.h"
+> >> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> >> index 817f70e..98d531d 100644
+> >> --- a/hw/ppc/mac_oldworld.c
+> >> +++ b/hw/ppc/mac_oldworld.c
+> >> @@ -30,7 +30,6 @@
+> >>  #include "hw/ppc/ppc.h"
+> >>  #include "mac.h"
+> >>  #include "hw/input/adb.h"
+> >> -#include "hw/timer/m48t59.h"
+> >>  #include "sysemu/sysemu.h"
+> >>  #include "net/net.h"
+> >>  #include "hw/isa/isa.h"
+> >> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> >> index 98b409f..cffdc39 100644
+> >> --- a/hw/ppc/ppc.c
+> >> +++ b/hw/ppc/ppc.c
+> >> @@ -30,10 +30,8 @@
+> >>  #include "qemu/timer.h"
+> >>  #include "sysemu/sysemu.h"
+> >>  #include "sysemu/cpus.h"
+> >> -#include "hw/timer/m48t59.h"
+> >>  #include "qemu/log.h"
+> >>  #include "qemu/error-report.h"
+> >> -#include "hw/loader.h"
+> >=20
+> > I supposed the "hw/loader.h" change slipped in by mistake.
+>=20
+> I should have mentioned it in the patch description, I guess. ppc.c also
+> compiles without this line, so it can be removed, too.
+
+Fair enough, applied to ppc-for-4.0.
+
+>=20
+>  Thomas
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--IrhDeMKUP4DT/M7F
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlxTmzUACgkQbDjKyiDZ
+s5JzKg//QbZZtlG+qJ5iaImi6MxCDgn5sXPN/AKoJlZIgrG+YRZlWN18LZdkw+i7
+oKutmggFO+oMse4JT3doFxk/e2E0ItPX5QAV6HG+VGgnBoMQjIUSDwAP37F3aW6c
+1A+WLzmJApZlCI8qxn5AGYxn+m7/mwMVj+hKQVNtLcCPPVZ+WXH02Vi7982AcRaN
+QKDp8Ef4aLwNMzg0fwyu6dhnTQggojSO2GLdh39OrBKAeo6s1aOH4T7ZHchDgmbs
+lYP2327fPshYyzC+lMq9oysXnzt5ows9Lg5hKTk8U17vMOvfeC4aXR9KHAocNGYQ
+i3ouyIYycnWkAq4bLv/FhIgwDRoa7tW02xKi2U1PiOZ1X2bi8WODXcBAXGwxxlhf
+Fe/Ro8PcX0dmwrAEnYd3oMg1zd+O+K7/2aYoSgQ6ly3mxHf/usrDqvoboJGvM9DZ
+c7IuHs60LhbKnrvKC33pTELTAttMyhvO1lRetPzgYLwrOJ75iqK3uXpPCvE87jn2
+8zC+TlT3qZUizoOJvIZ/6ebW6Re7anjqvCfOKRyuiQQVwx75FXptuQf2cx1zUL2w
+nrBizo52Cf4AxLgEJxEIO6peT14HVP3Tk8HevbOXicF56PrRJCB9Sme5nctzD5kT
+MYyp8Xb/53PSNaXeFVtsdlneqdYn3WBeuEfTXEltenGXcOG143c=
+=QQ6+
+-----END PGP SIGNATURE-----
+
+--IrhDeMKUP4DT/M7F--
