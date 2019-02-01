@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38876)
+Received: from eggs.gnu.org ([209.51.188.92]:38818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpa9a-0008Kz-Js
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpa9Y-0008Js-8Y
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpa9Z-00048q-Gi
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:50 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39984)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpa9W-00045U-KX
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:48 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45906)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpa9Z-00047h-6h
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:49 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id p4so7372821wrt.7
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 06:50:49 -0800 (PST)
+	id 1gpa9W-00044A-CF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:46 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so7330030wrr.12
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 06:50:46 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 14:50:31 +0000
-Message-Id: <20190201145035.22739-8-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 14:50:29 +0000
+Message-Id: <20190201145035.22739-6-peter.maydell@linaro.org>
 In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
 References: <20190201145035.22739-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 07/11] docs/conf.py: Disable option warnings
+Subject: [Qemu-devel] [PATCH 05/11] docs/conf.py: Configure the 'alabaster'
+ theme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +32,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-sphinx-build complains about using :option: to mark up option
-flags that it doesn't know about (because they were not defined
-using the "option::" directive):
-docs/pr-manager.rst:68: WARNING: unknown option: -d
-
-Suppress these warnings. This way we get the semantic markup
-of the option flag but no cross-referencing hyperlink.
+Add the 'navigation' bar to the sidebar, which for some
+reason is not enabled by default. Remove 'relations', which
+is effectively disabled anyway and isn't useful for us.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/conf.py | 3 +++
- 1 file changed, 3 insertions(+)
+ docs/conf.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/docs/conf.py b/docs/conf.py
-index 6ddaa549f28..c04000e78e4 100644
+index e1d08a34a65..348e6358740 100644
 --- a/docs/conf.py
 +++ b/docs/conf.py
-@@ -76,6 +76,9 @@ pygments_style = 'sphinx'
- # If true, `todo` and `todoList` produce output, else they produce nothing.
- todo_include_todos = False
- 
-+# Sphinx defaults to warning about use of :option: for options not defined
-+# with "option::" in the document being processed. Turn that off.
-+suppress_warnings = ["ref.option"]
- 
- # -- Options for HTML output ----------------------------------------------
- 
+@@ -106,7 +106,8 @@ html_theme = 'alabaster'
+ # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+ html_sidebars = {
+     '**': [
+-        'relations.html',  # needs 'show_related': True theme option to display
++        'about.html',
++        'navigation.html',
+         'searchbox.html',
+     ]
+ }
 -- 
 2.20.1
