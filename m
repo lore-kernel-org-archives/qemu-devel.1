@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44311)
+Received: from eggs.gnu.org ([209.51.188.92]:49128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpPPp-0001Kz-72
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 22:22:54 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gpQ2S-0000jp-8a
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpPEQ-0003Ku-H8
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 22:11:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gpPEQ-0003Jg-8n
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 22:11:06 -0500
-Date: Fri, 1 Feb 2019 11:11:02 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190201031102.GE12081@stefanha-x1.localdomain>
-References: <20190131202637.4062-1-jusual@mail.ru>
+	(envelope-from <aik@ozlabs.ru>) id 1gpQ2Q-0000fU-L0
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:48 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gpQ2P-0000eF-9a
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 23:02:45 -0500
+Received: by mail-pg1-x542.google.com with SMTP id w7so2294627pgp.13
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 20:02:43 -0800 (PST)
+References: <20190122170112.8706-1-farosas@linux.ibm.com>
+	<20190122170112.8706-3-farosas@linux.ibm.com>
+	<30929550-4e18-6c43-1d8f-d4065ec70544@ozlabs.ru>
+	<20190126015006.GB22942@umbus> <878sz41rjx.fsf@linux.ibm.com>
+	<d06f8763-f994-5913-424a-542f33d6b09a@ozlabs.ru>
+	<874l9q152u.fsf@linux.ibm.com>
+	<c2c652ad-69af-5288-4861-aaf0e67e9b5b@ozlabs.ru>
+	<871s4s1odz.fsf@linux.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <e5f9b8d3-1969-d75b-c4e2-e34efa932d3b@ozlabs.ru>
+Date: Fri, 1 Feb 2019 15:02:35 +1100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LSp5EJdfMPwZcMS1"
-Content-Disposition: inline
-In-Reply-To: <20190131202637.4062-1-jusual@mail.ru>
-Subject: Re: [Qemu-devel] [PATCH] monitor: Add whitelist support for QMP
- commands
+In-Reply-To: <871s4s1odz.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 2/3] target/ppc: Add GDB
+ callbacks for SPRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +37,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+To: Fabiano Rosas <farosas@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-ppc@nongnu.org, groug@kaod.org, qemu-devel@nongnu.org
 
 
---LSp5EJdfMPwZcMS1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 31, 2019 at 11:26:37PM +0300, Julia Suvorova wrote:
-> The whitelist option allows to run a reduced monitor with a subset of
-> QMP commands. This allows the monitor to run in secure mode, which is
-> convenient for sending commands via the WebSocket monitor using the
-> web UI. This is planned to be done on micro:bit board.
->=20
-> The list of allowed commands should be written to a file, one per line.
-> The command line will look like this:
->     -mon chardev_name,mode=3Dcontrol,whitelist=3Dpath_to_file
->=20
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> ---
+On 01/02/2019 08:57, Fabiano Rosas wrote:
+> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+> 
+>> On 31/01/2019 03:30, Fabiano Rosas wrote:
+>>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+>>>
+>>>>
+>>>> but this is a register which does not have endianness, the endianness
+>>>> appears here because the interface between gdb and qemu is
+>>>> uint8_t*==bytestream but this interface should have fixed endianness
+>>>> imho (now it is bigendian afaict).
+>>>>
+>>>> Something is not right here...
+>>>
+>>> Having a fixed endianness would not work because GDB have no way of
+>>> knowing how to represent what comes from the remote end.
+>>
+>> It definitely would. A register is stored as "unsigned long" in QEMU and
+>> all gdb has to do is printf("%lx") and that is it. 
+> 
+> OK, but something is not clear to me. Even if GDB just printf("%lx") the
+> value, we would still have to bswap when the host is LE, right?
 
-Please include a test case.  tests/qmp-cmd-test.c looks like a starting
-point.
+Not for %lx, this should just print a correct value.
 
-Interesting cases:
-1. QMP negotiation still works.
-2. A whitelisted command succeeds.
-3. A forbidden command fails with the expected error.
+> QEMU BE:
+>  (gdb) x/8xb &env->spr[287]
+>  0x11391760: 0x00    0x00    0x00    0x00    0x00    0x4e    0x12    0x00
+> 
+> QEMU LE:
+>  (gdb) x/8xb &env->spr[287]
+>  0x7ffff5bd98c0: 0x01    0x02    0x4b    0x00    0x00    0x00    0x00    0x00
+> 
+>> The problem is that
+>> we want to pass it as a byte stream from the gdb_read_register() hook
+>> all the way to gdb and for some reason gdb does not define endianness of
+>> that stream but rather tries guessing the endianness which is broken.
+> 
+> GDB does define the endianness of the stream (in a way):
+> 
+>  "Each byte of register data is described by two hex digits. The bytes
+>  with the register are transmitted in target byte order."
+> 
+> https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#Packets
 
-> +static void monitor_qmp_cleanup_commands(Monitor *mon)
-> +{
-> +    QmpCommand *cmd, *next_cmd;
-> +
-> +    if (!monitor_is_qmp(mon) ||
-> +        mon->qmp.commands =3D=3D &qmp_cap_negotiation_commands) {
-> +        return;
-> +    }
 
-Checking side-effects can be avoided with a bool flag:
+Target byte order changes all the time so we need a endian-agnostic way
+of knowing the current endianness.
 
-  if (!mon->qmp_commands_needs_free) {
-      return;
-  }
 
-Any place that allocates qmp.commands must set this flag and then we
-don't need to worry whether we're checking the right side-effects in the
-cleanup function.
+> 
+>> Today I was debugging rtas/clientinterface calls which a little endian
+>> kernel makes and these calls need to switch to the big endian first. And
+>> gdb goes nuts when this switch happens (note that I did not give an ELF
+>> to gdb this time so it picked LE itself). Even if it could fetch the
+>> endianness from QEMU, it would fail as it is an LE bit in MSR which is a
+>> register which is parsed according to the gdb's idea of endianness :)
+> 
+> I think it would be possible to define another packet for the remote
+> protocol that informs the endianness explicitly at each time the guest
+> stops. If you provide more info on how to reproduce that issue I could
+> put in my list or go bug GDB folks about it.
+> 
+>>> It will
+>>> always check the target endianness before printing a value, even if it
+>>> refers to a register:
+>>>
+>>> https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=blob;f=gdb/findvar.c;hb=HEAD#l49
+>>>
+>>> So in our case the contents of mem_buf need to match both the guest
+>>> endianness *and* what GDB has set for 'show endian' because it will
+>>> detect it automatically from the ELF. If it guesses incorrectly because
+>>> there is no ELF, we need to use the 'set endian' command.
+>>>
+>>> By the way, this is already the behavior for the registers that are
+>>> already implemented (e.g. $msr). Here's the commit that introduced
+>>> that:
+>>>
+>>> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=8a286ce4502356ce0b97a2424a2cb7
+>>>
+>>> Now, what might be a source of confusion here is the fact that we
+>>> *always* do a bswap when the host is LE because QEMU thinks that the ppc
+>>> guest is always BE. That requires the maybe_bswap function to make
+>>> things right in the end.
+>>>
+>>> What I could do is try to improve this by only swapping when the
+>>> guest's actual endianness (msr_le) is different from the host's.
+>>
+>> The bytestream for registers should have fixed endianness. But looking
+>> at the gdb code makes me think it is not going to happen :(
+> 
+> Yes, I can't think of a way to fix that without changing the way GDB
+> exhibits the values or the remote protocol.
+> 
+> May I proceed with this series as it is with the bswaps?
+> 
+>>> That
+>>> is not entirely within the scope of this patch, though.
+>>
+>> True. But since you are touching this, may be you could fix gdb too :)
+>>
+>> Does gdb tell QEMU about what endianness it thinks that QEMU is using?
+>> Or can it read it from QEMU? I cannot easily spot this in QEMU...
+> 
+> GDB currently does not tell and does not ask about endianness. So I
+> believe there is room for improvement here. I could not find it in the
+> documentation but I think that GDB supports file transfers and it asks
+> for the ELF in some scenarios. This approach could be one way of
+> informing it about the endianness, although it has its own shortcomings.
 
-I think this makes the code easier to read but it's just a suggestion.
 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 521511ec13..e5d1b7dfb5 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3195,12 +3195,16 @@ Like -qmp but uses pretty JSON formatting.
->  ETEXI
-> =20
->  DEF("mon", HAS_ARG, QEMU_OPTION_mon, \
-> -    "-mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]]=
-\n", QEMU_ARCH_ALL)
-> +    "-mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]]=
-" \
-> +    "[,whitelist=3Dfile]\n", QEMU_ARCH_ALL)
->  STEXI
-> -@item -mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]]
-> +@item -mon [chardev=3D]name[,mode=3Dreadline|control][,pretty[=3Don|off]=
-][,whitelist=3D@var{file}]
+There is no ELF in my scenario really. What I did was:
 
-Your change reminded me that "[chardev=3D]name" should be
-"[chardev=3D]@var{name}" since 'name' isn't a string literal but a
-variable.
+1. hack qemu to not load slof.bin but load vmlinux instead and changed
+starting pc to where I loaded the kernel (I did not have to but it is a
+lot easier to ditch slof and set breakpoint in gdb before starting the
+guest).
 
-This is a pre-existing issue but please add a patch to this series to
-fix it.
+2. start a guest, connect external gdb and observe garbage in $pc and
+disassembly until the guest switched to LE.
 
->  @findex -mon
->  Setup monitor on chardev @var{name}. @code{pretty} turns on JSON pretty =
-printing
->  easing human reading and debugging.
-> +The @code{whitelist} option disables all commands except those specified=
- in
-> +@var{file}. The file must contain one command name per line. This option=
- is only
-> +avaliable in 'control' mode.
+3. trace till here:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/powerpc/kernel/entry_64.S?h=v4.20#n1299
+and set breakpoint to whatever $r4 was at this point; $r4 points to RTAS
+which executes in BE as we remove LE bit from SRR1 (lines 1296..1298).
 
-s/avaliable/available/
+When we stop at this new breakpoint - we get same biteswapped garbage as
+in step2. Well, this is SLOF and there is an ELF somewhere but do we
+really want to load ELF and switch endianness every time the guest
+changes it and jumps to different chunks of code? :)
 
---LSp5EJdfMPwZcMS1
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+It also seems like we cannot really debug slof via the gdb stub as it is
+big endian so it will be executing instructions but the UI will look
+byteswapped.
 
-iQEcBAEBAgAGBQJcU7jGAAoJEJykq7OBq3PIP60H/0Z2Afmdqx8iRISK0mIxvYZt
-2hrOXfMbxgI3kiEgv0HpJnzyWY4HzjwTSg7+mk0CXYt6hoyri1xCycwLLlc8xREP
-oWrMp83l5iPqrEcYFCPraIQHbt/b9meq4Kl5HAX4vkrRvZjZXYZrY3ghCxCImUn7
-4pwirBkh+2dgUPcKneVsvd0/xZYhxgcdNX3GNNOXijlITKuhM93QQKnYZjrXEOtF
-56Gza29sPyj3Q2kCeK6vlULzFSi9vQTDlNBSpsfvfTZtIZa7j3xECyw5Erx5xm/H
-IsIALQFtqbPiLRLBxGTsVMUY9C+R3JVfmBVHriCRWdz9kaS3uGJ1H8nlXxKo9u4=
-=3h9f
------END PGP SIGNATURE-----
 
---LSp5EJdfMPwZcMS1--
+-- 
+Alexey
