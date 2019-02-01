@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33833)
+Received: from eggs.gnu.org ([209.51.188.92]:34306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpbVo-0000XK-CF
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:17:53 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gpbXi-00026o-A4
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpbVn-0007s4-Jh
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:17:52 -0500
-References: <20190117185628.21862-1-crosa@redhat.com>
-	<BN6PR2201MB1251E38EAEAFC4A8C0B13D31C69F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<f98bc26a-e0ed-9a45-46b0-331cce9bdc49@redhat.com>
-	<352f7b14-0c91-67c6-0cea-5d2d15fb3060@redhat.com>
-	<BN6PR2201MB1251AD11375F9590036D9D48C6920@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <18dc1822-da36-258f-5fe1-476e1569aaaa@redhat.com>
-Date: Fri, 1 Feb 2019 11:17:27 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gpbXh-000082-5H
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:19:50 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gpbXg-00006m-QE
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:19:49 -0500
+Received: by mail-wr1-x443.google.com with SMTP id f7so7789470wrp.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:19:48 -0800 (PST)
+References: <20190201145035.22739-1-peter.maydell@linaro.org>
+	<20190201145035.22739-10-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190201145035.22739-10-peter.maydell@linaro.org>
+Date: Fri, 01 Feb 2019 16:19:45 +0000
+Message-ID: <87r2crv5um.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251AD11375F9590036D9D48C6920@BN6PR2201MB1251.namprd22.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/18] Acceptance Tests: target
- architecture support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 09/11] Makefile,
+ configure: Support building rST documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 2/1/19 12:32 AM, Aleksandar Markovic wrote:
->>> I think, the term "arch" is a little problematic in QEMU parlance. IMHO,
->>> "target" should be used instead. ("arch" is used in Linux kernel community)
-> 
->> Naming things is hard, so this is a valid discussion.  But, I have to
->> say that I also find "arch" in this context to be descriptive enough.
-> 
-> This is not a "naming" problem, but a fundamental terminology convention used in QEMU. I am truly dissapointed that you chose to disrespect it.
-> 
-> Aleksandar
-> 
+> Add support to our configure and makefile machinery for building
+> our rST docs into HTML files.
+>
+> Building the documentation now requires that sphinx-build is
+> available; this seems better than allowing half the docs to
+> be built if it is not present but having half of them missing.
+> (In particular it means that assuming that distros configured with
+> --enable-docs they'll get a helpful error from configure telling
+> them the new build dependency.)
 
-Hi Aleksandar,
+Hmm we manage to break Travis CI:
 
-I'm basically listening to more experienced people on the matter, as I
-clearly lack the background on the "terminology conventions", and thus,
-I'm unable to make the best naming choices by myself.
+  https://travis-ci.org/stsquad/qemu/jobs/487512292#L902
 
-Now, we have had participation from few people, and there doesn't seem
-to be consensus.  So, to make it clear, I didn't *choose* to disrespect
-it, I chose to respect how I perceived the community input.
+It reports:
 
-If this makes you truly disappointed, please ask more people to give
-their input, and I'll gladly steer the direction of this humble ship, I
-mean, patch series. :)
+  Documentation     no
 
-Regards,
-- Cleber.
+But then proceeds to barf:
+
+  https://travis-ci.org/stsquad/qemu/jobs/487512292#L1395
+
+with:
+
+  /bin/sh: 1: sphinx-build: not found
+  Makefile:871: recipe for target 'docs/devel/index.html' failed
+  make: *** [docs/devel/index.html] Error 127
+
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  configure |  4 ++--
+>  Makefile  | 45 ++++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 44 insertions(+), 5 deletions(-)
+>
+> diff --git a/configure b/configure
+> index b18281c61f3..9cd5c0cd0bd 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4561,11 +4561,11 @@ fi
+>
+>  # Check if tools are available to build documentation.
+>  if test "$docs" !=3D "no" ; then
+> -  if has makeinfo && has pod2man; then
+> +  if has makeinfo && has pod2man && has sphinx-build; then
+>      docs=3Dyes
+>    else
+>      if test "$docs" =3D "yes" ; then
+> -      feature_not_found "docs" "Install texinfo and Perl/perl-podlators"
+> +      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and=
+ python-sphinx"
+>      fi
+>      docs=3Dno
+>    fi
+> diff --git a/Makefile b/Makefile
+> index 1278a3eb529..d519fadee39 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -387,7 +387,7 @@ dummy :=3D $(call unnest-vars,, \
+>
+>  include $(SRC_PATH)/tests/Makefile.include
+>
+> -all: $(DOCS) $(TOOLS) $(HELPERS-y) recurse-all modules
+> +all: $(DOCS) sphinxdocs $(TOOLS) $(HELPERS-y) recurse-all modules
+>
+>  qemu-version.h: FORCE
+>  	$(call quiet-command, \
+> @@ -631,6 +631,14 @@ dist: qemu-$(VERSION).tar.bz2
+>  qemu-%.tar.bz2:
+>  	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.b=
+z2,%,$@)"
+>
+> +# Note that these commands assume that there are no HTML files in
+> +# the docs subdir in the source tree! If there are then this will
+> +# blow them away for an in-source-tree 'make clean'.
+> +define clean-manual =3D
+> +rm -rf docs/$1/_static
+> +rm docs/$1/objects.inv docs/$1/searchindex.js docs/$1/*.html
+> +endef
+> +
+>  distclean: clean
+>  	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-option=
+s.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
+>  	rm -f config-all-devices.mak config-all-disas.mak config.status
+> @@ -651,6 +659,9 @@ distclean: clean
+>  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+>  	rm -f docs/qemu-block-drivers.7
+>  	rm -f docs/qemu-cpu-models.7
+> +	rm -f .doctrees
+> +	$(call clean-manual,devel)
+> +	$(call clean-manual,interop)
+>  	for d in $(TARGET_DIRS); do \
+>  	rm -rf $$d || exit 1 ; \
+>          done
+> @@ -684,7 +695,18 @@ else
+>  BLOBS=3D
+>  endif
+>
+> -install-doc: $(DOCS)
+> +define install-manual =3D
+> +for d in $$(cd docs && find $1 -type d); do $(INSTALL_DIR) "$(DESTDIR)$(=
+qemu_docdir)/$$d"; done
+> +for f in $$(cd docs && find $1 -type f); do $(INSTALL_DATA) "docs/$$f" "=
+$(DESTDIR)$(qemu_docdir)/$$f"; done
+> +endef
+> +
+> +# Note that we deliberately do not install the "devel" manual: it is
+> +# for QEMU developers, and not interesting to our users.
+> +.PHONY: install-sphinxdocs
+> +install-sphinxdocs: sphinxdocs
+> +	$(call install-manual,interop)
+> +
+> +install-doc: $(DOCS) install-sphinxdocs
+>  	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+> @@ -835,6 +857,23 @@ docs/version.texi: $(SRC_PATH)/VERSION
+>  %.pdf: %.texi docs/version.texi
+>  	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
+>
+> +# Sphinx builds all its documentation at once in one invocation
+> +# and handles "don't rebuild things unless necessary" itself.
+> +# The '.doctrees' files are cached information to speed this up.
+> +.PHONY: sphinxdocs
+> +sphinxdocs: docs/devel/index.html docs/interop/index.html
+> +
+> +# Canned command to build a single manual
+> +build-manual =3D $(call quiet-command,sphinx-build $(if $(V),,-q) -b htm=
+l -d .doctrees/$1 $(SRC_PATH)/docs/$1 docs/$1 ,"SPHINX","docs/$1")
+> +# We assume all RST files in the manual's directory are used in it
+> +manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$=
+1/conf.py $(SRC_PATH)/docs/conf.py
+> +
+> +docs/devel/index.html: $(call manual-deps,devel)
+> +	$(call build-manual,devel)
+> +
+> +docs/interop/index.html: $(call manual-deps,interop)
+> +	$(call build-manual,interop)
+> +
+>  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","=
+$@")
+>
+> @@ -863,7 +902,7 @@ docs/qemu-block-drivers.7: docs/qemu-block-drivers.te=
+xi
+>  docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
+>  scripts/qemu-trace-stap.1: scripts/qemu-trace-stap.texi
+>
+> -html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-=
+ref.html
+> +html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-=
+ref.html sphinxdocs
+>  info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-=
+ref.info
+>  pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref=
+.pdf
+>  txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref=
+.txt
+
+
+--
+Alex Benn=C3=A9e
