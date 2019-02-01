@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32949)
+Received: from eggs.gnu.org ([209.51.188.92]:33056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpVko-0003au-UR
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:08:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gpVl3-0003id-Fs
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:09:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpVkn-0003fg-Vr
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:08:58 -0500
-Date: Fri, 1 Feb 2019 18:08:47 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190201100847.GC30277@stefanha-x1.localdomain>
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-4-sgarzare@redhat.com>
-	<20190201045831.GD23131@stefanha-x1.localdomain>
-	<20190201095430.qemq2viy4enwk62y@steredhat>
+	(envelope-from <cohuck@redhat.com>) id 1gpVkz-0003j5-Pf
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:09:11 -0500
+Date: Fri, 1 Feb 2019 11:08:59 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190201110859.7481c5be.cohuck@redhat.com>
+In-Reply-To: <9ab3f62f-9011-b4af-2221-075d36d47327@redhat.com>
+References: <20190130155733.32742-1-david@redhat.com>
+	<20190130155733.32742-6-david@redhat.com>
+	<9ab3f62f-9011-b4af-2221-075d36d47327@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0lnxQi9hkpPO77W3"
-Content-Disposition: inline
-In-Reply-To: <20190201095430.qemq2viy4enwk62y@steredhat>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] virtio-blk: add DISCARD and WRITE
- ZEROES features
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] s390x/pci: Drop release timer and
+ replace it with a flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, Pierre Morel <pmorel@linux.ibm.com>
 
+On Thu, 31 Jan 2019 22:21:01 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
---0lnxQi9hkpPO77W3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Thinking out loud:
+> 
+> We should migrate the flag in the future. This is already a problem
+> right now, as the timer is also not migrated.
+> 
+> If the unplug request is sent and we migrate before the guest can react,
+> the unplug would not happen.
+> 
+> However, looks like migration of zpci devices is not implemented _at all_.
 
-On Fri, Feb 01, 2019 at 10:54:30AM +0100, Stefano Garzarella wrote:
-> On Fri, Feb 01, 2019 at 12:58:31PM +0800, Stefan Hajnoczi wrote:
-> > On Thu, Jan 31, 2019 at 04:19:12PM +0100, Stefano Garzarella wrote:
-> Only a question about options: I used a single option "dwz_max_sectors"
-> for both "max_discard_sectors" and "max_write_zeroes_sectors".
-> Since I'll include two options to enable/disable discard and
-> write_zeroes features, do you think make sense to split this
-> configurable option in two?
+Oh, joy.
 
-Yes, please.  Eventually a user will want full control so it makes sense
-to expose what virtio offers instead of coming up with higher-level
-options.
+> 
+> This does not matter for pci passthrough (main use case). But when
+> wanting to use e.g. virtio-pci-net, things are shaky after migration.
+> 
+> So this is future work.
+> 
 
-Stefan
+Hopefully folks running s390x guests are rather using virtio-ccw
+devices anyway...
 
---0lnxQi9hkpPO77W3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcVBqvAAoJEJykq7OBq3PIGmgH/jE4LKhXpAmeLb4aY53HHOqB
-6FwV6WP9FcUG20LmANf4kG1WEteVfxUncActxjx42Q8J4OHK3tGDAt/P3/sfbaqL
-J2BEnACSLY9CqRw7aQjZCNS3uaQjBAHT9QFWPqXwcuYRbjw0AxbpL5nafN0A23cG
-NJl9JxHQDJ2+tNPYSm/3B3tXB0wnBMMedUIpgTFk6rcIYaTolRY/w2GY8a0SB3sJ
-lC+uwSCjEJFTk+xhm+34QwSurG9Oup7x5usXEwRjnHKWg+e/ToFfuXKtfLGDCuZq
-2a5acrbuCUaOHGMrjbdsTzXRbdcmOnP1JwY+4EkKHGWtozDq5E/0aBAqAtNe2vs=
-=UlBV
------END PGP SIGNATURE-----
-
---0lnxQi9hkpPO77W3--
+I agree that this needs to be taken care of on top of these changes.
+Should we mark zpci devices unmigratable, or does it work for some
+values of "work"?
