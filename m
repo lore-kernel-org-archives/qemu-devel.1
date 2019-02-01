@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59038)
+Received: from eggs.gnu.org ([209.51.188.92]:59031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbME-0008HJ-Bk
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbME-0008Gz-1c
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003ia-FP
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:58 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:37131)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003jP-Sg
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36413)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003Ok-1M
+	id 1gpbMA-0003MA-Fi
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id g67so6746377wmd.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:27 -0800 (PST)
+Received: by mail-wm1-x341.google.com with SMTP id p6so6753254wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:19 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.25
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.17
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:25 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:17 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:29 +0000
-Message-Id: <20190201160653.13829-24-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:23 +0000
+Message-Id: <20190201160653.13829-18-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 23/47] hw/arm/mps2-tz: Add IRQ infrastructure to
- support SSE-200
+Subject: [Qemu-devel] [PULL 17/47] hw/arm/armsse: Add unimplemented-device
+ stubs for PPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,200 +36,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In preparation for adding support for the AN521 MPS2 image, we need
-to handle wiring up the MPS2 device interrupt lines to both CPUs in
-the SSE-200, rather than just the one that the IoTKit has.
-
-Abstract out a "connect to the IoTKit interrupt line" function
-and make it connect to a splitter which feeds both sets of inputs
-for the SSE-200 case.
+Add unimplemented-device stubs for the various Power Policy Unit
+devices that the SSE-200 has.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-23-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-17-peter.maydell@linaro.org
 ---
- hw/arm/mps2-tz.c | 79 ++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 59 insertions(+), 20 deletions(-)
+ include/hw/arm/armsse.h | 11 ++++++++
+ hw/arm/armsse.c         | 58 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 3859f17d98b..95adcd478ab 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -53,8 +53,11 @@
- #include "net/net.h"
- #include "hw/core/split-irq.h"
+diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
+index dbfcb280605..9855ec5f269 100644
+--- a/include/hw/arm/armsse.h
++++ b/include/hw/arm/armsse.h
+@@ -106,6 +106,16 @@
  
-+#define MPS2TZ_NUMIRQ 92
+ #define SSE_MAX_CPUS 2
+ 
++/* These define what each PPU in the ppu[] index is for */
++#define CPU0CORE_PPU 0
++#define CPU1CORE_PPU 1
++#define DBG_PPU 2
++#define RAM0_PPU 3
++#define RAM1_PPU 4
++#define RAM2_PPU 5
++#define RAM3_PPU 6
++#define NUM_PPUS 7
 +
- typedef enum MPS2TZFPGAType {
-     FPGA_AN505,
-+    FPGA_AN521,
- } MPS2TZFPGAType;
+ typedef struct ARMSSE {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -139,6 +149,7 @@ typedef struct ARMSSE {
+     IoTKitSysCtl sysinfo;
  
- typedef struct {
-@@ -85,6 +88,7 @@ typedef struct {
-     SplitIRQ sec_resp_splitter;
-     qemu_or_irq uart_irq_orgate;
-     DeviceState *lan9118;
-+    SplitIRQ cpu_irq_splitter[MPS2TZ_NUMIRQ];
- } MPS2TZMachineState;
+     UnimplementedDeviceState mhu[2];
++    UnimplementedDeviceState ppu[NUM_PPUS];
  
- #define TYPE_MPS2TZ_MACHINE "mps2tz"
-@@ -111,6 +115,23 @@ static void make_ram_alias(MemoryRegion *mr, const char *name,
-     memory_region_add_subregion(get_system_memory(), base, mr);
+     /*
+      * 'container' holds all devices seen by all CPUs.
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 1f3dc89c8e8..280ba5c78be 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -31,6 +31,7 @@ struct ARMSSEInfo {
+     uint32_t sys_version;
+     SysConfigFormat sys_config_format;
+     bool has_mhus;
++    bool has_ppus;
+ };
+ 
+ static const ARMSSEInfo armsse_variants[] = {
+@@ -41,6 +42,7 @@ static const ARMSSEInfo armsse_variants[] = {
+         .sys_version = 0x41743,
+         .sys_config_format = IoTKitFormat,
+         .has_mhus = false,
++        .has_ppus = false,
+     },
+ };
+ 
+@@ -265,6 +267,29 @@ static void armsse_init(Object *obj)
+         sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
+                               TYPE_UNIMPLEMENTED_DEVICE);
+     }
++    if (info->has_ppus) {
++        for (i = 0; i < info->num_cpus; i++) {
++            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
++            int ppuidx = CPU0CORE_PPU + i;
++
++            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
++                                  sizeof(s->ppu[ppuidx]),
++                                  TYPE_UNIMPLEMENTED_DEVICE);
++            g_free(name);
++        }
++        sysbus_init_child_obj(obj, "DBG_PPU", &s->ppu[DBG_PPU],
++                              sizeof(s->ppu[DBG_PPU]),
++                              TYPE_UNIMPLEMENTED_DEVICE);
++        for (i = 0; i < info->sram_banks; i++) {
++            char *name = g_strdup_printf("RAM%d_PPU", i);
++            int ppuidx = RAM0_PPU + i;
++
++            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
++                                  sizeof(s->ppu[ppuidx]),
++                                  TYPE_UNIMPLEMENTED_DEVICE);
++            g_free(name);
++        }
++    }
+     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
+                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
+                             &error_abort, NULL);
+@@ -329,6 +354,17 @@ static qemu_irq armsse_get_common_irq_in(ARMSSE *s, int irqno)
+     }
  }
  
-+static qemu_irq get_sse_irq_in(MPS2TZMachineState *mms, int irqno)
++static void map_ppu(ARMSSE *s, int ppuidx, const char *name, hwaddr addr)
 +{
-+    /* Return a qemu_irq which will signal IRQ n to all CPUs in the SSE. */
-+    MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_GET_CLASS(mms);
++    /* Map a PPU unimplemented device stub */
++    DeviceState *dev = DEVICE(&s->ppu[ppuidx]);
 +
-+    assert(irqno < MPS2TZ_NUMIRQ);
-+
-+    switch (mmc->fpga_type) {
-+    case FPGA_AN505:
-+        return qdev_get_gpio_in_named(DEVICE(&mms->iotkit), "EXP_IRQ", irqno);
-+    case FPGA_AN521:
-+        return qdev_get_gpio_in(DEVICE(&mms->cpu_irq_splitter[irqno]), 0);
-+    default:
-+        g_assert_not_reached();
-+    }
++    qdev_prop_set_string(dev, "name", name);
++    qdev_prop_set_uint64(dev, "size", 0x1000);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ppu[ppuidx]), 0, addr);
 +}
 +
- /* Most of the devices in the AN505 FPGA image sit behind
-  * Peripheral Protection Controllers. These data structures
-  * define the layout of which devices sit behind which PPCs.
-@@ -161,7 +182,6 @@ static MemoryRegion *make_uart(MPS2TZMachineState *mms, void *opaque,
-     int txirqno = i * 2 + 1;
-     int combirqno = i + 10;
-     SysBusDevice *s;
--    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-     DeviceState *orgate_dev = DEVICE(&mms->uart_irq_orgate);
- 
-     sysbus_init_child_obj(OBJECT(mms), name, uart, sizeof(mms->uart[0]),
-@@ -170,14 +190,11 @@ static MemoryRegion *make_uart(MPS2TZMachineState *mms, void *opaque,
-     qdev_prop_set_uint32(DEVICE(uart), "pclk-frq", SYSCLK_FRQ);
-     object_property_set_bool(OBJECT(uart), true, "realized", &error_fatal);
-     s = SYS_BUS_DEVICE(uart);
--    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", txirqno));
--    sysbus_connect_irq(s, 1, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", rxirqno));
-+    sysbus_connect_irq(s, 0, get_sse_irq_in(mms, txirqno));
-+    sysbus_connect_irq(s, 1, get_sse_irq_in(mms, rxirqno));
-     sysbus_connect_irq(s, 2, qdev_get_gpio_in(orgate_dev, i * 2));
-     sysbus_connect_irq(s, 3, qdev_get_gpio_in(orgate_dev, i * 2 + 1));
--    sysbus_connect_irq(s, 4, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", combirqno));
-+    sysbus_connect_irq(s, 4, get_sse_irq_in(mms, combirqno));
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(uart), 0);
- }
- 
-@@ -213,7 +230,6 @@ static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
-                                   const char *name, hwaddr size)
+ static void armsse_realize(DeviceState *dev, Error **errp)
  {
-     SysBusDevice *s;
--    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-     NICInfo *nd = &nd_table[0];
+     ARMSSE *s = ARMSSE(dev);
+@@ -833,6 +869,28 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x50021000);
  
-     /* In hardware this is a LAN9220; the LAN9118 is software compatible
-@@ -225,7 +241,7 @@ static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
-     qdev_init_nofail(mms->lan9118);
- 
-     s = SYS_BUS_DEVICE(mms->lan9118);
--    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
-+    sysbus_connect_irq(s, 0, get_sse_irq_in(mms, 16));
-     return sysbus_mmio_get_region(s, 0);
- }
- 
-@@ -315,12 +331,9 @@ static MemoryRegion *make_dma(MPS2TZMachineState *mms, void *opaque,
- 
-     s = SYS_BUS_DEVICE(dma);
-     /* Wire up DMACINTR, DMACINTERR, DMACINTTC */
--    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", 58 + i * 3));
--    sysbus_connect_irq(s, 1, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", 56 + i * 3));
--    sysbus_connect_irq(s, 2, qdev_get_gpio_in_named(iotkitdev,
--                                                    "EXP_IRQ", 57 + i * 3));
-+    sysbus_connect_irq(s, 0, get_sse_irq_in(mms, 58 + i * 3));
-+    sysbus_connect_irq(s, 1, get_sse_irq_in(mms, 56 + i * 3));
-+    sysbus_connect_irq(s, 2, get_sse_irq_in(mms, 57 + i * 3));
- 
-     g_free(mscname);
-     return sysbus_mmio_get_region(s, 0);
-@@ -339,21 +352,20 @@ static MemoryRegion *make_spi(MPS2TZMachineState *mms, void *opaque,
-      */
-     PL022State *spi = opaque;
-     int i = spi - &mms->spi[0];
--    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-     SysBusDevice *s;
- 
-     sysbus_init_child_obj(OBJECT(mms), name, spi, sizeof(mms->spi[0]),
-                           TYPE_PL022);
-     object_property_set_bool(OBJECT(spi), true, "realized", &error_fatal);
-     s = SYS_BUS_DEVICE(spi);
--    sysbus_connect_irq(s, 0,
--                       qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 51 + i));
-+    sysbus_connect_irq(s, 0, get_sse_irq_in(mms, 51 + i));
-     return sysbus_mmio_get_region(s, 0);
- }
- 
- static void mps2tz_common_init(MachineState *machine)
- {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-+    MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_GET_CLASS(mms);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     MemoryRegion *system_memory = get_system_memory();
-     DeviceState *iotkitdev;
-@@ -371,11 +383,38 @@ static void mps2tz_common_init(MachineState *machine)
-     iotkitdev = DEVICE(&mms->iotkit);
-     object_property_set_link(OBJECT(&mms->iotkit), OBJECT(system_memory),
-                              "memory", &error_abort);
--    qdev_prop_set_uint32(iotkitdev, "EXP_NUMIRQ", 92);
-+    qdev_prop_set_uint32(iotkitdev, "EXP_NUMIRQ", MPS2TZ_NUMIRQ);
-     qdev_prop_set_uint32(iotkitdev, "MAINCLK", SYSCLK_FRQ);
-     object_property_set_bool(OBJECT(&mms->iotkit), true, "realized",
-                              &error_fatal);
- 
-+    /*
-+     * The AN521 needs us to create splitters to feed the IRQ inputs
-+     * for each CPU in the SSE-200 from each device in the board.
-+     */
-+    if (mmc->fpga_type == FPGA_AN521) {
-+        for (i = 0; i < MPS2TZ_NUMIRQ; i++) {
-+            char *name = g_strdup_printf("mps2-irq-splitter%d", i);
-+            SplitIRQ *splitter = &mms->cpu_irq_splitter[i];
++    if (info->has_ppus) {
++        /* CPUnCORE_PPU for each CPU */
++        for (i = 0; i < info->num_cpus; i++) {
++            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
 +
-+            object_initialize_child(OBJECT(machine), name,
-+                                    splitter, sizeof(*splitter),
-+                                    TYPE_SPLIT_IRQ, &error_fatal, NULL);
++            map_ppu(s, CPU0CORE_PPU + i, name, 0x50023000 + i * 0x2000);
++            /*
++             * We don't support CPU debug so don't create the
++             * CPU0DEBUG_PPU at 0x50024000 and 0x50026000.
++             */
 +            g_free(name);
++        }
++        map_ppu(s, DBG_PPU, "DBG_PPU", 0x50029000);
 +
-+            object_property_set_int(OBJECT(splitter), 2, "num-lines",
-+                                    &error_fatal);
-+            object_property_set_bool(OBJECT(splitter), true, "realized",
-+                                     &error_fatal);
-+            qdev_connect_gpio_out(DEVICE(splitter), 0,
-+                                  qdev_get_gpio_in_named(DEVICE(&mms->iotkit),
-+                                                         "EXP_IRQ", i));
-+            qdev_connect_gpio_out(DEVICE(splitter), 1,
-+                                  qdev_get_gpio_in_named(DEVICE(&mms->iotkit),
-+                                                         "EXP_CPU1_IRQ", i));
++        for (i = 0; i < info->sram_banks; i++) {
++            char *name = g_strdup_printf("RAM%d_PPU", i);
++
++            map_ppu(s, RAM0_PPU + i, name, 0x5002a000 + i * 0x1000);
++            g_free(name);
 +        }
 +    }
 +
-     /* The sec_resp_cfg output from the IoTKit must be split into multiple
-      * lines, one for each of the PPCs we create here, plus one per MSC.
-      */
-@@ -426,7 +465,7 @@ static void mps2tz_common_init(MachineState *machine)
-     object_property_set_bool(OBJECT(&mms->uart_irq_orgate), true,
-                              "realized", &error_fatal);
-     qdev_connect_gpio_out(DEVICE(&mms->uart_irq_orgate), 0,
--                          qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 15));
-+                          get_sse_irq_in(mms, 15));
- 
-     /* Most of the devices in the FPGA are behind Peripheral Protection
-      * Controllers. The required order for initializing things is:
+     /* This OR gate wires together outputs from the secure watchdogs to NMI */
+     object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
+     if (err) {
 -- 
 2.20.1
