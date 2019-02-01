@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47129)
+Received: from eggs.gnu.org ([209.51.188.92]:49847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gpRlG-0001wV-F4
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:53:11 -0500
+	(envelope-from <thuth@redhat.com>) id 1gpS6G-0005Xg-QQ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:14:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gpRlF-0003RO-ER
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:53:10 -0500
-Date: Fri, 1 Feb 2019 13:53:02 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190201055302.GJ23131@stefanha-x1.localdomain>
-References: <20190131143151.6146-1-kwolf@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1gpS6G-00039q-10
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:14:52 -0500
+References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
+	<20190131185621.28815291.cohuck@redhat.com>
+	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
+	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
+Date: Fri, 1 Feb 2019 07:14:46 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GvznHscUikHnwW2p"
-Content-Disposition: inline
-In-Reply-To: <20190131143151.6146-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Fix invalidate_cache
- error path for parent activation
+In-Reply-To: <c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
+ the pci stub file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org, mreitz@redhat.com, dgilbert@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
+On 2019-01-31 19:08, Paolo Bonzini wrote:
+> On 31/01/19 19:00, Thomas Huth wrote:
+>>>> (and the prototypes in the header) anymore, so if you try to compile s390x
+>>>> without CONFIG_PCI, the build currently fails.
+>>>>
+>>> Fixes: 468a93898a97 ("s390x/pci: pass the retaddr to all PCI instructions")
+>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  hw/s390x/s390-pci-stub.c | 16 +++++++++-------
+>>>>  1 file changed, 9 insertions(+), 7 deletions(-)
+>>> This file seems to be in danger of bitrot. Do you think it'll be easier
+>>> to test rarely used configs like that after we switch to Kconfig?
+>> I hope so, yes. There will be a new --without-default-devices options
+>> for "configure" (which matches "make allnoconfig" from the kernel) - if
+>> we do it right in the Kconfig file for s390x, it should be possible to
+>> catch this problem with that option.
+> 
+> Yes, it will be in .travis.yml too.
+> 
+> Right now there is a "select PCI" in the hw/s390x/Kconfig file, but
+> probably it's best to add a config S390_ZPCI with "default y if
+> S390_CCW_VIRTIO" and "select PCI" in it.  Not a blocker, but I can
+> integrate it if you send me a fixup patch.
 
---GvznHscUikHnwW2p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, that's what I had in mind, too. I'll send a fixup patch...
 
-On Thu, Jan 31, 2019 at 03:31:51PM +0100, Kevin Wolf wrote:
-> bdrv_co_invalidate_cache() clears the BDRV_O_INACTIVE flag before
-> actually activating a node so that the correct permissions etc. are
-> taken. In case of errors, the flag must be restored so that the next
-> call to bdrv_co_invalidate_cache() retries activation.
->=20
-> Restoring the flag was missing in the error path for a failed
-> parent->role->activate() call. The consequence is that this attempt to
-> activate all images correctly fails because we still set errp, however
-> on the next attempt BDRV_O_INACTIVE is already clear, so we return
-> success without actually retrying the failed action.
->=20
-> An example where this is observable in practice is migration to a QEMU
-> instance that has a raw format block node attached to a guest device
-> with share-rw=3Doff (the default) while another process holds
-> BLK_PERM_WRITE for the same image. In this case, all activation steps
-> before parent->role->activate() succeed because raw can tolerate other
-> writers to the image. Only the parent callback (in particular
-> blk_root_activate()) tries to implement the share-rw=3Don property and
-> requests exclusive write permissions. This fails when the migration
-> completes and correctly displays an error. However, a manual 'cont' will
-> incorrectly resume the VM without calling blk_root_activate() again.
->=20
-> This case is described in more detail in the following bug report:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1531888
->=20
-> Fix this by correctly restoring the BDRV_O_INACTIVE flag in the error
-> path.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 1 +
->  1 file changed, 1 insertion(+)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---GvznHscUikHnwW2p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcU96+AAoJEJykq7OBq3PIY9AH/j3imQFkxRhAdocTpLeWN6Ku
-l330lmzRLuPWObGbvjwx809hHYOsrCesO+8Yhjh3TlGEyPDEtMWrA9iwxLe8iiQq
-DfJ7Cnvu16jnjz/G6GHzZwBKOZVtQVU9sk7ATm7zPuJKuPli6e/vst+6+11vkkDC
-t1XZDEmUOz8wuQpwbXWdp7Lh4Hu2nsfWSbtNsqHs2twjMu5pirBlOg2YnoWx9xRx
-29Cltn3HR5UsuhxmFJ5TwDAQcuorsiT3XdrId/w8PSCMUBAKbOt1VFzCmUKOytXp
-ZkhOt7L4uoFAyZ6pBfy+mj7ygRn3x7Bewf4iQ5tWkVlesRvENzN9GEhsd2vH4Vc=
-=MTao
------END PGP SIGNATURE-----
-
---GvznHscUikHnwW2p--
+ Thomas
