@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36305)
+Received: from eggs.gnu.org ([209.51.188.92]:36819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpd3p-0007if-NP
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:06 -0500
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gpd59-0000PB-Nx
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:58:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpd3k-0006wz-Bd
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:02 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:42715)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpd3k-0006vy-5M
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:00 -0500
-Received: by mail-oi1-x234.google.com with SMTP id w13so6495293oiw.9
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:56:59 -0800 (PST)
+	(envelope-from <leozinho29_eu@hotmail.com>) id 1gpd52-0007xQ-Ab
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:58:23 -0500
+Received: from mail-oln040092011025.outbound.protection.outlook.com
+	([40.92.11.25]:19529
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <leozinho29_eu@hotmail.com>)
+	id 1gpd4u-0007nD-IY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:58:16 -0500
+From: =?utf-8?B?TGVvbmFyZG8gU29hcmVzIE3DvGxsZXI=?= <leozinho29_eu@hotmail.com>
+Date: Fri, 1 Feb 2019 17:57:57 +0000
+Message-ID: <RO1P152MB1483FB727CBF051D3C2B250097920@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+References: <RO1P152MB1483190501127990FEBFCE9A97940@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128121331.GB2939@work-vm>
+	<RO1P152MB1483C38DCFD740BD8982F39597960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190128173536.GE2585@work-vm>
+	<RO1P152MB14834BE5D9747719CD493C5297960@RO1P152MB1483.LAMP152.PROD.OUTLOOK.COM>
+	<20190201133639.GE3150@work-vm>
+In-Reply-To: <20190201133639.GE3150@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DA41A8009DA90043A203513F976A1F83@LAMP152.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190201160653.13829-1-peter.maydell@linaro.org>
-In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Feb 2019 17:56:46 +0000
-Message-ID: <CAFEAcA8TXwf8J78Y=rhhvry98HoG1y7uWtKQu+V4xRScwe5j5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/47] target-arm queue
+Subject: Re: [Qemu-devel] Crash when booting KDE Neon using qxl-vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +36,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 1 Feb 2019 at 16:06, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> As promised, more Arm patches. The big thing in here is the
-> MPS2-AN521 board model.
->
-> thanks
-> -- PMM
->
-> The following changes since commit cfe6c547690b06fbce54a6d0f7b05dd7f18e36ea:
->
->   Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2019-01-31' into staging (2019-01-31 19:26:09 +0000)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190201
->
-> for you to fetch changes up to 7743b70ffe7a8ce168adce2cf50ad156b1fefb8c:
->
->   tests/microbit-test: Add tests for nRF51 NVMC (2019-02-01 15:32:17 +0000)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * New machine mps2-an521 -- this is a model of the AN521 FPGA image for the MPS2 devboard
->  * Fix various places where we failed to UNDEF invalid A64 instructions
->  * Don't UNDEF a valid FCMLA on 32-bit inputs
->  * Fix some bugs in the newly-added PAuth implementation
->  * microbit: Implement NVMC non-volatile memory controller
->
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+TWFnZWlhIDcgZ3Vlc3QgaXMgY3Jhc2hpbmcgdG9vLiBUaGUgY29tbWFuZCBsaW5lOg0KDQpxZW11
+LXN5c3RlbS14ODZfNjQgXA0KLW5hbWUgIk1hZ2VpYSA3IiAtayBwdC1iciAtbm9kZWZhdWx0cyAt
+YWNjZWwga3ZtIC1jcHUgaG9zdCAtc21wDQpjb3Jlcz0yLHRocmVhZHM9MSAtbSAxRyBcDQotZGV2
+aWNlIHF4bC12Z2EseHJlcz0xMzY2LHlyZXM9NzY4IFwNCi1kZXZpY2UgcWVtdS14aGNpLGlkPXho
+Y2lodWIgLWRldmljZSB1c2ItYXVkaW8saWQ9dXNiYXVkaW8sYnVmZmVyPTYxNDQgIFwNCi1kZXZp
+Y2UgdXNiLXRhYmxldCxpZD11c2J0YWJsZXQgLWJpb3MgL3Vzci9zaGFyZS9vdm1mL09WTUYuZmQg
+LWRpc3BsYXkNCmd0ayxnbD1vbiBcDQotZHJpdmUgaWY9dmlydGlvLGZpbGU9bWFnZWlhNy5xY293
+MiBcDQotbW9uaXRvciB2YyAtc2VyaWFsIHZjIC1jZHJvbSAiTWFnZWlhLTctYmV0YTEtTGl2ZS1Y
+ZmNlLXg4Nl82NC5pc28iIFwNCi1tYWNoaW5lIGtlcm5lbF9pcnFjaGlwPW9uIC1nbG9iYWwgUElJ
+WDRfUE0uZGlzYWJsZV9zMz0xIC1nbG9iYWwNClBJSVg0X1BNLmRpc2FibGVfczQ9MSAtTSBwYyx1
+c2I9dHJ1ZSBcDQotbmV0ZGV2IHVzZXIsaWQ9bmV0MCAtZGV2aWNlIGUxMDAwLG5ldGRldj1uZXQw
+LGFkZHI9OA0KDQpJdCBzZWVtcyB0aGF0Og0KDQotZHJpdmUgaWY9dmlydGlvLGZpbGU9DQoNCmlz
+IHRoZSBjYXVzZSBvZiB0aGlzLiBSZXBsYWNpbmcgaXQgd2l0aCAtaGRhIG1ha2VzIHRoZSBNYWdl
+aWEgNyBndWVzdA0Kd29yayBub3JtYWxseS4gS0RFIE5lb24gZ3Vlc3Qgc3RpbGwgY3Jhc2hlcyBi
+ZWNhdXNlIG9mIHRoZSBvdGhlciBwcm9ibGVtLg0KDQooZ2RiKSBidA0KIzAgIDB4MDAwMDdmZmZm
+MDM3MWU5NyBpbiBfX0dJX3JhaXNlIChzaWc9c2lnQGVudHJ5PTYpIGF0DQouLi9zeXNkZXBzL3Vu
+aXgvc3lzdi9saW51eC9yYWlzZS5jOjUxDQojMSAgMHgwMDAwN2ZmZmYwMzczODAxIGluIF9fR0lf
+YWJvcnQgKCkgYXQgYWJvcnQuYzo3OQ0KIzIgIDB4MDAwMDU1NTU1NTg5ZWFjOSBpbiBrdm1fbWVt
+X2lvZXZlbnRmZF9hZGQNCihsaXN0ZW5lcj0weDU1NTU1NmI0ZmZkOCwgc2VjdGlvbj0weDdmZmZj
+ZGYyM2E5MCwgbWF0Y2hfZGF0YT1mYWxzZSwNCmRhdGE9MCwgZT0weDU1NTU1N2I1MTY1OCkgYXQN
+Ci9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2FjY2VsL2t2bS9rdm0tYWxsLmM6ODY2DQoj
+MyAgMHgwMDAwNTU1NTU1ODgzMDBhIGluIGFkZHJlc3Nfc3BhY2VfYWRkX2RlbF9pb2V2ZW50ZmRz
+DQooYXM9MHg1NTU1NTY3ZTVhMDAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PiwgZmRzX25ldz0weDdm
+ZmZjNDU2MGZjMCwNCmZkc19uZXdfbmI9MSwgZmRzX29sZD0weDAsIGZkc19vbGRfbmI9MCkgYXQN
+Ci9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjc5Mw0KIzQgIDB4MDAwMDU1
+NTU1NTg4MzJmNCBpbiBhZGRyZXNzX3NwYWNlX3VwZGF0ZV9pb2V2ZW50ZmRzDQooYXM9MHg1NTU1
+NTY3ZTVhMDAgPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PikgYXQNCi9ob21lL3VzdWFyaW8vRG9jdW1l
+bnRvcy9xZW11L21lbW9yeS5jOjg0Mw0KIzUgIDB4MDAwMDU1NTU1NTg4NDE1YiBpbiBtZW1vcnlf
+cmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCAoKSBhdA0KL2hvbWUvdXN1YXJpby9Eb2N1bWVudG9z
+L3FlbXUvbWVtb3J5LmM6MTA5NA0KIzYgIDB4MDAwMDU1NTU1NTg4NzFjOCBpbiBtZW1vcnlfcmVn
+aW9uX2FkZF9ldmVudGZkIChtcj0weDU1NTU1N2IzZmEwMCwNCmFkZHI9MCwgc2l6ZT0wLCBtYXRj
+aF9kYXRhPWZhbHNlLCBkYXRhPTAsIGU9MHg1NTU1NTdiNTE2NTgpIGF0DQovaG9tZS91c3Vhcmlv
+L0RvY3VtZW50b3MvcWVtdS9tZW1vcnkuYzoyMzAzDQojNyAgMHgwMDAwNTU1NTU1YzI2Y2QwIGlu
+IHZpcnRpb19wY2lfaW9ldmVudGZkX2Fzc2lnbiAoZD0weDU1NTU1N2IzZWQzMCwNCm5vdGlmaWVy
+PTB4NTU1NTU3YjUxNjU4LCBuPTAsIGFzc2lnbj10cnVlKSBhdCBody92aXJ0aW8vdmlydGlvLXBj
+aS5jOjI0Mw0KIzggIDB4MDAwMDU1NTU1NWMyNGRkNSBpbiB2aXJ0aW9fYnVzX3NldF9ob3N0X25v
+dGlmaWVyDQooYnVzPTB4NTU1NTU3YjQ2ZTI4LCBuPTAsIGFzc2lnbj10cnVlKSBhdCBody92aXJ0
+aW8vdmlydGlvLWJ1cy5jOjI4Mw0KIzkgIDB4MDAwMDU1NTU1NThjZTY0OCBpbiB2aXJ0aW9fYmxr
+X2RhdGFfcGxhbmVfc3RhcnQNCih2ZGV2PTB4NTU1NTU3YjQ2ZWEwKSBhdA0KL2hvbWUvdXN1YXJp
+by9Eb2N1bWVudG9zL3FlbXUvaHcvYmxvY2svZGF0YXBsYW5lL3ZpcnRpby1ibGsuYzoyMDANCiMx
+MCAweDAwMDA1NTU1NTVjMjRhZjIgaW4gdmlydGlvX2J1c19zdGFydF9pb2V2ZW50ZmQNCihidXM9
+MHg1NTU1NTdiNDZlMjgpIGF0IGh3L3ZpcnRpby92aXJ0aW8tYnVzLmM6MjIzDQojMTEgMHgwMDAw
+NTU1NTU1YzI2ZTU3IGluIHZpcnRpb19wY2lfc3RhcnRfaW9ldmVudGZkDQoocHJveHk9MHg1NTU1
+NTdiM2VkMzApIGF0IGh3L3ZpcnRpby92aXJ0aW8tcGNpLmM6MjgyDQojMTIgMHgwMDAwNTU1NTU1
+YzI5Mjg1IGluIHZpcnRpb19wY2lfY29tbW9uX3dyaXRlDQoob3BhcXVlPTB4NTU1NTU3YjNlZDMw
+LCBhZGRyPTIwLCB2YWw9MTUsIHNpemU9MSkgYXQNCmh3L3ZpcnRpby92aXJ0aW8tcGNpLmM6MTIz
+Mw0KIzEzIDB4MDAwMDU1NTU1NTg4MWViZCBpbiBtZW1vcnlfcmVnaW9uX3dyaXRlX2FjY2Vzc29y
+DQoobXI9MHg1NTU1NTdiM2Y3MDAsIGFkZHI9MjAsIHZhbHVlPTB4N2ZmZmNkZjIzZjM4LCBzaXpl
+PTEsIHNoaWZ0PTAsDQptYXNrPTI1NSwgYXR0cnM9Li4uKSBhdCAvaG9tZS91c3VhcmlvL0RvY3Vt
+ZW50b3MvcWVtdS9tZW1vcnkuYzo1MDINCiMxNCAweDAwMDA1NTU1NTU4ODIwY2QgaW4gYWNjZXNz
+X3dpdGhfYWRqdXN0ZWRfc2l6ZSAoYWRkcj0yMCwNCnZhbHVlPTB4N2ZmZmNkZjIzZjM4LCBzaXpl
+PTEsIGFjY2Vzc19zaXplX21pbj0xLCBhY2Nlc3Nfc2l6ZV9tYXg9NCwNCmFjY2Vzc19mbj0NCiAg
+ICAweDU1NTU1NTg4MWRkNCA8bWVtb3J5X3JlZ2lvbl93cml0ZV9hY2Nlc3Nvcj4sIG1yPTB4NTU1
+NTU3YjNmNzAwLA0KYXR0cnM9Li4uKSBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3MvcWVtdS9t
+ZW1vcnkuYzo1NjgNCiMxNSAweDAwMDA1NTU1NTU4ODUxMDAgaW4gbWVtb3J5X3JlZ2lvbl9kaXNw
+YXRjaF93cml0ZQ0KKG1yPTB4NTU1NTU3YjNmNzAwLCBhZGRyPTIwLCBkYXRhPTE1LCBzaXplPTEs
+IGF0dHJzPS4uLikgYXQNCi9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L21lbW9yeS5jOjE0
+OTkNCiMxNiAweDAwMDA1NTU1NTU4MWJjYTkgaW4gZmxhdHZpZXdfd3JpdGVfY29udGludWUgKGZ2
+PTB4N2ZmZmI4MDAwZmMwLA0KYWRkcj0zNDY0NDk1MTA2MCwgYXR0cnM9Li4uLCBidWY9MHg3ZmZm
+ZjdmZjQwMjggPGVycm9yOiBOw6NvIMOpIHBvc3PDrXZlbA0KYWNlc3NhciBhIG1lbcOzcmlhIG5v
+IGVuZGVyZcOnbyAweDdmZmZmN2ZmNDAyOD4sIGxlbj0xLCBhZGRyMT0yMCwgbD0xLA0KbXI9MHg1
+NTU1NTdiM2Y3MDApIGF0IC9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2V4ZWMuYzozMjM0
+DQojMTcgMHgwMDAwNTU1NTU1ODFiZGYzIGluIGZsYXR2aWV3X3dyaXRlIChmdj0weDdmZmZiODAw
+MGZjMCwNCmFkZHI9MzQ2NDQ5NTEwNjAsIGF0dHJzPS4uLiwgYnVmPTB4N2ZmZmY3ZmY0MDI4IDxl
+cnJvcjogTsOjbyDDqSBwb3Nzw612ZWwNCmFjZXNzYXIgYSBtZW3Ds3JpYSBubyBlbmRlcmXDp28g
+MHg3ZmZmZjdmZjQwMjg+LCBsZW49MSkNCiAgICBhdCAvaG9tZS91c3VhcmlvL0RvY3VtZW50b3Mv
+cWVtdS9leGVjLmM6MzI3Mw0KIzE4IDB4MDAwMDU1NTU1NTgxYzBmOSBpbiBhZGRyZXNzX3NwYWNl
+X3dyaXRlIChhcz0weDU1NTU1NjdlNWEwMA0KPGFkZHJlc3Nfc3BhY2VfbWVtb3J5PiwgYWRkcj0z
+NDY0NDk1MTA2MCwgYXR0cnM9Li4uLCBidWY9MHg3ZmZmZjdmZjQwMjgNCjxlcnJvcjogTsOjbyDD
+qSBwb3Nzw612ZWwgYWNlc3NhciBhIG1lbcOzcmlhIG5vIGVuZGVyZcOnbyAweDdmZmZmN2ZmNDAy
+OD4sDQpsZW49MSkgYXQgL2hvbWUvdXN1YXJpby9Eb2N1bWVudG9zL3FlbXUvZXhlYy5jOjMzNjMN
+CiMxOSAweDAwMDA1NTU1NTU4MWMxNGEgaW4gYWRkcmVzc19zcGFjZV9ydyAoYXM9MHg1NTU1NTY3
+ZTVhMDANCjxhZGRyZXNzX3NwYWNlX21lbW9yeT4sIGFkZHI9MzQ2NDQ5NTEwNjAsIGF0dHJzPS4u
+LiwgYnVmPTB4N2ZmZmY3ZmY0MDI4DQo8ZXJyb3I6IE7Do28gw6kgcG9zc8OtdmVsIGFjZXNzYXIg
+YSBtZW3Ds3JpYSBubyBlbmRlcmXDp28gMHg3ZmZmZjdmZjQwMjg+LA0KbGVuPTEsIGlzX3dyaXRl
+PXRydWUpIGF0IC9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2V4ZWMuYzozMzc0DQojMjAg
+MHgwMDAwNTU1NTU1OGExNDZmIGluIGt2bV9jcHVfZXhlYyAoY3B1PTB4NTU1NTU2YmNjNDEwKSBh
+dA0KL2hvbWUvdXN1YXJpby9Eb2N1bWVudG9zL3FlbXUvYWNjZWwva3ZtL2t2bS1hbGwuYzoyMDMx
+DQojMjEgMHgwMDAwNTU1NTU1ODY1YTNlIGluIHFlbXVfa3ZtX2NwdV90aHJlYWRfZm4gKGFyZz0w
+eDU1NTU1NmJjYzQxMCkgYXQNCi9ob21lL3VzdWFyaW8vRG9jdW1lbnRvcy9xZW11L2NwdXMuYzox
+MjgxDQojMjIgMHgwMDAwNTU1NTU1ZTFiYTAyIGluIHFlbXVfdGhyZWFkX3N0YXJ0IChhcmdzPTB4
+NTU1NTU2YmVkYWEwKSBhdA0KdXRpbC9xZW11LXRocmVhZC1wb3NpeC5jOjUwMg0KIzIzIDB4MDAw
+MDdmZmZmMDcyYjZkYiBpbiBzdGFydF90aHJlYWQgKGFyZz0weDdmZmZjZGYyNzcwMCkgYXQNCnB0
+aHJlYWRfY3JlYXRlLmM6NDYzDQojMjQgMHgwMDAwN2ZmZmYwNDU0ODhmIGluIGNsb25lICgpIGF0
+DQouLi9zeXNkZXBzL3VuaXgvc3lzdi9saW51eC94ODZfNjQvY2xvbmUuUzo5NQ0KDQo=
