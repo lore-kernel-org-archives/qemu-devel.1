@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53056)
+Received: from eggs.gnu.org ([209.51.188.92]:53371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpXDr-0000Tq-IZ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 06:43:05 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpXFa-0001EV-PL
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 06:44:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpXDq-0002DU-I3
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 06:43:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gpXDq-0002Cf-9m
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 06:43:02 -0500
-Date: Fri, 1 Feb 2019 11:42:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190201114257.GC3150@work-vm>
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-8-yuval.shaia@oracle.com>
-	<42ba3330-f7ca-b5c5-126f-8dd97e343d51@redhat.com>
-	<20190131200816.GA2838@lap1>
-	<3557b3f3-cec5-fcb1-1527-e613fa446b89@redhat.com>
-	<87ftt8j73b.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gpXFZ-00036D-Fz
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 06:44:50 -0500
+Resent-Message-Id: <E1gpXFZ-00036D-Fz@eggs.gnu.org>
+Message-ID: <154902145391.29184.7539255014900374417@ebba9967afc0>
+In-Reply-To: <20190123101458.12478-1-eric.auger@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ftt8j73b.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 07/10] monitor: Expose pvrdma device
- statistics counters
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 03:44:15 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 00/18] ARM virt: Initial RAM expansion
+ and PCDIMM/NVDIMM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
+To: eric.auger@redhat.com
+Cc: fam@euphon.net, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com, drjones@redhat.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
-> > On 1/31/19 2:08 PM, Yuval Shaia wrote:
-> >> On Thu, Jan 31, 2019 at 07:17:16AM -0600, Eric Blake wrote:
-> >>> On 1/31/19 7:08 AM, Yuval Shaia wrote:
-> >>>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> >>>> ---
-> >>>>  hmp-commands-info.hx | 14 ++++++++++++++
-> >>>>  monitor.c            |  6 ++++++
-> >>>>  2 files changed, 20 insertions(+)
-> >> 
-> >> Hi Eric,
-> >> 
-> >>>
-> >>> Commit message should state WHY this is being added as an HMP-only
-> >>> command, and does not have a QMP counterpart.  It may be okay if the
-> >>> interface is only designed to be useful to developers, but having that
-> >>> justification in the git log is important.
-> >> 
-> >> Thanks for your review.
-> >> 
-> >> See, i need this interface mainly for development/debug purposes, to help
-> >> troubleshot problems and to give insights to what device "is doing".
-> >> 
-> >> Trace points are great but not effective in high load.
-> >> QMP as i see it, and correct me if i'm wrong, is used to report management
-> >> events etc and also here, is not effective in high load.
-> 
-> If QMP is not effective, HMP won't be effective, either.  But I guess
-> you mean something else, namely QMP *events* aren't effective, but
-> *polling* is.
-> 
-> That's an argument for polling, not an argument for not supporting QMP.
-> 
-> >> I choose this interface as it is interactive, i.e. whenever i need the info
-> >> i trigger 'info pvrdmastats' command from the monitor console.
-> >> 
-> >> During my research i notice that some devices (or families) have nice user
-> >> interface via virsh (blkstat, ifstat, memstat etc). Is it the preferred way
-> >> for non-devel/debug purposes?
-> 
-> Libvirt interfaces like these are built on top of *QMP* interfaces.  If
-> a libvirt interface would be useful, that's another argument for
-> supporting QMP.
-> 
-> > Using existing HMP-only debug interfaces as the design you copied is
-> > indeed acceptable justification for making yours HMP-only as well.  So
-> > now you just need to copy the rationale from this email into your commit
-> > message, so it doesn't get lost.
-> 
-> Yes.  If we conclude HMP-only is okay, then the rationale for it goes
-> into your commit message.
-> 
-> If we conclude we want HMP and QMP, I'll be happy to assist you with
-> adapting your patch.
-> 
-> HMP commands without a QMP equivalent are okay if their functionality
-> makes no sense in QMP, or is of use only for human users.
-> 
-> Example for "makes no sense in QMP": setting the current CPU, because a
-> QMP monitor doesn't have a current CPU.
-> 
-> Examples for "is of use only for human users": HMP command "help", the
-> integrated pocket calculator.
-> 
-> Debugging commands are kind of borderline.  Debugging is commonly a
-> human activity, where HMP is just fine.  However, humans create tools to
-> assist with their activities, and then QMP is useful.  While I wouldn't
-> encourage HMP-only for the debugging use case, I wouldn't veto it.
-> 
-> "Device statistics" sounds like it should have debugging uses.  But
-> statistics often have non-debugging uses as well.  What use cases can
-> you imagine for this command?
-
-I think the question here partially comes down to how 'stable' the set
-of statistics is and how useful they are to non-developers.
-The 'stable' part is a question because when you expose something via
-QMP it's part of the ABI so people don't like it changing.
-If they're things that are generic and likely to stay the same then they
-should probably go via QMP (e.g. bandwidth, requests/second).
-If they're things that are about the internal state of your
-implementation and just for debug, then they're fine to be HMP only.
-You can add them to the qmp as well, even if they're not stable by
-prefixing the name with an x-.
-
-Dave
-
-> >> If this is the correct method for this purpose then let me know and i'll
-> >> update the git log message accordingly.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMzEwMTQ1OC4xMjQ3
+OC0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
+ZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvYXJtL25zZXJpZXMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
+L2h3L2FybS9vbWFwX3N4MS5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vdmlydC1hY3BpLWJ1
+aWxkLmM6IEluIGZ1bmN0aW9uICdidWlsZF9zcmF0JzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fy
+bS92aXJ0LWFjcGktYnVpbGQuYzo1NDg6NDg6IGVycm9yOiBpbmNvbXBhdGlibGUgdHlwZSBmb3Ig
+YXJndW1lbnQgMyBvZiAnYnVpbGRfc3JhdF9tZW1vcnknCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIG1zLT5kZXZpY2VfbWVtb3J5LT5tci5zaXplLCBuYl9udW1hX25vZGVzIC0gMSwKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+fn5+Xn5+fn4KSW4gZmlsZSBp
+bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vdmlydC1hY3BpLWJ1aWxkLmM6
+NDI6CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDE5MDEyMzEwMTQ1OC4xMjQ3OC0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbS90ZXN0aW5nLmRv
+Y2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
