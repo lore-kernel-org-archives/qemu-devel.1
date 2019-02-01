@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60548)
+Received: from eggs.gnu.org ([209.51.188.92]:60554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gpXyo-0002Lt-9V
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:34 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gpXyq-0002Lz-Aa
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gpXye-0004cl-C3
+	(envelope-from <kraxel@redhat.com>) id 1gpXyf-0004d1-EJ
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54928)
+Received: from mx1.redhat.com ([209.132.183.28]:53862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpXyZ-0004ar-BI
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:19 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpXyZ-0004bH-C7
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:21 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  1 Feb 2019 13:30:56 +0100
-Message-Id: <20190201123100.27419-2-kraxel@redhat.com>
+Date: Fri,  1 Feb 2019 13:30:58 +0100
+Message-Id: <20190201123100.27419-4-kraxel@redhat.com>
 In-Reply-To: <20190201123100.27419-1-kraxel@redhat.com>
 References: <20190201123100.27419-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] hw/display: Move Milkymist specific
- hardware out of common-obj list
+Subject: [Qemu-devel] [PULL 3/5] hw/display/milkymist-tmu2: Explicit the
+ dependency to both X11 / OpenGL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +32,68 @@ Cc: libvir-list@redhat.com, Michael Walle <michael@walle.cc>, Gerd Hoffmann <kra
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-The Milkymist specific hardware is only used by the LM32 target,
-it is pointless to compile those objects in other targets.
+The TMU device requires both X11 and OpenGL.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190130120005.23123-2-philmd@redhat.com
+Message-id: 20190130120005.23123-4-philmd@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/Makefile.objs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/lm32/milkymist-hw.h           | 4 ++--
+ default-configs/lm32-softmmu.mak | 2 +-
+ hw/display/Makefile.objs         | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/hw/lm32/milkymist-hw.h b/hw/lm32/milkymist-hw.h
+index d3be0cfb3a..32c344ef9f 100644
+--- a/hw/lm32/milkymist-hw.h
++++ b/hw/lm32/milkymist-hw.h
+@@ -88,7 +88,7 @@ static inline DeviceState *milkymist_pfpu_create(hwaddr=
+ base,
+     return dev;
+ }
+=20
+-#ifdef CONFIG_OPENGL
++#if defined(CONFIG_X11) && defined(CONFIG_OPENGL)
+ #include <X11/Xlib.h>
+ #include <epoxy/gl.h>
+ #include <epoxy/glx.h>
+@@ -103,7 +103,7 @@ static const int glx_fbconfig_attr[] =3D {
+ static inline DeviceState *milkymist_tmu2_create(hwaddr base,
+         qemu_irq irq)
+ {
+-#ifdef CONFIG_OPENGL
++#if defined(CONFIG_X11) && defined(CONFIG_OPENGL)
+     DeviceState *dev;
+     Display *d;
+     GLXFBConfig *configs;
+diff --git a/default-configs/lm32-softmmu.mak b/default-configs/lm32-soft=
+mmu.mak
+index 4889348a10..4049b23562 100644
+--- a/default-configs/lm32-softmmu.mak
++++ b/default-configs/lm32-softmmu.mak
+@@ -2,7 +2,7 @@
+=20
+ CONFIG_LM32=3Dy
+ CONFIG_MILKYMIST=3Dy
+-CONFIG_MILKYMIST_TMU2=3D$(CONFIG_OPENGL)
++CONFIG_MILKYMIST_TMU2=3D$(call land,$(CONFIG_X11),$(CONFIG_OPENGL))
+ CONFIG_FRAMEBUFFER=3Dy
+ CONFIG_PTIMER=3Dy
+ CONFIG_PFLASH_CFI01=3Dy
 diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 97acd5b6cb..5b770817c7 100644
+index 5b770817c7..7c4ae9a0fd 100644
 --- a/hw/display/Makefile.objs
 +++ b/hw/display/Makefile.objs
-@@ -25,10 +25,10 @@ common-obj-$(CONFIG_BOCHS_DISPLAY) +=3D edid-region.o
- common-obj-$(CONFIG_BLIZZARD) +=3D blizzard.o
- common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_fimd.o
- common-obj-$(CONFIG_FRAMEBUFFER) +=3D framebuffer.o
--common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
-+obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
+@@ -29,8 +29,8 @@ obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
  common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
 =20
--common-obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
-+obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
- milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
- milkymist-tmu2.o-libs :=3D $(X11_LIBS)
+ obj-$(CONFIG_MILKYMIST_TMU2) +=3D milkymist-tmu2.o
+-milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS)
+-milkymist-tmu2.o-libs :=3D $(X11_LIBS)
++milkymist-tmu2.o-cflags :=3D $(X11_CFLAGS) $(OPENGL_CFLAGS)
++milkymist-tmu2.o-libs :=3D $(X11_LIBS) $(OPENGL_LIBS)
 =20
+ obj-$(CONFIG_OMAP) +=3D omap_dss.o
+ obj-$(CONFIG_OMAP) +=3D omap_lcdc.o
 --=20
 2.9.3
