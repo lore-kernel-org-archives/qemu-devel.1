@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55897)
+Received: from eggs.gnu.org ([209.51.188.92]:55955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpchf-0005Wa-Ae
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:34:12 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpchh-0005ZB-Tf
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpche-0002nY-0g
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:34:11 -0500
-Resent-Message-Id: <E1gpche-0002nY-0g@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpchd-0002hj-JU
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:34:09 -0500
-Message-ID: <154904241284.29184.16146340117507460837@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpchg-0002qk-Q3
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:34:13 -0500
+Date: Fri, 1 Feb 2019 18:34:01 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190201173401.GD31750@localhost.localdomain>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<2edaa66c-52d9-ad56-d155-304ec7fb6903@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:33:34 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="h31gzZEtNLTqOjlF"
+Content-Disposition: inline
+In-Reply-To: <2edaa66c-52d9-ad56-d155-304ec7fb6903@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension
+ new test 239
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
-YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
-ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-IC0+IHBhdGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplYTY3OWYwYTkxIGRvY3MvY29uZi5w
-eTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbgo5YzZjYmJhMmUxIE1ha2VmaWxlOiBBYnN0
-cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCjUyNmY5NzEwNGEgTWFrZWZp
-bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgo2NjVhOWZm
-MTQ3IFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKNGEwYWQxNjU0YSBk
-b2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmRhZmZlOTlmNmIgZG9jcy9jb25m
-LnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQKN2YyYjFjMzg3OCBk
-b2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUKMGVkYWQyZGFhMyBk
-b2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5CmQ2OTgzNzVhNGMg
-ZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydApiY2E1MjAy
-YmRkIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0CjBlOWZmYjEzZGIgZG9j
-cy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgMGU5ZmZiMTNkYmFhIChkb2NzL2NwdS1ob3RwbHVn
-LnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNraW5nIGNvbW1pdCBiY2E1MjAy
-YmRkZWUgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0KQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVtb3J5LnR4dAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1pdCBkNjk4Mzc1YTRjNjIgKGRv
-Y3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQpCkVSUk9SOiBN
-aXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IDBlZGFkMmRhYTM1NCAoZG9jcy9jb25mLnB5OiBEaXNh
-YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgN2YyYjFj
-Mzg3ODMwIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYv
-MTEgQ2hlY2tpbmcgY29tbWl0IGRhZmZlOTlmNmJlNSAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNs
-dWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDRhMGFk
-MTY1NGFmNCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVj
-a2luZyBjb21taXQgNjY1YTlmZjE0NzM1IChTZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVh
-bCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE2MTogRklMRTogZG9j
-cy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10g
-PSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlk
-ZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9y
-cywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDUyNmY5NzEwNGFhYyAoTWFrZWZp
-bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEg
-Q2hlY2tpbmcgY29tbWl0IDljNmNiYmEyZTE3YiAoTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
-bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNraW5nIGNvbW1pdCBlYTY3OWYw
-YTkxYTYgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExNDUw
-MzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90
-eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--h31gzZEtNLTqOjlF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 01.02.2019 um 18:23 hat Eric Blake geschrieben:
+> On 1/31/19 7:46 AM, Andrey Shinkevich wrote:
+> > A new test file 239 added to the qemu-iotests set. It checks
+> > the output format of 'qemu-img info' for bitmaps extension of
+> > qcow2 specific information.
+> >=20
+> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > ---
+> >  tests/qemu-iotests/239     |  74 ++++++++++++++++++++++++++
+> >  tests/qemu-iotests/239.out | 130 +++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  tests/qemu-iotests/group   |   1 +
+> >  3 files changed, 205 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/239
+> >  create mode 100644 tests/qemu-iotests/239.out
+>=20
+> Kevin just sent a pull request with 239 consumed for something else (a
+> test for dmg; also consumed 240); I don't mind renumbering the test as
+> 242 or later as part of staging if we are happy with this version of the
+> test.  But I also see that Vladimir had some suggestions, so I wouldn't
+> be surprised if you want to send a v12.
+>=20
+> >=20
+> > diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
+> > new file mode 100755
+> > index 0000000..bee7943
+> > --- /dev/null
+> > +++ b/tests/qemu-iotests/239
+> > @@ -0,0 +1,74 @@
+> > +#!/usr/bin/env python
+> > +#
+> > +# Test for qcow2 bitmap printed information
+> > +#
+> > +# Copyright (c) 2018 Virtuozzo International GmbH
+>=20
+> Want to claim 2019?
+>=20
+>=20
+> > +def add_bitmap(bitmap_number, persistent, disabled):
+> > +    granularity =3D 2**(13 + bitmap_number)
+> > +    bitmap_name =3D 'bitmap-' + str(bitmap_number-1)
+> > +    vm =3D iotests.VM().add_drive(disk)
+> > +    vm.launch()
+> > +    vm.qmp_log('block-dirty-bitmap-add', node=3D'drive0', name=3Dbitma=
+p_name,
+> > +               granularity=3Dgranularity, persistent=3Dpersistent,
+> > +               disabled=3Ddisabled)
+> > +    vm.shutdown()
+> > +
+> > +def write_to_disk(offset, size):
+> > +    write =3D 'write {} {}K'.format(offset, size)
+> > +    qemu_io('-f', iotests.imgfmt, '-c', write, disk)
+> > +    log('Write ' + str(size) + 'K to disk at offset ' + str(hex(offset=
+)))
+> > +
+> > +
+> > +qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+> > +
+> > +for num in range(1, 4):
+> > +    disabled =3D False
+> > +    if num =3D=3D 2:
+> > +        disabled =3D True
+> > +    add_bitmap(num, bool(num-1), disabled)
+>=20
+> I don't know the pythonic way of coercing a bool value out of a check
+> for whether another value is a particular integer; but I see that you
+> did it in two different styles.  I don't know if this works, but it
+> would at least look more consistent:
+>=20
+> add_bitmap(num, bool(num =3D=3D 1), bool(num =3D=3D 2))
+
+Hm...
+
+    >>> num =3D 0
+    >>> type(num =3D=3D 2)
+    <class 'bool'>
+
+Why all the bool() calls when the result of =3D=3D is already a bool?
+
+Kevin
+
+--h31gzZEtNLTqOjlF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcVIMJAAoJEH8JsnLIjy/WzoQQAIhhqez34KMLOH9JuujJSA6O
+Jg1/4WJMfvI5W53dT0zK9h5YYEHolgKRxyB+PUXT/OYCUkN7Bw8KxgNUPZJ1jEwl
+A7O5k/BfH6gIKKZMv8eh9o3VSsubayjNWfUAP9tqXaLeAPzHWnHfwTkHJ0159vMk
+SKNBzH+lgrchcHusHmsg8vIV0CcYe9CLfq1x87UjuX0Y/Dld5yY3a8jhKMIbATr8
+VZ1vs9mPysxDHH784/eOWPh6xr08n+mGqPk+iUmaK7ktPK33tCT69mA5/2IyYoNQ
+ju81ZOta9GTnFOOr6GvkGdqbP41+/c+l9ZzYSWCEa74p4ty0hz6Dcil7uBoQK59K
+5aNShvC/GZoDfdEwQnt5+nmsCjhnF+4oR7qjou4sRpYavx6CJ73zfIF0F6LIJWWL
+VqZwHzJsWbhDFQf6svi7n6FRZ4D2Fv67DPUoZS156upzVVRHIUJ7+tba/B3krGoh
++NbuMoS6JGApuleDEPC1YeaJ2eZU8Dwtkc9DpDghmc2XFxRPRzhSugo4sP0FrSGd
+I3tj5haS8ZFKyufLFCgbtRebUo4Owf42AnDCSudpjGNRo1QlEoX0kdIpvmPPx2s6
+mWS981v+aQyw7Z2/ti7RNWEbz31yLFCAZOKBZDc/4KVG6NlFnZQfi2prz65i4nRG
+u/nAj0NawZJT8YSt7EJH
+=OvHx
+-----END PGP SIGNATURE-----
+
+--h31gzZEtNLTqOjlF--
