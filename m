@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52095)
+Received: from eggs.gnu.org ([209.51.188.92]:52385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcWj-0004nk-DY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpcXd-0005W6-Qw
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:23:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcWi-0004wc-1a
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:53 -0500
-Resent-Message-Id: <E1gpcWi-0004wc-1a@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21785)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpcWg-0004ew-6Q
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:22:51 -0500
-Message-ID: <154904172581.29184.10652914247774232953@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gpcXa-0005c1-0J
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:23:47 -0500
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2edaa66c-52d9-ad56-d155-304ec7fb6903@redhat.com>
+Date: Fri, 1 Feb 2019 11:23:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:22:07 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+In-Reply-To: <1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GKlKjDRbR3MFidHviaT2emZ0eNOQnPMMS"
+Subject: Re: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension
+ new test 239
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +25,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
-YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
-ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCmI2OTZlZThlZmEgZG9jcy9jb25mLnB5OiBEb24ndCBoYXJkLWNv
-ZGUgUUVNVSB2ZXJzaW9uCjI0NjA2ZDllNzYgTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRlbnRp
-ZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUKZWY0NjBkMTRiYiBNYWtlZmlsZSwgY29uZmlndXJlOiBT
-dXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uCmVlY2JiYmNjNjcgU2VwYXJhdGUgY29u
-Zi5weSBmb3IgZWFjaCBtYW51YWwgd2Ugd2FudApiNmRkZmQ5OTY0IGRvY3MvY29uZi5weTogRGlz
-YWJsZSBvcHRpb24gd2FybmluZ3MKYjYxNzQwMzllNiBkb2NzL2NvbmYucHk6IERvbid0IGluY2x1
-ZGUgclNUIHNvdXJjZXMgaW4gSFRNTCBidWlsZAplOGJmZjBlODM0IGRvY3MvY29uZi5weTogQ29u
-ZmlndXJlIHRoZSAnYWxhYmFzdGVyJyB0aGVtZQo2OGRlMDUzNmU5IGRvY3MvY29uZi5weTogRGlz
-YWJsZSB1bnVzZWQgX3N0YXRpYyBkaXJlY3RvcnkKOTNiNWQxZGJkOCBkb2NzOiBDb21taXQgaW5p
-dGlhbCBmaWxlcyBmcm9tIHNwaGlueC1xdWlja3N0YXJ0CjczYWQ2M2NmM2QgZG9jczogQ29udmVy
-dCBtZW1vcnkudHh0IHRvIHJzdCBmb3JtYXQKY2YwYTgzNjRmNiBkb2NzL2NwdS1ob3RwbHVnLnJz
-dDogRml4IHJTVCBtYXJrdXAgaXNzdWVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzExIENoZWNr
-aW5nIGNvbW1pdCBjZjBhODM2NGY2ZWEgKGRvY3MvY3B1LWhvdHBsdWcucnN0OiBGaXggclNUIG1h
-cmt1cCBpc3N1ZXMpCjIvMTEgQ2hlY2tpbmcgY29tbWl0IDczYWQ2M2NmM2Q5NiAoZG9jczogQ29u
-dmVydCBtZW1vcnkudHh0IHRvIHJzdCBmb3JtYXQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIyOiAKcmVu
-YW1lIGZyb20gZG9jcy9kZXZlbC9tZW1vcnkudHh0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDE5NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCjMvMTEgQ2hlY2tpbmcgY29tbWl0IDkzYjVkMWRiZDg1ZiAoZG9jczogQ29tbWl0IGluaXRp
-YWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydCkKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9m
-Zi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODggbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMy8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC8xMSBDaGVja2lu
-ZyBjb21taXQgNjhkZTA1MzZlOWM3IChkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0
-aWMgZGlyZWN0b3J5KQo1LzExIENoZWNraW5nIGNvbW1pdCBlOGJmZjBlODM0ZWMgKGRvY3MvY29u
-Zi5weTogQ29uZmlndXJlIHRoZSAnYWxhYmFzdGVyJyB0aGVtZSkKNi8xMSBDaGVja2luZyBjb21t
-aXQgYjYxNzQwMzllNjg4IChkb2NzL2NvbmYucHk6IERvbid0IGluY2x1ZGUgclNUIHNvdXJjZXMg
-aW4gSFRNTCBidWlsZCkKNy8xMSBDaGVja2luZyBjb21taXQgYjZkZGZkOTk2NGFiIChkb2NzL2Nv
-bmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzKQo4LzExIENoZWNraW5nIGNvbW1pdCBlZWNi
-YmJjYzY3MzcgKFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQpCkVSUk9S
-OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTYwOiBGSUxFOiBkb2NzL2ludGVyb3AvY29uZi5w
-eToxNToKK2h0bWxfdGhlbWVfb3B0aW9uc1snZGVzY3JpcHRpb24nXSA9IHUnU3lzdGVtIEVtdWxh
-dGlvbiBNYW5hZ2VtZW50IGFuZCBJbnRlcm9wZXJhYmlsaXR5IEd1aWRlJwoKRVJST1I6IE1pc3Np
-bmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
-MzMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-OS8xMSBDaGVja2luZyBjb21taXQgZWY0NjBkMTRiYjA5IChNYWtlZmlsZSwgY29uZmlndXJlOiBT
-dXBwb3J0IGJ1aWxkaW5nIHJTVCBkb2N1bWVudGF0aW9uKQoxMC8xMSBDaGVja2luZyBjb21taXQg
-MjQ2MDZkOWU3NmNhIChNYWtlZmlsZTogQWJzdHJhY3Qgb3V0ICJpZGVudGlmeSB0aGUgcGtndmVy
-c2lvbiIgY29kZSkKMTEvMTEgQ2hlY2tpbmcgY29tbWl0IGI2OTZlZThlZmEzNCAoZG9jcy9jb25m
-LnB5OiBEb24ndCBoYXJkLWNvZGUgUUVNVSB2ZXJzaW9uKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwMTE0NTAzNS4yMjczOS0xLXBldGVy
-Lm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GKlKjDRbR3MFidHviaT2emZ0eNOQnPMMS
+From: Eric Blake <eblake@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <2edaa66c-52d9-ad56-d155-304ec7fb6903@redhat.com>
+Subject: Re: [PATCH v11 3/3] qemu-img info: bitmaps extension new test 239
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/31/19 7:46 AM, Andrey Shinkevich wrote:
+> A new test file 239 added to the qemu-iotests set. It checks
+> the output format of 'qemu-img info' for bitmaps extension of
+> qcow2 specific information.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/239     |  74 ++++++++++++++++++++++++++
+>  tests/qemu-iotests/239.out | 130 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 205 insertions(+)
+>  create mode 100755 tests/qemu-iotests/239
+>  create mode 100644 tests/qemu-iotests/239.out
+
+Kevin just sent a pull request with 239 consumed for something else (a
+test for dmg; also consumed 240); I don't mind renumbering the test as
+242 or later as part of staging if we are happy with this version of the
+test.  But I also see that Vladimir had some suggestions, so I wouldn't
+be surprised if you want to send a v12.
+
+>=20
+> diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
+> new file mode 100755
+> index 0000000..bee7943
+> --- /dev/null
+> +++ b/tests/qemu-iotests/239
+> @@ -0,0 +1,74 @@
+> +#!/usr/bin/env python
+> +#
+> +# Test for qcow2 bitmap printed information
+> +#
+> +# Copyright (c) 2018 Virtuozzo International GmbH
+
+Want to claim 2019?
+
+
+> +def add_bitmap(bitmap_number, persistent, disabled):
+> +    granularity =3D 2**(13 + bitmap_number)
+> +    bitmap_name =3D 'bitmap-' + str(bitmap_number-1)
+> +    vm =3D iotests.VM().add_drive(disk)
+> +    vm.launch()
+> +    vm.qmp_log('block-dirty-bitmap-add', node=3D'drive0', name=3Dbitma=
+p_name,
+> +               granularity=3Dgranularity, persistent=3Dpersistent,
+> +               disabled=3Ddisabled)
+> +    vm.shutdown()
+> +
+> +def write_to_disk(offset, size):
+> +    write =3D 'write {} {}K'.format(offset, size)
+> +    qemu_io('-f', iotests.imgfmt, '-c', write, disk)
+> +    log('Write ' + str(size) + 'K to disk at offset ' + str(hex(offset=
+)))
+> +
+> +
+> +qemu_img_create('-f', iotests.imgfmt, disk, '1M')
+> +
+> +for num in range(1, 4):
+> +    disabled =3D False
+> +    if num =3D=3D 2:
+> +        disabled =3D True
+> +    add_bitmap(num, bool(num-1), disabled)
+
+I don't know the pythonic way of coercing a bool value out of a check
+for whether another value is a particular integer; but I see that you
+did it in two different styles.  I don't know if this works, but it
+would at least look more consistent:
+
+add_bitmap(num, bool(num =3D=3D 1), bool(num =3D=3D 2))
+
+> +    write_to_disk((num-1)*chunk, chunk)
+
+Does PEP8 want spaces around those operators?
+
+> +    print_bitmap()
+> +    log('')
+> +
+> +vm =3D iotests.VM().add_drive(disk)
+> +vm.launch()
+> +log('Checking \"in-use\" flag...')
+> +print_bitmap()
+> +vm.shutdown()
+
+The test output looks like reasonable coverage.
+Tested-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--GKlKjDRbR3MFidHviaT2emZ0eNOQnPMMS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUgIMACgkQp6FrSiUn
+Q2oXTgf/bYuyjbFEgfI+gOhZC5RoA0j193y2g8YF6zZBnp7jk6trS4FUuLY3bT4h
+BipvAzu2hIdqkzhkQOrjqHaKaB9nyCOJYs4fcHgdYra413lNKrkcWGxXUei7mO5A
+0B4CujTxoqwjyssZ/5rn12CGAvXqI2SquQ8b+WZAcbuUiPCKm4YDF6GEwBh9sm33
+aSiW5zfCsmfH8WVUIy09ana2JM+deBgKB0fcSUQu0eHAM4bl639zxEG9bt3oLTPq
+8UTLdPkAMbf7elZcwEbbQwtrH1bqz7zzYki0SK2HB8cWkb6wzlgJYLOMLt0BFvKw
+YH75lOSmW+kvvRDLwZMSeuYbxp1Zjw==
+=Ks2W
+-----END PGP SIGNATURE-----
+
+--GKlKjDRbR3MFidHviaT2emZ0eNOQnPMMS--
