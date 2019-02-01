@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36533)
+Received: from eggs.gnu.org ([209.51.188.92]:36845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gpOXV-0005xc-Js
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:46 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gpOYy-0006bp-MS
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gpOXT-0001WE-NW
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34854)
+	(envelope-from <jasowang@redhat.com>) id 1gpOYx-0001pk-TG
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gpOXR-0001QP-R9
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:43 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gpOYx-0001pR-Ns
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:28:15 -0500
 References: <20190122083152.10705-1-xieyongji@baidu.com>
 	<20190122083152.10705-4-xieyongji@baidu.com>
 	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
-	<CAONzpcaQhfSa-Uw2-r_XTqvw8fYq_haJ6zKR-9NkK=fBkZky0w@mail.gmail.com>
+	<CAONzpcZ2fm11JdCA1aqaWTBjkHSagu5E_tquezJFGpWV4UT9fA@mail.gmail.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <03d8aa2d-e72d-4aa7-c83d-8252b0ebbc8a@redhat.com>
-Date: Fri, 1 Feb 2019 10:26:10 +0800
+Message-ID: <f1208a8b-463c-0f03-3987-d623425dd5f3@redhat.com>
+Date: Fri, 1 Feb 2019 10:27:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAONzpcaQhfSa-Uw2-r_XTqvw8fYq_haJ6zKR-9NkK=fBkZky0w@mail.gmail.com>
+In-Reply-To: <CAONzpcZ2fm11JdCA1aqaWTBjkHSagu5E_tquezJFGpWV4UT9fA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -35,7 +35,7 @@ To: Yongji Xie <elohimes@gmail.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
 
-On 2019/1/30 =E4=B8=8A=E5=8D=8811:58, Yongji Xie wrote:
+On 2019/1/30 =E4=B8=8B=E5=8D=881:48, Yongji Xie wrote:
 > On Wed, 30 Jan 2019 at 10:32, Jason Wang <jasowang@redhat.com> wrote:
 >>
 >> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
@@ -83,12 +83,18 @@ On 2019/1/30 =E4=B8=8A=E5=8D=8811:58, Yongji Xie wrote:
 e
 >> value reach memory.
 >>
-> Is it enough to declare those variables as volatile?
+> The cache line should have been flushed during crash. So we can see
+> the correct value when backend reconnecting. If so, compile barrier
+> should be enough here, right?
+
+
+Maybe I worry too much but it's not about flushing cache, but about=20
+whether or not compiler can generate mov to memory instead of mov to=20
+registers.
+
+Thanks
+
+
 >
 > Thanks,
 > Yongji
-
-
-I think so.
-
-Thanks
