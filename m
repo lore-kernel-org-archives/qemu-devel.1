@@ -1,20 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35135)
+Received: from eggs.gnu.org ([209.51.188.92]:35330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpYBm-0001O7-Na
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:44:59 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gpYCc-000206-Mr
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:45:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpYBl-0003A8-PR
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:44:58 -0500
-Date: Fri, 1 Feb 2019 13:44:43 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190201124424.GE5730@localhost.localdomain>
-References: <20190131123810.10233-1-berto@igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190131123810.10233-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qtest.py: Wait for the result
- of qtest commands
+	(envelope-from <cohuck@redhat.com>) id 1gpYCb-0003mj-R9
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:45:50 -0500
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  1 Feb 2019 13:45:43 +0100
+Message-Id: <20190201124543.5945-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH] s390x/pci: mark zpci devices as unmigratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +17,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Am 31.01.2019 um 13:38 hat Alberto Garcia geschrieben:
-> The cmd() method of the QEMUQtestProtocol class sends a qtest command
-> to QEMU but doesn't wait for the return message ("OK", "FAIL", "ERR").
-> Because of this, it can return control to the caller before the
-> command has actually finished.
-> 
-> In cases like clock_step or clock_set this means that cmd() can return
-> before all the timers triggered by the clock change have been fired.
-> This can be fixed by making cmd() wait for the output of the qtest
-> command.
-> 
-> This fixes iotests 093 and 136, which are flaky since commit
-> 8258292e18c39480b64eba9f3551 when the machine is under heavy workload.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+We currently don't migrate any state for zpci devices, which are
+coupled with standard pci devices. This means funny things happen
+when we e.g. try to migrate with a virtio-pci device but the s390x-
+specific zpci state is not migrated (vfio-pci is not affected, as
+it is not migratable anyway.)
 
-Thanks, applied to the block branch.
+Until this is fixed, mark zpci devices as unmigratable.
 
-Kevin
+Reported-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+
+This is just a stop-gap measure to give us time to implement the
+needed migration code properly.
+
+---
+ hw/s390x/s390-pci-bus.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index c96a7cba34..96c7c18f3f 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -1253,6 +1253,15 @@ static Property s390_pci_device_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static const VMStateDescription s390_pci_device_vmstate = {
++    .name = TYPE_S390_PCI_DEVICE,
++    /*
++     * TODO: add state handling here, so migration works at least with
++     * emulated pci devices on s390x
++     */
++    .unmigratable = 1,
++};
++
+ static void s390_pci_device_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1263,6 +1272,7 @@ static void s390_pci_device_class_init(ObjectClass *klass, void *data)
+     dc->bus_type = TYPE_S390_PCI_BUS;
+     dc->realize = s390_pci_device_realize;
+     dc->props = s390_pci_device_properties;
++    dc->vmsd = &s390_pci_device_vmstate;
+ }
+ 
+ static const TypeInfo s390_pci_device_info = {
+-- 
+2.17.2
