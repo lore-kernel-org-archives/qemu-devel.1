@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37874)
+Received: from eggs.gnu.org ([209.51.188.92]:38758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gpa5t-0007No-5R
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:47:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpa9W-0008Ji-PR
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gpa5r-0002j2-4C
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:47:01 -0500
-Date: Fri, 1 Feb 2019 14:46:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190201144632.GT12005@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<a0fe9357-7128-21cb-f5b5-ef766baaccbd@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gpa9V-00044E-RL
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:46 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46537)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpa9V-00041I-Kt
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 09:50:45 -0500
+Received: by mail-wr1-x443.google.com with SMTP id l9so7329157wrt.13
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 06:50:40 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 14:50:25 +0000
+Message-Id: <20190201145035.22739-2-peter.maydell@linaro.org>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+References: <20190201145035.22739-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a0fe9357-7128-21cb-f5b5-ef766baaccbd@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v11 1/3] bdrv_query_image_info Error
- parameter added
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 01/11] docs/cpu-hotplug.rst: Fix rST markup
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Fri, Feb 01, 2019 at 02:42:10PM +0000, Vladimir Sementsov-Ogievskiy wrote:
-> 31.01.2019 16:46, Andrey Shinkevich wrote:
-> > Inform a user in case qcow2_get_specific_info fails to obtain
-> > QCOW2 image specific information. This patch is preliminary to
-> > the print of bitmap information in the 'qemu-img info' output.
-> > 
-> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > ---
-> 
-> 
-> [...]
-> 
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
-> > @@ -594,13 +594,13 @@ static int block_crypto_get_info_luks(BlockDriverState *bs,
-> >   }
-> >   
-> >   static ImageInfoSpecific *
-> > -block_crypto_get_specific_info_luks(BlockDriverState *bs)
-> > +block_crypto_get_specific_info_luks(BlockDriverState *bs, Error **errp)
-> >   {
-> >       BlockCrypto *crypto = bs->opaque;
-> >       ImageInfoSpecific *spec_info;
-> >       QCryptoBlockInfo *info;
-> >   
-> > -    info = qcrypto_block_get_info(crypto->block, NULL);
-> > +    info = qcrypto_block_get_info(crypto->block, errp);
-> >       if (!info) {
-> >           return NULL;
-> >       }
-> 
-> more context:
-> 
->        if (info->format != Q_CRYPTO_BLOCK_FORMAT_LUKS) {
->            qapi_free_QCryptoBlockInfo(info);
->            return NULL;
->        }
-> 
-> for a fast look, I think it should be assertion, not if, Daniel, am I right?
+sphinx-build complains:
 
-Sure, it could be an assertion. In practice it should never trigger
-eitherway.
+docs/cpu-hotplug.rst:67: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:69: ERROR: Unexpected indentation.
+docs/cpu-hotplug.rst:74: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:75: WARNING: Block quote ends without a blank line; unexpected unindent.
+docs/cpu-hotplug.rst:76: SEVERE: Unexpected section title.
 
-> Also, I think we don't have block/crypto.c in Cryptography section of MAINTAINERS
-> by mistake, so you were not CC'ed.
+}
+{
+docs/cpu-hotplug.rst:78: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-I tend to let the block maintainers merge patches under block/,
-since that's largely block layer integration. The guts of the
-block crypto stuff is under crypto/
+These are the result of not indicating one of the literal
+blocks by finishing the preceding paragraph with the "::" marker.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ docs/cpu-hotplug.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-Daniel
+diff --git a/docs/cpu-hotplug.rst b/docs/cpu-hotplug.rst
+index 1c268e00b41..e2d4e893b01 100644
+--- a/docs/cpu-hotplug.rst
++++ b/docs/cpu-hotplug.rst
+@@ -60,7 +60,7 @@ vCPU hotplug
+     hot-plugged (no "qom-path" member).  From its output in step (3), we
+     can see that ``IvyBridge-IBRS-x86_64-cpu`` is present in socket 0,
+     while hot-plugging a CPU into socket 1 requires passing the listed
+-    properties to QMP ``device_add``:
++    properties to QMP ``device_add``::
+ 
+       (QEMU) device_add id=cpu-2 driver=IvyBridge-IBRS-x86_64-cpu socket-id=1 core-id=0 thread-id=0
+       {
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
