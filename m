@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59019)
+Received: from eggs.gnu.org ([209.51.188.92]:59028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0008Gp-SC
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbME-0008Gx-0p
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003iy-Kf
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003io-Hv
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38172)
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:34192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003dh-8r
+	id 1gpbMA-0003JV-7a
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id m22so6782427wml.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:46 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id f7so7742644wrp.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.43
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.07
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:44 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:07 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:45 +0000
-Message-Id: <20190201160653.13829-40-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:15 +0000
+Message-Id: <20190201160653.13829-10-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 39/47] target/arm: Always enable pac keys for
- user-only
+Subject: [Qemu-devel] [PULL 09/47] hw/misc/iotkit-secctl: Support 4 internal
+ MPCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,115 +36,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The SSE-200 has 4 banks of SRAM, each with its own internal
+Memory Protection Controller. The interrupt status for these
+extra MPCs appears in the same security controller SECMPCINTSTATUS
+register as the MPC for the IoTKit's single SRAM bank. Enhance the
+iotkit-secctl device to allow 4 MPCs. (If the particular IoTKit/SSE
+variant in use does not have all 4 MPCs then the unused inputs will
+simply result in the SECMPCINTSTATUS bits being zero as required.)
 
-Drop the pac properties.  This approach cannot work as written
-because the properties are applied before arm_cpu_reset, which
-zeros SCTLR_EL1 (amongst everything else).
+The hardcoded constant "1"s in armsse.c indicate the actual number
+of SRAM MPCs the IoTKit has, and will be replaced in the following
+commit.
 
-We can re-introduce the properties if they turn out to be useful.
-But since linux 5.0 enables all of the keys, they may not be.
-
-Fixes: 1ae9cfbd470
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190121185118.18550-9-peter.maydell@linaro.org
 ---
- target/arm/cpu.c   |  3 +++
- target/arm/cpu64.c | 60 ----------------------------------------------
- 2 files changed, 3 insertions(+), 60 deletions(-)
+ include/hw/misc/iotkit-secctl.h | 6 +++---
+ hw/arm/armsse.c                 | 6 +++---
+ hw/misc/iotkit-secctl.c         | 5 +++--
+ 3 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f00d450d0bd..3874dc98754 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -185,6 +185,9 @@ static void arm_cpu_reset(CPUState *s)
-         env->pstate = PSTATE_MODE_EL0t;
-         /* Userspace expects access to DC ZVA, CTL_EL0 and the cache ops */
-         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
-+        /* Enable all PAC keys.  */
-+        env->cp15.sctlr_el[1] |= (SCTLR_EnIA | SCTLR_EnIB |
-+                                  SCTLR_EnDA | SCTLR_EnDB);
-         /* Enable all PAC instructions */
-         env->cp15.hcr_el2 |= HCR_API;
-         env->cp15.scr_el3 |= SCR_API;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 8653cecd032..7107ec8d7eb 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -281,38 +281,6 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
-     error_propagate(errp, err);
+diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-secctl.h
+index 1a193b306f1..bcb0437be5b 100644
+--- a/include/hw/misc/iotkit-secctl.h
++++ b/include/hw/misc/iotkit-secctl.h
+@@ -40,8 +40,8 @@
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
+  *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
+- * Controlling the MPC in the IoTKit:
+- *  + named GPIO input mpc_status
++ * Controlling the (up to) 4 MPCs in the IoTKit/SSE:
++ *  + named GPIO inputs mpc_status[0..3]
+  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO inputs mpcexp_status[0..15]
+@@ -67,7 +67,7 @@
+ #define IOTS_NUM_APB_EXP_PPC 4
+ #define IOTS_NUM_AHB_EXP_PPC 4
+ #define IOTS_NUM_EXP_MPC 16
+-#define IOTS_NUM_MPC 1
++#define IOTS_NUM_MPC 4
+ #define IOTS_NUM_EXP_MSC 16
+ 
+ typedef struct IoTKitSecCtl IoTKitSecCtl;
+diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
+index 8554be14128..074c1d3a6cf 100644
+--- a/hw/arm/armsse.c
++++ b/hw/arm/armsse.c
+@@ -138,7 +138,7 @@ static void armsse_init(Object *obj)
+                             sizeof(s->mpc_irq_orgate), TYPE_OR_IRQ,
+                             &error_abort, NULL);
+ 
+-    for (i = 0; i < ARRAY_SIZE(s->mpc_irq_splitter); i++) {
++    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
+         char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
+         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
+ 
+@@ -363,7 +363,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+ 
+     /* We must OR together lines from the MPC splitters to go to the NVIC */
+     object_property_set_int(OBJECT(&s->mpc_irq_orgate),
+-                            IOTS_NUM_EXP_MPC + IOTS_NUM_MPC, "num-lines", &err);
++                            IOTS_NUM_EXP_MPC + 1, "num-lines", &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -636,7 +636,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* Wire up the splitters for the MPC IRQs */
+-    for (i = 0; i < IOTS_NUM_EXP_MPC + IOTS_NUM_MPC; i++) {
++    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
+         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
+         DeviceState *dev_splitter = DEVICE(splitter);
+ 
+diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
+index 2222b3e147d..537601cd53f 100644
+--- a/hw/misc/iotkit-secctl.c
++++ b/hw/misc/iotkit-secctl.c
+@@ -600,7 +600,7 @@ static void iotkit_secctl_mpc_status(void *opaque, int n, int level)
+ {
+     IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
+ 
+-    s->mpcintstatus = deposit32(s->mpcintstatus, 0, 1, !!level);
++    s->mpcintstatus = deposit32(s->mpcintstatus, n, 1, !!level);
  }
  
--#ifdef CONFIG_USER_ONLY
--static void cpu_max_get_packey(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    ARMCPU *cpu = ARM_CPU(obj);
--    const uint64_t *bit = opaque;
--    bool enabled = (cpu->env.cp15.sctlr_el[1] & *bit) != 0;
--
--    visit_type_bool(v, name, &enabled, errp);
--}
--
--static void cpu_max_set_packey(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    ARMCPU *cpu = ARM_CPU(obj);
--    Error *err = NULL;
--    const uint64_t *bit = opaque;
--    bool enabled;
--
--    visit_type_bool(v, name, &enabled, errp);
--
--    if (!err) {
--        if (enabled) {
--            cpu->env.cp15.sctlr_el[1] |= *bit;
--        } else {
--            cpu->env.cp15.sctlr_el[1] &= ~*bit;
--        }
--    }
--    error_propagate(errp, err);
--}
--#endif
--
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -388,34 +356,6 @@ static void aarch64_max_initfn(Object *obj)
-          */
-         cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-         cpu->dcz_blocksize = 7; /*  512 bytes */
--
--        /*
--         * Note that Linux will enable enable all of the keys at once.
--         * But doing it this way will allow experimentation beyond that.
--         */
--        {
--            static const uint64_t apia_bit = SCTLR_EnIA;
--            static const uint64_t apib_bit = SCTLR_EnIB;
--            static const uint64_t apda_bit = SCTLR_EnDA;
--            static const uint64_t apdb_bit = SCTLR_EnDB;
--
--            object_property_add(obj, "apia", "bool", cpu_max_get_packey,
--                                cpu_max_set_packey, NULL,
--                                (void *)&apia_bit, &error_fatal);
--            object_property_add(obj, "apib", "bool", cpu_max_get_packey,
--                                cpu_max_set_packey, NULL,
--                                (void *)&apib_bit, &error_fatal);
--            object_property_add(obj, "apda", "bool", cpu_max_get_packey,
--                                cpu_max_set_packey, NULL,
--                                (void *)&apda_bit, &error_fatal);
--            object_property_add(obj, "apdb", "bool", cpu_max_get_packey,
--                                cpu_max_set_packey, NULL,
--                                (void *)&apdb_bit, &error_fatal);
--
--            /* Enable all PAC keys by default.  */
--            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
--            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
--        }
- #endif
+ static void iotkit_secctl_mpcexp_status(void *opaque, int n, int level)
+@@ -686,7 +686,8 @@ static void iotkit_secctl_init(Object *obj)
+     qdev_init_gpio_out_named(dev, &s->sec_resp_cfg, "sec_resp_cfg", 1);
+     qdev_init_gpio_out_named(dev, &s->nsc_cfg_irq, "nsc_cfg", 1);
  
-         cpu->sve_max_vq = ARM_MAX_VQ;
+-    qdev_init_gpio_in_named(dev, iotkit_secctl_mpc_status, "mpc_status", 1);
++    qdev_init_gpio_in_named(dev, iotkit_secctl_mpc_status, "mpc_status",
++                            IOTS_NUM_MPC);
+     qdev_init_gpio_in_named(dev, iotkit_secctl_mpcexp_status,
+                             "mpcexp_status", IOTS_NUM_EXP_MPC);
+ 
 -- 
 2.20.1
