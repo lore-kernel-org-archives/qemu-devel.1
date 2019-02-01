@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46465)
+Received: from eggs.gnu.org ([209.51.188.92]:46538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeVl-0005gm-1o
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeVm-0005iu-Vp
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeVi-0002Hg-Ny
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeVl-0002La-04
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:02 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  1 Feb 2019 20:29:07 +0100
-Message-Id: <20190201192935.18394-4-mreitz@redhat.com>
+Date: Fri,  1 Feb 2019 20:29:11 +0100
+Message-Id: <20190201192935.18394-8-mreitz@redhat.com>
 In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 References: <20190201192935.18394-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 03/31] block: Skip implicit nodes for
- filename info
+Subject: [Qemu-devel] [PATCH v13 07/31] iotests.py: Add node_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +24,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-bdrv_refresh_filename() should simply skip all implicit nodes.  They are
-supposed to be invisible to the user, so they should not appear in
-filename information.
+This function queries a node; since we cannot do that right now, it
+executes query-named-block-nodes and returns the matching node's object.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ tests/qemu-iotests/iotests.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block.c b/block.c
-index 0e3d29d378..96fed5d7e6 100644
---- a/block.c
-+++ b/block.c
-@@ -5488,6 +5488,20 @@ void bdrv_refresh_filename(BlockDriverState *bs)
-         bdrv_refresh_filename(child->bs);
-     }
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 8c5dd40f83..719df561a3 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -551,6 +551,13 @@ class VM(qtest.QEMUQtestMachine):
+                 else:
+                     iotests.log(ev)
 =20
-+    if (bs->implicit) {
-+        /* For implicit nodes, just copy everything from the single chil=
-d */
-+        child =3D QLIST_FIRST(&bs->children);
-+        assert(QLIST_NEXT(child, next) =3D=3D NULL);
++    def node_info(self, node_name):
++        nodes =3D self.qmp('query-named-block-nodes')
++        for x in nodes['return']:
++            if x['node-name'] =3D=3D node_name:
++                return x
++        return None
 +
-+        pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+                child->bs->exact_filename);
-+        pstrcpy(bs->filename, sizeof(bs->filename), child->bs->filename)=
-;
-+
-+        bs->full_open_options =3D qobject_ref(child->bs->full_open_optio=
-ns);
-+
-+        return;
-+    }
-+
-     if (drv->bdrv_refresh_filename) {
-         /* Obsolete information is of no use here, so drop the old file =
-name
-          * information before refreshing it */
+=20
+ index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
+=20
 --=20
 2.20.1
