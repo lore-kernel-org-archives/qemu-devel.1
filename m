@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49847)
+Received: from eggs.gnu.org ([209.51.188.92]:51784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpS6G-0005Xg-QQ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:14:53 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gpSJ2-0007fo-36
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:28:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpS6G-00039q-10
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:14:52 -0500
-References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
-	<20190131185621.28815291.cohuck@redhat.com>
-	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
-	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-Date: Fri, 1 Feb 2019 07:14:46 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gpSJ1-0007PU-A5
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:28:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52224)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpSIz-0007L2-BT
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:28:03 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CA8774947D
+	for <qemu-devel@nongnu.org>; Fri,  1 Feb 2019 06:27:57 +0000 (UTC)
+Date: Fri, 1 Feb 2019 07:27:52 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190201062752.h7zud3bqd7zhho4q@sirius.home.kraxel.org>
+References: <20190131130016.17337-1-kraxel@redhat.com>
+	<b7995d51-0486-728e-05d9-7606064824c1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
- the pci stub file
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b7995d51-0486-728e-05d9-7606064824c1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] scripts: use git archive in
+ archive-source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 
-On 2019-01-31 19:08, Paolo Bonzini wrote:
-> On 31/01/19 19:00, Thomas Huth wrote:
->>>> (and the prototypes in the header) anymore, so if you try to compile s390x
->>>> without CONFIG_PCI, the build currently fails.
->>>>
->>> Fixes: 468a93898a97 ("s390x/pci: pass the retaddr to all PCI instructions")
->>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  hw/s390x/s390-pci-stub.c | 16 +++++++++-------
->>>>  1 file changed, 9 insertions(+), 7 deletions(-)
->>> This file seems to be in danger of bitrot. Do you think it'll be easier
->>> to test rarely used configs like that after we switch to Kconfig?
->> I hope so, yes. There will be a new --without-default-devices options
->> for "configure" (which matches "make allnoconfig" from the kernel) - if
->> we do it right in the Kconfig file for s390x, it should be possible to
->> catch this problem with that option.
+  Hi,
+
+> >  tar_file=$(realpath "$1")
+> > -list_file="${tar_file}.list"
+> > -vroot_dir="${tar_file}.vroot"
+> > +sub_file=$(mktemp "${tar_file%.tar}.sub.XXXXXXXX.tar")
+> > +sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
 > 
-> Yes, it will be in .travis.yml too.
+> mktemp is not specified by POSIX; and FreeBSD man pages for mktemp
+> suggest that if you don't use XXXXXX as the suffix that you are not
+> guaranteed correct behavior.  Are you sure this is portable enough?  Do
+> you need both a temp file and dir, or can you create the file name of
+> your choice inside a temp dir, where only the dir has to have a
+> randomized name?
+
+Yes, storing temp tar in the temp dir should work.
+
+> > +	status="$(git submodule status "$sm")"
+> > +	smhash="${status# }"
+> > +	smhash="${smhash#+}"
+> > +	smhash="${smhash#-}"
 > 
-> Right now there is a "select PCI" in the hw/s390x/Kconfig file, but
-> probably it's best to add a config S390_ZPCI with "default y if
-> S390_CCW_VIRTIO" and "select PCI" in it.  Not a blocker, but I can
-> integrate it if you send me a fixup patch.
+> These three lines can be consolidated into one:
+> smhash=${status#[ +-]}
 
-Yes, that's what I had in mind, too. I'll send a fixup patch...
+Ah, cool.  Learned a new trick.
 
- Thomas
+> > +		smdir="$sub_tdir/$sm"
+> > +		smurl="$(git config -f .gitmodules submodule.${sm}.url)"
+> > +		echo "NOTICE: using temporary clone for submodule $sm"
+> > +		git clone "$smurl" "$smdir"
+> > +		test $? -ne 0 && error "failed to clone submodule $sm"
+> 
+> I know we don't want to affect the developer's normal checkout, but is
+> it worth storing the temporary clone in a specifically-named
+> subdirectory of their checkout instead
+
+Hmm, we could do "git submodule init + git archive + git submodule
+deinit".  With git storing a bare repo in .git/modules/$submodule these
+days (and not deleting it on deinit) that'll effectively cache things.
+It's a (temporary) modification of the checkout though.
+
+Alternatively we could clone to $HOME/.cache/$somewhere, similar to the
+vm tests which store downloads (and soon vm images too) below
+$HOME/.cache/qemu-vm/.
+
+cheers,
+  Gerd
