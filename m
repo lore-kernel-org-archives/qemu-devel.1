@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40374)
+Received: from eggs.gnu.org ([209.51.188.92]:40369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDp-0003fI-1g
+	(envelope-from <lifei1214@126.com>) id 1gpRDo-0003fG-W2
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDo-0007nn-5a
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:37 -0500
-Received: from m50-111.126.com ([123.125.50.111]:54057)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gpRDl-0007mB-G4
+	(envelope-from <lifei1214@126.com>) id 1gpRDl-0007nW-R2
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:34 -0500
+Received: from m50-111.126.com ([123.125.50.111]:54034)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gpRDh-0007m7-Mi
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 00:18:32 -0500
 From: Fei Li <lifei1214@126.com>
-Date: Fri,  1 Feb 2019 13:18:05 +0800
-Message-Id: <20190201051806.53183-11-lifei1214@126.com>
+Date: Fri,  1 Feb 2019 13:17:59 +0800
+Message-Id: <20190201051806.53183-5-lifei1214@126.com>
 In-Reply-To: <20190201051806.53183-1-lifei1214@126.com>
 References: <20190201051806.53183-1-lifei1214@126.com>
-Subject: [Qemu-devel] [PATCH v11 for-4.0 10/11] qemu_thread: supplement
- error handling for vnc_start_worker_thread
+Subject: [Qemu-devel] [PATCH v11 for-4.0 04/11] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +25,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, shirley17fei@gmail.com
-Cc: Fei Li <fli@suse.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Fei Li <fli@suse.com>, Markus Armbruster <armbru@redhat.com>, Jiri Slaby <jslaby@suse.cz>
 
 From: Fei Li <fli@suse.com>
 
-Supplement the error handling for vnc_thread_worker_thread: add
-an Error parameter for it to propagate the error to its caller to
-handle in case it fails, and make it return a Boolean to indicate
-whether it succeeds.
+Utilize the existed errp to propagate the error and do the
+corresponding cleanup to replace the temporary &error_abort.
 
 Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jiri Slaby <jslaby@suse.cz>
 Signed-off-by: Fei Li <fli@suse.com>
 ---
- ui/vnc-jobs.c | 17 +++++++++++------
- ui/vnc-jobs.h |  2 +-
- ui/vnc.c      |  4 +++-
- 3 files changed, 15 insertions(+), 8 deletions(-)
+ hw/misc/edu.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
-index 5712f1f501..1371895513 100644
---- a/ui/vnc-jobs.c
-+++ b/ui/vnc-jobs.c
-@@ -332,16 +332,21 @@ static bool vnc_worker_thread_running(void)
-     return queue; /* Check global queue */
- }
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index 21adbfddce..8fe232b6d6 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -356,9 +356,14 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
  
--void vnc_start_worker_thread(void)
-+bool vnc_start_worker_thread(Error **errp)
- {
-     VncJobQueue *q;
- 
--    if (vnc_worker_thread_running())
--        return ;
-+    if (vnc_worker_thread_running()) {
-+        return true;
-+    }
- 
-     q = vnc_queue_init();
+     qemu_mutex_init(&edu->thr_mutex);
+     qemu_cond_init(&edu->thr_cond);
 -    /* TODO: let the further caller handle the error instead of abort() here */
--    qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread,
--                       q, QEMU_THREAD_DETACHED, &error_abort);
-+    if (qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread,
-+                           q, QEMU_THREAD_DETACHED, errp) < 0) {
-+        vnc_queue_clear(q);
-+        return false;
-+    }
-     queue = q; /* Set global queue */
-+
-+    return true;
- }
-diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
-index 59f66bcc35..14640593db 100644
---- a/ui/vnc-jobs.h
-+++ b/ui/vnc-jobs.h
-@@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
- void vnc_jobs_join(VncState *vs);
- 
- void vnc_jobs_consume_buffer(VncState *vs);
--void vnc_start_worker_thread(void);
-+bool vnc_start_worker_thread(Error **errp);
- 
- /* Locks */
- static inline int vnc_trylock_display(VncDisplay *vd)
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 6002d09407..2ab920f1a7 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3255,7 +3255,9 @@ void vnc_display_init(const char *id, Error **errp)
-     vd->connections_limit = 32;
- 
-     qemu_mutex_init(&vd->mutex);
--    vnc_start_worker_thread();
-+    if (!vnc_start_worker_thread(errp)) {
+-    qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+-                       edu, QEMU_THREAD_JOINABLE, &error_abort);
++    if (qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
++                           edu, QEMU_THREAD_JOINABLE, errp) < 0) {
++        qemu_cond_destroy(&edu->thr_cond);
++        qemu_mutex_destroy(&edu->thr_mutex);
++        timer_del(&edu->dma_timer);
++        msi_uninit(pdev);
 +        return;
 +    }
  
-     vd->dcl.ops = &dcl_ops;
-     register_displaychangelistener(&vd->dcl);
+     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+                     "edu-mmio", 1 * MiB);
 -- 
 2.17.2 (Apple Git-113)
