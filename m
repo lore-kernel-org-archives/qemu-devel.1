@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50889)
+Received: from eggs.gnu.org ([209.51.188.92]:51252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpcT7-00017U-N5
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpcU8-0001yA-3p
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gpcT6-0002oh-TY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:09 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:34825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gpcT6-0002mo-Mm
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:19:08 -0500
-Received: by mail-oi1-f193.google.com with SMTP id v6so6436192oif.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:19:06 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gpcU3-0003GM-BS
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:11 -0500
+Resent-Message-Id: <E1gpcU3-0003GM-BS@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpcU2-00032s-If
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:07 -0500
+Message-ID: <154904155753.29184.490082247309695971@ebba9967afc0>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-3-sgarzare@redhat.com>
-	<20190201101604-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190201101604-mutt-send-email-mst@kernel.org>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 1 Feb 2019 18:18:52 +0100
-Message-ID: <CAGxU2F50t=OeuoJMn7q7iDYyy+mc=3vz7V8dVe77KtOu1hKHyw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
- boolean property
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 09:19:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
+ docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-On Fri, Feb 1, 2019 at 4:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
-> > In order to avoid migration issues, we enable DISCARD and
-> > WRITE ZEROES features only for machine type >= 4.0
-> >
-> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  hw/block/virtio-blk.c          | 2 ++
-> >  hw/core/machine.c              | 1 +
-> >  include/hw/virtio/virtio-blk.h | 1 +
-> >  3 files changed, 4 insertions(+)
-> >
-> > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > index 8a6754d9a2..542ec52536 100644
-> > --- a/hw/block/virtio-blk.c
-> > +++ b/hw/block/virtio-blk.c
-> > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
-> >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-> >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-> >                       IOThread *),
-> > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
-> > +                     true),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> >
->
-> Thinking about it, are there security implications for discard?
-> Should we make it default false?
-
-Hi Michael,
-
-I'm not completely sure but if the guest can write on a specific sector,
-discard or write_zeroes operations should not have a security implication.
-
-Do I miss something?
-
-Thanks,
-Stefano
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
+OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjAxMTQ1MDM1
+LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
+UEFUQ0ggMDAvMTFdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
+aGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBh
+dGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMDE2MDdjIGRvY3MvY29uZi5weTogRG9uJ3Qg
+aGFyZC1jb2RlIFFFTVUgdmVyc2lvbgpkMjcwOWY1IE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlk
+ZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCjQ5NWY3M2MgTWFrZWZpbGUsIGNvbmZpZ3VyZTog
+U3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgo2ZTk3ODk0IFNlcGFyYXRlIGNvbmYu
+cHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKZTQ0YWQ3ZSBkb2NzL2NvbmYucHk6IERpc2FibGUg
+b3B0aW9uIHdhcm5pbmdzCmZhZGQ5ZjQgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBz
+b3VyY2VzIGluIEhUTUwgYnVpbGQKNmU0MzhkZSBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUg
+J2FsYWJhc3RlcicgdGhlbWUKZTIwOGUwOCBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9z
+dGF0aWMgZGlyZWN0b3J5CmFiYWY0ZGUgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBz
+cGhpbngtcXVpY2tzdGFydApmYmE0YWQ5IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
+Zm9ybWF0CmViNjk5OGYgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
+cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgZWI2OTk4ZmJmM2I1
+IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNr
+aW5nIGNvbW1pdCBmYmE0YWQ5MDNiMTUgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
+Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
+b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggMi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1p
+dCBhYmFmNGRlYjc1YTkgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
+aWNrc3RhcnQpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAx
+IGVycm9ycywgMCB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGUyMDhlMDg5NmZmMSAo
+ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVj
+a2luZyBjb21taXQgNmU0MzhkZTQ3ODExIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2Fs
+YWJhc3RlcicgdGhlbWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGZhZGQ5ZjQxN2RjNCAoZG9jcy9j
+b25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hl
+Y2tpbmcgY29tbWl0IGU0NGFkN2UwNzQ0NSAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3
+YXJuaW5ncykKOC8xMSBDaGVja2luZyBjb21taXQgNmU5Nzg5NGY1ODMxIChTZXBhcmF0ZSBjb25m
+LnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzE2MDogRklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlv
+bnNbJ2Rlc2NyaXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50
+ZXJvcGVyYWJpbGl0eSBHdWlkZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUo
+cykKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDQ5
+NWY3M2M3OTVjMiAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9j
+dW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IGQyNzA5ZjU5NWVmZCAoTWFrZWZpbGU6
+IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNr
+aW5nIGNvbW1pdCBiMDE2MDdjNmUxZDkgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFF
+TVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVz
+dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
