@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58795)
+Received: from eggs.gnu.org ([209.51.188.92]:58796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM1-00085x-3i
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbM1-00085y-3n
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbLp-0003U6-4g
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbLp-0003UB-4i
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:37 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35365)
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbLf-0003LG-I8
+	id 1gpbLf-0003If-Je
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:27 -0500
-Received: by mail-wm1-x344.google.com with SMTP id t200so6821097wmt.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:16 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id f188so6725360wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:05 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.13
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.02
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:13 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:02 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:20 +0000
-Message-Id: <20190201160653.13829-15-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:12 +0000
+Message-Id: <20190201160653.13829-7-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/47] hw/arm/armsse: Put each CPU in its own
- cluster object
+Subject: [Qemu-devel] [PULL 06/47] hw/arm/iotkit: Refactor into abstract
+ base class and subclass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,86 +37,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Create a cluster object to hold each CPU in the SSE. They are
-logically distinct and may be configured differently (for instance
-one may not have an FPU where the other does).
+The Arm SSE-200 Subsystem for Embedded is a revised and
+extended version of the older IoTKit SoC. Prepare for
+adding a model of it by refactoring the IoTKit code into
+an abstract base class which contains the functionality,
+driven by a class data block specific to each subclass.
+(This is the same approach used by the existing bcm283x
+SoC family implementation.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-14-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-6-peter.maydell@linaro.org
 ---
- include/hw/arm/armsse.h |  2 ++
- hw/arm/armsse.c         | 31 ++++++++++++++++++++++++++++---
- 2 files changed, 30 insertions(+), 3 deletions(-)
+ include/hw/arm/iotkit.h | 22 +++++++++++++++++-----
+ hw/arm/iotkit.c         | 34 +++++++++++++++++++++++++++++-----
+ 2 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index 89f19a971f4..999c2e4f7e5 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -80,6 +80,7 @@
- #include "hw/misc/iotkit-sysinfo.h"
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index 9701738ec75..521d1f73757 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -74,15 +74,15 @@
  #include "hw/or-irq.h"
  #include "hw/core/split-irq.h"
-+#include "hw/cpu/cluster.h"
  
- #define TYPE_ARMSSE "arm-sse"
+-#define TYPE_ARMSSE "iotkit"
++#define TYPE_ARMSSE "arm-sse"
  #define ARMSSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARMSSE)
-@@ -110,6 +111,7 @@ typedef struct ARMSSE {
  
-     /*< public >*/
-     ARMv7MState armv7m[SSE_MAX_CPUS];
-+    CPUClusterState cluster[SSE_MAX_CPUS];
-     IoTKitSecCtl secctl;
-     TZPPC apb_ppc0;
-     TZPPC apb_ppc1;
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 2472dfef3a1..2eb4ea3bfe0 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -147,9 +147,22 @@ static void armsse_init(Object *obj)
-     memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
+ /*
+- * For the moment TYPE_IOTKIT is a synonym for TYPE_ARMSSE (and the
+- * latter's underlying name is left as "iotkit"); in a later
+- * commit it will become a subclass of TYPE_ARMSSE.
++ * These type names are for specific IoTKit subsystems; other than
++ * instantiating them, code using these devices should always handle
++ * them via the ARMSSE base class, so they have no IOTKIT() etc macros.
+  */
+-#define TYPE_IOTKIT TYPE_ARMSSE
++#define TYPE_IOTKIT "iotkit"
  
-     for (i = 0; i < info->num_cpus; i++) {
--        char *name = g_strdup_printf("armv7m%d", i);
--        sysbus_init_child_obj(obj, name, &s->armv7m[i], sizeof(s->armv7m),
--                              TYPE_ARMV7M);
-+        /*
-+         * We put each CPU in its own cluster as they are logically
-+         * distinct and may be configured differently.
-+         */
-+        char *name;
+ /* We have an IRQ splitter and an OR gate input for each external PPC
+  * and the 2 internal PPCs
+@@ -143,4 +143,16 @@ typedef struct ARMSSE {
+     uint32_t mainclk_frq;
+ } ARMSSE;
+ 
++typedef struct ARMSSEInfo ARMSSEInfo;
 +
-+        name = g_strdup_printf("cluster%d", i);
-+        object_initialize_child(obj, name, &s->cluster[i],
-+                                sizeof(s->cluster[i]), TYPE_CPU_CLUSTER,
-+                                &error_abort, NULL);
-+        qdev_prop_set_uint32(DEVICE(&s->cluster[i]), "cluster-id", i);
-+        g_free(name);
++typedef struct ARMSSEClass {
++    DeviceClass parent_class;
++    const ARMSSEInfo *info;
++} ARMSSEClass;
 +
-+        name = g_strdup_printf("armv7m%d", i);
-+        sysbus_init_child_obj(OBJECT(&s->cluster[i]), name,
-+                              &s->armv7m[i], sizeof(s->armv7m), TYPE_ARMV7M);
-         qdev_prop_set_string(DEVICE(&s->armv7m[i]), "cpu-type",
-                              ARM_CPU_TYPE_NAME("cortex-m33"));
-         g_free(name);
-@@ -406,6 +419,18 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-             error_propagate(errp, err);
-             return;
-         }
-+        /*
-+         * The cluster must be realized after the armv7m container, as
-+         * the container's CPU object is only created on realize, and the
-+         * CPU must exist and have been parented into the cluster before
-+         * the cluster is realized.
-+         */
-+        object_property_set_bool(OBJECT(&s->cluster[i]),
-+                                 true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
++#define ARMSSE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(ARMSSEClass, (klass), TYPE_ARMSSE)
++#define ARMSSE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(ARMSSEClass, (obj), TYPE_ARMSSE)
++
+ #endif
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index 9360053184e..d5b172933c3 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -18,6 +18,16 @@
+ #include "hw/arm/iotkit.h"
+ #include "hw/arm/arm.h"
  
-         /* Connect EXP_IRQ/EXP_CPUn_IRQ GPIOs to the NVIC's lines 32 and up */
-         s->exp_irqs[i] = g_new(qemu_irq, s->exp_numirq);
++struct ARMSSEInfo {
++    const char *name;
++};
++
++static const ARMSSEInfo armsse_variants[] = {
++    {
++        .name = TYPE_IOTKIT,
++    },
++};
++
+ /* Clock frequency in HZ of the 32KHz "slow clock" */
+ #define S32KCLK (32 * 1000)
+ 
+@@ -732,29 +742,43 @@ static void iotkit_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(klass);
++    ARMSSEClass *asc = ARMSSE_CLASS(klass);
+ 
+     dc->realize = iotkit_realize;
+     dc->vmsd = &iotkit_vmstate;
+     dc->props = iotkit_properties;
+     dc->reset = iotkit_reset;
+     iic->check = iotkit_idau_check;
++    asc->info = data;
+ }
+ 
+-static const TypeInfo iotkit_info = {
++static const TypeInfo armsse_info = {
+     .name = TYPE_ARMSSE,
+     .parent = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(ARMSSE),
+     .instance_init = iotkit_init,
+-    .class_init = iotkit_class_init,
++    .abstract = true,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_IDAU_INTERFACE },
+         { }
+     }
+ };
+ 
+-static void iotkit_register_types(void)
++static void armsse_register_types(void)
+ {
+-    type_register_static(&iotkit_info);
++    int i;
++
++    type_register_static(&armsse_info);
++
++    for (i = 0; i < ARRAY_SIZE(armsse_variants); i++) {
++        TypeInfo ti = {
++            .name = armsse_variants[i].name,
++            .parent = TYPE_ARMSSE,
++            .class_init = iotkit_class_init,
++            .class_data = (void *)&armsse_variants[i],
++        };
++        type_register(&ti);
++    }
+ }
+ 
+-type_init(iotkit_register_types);
++type_init(armsse_register_types);
 -- 
 2.20.1
