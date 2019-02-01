@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58475)
+Received: from eggs.gnu.org ([209.51.188.92]:59143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpSwJ-0007BL-Nr
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:08:40 -0500
+	(envelope-from <brendan@bslabs.net>) id 1gpT0T-0008N6-Gm
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gpSwG-0005y5-Fy
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:08:38 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190123195527.29575-5-david@redhat.com>
-	<87imy4vgen.fsf@dusky.pond.sub.org>
-	<c5087353-60a1-62be-a34b-0b6296388fd1@redhat.com>
-Date: Fri, 01 Feb 2019 08:08:16 +0100
-In-Reply-To: <c5087353-60a1-62be-a34b-0b6296388fd1@redhat.com> (David
-	Hildenbrand's message of "Thu, 31 Jan 2019 19:54:36 +0100")
-Message-ID: <87pnscj89r.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFCv2 4/9] virtio-pmem: Prototype
+	(envelope-from <brendan@bslabs.net>) id 1gpT0S-0007BV-No
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:57 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brendan@bslabs.net>) id 1gpT0S-0007Ag-Em
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:12:56 -0500
+Received: by mail-pg1-x544.google.com with SMTP id m1so2512792pgq.8
+	for <qemu-devel@nongnu.org>; Thu, 31 Jan 2019 23:12:55 -0800 (PST)
+From: Brendan Shanks <brendan@bslabs.net>
+Date: Thu, 31 Jan 2019 23:12:25 -0800
+Message-Id: <20190201071225.20576-1-brendan@bslabs.net>
+Subject: [Qemu-devel] [PATCH] ui/cocoa.m: Fix macOS 10.14 deprecation
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Brendan Shanks <brendan@bslabs.net>
 
-David Hildenbrand <david@redhat.com> writes:
+macOS 10.14 deprecated NSOnState/NSOffState in favour of
+NSControlStateValueOn/NSControlStateValueOff. Use the new constants,
+and #define them to the old ones when compiling against a pre-10.13 SDK.
+Also [NSGraphicsContext graphicsPort] is now deprecated, use
+[NSGraphicsContext CGContext] when available.
 
-> On 31.01.19 19:19, Markus Armbruster wrote:
->> David Hildenbrand <david@redhat.com> writes:
->> 
->>> From: Pankaj Gupta <pagupta@redhat.com>
->>>
->>> This is the current protoype of virtio-pmem. Support will require
->>> machine changes for the architectures that will support it, so it will
->>> not yet be compiled.
->>>
->>> TODO:
->>> - Use separate struct for tracking requests internally
->>> - Move request/response structs to linux headers
->>> - Factor out linux header sync
->>> - Drop debug printfs
->>>
->>> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
->>> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
->>>   split up patches, unplug handler ]
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->> [...]
->>> diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
->>> index 6d5c3b2d4f..346389565a 100644
->>> --- a/include/standard-headers/linux/virtio_ids.h
->>> +++ b/include/standard-headers/linux/virtio_ids.h
->>> @@ -43,5 +43,6 @@
->>>  #define VIRTIO_ID_INPUT        18 /* virtio input */
->>>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
->>>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
->>> +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
->>>  
->>>  #endif /* _LINUX_VIRTIO_IDS_H */
->>> diff --git a/qapi/misc.json b/qapi/misc.json
->>> index 24d20a880a..b71eca2666 100644
->>> --- a/qapi/misc.json
->>> +++ b/qapi/misc.json
->>> @@ -2949,16 +2949,42 @@
->>>            }
->>>  }
->>>  
->>> +##
->>> +# @VirtioPMEMDeviceInfo:
->>> +#
->>> +# VirtioPMEM state information
->>> +#
->>> +# @id: device's ID
->>> +#
->>> +# @memaddr: physical address in memory, where device is mapped
->>> +#
->>> +# @size: size of memory that the device provides
->>> +#
->>> +# @memdev: memory backend linked with device
->>> +#
->>> +# Since: 4.0
->>> +##
->> 
->> This is like PCDIMMDeviceInfo less @slot, @node, @hotplugged,
->> @hotpluggable, and with @addr renamed to @memaddr.
->> 
->> Any particular reason for the rename?
->
-> I answered the same question already and thought I documented it
-> somewhere ... but looks like it went missing.
+Signed-off-by: Brendan Shanks <brendan@bslabs.net>
+---
+ ui/cocoa.m | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-Looks like my end-of-year mental garbage collection was overeager again.
-
-> We cannot use the "addr" property as that is already used e.g. for
-> virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proy.
-> So we have to chose a different one (unfortunately). We decided to also
-> use the name of the property in this struct here, as it will otherwise
-> be terribly confusing for the user.
->
-> -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
->
->> 
->>> +{ 'struct': 'VirtioPMEMDeviceInfo',
->>> +  'data': { '*id': 'str',
->>> +            'memaddr': 'size',
->>> +            'size': 'size',
->>> +            'memdev': 'str'
->>> +          }
->>> +}
->>> +
->>>  ##
->>>  # @MemoryDeviceInfo:
->>>  #
->>>  # Union containing information about a memory device
->>>  #
->>> +# nvdimm is included since 2.12. virtio-pmem is included since 4.0.
->>> +#
->> 
->> Let's stick to the way we document similar things elsewhere:
->> 
->>    # @nvdimm: since 2.12
->>    #
->>    # @virtio-pmem: since 4.0
->
-> Sounds good, doesn't work :)
->
-> (tried this already, the checker will complain that these fields don't
-> exist)
-
-Doc generator shortcoming *sigh*.
-
-QAPI part
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
-> Thanks!
->
->>    #
->> 
->>>  # Since: 2.1
->>>  ##
->>>  { 'union': 'MemoryDeviceInfo',
->>>    'data': { 'dimm': 'PCDIMMDeviceInfo',
->>> -            'nvdimm': 'PCDIMMDeviceInfo'
->>> +            'nvdimm': 'PCDIMMDeviceInfo',
->>> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
->>>            }
->>>  }
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index ddc058e76e..e2567d6946 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -54,6 +54,9 @@
+ #ifndef MAC_OS_X_VERSION_10_12
+ #define MAC_OS_X_VERSION_10_12 101200
+ #endif
++#ifndef MAC_OS_X_VERSION_10_13
++#define MAC_OS_X_VERSION_10_13 101300
++#endif
+ 
+ /* macOS 10.12 deprecated many constants, #define the new names for older SDKs */
+ #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
+@@ -90,6 +93,14 @@
+ #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
+ #define NSModalResponseOK NSFileHandlingPanelOKButton
+ #endif
++/* 10.14 deprecates NSOnState and NSOffState in favor of
++ * NSControlStateValueOn/Off, which were introduced in 10.13.
++ * Define for older versions
++ */
++#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_13
++#define NSControlStateValueOn NSOnState
++#define NSControlStateValueOff NSOffState
++#endif
+ 
+ //#define DEBUG
+ 
+@@ -377,7 +388,12 @@ - (void) drawRect:(NSRect) rect
+     COCOA_DEBUG("QemuCocoaView: drawRect\n");
+ 
+     // get CoreGraphic context
++#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10
+     CGContextRef viewContextRef = [[NSGraphicsContext currentContext] graphicsPort];
++#else
++    CGContextRef viewContextRef = [[NSGraphicsContext currentContext] CGContext];
++#endif
++
+     CGContextSetInterpolationQuality (viewContextRef, kCGInterpolationNone);
+     CGContextSetShouldAntialias (viewContextRef, NO);
+ 
+@@ -1147,9 +1163,9 @@ - (void)zoomToFit:(id) sender
+ {
+     stretch_video = !stretch_video;
+     if (stretch_video == true) {
+-        [sender setState: NSOnState];
++        [sender setState: NSControlStateValueOn];
+     } else {
+-        [sender setState: NSOffState];
++        [sender setState: NSControlStateValueOff];
+     }
+ }
+ 
+@@ -1390,15 +1406,15 @@ - (void)adjustSpeed:(id)sender
+     {
+         /* Unselect the currently selected item */
+         for (NSMenuItem *item in [menu itemArray]) {
+-            if (item.state == NSOnState) {
+-                [item setState: NSOffState];
++            if (item.state == NSControlStateValueOn) {
++                [item setState: NSControlStateValueOff];
+                 break;
+             }
+         }
+     }
+ 
+     // check the menu item
+-    [sender setState: NSOnState];
++    [sender setState: NSControlStateValueOn];
+ 
+     // get the throttle percentage
+     throttle_pct = [sender tag];
+@@ -1502,7 +1518,7 @@ int main (int argc, const char * argv[]) {
+                    initWithTitle: [NSString stringWithFormat: @"%d%%", percentage] action:@selector(adjustSpeed:) keyEquivalent:@""] autorelease];
+ 
+         if (percentage == 100) {
+-            [menuItem setState: NSOnState];
++            [menuItem setState: NSControlStateValueOn];
+         }
+ 
+         /* Calculate the throttle percentage */
+-- 
+2.17.2 (Apple Git-113)
