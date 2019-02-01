@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58962)
+Received: from eggs.gnu.org ([209.51.188.92]:59003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMC-0008Fe-Qu
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:02 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMD-0008GW-Hj
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbM9-0003hN-SI
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:56 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:35409)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003i5-5T
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39802)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbM9-0003Ku-Hd
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:53 -0500
-Received: by mail-wm1-x331.google.com with SMTP id t200so6821043wmt.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:14 -0800 (PST)
+	id 1gpbM9-0003LZ-SH
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
+Received: by mail-wm1-x341.google.com with SMTP id y8so6725513wmi.4
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:17 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.12
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.14
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:12 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:15 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:19 +0000
-Message-Id: <20190201160653.13829-14-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:21 +0000
+Message-Id: <20190201160653.13829-16-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/47] hw/arm/armsse: Give each CPU its own view
- of memory
+Subject: [Qemu-devel] [PULL 15/47] iotkit-sysinfo: Make SYS_VERSION and
+ SYS_CONFIG configurable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,92 +36,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Give each CPU its own container memory region. This is necessary
-for two reasons:
- * some devices are instantiated one per CPU and the CPU sees only
-   its own device
- * since a memory region can only be put into one container, we must
-   give each armv7m object a different MemoryRegion as its 'memory'
-   property, or a dual-CPU configuration will assert on realize when
-   the second armv7m object tries to put the MR into a container when
-   it is already in the first armv7m object's container
+The SYS_VERSION and SYS_CONFIG register values differ between the
+IoTKit and SSE-200. Make them configurable via QOM properties rather
+than hard-coded, and set them appropriately in the ARMSSE code that
+instantiates the IOTKIT_SYSINFO device.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-13-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-15-peter.maydell@linaro.org
 ---
- include/hw/arm/armsse.h | 10 ++++++++++
- hw/arm/armsse.c         | 22 ++++++++++++++++++++--
- 2 files changed, 30 insertions(+), 2 deletions(-)
+ include/hw/misc/iotkit-sysinfo.h |  6 ++++
+ hw/arm/armsse.c                  | 51 ++++++++++++++++++++++++++++++++
+ hw/misc/iotkit-sysinfo.c         | 15 ++++++++--
+ 3 files changed, 70 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index faf5dfed252..89f19a971f4 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -135,7 +135,17 @@ typedef struct ARMSSE {
-     IoTKitSysCtl sysctl;
-     IoTKitSysCtl sysinfo;
+diff --git a/include/hw/misc/iotkit-sysinfo.h b/include/hw/misc/iotkit-sysinfo.h
+index 7b2e1a5e48b..d84eb203b90 100644
+--- a/include/hw/misc/iotkit-sysinfo.h
++++ b/include/hw/misc/iotkit-sysinfo.h
+@@ -14,6 +14,8 @@
+  * Arm IoTKit and documented in
+  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
+  * QEMU interface:
++ *  + QOM property "SYS_VERSION": value to use for SYS_VERSION register
++ *  + QOM property "SYS_CONFIG": value to use for SYS_CONFIG register
+  *  + sysbus MMIO region 0: the system information register bank
+  */
  
-+    /*
-+     * 'container' holds all devices seen by all CPUs.
-+     * 'cpu_container[i]' is the view that CPU i has: this has the
-+     * per-CPU devices of that CPU, plus as the background 'container'
-+     * (or an alias of it, since we can only use it directly once).
-+     * container_alias[i] is the alias of 'container' used by CPU i+1;
-+     * CPU 0 can use 'container' directly.
-+     */
-     MemoryRegion container;
-+    MemoryRegion container_alias[SSE_MAX_CPUS - 1];
-+    MemoryRegion cpu_container[SSE_MAX_CPUS];
-     MemoryRegion alias1;
-     MemoryRegion alias2;
-     MemoryRegion alias3;
+@@ -32,6 +34,10 @@ typedef struct IoTKitSysInfo {
+ 
+     /*< public >*/
+     MemoryRegion iomem;
++
++    /* Properties */
++    uint32_t sys_version;
++    uint32_t sys_config;
+ } IoTKitSysInfo;
+ 
+ #endif
 diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 5cb2b78b1fc..2472dfef3a1 100644
+index 2eb4ea3bfe0..19cae77e770 100644
 --- a/hw/arm/armsse.c
 +++ b/hw/arm/armsse.c
-@@ -153,6 +153,15 @@ static void armsse_init(Object *obj)
-         qdev_prop_set_string(DEVICE(&s->armv7m[i]), "cpu-type",
-                              ARM_CPU_TYPE_NAME("cortex-m33"));
-         g_free(name);
-+        name = g_strdup_printf("arm-sse-cpu-container%d", i);
-+        memory_region_init(&s->cpu_container[i], obj, name, UINT64_MAX);
-+        g_free(name);
-+        if (i > 0) {
-+            name = g_strdup_printf("arm-sse-container-alias%d", i);
-+            memory_region_init_alias(&s->container_alias[i - 1], obj,
-+                                     name, &s->container, 0, UINT64_MAX);
-+            g_free(name);
-+        }
-     }
+@@ -18,10 +18,18 @@
+ #include "hw/arm/armsse.h"
+ #include "hw/arm/arm.h"
  
-     sysbus_init_child_obj(obj, "secctl", &s->secctl, sizeof(s->secctl),
-@@ -332,7 +341,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-      * 0x50000000..0x5fffffff  alias of 0x40000000..0x4fffffff
-      */
- 
--    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
-+    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -2);
- 
-     for (i = 0; i < info->num_cpus; i++) {
-         DeviceState *cpudev = DEVICE(&s->armv7m[i]);
-@@ -373,7 +382,16 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                 return;
-             }
-         }
--        object_property_set_link(cpuobj, OBJECT(&s->container), "memory", &err);
++/* Format of the System Information block SYS_CONFIG register */
++typedef enum SysConfigFormat {
++    IoTKitFormat,
++    SSE200Format,
++} SysConfigFormat;
 +
-+        if (i > 0) {
-+            memory_region_add_subregion_overlap(&s->cpu_container[i], 0,
-+                                                &s->container_alias[i - 1], -1);
-+        } else {
-+            memory_region_add_subregion_overlap(&s->cpu_container[i], 0,
-+                                                &s->container, -1);
+ struct ARMSSEInfo {
+     const char *name;
+     int sram_banks;
+     int num_cpus;
++    uint32_t sys_version;
++    SysConfigFormat sys_config_format;
+ };
+ 
+ static const ARMSSEInfo armsse_variants[] = {
+@@ -29,9 +37,39 @@ static const ARMSSEInfo armsse_variants[] = {
+         .name = TYPE_IOTKIT,
+         .sram_banks = 1,
+         .num_cpus = 1,
++        .sys_version = 0x41743,
++        .sys_config_format = IoTKitFormat,
+     },
+ };
+ 
++static uint32_t armsse_sys_config_value(ARMSSE *s, const ARMSSEInfo *info)
++{
++    /* Return the SYS_CONFIG value for this SSE */
++    uint32_t sys_config;
++
++    switch (info->sys_config_format) {
++    case IoTKitFormat:
++        sys_config = 0;
++        sys_config = deposit32(sys_config, 0, 4, info->sram_banks);
++        sys_config = deposit32(sys_config, 4, 4, s->sram_addr_width - 12);
++        break;
++    case SSE200Format:
++        sys_config = 0;
++        sys_config = deposit32(sys_config, 0, 4, info->sram_banks);
++        sys_config = deposit32(sys_config, 4, 5, s->sram_addr_width);
++        sys_config = deposit32(sys_config, 24, 4, 2);
++        if (info->num_cpus > 1) {
++            sys_config = deposit32(sys_config, 10, 1, 1);
++            sys_config = deposit32(sys_config, 20, 4, info->sram_banks - 1);
++            sys_config = deposit32(sys_config, 28, 4, 2);
 +        }
-+        object_property_set_link(cpuobj, OBJECT(&s->cpu_container[i]),
-+                                 "memory", &err);
-         if (err) {
-             error_propagate(errp, err);
-             return;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return sys_config;
++}
++
+ /* Clock frequency in HZ of the 32KHz "slow clock" */
+ #define S32KCLK (32 * 1000)
+ 
+@@ -726,6 +764,19 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+                           qdev_get_gpio_in_named(dev_apb_ppc1,
+                                                  "cfg_sec_resp", 0));
+ 
++    object_property_set_int(OBJECT(&s->sysinfo), info->sys_version,
++                            "SYS_VERSION", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_int(OBJECT(&s->sysinfo),
++                            armsse_sys_config_value(s, info),
++                            "SYS_CONFIG", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->sysinfo), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
+index 78955bc45f5..026ba942613 100644
+--- a/hw/misc/iotkit-sysinfo.c
++++ b/hw/misc/iotkit-sysinfo.c
+@@ -51,15 +51,16 @@ static const int sysinfo_id[] = {
+ static uint64_t iotkit_sysinfo_read(void *opaque, hwaddr offset,
+                                     unsigned size)
+ {
++    IoTKitSysInfo *s = IOTKIT_SYSINFO(opaque);
+     uint64_t r;
+ 
+     switch (offset) {
+     case A_SYS_VERSION:
+-        r = 0x41743;
++        r = s->sys_version;
+         break;
+ 
+     case A_SYS_CONFIG:
+-        r = 0x31;
++        r = s->sys_config;
+         break;
+     case A_PID4 ... A_CID3:
+         r = sysinfo_id[(offset - A_PID4) / 4];
+@@ -94,6 +95,12 @@ static const MemoryRegionOps iotkit_sysinfo_ops = {
+     .valid.max_access_size = 4,
+ };
+ 
++static Property iotkit_sysinfo_props[] = {
++    DEFINE_PROP_UINT32("SYS_VERSION", IoTKitSysInfo, sys_version, 0),
++    DEFINE_PROP_UINT32("SYS_CONFIG", IoTKitSysInfo, sys_config, 0),
++    DEFINE_PROP_END_OF_LIST()
++};
++
+ static void iotkit_sysinfo_init(Object *obj)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+@@ -106,10 +113,14 @@ static void iotkit_sysinfo_init(Object *obj)
+ 
+ static void iotkit_sysinfo_class_init(ObjectClass *klass, void *data)
+ {
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
+     /*
+      * This device has no guest-modifiable state and so it
+      * does not need a reset function or VMState.
+      */
++
++    dc->props = iotkit_sysinfo_props;
+ }
+ 
+ static const TypeInfo iotkit_sysinfo_info = {
 -- 
 2.20.1
