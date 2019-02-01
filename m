@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47520)
+Received: from eggs.gnu.org ([209.51.188.92]:49353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gpac4-0001Iy-Ud
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:20:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpajN-0004As-LN
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gpac1-0006Ic-5W
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:20:15 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 1 Feb 2019 15:19:41 +0000
-Message-ID: <b31d7f28-fc84-f9ad-6327-0afa2a26fc9f@virtuozzo.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FB9E9E36E6F7B54580AF95D9939A0A4E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gpajM-0001a9-OF
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:27:49 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:32966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpajK-0001Vo-HX
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:27:48 -0500
+Received: by mail-oi1-x243.google.com with SMTP id c206so6123593oib.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 07:27:37 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+References: <1648289.tQCHxfjYn9@basile.remlab.net>
+In-Reply-To: <1648289.tQCHxfjYn9@basile.remlab.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Feb 2019 15:27:26 +0000
+Message-ID: <CAFEAcA98cbqquL+mtz00XNgXoVuWqy66tvaw5pym02qy55ubUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/3] target/arm: fix PAuth in
+ user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-MzEuMDEuMjAxOSAxNjo0NiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEluIHRoZSAnRm9y
-bWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1pbWcgaW5mbycN
-Cj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRpb24gYWJvdXQgZXhp
-c3RpbmcgUUNPVzINCj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEgYml0bWFwIG5h
-bWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4gDQo+IGltYWdlOiAvdnovdm1wcml2YXRlL1ZN
-MS9oYXJkZGlzay5oZGQNCj4gZmlsZSBmb3JtYXQ6IHFjb3cyDQo+IHZpcnR1YWwgc2l6ZTogNjRH
-ICg2ODcxOTQ3NjczNiBieXRlcykNCj4gZGlzayBzaXplOiAzLjBNDQo+IGNsdXN0ZXJfc2l6ZTog
-MTA0ODU3Ng0KPiBGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRpb246DQo+ICAgICAgY29tcGF0OiAx
-LjENCj4gICAgICBsYXp5IHJlZmNvdW50czogdHJ1ZQ0KPiAgICAgIGJpdG1hcHM6DQo+ICAgICAg
-ICAgIFswXToNCj4gICAgICAgICAgICAgIGZsYWdzOg0KPiAgICAgICAgICAgICAgICAgIFswXTog
-aW4tdXNlDQo+ICAgICAgICAgICAgICAgICAgWzFdOiBhdXRvDQo+ICAgICAgICAgICAgICBuYW1l
-OiBiYWNrLXVwMQ0KPiAgICAgICAgICAgICAgdW5rbm93biBmbGFnczogNA0KPiAgICAgICAgICAg
-ICAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+ICAgICAgICAgIFsxXToNCj4gICAgICAgICAgICAgIGZs
-YWdzOg0KPiAgICAgICAgICAgICAgICAgIFswXTogaW4tdXNlDQo+ICAgICAgICAgICAgICAgICAg
-WzFdOiBhdXRvDQo+ICAgICAgICAgICAgICBuYW1lOiBiYWNrLXVwMg0KPiAgICAgICAgICAgICAg
-dW5rbm93biBmbGFnczogOA0KPiAgICAgICAgICAgICAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+ICAg
-ICAgcmVmY291bnQgYml0czogMTYNCj4gICAgICBjb3JydXB0OiBmYWxzZQ0KPiANCj4gU2lnbmVk
-LW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5j
-b20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
-c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Fri, 25 Jan 2019 at 23:02, R=C3=A9mi Denis-Courmont <remi@remlab.net> wr=
+ote:
+>
+>         Hello,
+>
+> As things stand, ARMv8.3-PAuth does not work in user mode. These tiny pat=
+ches
+> attempt to fix that.
+>
+> Br,
+>
+> ----------------------------------------------------------------
+> Remi Denis-Courmont (3):
+>       target/arm: fix AArch64 virtual address space size
+>       target/arm: actually enable PAuth in user mode
+>       target/arm: fix decoding of B{,L}RA{A,B}
+
+Thanks for this patchset. I've applied patches 1 (v2) and 3
+to my target-arm.next tree. (For patch 2 I prefer the approach
+in Richard's patchset which deletes the cpu properties entirely.)
+
+PS: for future patchsets, if you do a v2 of a patch it's better
+to then resend the whole patchset as a fresh email thread (not a
+followup. That makes our automated patch email handling tooling
+happier as it can keep the v1 and v2 versions distinct.
+
+thanks
+-- PMM
