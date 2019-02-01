@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49680)
+Received: from eggs.gnu.org ([209.51.188.92]:49746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcOt-0005uu-U7
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:14:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpcP2-00062o-IO
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcOs-0000up-NO
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:14:47 -0500
-Resent-Message-Id: <E1gpcOs-0000up-NO@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21735)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpcOs-0000rC-B4
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:14:46 -0500
-Message-ID: <154904124664.29184.3444892123354128466@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpcP0-000132-Sp
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:14:56 -0500
+Date: Fri, 1 Feb 2019 18:14:45 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190201171445.GB31750@localhost.localdomain>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:14:08 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension
+ new test 239
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
-YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
-ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-IC0+IHBhdGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1MGEwZjBkNWNlIGRvY3MvY29uZi5w
-eTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbgo3YjVmYThkOTUzIE1ha2VmaWxlOiBBYnN0
-cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCmU5NTY2ZWNiYTggTWFrZWZp
-bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgowOGRlODYx
-NzNiIFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKNDI4MDZjNTBlMiBk
-b2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmU1MGExMDZkN2QgZG9jcy9jb25m
-LnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQKMmUxYTY1MDIyYiBk
-b2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUKMTRiN2IxOGI3MCBk
-b2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5CmQ5OTFiNDUwNmIg
-ZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydAo0ZjQyOWNk
-ZGY0IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0CjU2ZjhlNGE2YzcgZG9j
-cy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgNTZmOGU0YTZjNzA4IChkb2NzL2NwdS1ob3RwbHVn
-LnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNraW5nIGNvbW1pdCA0ZjQyOWNk
-ZGY0MjEgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0KQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVtb3J5LnR4dAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1pdCBkOTkxYjQ1MDZiODYgKGRv
-Y3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQpCkVSUk9SOiBN
-aXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
-cywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IDE0YjdiMThiNzBjMyAoZG9jcy9jb25mLnB5OiBEaXNh
-YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgMmUxYTY1
-MDIyYmMxIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYv
-MTEgQ2hlY2tpbmcgY29tbWl0IGU1MGExMDZkN2RjNSAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNs
-dWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDQyODA2
-YzUwZTI0OCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVj
-a2luZyBjb21taXQgMDhkZTg2MTczYjJlIChTZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVh
-bCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE2MDogRklMRTogZG9j
-cy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10g
-PSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlk
-ZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9y
-cywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IGU5NTY2ZWNiYThlZCAoTWFrZWZp
-bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEg
-Q2hlY2tpbmcgY29tbWl0IDdiNWZhOGQ5NTM4NCAoTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
-bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNraW5nIGNvbW1pdCA1MGEwZjBk
-NWNlMmQgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExNDUw
-MzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90
-eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+Am 31.01.2019 um 14:46 hat Andrey Shinkevich geschrieben:
+> A new test file 239 added to the qemu-iotests set. It checks
+> the output format of 'qemu-img info' for bitmaps extension of
+> qcow2 specific information.
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
+239 is already taken, so please rename this one. I usually search the
+mailing list for "239.out" etc. until I find a number that nobody has
+used even in a patch series yet.
+
+Kevin
