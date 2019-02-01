@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39538)
+Received: from eggs.gnu.org ([209.51.188.92]:39540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboO-00084C-07
+	(envelope-from <kwolf@redhat.com>) id 1gpboN-00084I-S0
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboK-0000IM-Cw
+	(envelope-from <kwolf@redhat.com>) id 1gpboK-0000IR-Dq
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:37:02 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:35:13 +0100
-Message-Id: <20190201163518.31157-23-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:35:05 +0100
+Message-Id: <20190201163518.31157-15-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/27] iotests: Filter second BLOCK_JOB_ERROR
- from 229
+Subject: [Qemu-devel] [PULL 14/27] block/vdi: Don't take address of fields
+ in packed structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Without this filter, this test sometimes fails.
+Taking the address of a field in a packed struct is a bad idea, because
+it might not be actually aligned enough for that pointer type (and
+thus cause a crash on dereference on some host architectures). Newer
+versions of clang warn about this.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Instead of passing UUID related functions the address of a possibly
+unaligned QemuUUID struct, use local variables and then copy to/from
+the struct field as appropriate.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/229     | 6 +++++-
- tests/qemu-iotests/229.out | 1 -
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ block/vdi.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-index 893d098ad2..b0d4885fa6 100755
---- a/tests/qemu-iotests/229
-+++ b/tests/qemu-iotests/229
-@@ -81,11 +81,15 @@ echo
- echo '=3D=3D=3D Force cancel job paused in error state  =3D=3D=3D'
- echo
+diff --git a/block/vdi.c b/block/vdi.c
+index 2380daa583..4cc726047c 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -235,7 +235,8 @@ static void vdi_header_to_le(VdiHeader *header)
 =20
-+# Filter out BLOCK_JOB_ERROR events because they may or may not occur.
-+# Cancelling the job means resuming it for a bit before it is actually
-+# aborted, and in that time it may or may not re-encounter the error.
- success_or_failure=3D"y" _send_qemu_cmd $QEMU_HANDLE \
-     "{'execute': 'block-job-cancel',
-                  'arguments': { 'device': 'testdisk',
-                                 'force': true}}" \
--     "BLOCK_JOB_CANCELLED" "Assertion"
-+     "BLOCK_JOB_CANCELLED" "Assertion" \
-+    | grep -v '"BLOCK_JOB_ERROR"'
+ static void vdi_header_print(VdiHeader *header)
+ {
+-    char uuid[37];
++    char uuidstr[37];
++    QemuUUID uuid;
+     logout("text        %s", header->text);
+     logout("signature   0x%08x\n", header->signature);
+     logout("header size 0x%04x\n", header->header_size);
+@@ -254,14 +255,18 @@ static void vdi_header_print(VdiHeader *header)
+     logout("block extra 0x%04x\n", header->block_extra);
+     logout("blocks tot. 0x%04x\n", header->blocks_in_image);
+     logout("blocks all. 0x%04x\n", header->blocks_allocated);
+-    qemu_uuid_unparse(&header->uuid_image, uuid);
+-    logout("uuid image  %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_last_snap, uuid);
+-    logout("uuid snap   %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_link, uuid);
+-    logout("uuid link   %s\n", uuid);
+-    qemu_uuid_unparse(&header->uuid_parent, uuid);
+-    logout("uuid parent %s\n", uuid);
++    uuid =3D header->uuid_image;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid image  %s\n", uuidstr);
++    uuid =3D header->uuid_last_snap;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid snap   %s\n", uuidstr);
++    uuid =3D header->uuid_link;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid link   %s\n", uuidstr);
++    uuid =3D header->uuid_parent;
++    qemu_uuid_unparse(&uuid, uuidstr);
++    logout("uuid parent %s\n", uuidstr);
+ }
 =20
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-index 4c4112805f..a3eb33788a 100644
---- a/tests/qemu-iotests/229.out
-+++ b/tests/qemu-iotests/229.out
-@@ -17,7 +17,6 @@ wrote 2097152/2097152 bytes at offset 0
+ static int coroutine_fn vdi_co_check(BlockDriverState *bs, BdrvCheckResu=
+lt *res,
+@@ -368,6 +373,7 @@ static int vdi_open(BlockDriverState *bs, QDict *opti=
+ons, int flags,
+     size_t bmap_size;
+     int ret;
+     Error *local_err =3D NULL;
++    QemuUUID uuid_link, uuid_parent;
 =20
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write=
-", "action": "stop"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}=
-}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152,=
- "offset": 1048576, "speed": 0, "type": "mirror"}}
- *** done
+     bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+@@ -395,6 +401,9 @@ static int vdi_open(BlockDriverState *bs, QDict *opti=
+ons, int flags,
+         goto fail;
+     }
+=20
++    uuid_link =3D header.uuid_link;
++    uuid_parent =3D header.uuid_parent;
++
+     if (header.disk_size % SECTOR_SIZE !=3D 0) {
+         /* 'VBoxManage convertfromraw' can create images with odd disk s=
+izes.
+            We accept them but round the disk size to the next multiple o=
+f
+@@ -444,11 +453,11 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+                    (uint64_t)header.blocks_in_image * header.block_size)=
+;
+         ret =3D -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_link)) {
++    } else if (!qemu_uuid_is_null(&uuid_link)) {
+         error_setg(errp, "unsupported VDI image (non-NULL link UUID)");
+         ret =3D -ENOTSUP;
+         goto fail;
+-    } else if (!qemu_uuid_is_null(&header.uuid_parent)) {
++    } else if (!qemu_uuid_is_null(&uuid_parent)) {
+         error_setg(errp, "unsupported VDI image (non-NULL parent UUID)")=
+;
+         ret =3D -ENOTSUP;
+         goto fail;
+@@ -733,6 +742,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCrea=
+teOptions *create_options,
+     BlockDriverState *bs_file =3D NULL;
+     BlockBackend *blk =3D NULL;
+     uint32_t *bmap =3D NULL;
++    QemuUUID uuid;
+=20
+     assert(create_options->driver =3D=3D BLOCKDEV_DRIVER_VDI);
+     vdi_opts =3D &create_options->u.vdi;
+@@ -819,8 +829,10 @@ static int coroutine_fn vdi_co_do_create(BlockdevCre=
+ateOptions *create_options,
+     if (image_type =3D=3D VDI_TYPE_STATIC) {
+         header.blocks_allocated =3D blocks;
+     }
+-    qemu_uuid_generate(&header.uuid_image);
+-    qemu_uuid_generate(&header.uuid_last_snap);
++    qemu_uuid_generate(&uuid);
++    header.uuid_image =3D uuid;
++    qemu_uuid_generate(&uuid);
++    header.uuid_last_snap =3D uuid;
+     /* There is no need to set header.uuid_link or header.uuid_parent he=
+re. */
+     if (VDI_DEBUG) {
+         vdi_header_print(&header);
 --=20
 2.20.1
