@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51252)
+Received: from eggs.gnu.org ([209.51.188.92]:51265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcU8-0001yA-3p
+	(envelope-from <kwolf@redhat.com>) id 1gpcU8-0001ye-IO
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcU3-0003GM-BS
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:11 -0500
-Resent-Message-Id: <E1gpcU3-0003GM-BS@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpcU2-00032s-If
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:07 -0500
-Message-ID: <154904155753.29184.490082247309695971@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpcU7-0003MR-0z
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:20:12 -0500
+Date: Fri, 1 Feb 2019 18:19:36 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190201171936.GC31750@localhost.localdomain>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:19:18 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjAxMTQ1MDM1
-LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggMDAvMTFdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
-aGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBh
-dGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMDE2MDdjIGRvY3MvY29uZi5weTogRG9uJ3Qg
-aGFyZC1jb2RlIFFFTVUgdmVyc2lvbgpkMjcwOWY1IE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlk
-ZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCjQ5NWY3M2MgTWFrZWZpbGUsIGNvbmZpZ3VyZTog
-U3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgo2ZTk3ODk0IFNlcGFyYXRlIGNvbmYu
-cHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKZTQ0YWQ3ZSBkb2NzL2NvbmYucHk6IERpc2FibGUg
-b3B0aW9uIHdhcm5pbmdzCmZhZGQ5ZjQgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBz
-b3VyY2VzIGluIEhUTUwgYnVpbGQKNmU0MzhkZSBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUg
-J2FsYWJhc3RlcicgdGhlbWUKZTIwOGUwOCBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9z
-dGF0aWMgZGlyZWN0b3J5CmFiYWY0ZGUgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBz
-cGhpbngtcXVpY2tzdGFydApmYmE0YWQ5IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0CmViNjk5OGYgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgZWI2OTk4ZmJmM2I1
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNr
-aW5nIGNvbW1pdCBmYmE0YWQ5MDNiMTUgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1p
-dCBhYmFmNGRlYjc1YTkgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGUyMDhlMDg5NmZmMSAo
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVj
-a2luZyBjb21taXQgNmU0MzhkZTQ3ODExIChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2Fs
-YWJhc3RlcicgdGhlbWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGZhZGQ5ZjQxN2RjNCAoZG9jcy9j
-b25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hl
-Y2tpbmcgY29tbWl0IGU0NGFkN2UwNzQ0NSAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3
-YXJuaW5ncykKOC8xMSBDaGVja2luZyBjb21taXQgNmU5Nzg5NGY1ODMxIChTZXBhcmF0ZSBjb25m
-LnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzE2MDogRklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlv
-bnNbJ2Rlc2NyaXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50
-ZXJvcGVyYWJpbGl0eSBHdWlkZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUo
-cykKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDQ5
-NWY3M2M3OTVjMiAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9j
-dW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IGQyNzA5ZjU5NWVmZCAoTWFrZWZpbGU6
-IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNr
-aW5nIGNvbW1pdCBiMDE2MDdjNmUxZDkgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFF
-TVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Am 31.01.2019 um 14:46 hat Andrey Shinkevich geschrieben:
+> In the 'Format specific information' section of the 'qemu-img info'
+> command output, the supplemental information about existing QCOW2
+> bitmaps will be shown, such as a bitmap name, flags and granularity:
+> 
+> image: /vz/vmprivate/VM1/harddisk.hdd
+> file format: qcow2
+> virtual size: 64G (68719476736 bytes)
+> disk size: 3.0M
+> cluster_size: 1048576
+> Format specific information:
+>     compat: 1.1
+>     lazy refcounts: true
+>     bitmaps:
+>         [0]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up1
+>             unknown flags: 4
+>             granularity: 65536
+>         [1]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up2
+>             unknown flags: 8
+>             granularity: 65536
+>     refcount bits: 16
+>     corrupt: false
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
+I haven't reviewed the patch in detail, but I suggest that you change
+the subject line to make clear this is a qcow2 patch, not a qemu-img
+one. Maybe:
+
+    "qcow2: Add list of bitmaps to ImageInfoSpecificQCow2"
+
+Kevin
