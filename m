@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55248)
+Received: from eggs.gnu.org ([209.51.188.92]:55666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpcfZ-00041p-W6
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:32:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpcgn-0004uC-K1
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:33:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gpcfT-0001xV-4c
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:31:56 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gpcfR-0001w5-9F
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:31:55 -0500
-Received: by mail-wr1-x442.google.com with SMTP id t6so7901988wrr.12
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:31:49 -0800 (PST)
-References: <20190131215611.29341-1-michael@walle.cc>
-	<20190131215611.29341-3-michael@walle.cc>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190131215611.29341-3-michael@walle.cc>
-Date: Fri, 01 Feb 2019 17:31:46 +0000
-Message-ID: <875zu3v2il.fsf@zen.linaroharston>
+	(envelope-from <no-reply@patchew.org>) id 1gpcgk-0002Tq-5r
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:33:16 -0500
+Resent-Message-Id: <E1gpcgk-0002Tq-5r@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpcgi-0002Sw-7U
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:33:13 -0500
+Message-ID: <154904145074.29184.7022371585584554487@ebba9967afc0>
+In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] tests/tcg: also pass AS and LD
- variables
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Feb 2019 09:17:32 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
+ docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>
-Cc: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-
-Michael Walle <michael@walle.cc> writes:
-
-> The lm32 architecture doesn't need the complete compiler. In fact, only
-> the building of GCC is skipped to make building the docker image faster.
->
-> Signed-off-by: Michael Walle <michael@walle.cc>
-> ---
->  tests/tcg/Makefile.include | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
-> index 73b5626fc5..19b81400f5 100644
-> --- a/tests/tcg/Makefile.include
-> +++ b/tests/tcg/Makefile.include
-> @@ -41,17 +41,26 @@ ifneq ($(DOCKER_IMAGE),)
->  # We also need the Docker make rules to depend on
->  include $(SRC_PATH)/tests/docker/Makefile.include
->
-> -DOCKER_COMPILE_CMD=3D"$(DOCKER_SCRIPT) cc --user $(shell id -u) \
-> +DOCKER_CC_CMD=3D"$(DOCKER_SCRIPT) cc --user $(shell id -u) \
->  		--cc $(DOCKER_CROSS_COMPILER) \
->  		-i qemu:$(DOCKER_IMAGE) \
->  		-s $(SRC_PATH) -- "
-> +DOCKER_AS_CMD=3D"$(DOCKER_SCRIPT) cc --user $(shell id -u) \
-> +		--cc $(DOCKER_CROSS_ASSEMBLER) \
-> +		-i qemu:$(DOCKER_IMAGE) \
-> +		-s $(SRC_PATH) -- "
-> +DOCKER_LD_CMD=3D"$(DOCKER_SCRIPT) cc --user $(shell id -u) \
-> +		--cc $(DOCKER_CROSS_LINKER) \
-> +		-i qemu:$(DOCKER_IMAGE) \
-> +		-s $(SRC_PATH) -- "
->  DOCKER_PREREQ=3Ddocker-image-$(DOCKER_IMAGE)
->
->  .PHONY: docker-build-guest-tests
->  docker-build-guest-tests: $(DOCKER_PREREQ)
->  	$(call quiet-command, \
->  	  (mkdir -p tests && cd tests && \
-> -	   $(MAKE) -f $(TCG_MAKE) CC=3D$(DOCKER_COMPILE_CMD) \
-> +	   $(MAKE) -f $(TCG_MAKE) CC=3D$(DOCKER_CC_CMD) \
-> +			AS=3D$(DOCKER_AS_CMD) LD=3D$(DOCKER_LD_CMD) \
-
-Hmm will these overrides break exiting builds? We haven't defined
-DOCKER_CROSS_ASSEMBLER or DOCKER_CROSS_LINKER for all our targets.
-
->  			BUILD_STATIC=3Dy \
->  			EXTRA_CFLAGS=3D$(DOCKER_CROSS_COMPILER_CFLAGS)), \
->  	"BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_IMAGE)")
-
-
---
-Alex Benn=C3=A9e
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
+OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMV0gRW5h
+YmxlIGJ1aWxkIGFuZCBpbnN0YWxsIG9mIG91ciByU1QgZG9jcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
+ZS1pZDogMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
+ICBwYXRjaGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+IC0+IHBhdGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5v
+cmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyMmYyZGNkOTA2IGRvY3MvY29uZi5w
+eTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbgo5NzUwMzliNzFkIE1ha2VmaWxlOiBBYnN0
+cmFjdCBvdXQgImlkZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCmViNjY1OGU1MjEgTWFrZWZp
+bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgpkY2E2NzNj
+ZjJlIFNlcGFyYXRlIGNvbmYucHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKMmU2MGZhNjE0YSBk
+b2NzL2NvbmYucHk6IERpc2FibGUgb3B0aW9uIHdhcm5pbmdzCmNjYjU5YWMzYjUgZG9jcy9jb25m
+LnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQKY2ViZmM4YjQyNCBk
+b2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUKNjE5YjY5ZWE4ZSBk
+b2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9zdGF0aWMgZGlyZWN0b3J5CjRjZTZhNWQ1OWYg
+ZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBzcGhpbngtcXVpY2tzdGFydAowZTA4ZjRm
+MTM5IGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0CjJjNmRmMGNmZWQgZG9j
+cy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3VlcwoKPT09IE9VVFBVVCBCRUdJ
+TiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgMmM2ZGYwY2ZlZDhmIChkb2NzL2NwdS1ob3RwbHVn
+LnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNraW5nIGNvbW1pdCAwZTA4ZjRm
+MTM5NTAgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3QgZm9ybWF0KQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVtb3J5LnR4dAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8xMSBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1pdCA0Y2U2YTVkNTlmNDEgKGRv
+Y3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1aWNrc3RhcnQpCkVSUk9SOiBN
+aXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IDYxOWI2OWVhOGVlMyAoZG9jcy9jb25mLnB5OiBEaXNh
+YmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVja2luZyBjb21taXQgY2ViZmM4
+YjQyNDI1IChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2FsYWJhc3RlcicgdGhlbWUpCjYv
+MTEgQ2hlY2tpbmcgY29tbWl0IGNjYjU5YWMzYjUzNyAoZG9jcy9jb25mLnB5OiBEb24ndCBpbmNs
+dWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hlY2tpbmcgY29tbWl0IDJlNjBm
+YTYxNGEyMCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3YXJuaW5ncykKOC8xMSBDaGVj
+a2luZyBjb21taXQgZGNhNjczY2YyZWEzIChTZXBhcmF0ZSBjb25mLnB5IGZvciBlYWNoIG1hbnVh
+bCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE2MDogRklMRTogZG9j
+cy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlvbnNbJ2Rlc2NyaXB0aW9uJ10g
+PSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50ZXJvcGVyYWJpbGl0eSBHdWlk
+ZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAyIGVycm9y
+cywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTEgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IGViNjY1OGU1MjEyMCAoTWFrZWZp
+bGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbikKMTAvMTEg
+Q2hlY2tpbmcgY29tbWl0IDk3NTAzOWI3MWQ0MCAoTWFrZWZpbGU6IEFic3RyYWN0IG91dCAiaWRl
+bnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNraW5nIGNvbW1pdCAyMmYyZGNk
+OTA2ODAgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFFTVUgdmVyc2lvbikKPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExNDUw
+MzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90
+eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
