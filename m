@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47313)
+Received: from eggs.gnu.org ([209.51.188.92]:47369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWu-0006o9-E2
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeXJ-00076c-Se
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWq-00034G-2T
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gpeXH-0003A0-7S
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:31:37 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  1 Feb 2019 20:29:25 +0100
-Message-Id: <20190201192935.18394-22-mreitz@redhat.com>
+Date: Fri,  1 Feb 2019 20:29:32 +0100
+Message-Id: <20190201192935.18394-29-mreitz@redhat.com>
 In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 References: <20190201192935.18394-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 21/31] block: Add strong_runtime_opts to
- BlockDriver
+Subject: [Qemu-devel] [PATCH v13 28/31] block/curl: Implement
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,810 +25,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This new field can be set by block drivers to list the runtime options
-they accept that may influence the contents of the respective BDS. As of
-a follow-up patch, this list will be used by the common
-bdrv_refresh_filename() implementation to decide which options to put
-into BDS.full_open_options (and consequently whether a JSON filename has
-to be created), thus freeing the drivers of having to implement that
-logic themselves.
-
-Additionally, this patch adds the field to all of the block drivers that
-need it and sets it accordingly.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/block/block_int.h |  7 +++++++
- block/blkdebug.c          | 16 ++++++++++++++++
- block/blklogwrites.c      |  8 ++++++++
- block/crypto.c            |  8 ++++++++
- block/curl.c              | 21 +++++++++++++++++++++
- block/gluster.c           | 19 +++++++++++++++++++
- block/iscsi.c             | 18 ++++++++++++++++++
- block/nbd.c               | 14 ++++++++++++++
- block/nfs.c               | 11 +++++++++++
- block/null.c              |  9 +++++++++
- block/nvme.c              |  8 ++++++++
- block/qcow.c              |  7 +++++++
- block/qcow2.c             |  7 +++++++
- block/quorum.c            | 11 +++++++++++
- block/raw-format.c        | 10 +++++++++-
- block/rbd.c               | 14 ++++++++++++++
- block/replication.c       |  8 ++++++++
- block/sheepdog.c          | 12 ++++++++++++
- block/ssh.c               | 12 ++++++++++++
- block/throttle.c          |  7 +++++++
- block/vpc.c               |  7 +++++++
- block/vvfat.c             | 12 ++++++++++++
- block/vxhs.c              | 11 +++++++++++
- 23 files changed, 256 insertions(+), 1 deletion(-)
+ block/curl.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index d65f80a013..40f00aa44e 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -516,6 +516,13 @@ struct BlockDriver {
-     void (*bdrv_register_buf)(BlockDriverState *bs, void *host, size_t s=
-ize);
-     void (*bdrv_unregister_buf)(BlockDriverState *bs, void *host);
-     QLIST_ENTRY(BlockDriver) list;
-+
-+    /* Pointer to a NULL-terminated array of names of strong options
-+     * that can be specified for bdrv_open(). A strong option is one
-+     * that changes the data of a BDS.
-+     * If this pointer is NULL, the array is considered empty.
-+     * "filename" and "driver" are always considered strong. */
-+    const char *const *strong_runtime_opts;
- };
-=20
- typedef struct BlockLimits {
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 0759452925..71b4275b98 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -888,6 +888,20 @@ static int blkdebug_reopen_prepare(BDRVReopenState *=
-reopen_state,
-     return 0;
- }
-=20
-+static const char *const blkdebug_strong_runtime_opts[] =3D {
-+    "config",
-+    "inject-error.",
-+    "set-state.",
-+    "align",
-+    "max-transfer",
-+    "opt-write-zero",
-+    "max-write-zero",
-+    "opt-discard",
-+    "max-discard",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_blkdebug =3D {
-     .format_name            =3D "blkdebug",
-     .protocol_name          =3D "blkdebug",
-@@ -917,6 +931,8 @@ static BlockDriver bdrv_blkdebug =3D {
-                                 =3D blkdebug_debug_remove_breakpoint,
-     .bdrv_debug_resume          =3D blkdebug_debug_resume,
-     .bdrv_debug_is_suspended    =3D blkdebug_debug_is_suspended,
-+
-+    .strong_runtime_opts        =3D blkdebug_strong_runtime_opts,
- };
-=20
- static void bdrv_blkdebug_init(void)
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 36e3d0f822..5da5df112d 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -517,6 +517,13 @@ blk_log_writes_co_pdiscard(BlockDriverState *bs, int=
-64_t offset, int count)
-                                  LOG_DISCARD_FLAG, false);
- }
-=20
-+static const char *const blk_log_writes_strong_runtime_opts[] =3D {
-+    "log-append",
-+    "log-sector-size",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_blk_log_writes =3D {
-     .format_name            =3D "blklogwrites",
-     .instance_size          =3D sizeof(BDRVBlkLogWritesState),
-@@ -536,6 +543,7 @@ static BlockDriver bdrv_blk_log_writes =3D {
-     .bdrv_co_block_status   =3D bdrv_co_block_status_from_file,
-=20
-     .is_filter              =3D true,
-+    .strong_runtime_opts    =3D blk_log_writes_strong_runtime_opts,
- };
-=20
- static void bdrv_blk_log_writes_init(void)
-diff --git a/block/crypto.c b/block/crypto.c
-index f0a5f6b987..d9bfd1084a 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -622,6 +622,12 @@ block_crypto_get_specific_info_luks(BlockDriverState=
- *bs)
-     return spec_info;
- }
-=20
-+static const char *const block_crypto_strong_runtime_opts[] =3D {
-+    BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_crypto_luks =3D {
-     .format_name        =3D "luks",
-     .instance_size      =3D sizeof(BlockCrypto),
-@@ -643,6 +649,8 @@ BlockDriver bdrv_crypto_luks =3D {
-     .bdrv_getlength     =3D block_crypto_getlength,
-     .bdrv_get_info      =3D block_crypto_get_info_luks,
-     .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
-+
-+    .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
- };
-=20
- static void block_crypto_init(void)
 diff --git a/block/curl.c b/block/curl.c
-index b7ac265d3a..1c9e4f6a64 100644
+index 2c07a694d8..606709fea4 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -947,6 +947,19 @@ static int64_t curl_getlength(BlockDriverState *bs)
+@@ -950,6 +950,23 @@ static int64_t curl_getlength(BlockDriverState *bs)
      return s->len;
  }
 =20
-+static const char *const curl_strong_runtime_opts[] =3D {
-+    CURL_BLOCK_OPT_URL,
-+    CURL_BLOCK_OPT_SSLVERIFY,
-+    CURL_BLOCK_OPT_COOKIE,
-+    CURL_BLOCK_OPT_COOKIE_SECRET,
-+    CURL_BLOCK_OPT_USERNAME,
-+    CURL_BLOCK_OPT_PASSWORD_SECRET,
-+    CURL_BLOCK_OPT_PROXY_USERNAME,
-+    CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET,
++static void curl_refresh_filename(BlockDriverState *bs)
++{
++    BDRVCURLState *s =3D bs->opaque;
 +
-+    NULL
-+};
++    /* "readahead" and "timeout" do not change the guest-visible data,
++     * so ignore them */
++    if (s->sslverify !=3D CURL_BLOCK_OPT_SSLVERIFY_DEFAULT ||
++        s->cookie || s->username || s->password || s->proxyusername ||
++        s->proxypassword)
++    {
++        return;
++    }
 +
- static BlockDriver bdrv_http =3D {
-     .format_name                =3D "http",
-     .protocol_name              =3D "http",
-@@ -961,6 +974,8 @@ static BlockDriver bdrv_http =3D {
-=20
++    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename), s->url);
++}
++
++
+ static const char *const curl_strong_runtime_opts[] =3D {
+     CURL_BLOCK_OPT_URL,
+     CURL_BLOCK_OPT_SSLVERIFY,
+@@ -978,6 +995,7 @@ static BlockDriver bdrv_http =3D {
      .bdrv_detach_aio_context    =3D curl_detach_aio_context,
      .bdrv_attach_aio_context    =3D curl_attach_aio_context,
-+
-+    .strong_runtime_opts        =3D curl_strong_runtime_opts,
+=20
++    .bdrv_refresh_filename      =3D curl_refresh_filename,
+     .strong_runtime_opts        =3D curl_strong_runtime_opts,
  };
 =20
- static BlockDriver bdrv_https =3D {
-@@ -977,6 +992,8 @@ static BlockDriver bdrv_https =3D {
-=20
+@@ -996,6 +1014,7 @@ static BlockDriver bdrv_https =3D {
      .bdrv_detach_aio_context    =3D curl_detach_aio_context,
      .bdrv_attach_aio_context    =3D curl_attach_aio_context,
-+
-+    .strong_runtime_opts        =3D curl_strong_runtime_opts,
+=20
++    .bdrv_refresh_filename      =3D curl_refresh_filename,
+     .strong_runtime_opts        =3D curl_strong_runtime_opts,
  };
 =20
- static BlockDriver bdrv_ftp =3D {
-@@ -993,6 +1010,8 @@ static BlockDriver bdrv_ftp =3D {
-=20
+@@ -1014,6 +1033,7 @@ static BlockDriver bdrv_ftp =3D {
      .bdrv_detach_aio_context    =3D curl_detach_aio_context,
      .bdrv_attach_aio_context    =3D curl_attach_aio_context,
-+
-+    .strong_runtime_opts        =3D curl_strong_runtime_opts,
+=20
++    .bdrv_refresh_filename      =3D curl_refresh_filename,
+     .strong_runtime_opts        =3D curl_strong_runtime_opts,
  };
 =20
- static BlockDriver bdrv_ftps =3D {
-@@ -1009,6 +1028,8 @@ static BlockDriver bdrv_ftps =3D {
-=20
+@@ -1032,6 +1052,7 @@ static BlockDriver bdrv_ftps =3D {
      .bdrv_detach_aio_context    =3D curl_detach_aio_context,
      .bdrv_attach_aio_context    =3D curl_attach_aio_context,
-+
-+    .strong_runtime_opts        =3D curl_strong_runtime_opts,
+=20
++    .bdrv_refresh_filename      =3D curl_refresh_filename,
+     .strong_runtime_opts        =3D curl_strong_runtime_opts,
  };
 =20
- static void curl_block_init(void)
-diff --git a/block/gluster.c b/block/gluster.c
-index 72891060e3..af64330211 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1495,6 +1495,21 @@ static int coroutine_fn qemu_gluster_co_block_stat=
-us(BlockDriverState *bs,
- }
-=20
-=20
-+static const char *const gluster_strong_open_opts[] =3D {
-+    GLUSTER_OPT_VOLUME,
-+    GLUSTER_OPT_PATH,
-+    GLUSTER_OPT_TYPE,
-+    GLUSTER_OPT_SERVER_PATTERN,
-+    GLUSTER_OPT_HOST,
-+    GLUSTER_OPT_PORT,
-+    GLUSTER_OPT_TO,
-+    GLUSTER_OPT_IPV4,
-+    GLUSTER_OPT_IPV6,
-+    GLUSTER_OPT_SOCKET,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_gluster =3D {
-     .format_name                  =3D "gluster",
-     .protocol_name                =3D "gluster",
-@@ -1522,6 +1537,7 @@ static BlockDriver bdrv_gluster =3D {
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-+    .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-=20
- static BlockDriver bdrv_gluster_tcp =3D {
-@@ -1551,6 +1567,7 @@ static BlockDriver bdrv_gluster_tcp =3D {
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-+    .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-=20
- static BlockDriver bdrv_gluster_unix =3D {
-@@ -1580,6 +1597,7 @@ static BlockDriver bdrv_gluster_unix =3D {
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-+    .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-=20
- /* rdma is deprecated (actually never supported for volfile fetch).
-@@ -1615,6 +1633,7 @@ static BlockDriver bdrv_gluster_rdma =3D {
- #endif
-     .bdrv_co_block_status         =3D qemu_gluster_co_block_status,
-     .create_opts                  =3D &qemu_gluster_create_opts,
-+    .strong_runtime_opts          =3D gluster_strong_open_opts,
- };
-=20
- static void bdrv_gluster_init(void)
-diff --git a/block/iscsi.c b/block/iscsi.c
-index ff473206e6..a0c0084837 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2448,6 +2448,20 @@ static QemuOptsList iscsi_create_opts =3D {
-     }
- };
-=20
-+static const char *const iscsi_strong_runtime_opts[] =3D {
-+    "transport",
-+    "portal",
-+    "target",
-+    "user",
-+    "password",
-+    "password-secret",
-+    "lun",
-+    "initiator-name",
-+    "header-digest",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_iscsi =3D {
-     .format_name     =3D "iscsi",
-     .protocol_name   =3D "iscsi",
-@@ -2482,6 +2496,8 @@ static BlockDriver bdrv_iscsi =3D {
-=20
-     .bdrv_detach_aio_context =3D iscsi_detach_aio_context,
-     .bdrv_attach_aio_context =3D iscsi_attach_aio_context,
-+
-+    .strong_runtime_opts =3D iscsi_strong_runtime_opts,
- };
-=20
- #if LIBISCSI_API_VERSION >=3D (20160603)
-@@ -2519,6 +2535,8 @@ static BlockDriver bdrv_iser =3D {
-=20
-     .bdrv_detach_aio_context =3D iscsi_detach_aio_context,
-     .bdrv_attach_aio_context =3D iscsi_attach_aio_context,
-+
-+    .strong_runtime_opts =3D iscsi_strong_runtime_opts,
- };
- #endif
-=20
-diff --git a/block/nbd.c b/block/nbd.c
-index bca127c8f5..5b4e4cf1db 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -574,6 +574,17 @@ static char *nbd_dirname(BlockDriverState *bs, Error=
- **errp)
-     return NULL;
- }
-=20
-+static const char *const nbd_strong_runtime_opts[] =3D {
-+    "path",
-+    "host",
-+    "port",
-+    "export",
-+    "tls-creds",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_nbd =3D {
-     .format_name                =3D "nbd",
-     .protocol_name              =3D "nbd",
-@@ -593,6 +604,7 @@ static BlockDriver bdrv_nbd =3D {
-     .bdrv_refresh_filename      =3D nbd_refresh_filename,
-     .bdrv_co_block_status       =3D nbd_client_co_block_status,
-     .bdrv_dirname               =3D nbd_dirname,
-+    .strong_runtime_opts        =3D nbd_strong_runtime_opts,
- };
-=20
- static BlockDriver bdrv_nbd_tcp =3D {
-@@ -614,6 +626,7 @@ static BlockDriver bdrv_nbd_tcp =3D {
-     .bdrv_refresh_filename      =3D nbd_refresh_filename,
-     .bdrv_co_block_status       =3D nbd_client_co_block_status,
-     .bdrv_dirname               =3D nbd_dirname,
-+    .strong_runtime_opts        =3D nbd_strong_runtime_opts,
- };
-=20
- static BlockDriver bdrv_nbd_unix =3D {
-@@ -635,6 +648,7 @@ static BlockDriver bdrv_nbd_unix =3D {
-     .bdrv_refresh_filename      =3D nbd_refresh_filename,
-     .bdrv_co_block_status       =3D nbd_client_co_block_status,
-     .bdrv_dirname               =3D nbd_dirname,
-+    .strong_runtime_opts        =3D nbd_strong_runtime_opts,
- };
-=20
- static void bdrv_nbd_init(void)
-diff --git a/block/nfs.c b/block/nfs.c
-index 19ee07c321..6985a44b89 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -878,6 +878,15 @@ static void coroutine_fn nfs_co_invalidate_cache(Blo=
-ckDriverState *bs,
- }
- #endif
-=20
-+static const char *nfs_strong_runtime_opts[] =3D {
-+    "path",
-+    "user",
-+    "group",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_nfs =3D {
-     .format_name                    =3D "nfs",
-     .protocol_name                  =3D "nfs",
-@@ -905,6 +914,8 @@ static BlockDriver bdrv_nfs =3D {
-     .bdrv_refresh_filename          =3D nfs_refresh_filename,
-     .bdrv_dirname                   =3D nfs_dirname,
-=20
-+    .strong_runtime_opts            =3D nfs_strong_runtime_opts,
-+
- #ifdef LIBNFS_FEATURE_PAGECACHE
-     .bdrv_co_invalidate_cache       =3D nfs_co_invalidate_cache,
- #endif
-diff --git a/block/null.c b/block/null.c
-index d442d3e901..858892f0c4 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -252,6 +252,13 @@ static void null_refresh_filename(BlockDriverState *=
-bs, QDict *opts)
-     bs->full_open_options =3D qobject_ref(opts);
- }
-=20
-+static const char *const null_strong_runtime_opts[] =3D {
-+    BLOCK_OPT_SIZE,
-+    NULL_OPT_ZEROES,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_null_co =3D {
-     .format_name            =3D "null-co",
-     .protocol_name          =3D "null-co",
-@@ -269,6 +276,7 @@ static BlockDriver bdrv_null_co =3D {
-     .bdrv_co_block_status   =3D null_co_block_status,
-=20
-     .bdrv_refresh_filename  =3D null_refresh_filename,
-+    .strong_runtime_opts    =3D null_strong_runtime_opts,
- };
-=20
- static BlockDriver bdrv_null_aio =3D {
-@@ -288,6 +296,7 @@ static BlockDriver bdrv_null_aio =3D {
-     .bdrv_co_block_status   =3D null_co_block_status,
-=20
-     .bdrv_refresh_filename  =3D null_refresh_filename,
-+    .strong_runtime_opts    =3D null_strong_runtime_opts,
- };
-=20
- static void bdrv_null_init(void)
-diff --git a/block/nvme.c b/block/nvme.c
-index b5952c9b08..2d5acfdccf 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -1136,6 +1136,13 @@ static void nvme_unregister_buf(BlockDriverState *=
-bs, void *host)
-     qemu_vfio_dma_unmap(s->vfio, host);
- }
-=20
-+static const char *const nvme_strong_runtime_opts[] =3D {
-+    NVME_BLOCK_OPT_DEVICE,
-+    NVME_BLOCK_OPT_NAMESPACE,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_nvme =3D {
-     .format_name              =3D "nvme",
-     .protocol_name            =3D "nvme",
-@@ -1153,6 +1160,7 @@ static BlockDriver bdrv_nvme =3D {
-=20
-     .bdrv_refresh_filename    =3D nvme_refresh_filename,
-     .bdrv_refresh_limits      =3D nvme_refresh_limits,
-+    .strong_runtime_opts      =3D nvme_strong_runtime_opts,
-=20
-     .bdrv_detach_aio_context  =3D nvme_detach_aio_context,
-     .bdrv_attach_aio_context  =3D nvme_attach_aio_context,
-diff --git a/block/qcow.c b/block/qcow.c
-index d47515d3df..25d2025fd0 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -1186,6 +1186,12 @@ static QemuOptsList qcow_create_opts =3D {
-     }
- };
-=20
-+static const char *const qcow_strong_runtime_opts[] =3D {
-+    "encrypt." BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_qcow =3D {
-     .format_name	=3D "qcow",
-     .instance_size	=3D sizeof(BDRVQcowState),
-@@ -1209,6 +1215,7 @@ static BlockDriver bdrv_qcow =3D {
-     .bdrv_get_info          =3D qcow_get_info,
-=20
-     .create_opts            =3D &qcow_create_opts,
-+    .strong_runtime_opts    =3D qcow_strong_runtime_opts,
- };
-=20
- static void bdrv_qcow_init(void)
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 662737275a..c21452bc2f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4921,6 +4921,12 @@ static QemuOptsList qcow2_create_opts =3D {
-     }
- };
-=20
-+static const char *const qcow2_strong_runtime_opts[] =3D {
-+    "encrypt." BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_qcow2 =3D {
-     .format_name        =3D "qcow2",
-     .instance_size      =3D sizeof(BDRVQcow2State),
-@@ -4969,6 +4975,7 @@ BlockDriver bdrv_qcow2 =3D {
-     .bdrv_inactivate            =3D qcow2_inactivate,
-=20
-     .create_opts         =3D &qcow2_create_opts,
-+    .strong_runtime_opts =3D qcow2_strong_runtime_opts,
-     .bdrv_co_check       =3D qcow2_co_check,
-     .bdrv_amend_options  =3D qcow2_amend_options,
-=20
-diff --git a/block/quorum.c b/block/quorum.c
-index a890f21e85..1af6458dc4 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1104,6 +1104,15 @@ static char *quorum_dirname(BlockDriverState *bs, =
-Error **errp)
-     return NULL;
- }
-=20
-+static const char *const quorum_strong_runtime_opts[] =3D {
-+    QUORUM_OPT_VOTE_THRESHOLD,
-+    QUORUM_OPT_BLKVERIFY,
-+    QUORUM_OPT_REWRITE,
-+    QUORUM_OPT_READ_PATTERN,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_quorum =3D {
-     .format_name                        =3D "quorum",
-=20
-@@ -1128,6 +1137,8 @@ static BlockDriver bdrv_quorum =3D {
-=20
-     .is_filter                          =3D true,
-     .bdrv_recurse_is_first_non_filter   =3D quorum_recurse_is_first_non_=
-filter,
-+
-+    .strong_runtime_opts                =3D quorum_strong_runtime_opts,
- };
-=20
- static void bdrv_quorum_init(void)
-diff --git a/block/raw-format.c b/block/raw-format.c
-index d07bcdae62..e3e5ba2c8a 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -532,6 +532,13 @@ static int coroutine_fn raw_co_copy_range_to(BlockDr=
-iverState *bs,
-                                  read_flags, write_flags);
- }
-=20
-+static const char *const raw_strong_runtime_opts[] =3D {
-+    "offset",
-+    "size",
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_raw =3D {
-     .format_name          =3D "raw",
-     .instance_size        =3D sizeof(BDRVRawState),
-@@ -561,7 +568,8 @@ BlockDriver bdrv_raw =3D {
-     .bdrv_lock_medium     =3D &raw_lock_medium,
-     .bdrv_co_ioctl        =3D &raw_co_ioctl,
-     .create_opts          =3D &raw_create_opts,
--    .bdrv_has_zero_init   =3D &raw_has_zero_init
-+    .bdrv_has_zero_init   =3D &raw_has_zero_init,
-+    .strong_runtime_opts  =3D raw_strong_runtime_opts,
- };
-=20
- static void bdrv_raw_init(void)
-diff --git a/block/rbd.c b/block/rbd.c
-index 8a1a9f4b6e..0c549c9935 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1228,6 +1228,18 @@ static QemuOptsList qemu_rbd_create_opts =3D {
-     }
- };
-=20
-+static const char *const qemu_rbd_strong_runtime_opts[] =3D {
-+    "pool",
-+    "image",
-+    "conf",
-+    "snapshot",
-+    "user",
-+    "server.",
-+    "password-secret",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_rbd =3D {
-     .format_name            =3D "rbd",
-     .instance_size          =3D sizeof(BDRVRBDState),
-@@ -1265,6 +1277,8 @@ static BlockDriver bdrv_rbd =3D {
- #ifdef LIBRBD_SUPPORTS_INVALIDATE
-     .bdrv_co_invalidate_cache =3D qemu_rbd_co_invalidate_cache,
- #endif
-+
-+    .strong_runtime_opts    =3D qemu_rbd_strong_runtime_opts,
- };
-=20
- static void bdrv_rbd_init(void)
-diff --git a/block/replication.c b/block/replication.c
-index 9b332002ee..4c80b54daf 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -676,6 +676,13 @@ static void replication_stop(ReplicationState *rs, b=
-ool failover, Error **errp)
-     aio_context_release(aio_context);
- }
-=20
-+static const char *const replication_strong_runtime_opts[] =3D {
-+    REPLICATION_MODE,
-+    REPLICATION_TOP_ID,
-+
-+    NULL
-+};
-+
- BlockDriver bdrv_replication =3D {
-     .format_name                =3D "replication",
-     .instance_size              =3D sizeof(BDRVReplicationState),
-@@ -692,6 +699,7 @@ BlockDriver bdrv_replication =3D {
-     .bdrv_recurse_is_first_non_filter =3D replication_recurse_is_first_n=
-on_filter,
-=20
-     .has_variable_length        =3D true,
-+    .strong_runtime_opts        =3D replication_strong_runtime_opts,
- };
-=20
- static void bdrv_replication_init(void)
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index b916ba07bf..cbdfe9ab6e 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -3203,6 +3203,15 @@ static QemuOptsList sd_create_opts =3D {
-     }
- };
-=20
-+static const char *const sd_strong_runtime_opts[] =3D {
-+    "vdi",
-+    "snap-id",
-+    "tag",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_sheepdog =3D {
-     .format_name                  =3D "sheepdog",
-     .protocol_name                =3D "sheepdog",
-@@ -3238,6 +3247,7 @@ static BlockDriver bdrv_sheepdog =3D {
-     .bdrv_attach_aio_context      =3D sd_attach_aio_context,
-=20
-     .create_opts                  =3D &sd_create_opts,
-+    .strong_runtime_opts          =3D sd_strong_runtime_opts,
- };
-=20
- static BlockDriver bdrv_sheepdog_tcp =3D {
-@@ -3275,6 +3285,7 @@ static BlockDriver bdrv_sheepdog_tcp =3D {
-     .bdrv_attach_aio_context      =3D sd_attach_aio_context,
-=20
-     .create_opts                  =3D &sd_create_opts,
-+    .strong_runtime_opts          =3D sd_strong_runtime_opts,
- };
-=20
- static BlockDriver bdrv_sheepdog_unix =3D {
-@@ -3312,6 +3323,7 @@ static BlockDriver bdrv_sheepdog_unix =3D {
-     .bdrv_attach_aio_context      =3D sd_attach_aio_context,
-=20
-     .create_opts                  =3D &sd_create_opts,
-+    .strong_runtime_opts          =3D sd_strong_runtime_opts,
- };
-=20
- static void bdrv_sheepdog_init(void)
-diff --git a/block/ssh.c b/block/ssh.c
-index bbc513e095..190ef95300 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -1254,6 +1254,17 @@ static int coroutine_fn ssh_co_truncate(BlockDrive=
-rState *bs, int64_t offset,
-     return ssh_grow_file(s, offset, errp);
- }
-=20
-+static const char *const ssh_strong_runtime_opts[] =3D {
-+    "host",
-+    "port",
-+    "path",
-+    "user",
-+    "host_key_check",
-+    "server.",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_ssh =3D {
-     .format_name                  =3D "ssh",
-     .protocol_name                =3D "ssh",
-@@ -1270,6 +1281,7 @@ static BlockDriver bdrv_ssh =3D {
-     .bdrv_co_truncate             =3D ssh_co_truncate,
-     .bdrv_co_flush_to_disk        =3D ssh_co_flush,
-     .create_opts                  =3D &ssh_create_opts,
-+    .strong_runtime_opts          =3D ssh_strong_runtime_opts,
- };
-=20
- static void bdrv_ssh_init(void)
-diff --git a/block/throttle.c b/block/throttle.c
-index 636c9764aa..f64dcc27b9 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -227,6 +227,12 @@ static void coroutine_fn throttle_co_drain_end(Block=
-DriverState *bs)
-     atomic_dec(&tgm->io_limits_disabled);
- }
-=20
-+static const char *const throttle_strong_runtime_opts[] =3D {
-+    QEMU_OPT_THROTTLE_GROUP_NAME,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_throttle =3D {
-     .format_name                        =3D   "throttle",
-     .instance_size                      =3D   sizeof(ThrottleGroupMember=
-),
-@@ -259,6 +265,7 @@ static BlockDriver bdrv_throttle =3D {
-     .bdrv_co_drain_end                  =3D   throttle_co_drain_end,
-=20
-     .is_filter                          =3D   true,
-+    .strong_runtime_opts                =3D   throttle_strong_runtime_op=
-ts,
- };
-=20
- static void bdrv_throttle_init(void)
-diff --git a/block/vpc.c b/block/vpc.c
-index 52ab717642..a902a4c54d 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1218,6 +1218,12 @@ static QemuOptsList vpc_create_opts =3D {
-     }
- };
-=20
-+static const char *const vpc_strong_runtime_opts[] =3D {
-+    VPC_OPT_SIZE_CALC,
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vpc =3D {
-     .format_name    =3D "vpc",
-     .instance_size  =3D sizeof(BDRVVPCState),
-@@ -1238,6 +1244,7 @@ static BlockDriver bdrv_vpc =3D {
-=20
-     .create_opts            =3D &vpc_create_opts,
-     .bdrv_has_zero_init     =3D vpc_has_zero_init,
-+    .strong_runtime_opts    =3D vpc_strong_runtime_opts,
- };
-=20
- static void bdrv_vpc_init(void)
-diff --git a/block/vvfat.c b/block/vvfat.c
-index b7b61ea8b7..5f66787890 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3253,6 +3253,16 @@ static void vvfat_close(BlockDriverState *bs)
-     }
- }
-=20
-+static const char *const vvfat_strong_runtime_opts[] =3D {
-+    "dir",
-+    "fat-type",
-+    "floppy",
-+    "label",
-+    "rw",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vvfat =3D {
-     .format_name            =3D "vvfat",
-     .protocol_name          =3D "fat",
-@@ -3267,6 +3277,8 @@ static BlockDriver bdrv_vvfat =3D {
-     .bdrv_co_preadv         =3D vvfat_co_preadv,
-     .bdrv_co_pwritev        =3D vvfat_co_pwritev,
-     .bdrv_co_block_status   =3D vvfat_co_block_status,
-+
-+    .strong_runtime_opts    =3D vvfat_strong_runtime_opts,
- };
-=20
- static void bdrv_vvfat_init(void)
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 0cb0a007e9..2e18229ba4 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -556,6 +556,16 @@ static int64_t vxhs_getlength(BlockDriverState *bs)
-     return vdisk_size;
- }
-=20
-+static const char *const vxhs_strong_runtime_opts[] =3D {
-+    VXHS_OPT_VDISK_ID,
-+    "tls-creds",
-+    VXHS_OPT_HOST,
-+    VXHS_OPT_PORT,
-+    VXHS_OPT_SERVER".",
-+
-+    NULL
-+};
-+
- static BlockDriver bdrv_vxhs =3D {
-     .format_name                  =3D "vxhs",
-     .protocol_name                =3D "vxhs",
-@@ -567,6 +577,7 @@ static BlockDriver bdrv_vxhs =3D {
-     .bdrv_getlength               =3D vxhs_getlength,
-     .bdrv_aio_preadv              =3D vxhs_aio_preadv,
-     .bdrv_aio_pwritev             =3D vxhs_aio_pwritev,
-+    .strong_runtime_opts          =3D vxhs_strong_runtime_opts,
- };
-=20
- static void bdrv_vxhs_init(void)
 --=20
 2.20.1
