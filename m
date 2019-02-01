@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39416)
+Received: from eggs.gnu.org ([209.51.188.92]:39256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboG-0007wW-IZ
+	(envelope-from <kwolf@redhat.com>) id 1gpboB-0007s7-63
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpboB-0000Cy-St
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpbo7-00008f-MJ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:50 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:35:06 +0100
-Message-Id: <20190201163518.31157-16-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:34:58 +0100
+Message-Id: <20190201163518.31157-8-kwolf@redhat.com>
 In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
 References: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 15/27] uuid: Make qemu_uuid_bswap() take and
- return a QemuUUID
+Subject: [Qemu-devel] [PULL 07/27] iotests: Make 234 stable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,139 +24,185 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
 
-Currently qemu_uuid_bswap() takes a pointer to the QemuUUID to
-be byte-swapped. This means it can't be used when the UUID
-to be swapped is in a packed member of a struct. It's also
-out of line with the general bswap*() functions we provide
-in bswap.h, which take the value to be swapped and return it.
+This test waits for a MIGRATION event with status=3Dcompleted on the
+source VM before querying the migration status on both source and
+destination.  However, just because the source says migration has
+completed does not mean the destination thinks the same.  Therefore, in
+some cases, the destination VM may still report "active" instead of
+"completed" when asked for its migration status.
 
-Make qemu_uuid_bswap() take a QemuUUID and return the swapped version.
+Fix this by enabling migration events on both VMs and waiting until both
+source and destination emit a status=3Dcompleted MIGRATION event.
 
-This fixes some clang warnings about taking the address of
-a packed struct member in block/vdi.c.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qemu/uuid.h  |  2 +-
- block/vdi.c          | 16 ++++++++--------
- hw/acpi/vmgenid.c    |  6 ++----
- tests/vmgenid-test.c |  2 +-
- util/uuid.c          | 10 +++++-----
- 5 files changed, 17 insertions(+), 19 deletions(-)
+ tests/qemu-iotests/234     | 56 ++++++++++++++++++++------------------
+ tests/qemu-iotests/234.out | 10 +++++--
+ 2 files changed, 38 insertions(+), 28 deletions(-)
 
-diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-index 09489ce5c5..037357d990 100644
---- a/include/qemu/uuid.h
-+++ b/include/qemu/uuid.h
-@@ -56,6 +56,6 @@ char *qemu_uuid_unparse_strdup(const QemuUUID *uuid);
+diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+index a8185b4360..c4c26bc21e 100755
+--- a/tests/qemu-iotests/234
++++ b/tests/qemu-iotests/234
+@@ -26,6 +26,22 @@ import os
+ iotests.verify_image_format(supported_fmts=3D['qcow2'])
+ iotests.verify_platform(['linux'])
 =20
- int qemu_uuid_parse(const char *str, QemuUUID *uuid);
++def enable_migration_events(vm, name):
++    iotests.log('Enabling migration QMP events on %s...' % name)
++    iotests.log(vm.qmp('migrate-set-capabilities', capabilities=3D[
++        {
++            'capability': 'events',
++            'state': True
++        }
++    ]))
++
++def wait_migration(vm):
++    while True:
++        event =3D vm.event_wait('MIGRATION')
++        iotests.log(event, filters=3D[iotests.filter_qmp_event])
++        if event['data']['status'] =3D=3D 'completed':
++            break
++
+ with iotests.FilePath('img') as img_path, \
+      iotests.FilePath('backing') as backing_path, \
+      iotests.FilePath('mig_fifo_a') as fifo_a, \
+@@ -46,6 +62,8 @@ with iotests.FilePath('img') as img_path, \
+          .add_blockdev('%s,file=3Ddrive0-backing-file,node-name=3Ddrive0=
+-backing' % (iotests.imgfmt))
+          .launch())
 =20
--void qemu_uuid_bswap(QemuUUID *uuid);
-+QemuUUID qemu_uuid_bswap(QemuUUID uuid);
++    enable_migration_events(vm_a, 'A')
++
+     iotests.log('Launching destination VM...')
+     (vm_b.add_blockdev('file,filename=3D%s,node-name=3Ddrive0-file' % (i=
+mg_path))
+          .add_blockdev('%s,file=3Ddrive0-file,node-name=3Ddrive0' % (iot=
+ests.imgfmt))
+@@ -54,6 +72,8 @@ with iotests.FilePath('img') as img_path, \
+          .add_incoming("exec: cat '%s'" % (fifo_a))
+          .launch())
 =20
- #endif
-diff --git a/block/vdi.c b/block/vdi.c
-index 4cc726047c..0c34f6bae4 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -203,10 +203,10 @@ static void vdi_header_to_cpu(VdiHeader *header)
-     header->block_extra =3D le32_to_cpu(header->block_extra);
-     header->blocks_in_image =3D le32_to_cpu(header->blocks_in_image);
-     header->blocks_allocated =3D le32_to_cpu(header->blocks_allocated);
--    qemu_uuid_bswap(&header->uuid_image);
--    qemu_uuid_bswap(&header->uuid_last_snap);
--    qemu_uuid_bswap(&header->uuid_link);
--    qemu_uuid_bswap(&header->uuid_parent);
-+    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
-+    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
-+    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
-+    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
- }
++    enable_migration_events(vm_b, 'B')
++
+     # Add a child node that was created after the parent node. The rever=
+se case
+     # is covered by the -blockdev options above.
+     iotests.log(vm_a.qmp('blockdev-snapshot', node=3D'drive0-backing',
+@@ -61,22 +81,13 @@ with iotests.FilePath('img') as img_path, \
+     iotests.log(vm_b.qmp('blockdev-snapshot', node=3D'drive0-backing',
+                          overlay=3D'drive0'))
 =20
- static void vdi_header_to_le(VdiHeader *header)
-@@ -227,10 +227,10 @@ static void vdi_header_to_le(VdiHeader *header)
-     header->block_extra =3D cpu_to_le32(header->block_extra);
-     header->blocks_in_image =3D cpu_to_le32(header->blocks_in_image);
-     header->blocks_allocated =3D cpu_to_le32(header->blocks_allocated);
--    qemu_uuid_bswap(&header->uuid_image);
--    qemu_uuid_bswap(&header->uuid_last_snap);
--    qemu_uuid_bswap(&header->uuid_link);
--    qemu_uuid_bswap(&header->uuid_parent);
-+    header->uuid_image =3D qemu_uuid_bswap(header->uuid_image);
-+    header->uuid_last_snap =3D qemu_uuid_bswap(header->uuid_last_snap);
-+    header->uuid_link =3D qemu_uuid_bswap(header->uuid_link);
-+    header->uuid_parent =3D qemu_uuid_bswap(header->uuid_parent);
- }
+-    iotests.log('Enabling migration QMP events on A...')
+-    iotests.log(vm_a.qmp('migrate-set-capabilities', capabilities=3D[
+-        {
+-            'capability': 'events',
+-            'state': True
+-        }
+-    ]))
+-
+     iotests.log('Starting migration to B...')
+     iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_a)))
+     with iotests.Timeout(3, 'Migration does not complete'):
+-        while True:
+-            event =3D vm_a.event_wait('MIGRATION')
+-            iotests.log(event, filters=3D[iotests.filter_qmp_event])
+-            if event['data']['status'] =3D=3D 'completed':
+-                break
++        # Wait for the source first (which includes setup=3Dsetup)
++        wait_migration(vm_a)
++        # Wait for the destination second (which does not)
++        wait_migration(vm_b)
 =20
- static void vdi_header_print(VdiHeader *header)
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index d78b579a20..02717a8b0d 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -30,8 +30,7 @@ void vmgenid_build_acpi(VmGenIdState *vms, GArray *tabl=
-e_data, GArray *guid,
-      * first, since that's what the guest expects
-      */
-     g_array_set_size(guid, VMGENID_FW_CFG_SIZE - ARRAY_SIZE(guid_le.data=
-));
--    guid_le =3D vms->guid;
--    qemu_uuid_bswap(&guid_le);
-+    guid_le =3D qemu_uuid_bswap(vms->guid);
-     /* The GUID is written at a fixed offset into the fw_cfg file
-      * in order to implement the "OVMF SDT Header probe suppressor"
-      * see docs/specs/vmgenid.txt for more details
-@@ -149,8 +148,7 @@ static void vmgenid_update_guest(VmGenIdState *vms)
-              * however, will expect the fields to be little-endian.
-              * Perform a byte swap immediately before writing.
-              */
--            guid_le =3D vms->guid;
--            qemu_uuid_bswap(&guid_le);
-+            guid_le =3D qemu_uuid_bswap(vms->guid);
-             /* The GUID is written at a fixed offset into the fw_cfg fil=
-e
-              * in order to implement the "OVMF SDT Header probe suppress=
-or"
-              * see docs/specs/vmgenid.txt for more details.
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 52cdd83ec0..ae38ee5ac0 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -88,7 +88,7 @@ static void read_guid_from_memory(QTestState *qts, Qemu=
-UUID *guid)
-     /* The GUID is in little-endian format in the guest, while QEMU
-      * uses big-endian.  Swap after reading.
-      */
--    qemu_uuid_bswap(guid);
-+    *guid =3D qemu_uuid_bswap(*guid);
- }
+     iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+     iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+@@ -94,25 +105,18 @@ with iotests.FilePath('img') as img_path, \
+          .add_incoming("exec: cat '%s'" % (fifo_b))
+          .launch())
 =20
- static void read_guid_from_monitor(QTestState *qts, QemuUUID *guid)
-diff --git a/util/uuid.c b/util/uuid.c
-index ebf06c049a..5787f0978c 100644
---- a/util/uuid.c
-+++ b/util/uuid.c
-@@ -110,10 +110,10 @@ int qemu_uuid_parse(const char *str, QemuUUID *uuid=
-)
++    enable_migration_events(vm_a, 'A')
++
+     iotests.log(vm_a.qmp('blockdev-snapshot', node=3D'drive0-backing',
+                          overlay=3D'drive0'))
 =20
- /* Swap from UUID format endian (BE) to the opposite or vice versa.
-  */
--void qemu_uuid_bswap(QemuUUID *uuid)
-+QemuUUID qemu_uuid_bswap(QemuUUID uuid)
- {
--    assert(QEMU_PTR_IS_ALIGNED(uuid, sizeof(uint32_t)));
--    bswap32s(&uuid->fields.time_low);
--    bswap16s(&uuid->fields.time_mid);
--    bswap16s(&uuid->fields.time_high_and_version);
-+    bswap32s(&uuid.fields.time_low);
-+    bswap16s(&uuid.fields.time_mid);
-+    bswap16s(&uuid.fields.time_high_and_version);
-+    return uuid;
- }
+-    iotests.log('Enabling migration QMP events on B...')
+-    iotests.log(vm_b.qmp('migrate-set-capabilities', capabilities=3D[
+-        {
+-            'capability': 'events',
+-            'state': True
+-        }
+-    ]))
+-
+     iotests.log('Starting migration back to A...')
+     iotests.log(vm_b.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_b)))
+     with iotests.Timeout(3, 'Migration does not complete'):
+-        while True:
+-            event =3D vm_b.event_wait('MIGRATION')
+-            iotests.log(event, filters=3D[iotests.filter_qmp_event])
+-            if event['data']['status'] =3D=3D 'completed':
+-                break
++        # Wait for the source first (which includes setup=3Dsetup)
++        wait_migration(vm_b)
++        # Wait for the destination second (which does not)
++        wait_migration(vm_a)
+=20
+     iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+     iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+diff --git a/tests/qemu-iotests/234.out b/tests/qemu-iotests/234.out
+index b9ed910b1a..692976d1c6 100644
+--- a/tests/qemu-iotests/234.out
++++ b/tests/qemu-iotests/234.out
+@@ -1,14 +1,18 @@
+ Launching source VM...
++Enabling migration QMP events on A...
++{"return": {}}
+ Launching destination VM...
++Enabling migration QMP events on B...
+ {"return": {}}
+ {"return": {}}
+-Enabling migration QMP events on A...
+ {"return": {}}
+ Starting migration to B...
+ {"return": {}}
+ {"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
+seconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+ completed
+ completed
+ {"return": {"running": false, "singlestep": false, "status": "postmigrat=
+e"}}
+@@ -16,14 +20,16 @@ completed
+ Add a second parent to drive0-file...
+ {"return": {}}
+ Restart A with -incoming and second parent...
++Enabling migration QMP events on A...
+ {"return": {}}
+-Enabling migration QMP events on B...
+ {"return": {}}
+ Starting migration back to A...
+ {"return": {}}
+ {"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
+seconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
+oseconds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
+icroseconds": "USECS", "seconds": "SECS"}}
+ completed
+ completed
+ {"return": {"running": true, "singlestep": false, "status": "running"}}
 --=20
 2.20.1
