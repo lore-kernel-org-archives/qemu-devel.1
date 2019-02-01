@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43146)
+Received: from eggs.gnu.org ([209.51.188.92]:44387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpWNt-0005DT-2I
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:49:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpWVq-0007nU-CR
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gpWNs-000718-At
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:49:21 -0500
-Date: Fri, 1 Feb 2019 10:49:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190201104906.GA3150@work-vm>
-References: <20190123195527.29575-1-david@redhat.com>
-	<20190123195527.29575-8-david@redhat.com>
-	<20190125175818.GG2695@work-vm> <87ef8svg79.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1gpWVp-0002fo-Jm
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 05:57:34 -0500
+Date: Fri, 1 Feb 2019 11:57:23 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190201105723.GD5730@localhost.localdomain>
+References: <20181210112649.11581-1-peter.maydell@linaro.org>
+	<20190118161746.GG4530@dhcp-200-176.str.redhat.com>
+	<CAFEAcA95dfYRZE9YnpX=JQanfi_Y2HcYkj5RW5VGu2KiWiBDhQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87ef8svg79.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH RFCv2 7/9] hmp: Handle virtio-pmem when
- printing memory device infos
+In-Reply-To: <CAFEAcA95dfYRZE9YnpX=JQanfi_Y2HcYkj5RW5VGu2KiWiBDhQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] block: fix last
+ address-of-packed-member warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,93 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+Am 01.02.2019 um 11:30 hat Peter Maydell geschrieben:
+> On Fri, 18 Jan 2019 at 16:17, Kevin Wolf <kwolf@redhat.com> wrote:
+> >
+> > Am 10.12.2018 um 12:26 hat Peter Maydell geschrieben:
+> > > This patchset fixes the remaining clang warnings in the block/ code
+> > > about taking the address of a packed struct member, which are all
+> > > in block/vpc and block/vdi code handling UUIDs. Mostly I fix
+> > > these by copying the unaligned field to/from a local variable.
+> > > In the case of qemu_uuid_bswap() I opted to change the API to
+> > > take and return the QemuUUID rather than taking a pointer to it,
+> > > which makes almost all the callsites simpler. This does mean
+> > > a struct copy but the struct is only 16 bytes and I didn't
+> > > judge any of the callsites performance-sensitive enough to care
+> > > about a struct copy of that size.
+> > >
+> > > As usual, tested with "make check" only.
+> >
+> > Thanks, applied to the block branch.
 > 
-> > * David Hildenbrand (david@redhat.com) wrote:
-> >> Print the memory device info just like for PCDIMM/NVDIMM.
-> >> 
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hmp.c | 27 +++++++++++++++------------
-> >>  1 file changed, 15 insertions(+), 12 deletions(-)
-> >> 
-> >> diff --git a/hmp.c b/hmp.c
-> >> index 8da5fd8760..25c32e0810 100644
-> >> --- a/hmp.c
-> >> +++ b/hmp.c
-> >> @@ -2553,6 +2553,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >>      Error *err = NULL;
-> >>      MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
-> >>      MemoryDeviceInfoList *info;
-> >> +    VirtioPMEMDeviceInfo *vpi;
-> >>      MemoryDeviceInfo *value;
-> >>      PCDIMMDeviceInfo *di;
-> >>  
-> >> @@ -2562,19 +2563,9 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >>          if (value) {
-> >>              switch (value->type) {
-> >>              case MEMORY_DEVICE_INFO_KIND_DIMM:
-> >> -                di = value->u.dimm.data;
-> >> -                break;
-> >> -
-> >>              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-> >> -                di = value->u.nvdimm.data;
-> >> -                break;
-> >> -
-> >> -            default:
-> >> -                di = NULL;
-> >> -                break;
-> >> -            }
-> >> -
-> >> -            if (di) {
-> >> +                di = value->type == MEMORY_DEVICE_INFO_KIND_DIMM ?
-> >> +                     value->u.dimm.data : value->u.nvdimm.data;
-> >>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-> >>                                 MemoryDeviceInfoKind_str(value->type),
-> >>                                 di->id ? di->id : "");
-> >> @@ -2587,6 +2578,18 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
-> >>                                 di->hotplugged ? "true" : "false");
-> >>                  monitor_printf(mon, "  hotpluggable: %s\n",
-> >>                                 di->hotpluggable ? "true" : "false");
-> >> +                break;
-> >> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
-> >> +                vpi = value->u.virtio_pmem.data;
-> >> +                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
-> >> +                               MemoryDeviceInfoKind_str(value->type),
-> >> +                               vpi->id ? vpi->id : "");
-> >> +                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vpi->memaddr);
-> >> +                monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
-> >> +                monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
-> >> +                break;
-> >> +            default:
-> >> +                g_assert_not_reached();
-> >
-> >
-> > Although I'd prefer if that assert was replaced by a print
-> > saying it was an unknown type.
-> 
-> I would not.  If we reach this, something must have scribbled over
-> value->type and who knows what else.  Continuing is unsafe.  Looks like
-> a textbook use of assertions to me.
+> Ping? These don't seem to have made it into master yet.
 
-Or it could be that someone added a new type of memory device and forgot
-to update the hmp code.
+It's in my queue.
 
-Dave
-
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
-> >>              }
-> >>          }
-> >>      }
-> >> -- 
-> >> 2.17.2
-> >> 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Kevin
