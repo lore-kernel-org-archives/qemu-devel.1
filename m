@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48141)
+Received: from eggs.gnu.org ([209.51.188.92]:52701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpgwe-0007XB-J2
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:05:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1gph6D-0001RE-Hg
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpgkw-000626-MG
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 16:53:51 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <ae28cefe-84fb-6c4e-0452-55b717726b2b@redhat.com>
-Date: Fri, 1 Feb 2019 16:53:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1gph6C-0006rn-9R
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:15:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gph6B-0006ki-V7
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:15:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gph5z-0002z0-1t
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 22:15:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 072662E8048
+	for <qemu-devel@nongnu.org>; Fri,  1 Feb 2019 22:15:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] 2x-3x tcg performance regression on ppc64 (maybe
- others)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 01 Feb 2019 22:06:34 -0000
+From: Jonathan Behrens <1814343@bugs.launchpad.net>
+Reply-To: Bug 1814343 <1814343@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154905879413.25667.2843143192142684785.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1814343] [NEW] Initrd not loaded on riscv32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +35,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-While working on the "boot_linux_console.py" tests, after a given
-rebase, I noticed that the ppc64 specific test began timing out.  The
-original timeout set to the test was 60 seconds, and it "always" had
-room to spare when running either on my system, or on Travis CI.
+Public bug reported:
 
-Then, Alex mentioned that specific test timing out on his "slow"
-system[1].  I did some further investigation and found out that commit
-f7b78602f might have been responsible for a significant slowdown,
-and maybe was also affecting his execution.
+I attempted to run qemu with a ram disk. However, when reading the
+contents of the disk from within the VM I only get back zeros.
 
-Getting straight to the point, this is the ppc64 "boot linux console"
-test, running 10 times, on top my latest rebase (e8977901b, that
-includes f7b78602f).
+I was able to trace the issue to a mismatch of expectations on line 93
+of hw/riscv/virt.c. Specifically, when running in 32-bit mode the value
+of kernel_entry is sign extended to 64-bits, but load_image_targphys
+expects the start address to not be sign extended.
 
- ...
- (01/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(63.07 s)
- (02/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(64.00 s)
- (03/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(62.93 s)
- (04/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(64.01 s)
- (05/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(63.13 s)
- (06/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(64.65 s)
- (07/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(63.25 s)
- (08/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(66.77 s)
- (09/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(65.07 s)
- (10/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(63.55 s)
- ...
+Straw man patch (works for 32-bit but would probably break 64-bit VMs?):
 
-The exact branch I used for the results above can be seen at:
-  - https://github.com/clebergnu/qemu/tree/regression_tcg_ppc64
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index e7f0716fb6..32216f993c 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -90,7 +90,7 @@ static hwaddr load_initrd(const char *filename, uint64_t =
+mem_size,
+      * halfway into RAM, and for boards with 256MB of RAM or more we put
+      * the initrd at 128MB.
+      */
+-    *start =3D kernel_entry + MIN(mem_size / 2, 128 * MiB);
++    *start =3D (kernel_entry & 0xffffffff) + MIN(mem_size / 2, 128 * MiB);
+ =
 
-Then, with f7b78602f reverted:
+     size =3D load_ramdisk(filename, *start, mem_size - *start);
+     if (size =3D=3D -1) {
 
- (01/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.54 s)
- (02/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(21.06 s)
- (03/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.81 s)
- (04/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(21.00 s)
- (05/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.37 s)
- (06/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.40 s)
- (07/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.36 s)
- (08/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.39 s)
- (09/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.39 s)
- (10/10) boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries: PASS
-(20.38 s)
 
-The exact branch I used for the results above can be seen at:
-  - https://github.com/clebergnu/qemu/tree/regression_tcg_ppc64_revert
+Run command:
 
-Even though there's a lot more noise involved, similar results can be
-seen on Travis-CI:
+$ qemu/build/riscv32-softmmu/qemu-system-riscv32 -machine virt -kernel
+mykernel.elf -nographic -initrd payload
 
-  - https://travis-ci.org/clebergnu/qemu/builds/487607293#L3035
-     (04/16)
-/home/travis/build/clebergnu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries:
- PASS (22.21 s)
+Commit hash:
 
-  - https://travis-ci.org/clebergnu/qemu/builds/487606849#L3035
-     (04/16)
-/home/travis/build/clebergnu/qemu/tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_ppc64_pseries:
- PASS (11.27 s)
+3a183e330dbd7dbcac3841737ac874979552cca2
 
-The reasons for the extra noise include:
-  1) Those tests download the kernel images
-  2) They are run only once
-  3) They run on shared infrastructure
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Based on Travis-CI runs alone, it's hard to determine if there was any
-other significant regression (or improvement?) for other targets.  I'm
-posting this early, but if I come up with more relevant information,
-follow up here.
+-- =
 
-Regards,
-- Cleber.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1814343
 
----
+Title:
+  Initrd not loaded on riscv32
 
-[1] - https://www.mail-archive.com/qemu-devel@nongnu.org/msg589497.html
+Status in QEMU:
+  New
+
+Bug description:
+  I attempted to run qemu with a ram disk. However, when reading the
+  contents of the disk from within the VM I only get back zeros.
+
+  I was able to trace the issue to a mismatch of expectations on line 93
+  of hw/riscv/virt.c. Specifically, when running in 32-bit mode the
+  value of kernel_entry is sign extended to 64-bits, but
+  load_image_targphys expects the start address to not be sign extended.
+
+  Straw man patch (works for 32-bit but would probably break 64-bit
+  VMs?):
+
+  diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+  index e7f0716fb6..32216f993c 100644
+  --- a/hw/riscv/virt.c
+  +++ b/hw/riscv/virt.c
+  @@ -90,7 +90,7 @@ static hwaddr load_initrd(const char *filename, uint64_=
+t mem_size,
+        * halfway into RAM, and for boards with 256MB of RAM or more we put
+        * the initrd at 128MB.
+        */
+  -    *start =3D kernel_entry + MIN(mem_size / 2, 128 * MiB);
+  +    *start =3D (kernel_entry & 0xffffffff) + MIN(mem_size / 2, 128 * MiB=
+);
+   =
+
+       size =3D load_ramdisk(filename, *start, mem_size - *start);
+       if (size =3D=3D -1) {
+
+  =
+
+  Run command:
+
+  $ qemu/build/riscv32-softmmu/qemu-system-riscv32 -machine virt -kernel
+  mykernel.elf -nographic -initrd payload
+
+  Commit hash:
+
+  3a183e330dbd7dbcac3841737ac874979552cca2
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1814343/+subscriptions
