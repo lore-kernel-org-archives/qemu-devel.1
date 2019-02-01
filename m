@@ -1,40 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53157)
+Received: from eggs.gnu.org ([209.51.188.92]:54149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gpawU-0000Sx-4a
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:41:22 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gpazf-0002Nl-RJ
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gpawR-0007hL-DO
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:41:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56736
+	(envelope-from <walling@linux.ibm.com>) id 1gpazd-0000My-I3
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:44:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58022
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gpawR-0007gS-6T
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:41:19 -0500
+	id 1gpazb-0000Jy-KN
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 10:44:35 -0500
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x11FT8Dq007828
-	for <qemu-devel@nongnu.org>; Fri, 1 Feb 2019 10:41:16 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qcpp906jb-1
+	x11FT8Qs007829
+	for <qemu-devel@nongnu.org>; Fri, 1 Feb 2019 10:44:24 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qcpp90asc-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 10:41:15 -0500
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 10:44:24 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 1 Feb 2019 15:41:15 -0000
-References: <20190201124543.5945-1-cohuck@redhat.com>
+	Fri, 1 Feb 2019 15:44:23 -0000
+References: <20190130155733.32742-1-david@redhat.com>
+	<4fec7d60-1d09-ba37-c66a-1d86088a1c0e@linux.ibm.com>
+	<20190201093524.321787a2.cohuck@redhat.com>
+	<2bcb9cac-d8af-bfd4-e080-9650492ab770@redhat.com>
 From: Collin Walling <walling@linux.ibm.com>
-Date: Fri, 1 Feb 2019 10:41:10 -0500
+Date: Fri, 1 Feb 2019 10:44:20 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190201124543.5945-1-cohuck@redhat.com>
+In-Reply-To: <2bcb9cac-d8af-bfd4-e080-9650492ab770@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <6239c630-24d1-f68f-ec16-023e1f37148d@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/pci: mark zpci devices as
- unmigratable
+Message-Id: <a20b906b-bcd1-12d4-e8e8-d6d14a35addf@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 0/6] s390x/pci: remaining
+ hot/un)plug patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,65 +46,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 2/1/19 7:45 AM, Cornelia Huck wrote:
-> We currently don't migrate any state for zpci devices, which are
-> coupled with standard pci devices. This means funny things happen
-> when we e.g. try to migrate with a virtio-pci device but the s390x-
-> specific zpci state is not migrated (vfio-pci is not affected, as
-> it is not migratable anyway.)
+On 2/1/19 4:18 AM, David Hildenbrand wrote:
+> On 01.02.19 09:35, Cornelia Huck wrote:
+>> On Thu, 31 Jan 2019 15:43:16 -0500
+>> Collin Walling <walling@linux.ibm.com> wrote:
+>>
+>>> On 1/30/19 10:57 AM, David Hildenbrand wrote:
+>>>> These are all the patches that are not yet upstream (@Conny you might
+>>>> already picked some, including them for the full picture) and after
+>>>> a good discussion yesterday, including a patch t get rid of the release
+>>>> timer. I ran a couple of sanity tests on this series.
+>>>>
+>>>> #1 and #2 fix hotplugging of PCI bridges.
+>>>> #3 warns when "zpci=off"
+>>>> #4 refactors unplugging
+>>>> #5 get's rid of the release timer
+>>>> #6 processes all unplug requests on reboot
+>>>>
+>>>> @Colin, can you review/ack? Especially Patch #4 is needed for qdev
+>>>> patches already on the list. ("[PATCH RFCv2 0/9] qdev: Hotplug handler
+>>>> chaining + virtio-pmem")
+>>>
+>>> I've given my r-b for 4, 5, and 6. IIRC, the other patches in this
+>>> series looked fine from previous versions, but I'd like to look at them
+>>> more carefully before ack'ing. Please allow me some time to devote to
+>>> them in the near future. Trying my best to balance things :)
+>>
+>> Great, thanks for looking. If patches 4-6 can be applied without
+>> patches 1-3 (I think they can?), I'll go ahead and queue them.
 > 
-> Until this is fixed, mark zpci devices as unmigratable.
+> Yes, I think they can, patch 1-3 mainly deals with plugging, these ones
+> with unplugging. Thanks Conny!
 > 
-> Reported-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
+>>
+>> (I'll probably send a pull request next week, will be happy to include
+>> the other patches as well.)
+>>
 > 
-> This is just a stop-gap measure to give us time to implement the
-> needed migration code properly.
-
-I imagine this means we'll want a single migration handler that will
-take care of PCI and zPCI in one go, that way the data stays coupled?
-
-Just throwing thoughts out there.
-
-> 
-> ---
->   hw/s390x/s390-pci-bus.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index c96a7cba34..96c7c18f3f 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -1253,6 +1253,15 @@ static Property s390_pci_device_properties[] = {
->       DEFINE_PROP_END_OF_LIST(),
->   };
->   
-> +static const VMStateDescription s390_pci_device_vmstate = {
-> +    .name = TYPE_S390_PCI_DEVICE,
-> +    /*
-> +     * TODO: add state handling here, so migration works at least with
-> +     * emulated pci devices on s390x
-> +     */
-> +    .unmigratable = 1,
-> +};
-> +
->   static void s390_pci_device_class_init(ObjectClass *klass, void *data)
->   {
->       DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -1263,6 +1272,7 @@ static void s390_pci_device_class_init(ObjectClass *klass, void *data)
->       dc->bus_type = TYPE_S390_PCI_BUS;
->       dc->realize = s390_pci_device_realize;
->       dc->props = s390_pci_device_properties;
-> +    dc->vmsd = &s390_pci_device_vmstate;
->   }
->   
->   static const TypeInfo s390_pci_device_info = {
 > 
 
-Good band-aid patch.!
-
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
+I noted the conflict you ran into when applying. I'll try to get to
+reviewing the other patches either by today or Monday. If for some
+reason I don't get to it by then, please ping me.
