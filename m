@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52855)
+Received: from eggs.gnu.org ([209.51.188.92]:55414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdXX-0004Go-Bm
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:27:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpdeM-00069R-R6
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:34:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gpdXV-0003XV-Cs
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:27:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gpdeL-00084o-VY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 13:34:50 -0500
 References: <20190128165830.165170-1-vsementsov@virtuozzo.com>
+	<eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
-Date: Fri, 1 Feb 2019 12:27:09 -0600
+Message-ID: <a24a7b8b-83ce-3787-162f-ace7c09d362c@redhat.com>
+Date: Fri, 1 Feb 2019 12:34:36 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190128165830.165170-1-vsementsov@virtuozzo.com>
+In-Reply-To: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="81UYpWPdR4wiQLYLu9TCqG8Mveg9n3EEC"
+	boundary="S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG"
 Subject: Re: [Qemu-devel] [PATCH] nbd: generalize usage of nbd_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,79 +25,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---81UYpWPdR4wiQLYLu9TCqG8Mveg9n3EEC
+--S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com
-Message-ID: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com
+Message-ID: <a24a7b8b-83ce-3787-162f-ace7c09d362c@redhat.com>
 Subject: Re: [PATCH] nbd: generalize usage of nbd_read
 References: <20190128165830.165170-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190128165830.165170-1-vsementsov@virtuozzo.com>
+ <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
+In-Reply-To: <eb482fb2-5934-c786-1b23-f46054bbdb39@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/28/19 10:58 AM, Vladimir Sementsov-Ogievskiy wrote:
-> We generally do very similar things around nbd_read: error_prepend,
-> specifying, what we have tried to read and be_to_cpu conversion of
-> integers.
+On 2/1/19 12:27 PM, Eric Blake wrote:
+
 >=20
-> So, it seems reasonable to move common things to helper functions,
-> which:
-> 1. simplify code a bit
-> 2. generalize nbd_read error descriptions, all starting with
->    "Failed to read"
-> 3. make it more difficult to forget to convert things from BE
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h | 31 ++++++++++++++--
->  block/nbd-client.c  |  5 ++-
->  nbd/client.c        | 88 +++++++++++++++------------------------------=
+>> +
+>> +#define DEF_NBD_READ(bits) \
+>> +static inline int nbd_read ## bits(QIOChannel *ioc, uint ## bits ## _=
+t * val, \
+>=20
+> checkpatch didn't flag it, but I think our style is '*val', not '* val'=
+=2E
 
->  nbd/common.c        |  2 +-
->  nbd/server.c        | 27 +++++---------
->  5 files changed, 70 insertions(+), 83 deletions(-)
-
-
-> +
-> +#define DEF_NBD_READ(bits) \
-> +static inline int nbd_read ## bits(QIOChannel *ioc, uint ## bits ## _t=
- * val, \
-
-checkpatch didn't flag it, but I think our style is '*val', not '* val'.
-
-> +                                   const char *desc, Error **errp)    =
-        \
-> +{                                                                     =
-        \
-> +    if (nbd_read(ioc, val, sizeof(*val), desc, errp) < 0) {           =
-        \
-> +        return -1;                                                    =
-        \
-> +    }                                                                 =
-        \
-> +    *val =3D be ## bits ## _to_cpu(*val);                             =
-          \
-> +    return 0;                                                         =
-        \
->  }
-> =20
-> +DEF_NBD_READ(16) /* Defines nbd_read16(). */
-> +DEF_NBD_READ(32) /* Defines nbd_read32(). */
-> +DEF_NBD_READ(64) /* Defines nbd_read64(). */
-> +
-> +#undef DEF_NBD_READ
-
-I think the name DEF_NBD_READ_N is slightly nicer; that's minor enough
-that I don't mind tweaking it.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks; queued for my next NBD pull request.
+But it DOES flag '*val' as a false positive.  Oh well.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -104,21 +61,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---81UYpWPdR4wiQLYLu9TCqG8Mveg9n3EEC
+--S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUj30ACgkQp6FrSiUn
-Q2pWpAgAnCdNCHF5ltl9KQp3W/hoMCr+mmrxC9Shlr5bJ+5/6FHRFu+Ck8/f8WTH
-CSmatRbUQBcahqpHgI61vc7KgRn7lQ+K8SWSAb6J3yRcCZxPWbiiDQIUqu6iocIb
-1g6TcO1znnOWzhxvB2/l7YHll0EBkAIy426WDZ0mWOkbQI7xWMdVxrcAcGX1hdIE
-EzYaro6BlxRJelXp/aQS0yL2Ydsno4wCCsOpinlsfpm/PPpXSY8LgeM2+OdFIUbb
-cfwmKl1fN3pYi8pLvMjn2Vb4s/ZhjR4D+zSFldSPb0swqsktr6YKlncGEi/03ILP
-0POv+WLc2AYTXzgeZMjxAtvuhzTD5Q==
-=CeDq
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUkTwACgkQp6FrSiUn
+Q2oNsQf/VJumbwljAw8Yq+UAezZYIaZf9yVOP3yGhbiodGwqoT/eYmnqrzIrcV5V
+ArG1wKhNrw035Yuy0o5P0GUwSrI20uQ1RQeZ+WOYZSMnIzW9HDkHreStiowWd/t/
+S1wlHZKXHpRI/VPNkSyu7TROA5QiIJtoAt7/O34SHQ9/zIUg/b0bL7MfSQYdYu89
+uozc+UBuxKQlqUHyc+30K1iTCI+BTQRpgxkOwMnHnBvzn0CmzRE4UqiEJD+RDIV/
+1qQpGv1MWG6oxFKuAXRWeCxQ6W+cz3T6gtLkixOF5thJV7lTSx4DybAcGyy3MfiP
+KvjJo+atf8GXbEKglbP4d8SsOUoFzQ==
+=hYOa
 -----END PGP SIGNATURE-----
 
---81UYpWPdR4wiQLYLu9TCqG8Mveg9n3EEC--
+--S8IkVhWS4NRtL6yx3s6iCscvgVgp3eJOG--
