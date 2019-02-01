@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47222)
+Received: from eggs.gnu.org ([209.51.188.92]:47223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWX-0006XU-Fx
+	(envelope-from <mreitz@redhat.com>) id 1gpeWX-0006XV-G1
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gpeWS-0002x7-4Q
+	(envelope-from <mreitz@redhat.com>) id 1gpeWS-0002x6-4I
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:30:47 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri,  1 Feb 2019 20:29:23 +0100
-Message-Id: <20190201192935.18394-20-mreitz@redhat.com>
+Date: Fri,  1 Feb 2019 20:29:24 +0100
+Message-Id: <20190201192935.18394-21-mreitz@redhat.com>
 In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 References: <20190201192935.18394-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 19/31] block: Use bdrv_dirname() for
- relative filenames
+Subject: [Qemu-devel] [PATCH v13 20/31] iotests: Add quorum case to test 110
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +24,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-bdrv_get_full_backing_filename_from_filename() breaks down when it comes
-to JSON filenames. Using bdrv_dirname() as the basis is better because
-since we have BDS, we can descend through the BDS tree to the protocol
-layer, which gives us a greater probability of finding a non-JSON name;
-also, bdrv_dirname() is more correct as it allows block drivers to
-override the generation of that directory name in a protocol-specific
-way.
-
-We still need to keep bdrv_get_full_backing_filename_from_filename(),
-though, because it has valid callers which need it during image creation
-when no BDS is available yet.
-
-This makes a test case in qemu-iotest 110, which was supposed to fail,
-work. That is actually good, but we need to change the reference output
-(and the comment in 110) accordingly.
+Test 110 tests relative backing filenames for complex BDS trees.  Now
+that the originally supposedly failing test passes, let us add a new
+failing test: Quorum can never work automatically (without detecting
+whether all child nodes have the same base directory, but that would be
+rather inconsistent behavior).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c                    | 20 +++++++++++++-------
- tests/qemu-iotests/110     |  3 ++-
- tests/qemu-iotests/110.out |  2 +-
- 3 files changed, 16 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/110     | 26 ++++++++++++++++++++++++++
+ tests/qemu-iotests/110.out |  7 +++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/block.c b/block.c
-index dba05ee349..05135152d5 100644
---- a/block.c
-+++ b/block.c
-@@ -337,16 +337,22 @@ char *bdrv_get_full_backing_filename_from_filename(=
-const char *backed,
- static char *bdrv_make_absolute_filename(BlockDriverState *relative_to,
-                                          const char *filename, Error **e=
-rrp)
- {
--    char *bs_filename;
-+    char *dir, *full_name;
-=20
--    bdrv_refresh_filename(relative_to);
-+    if (!filename || filename[0] =3D=3D '\0') {
-+        return NULL;
-+    } else if (path_has_protocol(filename) || path_is_absolute(filename)=
-) {
-+        return g_strdup(filename);
-+    }
-=20
--    bs_filename =3D relative_to->exact_filename[0]
--                      ? relative_to->exact_filename
--                      : relative_to->filename;
-+    dir =3D bdrv_dirname(relative_to, errp);
-+    if (!dir) {
-+        return NULL;
-+    }
-=20
--    return bdrv_get_full_backing_filename_from_filename(bs_filename,
--                                                        filename ?: "", =
-errp);
-+    full_name =3D g_strconcat(dir, filename, NULL);
-+    g_free(dir);
-+    return full_name;
- }
-=20
- char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
 diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index b64b3b215a..3e9d72d302 100755
+index 3e9d72d302..185ad5437e 100755
 --- a/tests/qemu-iotests/110
 +++ b/tests/qemu-iotests/110
-@@ -60,7 +60,8 @@ echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
- echo
+@@ -29,6 +29,7 @@ status=3D1	# failure is the default!
+ _cleanup()
+ {
+ 	_cleanup_test_img
++        rm -f "$TEST_IMG.copy"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 =20
- # Across blkdebug without a config file, you cannot reconstruct filename=
-s, so
--# qemu is incapable of knowing the directory of the top image
-+# qemu is incapable of knowing the directory of the top image from the f=
-ilename
-+# alone. However, using bdrv_dirname(), it should still work.
- TEST_IMG=3D"json:{
-     'driver': '$IMGFMT',
-     'file': {
+@@ -86,6 +87,31 @@ echo
+ # omit the image size; it should work anyway
+ _make_test_img -b "$TEST_IMG_REL.base"
+=20
++echo
++echo '=3D=3D=3D Nodes without a common directory =3D=3D=3D'
++echo
++
++cp "$TEST_IMG" "$TEST_IMG.copy"
++
++# Should inform us that the actual path of the backing file cannot be de=
+termined
++TEST_IMG=3D"json:{
++    'driver': '$IMGFMT',
++    'file': {
++        'driver': 'quorum',
++        'vote-threshold': 1,
++        'children': [
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG'
++            },
++            {
++                'driver': 'file',
++                'filename': '$TEST_IMG.copy'
++            }
++        ]
++    }
++}" _img_info | _filter_img_info
++
+=20
+ # success, all done
+ echo '*** done'
 diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index b3584ff87f..5370bc1d26 100644
+index 5370bc1d26..1d0b2475cc 100644
 --- a/tests/qemu-iotests/110.out
 +++ b/tests/qemu-iotests/110.out
-@@ -14,7 +14,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IM=
-GFMT.base)
- image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_aio=
-", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driver"=
-: "blkdebug", "set-state.0.new_state": 42}}
- file format: IMGFMT
- virtual size: 64M (67108864 bytes)
--backing file: t.IMGFMT.base (cannot determine actual path)
-+backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
-=20
+@@ -19,4 +19,11 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.I=
+MGFMT.base)
  =3D=3D=3D Backing name is always relative to the backed image =3D=3D=3D
 =20
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 backing_fil=
+e=3Dt.IMGFMT.base
++
++=3D=3D=3D Nodes without a common directory =3D=3D=3D
++
++image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file"=
+, "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_=
+DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-co=
+rrupted": false, "vote-threshold": 1}}
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++backing file: t.IMGFMT.base (cannot determine actual path)
+ *** done
 --=20
 2.20.1
