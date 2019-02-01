@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54162)
+Received: from eggs.gnu.org ([209.51.188.92]:58475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpSb8-00043O-EZ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:46:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1gpSwJ-0007BL-Nr
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gpSb7-0005T2-Am
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 01:46:46 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <1548956828-10210-1-git-send-email-thuth@redhat.com>
-	<20190131185621.28815291.cohuck@redhat.com>
-	<538ee62b-293d-f053-4bd2-76bf166388e1@redhat.com>
-	<c60dd137-ca05-85cd-78ca-d22c79ccd85e@redhat.com>
-	<aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-Message-ID: <cfe20aba-2f80-f8cb-66df-f9958bdf61f6@redhat.com>
-Date: Fri, 1 Feb 2019 07:46:40 +0100
+	(envelope-from <armbru@redhat.com>) id 1gpSwG-0005y5-Fy
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 02:08:38 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190123195527.29575-1-david@redhat.com>
+	<20190123195527.29575-5-david@redhat.com>
+	<87imy4vgen.fsf@dusky.pond.sub.org>
+	<c5087353-60a1-62be-a34b-0b6296388fd1@redhat.com>
+Date: Fri, 01 Feb 2019 08:08:16 +0100
+In-Reply-To: <c5087353-60a1-62be-a34b-0b6296388fd1@redhat.com> (David
+	Hildenbrand's message of "Thu, 31 Jan 2019 19:54:36 +0100")
+Message-ID: <87pnscj89r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <aee584b8-90f1-3f10-25dd-5b38d1f46142@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Fix the function arguments in
- the pci stub file
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFCv2 4/9] virtio-pmem: Prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 2019-02-01 07:14, Thomas Huth wrote:
-> On 2019-01-31 19:08, Paolo Bonzini wrote:
->> On 31/01/19 19:00, Thomas Huth wrote:
->>>>> (and the prototypes in the header) anymore, so if you try to compil=
-e s390x
->>>>> without CONFIG_PCI, the build currently fails.
->>>>>
->>>> Fixes: 468a93898a97 ("s390x/pci: pass the retaddr to all PCI instruc=
-tions")
->>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>  hw/s390x/s390-pci-stub.c | 16 +++++++++-------
->>>>>  1 file changed, 9 insertions(+), 7 deletions(-)
->>>> This file seems to be in danger of bitrot. Do you think it'll be eas=
-ier
->>>> to test rarely used configs like that after we switch to Kconfig?
->>> I hope so, yes. There will be a new --without-default-devices options
->>> for "configure" (which matches "make allnoconfig" from the kernel) - =
-if
->>> we do it right in the Kconfig file for s390x, it should be possible t=
-o
->>> catch this problem with that option.
->>
->> Yes, it will be in .travis.yml too.
->>
->> Right now there is a "select PCI" in the hw/s390x/Kconfig file, but
->> probably it's best to add a config S390_ZPCI with "default y if
->> S390_CCW_VIRTIO" and "select PCI" in it.  Not a blocker, but I can
->> integrate it if you send me a fixup patch.
->=20
-> Yes, that's what I had in mind, too. I'll send a fixup patch...
+David Hildenbrand <david@redhat.com> writes:
 
-Actually, disabling the s390-pci code works from a compiling+linking
-point of view, but when you then try to start the machine, it fails:
+> On 31.01.19 19:19, Markus Armbruster wrote:
+>> David Hildenbrand <david@redhat.com> writes:
+>> 
+>>> From: Pankaj Gupta <pagupta@redhat.com>
+>>>
+>>> This is the current protoype of virtio-pmem. Support will require
+>>> machine changes for the architectures that will support it, so it will
+>>> not yet be compiled.
+>>>
+>>> TODO:
+>>> - Use separate struct for tracking requests internally
+>>> - Move request/response structs to linux headers
+>>> - Factor out linux header sync
+>>> - Drop debug printfs
+>>>
+>>> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+>>> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
+>>>   split up patches, unplug handler ]
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>> [...]
+>>> diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+>>> index 6d5c3b2d4f..346389565a 100644
+>>> --- a/include/standard-headers/linux/virtio_ids.h
+>>> +++ b/include/standard-headers/linux/virtio_ids.h
+>>> @@ -43,5 +43,6 @@
+>>>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>>>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+>>>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+>>> +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+>>>  
+>>>  #endif /* _LINUX_VIRTIO_IDS_H */
+>>> diff --git a/qapi/misc.json b/qapi/misc.json
+>>> index 24d20a880a..b71eca2666 100644
+>>> --- a/qapi/misc.json
+>>> +++ b/qapi/misc.json
+>>> @@ -2949,16 +2949,42 @@
+>>>            }
+>>>  }
+>>>  
+>>> +##
+>>> +# @VirtioPMEMDeviceInfo:
+>>> +#
+>>> +# VirtioPMEM state information
+>>> +#
+>>> +# @id: device's ID
+>>> +#
+>>> +# @memaddr: physical address in memory, where device is mapped
+>>> +#
+>>> +# @size: size of memory that the device provides
+>>> +#
+>>> +# @memdev: memory backend linked with device
+>>> +#
+>>> +# Since: 4.0
+>>> +##
+>> 
+>> This is like PCDIMMDeviceInfo less @slot, @node, @hotplugged,
+>> @hotpluggable, and with @addr renamed to @memaddr.
+>> 
+>> Any particular reason for the rename?
+>
+> I answered the same question already and thought I documented it
+> somewhere ... but looks like it went missing.
 
-$ s390x-softmmu/qemu-system-s390x -nographic
-qemu-system-s390x: Unknown device 's390-pcihost' for default sysbus
-Aborted (core dumped)
+Looks like my end-of-year mental garbage collection was overeager again.
 
-IIRC we originally wanted to make the "s390-pcihost" device really
-optional, but then decided not to do it since it would break migration.
-So the status of the "PCI disablement" got stuck somewhere inbetween,
-where we've created the switch for the Makefile and the stub file, but
-never really got it to a point where it could really really be disabled.
+> We cannot use the "addr" property as that is already used e.g. for
+> virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proy.
+> So we have to chose a different one (unfortunately). We decided to also
+> use the name of the property in this struct here, as it will otherwise
+> be terribly confusing for the user.
+>
+> -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
+>
+>> 
+>>> +{ 'struct': 'VirtioPMEMDeviceInfo',
+>>> +  'data': { '*id': 'str',
+>>> +            'memaddr': 'size',
+>>> +            'size': 'size',
+>>> +            'memdev': 'str'
+>>> +          }
+>>> +}
+>>> +
+>>>  ##
+>>>  # @MemoryDeviceInfo:
+>>>  #
+>>>  # Union containing information about a memory device
+>>>  #
+>>> +# nvdimm is included since 2.12. virtio-pmem is included since 4.0.
+>>> +#
+>> 
+>> Let's stick to the way we document similar things elsewhere:
+>> 
+>>    # @nvdimm: since 2.12
+>>    #
+>>    # @virtio-pmem: since 4.0
+>
+> Sounds good, doesn't work :)
+>
+> (tried this already, the checker will complain that these fields don't
+> exist)
 
-So I see two options now:
+Doc generator shortcoming *sigh*.
 
-1) Finally really make the device optional, at least for new machine
-types, so we can really disable CONFIG_PCI and get a working executable.
+QAPI part
+Acked-by: Markus Armbruster <armbru@redhat.com>
 
-2) Scratch the idea completely to make this optional, always link the
-s390-pci-bus.o and s390-pci-inst.o files unconditionally, and remove the
-s390-pci-stub.c file.
-
-I assume options 2 is preferred, since we likely rather want to move
-into the PCI direction in the long run, instead of ignoring it...
-
-Other opinions?
-
- Thomas
+> Thanks!
+>
+>>    #
+>> 
+>>>  # Since: 2.1
+>>>  ##
+>>>  { 'union': 'MemoryDeviceInfo',
+>>>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+>>> -            'nvdimm': 'PCDIMMDeviceInfo'
+>>> +            'nvdimm': 'PCDIMMDeviceInfo',
+>>> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+>>>            }
+>>>  }
