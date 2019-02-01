@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60555)
+Received: from eggs.gnu.org ([209.51.188.92]:60633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gpXyq-0002M0-Ae
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:37 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gpXz0-0002Vq-Pn
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gpXye-0004cg-C0
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47494)
+	(envelope-from <kraxel@redhat.com>) id 1gpXyv-0004jD-4T
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpXyZ-0004as-BF
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:19 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gpXyt-0004ex-PA
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 07:31:41 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  1 Feb 2019 13:30:55 +0100
-Message-Id: <20190201123100.27419-1-kraxel@redhat.com>
+Date: Fri,  1 Feb 2019 13:30:57 +0100
+Message-Id: <20190201123100.27419-3-kraxel@redhat.com>
+In-Reply-To: <20190201123100.27419-1-kraxel@redhat.com>
+References: <20190201123100.27419-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/5] Ui 20190201 patches
+Subject: [Qemu-devel] [PULL 2/5] configure: LM32 Milkymist Texture Mapping
+ Unit (tmu2) also depends of X11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +28,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: libvir-list@redhat.com, Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The following changes since commit e8977901b79fb678f288dd372261b640bbeccd=
-0d:
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
-request' into staging (2019-01-31 15:40:39 +0000)
+Commit 5f9b1e35060b8 remove the dependency between OpenGL and X11.
+However the milkymist-tmu2 device do require X11.
+When using SDL, the configure script sets need_x11=3Dyes, so the X11
+flags are populated to the makefiles.
+When building without SDL, X11 is not pulled and populated, leading
+to a link failure:
 
-are available in the git repository at:
+    LINK    lm32-softmmu/qemu-system-lm32
+  hw/lm32/milkymist.o: In function `milkymist_tmu2_create':
+  hw/lm32/milkymist-hw.h:114: undefined reference to `XOpenDisplay'
+  hw/lm32/milkymist-hw.h:140: undefined reference to `XFree'
+  hw/lm32/milkymist-hw.h:141: undefined reference to `XCloseDisplay'
+  hw/lm32/milkymist-hw.h:130: undefined reference to `XCloseDisplay'
+  ../hw/display/milkymist-tmu2.o: In function `tmu2_glx_init':
+  hw/display/milkymist-tmu2.c:112: undefined reference to `XOpenDisplay'
+  hw/display/milkymist-tmu2.c:123: undefined reference to `XFree'
+  collect2: error: ld returned 1 exit status
+  gmake[1]: *** [Makefile:199: qemu-system-lm32] Error 1
 
-  git://git.kraxel.org/qemu tags/ui-20190201-pull-request
+Enforce the X11 dependency when the LM32 target is built.
+This will allow us to build QEMU without SDL.
 
-for you to fetch changes up to 0015ca5cbabe0b31d31610ddfaafd90a9e5911a4:
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 20190130120005.23123-3-philmd@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-  ui: remove support for SDL1.2 in favour of SDL2 (2019-02-01 11:59:12 +0=
-100)
-
-----------------------------------------------------------------
-ui: fix build with SDL disabled, drop SDL1 support.
-
-----------------------------------------------------------------
-
-Daniel P. Berrang=C3=A9 (1):
-  ui: remove support for SDL1.2 in favour of SDL2
-
-Philippe Mathieu-Daud=C3=A9 (4):
-  hw/display: Move Milkymist specific hardware out of common-obj list
-  configure: LM32 Milkymist Texture Mapping Unit (tmu2) also depends of
-    X11
-  hw/display/milkymist-tmu2: Explicit the dependency to both X11 /
-    OpenGL
-  hw/display/milkymist-tmu2: Move inlined code from header to source
-
- configure                           |   70 +--
- hw/lm32/milkymist-hw.h              |   63 ---
- include/hw/display/milkymist_tmu2.h |   41 ++
- ui/sdl_zoom.h                       |   25 -
- ui/sdl_zoom_template.h              |  219 --------
- hw/display/milkymist-tmu2.c         |   49 ++
- hw/lm32/milkymist.c                 |    1 +
- ui/sdl.c                            | 1027 -----------------------------=
-------
- ui/sdl_zoom.c                       |   93 ----
- MAINTAINERS                         |    1 +
- default-configs/lm32-softmmu.mak    |    2 +-
- hw/display/Makefile.objs            |    8 +-
- qemu-deprecated.texi                |    9 -
- ui/Makefile.objs                    |    5 -
- 14 files changed, 114 insertions(+), 1499 deletions(-)
- create mode 100644 include/hw/display/milkymist_tmu2.h
- delete mode 100644 ui/sdl_zoom.h
- delete mode 100644 ui/sdl_zoom_template.h
- delete mode 100644 ui/sdl.c
- delete mode 100644 ui/sdl_zoom.c
-
+diff --git a/configure b/configure
+index b18281c61f..c7024d6662 100755
+--- a/configure
++++ b/configure
+@@ -4047,6 +4047,16 @@ EOF
+   fi
+ fi
+=20
++if test "$opengl" =3D "yes" -a "$have_x11" =3D "yes"; then
++  for target in $target_list; do
++    case $target in
++      lm32-softmmu) # milkymist-tmu2 requires X11 and OpenGL
++        need_x11=3Dyes
++      ;;
++    esac
++  done
++fi
++
+ ##########################################
+ # libxml2 probe
+ if test "$libxml2" !=3D "no" ; then
 --=20
 2.9.3
