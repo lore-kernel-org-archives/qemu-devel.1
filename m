@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59279)
+Received: from eggs.gnu.org ([209.51.188.92]:60081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbML-0008NC-AY
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:10 -0500
+	(envelope-from <crosa@redhat.com>) id 1gpbPB-0002ah-Gs
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003kI-BF
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:55101)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003gw-Vf
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:55 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id a62so6651455wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:54 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.51
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:51 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:51 +0000
-Message-Id: <20190201160653.13829-46-peter.maydell@linaro.org>
-In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
-References: <20190201160653.13829-1-peter.maydell@linaro.org>
+	(envelope-from <crosa@redhat.com>) id 1gpbOv-00055J-W3
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:10:56 -0500
+From: Cleber Rosa <crosa@redhat.com>
+References: <20190117185628.21862-1-crosa@redhat.com>
+	<20190117185628.21862-16-crosa@redhat.com>
+	<b235e7a9-57ad-5547-b8ca-693159820a8f@redhat.com>
+	<e63a4ea3-e9ff-4920-cdfa-14bf04b5b08c@redhat.com>
+	<84aa43ba-df19-51f6-e14d-fb82a7f2dfcc@redhat.com>
+Message-ID: <a638e504-f7ad-fa3a-f198-c3878cfc560e@redhat.com>
+Date: Fri, 1 Feb 2019 11:10:31 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 45/47] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+In-Reply-To: <84aa43ba-df19-51f6-e14d-fb82a7f2dfcc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 15/18] Boot Linux Console Test: add a test
+ for aarch64 + virt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,511 +28,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, Claudio Fontana <claudio.fontana@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Steffen Görtz <contrib@steffen-goertz.de>
 
-The nRF51 contains three regions of non-volatile memory (NVM):
-- CODE (R/W): contains code
-- FICR (R): Factory information like code size, chip id etc.
-- UICR (R/W): Changeable configuration data. Lock bits, Code
-  protection configuration, Bootloader address, Nordic SoftRadio
-  configuration, Firmware configuration.
 
-Read and write access to the memories is managed by the
-Non-volatile memory controller.
+On 1/31/19 4:26 PM, Cleber Rosa wrote:
+>=20
+>=20
+> On 1/31/19 3:21 PM, Cleber Rosa wrote:
+>>
+>>
+>> On 1/31/19 3:02 PM, Wainer dos Santos Moschetta wrote:
+>>>
+>>> On 01/17/2019 04:56 PM, Cleber Rosa wrote:
+>>>> Just like the previous tests, boots a Linux kernel on a aarch64 targ=
+et
+>>>> using the virt machine.
+>>>>
+>>>> One special option added is the CPU type, given that the kernel
+>>>> selected fails to boot on the virt machine's default CPU (cortex-a15=
+).
+>>>>
+>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>>> ---
+>>>> =C2=A0 .travis.yml=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
+>>>> =C2=A0 tests/acceptance/boot_linux_console.py | 20 +++++++++++++++++=
++++
+>>>> =C2=A0 2 files changed, 21 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/.travis.yml b/.travis.yml
+>>>> index 54100eea5a..595e8c0b6c 100644
+>>>> --- a/.travis.yml
+>>>> +++ b/.travis.yml
+>>>> @@ -187,7 +187,7 @@ matrix:
+>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Acceptance (Functional) test=
+s
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - env:
+>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - CONFIG=3D"--python=3D/=
+usr/bin/python3
+>>>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,ppc64-s=
+oftmmu"
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - CONFIG=3D"--python=3D/=
+usr/bin/python3
+>>>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,ppc64-s=
+oftmmu,aarch64-softmmu"
+>>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - TEST_CMD=3D=
+"make check-acceptance"
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 addons:
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 apt:
+>>>> diff --git a/tests/acceptance/boot_linux_console.py
+>>>> b/tests/acceptance/boot_linux_console.py
+>>>> index f3ccd23a7a..107700b517 100644
+>>>> --- a/tests/acceptance/boot_linux_console.py
+>>>> +++ b/tests/acceptance/boot_linux_console.py
+>>>> @@ -138,3 +138,23 @@ class BootLinuxConsole(Test):
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.launc=
+h()
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 console_patte=
+rn =3D 'Kernel command line: %s' %
+>>>> kernel_command_line
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.wait_for=
+_console_pattern(console_pattern)
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 def test_aarch64_virt(self):
+>>>
+>>> That test case fails on my system (Fedora 29 x86_64). Avocado seems
+>>> unable to kill the VM so it=C2=A0 reaches the timeout.
+>>>
+>>> I compiled QEMU with default configuration:
+>>>
+>>> $ configure --python=3D/usr/bin/python3 --target-list=3Dx86_64-softmm=
+u
+>>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,ppc64-so=
+ftmmu,aarch64-softmmu)
+>>>
+>>>
+>>> Follows a snippet of the Avocado's job.log file:
+>>> ----
+>>> 2019-01-31 14:41:34,912 test=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0602 INFO | START
+>>> 07-/root/src/qemu/tests/acceptance/boot_linux_console.py:BootLinuxCon=
+sole.test_aarch64_virt
+>>>
+>>> 2019-01-31 14:41:34,912 test=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0298 DEBUG| DATA
+>>> (filename=3Doutput.expected) =3D> NOT FOUND (data sources: variant, t=
+est, file)
+>>> 2019-01-31 14:41:34,913 parameters=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ L0146 DEBUG| PARAMS (key=3Darch,
+>>> path=3D*, default=3Daarch64) =3D> 'aarch64'
+>>> 2019-01-31 14:41:34,913 parameters=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ L0146 DEBUG| PARAMS
+>>> (key=3Dqemu_bin, path=3D*, default=3Daarch64-softmmu/qemu-system-aarc=
+h64) =3D>
+>>> 'aarch64-softmmu/qemu-system-aarch64'
+>>> 2019-01-31 14:41:34,915 download=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 L0070 INFO | Fetching
+>>> https://sjc.edge.kernel.org/fedora-buffet/fedora/linux/releases/29/Se=
+rver/aarch64/os/images/pxeboot/vmlinuz
+>>> -> /var/lib/avocado/data/cache/by_name/vmlinuz.3upct2pr
+>>> 2019-01-31 14:41:35,490 download=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 L0054 DEBUG| Retrieved URL
+>>> "https://sjc.edge.kernel.org/fedora-buffet/fedora/linux/releases/29/S=
+erver/aarch64/os/images/pxeboot/vmlinuz":
+>>> content-length 8623423, date: "Thu, 31 Jan 2019 19:41:35 GMT",
+>>> last-modified: "Sun, 21 Oct 2018 00:43:09 GMT"
+>>> 2019-01-31 14:41:41,765 qemu=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0317 DEBUG| VM launch command:
+>>> 'aarch64-softmmu/qemu-system-aarch64 -chardev
+>>> socket,id=3Dmon,path=3D/var/tmp/tmpizirkcud/qemu-32609-monitor.sock -=
+mon
+>>> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine virt -c=
+hardev
+>>> socket,id=3Dconsole,path=3D/var/tmp/tmpizirkcud/qemu-32609-console.so=
+ck,server,nowait
+>>> -serial chardev:console -cpu cortex-a53 -kernel
+>>> /var/lib/avocado/data/cache/by_name/vmlinuz -append console=3DttyAMA0=
+'
+>>> 2019-01-31 14:41:41,779 qmp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0167 DEBUG| >>> {'execute':
+>>> 'qmp_capabilities'}
+>>> 2019-01-31 14:41:41,931 qmp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0175 DEBUG| <<< {'return': {}}
+>>> 2019-01-31 14:41:42,830 boot_linux_conso L0041 DEBUG| [=C2=A0=C2=A0=C2=
+=A0 0.000000]
+>>> Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+>>>
+>>> (...)
+>>>
+>>> 2019-01-31 14:41:42,833 boot_linux_conso L0041 DEBUG| [=C2=A0=C2=A0=C2=
+=A0 0.000000]
+>>> Policy zone: DMA32
+>>> 2019-01-31 14:41:42,833 boot_linux_conso L0041 DEBUG| [=C2=A0=C2=A0=C2=
+=A0 0.000000]
+>>> Kernel command line: console=3DttyAMA0
+>>> 2019-01-31 14:41:42,833 qmp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 L0167 DEBUG| >>> {'execute':
+>>> 'quit'}
+>>
+>> Here, a QMP response like "<<< {'return': {}}" would be expected.
+>>
+>> Since I can not reproduce this on my system (or on Travis-CI jobs I've
+>> sent), can you tell me on top of which commit you've applied these pat=
+ches?
+>>
+>=20
+> I spoke too soon:
+>=20
+> https://travis-ci.org/clebergnu/qemu/jobs/487121425#L3033
+>=20
+> This looks like a recent regression, and I'm guessing it's not on the
+> test's side.  I'll try to bisect it and let you know.
+>=20
 
-Memory schema:
- [ CPU ] -+- [ NVM, either FICR, UICR or CODE ]
-          |      |
-          \- [ NVMC ]
+On a fresh environment, I am able to get this reproduced on every 2 of
+runs, more or less.  When I hit it, I attached GDB to it, and the
+backtrace shows:
 
-Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Tested-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20190201023357.22596-2-stefanha@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/nvram/Makefile.objs       |   1 +
- include/hw/nvram/nrf51_nvm.h |  64 ++++++
- hw/nvram/nrf51_nvm.c         | 388 +++++++++++++++++++++++++++++++++++
- 3 files changed, 453 insertions(+)
- create mode 100644 include/hw/nvram/nrf51_nvm.h
- create mode 100644 hw/nvram/nrf51_nvm.c
+Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+__lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:10=
+3
+103     2:      movl    %edx, %eax
+(gdb) bt
+#0  __lll_lock_wait () at
+../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:103
+#1  0x00007fc6ba1a2e09 in __GI___pthread_mutex_lock
+(mutex=3Dmutex@entry=3D0x5615a233d020 <qemu_global_mutex>) at
+../nptl/pthread_mutex_lock.c:80
+#2  0x00005615a1bb7593 in qemu_mutex_lock_impl (mutex=3D0x5615a233d020
+<qemu_global_mutex>, file=3D0x5615a1db2d4c "util/main-loop.c", line=3D236=
+)
+at util/qemu-thread-posix.c:66
+#3  0x00005615a171125e in qemu_mutex_lock_iothread_impl
+(file=3Dfile@entry=3D0x5615a1db2d4c "util/main-loop.c", line=3Dline@entry=
+=3D236)
+at /home/cleber/src/qemu/cpus.c:1849
+#4  0x00005615a1bb415d in os_host_main_loop_wait (timeout=3D<optimized
+out>) at util/main-loop.c:236
+#5  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:49=
+7
+#6  0x00005615a18fdd39 in main_loop () at vl.c:1928
+#7  0x00005615a16c9ee9 in main (argc=3D<optimized out>, argv=3D<optimized
+out>, envp=3D<optimized out>) at vl.c:4665
 
-diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
-index b318e53a434..26f7b4ca357 100644
---- a/hw/nvram/Makefile.objs
-+++ b/hw/nvram/Makefile.objs
-@@ -5,3 +5,4 @@ common-obj-y += fw_cfg.o
- common-obj-y += chrp_nvram.o
- common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
- obj-$(CONFIG_PSERIES) += spapr_nvram.o
-+obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
-diff --git a/include/hw/nvram/nrf51_nvm.h b/include/hw/nvram/nrf51_nvm.h
-new file mode 100644
-index 00000000000..3792e4a9fec
---- /dev/null
-+++ b/include/hw/nvram/nrf51_nvm.h
-@@ -0,0 +1,64 @@
-+/*
-+ * Nordic Semiconductor nRF51 non-volatile memory
-+ *
-+ * It provides an interface to erase regions in flash memory.
-+ * Furthermore it provides the user and factory information registers.
-+ *
-+ * QEMU interface:
-+ * + sysbus MMIO regions 0: NVMC peripheral registers
-+ * + sysbus MMIO regions 1: FICR peripheral registers
-+ * + sysbus MMIO regions 2: UICR peripheral registers
-+ * + flash-size property: flash size in bytes.
-+ *
-+ * Accuracy of the peripheral model:
-+ * + Code regions (MPU configuration) are disregarded.
-+ *
-+ * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef NRF51_NVM_H
-+#define NRF51_NVM_H
-+
-+#include "hw/sysbus.h"
-+#define TYPE_NRF51_NVM "nrf51_soc.nvm"
-+#define NRF51_NVM(obj) OBJECT_CHECK(NRF51NVMState, (obj), TYPE_NRF51_NVM)
-+
-+#define NRF51_UICR_FIXTURE_SIZE 64
-+
-+#define NRF51_NVMC_SIZE         0x1000
-+
-+#define NRF51_NVMC_READY        0x400
-+#define NRF51_NVMC_READY_READY  0x01
-+#define NRF51_NVMC_CONFIG       0x504
-+#define NRF51_NVMC_CONFIG_MASK  0x03
-+#define NRF51_NVMC_CONFIG_WEN   0x01
-+#define NRF51_NVMC_CONFIG_EEN   0x02
-+#define NRF51_NVMC_ERASEPCR1    0x508
-+#define NRF51_NVMC_ERASEPCR0    0x510
-+#define NRF51_NVMC_ERASEALL     0x50C
-+#define NRF51_NVMC_ERASEUICR    0x514
-+#define NRF51_NVMC_ERASE        0x01
-+
-+#define NRF51_UICR_SIZE         0x100
-+
-+typedef struct NRF51NVMState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mmio;
-+    MemoryRegion ficr;
-+    MemoryRegion uicr;
-+    MemoryRegion flash;
-+
-+    uint32_t uicr_content[NRF51_UICR_FIXTURE_SIZE];
-+    uint32_t flash_size;
-+    uint8_t *storage;
-+
-+    uint32_t config;
-+
-+} NRF51NVMState;
-+
-+
-+#endif
-diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
-new file mode 100644
-index 00000000000..7d94cef1db3
---- /dev/null
-+++ b/hw/nvram/nrf51_nvm.c
-@@ -0,0 +1,388 @@
-+/*
-+ * Nordic Semiconductor nRF51 non-volatile memory
-+ *
-+ * It provides an interface to erase regions in flash memory.
-+ * Furthermore it provides the user and factory information registers.
-+ *
-+ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-+ *
-+ * See nRF51 reference manual and product sheet sections:
-+ * + Non-Volatile Memory Controller (NVMC)
-+ * + Factory Information Configuration Registers (FICR)
-+ * + User Information Configuration Registers (UICR)
-+ *
-+ * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/log.h"
-+#include "exec/address-spaces.h"
-+#include "hw/arm/nrf51.h"
-+#include "hw/nvram/nrf51_nvm.h"
-+
-+/*
-+ * FICR Registers Assignments
-+ * CODEPAGESIZE      0x010
-+ * CODESIZE          0x014
-+ * CLENR0            0x028
-+ * PPFC              0x02C
-+ * NUMRAMBLOCK       0x034
-+ * SIZERAMBLOCKS     0x038
-+ * SIZERAMBLOCK[0]   0x038
-+ * SIZERAMBLOCK[1]   0x03C
-+ * SIZERAMBLOCK[2]   0x040
-+ * SIZERAMBLOCK[3]   0x044
-+ * CONFIGID          0x05C
-+ * DEVICEID[0]       0x060
-+ * DEVICEID[1]       0x064
-+ * ER[0]             0x080
-+ * ER[1]             0x084
-+ * ER[2]             0x088
-+ * ER[3]             0x08C
-+ * IR[0]             0x090
-+ * IR[1]             0x094
-+ * IR[2]             0x098
-+ * IR[3]             0x09C
-+ * DEVICEADDRTYPE    0x0A0
-+ * DEVICEADDR[0]     0x0A4
-+ * DEVICEADDR[1]     0x0A8
-+ * OVERRIDEEN        0x0AC
-+ * NRF_1MBIT[0]      0x0B0
-+ * NRF_1MBIT[1]      0x0B4
-+ * NRF_1MBIT[2]      0x0B8
-+ * NRF_1MBIT[3]      0x0BC
-+ * NRF_1MBIT[4]      0x0C0
-+ * BLE_1MBIT[0]      0x0EC
-+ * BLE_1MBIT[1]      0x0F0
-+ * BLE_1MBIT[2]      0x0F4
-+ * BLE_1MBIT[3]      0x0F8
-+ * BLE_1MBIT[4]      0x0FC
-+ */
-+static const uint32_t ficr_content[64] = {
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000400,
-+    0x00000100, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000002, 0x00002000,
-+    0x00002000, 0x00002000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000003,
-+    0x12345678, 0x9ABCDEF1, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-+};
-+
-+static uint64_t ficr_read(void *opaque, hwaddr offset, unsigned int size)
-+{
-+    assert(offset < sizeof(ficr_content));
-+    return ficr_content[offset / 4];
-+}
-+
-+static void ficr_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned int size)
-+{
-+    /* Intentionally do nothing */
-+}
-+
-+static const MemoryRegionOps ficr_ops = {
-+    .read = ficr_read,
-+    .write = ficr_write,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN
-+};
-+
-+/*
-+ * UICR Registers Assignments
-+ * CLENR0           0x000
-+ * RBPCONF          0x004
-+ * XTALFREQ         0x008
-+ * FWID             0x010
-+ * BOOTLOADERADDR   0x014
-+ * NRFFW[0]         0x014
-+ * NRFFW[1]         0x018
-+ * NRFFW[2]         0x01C
-+ * NRFFW[3]         0x020
-+ * NRFFW[4]         0x024
-+ * NRFFW[5]         0x028
-+ * NRFFW[6]         0x02C
-+ * NRFFW[7]         0x030
-+ * NRFFW[8]         0x034
-+ * NRFFW[9]         0x038
-+ * NRFFW[10]        0x03C
-+ * NRFFW[11]        0x040
-+ * NRFFW[12]        0x044
-+ * NRFFW[13]        0x048
-+ * NRFFW[14]        0x04C
-+ * NRFHW[0]         0x050
-+ * NRFHW[1]         0x054
-+ * NRFHW[2]         0x058
-+ * NRFHW[3]         0x05C
-+ * NRFHW[4]         0x060
-+ * NRFHW[5]         0x064
-+ * NRFHW[6]         0x068
-+ * NRFHW[7]         0x06C
-+ * NRFHW[8]         0x070
-+ * NRFHW[9]         0x074
-+ * NRFHW[10]        0x078
-+ * NRFHW[11]        0x07C
-+ * CUSTOMER[0]      0x080
-+ * CUSTOMER[1]      0x084
-+ * CUSTOMER[2]      0x088
-+ * CUSTOMER[3]      0x08C
-+ * CUSTOMER[4]      0x090
-+ * CUSTOMER[5]      0x094
-+ * CUSTOMER[6]      0x098
-+ * CUSTOMER[7]      0x09C
-+ * CUSTOMER[8]      0x0A0
-+ * CUSTOMER[9]      0x0A4
-+ * CUSTOMER[10]     0x0A8
-+ * CUSTOMER[11]     0x0AC
-+ * CUSTOMER[12]     0x0B0
-+ * CUSTOMER[13]     0x0B4
-+ * CUSTOMER[14]     0x0B8
-+ * CUSTOMER[15]     0x0BC
-+ * CUSTOMER[16]     0x0C0
-+ * CUSTOMER[17]     0x0C4
-+ * CUSTOMER[18]     0x0C8
-+ * CUSTOMER[19]     0x0CC
-+ * CUSTOMER[20]     0x0D0
-+ * CUSTOMER[21]     0x0D4
-+ * CUSTOMER[22]     0x0D8
-+ * CUSTOMER[23]     0x0DC
-+ * CUSTOMER[24]     0x0E0
-+ * CUSTOMER[25]     0x0E4
-+ * CUSTOMER[26]     0x0E8
-+ * CUSTOMER[27]     0x0EC
-+ * CUSTOMER[28]     0x0F0
-+ * CUSTOMER[29]     0x0F4
-+ * CUSTOMER[30]     0x0F8
-+ * CUSTOMER[31]     0x0FC
-+ */
-+
-+static uint64_t uicr_read(void *opaque, hwaddr offset, unsigned int size)
-+{
-+    NRF51NVMState *s = NRF51_NVM(opaque);
-+
-+    assert(offset < sizeof(s->uicr_content));
-+    return s->uicr_content[offset / 4];
-+}
-+
-+static void uicr_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned int size)
-+{
-+    NRF51NVMState *s = NRF51_NVM(opaque);
-+
-+    assert(offset < sizeof(s->uicr_content));
-+    s->uicr_content[offset / 4] = value;
-+}
-+
-+static const MemoryRegionOps uicr_ops = {
-+    .read = uicr_read,
-+    .write = uicr_write,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN
-+};
-+
-+
-+static uint64_t io_read(void *opaque, hwaddr offset, unsigned int size)
-+{
-+    NRF51NVMState *s = NRF51_NVM(opaque);
-+    uint64_t r = 0;
-+
-+    switch (offset) {
-+    case NRF51_NVMC_READY:
-+        r = NRF51_NVMC_READY_READY;
-+        break;
-+    case NRF51_NVMC_CONFIG:
-+        r = s->config;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "%s: bad read offset 0x%" HWADDR_PRIx "\n", __func__, offset);
-+        break;
-+    }
-+
-+    return r;
-+}
-+
-+static void io_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned int size)
-+{
-+    NRF51NVMState *s = NRF51_NVM(opaque);
-+
-+    switch (offset) {
-+    case NRF51_NVMC_CONFIG:
-+        s->config = value & NRF51_NVMC_CONFIG_MASK;
-+        break;
-+    case NRF51_NVMC_ERASEPCR0:
-+    case NRF51_NVMC_ERASEPCR1:
-+        if (s->config & NRF51_NVMC_CONFIG_EEN) {
-+            /* Mask in-page sub address */
-+            value &= ~(NRF51_PAGE_SIZE - 1);
-+            if (value <= (s->flash_size - NRF51_PAGE_SIZE)) {
-+                memset(s->storage + value, 0xFF, NRF51_PAGE_SIZE);
-+                memory_region_flush_rom_device(&s->flash, value,
-+                                               NRF51_PAGE_SIZE);
-+            }
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+            "%s: Flash erase at 0x%" HWADDR_PRIx" while flash not erasable.\n",
-+            __func__, offset);
-+        }
-+        break;
-+    case NRF51_NVMC_ERASEALL:
-+        if (value == NRF51_NVMC_ERASE) {
-+            if (s->config & NRF51_NVMC_CONFIG_EEN) {
-+                memset(s->storage, 0xFF, s->flash_size);
-+                memory_region_flush_rom_device(&s->flash, 0, s->flash_size);
-+                memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
-+            } else {
-+                qemu_log_mask(LOG_GUEST_ERROR, "%s: Flash not erasable.\n",
-+                              __func__);
-+            }
-+        }
-+        break;
-+    case NRF51_NVMC_ERASEUICR:
-+        if (value == NRF51_NVMC_ERASE) {
-+            memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
-+        }
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "%s: bad write offset 0x%" HWADDR_PRIx "\n", __func__, offset);
-+    }
-+}
-+
-+static const MemoryRegionOps io_ops = {
-+        .read = io_read,
-+        .write = io_write,
-+        .impl.min_access_size = 4,
-+        .impl.max_access_size = 4,
-+        .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+
-+static void flash_write(void *opaque, hwaddr offset, uint64_t value,
-+        unsigned int size)
-+{
-+    NRF51NVMState *s = NRF51_NVM(opaque);
-+
-+    if (s->config & NRF51_NVMC_CONFIG_WEN) {
-+        uint32_t oldval;
-+
-+        assert(offset + size <= s->flash_size);
-+
-+        /* NOR Flash only allows bits to be flipped from 1's to 0's on write */
-+        oldval = ldl_le_p(s->storage + offset);
-+        oldval &= value;
-+        stl_le_p(s->storage + offset, oldval);
-+
-+        memory_region_flush_rom_device(&s->flash, offset, size);
-+    } else {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                "%s: Flash write 0x%" HWADDR_PRIx" while flash not writable.\n",
-+                __func__, offset);
-+    }
-+}
-+
-+
-+
-+static const MemoryRegionOps flash_ops = {
-+    .write = flash_write,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void nrf51_nvm_init(Object *obj)
-+{
-+    NRF51NVMState *s = NRF51_NVM(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->mmio, obj, &io_ops, s, "nrf51_soc.nvmc",
-+                          NRF51_NVMC_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+
-+    memory_region_init_io(&s->ficr, obj, &ficr_ops, s, "nrf51_soc.ficr",
-+                          sizeof(ficr_content));
-+    sysbus_init_mmio(sbd, &s->ficr);
-+
-+    memory_region_init_io(&s->uicr, obj, &uicr_ops, s, "nrf51_soc.uicr",
-+                          sizeof(s->uicr_content));
-+    sysbus_init_mmio(sbd, &s->uicr);
-+}
-+
-+static void nrf51_nvm_realize(DeviceState *dev, Error **errp)
-+{
-+    NRF51NVMState *s = NRF51_NVM(dev);
-+    Error *err = NULL;
-+
-+    memory_region_init_rom_device(&s->flash, OBJECT(dev), &flash_ops, s,
-+        "nrf51_soc.flash", s->flash_size, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    s->storage = memory_region_get_ram_ptr(&s->flash);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->flash);
-+}
-+
-+static void nrf51_nvm_reset(DeviceState *dev)
-+{
-+    NRF51NVMState *s = NRF51_NVM(dev);
-+
-+    s->config = 0x00;
-+    memset(s->uicr_content, 0xFF, sizeof(s->uicr_content));
-+}
-+
-+static Property nrf51_nvm_properties[] = {
-+    DEFINE_PROP_UINT32("flash-size", NRF51NVMState, flash_size, 0x40000),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static const VMStateDescription vmstate_nvm = {
-+    .name = "nrf51_soc.nvm",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(uicr_content, NRF51NVMState,
-+                NRF51_UICR_FIXTURE_SIZE),
-+        VMSTATE_UINT32(config, NRF51NVMState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void nrf51_nvm_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = nrf51_nvm_properties;
-+    dc->vmsd = &vmstate_nvm;
-+    dc->realize = nrf51_nvm_realize;
-+    dc->reset = nrf51_nvm_reset;
-+}
-+
-+static const TypeInfo nrf51_nvm_info = {
-+    .name = TYPE_NRF51_NVM,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(NRF51NVMState),
-+    .instance_init = nrf51_nvm_init,
-+    .class_init = nrf51_nvm_class_init
-+};
-+
-+static void nrf51_nvm_register_types(void)
-+{
-+    type_register_static(&nrf51_nvm_info);
-+}
-+
-+type_init(nrf51_nvm_register_types)
--- 
-2.20.1
+Running it with `taskset -c 1` prevents this issue from happening, which
+AFAICT, contributes even further towards this being a QEMU race condition=
+.
+
+I'm CC'ing Peter and Claudio (listed maintainers of aarch64), as this
+seems to limited to that target.  Any tips on what to do here?
+
+Thanks,
+- Cleber.
+
+> Thanks,
+> - Cleber.
+>=20
