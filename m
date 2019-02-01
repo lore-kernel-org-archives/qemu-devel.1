@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38657)
+Received: from eggs.gnu.org ([209.51.188.92]:38694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpbnJ-0006zg-1e
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:35:58 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpbnQ-00078i-RK
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gpbnE-00088Z-QF
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:35:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gpbnI-00089r-T1
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:36:00 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  1 Feb 2019 17:34:53 +0100
-Message-Id: <20190201163518.31157-3-kwolf@redhat.com>
-In-Reply-To: <20190201163518.31157-1-kwolf@redhat.com>
-References: <20190201163518.31157-1-kwolf@redhat.com>
+Date: Fri,  1 Feb 2019 17:34:51 +0100
+Message-Id: <20190201163518.31157-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/27] mirror: Block the source BlockDriverState
- in mirror_start_job()
+Subject: [Qemu-devel] [PULL 00/27] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +23,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Alberto Garcia <berto@igalia.com>
+The following changes since commit cfe6c547690b06fbce54a6d0f7b05dd7f18e36=
+ea:
 
-The mirror_start_job() function used for the commit-active job blocks
-the source, target and all intermediate nodes for the duration of the
-job.
+  Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2019-01-3=
+1' into staging (2019-01-31 19:26:09 +0000)
 
-   target <- intermediate <- source
+are available in the Git repository at:
 
-Since 4ef85a9c2339 this function creates a dummy mirror_top_bs that
-goes on top of the source node, and it is this dummy node that gets
-blocked instead. The source node is never blocked or added to the
-job's list of nodes.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-   target <- intermediate <- source <- mirror_top
+for you to fetch changes up to 7471a649fc3a391dd497297013fb2525ca9821ba:
 
-At the moment I don't think it is possible to exploit this problem
-because any additional job on 'source' would either be forbidden for
-other reasons or it would need to involve an additional node that is
-blocked, causing an error.
+  scsi-disk: Add device_id property (2019-02-01 13:48:11 +0100)
 
-This can be seen in the error messages, however, because they never
-refer to the source node being blocked:
+----------------------------------------------------------------
+Block layer patches:
 
-  $ qemu-img create -f qcow2 hd0.qcow2 1M
-  $ qemu-img create -f qcow2 -b hd0.qcow2 hd1.qcow2
-  $ qemu-io -c 'write 0 1M' hd0.qcow2
-  $ $QEMU -drive if=3Dnone,file=3Dhd1.qcow2,node-name=3Dhd1
-  { "execute": "qmp_capabilities" }
-  { "execute": "block-commit", "arguments": {"device": "hd1", "speed": 25=
-6}}
-  { "execute": "block-stream", "arguments": {"device": "hd1"}}
-  { "error": {"class": "GenericError",
-    "desc": "Node 'hd0' is busy: block device is in use by block job: com=
-mit"}}
+- vmdk: Support for blockdev-create
+- block: Apply auto-read-only for ro-whitelist drivers
+- virtio-scsi: Fixes related to attaching/detaching iothreads
+- scsi-disk: Fixed erroneously detected multipath setup with multiple
+  disks created with node-names. Added device_id property.
+- block: Fix hangs in synchronous APIs with iothreads
+- block: Fix invalidate_cache error path for parent activation
+- block-backend, mirror, qcow2, vpc, vdi, qemu-iotests:
+  Minor fixes and code improvements
 
-After this patch the error message refers to 'hd1', as it should.
+----------------------------------------------------------------
+Alberto Garcia (7):
+      mirror: Release the dirty bitmap if mirror_start_job() fails
+      mirror: Block the source BlockDriverState in mirror_start_job()
+      qcow2: Assert that refcount block offsets fit in the refcount table
+      virtio-scsi: Move BlockBackend back to the main AioContext on unplu=
+g
+      scsi-disk: Acquire the AioContext in scsi_*_realize()
+      virtio-scsi: Forbid devices with different iothreads sharing a bloc=
+kdev
+      qtest.py: Wait for the result of qtest commands
 
-The expected output of iotest 141 also needs to be updated for the
-same reason.
+Fam Zheng (3):
+      vmdk: Refactor vmdk_create_extent
+      vmdk: Implement .bdrv_co_create callback
+      iotests: Filter cid numbers in VMDK extent info
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/mirror.c             | 8 ++++++++
- tests/qemu-iotests/141.out | 4 ++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+John Snow (1):
+      iotests/236: fix transaction kwarg order
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 4cf1c088c0..b67b0120f8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1612,6 +1612,14 @@ static void mirror_start_job(const char *job_id, B=
-lockDriverState *bs,
-         goto fail;
-     }
-=20
-+    ret =3D block_job_add_bdrv(&s->common, "source", bs, 0,
-+                             BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE |
-+                             BLK_PERM_CONSISTENT_READ,
-+                             errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-     /* Required permissions are already taken with blk_new() */
-     block_job_add_bdrv(&s->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index f252c86875..41c7291258 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -28,7 +28,7 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=3DIMGFMT size=3D104=
-8576 backing_file=3DTEST_DIR/t.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, =
-"speed": 0, "type": "mirror"}}
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node i=
-s used as backing hd of 'NODE_NAME'"}}
-+{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block =
-device is in use by block job: mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
-@@ -45,7 +45,7 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=3DIMGFMT size=3D104=
-8576 backing_file=3DTEST_DIR/t.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, =
-"speed": 0, "type": "commit"}}
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node i=
-s used as backing hd of 'NODE_NAME'"}}
-+{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block =
-device is in use by block job: commit"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
---=20
-2.20.1
+Kevin Wolf (7):
+      block: Fix hangs in synchronous APIs with iothreads
+      iotests: Add VMDK tests for blockdev-create
+      vmdk: Reject excess extents in blockdev-create
+      block: Apply auto-read-only for ro-whitelist drivers
+      block: Fix invalidate_cache error path for parent activation
+      scsi-disk: Don't use empty string as device id
+      scsi-disk: Add device_id property
+
+Markus Armbruster (2):
+      block: Replace qdict_put() by qdict_put_obj() where appropriate
+      block: Eliminate the S_1KiB, S_2KiB, ... macros
+
+Max Reitz (2):
+      iotests: Make 234 stable
+      iotests: Filter second BLOCK_JOB_ERROR from 229
+
+Peter Maydell (3):
+      block/vpc: Don't take address of fields in packed structs
+      block/vdi: Don't take address of fields in packed structs
+      uuid: Make qemu_uuid_bswap() take and return a QemuUUID
+
+Thomas Huth (1):
+      block: Remove blk_attach_dev_legacy() / legacy_dev code
+
+yuchenlin (1):
+      qemu-iotests: add test case for dmg
+
+ qapi/block-core.json                               |  71 +++
+ qapi/qapi-schema.json                              |  16 +-
+ block/qcow2.h                                      |  10 +-
+ include/qemu/units.h                               |  73 ---
+ include/qemu/uuid.h                                |   2 +-
+ include/sysemu/block-backend.h                     |   5 +-
+ block.c                                            |  27 +-
+ block/blklogwrites.c                               |   5 +-
+ block/block-backend.c                              |  59 +--
+ block/io.c                                         |   8 +-
+ block/mirror.c                                     |  11 +
+ block/nbd-client.c                                 |   1 +
+ block/nvme.c                                       |   1 +
+ block/qcow2-refcount.c                             |   3 +
+ block/qcow2.c                                      |   1 +
+ block/qed.c                                        |   1 +
+ block/vdi.c                                        |  57 ++-
+ block/vmdk.c                                       | 532 +++++++++++++++=
+------
+ block/vpc.c                                        |   4 +-
+ hw/acpi/vmgenid.c                                  |   6 +-
+ hw/scsi/scsi-disk.c                                |  59 ++-
+ hw/scsi/virtio-scsi.c                              |  13 +
+ tests/test-block-iothread.c                        | 372 ++++++++++++++
+ tests/vmgenid-test.c                               |   2 +-
+ util/uuid.c                                        |  10 +-
+ scripts/qtest.py                                   |   6 +
+ tests/Makefile.include                             |   2 +
+ tests/qemu-iotests/141.out                         |   4 +-
+ tests/qemu-iotests/229                             |   6 +-
+ tests/qemu-iotests/229.out                         |   1 -
+ tests/qemu-iotests/234                             |  56 ++-
+ tests/qemu-iotests/234.out                         |  10 +-
+ tests/qemu-iotests/236.out                         |  56 +--
+ tests/qemu-iotests/237                             | 237 +++++++++
+ tests/qemu-iotests/237.out                         | 348 ++++++++++++++
+ tests/qemu-iotests/239                             |  53 ++
+ tests/qemu-iotests/239.out                         |   4 +
+ tests/qemu-iotests/240                             | 129 +++++
+ tests/qemu-iotests/240.out                         |  54 +++
+ tests/qemu-iotests/check                           |   7 +
+ tests/qemu-iotests/common.filter                   |   1 +
+ tests/qemu-iotests/group                           |   3 +
+ tests/qemu-iotests/iotests.py                      |  22 +-
+ .../qemu-iotests/sample_images/simple-dmg.dmg.bz2  | Bin 0 -> 3479 bytes
+ 44 files changed, 1931 insertions(+), 417 deletions(-)
+ create mode 100644 tests/test-block-iothread.c
+ create mode 100755 tests/qemu-iotests/237
+ create mode 100644 tests/qemu-iotests/237.out
+ create mode 100755 tests/qemu-iotests/239
+ create mode 100644 tests/qemu-iotests/239.out
+ create mode 100755 tests/qemu-iotests/240
+ create mode 100644 tests/qemu-iotests/240.out
+ create mode 100644 tests/qemu-iotests/sample_images/simple-dmg.dmg.bz2
