@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59031)
+Received: from eggs.gnu.org ([209.51.188.92]:59033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbME-0008Gz-1c
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbME-0008H2-4T
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003jP-Sg
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:57 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36413)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003jk-1i
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:58 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003MA-Fi
+	id 1gpbMA-0003JC-LC
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p6so6753254wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:19 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id y139so6605566wmc.5
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:08 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.17
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.06
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:17 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:06 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:23 +0000
-Message-Id: <20190201160653.13829-18-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:14 +0000
+Message-Id: <20190201160653.13829-9-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/47] hw/arm/armsse: Add unimplemented-device
- stubs for PPUs
+Subject: [Qemu-devel] [PULL 08/47] hw/arm/iotkit: Rename files to
+ hw/arm/armsse.[ch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,142 +37,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Add unimplemented-device stubs for the various Power Policy Unit
-devices that the SSE-200 has.
+Rename the files that used to be iotkit.[ch] to
+armsse.[ch] to reflect the fact they new cover
+multiple Arm subsystems for embedded.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-17-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-8-peter.maydell@linaro.org
 ---
- include/hw/arm/armsse.h | 11 ++++++++
- hw/arm/armsse.c         | 58 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ hw/arm/Makefile.objs                  | 2 +-
+ include/hw/arm/{iotkit.h => armsse.h} | 4 ++--
+ hw/arm/{iotkit.c => armsse.c}         | 2 +-
+ hw/arm/mps2-tz.c                      | 2 +-
+ MAINTAINERS                           | 4 ++--
+ default-configs/arm-softmmu.mak       | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+ rename include/hw/arm/{iotkit.h => armsse.h} (99%)
+ rename hw/arm/{iotkit.c => armsse.c} (99%)
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index dbfcb280605..9855ec5f269 100644
---- a/include/hw/arm/armsse.h
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 50c7b4a927d..22b7f0ed0ba 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -34,7 +34,7 @@ obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) += mps2.o
+ obj-$(CONFIG_MPS2) += mps2-tz.o
+ obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
+-obj-$(CONFIG_IOTKIT) += iotkit.o
++obj-$(CONFIG_ARMSSE) += armsse.o
+ obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
+ obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
+ obj-$(CONFIG_FSL_IMX6UL) += fsl-imx6ul.o mcimx6ul-evk.o
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/armsse.h
+similarity index 99%
+rename from include/hw/arm/iotkit.h
+rename to include/hw/arm/armsse.h
+index 521d1f73757..ff512054988 100644
+--- a/include/hw/arm/iotkit.h
 +++ b/include/hw/arm/armsse.h
-@@ -106,6 +106,16 @@
+@@ -58,8 +58,8 @@
+  *  + named GPIO outputs mscexp_ns[0..15]
+  */
  
- #define SSE_MAX_CPUS 2
+-#ifndef IOTKIT_H
+-#define IOTKIT_H
++#ifndef ARMSSE_H
++#define ARMSSE_H
  
-+/* These define what each PPU in the ppu[] index is for */
-+#define CPU0CORE_PPU 0
-+#define CPU1CORE_PPU 1
-+#define DBG_PPU 2
-+#define RAM0_PPU 3
-+#define RAM1_PPU 4
-+#define RAM2_PPU 5
-+#define RAM3_PPU 6
-+#define NUM_PPUS 7
-+
- typedef struct ARMSSE {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -139,6 +149,7 @@ typedef struct ARMSSE {
-     IoTKitSysCtl sysinfo;
- 
-     UnimplementedDeviceState mhu[2];
-+    UnimplementedDeviceState ppu[NUM_PPUS];
- 
-     /*
-      * 'container' holds all devices seen by all CPUs.
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 1f3dc89c8e8..280ba5c78be 100644
---- a/hw/arm/armsse.c
+ #include "hw/sysbus.h"
+ #include "hw/arm/armv7m.h"
+diff --git a/hw/arm/iotkit.c b/hw/arm/armsse.c
+similarity index 99%
+rename from hw/arm/iotkit.c
+rename to hw/arm/armsse.c
+index 7ff14fd5aef..8554be14128 100644
+--- a/hw/arm/iotkit.c
 +++ b/hw/arm/armsse.c
-@@ -31,6 +31,7 @@ struct ARMSSEInfo {
-     uint32_t sys_version;
-     SysConfigFormat sys_config_format;
-     bool has_mhus;
-+    bool has_ppus;
- };
+@@ -15,7 +15,7 @@
+ #include "trace.h"
+ #include "hw/sysbus.h"
+ #include "hw/registerfields.h"
+-#include "hw/arm/iotkit.h"
++#include "hw/arm/armsse.h"
+ #include "hw/arm/arm.h"
  
- static const ARMSSEInfo armsse_variants[] = {
-@@ -41,6 +42,7 @@ static const ARMSSEInfo armsse_variants[] = {
-         .sys_version = 0x41743,
-         .sys_config_format = IoTKitFormat,
-         .has_mhus = false,
-+        .has_ppus = false,
-     },
- };
- 
-@@ -265,6 +267,29 @@ static void armsse_init(Object *obj)
-         sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
-                               TYPE_UNIMPLEMENTED_DEVICE);
-     }
-+    if (info->has_ppus) {
-+        for (i = 0; i < info->num_cpus; i++) {
-+            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
-+            int ppuidx = CPU0CORE_PPU + i;
-+
-+            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
-+                                  sizeof(s->ppu[ppuidx]),
-+                                  TYPE_UNIMPLEMENTED_DEVICE);
-+            g_free(name);
-+        }
-+        sysbus_init_child_obj(obj, "DBG_PPU", &s->ppu[DBG_PPU],
-+                              sizeof(s->ppu[DBG_PPU]),
-+                              TYPE_UNIMPLEMENTED_DEVICE);
-+        for (i = 0; i < info->sram_banks; i++) {
-+            char *name = g_strdup_printf("RAM%d_PPU", i);
-+            int ppuidx = RAM0_PPU + i;
-+
-+            sysbus_init_child_obj(obj, name, &s->ppu[ppuidx],
-+                                  sizeof(s->ppu[ppuidx]),
-+                                  TYPE_UNIMPLEMENTED_DEVICE);
-+            g_free(name);
-+        }
-+    }
-     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
-                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
-@@ -329,6 +354,17 @@ static qemu_irq armsse_get_common_irq_in(ARMSSE *s, int irqno)
-     }
- }
- 
-+static void map_ppu(ARMSSE *s, int ppuidx, const char *name, hwaddr addr)
-+{
-+    /* Map a PPU unimplemented device stub */
-+    DeviceState *dev = DEVICE(&s->ppu[ppuidx]);
-+
-+    qdev_prop_set_string(dev, "name", name);
-+    qdev_prop_set_uint64(dev, "size", 0x1000);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ppu[ppuidx]), 0, addr);
-+}
-+
- static void armsse_realize(DeviceState *dev, Error **errp)
- {
-     ARMSSE *s = ARMSSE(dev);
-@@ -833,6 +869,28 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x50021000);
- 
-+    if (info->has_ppus) {
-+        /* CPUnCORE_PPU for each CPU */
-+        for (i = 0; i < info->num_cpus; i++) {
-+            char *name = g_strdup_printf("CPU%dCORE_PPU", i);
-+
-+            map_ppu(s, CPU0CORE_PPU + i, name, 0x50023000 + i * 0x2000);
-+            /*
-+             * We don't support CPU debug so don't create the
-+             * CPU0DEBUG_PPU at 0x50024000 and 0x50026000.
-+             */
-+            g_free(name);
-+        }
-+        map_ppu(s, DBG_PPU, "DBG_PPU", 0x50029000);
-+
-+        for (i = 0; i < info->sram_banks; i++) {
-+            char *name = g_strdup_printf("RAM%d_PPU", i);
-+
-+            map_ppu(s, RAM0_PPU + i, name, 0x5002a000 + i * 0x1000);
-+            g_free(name);
-+        }
-+    }
-+
-     /* This OR gate wires together outputs from the secure watchdogs to NMI */
-     object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
-     if (err) {
+ struct ARMSSEInfo {
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 5824335b4fb..3859f17d98b 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -46,7 +46,7 @@
+ #include "hw/misc/mps2-fpgaio.h"
+ #include "hw/misc/tz-mpc.h"
+ #include "hw/misc/tz-msc.h"
+-#include "hw/arm/iotkit.h"
++#include "hw/arm/armsse.h"
+ #include "hw/dma/pl080.h"
+ #include "hw/ssi/pl022.h"
+ #include "hw/devices.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 234e5c413bd..c2ad4e52c9d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -623,8 +623,8 @@ F: hw/arm/mps2.c
+ F: hw/arm/mps2-tz.c
+ F: hw/misc/mps2-*.c
+ F: include/hw/misc/mps2-*.h
+-F: hw/arm/iotkit.c
+-F: include/hw/arm/iotkit.h
++F: hw/arm/armsse.c
++F: include/hw/arm/armsse.h
+ F: hw/misc/iotkit-secctl.c
+ F: include/hw/misc/iotkit-secctl.h
+ F: hw/misc/iotkit-sysctl.c
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 2420491aacd..3f200157879 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -114,7 +114,7 @@ CONFIG_MPS2_SCC=y
+ CONFIG_TZ_MPC=y
+ CONFIG_TZ_MSC=y
+ CONFIG_TZ_PPC=y
+-CONFIG_IOTKIT=y
++CONFIG_ARMSSE=y
+ CONFIG_IOTKIT_SECCTL=y
+ CONFIG_IOTKIT_SYSCTL=y
+ CONFIG_IOTKIT_SYSINFO=y
 -- 
 2.20.1
