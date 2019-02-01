@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37679)
+Received: from eggs.gnu.org ([209.51.188.92]:37714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpOej-0007l7-77
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gpOem-0007o4-Tz
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gpOei-0002nG-Fq
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gpOem-0002oI-1J
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:34:16 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  1 Feb 2019 10:33:54 +0800
-Message-Id: <20190201023357.22596-1-stefanha@redhat.com>
+Date: Fri,  1 Feb 2019 10:33:56 +0800
+Message-Id: <20190201023357.22596-3-stefanha@redhat.com>
+In-Reply-To: <20190201023357.22596-1-stefanha@redhat.com>
+References: <20190201023357.22596-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/3] arm: microbit Non-Volatile Memory
- Controller
+Subject: [Qemu-devel] [PATCH v4 2/3] arm: Instantiate NRF51 special NVM's
+ and NVMC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +26,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, jusual@mail.ru, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, jim@groklearning.com, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-v4:
- * assert(offset + size <=3D s->flash_size) [Peter]
-v3:
- * Fix endianness of s->storage[], tested by Joel Stanley <joel@jms.id.au=
-> on
-   big-endian ppc [Peter]
- * Fix off-by-one that prevented clearing the last page of flash
- * Add missing memory_region_flush_rom_device() call to flash_write()
-v2:
- * Add Patch 2 to call memory_region_flush_rom_device() from pflash devic=
-es
-   [Peter]
+From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
 
-This series adds the Non-Volatile Memory Controller, which controls acces=
-s to
-the User Information Control Registers (UICR), Factory Information Contro=
-l
-Registers (FICR), and flash memory.
+Instantiates UICR, FICR, FLASH and NVMC in nRF51 SOC.
 
-This is the last piece of microbit work needed to make basic programs lik=
-e
-Micropython "Hello world" work under QEMU.
+Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/hw/arm/nrf51_soc.h |  2 ++
+ hw/arm/nrf51_soc.c         | 41 +++++++++++++++++++++++++++-----------
+ 2 files changed, 31 insertions(+), 12 deletions(-)
 
-Originally sent as part of Steffen's longer microbit device emulation ser=
-ies, I
-extracted this and deferred it until later because cleanups were necessar=
-y:
-
- * Use memory_region_flush_rom_device() to dirty/invalidate memory [Peter=
-]
-   ^--- Paolo: I CCed you on this new memory API
- * Fix device-introspect-test segfault due to missing owner when initiali=
-zing
-   FICR and UICR memory regions [Peter]
- * Fix off-by-one assertion checks [Peter]
- * Fix missing whitespace at end of comment [Peter]
- * Clear UICR on reset - we'd need a block device for true non-volatility
-   [Peter]
-
-Steffen G=C3=B6rtz (3):
-  hw/nvram/nrf51_nvm: Add nRF51 non-volatile memories
-  arm: Instantiate NRF51 special NVM's and NVMC
-  tests/microbit-test: Add tests for nRF51 NVMC
-
- hw/nvram/Makefile.objs       |   1 +
- include/hw/arm/nrf51_soc.h   |   2 +
- include/hw/nvram/nrf51_nvm.h |  64 ++++++
- hw/arm/nrf51_soc.c           |  41 ++--
- hw/nvram/nrf51_nvm.c         | 388 +++++++++++++++++++++++++++++++++++
- tests/microbit-test.c        | 108 ++++++++++
- 6 files changed, 592 insertions(+), 12 deletions(-)
- create mode 100644 include/hw/nvram/nrf51_nvm.h
- create mode 100644 hw/nvram/nrf51_nvm.c
-
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index fbdefc07e4..fd7fcc71a5 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -15,6 +15,7 @@
+ #include "hw/char/nrf51_uart.h"
+ #include "hw/misc/nrf51_rng.h"
+ #include "hw/gpio/nrf51_gpio.h"
++#include "hw/nvram/nrf51_nvm.h"
+ #include "hw/timer/nrf51_timer.h"
+=20
+ #define TYPE_NRF51_SOC "nrf51-soc"
+@@ -32,6 +33,7 @@ typedef struct NRF51State {
+=20
+     NRF51UARTState uart;
+     NRF51RNGState rng;
++    NRF51NVMState nvm;
+     NRF51GPIOState gpio;
+     NRF51TimerState timer[NRF51_NUM_TIMERS];
+=20
+diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
+index 1630c27594..b839daea8b 100644
+--- a/hw/arm/nrf51_soc.c
++++ b/hw/arm/nrf51_soc.c
+@@ -29,8 +29,10 @@
+  * are supported in the future, add a sub-class of NRF51SoC for
+  * the specific variants
+  */
+-#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
+-#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
++#define NRF51822_FLASH_PAGES    256
++#define NRF51822_SRAM_PAGES     16
++#define NRF51822_FLASH_SIZE     (NRF51822_FLASH_PAGES * NRF51_PAGE_SIZE)
++#define NRF51822_SRAM_SIZE      (NRF51822_SRAM_PAGES * NRF51_PAGE_SIZE)
+=20
+ #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
+=20
+@@ -81,14 +83,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Er=
+ror **errp)
+=20
+     memory_region_add_subregion_overlap(&s->container, 0, s->board_memor=
+y, -1);
+=20
+-    memory_region_init_rom(&s->flash, OBJECT(s), "nrf51.flash", s->flash=
+_size,
+-            &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->fla=
+sh);
+-
+     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &=
+err);
+     if (err) {
+         error_propagate(errp, err);
+@@ -121,6 +115,29 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
+Error **errp)
+                        qdev_get_gpio_in(DEVICE(&s->cpu),
+                        BASE_TO_IRQ(NRF51_RNG_BASE)));
+=20
++    /* UICR, FICR, NVMC, FLASH */
++    object_property_set_uint(OBJECT(&s->nvm), s->flash_size, "flash-size=
+",
++                             &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    object_property_set_bool(OBJECT(&s->nvm), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 0);
++    memory_region_add_subregion_overlap(&s->container, NRF51_NVMC_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 1);
++    memory_region_add_subregion_overlap(&s->container, NRF51_FICR_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 2);
++    memory_region_add_subregion_overlap(&s->container, NRF51_UICR_BASE, =
+mr, 0);
++    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->nvm), 3);
++    memory_region_add_subregion_overlap(&s->container, NRF51_FLASH_BASE,=
+ mr, 0);
++
+     /* GPIO */
+     object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
+     if (err) {
+@@ -158,8 +175,6 @@ static void nrf51_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+=20
+     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
+                                 NRF51_IOMEM_SIZE);
+-    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
+-                                NRF51_FICR_SIZE);
+     create_unimplemented_device("nrf51_soc.private",
+                                 NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
+ }
+@@ -186,6 +201,8 @@ static void nrf51_soc_init(Object *obj)
+     sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
+                            TYPE_NRF51_RNG);
+=20
++    sysbus_init_child_obj(obj, "nvm", &s->nvm, sizeof(s->nvm), TYPE_NRF5=
+1_NVM);
++
+     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
+                           TYPE_NRF51_GPIO);
+=20
 --=20
 2.20.1
