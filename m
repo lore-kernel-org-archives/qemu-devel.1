@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59114)
+Received: from eggs.gnu.org ([209.51.188.92]:59126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMG-0008Iv-3g
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMG-0008Iy-C0
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003jx-5L
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003l0-Ks
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:00 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44164)
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:38385)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMA-0003Jq-O8
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id z5so7629018wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:11 -0800 (PST)
+	id 1gpbMB-0003Lr-A5
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:55 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id v13so7654838wrw.5
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:18 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.08
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.16
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:09 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:16 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:16 +0000
-Message-Id: <20190201160653.13829-11-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:22 +0000
+Message-Id: <20190201160653.13829-17-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/47] hw/arm/armsse: Make number of SRAM banks
- parameterised
+Subject: [Qemu-devel] [PULL 16/47] hw/arm/armsse: Add unimplemented-device
+ stubs for MHUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,197 +36,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The SSE-200 has four banks of SRAM, each with its own
-Memory Protection Controller, where the IoTKit has only one.
-Make the number of SRAM banks a field in ARMSSEInfo.
+The SSE-200 has two Message Handling Units (MHUs), which sit behind
+the APB PPC0. Wire up some unimplemented-device stubs for these,
+since we don't yet implement a real model of this device.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190121185118.18550-10-peter.maydell@linaro.org
+Message-id: 20190121185118.18550-16-peter.maydell@linaro.org
 ---
- include/hw/arm/armsse.h |  9 +++--
- hw/arm/armsse.c         | 78 ++++++++++++++++++++++++++---------------
- 2 files changed, 56 insertions(+), 31 deletions(-)
+ include/hw/arm/armsse.h |  3 +++
+ hw/arm/armsse.c         | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
 diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index ff512054988..99714aa63cd 100644
+index 999c2e4f7e5..dbfcb280605 100644
 --- a/include/hw/arm/armsse.h
 +++ b/include/hw/arm/armsse.h
-@@ -90,6 +90,11 @@
- #define NUM_EXTERNAL_PPCS (IOTS_NUM_AHB_EXP_PPC + IOTS_NUM_APB_EXP_PPC)
- #define NUM_PPCS (NUM_EXTERNAL_PPCS + 2)
+@@ -78,6 +78,7 @@
+ #include "hw/watchdog/cmsdk-apb-watchdog.h"
+ #include "hw/misc/iotkit-sysctl.h"
+ #include "hw/misc/iotkit-sysinfo.h"
++#include "hw/misc/unimp.h"
+ #include "hw/or-irq.h"
+ #include "hw/core/split-irq.h"
+ #include "hw/cpu/cluster.h"
+@@ -137,6 +138,8 @@ typedef struct ARMSSE {
+     IoTKitSysCtl sysctl;
+     IoTKitSysCtl sysinfo;
  
-+#define MAX_SRAM_BANKS 4
-+#if MAX_SRAM_BANKS > IOTS_NUM_MPC
-+#error Too many SRAM banks
-+#endif
++    UnimplementedDeviceState mhu[2];
 +
- typedef struct ARMSSE {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -99,7 +104,7 @@ typedef struct ARMSSE {
-     IoTKitSecCtl secctl;
-     TZPPC apb_ppc0;
-     TZPPC apb_ppc1;
--    TZMPC mpc;
-+    TZMPC mpc[IOTS_NUM_MPC];
-     CMSDKAPBTIMER timer0;
-     CMSDKAPBTIMER timer1;
-     CMSDKAPBTIMER s32ktimer;
-@@ -123,7 +128,7 @@ typedef struct ARMSSE {
-     MemoryRegion alias1;
-     MemoryRegion alias2;
-     MemoryRegion alias3;
--    MemoryRegion sram0;
-+    MemoryRegion sram[MAX_SRAM_BANKS];
- 
-     qemu_irq *exp_irqs;
-     qemu_irq ppc0_irq;
+     /*
+      * 'container' holds all devices seen by all CPUs.
+      * 'cpu_container[i]' is the view that CPU i has: this has the
 diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 074c1d3a6cf..b639b54e0db 100644
+index 19cae77e770..1f3dc89c8e8 100644
 --- a/hw/arm/armsse.c
 +++ b/hw/arm/armsse.c
-@@ -20,11 +20,13 @@
- 
- struct ARMSSEInfo {
-     const char *name;
-+    int sram_banks;
+@@ -30,6 +30,7 @@ struct ARMSSEInfo {
+     int num_cpus;
+     uint32_t sys_version;
+     SysConfigFormat sys_config_format;
++    bool has_mhus;
  };
  
  static const ARMSSEInfo armsse_variants[] = {
-     {
-         .name = TYPE_IOTKIT,
-+        .sram_banks = 1,
+@@ -39,6 +40,7 @@ static const ARMSSEInfo armsse_variants[] = {
+         .num_cpus = 1,
+         .sys_version = 0x41743,
+         .sys_config_format = IoTKitFormat,
++        .has_mhus = false,
      },
  };
  
-@@ -118,8 +120,12 @@ static void armsse_forward_sec_resp_cfg(ARMSSE *s)
- static void armsse_init(Object *obj)
- {
-     ARMSSE *s = ARMSSE(obj);
-+    ARMSSEClass *asc = ARMSSE_GET_CLASS(obj);
-+    const ARMSSEInfo *info = asc->info;
-     int i;
- 
-+    assert(info->sram_banks <= MAX_SRAM_BANKS);
-+
-     memory_region_init(&s->container, obj, "armsse-container", UINT64_MAX);
- 
-     sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-@@ -133,12 +139,17 @@ static void armsse_init(Object *obj)
-                           TYPE_TZ_PPC);
-     sysbus_init_child_obj(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
-                           TYPE_TZ_PPC);
--    sysbus_init_child_obj(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
-+    for (i = 0; i < info->sram_banks; i++) {
-+        char *name = g_strdup_printf("mpc%d", i);
-+        sysbus_init_child_obj(obj, name, &s->mpc[i],
-+                              sizeof(s->mpc[i]), TYPE_TZ_MPC);
-+        g_free(name);
+@@ -257,6 +259,12 @@ static void armsse_init(Object *obj)
+                           sizeof(s->sysctl), TYPE_IOTKIT_SYSCTL);
+     sysbus_init_child_obj(obj, "armsse-sysinfo", &s->sysinfo,
+                           sizeof(s->sysinfo), TYPE_IOTKIT_SYSINFO);
++    if (info->has_mhus) {
++        sysbus_init_child_obj(obj, "mhu0", &s->mhu[0], sizeof(s->mhu[0]),
++                              TYPE_UNIMPLEMENTED_DEVICE);
++        sysbus_init_child_obj(obj, "mhu1", &s->mhu[1], sizeof(s->mhu[1]),
++                              TYPE_UNIMPLEMENTED_DEVICE);
 +    }
-     object_initialize_child(obj, "mpc-irq-orgate", &s->mpc_irq_orgate,
-                             sizeof(s->mpc_irq_orgate), TYPE_OR_IRQ,
+     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
+                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
                              &error_abort, NULL);
- 
--    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
-+    for (i = 0; i < IOTS_NUM_EXP_MPC + info->sram_banks; i++) {
-         char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
- 
-@@ -199,6 +210,8 @@ static void armsse_mpcexp_status(void *opaque, int n, int level)
- static void armsse_realize(DeviceState *dev, Error **errp)
- {
-     ARMSSE *s = ARMSSE(dev);
-+    ARMSSEClass *asc = ARMSSE_GET_CLASS(dev);
-+    const ARMSSEInfo *info = asc->info;
-     int i;
-     MemoryRegion *mr;
-     Error *err = NULL;
-@@ -335,35 +348,41 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     qdev_connect_gpio_out_named(dev_secctl, "sec_resp_cfg", 0,
-                                 qdev_get_gpio_in(dev_splitter, 0));
- 
--    /* This RAM lives behind the Memory Protection Controller */
--    memory_region_init_ram(&s->sram0, NULL, "armsse.sram0", 0x00008000, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
-+    /* Each SRAM bank lives behind its own Memory Protection Controller */
-+    for (i = 0; i < info->sram_banks; i++) {
-+        char *ramname = g_strdup_printf("armsse.sram%d", i);
-+        SysBusDevice *sbd_mpc;
-+
-+        memory_region_init_ram(&s->sram[i], NULL, ramname, 0x00008000, &err);
-+        g_free(ramname);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_link(OBJECT(&s->mpc[i]), OBJECT(&s->sram[i]),
-+                                 "downstream", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        object_property_set_bool(OBJECT(&s->mpc[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        /* Map the upstream end of the MPC into the right place... */
-+        sbd_mpc = SYS_BUS_DEVICE(&s->mpc[i]);
-+        memory_region_add_subregion(&s->container, 0x20000000 + i * 0x8000,
-+                                    sysbus_mmio_get_region(sbd_mpc, 1));
-+        /* ...and its register interface */
-+        memory_region_add_subregion(&s->container, 0x50083000 + i * 0x1000,
-+                                    sysbus_mmio_get_region(sbd_mpc, 0));
+@@ -616,6 +624,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+      *   0x40000000: timer0
+      *   0x40001000: timer1
+      *   0x40002000: dual timer
++     *   0x40003000: MHU0 (SSE-200 only)
++     *   0x40004000: MHU1 (SSE-200 only)
+      * We must configure and realize each downstream device and connect
+      * it to the appropriate PPC port; then we can realize the PPC and
+      * map its upstream ends to the right place in the container.
+@@ -666,6 +676,31 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+         return;
      }
--    object_property_set_link(OBJECT(&s->mpc), OBJECT(&s->sram0),
--                             "downstream", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    object_property_set_bool(OBJECT(&s->mpc), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    /* Map the upstream end of the MPC into the right place... */
--    memory_region_add_subregion(&s->container, 0x20000000,
--                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
--                                                       1));
--    /* ...and its register interface */
--    memory_region_add_subregion(&s->container, 0x50083000,
--                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
--                                                       0));
  
-     /* We must OR together lines from the MPC splitters to go to the NVIC */
-     object_property_set_int(OBJECT(&s->mpc_irq_orgate),
--                            IOTS_NUM_EXP_MPC + 1, "num-lines", &err);
-+                            IOTS_NUM_EXP_MPC + info->sram_banks,
-+                            "num-lines", &err);
++    if (info->has_mhus) {
++        for (i = 0; i < ARRAY_SIZE(s->mhu); i++) {
++            char *name = g_strdup_printf("MHU%d", i);
++            char *port = g_strdup_printf("port[%d]", i + 3);
++
++            qdev_prop_set_string(DEVICE(&s->mhu[i]), "name", name);
++            qdev_prop_set_uint64(DEVICE(&s->mhu[i]), "size", 0x1000);
++            object_property_set_bool(OBJECT(&s->mhu[i]), true,
++                                     "realized", &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
++            mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mhu[i]), 0);
++            object_property_set_link(OBJECT(&s->apb_ppc0), OBJECT(mr),
++                                     port, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
++            g_free(name);
++            g_free(port);
++        }
++    }
++
+     object_property_set_bool(OBJECT(&s->apb_ppc0), true, "realized", &err);
      if (err) {
          error_propagate(errp, err);
-         return;
-@@ -636,7 +655,7 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* Wire up the splitters for the MPC IRQs */
--    for (i = 0; i < IOTS_NUM_EXP_MPC + 1; i++) {
-+    for (i = 0; i < IOTS_NUM_EXP_MPC + info->sram_banks; i++) {
-         SplitIRQ *splitter = &s->mpc_irq_splitter[i];
-         DeviceState *dev_splitter = DEVICE(splitter);
- 
-@@ -659,7 +678,8 @@ static void armsse_realize(DeviceState *dev, Error **errp)
-                                                          "mpcexp_status", i));
-         } else {
-             /* Splitter input is from our own MPC */
--            qdev_connect_gpio_out_named(DEVICE(&s->mpc), "irq", 0,
-+            qdev_connect_gpio_out_named(DEVICE(&s->mpc[i - IOTS_NUM_EXP_MPC]),
-+                                        "irq", 0,
-                                         qdev_get_gpio_in(dev_splitter, 0));
-             qdev_connect_gpio_out(dev_splitter, 0,
-                                   qdev_get_gpio_in_named(dev_secctl,
+@@ -681,6 +716,12 @@ static void armsse_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->container, 0x40001000, mr);
+     mr = sysbus_mmio_get_region(sbd_apb_ppc0, 2);
+     memory_region_add_subregion(&s->container, 0x40002000, mr);
++    if (info->has_mhus) {
++        mr = sysbus_mmio_get_region(sbd_apb_ppc0, 3);
++        memory_region_add_subregion(&s->container, 0x40003000, mr);
++        mr = sysbus_mmio_get_region(sbd_apb_ppc0, 4);
++        memory_region_add_subregion(&s->container, 0x40004000, mr);
++    }
+     for (i = 0; i < IOTS_APB_PPC0_NUM_PORTS; i++) {
+         qdev_connect_gpio_out_named(dev_secctl, "apb_ppc0_nonsec", i,
+                                     qdev_get_gpio_in_named(dev_apb_ppc0,
 -- 
 2.20.1
