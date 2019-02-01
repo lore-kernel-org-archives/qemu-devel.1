@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59022)
+Received: from eggs.gnu.org ([209.51.188.92]:36533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1gpNsz-00071P-Gl
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 20:44:54 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gpOXV-0005xc-Js
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <catherine.hecx@gmail.com>) id 1gpNsy-0007wJ-Th
-	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 20:44:53 -0500
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Thu, 31 Jan 2019 20:40:44 -0500
-Message-Id: <1548985244-24523-1-git-send-email-catherine.hecx@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH] target/arm: Fix int128_make128 lo,
- hi order in paired_cmpxchg64_be
+	(envelope-from <jasowang@redhat.com>) id 1gpOXT-0001WE-NW
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gpOXR-0001QP-R9
+	for qemu-devel@nongnu.org; Thu, 31 Jan 2019 21:26:43 -0500
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-4-xieyongji@baidu.com>
+	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+	<CAONzpcaQhfSa-Uw2-r_XTqvw8fYq_haJ6zKR-9NkK=fBkZky0w@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <03d8aa2d-e72d-4aa7-c83d-8252b0ebbc8a@redhat.com>
+Date: Fri, 1 Feb 2019 10:26:10 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAONzpcaQhfSa-Uw2-r_XTqvw8fYq_haJ6zKR-9NkK=fBkZky0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
+ inflight I/O in shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,40 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Catherine Ho <catherine.hecx@gmail.com>
+To: Yongji Xie <elohimes@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-The lo,hi order is different from the comments. And in commit
-1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128"), it changes
-the original code logic. So just restore the old code logic before this 
-commit:
-do_paired_cmpxchg64_be():
-    cmpv = int128_make128(env->exclusive_high, env->exclusive_val);
-    newv = int128_make128(new_hi, new_lo);
 
-Fixes: 1ec182c33379 ("target/arm: Convert to HAVE_CMPXCHG128")
+On 2019/1/30 =E4=B8=8A=E5=8D=8811:58, Yongji Xie wrote:
+> On Wed, 30 Jan 2019 at 10:32, Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
+>>> +static int
+>>> +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
+>>> +{
+>>> +    if (!has_feature(dev->protocol_features,
+>>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    if (unlikely(!vq->inflight)) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    vq->inflight->desc[desc_idx].inuse =3D 1;
+>>> +
+>>> +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static int
+>>> +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
+>>> +{
+>>> +    if (!has_feature(dev->protocol_features,
+>>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    if (unlikely(!vq->inflight)) {
+>>> +        return -1;
+>>> +    }
+>>> +
+>>> +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
+>>> +
+>>> +    barrier();
+>>> +
+>>> +    vq->inflight->desc[desc_idx].version++;
+>>> +
+>>> +    return 0;
+>>> +}
+>>
+>> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure th=
+e
+>> value reach memory.
+>>
+> Is it enough to declare those variables as volatile?
+>
+> Thanks,
+> Yongji
 
-Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
----
-I didn't see any obvious real error case here, so set it as RFC
 
- target/arm/helper-a64.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I think so.
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 101fa6d3ea..70850e564d 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -583,8 +583,8 @@ uint64_t HELPER(paired_cmpxchg64_be)(CPUARMState *env, uint64_t addr,
-      * High and low need to be switched here because this is not actually a
-      * 128bit store but two doublewords stored consecutively
-      */
--    Int128 cmpv = int128_make128(env->exclusive_val, env->exclusive_high);
--    Int128 newv = int128_make128(new_lo, new_hi);
-+    Int128 cmpv = int128_make128(env->exclusive_high, env->exclusive_val);
-+    Int128 newv = int128_make128(new_hi, new_lo);
-     Int128 oldv;
-     uintptr_t ra = GETPC();
-     uint64_t o0, o1;
--- 
-2.17.1
+Thanks
