@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58002)
+Received: from eggs.gnu.org ([209.51.188.92]:58926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gperc-0007nK-Sj
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:52:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gpeto-0000tK-8B
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gperZ-0000te-19
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:52:34 -0500
-References: <20190201192935.18394-1-mreitz@redhat.com>
-	<20190201192935.18394-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8c79113a-b384-2c6f-2330-8327d421d888@redhat.com>
-Date: Fri, 1 Feb 2019 13:52:13 -0600
-MIME-Version: 1.0
-In-Reply-To: <20190201192935.18394-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JFoFX6x1fHOEQvCRb7ElgBmGvCMVW5foW"
-Subject: Re: [Qemu-devel] [PATCH v13 01/31] block: Use
- bdrv_refresh_filename() to pull
+	(envelope-from <richard.henderson@linaro.org>) id 1gpetm-00028o-7Q
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:52 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:33958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gpeth-0001pR-VC
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 14:54:48 -0500
+Received: by mail-pl1-x643.google.com with SMTP id w4so3742425plz.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 11:54:09 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  1 Feb 2019 11:54:03 -0800
+Message-Id: <20190201195404.30486-2-richard.henderson@linaro.org>
+In-Reply-To: <20190201195404.30486-1-richard.henderson@linaro.org>
+References: <20190201195404.30486-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 1/2] linux-user: Implement PR_PAC_RESET_KEYS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JFoFX6x1fHOEQvCRb7ElgBmGvCMVW5foW
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <8c79113a-b384-2c6f-2330-8327d421d888@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v13 01/31] block: Use bdrv_refresh_filename()
- to pull
-References: <20190201192935.18394-1-mreitz@redhat.com>
- <20190201192935.18394-2-mreitz@redhat.com>
-In-Reply-To: <20190201192935.18394-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2: Check arg3-5 are zero.
+---
+ linux-user/aarch64/target_syscall.h |  7 ++++++
+ linux-user/syscall.c                | 36 +++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-On 2/1/19 1:29 PM, Max Reitz wrote:
-> Before this patch, bdrv_refresh_filename() is used in a pushing manner:=
-
-> Whenever the BDS graph is modified, the parents of the modified edges
-> are supposed to be updated (recursively upwards).  However, that is
-> nonviable, considering that we want child changes not to concern
-> parents.
->=20
-> Also, in the long run we want a pull model anyway: Here, we would have =
-a
-> bdrv_filename() function which returns a BDS's filename, freshly
-> constructed.
->=20
-> This patch is an intermediate step.  It adds bdrv_refresh_filename()
-> calls before every place a BDS.filename value is used.  The only
-> exceptions are protocol drivers that use their own filename, which
-> clearly would not profit from refreshing that filename before.
->=20
-> Also, bdrv_get_encrypted_filename() is removed along the way (as a user=
-
-> of BDS.filename), since it is completely unused.
->=20
-> In turn, all of the calls to bdrv_refresh_filename() before this patch
-> are removed, because we no longer have to call this function on graph
-> changes.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---JFoFX6x1fHOEQvCRb7ElgBmGvCMVW5foW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxUo20ACgkQp6FrSiUn
-Q2rajAf/X9vHW9vlLOVDhgSgQFlKwZyWAay+YiE4YN/o1fcliN5l7lyByw0gFyXK
-2J9Bc8Js4vC8H8Uh7GuefSS3eWxj+w/2PyvfGm40sXg7Pc6q6uNfX27caSGLsvp6
-Evl7zy0gLdfAnDB+fz9y18ZhBS8qbexxMphTTIy3s7Qj8sheqjleQ9yRnHCtYCzE
-yrNnBkltJGRkhurp2qkSqzvdsN6NKl3fYxhXH6kcwDhy5IJfyaXe9DK7L/M95jH/
-Pp9NYhLmth+eO+FGuDDWcAjoKkKaOqoc9StZllSpCHAkgGZjr/7MBe8G+zklE2YL
-H64W9emDS/LqPJaykId8vUVjG7sJGA==
-=W+B6
------END PGP SIGNATURE-----
-
---JFoFX6x1fHOEQvCRb7ElgBmGvCMVW5foW--
+diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+index 937fd7989e..b595e5da82 100644
+--- a/linux-user/aarch64/target_syscall.h
++++ b/linux-user/aarch64/target_syscall.h
+@@ -22,6 +22,13 @@ struct target_pt_regs {
+ #define TARGET_PR_SVE_SET_VL  50
+ #define TARGET_PR_SVE_GET_VL  51
+ 
++#define TARGET_PR_PAC_RESET_KEYS 54
++# define TARGET_PR_PAC_APIAKEY   (1 << 0)
++# define TARGET_PR_PAC_APIBKEY   (1 << 1)
++# define TARGET_PR_PAC_APDAKEY   (1 << 2)
++# define TARGET_PR_PAC_APDBKEY   (1 << 3)
++# define TARGET_PR_PAC_APGAKEY   (1 << 4)
++
+ void arm_init_pauth_key(ARMPACKey *key);
+ 
+ #endif /* AARCH64_TARGET_SYSCALL_H */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b5786d4fc1..bf076cbf8c 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9691,6 +9691,42 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                 }
+             }
+             return ret;
++        case TARGET_PR_PAC_RESET_KEYS:
++            {
++                CPUARMState *env = cpu_env;
++                ARMCPU *cpu = arm_env_get_cpu(env);
++
++                if (arg3 || arg4 || arg5) {
++                    return -TARGET_EINVAL;
++                }
++                if (cpu_isar_feature(aa64_pauth, cpu)) {
++                    int all = (TARGET_PR_PAC_APIAKEY | TARGET_PR_PAC_APIBKEY |
++                               TARGET_PR_PAC_APDAKEY | TARGET_PR_PAC_APDBKEY |
++                               TARGET_PR_PAC_APGAKEY);
++                    if (arg2 == 0) {
++                        arg2 = all;
++                    } else if (arg2 & ~all) {
++                        return -TARGET_EINVAL;
++                    }
++                    if (arg2 & TARGET_PR_PAC_APIAKEY) {
++                        arm_init_pauth_key(&env->apia_key);
++                    }
++                    if (arg2 & TARGET_PR_PAC_APIBKEY) {
++                        arm_init_pauth_key(&env->apib_key);
++                    }
++                    if (arg2 & TARGET_PR_PAC_APDAKEY) {
++                        arm_init_pauth_key(&env->apda_key);
++                    }
++                    if (arg2 & TARGET_PR_PAC_APDBKEY) {
++                        arm_init_pauth_key(&env->apdb_key);
++                    }
++                    if (arg2 & TARGET_PR_PAC_APGAKEY) {
++                        arm_init_pauth_key(&env->apga_key);
++                    }
++                    return 0;
++                }
++            }
++            return -TARGET_EINVAL;
+ #endif /* AARCH64 */
+         case PR_GET_SECCOMP:
+         case PR_SET_SECCOMP:
+-- 
+2.17.2
