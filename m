@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59102)
+Received: from eggs.gnu.org ([209.51.188.92]:58961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMF-0008Id-MC
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMC-0008Fd-RD
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gpbMB-0003kq-K2
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:59 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55109)
+	(envelope-from <peter.maydell@linaro.org>) id 1gpbMA-0003jF-Ro
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:56 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:44167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gpbMB-0003fn-8b
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:55 -0500
-Received: by mail-wm1-x334.google.com with SMTP id a62so6651364wmh.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:52 -0800 (PST)
+	id 1gpbMA-0003TI-GV
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 11:07:54 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id z5so7630089wrt.11
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 08:07:30 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.50
+	by smtp.gmail.com with ESMTPSA id n6sm2847250wmk.9.2019.02.01.08.07.28
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 01 Feb 2019 08:07:50 -0800 (PST)
+	Fri, 01 Feb 2019 08:07:28 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Feb 2019 16:06:50 +0000
-Message-Id: <20190201160653.13829-45-peter.maydell@linaro.org>
+Date: Fri,  1 Feb 2019 16:06:32 +0000
+Message-Id: <20190201160653.13829-27-peter.maydell@linaro.org>
 In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
 References: <20190201160653.13829-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 44/47] target/arm: fix decoding of B{, L}RA{A, B}
+Subject: [Qemu-devel] [PULL 26/47] target/arm/translate-a64: Don't
+ underdecode PRFM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +36,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
+The PRFM prefetch insn in the load/store with imm9 encodings
+requires idx field 0b00; we were underdecoding this by
+only checking !is_unpriv (which is equivalent to idx != 2).
+Correctly UNDEF the unallocated encodings where idx == 0b01
+and 0b11 as well as 0b10.
 
-A flawed test lead to the instructions always being treated as
-unallocated encodings.
-
-Fixes: https://bugs.launchpad.net/bugs/1813460
-Signed-off-by: Remi Denis-Courmont <remi.denis.courmont@huawei.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-id: 20190125182626.9221-3-peter.maydell@linaro.org
 ---
  target/arm/translate-a64.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b864ac7a69f..a1997e3ae28 100644
+index e6df303e321..8e081758e03 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -2036,7 +2036,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         if (!dc_isar_feature(aa64_pauth, s)) {
-             goto do_unallocated;
-         }
--        if (op3 != 2 || op3 != 3) {
-+        if ((op3 & ~1) != 2) {
-             goto do_unallocated;
-         }
-         if (s->pauth_active) {
+@@ -2803,7 +2803,7 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
+     } else {
+         if (size == 3 && opc == 2) {
+             /* PRFM - prefetch */
+-            if (is_unpriv) {
++            if (idx != 0) {
+                 unallocated_encoding(s);
+                 return;
+             }
 -- 
 2.20.1
