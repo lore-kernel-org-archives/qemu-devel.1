@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32840)
+Received: from eggs.gnu.org ([209.51.188.92]:36305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcwl-0001by-GA
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:49:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gpd3p-0007if-NP
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpcwj-0002ow-9o
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:49:47 -0500
-Resent-Message-Id: <E1gpcwj-0002ow-9o@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpcwf-0002aP-ER
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:49:43 -0500
-Message-ID: <154904332148.29184.18103589410708031609@ebba9967afc0>
-In-Reply-To: <20190201145035.22739-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gpd3k-0006wz-Bd
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:02 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:42715)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gpd3k-0006vy-5M
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 12:57:00 -0500
+Received: by mail-oi1-x234.google.com with SMTP id w13so6495293oiw.9
+	for <qemu-devel@nongnu.org>; Fri, 01 Feb 2019 09:56:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 09:48:42 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/11] Enable build and install of our rST
- docs
+References: <20190201160653.13829-1-peter.maydell@linaro.org>
+In-Reply-To: <20190201160653.13829-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Feb 2019 17:56:46 +0000
+Message-ID: <CAFEAcA8TXwf8J78Y=rhhvry98HoG1y7uWtKQu+V4xRScwe5j5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/47] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, patches@linaro.org, stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, philmd@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE0NTAzNS4yMjcz
-OS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMjAxMTQ1MDM1
-LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggMDAvMTFdIEVuYWJsZSBidWlsZCBhbmQgaW5zdGFsbCBvZiBvdXIgclNUIGRvY3MKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
-aGV3LzIwMTkwMjAxMTQ1MDM1LjIyNzM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBh
-dGNoZXcvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcKU3dp
-dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0MjllMjQ1IGRvY3MvY29uZi5weTogRG9uJ3Qg
-aGFyZC1jb2RlIFFFTVUgdmVyc2lvbgpkMWQ3M2UzIE1ha2VmaWxlOiBBYnN0cmFjdCBvdXQgImlk
-ZW50aWZ5IHRoZSBwa2d2ZXJzaW9uIiBjb2RlCjk5OWMwOWIgTWFrZWZpbGUsIGNvbmZpZ3VyZTog
-U3VwcG9ydCBidWlsZGluZyByU1QgZG9jdW1lbnRhdGlvbgozNGJkMmRhIFNlcGFyYXRlIGNvbmYu
-cHkgZm9yIGVhY2ggbWFudWFsIHdlIHdhbnQKOWE2YzVhNCBkb2NzL2NvbmYucHk6IERpc2FibGUg
-b3B0aW9uIHdhcm5pbmdzCmM0NjYyMzMgZG9jcy9jb25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBz
-b3VyY2VzIGluIEhUTUwgYnVpbGQKMGFmMjA5NyBkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUg
-J2FsYWJhc3RlcicgdGhlbWUKZGQxYjQ0OSBkb2NzL2NvbmYucHk6IERpc2FibGUgdW51c2VkIF9z
-dGF0aWMgZGlyZWN0b3J5Cjc2ZjRkOWQgZG9jczogQ29tbWl0IGluaXRpYWwgZmlsZXMgZnJvbSBz
-cGhpbngtcXVpY2tzdGFydAoxOTE1NjFiIGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0CmY3MmRlNmMgZG9jcy9jcHUtaG90cGx1Zy5yc3Q6IEZpeCByU1QgbWFya3VwIGlzc3Vl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgZjcyZGU2YzcwZWU2
-IChkb2NzL2NwdS1ob3RwbHVnLnJzdDogRml4IHJTVCBtYXJrdXAgaXNzdWVzKQoyLzExIENoZWNr
-aW5nIGNvbW1pdCAxOTE1NjFiY2JkYzYgKGRvY3M6IENvbnZlcnQgbWVtb3J5LnR4dCB0byByc3Qg
-Zm9ybWF0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMjogCnJlbmFtZSBmcm9tIGRvY3MvZGV2ZWwvbWVt
-b3J5LnR4dAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxOTUgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzExIENoZWNraW5nIGNvbW1p
-dCA3NmY0ZDlkNDI4MzMgKGRvY3M6IENvbW1pdCBpbml0aWFsIGZpbGVzIGZyb20gc3BoaW54LXF1
-aWNrc3RhcnQpCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMTEgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTEgQ2hlY2tpbmcgY29tbWl0IGRkMWI0NDkxODkwNSAo
-ZG9jcy9jb25mLnB5OiBEaXNhYmxlIHVudXNlZCBfc3RhdGljIGRpcmVjdG9yeSkKNS8xMSBDaGVj
-a2luZyBjb21taXQgMGFmMjA5NzFiMjY5IChkb2NzL2NvbmYucHk6IENvbmZpZ3VyZSB0aGUgJ2Fs
-YWJhc3RlcicgdGhlbWUpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IGM0NjYyMzM5MTIzOCAoZG9jcy9j
-b25mLnB5OiBEb24ndCBpbmNsdWRlIHJTVCBzb3VyY2VzIGluIEhUTUwgYnVpbGQpCjcvMTEgQ2hl
-Y2tpbmcgY29tbWl0IDlhNmM1YTRhMzRmZCAoZG9jcy9jb25mLnB5OiBEaXNhYmxlIG9wdGlvbiB3
-YXJuaW5ncykKOC8xMSBDaGVja2luZyBjb21taXQgMzRiZDJkYWI1ZmI5IChTZXBhcmF0ZSBjb25m
-LnB5IGZvciBlYWNoIG1hbnVhbCB3ZSB3YW50KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzE2MTogRklMRTogZG9jcy9pbnRlcm9wL2NvbmYucHk6MTU6CitodG1sX3RoZW1lX29wdGlv
-bnNbJ2Rlc2NyaXB0aW9uJ10gPSB1J1N5c3RlbSBFbXVsYXRpb24gTWFuYWdlbWVudCBhbmQgSW50
-ZXJvcGVyYWJpbGl0eSBHdWlkZScKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUo
-cykKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTMzIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDgvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTEgQ2hlY2tpbmcgY29tbWl0IDk5
-OWMwOWIyYmIyYiAoTWFrZWZpbGUsIGNvbmZpZ3VyZTogU3VwcG9ydCBidWlsZGluZyByU1QgZG9j
-dW1lbnRhdGlvbikKMTAvMTEgQ2hlY2tpbmcgY29tbWl0IGQxZDczZTM0MWJmNSAoTWFrZWZpbGU6
-IEFic3RyYWN0IG91dCAiaWRlbnRpZnkgdGhlIHBrZ3ZlcnNpb24iIGNvZGUpCjExLzExIENoZWNr
-aW5nIGNvbW1pdCA0MjllMjQ1YTdjNWYgKGRvY3MvY29uZi5weTogRG9uJ3QgaGFyZC1jb2RlIFFF
-TVUgdmVyc2lvbikKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTAyMDExNDUwMzUuMjI3MzktMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, 1 Feb 2019 at 16:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> As promised, more Arm patches. The big thing in here is the
+> MPS2-AN521 board model.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit cfe6c547690b06fbce54a6d0f7b05dd7f18e36ea:
+>
+>   Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2019-01-31' into staging (2019-01-31 19:26:09 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190201
+>
+> for you to fetch changes up to 7743b70ffe7a8ce168adce2cf50ad156b1fefb8c:
+>
+>   tests/microbit-test: Add tests for nRF51 NVMC (2019-02-01 15:32:17 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * New machine mps2-an521 -- this is a model of the AN521 FPGA image for the MPS2 devboard
+>  * Fix various places where we failed to UNDEF invalid A64 instructions
+>  * Don't UNDEF a valid FCMLA on 32-bit inputs
+>  * Fix some bugs in the newly-added PAuth implementation
+>  * microbit: Implement NVMC non-volatile memory controller
+>
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
