@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53965)
+Received: from eggs.gnu.org ([209.51.188.92]:55930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gphA2-00036t-HU
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:19:47 -0500
+	(envelope-from <mst@redhat.com>) id 1gphEo-0004Gj-5o
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gphA0-00012G-Mj
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:19:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46320)
+	(envelope-from <mst@redhat.com>) id 1gphEk-0004ro-9r
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:24:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gph9w-0000vh-JU
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:19:42 -0500
-Date: Fri, 1 Feb 2019 17:19:32 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gphEi-0004md-4u
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 17:24:38 -0500
+Date: Fri, 1 Feb 2019 17:24:19 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190201171915-mutt-send-email-mst@kernel.org>
-References: <20190118133826.22447-1-berrange@redhat.com>
-	<20190128174857.GT4136@habkost.net>
+Message-ID: <20190201172251-mutt-send-email-mst@kernel.org>
+References: <20190124203959.30875-1-lersek@redhat.com>
+	<d4db23b5-8b6d-999f-d127-466a8acf040c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190128174857.GT4136@habkost.net>
+In-Reply-To: <d4db23b5-8b6d-999f-d127-466a8acf040c@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw: report invalid disable-legacy|modern
- usage for virtio-1-only devs
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] add the BiosTablesTest UEFI app,
+ build it with the new roms/edk2 submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 
-On Mon, Jan 28, 2019 at 03:48:57PM -0200, Eduardo Habkost wrote:
-> On Fri, Jan 18, 2019 at 01:38:26PM +0000, Daniel P. Berrang=E9 wrote:
-> > A number of virtio devices (gpu, crypto, mouse, keyboard, tablet) onl=
-y
-> > support the virtio-1 (aka modern) mode. Currently if the user launche=
-s
-> > QEMU, setting those devices to enable legacy mode, QEMU will silently
-> > create them in modern mode, ignoring the user's (mistaken) request.
+On Thu, Jan 31, 2019 at 03:23:50PM +0100, Laszlo Ersek wrote:
+> On 01/24/19 21:39, Laszlo Ersek wrote:
+> > Previous version (v1):
+> > http://mid.mail-archive.com/20190118223400.24311-1-lersek@redhat.com
 > >=20
-> > This patch introduces proper data validation so that an attempt to
-> > configure a virtio-1-only devices in legacy mode gets reported as an
-> > error to the user.
-> >=20
-> > Checking this required introduction of a new field to explicitly trac=
-k
-> > what operating model is to be used for a device, separately from the
-> > disable_modern and disable_legacy fields that record the user's
-> > requested configuration.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > Updates in v2 have been noted on each patch in the series.
 >=20
-> This breaks the virtio-1-only devices on pc-*-2.6:
->=20
->   $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga -machine pc-=
-i440fx-2.6
->   qemu-system-x86_64: -device virtio-vga: Unable to set disable-legacy=3D=
-off on a virtio-1.0 only device
->=20
-> Probably the simplest way to fix that is to append the following to
-> hw_compat_2_6:
->=20
->   { virtio-vga,        disable-modern, off },
->   { virtio-gpu-pci,    disable-modern, off },
->   { virtio-input-pci,  disable-modern, off },
->   { virtio-crypto-pci, disable-modern, off }
+> ping
 
-Daniel do you plan to take a stub at this approach?
+Oh sorry I noticed Philippe reported some failures with this patchset.
+Can you guys pls get to the bottom of it? I don't want
+everyone to suffer.
 
-> We could also remove the property completely from those devices
-> (e.g. by moving virtio-vga to virtio_vga_info.non_transitional_name),
-> but it would break compatibility in case people are explicitly
-> setting "disable-modern=3Doff" on those devices.
->=20
-> --=20
-> Eduardo
+> >=20
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Cc: Gerd Hoffmann <kraxel@redhat.com>
+> > Cc: Igor Mammedov <imammedo@redhat.com>
+> > Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> >=20
+> > Thanks
+> > Laszlo
+> >=20
+> > Laszlo Ersek (5):
+> >   roms: add the edk2 project as a git submodule
+> >   roms: build the EfiRom utility from the roms/edk2 submodule
+> >   tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+> >   tests/uefi-test-tools: add build scripts
+> >   tests/data: introduce "uefi-boot-images" with the "bios-tables-test=
+"
+> >     ISOs
+> >=20
+> >  .gitmodules                                                         =
+     |   3 +
+> >  Makefile                                                            =
+     |   6 +-
+> >  roms/Makefile                                                       =
+     |  13 +-
+> >  roms/edk2                                                           =
+     |   1 +
+> >  tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2      =
+     | Bin 0 -> 11776 bytes
+> >  tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2          =
+     | Bin 0 -> 11776 bytes
+> >  tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2         =
+     | Bin 0 -> 12800 bytes
+> >  tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2       =
+     | Bin 0 -> 13312 bytes
+> >  tests/uefi-test-tools/.gitignore                                    =
+     |   3 +
+> >  tests/uefi-test-tools/LICENSE                                       =
+     |  25 ++++
+> >  tests/uefi-test-tools/Makefile                                      =
+     |  97 +++++++++++++
+> >  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest=
+.c   | 130 ++++++++++++++++++
+> >  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest=
+.inf |  41 ++++++
+> >  tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h=
+     |  67 +++++++++
+> >  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec         =
+     |  27 ++++
+> >  tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc         =
+     |  69 ++++++++++
+> >  tests/uefi-test-tools/build.sh                                      =
+     | 145 ++++++++++++++++++++
+> >  17 files changed, 619 insertions(+), 8 deletions(-)
+> >  create mode 160000 roms/edk2
+> >  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarc=
+h64.iso.qcow2
+> >  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.=
+iso.qcow2
+> >  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386=
+.iso.qcow2
+> >  create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_=
+64.iso.qcow2
+> >  create mode 100644 tests/uefi-test-tools/.gitignore
+> >  create mode 100644 tests/uefi-test-tools/LICENSE
+> >  create mode 100644 tests/uefi-test-tools/Makefile
+> >  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTables=
+Test/BiosTablesTest.c
+> >  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTables=
+Test/BiosTablesTest.inf
+> >  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Gu=
+id/BiosTablesTest.h
+> >  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestTo=
+olsPkg.dec
+> >  create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestTo=
+olsPkg.dsc
+> >  create mode 100755 tests/uefi-test-tools/build.sh
+> >=20
