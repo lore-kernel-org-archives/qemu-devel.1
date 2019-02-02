@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50571)
+Received: from eggs.gnu.org ([209.51.188.92]:50509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gppgd-0001Iv-QP
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:26:00 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gppgc-0003IQ-PG
+	(envelope-from <yang.zhong@intel.com>) id 1gppgc-0001IV-BM
 	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:59 -0500
-Received: from mga14.intel.com ([192.55.52.115]:56070)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <yang.zhong@intel.com>) id 1gppga-0003FQ-67
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:58 -0500
+Received: from mga14.intel.com ([192.55.52.115]:56083)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gppgc-0002Ky-8r
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:58 -0500
+	id 1gppgW-0002jk-A2
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:54 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Sat,  2 Feb 2019 15:24:46 +0800
-Message-Id: <20190202072456.6468-18-yang.zhong@intel.com>
+Date: Sat,  2 Feb 2019 15:24:45 +0800
+Message-Id: <20190202072456.6468-17-yang.zhong@intel.com>
 In-Reply-To: <20190202072456.6468-1-yang.zhong@intel.com>
 References: <20190202072456.6468-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v2 17/27] hw/nios2/Makefile.objs: Conditionally
- build nios2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 16/27] hw/xtensa/Makefile.objs: Build
+ xtensa_sim and xtensa_fpga conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +29,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, yang.zhong@intel.com
+Cc: pbonzini@redhat.com, thuth@redhat.com, yang.zhong@intel.com, =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
 
-CONFIG_NIOS2_10M50 added for 10m50 dev board.
+From: Ákos Kovács <akoskovacs@gmx.com>
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Add the new CONFIG_* values to default-config/xtensa*-softmmu.mak.
+
+Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- default-configs/nios2-softmmu.mak | 1 +
- hw/nios2/Makefile.objs            | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ default-configs/xtensa-softmmu.mak   | 3 +++
+ default-configs/xtensaeb-softmmu.mak | 3 +++
+ hw/xtensa/Makefile.objs              | 4 ++--
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index 74dc70caae..ab42d0fc28 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
+diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtensa-softmmu.mak
+index 9d8899cde7..baf90ca162 100644
+--- a/default-configs/xtensa-softmmu.mak
++++ b/default-configs/xtensa-softmmu.mak
+@@ -3,3 +3,6 @@
  CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
-+CONFIG_NIOS2_10M50=y
-diff --git a/hw/nios2/Makefile.objs b/hw/nios2/Makefile.objs
-index 6b5c421760..89a419a9f5 100644
---- a/hw/nios2/Makefile.objs
-+++ b/hw/nios2/Makefile.objs
-@@ -1 +1,2 @@
--obj-y = boot.o cpu_pic.o 10m50_devboard.o
-+obj-y = boot.o cpu_pic.o
-+obj-$(CONFIG_NIOS2_10M50) += 10m50_devboard.o
+ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
++
++CONFIG_XTENSA_SIM=y
++CONFIG_XTENSA_FPGA=y
+diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xtensaeb-softmmu.mak
+index 9d8899cde7..baf90ca162 100644
+--- a/default-configs/xtensaeb-softmmu.mak
++++ b/default-configs/xtensaeb-softmmu.mak
+@@ -3,3 +3,6 @@
+ CONFIG_SERIAL=y
+ CONFIG_OPENCORES_ETH=y
+ CONFIG_PFLASH_CFI01=y
++
++CONFIG_XTENSA_SIM=y
++CONFIG_XTENSA_FPGA=y
+diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
+index cb4998d2bf..62e244fa53 100644
+--- a/hw/xtensa/Makefile.objs
++++ b/hw/xtensa/Makefile.objs
+@@ -1,4 +1,4 @@
+ obj-y += pic_cpu.o
+-obj-y += sim.o
+ obj-y += xtensa_memory.o
+-obj-y += xtfpga.o
++obj-$(CONFIG_XTENSA_SIM) += sim.o
++obj-$(CONFIG_XTENSA_FPGA) += xtfpga.o
 -- 
 2.17.1
