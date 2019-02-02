@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33353)
+Received: from eggs.gnu.org ([209.51.188.92]:44819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gpjpm-0005sW-2h
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:11:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1gpkNX-0006AS-Ie
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gpjpj-0007ic-SQ
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:11:01 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Fri,  1 Feb 2019 20:10:48 -0500
-Message-Id: <20190202011048.12343-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] block/dirty-bitmap: Documentation and
- Comment fixups
+	(envelope-from <bounces@canonical.com>) id 1gpkNW-0003Sx-GX
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gpkNW-0003Jv-6M
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gpkNB-0000nS-OP
+	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:45:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AB1402E8037
+	for <qemu-devel@nongnu.org>; Sat,  2 Feb 2019 01:45:33 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 02 Feb 2019 01:38:37 -0000
+From: Erik Kline <1814352@bugs.launchpad.net>
+Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1814352] [NEW] SIOCGIFNAME takes a struct ifreq
+ not an integer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,118 +36,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <fam@euphon.net>
+To: qemu-devel@nongnu.org
 
-The meaning of the states has changed subtly over time,
-this should bring the understanding more in-line with the
-current, actual usages.
+Public bug reported:
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
+The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an integer.
+This leads to if_indextoname() not correctly returning interface names
+(well, not if they're longer than 4 characters including the trailing
+NULL ;-).
 
----
-V2: Amended some wordings, though this is a little chatty now.
-    Hopefully it's clearer, though.
----
- block/dirty-bitmap.c | 20 ++++++++++++++------
- qapi/block-core.json | 32 ++++++++++++++++++++++++--------
- 2 files changed, 38 insertions(+), 14 deletions(-)
+This is observed on v3.1.0.
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 00ea36f554..b1b9b03939 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -29,12 +29,20 @@
- #include "block/blockjob.h"
- 
- /**
-- * A BdrvDirtyBitmap can be in three possible states:
-- * (1) successor is NULL and disabled is false: full r/w mode
-- * (2) successor is NULL and disabled is true: read only mode ("disabled")
-- * (3) successor is set: frozen mode.
-- *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared, set,
-- *     or enabled. A frozen bitmap can only abdicate() or reclaim().
-+ * A BdrvDirtyBitmap can be in four possible user-visible states:
-+ * (1) Active:   successor is NULL, and disabled is false: full r/w mode
-+ * (2) Disabled: successor is NULL, and disabled is true: qualified r/w mode,
-+ *               guest writes are dropped, but monitor writes are possible,
-+ *               through commands like merge and clear.
-+ * (3) Frozen:   successor is not NULL.
-+ *               A frozen bitmap cannot be renamed, deleted, cleared, set,
-+ *               enabled, merged to, etc. A frozen bitmap can only abdicate()
-+ *               or reclaim().
-+ *               In this state, the anonymous successor bitmap may be either
-+ *               Active and recording writes from the guest (e.g. backup jobs),
-+ *               but it can be Disabled and not recording writes.
-+ * (4) Locked:   Whether Active or Disabled, the user cannot modify this bitmap
-+ *               in any way from the monitor.
-  */
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5f17d67d71..a775af04cf 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -417,17 +417,27 @@
- #
- # An enumeration of possible states that a dirty bitmap can report to the user.
- #
--# @frozen: The bitmap is currently in-use by a backup operation or block job,
--#          and is immutable.
-+# @frozen: The bitmap is currently in-use by some operation and is immutable.
-+#          If the bitmap was @active prior to the operation, new writes by the
-+#          guest are being recorded in a temporary buffer, and will not be lost.
-+#          Generally, bitmaps are cleared on successful use in an operation and
-+#          the temporary buffer is committed into the bitmap. On failure, the
-+#          temporary buffer is merged back into the bitmap without first
-+#          clearing it.
-+#          Please refer to the documentation for each bitmap-using operation,
-+#          See also @blockdev-backup, @drive-backup.
- #
--# @disabled: The bitmap is currently in-use by an internal operation and is
--#            read-only. It can still be deleted.
-+# @disabled: The bitmap is not currently recording new writes by the guest.
-+#            This is requested explicitly via @block-dirty-bitmap-disable.
-+#            It can still be cleared, deleted, or used for backup operations.
- #
- # @active: The bitmap is actively monitoring for new writes, and can be cleared,
- #          deleted, or used for backup operations.
- #
--# @locked: The bitmap is currently in-use by some operation and can not be
--#          cleared, deleted, or used for backup operations. (Since 2.12)
-+# @locked: The bitmap is currently in-use by some operation and is immutable.
-+#          If the bitmap was @active prior to the operation, it is still
-+#          recording new writes. If the bitmap was @disabled, it is not
-+#          recording new writes. (Since 2.12)
- #
- # Since: 2.4
- ##
-@@ -2052,9 +2062,15 @@
- # @block-dirty-bitmap-merge:
- #
- # Merge dirty bitmaps listed in @bitmaps to the @target dirty bitmap.
--# The @bitmaps dirty bitmaps are unchanged.
-+# Dirty bitmaps in @bitmaps will be unchanged, except if it also appears
-+# as the @target bitmap. Any bits already set in @target will still be
-+# set after the merge, i.e., this operation does not clear the target.
- # On error, @target is unchanged.
- #
-+# The resulting bitmap will count as dirty any clusters that were dirty in any
-+# of the source bitmaps. This can be used to achieve backup checkpoints, or in
-+# simpler usages, to copy bitmaps.
-+#
- # Returns: nothing on success
- #          If @node is not a valid block device, DeviceNotFound
- #          If any bitmap in @bitmaps or @target is not found, GenericError
-@@ -2089,7 +2105,7 @@
- ##
- # @x-debug-block-dirty-bitmap-sha256:
- #
--# Get bitmap SHA256
-+# Get bitmap SHA256.
- #
- # Returns: BlockDirtyBitmapSha256 on success
- #          If @node is not a valid block device, DeviceNotFound
--- 
-2.17.2
+The following one-line patch will be sent to the qemu-devel mailing
+list:
+
+"""
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index ae8951625f..37501f575c 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -178,7 +178,7 @@
+ #endif /* CONFIG_USBFS */
+ =
+
+   IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+-  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
++  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+   IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq=
+)))
+"""
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1814352
+
+Title:
+  SIOCGIFNAME takes a struct ifreq not an integer
+
+Status in QEMU:
+  New
+
+Bug description:
+  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
+  integer.  This leads to if_indextoname() not correctly returning
+  interface names (well, not if they're longer than 4 characters
+  including the trailing NULL ;-).
+
+  This is observed on v3.1.0.
+
+  The following one-line patch will be sent to the qemu-devel mailing
+  list:
+
+  """
+  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+  index ae8951625f..37501f575c 100644
+  --- a/linux-user/ioctls.h
+  +++ b/linux-user/ioctls.h
+  @@ -178,7 +178,7 @@
+   #endif /* CONFIG_USBFS */
+   =
+
+     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
+  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
+)))
+     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
+eq)))
+  """
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
