@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54939)
+Received: from eggs.gnu.org ([209.51.188.92]:54821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpjcg-0002pO-9h
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 19:57:31 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gpjcJ-0003NP-5K
+	(envelope-from <crosa@redhat.com>) id 1gpjcV-0002fk-L6
 	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 19:57:22 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <crosa@redhat.com>) id 1gpjcM-0003eG-DY
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 19:57:14 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Fri,  1 Feb 2019 19:55:56 -0500
-Message-Id: <20190202005610.24048-7-crosa@redhat.com>
+Date: Fri,  1 Feb 2019 19:56:09 -0500
+Message-Id: <20190202005610.24048-20-crosa@redhat.com>
 In-Reply-To: <20190202005610.24048-1-crosa@redhat.com>
 References: <20190202005610.24048-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/20] Acceptance tests: use "arch:" tag to
- filter target specific tests
+Subject: [Qemu-devel] [PATCH v2 19/20] Boot Linux Console Test: add a test
+ for s390x + s390-ccw-virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +25,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Caio Carrara <ccarrara@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Cleber Rosa <crosa@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>
 
-Currently, the only test that contains some target architecture
-information is "boot_linux_console.py" which test contains a "x86_64"
-tag.  But that tag is not respected in the default execution, that is,
-"make check-acceptance" doesn't do anything with it.
+Just like the previous tests, boots a Linux kernel on a s390x target
+using the s390-ccw-virtio machine.
 
-That said, even the target architecture handling currently present in
-the "avocado_qemu.Test" class, class is pretty limited.  For instance,
-by default, it chooses a target based on the host architecture.
+Because it's not possible to have multiple VT220 consoles,
+'-nodefaults' is used, so that the one set with set_console() works
+correctly.
 
-Because the original implementation of the tags feature in Avocado did
-not include any time of namespace or "key:val" mechanism, no tag has
-relation to another tag.  The new implementation of the tags feature
-from version 67.0 onwards, allows "key:val" tags, and because of that,
-a test can be classified with a tag in a given key.  For instance, the
-new proposed version of the "boot_linux_console.py" test, which
-downloads and attempts to run a x86_64 kernel, is now tagged as:
-
-  :avocado: tags=3Darch:x86_64
-
-This means that it can be filtered (out) when no x86_64 target is
-available.  At the same time, tests that don't have a "arch:" tag,
-will not be filtered out.
-
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/Makefile.include                 | 3 +++
- tests/acceptance/boot_linux_console.py | 2 +-
- tests/acceptance/linux_initrd.py       | 2 +-
- tests/acceptance/virtio_version.py     | 2 +-
- tests/requirements.txt                 | 2 +-
- 5 files changed, 7 insertions(+), 4 deletions(-)
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 67e222eeff..e9e60117f8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1094,6 +1094,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
- # Any number of command separated loggers are accepted.  For more
- # information please refer to "avocado --help".
- AVOCADO_SHOW=3Dapp
-+AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
-ET_DIRS)))
+diff --git a/.travis.yml b/.travis.yml
+index 0b6416ba06..31ff85920a 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -189,7 +189,7 @@ matrix:
 =20
- ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
- $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-@@ -1119,6 +1120,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- 	$(call quiet-command, \
-             $(TESTS_VENV_DIR)/bin/python -m avocado \
-             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RES=
-ULTS_DIR) \
-+            --filter-by-tags-include-empty --filter-by-tags-include-empt=
-y-key \
-+            $(AVOCADO_TAGS) \
-             --failfast=3Don $(SRC_PATH)/tests/acceptance, \
-             "AVOCADO", "tests/acceptance")
-=20
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,arm-so=
+ftmmu"
++        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu,ppc64-softmmu,aarch64-softmmu,arm-so=
+ftmmu,s390x-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       addons:
+         apt:
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
 ot_linux_console.py
-index 98324f7591..46b20bdfe2 100644
+index 4b031baf7a..5d79099602 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
-     and the kernel command line is properly passed from QEMU to the kern=
-el
-=20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
-=20
-     timeout =3D 60
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
-itrd.py
-index 737355c2ef..c75e29be70 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -19,7 +19,7 @@ class LinuxInitrd(Test):
-     Checks QEMU evaluates correctly the initrd file passed as -initrd op=
-tion.
-=20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
-=20
-     timeout =3D 60
-diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio=
-_version.py
-index ce990250d8..3b280e7fc3 100644
---- a/tests/acceptance/virtio_version.py
-+++ b/tests/acceptance/virtio_version.py
-@@ -62,7 +62,7 @@ class VirtioVersionCheck(Test):
-     `disable-legacy`.
-=20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
-=20
-     # just in case there are failures, show larger diff:
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index 64c6e27a94..426a9e8a9a 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -1,4 +1,4 @@
- # Add Python module requirements, one per line, to be installed
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
--avocado-framework=3D=3D65.0
-+avocado-framework=3D=3D67.0
+@@ -193,3 +193,23 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_s390x_s390_ccw_virtio(self):
++        """
++        :avocado: tags=3Darch:s390x
++        :avocado: tags=3Dmachine:s390_ccw_virtio
++        """
++        kernel_url =3D ('http://mirrors.rit.edu/fedora/fedora-secondary/=
+releases'
++                      '/29/Server/s390x/os/images/kernel.img')
++        kernel_hash =3D 'e8e8439103ef8053418ef062644ffd46a7919313'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
++
++        self.vm.set_machine('s390-ccw-virtio')
++        self.vm.set_console()
++        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
+le=3Dsclp0'
++        self.vm.add_args('-nodefaults',
++                         '-kernel', kernel_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
++        self.wait_for_console_pattern(console_pattern)
 --=20
 2.20.1
