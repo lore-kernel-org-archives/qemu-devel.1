@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47546)
+Received: from eggs.gnu.org ([209.51.188.92]:43161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpoT7-00049x-Fd
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 01:08:00 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gppKg-0004rz-9b
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:03:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gpoT0-0002Rp-Pp
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 01:07:57 -0500
-Resent-Message-Id: <E1gpoT0-0002Rp-Pp@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gpoT0-0002GI-5b
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 01:07:50 -0500
-Message-ID: <154908761170.29184.15490840056344537316@ebba9967afc0>
-In-Reply-To: <20190128021835.24451-1-jcmvbkbc@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <yang.zhong@intel.com>) id 1gppKc-0006Nn-AK
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:03:16 -0500
+Received: from mga05.intel.com ([192.55.52.43]:41924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gppKa-0006FU-D6
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:03:13 -0500
+Date: Sat, 2 Feb 2019 14:59:18 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190202065918.GA9771@yangzhon-Virtual>
+References: <20190131073234.18037-1-yang.zhong@intel.com>
+	<20190131073234.18037-28-yang.zhong@intel.com>
+	<7ff49749-92c8-b0f1-2fd5-6d8a3625f0a3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Feb 2019 22:06:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hw/xtensa: xtfpga: raise CPU number limit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7ff49749-92c8-b0f1-2fd5-6d8a3625f0a3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 27/27] hw/vfio/Makefile.objs: Create new
+ CONFIG_* variables for VFIO core and PCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,197 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcmvbkbc@gmail.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, yang.zhong@intel.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODAyMTgzNS4yNDQ1
-MS0xLWpjbXZia2JjQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
-YSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkNvbmZpZ3VyZSBvcHRp
-b25zOgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0
-LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhvbj0vdXNyL2Jp
-bi9weXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1lbmFibGUtdHJh
-Y2UtYmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0bGUgLS1lbmFi
-bGUtY3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vlc3QtYWdlbnQg
-LS13aXRoLXNkbGFiaT0yLjAKCkVSUk9SOiAieDg2XzY0LXc2NC1taW5ndzMyLWdjYyIgZWl0aGVy
-IGRvZXMgbm90IGV4aXN0IG9yIGRvZXMgbm90IHdvcmsKCiMgUUVNVSBjb25maWd1cmUgbG9nIFNh
-dCBGZWIgIDIgMDY6MDY6NDYgVVRDIDIwMTkKIyBDb25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUt
-dGVzdC9zcmMvY29uZmlndXJlJyAnLS1lbmFibGUtd2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZf
-NjQtc29mdG1tdSxhYXJjaDY0LXNvZnRtbXUnICctLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0
-YWxsJyAnLS1weXRob249L3Vzci9iaW4vcHl0aG9uMycgJy0tY3Jvc3MtcHJlZml4PXg4Nl82NC13
-NjQtbWluZ3czMi0nICctLWVuYWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUnICctLWVuYWJsZS1n
-bnV0bHMnICctLWVuYWJsZS1uZXR0bGUnICctLWVuYWJsZS1jdXJsJyAnLS1lbmFibGUtdm5jJyAn
-LS1lbmFibGUtYnppcDInICctLWVuYWJsZS1ndWVzdC1hZ2VudCcgJy0td2l0aC1zZGxhYmk9Mi4w
-JwotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmlu
-ZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDYzNiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURf
-R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
-dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
-c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
-bW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29u
-ZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1w
-b3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJt
-aXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNo
-ZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDYzOCAwCng4Nl82NC13NjQtbWluZ3cz
-Mi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9T
-T1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVm
-IC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2lu
-ZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1j
-b25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNy
-ZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rk
-b3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVf
-b2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDY0MCAwCng4Nl82NC13
-NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xB
-UkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2Fs
-bCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmlj
-dC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRl
-bXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFp
-bGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11
-LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2Nj
-IGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDY0MiAw
-Cng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRT
-PTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1k
-ZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAt
-Zm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8g
-Y29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBl
-cnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hl
-L3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBp
-bGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIg
-NjE5IDY0NCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09G
-RlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3Jl
-ZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJv
-dG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251
-OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMK
-Y2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90
-bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6
-IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVz
-OiA5MiAxMjIgNjE5IDY0NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAt
-RF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90
-eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21p
-c3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2
-IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVt
-dS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBm
-b3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmll
-ZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBt
-YWluCmxpbmVzOiA5MiAxMjIgNjE5IDY0OCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05V
-X1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJp
-Y3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3Ry
-aW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1v
-biAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmln
-LXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3Jh
-cnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNz
-aW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNr
-X2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDY1MCAwCng4Nl82NC13NjQtbWluZ3czMi1n
-Y2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VS
-Q0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1X
-d3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAt
-Zm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25m
-Lm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0
-ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0
-OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2Jq
-ZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDY1MiAwCng4Nl82NC13NjQt
-bWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdF
-RklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAt
-V3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1h
-bGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAv
-cWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVk
-IHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNv
-bmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNv
-bXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDY1NCAwCng4
-Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0
-IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNs
-cyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5v
-LXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29u
-ZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJv
-cjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3Rt
-cC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVy
-IGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5
-IDY4OCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNF
-VF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVu
-ZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90
-eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkg
-LWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2Nh
-Y2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAv
-Y2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRv
-X2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5
-MiAxMjIgNjE5IDY5MCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9G
-SUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBl
-cyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Np
-bmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1z
-dGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1j
-b25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3Ig
-L3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoK
-ZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWlu
-CmxpbmVzOiA5MiAxMjIgNjE5IDY5NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NP
-VVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3Qt
-cHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5n
-cyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAt
-ZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRl
-bXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3Jhcnkg
-ZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9u
-IGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2Rl
-ZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDcwMiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2Mg
-LURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0Ug
-LVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3Jp
-dGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5v
-LWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8g
-Y29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0
-ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQ
-ZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0
-IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDcwOCAwCng4Nl82NC13NjQtbWlu
-Z3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklM
-RV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3Vu
-ZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlh
-c2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVt
-dS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRv
-IGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYu
-c3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBp
-bGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDcxMCAwCng4Nl82
-NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1E
-X0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAt
-V2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0
-cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmln
-LXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjog
-RmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9x
-ZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRv
-X2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE5IDcx
-NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9C
-SVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFu
-dC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBl
-cyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMg
-LW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hl
-OiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2Nh
-Y2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2Nv
-bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
-MjIgNjE5IDcyMiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
-X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
-V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
-cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9
-Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25m
-LmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zh
-ci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVu
-Y3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxp
-bmVzOiA5MiAxMjIgNjE5IDcyNCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJD
-RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
-dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
-V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
-YXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAv
-cWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmls
-ZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRl
-bmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IG1haW4KbGluZXM6
-IDkyIDEyMiAxODIwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtbTY0IC1tY3gxNiAtRF9HTlVf
-U09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmlj
-dC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJp
-bmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9u
-IC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWct
-dGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFy
-eSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Np
-b24gZGVuaWVkCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJlY2Vu
-dCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNTYz
-LCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
-ZXcub3JnL2xvZ3MvMjAxOTAxMjgwMjE4MzUuMjQ0NTEtMS1qY212YmtiY0BnbWFpbC5jb20vdGVz
-dGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Jan 31, 2019 at 09:48:54AM +0100, Thomas Huth wrote:
+> On 2019-01-31 08:32, Yang Zhong wrote:
+> > From: Paolo Bonzini <pbonzini@redhat.com>
+> > 
+> > Make hw/vfio configurable and add new CONFIG_VFIO_* to the
+> > default-configs/s390x*-softmmu.mak.  This allow a finer-grain
+> > selection of the various VFIO backends.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  default-configs/arm-softmmu.mak   | 2 ++
+> >  default-configs/pci.mak           | 2 ++
+> >  default-configs/ppc64-softmmu.mak | 1 +
+> >  default-configs/s390x-softmmu.mak | 5 +++--
+> >  hw/Makefile.objs                  | 2 +-
+> >  hw/vfio/Makefile.objs             | 7 +++----
+> >  6 files changed, 12 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> > index d2c8b52f6d..e74b994f2a 100644
+> > --- a/default-configs/arm-softmmu.mak
+> > +++ b/default-configs/arm-softmmu.mak
+> > @@ -123,6 +123,8 @@ CONFIG_VERSATILE_PCI=y
+> >  CONFIG_VERSATILE_I2C=y
+> >  
+> >  CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
+> > +CONFIG_VFIO=$(CONFIG_LINUX)
+> > +CONFIG_VFIO_PLATFORM=y
+> >  CONFIG_VFIO_XGMAC=y
+> >  CONFIG_VFIO_AMD_XGBE=y
+> >  
+> > diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+> > index 83738cbb65..037636fa33 100644
+> > --- a/default-configs/pci.mak
+> > +++ b/default-configs/pci.mak
+> > @@ -47,3 +47,5 @@ CONFIG_VGA_PCI=y
+> >  CONFIG_BOCHS_DISPLAY=y
+> >  CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
+> >  CONFIG_ROCKER=y
+> > +CONFIG_VFIO=$(CONFIG_LINUX)
+> > +CONFIG_VFIO_PCI=y
+> > diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+> > index 7f34ad0528..ccd7b179df 100644
+> > --- a/default-configs/ppc64-softmmu.mak
+> > +++ b/default-configs/ppc64-softmmu.mak
+> > @@ -18,6 +18,7 @@ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+> >  CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+> >  CONFIG_XIVE=$(CONFIG_PSERIES)
+> >  CONFIG_XIVE_SPAPR=$(CONFIG_PSERIES)
+> > +CONFIG_VFIO_SPAPR=$(CONFIG_PSERIES)
+> >  CONFIG_MEM_DEVICE=y
+> >  CONFIG_DIMM=y
+> >  CONFIG_SPAPR_RNG=y
+> > diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> > index 8bb7e438c8..6f2c6cec18 100644
+> > --- a/default-configs/s390x-softmmu.mak
+> > +++ b/default-configs/s390x-softmmu.mak
+> > @@ -5,7 +5,8 @@ CONFIG_SCLPCONSOLE=y
+> >  CONFIG_TERMINAL3270=y
+> >  CONFIG_S390_FLIC=y
+> >  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+> > -CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+> >  CONFIG_WDT_DIAG288=y
+> > -CONFIG_VFIO_AP=$(CONFIG_LINUX)
+> >  CONFIG_S390_CCW_VIRTIO=y
+> > +CONFIG_VFIO=$(CONFIG_LINUX)
+> > +CONFIG_VFIO_CCW=y
+> > +CONFIG_VFIO_AP=y
+> > diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> > index 22dd211363..e2fcd6aafc 100644
+> > --- a/hw/Makefile.objs
+> > +++ b/hw/Makefile.objs
+> > @@ -30,7 +30,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += ssi/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += timer/
+> >  devices-dirs-$(CONFIG_TPM) += tpm/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += usb/
+> > -devices-dirs-$(CONFIG_LINUX) += vfio/
+> > +devices-dirs-$(CONFIG_VFIO) += vfio/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += virtio/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+> >  devices-dirs-$(CONFIG_SOFTMMU) += xen/
+> > diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> > index 91805893f7..abad8b818c 100644
+> > --- a/hw/vfio/Makefile.objs
+> > +++ b/hw/vfio/Makefile.objs
+> > @@ -1,8 +1,7 @@
+> > -obj-$(CONFIG_SOFTMMU) += common.o
+> > -obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
+> > +obj-y += common.o spapr.o
+> 
+> I had rather expected a "obj-$(CONFIG_VFIO_SPAPR) += spapr.o" here...
+> but I guess it doesn't link without spapr.o? Maybe worth to mention that
+> in the patch description...
+> 
+
+  Yes, The common.c call some functions in spapr.c here. Thanks Thomas.
+
+  Yang 
+
+> Anyway:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> 
+> > +obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
+> >  obj-$(CONFIG_VFIO_CCW) += ccw.o
+> > -obj-$(CONFIG_SOFTMMU) += platform.o
+> > +obj-$(CONFIG_VFIO_PLATFORM) += platform.o
+> >  obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+> >  obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+> > -obj-$(CONFIG_SOFTMMU) += spapr.o
+> >  obj-$(CONFIG_VFIO_AP) += ap.o
+> > 
