@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44819)
+Received: from eggs.gnu.org ([209.51.188.92]:47184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpkNX-0006AS-Ie
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:56 -0500
+	(envelope-from <lifei1214@126.com>) id 1gpnAl-00080T-B5
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 23:44:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpkNW-0003Sx-GX
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52708)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gpkNW-0003Jv-6M
-	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 20:45:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gpkNB-0000nS-OP
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:45:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AB1402E8037
-	for <qemu-devel@nongnu.org>; Sat,  2 Feb 2019 01:45:33 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <lifei1214@126.com>) id 1gpnAj-0000F5-4V
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 23:44:55 -0500
+Received: from m50-111.126.com ([123.125.50.111]:57962)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gpnAh-0000By-Vu
+	for qemu-devel@nongnu.org; Fri, 01 Feb 2019 23:44:53 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (1.0)
+From: fei <lifei1214@126.com>
+In-Reply-To: <87k1ij7jie.fsf@dusky.pond.sub.org>
+Date: Sat, 2 Feb 2019 12:44:22 +0800
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 Feb 2019 01:38:37 -0000
-From: Erik Kline <1814352@bugs.launchpad.net>
-Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1814352] [NEW] SIOCGIFNAME takes a struct ifreq
- not an integer
+Message-Id: <447BFB43-A3B1-4236-8DA5-D8E9C2B467D4@126.com>
+References: <20190201051806.53183-1-lifei1214@126.com>
+	<20190201051806.53183-5-lifei1214@126.com>
+	<87k1ij7jie.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 04/11] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Jiri Slaby <jslaby@suse.cz>
 
-Public bug reported:
 
-The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an integer.
-This leads to if_indextoname() not correctly returning interface names
-(well, not if they're longer than 4 characters including the trailing
-NULL ;-).
 
-This is observed on v3.1.0.
+> =E5=9C=A8 2019=E5=B9=B42=E6=9C=881=E6=97=A5=EF=BC=8C20:58=EF=BC=8CMarkus A=
+rmbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> Fei Li <lifei1214@126.com> writes:
+>=20
+>> From: Fei Li <fli@suse.com>
+>>=20
+>> Utilize the existed errp to propagate the error and do the
+>> corresponding cleanup to replace the temporary &error_abort.
+>>=20
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Jiri Slaby <jslaby@suse.cz>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>> hw/misc/edu.c | 11 ++++++++---
+>> 1 file changed, 8 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+>> index 21adbfddce..8fe232b6d6 100644
+>> --- a/hw/misc/edu.c
+>> +++ b/hw/misc/edu.c
+>> @@ -356,9 +356,14 @@ static void pci_edu_realize(PCIDevice *pdev, Error *=
+*errp)
+>>=20
+>>     qemu_mutex_init(&edu->thr_mutex);
+>>     qemu_cond_init(&edu->thr_cond);
+>> -    /* TODO: let the further caller handle the error instead of abort() h=
+ere */
+>> -    qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+>> -                       edu, QEMU_THREAD_JOINABLE, &error_abort);
+>> +    if (qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+>> +                           edu, QEMU_THREAD_JOINABLE, errp) < 0) {
+>> +        qemu_cond_destroy(&edu->thr_cond);
+>> +        qemu_mutex_destroy(&edu->thr_mutex);
+>> +        timer_del(&edu->dma_timer);
+>> +        msi_uninit(pdev);
+>> +        return;
+>> +    }
+>>=20
+>>     memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+>>                     "edu-mmio", 1 * MiB);
+>=20
+> In review of v9, I pointed out that pci_edu_uninit() neglects to call
+> msix_uninit(), and you offered to fix it.  Not in this series.  Do you
+> still intend to fix it?
+Yes, I have already sent that patch separately as I consider it is little re=
+levant. And that patch has been merged. :)
+>=20
+> That's a separate patch, though, so
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Thanks for the review!
 
-The following one-line patch will be sent to the qemu-devel mailing
-list:
-
-"""
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index ae8951625f..37501f575c 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -178,7 +178,7 @@
- #endif /* CONFIG_USBFS */
- =
-
-   IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
--  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
-+  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-   IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq=
-)))
-"""
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1814352
-
-Title:
-  SIOCGIFNAME takes a struct ifreq not an integer
-
-Status in QEMU:
-  New
-
-Bug description:
-  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
-  integer.  This leads to if_indextoname() not correctly returning
-  interface names (well, not if they're longer than 4 characters
-  including the trailing NULL ;-).
-
-  This is observed on v3.1.0.
-
-  The following one-line patch will be sent to the qemu-devel mailing
-  list:
-
-  """
-  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-  index ae8951625f..37501f575c 100644
-  --- a/linux-user/ioctls.h
-  +++ b/linux-user/ioctls.h
-  @@ -178,7 +178,7 @@
-   #endif /* CONFIG_USBFS */
-   =
-
-     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
-  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
-  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
-)))
-     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
-eq)))
-  """
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
+Have a nice day
+Fei=
