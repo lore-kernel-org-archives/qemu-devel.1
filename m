@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56229)
+Received: from eggs.gnu.org ([209.51.188.92]:58213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpvcJ-0001wf-PV
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:56 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gpviV-0004uW-6X
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:52:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpvcI-0003ak-IB
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gpvcG-0003Om-LW
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gpvbw-0006ok-1x
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 13:45:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E7D042E80CB
-	for <qemu-devel@nongnu.org>; Sat,  2 Feb 2019 13:45:31 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1gpviU-0007y3-An
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:52:19 -0500
+Resent-Message-Id: <E1gpviU-0007y3-An@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gpviU-0007xT-2h
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:52:18 -0500
+Message-ID: <154911544593.29184.6703775313932699252@ebba9967afc0>
+In-Reply-To: <20190131130850.6850-1-yuval.shaia@oracle.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 Feb 2019 13:32:57 -0000
-From: Richard Jones <rjones@redhat.com>
-Reply-To: Bug 1814381 <1814381@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154911433612.20173.9806415794048827550.malonedeb@wampee.canonical.com>
-Message-Id: <154911437746.27616.17512414643870368157.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1814381] Re: qemu can't resolve ::1 when no
- network is available
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 2 Feb 2019 05:50:47 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 00/10] Misc fixes to pvrdma device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: yuval.shaia@oracle.com
+Cc: fam@euphon.net, dgilbert@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-ping6 output when the network is not connected:
-
-$ ping6 ::1
-PING ::1(::1) 56 data bytes
-64 bytes from ::1: icmp_seq=3D1 ttl=3D64 time=3D0.082 ms
-64 bytes from ::1: icmp_seq=3D2 ttl=3D64 time=3D0.092 ms
-64 bytes from ::1: icmp_seq=3D3 ttl=3D64 time=3D0.089 ms
-^C
---- ::1 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 55ms
-rtt min/avg/max/mdev =3D 0.082/0.087/0.092/0.011 ms
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1814381
-
-Title:
-  qemu can't resolve ::1 when no network is available
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm not sure if this is a qemu thing or a getaddrinfo/glibc thing, or
-  even just something about my laptop.  However we have a test failure
-  in nbdkit which only occurs when my laptop is not connected to wifi or
-  other networking.  It boils down to:
-
-  =C2=A0=C2=A0$ qemu-img info --image-opts "file.driver=3Dnbd,file.host=3D:=
-:1,file.port=3D1234"
-  =C2=A0=C2=A0qemu-img: Could not open 'file.driver=3Dnbd,file.host=3D::1,f=
-ile.port=3D1234': address resolution failed for ::1:1234: Address family fo=
-r hostname not supported
-
-  In a successful case it should connect to a local NBD server on port
-  1234, but if you don't have that you will see:
-
-  =C2=A0=C2=A0qemu-img: Could not open
-  'file.driver=3Dnbd,file.host=3D::1,file.port=3D1234': Failed to connect
-  socket: Connection refused
-
-  I can =E2=80=98ping6 ::1=E2=80=99 fine.
-
-  It also works if I replace =E2=80=98::1=E2=80=99 with =E2=80=98localhost6=
-=E2=80=99.
-
-  My /etc/hosts contains:
-
-  127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdo=
-main4
-  ::1         localhost localhost.localdomain localhost6 localhost6.localdo=
-main6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1814381/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEzMTEzMDg1MC42ODUw
+LTEteXV2YWwuc2hhaWFAb3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
+ZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICB4
+ODZfNjQtc29mdG1tdS9leGVjLm8KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0
+L3NyYy9ody9yZG1hL3Ztdy9wdnJkbWEuaDoyNiwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAv
+cWVtdS10ZXN0L3NyYy9tb25pdG9yLmM6ODc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9yZG1hL3Zt
+dy8uLi9yZG1hX2JhY2tlbmRfZGVmcy5oOjIxOjEwOiBmYXRhbCBlcnJvcjogaW5maW5pYmFuZC92
+ZXJicy5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAjaW5jbHVkZSA8aW5maW5pYmFuZC92
+ZXJicy5oPgogICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn4KY29tcGlsYXRpb24gdGVybWlu
+YXRlZC4KLS0tCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9tZW1vcnkubwpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3JkbWEvdm13L3B2cmRtYS5oOjI2LAogICAg
+ICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL21vbml0b3IuYzo4NzoKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2h3L3JkbWEvdm13Ly4uL3JkbWFfYmFja2VuZF9kZWZzLmg6MjE6MTA6IGZh
+dGFsIGVycm9yOiBpbmZpbmliYW5kL3ZlcmJzLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkK
+ICNpbmNsdWRlIDxpbmZpbmliYW5kL3ZlcmJzLmg+CiAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+
+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMzExMzA4NTAuNjg1MC0xLXl1dmFsLnNo
+YWlhQG9yYWNsZS5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
