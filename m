@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54880)
+Received: from eggs.gnu.org ([209.51.188.92]:54983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gprzI-0006z8-Hq
+	(envelope-from <palmer@sifive.com>) id 1gprzI-0006zO-Ih
 	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gprq8-0005hF-05
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:43:57 -0500
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:36371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gprq5-0005WZ-Uh
+	(envelope-from <palmer@sifive.com>) id 1gprq5-0005f5-UU
 	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:43:55 -0500
-Received: by mail-ed1-x541.google.com with SMTP id f23so7492720edb.3
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:43:46 -0800 (PST)
-Date: Sat,  2 Feb 2019 01:43:24 -0800
-Message-Id: <20190202094329.22874-6-palmer@sifive.com>
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37760)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gprq5-0005bz-6p
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:43:53 -0500
+Received: by mail-ed1-x544.google.com with SMTP id h15so7475916edb.4
+	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:43:50 -0800 (PST)
+Date: Sat,  2 Feb 2019 01:43:27 -0800
+Message-Id: <20190202094329.22874-9-palmer@sifive.com>
 In-Reply-To: <20190202094329.22874-1-palmer@sifive.com>
 References: <20190202094329.22874-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 05/10] RISC-V: Add priv_ver to DisasContext
+Subject: [Qemu-devel] [PULL 08/10] RISC-V: Add misa runtime write support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +26,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
 
-From: Alistair Francis <Alistair.Francis@wdc.com>
+From: Michael Clark <mjc@sifive.com>
 
-The gen methods should access state from DisasContext. Add priv_ver
-field to the DisasContext struct.
+This patch adds support for writing misa. misa is validated based
+on rules in the ISA specification. 'E' is mutually exclusive with
+all other extensions. 'D' depends on 'F' so 'D' bit is dropped
+if 'F' is not present. A conservative approach to consistency is
+taken by flushing the translation cache on misa writes. misa_mask
+is added to the CPU struct to store the original set of extensions.
 
+Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/translate.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ target/riscv/cpu.c      |  2 +-
+ target/riscv/cpu.h      |  4 ++-
+ target/riscv/cpu_bits.h | 11 +++++++++
+ target/riscv/csr.c      | 54 ++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 68 insertions(+), 3 deletions(-)
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 0581b3c1f7d7..35eb6bdfe099 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -43,6 +43,7 @@ typedef struct DisasContext {
-     DisasContextBase base;
-     /* pc_succ_insn points to the instruction following base.pc_next */
-     target_ulong pc_succ_insn;
-+    target_ulong priv_ver;
-     uint32_t opcode;
-     uint32_t mstatus_fs;
-     uint32_t mem_idx;
-@@ -1330,7 +1331,7 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
- #ifndef CONFIG_USER_ONLY
-     /* Extract funct7 value and check whether it matches SFENCE.VMA */
-     if ((opc == OPC_RISC_ECALL) && ((csr >> 5) == 9)) {
--        if (env->priv_ver == PRIV_VERSION_1_10_0) {
-+        if (ctx->priv_ver == PRIV_VERSION_1_10_0) {
-             /* sfence.vma */
-             /* TODO: handle ASID specific fences */
-             gen_helper_tlb_flush(cpu_env);
-@@ -1384,7 +1385,7 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-             gen_helper_wfi(cpu_env);
-             break;
-         case 0x104: /* SFENCE.VM */
--            if (env->priv_ver <= PRIV_VERSION_1_09_1) {
-+            if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
-                 gen_helper_tlb_flush(cpu_env);
-             } else {
-                 gen_exception_illegal(ctx);
-@@ -1854,10 +1855,12 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx)
- static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-+    CPURISCVState *env = cs->env_ptr;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 28d7e5302fb1..cc3ddc0ae4b5 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -88,7 +88,7 @@ typedef struct RISCVCPUInfo {
  
-     ctx->pc_succ_insn = ctx->base.pc_first;
-     ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
-     ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
-+    ctx->priv_ver = env->priv_ver;
-     ctx->frm = -1;  /* unknown rounding mode */
+ static void set_misa(CPURISCVState *env, target_ulong misa)
+ {
+-    env->misa = misa;
++    env->misa_mask = env->misa = misa;
  }
  
+ static void set_versions(CPURISCVState *env, int user_ver, int priv_ver)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index a97435bd7b1d..5c2aebf13251 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -86,7 +86,8 @@
+    so a cpu features bitfield is required, likewise for optional PMP support */
+ enum {
+     RISCV_FEATURE_MMU,
+-    RISCV_FEATURE_PMP
++    RISCV_FEATURE_PMP,
++    RISCV_FEATURE_MISA
+ };
+ 
+ #define USER_VERSION_2_02_0 0x00020200
+@@ -118,6 +119,7 @@ struct CPURISCVState {
+     target_ulong user_ver;
+     target_ulong priv_ver;
+     target_ulong misa;
++    target_ulong misa_mask;
+ 
+     uint32_t features;
+ 
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 5439f4719ee5..7afcb2468d80 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -311,10 +311,21 @@
+ #define MSTATUS32_SD        0x80000000
+ #define MSTATUS64_SD        0x8000000000000000ULL
+ 
++#define MISA32_MXL          0xC0000000
++#define MISA64_MXL          0xC000000000000000ULL
++
++#define MXL_RV32            1
++#define MXL_RV64            2
++#define MXL_RV128           3
++
+ #if defined(TARGET_RISCV32)
+ #define MSTATUS_SD MSTATUS32_SD
++#define MISA_MXL MISA32_MXL
++#define MXL_VAL MXL_RV32
+ #elif defined(TARGET_RISCV64)
+ #define MSTATUS_SD MSTATUS64_SD
++#define MISA_MXL MISA64_MXL
++#define MXL_VAL MXL_RV64
+ #endif
+ 
+ /* sstatus CSR bits */
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index e2bd374f09ed..e72fcf1265d4 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -332,6 +332,58 @@ static int read_misa(CPURISCVState *env, int csrno, target_ulong *val)
+     return 0;
+ }
+ 
++static int write_misa(CPURISCVState *env, int csrno, target_ulong val)
++{
++    if (!riscv_feature(env, RISCV_FEATURE_MISA)) {
++        /* drop write to misa */
++        return 0;
++    }
++
++    /* 'I' or 'E' must be present */
++    if (!(val & (RVI | RVE))) {
++        /* It is not, drop write to misa */
++        return 0;
++    }
++
++    /* 'E' excludes all other extensions */
++    if (val & RVE) {
++        /* when we support 'E' we can do "val = RVE;" however
++         * for now we just drop writes if 'E' is present.
++         */
++        return 0;
++    }
++
++    /* Mask extensions that are not supported by this hart */
++    val &= env->misa_mask;
++
++    /* Mask extensions that are not supported by QEMU */
++    val &= (RVI | RVE | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
++
++    /* 'D' depends on 'F', so clear 'D' if 'F' is not present */
++    if ((val & RVD) && !(val & RVF)) {
++        val &= ~RVD;
++    }
++
++    /* Suppress 'C' if next instruction is not aligned
++     * TODO: this should check next_pc
++     */
++    if ((val & RVC) && (GETPC() & ~3) != 0) {
++        val &= ~RVC;
++    }
++
++    /* misa.MXL writes are not supported by QEMU */
++    val = (env->misa & MISA_MXL) | (val & ~MISA_MXL);
++
++    /* flush translation cache */
++    if (val != env->misa) {
++        tb_flush(CPU(riscv_env_get_cpu(env)));
++    }
++
++    env->misa = val;
++
++    return 0;
++}
++
+ static int read_medeleg(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     *val = env->medeleg;
+@@ -810,7 +862,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+ 
+     /* Machine Trap Setup */
+     [CSR_MSTATUS] =             { any,  read_mstatus,     write_mstatus     },
+-    [CSR_MISA] =                { any,  read_misa                           },
++    [CSR_MISA] =                { any,  read_misa,        write_misa        },
+     [CSR_MIDELEG] =             { any,  read_mideleg,     write_mideleg     },
+     [CSR_MEDELEG] =             { any,  read_medeleg,     write_medeleg     },
+     [CSR_MIE] =                 { any,  read_mie,         write_mie         },
 -- 
 2.18.1
