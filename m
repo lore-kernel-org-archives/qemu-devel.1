@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53299)
+Received: from eggs.gnu.org ([209.51.188.92]:54880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gpqsC-00037h-8e
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 03:42:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gprz6-0006z8-6I
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gpqs8-0003yN-Cg
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 03:41:58 -0500
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:46015)
+	(envelope-from <alex.bennee@linaro.org>) id 1gprtc-0008Ug-Qj
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:47:36 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gpqs4-0003lz-Fw
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 03:41:54 -0500
-Received: by mail-ed1-x533.google.com with SMTP id d39so7362017edb.12
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 00:41:44 -0800 (PST)
-Date: Sat, 02 Feb 2019 00:41:42 -0800 (PST)
-In-Reply-To: <547f1afb-cce5-e456-5466-87ba333859b8@redhat.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-540aa736-f429-48d0-9823-6f4abe456ffd@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gprtW-0008PX-20
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:47:29 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id b11so8451726wmj.1
+	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:47:21 -0800 (PST)
+MIME-Version: 1.0
+References: <20190123114220.16972-1-alex.bennee@linaro.org>
+	<39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
+In-Reply-To: <39aa1e09-ecb9-b795-9ec2-1835a40edd20@redhat.com>
+From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Sat, 2 Feb 2019 09:47:09 +0000
+Message-ID: <CAHDbmO0Vt8PUNNAsmd9V0_U-W+r+C9CRE0FfOK2dULyQj5VXVA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/11] check-softfloat,
+ fp-bench and clang compile fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: eblake@redhat.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 30 Jan 2019 22:39:35 PST (-0800), thuth@redhat.com wrote:
-> On 2019-01-30 20:01, Palmer Dabbelt wrote:
->> On Wed, 30 Jan 2019 09:45:33 PST (-0800), eblake@redhat.com wrote:
->>> On 1/30/19 11:35 AM, Palmer Dabbelt wrote:
->>>> The following changes since commit
->>>> 5385a5988c8a55bebdc878c05b96648579b5d6e0:
->>>>
->>>>   hw/virtio/virtio-balloon: zero-initialize the virtio_balloon_config
->>>> struct (2019-01-21 17:20:36 +0000)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   git://github.com/palmer-dabbelt/qemu.git
->>>> tags/riscv-for-master-3.2-part3
->>>>
->>>> for you to fetch changes up to 461ab9de46d085a37b0da6f096aadc4e0dda4d4c:
->>>>
->>>>   target/riscv: fix counter-enable checks in ctr() (2019-01-29
->>>> 11:33:38 -0800)
->>>>
->>>> ----------------------------------------------------------------
->>>> RISC-V Patches for 3.2, Part 3
->>>
->>> There is no 3.2 release; the next release is named 4.0.  However, if you
->>> don't want to bother with sending a v2 pull request just to fix the
->>> merge commit message, that's okay with me.
->>
->> Ah, sorry.  I think I'm just going to leave it as is, I'll get it right
->> next time.
+I'll add an ignore when I send the next fpu series.
+
+Thanks.
+
+On Fri, 1 Feb 2019, 18:44 Eric Blake <eblake@redhat.com wrote:
+
+> On 1/23/19 5:42 AM, Alex Benn=C3=A9e wrote:
+> > The following changes since commit
+> 952bc8b3c2cbba78261923a1e8ca55cda261dee9:
+> >
+> >   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-21'
+> into staging (2019-01-22 17:56:21 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/stsquad/qemu.git tags/pull-fpu-next-230119-2
+> >
+> > for you to fetch changes up to 7617010250822677348af2bd98f048be10e7f334=
+:
+> >
+> >   tests/Makefile: add check-softfloat rule (2019-01-23 08:30:01 +0000)
+> >
+> > ----------------------------------------------------------------
+> > Some more softfloat/fpu fixes
+> >
+> >    - make check-softfloat
+> >    - fixes for fp-bench
+> >    - workaround broken host fma
+> >    - compile fix for s390x/clang
+> >    - fixed for bigendian (v2)
+> >    - minor makefile tweaks (v2)
 >
-> Also note that you used "PR RFC" in the title ... so not sure whether
-> Peter's scripts will catch this PR as a valid one...
-
-It's actually meant not to: my blow is to send out these as a test to see if 
-there's anything wrong, and then if there is to fix it up.  I'm less worried 
-about the text of the pull request and more about making sure I didn't screw up 
-a patch, which is the only reason I wasn't worried about picking up your 
-suggested change.
+> I think this series is the reason that an in-tree 'make && make check &&
+> git status' is now showing a bunch of untracked files:
+>
+>         tests/fp/add.out
+>         tests/fp/div.out
+>         tests/fp/eq.out
+> ...
+>
+> I suggest a followup patch to amend a .gitignore for tests/fp/*.out
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>
+>
