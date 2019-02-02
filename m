@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56223)
+Received: from eggs.gnu.org ([209.51.188.92]:56229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpvcJ-0001wc-Cv
+	(envelope-from <bounces@canonical.com>) id 1gpvcJ-0001wf-PV
 	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gpvcI-0003aL-Cy
+	(envelope-from <bounces@canonical.com>) id 1gpvcI-0003ak-IB
 	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42700)
+Received: from indium.canonical.com ([91.189.90.7]:42660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gpvcG-0003Ox-EQ
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:52 -0500
+	id 1gpvcG-0003Om-LW
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 08:45:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gpvbx-0006pt-1D
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 13:45:33 +0000
+	id 1gpvbw-0006ok-1x
+	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 13:45:32 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E2E252E80CB
-	for <qemu-devel@nongnu.org>; Sat,  2 Feb 2019 13:45:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E7D042E80CB
+	for <qemu-devel@nongnu.org>; Sat,  2 Feb 2019 13:45:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 Feb 2019 13:35:59 -0000
+Date: Sat, 02 Feb 2019 13:32:57 -0000
 From: Richard Jones <rjones@redhat.com>
 Reply-To: Bug 1814381 <1814381@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154911433612.20173.9806415794048827550.malonedeb@wampee.canonical.com>
-Message-Id: <154911455957.30879.7558671487225439488.malone@gac.canonical.com>
+Message-Id: <154911437746.27616.17512414643870368157.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1814381] Re: qemu can't resolve ::1 when no
  network is available
@@ -39,9 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The logic in util/qemu-sockets.c is very complicated, containing workarounds
-for all sorts of broken/obsolete GAI implementations, so it's hard to tell
-what's going on there.
+ping6 output when the network is not connected:
+
+$ ping6 ::1
+PING ::1(::1) 56 data bytes
+64 bytes from ::1: icmp_seq=3D1 ttl=3D64 time=3D0.082 ms
+64 bytes from ::1: icmp_seq=3D2 ttl=3D64 time=3D0.092 ms
+64 bytes from ::1: icmp_seq=3D3 ttl=3D64 time=3D0.089 ms
+^C
+--- ::1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 55ms
+rtt min/avg/max/mdev =3D 0.082/0.087/0.092/0.011 ms
 
 -- =
 
