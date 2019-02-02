@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50383)
+Received: from eggs.gnu.org ([209.51.188.92]:50405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gppgQ-000186-KP
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:47 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gppgU-0001Bg-B9
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gppgI-0002zQ-1N
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:39 -0500
-Received: from mga14.intel.com ([192.55.52.115]:56083)
+	(envelope-from <yang.zhong@intel.com>) id 1gppgN-00033V-Be
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:46 -0500
+Received: from mga14.intel.com ([192.55.52.115]:56070)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gppgH-0002jk-ED
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:37 -0500
+	id 1gppgH-0002Ky-RR
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 02:25:38 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Sat,  2 Feb 2019 15:24:43 +0800
-Message-Id: <20190202072456.6468-15-yang.zhong@intel.com>
+Date: Sat,  2 Feb 2019 15:24:41 +0800
+Message-Id: <20190202072456.6468-13-yang.zhong@intel.com>
 In-Reply-To: <20190202072456.6468-1-yang.zhong@intel.com>
 References: <20190202072456.6468-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 14/27] hw/sparc/Makefile.objs: CONFIG_* for
- sun4m and leon3 created
+Subject: [Qemu-devel] [PATCH v2 12/27] hw/sh4/Makefile.objs: New CONFIG_*
+ varibales created for sh4 boards and device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +33,48 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, yang.zhong@intel.com, =?UTF-8?q?=C3=8
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_LEON3 added to default-configs/sparc-softmmu.mak.
+Make hw/sh4 configurable and add new CONFIG_* to the
+default-configs/sh4*-softmmu.mak.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/sparc-softmmu.mak | 2 ++
- hw/sparc/Makefile.objs            | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ default-configs/sh4-softmmu.mak   | 2 ++
+ default-configs/sh4eb-softmmu.mak | 2 ++
+ hw/sh4/Makefile.objs              | 4 ++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
-index 12f97eeb20..59a4a3d693 100644
---- a/default-configs/sparc-softmmu.mak
-+++ b/default-configs/sparc-softmmu.mak
-@@ -18,4 +18,6 @@ CONFIG_CS4231=y
- CONFIG_GRLIB=y
- CONFIG_STP2000=y
- CONFIG_ECCMEMCTL=y
-+
- CONFIG_SUN4M=y
-+CONFIG_LEON3=y
-diff --git a/hw/sparc/Makefile.objs b/hw/sparc/Makefile.objs
-index e2d0828c39..d57e33f83e 100644
---- a/hw/sparc/Makefile.objs
-+++ b/hw/sparc/Makefile.objs
-@@ -1 +1,3 @@
--obj-y += sun4m_iommu.o sun4m.o leon3.o
-+obj-$(CONFIG_SUN4M) += sun4m_iommu.o
-+obj-$(CONFIG_SUN4M) += sun4m.o
-+obj-$(CONFIG_LEON3) += leon3.o
+diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
+index caeccd55be..1fdb009151 100644
+--- a/default-configs/sh4-softmmu.mak
++++ b/default-configs/sh4-softmmu.mak
+@@ -19,3 +19,5 @@ CONFIG_PCSPK=y
+ CONFIG_I82374=y
+ CONFIG_I8257=y
+ CONFIG_MC146818RTC=y
++CONFIG_R2D=y
++CONFIG_SHIX=y
+diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
+index 53b9cd7b5a..3b550a5fe8 100644
+--- a/default-configs/sh4eb-softmmu.mak
++++ b/default-configs/sh4eb-softmmu.mak
+@@ -19,3 +19,5 @@ CONFIG_PCSPK=y
+ CONFIG_I82374=y
+ CONFIG_I8257=y
+ CONFIG_MC146818RTC=y
++CONFIG_R2D=y
++CONFIG_SHIX=y
+diff --git a/hw/sh4/Makefile.objs b/hw/sh4/Makefile.objs
+index 2393702c57..2a707f9473 100644
+--- a/hw/sh4/Makefile.objs
++++ b/hw/sh4/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y += shix.o r2d.o
+-
+ obj-y += sh7750.o sh7750_regnames.o
+ obj-y += sh_pci.o
++obj-$(CONFIG_R2D) +=  r2d.o
++obj-$(CONFIG_SHIX) += shix.o
 -- 
 2.17.1
