@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55118)
+Received: from eggs.gnu.org ([209.51.188.92]:55006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gprz9-000700-JP
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:53:16 -0500
+	(envelope-from <palmer@sifive.com>) id 1gprzE-0006zR-QL
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:53:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gprqF-0005rc-RU
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:44:04 -0500
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:45145)
+	(envelope-from <palmer@sifive.com>) id 1gprqB-0005k5-O6
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:44:01 -0500
+Received: from mail-ed1-x536.google.com ([2a00:1450:4864:20::536]:33483)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gprqD-0005fJ-P3
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:44:03 -0500
-Received: by mail-ed1-x544.google.com with SMTP id d39so7433967edb.12
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:43:54 -0800 (PST)
-Date: Sat,  2 Feb 2019 01:43:29 -0800
-Message-Id: <20190202094329.22874-11-palmer@sifive.com>
-In-Reply-To: <20190202094329.22874-1-palmer@sifive.com>
-References: <20190202094329.22874-1-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gprq7-0005N3-P5
+	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 04:43:55 -0500
+Received: by mail-ed1-x536.google.com with SMTP id p6so7529069eds.0
+	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 01:43:38 -0800 (PST)
+Date: Sat,  2 Feb 2019 01:43:19 -0800
+Message-Id: <20190202094329.22874-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 10/10] target/riscv: fix counter-enable checks
- in ctr()
+Subject: [Qemu-devel] [PULL] RISC-V Patches for 3.2, Part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +24,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Xi Wang <xi.wang@gmail.com>, Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-From: Xi Wang <xi.wang@gmail.com>
+The following changes since commit 5385a5988c8a55bebdc878c05b96648579b5d6e0:
 
-Access to a counter in U-mode is permitted only if the corresponding
-bit is set in both mcounteren and scounteren.  The current code
-ignores mcounteren and checks scounteren only for U-mode access.
+  hw/virtio/virtio-balloon: zero-initialize the virtio_balloon_config struct (2019-01-21 17:20:36 +0000)
 
-Signed-off-by: Xi Wang <xi.wang@gmail.com>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/csr.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+are available in the Git repository at:
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index e72fcf1265d4..960d2b0aa951 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -56,9 +56,15 @@ static int fs(CPURISCVState *env, int csrno)
- static int ctr(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
--    target_ulong ctr_en = env->priv == PRV_U ? env->scounteren :
--                          env->priv == PRV_S ? env->mcounteren : -1U;
--    if (!(ctr_en & (1 << (csrno & 31)))) {
-+    uint32_t ctr_en = ~0u;
-+
-+    if (env->priv < PRV_M) {
-+        ctr_en &= env->mcounteren;
-+    }
-+    if (env->priv < PRV_S) {
-+        ctr_en &= env->scounteren;
-+    }
-+    if (!(ctr_en & (1u << (csrno & 31)))) {
-         return -1;
-     }
- #endif
--- 
-2.18.1
+  git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-3.2-part3
+
+for you to fetch changes up to 461ab9de46d085a37b0da6f096aadc4e0dda4d4c:
+
+  target/riscv: fix counter-enable checks in ctr() (2019-01-29 11:33:38 -0800)
+
+----------------------------------------------------------------
+RISC-V Patches for 3.2, Part 3
+
+This patch set contains a handful of patches I've collected over the
+last few weeks.  There's nothing really fundamental, but I thought it
+would be good to send these out now as there are some other patch sets
+on the mailing list that are getting ready to go.
+
+As far as the actual patches, there's:
+
+* A set that cleans up our FS dirty-mode handling.
+* Support for writing MISA.
+* The removal of Michael as a maintainer.
+* A fix to {m,s}counteren handling.
+
+This passes my standard "boots Fedora" test case.
+
+----------------------------------------------------------------
+Alistair Francis (1):
+      RISC-V: Add priv_ver to DisasContext
+
+Michael Clark (5):
+      RISC-V: Implement mstatus.TSR/TW/TVM
+      RISC-V: Use riscv prefix consistently on cpu helpers
+      RISC-V: Add misa to DisasContext
+      RISC-V: Add misa.MAFD checks to translate
+      RISC-V: Add misa runtime write support
+
+Palmer Dabbelt (1):
+      MAINTAINERS: Remove Michael Clark as a RISC-V Maintainer
+
+Richard Henderson (2):
+      RISC-V: Split out mstatus_fs from tb_flags
+      RISC-V: Mark mstatus.fs dirty
+
+Xi Wang (1):
+      target/riscv: fix counter-enable checks in ctr()
+
+ MAINTAINERS               |   1 -
+ linux-user/riscv/signal.c |   4 +-
+ target/riscv/cpu.c        |   2 +-
+ target/riscv/cpu.h        |  31 ++---
+ target/riscv/cpu_bits.h   |  11 ++
+ target/riscv/cpu_helper.c |  10 +-
+ target/riscv/csr.c        | 103 ++++++++++++----
+ target/riscv/fpu_helper.c |   6 +-
+ target/riscv/op_helper.c  |  47 +++++---
+ target/riscv/translate.c  | 290 +++++++++++++++++++++++++++++++++++++++-------
+ 10 files changed, 396 insertions(+), 109 deletions(-)
