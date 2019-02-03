@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42734)
+Received: from eggs.gnu.org ([209.51.188.92]:56225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gq6wI-0007gm-U6
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 20:51:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gqAyU-0003EI-El
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:09:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gq6wH-0001ha-S5
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 20:51:18 -0500
-Resent-Message-Id: <E1gq6wH-0001ha-S5@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gq6wH-0001eZ-KG
-	for qemu-devel@nongnu.org; Sat, 02 Feb 2019 20:51:17 -0500
-Message-ID: <154914510871.29184.15581142770490504705@ebba9967afc0>
-In-Reply-To: <20190122150543.16889-1-bala24@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bounces@canonical.com>) id 1gqApr-0008Ck-BI
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:00:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gqApr-0008AE-0k
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:00:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gqApn-0004vc-N7
+	for <qemu-devel@nongnu.org>; Sun, 03 Feb 2019 06:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EED9F2E80D2
+	for <qemu-devel@nongnu.org>; Sun,  3 Feb 2019 06:00:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 2 Feb 2019 14:05:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/1] migration: calculate expected_downtime
- considering redirtied ram
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 Feb 2019 05:52:26 -0000
+From: Cheng Chen <1814418@bugs.launchpad.net>
+Reply-To: Bug 1814418 <1814418@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154917314614.27692.2830748026894633212.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1814418] [NEW] persistent bitmap will be
+ inconsistent when qemu crash,
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +36,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bala24@linux.vnet.ibm.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com, peterx@redhat.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyMjE1MDU0My4xNjg4
-OS0xLWJhbGEyNEBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAg
-ICAgbmV0L3V0aWwubwogIENDICAgICAgbmV0L2h1Yi5vCi90bXAvcWVtdS10ZXN0L3NyYy9taWdy
-YXRpb24vbWlncmF0aW9uLmM6IEluIGZ1bmN0aW9uICdtaWdyYXRpb25fdXBkYXRlX2NvdW50ZXJz
-JzoKL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9taWdyYXRpb24uYzoyOTA3Ojk6IGVycm9y
-OiAncmVtYWluaW5nX3JhbV90cmFuc2Zlcl90aW1lJyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4g
-dGhpcyBmdW5jdGlvbikKICAgICAgICAgcmVtYWluaW5nX3JhbV90cmFuc2Zlcl90aW1lID0gcmFt
-X2NvdW50ZXJzLnJlbWFpbmluZyAvIGJhbmR3aWR0aAogICAgICAgICBefn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9taWdyYXRpb24uYzoyOTA3
-Ojk6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25j
-ZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluCi90bXAvcWVtdS10ZXN0L3NyYy9taWdy
-YXRpb24vbWlncmF0aW9uLmM6MjkwNzo3MzogZXJyb3I6IGV4cGVjdGVkICc7JyBiZWZvcmUgJ25l
-d2x5X2RpcnRpZWRfcmFtJwogICAgICAgICByZW1haW5pbmdfcmFtX3RyYW5zZmVyX3RpbWUgPSBy
-YW1fY291bnRlcnMucmVtYWluaW5nIC8gYmFuZHdpZHRoCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICA7CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDEyMjE1MDU0My4xNjg4OS0xLWJhbGEyNEBsaW51eC52bmV0LmlibS5j
-b20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Public bug reported:
+
+Follow these steps to reappear the bug:
+
+1. start qemu
+2. add persistent bitmap: '{ "execute": "block-dirty-bitmap-add", "argument=
+s": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
+3. kill -9 qemu (simulate Host crash, eg. lose power)
+4. restart qemu
+
+Now, the '{ "execute": "query-block" }' can't find the bitmap0. I can
+understand at this point, because the bitmap0 has not been synchronized
+yet.
+
+But, when I try to add persistent bitmap0 again: '{ "execute": "block-
+dirty-bitmap-add", "arguments": {"node": "drive-virtio-disk1","name":
+"bitmap0", "persistent":true }}', It failed:
+
+{"id":"libvirt-42","error":{"class":"GenericError","desc":"Can't make
+bitmap 'bitmap0' persistent in 'drive-virtio-disk1': Bitmap with the
+same name is already stored"}}
+
+In other word, when qemu crash, the qcow2 image remain the incomplete
+persistent bitmap.
+
+---
+
+qemu version: 2.12.0 and 3.1.0, other version I does not test yet.
+qemu command: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-path /dev/h=
+ugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,sockets=3D1,c=
+ores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -smbios typ=
+e=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=3Don -dev=
+ice piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device virtio-seria=
+l-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/opt/vol/sas=
+/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=3Ddrive-v=
+irtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0=
+,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,writ=
+e-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a4f1ea7be51=
+3,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteback -devic=
+e virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-virtio-dis=
+k1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dhostnet0,vho=
+st=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
+=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dcharserial0 -=
+device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
+harchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dvirtio-seria=
+l0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agen=
+t.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0,pass=
+word -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-b=
+alloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=3Don
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1814418
+
+Title:
+  persistent bitmap will be inconsistent when qemu  crash,
+
+Status in QEMU:
+  New
+
+Bug description:
+  Follow these steps to reappear the bug:
+
+  1. start qemu
+  2. add persistent bitmap: '{ "execute": "block-dirty-bitmap-add", "argume=
+nts": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
+  3. kill -9 qemu (simulate Host crash, eg. lose power)
+  4. restart qemu
+
+  Now, the '{ "execute": "query-block" }' can't find the bitmap0. I can
+  understand at this point, because the bitmap0 has not been
+  synchronized yet.
+
+  But, when I try to add persistent bitmap0 again: '{ "execute": "block-
+  dirty-bitmap-add", "arguments": {"node": "drive-virtio-disk1","name":
+  "bitmap0", "persistent":true }}', It failed:
+
+  {"id":"libvirt-42","error":{"class":"GenericError","desc":"Can't make
+  bitmap 'bitmap0' persistent in 'drive-virtio-disk1': Bitmap with the
+  same name is already stored"}}
+
+  In other word, when qemu crash, the qcow2 image remain the incomplete
+  persistent bitmap.
+
+  ---
+
+  qemu version: 2.12.0 and 3.1.0, other version I does not test yet.
+  qemu command: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3Don -S=
+ -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
+omain-190-test./master-key.aes -machine pc-i440fx-3.1,accel=3Dkvm,usb=3Doff=
+,dump-guest-core=3Doff,mem-merge=3Doff -m 1024 -mem-prealloc -mem-path /dev=
+/hugepages1G/libvirt/qemu/190-test -realtime mlock=3Doff -smp 1,sockets=3D1=
+,cores=3D1,threads=3D1 -uuid 1c8611c2-a18a-4b1c-b40b-9d82040eafa4 -smbios t=
+ype=3D1,manufacturer=3DIaaS -no-user-config -nodefaults -chardev socket,id=
+=3Dcharmonitor,fd=3D31,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonito=
+r,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot menu=3Don,strict=3Don -=
+device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device virtio-se=
+rial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/opt/vol/=
+sas/fb0c7c37-13e7-41fe-b3f8-f0fbaaeec7ce,format=3Dqcow2,if=3Dnone,id=3Ddriv=
+e-virtio-disk0,cache=3Dwriteback -device virtio-blk-pci,scsi=3Doff,bus=3Dpc=
+i.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,w=
+rite-cache=3Don -drive file=3D/opt/vol/sas/bde66671-536d-49cd-8b46-a4f1ea7b=
+e513,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk1,cache=3Dwriteback -de=
+vice virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-virtio-=
+disk1,id=3Dvirtio-disk1,write-cache=3Don -netdev tap,fd=3D33,id=3Dhostnet0,=
+vhost=3Don,vhostfd=3D34 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,=
+mac=3D00:85:45:3e:d4:3a,bus=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dcharserial=
+0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=
+=3Dcharchannel0,fd=3D35,server,nowait -device virtserialport,bus=3Dvirtio-s=
+erial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_=
+agent.0 -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0,=
+password -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virt=
+io-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1814418/+subscriptions
