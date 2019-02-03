@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40421)
+Received: from eggs.gnu.org ([209.51.188.92]:54137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dino.papararo@gmail.com>) id 1gqJFJ-0003Id-Fn
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:59:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqKE4-0004do-Jf
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dino.papararo@gmail.com>) id 1gqJEQ-0001yd-Gu
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:58:52 -0500
-From: "Dino Papararo" <dino.papararo@gmail.com>
-References: <20190130203638.21179-1-mark.cave-ayland@ilande.co.uk>
-	<20190130203638.21179-9-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20190130203638.21179-9-mark.cave-ayland@ilande.co.uk>
-Date: Sun, 3 Feb 2019 15:58:42 +0100
-Message-ID: <000301d4bbd0$f50d7ac0$df287040$@gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1gqKDs-0007Be-Bg
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:02:22 -0500
+Resent-Message-Id: <E1gqKDs-0007Be-Bg@eggs.gnu.org>
+Message-ID: <154920970675.29184.9596308559336382977@ebba9967afc0>
+In-Reply-To: <20190128165830.165170-1-vsementsov@virtuozzo.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: it
-Subject: [Qemu-devel] R: [PATCH v5 8/8] target/ppc: remove various
- HOST_WORDS_BIGENDIAN hacks in int_helper.c
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 3 Feb 2019 08:01:47 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] nbd: generalize usage of nbd_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,401 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Mark Cave-Ayland' <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
+To: vsementsov@virtuozzo.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-Hello Mark,
-I have a question about improving speed manually unrolling loops like =
-this
-
-Assuming ARRAY_SIZE(r->u8) is always multiple of 4 you can manually =
-improve loop in this way, on modern CPU non sequential instructions can =
-be computed nearly for free:
-
-> {
->     int i, j =3D (sh & 0xf);
->
-> -    VECTOR_FOR_INORDER_I(i, u8) {
-> -        r->u8[i] =3D j++;
-> +    for (i =3D 0; i < ARRAY_SIZE(r->u8); i+=3D4,j+=3D4) {
-> +        r->VsrB(i) =3D j;
-> +        r->VsrB(i+1) =3D j+1;
-> +        r->VsrB(i+2) =3D j+2;
-> +        r->VsrB(i+3) =3D j+3; }
-> }
-
-In this patch there are a lot of functions can benefit by unrolling =
-loops, with a huge speed improvement.
-Maybe compiler could do it itself but aren't humans still better? =
-=F0=9F=98=8A
-
-Best Regards,
-Dino Papararo
-
------Messaggio originale-----
-Da: Qemu-devel <qemu-devel-bounces+skizzato73=3Dmsn.com@nongnu.org> Per =
-conto di Mark Cave-Ayland
-Inviato: mercoled=C3=AC 30 gennaio 2019 21:37
-A: qemu-devel@nongnu.org; qemu-ppc@nongnu.org; =
-richard.henderson@linaro.org; david@gibson.dropbear.id.au
-Oggetto: [Qemu-devel] [PATCH v5 8/8] target/ppc: remove various =
-HOST_WORDS_BIGENDIAN hacks in int_helper.c
-
-Following on from the previous work, there are numerous endian-related =
-hacks in int_helper.c that can now be replaced with Vsr* macros.
-
-There are also a few places where the VECTOR_FOR_INORDER_I macro can be =
-replaced with a normal iterator since the processing order is =
-irrelevant.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/int_helper.c | 155 =
-++++++++++++++----------------------------------
- 1 file changed, 45 insertions(+), 110 deletions(-)
-
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c index =
-916d10c25b..8efc283388 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -443,8 +443,8 @@ void helper_lvsl(ppc_avr_t *r, target_ulong sh)  {
-     int i, j =3D (sh & 0xf);
-=20
--    VECTOR_FOR_INORDER_I(i, u8) {
--        r->u8[i] =3D j++;
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        r->VsrB(i) =3D j++;
-     }
- }
-=20
-@@ -452,18 +452,14 @@ void helper_lvsr(ppc_avr_t *r, target_ulong sh)  {
-     int i, j =3D 0x10 - (sh & 0xf);
-=20
--    VECTOR_FOR_INORDER_I(i, u8) {
--        r->u8[i] =3D j++;
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        r->VsrB(i) =3D j++;
-     }
- }
-=20
- void helper_mtvscr(CPUPPCState *env, ppc_avr_t *r)  { -#if =
-defined(HOST_WORDS_BIGENDIAN)
--    env->vscr =3D r->u32[3];
--#else
--    env->vscr =3D r->u32[0];
--#endif
-+    env->vscr =3D r->VsrW(3);
-     set_flush_to_zero(vscr_nj, &env->vec_status);  }
-=20
-@@ -870,8 +866,8 @@ target_ulong helper_vclzlsbb(ppc_avr_t *r)  {
-     target_ulong count =3D 0;
-     int i;
--    VECTOR_FOR_INORDER_I(i, u8) {
--        if (r->u8[i] & 0x01) {
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        if (r->VsrB(i) & 0x01) {
-             break;
-         }
-         count++;
-@@ -883,12 +879,8 @@ target_ulong helper_vctzlsbb(ppc_avr_t *r)  {
-     target_ulong count =3D 0;
-     int i;
--#if defined(HOST_WORDS_BIGENDIAN)
-     for (i =3D ARRAY_SIZE(r->u8) - 1; i >=3D 0; i--) { -#else
--    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
--#endif
--        if (r->u8[i] & 0x01) {
-+        if (r->VsrB(i) & 0x01) {
-             break;
-         }
-         count++;
-@@ -1137,18 +1129,14 @@ void helper_vperm(CPUPPCState *env, ppc_avr_t =
-*r, ppc_avr_t *a, ppc_avr_t *b,
-     ppc_avr_t result;
-     int i;
-=20
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int s =3D c->u8[i] & 0x1f;
--#if defined(HOST_WORDS_BIGENDIAN)
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int s =3D c->VsrB(i) & 0x1f;
-         int index =3D s & 0xf;
--#else
--        int index =3D 15 - (s & 0xf);
--#endif
-=20
-         if (s & 0x10) {
--            result.u8[i] =3D b->u8[index];
-+            result.VsrB(i) =3D b->VsrB(index);
-         } else {
--            result.u8[i] =3D a->u8[index];
-+            result.VsrB(i) =3D a->VsrB(index);
-         }
-     }
-     *r =3D result;
-@@ -1160,18 +1148,14 @@ void helper_vpermr(CPUPPCState *env, ppc_avr_t =
-*r, ppc_avr_t *a, ppc_avr_t *b,
-     ppc_avr_t result;
-     int i;
-=20
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int s =3D c->u8[i] & 0x1f;
--#if defined(HOST_WORDS_BIGENDIAN)
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int s =3D c->VsrB(i) & 0x1f;
-         int index =3D 15 - (s & 0xf);
--#else
--        int index =3D s & 0xf;
--#endif
-=20
-         if (s & 0x10) {
--            result.u8[i] =3D a->u8[index];
-+            result.VsrB(i) =3D a->VsrB(index);
-         } else {
--            result.u8[i] =3D b->u8[index];
-+            result.VsrB(i) =3D b->VsrB(index);
-         }
-     }
-     *r =3D result;
-@@ -1868,25 +1852,14 @@ void helper_vsldoi(ppc_avr_t *r, ppc_avr_t *a, =
-ppc_avr_t *b, uint32_t shift)
-     int i;
-     ppc_avr_t result;
-=20
--#if defined(HOST_WORDS_BIGENDIAN)
-     for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-         int index =3D sh + i;
-         if (index > 0xf) {
--            result.u8[i] =3D b->u8[index - 0x10];
--        } else {
--            result.u8[i] =3D a->u8[index];
--        }
--    }
--#else
--    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
--        int index =3D (16 - sh) + i;
--        if (index > 0xf) {
--            result.u8[i] =3D a->u8[index - 0x10];
-+            result.VsrB(i) =3D b->VsrB(index - 0x10);
-         } else {
--            result.u8[i] =3D b->u8[index];
-+            result.VsrB(i) =3D a->VsrB(index);
-         }
-     }
--#endif
-     *r =3D result;
- }
-=20
-@@ -1905,25 +1878,20 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, =
-ppc_avr_t *b)
-=20
- /* Experimental testing shows that hardware masks the immediate.  */  =
-#define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1)) =
--#if defined(HOST_WORDS_BIGENDIAN)  #define SPLAT_ELEMENT(element) =
-_SPLAT_MASKED(element) -#else
--#define SPLAT_ELEMENT(element)                                  \
--    (ARRAY_SIZE(r->element) - 1 - _SPLAT_MASKED(element))
--#endif
--#define VSPLT(suffix, element)                                          =
-\
-+#define VSPLT(suffix, element, access)                                  =
-\
-     void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t =
-splat) \
-     {                                                                   =
-\
--        uint32_t s =3D b->element[SPLAT_ELEMENT(element)];              =
-  \
-+        uint32_t s =3D b->access(SPLAT_ELEMENT(element));               =
-  \
-         int i;                                                          =
-\
-                                                                         =
-\
-         for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
--            r->element[i] =3D s;                                        =
-  \
-+            r->access(i) =3D s;                                         =
-  \
-         }                                                               =
-\
-     }
--VSPLT(b, u8)
--VSPLT(h, u16)
--VSPLT(w, u32)
-+VSPLT(b, u8, VsrB)
-+VSPLT(h, u16, VsrH)
-+VSPLT(w, u32, VsrW)
- #undef VSPLT
- #undef SPLAT_ELEMENT
- #undef _SPLAT_MASKED
-@@ -1984,17 +1952,10 @@ void helper_xxextractuw(CPUPPCState *env, =
-target_ulong xtn,
-     getVSR(xbn, &xb, env);
-     memset(&xt, 0, sizeof(xt));
-=20
--#if defined(HOST_WORDS_BIGENDIAN)
-     ext_index =3D index;
-     for (i =3D 0; i < es; i++, ext_index++) {
--        xt.u8[8 - es + i] =3D xb.u8[ext_index % 16];
--    }
--#else
--    ext_index =3D 15 - index;
--    for (i =3D es - 1; i >=3D 0; i--, ext_index--) {
--        xt.u8[8 + i] =3D xb.u8[ext_index % 16];
-+        xt.VsrB(8 - es + i) =3D xb.VsrB(ext_index % 16);
-     }
--#endif
-=20
-     putVSR(xtn, &xt, env);
- }
-@@ -2009,17 +1970,10 @@ void helper_xxinsertw(CPUPPCState *env, =
-target_ulong xtn,
-     getVSR(xbn, &xb, env);
-     getVSR(xtn, &xt, env);
-=20
--#if defined(HOST_WORDS_BIGENDIAN)
-     ins_index =3D index;
-     for (i =3D 0; i < es && ins_index < 16; i++, ins_index++) {
--        xt.u8[ins_index] =3D xb.u8[8 - es + i];
--    }
--#else
--    ins_index =3D 15 - index;
--    for (i =3D es - 1; i >=3D 0 && ins_index >=3D 0; i--, ins_index--) =
-{
--        xt.u8[ins_index] =3D xb.u8[8 + i];
-+        xt.VsrB(ins_index) =3D xb.VsrB(8 - es + i);
-     }
--#endif
-=20
-     putVSR(xtn, &xt, env);
- }
-@@ -2028,7 +1982,7 @@ void helper_xxinsertw(CPUPPCState *env, =
-target_ulong xtn,
- void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
- {                                                                   \
-     int i;                                                          \
--    VECTOR_FOR_INORDER_I(i, element) {                              \
-+    for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                  \
-         r->element[i] =3D (cast)b->element[i];                        \
-     }                                                               \
- }
-@@ -2043,7 +1997,7 @@ VEXT_SIGNED(vextsw2d, s64, int32_t)
- void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
- {                                                                   \
-     int i;                                                          \
--    VECTOR_FOR_INORDER_I(i, element) {                              \
-+    for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                  \
-         r->element[i] =3D -b->element[i];                             \
-     }                                                               \
- }
-@@ -2115,17 +2069,13 @@ void helper_vsumsws(CPUPPCState *env, ppc_avr_t =
-*r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t result;
-     int sat =3D 0;
-=20
--#if defined(HOST_WORDS_BIGENDIAN)
--    upper =3D ARRAY_SIZE(r->s32)-1;
--#else
--    upper =3D 0;
--#endif
--    t =3D (int64_t)b->s32[upper];
-+    upper =3D ARRAY_SIZE(r->s32) - 1;
-+    t =3D (int64_t)b->VsrSW(upper);
-     for (i =3D 0; i < ARRAY_SIZE(r->s32); i++) {
--        t +=3D a->s32[i];
--        result.s32[i] =3D 0;
-+        t +=3D a->VsrSW(i);
-+        result.VsrSW(i) =3D 0;
-     }
--    result.s32[upper] =3D cvtsdsw(t, &sat);
-+    result.VsrSW(upper) =3D cvtsdsw(t, &sat);
-     *r =3D result;
-=20
-     if (sat) {
-@@ -2139,19 +2089,15 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t =
-*r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t result;
-     int sat =3D 0;
-=20
--#if defined(HOST_WORDS_BIGENDIAN)
-     upper =3D 1;
--#else
--    upper =3D 0;
--#endif
-     for (i =3D 0; i < ARRAY_SIZE(r->u64); i++) {
--        int64_t t =3D (int64_t)b->s32[upper + i * 2];
-+        int64_t t =3D (int64_t)b->VsrSW(upper + i * 2);
-=20
--        result.u64[i] =3D 0;
-+        result.VsrW(i) =3D 0;
-         for (j =3D 0; j < ARRAY_SIZE(r->u64); j++) {
--            t +=3D a->s32[2 * i + j];
-+            t +=3D a->VsrSW(2 * i + j);
-         }
--        result.s32[upper + i * 2] =3D cvtsdsw(t, &sat);
-+        result.VsrSW(upper + i * 2) =3D cvtsdsw(t, &sat);
-     }
-=20
-     *r =3D result;
-@@ -2276,7 +2222,7 @@ VUPK(lsw, s64, s32, UPKLO)
-     {                                                                   =
-\
-         int i;                                                          =
-\
-                                                                         =
-\
--        VECTOR_FOR_INORDER_I(i, element) {                              =
-\
-+        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
-             r->element[i] =3D name(b->element[i]);                      =
-  \
-         }                                                               =
-\
-     }
-@@ -2616,20 +2562,12 @@ static int bcd_cmp_zero(ppc_avr_t *bcd)
-=20
- static uint16_t get_national_digit(ppc_avr_t *reg, int n)  { -#if =
-defined(HOST_WORDS_BIGENDIAN)
--    return reg->u16[7 - n];
--#else
--    return reg->u16[n];
--#endif
-+    return reg->VsrH(7 - n);
- }
-=20
- static void set_national_digit(ppc_avr_t *reg, uint8_t val, int n)  { =
--#if defined(HOST_WORDS_BIGENDIAN)
--    reg->u16[7 - n] =3D val;
--#else
--    reg->u16[n] =3D val;
--#endif
-+    reg->VsrH(7 - n) =3D val;
- }
-=20
- static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b) @@ -3373,14 +3311,11 =
-@@ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, =
-ppc_avr_t *c)
-     ppc_avr_t result;
-     int i;
-=20
--    VECTOR_FOR_INORDER_I(i, u8) {
--        int indexA =3D c->u8[i] >> 4;
--        int indexB =3D c->u8[i] & 0xF;
--#if defined(HOST_WORDS_BIGENDIAN)
--        result.u8[i] =3D a->u8[indexA] ^ b->u8[indexB];
--#else
--        result.u8[i] =3D a->u8[15-indexA] ^ b->u8[15-indexB];
--#endif
-+    for (i =3D 0; i < ARRAY_SIZE(r->u8); i++) {
-+        int indexA =3D c->VsrB(i) >> 4;
-+        int indexB =3D c->VsrB(i) & 0xF;
-+
-+        result.VsrB(i) =3D a->VsrB(indexA) ^ b->VsrB(indexB);
-     }
-     *r =3D result;
- }
---
-2.11.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyODE2NTgzMC4xNjUx
+NzAtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
+IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
+d0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29uZmln
+dXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11
+LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9u
+PS91c3IvYmluL3B5dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVu
+YWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRs
+ZSAtLWVuYWJsZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVz
+dC1hZ2VudCAtLXdpdGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRoLXNk
+bGFiaT0yLjAKVHJ5ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9yIG1v
+cmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3VuIEZlYiAgMyAxNjowMToyOCBV
+VEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUn
+ICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQt
+c29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0vdXNy
+L2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0tZW5h
+YmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxlLW5l
+dHRsZScgJy0tZW5hYmxlLWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicgJy0t
+ZW5hYmxlLWd1ZXN0LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9fY29t
+cGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEy
+MiA2MTcgNjM0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVf
+T0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1X
+cmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1w
+cm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1n
+bnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYu
+Ywpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9fIG5v
+dCBkZWZpbmVkCiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5j
+czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
+ZXM6IDkyIDEyMiA2MTcgNjg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
+IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
+b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
+bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
+cHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9x
+ZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19p
+Mzg2X18gbm90IGRlZmluZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+Cgot
+LS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBt
+YWluCmxpbmVzOiA5MiAxMjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05V
+X1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJp
+Y3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3Ry
+aW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1v
+biAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmln
+LXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vy
+cm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAog
+IF5+fn5+CgotLS0KbGluZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1t
+dGhyZWFkcyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxF
+X1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5k
+ZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFz
+aW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11LWNv
+bmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2djYy94
+ODZfNjQtdzY0LW1pbmd3MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jp
+bi9sZDogY2Fubm90IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAx
+IGV4aXQgc3RhdHVzCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJl
+Y2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUg
+NTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvMjAxOTAxMjgxNjU4MzAuMTY1MTcwLTEtdnNlbWVudHNvdkB2aXJ0dW96
+em8uY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
