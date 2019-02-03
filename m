@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48924)
+Received: from eggs.gnu.org ([209.51.188.92]:51795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqHZ9-0002FQ-QJ
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:12:09 -0500
+	(envelope-from <lifei1214@126.com>) id 1gqHpZ-0004Ne-4l
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqHZ8-0005Py-64
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:12:07 -0500
-Resent-Message-Id: <E1gqHZ8-0005Py-64@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqHZ7-0005P4-UC
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:12:06 -0500
-Message-ID: <154915708209.29184.3948593928668624319@ebba9967afc0>
-In-Reply-To: <20190129150029.29829-1-philmd@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <lifei1214@126.com>) id 1gqHgU-0000jA-8l
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:19:44 -0500
+Received: from m50-111.126.com ([123.125.50.111]:51744)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gqHgR-0000d4-Kg
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 08:19:41 -0500
+References: <20190201052551.53359-1-lifei1214@126.com>
+	<87va234kkh.fsf@dusky.pond.sub.org>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <8566f644-6dc6-4a70-8c45-3c8dcfad46ac@126.com>
+Date: Sun, 3 Feb 2019 21:19:24 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 2 Feb 2019 17:24:43 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] sdl: Let it be optional (in
- particular, on OpenBSD)
+In-Reply-To: <87va234kkh.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 11/11] qemu_thread: supplement
+ error handling for touch_all_pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,197 +28,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.orgfam@euphon.net, peter.maydell@linaro.org, michael@walle.cc, kraxel@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, brad@comstyle.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEyOTE1MDAyOS4yOTgy
-OS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKQ29uZmlndXJlIG9wdGlv
-bnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQt
-c29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9uPS91c3IvYmlu
-L3B5dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVuYWJsZS10cmFj
-ZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRsZSAtLWVuYWJs
-ZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVzdC1hZ2VudCAt
-LXdpdGgtc2RsYWJpPTIuMAoKRVJST1I6ICJ4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIiBlaXRoZXIg
-ZG9lcyBub3QgZXhpc3Qgb3IgZG9lcyBub3Qgd29yawoKIyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3Vu
-IEZlYiAgMyAwMToyNDozOCBVVEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10
-ZXN0L3NyYy9jb25maWd1cmUnICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82
-NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3Rh
-bGwnICctLXB5dGhvbj0vdXNyL2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2
-NC1taW5ndzMyLScgJy0tZW5hYmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdu
-dXRscycgJy0tZW5hYmxlLW5ldHRsZScgJy0tZW5hYmxlLWN1cmwnICctLWVuYWJsZS12bmMnICct
-LWVuYWJsZS1iemlwMicgJy0tZW5hYmxlLWd1ZXN0LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAn
-Ci0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5l
-IG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjM2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9H
-TlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0
-cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1z
-dHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29t
-bW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25m
-aWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBv
-cmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1p
-c3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hl
-Y2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjM4IDAKeDg2XzY0LXc2NC1taW5ndzMy
-LWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NP
-VVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYg
-LVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5n
-IC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNv
-bmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3Jl
-YXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRv
-dXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9v
-YmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjQwIDAKeDg2XzY0LXc2
-NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFS
-R0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxs
-IC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0
-LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVt
-cC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWls
-ZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUt
-Y29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2Mg
-Y29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjQyIDAK
-eDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9
-NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRl
-Y2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1m
-bm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBj
-b25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVy
-cm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUv
-dG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGls
-ZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2
-MTkgNjQ0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZG
-U0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVk
-dW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90
-b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5
-OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpj
-Y2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3Rt
-cC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczog
-ZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6
-IDkyIDEyMiA2MTkgNjQ2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1E
-X0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5
-cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlz
-c2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYg
-LXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11
-LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZv
-ciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVk
-CgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1h
-aW4KbGluZXM6IDkyIDEyMiA2MTkgNjQ4IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVf
-U09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmlj
-dC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJp
-bmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9u
-IC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWct
-dGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFy
-eSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Np
-b24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tf
-ZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjUwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdj
-YyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJD
-RSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3
-cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1m
-bm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYu
-byBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRl
-IHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6
-IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmpl
-Y3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjUyIDAKeDg2XzY0LXc2NC1t
-aW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VG
-SUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1X
-dW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFs
-aWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9x
-ZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQg
-dG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29u
-Zi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29t
-cGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNjU0IDAKeDg2
-XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQg
-LURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xz
-IC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8t
-c3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25m
-aWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9y
-OiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1w
-L3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIg
-ZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkg
-Njg4IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VU
-X0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5k
-YW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5
-cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAt
-YyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2Fj
-aGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9j
-Y2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9f
-Y29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDky
-IDEyMiA2MTkgNjkwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJ
-TEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVz
-IC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2lu
-Zy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0
-ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNv
-bmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAv
-dmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpm
-dW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4K
-bGluZXM6IDkyIDEyMiA2MTkgNjk2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09V
-UkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1w
-cm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdz
-IC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1m
-d3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVt
-cC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBm
-aWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24g
-ZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVm
-aW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNzAyIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAt
-RF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAt
-V3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0
-ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8t
-Y29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBj
-b25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRl
-bXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBl
-cm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3Qg
-Y2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNzA4IDAKeDg2XzY0LXc2NC1taW5n
-dzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxF
-X1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5k
-ZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFz
-aW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11
-LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8g
-Y3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5z
-dGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGls
-ZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNzEwIDAKeDg2XzY0
-LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURf
-TEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1X
-YWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3Ry
-aWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWct
-dGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBG
-YWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3Fl
-bXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9f
-Y2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTkgNzE2
-IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJ
-VFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50
-LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVz
-IC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAt
-byBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6
-IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2Fj
-aGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29t
-cGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEy
-MiA2MTkgNzIyIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVf
-T0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1X
-cmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1w
-cm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1n
-bnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYu
-YwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFy
-L3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5j
-czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
-ZXM6IDkyIDEyMiA2MTkgNzI0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
-IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
-b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
-bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
-cHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9x
-ZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxl
-IGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVu
-aWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgbWFpbgpsaW5lczog
-OTIgMTIyIDE4MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1tNjQgLW1jeDE2IC1EX0dOVV9T
-T1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0
-LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmlu
-Z3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24g
-LWZ3cmFwdiAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10
-ZW1wL3FlbXUtY29uZi5jCmNjYWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5
-IGZpbGUgZm9yIC92YXIvdG1wL2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lv
-biBkZW5pZWQKRmFpbGVkIHRvIHJ1biAnY29uZmlndXJlJwpUcmFjZWJhY2sgKG1vc3QgcmVjZW50
-IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA1NjMs
-IGluIDxtb2R1bGU+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDEyOTE1MDAyOS4yOTgyOS0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3Rp
-bmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+ÔÚ 2019/2/1 ÏÂÎç11:03, Markus Armbruster Ð´µÀ:
+> Cc: Paolo for preexisting issues due to commit 1e356fc14be.
+>
+> Fei Li <lifei1214@126.com> writes:
+>
+>> From: Fei Li <fli@suse.com>
+>>
+>> Supplement the error handling for touch_all_pages: add an Error
+>> parameter for it to propagate the error to its caller to do the
+>> handling in case it fails.
+>>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>>   util/oslib-posix.c | 26 ++++++++++++++++----------
+>>   1 file changed, 16 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+>> index b6c2ee270d..b4dd3d8970 100644
+>> --- a/util/oslib-posix.c
+>> +++ b/util/oslib-posix.c
+> Some context we'll need below:
+>
+>     static void sigbus_handler(int signal)
+>     {
+>         int i;
+>         if (memset_thread) {
+>             for (i = 0; i < memset_num_threads; i++) {
+>                 if (qemu_thread_is_self(&memset_thread[i].pgthread)) {
+>                     siglongjmp(memset_thread[i].env, 1);
+>                 }
+>             }
+>         }
+>     }
+>
+> Preexisting, not this patch's business: touch_all_pages() sets
+> @memset_num_threads to the number of desired threads, then leisurely
+> populates memset_thread[], starting threads as it goes.  If one of these
+> threads catches SIGBUS before memset_thread[] is completely populated,
+> memset_thread[i].pgthread can be null here.  qemu_thread_is_self()
+> dereferences it.  Oops.
+Ok,
+>
+> Note there's a time window between qemu_thread_create() starting the
+> thread and storing it in memset_thread[i].pgthread.  Any fix will have
+> to work even when the thread catches SIGBUS within that time window.
+>
+>     static void *do_touch_pages(void *arg)
+>     {
+>         MemsetThread *memset_args = (MemsetThread *)arg;
+>         sigset_t set, oldset;
+>
+>         /* unblock SIGBUS */
+>         sigemptyset(&set);
+>         sigaddset(&set, SIGBUS);
+>         pthread_sigmask(SIG_UNBLOCK, &set, &oldset);
+>
+>         if (sigsetjmp(memset_args->env, 1)) {
+>             memset_thread_failed = true;
+>         } else {
+> [...]
+>         }
+>         pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+>         return NULL;
+>     }
+>
+> We set @memset_thread_failed on SIGBUS in a memset thread.
+Ok, thanks for the detail explanation.
+>
+>> @@ -435,7 +435,7 @@ static inline int get_memset_num_threads(int smp_cpus)
+>>   }
+>>   
+>>   static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
+>> -                            int smp_cpus)
+>> +                            int smp_cpus, Error **errp)
+>>   {
+>>       size_t numpages_per_thread;
+>>       size_t size_per_thread;
+>         char *addr = area;
+>         int i = 0;
+>
+>         memset_thread_failed = false;
+>
+> We clear @memset_thread_failed before we create the memset threads.
+>
+> Preexisting, not this patch's business: use of global state without
+> synchronization leaves touch_all_pages() and thus os_mem_prealloc() not
+> thread-safe.  Even when that's just fine, it warrants at least a big fat
+> comment, and ideally assertions to catch misuse.
+>
+>         memset_num_threads = get_memset_num_threads(smp_cpus);
+>         memset_thread = g_new0(MemsetThread, memset_num_threads);
+>         numpages_per_thread = (numpages / memset_num_threads);
+>         size_per_thread = (hpagesize * numpages_per_thread);
+>         for (i = 0; i < memset_num_threads; i++) {
+>             memset_thread[i].addr = addr;
+>> @@ -452,20 +452,29 @@ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
+>>           memset_thread[i].numpages = (i == (memset_num_threads - 1)) ?
+>>                                       numpages : numpages_per_thread;
+>>           memset_thread[i].hpagesize = hpagesize;
+>> -        /* TODO: let the callers handle the error instead of abort() here */
+>> -        qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
+>> -                           do_touch_pages, &memset_thread[i],
+>> -                           QEMU_THREAD_JOINABLE, &error_abort);
+>> +        if (qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
+>> +                               do_touch_pages, &memset_thread[i],
+>> +                               QEMU_THREAD_JOINABLE, errp) < 0) {
+>> +            memset_thread_failed = true;
+> We set @memset_thread_failed when creating a memset thread fails.  @errp
+> contains an error then.
+>
+>> +            break;
+>> +        }
+>>           addr += size_per_thread;
+>>           numpages -= numpages_per_thread;
+>>       }
+>> +
+>> +    memset_num_threads = i;
+>>       for (i = 0; i < memset_num_threads; i++) {
+>>           qemu_thread_join(&memset_thread[i].pgthread);
+>>       }
+>>       g_free(memset_thread);
+>>       memset_thread = NULL;
+>>   
+>> -    return memset_thread_failed;
+>> +    if (memset_thread_failed) {
+>> +        error_append_hint(errp, "os_mem_prealloc: Insufficient free host "
+>> +                          "memory pages available to allocate guest RAM");
+>> +        return false;
+> @memset_thread_failed is true when creating a memset thread failed, or a
+> memset thread caught SIGBUS.
+>
+> @errp contains an error only if the former is the case.
+>
+> If we succeeded in creating all threads, but got SIGBUS, @errp is null,
+> and error_append_hint() does nothing.  touch_all_pages() then fails
+> without setting an error.
+>
+> Suggested fix: drop the memset_thread_failed = true on thread creation
+> failure, and do something like
+>
+>         for (j = 0; j < i; j++) {
+>             qemu_thread_join(&memset_thread[i].pgthread);
+[j]
+>         }
+>         g_free(memset_thread);
+>         memset_thread = NULL;
+>
+>         if (i < memset_num_threads) {
+>             /* qemu_thread_create() has set @errp */
+>             return false;
+>         }
+>
+>         if (memset_thread_failed) {
+>             error_setg(errp, "os_mem_prealloc: Insufficient free host "
+>                        "memory pages available to allocate guest RAM");
+>             return false;
+Agree.
+>> +    }
+>> +    return true;
+>>   }
+> One more remark: when creating the N-th thread fails, we patiently wait
+> for thread 0..N-1 to complete their job.  I guess that's tolerable.  If
+> we want it to fail quickly, we'd need a way to tell the threads to
+> abandon the job.  Perhaps sending a SIGBUS would do.
+Have a nice day, thanks
+Fei
+>>   
+>>   void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
+>> @@ -488,10 +497,7 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
+>>       }
+>>   
+>>       /* touch pages simultaneously */
+>> -    if (touch_all_pages(area, hpagesize, numpages, smp_cpus)) {
+>> -        error_setg(errp, "os_mem_prealloc: Insufficient free host memory "
+>> -            "pages available to allocate guest RAM");
+>> -    }
+>> +    touch_all_pages(area, hpagesize, numpages, smp_cpus, errp);
+>>   
+>>       ret = sigaction(SIGBUS, &oldact, NULL);
+>>       if (ret) {
