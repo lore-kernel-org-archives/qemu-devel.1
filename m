@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57555)
+Received: from eggs.gnu.org ([209.51.188.92]:45134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gqOml-000454-Ax
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 15:54:40 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqPvh-0002Bz-51
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 17:07:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gqOiA-0004Jx-NM
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 15:49:55 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54051)
+	(envelope-from <philmd@redhat.com>) id 1gqPvg-0006vn-Cl
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 17:07:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38058)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gqOiA-0004JD-Dz
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 15:49:54 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun,  3 Feb 2019 15:49:50 -0500
-Message-Id: <20190203204950.8447-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH] qemu-doc: remove outdated comment about
- full-system SMP support
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqPvg-0006uT-78
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 17:07:56 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Sun,  3 Feb 2019 23:07:38 +0100
+Message-Id: <20190203220744.11734-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/6] Kconfig dependencies for MIPS machines
+ (but Malta)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +26,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Steiner <davids@bitmail.cc>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, James Hogan <jhogan@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>, Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-We have had SMP support in TCG for quite a while; remove
-the reference to a necessary in-kernel accelerator.
+Express the MIPS machine dependencies with Kconfig.
 
-Note that I was tempted to enumerate here the MTTCG-compatible
-ISAs, but I decided against it because (1) most popular target ISAs
-have been converted, and (2) I doubt we'd do a good job in keeping
-the list up to date.
+Due to the complexity of the PIIX codebase being shared with
+the X86 machines, the Malta board fill follow in a different
+series (after some refactor cleanup).
 
-Reported-by: David Steiner <davids@bitmail.cc>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- qemu-doc.texi | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Regards,
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 83be010a0a..0c20ec6d6f 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -119,8 +119,7 @@ can be used for talking to external physical peripherals (e.g. a
- webcam, modem or tape drive).
- 
- @item
--Symmetric multiprocessing (SMP) support.  Currently, an in-kernel
--accelerator is required to use more than one host CPU for emulation.
-+Symmetric multiprocessing (SMP) support.
- 
- @end itemize
- 
--- 
-2.17.1
+Phil.
+
+Based on "Kconfig dependencies for ppc machines" from Thomas
+Huth (which is based on Paolo's, which uses Yang Zhong "make
+qemu configurable for Kconfig" v1).
+Based-on: 1548942810-22942-1-git-send-email-thuth@redhat.com
+
+Philippe Mathieu-Daud=C3=A9 (6):
+  mips: Express dependencies of the MIPSsim machine with kconfig
+  mips: Express dependencies of the Jazz machine with kconfig
+  mips: Express dependencies of the r4k platform with kconfig
+  mips: Express dependencies of the Boston machine with kconfig
+  hw/pci-host: Use CONFIG_PCI_BONITO to select the Bonito North Bridge
+  mips: Express dependencies of the Loongson 2E machine with kconfig
+
+ default-configs/mips-softmmu-common.mak |  4 ---
+ default-configs/mips64-softmmu.mak      |  6 ----
+ default-configs/mips64el-softmmu.mak    | 14 ---------
+ hw/isa/Kconfig                          | 13 +++++---
+ hw/mips/Kconfig                         | 40 +++++++++++++++++++++++++
+ hw/pci-host/Kconfig                     |  4 +++
+ hw/pci-host/Makefile.objs               |  2 +-
+ 7 files changed, 54 insertions(+), 29 deletions(-)
+
+--=20
+2.20.1
