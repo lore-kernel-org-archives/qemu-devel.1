@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52078)
+Received: from eggs.gnu.org ([209.51.188.92]:52158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqM6R-0003wy-HP
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:02:48 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqM6S-0003xP-8y
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:02:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqLvV-0008IW-Na
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 12:51:33 -0500
-Resent-Message-Id: <E1gqLvV-0008IW-Na@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21801)
+	(envelope-from <no-reply@patchew.org>) id 1gqLup-0007Xb-5G
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 12:50:48 -0500
+Resent-Message-Id: <E1gqLup-0007Xb-5G@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqLvV-0008FS-7v
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 12:51:29 -0500
-Message-ID: <154921627507.29184.4160961593105883641@ebba9967afc0>
-In-Reply-To: <20190201195404.30486-1-richard.henderson@linaro.org>
+	id 1gqLuo-0007Uj-TE
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 12:50:47 -0500
+Message-ID: <154921622085.29184.8837628020054410672@ebba9967afc0>
+In-Reply-To: <20190203142225.32268-1-samuel.thibault@ens-lyon.org>
 Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Sun, 3 Feb 2019 09:51:16 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] target/arm: Complete ARMv8.3-PAuth
- linux-user
+Date: Sun, 3 Feb 2019 09:50:22 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] slirp: Move g_spawn_async_with_fds_qemu
+ compatibility to slirp/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,11 +29,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
+To: samuel.thibault@ens-lyon.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, stefanha@redhat.com, jan.kiszka@siemens.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE5NTQwNC4zMDQ4
-Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMzE0MjIyNS4zMjI2
+OC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
 bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
 ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
 ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
@@ -46,8 +46,8 @@ LWVuYWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5l
 dHRsZSAtLWVuYWJsZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1n
 dWVzdC1hZ2VudCAtLXdpdGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRo
 LXNkbGFiaT0yLjAKVHJ5ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9y
-IG1vcmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3VuIEZlYiAgMyAxNzo1MTow
-MyBVVEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1
+IG1vcmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3VuIEZlYiAgMyAxNzo1MDox
+MCBVVEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1
 cmUnICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNo
 NjQtc29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0v
 dXNyL2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0t
@@ -89,8 +89,8 @@ L2Jpbi9sZDogY2Fubm90IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5l
 ZCAxIGV4aXQgc3RhdHVzCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0
 IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
 bmUgNTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDExOTU0MDQuMzA0ODYtMS1yaWNoYXJkLmhlbmRlcnNv
-bkBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgot
+L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDMxNDIyMjUuMzIyNjgtMS1zYW11ZWwudGhpYmF1bHRA
+ZW5zLWx5b24ub3JnL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgot
 LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
 ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
 YXQuY29t
