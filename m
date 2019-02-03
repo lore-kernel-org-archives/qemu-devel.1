@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46307)
+Received: from eggs.gnu.org ([209.51.188.92]:52268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shirley17fei@gmail.com>) id 1gqCdH-0003cZ-S5
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 02:56:05 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqDBt-00081M-U6
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 03:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shirley17fei@gmail.com>) id 1gqCdG-0007Ny-9R
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 02:56:03 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35316)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shirley17fei@gmail.com>)
-	id 1gqCdE-0007Js-Ce
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 02:56:02 -0500
-Received: by mail-pf1-x442.google.com with SMTP id z9so5356255pfi.2
-	for <qemu-devel@nongnu.org>; Sat, 02 Feb 2019 23:55:59 -0800 (PST)
-References: <20190201051806.53183-1-lifei1214@126.com>
-	<20190201051806.53183-10-lifei1214@126.com>
-	<878syz4j5y.fsf@dusky.pond.sub.org>
-From: Fei Li <shirley17fei@gmail.com>
-Message-ID: <a5c93560-44d0-cbd8-73dd-69686d632e3b@gmail.com>
-Date: Sun, 3 Feb 2019 15:55:53 +0800
+	(envelope-from <no-reply@patchew.org>) id 1gqCyd-0002C0-N5
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 03:18:09 -0500
+Resent-Message-Id: <E1gqCyd-0002C0-N5@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21820)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqCyd-0002AN-Eu
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 03:18:07 -0500
+Message-ID: <154918091251.29184.16771133170690339564@ebba9967afc0>
+In-Reply-To: <1547729344-3895-1-git-send-email-lizhijian@cn.fujitsu.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <878syz4j5y.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 09/11] qemu_thread: supplement
- error handling for migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 3 Feb 2019 00:01:54 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] allow to load initrd below 4G for
+ recent kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,337 +29,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Fei Li <lifei1214@126.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: lizhijian@cn.fujitsu.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org, ehabkost@redhat.com, crosthwaite.peter@gmail.com, philip.li@intel.com, zhijianx.li@intel.com, pbonzini@redhat.com, sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 
-
-ÔÚ 2019/2/1 ÏÂÎç11:34, Markus Armbruster Ð´µÀ:
-> Dave, I tried to review the error paths, in particular resource cleanup,
-> but there's a lot going on, and I'm not feeling confident.  Please have
-> a close look.
->
-> Fei Li <lifei1214@126.com> writes:
->
->> From: Fei Li <fli@suse.com>
->>
->> Update qemu_thread_create()'s callers by
->> - setting an error on qemu_thread_create() failure for callers that
->>    set an error on failure;
->> - reporting the error and returning failure for callers that return
->>    an error code on failure;
->> - reporting the error and setting some state for callers that just
->>    report errors and choose not to continue on.
->>
->> Besides, make compress_threads_save_cleanup() cope with partially
->> initialized comp_param[i] to adapt to the new qemu_thread_create()
->> failure case.
->>
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Fei Li <fli@suse.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>   migration/migration.c    | 35 +++++++++++++-------
->>   migration/postcopy-ram.c | 16 ++++++---
->>   migration/ram.c          | 70 ++++++++++++++++++++++++++--------------
->>   migration/savevm.c       | 12 ++++---
->>   4 files changed, 89 insertions(+), 44 deletions(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 1da71211c8..0034ca1334 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -447,10 +447,13 @@ static void process_incoming_migration_co(void *opaque)
->>               goto fail;
->>           }
->>   
->> -        /* TODO: let the further caller handle the error instead of abort() */
->> -        qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
->> -                           colo_process_incoming_thread, mis,
->> -                           QEMU_THREAD_JOINABLE, &error_abort);
->> +        if (qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
->> +                               colo_process_incoming_thread, mis,
->> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +            error_reportf_err(local_err, "failed to create "
->> +                              "colo_process_incoming_thread: ");
->> +            goto fail;
->> +        }
->>           mis->have_colo_incoming_thread = true;
->>           qemu_coroutine_yield();
->>   
->> @@ -2349,6 +2352,7 @@ out:
->>   static int open_return_path_on_source(MigrationState *ms,
->>                                         bool create_thread)
->>   {
->> +    Error *local_err = NULL;
->>   
->>       ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
->>       if (!ms->rp_state.from_dst_file) {
->> @@ -2362,10 +2366,15 @@ static int open_return_path_on_source(MigrationState *ms,
->>           return 0;
->>       }
->>   
->> -    /* TODO: let the further caller handle the error instead of abort() here */
->> -    qemu_thread_create(&ms->rp_state.rp_thread, "return path",
->> -                       source_return_path_thread, ms,
->> -                       QEMU_THREAD_JOINABLE, &error_abort);
->> +    if (qemu_thread_create(&ms->rp_state.rp_thread, "return path",
->> +                           source_return_path_thread, ms,
->> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create source_return_path_thread: ");
->> +        qemu_fclose(ms->rp_state.from_dst_file);
->> +        ms->rp_state.from_dst_file = NULL;
->> +        return -1;
->> +     }
->>   
->>       trace_open_return_path_on_source_continue();
->>   
->> @@ -3201,9 +3210,13 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
->         if (multifd_save_setup() != 0) {
->             migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                               MIGRATION_STATUS_FAILED);
->>           migrate_fd_cleanup(s);
->>           return;
->>       }
->> -    /* TODO: let the further caller handle the error instead of abort() here */
->> -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
->> -                       QEMU_THREAD_JOINABLE, &error_abort);
->> +    if (qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
->> +                           QEMU_THREAD_JOINABLE, &error_in) < 0) {
->> +        error_reportf_err(error_in, "failed to create migration_thread: ");
->> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
->> +        migrate_fd_cleanup(s);
-> Is there anything to clean up for multifd_save_setup()?  Dave?
->
->> +        return;
->> +    }
->>       s->migration_thread_running = true;
->>   }
->>   
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index 221ea24919..0934a1403a 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -1083,6 +1083,8 @@ retry:
->>   
->>   int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>   {
->> +    Error *local_err = NULL;
->> +
->>       /* Open the fd for the kernel to give us userfaults */
->>       mis->userfault_fd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
->>       if (mis->userfault_fd == -1) {
->> @@ -1109,10 +1111,16 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
->>       }
->>   
->>       qemu_sem_init(&mis->fault_thread_sem, 0);
->> -    /* TODO: let the further caller handle the error instead of abort() here */
->> -    qemu_thread_create(&mis->fault_thread, "postcopy/fault",
->> -                       postcopy_ram_fault_thread, mis,
->> -                       QEMU_THREAD_JOINABLE, &error_abort);
->> +    if (qemu_thread_create(&mis->fault_thread, "postcopy/fault",
->> +                           postcopy_ram_fault_thread, mis,
->> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create postcopy_ram_fault_thread: ");
->> +        close(mis->userfault_event_fd);
->> +        close(mis->userfault_fd);
->> +        qemu_sem_destroy(&mis->fault_thread_sem);
->> +        return -1;
->> +    }
->>       qemu_sem_wait(&mis->fault_thread_sem);
->>       qemu_sem_destroy(&mis->fault_thread_sem);
->>       mis->have_fault_thread = true;
->         /* Mark so that we get notified of accesses to unwritten areas */
->         if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
->             error_report("ram_block_enable_notify failed");
->             return -1;
->
-> Not this patch's problem, but here goes anyway: where are
-> mis->userfault_event_fd and mis->userfault_fd closed?
-
-They are actually cleaned in the caller when 
-postcopy_ram_enable_notify() fails:
-
-call postcopy_ram_incoming_cleanup() to do the cleanup when 
-mis->have_fault_thread=true
-
-The merged patch: 91b02dc is to fix this.
-
->
->         }
->
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 700ea229e0..66b8b764f1 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -441,6 +441,14 @@ static void compress_threads_save_cleanup(void)
->>   
->>       thread_count = migrate_compress_threads();
->>       for (i = 0; i < thread_count; i++) {
->> +        qemu_mutex_lock(&comp_param[i].mutex);
->> +        comp_param[i].quit = true;
->> +        qemu_cond_signal(&comp_param[i].cond);
->> +        qemu_mutex_unlock(&comp_param[i].mutex);
->> +
->> +        qemu_mutex_destroy(&comp_param[i].mutex);
->> +        qemu_cond_destroy(&comp_param[i].cond);
->> +
->>           /*
->>            * we use it as a indicator which shows if the thread is
->>            * properly init'd or not
->> @@ -448,15 +456,7 @@ static void compress_threads_save_cleanup(void)
->>           if (!comp_param[i].file) {
->>               break;
->>           }
->> -
->> -        qemu_mutex_lock(&comp_param[i].mutex);
->> -        comp_param[i].quit = true;
->> -        qemu_cond_signal(&comp_param[i].cond);
->> -        qemu_mutex_unlock(&comp_param[i].mutex);
->> -
->>           qemu_thread_join(compress_threads + i);
->> -        qemu_mutex_destroy(&comp_param[i].mutex);
->> -        qemu_cond_destroy(&comp_param[i].cond);
->>           deflateEnd(&comp_param[i].stream);
->>           g_free(comp_param[i].originbuf);
->>           qemu_fclose(comp_param[i].file);
->> @@ -473,6 +473,7 @@ static void compress_threads_save_cleanup(void)
->>   static int compress_threads_save_setup(void)
->>   {
->>       int i, thread_count;
->> +    Error *local_err = NULL;
->>   
->>       if (!migrate_use_compression()) {
->>           return 0;
->> @@ -483,6 +484,9 @@ static int compress_threads_save_setup(void)
->>       qemu_cond_init(&comp_done_cond);
->>       qemu_mutex_init(&comp_done_lock);
->>       for (i = 0; i < thread_count; i++) {
->> +        qemu_mutex_init(&comp_param[i].mutex);
->> +        qemu_cond_init(&comp_param[i].cond);
->> +        comp_param[i].quit = false;
->>           comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
->>           if (!comp_param[i].originbuf) {
->>               goto exit;
->> @@ -499,13 +503,16 @@ static int compress_threads_save_setup(void)
->>            */
->>           comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
->>           comp_param[i].done = true;
->> -        comp_param[i].quit = false;
->> -        qemu_mutex_init(&comp_param[i].mutex);
->> -        qemu_cond_init(&comp_param[i].cond);
->> -        /* TODO: let the further caller handle the error instead of abort() */
->> -        qemu_thread_create(compress_threads + i, "compress",
->> -                           do_data_compress, comp_param + i,
->> -                           QEMU_THREAD_JOINABLE, &error_abort);
->> +        if (qemu_thread_create(compress_threads + i, "compress",
->> +                               do_data_compress, comp_param + i,
->> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +            error_reportf_err(local_err, "failed to create do_data_compress: ");
->> +            deflateEnd(&comp_param[i].stream);
->> +            g_free(comp_param[i].originbuf);
->> +            qemu_fclose(comp_param[i].file);
->> +            comp_param[i].file = NULL;
->> +            goto exit;
->> +        }
->>       }
->>       return 0;
->>   
->> @@ -1076,9 +1083,14 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
->>           p->c = QIO_CHANNEL(sioc);
->>           qio_channel_set_delay(p->c, false);
->>           p->running = true;
->> -        /* TODO: let the further caller handle the error instead of abort() */
->> -        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
->> -                           QEMU_THREAD_JOINABLE, &error_abort);
->> +        if (qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
->> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +            migrate_set_error(migrate_get_current(), local_err);
->> +            error_reportf_err(local_err,
->> +                              "failed to create multifd_send_thread: ");
->> +            multifd_save_cleanup();
->> +            return;
->> +        }
->>   
->>           atomic_inc(&multifd_send_state->count);
->>       }
->> @@ -1357,9 +1369,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
->>       p->num_packets = 1;
->>   
->>       p->running = true;
->> -    /* TODO: let the further caller handle the error instead of abort() here */
->> -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
->> -                       QEMU_THREAD_JOINABLE, &error_abort);
->> +    if (qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
->> +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +        error_propagate_prepend(errp, local_err,
->> +                                "failed to create multifd_recv_thread: ");
-> This prepends only if @errp isn't null.  Fine from the caller's point of
-> view.  But it also affects multifd_recv_thread():
->
->> +        multifd_recv_terminate_threads(local_err);
-> That's at least unclean.
->
-> I think you should use error_prepend() and error_propagate() here.
-
-Right, I will change these two sentences' order. Thanks for pointing 
-this out. :)
-
-Have a nice day
-Fei
->
->> +        return false;
->> +    }
->>       atomic_inc(&multifd_recv_state->count);
->>       return atomic_read(&multifd_recv_state->count) ==
->>              migrate_multifd_channels();
->> @@ -3631,6 +3647,7 @@ static void compress_threads_load_cleanup(void)
->>   static int compress_threads_load_setup(QEMUFile *f)
->>   {
->>       int i, thread_count;
->> +    Error *local_err = NULL;
->>   
->>       if (!migrate_use_compression()) {
->>           return 0;
->> @@ -3652,10 +3669,13 @@ static int compress_threads_load_setup(QEMUFile *f)
->>           qemu_cond_init(&decomp_param[i].cond);
->>           decomp_param[i].done = true;
->>           decomp_param[i].quit = false;
->> -        /* TODO: let the further caller handle the error instead of abort() */
->> -        qemu_thread_create(decompress_threads + i, "decompress",
->> -                           do_data_decompress, decomp_param + i,
->> -                           QEMU_THREAD_JOINABLE, &error_abort);
->> +        if (qemu_thread_create(decompress_threads + i, "decompress",
->> +                               do_data_decompress, decomp_param + i,
->> +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
->> +            error_reportf_err(local_err,
->> +                              "failed to create do_data_decompress: ");
->> +            goto exit;
->> +        }
->>       }
->>       return 0;
->>   exit:
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index d5b45843b6..310cecbf8f 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1747,10 +1747,14 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
->>       mis->have_listen_thread = true;
->>       /* Start up the listening thread and wait for it to signal ready */
->>       qemu_sem_init(&mis->listen_thread_sem, 0);
->> -    /* TODO: let the further caller handle the error instead of abort() here */
->> -    qemu_thread_create(&mis->listen_thread, "postcopy/listen",
->> -                       postcopy_ram_listen_thread, NULL,
->> -                       QEMU_THREAD_DETACHED, &error_abort);
->> +    if (qemu_thread_create(&mis->listen_thread, "postcopy/listen",
->> +                           postcopy_ram_listen_thread, NULL,
->> +                           QEMU_THREAD_DETACHED, &local_err) < 0) {
->> +        error_reportf_err(local_err,
->> +                          "failed to create postcopy_ram_listen_thread: ");
->> +        qemu_sem_destroy(&mis->listen_thread_sem);
->> +        return -1;
->> +    }
->>       qemu_sem_wait(&mis->listen_thread_sem);
->>       qemu_sem_destroy(&mis->listen_thread_sem);
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ3NzI5MzQ0LTM4OTUtMS1n
+aXQtc2VuZC1lbWFpbC1saXpoaWppYW5AY24uZnVqaXRzdS5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
+ZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXIt
+dGVzdC1taW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpDb25maWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0
+LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwg
+LS1weXRob249L3Vzci9iaW4vcHl0aG9uMyAtLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3
+MzItIC0tZW5hYmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZSAtLWVuYWJsZS1nbnV0bHMgLS1lbmFi
+bGUtbmV0dGxlIC0tZW5hYmxlLWN1cmwgLS1lbmFibGUtdm5jIC0tZW5hYmxlLWJ6aXAyIC0tZW5h
+YmxlLWd1ZXN0LWFnZW50IC0td2l0aC1zZGxhYmk9Mi4wCgpFUlJPUjogIng4Nl82NC13NjQtbWlu
+Z3czMi1nY2MiIGVpdGhlciBkb2VzIG5vdCBleGlzdCBvciBkb2VzIG5vdCB3b3JrCgojIFFFTVUg
+Y29uZmlndXJlIGxvZyBTdW4gRmViICAzIDA4OjAxOjQ5IFVUQyAyMDE5CiMgQ29uZmlndXJlZCB3
+aXRoOiAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZScgJy0tZW5hYmxlLXdlcnJvcicgJy0t
+dGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11JyAnLS1wcmVmaXg9L3Rt
+cC9xZW11LXRlc3QvaW5zdGFsbCcgJy0tcHl0aG9uPS91c3IvYmluL3B5dGhvbjMnICctLWNyb3Nz
+LXByZWZpeD14ODZfNjQtdzY0LW1pbmd3MzItJyAnLS1lbmFibGUtdHJhY2UtYmFja2VuZHM9c2lt
+cGxlJyAnLS1lbmFibGUtZ251dGxzJyAnLS1lbmFibGUtbmV0dGxlJyAnLS1lbmFibGUtY3VybCcg
+Jy0tZW5hYmxlLXZuYycgJy0tZW5hYmxlLWJ6aXAyJyAnLS1lbmFibGUtZ3Vlc3QtYWdlbnQnICct
+LXdpdGgtc2RsYWJpPTIuMCcKLS0tCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29i
+amVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIgMTE5IDYxNSA2MzIgMAp4ODZfNjQtdzY0
+LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJH
+RUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwg
+LVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3Qt
+YWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYu
+byBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRl
+IHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6
+IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmpl
+Y3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDExOSA2MTUgNjM0IDAKeDg2XzY0LXc2NC1t
+aW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VG
+SUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1X
+dW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFs
+aWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8g
+Y29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0
+ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQ
+ZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0
+IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMTkgNjE1IDYzNiAwCng4Nl82NC13NjQtbWlu
+Z3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklM
+RV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3Vu
+ZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlh
+c2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNv
+bmZpZy10ZW1wL3FlbXUtY29uZi5jCmNjYWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVt
+cG9yYXJ5IGZpbGUgZm9yIC92YXIvdG1wL2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVy
+bWlzc2lvbiBkZW5pZWQKCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBj
+aGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIgMTE5IDYxNSA2MzggMAp4ODZfNjQtdzY0LW1pbmd3
+MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVf
+U09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRl
+ZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNp
+bmcgLWZuby1jb21tb24gLWZ3cmFwdiAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25m
+aWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBv
+cmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1p
+c3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hl
+Y2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDExOSA2MTUgNjQwIDAKeDg2XzY0LXc2NC1taW5ndzMy
+LWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NP
+VVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYg
+LVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5n
+IC1mbm8tY29tbW9uIC1md3JhcHYgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmln
+LXRlbXAvcWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3Jh
+cnkgZmlsZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNz
+aW9uIGRlbmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNr
+X2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMTkgNjE1IDY0MiAwCng4Nl82NC13NjQtbWluZ3czMi1n
+Y2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VS
+Q0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1X
+d3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAt
+Zm5vLWNvbW1vbiAtZndyYXB2IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10
+ZW1wL3FlbXUtY29uZi5jCmNjYWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5
+IGZpbGUgZm9yIC92YXIvdG1wL2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lv
+biBkZW5pZWQKCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19k
+ZWZpbmUgbWFpbgpsaW5lczogOTIgMTE5IDYxNSA2NDQgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2Nj
+IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNF
+IC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dy
+aXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZu
+by1jb21tb24gLWZ3cmFwdiAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVt
+cC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBm
+aWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24g
+ZGVuaWVkCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVm
+aW5lIG1haW4KbGluZXM6IDkyIDExOSA2MTUgNjQ2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAt
+RF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAt
+V3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0
+ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8t
+Y29tbW9uIC1md3JhcHYgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAv
+cWVtdS1jb25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmls
+ZSBmb3IgL3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRl
+bmllZAoKZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmlu
+ZSBtYWluCmxpbmVzOiA5MiAxMTkgNjE1IDY0OCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURf
+R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
+dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
+c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
+bW1vbiAtZndyYXB2IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3Fl
+bXUtY29uZi5jCmNjYWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5IGZpbGUg
+Zm9yIC92YXIvdG1wL2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lvbiBkZW5p
+ZWQKCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUg
+bWFpbgpsaW5lczogOTIgMTE5IDYxNSA2NTAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dO
+VV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3Ry
+aWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0
+cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21t
+b24gLWZ3cmFwdiAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11
+LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZv
+ciAvdmFyL3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVk
+CgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1h
+aW4KbGluZXM6IDkyIDExOSA2MTUgNjg0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVf
+U09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmlj
+dC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJp
+bmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9u
+IC1md3JhcHYgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1j
+b25mLmMKY2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3Ig
+L3Zhci90bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoK
+ZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWlu
+CmxpbmVzOiA5MiAxMTkgNjE1IDY4NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NP
+VVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3Qt
+cHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5n
+cyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAt
+ZndyYXB2IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29u
+Zi5jCmNjYWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5IGZpbGUgZm9yIC92
+YXIvdG1wL2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lvbiBkZW5pZWQKCmZ1
+bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgps
+aW5lczogOTIgMTE5IDYxNSA2OTIgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VS
+Q0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXBy
+b3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3Mg
+LVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3
+cmFwdiAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYu
+YwpjY2FjaGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFy
+L3RtcC9jY2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5j
+czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
+ZXM6IDkyIDExOSA2MTUgNjk4IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
+IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
+b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
+bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
+cHYgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMK
+Y2NhY2hlOiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90
+bXAvY2NhY2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6
+IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVz
+OiA5MiAxMTkgNjE1IDcwNCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAt
+RF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90
+eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21p
+c3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2
+IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jCmNj
+YWNoZTogZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5IGZpbGUgZm9yIC92YXIvdG1w
+L2NjYWNoZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lvbiBkZW5pZWQKCmZ1bmNzOiBk
+b19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczog
+OTIgMTE5IDYxNSA3MDYgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURf
+RklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlw
+ZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNz
+aW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAt
+YyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2Fj
+aGU6IGVycm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9j
+Y2FjaGUvdG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9f
+Y29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDky
+IDExOSA2MTUgNzEyIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJ
+TEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVz
+IC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2lu
+Zy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLWMg
+LW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY2NhY2hl
+OiBlcnJvcjogRmFpbGVkIHRvIGNyZWF0ZSB0ZW1wb3JhcnkgZmlsZSBmb3IgL3Zhci90bXAvY2Nh
+Y2hlL3RtcC9xZW11LWNvbmYuc3Rkb3V0OiBQZXJtaXNzaW9uIGRlbmllZAoKZnVuY3M6IGRvX2Nv
+bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
+MTkgNjE1IDcxOCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
+X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
+V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
+cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1jIC1v
+IGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jCmNjYWNoZTog
+ZXJyb3I6IEZhaWxlZCB0byBjcmVhdGUgdGVtcG9yYXJ5IGZpbGUgZm9yIC92YXIvdG1wL2NjYWNo
+ZS90bXAvcWVtdS1jb25mLnN0ZG91dDogUGVybWlzc2lvbiBkZW5pZWQKCmZ1bmNzOiBkb19jb21w
+aWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIgMTE5
+IDYxNSA3MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9P
+RkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdy
+ZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXBy
+b3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtYyAtbyBj
+b25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVy
+cm9yOiBGYWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUv
+dG1wL3FlbXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCgpmdW5jczogZG9fY29tcGls
+ZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgbWFpbgpsaW5lczogOTIgMTE5IDE4MTEgMAp4ODZfNjQt
+dzY0LW1pbmd3MzItZ2NjIC1tNjQgLW1jeDE2IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRf
+QklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRh
+bnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlw
+ZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtYyAtbyBjb25maWct
+dGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjY2FjaGU6IGVycm9yOiBG
+YWlsZWQgdG8gY3JlYXRlIHRlbXBvcmFyeSBmaWxlIGZvciAvdmFyL3RtcC9jY2FjaGUvdG1wL3Fl
+bXUtY29uZi5zdGRvdXQ6IFBlcm1pc3Npb24gZGVuaWVkCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3Vy
+ZScKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9j
+a2VyL2RvY2tlci5weSIsIGxpbmUgNTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0NzcyOTM0NC0zODk1LTEtZ2l0
+LXNlbmQtZW1haWwtbGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3
+QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
