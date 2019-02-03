@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35558)
+Received: from eggs.gnu.org ([209.51.188.92]:40483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gqIqD-0006hq-1m
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:33:52 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqJFQ-0003Ke-97
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gqIgz-0008Vt-F8
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:24:18 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:52776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gqIgz-0008PP-44
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:24:17 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun,  3 Feb 2019 15:22:25 +0100
-Message-Id: <20190203142225.32268-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <no-reply@patchew.org>) id 1gqJ3I-0007m7-JC
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:47:22 -0500
+Resent-Message-Id: <E1gqJ3I-0007m7-JC@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21801)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqJ3H-0007iU-Dq
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 09:47:20 -0500
+Message-ID: <154920428892.29184.16771816179985102720@ebba9967afc0>
+In-Reply-To: <20190201123100.27419-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] slirp: Move g_spawn_async_with_fds_qemu
- compatibility to slirp/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 3 Feb 2019 06:31:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [libvirt] [PULL 0/5] Ui 20190201 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, jan.kiszka@siemens.com, stefanha@redhat.com
+To: kraxel@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, libvir-list@redhat.com, michael@walle.cc
 
-Only slirp actually needs it, and will need it along in libslirp.
-
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- include/glib-compat.h | 57 -------------------------------------------
- slirp/misc.c          | 57 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+), 57 deletions(-)
-
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index 8a078c5288..1291628e09 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -83,63 +83,6 @@ static inline gboolean g_strv_contains_qemu(const gcha=
-r *const *strv,
- }
- #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
-=20
--#if !GLIB_CHECK_VERSION(2, 58, 0)
--typedef struct QemuGSpawnFds {
--    GSpawnChildSetupFunc child_setup;
--    gpointer user_data;
--    gint stdin_fd;
--    gint stdout_fd;
--    gint stderr_fd;
--} QemuGSpawnFds;
--
--static inline void
--qemu_gspawn_fds_setup(gpointer user_data)
--{
--    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
--
--    dup2(q->stdin_fd, 0);
--    dup2(q->stdout_fd, 1);
--    dup2(q->stderr_fd, 2);
--    q->child_setup(q->user_data);
--}
--#endif
--
--static inline gboolean
--g_spawn_async_with_fds_qemu(const gchar *working_directory,
--                            gchar **argv,
--                            gchar **envp,
--                            GSpawnFlags flags,
--                            GSpawnChildSetupFunc child_setup,
--                            gpointer user_data,
--                            GPid *child_pid,
--                            gint stdin_fd,
--                            gint stdout_fd,
--                            gint stderr_fd,
--                            GError **error)
--{
--#if GLIB_CHECK_VERSION(2, 58, 0)
--    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
--                                  child_setup, user_data,
--                                  child_pid, stdin_fd, stdout_fd, stderr=
-_fd,
--                                  error);
--#else
--    QemuGSpawnFds setup =3D {
--        .child_setup =3D child_setup,
--        .user_data =3D user_data,
--        .stdin_fd =3D stdin_fd,
--        .stdout_fd =3D stdout_fd,
--        .stderr_fd =3D stderr_fd,
--    };
--
--    return g_spawn_async(working_directory, argv, envp, flags,
--                         qemu_gspawn_fds_setup, &setup,
--                         child_pid, error);
--#endif
--}
--
--#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
- err) \
--    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, efd=
-, err)
--
- #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
- /*
-  * g_poll has a problem on Windows when using
-diff --git a/slirp/misc.c b/slirp/misc.c
-index edb0d187d7..18b25f93ac 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -120,6 +120,63 @@ fork_exec_child_setup(gpointer data)
- #endif
- }
-=20
-+#if !GLIB_CHECK_VERSION(2, 58, 0)
-+typedef struct SlirpGSpawnFds {
-+    GSpawnChildSetupFunc child_setup;
-+    gpointer user_data;
-+    gint stdin_fd;
-+    gint stdout_fd;
-+    gint stderr_fd;
-+} SlirpGSpawnFds;
-+
-+static inline void
-+slirp_gspawn_fds_setup(gpointer user_data)
-+{
-+    SlirpGSpawnFds *q =3D (SlirpGSpawnFds *)user_data;
-+
-+    dup2(q->stdin_fd, 0);
-+    dup2(q->stdout_fd, 1);
-+    dup2(q->stderr_fd, 2);
-+    q->child_setup(q->user_data);
-+}
-+#endif
-+
-+static inline gboolean
-+g_spawn_async_with_fds_slirp(const gchar *working_directory,
-+                            gchar **argv,
-+                            gchar **envp,
-+                            GSpawnFlags flags,
-+                            GSpawnChildSetupFunc child_setup,
-+                            gpointer user_data,
-+                            GPid *child_pid,
-+                            gint stdin_fd,
-+                            gint stdout_fd,
-+                            gint stderr_fd,
-+                            GError **error)
-+{
-+#if GLIB_CHECK_VERSION(2, 58, 0)
-+    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
-+                                  child_setup, user_data,
-+                                  child_pid, stdin_fd, stdout_fd, stderr=
-_fd,
-+                                  error);
-+#else
-+    QemuGSpawnFds setup =3D {
-+        .child_setup =3D child_setup,
-+        .user_data =3D user_data,
-+        .stdin_fd =3D stdin_fd,
-+        .stdout_fd =3D stdout_fd,
-+        .stderr_fd =3D stderr_fd,
-+    };
-+
-+    return g_spawn_async(working_directory, argv, envp, flags,
-+                         slirp_gspawn_fds_setup, &setup,
-+                         child_pid, error);
-+#endif
-+}
-+
-+#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
- err) \
-+    g_spawn_async_with_fds_slirp(wd, argv, env, f, c, d, p, ifd, ofd, ef=
-d, err)
-+
- int
- fork_exec(struct socket *so, const char *ex)
- {
---=20
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTEyMzEwMC4yNzQx
+OS0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCkNvbmZpZ3VyZSBvcHRp
+b25zOgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0
+LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhvbj0vdXNyL2Jp
+bi9weXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1lbmFibGUtdHJh
+Y2UtYmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0bGUgLS1lbmFi
+bGUtY3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vlc3QtYWdlbnQg
+LS13aXRoLXNkbGFiaT0yLjAKRVJST1I6IHVua25vd24gb3B0aW9uIC0td2l0aC1zZGxhYmk9Mi4w
+ClRyeSAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZSAtLWhlbHAnIGZvciBtb3JlIGluZm9y
+bWF0aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIFN1biBGZWIgIDMgMTQ6MzE6MDUgVVRDIDIwMTkK
+IyBDb25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlJyAnLS1lbmFi
+bGUtd2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNvZnRtbXUn
+ICctLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsJyAnLS1weXRob249L3Vzci9iaW4vcHl0
+aG9uMycgJy0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0nICctLWVuYWJsZS10cmFj
+ZS1iYWNrZW5kcz1zaW1wbGUnICctLWVuYWJsZS1nbnV0bHMnICctLWVuYWJsZS1uZXR0bGUnICct
+LWVuYWJsZS1jdXJsJyAnLS1lbmFibGUtdm5jJyAnLS1lbmFibGUtYnppcDInICctLWVuYWJsZS1n
+dWVzdC1hZ2VudCcgJy0td2l0aC1zZGxhYmk9Mi4wJwotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRv
+X2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE3IDYz
+NCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9C
+SVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFu
+dC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBl
+cyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMg
+LW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY29uZmln
+LXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5l
+ZAogI2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVuY3M6IGRvX2Nv
+bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
+MjIgNjE3IDY4NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
+X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
+V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
+cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9
+Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25m
+LmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9faTM4Nl9fIG5v
+dCBkZWZpbmVkCiAjZXJyb3IgX19pMzg2X18gbm90IGRlZmluZWQKICBefn5+fgoKLS0tCmZ1bmNz
+OiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5l
+czogOTIgMTIyIDYxNyA2ODkgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0Ug
+LURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3Rv
+dHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdt
+aXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFw
+diAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3Fl
+bXUtY29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBfX0lM
+UDMyX18gbm90IGRlZmluZWQKICNlcnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQKICBefn5+fgoK
+LS0tCmxpbmVzOiA5MiAxMjggOTIwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtbXRocmVhZHMg
+LURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0Ug
+LVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3Jp
+dGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5v
+LWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmV4ZSBj
+b25maWctdGVtcC9xZW11LWNvbmYuYyAtZyAtbGliZXJ0eQovdXNyL2xpYi9nY2MveDg2XzY0LXc2
+NC1taW5ndzMyLzguMi4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQ6IGNh
+bm5vdCBmaW5kIC1saWJlcnR5CmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQgMSBleGl0IHN0
+YXR1cwpGYWlsZWQgdG8gcnVuICdjb25maWd1cmUnClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2Fs
+bCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDU2MywgaW4g
+PG1vZHVsZT4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwMjAxMTIzMTAwLjI3NDE5LTEta3JheGVsQHJlZGhhdC5jb20vdGVzdGluZy5k
+b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
