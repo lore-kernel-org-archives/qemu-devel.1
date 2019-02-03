@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56197)
+Received: from eggs.gnu.org ([209.51.188.92]:60758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqML6-0000XO-2L
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:17:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqMhD-0004rA-SR
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:40:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqML5-0000Go-3m
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:17:56 -0500
-Resent-Message-Id: <E1gqML5-0000Go-3m@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21734)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqML4-0000FE-UH
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:17:55 -0500
-Message-ID: <154921511423.29184.2673476189669329431@ebba9967afc0>
-In-Reply-To: <20190202144531.5772-1-n54@gmx.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philmd@redhat.com>) id 1gqMhD-0008RU-2b
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:40:47 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqMhB-0008K7-Cz
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 13:40:46 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so12158637wrx.9
+	for <qemu-devel@nongnu.org>; Sun, 03 Feb 2019 10:40:37 -0800 (PST)
+References: <20190124203959.30875-1-lersek@redhat.com>
+	<20190124203959.30875-5-lersek@redhat.com>
+	<6d5868f5-70b4-71e2-3495-8d47156148c1@redhat.com>
+	<f39b4b89-bd10-de9c-d3d2-c38411594f70@redhat.com>
+	<74cf6f64-254f-1a15-4071-0b73daef02a6@redhat.com>
+	<d65eda71-c173-5ca2-1e57-162acaaf223f@redhat.com>
+	<e67a7cb3-954f-c497-c51c-cc8cdde4011a@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <52f766b2-16e9-7b6e-8086-11914142816f@redhat.com>
+Date: Sun, 3 Feb 2019 19:40:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 3 Feb 2019 09:31:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Enhance the stub for
- kvm_arch_get_supported_cpuid()
+In-Reply-To: <e67a7cb3-954f-c497-c51c-cc8cdde4011a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] tests/uefi-test-tools: add build
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: n54@gmx.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMjE0NDUzMS41Nzcy
-LTEtbjU0QGdteC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWlu
-Z3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFu
-ZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBj
-YW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEgU0hPV19F
-TlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29uZmlndXJlIG9wdGlvbnM6Ci0t
-ZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1t
-dSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9uPS91c3IvYmluL3B5dGhv
-bjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVuYWJsZS10cmFjZS1iYWNr
-ZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRsZSAtLWVuYWJsZS1jdXJs
-IC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVzdC1hZ2VudCAtLXdpdGgt
-c2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRoLXNkbGFiaT0yLjAKVHJ5ICcv
-dG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9yIG1vcmUgaW5mb3JtYXRpb24K
-IyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3VuIEZlYiAgMyAxNzozMTo0NCBVVEMgMjAxOQojIENvbmZp
-Z3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUnICctLWVuYWJsZS13ZXJy
-b3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdScgJy0tcHJl
-Zml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0vdXNyL2Jpbi9weXRob24zJyAn
-LS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0tZW5hYmxlLXRyYWNlLWJhY2tl
-bmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxlLW5ldHRsZScgJy0tZW5hYmxl
-LWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicgJy0tZW5hYmxlLWd1ZXN0LWFn
-ZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29t
-cGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTcgNjM0IDAKeDg2
-XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQg
-LURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xz
-IC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8t
-c3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25m
-aWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjb25maWctdGVtcC9x
-ZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAjZXJy
-b3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5jczogZG9fY29tcGlsZXIg
-ZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTcg
-Njg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VU
-X0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5k
-YW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5
-cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAt
-YyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjb25m
-aWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19pMzg2X18gbm90IGRlZmlu
-ZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVuY3M6IGRvX2Nv
-bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
-MjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
-X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
-V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
-cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9
-Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25m
-LmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fSUxQMzJfXyBu
-b3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KbGlu
-ZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1tdGhyZWFkcyAtRF9HTlVf
-U09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmlj
-dC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJp
-bmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9u
-IC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11LWNvbmYuZXhlIGNvbmZpZy10
-ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2djYy94ODZfNjQtdzY0LW1pbmd3
-MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZDogY2Fubm90IGZp
-bmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCkZh
-aWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3Qp
-OgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNTYzLCBpbiA8bW9kdWxl
-PgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAxOTAyMDIxNDQ1MzEuNTc3Mi0xLW41NEBnbXguY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZl
-ZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 2/2/19 12:27 AM, Laszlo Ersek wrote:
+> On 02/02/19 00:03, Philippe Mathieu-Daudé wrote:
+>> On 2/1/19 11:35 PM, Laszlo Ersek wrote:
+>>> On 01/31/19 19:55, Laszlo Ersek wrote:
+[...]
+>>> (f) So, the solution is to prefix the "./build.sh" recipe with a "+"
+>>> sign, to mark it as "recursive":
+>>>
+>>>> diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Makefile
+>>>> index 61d263861e..449b81d8ba 100644
+>>>> --- a/tests/uefi-test-tools/Makefile
+>>>> +++ b/tests/uefi-test-tools/Makefile
+>>>> @@ -87,7 +87,7 @@ Build/%.fat: Build/%.efi
+>>>>  .NOTPARALLEL:
+>>>>
+>>>>  Build/bios-tables-test.%.efi: build-edk2-tools
+>>>> -	./build.sh $(edk2_dir) BiosTablesTest $* $@
+>>>> +	+./build.sh $(edk2_dir) BiosTablesTest $* $@
+>>
+>> Yes :) This fixed it!
+>>
+>>>>
+>>>>  build-edk2-tools:
+>>>>  	$(MAKE) -C $(edk2_dir)/BaseTools
+>>>
+>>> This fixes the issue for me on Fedora 29, without breaking the behavior
+>>> on RHEL7.
+>>
+>> Excellent! I triggered Travis builds (Ubuntu/Debian).
+
+FYI, everthing build fine there.
+
+>>>
+>>> I'll submit v3 later. Thank you for catching this error.
+[...]
