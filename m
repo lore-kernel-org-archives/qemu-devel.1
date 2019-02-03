@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56730)
+Received: from eggs.gnu.org ([209.51.188.92]:59906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gqAzO-0003sc-Bi
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:10:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1gqBDw-0007ZE-4J
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:25:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gqAzM-0006Db-Dz
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:10:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43098)
+	(envelope-from <bounces@canonical.com>) id 1gqBDu-00049S-OL
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:25:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gqAzK-0006BV-Fd
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:10:43 -0500
+	id 1gqBDu-00043m-G6
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 01:25:46 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gqAzI-0005KJ-3E
-	for <qemu-devel@nongnu.org>; Sun, 03 Feb 2019 06:10:40 +0000
+	id 1gqBDs-0005xW-Cu
+	for <qemu-devel@nongnu.org>; Sun, 03 Feb 2019 06:25:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D10EA2E80C9
-	for <qemu-devel@nongnu.org>; Sun,  3 Feb 2019 06:10:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5B6CB2E8050
+	for <qemu-devel@nongnu.org>; Sun,  3 Feb 2019 06:25:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Feb 2019 06:01:46 -0000
+Date: Sun, 03 Feb 2019 06:20:09 -0000
 From: Cheng Chen <1814418@bugs.launchpad.net>
 Reply-To: Bug 1814418 <1814418@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154917314614.27692.2830748026894633212.malonedeb@soybean.canonical.com>
-Message-Id: <154917370669.28189.7764031165186546228.launchpad@soybean.canonical.com>
+Message-Id: <154917480963.27616.11208964899011686250.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1814418] Re: persistent bitmap will be
  inconsistent when qemu crash,
@@ -47,12 +47,10 @@ To: qemu-devel@nongnu.org
   1. start qemu
   2. add persistent bitmap: '{ "execute": "block-dirty-bitmap-add", "argume=
 nts": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
-- 3. kill -9 qemu (simulate Host crash, eg. lose power)
-- 4. restart qemu
-+ 3. stop qemu (Friendly shutdown)
-+ 4. re-start qemu
-+ 5. kill -9 qemu (simulate Host crash, eg. lose power)
-+ 6. re-start qemu
+  3. stop qemu (Friendly shutdown)
+  4. re-start qemu
+  5. kill -9 qemu (simulate Host crash, eg. lose power)
+  6. re-start qemu
   =
 
   Now, the '{ "execute": "query-block" }' can't find the bitmap0. I can
@@ -77,6 +75,7 @@ nts": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
   ---
   =
 
++ host: centos 7.5
   qemu version: 2.12.0 and 3.1.0, other version I does not test yet.
   qemu command: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3Don -S=
  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
@@ -145,6 +144,7 @@ nts": {"node": "drive-virtio-disk1","name": "bitmap0", "persistent":true }}'
 
   ---
 
+  host: centos 7.5
   qemu version: 2.12.0 and 3.1.0, other version I does not test yet.
   qemu command: qemu-system-x86_64 -name guest=3Dtest,debug-threads=3Don -S=
  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
