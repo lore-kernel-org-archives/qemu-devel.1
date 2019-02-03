@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56344)
+Received: from eggs.gnu.org ([209.51.188.92]:59685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqKMS-00075T-6u
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:11:13 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqKas-0006Af-9s
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqKMR-0001tV-7i
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:11:12 -0500
-Resent-Message-Id: <E1gqKMR-0001tV-7i@eggs.gnu.org>
-Message-ID: <154921024833.29184.6906786542896111448@ebba9967afc0>
-In-Reply-To: <20190201185358.6972-1-ppandit@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gqKar-0005TB-77
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:26:06 -0500
+Resent-Message-Id: <E1gqKar-0005TB-77@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqKar-0005SI-1b
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 11:26:05 -0500
+Message-ID: <154921112952.29184.16431798108213839842@ebba9967afc0>
+In-Reply-To: <20190201192935.18394-1-mreitz@redhat.com>
 Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Sun, 3 Feb 2019 08:10:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] ppc: add host-serial and host-model
- machine attributes
+Date: Sun, 3 Feb 2019 08:25:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v13 00/31] Fix some filename generation
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,11 +29,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ppandit@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pjp@fedoraproject.org, david@gibson.dropbear.id.au
+To: mreitz@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE4NTM1OC42OTcy
-LTEtcHBhbmRpdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMTE5MjkzNS4xODM5
+NC0xLW1yZWl0ekByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
 a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
 YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
 LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
@@ -41,7 +46,7 @@ Y2UtYmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0bGUgLS1lbmFi
 bGUtY3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vlc3QtYWdlbnQg
 LS13aXRoLXNkbGFiaT0yLjAKRVJST1I6IHVua25vd24gb3B0aW9uIC0td2l0aC1zZGxhYmk9Mi4w
 ClRyeSAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZSAtLWhlbHAnIGZvciBtb3JlIGluZm9y
-bWF0aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIFN1biBGZWIgIDMgMTY6MTA6NDIgVVRDIDIwMTkK
+bWF0aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIFN1biBGZWIgIDMgMTY6MjU6MjAgVVRDIDIwMTkK
 IyBDb25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlJyAnLS1lbmFi
 bGUtd2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNvZnRtbXUn
 ICctLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsJyAnLS1weXRob249L3Vzci9iaW4vcHl0
@@ -84,7 +89,7 @@ bm5vdCBmaW5kIC1saWJlcnR5CmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQgMSBleGl0IHN0
 YXR1cwpGYWlsZWQgdG8gcnVuICdjb25maWd1cmUnClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2Fs
 bCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDU2MywgaW4g
 PG1vZHVsZT4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMTkwMjAxMTg1MzU4LjY5NzItMS1wcGFuZGl0QHJlZGhhdC5jb20vdGVzdGluZy5k
+Zy9sb2dzLzIwMTkwMjAxMTkyOTM1LjE4Mzk0LTEtbXJlaXR6QHJlZGhhdC5jb20vdGVzdGluZy5k
 b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
 b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
 eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
