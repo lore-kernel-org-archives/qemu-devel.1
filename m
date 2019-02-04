@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38916)
+Received: from eggs.gnu.org ([209.51.188.92]:38945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9V-0001FA-OO
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa9a-0001If-Tw
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9N-0000HV-Ks
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:47 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa9N-0000Hc-Jv
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:50 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:24 +1100
-Message-Id: <20190204090124.26191-38-david@gibson.dropbear.id.au>
+Date: Mon,  4 Feb 2019 20:01:16 +1100
+Message-Id: <20190204090124.26191-30-david@gibson.dropbear.id.au>
 In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/37] mmap-alloc: fix hugetlbfs misaligned
- length in ppc64
+Subject: [Qemu-devel] [PULL 29/37] target/ppc: eliminate use of HI_IDX and
+ LO_IDX macros from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,167 +23,548 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The commit 7197fb4058bcb68986bae2bb2c04d6370f3e7218 ("util/mmap-alloc:
-fix hugetlb support on ppc64") fixed Huge TLB mappings on ppc64.
+The original purpose of these macros was to correctly reference the high =
+and low
+parts of the VSRs regardless of the host endianness.
 
-However, we still need to consider the underlying huge page size
-during munmap() because it requires that both address and length be a
-multiple of the underlying huge page size for Huge TLB mappings.
-Quote from "Huge page (Huge TLB) mappings" paragraph under NOTES
-section of the munmap(2) manual:
+Replace these direct references to high and low parts with the relevant V=
+srD
+macro instead, and completely remove the now-unused HI_IDX and LO_IDX mac=
+ros.
 
-  "For munmap(), addr and length must both be a multiple of the
-  underlying huge page size."
-
-On ppc64, the munmap() in qemu_ram_munmap() does not work for Huge TLB
-mappings because the mapped segment can be aligned with the underlying
-huge page size, not aligned with the native system page size, as
-returned by getpagesize().
-
-This has the side effect of not releasing huge pages back to the pool
-after a hugetlbfs file-backed memory device is hot-unplugged.
-
-This patch fixes the situation in qemu_ram_mmap() and
-qemu_ram_munmap() by considering the underlying page size on ppc64.
-
-After this patch, memory hot-unplug releases huge pages back to the
-pool.
-
-Fixes: 7197fb4058bcb68986bae2bb2c04d6370f3e7218
-Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- exec.c                    |  4 ++--
- include/qemu/mmap-alloc.h |  2 +-
- util/mmap-alloc.c         | 22 ++++++++++++++++------
- util/oslib-posix.c        |  2 +-
- 4 files changed, 20 insertions(+), 10 deletions(-)
+ target/ppc/int_helper.c | 180 +++++++++++++++++++---------------------
+ 1 file changed, 85 insertions(+), 95 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 25f3938a27..03dd673d36 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1873,7 +1873,7 @@ static void *file_ram_alloc(RAMBlock *block,
-     if (mem_prealloc) {
-         os_mem_prealloc(fd, area, memory, smp_cpus, errp);
-         if (errp && *errp) {
--            qemu_ram_munmap(area, memory);
-+            qemu_ram_munmap(fd, area, memory);
-             return NULL;
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index e531af5294..7a9c02d4bb 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -388,14 +388,6 @@ target_ulong helper_602_mfrom(target_ulong arg)
+=20
+ /***********************************************************************=
+******/
+ /* Altivec extension helpers */
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define HI_IDX 0
+-#define LO_IDX 1
+-#else
+-#define HI_IDX 1
+-#define LO_IDX 0
+-#endif
+-
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define VECTOR_FOR_INORDER_I(index, element)                    \
+     for (index =3D 0; index < ARRAY_SIZE(r->element); index++)
+@@ -514,8 +506,8 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
+     res ^=3D res >> 32;
+     res ^=3D res >> 16;
+     res ^=3D res >> 8;
+-    r->u64[LO_IDX] =3D res & 1;
+-    r->u64[HI_IDX] =3D 0;
++    r->VsrD(1) =3D res & 1;
++    r->VsrD(0) =3D 0;
+ }
+=20
+ #define VARITH_DO(name, op, element)                                    =
+\
+@@ -1229,8 +1221,8 @@ void helper_vbpermq(ppc_avr_t *r, ppc_avr_t *a, ppc=
+_avr_t *b)
          }
      }
-@@ -2394,7 +2394,7 @@ static void reclaim_ramblock(RAMBlock *block)
-         xen_invalidate_map_cache_entry(block->host);
- #ifndef _WIN32
-     } else if (block->fd >=3D 0) {
--        qemu_ram_munmap(block->host, block->max_length);
-+        qemu_ram_munmap(block->fd, block->host, block->max_length);
-         close(block->fd);
- #endif
-     } else {
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index 50385e3f81..ef04f0ed5b 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -9,6 +9,6 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
 =20
- void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+-    r->u64[HI_IDX] =3D perm;
+-    r->u64[LO_IDX] =3D 0;
++    r->VsrD(0) =3D perm;
++    r->VsrD(1) =3D 0;
+ }
 =20
--void qemu_ram_munmap(void *ptr, size_t size);
-+void qemu_ram_munmap(int fd, void *ptr, size_t size);
+ #undef VBPERMQ_INDEX
+@@ -1559,25 +1551,25 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a, p=
+pc_avr_t *b)
+     ppc_avr_t prod[2];
 =20
- #endif
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index f71ea038c8..8565885420 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -80,6 +80,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, =
-bool shared)
-     int flags;
-     int guardfd;
-     size_t offset;
-+    size_t pagesize;
-     size_t total;
-     void *guardptr;
-     void *ptr;
-@@ -100,7 +101,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align=
-, bool shared)
-      * anonymous memory is OK.
-      */
-     flags =3D MAP_PRIVATE;
--    if (fd =3D=3D -1 || qemu_fd_getpagesize(fd) =3D=3D getpagesize()) {
-+    pagesize =3D qemu_fd_getpagesize(fd);
-+    if (fd =3D=3D -1 || pagesize =3D=3D getpagesize()) {
-         guardfd =3D -1;
-         flags |=3D MAP_ANONYMOUS;
-     } else {
-@@ -109,6 +111,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align=
-, bool shared)
+     VECTOR_FOR_INORDER_I(i, u64) {
+-        prod[i].u64[LO_IDX] =3D prod[i].u64[HI_IDX] =3D 0;
++        prod[i].VsrD(1) =3D prod[i].VsrD(0) =3D 0;
+         for (j =3D 0; j < 64; j++) {
+             if (a->u64[i] & (1ull<<j)) {
+                 ppc_avr_t bshift;
+                 if (j =3D=3D 0) {
+-                    bshift.u64[HI_IDX] =3D 0;
+-                    bshift.u64[LO_IDX] =3D b->u64[i];
++                    bshift.VsrD(0) =3D 0;
++                    bshift.VsrD(1) =3D b->u64[i];
+                 } else {
+-                    bshift.u64[HI_IDX] =3D b->u64[i] >> (64-j);
+-                    bshift.u64[LO_IDX] =3D b->u64[i] << j;
++                    bshift.VsrD(0) =3D b->u64[i] >> (64 - j);
++                    bshift.VsrD(1) =3D b->u64[i] << j;
+                 }
+-                prod[i].u64[LO_IDX] ^=3D bshift.u64[LO_IDX];
+-                prod[i].u64[HI_IDX] ^=3D bshift.u64[HI_IDX];
++                prod[i].VsrD(1) ^=3D bshift.VsrD(1);
++                prod[i].VsrD(0) ^=3D bshift.VsrD(0);
+             }
+         }
      }
+=20
+-    r->u64[LO_IDX] =3D prod[0].u64[LO_IDX] ^ prod[1].u64[LO_IDX];
+-    r->u64[HI_IDX] =3D prod[0].u64[HI_IDX] ^ prod[1].u64[HI_IDX];
++    r->VsrD(1) =3D prod[0].VsrD(1) ^ prod[1].VsrD(1);
++    r->VsrD(0) =3D prod[0].VsrD(0) ^ prod[1].VsrD(0);
+ #endif
+ }
+=20
+@@ -1795,7 +1787,7 @@ VEXTU_X_DO(vextuwrx, 32, 0)
+ #define VSHIFT(suffix, leftp)                                           =
+\
+     void helper_vs##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)    =
+\
+     {                                                                   =
+\
+-        int shift =3D b->u8[LO_IDX*15] & 0x7;                           =
+  \
++        int shift =3D b->VsrB(15) & 0x7;                                =
+  \
+         int doit =3D 1;                                                 =
+  \
+         int i;                                                          =
+\
+                                                                         =
+\
+@@ -1806,15 +1798,15 @@ VEXTU_X_DO(vextuwrx, 32, 0)
+             if (shift =3D=3D 0) {                                       =
+    \
+                 *r =3D *a;                                              =
+  \
+             } else if (leftp) {                                         =
+\
+-                uint64_t carry =3D a->u64[LO_IDX] >> (64 - shift);      =
+  \
++                uint64_t carry =3D a->VsrD(1) >> (64 - shift);          =
+  \
+                                                                         =
+\
+-                r->u64[HI_IDX] =3D (a->u64[HI_IDX] << shift) | carry;   =
+  \
+-                r->u64[LO_IDX] =3D a->u64[LO_IDX] << shift;             =
+  \
++                r->VsrD(0) =3D (a->VsrD(0) << shift) | carry;           =
+  \
++                r->VsrD(1) =3D a->VsrD(1) << shift;                     =
+  \
+             } else {                                                    =
+\
+-                uint64_t carry =3D a->u64[HI_IDX] << (64 - shift);      =
+  \
++                uint64_t carry =3D a->VsrD(0) << (64 - shift);          =
+  \
+                                                                         =
+\
+-                r->u64[LO_IDX] =3D (a->u64[LO_IDX] >> shift) | carry;   =
+  \
+-                r->u64[HI_IDX] =3D a->u64[HI_IDX] >> shift;             =
+  \
++                r->VsrD(1) =3D (a->VsrD(1) >> shift) | carry;           =
+  \
++                r->VsrD(0) =3D a->VsrD(0) >> shift;                     =
+  \
+             }                                                           =
+\
+         }                                                               =
+\
+     }
+@@ -1900,7 +1892,7 @@ void helper_vsldoi(ppc_avr_t *r, ppc_avr_t *a, ppc_=
+avr_t *b, uint32_t shift)
+=20
+ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ {
+-    int sh =3D (b->u8[LO_IDX*0xf] >> 3) & 0xf;
++    int sh =3D (b->VsrB(0xf) >> 3) & 0xf;
+=20
+ #if defined(HOST_WORDS_BIGENDIAN)
+     memmove(&r->u8[0], &a->u8[sh], 16 - sh);
+@@ -2096,7 +2088,7 @@ VSR(d, u64, 0x3F)
+=20
+ void helper_vsro(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ {
+-    int sh =3D (b->u8[LO_IDX * 0xf] >> 3) & 0xf;
++    int sh =3D (b->VsrB(0xf) >> 3) & 0xf;
+=20
+ #if defined(HOST_WORDS_BIGENDIAN)
+     memmove(&r->u8[sh], &a->u8[0], 16 - sh);
+@@ -2352,13 +2344,13 @@ static inline void avr_qw_not(ppc_avr_t *t, ppc_a=
+vr_t a)
+=20
+ static int avr_qw_cmpu(ppc_avr_t a, ppc_avr_t b)
+ {
+-    if (a.u64[HI_IDX] < b.u64[HI_IDX]) {
++    if (a.VsrD(0) < b.VsrD(0)) {
+         return -1;
+-    } else if (a.u64[HI_IDX] > b.u64[HI_IDX]) {
++    } else if (a.VsrD(0) > b.VsrD(0)) {
+         return 1;
+-    } else if (a.u64[LO_IDX] < b.u64[LO_IDX]) {
++    } else if (a.VsrD(1) < b.VsrD(1)) {
+         return -1;
+-    } else if (a.u64[LO_IDX] > b.u64[LO_IDX]) {
++    } else if (a.VsrD(1) > b.VsrD(1)) {
+         return 1;
+     } else {
+         return 0;
+@@ -2367,17 +2359,17 @@ static int avr_qw_cmpu(ppc_avr_t a, ppc_avr_t b)
+=20
+ static void avr_qw_add(ppc_avr_t *t, ppc_avr_t a, ppc_avr_t b)
+ {
+-    t->u64[LO_IDX] =3D a.u64[LO_IDX] + b.u64[LO_IDX];
+-    t->u64[HI_IDX] =3D a.u64[HI_IDX] + b.u64[HI_IDX] +
+-                     (~a.u64[LO_IDX] < b.u64[LO_IDX]);
++    t->VsrD(1) =3D a.VsrD(1) + b.VsrD(1);
++    t->VsrD(0) =3D a.VsrD(0) + b.VsrD(0) +
++                     (~a.VsrD(1) < b.VsrD(1));
+ }
+=20
+ static int avr_qw_addc(ppc_avr_t *t, ppc_avr_t a, ppc_avr_t b)
+ {
+     ppc_avr_t not_a;
+-    t->u64[LO_IDX] =3D a.u64[LO_IDX] + b.u64[LO_IDX];
+-    t->u64[HI_IDX] =3D a.u64[HI_IDX] + b.u64[HI_IDX] +
+-                     (~a.u64[LO_IDX] < b.u64[LO_IDX]);
++    t->VsrD(1) =3D a.VsrD(1) + b.VsrD(1);
++    t->VsrD(0) =3D a.VsrD(0) + b.VsrD(0) +
++                     (~a.VsrD(1) < b.VsrD(1));
+     avr_qw_not(&not_a, a);
+     return avr_qw_cmpu(not_a, b) < 0;
+ }
+@@ -2399,11 +2391,11 @@ void helper_vaddeuqm(ppc_avr_t *r, ppc_avr_t *a, =
+ppc_avr_t *b, ppc_avr_t *c)
+     r->u128 =3D a->u128 + b->u128 + (c->u128 & 1);
  #else
-     guardfd =3D -1;
-+    pagesize =3D getpagesize();
-     flags =3D MAP_PRIVATE | MAP_ANONYMOUS;
+=20
+-    if (c->u64[LO_IDX] & 1) {
++    if (c->VsrD(1) & 1) {
+         ppc_avr_t tmp;
+=20
+-        tmp.u64[HI_IDX] =3D 0;
+-        tmp.u64[LO_IDX] =3D c->u64[LO_IDX] & 1;
++        tmp.VsrD(0) =3D 0;
++        tmp.VsrD(1) =3D c->VsrD(1) & 1;
+         avr_qw_add(&tmp, *a, tmp);
+         avr_qw_add(r, tmp, *b);
+     } else {
+@@ -2421,8 +2413,8 @@ void helper_vaddcuq(ppc_avr_t *r, ppc_avr_t *a, ppc=
+_avr_t *b)
+=20
+     avr_qw_not(&not_a, *a);
+=20
+-    r->u64[HI_IDX] =3D 0;
+-    r->u64[LO_IDX] =3D (avr_qw_cmpu(not_a, *b) < 0);
++    r->VsrD(0) =3D 0;
++    r->VsrD(1) =3D (avr_qw_cmpu(not_a, *b) < 0);
  #endif
+ }
 =20
-@@ -120,7 +123,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align=
-, bool shared)
+@@ -2437,7 +2429,7 @@ void helper_vaddecuq(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, ppc_avr_t *c)
+     r->u128 =3D carry_out;
+ #else
 =20
-     assert(is_power_of_2(align));
-     /* Always align to host page size */
--    assert(align >=3D getpagesize());
-+    assert(align >=3D pagesize);
+-    int carry_in =3D c->u64[LO_IDX] & 1;
++    int carry_in =3D c->VsrD(1) & 1;
+     int carry_out =3D 0;
+     ppc_avr_t tmp;
 =20
-     flags =3D MAP_FIXED;
-     flags |=3D fd =3D=3D -1 ? MAP_ANONYMOUS : 0;
-@@ -143,17 +146,24 @@ void *qemu_ram_mmap(int fd, size_t size, size_t ali=
-gn, bool shared)
-      * a guard page guarding against potential buffer overflows.
-      */
-     total -=3D offset;
--    if (total > size + getpagesize()) {
--        munmap(ptr + size + getpagesize(), total - size - getpagesize())=
-;
-+    if (total > size + pagesize) {
-+        munmap(ptr + size + pagesize, total - size - pagesize);
+@@ -2447,8 +2439,8 @@ void helper_vaddecuq(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, ppc_avr_t *c)
+         ppc_avr_t one =3D QW_ONE;
+         carry_out =3D avr_qw_addc(&tmp, tmp, one);
+     }
+-    r->u64[HI_IDX] =3D 0;
+-    r->u64[LO_IDX] =3D carry_out;
++    r->VsrD(0) =3D 0;
++    r->VsrD(1) =3D carry_out;
+ #endif
+ }
+=20
+@@ -2476,8 +2468,8 @@ void helper_vsubeuqm(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, ppc_avr_t *c)
+     avr_qw_not(&tmp, *b);
+     avr_qw_add(&sum, *a, tmp);
+=20
+-    tmp.u64[HI_IDX] =3D 0;
+-    tmp.u64[LO_IDX] =3D c->u64[LO_IDX] & 1;
++    tmp.VsrD(0) =3D 0;
++    tmp.VsrD(1) =3D c->VsrD(1) & 1;
+     avr_qw_add(r, sum, tmp);
+ #endif
+ }
+@@ -2493,10 +2485,10 @@ void helper_vsubcuq(ppc_avr_t *r, ppc_avr_t *a, p=
+pc_avr_t *b)
+         ppc_avr_t tmp;
+         avr_qw_not(&tmp, *b);
+         avr_qw_add(&tmp, *a, tmp);
+-        carry =3D ((tmp.s64[HI_IDX] =3D=3D -1ull) && (tmp.s64[LO_IDX] =3D=
+=3D -1ull));
++        carry =3D ((tmp.VsrSD(0) =3D=3D -1ull) && (tmp.VsrSD(1) =3D=3D -=
+1ull));
+     }
+-    r->u64[HI_IDX] =3D 0;
+-    r->u64[LO_IDX] =3D carry;
++    r->VsrD(0) =3D 0;
++    r->VsrD(1) =3D carry;
+ #endif
+ }
+=20
+@@ -2507,17 +2499,17 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, =
+ppc_avr_t *b, ppc_avr_t *c)
+         (~a->u128 < ~b->u128) ||
+         ((c->u128 & 1) && (a->u128 + ~b->u128 =3D=3D (__uint128_t)-1));
+ #else
+-    int carry_in =3D c->u64[LO_IDX] & 1;
++    int carry_in =3D c->VsrD(1) & 1;
+     int carry_out =3D (avr_qw_cmpu(*a, *b) > 0);
+     if (!carry_out && carry_in) {
+         ppc_avr_t tmp;
+         avr_qw_not(&tmp, *b);
+         avr_qw_add(&tmp, *a, tmp);
+-        carry_out =3D ((tmp.u64[HI_IDX] =3D=3D -1ull) && (tmp.u64[LO_IDX=
+] =3D=3D -1ull));
++        carry_out =3D ((tmp.VsrD(0) =3D=3D -1ull) && (tmp.VsrD(1) =3D=3D=
+ -1ull));
      }
 =20
-     return ptr;
+-    r->u64[HI_IDX] =3D 0;
+-    r->u64[LO_IDX] =3D carry_out;
++    r->VsrD(0) =3D 0;
++    r->VsrD(1) =3D carry_out;
+ #endif
  }
 =20
--void qemu_ram_munmap(void *ptr, size_t size)
-+void qemu_ram_munmap(int fd, void *ptr, size_t size)
+@@ -2615,7 +2607,7 @@ static bool bcd_is_valid(ppc_avr_t *bcd)
+=20
+ static int bcd_cmp_zero(ppc_avr_t *bcd)
  {
-+    size_t pagesize;
-+
-     if (ptr) {
-         /* Unmap both the RAM block and the guard page */
--        munmap(ptr, size + getpagesize());
-+#if defined(__powerpc64__) && defined(__linux__)
-+        pagesize =3D qemu_fd_getpagesize(fd);
-+#else
-+        pagesize =3D getpagesize();
-+#endif
-+        munmap(ptr, size + pagesize);
+-    if (bcd->u64[HI_IDX] =3D=3D 0 && (bcd->u64[LO_IDX] >> 4) =3D=3D 0) {
++    if (bcd->VsrD(0) =3D=3D 0 && (bcd->VsrD(1) >> 4) =3D=3D 0) {
+         return CRF_EQ;
+     } else {
+         return (bcd_get_sgn(bcd) =3D=3D 1) ? CRF_GT : CRF_LT;
+@@ -2735,7 +2727,7 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a,=
+ ppc_avr_t *b, uint32_t ps)
      }
- }
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 4ce1ba9ca4..37c5854b9c 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -226,7 +226,7 @@ void qemu_vfree(void *ptr)
- void qemu_anon_ram_free(void *ptr, size_t size)
- {
-     trace_qemu_anon_ram_free(ptr, size);
--    qemu_ram_munmap(ptr, size);
-+    qemu_ram_munmap(-1, ptr, size);
+=20
+     if (unlikely(invalid)) {
+-        result.u64[HI_IDX] =3D result.u64[LO_IDX] =3D -1;
++        result.VsrD(0) =3D result.VsrD(1) =3D -1;
+         cr =3D CRF_SO;
+     } else if (overflow) {
+         cr |=3D CRF_SO;
+@@ -2804,7 +2796,7 @@ uint32_t helper_bcdctn(ppc_avr_t *r, ppc_avr_t *b, =
+uint32_t ps)
+     int invalid =3D (sgnb =3D=3D 0);
+     ppc_avr_t ret =3D { .u64 =3D { 0, 0 } };
+=20
+-    int ox_flag =3D (b->u64[HI_IDX] !=3D 0) || ((b->u64[LO_IDX] >> 32) !=
+=3D 0);
++    int ox_flag =3D (b->VsrD(0) !=3D 0) || ((b->VsrD(1) >> 32) !=3D 0);
+=20
+     for (i =3D 1; i < 8; i++) {
+         set_national_digit(&ret, 0x30 + bcd_get_digit(b, i, &invalid), i=
+);
+@@ -2884,7 +2876,7 @@ uint32_t helper_bcdctz(ppc_avr_t *r, ppc_avr_t *b, =
+uint32_t ps)
+     int invalid =3D (sgnb =3D=3D 0);
+     ppc_avr_t ret =3D { .u64 =3D { 0, 0 } };
+=20
+-    int ox_flag =3D ((b->u64[HI_IDX] >> 4) !=3D 0);
++    int ox_flag =3D ((b->VsrD(0) >> 4) !=3D 0);
+=20
+     for (i =3D 0; i < 16; i++) {
+         digit =3D bcd_get_digit(b, i + 1, &invalid);
+@@ -2925,13 +2917,13 @@ uint32_t helper_bcdcfsq(ppc_avr_t *r, ppc_avr_t *=
+b, uint32_t ps)
+     uint64_t hi_value;
+     ppc_avr_t ret =3D { .u64 =3D { 0, 0 } };
+=20
+-    if (b->s64[HI_IDX] < 0) {
+-        lo_value =3D -b->s64[LO_IDX];
+-        hi_value =3D ~b->u64[HI_IDX] + !lo_value;
++    if (b->VsrSD(0) < 0) {
++        lo_value =3D -b->VsrSD(1);
++        hi_value =3D ~b->VsrD(0) + !lo_value;
+         bcd_put_digit(&ret, 0xD, 0);
+     } else {
+-        lo_value =3D b->u64[LO_IDX];
+-        hi_value =3D b->u64[HI_IDX];
++        lo_value =3D b->VsrD(1);
++        hi_value =3D b->VsrD(0);
+         bcd_put_digit(&ret, bcd_preferred_sgn(0, ps), 0);
+     }
+=20
+@@ -2979,11 +2971,11 @@ uint32_t helper_bcdctsq(ppc_avr_t *r, ppc_avr_t *=
+b, uint32_t ps)
+     }
+=20
+     if (sgnb =3D=3D -1) {
+-        r->s64[LO_IDX] =3D -lo_value;
+-        r->s64[HI_IDX] =3D ~hi_value + !r->s64[LO_IDX];
++        r->VsrSD(1) =3D -lo_value;
++        r->VsrSD(0) =3D ~hi_value + !r->VsrSD(1);
+     } else {
+-        r->s64[LO_IDX] =3D lo_value;
+-        r->s64[HI_IDX] =3D hi_value;
++        r->VsrSD(1) =3D lo_value;
++        r->VsrSD(0) =3D hi_value;
+     }
+=20
+     cr =3D bcd_cmp_zero(b);
+@@ -3043,7 +3035,7 @@ uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, uint32_t ps)
+     bool ox_flag =3D false;
+     int sgnb =3D bcd_get_sgn(b);
+     ppc_avr_t ret =3D *b;
+-    ret.u64[LO_IDX] &=3D ~0xf;
++    ret.VsrD(1) &=3D ~0xf;
+=20
+     if (bcd_is_valid(b) =3D=3D false) {
+         return CRF_SO;
+@@ -3056,9 +3048,9 @@ uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, uint32_t ps)
+     }
+=20
+     if (i > 0) {
+-        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
++        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
+     } else {
+-        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
++        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
+     }
+     bcd_put_digit(&ret, bcd_preferred_sgn(sgnb, ps), 0);
+=20
+@@ -3095,13 +3087,13 @@ uint32_t helper_bcdus(ppc_avr_t *r, ppc_avr_t *a,=
+ ppc_avr_t *b, uint32_t ps)
+ #endif
+     if (i >=3D 32) {
+         ox_flag =3D true;
+-        ret.u64[LO_IDX] =3D ret.u64[HI_IDX] =3D 0;
++        ret.VsrD(1) =3D ret.VsrD(0) =3D 0;
+     } else if (i <=3D -32) {
+-        ret.u64[LO_IDX] =3D ret.u64[HI_IDX] =3D 0;
++        ret.VsrD(1) =3D ret.VsrD(0) =3D 0;
+     } else if (i > 0) {
+-        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
++        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
+     } else {
+-        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
++        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
+     }
+     *r =3D ret;
+=20
+@@ -3121,7 +3113,7 @@ uint32_t helper_bcdsr(ppc_avr_t *r, ppc_avr_t *a, p=
+pc_avr_t *b, uint32_t ps)
+     bool ox_flag =3D false;
+     int sgnb =3D bcd_get_sgn(b);
+     ppc_avr_t ret =3D *b;
+-    ret.u64[LO_IDX] &=3D ~0xf;
++    ret.VsrD(1) &=3D ~0xf;
+=20
+ #if defined(HOST_WORDS_BIGENDIAN)
+     int i =3D a->s8[7];
+@@ -3142,9 +3134,9 @@ uint32_t helper_bcdsr(ppc_avr_t *r, ppc_avr_t *a, p=
+pc_avr_t *b, uint32_t ps)
+     }
+=20
+     if (i > 0) {
+-        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
++        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
+     } else {
+-        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
++        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
+=20
+         if (bcd_get_digit(&ret, 0, &invalid) >=3D 5) {
+             bcd_add_mag(&ret, &ret, &bcd_one, &invalid, &unused);
+@@ -3178,19 +3170,19 @@ uint32_t helper_bcdtrunc(ppc_avr_t *r, ppc_avr_t =
+*a, ppc_avr_t *b, uint32_t ps)
+=20
+     if (i > 16 && i < 32) {
+         mask =3D (uint64_t)-1 >> (128 - i * 4);
+-        if (ret.u64[HI_IDX] & ~mask) {
++        if (ret.VsrD(0) & ~mask) {
+             ox_flag =3D CRF_SO;
+         }
+=20
+-        ret.u64[HI_IDX] &=3D mask;
++        ret.VsrD(0) &=3D mask;
+     } else if (i >=3D 0 && i <=3D 16) {
+         mask =3D (uint64_t)-1 >> (64 - i * 4);
+-        if (ret.u64[HI_IDX] || (ret.u64[LO_IDX] & ~mask)) {
++        if (ret.VsrD(0) || (ret.VsrD(1) & ~mask)) {
+             ox_flag =3D CRF_SO;
+         }
+=20
+-        ret.u64[LO_IDX] &=3D mask;
+-        ret.u64[HI_IDX] =3D 0;
++        ret.VsrD(1) &=3D mask;
++        ret.VsrD(0) =3D 0;
+     }
+     bcd_put_digit(&ret, bcd_preferred_sgn(bcd_get_sgn(b), ps), 0);
+     *r =3D ret;
+@@ -3221,28 +3213,28 @@ uint32_t helper_bcdutrunc(ppc_avr_t *r, ppc_avr_t=
+ *a, ppc_avr_t *b, uint32_t ps)
+ #endif
+     if (i > 16 && i < 33) {
+         mask =3D (uint64_t)-1 >> (128 - i * 4);
+-        if (ret.u64[HI_IDX] & ~mask) {
++        if (ret.VsrD(0) & ~mask) {
+             ox_flag =3D CRF_SO;
+         }
+=20
+-        ret.u64[HI_IDX] &=3D mask;
++        ret.VsrD(0) &=3D mask;
+     } else if (i > 0 && i <=3D 16) {
+         mask =3D (uint64_t)-1 >> (64 - i * 4);
+-        if (ret.u64[HI_IDX] || (ret.u64[LO_IDX] & ~mask)) {
++        if (ret.VsrD(0) || (ret.VsrD(1) & ~mask)) {
+             ox_flag =3D CRF_SO;
+         }
+=20
+-        ret.u64[LO_IDX] &=3D mask;
+-        ret.u64[HI_IDX] =3D 0;
++        ret.VsrD(1) &=3D mask;
++        ret.VsrD(0) =3D 0;
+     } else if (i =3D=3D 0) {
+-        if (ret.u64[HI_IDX] || ret.u64[LO_IDX]) {
++        if (ret.VsrD(0) || ret.VsrD(1)) {
+             ox_flag =3D CRF_SO;
+         }
+-        ret.u64[HI_IDX] =3D ret.u64[LO_IDX] =3D 0;
++        ret.VsrD(0) =3D ret.VsrD(1) =3D 0;
+     }
+=20
+     *r =3D ret;
+-    if (r->u64[HI_IDX] =3D=3D 0 && r->u64[LO_IDX] =3D=3D 0) {
++    if (r->VsrD(0) =3D=3D 0 && r->VsrD(1) =3D=3D 0) {
+         return ox_flag | CRF_EQ;
+     }
+=20
+@@ -3414,8 +3406,6 @@ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, p=
+pc_avr_t *b, ppc_avr_t *c)
  }
 =20
- void qemu_set_block(int fd)
+ #undef VECTOR_FOR_INORDER_I
+-#undef HI_IDX
+-#undef LO_IDX
+=20
+ /***********************************************************************=
+******/
+ /* SPE extension helpers */
 --=20
 2.20.1
