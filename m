@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59251)
+Received: from eggs.gnu.org ([209.51.188.92]:59257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6r-00051y-0e
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6r-000528-3s
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6p-0003TB-On
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:44 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:34976)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6p-0003Sy-Mk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:45 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6n-0003QU-PW
+	id 1gqj6n-0003O0-Ol
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:43 -0500
-Received: by mail-wm1-x336.google.com with SMTP id t200so1041427wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:39 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id m1so970565wml.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:34 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:19 +0100
-Message-Id: <1549305379-51117-18-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:15 +0100
+Message-Id: <1549305379-51117-14-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 17/77] linuxboot_dma: remove duplicate
- definitions of FW_CFG
+Subject: [Qemu-devel] [PULL 13/77] elf-ops.h: Add get_elf_note_type()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
 
-FW_CFG_DMA_CTL_* bits and struct fw_cfg_dma_access are
-defined in the qemu_fw_cfg.h header file already included
-in linuxboot_dma.c, so we can remove the definition of
-BIOS_CFG_DMA_CTL_* and struct FWCfgDmaAccess.
+Introduce a routine which, given a pointer to a range of ELF Notes,
+searches through them looking for a note matching the type specified
+and returns a pointer to the matching ELF note.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Based-on: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
+get_elf_note_type() is used by elf_load[32|64]() to find the
+specified note type required by the 'elf_note_fn' parameter
+added in the previous commit.
+
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
 ---
- pc-bios/optionrom/linuxboot_dma.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
+ include/hw/elf_ops.h | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
-diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxboot_dma.c
-index d856d41..f728dc8 100644
---- a/pc-bios/optionrom/linuxboot_dma.c
-+++ b/pc-bios/optionrom/linuxboot_dma.c
-@@ -58,12 +58,6 @@ asm(
- "   jmp load_kernel\n"
- );
- 
--/* QEMU_CFG_DMA_CONTROL bits */
--#define BIOS_CFG_DMA_CTL_ERROR   0x01
--#define BIOS_CFG_DMA_CTL_READ    0x02
--#define BIOS_CFG_DMA_CTL_SKIP    0x04
--#define BIOS_CFG_DMA_CTL_SELECT  0x08
--
- #define BIOS_CFG_DMA_ADDR_HIGH 0x514
- #define BIOS_CFG_DMA_ADDR_LOW  0x518
- 
-@@ -75,12 +69,6 @@ asm(
- 
- #define barrier() asm("" : : : "memory")
- 
--typedef struct FWCfgDmaAccess {
--    uint32_t control;
--    uint32_t length;
--    uint64_t address;
--} __attribute__((packed)) FWCfgDmaAccess;
--
- static inline void outl(uint32_t value, uint16_t port)
- {
-     asm("outl %0, %w1" : : "a"(value), "Nd"(port));
-@@ -153,9 +141,9 @@ static inline uint32_t be32_to_cpu(uint32_t x)
- static __attribute__((__noinline__))
- void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
- {
--    FWCfgDmaAccess access;
--    uint32_t control = (entry << 16) | BIOS_CFG_DMA_CTL_SELECT
--                        | BIOS_CFG_DMA_CTL_READ;
-+    struct fw_cfg_dma_access access;
-+    uint32_t control = (entry << 16) | FW_CFG_DMA_CTL_SELECT
-+                        | FW_CFG_DMA_CTL_READ;
- 
-     access.address = cpu_to_be64((uint64_t)(uint32_t)buf);
-     access.length = cpu_to_be32(len);
-@@ -165,7 +153,7 @@ void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
- 
-     outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
- 
--    while (be32_to_cpu(access.control) & ~BIOS_CFG_DMA_CTL_ERROR) {
-+    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
-         barrier();
-     }
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 3438d6f..690f923 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -265,6 +265,51 @@ fail:
+     return ret;
  }
+ 
++/*
++ * Given 'nhdr', a pointer to a range of ELF Notes, search through them
++ * for a note matching type 'elf_note_type' and return a pointer to
++ * the matching ELF note.
++ */
++static struct elf_note *glue(get_elf_note_type, SZ)(struct elf_note *nhdr,
++                                                    elf_word note_size,
++                                                    elf_word phdr_align,
++                                                    elf_word elf_note_type)
++{
++    elf_word nhdr_size = sizeof(struct elf_note);
++    elf_word elf_note_entry_offset = 0;
++    elf_word note_type;
++    elf_word nhdr_namesz;
++    elf_word nhdr_descsz;
++
++    if (nhdr == NULL) {
++        return NULL;
++    }
++
++    note_type = nhdr->n_type;
++    while (note_type != elf_note_type) {
++        nhdr_namesz = nhdr->n_namesz;
++        nhdr_descsz = nhdr->n_descsz;
++
++        elf_note_entry_offset = nhdr_size +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align) +
++            QEMU_ALIGN_UP(nhdr_descsz, phdr_align);
++
++        /*
++         * If the offset calculated in this iteration exceeds the
++         * supplied size, we are done and no matching note was found.
++         */
++        if (elf_note_entry_offset > note_size) {
++            return NULL;
++        }
++
++        /* skip to the next ELF Note entry */
++        nhdr = (void *)nhdr + elf_note_entry_offset;
++        note_type = nhdr->n_type;
++    }
++
++    return nhdr;
++}
++
+ static int glue(load_elf, SZ)(const char *name, int fd,
+                               uint64_t (*elf_note_fn)(void *, void *, bool),
+                               uint64_t (*translate_fn)(void *, uint64_t),
+@@ -497,6 +542,36 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                 high = addr + mem_size;
+ 
+             data = NULL;
++
++        } else if (ph->p_type == PT_NOTE && elf_note_fn) {
++            struct elf_note *nhdr = NULL;
++
++            file_size = ph->p_filesz; /* Size of the range of ELF notes */
++            data = g_malloc0(file_size);
++            if (ph->p_filesz > 0) {
++                if (lseek(fd, ph->p_offset, SEEK_SET) < 0) {
++                    goto fail;
++                }
++                if (read(fd, data, file_size) != file_size) {
++                    goto fail;
++                }
++            }
++
++            /*
++             * Search the ELF notes to find one with a type matching the
++             * value passed in via 'translate_opaque'
++             */
++            nhdr = (struct elf_note *)data;
++            assert(translate_opaque != NULL);
++            nhdr = glue(get_elf_note_type, SZ)(nhdr, file_size, ph->p_align,
++                                               *(uint64_t *)translate_opaque);
++            if (nhdr != NULL) {
++                bool is64 =
++                    sizeof(struct elf_note) == sizeof(struct elf64_note);
++                elf_note_fn((void *)nhdr, (void *)&ph->p_align, is64);
++            }
++            g_free(data);
++            data = NULL;
+         }
+     }
+ 
 -- 
 1.8.3.1
