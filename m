@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54830)
+Received: from eggs.gnu.org ([209.51.188.92]:55726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gqazZ-0003j7-JA
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:56:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gqb2o-00052C-JF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gqazY-00035i-Se
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:56:41 -0500
-Date: Mon, 4 Feb 2019 10:56:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190204095628.GC5855@linux.fritz.box>
-References: <20190125174653.4604-1-kwolf@redhat.com>
-	<20190125174653.4604-4-kwolf@redhat.com>
-	<20190129155832.GJ30796@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gqb2n-0005ao-Mq
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:00:02 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gqb2n-0005Yd-7u
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:00:01 -0500
+Received: by mail-ot1-x343.google.com with SMTP id s5so11959321oth.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:00:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190129155832.GJ30796@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] scsi-disk: Deprecate device_id
- fallback to BlockBackend name
+References: <mhng-99c129ef-4e70-4840-b80f-7b3c6b806083@palmer-si-x1c4>
+	<01c75f94-26ae-ffa4-dd46-4dd019702fa0@redhat.com>
+In-Reply-To: <01c75f94-26ae-ffa4-dd46-4dd019702fa0@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Feb 2019 09:59:48 +0000
+Message-ID: <CAFEAcA9JXK5O5tSvBD17CM3Eb132EWuub9VvOJWaAKUOu8KA5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 29.01.2019 um 16:58 hat Daniel P. Berrang=E9 geschrieben:
-> On Fri, Jan 25, 2019 at 06:46:53PM +0100, Kevin Wolf wrote:
-> > We should never have exposed BlockBackend names to the guest, it's a
-> > host detail. Deprecate this behaviour. Users who need to maintain the
-> > guest ABI can explicitly set the value with the device_id property.
->=20
-> I don't think we've deprecated things in the past which would cause
-> a guest ABI change when finally deleted.
->=20
-> Shouldn't we be instead setting using machine type versioning here,
-> so that existing machine types keep using the blk_name() fallback
-> forever, while QEMU 4.0+ machine types avoid blk_name() fallback
-> immediately.
+On Mon, 4 Feb 2019 at 09:05, Thomas Huth <thuth@redhat.com> wrote:
+> On 2019-02-02 09:41, Palmer Dabbelt wrote:
+> >> My mail filter finds these RFC pullrequests, yes. I'm then
+> >> relying on my manual brain to not actually apply them.
+> >> (If it's a slow day I might do a test merge on them, but
+> >> usually my queue is full enough that I don't get to them
+> >> before the real PR appears.)
+> >
+> > Ah, OK -- do you want me to do something else?
+>
+> At least I got a little bit confused by "PR RFC" ... I think some other
+> maintainers rather send out patch series marked with "PATCH" first, and
+> add some non-pull-request cover letter with a text like "I'm intending
+> to send a pull request for this soon, please review one more time...".
+> Then after a day or two, once Patchew checked the series and nobody else
+> complained, they send a real "PULL" request.
 
-I was going to implement this, but then I wondered if that's actually
-worthwhile. With -blockdev, you don't get the bad behaviour anyway, and
-tools that would select new machine types will hopefully also use new
-backend options.
+Yeah, generally nobody else sends RFC pull requests, they just
+send the actual pulls. I don't object if Palmer finds them
+useful, though.
 
-So if we need to keep the bad behaviour around anyway instead of
-completely removing it as I intended originally, maybe -drive vs.
--blockdev is enough to make the difference and we shouldn't change
-anything at the device model level at all.
+For what it's worth, my filter for finding pull requests is emails
+containing "for you to fetch changes up to" but not either of
+"not for master" or "PULL SUBSYSTEM". So if you want to specifically
+keep out of the filters you can add "not for master" in the cover
+letter. But as I say it's not a big deal for me to sort things out
+manually -- the filter has the odd false positive anyway.
 
-Kevin
+thanks
+-- PMM
