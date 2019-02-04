@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33487)
+Received: from eggs.gnu.org ([209.51.188.92]:35020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqWAp-0002Vk-Ag
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:48:00 -0500
+	(envelope-from <mst@redhat.com>) id 1gqWIs-0004Sp-Sd
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:56:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqWAm-00019H-CS
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:47:59 -0500
-Resent-Message-Id: <E1gqWAm-00019H-CS@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqWAm-0000nS-3V
-	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:47:56 -0500
-Message-ID: <154922766779.29184.14599718214801117033@ebba9967afc0>
-In-Reply-To: <20190203204950.8447-1-cota@braap.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1gqWIq-00067p-Ps
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:56:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqWIo-00063L-TI
+	for qemu-devel@nongnu.org; Sun, 03 Feb 2019 23:56:15 -0500
+Date: Sun, 3 Feb 2019 23:56:04 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190204045543.21238-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 3 Feb 2019 13:01:08 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: remove outdated comment about
- full-system SMP support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] fixup: include: update Linux headers to
+ 4.21-rc1/5.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, davids@bitmail.cc
+To: qemu-devel@nongnu.org
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Yongji Xie <xieyongji@baidu.com>, Peter Xu <peterx@redhat.com>, pbonzini@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwMzIwNDk1MC44NDQ3
-LTEtY290YUBicmFhcC5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXIt
-bWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRz
-IGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlv
-dSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEgU0hP
-V19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29uZmlndXJlIG9wdGlvbnM6
-Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29m
-dG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9uPS91c3IvYmluL3B5
-dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVuYWJsZS10cmFjZS1i
-YWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRsZSAtLWVuYWJsZS1j
-dXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVzdC1hZ2VudCAtLXdp
-dGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRoLXNkbGFiaT0yLjAKVHJ5
-ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9yIG1vcmUgaW5mb3JtYXRp
-b24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgU3VuIEZlYiAgMyAyMTowMDo0NiBVVEMgMjAxOQojIENv
-bmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUnICctLWVuYWJsZS13
-ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdScgJy0t
-cHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0vdXNyL2Jpbi9weXRob24z
-JyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0tZW5hYmxlLXRyYWNlLWJh
-Y2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxlLW5ldHRsZScgJy0tZW5h
-YmxlLWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicgJy0tZW5hYmxlLWd1ZXN0
-LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2Mg
-Y29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2MTcgNjM0IDAK
-eDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9
-NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRl
-Y2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1m
-bm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBj
-b25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpjb25maWctdGVt
-cC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAj
-ZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5jczogZG9fY29tcGls
-ZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEyMiA2
-MTcgNjg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZG
-U0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVk
-dW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90
-b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5
-OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYuYwpj
-b25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19pMzg2X18gbm90IGRl
-ZmluZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVuY3M6IGRv
-X2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5
-MiAxMjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9G
-SUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBl
-cyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Np
-bmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1z
-dGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1j
-b25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fSUxQMzJf
-XyBub3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0K
-bGluZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1tdGhyZWFkcyAtRF9H
-TlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0
-cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1z
-dHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29t
-bW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11LWNvbmYuZXhlIGNvbmZp
-Zy10ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2djYy94ODZfNjQtdzY0LW1p
-bmd3MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jpbi9sZDogY2Fubm90
-IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVz
-CkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxh
-c3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNTYzLCBpbiA8bW9k
-dWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAxOTAyMDMyMDQ5NTAuODQ0Ny0xLWNvdGFAYnJhYXAub3JnL3Rlc3RpbmcuZG9ja2VyLW1p
-bmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This update switched structures from __u64 to uint64_t.
+Accordingly, need to print with PRIx64.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index a6b46cdc03..3f14b4138b 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -790,10 +790,10 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
+     DPRINT("vhost_vring_addr:\n");
+     DPRINT("    index:  %d\n", vra->index);
+     DPRINT("    flags:  %d\n", vra->flags);
+-    DPRINT("    desc_user_addr:   0x%016llx\n", vra->desc_user_addr);
+-    DPRINT("    used_user_addr:   0x%016llx\n", vra->used_user_addr);
+-    DPRINT("    avail_user_addr:  0x%016llx\n", vra->avail_user_addr);
+-    DPRINT("    log_guest_addr:   0x%016llx\n", vra->log_guest_addr);
++    DPRINT("    desc_user_addr:   0x%016" PRIx64 "\n", vra->desc_user_addr);
++    DPRINT("    used_user_addr:   0x%016" PRIx64 "\n", vra->used_user_addr);
++    DPRINT("    avail_user_addr:  0x%016" PRIx64 "\n", vra->avail_user_addr);
++    DPRINT("    log_guest_addr:   0x%016" PRIx64 "\n", vra->log_guest_addr);
+ 
+     vq->vring.flags = vra->flags;
+     vq->vring.desc = qva_to_va(dev, vra->desc_user_addr);
+-- 
+MST
