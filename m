@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38422)
+Received: from eggs.gnu.org ([209.51.188.92]:38328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8j-0000dM-UN
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8g-0000bw-G4
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8i-0007mq-Dx
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8e-0007eD-NN
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:04 +1100
-Message-Id: <20190204090124.26191-18-david@gibson.dropbear.id.au>
+Date: Mon,  4 Feb 2019 20:00:54 +1100
+Message-Id: <20190204090124.26191-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/37] spapr: move the interrupt presenters
- under machine_data
+Subject: [Qemu-devel] [PULL 07/37] sam460ex: Fix support for memory larger
+ than 1GB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,257 +24,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-Next step is to remove them from under the PowerPCCPU
+Fix the encoding of larger memory modules in the SoC registers which
+allows specifying more than 1GB memory for sam460ex. Well, only 2GB
+due to SoC and firmware restrictions which was the only missing value
+compared to what the real hardware supports. The SoC should support up
+to 4GB but when setting that the firmware hangs during memory test.
+This may be an overflow bug in the firmware which I did not try to
+debug but this may affect real hardware as well.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c            |  3 ++-
- hw/intc/xics_spapr.c            | 11 ++++++-----
- hw/ppc/spapr.c                  |  2 +-
- hw/ppc/spapr_cpu_core.c         |  8 ++++----
- hw/ppc/spapr_irq.c              | 17 ++++++++++-------
- include/hw/ppc/spapr_cpu_core.h |  2 ++
- 6 files changed, 25 insertions(+), 18 deletions(-)
+ hw/ppc/ppc440_uc.c | 22 ++++++++++++----------
+ hw/ppc/sam460ex.c  |  6 ++++--
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 136d872f16..a0f5ff9294 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -16,6 +16,7 @@
- #include "monitor/monitor.h"
- #include "hw/ppc/fdt.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xive.h"
- #include "hw/ppc/xive_regs.h"
-@@ -394,7 +395,7 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr=
-, CPUState *cs)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index 60dbb35eee..c489368905 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -2,7 +2,7 @@
+  * QEMU PowerPC 440 embedded processors emulation
+  *
+  * Copyright (c) 2012 Fran=C3=A7ois Revol
+- * Copyright (c) 2016-2018 BALATON Zoltan
++ * Copyright (c) 2016-2019 BALATON Zoltan
+  *
+  * This work is licensed under the GNU GPL license version 2 or later.
+  *
+@@ -505,10 +505,6 @@ enum {
+     SDRAM_PLBADDUHB =3D 0x50,
+ };
 =20
--    return cpu->tctx;
-+    return spapr_cpu_state(cpu)->tctx;
+-/* XXX: TOFIX: some patches have made this code become inconsistent:
+- *      there are type inconsistencies, mixing hwaddr, target_ulong
+- *      and uint32_t
+- */
+ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+ {
+     uint32_t bcr;
+@@ -538,11 +534,17 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr r=
+am_size)
+     case (1 * GiB):
+         bcr =3D 0xe000;
+         break;
++    case (2 * GiB):
++        bcr =3D 0xc000;
++        break;
++    case (4 * GiB):
++        bcr =3D 0x8000;
++        break;
+     default:
+         error_report("invalid RAM size " TARGET_FMT_plx, ram_size);
+         return 0;
+     }
+-    bcr |=3D ram_base & 0xFF800000;
++    bcr |=3D ram_base >> 2 & 0xffe00000;
+     bcr |=3D 1;
+=20
+     return bcr;
+@@ -550,12 +552,12 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr r=
+am_size)
+=20
+ static inline hwaddr sdram_base(uint32_t bcr)
+ {
+-    return bcr & 0xFF800000;
++    return (bcr & 0xffe00000) << 2;
  }
 =20
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index de6cc15b64..e2d8b38183 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -31,6 +31,7 @@
- #include "trace.h"
- #include "qemu/timer.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/xics.h"
- #include "hw/ppc/xics_spapr.h"
- #include "hw/ppc/fdt.h"
-@@ -45,7 +46,7 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
+-static target_ulong sdram_size(uint32_t bcr)
++static uint64_t sdram_size(uint32_t bcr)
  {
-     target_ulong cppr =3D args[0];
+-    target_ulong size;
++    uint64_t size;
+     int sh;
 =20
--    icp_set_cppr(cpu->icp, cppr);
-+    icp_set_cppr(spapr_cpu_state(cpu)->icp, cppr);
-     return H_SUCCESS;
- }
-=20
-@@ -66,7 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(cpu->icp);
-+    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-=20
-     args[0] =3D xirr;
-     return H_SUCCESS;
-@@ -75,7 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                              target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(cpu->icp);
-+    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-=20
-     args[0] =3D xirr;
-     args[1] =3D cpu_get_host_ticks();
-@@ -87,7 +88,7 @@ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- {
-     target_ulong xirr =3D args[0];
-=20
--    icp_eoi(cpu->icp, xirr);
-+    icp_eoi(spapr_cpu_state(cpu)->icp, xirr);
-     return H_SUCCESS;
- }
-=20
-@@ -95,7 +96,7 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
-     uint32_t mfrr;
--    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
-+    uint32_t xirr =3D icp_ipoll(spapr_cpu_state(cpu)->icp, &mfrr);
-=20
-     args[0] =3D xirr;
-     args[1] =3D mfrr;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a217c7f7a6..487cdf2f3a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3902,7 +3902,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
-vcpu_id)
- {
-     PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-=20
--    return cpu ? cpu->icp : NULL;
-+    return cpu ? spapr_cpu_state(cpu)->icp : NULL;
- }
-=20
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 0405306d1e..ef6cbb9c29 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -194,11 +194,11 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, s=
-PAPRCPUCore *sc)
-         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
+     sh =3D 1024 - ((bcr >> 6) & 0x3ff);
+@@ -575,7 +577,7 @@ static void sdram_set_bcr(ppc440_sdram_t *sdram, int =
+i,
+                                     &sdram->ram_memories[i]);
+         object_unparent(OBJECT(&sdram->containers[i]));
      }
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
--    if (cpu->icp) {
--        object_unparent(OBJECT(cpu->icp));
-+    if (spapr_cpu_state(cpu)->icp) {
-+        object_unparent(OBJECT(spapr_cpu_state(cpu)->icp));
-     }
--    if (cpu->tctx) {
--        object_unparent(OBJECT(cpu->tctx));
-+    if (spapr_cpu_state(cpu)->tctx) {
-+        object_unparent(OBJECT(spapr_cpu_state(cpu)->tctx));
-     }
-     cpu_remove_sync(CPU(cpu));
-     object_unparent(OBJECT(cpu));
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 1da7a32348..2d7a7c1638 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -12,6 +12,7 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xics.h"
- #include "hw/ppc/xics_spapr.h"
-@@ -185,7 +186,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineSta=
-te *spapr, Monitor *mon)
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-    sdram->bcr[i] =3D bcr & 0xFFDEE001;
++    sdram->bcr[i] =3D bcr & 0xffe0ffc1;
+     if (enabled && (bcr & 1)) {
+         memory_region_init(&sdram->containers[i], NULL, "sdram-container=
+s",
+                            sdram_size(bcr));
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 7a8c745021..202ed14bcf 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -76,9 +76,11 @@
+ #define UART_FREQ 11059200
+ #define SDRAM_NR_BANKS 4
 =20
--        icp_pic_print_info(cpu->icp, mon);
-+        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-     }
+-/* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
++/* The SoC could also handle 4 GiB but firmware does not work with that.=
+ */
++/* Maybe it overflows a signed 32 bit number somewhere? */
+ static const ram_addr_t ppc460ex_sdram_bank_sizes[] =3D {
+-    1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 0
++    2 * GiB, 1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB,
++    32 * MiB, 0
+ };
 =20
-     ics_pic_print_info(spapr->ics, mon);
-@@ -196,6 +197,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
-neState *spapr,
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-+    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
-     obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr),
-                      &local_err);
-@@ -204,7 +206,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
-neState *spapr,
-         return;
-     }
-=20
--    cpu->icp =3D ICP(obj);
-+    spapr_cpu->icp =3D ICP(obj);
- }
-=20
- static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -213,7 +215,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineState=
- *spapr, int version_id)
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-             PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--            icp_resend(cpu->icp);
-+            icp_resend(spapr_cpu_state(cpu)->icp);
-         }
-     }
-     return 0;
-@@ -334,7 +336,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineSta=
-te *spapr,
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--        xive_tctx_pic_print_info(cpu->tctx, mon);
-+        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-     }
-=20
-     spapr_xive_pic_print_info(spapr->xive, mon);
-@@ -345,6 +347,7 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMachi=
-neState *spapr,
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-+    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
-     obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &loc=
-al_err);
-     if (local_err) {
-@@ -352,13 +355,13 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMac=
-hineState *spapr,
-         return;
-     }
-=20
--    cpu->tctx =3D XIVE_TCTX(obj);
-+    spapr_cpu->tctx =3D XIVE_TCTX(obj);
-=20
-     /*
-      * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
-      * don't beneficiate from the reset of the XIVE IRQ backend
-      */
--    spapr_xive_set_tctx_os_cam(cpu->tctx);
-+    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
- }
-=20
- static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -374,7 +377,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
-         /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(cpu->tctx);
-+        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
-     }
-=20
-     /* Activate the XIVE MMIOs */
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-index 9e2821e4b3..d64f86bc28 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -46,6 +46,8 @@ typedef struct sPAPRCPUState {
-     uint64_t vpa_addr;
-     uint64_t slb_shadow_addr, slb_shadow_size;
-     uint64_t dtl_addr, dtl_size;
-+    struct ICPState *icp;
-+    struct XiveTCTX *tctx;
- } sPAPRCPUState;
-=20
- static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
+ struct boot_info {
 --=20
 2.20.1
