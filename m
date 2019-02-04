@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33063)
+Received: from eggs.gnu.org ([209.51.188.92]:34190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqd1N-0005nj-6a
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:06:42 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqd5W-0007uy-3s
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqd1G-00047n-FZ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:06:38 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46877)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gqd1A-00040r-FQ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:06:30 -0500
-Received: by mail-wr1-x444.google.com with SMTP id l9so14040101wrt.13
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 04:06:25 -0800 (PST)
-References: <20190128223118.5255-1-richard.henderson@linaro.org>
-	<20190128223118.5255-12-richard.henderson@linaro.org>
-	<CAFEAcA_isfxbkFcjdx8bcDs4_D66Vpi3czJq-TXRoesy8LVXGg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <84bf3e00-2294-99ed-4cae-9e117a38bdf9@linaro.org>
-Date: Mon, 4 Feb 2019 12:06:21 +0000
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_isfxbkFcjdx8bcDs4_D66Vpi3czJq-TXRoesy8LVXGg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] linux-user/aarch64: Reset btype
- for syscalls and signals
+	(envelope-from <thuth@redhat.com>) id 1gqd5U-0006Q1-EP
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:10:58 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  4 Feb 2019 13:10:41 +0100
+Message-Id: <1549282241-23535-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] ui/sdl_keysym: Remove obsolete SDL1.2
+ related code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +18,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 2/4/19 12:02 PM, Peter Maydell wrote:
-> On Mon, 28 Jan 2019 at 22:31, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> The value of btype for syscalls is CONSTRAINED UNPREDICTABLE,
->> so we need to make sure that the value is 0 before clone,
->> fork, or syscall return.
->>
->> The value of btype for signals is defined, but it does not make
->> sense for a SIGILL handler to enter with the btype set as for
->> the indirect branch that caused the SIGILL.
->>
->> Clearing the value early means that btype is zero within the pstate
->> saved into the signal frame, and so is also zero on (normal) signal
->> return, but also allows the signal handler to adjust the value as
->> seen after the sigcontext restore.
->>
->> This last is a guess at a future kernel's user-space ABI.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  linux-user/aarch64/cpu_loop.c | 15 +++++++++++++++
->>  1 file changed, 15 insertions(+)
->>
->> diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
->> index 65d815f030..51ea9961ba 100644
->> --- a/linux-user/aarch64/cpu_loop.c
->> +++ b/linux-user/aarch64/cpu_loop.c
->> @@ -83,8 +83,19 @@ void cpu_loop(CPUARMState *env)
->>          cpu_exec_end(cs);
->>          process_queued_cpu_work(cs);
->>
->> +        /*
->> +         * The state of BTYPE on syscall and interrupt entry is CONSTRAINED
->> +         * UNPREDICTABLE.  The real kernel will need to tidy this up as well.
->> +         * Do this before syscalls and signals, so that the value is correct
->> +         * both within signal handlers, and on return from syscall (especially
->> +         * clone & fork) and from signal handlers.
->> +         *
->> +         * The SIGILL signal handler, for BTITrap, can see the failing BTYPE
->> +         * within the ESR value in the signal frame.
->> +         */
->>          switch (trapnr) {
->>          case EXCP_SWI:
->> +            env->btype = 0;
->>              ret = do_syscall(env,
->>                               env->xregs[8],
->>                               env->xregs[0],
-> 
-> If the idea is to give a particular value on return from
-> the syscall and on entry to a signal handler, shouldn't we be
-> setting it after the do_syscall() call returns, and in the
-> signal handler entry path ?
-> 
->> @@ -104,6 +115,7 @@ void cpu_loop(CPUARMState *env)
->>              /* just indicate that signals should be handled asap */
->>              break;
->>          case EXCP_UDEF:
->> +            env->btype = 0;
->>              info.si_signo = TARGET_SIGILL;
->>              info.si_errno = 0;
->>              info.si_code = TARGET_ILL_ILLOPN;
->> @@ -112,6 +124,7 @@ void cpu_loop(CPUARMState *env)
->>              break;
->>          case EXCP_PREFETCH_ABORT:
->>          case EXCP_DATA_ABORT:
->> +            env->btype = 0;
->>              info.si_signo = TARGET_SIGSEGV;
->>              info.si_errno = 0;
->>              /* XXX: check env->error_code */
-> 
->> @@ -121,12 +134,14 @@ void cpu_loop(CPUARMState *env)
->>              break;
->>          case EXCP_DEBUG:
->>          case EXCP_BKPT:
->> +            env->btype = 0;
->>              info.si_signo = TARGET_SIGTRAP;
->>              info.si_errno = 0;
->>              info.si_code = TARGET_TRAP_BRKPT;
->>              queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
->>              break;
->>          case EXCP_SEMIHOST:
->> +            env->btype = 0;
-> 
-> Leaving btype alone rather than clearing it here would be
-> consistent with how we handle semihosting in system emulation,
-> right ?
+sdl_keysym.h has only been included by sdl.c which has recently been
+removed recently with this commit:
 
-Er.. yes.  I sort of forgot we had semi-hosting for aa64.
+  0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
+  ("ui: remove support for SDL1.2 in favour of SDL2")
 
+So we can drop this header file now completely, too.
 
-r~
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: The file is now removed completely.
+
+ ui/sdl_keysym.h | 278 --------------------------------------------------------
+ 1 file changed, 278 deletions(-)
+ delete mode 100644 ui/sdl_keysym.h
+
+diff --git a/ui/sdl_keysym.h b/ui/sdl_keysym.h
+deleted file mode 100644
+index 599d9fc..0000000
+--- a/ui/sdl_keysym.h
++++ /dev/null
+@@ -1,278 +0,0 @@
+-
+-#include "keymaps.h"
+-
+-static const name2keysym_t name2keysym[]={
+-/* ascii */
+-    { "space",                0x020},
+-    { "exclam",               0x021},
+-    { "quotedbl",             0x022},
+-    { "numbersign",           0x023},
+-    { "dollar",               0x024},
+-    { "percent",              0x025},
+-    { "ampersand",            0x026},
+-    { "apostrophe",           0x027},
+-    { "parenleft",            0x028},
+-    { "parenright",           0x029},
+-    { "asterisk",             0x02a},
+-    { "plus",                 0x02b},
+-    { "comma",                0x02c},
+-    { "minus",                0x02d},
+-    { "period",               0x02e},
+-    { "slash",                0x02f},
+-    { "0",                    0x030},
+-    { "1",                    0x031},
+-    { "2",                    0x032},
+-    { "3",                    0x033},
+-    { "4",                    0x034},
+-    { "5",                    0x035},
+-    { "6",                    0x036},
+-    { "7",                    0x037},
+-    { "8",                    0x038},
+-    { "9",                    0x039},
+-    { "colon",                0x03a},
+-    { "semicolon",            0x03b},
+-    { "less",                 0x03c},
+-    { "equal",                0x03d},
+-    { "greater",              0x03e},
+-    { "question",             0x03f},
+-    { "at",                   0x040},
+-    { "A",                    0x041},
+-    { "B",                    0x042},
+-    { "C",                    0x043},
+-    { "D",                    0x044},
+-    { "E",                    0x045},
+-    { "F",                    0x046},
+-    { "G",                    0x047},
+-    { "H",                    0x048},
+-    { "I",                    0x049},
+-    { "J",                    0x04a},
+-    { "K",                    0x04b},
+-    { "L",                    0x04c},
+-    { "M",                    0x04d},
+-    { "N",                    0x04e},
+-    { "O",                    0x04f},
+-    { "P",                    0x050},
+-    { "Q",                    0x051},
+-    { "R",                    0x052},
+-    { "S",                    0x053},
+-    { "T",                    0x054},
+-    { "U",                    0x055},
+-    { "V",                    0x056},
+-    { "W",                    0x057},
+-    { "X",                    0x058},
+-    { "Y",                    0x059},
+-    { "Z",                    0x05a},
+-    { "bracketleft",          0x05b},
+-    { "backslash",            0x05c},
+-    { "bracketright",         0x05d},
+-    { "asciicircum",          0x05e},
+-    { "underscore",           0x05f},
+-    { "grave",                0x060},
+-    { "a",                    0x061},
+-    { "b",                    0x062},
+-    { "c",                    0x063},
+-    { "d",                    0x064},
+-    { "e",                    0x065},
+-    { "f",                    0x066},
+-    { "g",                    0x067},
+-    { "h",                    0x068},
+-    { "i",                    0x069},
+-    { "j",                    0x06a},
+-    { "k",                    0x06b},
+-    { "l",                    0x06c},
+-    { "m",                    0x06d},
+-    { "n",                    0x06e},
+-    { "o",                    0x06f},
+-    { "p",                    0x070},
+-    { "q",                    0x071},
+-    { "r",                    0x072},
+-    { "s",                    0x073},
+-    { "t",                    0x074},
+-    { "u",                    0x075},
+-    { "v",                    0x076},
+-    { "w",                    0x077},
+-    { "x",                    0x078},
+-    { "y",                    0x079},
+-    { "z",                    0x07a},
+-    { "braceleft",            0x07b},
+-    { "bar",                  0x07c},
+-    { "braceright",           0x07d},
+-    { "asciitilde",           0x07e},
+-
+-/* latin 1 extensions */
+-{ "nobreakspace",         0x0a0},
+-{ "exclamdown",           0x0a1},
+-{ "cent",         	  0x0a2},
+-{ "sterling",             0x0a3},
+-{ "currency",             0x0a4},
+-{ "yen",                  0x0a5},
+-{ "brokenbar",            0x0a6},
+-{ "section",              0x0a7},
+-{ "diaeresis",            0x0a8},
+-{ "copyright",            0x0a9},
+-{ "ordfeminine",          0x0aa},
+-{ "guillemotleft",        0x0ab},
+-{ "notsign",              0x0ac},
+-{ "hyphen",               0x0ad},
+-{ "registered",           0x0ae},
+-{ "macron",               0x0af},
+-{ "degree",               0x0b0},
+-{ "plusminus",            0x0b1},
+-{ "twosuperior",          0x0b2},
+-{ "threesuperior",        0x0b3},
+-{ "acute",                0x0b4},
+-{ "mu",                   0x0b5},
+-{ "paragraph",            0x0b6},
+-{ "periodcentered",       0x0b7},
+-{ "cedilla",              0x0b8},
+-{ "onesuperior",          0x0b9},
+-{ "masculine",            0x0ba},
+-{ "guillemotright",       0x0bb},
+-{ "onequarter",           0x0bc},
+-{ "onehalf",              0x0bd},
+-{ "threequarters",        0x0be},
+-{ "questiondown",         0x0bf},
+-{ "Agrave",               0x0c0},
+-{ "Aacute",               0x0c1},
+-{ "Acircumflex",          0x0c2},
+-{ "Atilde",               0x0c3},
+-{ "Adiaeresis",           0x0c4},
+-{ "Aring",                0x0c5},
+-{ "AE",                   0x0c6},
+-{ "Ccedilla",             0x0c7},
+-{ "Egrave",               0x0c8},
+-{ "Eacute",               0x0c9},
+-{ "Ecircumflex",          0x0ca},
+-{ "Ediaeresis",           0x0cb},
+-{ "Igrave",               0x0cc},
+-{ "Iacute",               0x0cd},
+-{ "Icircumflex",          0x0ce},
+-{ "Idiaeresis",           0x0cf},
+-{ "ETH",                  0x0d0},
+-{ "Eth",                  0x0d0},
+-{ "Ntilde",               0x0d1},
+-{ "Ograve",               0x0d2},
+-{ "Oacute",               0x0d3},
+-{ "Ocircumflex",          0x0d4},
+-{ "Otilde",               0x0d5},
+-{ "Odiaeresis",           0x0d6},
+-{ "multiply",             0x0d7},
+-{ "Ooblique",             0x0d8},
+-{ "Oslash",               0x0d8},
+-{ "Ugrave",               0x0d9},
+-{ "Uacute",               0x0da},
+-{ "Ucircumflex",          0x0db},
+-{ "Udiaeresis",           0x0dc},
+-{ "Yacute",               0x0dd},
+-{ "THORN",                0x0de},
+-{ "Thorn",                0x0de},
+-{ "ssharp",               0x0df},
+-{ "agrave",               0x0e0},
+-{ "aacute",               0x0e1},
+-{ "acircumflex",          0x0e2},
+-{ "atilde",               0x0e3},
+-{ "adiaeresis",           0x0e4},
+-{ "aring",                0x0e5},
+-{ "ae",                   0x0e6},
+-{ "ccedilla",             0x0e7},
+-{ "egrave",               0x0e8},
+-{ "eacute",               0x0e9},
+-{ "ecircumflex",          0x0ea},
+-{ "ediaeresis",           0x0eb},
+-{ "igrave",               0x0ec},
+-{ "iacute",               0x0ed},
+-{ "icircumflex",          0x0ee},
+-{ "idiaeresis",           0x0ef},
+-{ "eth",                  0x0f0},
+-{ "ntilde",               0x0f1},
+-{ "ograve",               0x0f2},
+-{ "oacute",               0x0f3},
+-{ "ocircumflex",          0x0f4},
+-{ "otilde",               0x0f5},
+-{ "odiaeresis",           0x0f6},
+-{ "division",             0x0f7},
+-{ "oslash",               0x0f8},
+-{ "ooblique",             0x0f8},
+-{ "ugrave",               0x0f9},
+-{ "uacute",               0x0fa},
+-{ "ucircumflex",          0x0fb},
+-{ "udiaeresis",           0x0fc},
+-{ "yacute",               0x0fd},
+-{ "thorn",                0x0fe},
+-{ "ydiaeresis",           0x0ff},
+-#if SDL_MAJOR_VERSION == 1
+-{"EuroSign", SDLK_EURO},
+-
+-    /* modifiers */
+-{"Control_L", SDLK_LCTRL},
+-{"Control_R", SDLK_RCTRL},
+-{"Alt_L", SDLK_LALT},
+-{"Alt_R", SDLK_RALT},
+-{"Caps_Lock", SDLK_CAPSLOCK},
+-{"Meta_L", SDLK_LMETA},
+-{"Meta_R", SDLK_RMETA},
+-{"Shift_L", SDLK_LSHIFT},
+-{"Shift_R", SDLK_RSHIFT},
+-{"Super_L", SDLK_LSUPER},
+-{"Super_R", SDLK_RSUPER},
+-
+-    /* special keys */
+-{"BackSpace", SDLK_BACKSPACE},
+-{"Tab", SDLK_TAB},
+-{"Return", SDLK_RETURN},
+-{"Right", SDLK_RIGHT},
+-{"Left", SDLK_LEFT},
+-{"Up", SDLK_UP},
+-{"Down", SDLK_DOWN},
+-{"Page_Down", SDLK_PAGEDOWN},
+-{"Page_Up", SDLK_PAGEUP},
+-{"Insert", SDLK_INSERT},
+-{"Delete", SDLK_DELETE},
+-{"Home", SDLK_HOME},
+-{"End", SDLK_END},
+-{"Scroll_Lock", SDLK_SCROLLOCK},
+-{"F1", SDLK_F1},
+-{"F2", SDLK_F2},
+-{"F3", SDLK_F3},
+-{"F4", SDLK_F4},
+-{"F5", SDLK_F5},
+-{"F6", SDLK_F6},
+-{"F7", SDLK_F7},
+-{"F8", SDLK_F8},
+-{"F9", SDLK_F9},
+-{"F10", SDLK_F10},
+-{"F11", SDLK_F11},
+-{"F12", SDLK_F12},
+-{"F13", SDLK_F13},
+-{"F14", SDLK_F14},
+-{"F15", SDLK_F15},
+-{"Sys_Req", SDLK_SYSREQ},
+-{"KP_0", SDLK_KP0},
+-{"KP_1", SDLK_KP1},
+-{"KP_2", SDLK_KP2},
+-{"KP_3", SDLK_KP3},
+-{"KP_4", SDLK_KP4},
+-{"KP_5", SDLK_KP5},
+-{"KP_6", SDLK_KP6},
+-{"KP_7", SDLK_KP7},
+-{"KP_8", SDLK_KP8},
+-{"KP_9", SDLK_KP9},
+-{"KP_Add", SDLK_KP_PLUS},
+-{"KP_Decimal", SDLK_KP_PERIOD},
+-{"KP_Divide", SDLK_KP_DIVIDE},
+-{"KP_Enter", SDLK_KP_ENTER},
+-{"KP_Equal", SDLK_KP_EQUALS},
+-{"KP_Multiply", SDLK_KP_MULTIPLY},
+-{"KP_Subtract", SDLK_KP_MINUS},
+-{"help", SDLK_HELP},
+-{"Menu", SDLK_MENU},
+-{"Power", SDLK_POWER},
+-{"Print", SDLK_PRINT},
+-{"Mode_switch", SDLK_MODE},
+-{"Multi_Key", SDLK_COMPOSE},
+-{"Num_Lock", SDLK_NUMLOCK},
+-{"Pause", SDLK_PAUSE},
+-{"Escape", SDLK_ESCAPE},
+-#endif
+-{NULL, 0},
+-};
+-- 
+1.8.3.1
