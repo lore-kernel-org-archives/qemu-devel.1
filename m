@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54546)
+Received: from eggs.gnu.org ([209.51.188.92]:54673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqeKX-0008MR-7k
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:30:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1gqeKu-0000EG-8O
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqeKO-00066O-M6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:30:30 -0500
-References: <20190131143759.3122-1-david@redhat.com>
-	<a34065d4-b06e-2157-e89d-be30adf87ed0@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4c7fd460-2b5c-b109-cbc7-6d2bb242df99@redhat.com>
-Date: Mon, 4 Feb 2019 14:30:16 +0100
+	(envelope-from <bounces@canonical.com>) id 1gqeKt-00070F-7g
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:30:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gqeKr-0006d5-1B
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:30:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gqeKf-0006Kn-AM
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 13:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4C6892E80C7
+	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 13:30:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a34065d4-b06e-2157-e89d-be30adf87ed0@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: Don't model FP registers as
- globals
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Feb 2019 13:23:23 -0000
+From: Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1813460 <1813460@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154858120998.1748.9152682687215641431.malonedeb@wampee.canonical.com>
+Message-Id: <154928660312.20300.8171475052931956885.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1813460] Re:
+ qemu/target/arm/translate-a64.c:2039: bad test ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 04.02.19 14:27, Richard Henderson wrote:
-> On 1/31/19 2:37 PM, David Hildenbrand wrote:
->> As floating point registers overlay some vector registers and we want
->> to make use of the general tcg_gvec infrastructure that assumes vectors
->> are not stored in globals but in memory, don't model flaoting point
->> registers as globals anymore. This is than similar to how arm handles
->> it.
->>
->> Reading/writing a floating point register means reading/writing memory now.
->>
->> Break up ugly in2_x2() handling that modifies both, in1 and in2 into
->> in1_x2l and in2_x2h. This makes things more readable. Also, in1_x1() is
->> ugly as it touches out/out2, get rid of that and use prep_x1() instead.
->>
->> As we are no longer able to use the original global variables for
->> out/out2, we have to use new temporary variables and write from them to
->> the target registers using wout_ helpers.
->>
->> E.g. an instruction that reads and writes x1 will use
->> - prep_x1 to get the values into out/out2
->> - wout_x1 to write the values from out/out2
->> This special handling is needed for x1 as it is often used along with
->> other inputs, so in1/in2 is already used.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/insn-data.def | 150 ++++++++++++++++++-------------------
->>  target/s390x/translate.c   | 133 +++++++++++++++++++-------------
->>  2 files changed, 158 insertions(+), 125 deletions(-)
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+The patch is now in master.
 
-Thanks!
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-I'll probably switch naming of in1_x2l and in2_x2h to
+-- =
 
-in1_x2h and in2_x2l (will double check, but I guess this is the right
-thing to do - high double word always comes first, e.g. in memory).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813460
 
-> 
-> 
-> r~
-> 
+Title:
+  qemu/target/arm/translate-a64.c:2039: bad test ?
 
+Status in QEMU:
+  Fix Committed
 
--- 
+Bug description:
+  qemu/target/arm/translate-a64.c:2039]: (warning) Logical disjunction
+  always evaluates to true: op3 !=3D 2 || op3 !=3D 3.
 
-Thanks,
+  Source code is
 
-David / dhildenb
+         if (op3 !=3D 2 || op3 !=3D 3) {
+
+  Maybe better code
+
+         if (op3 !=3D 2 && op3 !=3D 3) {
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813460/+subscriptions
