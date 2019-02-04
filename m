@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38374)
+Received: from eggs.gnu.org ([209.51.188.92]:38283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8h-0000cN-Vd
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8f-0000aq-F8
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8h-0007kG-2g
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8d-0007bD-Ov
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:01 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:14 +1100
-Message-Id: <20190204090124.26191-28-david@gibson.dropbear.id.au>
+Date: Mon,  4 Feb 2019 20:00:58 +1100
+Message-Id: <20190204090124.26191-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/37] target/ppc: rework vmrg{l, h}{b, h,
- w} instructions to use Vsr* macros
+Subject: [Qemu-devel] [PULL 11/37] spapr/vio: remove the "irq" property"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +23,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The current implementations make use of the endian-specific macros MRGLO/=
-MRGHI
-and also reference HI_IDX and LO_IDX directly to calculate array offsets.
+commit efe2add7cb7f ("spapr/vio: deprecate the "irq" property") was
+merged in QEMU version 3.0. The "irq" property" can be removed for
+QEMU version 4.0.
 
-Rework the implementation to use the Vsr* macros so that these per-endian
-references can be removed.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/int_helper.c | 54 +++++++++++++++--------------------------
- 1 file changed, 19 insertions(+), 35 deletions(-)
+ hw/ppc/spapr_vio.c   | 47 ++++++--------------------------------------
+ qemu-deprecated.texi |  6 ------
+ 2 files changed, 6 insertions(+), 47 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 598731d47a..fe418b3393 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -976,43 +976,27 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, p=
-pc_avr_t *b, ppc_avr_t *c)
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 7e8a9ad093..414673d313 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -44,38 +44,6 @@
+=20
+ #define SPAPR_VIO_REG_BASE 0x71000000
+=20
+-static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
+-                              void *opaque, Error **errp)
+-{
+-    Property *prop =3D opaque;
+-    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
+-
+-    visit_type_uint32(v, name, ptr, errp);
+-}
+-
+-static void spapr_vio_set_irq(Object *obj, Visitor *v, const char *name,
+-                              void *opaque, Error **errp)
+-{
+-    Property *prop =3D opaque;
+-    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
+-
+-    if (!qtest_enabled()) {
+-        warn_report(TYPE_VIO_SPAPR_DEVICE " '%s' property is deprecated"=
+, name);
+-    }
+-    visit_type_uint32(v, name, ptr, errp);
+-}
+-
+-static const PropertyInfo spapr_vio_irq_propinfo =3D {
+-    .name =3D "irq",
+-    .get =3D spapr_vio_get_irq,
+-    .set =3D spapr_vio_set_irq,
+-};
+-
+-static Property spapr_vio_props[] =3D {
+-    DEFINE_PROP("irq", VIOsPAPRDevice, irq, spapr_vio_irq_propinfo, uint=
+32_t),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static char *spapr_vio_get_dev_name(DeviceState *qdev)
+ {
+     VIOsPAPRDevice *dev =3D VIO_SPAPR_DEVICE(qdev);
+@@ -534,15 +502,13 @@ static void spapr_vio_busdev_realize(DeviceState *q=
+dev, Error **errp)
+         dev->qdev.id =3D id;
      }
+=20
+-    if (!dev->irq) {
+-        dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
++    dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
+=20
+-        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+-            dev->irq =3D spapr_irq_findone(spapr, &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
+-                return;
+-            }
++    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
++        dev->irq =3D spapr_irq_findone(spapr, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
+         }
+     }
+=20
+@@ -668,7 +634,6 @@ static void vio_spapr_device_class_init(ObjectClass *=
+klass, void *data)
+     k->realize =3D spapr_vio_busdev_realize;
+     k->reset =3D spapr_vio_busdev_reset;
+     k->bus_type =3D TYPE_SPAPR_VIO_BUS;
+-    k->props =3D spapr_vio_props;
  }
 =20
--#define VMRG_DO(name, element, highp)                                   =
-\
--    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       =
-\
--    {                                                                   =
-\
--        ppc_avr_t result;                                               =
-\
--        int i;                                                          =
-\
--        size_t n_elems =3D ARRAY_SIZE(r->element);                      =
-  \
--                                                                        =
-\
--        for (i =3D 0; i < n_elems / 2; i++) {                           =
-  \
--            if (highp) {                                                =
-\
--                result.element[i*2+HI_IDX] =3D a->element[i];           =
-  \
--                result.element[i*2+LO_IDX] =3D b->element[i];           =
-  \
--            } else {                                                    =
-\
--                result.element[n_elems - i * 2 - (1 + HI_IDX)] =3D      =
-  \
--                    b->element[n_elems - i - 1];                        =
-\
--                result.element[n_elems - i * 2 - (1 + LO_IDX)] =3D      =
-  \
--                    a->element[n_elems - i - 1];                        =
-\
--            }                                                           =
-\
--        }                                                               =
-\
--        *r =3D result;                                                  =
-  \
--    }
--#if defined(HOST_WORDS_BIGENDIAN)
--#define MRGHI 0
--#define MRGLO 1
--#else
--#define MRGHI 1
--#define MRGLO 0
--#endif
--#define VMRG(suffix, element)                   \
--    VMRG_DO(mrgl##suffix, element, MRGHI)       \
--    VMRG_DO(mrgh##suffix, element, MRGLO)
--VMRG(b, u8)
--VMRG(h, u16)
--VMRG(w, u32)
-+#define VMRG_DO(name, element, access, ofs)                             =
-     \
-+    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       =
-     \
-+    {                                                                   =
-     \
-+        ppc_avr_t result;                                               =
-     \
-+        int i, half =3D ARRAY_SIZE(r->element) / 2;                     =
-       \
-+                                                                        =
-     \
-+        for (i =3D 0; i < half; i++) {                                  =
-       \
-+            result.access(i * 2 + 0) =3D a->access(i + ofs);            =
-       \
-+            result.access(i * 2 + 1) =3D b->access(i + ofs);            =
-       \
-+        }                                                               =
-     \
-+        *r =3D result;                                                  =
-       \
-+    }
-+
-+#define VMRG(suffix, element, access)          \
-+    VMRG_DO(mrgl##suffix, element, access, half)   \
-+    VMRG_DO(mrgh##suffix, element, access, 0)
-+VMRG(b, u8, VsrB)
-+VMRG(h, u16, VsrH)
-+VMRG(w, u32, VsrW)
- #undef VMRG_DO
- #undef VMRG
--#undef MRGHI
--#undef MRGLO
+ static const TypeInfo spapr_vio_type_info =3D {
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index dfb278a377..9cc20b365c 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -160,9 +160,3 @@ Example of legacy encoding:
+ The above, converted to the current supported format:
 =20
- void helper_vmsummbm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-                      ppc_avr_t *b, ppc_avr_t *c)
+ @code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"=
+@}}
+-
+-@subsection vio-spapr-device device options
+-
+-@subsubsection "irq": "" (since 3.0.0)
+-
+-The ``irq'' property is obsoleted.
 --=20
 2.20.1
