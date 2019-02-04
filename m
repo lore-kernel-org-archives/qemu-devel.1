@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42492)
+Received: from eggs.gnu.org ([209.51.188.92]:42941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqbnM-0002QS-Kh
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:48:09 -0500
+	(envelope-from <admin@grossmann-venter.com>) id 1gqbpB-0003OS-8v
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqbnL-0003AC-Pn
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:48:08 -0500
-Date: Mon, 4 Feb 2019 11:48:01 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190204114801.2699c9a0.cohuck@redhat.com>
-In-Reply-To: <1548768562-20007-7-git-send-email-jjherne@linux.ibm.com>
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-7-git-send-email-jjherne@linux.ibm.com>
+	(envelope-from <admin@grossmann-venter.com>) id 1gqbpA-0004DL-MQ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:50:01 -0500
+Received: from server54-2.web-hosting.com ([198.54.126.118]:50648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
+	id 1gqbp8-00048A-Nx
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:49:59 -0500
+Received: from [::1] (port=53350 helo=server54.web-hosting.com)
+	by server54.web-hosting.com with esmtpa (Exim 4.91)
+	(envelope-from <admin@grossmann-venter.com>) id 1gqbp1-0025RD-R6
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:49:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/15] s390-bios: Clean up cio.h
+Date: Mon, 04 Feb 2019 05:49:51 -0500
+From: liebrecht@grossmann-venter.com
+In-Reply-To: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
+References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
+	<665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
+Message-ID: <7d4a413036a784179b1b848a1cd98e13@grossmann-venter.com>
+Subject: [Qemu-devel] Usb device disappears from linux  after Qemu starts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
 
-On Tue, 29 Jan 2019 08:29:13 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+Below is the string I use:
 
-> Add proper typedefs to all structs and modify all bit fields to use consistent
-> formatting.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/cio.h      | 86 ++++++++++++++++++++++-----------------------
->  pc-bios/s390-ccw/s390-ccw.h |  8 -----
->  2 files changed, 43 insertions(+), 51 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-> index 1a0795f..a48eee5 100644
-> --- a/pc-bios/s390-ccw/cio.h
-> +++ b/pc-bios/s390-ccw/cio.h
-> @@ -53,12 +53,12 @@ struct schib_config {
->      __u64 mba;
->      __u32 intparm;
->      __u16 mbi;
-> -    __u32 isc:3;
-> -    __u32 ena:1;
-> -    __u32 mme:2;
-> -    __u32 mp:1;
-> -    __u32 csense:1;
-> -    __u32 mbfc:1;
-> +    __u32 isc    : 3;
-> +    __u32 ena    : 1;
-> +    __u32 mme    : 2;
-> +    __u32 mp     : 1;
-> +    __u32 csense : 1;
-> +    __u32 mbfc   : 1;
->  } __attribute__ ((packed));
+I use lsb to search for the the hostaddr of the usb device i want to 
+connect to qemu.
+Qemu when it starts with this hostaddr then removes the device from the 
+acticve usb list.
+Running lsusb after qemu starts shows the device disappeared.
 
-This seems to make checkpatch unhappy... maybe consolidate to the other
-formatting instead?
+Is this a bug ? as I cannot see a device just disappearing when qemu 
+starts.
+
+
+sudo qemu-system-x86_64 -usb -device usb-host,hostbus=1,hostaddr=42 
+-device piix3-usb-uhci  -enable-kvm -soundhw all  -smp 4 -m 2048M -boot 
+d -cdrom /dev/cdrom -drive format=raw,file=hd.img
