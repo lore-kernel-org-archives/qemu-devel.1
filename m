@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59817)
+Received: from eggs.gnu.org ([209.51.188.92]:60080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqbKN-00042V-HU
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:18:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1gqbLI-0004eh-UP
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqbKM-0001I6-Or
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:18:11 -0500
-References: <20190124141731.21509-1-kwolf@redhat.com>
-	<f3b34487-5c86-287e-00b5-331adf9ac931@virtuozzo.com>
-	<20190124151105.GH4601@localhost.localdomain>
-	<093415a1-c31c-c727-583f-bf3176621336@virtuozzo.com>
-	<20190124154248.GK4601@localhost.localdomain>
-	<3cf90de9-5fc5-c24c-b232-bd0f564202a9@redhat.com>
-	<20190125103015.GA9055@linux.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7ce2a07-8cd8-cb63-0e35-bd1c41dfd7c7@redhat.com>
-Date: Mon, 4 Feb 2019 11:17:46 +0100
+	(envelope-from <berrange@redhat.com>) id 1gqbLH-0004t2-4I
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqbLG-0004m2-Rv
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:06 -0500
+Date: Mon, 4 Feb 2019 10:10:05 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190204101005.GC1905@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190201185358.6972-1-ppandit@redhat.com>
+	<20190204010904.GD2593@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20190125103015.GA9055@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Cache lseek result for data
- regions
+Content-Disposition: inline
+In-Reply-To: <20190204010904.GD2593@umbus.fritz.box>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc: add host-serial and host-model
+ machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 25/01/19 11:30, Kevin Wolf wrote:
->> On the other hand, the AioContext lock is only used in
->> some special cases around block jobs and blk_set_aio_context, and in
->> general the block devices already should not have any dependencies
->> (unless they crept in without me noticing).
-> It's also used in those cases where coroutines don't need locking, but
-> threads would. Did you audit all of the drivers for such cases?
+On Mon, Feb 04, 2019 at 12:09:04PM +1100, David Gibson wrote:
+> On Sat, Feb 02, 2019 at 12:23:58AM +0530, P J P wrote:
+> > From: Prasad J Pandit <pjp@fedoraproject.org>
+> >=20
+> > On ppc hosts, hypervisor shares following system attributes
+> >=20
+> >   - /proc/device-tree/system-id
+> >   - /proc/device-tree/model
+> >=20
+> > with a guest. This could lead to information leakage and misuse.[*]
+> > Add machine attributes to control such system information exposure
+> > to a guest.
+> >=20
+> > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+> >=20
+> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+>=20
+> Hm.  This seems like it might be overkill.  I mean, obviously we need
+> to not leak that host information, but it's not clear we really need
+> these properties at all.  They're not specified in PAPR (contrary to
+> my previous guess) and it's not clear what actually uses them.
+>=20
+> I'm wondering if we can just ditch them entirely, or at least make
+> them default to not present without regard to machine version.
+>=20
+> Yes, that's technically a compatibility breaking change, but it's hard
+> to see anything that actually relied on these as not being broken
+> already, so I think that's actually a fair trade off for the security
+> improvement here.
 
-I did and the drivers already have a QemuMutex if that's the case (e.g.
-curl, iscsi).
+We cannot assume that no one is using it.
 
->> In particular...
->>
->>> But raw doesn't have an s->lock yet, so I
->>> think removing the AioContext lock involves some work on it anyway and
->>> adding this doesn't really change the amount of work.
->> ... BDRVRawState doesn't have any data that changes after open, does it?
->>  This is why it doesn't have an s->lock.
-> No important data anyway. We do things like setting s->has_write_zeroes
-> = false after failure, but if we got a race and end up trying twice
-> before disabling it, it doesn't really hurt either.
-> 
-> Then there is reopen, but that involves a drain anyway. And that's it
-> probably.
-> 
-> So do you think I should introduce a CoMutex for raw here? Or QemuMutex?
+In fact this issue came to light precisely because a person on IRC
+was asking why x86 couldn't provide the same info as PPC, because
+they found it useful on PPC.
 
-For the cache you can introduce either a CoMutex or QemuMutex, it's the
-same.
+So we will definitely break people if we remove this from existing
+VMs.
 
-Paolo
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
