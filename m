@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60178)
+Received: from eggs.gnu.org ([209.51.188.92]:60696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqgBx-0003Uw-Sp
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:29:50 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqgDO-0004aS-Uq
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:31:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqgBx-0005ID-1w
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:29:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqgBw-0005Fv-Ro
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:29:48 -0500
-Date: Mon, 4 Feb 2019 15:29:21 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204152921.GQ1905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190204142638.27021-1-mst@redhat.com>
-	<20190204142638.27021-16-mst@redhat.com>
-	<20190204150748.GP1905@redhat.com>
-	<20190204101130-mutt-send-email-mst@kernel.org>
+	(envelope-from <cohuck@redhat.com>) id 1gqgDN-0006QD-Mj
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:31:18 -0500
+Date: Mon, 4 Feb 2019 16:31:02 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190204163102.33d744d8.cohuck@redhat.com>
+In-Reply-To: <20190131133455.3097613f@oc2783563651>
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-2-cohuck@redhat.com>
+	<20190130195127.5ff3c849@oc2783563651>
+	<20190131125220.285a4bc8.cohuck@redhat.com>
+	<20190131133455.3097613f@oc2783563651>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190204101130-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PULL 15/25] contrib: compile vhost-user-blk tool
- by default
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, Feb 04, 2019 at 10:19:42AM -0500, Michael S. Tsirkin wrote:
-> Hmm I do think we want to build the contrib tools,
-> otherwise they bitrot too quickly, witness follow-up
-> patches that fix the compilation.
+On Thu, 31 Jan 2019 13:34:55 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Thu, 31 Jan 2019 12:52:20 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> And I think we need tests that actually use them.
+> > On Wed, 30 Jan 2019 19:51:27 +0100
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> > > On Wed, 30 Jan 2019 14:22:07 +0100
+> > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > >   
+> > > > When we get a solicited interrupt, the start function may have
+> > > > been cleared by a csch, but we still have a channel program
+> > > > structure allocated. Make it safe to call the cp accessors in
+> > > > any case, so we can call them unconditionally.    
+> > > 
+> > > I read this like it is supposed to be safe regardless of
+> > > parallelism and threads. However I don't see any explicit
+> > > synchronization done for cp->initialized.
+> > > 
+> > > I've managed to figure out how is that supposed to be safe
+> > > for the cp_free() (which is probably our main concern) in
+> > > vfio_ccw_sch_io_todo(), but if fail when it comes to the one
+> > > in vfio_ccw_mdev_notifier().
+> > > 
+> > > Can you explain us how does the synchronization work?  
+> > 
+> > You read that wrong, I don't add synchronization, I just add a check.
+> >   
 > 
-> However I agree adding them to tools and installing
-> is probably rushing things, e.g. there's no
-> manpage even.
+> Now I'm confused. Does that mean we don't need synchronization for this?
 
-Yes, if we build, but do not install, the binary that would be ok
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If we lack synchronization (that is not provided by the current state
+machine handling, or the rework here), we should do a patch on top
+(preferably on top of the whole series, so this does not get even more
+tangled up.) This is really just about the extra check.
