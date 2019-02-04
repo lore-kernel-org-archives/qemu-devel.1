@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56880)
+Received: from eggs.gnu.org ([209.51.188.92]:35010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqmER-0002mq-RE
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 16:56:48 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1gqmef-0006oj-4Y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:23:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqmEL-0003WC-QL
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 16:56:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gqmEI-000330-3S
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 16:56:39 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Mon,  4 Feb 2019 15:56:27 -0600
-Message-Id: <20190204215627.2099-1-eblake@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <brijesh.singh@amd.com>) id 1gqmed-0001gr-4o
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:23:53 -0500
+Received: from mail-eopbgr750044.outbound.protection.outlook.com
+	([40.107.75.44]:33504
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1gqmec-0001ZM-UD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:23:51 -0500
+From: "Singh, Brijesh" <brijesh.singh@amd.com>
+Date: Mon, 4 Feb 2019 22:23:39 +0000
+Message-ID: <20190204222322.26766-2-brijesh.singh@amd.com>
+References: <20190204222322.26766-1-brijesh.singh@amd.com>
+In-Reply-To: <20190204222322.26766-1-brijesh.singh@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] checkpatch: Flag suspicious attribution lines
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v2 1/2] memory: Fix the memory region type
+ assignment order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Singh,
+	Brijesh" <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Flag commit attribution tags that are unusual (often because they
-were a typo), but only as a warning (because sometimes a humorous
-or otherwise useful tag is intentionally supplied).
+Currently, a callback registered through the RAMBlock notifier
+is not able to get the memory region type (i.e callback is not
+able to use memory_region_is_ram_device function). This is
+because mr->ram assignment happens _after_ the memory is allocated
+whereas the callback is executed during allocation.
 
-This picks the 6-most popular tags, each with 700 or more uses (well,
-S-o-b was already checked for case-sensitivity and typos, leaving
-only 5 new tags being checked), as determined by:
-$ git log | sed -n 's/^ *\([A-Za-z-]*-by:\).*/\1/p' | \
-  sort | uniq -c | sort -k1,1n | tail
-
-Most of the rejected lines were obvious typos (among others, we've
-had 4 cases of someone being burnt, based on Singed-off-by; and 2
-cases of list-reading via an e-reader, based on eviewed-by; there
-are also lines forgetting a space after the ':') or otherwise
-tongue-in-check (3 Approximately-suggested-by). A few lines not
-whitelisted here may be legitimate, but as they are orders of
-magnitude rarer, it is therefore not worth worrying about
-(7 Requested-by, 3 Co-authored-by, 1 Inspired-by, etc.).
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1667249
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- scripts/checkpatch.pl | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ memory.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 88682cb0a9f..51d55f80621 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1456,7 +1456,7 @@ sub process {
- 		    ERROR("Author email address is mangled by the mailing list\n" . $h=
-erecurr);
- 		}
-
--#check the patch for a signoff:
-+#check the patch for a signoff, and that other attribution lines are typ=
-ical:
- 		if ($line =3D~ /^\s*signed-off-by:/i) {
- 			# This is a signoff, if ugly, so do not double report.
- 			$signoff++;
-@@ -1470,6 +1470,10 @@ sub process {
- 				ERROR("space required after Signed-off-by:\n" .
- 					$herecurr);
- 			}
-+		} elsif($line =3D~ /^\s*([A-Za-z-])*-by:/ &&
-+			($1 !~ /(Suggest|Report|Test|Ack|Review)ed/ ||
-+			 $line !~ /^\s[a-z-]*-by:\S/i)) {
-+		    WARN("suspicious attribution tag:\n" . $herecurr);
- 		}
-
- # Check if MAINTAINERS is being updated.  If so, there's probably no nee=
-d to
+diff --git a/memory.c b/memory.c
+index 61d66e4441..9ec15349dd 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1652,10 +1652,17 @@ void memory_region_init_ram_device_ptr(MemoryRegion=
+ *mr,
+                                        uint64_t size,
+                                        void *ptr)
+ {
+-    memory_region_init_ram_ptr(mr, owner, name, size, ptr);
++    memory_region_init(mr, owner, name, size);
++    mr->ram =3D true;
++    mr->terminates =3D true;
+     mr->ram_device =3D true;
+     mr->ops =3D &ram_device_mem_ops;
+     mr->opaque =3D mr;
++    mr->destructor =3D memory_region_destructor_ram;
++    mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
++    /* qemu_ram_alloc_from_ptr cannot fail with ptr !=3D NULL.  */
++    assert(ptr !=3D NULL);
++    mr->ram_block =3D qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal)=
+;
+ }
+=20
+ void memory_region_init_alias(MemoryRegion *mr,
 --=20
-2.20.1
+2.17.1
