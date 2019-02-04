@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34801)
+Received: from eggs.gnu.org ([209.51.188.92]:34864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqkpA-0007kI-L9
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:37 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqkpG-0007q6-Fd
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqkp8-0006Y8-PW
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41168)
+	(envelope-from <philmd@redhat.com>) id 1gqkpE-0006bh-LT
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqkp6-0006UZ-Sh
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:34 -0500
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqkpC-0006Zy-Oj
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:40 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon,  4 Feb 2019 21:26:07 +0100
-Message-Id: <20190204202609.26956-5-philmd@redhat.com>
+Date: Mon,  4 Feb 2019 21:26:08 +0100
+Message-Id: <20190204202609.26956-6-philmd@redhat.com>
 In-Reply-To: <20190204202609.26956-1-philmd@redhat.com>
 References: <20190204202609.26956-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/6] mips: Express dependencies of the
- Boston machine with kconfig
+Subject: [Qemu-devel] [PATCH v2 5/6] hw/pci-host: Use CONFIG_PCI_BONITO to
+ select the Bonito North Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Boston is built around a Xilinx FPGA, which includes a PCIe root port
-and an UART. An Intel EG20T PCH connects the I/O peripherals, but only
-the SATA bus is emulated.
+Ease the kconfig selection by introducing CONFIG_PCI_BONITO to select
+the Bonito North Bridge.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- default-configs/mips64el-softmmu.mak | 4 ----
- hw/mips/Kconfig                      | 5 +++++
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ default-configs/mips64el-softmmu.mak | 1 +
+ hw/pci-host/Kconfig                  | 4 ++++
+ hw/pci-host/Makefile.objs            | 2 +-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips6=
 4el-softmmu.mak
-index 23445cfcf9..c6f1f9c9aa 100644
+index c6f1f9c9aa..9e80711275 100644
 --- a/default-configs/mips64el-softmmu.mak
 +++ b/default-configs/mips64el-softmmu.mak
-@@ -4,8 +4,4 @@ include mips-softmmu-common.mak
+@@ -3,5 +3,6 @@
+ include mips-softmmu-common.mak
  CONFIG_IDE_VIA=3Dy
  CONFIG_FULONG=3Dy
++CONFIG_PCI_BONITO=3Dy
  CONFIG_VT82C686=3Dy
--CONFIG_AHCI=3Dy
  CONFIG_MIPS_BOSTON=3Dy
--CONFIG_FITLOADER=3Dy
--CONFIG_PCI_EXPRESS=3Dy
--CONFIG_PCI_EXPRESS_XILINX=3Dy
-diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index ee6290d497..2940ff39ab 100644
---- a/hw/mips/Kconfig
-+++ b/hw/mips/Kconfig
-@@ -49,3 +49,8 @@ config MIPS_CPS
-=20
- config MIPS_BOSTON
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index b39ea297ba..9abadafaf5 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -49,3 +49,7 @@ config PCI_EXPRESS_XILINX
+ config PCI_EXPRESS_DESIGNWARE
      bool
-+    select FITLOADER
-+    select MIPS_CPS
-+    select PCI_EXPRESS_XILINX
-+    select AHCI
-+    select SERIAL
+     select PCI_EXPRESS
++
++config PCI_BONITO
++    select PCI
++    bool
+diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+index a9cd3e022d..d6e86b9b89 100644
+--- a/hw/pci-host/Makefile.objs
++++ b/hw/pci-host/Makefile.objs
+@@ -12,7 +12,7 @@ common-obj-$(CONFIG_PPCE500_PCI) +=3D ppce500.o
+ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
+=20
+ common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
+-common-obj-$(CONFIG_FULONG) +=3D bonito.o
++common-obj-$(CONFIG_PCI_BONITO) +=3D bonito.o
+ common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
+ common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
+ common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
 --=20
 2.20.1
