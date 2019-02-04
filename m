@@ -1,17 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:42726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqn9l-0005x2-Q6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:02 -0500
+	(envelope-from <david@redhat.com>) id 1gqn9n-0005x2-M3
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqn9e-0002gN-2p
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:55:59 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Mon,  4 Feb 2019 16:55:42 -0600
-Message-Id: <20190204225542.5597-1-eblake@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gqmzs-00057j-DB
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:45:49 -0500
+References: <20190130155733.32742-1-david@redhat.com>
+	<20190130155733.32742-4-david@redhat.com>
+	<80dae41f-f3f0-1acd-1fd6-8e7473712802@linux.ibm.com>
+	<5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
+	<810ede3a-7d69-8cff-7058-9e2bb002fff9@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e59ccaf4-8df4-f8da-0682-4d388fab672e@redhat.com>
+Date: Mon, 4 Feb 2019 23:45:35 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] checkpatch: Flag suspicious attribution
- lines
+In-Reply-To: <810ede3a-7d69-8cff-7058-9e2bb002fff9@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] s390x/pci: Warn when
+ adding PCI devices without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,62 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-trivial@nongnu.org
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Flag commit attribution tags that are unusual (often because they
-were a typo), but only as a warning (because sometimes a humorous
-or otherwise useful tag is intentionally supplied).
+On 04.02.19 23:42, Collin Walling wrote:
+> On 2/4/19 4:54 PM, David Hildenbrand wrote:
+>> On 04.02.19 21:19, Collin Walling wrote:
+>>> On 1/30/19 10:57 AM, David Hildenbrand wrote:
+>>>> We decided to always create the PCI host bridge, even if 'zpci' is not
+>>>> enabled (due to migration compatibility). This however right now allows
+>>>> to add zPCI/PCI devices to a VM although the guest will never actually see
+>>>> them, confusing people that are using a simple CPU model that has no
+>>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+>>>>
+>>>> Let's check for 'zpci' and at least print a warning that this will not
+>>>> work as expected. We could also bail out, however that might break
+>>>> existing QEMU commandlines.
+>>>>
+>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>    hw/s390x/s390-pci-bus.c | 5 +++++
+>>>>    1 file changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>> index 9b5c5fff60..2efd9186c2 100644
+>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>> @@ -826,6 +826,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>    {
+>>>>        S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>>>>    
+>>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+>>>> +        warn_report("PCI/zPCI device without the 'zpci' CPU feature."
+>>>> +                    " The guest will not be able to see/use this device");
+>>>> +    }
+>>>> +
+>>>>        if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>>>>            PCIDevice *pdev = PCI_DEVICE(dev);
+>>>>    
+>>>>
+>>>
+>>> I wonder if someone might misconstrue this as "the _PCI device_ needs
+>>> the zpci feature." I think "'zpci' CPU feature required to support
+>>> PCI/zPCI devices." reads better. The last sentence is fine to me.
+>>>
+>>
+>> Well, the guest needs the 'zpci' feature to see the device. And that's
+>> what that message says in my opinion. Not that a device needs to have a
+>> feature (I added "CPU feature" for this reason).
+>>
+>> "required to support" does it not make very clear what we actually want
+>> to say.
+>>
+>> Thanks!
+>>
+> 
+> I see your point. We can still plug in the device without the CPU
+> feature, but the device will ultimately be useless to the guest. Thanks
+> for clearing that up.
+> 
+> Still, the wording reads strangely to me. I read it as the PCI device
+> itself requires a "zpci CPU feature" which of course does not make sense
+> (and I fully understand that's not what you mean here).
+> 
+> What do you think about:
+> 
+> "PCI/zPCI device plugging without 'zpci' CPU feature enabled." along
+> with your second sentence, of course.
 
-This picks the 6-most popular tags, each with 700 or more uses (well,
-S-o-b was already checked for case-sensitivity and typos, leaving
-only 5 new tags being checked), as determined by:
-$ git log | sed -n 's/^ *\([A-Za-z-]*-by:\).*/\1/p' | \
-  sort | uniq -c | sort -k1,1n | tail
+"Plugging a PCI/zPCI device without the 'zpci' CPU feature enabled. The
+guest will not be able to see/use this device."
 
-Most of the rejected lines were obvious typos (among others, we've
-had 4 cases of someone being burnt, based on Singed-off-by; and 2
-cases of list-reading via an e-reader, based on eviewed-by; there
-are also lines forgetting a space after the ':') or otherwise
-tongue-in-check (3 Approximately-suggested-by). A few lines not
-whitelisted here may be legitimate, but as they are orders of
-magnitude rarer, it is therefore not worth worrying about
-(7 Requested-by, 3 Co-authored-by, 1 Inspired-by, etc.).
+would make sense to me!
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
+> 
+> Either way you decide, it's still a good idea to have this warning in
+> here. I'm really just debating syntax and not semantics, so it's not
+> really important. I won't impede this patch over a differing opinion of
+> a small rewording. :)
+> 
+> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> 
 
-v2: fix regex
+Thanks!
 
- scripts/checkpatch.pl | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+-- 
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 88682cb0a9f..4962f74eec1 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1456,7 +1456,7 @@ sub process {
- 		    ERROR("Author email address is mangled by the mailing list\n" . $h=
-erecurr);
- 		}
+Thanks,
 
--#check the patch for a signoff:
-+#check the patch for a signoff, and that other attribution lines are typ=
-ical:
- 		if ($line =3D~ /^\s*signed-off-by:/i) {
- 			# This is a signoff, if ugly, so do not double report.
- 			$signoff++;
-@@ -1470,6 +1470,10 @@ sub process {
- 				ERROR("space required after Signed-off-by:\n" .
- 					$herecurr);
- 			}
-+		} elsif($line =3D~ /^\s*([A-Za-z-]*)-by:/ &&
-+			($1 !~ /(Suggest|Report|Test|Ack|Review)ed/ ||
-+			 $line !~ /^\s*[a-z-]*-by:\s/i)) {
-+		    WARN("suspicious attribution tag:\n" . $herecurr);
- 		}
-
- # Check if MAINTAINERS is being updated.  If so, there's probably no nee=
-d to
---=20
-2.20.1
+David / dhildenb
