@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48683)
+Received: from eggs.gnu.org ([209.51.188.92]:49114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ5e-0003iY-6S
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:51 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gqZ74-0004dZ-3W
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ5d-0002XW-7j
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:50 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 4 Feb 2019 07:49:28 +0000
-Message-ID: <2850e8a6-e0c4-c8b0-602b-2192af8d7a3b@virtuozzo.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<87pnsbxsi7.fsf@dusky.pond.sub.org>
-In-Reply-To: <87pnsbxsi7.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3933AE13AB3B2349973B8B4D6FD88354@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@redhat.com>) id 1gqZ73-0003Y3-Bo
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:56:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gqZ73-0003Xl-5e
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:56:17 -0500
+Date: Mon, 4 Feb 2019 15:50:23 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190204075023.GA15322@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
+Content-Disposition: inline
+Subject: [Qemu-devel] Querying the size of devdax devices from userspace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>, Jeff Moyer <jmoyer@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+Cc: qemu-devel@nongnu.org, linux-nvdimm@lists.01.org
 
-MDEuMDIuMjAxOSAyMTozOSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IEFuZHJleSBTaGlu
-a2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+IA0KPj4g
-SW4gdGhlICdGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRpb24nIHNlY3Rpb24gb2YgdGhlICdxZW11
-LWltZyBpbmZvJw0KPj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRp
-b24gYWJvdXQgZXhpc3RpbmcgUUNPVzINCj4+IGJpdG1hcHMgd2lsbCBiZSBzaG93biwgc3VjaCBh
-cyBhIGJpdG1hcCBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHk6DQo+Pg0KPj4gaW1hZ2U6IC92
-ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhkZA0KPj4gZmlsZSBmb3JtYXQ6IHFjb3cyDQo+PiB2
-aXJ0dWFsIHNpemU6IDY0RyAoNjg3MTk0NzY3MzYgYnl0ZXMpDQo+PiBkaXNrIHNpemU6IDMuME0N
-Cj4+IGNsdXN0ZXJfc2l6ZTogMTA0ODU3Ng0KPj4gRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9u
-Og0KPj4gICAgICBjb21wYXQ6IDEuMQ0KPj4gICAgICBsYXp5IHJlZmNvdW50czogdHJ1ZQ0KPj4g
-ICAgICBiaXRtYXBzOg0KPj4gICAgICAgICAgWzBdOg0KPj4gICAgICAgICAgICAgIGZsYWdzOg0K
-Pj4gICAgICAgICAgICAgICAgICBbMF06IGluLXVzZQ0KPj4gICAgICAgICAgICAgICAgICBbMV06
-IGF1dG8NCj4+ICAgICAgICAgICAgICBuYW1lOiBiYWNrLXVwMQ0KPj4gICAgICAgICAgICAgIHVu
-a25vd24gZmxhZ3M6IDQNCj4+ICAgICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+ICAg
-ICAgICAgIFsxXToNCj4+ICAgICAgICAgICAgICBmbGFnczoNCj4+ICAgICAgICAgICAgICAgICAg
-WzBdOiBpbi11c2UNCj4+ICAgICAgICAgICAgICAgICAgWzFdOiBhdXRvDQo+PiAgICAgICAgICAg
-ICAgbmFtZTogYmFjay11cDINCj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA4DQo+PiAg
-ICAgICAgICAgICAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+PiAgICAgIHJlZmNvdW50IGJpdHM6IDE2
-DQo+PiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNo
-aW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4gWy4u
-Ll0NCj4+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29y
-ZS5qc29uDQo+PiBpbmRleCA5MTY4NWJlLi4yNzFlMGRmIDEwMDY0NA0KPj4gLS0tIGEvcWFwaS9i
-bG9jay1jb3JlLmpzb24NCj4+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiBAQCAtNjks
-NiArNjksOCBAQA0KPj4gICAjIEBlbmNyeXB0OiBkZXRhaWxzIGFib3V0IGVuY3J5cHRpb24gcGFy
-YW1ldGVyczsgb25seSBzZXQgaWYgaW1hZ2UNCj4+ICAgIyAgICAgICAgICAgaXMgZW5jcnlwdGVk
-IChzaW5jZSAyLjEwKQ0KPj4gICAjDQo+PiArIyBAYml0bWFwczogQSBsaXN0IG9mIHFjb3cyIGJp
-dG1hcCBkZXRhaWxzIChzaW5jZSA0LjApDQo+PiArIw0KPj4gICAjIFNpbmNlOiAxLjcNCj4+ICAg
-IyMNCj4+ICAgeyAnc3RydWN0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzInLA0KPj4gQEAgLTc3
-LDcgKzc5LDggQEANCj4+ICAgICAgICAgJypsYXp5LXJlZmNvdW50cyc6ICdib29sJywNCj4+ICAg
-ICAgICAgJypjb3JydXB0JzogJ2Jvb2wnLA0KPj4gICAgICAgICAncmVmY291bnQtYml0cyc6ICdp
-bnQnLA0KPj4gLSAgICAgICcqZW5jcnlwdCc6ICdJbWFnZUluZm9TcGVjaWZpY1FDb3cyRW5jcnlw
-dGlvbicNCj4+ICsgICAgICAnKmVuY3J5cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5
-cHRpb24nLA0KPj4gKyAgICAgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJbmZvJ10NCj4+ICAg
-ICB9IH0NCj4+ICAgDQo+PiAgICMjDQo+PiBAQCAtNDU0LDYgKzQ1Nyw0MSBAQA0KPj4gICAgICAg
-ICAgICAgICdzdGF0dXMnOiAnRGlydHlCaXRtYXBTdGF0dXMnfSB9DQo+PiAgIA0KPj4gICAjIw0K
-Pj4gKyMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPj4gKyMNCj4+ICsjIEFuIGVudW1lcmF0aW9u
-IG9mIGZsYWdzIHRoYXQgYSBiaXRtYXAgY2FuIHJlcG9ydCB0byB0aGUgdXNlci4NCj4+ICsjDQo+
-PiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5IGFuZCBtYXkg
-YmUgaW5jb25zaXN0ZW50Lg0KPiANCj4gSSBkb3VidCB0aGUgY2FzdWFsIHJlYWRlciBjb3VsZCBn
-dWVzcyB0aGUgbWVhbmluZyBmcm9tIHRoZSBuYW1lLiAgV2hhdA0KPiBhYm91dCBAZGlydHk/DQoN
-CkknZCBwcmVmZXIgdG8ga2VlcCBpdCBtYXRjaGluZyBRY293MiBmb3JtYXQgc3BlY2lmaWNhdGlv
-bi4gVGhpcyBJbmZvIGFpbXMNCnRvIGV4cG9ydCBxY293MiBzcGVjaWZpY3MgYXMgaXMuIEFuZCBR
-Y293MiBzcGVjIGlzIG5vdCBzb21ldGhpbmcgcWVtdS1pbnRlcm5hbCwNCndoeSBpcyBpdCB3b3Jz
-ZSB0aGFuIFFRUEksIGFuZCB3aHkgdG8gaGF2ZSBkaWZmZXJlbnQgbmFtZSBmb3IgdGhlIHNhbWUg
-dGhpbmcNCmluIGRpZmZlcmVudCBwYXJ0cyBvZiBzcGVjPw0KDQpXZSBtYXkgaW5zdGVhZCByZXBo
-cmFzZSBpdCBsaWtlDQoNClRoZSBiaXRtYXAgaXMgcG9zc2libHkgaW4gdXNlIGJ5IG90aGVyIHBy
-b2Nlc3Mgb3Igd2FzIG5vdCBzYXZlZCBjb3JyZWN0bHkgKGFuZA0KdGhlcmVmb3JlIHRoaXMgZmxh
-ZyB3YXMgbm90IGNsZWFyZWQpLiBUaGUgZGF0YSBvZiB0aGUgYml0bWFwIG1heSBiZSBpbmNvbnNp
-c3RlbnQuDQoNCnRvIHJlZmxlY3QgaW4tdXNlIG5hbWUgb2YgdGhlIGZsYWcuLg0KDQoNCkFuZCwg
-aWYgd2UgY2hhbmdlIGl0IHRvIEBkaXJ0eSwgd2UgYXQgbGVhc3Qgc2hvdWxkIGFkZCBhIGNvbW1l
-bnQgdGhhdCB0aGlzIGZpZWxkDQptYXRjaGVzIElOX1VTRSBmbGFnIG9mIHFjb3cyIGZvcm1hdC4N
-Cg0KPiANCj4+ICsjDQo+PiArIyBAYXV0bzogVGhlIGJpdG1hcCBtdXN0IHJlZmxlY3QgYWxsIGNo
-YW5nZXMgb2YgdGhlIHZpcnR1YWwgZGlzayBieSBhbnkNCj4+ICsjICAgICAgICBhcHBsaWNhdGlv
-biB0aGF0IHdvdWxkIHdyaXRlIHRvIHRoaXMgcWNvdzIgZmlsZS4NCj4+ICsjDQo+PiArIyBTaW5j
-ZTogNC4wDQo+PiArIyMNCj4+ICt7ICdlbnVtJzogJ1Fjb3cyQml0bWFwSW5mb0ZsYWdzJywNCj4+
-ICsgICdkYXRhJzogWydpbi11c2UnLCAnYXV0byddIH0NCj4+ICsNCj4+ICsjIw0KPj4gKyMgQFFj
-b3cyQml0bWFwSW5mbzoNCj4+ICsjDQo+PiArIyBRY293MiBiaXRtYXAgaW5mb3JtYXRpb24uDQo+
-PiArIw0KPj4gKyMgQG5hbWU6IHRoZSBuYW1lIG9mIHRoZSBiaXRtYXANCj4+ICsjDQo+PiArIyBA
-Z3JhbnVsYXJpdHk6IGdyYW51bGFyaXR5IG9mIHRoZSBiaXRtYXAgaW4gYnl0ZXMNCj4+ICsjDQo+
-PiArIyBAZmxhZ3M6IHJlY29nbml6ZWQgZmxhZ3Mgb2YgdGhlIGJpdG1hcA0KPj4gKyMNCj4+ICsj
-IEB1bmtub3duLWZsYWdzOiBhbnkgcmVtYWluaW5nIGZsYWdzIG5vdCByZWNvZ25pemVkIGJ5IHRo
-ZSBjdXJyZW50IHFlbXUgdmVyc2lvbg0KPiANCj4gSW50ZW5kZWQgdXNlIGNhc2VzIGZvciBAdW5r
-bm93bi1mbGFncz8NCj4gDQo+PiArIw0KPj4gKyMgU2luY2U6IDQuMA0KPj4gKyMjDQo+PiAreyAn
-c3RydWN0JzogJ1Fjb3cyQml0bWFwSW5mbycsDQo+PiArICAnZGF0YSc6IHsnbmFtZSc6ICdzdHIn
-LCAnZ3JhbnVsYXJpdHknOiAndWludDMyJywNCj4+ICsgICAgICAgICAgICdmbGFncyc6IFsnUWNv
-dzJCaXRtYXBJbmZvRmxhZ3MnXSwNCj4+ICsgICAgICAgICAgICcqdW5rbm93bi1mbGFncyc6ICd1
-aW50MzInIH0gfQ0KPj4gKw0KPj4gKyMjDQo+PiAgICMgQEJsb2NrTGF0ZW5jeUhpc3RvZ3JhbUlu
-Zm86DQo+PiAgICMNCj4+ICAgIyBCbG9jayBsYXRlbmN5IGhpc3RvZ3JhbS4NCg0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+--wac7ysb48OaltWcw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+How can userspace applications query the size of devdax character
+devices?
+
+stat(1) doesn't know how large the device is:
+
+  # stat /dev/dax0.0
+    File: /dev/dax0.0
+    Size: 0         	Blocks: 0          IO Block: 4096   character special file
+  Device: 6h/6d	Inode: 56764       Links: 1     Device type: fa,d
+
+ndctl(1) finds out by digging in /sys:
+
+  # ndctl list
+  [
+    {
+      "dev":"namespace0.0",
+      "mode":"devdax",
+      "map":"dev",
+      "size":2111832064,
+      "uuid":"235acf4d-503f-46be-bf64-f26faf9777ef",
+      "chardev":"dax0.0"
+    }
+  ]
+
+I'm not sure how to do it without enumerating all nvdimms in /sys.  Is
+there a mapping from devdax major/minor number to a /sys path?
+
+The use case I have in mind is that QEMU currently takes the size as a
+command-line parameter.  The failure mode is ugly when users get this
+value wrong: the guest gets a softlockup and there is no error message
+on the host side.
+
+I'd like QEMU to detect the size or at least reject size values that are
+too large.  In order to do that userspace needs a convenient way of
+querying the size.  Any ideas?
+
+Stefan
+
+--wac7ysb48OaltWcw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcV+6/AAoJEJykq7OBq3PIE2MIAMXxtSr5u1UIYoiPbz9ZvVlu
+gEb4tn/t3lMDq91aaZ4KdfWHWCxr9kNeKWw1xMgyLQiL8RlPp/ssK3los2giZDAR
+ifjfImHbcq1mZsj1x18uYHk7outeciAiAfArssLT2190hHzDhFxSh1sbqo47bJm5
+Uo/gY7gEjVa7fP9tFlRzvsjfIEaCESqCyQ1HbJlHbog/TvteontM9QSiFUE7Wu2j
+utagrJjIgp0tpvTubf27LOQUxtmYN18HZWpzSDwy2RWaTO3unoup4rID4Tujo56Z
+qbM77x9qKsEf81aYYtffHiOWTT1/D6oLYdd9p7I55qrSPGHPXLbT+DPDWcl/674=
+=tye0
+-----END PGP SIGNATURE-----
+
+--wac7ysb48OaltWcw--
