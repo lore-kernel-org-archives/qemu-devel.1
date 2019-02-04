@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59462)
+Received: from eggs.gnu.org ([209.51.188.92]:59367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6x-00058Q-9A
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:52 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6u-0003ZS-Pi
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6u-00055L-6a
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:51 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38893)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6r-0003Vt-6f
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:48 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6u-0003YJ-Hn
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:48 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id v13so961367wrw.5
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:48 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	s132sm8836236wmf.28.2019.02.04.10.36.46 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 04 Feb 2019 10:36:46 -0800 (PST)
+	id 1gqj6q-0003Tx-UJ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:45 -0500
+Received: by mail-wm1-x336.google.com with SMTP id b11so978632wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:44 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:28 +0100
-Message-Id: <1549305379-51117-27-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:24 +0100
+Message-Id: <1549305379-51117-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 26/77] target-i386: hvf: remove MPX support
+Subject: [Qemu-devel] [PULL 22/77] hw/i386/pc: enable PVH only for machine
+ type >= 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +29,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Stefano Garzarella <sgarzare@redhat.com>
 
-MPX support is being phased out by Intel and actually I am not sure that
-OS X has ever enabled it in XCR0.  Drop it from the Hypervisor.framework
-acceleration.
+From: Stefano Garzarella <sgarzare@redhat.com>
 
+In order to avoid migration issues, we enable PVH only for
+machine type >= 4.0
+
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf/x86_cpuid.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+ hw/i386/pc.c         | 4 +++-
+ hw/i386/pc_piix.c    | 3 +++
+ hw/i386/pc_q35.c     | 3 +++
+ include/hw/i386/pc.h | 3 +++
+ 4 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/hvf/x86_cpuid.c b/target/i386/hvf/x86_cpuid.c
-index 9874a46..4d957fe 100644
---- a/target/i386/hvf/x86_cpuid.c
-+++ b/target/i386/hvf/x86_cpuid.c
-@@ -38,16 +38,6 @@ static uint64_t xgetbv(uint32_t xcr)
-     return (((uint64_t)edx) << 32) | eax;
- }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9efbd16..00166d1 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1220,7 +1220,8 @@ static void load_linux(PCMachineState *pcms,
+          * saving the PVH entry point used by the x86/HVM direct boot ABI.
+          * If load_elfboot() is successful, populate the fw_cfg info.
+          */
+-        if (load_elfboot(kernel_filename, kernel_size,
++        if (pcmc->pvh_enabled &&
++            load_elfboot(kernel_filename, kernel_size,
+                          header, pvh_start_addr, fw_cfg)) {
+             fclose(f);
  
--static bool vmx_mpx_supported()
--{
--    uint64_t cap_exit, cap_entry;
--
--    hv_vmx_read_capability(HV_VMX_CAP_ENTRY, &cap_entry);
--    hv_vmx_read_capability(HV_VMX_CAP_EXIT, &cap_exit);
--
--    return ((cap_exit & (1 << 23)) && (cap_entry & (1 << 16)));
--}
--
- uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                  int reg)
+@@ -2783,6 +2784,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     pcmc->acpi_data_size = 0x20000 + 0x8000;
+     pcmc->save_tsc_khz = true;
+     pcmc->linuxboot_dma_enabled = true;
++    pcmc->pvh_enabled = true;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = pc_get_hotplug_handler;
+     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 63c84e3..fd0f2c2 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -440,9 +440,12 @@ DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
+ 
+ static void pc_i440fx_3_1_machine_options(MachineClass *m)
  {
-@@ -92,11 +82,8 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                     CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-                     CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_SHA_NI |
-                     CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL |
--                    CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_MPX;
-+                    CPUID_7_0_EBX_INVPCID;
++    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
++
+     pc_i440fx_4_0_machine_options(m);
+     m->is_default = 0;
+     m->alias = NULL;
++    pcmc->pvh_enabled = false;
+     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+ }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index b7b7959..4a175ea 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -376,9 +376,12 @@ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
  
--            if (!vmx_mpx_supported()) {
--                ebx &= ~CPUID_7_0_EBX_MPX;
--            }
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             if (!(cap & CPU_BASED2_INVPCID)) {
-                 ebx &= ~CPUID_7_0_EBX_INVPCID;
-@@ -119,9 +106,6 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                   XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK |
-                                   XSTATE_ZMM_Hi256_MASK | XSTATE_Hi16_ZMM_MASK);
-             eax &= supp_xcr0;
--            if (!vmx_mpx_supported()) {
--                eax &= ~(XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK);
--            }
-         } else if (idx == 1) {
-             hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2, &cap);
-             eax &= CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1;
+ static void pc_q35_3_1_machine_options(MachineClass *m)
+ {
++    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
++
+     pc_q35_4_0_machine_options(m);
+     m->default_kernel_irqchip_split = false;
+     m->alias = NULL;
++    pcmc->pvh_enabled = false;
+     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+ }
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 882fd8d..3ff127e 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -133,6 +133,9 @@ typedef struct PCMachineClass {
+ 
+     /* use DMA capable linuxboot option rom */
+     bool linuxboot_dma_enabled;
++
++    /* use PVH to load kernels that support this feature */
++    bool pvh_enabled;
+ } PCMachineClass;
+ 
+ #define TYPE_PC_MACHINE "generic-pc-machine"
 -- 
 1.8.3.1
