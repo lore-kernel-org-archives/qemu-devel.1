@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60267)
+Received: from eggs.gnu.org ([209.51.188.92]:60543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbM3-0005Gr-Cw
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:56 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gqbN2-00062r-Lk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:20:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbM2-00082z-L6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:55 -0500
-Date: Mon, 4 Feb 2019 10:19:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204101944.GE1905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1549268743-18502-1-git-send-email-thuth@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gqbN1-0002NW-RD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:20:56 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:34911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gqbN1-0002M1-LO
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:20:55 -0500
+Received: by mail-qt1-f194.google.com with SMTP id v11so14798322qtc.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:20:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1549268743-18502-1-git-send-email-thuth@redhat.com>
+References: <20190123172740.32452-1-berrange@redhat.com>
+	<20190123172740.32452-17-berrange@redhat.com>
+In-Reply-To: <20190123172740.32452-17-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 4 Feb 2019 11:20:42 +0100
+Message-ID: <CAMxuvaxZTGVc_UBKrceaQ_czFrANcyQssQr-8bMYpNM73N9ZXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/docker/test-mingw and docs: Remove
- --with-sdlabi=2.0
+Subject: Re: [Qemu-devel] [PATCH v2 16/16] chardev: ensure termios is fully
+ initialized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Yongji Xie <elohimes@gmail.com>
 
-On Mon, Feb 04, 2019 at 09:25:43AM +0100, Thomas Huth wrote:
-> Patchew currently reports failures with the mingw docker test - this
-> is due to --with-sdlabi=3D2.0 configure flag which does not exist anymo=
-re.
-> Remove this remainder from the docker test and the docs now.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Wed, Jan 23, 2019 at 6:29 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> valgrind on the test-char.c code reports that 'struct termios' contains
+> uninitialized memory.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  docs/multiseat.txt      | 2 +-
->  tests/docker/test-mingw | 3 +--
->  2 files changed, 2 insertions(+), 3 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  chardev/char-serial.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+> index 3299b46853..a8bae31b8d 100644
+> --- a/chardev/char-serial.c
+> +++ b/chardev/char-serial.c
+> @@ -57,7 +57,7 @@ static void qmp_chardev_open_serial(Chardev *chr,
+>  static void tty_serial_init(int fd, int speed,
+>                              int parity, int data_bits, int stop_bits)
+>  {
+> -    struct termios tty;
+> +    struct termios tty =3D {0};
+>      speed_t spd;
+>
+>  #if 0
+> --
+> 2.20.1
+>
