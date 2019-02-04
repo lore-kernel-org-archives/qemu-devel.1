@@ -1,27 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:39449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1gqfBB-0005Lr-LC
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:24:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gqfBN-0005Lr-LD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:25:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1gqf7J-0006dq-6P
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:20:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1gqf7I-0006ci-Ti
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:20:57 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63C0C12794A
-	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 14:11:55 +0000 (UTC)
-Date: Mon, 4 Feb 2019 15:11:24 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190204141124.GJ5349@paraplu.home>
+	(envelope-from <peter.maydell@linaro.org>) id 1gqf1q-0002a3-Cb
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:15:23 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gqf1l-0002Rq-4x
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:15:14 -0500
+Received: by mail-ot1-x341.google.com with SMTP id t5so13225otk.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:15:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] Regression: Nested JSON structs in 'qmp-shell'
+References: <20190204132126.3255-1-richard.henderson@linaro.org>
+In-Reply-To: <20190204132126.3255-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Feb 2019 14:14:58 +0000
+Message-ID: <CAFEAcA_HG2St1mViKzvNRGFo37BO4gRRM2h7Sb7rE88e8k0xFQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] target/arm: Implement TBI for
+ user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, marcandre.lureau@redhat.com, armbru@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi,
-
-Just noticed that this commit fcfab7541 ("qmp-shell: learn to send
-commands with quoted arguments"), which introduces the usage of Python
-'shlex' to handle quoted arguments, but it accidentally broke generation
-of nested JSON structs.
-
-With commit fcfab7541, you'll see the following brokenness:
-
-    (QEMU) blockdev-create job-id=job0 options={"driver":"qcow2","size":16384,"file":{"driver":"file","filename":"foo.qcow2"}}
-    {
-        "execute": "blockdev-create", 
-        "arguments": {
-            "job-id": "job0", 
-            "options": "{driver:qcow2,size:16384,file:{driver:file,filename:foo.qcow2}}"
-        }
-    }
-    {
-        "error": {
-            "class": "GenericError", 
-            "desc": "Invalid parameter type for 'options', expected: object"
-        }
-    }
+On Mon, 4 Feb 2019 at 13:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Based-on: <20190204131228.25949-1-richard.henderson@linaro.org>
+> aka v3 BTI.
+>
+> This is a prerequisite to implementing v8.5-MemTag.
+>
+>
+> r~
+>
 
 
-If I revert commit fcfab7541, then the same 'qmp-shell' invocation
-generates the _correct_ nested JSON:
 
-    (QEMU) blockdev-create job-id=job0 options={"driver":"qcow2","size":16384,"file":{"driver":"file","filename":"foo.qcow2"}}                                                                    
-    {                                                                                                                                                                                             
-        "execute": "blockdev-create",                                                                                                                                                             
-        "arguments": {                                                                                                                                                                            
-            "job-id": "job000000000",                                                                                                                                                                     
-            "options": {                                                                                                                                                                          
-                "driver": "qcow2",                                                                                                                                                                
-                "file": {                                                                                                                                                                         
-                    "driver": "file",                                                                                                                                                             
-                    "filename": "foo.qcow2"                                                                                                                                                       
-                },                                                                                                                                                                                
-                "size": 16384
-            }                                                                                                                                                                                     
-        }                                                                                                                                                                                         
-    }                                                                                                                                                                                             
-    {                                                                                                                                                                                             
-        "return": {}                                                                                                                                                                              
-    }                      
+Applied to target-arm.next, thanks.
 
-
--- 
-/kashyap
+-- PMM
