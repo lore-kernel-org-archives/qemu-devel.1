@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39757)
+Received: from eggs.gnu.org ([209.51.188.92]:39482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gqgWO-0001q7-PD
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:50:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gqgWa-0001iR-KW
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gqgKU-0004bi-2H
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:38:39 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gqgKT-0004Ue-RO
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:38:37 -0500
-Received: by mail-wm1-f67.google.com with SMTP id m22so346754wml.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 07:38:28 -0800 (PST)
-Date: Mon, 4 Feb 2019 16:38:24 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190204153824.inpb7wwzhb4nd4nw@steredhat>
-References: <20190131151914.164903-1-sgarzare@redhat.com>
-	<20190131151914.164903-3-sgarzare@redhat.com>
-	<20190201101604-mutt-send-email-mst@kernel.org>
-	<CAGxU2F50t=OeuoJMn7q7iDYyy+mc=3vz7V8dVe77KtOu1hKHyw@mail.gmail.com>
-	<20190204033307.GC29523@stefanha-x1.localdomain>
-	<20190204101614.hid4eiorvm37cq5f@steredhat>
-	<20190204083556-mutt-send-email-mst@kernel.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gqgI7-0002jY-RF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:36:12 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 4 Feb 2019 15:36:03 +0000
+Message-ID: <b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<87pnsbxsi7.fsf@dusky.pond.sub.org>
+	<20190204094621.GB5855@linux.fritz.box>
+	<87d0o7psz6.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d0o7psz6.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <050ED3C1EE124240A773D578A3AC28C2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190204083556-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
- boolean property
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,86 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-On Mon, Feb 04, 2019 at 08:37:28AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Feb 04, 2019 at 11:16:14AM +0100, Stefano Garzarella wrote:
-> > On Mon, Feb 04, 2019 at 11:33:07AM +0800, Stefan Hajnoczi wrote:
-> > > On Fri, Feb 01, 2019 at 06:18:52PM +0100, Stefano Garzarella wrote:
-> > > > On Fri, Feb 1, 2019 at 4:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
-> > > > > > In order to avoid migration issues, we enable DISCARD and
-> > > > > > WRITE ZEROES features only for machine type >= 4.0
-> > > > > >
-> > > > > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > > > ---
-> > > > > >  hw/block/virtio-blk.c          | 2 ++
-> > > > > >  hw/core/machine.c              | 1 +
-> > > > > >  include/hw/virtio/virtio-blk.h | 1 +
-> > > > > >  3 files changed, 4 insertions(+)
-> > > > > >
-> > > > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > > > > > index 8a6754d9a2..542ec52536 100644
-> > > > > > --- a/hw/block/virtio-blk.c
-> > > > > > +++ b/hw/block/virtio-blk.c
-> > > > > > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
-> > > > > >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-> > > > > >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-> > > > > >                       IOThread *),
-> > > > > > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
-> > > > > > +                     true),
-> > > > > >      DEFINE_PROP_END_OF_LIST(),
-> > > > > >  };
-> > > > > >
-> > > > >
-> > > > > Thinking about it, are there security implications for discard?
-> > > > > Should we make it default false?
-> > > > 
-> > > > Hi Michael,
-> > > > 
-> > > > I'm not completely sure but if the guest can write on a specific sector,
-> > > > discard or write_zeroes operations should not have a security implication.
-> > > > 
-> > > > Do I miss something?
-> > > 
-> > > Recently page cache attacks have been discussed in the Linux community:
-> > > https://arxiv.org/pdf/1901.01161.pdf
-> > > 
-> > > I guess the scenario Michael is thinking about involves either -drive
-> > > cache.direct=off (including cache=writeback or cache=writethrough) or
-> > > maybe a timing side-channel in the storage appliance.
-> > > 
-> > > The discard operation may allow a guest to evict the cache, an important
-> > > primitive for page cache attacks.
-> > > 
-> > > Most of the time disk images are not shared between guests at all.
-> > > Therefore the discard operation cannot be used to learn information
-> > > about other guests.
-> > > 
-> > > Let's focus on shared disk images: shared disk images are either
-> > > read-only (then discard isn't allowed anyway) or they are shared
-> > > writable (but this already implies a trust relationship between the
-> > > guests).
-> > > 
-> > > My opinion is that discard is safe because virtualization use cases are
-> > > quite different from the attacks possible with shared library files
-> > > between userspace processes.  I'm curious if anyone has figured out a
-> > > realistic scenario where it does matter though...
-> > 
-> > Many thanks for the explanation!
-> > 
-> > I'll wait to send the v3 in order to understand if Michael agrees to
-> > leave discard feature enabled to default.
-> > 
-> > Thanks,
-> > Stefano
-> 
-> OK. Maybe mention the above in the commit log.
-> 
-
-Ok, I'll do it!
-
-Thanks,
-Stefano
+MDQuMDIuMjAxOSAxNjo0NSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IEtldmluIFdvbGYg
+PGt3b2xmQHJlZGhhdC5jb20+IHdyaXRlczoNCj4gDQo+PiBBbSAwMS4wMi4yMDE5IHVtIDE5OjM5
+IGhhdCBNYXJrdXMgQXJtYnJ1c3RlciBnZXNjaHJpZWJlbjoNCj4+PiBBbmRyZXkgU2hpbmtldmlj
+aCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPj4+DQo+Pj4+IElu
+IHRoZSAnRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1p
+bWcgaW5mbycNCj4+Pj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRp
+b24gYWJvdXQgZXhpc3RpbmcgUUNPVzINCj4+Pj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNo
+IGFzIGEgYml0bWFwIG5hbWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4+Pj4NCj4+Pj4gaW1h
+Z2U6IC92ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhkZA0KPj4+PiBmaWxlIGZvcm1hdDogcWNv
+dzINCj4+Pj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2NzM2IGJ5dGVzKQ0KPj4+PiBkaXNr
+IHNpemU6IDMuME0NCj4+Pj4gY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+Pj4+IEZvcm1hdCBzcGVj
+aWZpYyBpbmZvcm1hdGlvbjoNCj4+Pj4gICAgICBjb21wYXQ6IDEuMQ0KPj4+PiAgICAgIGxhenkg
+cmVmY291bnRzOiB0cnVlDQo+Pj4+ICAgICAgYml0bWFwczoNCj4+Pj4gICAgICAgICAgWzBdOg0K
+Pj4+PiAgICAgICAgICAgICAgZmxhZ3M6DQo+Pj4+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11
+c2UNCj4+Pj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4gICAgICAgICAgICAgIG5h
+bWU6IGJhY2stdXAxDQo+Pj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA0DQo+Pj4+ICAg
+ICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4gICAgICAgICAgWzFdOg0KPj4+PiAg
+ICAgICAgICAgICAgZmxhZ3M6DQo+Pj4+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4+
+Pj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4gICAgICAgICAgICAgIG5hbWU6IGJh
+Y2stdXAyDQo+Pj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA4DQo+Pj4+ICAgICAgICAg
+ICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4gICAgICByZWZjb3VudCBiaXRzOiAxNg0KPj4+
+PiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBT
+aGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+
+PiBbLi4uXQ0KPj4+PiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Js
+b2NrLWNvcmUuanNvbg0KPj4+PiBpbmRleCA5MTY4NWJlLi4yNzFlMGRmIDEwMDY0NA0KPj4+PiAt
+LS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNv
+bg0KPj4+PiBAQCAtNjksNiArNjksOCBAQA0KPj4+PiAgICMgQGVuY3J5cHQ6IGRldGFpbHMgYWJv
+dXQgZW5jcnlwdGlvbiBwYXJhbWV0ZXJzOyBvbmx5IHNldCBpZiBpbWFnZQ0KPj4+PiAgICMgICAg
+ICAgICAgIGlzIGVuY3J5cHRlZCAoc2luY2UgMi4xMCkNCj4+Pj4gICAjDQo+Pj4+ICsjIEBiaXRt
+YXBzOiBBIGxpc3Qgb2YgcWNvdzIgYml0bWFwIGRldGFpbHMgKHNpbmNlIDQuMCkNCj4+Pj4gKyMN
+Cj4+Pj4gICAjIFNpbmNlOiAxLjcNCj4+Pj4gICAjIw0KPj4+PiAgIHsgJ3N0cnVjdCc6ICdJbWFn
+ZUluZm9TcGVjaWZpY1FDb3cyJywNCj4+Pj4gQEAgLTc3LDcgKzc5LDggQEANCj4+Pj4gICAgICAg
+ICAnKmxhenktcmVmY291bnRzJzogJ2Jvb2wnLA0KPj4+PiAgICAgICAgICcqY29ycnVwdCc6ICdi
+b29sJywNCj4+Pj4gICAgICAgICAncmVmY291bnQtYml0cyc6ICdpbnQnLA0KPj4+PiAtICAgICAg
+JyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9uJw0KPj4+PiArICAg
+ICAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9uJywNCj4+Pj4g
+KyAgICAgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJbmZvJ10NCj4+Pj4gICAgIH0gfQ0KPj4+
+PiAgIA0KPj4+PiAgICMjDQo+Pj4+IEBAIC00NTQsNiArNDU3LDQxIEBADQo+Pj4+ICAgICAgICAg
+ICAgICAnc3RhdHVzJzogJ0RpcnR5Qml0bWFwU3RhdHVzJ30gfQ0KPj4+PiAgIA0KPj4+PiAgICMj
+DQo+Pj4+ICsjIEBRY293MkJpdG1hcEluZm9GbGFnczoNCj4+Pj4gKyMNCj4+Pj4gKyMgQW4gZW51
+bWVyYXRpb24gb2YgZmxhZ3MgdGhhdCBhIGJpdG1hcCBjYW4gcmVwb3J0IHRvIHRoZSB1c2VyLg0K
+Pj4+PiArIw0KPj4+PiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVj
+dGx5IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPj4+DQo+Pj4gSSBkb3VidCB0aGUgY2FzdWFs
+IHJlYWRlciBjb3VsZCBndWVzcyB0aGUgbWVhbmluZyBmcm9tIHRoZSBuYW1lLiAgV2hhdA0KPj4+
+IGFib3V0IEBkaXJ0eT8NCj4+DQo+PiBGZWVscyBsaWtlIG92ZXJsb2FkaW5nIHRoZSB3b3JkICJk
+aXJ0eSIgaW4gdGhlIGNvbnRleHQgb2YgImRpcnR5DQo+PiBiaXRtYXBzIi4gVGhpcyBtaWdodCBl
+YXNpbHkgbGVhZCB0byBtaXNpbnRlcnByZXRhdGlvbiBhcyAidGhpcyBiaXRtYXANCj4+IG1hcmtz
+IHNvbWUgY2x1c3RlcnMgYXMgZGlydHkiIHJhdGhlciB0aGFuICJ0aGlzIGJpdG1hcCBtaWdodCBi
+ZQ0KPj4gaW5jb25zaXN0ZW50Ii4NCj4gDQo+IENhbGwgaXQgQHBvc3NpYmx5LWluY29uc2lzdGVu
+dCB0aGVuPw0KPiANCg0KSWYgeW91IHJ1biBxbXAgcXVlcnktYmxvY2sgd2hpbGUgdm0gaXMgcnVu
+bmluZywgYWxsIGJpdG1hcHMgaW4gaW1hZ2Ugd2lsbA0KYmUgaW4gdXNlLiBBbmQgaW4gdGhpcyBj
+b250ZXh0LCBpbi11c2Ugc2VlbXMgbW9yZSBhcHByb3ByaWF0ZSB0aGFuDQpwb3NzaWJseS1pbmNv
+bnNpc3RlbnQuIEFuZCBpbi11c2UgaGFzIGxlc3MgaW50ZXJmZXJlbmNlIHdpdGggdGhlIGZhY3Qg
+dGhhdA0KYWN0dWFsIGJpdG1hcHMgbm93IGFyZSBpbi1SQU0gQmRydkRpcnR5Qml0bWFwIHN0cnVj
+dHVyZXMgd2hpY2ggYXJlIGFjdHVhbGx5DQpjb25zaXN0ZW50IChhbmQgYWxzbyBzaG93biBieSBx
+dWVyeS1ibG9jaykNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
