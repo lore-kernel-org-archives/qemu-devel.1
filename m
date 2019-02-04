@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51512)
+Received: from eggs.gnu.org ([209.51.188.92]:52652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqeCC-00011N-QT
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:57 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqeEN-0002wo-7Y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqdx8-0006kw-1i
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:06:22 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<87pnsbxsi7.fsf@dusky.pond.sub.org>
-	<3ed70b8e-f778-f942-2841-905223d3af8d@redhat.com>
-	<87womjwbwj.fsf@dusky.pond.sub.org>
-	<c017dbfe-f619-b626-211a-d3bdafb451aa@redhat.com>
-Date: Mon, 04 Feb 2019 14:05:58 +0100
-In-Reply-To: <c017dbfe-f619-b626-211a-d3bdafb451aa@redhat.com> (Eric Blake's
-	message of "Fri, 1 Feb 2019 13:28:32 -0600")
-Message-ID: <877eefsnyh.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1gqeEI-0000Cq-Da
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:24:09 -0500
+Resent-Message-Id: <E1gqeEI-0000Cq-Da@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqeEF-0000Ag-Dv
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:24:04 -0500
+Message-ID: <154928661955.29184.5440495513029760420@ebba9967afc0>
+In-Reply-To: <20190204122043.43007-1-slp@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Feb 2019 05:23:40 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] ui: don't send any event if delta_y == 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, jsnow@redhat.com
+To: slp@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, kraxel@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 2/1/19 1:23 PM, Markus Armbruster wrote:
->
->>>>> +# @unknown-flags: any remaining flags not recognized by the current qemu version
->>>>
->>>> Intended use cases for @unknown-flags?
->>>
->>> The qcow2 spec defines bit 2 extra_data_compatible; and also leaves the
->>> door open for future extensions that may define other bits. If a new
->>> version of qemu (or some non-qemu qcow2 creation app) creates an image
->>> with additional feature bits set, THIS version of qemu doesn't know what
->>> name to give those bits, but can still inform the user that those bits
->>> are set via this field. It will be omitted for all images created by
->>> this version of qemu.
->> 
->> What would QMP clients do with this information?
->
-> 'qemu-img info' is the intended QMP client; and it will print the
-> unknown-flags along with everything else. In other words, we're trying
-> to make qemu-img become useful for inspecting as much useful information
-> as possible from an image with unknown origins.  Knowing that an image
-> uses bitmaps with flags unknown to THIS version of qemu is a good
-> indication that you should be careful about using/altering the image
-> without first upgrading qemu, as it may destroy data that some other
-> product desires to utilize.
-
-Okay.  Now work that into the documentation :)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDEyMjA0My40MzAw
+Ny0xLXNscEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
+LW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
+cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
+b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIFNI
+T1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCkNvbmZpZ3VyZSBvcHRpb25z
+OgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNv
+ZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhvbj0vdXNyL2Jpbi9w
+eXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1lbmFibGUtdHJhY2Ut
+YmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0bGUgLS1lbmFibGUt
+Y3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vlc3QtYWdlbnQgLS13
+aXRoLXNkbGFiaT0yLjAKRVJST1I6IHVua25vd24gb3B0aW9uIC0td2l0aC1zZGxhYmk9Mi4wClRy
+eSAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZSAtLWhlbHAnIGZvciBtb3JlIGluZm9ybWF0
+aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIE1vbiBGZWIgIDQgMTM6MjM6MjUgVVRDIDIwMTkKIyBD
+b25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlJyAnLS1lbmFibGUt
+d2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNvZnRtbXUnICct
+LXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsJyAnLS1weXRob249L3Vzci9iaW4vcHl0aG9u
+MycgJy0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0nICctLWVuYWJsZS10cmFjZS1i
+YWNrZW5kcz1zaW1wbGUnICctLWVuYWJsZS1nbnV0bHMnICctLWVuYWJsZS1uZXR0bGUnICctLWVu
+YWJsZS1jdXJsJyAnLS1lbmFibGUtdm5jJyAnLS1lbmFibGUtYnppcDInICctLWVuYWJsZS1ndWVz
+dC1hZ2VudCcgJy0td2l0aC1zZGxhYmk9Mi4wJwotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2Nj
+IGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE3IDYzNCAw
+Cng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRT
+PTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1k
+ZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAt
+Zm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8g
+Y29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRl
+bXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5lZAog
+I2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVuY3M6IGRvX2NvbXBp
+bGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIg
+NjE3IDY4NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxFX09G
+RlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3Jl
+ZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJv
+dG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251
+OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMK
+Y29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9faTM4Nl9fIG5vdCBk
+ZWZpbmVkCiAjZXJyb3IgX19pMzg2X18gbm90IGRlZmluZWQKICBefn5+fgoKLS0tCmZ1bmNzOiBk
+b19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczog
+OTIgMTIyIDYxNyA2ODkgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURf
+RklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlw
+ZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNz
+aW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAt
+c3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUt
+Y29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBfX0lMUDMy
+X18gbm90IGRlZmluZWQKICNlcnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQKICBefn5+fgoKLS0t
+CmxpbmVzOiA5MiAxMjggOTIwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtbXRocmVhZHMgLURf
+R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
+dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
+c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
+bW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmV4ZSBjb25m
+aWctdGVtcC9xZW11LWNvbmYuYyAtZyAtbGliZXJ0eQovdXNyL2xpYi9nY2MveDg2XzY0LXc2NC1t
+aW5ndzMyLzguMi4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9iaW4vbGQ6IGNhbm5v
+dCBmaW5kIC1saWJlcnR5CmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQgMSBleGl0IHN0YXR1
+cwpGYWlsZWQgdG8gcnVuICdjb25maWd1cmUnClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBs
+YXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDU2MywgaW4gPG1v
+ZHVsZT4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMTkwMjA0MTIyMDQzLjQzMDA3LTEtc2xwQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXIt
+bWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
