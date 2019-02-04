@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43258)
+Received: from eggs.gnu.org ([209.51.188.92]:43834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqjl7-0005Ma-9l
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:18:22 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gqjlO-00068p-5t
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqjXV-0003ze-EN
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:04:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gqjXV-0003vj-6K
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:04:17 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-34-git-send-email-pbonzini@redhat.com>
-	<6e8609da-a198-4457-afc2-88f911261994@redhat.com>
-	<20190204154557.GI2306@perard.uk.xensource.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <038db75f-ab55-947d-41ab-54aff32b744b@redhat.com>
-Date: Mon, 4 Feb 2019 20:04:10 +0100
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gqjX4-0003HI-Bt
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:03:54 -0500
+Received: from mail-lf1-x129.google.com ([2a00:1450:4864:20::129]:42898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gqjWz-000301-53
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:03:46 -0500
+Received: by mail-lf1-x129.google.com with SMTP id l10so727687lfh.9
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 11:03:29 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon,  4 Feb 2019 11:03:14 -0800
+Message-Id: <20190204190314.25373-1-jcmvbkbc@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190204154557.GI2306@perard.uk.xensource.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 33/52] build: switch to Kconfig
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/11] target/xtensa: SMP updates and various
+ fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, yang.zhong@intel.com, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
-On 04/02/19 16:45, Anthony PERARD wrote:
-> I've tested the series, and here is the first issue:
->   CC      hw/9pfs/xen-9p-backend.o
->   LINK    i386-softmmu/qemu-system-i386
-> /usr/bin/ld: ../hw/xen/xen-legacy-backend.o: in function `xen_be_register_common':
-> xen-legacy-backend.c:(.text+0x1cb6): undefined reference to `xen_9pfs_ops'
-> 
-> The `struct xen_9pfs_ops` is in "xen-9p-backend", so it's built, but
-> link time still fails.
+Hi Peter,
 
-Ok, I'll take a look.  My Xen builds were broken until recently.
+please pull the following series that enables SMP linux support for
+xtensa-softmmu.
 
-> Building QEMU with --disable-virtfs works. (Same as commenting out the
-> line that uses xen_9pfs_ops in xen-legacy-backend.) Part of the other
-> options I have for configure: --enable-xen --target-list=i386-softmmu
-> --disable-user --cpu=x86_64
-> 
-> 
-> I did also other build tests and one without --target-list, and that
-> fails, but not because of xen:
-> $ ./configure --enable-xen
-> ...
-> $ make
-> ...
->   GEN     aarch64-softmmu/config-devices.mak.tmp
->   GEN     alpha-softmmu/config-devices.mak.tmp
->   GEN     arm-softmmu/config-devices.mak.tmp
->   GEN     cris-softmmu/config-devices.mak.tmp
->   GEN     hppa-softmmu/config-devices.mak.tmp
->   GEN     i386-softmmu/config-devices.mak.tmp
->   GEN     lm32-softmmu/config-devices.mak.tmp
->   GEN     m68k-softmmu/config-devices.mak.tmp
->   GEN     microblaze-softmmu/config-devices.mak.tmp
-> undefined symbol ARMSSE_CPUID
-> undefined symbol ARMSSE
+The following changes since commit 8b7a3e1e5434b55d7710071b00af97c7086cab7a:
 
-This is just a rebasing issue, the patches are based on an older master
-that didn't have the symbols.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-24 15:04:47 +0000)
 
-Paiolo
+are available in the git repository at:
+
+  git://github.com/OSLL/qemu-xtensa.git tags/20190204-xtensa
+
+for you to fetch changes up to 174e09b73ab1c47408dd29fb36c4dd9fbda54f97:
+
+  hw/xtensa: xtfpga: raise CPU number limit (2019-01-28 11:55:20 -0800)
+
+----------------------------------------------------------------
+target/xtensa: SMP updates and various fixes
+
+- fix CPU wakeup on runstall changes; expose runstall as an IRQ line;
+- place mini-bootloader at the BSP reset vector;
+- expose CPU core frequency in XTFPGA board FPGA register;
+- rearrange access to external interrupts of xtensa cores;
+- add MX interrupt distributor and use it on SMP XTFPGA boards;
+- add test_mmuhifi_c3 xtensa core variant;
+- raise number of CPUs that can be instantiated on XTFPGA boards.
+
+----------------------------------------------------------------
+Max Filippov (11):
+      target/xtensa: add qemu_cpu_kick to xtensa_runstall
+      hw/xtensa: xtfpga: fix bootloader placement in SMP
+      hw/xtensa: xtfpga: use core frequency
+      target/xtensa: fix access to the INTERRUPT SR
+      target/xtensa: drop function xtensa_timer_irq
+      target/xtensa: rearrange access to external interrupts
+      target/xtensa: expose core runstall as an IRQ line
+      target/xtensa: add MX interrupt controller
+      hw/xtensa: xtfpga: use MX PIC for SMP
+      target/xtensa: add test_mmuhifi_c3 core
+      hw/xtensa: xtfpga: raise CPU number limit
+
+ hw/xtensa/Makefile.objs                            |     1 +
+ hw/xtensa/mx_pic.c                                 |   354 +
+ hw/xtensa/pic_cpu.c                                |    47 +-
+ hw/xtensa/xtfpga.c                                 |    65 +-
+ include/hw/xtensa/mx_pic.h                         |    44 +
+ target/xtensa/Makefile.objs                        |     1 +
+ target/xtensa/core-test_mmuhifi_c3.c               |    53 +
+ target/xtensa/core-test_mmuhifi_c3/core-isa.h      |   384 +
+ .../xtensa/core-test_mmuhifi_c3/gdb-config.inc.c   |   140 +
+ .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 36403 +++++++++++++++++++
+ target/xtensa/cpu.h                                |     8 +-
+ target/xtensa/exc_helper.c                         |    13 +
+ target/xtensa/helper.c                             |     2 +-
+ target/xtensa/helper.h                             |     2 +
+ target/xtensa/op_helper.c                          |     2 +
+ target/xtensa/translate.c                          |    14 +-
+ 16 files changed, 37479 insertions(+), 54 deletions(-)
+ create mode 100644 hw/xtensa/mx_pic.c
+ create mode 100644 include/hw/xtensa/mx_pic.h
+ create mode 100644 target/xtensa/core-test_mmuhifi_c3.c
+ create mode 100644 target/xtensa/core-test_mmuhifi_c3/core-isa.h
+ create mode 100644 target/xtensa/core-test_mmuhifi_c3/gdb-config.inc.c
+ create mode 100644 target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc.c
+
+-- 
+Thanks.
+-- Max
