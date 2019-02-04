@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59794)
+Received: from eggs.gnu.org ([209.51.188.92]:59796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7M-0005Xb-Gi
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7M-0005Xd-Gh
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7K-0003qR-KT
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7K-0003qM-Jo
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:16 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34774)
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:34875)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7I-0003nr-H7
+	id 1gqj7G-0003mz-OO
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:12 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id f7so994726wrp.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:10 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id z18so203975wrh.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:08 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s132sm8836236wmf.28.2019.02.04.10.37.05 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 04 Feb 2019 10:37:06 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:51 +0100
-Message-Id: <1549305379-51117-50-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:49 +0100
+Message-Id: <1549305379-51117-48-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 49/77] hw/pci-host/Makefile.objs: make CONFIGS
- clear for PCI EXPRESS
+Subject: [Qemu-devel] [PULL 47/77] ide: split ioport registration to a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +33,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+This is not needed on ARM, and brings in ISA bus code which is otherwise not
+necessary.
 
-Change the CONFIGs for PCI EXPRESS and make module name more
-clear for code files.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-5-yang.zhong@intel.com>
+Message-Id: <20190202072456.6468-3-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/arm-softmmu.mak      | 4 ++--
- default-configs/i386-softmmu.mak     | 2 +-
- default-configs/mips64el-softmmu.mak | 2 +-
- default-configs/pci.mak              | 2 +-
- default-configs/riscv32-softmmu.mak  | 2 +-
- default-configs/riscv64-softmmu.mak  | 2 +-
- hw/net/Makefile.objs                 | 4 ++--
- hw/pci-host/Makefile.objs            | 8 ++++----
- 8 files changed, 13 insertions(+), 13 deletions(-)
+ hw/ide/Makefile.objs |  4 ++--
+ hw/ide/core.c        | 25 --------------------
+ hw/ide/ioport.c      | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 68 insertions(+), 27 deletions(-)
+ create mode 100644 hw/ide/ioport.c
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index d7b540c..32f4a4a 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -123,7 +123,7 @@ CONFIG_VERSATILE=y
- CONFIG_VERSATILE_PCI=y
- CONFIG_VERSATILE_I2C=y
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+index fc328ff..a142add 100644
+--- a/hw/ide/Makefile.objs
++++ b/hw/ide/Makefile.objs
+@@ -1,8 +1,8 @@
+ common-obj-$(CONFIG_IDE_CORE) += core.o atapi.o
+ common-obj-$(CONFIG_IDE_QDEV) += qdev.o
+ common-obj-$(CONFIG_IDE_PCI) += pci.o
+-common-obj-$(CONFIG_IDE_ISA) += isa.o
+-common-obj-$(CONFIG_IDE_PIIX) += piix.o
++common-obj-$(CONFIG_IDE_ISA) += isa.o ioport.o
++common-obj-$(CONFIG_IDE_PIIX) += piix.o ioport.o
+ common-obj-$(CONFIG_IDE_CMD646) += cmd646.o
+ common-obj-$(CONFIG_IDE_MACIO) += macio.o
+ common-obj-$(CONFIG_IDE_MMIO) += mmio.o
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index c3d779d..8483200 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -2686,31 +2686,6 @@ void ide_exit(IDEState *s)
+     qemu_vfree(s->io_buffer);
+ }
  
--CONFIG_PCI_GENERIC=y
-+CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- CONFIG_VFIO_XGMAC=y
- CONFIG_VFIO_AMD_XGBE=y
- 
-@@ -154,7 +154,7 @@ CONFIG_GPIO_KEY=y
- CONFIG_MSF2=y
- CONFIG_FW_CFG_DMA=y
- CONFIG_XILINX_AXI=y
--CONFIG_PCI_DESIGNWARE=y
-+CONFIG_PCI_EXPRESS_DESIGNWARE=y
- 
- CONFIG_STRONGARM=y
- CONFIG_HIGHBANK=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 64c998c..2f919df 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -47,7 +47,7 @@ CONFIG_ISA_TESTDEV=y
- CONFIG_VMPORT=y
- CONFIG_SGA=y
- CONFIG_LPC_ICH9=y
--CONFIG_PCI_Q35=y
-+CONFIG_PCI_EXPRESS_Q35=y
- CONFIG_APIC=y
- CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
-diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
-index c2ae313..9eb1208 100644
---- a/default-configs/mips64el-softmmu.mak
-+++ b/default-configs/mips64el-softmmu.mak
-@@ -12,4 +12,4 @@ CONFIG_JAZZ_LED=y
- CONFIG_VT82C686=y
- CONFIG_MIPS_BOSTON=y
- CONFIG_FITLOADER=y
--CONFIG_PCI_XILINX=y
-+CONFIG_PCI_EXPRESS_XILINX=y
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 6c7be12..83738cb 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -22,7 +22,7 @@ CONFIG_MEGASAS_SCSI_PCI=y
- CONFIG_MPTSAS_SCSI_PCI=y
- CONFIG_RTL8139_PCI=y
- CONFIG_E1000_PCI=y
--CONFIG_E1000E_PCI=y
-+CONFIG_E1000E_PCI_EXPRESS=y
- CONFIG_IDE_CORE=y
- CONFIG_IDE_QDEV=y
- CONFIG_IDE_PCI=y
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index c9c5971..fbfd1d4 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -8,7 +8,7 @@ CONFIG_VIRTIO_MMIO=y
- 
- CONFIG_CADENCE=y
- 
--CONFIG_PCI_GENERIC=y
-+CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index c9c5971..fbfd1d4 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -8,7 +8,7 @@ CONFIG_VIRTIO_MMIO=y
- 
- CONFIG_CADENCE=y
- 
--CONFIG_PCI_GENERIC=y
-+CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index fa461d4..a43351a 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -7,8 +7,8 @@ common-obj-$(CONFIG_EEPRO100_PCI) += eepro100.o
- common-obj-$(CONFIG_PCNET_PCI) += pcnet-pci.o
- common-obj-$(CONFIG_PCNET_COMMON) += pcnet.o
- common-obj-$(CONFIG_E1000_PCI) += e1000.o e1000x_common.o
--common-obj-$(CONFIG_E1000E_PCI) += net_tx_pkt.o net_rx_pkt.o
--common-obj-$(CONFIG_E1000E_PCI) += e1000e.o e1000e_core.o e1000x_common.o
-+common-obj-$(CONFIG_E1000E_PCI_EXPRESS) += net_tx_pkt.o net_rx_pkt.o
-+common-obj-$(CONFIG_E1000E_PCI_EXPRESS) += e1000e.o e1000e_core.o e1000x_common.o
- common-obj-$(CONFIG_RTL8139_PCI) += rtl8139.o
- common-obj-$(CONFIG_VMXNET3_PCI) += net_tx_pkt.o net_rx_pkt.o
- common-obj-$(CONFIG_VMXNET3_PCI) += vmxnet3.o
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index 6d6597c..073d512 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -14,8 +14,8 @@ common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
- common-obj-$(CONFIG_PCI_SABRE) += sabre.o
- common-obj-$(CONFIG_FULONG) += bonito.o
- common-obj-$(CONFIG_PCI_PIIX) += piix.o
--common-obj-$(CONFIG_PCI_Q35) += q35.o
--common-obj-$(CONFIG_PCI_GENERIC) += gpex.o
--common-obj-$(CONFIG_PCI_XILINX) += xilinx-pcie.o
-+common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
-+common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
-+common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
- 
--common-obj-$(CONFIG_PCI_DESIGNWARE) += designware.o
-+common-obj-$(CONFIG_PCI_EXPRESS_DESIGNWARE) += designware.o
+-static const MemoryRegionPortio ide_portio_list[] = {
+-    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
+-    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
+-    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
+-    PORTIO_END_OF_LIST(),
+-};
+-
+-static const MemoryRegionPortio ide_portio2_list[] = {
+-    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
+-    PORTIO_END_OF_LIST(),
+-};
+-
+-void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
+-{
+-    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
+-       bridge has been setup properly to always register with ISA.  */
+-    isa_register_portio_list(dev, &bus->portio_list,
+-                             iobase, ide_portio_list, bus, "ide");
+-
+-    if (iobase2) {
+-        isa_register_portio_list(dev, &bus->portio2_list,
+-                                 iobase2, ide_portio2_list, bus, "ide");
+-    }
+-}
+-
+ static bool is_identify_set(void *opaque, int version_id)
+ {
+     IDEState *s = opaque;
+diff --git a/hw/ide/ioport.c b/hw/ide/ioport.c
+new file mode 100644
+index 0000000..a0b3c1f
+--- /dev/null
++++ b/hw/ide/ioport.c
+@@ -0,0 +1,66 @@
++/*
++ * QEMU IDE disk and CD/DVD-ROM Emulator
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ * Copyright (c) 2006 Openedhand Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/isa/isa.h"
++#include "qemu/error-report.h"
++#include "qemu/timer.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/dma.h"
++#include "hw/block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++#include "qemu/cutils.h"
++#include "sysemu/replay.h"
++
++#include "hw/ide/internal.h"
++#include "trace.h"
++
++static const MemoryRegionPortio ide_portio_list[] = {
++    { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
++    { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
++    { 0, 1, 4, .read = ide_data_readl, .write = ide_data_writel },
++    PORTIO_END_OF_LIST(),
++};
++
++static const MemoryRegionPortio ide_portio2_list[] = {
++    { 0, 1, 1, .read = ide_status_read, .write = ide_cmd_write },
++    PORTIO_END_OF_LIST(),
++};
++
++void ide_init_ioport(IDEBus *bus, ISADevice *dev, int iobase, int iobase2)
++{
++    /* ??? Assume only ISA and PCI configurations, and that the PCI-ISA
++       bridge has been setup properly to always register with ISA.  */
++    isa_register_portio_list(dev, &bus->portio_list,
++                             iobase, ide_portio_list, bus, "ide");
++
++    if (iobase2) {
++        isa_register_portio_list(dev, &bus->portio2_list,
++                                 iobase2, ide_portio2_list, bus, "ide");
++    }
++}
 -- 
 1.8.3.1
