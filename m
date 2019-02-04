@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44471)
+Received: from eggs.gnu.org ([209.51.188.92]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqdkI-0002HH-9g
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:53:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gqdoD-0003HB-LP
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqdkG-00049x-Aa
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:53:06 -0500
-Date: Mon, 4 Feb 2019 12:52:54 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204125254.GI1905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1549282241-23535-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gqdoB-0006pS-FQ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:57:09 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gqdoA-0006oT-S6
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:57:07 -0500
+Received: by mail-ot1-x343.google.com with SMTP id e12so12729651otl.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 04:57:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1549282241-23535-1-git-send-email-thuth@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ui/sdl_keysym: Remove obsolete SDL1.2
- related code
+References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Feb 2019 12:56:54 +0000
+Message-ID: <CAFEAcA8nSy=gi+CDSi0GoJbdzgM-b=hOv6BdSFj67eb3yijUsA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/37] ppc-for-4.0 queue 20190204
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>, spopovyc@redhat.com
 
-On Mon, Feb 04, 2019 at 01:10:41PM +0100, Thomas Huth wrote:
-> sdl_keysym.h has only been included by sdl.c which has recently been
-> removed recently with this commit:
->=20
->   0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
->   ("ui: remove support for SDL1.2 in favour of SDL2")
->=20
-> So we can drop this header file now completely, too.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: The file is now removed completely.
->=20
->  ui/sdl_keysym.h | 278 ------------------------------------------------=
---------
->  1 file changed, 278 deletions(-)
->  delete mode 100644 ui/sdl_keysym.h
+On Mon, 4 Feb 2019 at 09:01, David Gibson <david@gibson.dropbear.id.au> wrote:
+>
+> The following changes since commit b3fc0af1ff5e922d4dd7c875394dbd26dc7313b4:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-01 17:58:27 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190204
+>
+> for you to fetch changes up to 53adb9d43e1abba187387a51f238e878e934c647:
+>
+>   mmap-alloc: fix hugetlbfs misaligned length in ppc64 (2019-02-04 18:44:20 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2019-02-04
+>
+> Here's the next batch of ppc target and spapr related changes.
+> Highlights are:
+>  * A number of endianness handling cleanups from Mark Cave-Ayland
+>  * Updated Mac VGA driver
+>  * Updated SLOF image
+>  * Some XIVE cleanups and small fixes
+>  * ppc4xx cleanups and fixes from BALATON Zoltan
+>
+> There are a few chances not technically in the ppc target code:
+>  * Several MAINTAINERS updates
+>  * Fixes for unmapping of hugepages on power hosts
+>
+> The latter is included because it's primarily of interest for ppc KVM setups.
+>
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- PMM
