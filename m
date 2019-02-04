@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33029)
+Received: from eggs.gnu.org ([209.51.188.92]:34746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gqkiq-00060R-71
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:20:07 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqkp1-0007cm-Hy
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gqkip-00023X-CM
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:20:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gqkip-00022C-1s
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:20:03 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x14KJ9ml065251
-	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 15:20:00 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qev64rcat-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 15:20:00 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Mon, 4 Feb 2019 20:19:59 -0000
-References: <20190130155733.32742-1-david@redhat.com>
-	<20190130155733.32742-4-david@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Mon, 4 Feb 2019 15:19:53 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqkot-0006QR-7O
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38806)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqkoq-0006Ov-Ud
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:26:17 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Mon,  4 Feb 2019 21:26:03 +0100
+Message-Id: <20190204202609.26956-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190130155733.32742-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <80dae41f-f3f0-1acd-1fd6-8e7473712802@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] s390x/pci: Warn when
- adding PCI devices without the 'zpci' feature
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/6] Kconfig dependencies for MIPS machines
+ (but Malta)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,44 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On 1/30/19 10:57 AM, David Hildenbrand wrote:
-> We decided to always create the PCI host bridge, even if 'zpci' is not
-> enabled (due to migration compatibility). This however right now allows
-> to add zPCI/PCI devices to a VM although the guest will never actually see
-> them, confusing people that are using a simple CPU model that has no
-> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
-> 
-> Let's check for 'zpci' and at least print a warning that this will not
-> work as expected. We could also bail out, however that might break
-> existing QEMU commandlines.
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   hw/s390x/s390-pci-bus.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 9b5c5fff60..2efd9186c2 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -826,6 +826,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->   {
->       S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->   
-> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> +        warn_report("PCI/zPCI device without the 'zpci' CPU feature."
-> +                    " The guest will not be able to see/use this device");
-> +    }
-> +
->       if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->           PCIDevice *pdev = PCI_DEVICE(dev);
->   
-> 
+Express the MIPS machine dependencies with Kconfig.
 
-I wonder if someone might misconstrue this as "the _PCI device_ needs
-the zpci feature." I think "'zpci' CPU feature required to support
-PCI/zPCI devices." reads better. The last sentence is fine to me.
+Due to the complexity of the PIIX codebase being shared with
+the X86 machines, the Malta board fill follow in a different
+series (after some refactor cleanup).
+
+v2:
+- Do not remove machines from the default config (Thomas)
+- Corrected comment about CONFIG_PCI_BONITO (Thomas)
+
+v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg593013.html
+
+$ git backport-diff -u kconfig_mips_v1
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/6:[0001] [FC] 'mips: Express dependencies of the MIPSsim machine with=
+ kconfig'
+002/6:[0001] [FC] 'mips: Express dependencies of the Jazz machine with kc=
+onfig'
+003/6:[0001] [FC] 'mips: Express dependencies of the r4k platform with kc=
+onfig'
+004/6:[0001] [FC] 'mips: Express dependencies of the Boston machine with =
+kconfig'
+005/6:[----] [-C] 'hw/pci-host: Use CONFIG_PCI_BONITO to select the Bonit=
+o North Bridge'
+006/6:[0001] [FC] 'mips: Express dependencies of the Loongson 2E machine =
+with kconfig'
+
+Regards,
+
+Phil.
+
+Based on "Kconfig dependencies for ppc machines" from Thomas
+Huth (which is based on Paolo's, which uses Yang Zhong "make
+qemu configurable for Kconfig" v1).
+Based-on: 1548942810-22942-1-git-send-email-thuth@redhat.com
+
+Philippe Mathieu-Daud=C3=A9 (6):
+  mips: Express dependencies of the MIPSsim machine with kconfig
+  mips: Express dependencies of the Jazz machine with kconfig
+  mips: Express dependencies of the r4k platform with kconfig
+  mips: Express dependencies of the Boston machine with kconfig
+  hw/pci-host: Use CONFIG_PCI_BONITO to select the Bonito North Bridge
+  mips: Express dependencies of the Loongson 2E machine with kconfig
+
+ default-configs/mips-softmmu-common.mak |  2 --
+ default-configs/mips64-softmmu.mak      |  5 ----
+ default-configs/mips64el-softmmu.mak    | 12 --------
+ hw/isa/Kconfig                          | 13 +++++---
+ hw/mips/Kconfig                         | 40 +++++++++++++++++++++++++
+ hw/pci-host/Kconfig                     |  4 +++
+ hw/pci-host/Makefile.objs               |  2 +-
+ 7 files changed, 54 insertions(+), 24 deletions(-)
+
+--=20
+2.20.1
