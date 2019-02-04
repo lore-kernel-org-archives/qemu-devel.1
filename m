@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60241)
+Received: from eggs.gnu.org ([209.51.188.92]:60433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqcwu-0002y8-6K
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:05 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqcxn-0003PH-FY
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:03:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqcwt-0001HY-4X
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:04 -0500
-Resent-Message-Id: <E1gqcwt-0001HY-4X@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21126)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqcws-0001Fb-SC
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:03 -0500
-Message-ID: <154928079260.29184.375738094710200729@ebba9967afc0>
-In-Reply-To: <20190204112803.11645-1-anthony.perard@citrix.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1gqcxk-0003Ob-So
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:59 -0500
+Date: Mon, 4 Feb 2019 13:02:38 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190204130238.120099ff.cohuck@redhat.com>
+In-Reply-To: <1548768562-20007-16-git-send-email-jjherne@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-16-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 03:46:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/4] Xen queue 20190204
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 15/15] s390-bios: Support booting from real
+ dasd device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +24,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: anthony.perard@citrix.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, peter.maydell@linaro.org
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDExMjgwMy4xMTY0
-NS0xLWFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29uZmln
-dXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11
-LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9u
-PS91c3IvYmluL3B5dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVu
-YWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRs
-ZSAtLWVuYWJsZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVz
-dC1hZ2VudCAtLXdpdGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRoLXNk
-bGFiaT0yLjAKVHJ5ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9yIG1v
-cmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgTW9uIEZlYiAgNCAxMTo0NjowNiBV
-VEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUn
-ICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQt
-c29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0vdXNy
-L2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0tZW5h
-YmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxlLW5l
-dHRsZScgJy0tZW5hYmxlLWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicgJy0t
-ZW5hYmxlLWd1ZXN0LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9fY29t
-cGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEy
-MiA2MTcgNjM0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVf
-T0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1X
-cmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1w
-cm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1n
-bnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYu
-Ywpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9fIG5v
-dCBkZWZpbmVkCiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5j
-czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
-ZXM6IDkyIDEyMiA2MTcgNjg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
-IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
-b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
-bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
-cHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9x
-ZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19p
-Mzg2X18gbm90IGRlZmluZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+Cgot
-LS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBt
-YWluCmxpbmVzOiA5MiAxMjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05V
-X1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJp
-Y3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3Ry
-aW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1v
-biAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmln
-LXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vy
-cm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAog
-IF5+fn5+CgotLS0KbGluZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1t
-dGhyZWFkcyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxF
-X1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5k
-ZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFz
-aW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11LWNv
-bmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2djYy94
-ODZfNjQtdzY0LW1pbmd3MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jp
-bi9sZDogY2Fubm90IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAx
-IGV4aXQgc3RhdHVzCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJl
-Y2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUg
-NTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAxOTAyMDQxMTI4MDMuMTE2NDUtMS1hbnRob255LnBlcmFyZEBjaXRy
-aXguY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Tue, 29 Jan 2019 08:29:22 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+
+> Allows guest to boot from a vfio configured real dasd device.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  docs/devel/s390-dasd-ipl.txt | 132 +++++++++++++++++++++++
+>  pc-bios/s390-ccw/Makefile    |   2 +-
+>  pc-bios/s390-ccw/dasd-ipl.c  | 249 +++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/dasd-ipl.h  |  16 +++
+>  pc-bios/s390-ccw/main.c      |   4 +
+>  pc-bios/s390-ccw/s390-arch.h |  13 +++
+>  6 files changed, 415 insertions(+), 1 deletion(-)
+>  create mode 100644 docs/devel/s390-dasd-ipl.txt
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.c
+>  create mode 100644 pc-bios/s390-ccw/dasd-ipl.h
+> 
+> diff --git a/docs/devel/s390-dasd-ipl.txt b/docs/devel/s390-dasd-ipl.txt
+> new file mode 100644
+> index 0000000..84ec7b8
+> --- /dev/null
+> +++ b/docs/devel/s390-dasd-ipl.txt
+> @@ -0,0 +1,132 @@
+> +*****************************
+> +***** s390 hardware IPL *****
+> +*****************************
+> +
+> +The s390 hardware IPL process consists of the following steps.
+> +
+> +1. A READ IPL ccw is constructed in memory location 0x0.
+> +    This ccw, by definition, reads the IPL1 record which is located on the disk
+> +    at cylinder 0 track 0 record 1. Note that the chain flag is on in this ccw
+> +    so when it is complete another ccw will be fetched and executed from memory
+> +    location 0x08.
+> +
+> +2. Execute the Read IPL ccw at 0x00, thereby reading IPL1 data into 0x00.
+> +    IPL1 data is 24 bytes in length and consists of the following pieces of
+> +    information: [psw][read ccw][tic ccw]. When the machine executes the Read
+> +    IPL ccw it read the 24-bytes of IPL1 to be read into memory starting at
+> +    location 0x0. Then the ccw program at 0x08 which consists of a read
+> +    ccw and a tic ccw is automatically executed because of the chain flag from
+> +    the original READ IPL ccw. The read ccw will read the IPL2 data into memory
+> +    and the TIC (Tranfer In Channel) will transfer control to the channel
+> +    program contained in the IPL2 data. The TIC channel command is the
+> +    equivalent of a branch/jump/goto instruction for channel programs.
+> +    NOTE: The ccws in IPL1 are defined by the architecture to be format 0.
+> +
+> +3. Execute IPL2.
+> +    The TIC ccw instruction at the end of the IPL1 channel program will begin
+> +    the execution of the IPL2 channel program. IPL2 is stage-2 of the boot
+> +    process and will contain a larger channel program than IPL1. The point of
+> +    IPL2 is to find and load either the operating system or a small program that
+> +    loads the operating system from disk. At the end of this step all or some of
+> +    the real operating system is loaded into memory and we are ready to hand
+> +    control over to the guest operating system. At this point the guest
+> +    operating system is entirely responsible for loading any more data it might
+> +    need to function. NOTE: The IPL2 channel program might read data into memory
+> +    location 0 thereby overwriting the IPL1 psw and channel program. This is ok
+> +    as long as the data placed in location 0 contains a psw whose instruction
+> +    address points to the guest operating system code to execute at the end of
+> +    the IPL/boot process.
+> +    NOTE: The ccws in IPL2 are defined by the architecture to be format 0.
+> +
+> +4. Start executing the guest operating system.
+> +    The psw that was loaded into memory location 0 as part of the ipl process
+> +    should contain the needed flags for the operating system we have loaded. The
+> +    psw's instruction address will point to the location in memory where we want
+> +    to start executing the operating system. This psw is loaded (via LPSW
+> +    instruction) causing control to be passed to the operating system code.
+> +
+> +In a non-virtualized environment this process, handled entirely by the hardware,
+> +is kicked off by the user initiating a "Load" procedure from the hardware
+> +management console. This "Load" procedure crafts a special "Read IPL" ccw in
+> +memory location 0x0 that reads IPL1. It then executes this ccw thereby kicking
+> +off the reading of IPL1 data. Since the channel program from IPL1 will be
+> +written immediately after the special "Read IPL" ccw, the IPL1 channel program
+> +will be executed immediately (the special read ccw has the chaining bit turned
+> +on). The TIC at the end of the IPL1 channel program will cause the IPL2 channel
+> +program to be executed automatically. After this sequence completes the "Load"
+> +procedure then loads the psw from 0x0.
+
+Nice summary!
+
+> +
+> +*****************************************
+> +***** How this all pertains to Qemu *****
+
+s/Qemu/QEMU/
+
+(also below)
+
+> +*****************************************
+> +
+> +In theory we should merely have to do the following to IPL/boot a guest
+> +operating system from a DASD device:
+> +
+> +1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
+> +2. Execute channel program at 0x0.
+> +3. LPSW 0x0.
+> +
+> +However, our emulation of the machine's channel program logic is missing one key
+> +feature that is required for this process to work: non-prefetch of ccw data.
+> +
+> +When we start a channel program we pass the channel subsystem parameters via an
+> +ORB (Operation Request Block). One of those parameters is a prefetch bit. If the
+> +bit is on then Qemu is allowed to read the entire channel program from guest
+> +memory before it starts executing it. This means that any channel commands that
+> +read additional channel commands will not work as expected because the newly
+> +read commands will only exist in guest memory and NOT within Qemu's channel
+> +subsystem memory. Qemu's channel subsystem's implementation currently requires
+
+But isn't that the vfio-ccw backend, rather than the channel subsystem
+implementation?
+
+> +this bit to be on for all channel programs. This is a problem because the IPL
+> +process consists of transferring control from the "Read IPL" ccw immediately to
+> +the IPL1 channel program that was read by "Read IPL".
+> +
+> +Not being able to turn off prefetch will also prevent the TIC at the end of the
+> +IPL1 channel program from transferring control to the IPL2 channel program.
+> +
+> +Lastly, in some cases (the zipl bootloader for example) the IPL2 program also
+> +tansfers control to another channel program segment immediately after reading it
+> +from the disk. So we need to be able to handle this case.
+> +
+> +**************************
+> +***** What Qemu does *****
+> +**************************
+> +
+> +Since we are forced to live with prefetch we cannot use the very simple IPL
+> +procedure we defined in the preceding section. So we compensate by doing the
+> +following.
+> +
+> +1. Place "Read IPL" ccw into memory location 0x0, but turn off chaining bit.
+> +2. Execute "Read IPL" at 0x0.
+> +
+> +   So now IPL1's psw is at 0x0 and IPL1's channel program is at 0x08.
+> +
+> +4. Write a custom channel program that will seek to the IPL2 record and then
+> +   execute the READ and TIC ccws from IPL1.  Normamly the seek is not required
+> +   because after reading the IPL1 record the disk is automatically positioned
+> +   to read the very next record which will be IPL2. But since we are not reading
+> +   both IPL1 and IPL2 as part of the same channel program we must manually set
+> +   the position.
+> +
+> +5. Grab the target address of the TIC instruction from the IPL1 channel program.
+> +   This address is where the IPL2 channel program starts.
+> +
+> +   Now IPL2 is loaded into memory somewhere, and we know the address.
+> +
+> +6. Execute the IPL2 channel program at the address obtained in step #5.
+> +
+> +   Because this channel program can be dynamic, we must use a special algorithm
+> +   that detects a READ immediately followed by a TIC and breaks the ccw chain
+> +   by turning off the chain bit in the READ ccw. When control is returned from
+> +   the kernel/hardware to the Qemu bios code we immediately issue another start
+> +   subchannel to execute the remaining TIC instruction. This causes the entire
+> +   channel program (starting from the TIC) and all needed data to be refetched
+> +   thereby stepping around the limitation that would otherwise prevent this
+> +   channel program from executing properly.
+> +
+> +   Now the operating system code is loaded somewhere in guest memory and the psw
+> +   in memory location 0x0 will point to entry code for the guest operating
+> +   system.
+> +
+> +7. LPSW 0x0.
+> +   LPSW transfers control to the guest operating system and we're done.
+
+Also a good explanation of the procedure here!
+
+(...)
+
+> +static int run_dynamic_ccw_program(SubChannelId schid, uint32_t cpa)
+> +{
+> +    bool has_next;
+> +    uint32_t next_cpa = 0;
+> +    int rc;
+> +
+> +    do {
+> +        has_next = dynamic_cp_fixup(cpa, &next_cpa);
+> +
+> +        print_int("executing ccw chain at ", cpa);
+
+Do you want to keep the unconditional print here? Or make it a
+debug_print_int, and maybe an unconditional print on error?
+
+> +        enable_prefixing();
+> +        rc = do_cio(schid, cpa, CCW_FMT0);
+> +        disable_prefixing();
+> +
+> +        if (rc) {
+> +            break;
+> +        }
+> +        cpa = next_cpa;
+> +    } while (has_next);
+> +
+> +    return rc;
+> +}
+
+Code looks fine after a quick browse.
