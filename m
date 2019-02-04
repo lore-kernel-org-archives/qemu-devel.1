@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56702)
+Received: from eggs.gnu.org ([209.51.188.92]:56922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqckL-0007jD-8n
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:49:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gqckN-0007zL-BB
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqcWQ-0004gd-CT
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:34:44 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gqcWK-0004Zn-84
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:34:36 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l9so13933079wrt.13
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 03:34:35 -0800 (PST)
-References: <20190204052712.30833-1-richard.henderson@linaro.org>
-	<20190204052712.30833-4-richard.henderson@linaro.org>
-	<CABoDooOYVShpc+OAXVCnZ0CF2P1xqk=vEzOMsoxOiCzDjnkQjw@mail.gmail.com>
-	<b84d3114-d046-ab9b-bb20-4098f7a5070e@linaro.org>
-	<CAFEAcA8+FJ1SL4mB=hMQ8mLS4vkJr885=+kxD0chAHS-nBh_Dg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c1177c37-e8b3-a20f-6b8c-877ede487b19@linaro.org>
-Date: Mon, 4 Feb 2019 11:34:31 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1gqckL-00061k-Aq
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:49:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gqckG-0005vI-8q
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:49:02 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E050144043
+	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 11:48:57 +0000 (UTC)
+Date: Mon, 4 Feb 2019 11:48:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190204114851.GB2680@work-vm>
+References: <20190128170321.16936-1-dgilbert@redhat.com>
+	<20190128170321.16936-3-dgilbert@redhat.com>
+	<87a7jfz83x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8+FJ1SL4mB=hMQ8mLS4vkJr885=+kxD0chAHS-nBh_Dg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/arm: Implement ARMv8.3-JSConv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7jfz83x.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 2/9] migration: Add announce parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +34,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-On 2/4/19 11:21 AM, Peter Maydell wrote:
-> On Mon, 4 Feb 2019 at 10:17, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 2/4/19 8:00 AM, Laurent Desnogues wrote:
->>> The pseudo code asks for NaN inputs to return 0 since FPUnpack returns
->>> a value of 0 for NaN.
->>>
->>> The rest looks correct.
->>
->> So it does.  I apparently copied the INT_MAX thing from softfloat.c without
->> double-checking.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 > 
-> I'm a little surprised risu didn't catch that -- it's usually
-> quite keen on checking NaN behaviour...
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > Add migration parameters that control RARP/GARP announcement timeouts.
+> >
+> > Based on earlier patches by myself and
+> >   Vladislav Yasevich <vyasevic@redhat.com>
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> [...]
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index 7a795ecc16..868071d3a0 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -6,6 +6,7 @@
+> >  ##
+> >  
+> >  { 'include': 'common.json' }
+> > +{ 'include': 'net.json' }
+> >  
+> >  ##
+> >  # @MigrationStats:
+> 
+> This hunk looks superfluous.
 
-I'm not sure either...  Because of other issues, I regenerated the .bin file
-and the nan case does trigger now.  I'm not sure what happened before.
+Gone.
 
+> > @@ -480,6 +481,18 @@
+> >  #
+> >  # Migration parameters enumeration
+> >  #
+> > +# @announce-initial: Inital delay (in ms) before sending the first announce
+> > +#          (Since 4.0)
+> 
+> Current master has one instance of ms in qapi/, 9 of milliseconds.  I'd
+> stick to the more common spelling.
 
-r~
+OK, changed (with some wrapping changed now the lines are longer, and an
+added 'e' in announcment).
+
+> > +#
+> > +# @announce-max: Maximum delay (in ms) between packets in the announcment
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-rounds: Number of self-announce packets sent after migration
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-step: Increase in delay (in ms) between subsequent packets in
+> > +#          the announcement (Since 4.0)
+> > +#
+> >  # @compress-level: Set the compression level to be used in live migration,
+> >  #          the compression level is an integer between 0 and 9, where 0 means
+> >  #          no compression, 1 means the best compression speed, and 9 means best
+> > @@ -557,10 +570,13 @@
+> >  #
+> >  # @max-cpu-throttle: maximum cpu throttle percentage.
+> >  #                    Defaults to 99. (Since 3.1)
+> > +#
+> >  # Since: 2.4
+> >  ##
+> >  { 'enum': 'MigrationParameter',
+> > -  'data': ['compress-level', 'compress-threads', 'decompress-threads',
+> > +  'data': ['announce-initial', 'announce-max',
+> > +           'announce-rounds', 'announce-step',
+> > +           'compress-level', 'compress-threads', 'decompress-threads',
+> >             'compress-wait-thread',
+> >             'cpu-throttle-initial', 'cpu-throttle-increment',
+> >             'tls-creds', 'tls-hostname', 'max-bandwidth',
+> > @@ -572,6 +588,18 @@
+> >  ##
+> >  # @MigrateSetParameters:
+> >  #
+> > +# @announce-initial: Inital delay (in ms) before sending the first announce
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-max: Maximum delay (in ms) between packets in the announcment
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-rounds: Number of self-announce packets sent after migration
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-step: Increase in delay (in ms) between subsequent packets in
+> > +#          the announcement (Since 4.0)
+> > +#
+> >  # @compress-level: compression level
+> >  #
+> >  # @compress-threads: compression thread count
+> > @@ -653,7 +681,11 @@
+> >  # TODO either fuse back into MigrationParameters, or make
+> >  # MigrationParameters members mandatory
+> >  { 'struct': 'MigrateSetParameters',
+> > -  'data': { '*compress-level': 'int',
+> > +  'data': { '*announce-initial': 'size',
+> > +            '*announce-max': 'size',
+> > +            '*announce-rounds': 'size',
+> > +            '*announce-step': 'size',
+> > +            '*compress-level': 'int',
+> >              '*compress-threads': 'int',
+> >              '*compress-wait-thread': 'bool',
+> >              '*decompress-threads': 'int',
+> > @@ -692,6 +724,18 @@
+> >  #
+> >  # The optional members aren't actually optional.
+> >  #
+> > +# @announce-initial: Inital delay (in ms) before sending the first announce
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-max: Maximum delay (in ms) between packets in the announcment
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-rounds: Number of self-announce packets sent after migration
+> > +#          (Since 4.0)
+> > +#
+> > +# @announce-step: Increase in delay (in ms) between subsequent packets in
+> > +#          the announcement (Since 4.0)
+> > +#
+> >  # @compress-level: compression level
+> >  #
+> >  # @compress-threads: compression thread count
+> > @@ -769,7 +813,11 @@
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'MigrationParameters',
+> > -  'data': { '*compress-level': 'uint8',
+> > +  'data': { '*announce-initial': 'size',
+> > +            '*announce-max': 'size',
+> > +            '*announce-rounds': 'size',
+> > +            '*announce-step': 'size',
+> > +            '*compress-level': 'uint8',
+> >              '*compress-threads': 'uint8',
+> >              '*compress-wait-thread': 'bool',
+> >              '*decompress-threads': 'uint8',
+> > @@ -785,7 +833,7 @@
+> >              '*x-multifd-page-count': 'uint32',
+> >              '*xbzrle-cache-size': 'size',
+> >  	    '*max-postcopy-bandwidth': 'size',
+> > -            '*max-cpu-throttle':'uint8'} }
+> > +            '*max-cpu-throttle':'uint8' } }
+> >  
+> >  ##
+> >  # @query-migrate-parameters:
+> 
+> Since you're tidying up whitespace, consider expanding the tab.
+
+I'd removed that cleanup based on another review.
+
+> With the superfluous hunk dropped, QAPI part
+> Acked-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks,
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
