@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34343)
+Received: from eggs.gnu.org ([209.51.188.92]:34462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqbTv-0002eX-7X
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:28:04 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqbUR-0002uR-BI
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:28:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqbTu-0002yK-6X
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:28:03 -0500
-Resent-Message-Id: <E1gqbTu-0002yK-6X@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21072)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqbTt-0002vZ-Tj
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:28:02 -0500
-Message-ID: <154927514397.29184.11588129616229360112@ebba9967afc0>
-In-Reply-To: <20190204095725.27259-1-marcandre.lureau@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1gqbUQ-0003ak-7D
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:28:34 -0500
+Date: Mon, 4 Feb 2019 11:28:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190204112827.612150fe.cohuck@redhat.com>
+In-Reply-To: <1548768562-20007-3-git-send-email-jjherne@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-3-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 02:12:25 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-gdb: add a QObject pretty printer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/15] s390-bios: decouple cio setup from
+ virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, ehabkost@redhat.com, crosa@redhat.com
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDA5NTcyNS4yNzI1
-OS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
-IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
-bmd3QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgpDb25m
-aWd1cmUgb3B0aW9uczoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRt
-bXUsYWFyY2g2NC1zb2Z0bW11IC0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwgLS1weXRo
-b249L3Vzci9iaW4vcHl0aG9uMyAtLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3MzItIC0t
-ZW5hYmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZSAtLWVuYWJsZS1nbnV0bHMgLS1lbmFibGUtbmV0
-dGxlIC0tZW5hYmxlLWN1cmwgLS1lbmFibGUtdm5jIC0tZW5hYmxlLWJ6aXAyIC0tZW5hYmxlLWd1
-ZXN0LWFnZW50IC0td2l0aC1zZGxhYmk9Mi4wCkVSUk9SOiB1bmtub3duIG9wdGlvbiAtLXdpdGgt
-c2RsYWJpPTIuMApUcnkgJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUgLS1oZWxwJyBmb3Ig
-bW9yZSBpbmZvcm1hdGlvbgojIFFFTVUgY29uZmlndXJlIGxvZyBNb24gRmViICA0IDEwOjEyOjEz
-IFVUQyAyMDE5CiMgQ29uZmlndXJlZCB3aXRoOiAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3Vy
-ZScgJy0tZW5hYmxlLXdlcnJvcicgJy0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2
-NC1zb2Z0bW11JyAnLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCcgJy0tcHl0aG9uPS91
-c3IvYmluL3B5dGhvbjMnICctLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3MzItJyAnLS1l
-bmFibGUtdHJhY2UtYmFja2VuZHM9c2ltcGxlJyAnLS1lbmFibGUtZ251dGxzJyAnLS1lbmFibGUt
-bmV0dGxlJyAnLS1lbmFibGUtY3VybCcgJy0tZW5hYmxlLXZuYycgJy0tZW5hYmxlLWJ6aXAyJyAn
-LS1lbmFibGUtZ3Vlc3QtYWdlbnQnICctLXdpdGgtc2RsYWJpPTIuMCcKLS0tCmZ1bmNzOiBkb19j
-b21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIg
-MTIyIDYxNyA2MzQgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklM
-RV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMg
-LVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5n
-LXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3Rk
-PWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29u
-Zi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBfX2xpbnV4X18g
-bm90IGRlZmluZWQKICNlcnJvciBfX2xpbnV4X18gbm90IGRlZmluZWQKICBefn5+fgoKLS0tCmZ1
-bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgps
-aW5lczogOTIgMTIyIDYxNyA2ODYgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VS
-Q0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXBy
-b3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3Mg
-LVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3
-cmFwdiAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1w
-L3FlbXUtY29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBf
-X2kzODZfXyBub3QgZGVmaW5lZAogI2Vycm9yIF9faTM4Nl9fIG5vdCBkZWZpbmVkCiAgXn5+fn4K
-Ci0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5l
-IG1haW4KbGluZXM6IDkyIDEyMiA2MTcgNjg5IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9H
-TlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0
-cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1z
-dHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29t
-bW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25m
-aWctdGVtcC9xZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAj
-ZXJyb3IgX19JTFAzMl9fIG5vdCBkZWZpbmVkCiAjZXJyb3IgX19JTFAzMl9fIG5vdCBkZWZpbmVk
-CiAgXn5+fn4KCi0tLQpsaW5lczogOTIgMTI4IDkyMCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2Mg
-LW10aHJlYWRzIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJ
-TEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1
-bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxp
-YXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5IC1vIGNvbmZpZy10ZW1wL3FlbXUt
-Y29uZi5leGUgY29uZmlnLXRlbXAvcWVtdS1jb25mLmMgLWcgLWxpYmVydHkKL3Vzci9saWIvZ2Nj
-L3g4Nl82NC13NjQtbWluZ3czMi84LjIuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIv
-YmluL2xkOiBjYW5ub3QgZmluZCAtbGliZXJ0eQpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVk
-IDEgZXhpdCBzdGF0dXMKRmFpbGVkIHRvIHJ1biAnY29uZmlndXJlJwpUcmFjZWJhY2sgKG1vc3Qg
-cmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGlu
-ZSA1NjMsIGluIDxtb2R1bGU+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNDA5NTcyNS4yNzI1OS0xLW1hcmNhbmRyZS5sdXJlYXVA
-cmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+On Tue, 29 Jan 2019 08:29:09 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+
+> Move channel i/o setup code out to a separate function. This decouples cio
+> setup from the virtio code path and allows us to make use of it for booting
+> dasd devices.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/main.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
