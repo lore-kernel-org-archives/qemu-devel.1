@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42557)
+Received: from eggs.gnu.org ([209.51.188.92]:42736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqn9p-0005Zw-OP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:06 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gqn9r-0005x8-Ve
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqmy6-00029p-Ug
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:43:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gqmy6-00028p-FC
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:43:58 -0500
-References: <20190204215627.2099-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9889ec82-f1ed-3636-e706-5c359c17e668@redhat.com>
-Date: Mon, 4 Feb 2019 16:43:56 -0600
+	(envelope-from <walling@linux.ibm.com>) id 1gqmwM-0008Dy-1r
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:42:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45868
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gqmwL-00087j-QF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:42:09 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x14MYe3V083517
+	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 17:42:07 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2qewmn9nj7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 17:42:07 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Mon, 4 Feb 2019 22:42:06 -0000
+References: <20190130155733.32742-1-david@redhat.com>
+	<20190130155733.32742-4-david@redhat.com>
+	<80dae41f-f3f0-1acd-1fd6-8e7473712802@linux.ibm.com>
+	<5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Mon, 4 Feb 2019 17:42:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190204215627.2099-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NRoihj02Xyla4zvMRAfQTZkQa2ezLwC8T"
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Flag suspicious attribution
- lines
+In-Reply-To: <5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <810ede3a-7d69-8cff-7058-9e2bb002fff9@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] s390x/pci: Warn when
+ adding PCI devices without the 'zpci' feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +46,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NRoihj02Xyla4zvMRAfQTZkQa2ezLwC8T
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <9889ec82-f1ed-3636-e706-5c359c17e668@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Flag suspicious attribution
- lines
-References: <20190204215627.2099-1-eblake@redhat.com>
-In-Reply-To: <20190204215627.2099-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2/4/19 4:54 PM, David Hildenbrand wrote:
+> On 04.02.19 21:19, Collin Walling wrote:
+>> On 1/30/19 10:57 AM, David Hildenbrand wrote:
+>>> We decided to always create the PCI host bridge, even if 'zpci' is not
+>>> enabled (due to migration compatibility). This however right now allows
+>>> to add zPCI/PCI devices to a VM although the guest will never actually see
+>>> them, confusing people that are using a simple CPU model that has no
+>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
+>>>
+>>> Let's check for 'zpci' and at least print a warning that this will not
+>>> work as expected. We could also bail out, however that might break
+>>> existing QEMU commandlines.
+>>>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>    hw/s390x/s390-pci-bus.c | 5 +++++
+>>>    1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index 9b5c5fff60..2efd9186c2 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -826,6 +826,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>    {
+>>>        S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>>>    
+>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+>>> +        warn_report("PCI/zPCI device without the 'zpci' CPU feature."
+>>> +                    " The guest will not be able to see/use this device");
+>>> +    }
+>>> +
+>>>        if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>>>            PCIDevice *pdev = PCI_DEVICE(dev);
+>>>    
+>>>
+>>
+>> I wonder if someone might misconstrue this as "the _PCI device_ needs
+>> the zpci feature." I think "'zpci' CPU feature required to support
+>> PCI/zPCI devices." reads better. The last sentence is fine to me.
+>>
+> 
+> Well, the guest needs the 'zpci' feature to see the device. And that's
+> what that message says in my opinion. Not that a device needs to have a
+> feature (I added "CPU feature" for this reason).
+> 
+> "required to support" does it not make very clear what we actually want
+> to say.
+> 
+> Thanks!
+> 
 
-On 2/4/19 3:56 PM, Eric Blake wrote:
-> Flag commit attribution tags that are unusual (often because they
-> were a typo), but only as a warning (because sometimes a humorous
-> or otherwise useful tag is intentionally supplied).
->=20
-> This picks the 6-most popular tags, each with 700 or more uses (well,
-> S-o-b was already checked for case-sensitivity and typos, leaving
-> only 5 new tags being checked), as determined by:
-> $ git log | sed -n 's/^ *\([A-Za-z-]*-by:\).*/\1/p' | \
->   sort | uniq -c | sort -k1,1n | tail
->=20
-> Most of the rejected lines were obvious typos (among others, we've
-> had 4 cases of someone being burnt, based on Singed-off-by; and 2
-> cases of list-reading via an e-reader, based on eviewed-by; there
-> are also lines forgetting a space after the ':') or otherwise
-> tongue-in-check (3 Approximately-suggested-by). A few lines not
-> whitelisted here may be legitimate, but as they are orders of
-> magnitude rarer, it is therefore not worth worrying about
-> (7 Requested-by, 3 Co-authored-by, 1 Inspired-by, etc.).
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+I see your point. We can still plug in the device without the CPU
+feature, but the device will ultimately be useless to the guest. Thanks
+for clearing that up.
 
->  			}
-> +		} elsif($line =3D~ /^\s*([A-Za-z-])*-by:/ &&
-> +			($1 !~ /(Suggest|Report|Test|Ack|Review)ed/ ||
-> +			 $line !~ /^\s[a-z-]*-by:\S/i)) {
+Still, the wording reads strangely to me. I read it as the PCI device
+itself requires a "zpci CPU feature" which of course does not make sense
+(and I fully understand that's not what you mean here).
 
-Oops, that last one is supposed to be =3D~, to flag lines that forget the=
+What do you think about:
 
-space between *-by: and the email address.
+"PCI/zPCI device plugging without 'zpci' CPU feature enabled." along
+with your second sentence, of course.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Either way you decide, it's still a good idea to have this warning in
+here. I'm really just debating syntax and not semantics, so it's not
+really important. I won't impede this patch over a differing opinion of
+a small rewording. :)
 
-
---NRoihj02Xyla4zvMRAfQTZkQa2ezLwC8T
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxYwCwACgkQp6FrSiUn
-Q2qeQQf9GVxK4bE5PxUFHW5wpaRUAwGJtc7w70ZGkeObnQ3IaWdzVwPV5tqid3Su
-QinSl/yI0TRJhK2tDPgcpamttLP5rw3jBQJpFOnpTlol7jjxNynkEUSaTmlDc5Nb
-yOuAt1eGzp7BL4XW/wV/fuLuVhN/DtegtIQPNMboHcJzCBUnisdEV3n0Mg19yBNu
-IYjmcQZLP5gSGbrh6Qvf6hX0u0X7POa/igKRWWy+hZeVP97wCo05fnLtybPhN+5w
-RctkpEW+RVF4rCB2LkBCfofBQ0lpSoCT2ubhzp3bnR7Xd3DhsL6aSD2XA4U8p1eI
-7GuCv97xngzSE7BmToTRVTuyITjk3Q==
-=cFkH
------END PGP SIGNATURE-----
-
---NRoihj02Xyla4zvMRAfQTZkQa2ezLwC8T--
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
