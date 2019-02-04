@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46999)
+Received: from eggs.gnu.org ([209.51.188.92]:47784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqdsq-0005r9-0v
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1gqduv-0006t3-WD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gqdsk-0001tM-2q
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:55 -0500
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:40307)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqdsh-0001kT-5V
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:49 -0500
-Received: by mail-wr1-f42.google.com with SMTP id p4so14274530wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 05:01:39 -0800 (PST)
-References: <20190201171229.3361-1-alex.bennee@linaro.org>
-	<3792ad53-69e1-e45e-1f0f-406288af0912@redhat.com>
-	<87pns74smb.fsf@zen.linaroharston>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e533781e-914f-50dc-5df3-7a2d9831f1d1@redhat.com>
-Date: Mon, 4 Feb 2019 14:01:36 +0100
+	(envelope-from <armbru@redhat.com>) id 1gqduu-00041l-3G
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gqdus-0003yW-1J
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:03 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-7-yuval.shaia@oracle.com>
+Date: Mon, 04 Feb 2019 14:03:58 +0100
+In-Reply-To: <20190131130850.6850-7-yuval.shaia@oracle.com> (Yuval Shaia's
+	message of "Thu, 31 Jan 2019 15:08:46 +0200")
+Message-ID: <87bm3rso1t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87pns74smb.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] .travis.yml: separate tools and docs into
- another entry
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 06/10] hw/pvrdma: Dump device statistics
+ counters to file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: dgilbert@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-On 2/4/19 1:59 PM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
->> On 2/1/19 6:12 PM, Alex Bennée wrote:
->>> Re-building the tools and documents by default is a little wasteful as
->>> they are not really affected by the main build options. Split tools
->>> and documents into their own task with a minimal softmmu and
->>> linux-user target list just to check they don't interact badly.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  .travis.yml | 14 ++++++++++++--
->>>  1 file changed, 12 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/.travis.yml b/.travis.yml
->>> index 87d9fa971c..1c8effcf63 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -61,6 +61,7 @@ env:
->>>    global:
->>>      - SRC_DIR="."
->>>      - BUILD_DIR="."
->>> +    - BASE_CONFIG="--disable-docs --disable-tools"
->>>      - TEST_CMD="make check -j3 V=1"
->>>
->>>
->>> @@ -71,7 +72,7 @@ git:
->>>
->>>  before_script:
->>>    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
->>> -  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
->>> +  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
->>>  script:
->>>    - make -j3 && ${TEST_CMD}
->>>
->>> @@ -106,6 +107,15 @@ matrix:
->>>          - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
->>>
->>>
->>> +    # Check we can build docs and tools
->>> +    - env:
->>> +        - BASE_CONFIG=""
->>
->> What about using explicit configure options?
->>
->>    BASE_CONFIG="--enable-docs --enable-tools"
-> 
-> Will add for clarity (although not effect ;-)
+Yuval Shaia <yuval.shaia@oracle.com> writes:
 
-The effect will be in 10 months when I'll look at this again :P
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>  hw/rdma/vmw/pvrdma.h      |  1 +
+>  hw/rdma/vmw/pvrdma_main.c | 72 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 73 insertions(+)
+>
+> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> index 167706ec2c..dc10f21ca0 100644
+> --- a/hw/rdma/vmw/pvrdma.h
+> +++ b/hw/rdma/vmw/pvrdma.h
+> @@ -133,5 +133,6 @@ static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
+>  }
+>  
+>  int pvrdma_exec_cmd(PVRDMADev *dev);
+> +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func);
+>  
+>  #endif
 
-Thanks!
+The only user appears in the next patch.  I'd squash the two patches.
+Matter of taste.
 
->>
->> Regardless:
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->>> +        - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
->>> +      addons:
->>> +        apt:
->>> +          packages:
->>> +            - python-sphinx
->>> +
->>>      # Test out-of-tree builds
->>>      - env:
->>>          - CONFIG="--enable-debug --enable-debug-tcg"
->>> @@ -243,5 +253,5 @@ matrix:
->>>
->>>
->>>      - env:
->>> -        - CONFIG="--disable-system --disable-docs"
->>> +        - CONFIG="--disable-system"
->>>          - TEST_CMD="make -j3 check-tcg V=1"
->>>
-> 
-> 
-> --
-> Alex Bennée
-> 
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index cf82e78f08..79900076ec 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -14,6 +14,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+> @@ -36,6 +37,8 @@
+>  #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
+>  #include "pvrdma_qp_ops.h"
+>  
+> +GSList *devices;
+> +
+>  static Property pvrdma_dev_properties[] = {
+>      DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
+>      DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
+> @@ -55,6 +58,72 @@ static Property pvrdma_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static void pvrdma_dump_device_statistics(gpointer data, gpointer user_data)
+> +{
+> +    CPUListState *s = user_data;
+> +    PCIDevice *pdev = data;
+> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> +
+> +    (*s->cpu_fprintf)(s->file, "%s_%x.%x\n", pdev->name,
+> +                 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
+
+Why the indirection through CPUListState?  What's wrong with straight
+monitor_printf()?
+
+> +    (*s->cpu_fprintf)(s->file, "\tcommands         : %" PRId64 "\n",
+> +                      dev->stats.commands);
+> +    (*s->cpu_fprintf)(s->file, "\ttx               : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.tx);
+> +    (*s->cpu_fprintf)(s->file, "\ttx_len           : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.tx_len);
+> +    (*s->cpu_fprintf)(s->file, "\ttx_err           : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.tx_err);
+> +    (*s->cpu_fprintf)(s->file, "\trx_bufs          : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.rx_bufs);
+> +    (*s->cpu_fprintf)(s->file, "\trx_bufs_len      : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.rx_bufs_len);
+> +    (*s->cpu_fprintf)(s->file, "\trx_bufs_err      : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.rx_bufs_err);
+> +    (*s->cpu_fprintf)(s->file, "\tcompletions      : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.completions);
+> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (bk)     : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.poll_cq_from_bk);
+> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.poll_cq_ppoll_to);
+> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (fe)     : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.poll_cq_from_guest);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_tx           : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_tx);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_tx_err       : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_tx_err);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_rx           : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_rx);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_err       : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_rx_err);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs      : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_rx_bufs);
+> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs_err  : %" PRId64 "\n",
+> +                      dev->rdma_dev_res.stats.mad_rx_bufs_err);
+> +    (*s->cpu_fprintf)(s->file, "\tPDs              : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.pd_tbl.used);
+> +    (*s->cpu_fprintf)(s->file, "\tMRs              : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.mr_tbl.used);
+> +    (*s->cpu_fprintf)(s->file, "\tUCs              : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.uc_tbl.used);
+> +    (*s->cpu_fprintf)(s->file, "\tQPs              : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.qp_tbl.used);
+> +    (*s->cpu_fprintf)(s->file, "\tCQs              : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.cq_tbl.used);
+> +    (*s->cpu_fprintf)(s->file, "\tCEQ_CTXs         : %" PRId32 "\n",
+> +                      dev->rdma_dev_res.cqe_ctx_tbl.used);
+> +}
+> +
+> +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func)
+> +{
+> +    CPUListState s = {
+> +        .file = f,
+> +        .cpu_fprintf = fprintf_func,
+> +    };
+> +
+> +    g_slist_foreach(devices, pvrdma_dump_device_statistics, &s);
+> +}
+> +
+>  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+>                            void *ring_state)
+>  {
+> @@ -618,6 +687,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+>      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
+>      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+>  
+> +    devices = g_slist_append(devices, pdev);
+> +
+>  out:
+>      if (rc) {
+>          pvrdma_fini(pdev);
+> @@ -627,6 +698,7 @@ out:
+>  
+>  static void pvrdma_exit(PCIDevice *pdev)
+>  {
+> +    devices = g_slist_remove(devices, pdev);
+>      pvrdma_fini(pdev);
+>  }
