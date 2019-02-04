@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37400)
+Received: from eggs.gnu.org ([209.51.188.92]:37411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqbb5-0006J0-LV
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:28 -0500
+	(envelope-from <berrange@redhat.com>) id 1gqbb6-0006J7-L5
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqbaw-0000Gd-2e
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:22 -0500
-Resent-Message-Id: <E1gqbaw-0000Gd-2e@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqbar-0008UQ-TM
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:16 -0500
-Message-ID: <154927649310.29184.13832541431637637256@ebba9967afc0>
-In-Reply-To: <20190204100810.14800-1-lhrazky@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berrange@redhat.com>) id 1gqbay-0000Jq-2b
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqbav-0000A2-Uq
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:18 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CDFA87F7B1
+	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 10:35:12 +0000 (UTC)
+Date: Mon, 4 Feb 2019 10:35:06 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190204103506.GG1905@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190202110834.24880-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 02:34:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2] spice: set device address and device
- display ID in QXL interface
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190202110834.24880-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] char: allow specifying a GMainContext at
+ opening time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +35,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lhrazky@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, kraxel@redhat.com, spice-devel@lists.freedesktop.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDEwMDgxMC4xNDgw
-MC0xLWxocmF6a3lAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
-YSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgpDb25maWd1cmUgb3B0
-aW9uczoKLS1lbmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2
-NC1zb2Z0bW11IC0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwgLS1weXRob249L3Vzci9i
-aW4vcHl0aG9uMyAtLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3MzItIC0tZW5hYmxlLXRy
-YWNlLWJhY2tlbmRzPXNpbXBsZSAtLWVuYWJsZS1nbnV0bHMgLS1lbmFibGUtbmV0dGxlIC0tZW5h
-YmxlLWN1cmwgLS1lbmFibGUtdm5jIC0tZW5hYmxlLWJ6aXAyIC0tZW5hYmxlLWd1ZXN0LWFnZW50
-IC0td2l0aC1zZGxhYmk9Mi4wCkVSUk9SOiB1bmtub3duIG9wdGlvbiAtLXdpdGgtc2RsYWJpPTIu
-MApUcnkgJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUgLS1oZWxwJyBmb3IgbW9yZSBpbmZv
-cm1hdGlvbgojIFFFTVUgY29uZmlndXJlIGxvZyBNb24gRmViICA0IDEwOjM0OjI2IFVUQyAyMDE5
-CiMgQ29uZmlndXJlZCB3aXRoOiAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZScgJy0tZW5h
-YmxlLXdlcnJvcicgJy0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUsYWFyY2g2NC1zb2Z0bW11
-JyAnLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCcgJy0tcHl0aG9uPS91c3IvYmluL3B5
-dGhvbjMnICctLWNyb3NzLXByZWZpeD14ODZfNjQtdzY0LW1pbmd3MzItJyAnLS1lbmFibGUtdHJh
-Y2UtYmFja2VuZHM9c2ltcGxlJyAnLS1lbmFibGUtZ251dGxzJyAnLS1lbmFibGUtbmV0dGxlJyAn
-LS1lbmFibGUtY3VybCcgJy0tZW5hYmxlLXZuYycgJy0tZW5hYmxlLWJ6aXAyJyAnLS1lbmFibGUt
-Z3Vlc3QtYWdlbnQnICctLXdpdGgtc2RsYWJpPTIuMCcKLS0tCmZ1bmNzOiBkb19jb21waWxlciBk
-b19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIgMTIyIDYxNyA2
-MzQgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRf
-QklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRh
-bnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlw
-ZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5IC1j
-IC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jCmNvbmZp
-Zy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBfX2xpbnV4X18gbm90IGRlZmlu
-ZWQKICNlcnJvciBfX2xpbnV4X18gbm90IGRlZmluZWQKICBefn5+fgoKLS0tCmZ1bmNzOiBkb19j
-b21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUgbWFpbgpsaW5lczogOTIg
-MTIyIDYxNyA2ODYgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dOVV9TT1VSQ0UgLURfRklM
-RV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMg
-LVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5n
-LXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3Rk
-PWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29u
-Zi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNlcnJvciBfX2kzODZfXyBu
-b3QgZGVmaW5lZAogI2Vycm9yIF9faTM4Nl9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5j
-czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
-ZXM6IDkyIDEyMiA2MTcgNjg5IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
-IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
-b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
-bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
-cHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9x
-ZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19J
-TFAzMl9fIG5vdCBkZWZpbmVkCiAjZXJyb3IgX19JTFAzMl9fIG5vdCBkZWZpbmVkCiAgXn5+fn4K
-Ci0tLQpsaW5lczogOTIgMTI4IDkyMCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLW10aHJlYWRz
-IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNF
-IC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dy
-aXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZu
-by1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5IC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5leGUg
-Y29uZmlnLXRlbXAvcWVtdS1jb25mLmMgLWcgLWxpYmVydHkKL3Vzci9saWIvZ2NjL3g4Nl82NC13
-NjQtbWluZ3czMi84LjIuMC8uLi8uLi8uLi8uLi94ODZfNjQtdzY0LW1pbmd3MzIvYmluL2xkOiBj
-YW5ub3QgZmluZCAtbGliZXJ0eQpjb2xsZWN0MjogZXJyb3I6IGxkIHJldHVybmVkIDEgZXhpdCBz
-dGF0dXMKRmFpbGVkIHRvIHJ1biAnY29uZmlndXJlJwpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNh
-bGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA1NjMsIGlu
-IDxtb2R1bGU+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
-cmcvbG9ncy8yMDE5MDIwNDEwMDgxMC4xNDgwMC0xLWxocmF6a3lAcmVkaGF0LmNvbS90ZXN0aW5n
-LmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Sat, Feb 02, 2019 at 12:08:34PM +0100, Paolo Bonzini wrote:
+> This will be needed by vhost-user-test, when each test switches to
+> its own GMainLoop and GMainContext.  Otherwise, for a reconnecting
+> socket the initial connection will happen on the default GMainContext,
+> and no one will be listening on it.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Based-on: <1544684731-18828-1-git-send-email-thuth@redhat.com>
+
+I'm wondering if you had looked at my series related to the chardev
+reconnect feature, as this feature has many flaws as implemented
+right now:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05947.html
+
+Our patches will conflict, but I think yours is needed regardless.
+
+Incidentally I'm increasingly of the opinion that the qemu_chr_new()
+design right now is flawed.
+
+IMHO we should really decouple the parsing & creation of the
+Chardev object, from the opening of the backend. eg I would like
+to see a qemu_chr_open() as a separate explicitly callable step
+from qemu_chr_new(). If we had that, then we would not need to
+pass GMainContext into qemu_chr_new() as we would be able to
+call the API to set the GMainContext before calling qemu_chr_open
+
+I fear that would be a complex refactoring job though, so no
+objection to your current patch for solving the immediate need.
+
+> ---
+>  chardev/char.c          | 30 +++++++++++++++-------------
+>  gdbstub.c               |  4 ++--
+>  hmp.c                   |  2 +-
+>  hw/arm/omap2.c          |  2 +-
+>  hw/bt/hci-csr.c         |  2 +-
+>  hw/char/omap_uart.c     |  4 ++--
+>  hw/char/xen_console.c   |  3 ++-
+>  hw/isa/isa-superio.c    |  4 ++--
+>  hw/mips/boston.c        |  2 +-
+>  hw/mips/mips_malta.c    |  2 +-
+>  hw/usb/dev-serial.c     |  2 +-
+>  include/chardev/char.h  | 16 +++++++++++----
+>  net/slirp.c             |  2 +-
+>  qtest.c                 |  2 +-
+>  tests/test-char.c       | 43 +++++++++++++++++++++--------------------
+>  tests/vhost-user-test.c |  2 +-
+>  vl.c                    |  8 ++++----
+>  17 files changed, 72 insertions(+), 58 deletions(-)
+
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
