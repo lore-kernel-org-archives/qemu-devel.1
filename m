@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48496)
+Received: from eggs.gnu.org ([209.51.188.92]:48683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqZ5I-0003TF-H8
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:29 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ5e-0003iY-6S
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqZ5H-0002KV-Bs
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:28 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  4 Feb 2019 08:54:18 +0100
-Message-Id: <1549266858-5043-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the file
- headers
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ5d-0002XW-7j
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:50 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 4 Feb 2019 07:49:28 +0000
+Message-ID: <2850e8a6-e0c4-c8b0-602b-2192af8d7a3b@virtuozzo.com>
+References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<87pnsbxsi7.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pnsbxsi7.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3933AE13AB3B2349973B8B4D6FD88354@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,122 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Anthony Green <green@moxielogic.com>
+To: Markus Armbruster <armbru@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-It's either "GNU *Library* General Public License version 2" or "GNU
-Lesser General Public License version *2.1*", but there was no "version
-2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
-Also the files mentioned the GPL instead of the LGPL after declaring
-that the files are licensed under the LGPL, so change these spots to
-use LGPL, too.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- target/moxie/cpu.c       | 2 +-
- target/moxie/cpu.h       | 4 ++--
- target/moxie/helper.c    | 4 ++--
- target/moxie/mmu.c       | 4 ++--
- target/moxie/translate.c | 4 ++--
- 5 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 8d67eb6..46434e6 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -13,7 +13,7 @@
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-+ * You should have received a copy of the GNU Lesser General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index d40f1e6..080df4e 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -6,14 +6,14 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-+ * You should have received a copy of the GNU Lesser General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-diff --git a/target/moxie/helper.c b/target/moxie/helper.c
-index 5b1532b..f3d8ee7 100644
---- a/target/moxie/helper.c
-+++ b/target/moxie/helper.c
-@@ -6,14 +6,14 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-+ * You should have received a copy of the GNU Lesser General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-diff --git a/target/moxie/mmu.c b/target/moxie/mmu.c
-index bd90b1e..87783a3 100644
---- a/target/moxie/mmu.c
-+++ b/target/moxie/mmu.c
-@@ -6,14 +6,14 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-+ * You should have received a copy of the GNU Lesser General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-diff --git a/target/moxie/translate.c b/target/moxie/translate.c
-index 29da02b..68ca223 100644
---- a/target/moxie/translate.c
-+++ b/target/moxie/translate.c
-@@ -5,7 +5,7 @@
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public License
-- * as published by the Free Software Foundation; either version 2 of
-+ * as published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful, but
-@@ -13,7 +13,7 @@
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-+ * You should have received a copy of the GNU Lesser General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
--- 
-1.8.3.1
+MDEuMDIuMjAxOSAyMTozOSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IEFuZHJleSBTaGlu
+a2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+IA0KPj4g
+SW4gdGhlICdGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRpb24nIHNlY3Rpb24gb2YgdGhlICdxZW11
+LWltZyBpbmZvJw0KPj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRp
+b24gYWJvdXQgZXhpc3RpbmcgUUNPVzINCj4+IGJpdG1hcHMgd2lsbCBiZSBzaG93biwgc3VjaCBh
+cyBhIGJpdG1hcCBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHk6DQo+Pg0KPj4gaW1hZ2U6IC92
+ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhkZA0KPj4gZmlsZSBmb3JtYXQ6IHFjb3cyDQo+PiB2
+aXJ0dWFsIHNpemU6IDY0RyAoNjg3MTk0NzY3MzYgYnl0ZXMpDQo+PiBkaXNrIHNpemU6IDMuME0N
+Cj4+IGNsdXN0ZXJfc2l6ZTogMTA0ODU3Ng0KPj4gRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9u
+Og0KPj4gICAgICBjb21wYXQ6IDEuMQ0KPj4gICAgICBsYXp5IHJlZmNvdW50czogdHJ1ZQ0KPj4g
+ICAgICBiaXRtYXBzOg0KPj4gICAgICAgICAgWzBdOg0KPj4gICAgICAgICAgICAgIGZsYWdzOg0K
+Pj4gICAgICAgICAgICAgICAgICBbMF06IGluLXVzZQ0KPj4gICAgICAgICAgICAgICAgICBbMV06
+IGF1dG8NCj4+ICAgICAgICAgICAgICBuYW1lOiBiYWNrLXVwMQ0KPj4gICAgICAgICAgICAgIHVu
+a25vd24gZmxhZ3M6IDQNCj4+ICAgICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+ICAg
+ICAgICAgIFsxXToNCj4+ICAgICAgICAgICAgICBmbGFnczoNCj4+ICAgICAgICAgICAgICAgICAg
+WzBdOiBpbi11c2UNCj4+ICAgICAgICAgICAgICAgICAgWzFdOiBhdXRvDQo+PiAgICAgICAgICAg
+ICAgbmFtZTogYmFjay11cDINCj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA4DQo+PiAg
+ICAgICAgICAgICAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+PiAgICAgIHJlZmNvdW50IGJpdHM6IDE2
+DQo+PiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNo
+aW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4gWy4u
+Ll0NCj4+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29y
+ZS5qc29uDQo+PiBpbmRleCA5MTY4NWJlLi4yNzFlMGRmIDEwMDY0NA0KPj4gLS0tIGEvcWFwaS9i
+bG9jay1jb3JlLmpzb24NCj4+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiBAQCAtNjks
+NiArNjksOCBAQA0KPj4gICAjIEBlbmNyeXB0OiBkZXRhaWxzIGFib3V0IGVuY3J5cHRpb24gcGFy
+YW1ldGVyczsgb25seSBzZXQgaWYgaW1hZ2UNCj4+ICAgIyAgICAgICAgICAgaXMgZW5jcnlwdGVk
+IChzaW5jZSAyLjEwKQ0KPj4gICAjDQo+PiArIyBAYml0bWFwczogQSBsaXN0IG9mIHFjb3cyIGJp
+dG1hcCBkZXRhaWxzIChzaW5jZSA0LjApDQo+PiArIw0KPj4gICAjIFNpbmNlOiAxLjcNCj4+ICAg
+IyMNCj4+ICAgeyAnc3RydWN0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzInLA0KPj4gQEAgLTc3
+LDcgKzc5LDggQEANCj4+ICAgICAgICAgJypsYXp5LXJlZmNvdW50cyc6ICdib29sJywNCj4+ICAg
+ICAgICAgJypjb3JydXB0JzogJ2Jvb2wnLA0KPj4gICAgICAgICAncmVmY291bnQtYml0cyc6ICdp
+bnQnLA0KPj4gLSAgICAgICcqZW5jcnlwdCc6ICdJbWFnZUluZm9TcGVjaWZpY1FDb3cyRW5jcnlw
+dGlvbicNCj4+ICsgICAgICAnKmVuY3J5cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5
+cHRpb24nLA0KPj4gKyAgICAgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJbmZvJ10NCj4+ICAg
+ICB9IH0NCj4+ICAgDQo+PiAgICMjDQo+PiBAQCAtNDU0LDYgKzQ1Nyw0MSBAQA0KPj4gICAgICAg
+ICAgICAgICdzdGF0dXMnOiAnRGlydHlCaXRtYXBTdGF0dXMnfSB9DQo+PiAgIA0KPj4gICAjIw0K
+Pj4gKyMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPj4gKyMNCj4+ICsjIEFuIGVudW1lcmF0aW9u
+IG9mIGZsYWdzIHRoYXQgYSBiaXRtYXAgY2FuIHJlcG9ydCB0byB0aGUgdXNlci4NCj4+ICsjDQo+
+PiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5IGFuZCBtYXkg
+YmUgaW5jb25zaXN0ZW50Lg0KPiANCj4gSSBkb3VidCB0aGUgY2FzdWFsIHJlYWRlciBjb3VsZCBn
+dWVzcyB0aGUgbWVhbmluZyBmcm9tIHRoZSBuYW1lLiAgV2hhdA0KPiBhYm91dCBAZGlydHk/DQoN
+CkknZCBwcmVmZXIgdG8ga2VlcCBpdCBtYXRjaGluZyBRY293MiBmb3JtYXQgc3BlY2lmaWNhdGlv
+bi4gVGhpcyBJbmZvIGFpbXMNCnRvIGV4cG9ydCBxY293MiBzcGVjaWZpY3MgYXMgaXMuIEFuZCBR
+Y293MiBzcGVjIGlzIG5vdCBzb21ldGhpbmcgcWVtdS1pbnRlcm5hbCwNCndoeSBpcyBpdCB3b3Jz
+ZSB0aGFuIFFRUEksIGFuZCB3aHkgdG8gaGF2ZSBkaWZmZXJlbnQgbmFtZSBmb3IgdGhlIHNhbWUg
+dGhpbmcNCmluIGRpZmZlcmVudCBwYXJ0cyBvZiBzcGVjPw0KDQpXZSBtYXkgaW5zdGVhZCByZXBo
+cmFzZSBpdCBsaWtlDQoNClRoZSBiaXRtYXAgaXMgcG9zc2libHkgaW4gdXNlIGJ5IG90aGVyIHBy
+b2Nlc3Mgb3Igd2FzIG5vdCBzYXZlZCBjb3JyZWN0bHkgKGFuZA0KdGhlcmVmb3JlIHRoaXMgZmxh
+ZyB3YXMgbm90IGNsZWFyZWQpLiBUaGUgZGF0YSBvZiB0aGUgYml0bWFwIG1heSBiZSBpbmNvbnNp
+c3RlbnQuDQoNCnRvIHJlZmxlY3QgaW4tdXNlIG5hbWUgb2YgdGhlIGZsYWcuLg0KDQoNCkFuZCwg
+aWYgd2UgY2hhbmdlIGl0IHRvIEBkaXJ0eSwgd2UgYXQgbGVhc3Qgc2hvdWxkIGFkZCBhIGNvbW1l
+bnQgdGhhdCB0aGlzIGZpZWxkDQptYXRjaGVzIElOX1VTRSBmbGFnIG9mIHFjb3cyIGZvcm1hdC4N
+Cg0KPiANCj4+ICsjDQo+PiArIyBAYXV0bzogVGhlIGJpdG1hcCBtdXN0IHJlZmxlY3QgYWxsIGNo
+YW5nZXMgb2YgdGhlIHZpcnR1YWwgZGlzayBieSBhbnkNCj4+ICsjICAgICAgICBhcHBsaWNhdGlv
+biB0aGF0IHdvdWxkIHdyaXRlIHRvIHRoaXMgcWNvdzIgZmlsZS4NCj4+ICsjDQo+PiArIyBTaW5j
+ZTogNC4wDQo+PiArIyMNCj4+ICt7ICdlbnVtJzogJ1Fjb3cyQml0bWFwSW5mb0ZsYWdzJywNCj4+
+ICsgICdkYXRhJzogWydpbi11c2UnLCAnYXV0byddIH0NCj4+ICsNCj4+ICsjIw0KPj4gKyMgQFFj
+b3cyQml0bWFwSW5mbzoNCj4+ICsjDQo+PiArIyBRY293MiBiaXRtYXAgaW5mb3JtYXRpb24uDQo+
+PiArIw0KPj4gKyMgQG5hbWU6IHRoZSBuYW1lIG9mIHRoZSBiaXRtYXANCj4+ICsjDQo+PiArIyBA
+Z3JhbnVsYXJpdHk6IGdyYW51bGFyaXR5IG9mIHRoZSBiaXRtYXAgaW4gYnl0ZXMNCj4+ICsjDQo+
+PiArIyBAZmxhZ3M6IHJlY29nbml6ZWQgZmxhZ3Mgb2YgdGhlIGJpdG1hcA0KPj4gKyMNCj4+ICsj
+IEB1bmtub3duLWZsYWdzOiBhbnkgcmVtYWluaW5nIGZsYWdzIG5vdCByZWNvZ25pemVkIGJ5IHRo
+ZSBjdXJyZW50IHFlbXUgdmVyc2lvbg0KPiANCj4gSW50ZW5kZWQgdXNlIGNhc2VzIGZvciBAdW5r
+bm93bi1mbGFncz8NCj4gDQo+PiArIw0KPj4gKyMgU2luY2U6IDQuMA0KPj4gKyMjDQo+PiAreyAn
+c3RydWN0JzogJ1Fjb3cyQml0bWFwSW5mbycsDQo+PiArICAnZGF0YSc6IHsnbmFtZSc6ICdzdHIn
+LCAnZ3JhbnVsYXJpdHknOiAndWludDMyJywNCj4+ICsgICAgICAgICAgICdmbGFncyc6IFsnUWNv
+dzJCaXRtYXBJbmZvRmxhZ3MnXSwNCj4+ICsgICAgICAgICAgICcqdW5rbm93bi1mbGFncyc6ICd1
+aW50MzInIH0gfQ0KPj4gKw0KPj4gKyMjDQo+PiAgICMgQEJsb2NrTGF0ZW5jeUhpc3RvZ3JhbUlu
+Zm86DQo+PiAgICMNCj4+ICAgIyBCbG9jayBsYXRlbmN5IGhpc3RvZ3JhbS4NCg0KDQotLSANCkJl
+c3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
