@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40144)
+Received: from eggs.gnu.org ([209.51.188.92]:49349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqaCL-0003i1-1Y
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:05:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqaec-0003F4-I7
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:35:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqaCK-0002u6-4y
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:05:48 -0500
-References: <mhng-99c129ef-4e70-4840-b80f-7b3c6b806083@palmer-si-x1c4>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <01c75f94-26ae-ffa4-dd46-4dd019702fa0@redhat.com>
-Date: Mon, 4 Feb 2019 10:05:42 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gqaeb-0006BO-D6
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:35:02 -0500
+Resent-Message-Id: <E1gqaeb-0006BO-D6@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqaeb-00068f-4K
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:35:01 -0500
+Message-ID: <154925933043.29184.8790129059214163156@ebba9967afc0>
+In-Reply-To: <20190204052712.30833-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <mhng-99c129ef-4e70-4840-b80f-7b3c6b806083@palmer-si-x1c4>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 3 Feb 2019 21:48:51 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/3] target/arm: Implement ARMv8.3-JSConv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: richard.henderson@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-On 2019-02-02 09:41, Palmer Dabbelt wrote:
-> On Thu, 31 Jan 2019 01:51:52 PST (-0800), Peter Maydell wrote:
->> On Thu, 31 Jan 2019 at 06:39, Thomas Huth <thuth@redhat.com> wrote:
->>>
->>> On 2019-01-30 20:01, Palmer Dabbelt wrote:
->>> > On Wed, 30 Jan 2019 09:45:33 PST (-0800), eblake@redhat.com wrote:
->>> >> On 1/30/19 11:35 AM, Palmer Dabbelt wrote:
->>> >>> The following changes since commit
->>> >>> 5385a5988c8a55bebdc878c05b96648579b5d6e0:
->>> >>>
->>> >>>=C2=A0=C2=A0 hw/virtio/virtio-balloon: zero-initialize the
->>> virtio_balloon_config
->>> >>> struct (2019-01-21 17:20:36 +0000)
->>> >>>
->>> >>> are available in the Git repository at:
->>> >>>
->>> >>>=C2=A0=C2=A0 git://github.com/palmer-dabbelt/qemu.git
->>> >>> tags/riscv-for-master-3.2-part3
->>> >>>
->>> >>> for you to fetch changes up to
->>> 461ab9de46d085a37b0da6f096aadc4e0dda4d4c:
->>> >>>
->>> >>>=C2=A0=C2=A0 target/riscv: fix counter-enable checks in ctr() (201=
-9-01-29
->>> >>> 11:33:38 -0800)
->>> >>>
->>> >>> ----------------------------------------------------------------
->>> >>> RISC-V Patches for 3.2, Part 3
->>> >>
->>> >> There is no 3.2 release; the next release is named 4.0.=C2=A0 Howe=
-ver,
->>> if you
->>> >> don't want to bother with sending a v2 pull request just to fix th=
-e
->>> >> merge commit message, that's okay with me.
->>> >
->>> > Ah, sorry.=C2=A0 I think I'm just going to leave it as is, I'll get=
- it
->>> right
->>> > next time.
->>>
->>> Also note that you used "PR RFC" in the title ... so not sure whether
->>> Peter's scripts will catch this PR as a valid one...
->>
->> My mail filter finds these RFC pullrequests, yes. I'm then
->> relying on my manual brain to not actually apply them.
->> (If it's a slow day I might do a test merge on them, but
->> usually my queue is full enough that I don't get to them
->> before the real PR appears.)
->=20
-> Ah, OK -- do you want me to do something else?
-
-At least I got a little bit confused by "PR RFC" ... I think some other
-maintainers rather send out patch series marked with "PATCH" first, and
-add some non-pull-request cover letter with a text like "I'm intending
-to send a pull request for this soon, please review one more time...".
-Then after a day or two, once Patchew checked the series and nobody else
-complained, they send a real "PULL" request.
-(at least that's how I saw the handling on the mailing list in the past,
-not sure whether Peter has a different point of view here, though).
-
- Thomas
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDA1MjcxMi4zMDgz
+My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
+ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
+ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1t
+aW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29u
+ZmlndXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0
+bW11LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0
+aG9uPS91c3IvYmluL3B5dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAt
+LWVuYWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5l
+dHRsZSAtLWVuYWJsZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1n
+dWVzdC1hZ2VudCAtLXdpdGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRo
+LXNkbGFiaT0yLjAKVHJ5ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9y
+IG1vcmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgTW9uIEZlYiAgNCAwNTo0ODoz
+NyBVVEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1
+cmUnICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNo
+NjQtc29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0v
+dXNyL2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0t
+ZW5hYmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxl
+LW5ldHRsZScgJy0tZW5hYmxlLWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicg
+Jy0tZW5hYmxlLWd1ZXN0LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9f
+Y29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDky
+IDEyMiA2MTcgNjM0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJ
+TEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVz
+IC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2lu
+Zy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0
+ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNv
+bmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9f
+IG5vdCBkZWZpbmVkCiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpm
+dW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4K
+bGluZXM6IDkyIDEyMiA2MTcgNjg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09V
+UkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1w
+cm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdz
+IC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1m
+d3JhcHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVt
+cC9xZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3Ig
+X19pMzg2X18gbm90IGRlZmluZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+
+CgotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmlu
+ZSBtYWluCmxpbmVzOiA5MiAxMjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURf
+R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
+dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
+c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
+bW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29u
+ZmlnLXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjog
+I2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5l
+ZAogIF5+fn5+CgotLS0KbGluZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2Nj
+IC1tdGhyZWFkcyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VG
+SUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1X
+dW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFs
+aWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11
+LWNvbmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2dj
+Yy94ODZfNjQtdzY0LW1pbmd3MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMy
+L2Jpbi9sZDogY2Fubm90IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5l
+ZCAxIGV4aXQgc3RhdHVzCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0
+IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
+bmUgNTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDQwNTI3MTIuMzA4MzMtMS1yaWNoYXJkLmhlbmRlcnNv
+bkBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
