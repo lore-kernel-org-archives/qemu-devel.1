@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60017)
+Received: from eggs.gnu.org ([209.51.188.92]:60014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7v-00064V-Cu
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7v-00064O-9Q
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7u-0004Ec-AQ
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7u-0004EV-9j
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:51 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:36817)
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:41999)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7u-00042v-1n
+	id 1gqj7u-0003wR-1Y
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:50 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id z3so981891wrv.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:28 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id q18so933141wrx.9
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:21 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:36:10 +0100
-Message-Id: <1549305379-51117-69-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:36:02 +0100
+Message-Id: <1549305379-51117-61-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 68/77] hw/moxie/Makefile.objs: Conditionally
- build moxie
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 60/77] hw/lm32/Makefile.objs: Conditionally
+ build lm32 and milkmyst
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +32,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
+Cc: =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_MOXIE added for moxiesim board.
+CONFIG_LM32 and CONFIG_MILKYMIST added for lm32 and milkmyst build.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-24-yang.zhong@intel.com>
+Message-Id: <20190202072456.6468-16-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/moxie-softmmu.mak | 1 +
- hw/moxie/Makefile.objs            | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ hw/lm32/Makefile.objs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/moxie-softmmu.mak b/default-configs/moxie-softmmu.mak
-index e00d099..17ba906 100644
---- a/default-configs/moxie-softmmu.mak
-+++ b/default-configs/moxie-softmmu.mak
-@@ -5,3 +5,4 @@ CONFIG_MC146818RTC=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_VGA=y
-+CONFIG_MOXIESIM=y
-diff --git a/hw/moxie/Makefile.objs b/hw/moxie/Makefile.objs
-index bfc9001..ddbf300 100644
---- a/hw/moxie/Makefile.objs
-+++ b/hw/moxie/Makefile.objs
-@@ -1,2 +1,2 @@
- # moxie boards
--obj-y += moxiesim.o
-+obj-$(CONFIG_MOXIESIM) += moxiesim.o
+diff --git a/hw/lm32/Makefile.objs b/hw/lm32/Makefile.objs
+index ea6418a..c394186 100644
+--- a/hw/lm32/Makefile.objs
++++ b/hw/lm32/Makefile.objs
+@@ -1,3 +1,3 @@
+ # LM32 boards
+-obj-y += lm32_boards.o
+-obj-y += milkymist.o
++obj-$(CONFIG_LM32) += lm32_boards.o
++obj-$(CONFIG_MILKYMIST) += milkymist.o
 -- 
 1.8.3.1
