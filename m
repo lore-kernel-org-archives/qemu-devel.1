@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59963)
+Received: from eggs.gnu.org ([209.51.188.92]:59996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7t-00062k-LI
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7u-00063x-Sf
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7p-0004AK-9n
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:46 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:39204)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7t-0004E9-UU
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:50 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36817)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7e-000413-Eo
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:39 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id y8so1002467wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:25 -0800 (PST)
+	id 1gqj7t-0003yJ-LX
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:49 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id z3so981544wrv.3
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:23 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:36:06 +0100
-Message-Id: <1549305379-51117-65-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:36:04 +0100
+Message-Id: <1549305379-51117-63-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 64/77] hw/sparc64/Makefile.objs: Create CONFIG_*
- for sparc64
+Subject: [Qemu-devel] [PULL 62/77] hw/nios2/Makefile.objs: Conditionally
+ build nios2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,34 @@ Cc: Yang Zhong <yang.zhong@intel.com>
 
 From: Yang Zhong <yang.zhong@intel.com>
 
-Add the new configs to default-configs/sparc64-sofmmu.mak.
+CONFIG_NIOS2_10M50 added for 10m50 dev board.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-20-yang.zhong@intel.com>
+Message-Id: <20190202072456.6468-18-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/sparc64-softmmu.mak | 2 ++
- hw/sparc64/Makefile.objs            | 6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ default-configs/nios2-softmmu.mak | 1 +
+ hw/nios2/Makefile.objs            | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index ce63d47..1fae488 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -17,3 +17,5 @@ CONFIG_SUNHME=y
- CONFIG_MC146818RTC=y
- CONFIG_ISA_TESTDEV=y
- CONFIG_SUN4V_RTC=y
-+CONFIG_SUN4U=y
-+CONFIG_NIAGARA=y
-diff --git a/hw/sparc64/Makefile.objs b/hw/sparc64/Makefile.objs
-index 117e0ff..af0525c 100644
---- a/hw/sparc64/Makefile.objs
-+++ b/hw/sparc64/Makefile.objs
-@@ -1,4 +1,4 @@
- obj-y += sparc64.o
--obj-y += sun4u_iommu.o
--obj-y += sun4u.o
--obj-y += niagara.o
-\ No newline at end of file
-+obj-$(CONFIG_SUN4U) += sun4u_iommu.o
-+obj-$(CONFIG_SUN4U) += sun4u.o
-+obj-$(CONFIG_NIAGARA) += niagara.o
+diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
+index 74dc70c..ab42d0f 100644
+--- a/default-configs/nios2-softmmu.mak
++++ b/default-configs/nios2-softmmu.mak
+@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
+ CONFIG_SERIAL=y
+ CONFIG_PTIMER=y
+ CONFIG_ALTERA_TIMER=y
++CONFIG_NIOS2_10M50=y
+diff --git a/hw/nios2/Makefile.objs b/hw/nios2/Makefile.objs
+index 6b5c421..89a419a 100644
+--- a/hw/nios2/Makefile.objs
++++ b/hw/nios2/Makefile.objs
+@@ -1 +1,2 @@
+-obj-y = boot.o cpu_pic.o 10m50_devboard.o
++obj-y = boot.o cpu_pic.o
++obj-$(CONFIG_NIOS2_10M50) += 10m50_devboard.o
 -- 
 1.8.3.1
