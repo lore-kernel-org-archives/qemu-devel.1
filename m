@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57486)
+Received: from eggs.gnu.org ([209.51.188.92]:58655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gqcm0-00016v-84
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:50:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqcr1-0006JA-8d
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:56:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gqclx-0007qi-EC
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:50:48 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:53628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gqclx-0007n4-4X
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:50:45 -0500
-References: <1548859022-3969-1-git-send-email-liam.merwick@oracle.com>
-	<1548859022-3969-3-git-send-email-liam.merwick@oracle.com>
-	<20190131080352.nymxlr5nc7xtqiom@sirius.home.kraxel.org>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <8ba1674d-915d-cd72-bee1-3a0774561318@oracle.com>
-Date: Mon, 4 Feb 2019 11:50:33 +0000
+	(envelope-from <philmd@redhat.com>) id 1gqcqz-0003e3-9N
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:55:59 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqcqz-0003KF-2V
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:55:57 -0500
+Received: by mail-wr1-f66.google.com with SMTP id r17so8125662wrp.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 03:55:46 -0800 (PST)
+References: <20190203220744.11734-1-philmd@redhat.com>
+	<20190203220744.11734-2-philmd@redhat.com>
+	<162915fe-ef7f-c977-2fd2-985406b465d1@redhat.com>
+	<54a0c271-c499-eeea-7344-68f68c010f7b@redhat.com>
+	<aaee9b37-72b7-7c9b-9b79-e1cc1590b07a@redhat.com>
+	<89768aca-717b-dfbf-e10b-8390671d5f44@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7a956e02-779b-4b47-a396-98543a7be51d@redhat.com>
+Date: Mon, 4 Feb 2019 12:55:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190131080352.nymxlr5nc7xtqiom@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] usb: deal with potential Null pointer
- returned by usb_ep_get()
+In-Reply-To: <89768aca-717b-dfbf-e10b-8390671d5f44@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] mips: Express dependencies of the
+ MIPSsim machine with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Darren.Kenny@oracle.com, Mark.Kanda@oracle.com, ameya.more@oracle.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 31/01/2019 08:03, Gerd Hoffmann wrote:
-> On Wed, Jan 30, 2019 at 02:37:02PM +0000, Liam Merwick wrote:
->> From: Liam Merwick <Liam.Merwick@oracle.com>
->>
->> usb_ep_get() can return a Null pointer in the (albeit unlikely) case
->> that a NULL USBDevice is passed in via the 'dev' parameter.
-> That should never ever happen.
->
->> Reported by the Parfait static code analysis tool
-> Try add "assert(dev !=3D NULL)" to usb_ep_get() instead of sprinkling
-> pointless checks all over the place.
->
-Adding "assert(dev !=3D NULL)" to usb_ep_get() isn't sufficient for that=20
-tool unless the 'if (dev=3D=3D NULL)' check is removed which seems a=20
-backwards step even if that NULL USBDevice case is impossible.
+On 2/4/19 12:21 PM, Paolo Bonzini wrote:
+> On 04/02/19 12:05, Philippe Mathieu-Daudé wrote:
+>>> Scratch that. I think you have to keep CONFIG_MIPSSIM=y enabled in the
+>>> default-configs, don't you?
+>> I guess I misunderstood --without-default-devices with --no-defaults,
+>> where you'd manually select the machines you want.
+> 
+> Note that machines have to be included in default-configs/ even for
+> --with-default-devices (which is the default).
 
-Adding an assert like below in 7 places in hw/usb/core.c that call=20
-usb_ep_get() would resolve it but would that=C2=A0 pass coding convention=
-s=20
-(checkpatch.pl seems OK with it)?
+OK, I'll respin.
 
- =C2=A0uint8_t usb_ep_get_type(USBDevice *dev, int pid, int ep)
- =C2=A0{
-+=C2=A0=C2=A0=C2=A0 assert(dev);
- =C2=A0=C2=A0=C2=A0=C2=A0 struct USBEndpoint *uep =3D usb_ep_get(dev, pid=
-, ep);
- =C2=A0=C2=A0=C2=A0=C2=A0 return uep->type;
- =C2=A0}
+Thanks,
 
-(the other option below it seems like too much code churn).
-
-
- =C2=A0uint8_t usb_ep_get_type(USBDevice *dev, int pid, int ep)
- =C2=A0{
--=C2=A0=C2=A0=C2=A0 struct USBEndpoint *uep =3D usb_ep_get(dev, pid, ep);
-+=C2=A0=C2=A0=C2=A0 struct USBEndpoint *uep;
-+=C2=A0=C2=A0=C2=A0 assert(dev);
-+=C2=A0=C2=A0=C2=A0 uep =3D usb_ep_get(dev, pid, ep);
- =C2=A0=C2=A0=C2=A0=C2=A0 return uep->type;
- =C2=A0}
-
-
-So that's kinda a long way of saying I'll drop this patch unless someone=20
-thinks it still adds a benefit and will send a v2 with a modified Patch1=20
-and a patch that adds two asserts to hw/usb/hcd-xhci.c
-
-Regards,
-
-Liam
+Phil.
