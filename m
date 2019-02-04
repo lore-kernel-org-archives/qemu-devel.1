@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59146)
+Received: from eggs.gnu.org ([209.51.188.92]:59167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6l-0004xH-SG
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:40 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6n-0004yc-HH
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6h-0003Ob-MV
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:39 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33125)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6l-0003Qq-RZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:41 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:51428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6e-0003L2-2e
+	id 1gqj6h-0003Io-NJ
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:35 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id a16so998496wrv.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:29 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id b11so977769wmj.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:27 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s132sm8836236wmf.28.2019.02.04.10.36.25 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 04 Feb 2019 10:36:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:10 +0100
-Message-Id: <1549305379-51117-9-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:08 +0100
+Message-Id: <1549305379-51117-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 08/77] cpu-exec: add assert_no_pages_locked()
- after longjmp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 06/77] vhost-user-test: reduce usage of
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +36,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Whenever the code can run on multiple QTestStates, use them explicitly instead of
+global_qtest.
 
-We forgot to add this check in faa9372c07 ("translate-all:
-introduce assert_no_pages_locked", 2018-06-15); we only added
-it after returning from a longjmp in cpu_exec_step_atomic. Fix it.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-12-git-send-email-pbonzini@redhat.com>
 ---
- accel/tcg/cpu-exec.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/vhost-user-test.c | 38 +++++++++++++++++---------------------
+ 1 file changed, 17 insertions(+), 21 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 7cf1292..49b3259 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -702,6 +702,7 @@ int cpu_exec(CPUState *cpu)
-         if (qemu_mutex_iothread_locked()) {
-             qemu_mutex_unlock_iothread();
-         }
-+        assert_no_pages_locked();
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index a0da5c3..7d5f234 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -187,12 +187,12 @@ static char *get_qemu_cmd(TestServer *s,
+     }
+ }
+ 
+-static void init_virtio_dev(TestServer *s, uint32_t features_mask)
++static void init_virtio_dev(QTestState *qts, TestServer *s, uint32_t features_mask)
+ {
+     uint32_t features;
+     int i;
+ 
+-    s->bus = qpci_init_pc(global_qtest, NULL);
++    s->bus = qpci_init_pc(qts, NULL);
+     g_assert_nonnull(s->bus);
+ 
+     s->dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+@@ -203,7 +203,7 @@ static void init_virtio_dev(TestServer *s, uint32_t features_mask)
+     qvirtio_set_acknowledge(&s->dev->vdev);
+     qvirtio_set_driver(&s->dev->vdev);
+ 
+-    s->alloc = pc_alloc_init(global_qtest);
++    s->alloc = pc_alloc_init(qts);
+ 
+     for (i = 0; i < s->queues * 2; i++) {
+         s->vq[i] = qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
+@@ -265,7 +265,7 @@ static bool wait_for_fds(TestServer *s)
+     return got_region;
+ }
+ 
+-static void read_guest_mem_server(TestServer *s)
++static void read_guest_mem_server(QTestState *qts, TestServer *s)
+ {
+     uint8_t *guest_mem;
+     int i, j;
+@@ -293,7 +293,7 @@ static void read_guest_mem_server(TestServer *s)
+         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
+ 
+         for (j = 0; j < 1024; j++) {
+-            uint32_t a = readb(s->memory.regions[i].guest_phys_addr + j);
++            uint32_t a = qtest_readb(qts, s->memory.regions[i].guest_phys_addr + j);
+             uint32_t b = guest_mem[j];
+ 
+             g_assert_cmpint(a, ==, b);
+@@ -670,13 +670,13 @@ static void test_read_guest_mem(const void *arg)
+     s = qtest_start(qemu_cmd);
+     g_free(qemu_cmd);
+ 
+-    init_virtio_dev(server, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, server, 1u << VIRTIO_NET_F_MAC);
+ 
+     if (!wait_for_fds(server)) {
+         goto exit;
      }
  
-     /* if an exception is pending, we execute it here */
+-    read_guest_mem_server(server);
++    read_guest_mem_server(global_qtest, server);
+ 
+ exit:
+     uninit_virtio_dev(server);
+@@ -690,7 +690,7 @@ static void test_migrate(void)
+     TestServer *s = test_server_new("src");
+     TestServer *dest = test_server_new("dest");
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+-    QTestState *global = global_qtest, *from, *to;
++    QTestState *from, *to;
+     GSource *source;
+     gchar *cmd, *tmp;
+     QDict *rsp;
+@@ -704,7 +704,7 @@ static void test_migrate(void)
+     from = qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(from, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -717,7 +717,7 @@ static void test_migrate(void)
+     g_free(tmp);
+     to = qtest_init(cmd);
+     g_free(cmd);
+-    init_virtio_dev(dest, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(to, dest, 1u << VIRTIO_NET_F_MAC);
+ 
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -753,12 +753,10 @@ static void test_migrate(void)
+     qobject_unref(rsp);
+ 
+     qmp_eventwait("STOP");
++    qtest_qmp_eventwait(to, "RESUME");
+ 
+-    global_qtest = to;
+-    qmp_eventwait("RESUME");
+-
+-    g_assert(wait_for_fds(s));
+-    read_guest_mem_server(dest);
++    g_assert(wait_for_fds(dest));
++    read_guest_mem_server(to, dest);
+ 
+     uninit_virtio_dev(dest);
+     qtest_quit(to);
+@@ -773,8 +771,6 @@ exit:
+     qtest_quit(from);
+     test_server_free(s);
+     g_free(uri);
+-
+-    global_qtest = global;
+ }
+ 
+ static void wait_for_rings_started(TestServer *s, size_t count)
+@@ -831,7 +827,7 @@ static void test_reconnect_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -873,7 +869,7 @@ static void test_connect_fail_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -906,7 +902,7 @@ static void test_flags_mismatch_subprocess(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, 1u << VIRTIO_NET_F_MAC);
++    init_virtio_dev(global_qtest, s, 1u << VIRTIO_NET_F_MAC);
+     if (!wait_for_fds(s)) {
+         goto exit;
+     }
+@@ -957,7 +953,7 @@ static void test_multiqueue(void)
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+-    init_virtio_dev(s, features_mask);
++    init_virtio_dev(global_qtest, s, features_mask);
+ 
+     wait_for_rings_started(s, s->queues * 2);
+ 
 -- 
 1.8.3.1
