@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50547)
+Received: from eggs.gnu.org ([209.51.188.92]:51684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqZCT-0007Bn-6H
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1gqZGz-0000Jr-7C
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqZCR-0001tu-SR
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:53 -0500
-Resent-Message-Id: <E1gqZCR-0001tu-SR@eggs.gnu.org>
-Message-ID: <154926727487.29184.96870218730905830@ebba9967afc0>
-In-Reply-To: <1549266858-5043-1-git-send-email-thuth@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <armbru@redhat.com>) id 1gqZGw-0006Za-2j
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gqZGq-0006Op-VO
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:27 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-8-yuval.shaia@oracle.com>
+	<42ba3330-f7ca-b5c5-126f-8dd97e343d51@redhat.com>
+	<20190131200816.GA2838@lap1>
+Date: Mon, 04 Feb 2019 09:00:31 +0100
+In-Reply-To: <20190131200816.GA2838@lap1> (Yuval Shaia's message of "Thu, 31
+	Jan 2019 22:08:17 +0200")
+Message-ID: <87ef8ot23k.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 00:01:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the
- file headers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 07/10] monitor: Expose pvrdma device
+ statistics counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, green@moxielogic.com
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ5MjY2ODU4LTUwNDMtMS1n
-aXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxl
-ZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVz
-dGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIg
-aW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
-Z3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCkNvbmZp
-Z3VyZSBvcHRpb25zOgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1t
-dSxhYXJjaDY0LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhv
-bj0vdXNyL2Jpbi9weXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1l
-bmFibGUtdHJhY2UtYmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0
-bGUgLS1lbmFibGUtY3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vl
-c3QtYWdlbnQgLS13aXRoLXNkbGFiaT0yLjAKRVJST1I6IHVua25vd24gb3B0aW9uIC0td2l0aC1z
-ZGxhYmk9Mi4wClRyeSAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZSAtLWhlbHAnIGZvciBt
-b3JlIGluZm9ybWF0aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIE1vbiBGZWIgIDQgMDg6MDE6MDUg
-VVRDIDIwMTkKIyBDb25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJl
-JyAnLS1lbmFibGUtd2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0
-LXNvZnRtbXUnICctLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsJyAnLS1weXRob249L3Vz
-ci9iaW4vcHl0aG9uMycgJy0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0nICctLWVu
-YWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUnICctLWVuYWJsZS1nbnV0bHMnICctLWVuYWJsZS1u
-ZXR0bGUnICctLWVuYWJsZS1jdXJsJyAnLS1lbmFibGUtdm5jJyAnLS1lbmFibGUtYnppcDInICct
-LWVuYWJsZS1ndWVzdC1hZ2VudCcgJy0td2l0aC1zZGxhYmk9Mi4wJwotLS0KZnVuY3M6IGRvX2Nv
-bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
-MjIgNjE3IDYzNCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
-X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
-V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
-cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9
-Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25m
-LmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fbGludXhfXyBu
-b3QgZGVmaW5lZAogI2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVu
-Y3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxp
-bmVzOiA5MiAxMjIgNjE3IDY4NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJD
-RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
-dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
-V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
-YXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAv
-cWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9f
-aTM4Nl9fIG5vdCBkZWZpbmVkCiAjZXJyb3IgX19pMzg2X18gbm90IGRlZmluZWQKICBefn5+fgoK
-LS0tCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUg
-bWFpbgpsaW5lczogOTIgMTIyIDYxNyA2ODkgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dO
-VV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3Ry
-aWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0
-cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21t
-b24gLWZ3cmFwdiAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZp
-Zy10ZW1wL3FlbXUtY29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNl
-cnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQKICNlcnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQK
-ICBefn5+fgoKLS0tCmxpbmVzOiA5MiAxMjggOTIwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAt
-bXRocmVhZHMgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklM
-RV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3Vu
-ZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlh
-c2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLW8gY29uZmlnLXRlbXAvcWVtdS1j
-b25mLmV4ZSBjb25maWctdGVtcC9xZW11LWNvbmYuYyAtZyAtbGliZXJ0eQovdXNyL2xpYi9nY2Mv
-eDg2XzY0LXc2NC1taW5ndzMyLzguMi4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9i
-aW4vbGQ6IGNhbm5vdCBmaW5kIC1saWJlcnR5CmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQg
-MSBleGl0IHN0YXR1cwpGYWlsZWQgdG8gcnVuICdjb25maWd1cmUnClRyYWNlYmFjayAobW9zdCBy
-ZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
-IDU2MywgaW4gPG1vZHVsZT4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzE1NDkyNjY4NTgtNTA0My0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJl
-ZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+Yuval Shaia <yuval.shaia@oracle.com> writes:
+
+> On Thu, Jan 31, 2019 at 07:17:16AM -0600, Eric Blake wrote:
+>> On 1/31/19 7:08 AM, Yuval Shaia wrote:
+>> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> > ---
+>> >  hmp-commands-info.hx | 14 ++++++++++++++
+>> >  monitor.c            |  6 ++++++
+>> >  2 files changed, 20 insertions(+)
+>
+> Hi Eric,
+>
+>> 
+>> Commit message should state WHY this is being added as an HMP-only
+>> command, and does not have a QMP counterpart.  It may be okay if the
+>> interface is only designed to be useful to developers, but having that
+>> justification in the git log is important.
+>
+> Thanks for your review.
+>
+> See, i need this interface mainly for development/debug purposes, to help
+> troubleshot problems and to give insights to what device "is doing".
+>
+> Trace points are great but not effective in high load.
+
+I figure that depends on the trace backend.  The "log" backend can be
+problematic for high tracing rates.  "ftrace", "dtrace" and "ust"
+backends should support such cases.  Stefan, any advice?
+
+> QMP as i see it, and correct me if i'm wrong, is used to report management
+> events etc and also here, is not effective in high load.
+>
+> I choose this interface as it is interactive, i.e. whenever i need the info
+> i trigger 'info pvrdmastats' command from the monitor console.
+>
+> During my research i notice that some devices (or families) have nice user
+> interface via virsh (blkstat, ifstat, memstat etc). Is it the preferred way
+> for non-devel/debug purposes?
+>
+> If this is the correct method for this purpose then let me know and i'll
+> update the git log message accordingly.
+>
+> Thanks.
