@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39181)
+Received: from eggs.gnu.org ([209.51.188.92]:39255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9q-0001WP-6R
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:16 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa9v-0001at-1a
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9n-0000iz-Of
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:14 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa9o-0000k8-EQ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:18 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:17 +1100
-Message-Id: <20190204090124.26191-31-david@gibson.dropbear.id.au>
+Date: Mon,  4 Feb 2019 20:01:22 +1100
+Message-Id: <20190204090124.26191-36-david@gibson.dropbear.id.au>
 In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/37] target/ppc: eliminate use of EL_IDX
- macros from int_helper.c
+Subject: [Qemu-devel] [PULL 35/37] hw/ppc: Don't include m48t59.h if it is
+ not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +24,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
 
-These macros can be eliminated by instead using the relavant Vsr* macros =
-in
-the few locations where they appear.
+These files don't use anything from m48t59.h, so no need to include
+this header here.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/int_helper.c | 66 +++++++++++++++++------------------------
- 1 file changed, 27 insertions(+), 39 deletions(-)
+ hw/ppc/mac_newworld.c | 1 -
+ hw/ppc/mac_oldworld.c | 1 -
+ hw/ppc/ppc.c          | 2 --
+ hw/ppc/ppc_booke.c    | 1 -
+ 4 files changed, 5 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 7a9c02d4bb..355b6630a2 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -3306,12 +3306,7 @@ void helper_vncipherlast(ppc_avr_t *r, ppc_avr_t *=
-a, ppc_avr_t *b)
-     *r =3D result;
- }
-=20
--#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32-n)))
--#if defined(HOST_WORDS_BIGENDIAN)
--#define EL_IDX(i) (i)
--#else
--#define EL_IDX(i) (3 - (i))
--#endif
-+#define ROTRu32(v, n) (((v) >> (n)) | ((v) << (32 - n)))
-=20
- void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
- {
-@@ -3319,40 +3314,34 @@ void helper_vshasigmaw(ppc_avr_t *r,  ppc_avr_t *=
-a, uint32_t st_six)
-     int six =3D st_six & 0xF;
-     int i;
-=20
--    VECTOR_FOR_INORDER_I(i, u32) {
-+    for (i =3D 0; i < ARRAY_SIZE(r->u32); i++) {
-         if (st =3D=3D 0) {
-             if ((six & (0x8 >> i)) =3D=3D 0) {
--                r->u32[EL_IDX(i)] =3D ROTRu32(a->u32[EL_IDX(i)], 7) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 18) ^
--                                    (a->u32[EL_IDX(i)] >> 3);
-+                r->VsrW(i) =3D ROTRu32(a->VsrW(i), 7) ^
-+                             ROTRu32(a->VsrW(i), 18) ^
-+                             (a->VsrW(i) >> 3);
-             } else { /* six.bit[i] =3D=3D 1 */
--                r->u32[EL_IDX(i)] =3D ROTRu32(a->u32[EL_IDX(i)], 17) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 19) ^
--                                    (a->u32[EL_IDX(i)] >> 10);
-+                r->VsrW(i) =3D ROTRu32(a->VsrW(i), 17) ^
-+                             ROTRu32(a->VsrW(i), 19) ^
-+                             (a->VsrW(i) >> 10);
-             }
-         } else { /* st =3D=3D 1 */
-             if ((six & (0x8 >> i)) =3D=3D 0) {
--                r->u32[EL_IDX(i)] =3D ROTRu32(a->u32[EL_IDX(i)], 2) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 13) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 22);
-+                r->VsrW(i) =3D ROTRu32(a->VsrW(i), 2) ^
-+                             ROTRu32(a->VsrW(i), 13) ^
-+                             ROTRu32(a->VsrW(i), 22);
-             } else { /* six.bit[i] =3D=3D 1 */
--                r->u32[EL_IDX(i)] =3D ROTRu32(a->u32[EL_IDX(i)], 6) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 11) ^
--                                    ROTRu32(a->u32[EL_IDX(i)], 25);
-+                r->VsrW(i) =3D ROTRu32(a->VsrW(i), 6) ^
-+                             ROTRu32(a->VsrW(i), 11) ^
-+                             ROTRu32(a->VsrW(i), 25);
-             }
-         }
-     }
- }
-=20
- #undef ROTRu32
--#undef EL_IDX
-=20
- #define ROTRu64(v, n) (((v) >> (n)) | ((v) << (64-n)))
--#if defined(HOST_WORDS_BIGENDIAN)
--#define EL_IDX(i) (i)
--#else
--#define EL_IDX(i) (1 - (i))
--#endif
-=20
- void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *a, uint32_t st_six)
- {
-@@ -3360,33 +3349,32 @@ void helper_vshasigmad(ppc_avr_t *r,  ppc_avr_t *=
-a, uint32_t st_six)
-     int six =3D st_six & 0xF;
-     int i;
-=20
--    VECTOR_FOR_INORDER_I(i, u64) {
-+    for (i =3D 0; i < ARRAY_SIZE(r->u64); i++) {
-         if (st =3D=3D 0) {
-             if ((six & (0x8 >> (2*i))) =3D=3D 0) {
--                r->u64[EL_IDX(i)] =3D ROTRu64(a->u64[EL_IDX(i)], 1) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 8) ^
--                                    (a->u64[EL_IDX(i)] >> 7);
-+                r->VsrD(i) =3D ROTRu64(a->VsrD(i), 1) ^
-+                             ROTRu64(a->VsrD(i), 8) ^
-+                             (a->VsrD(i) >> 7);
-             } else { /* six.bit[2*i] =3D=3D 1 */
--                r->u64[EL_IDX(i)] =3D ROTRu64(a->u64[EL_IDX(i)], 19) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 61) ^
--                                    (a->u64[EL_IDX(i)] >> 6);
-+                r->VsrD(i) =3D ROTRu64(a->VsrD(i), 19) ^
-+                             ROTRu64(a->VsrD(i), 61) ^
-+                             (a->VsrD(i) >> 6);
-             }
-         } else { /* st =3D=3D 1 */
-             if ((six & (0x8 >> (2*i))) =3D=3D 0) {
--                r->u64[EL_IDX(i)] =3D ROTRu64(a->u64[EL_IDX(i)], 28) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 34) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 39);
-+                r->VsrD(i) =3D ROTRu64(a->VsrD(i), 28) ^
-+                             ROTRu64(a->VsrD(i), 34) ^
-+                             ROTRu64(a->VsrD(i), 39);
-             } else { /* six.bit[2*i] =3D=3D 1 */
--                r->u64[EL_IDX(i)] =3D ROTRu64(a->u64[EL_IDX(i)], 14) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 18) ^
--                                    ROTRu64(a->u64[EL_IDX(i)], 41);
-+                r->VsrD(i) =3D ROTRu64(a->VsrD(i), 14) ^
-+                             ROTRu64(a->VsrD(i), 18) ^
-+                             ROTRu64(a->VsrD(i), 41);
-             }
-         }
-     }
- }
-=20
- #undef ROTRu64
--#undef EL_IDX
-=20
- void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_=
-t *c)
- {
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index bb19eaba36..f1c8400efd 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -53,7 +53,6 @@
+ #include "hw/ppc/mac.h"
+ #include "hw/input/adb.h"
+ #include "hw/ppc/mac_dbdma.h"
+-#include "hw/timer/m48t59.h"
+ #include "hw/pci/pci.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 817f70e52c..98d531d114 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -30,7 +30,6 @@
+ #include "hw/ppc/ppc.h"
+ #include "mac.h"
+ #include "hw/input/adb.h"
+-#include "hw/timer/m48t59.h"
+ #include "sysemu/sysemu.h"
+ #include "net/net.h"
+ #include "hw/isa/isa.h"
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 98b409f83d..cffdc3914a 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -30,10 +30,8 @@
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/cpus.h"
+-#include "hw/timer/m48t59.h"
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+-#include "hw/loader.h"
+ #include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "trace.h"
+diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
+index 23bcf1b138..4f11e00a17 100644
+--- a/hw/ppc/ppc_booke.c
++++ b/hw/ppc/ppc_booke.c
+@@ -28,7 +28,6 @@
+ #include "hw/ppc/ppc.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+-#include "hw/timer/m48t59.h"
+ #include "qemu/log.h"
+ #include "hw/loader.h"
+ #include "kvm_ppc.h"
 --=20
 2.20.1
