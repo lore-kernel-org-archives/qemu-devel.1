@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59748)
+Received: from eggs.gnu.org ([209.51.188.92]:59783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7I-0005Vh-S0
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:15 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7L-0005We-S7
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7G-0003oN-Ow
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:12 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38899)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7I-0003pC-Je
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:14 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:43137)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7E-0003lj-DS
+	id 1gqj7G-0003mY-ND
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:10 -0500
-Received: by mail-wr1-x433.google.com with SMTP id v13so962158wrw.5
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:05 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id r2so923806wrv.10
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:06 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s132sm8836236wmf.28.2019.02.04.10.37.05 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 04 Feb 2019 10:37:05 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:46 +0100
-Message-Id: <1549305379-51117-45-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:48 +0100
+Message-Id: <1549305379-51117-47-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 44/77] Remove deprecated -enable-hax option
+Subject: [Qemu-devel] [PULL 46/77] arm: disable CONFIG_SERIAL_ISA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +32,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+ARM should not have an ISA bus, this device should not be enabled.
+Kconfig allows to clean up the dependencies and remove CONFIG_ISA_BUS=y
+from ARM, and then catches a contradiction between the hardcoded
+CONFIG_SERIAL_ISA=y and CONFIG_ISA_BUS=n.
 
-Our command line interface is really quite overcrowded, we should avoid
-duplicated options that do the same thing in just a slightly different
-way. "-accel hax" is shorter and more generic that "-enable-hax", so
-there is really no real usage for the latter option. "-enable-hax" has
-been deprecated since two releases, and nobody complained so far, so
-it's time to remove this now.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1544790073-23049-1-git-send-email-thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190202072456.6468-2-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-deprecated.texi |  5 -----
- qemu-options.hx      | 11 -----------
- vl.c                 |  5 -----
- 3 files changed, 21 deletions(-)
+ default-configs/arm-softmmu.mak | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9cc20b3..e184a7d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -53,11 +53,6 @@ Option @option{-virtioconsole} has been replaced by
- The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
- replacement since it is not needed anymore.
- 
--@subsection -enable-hax (since 3.0.0)
--
--The @option{-enable-hax} option has been replaced by @option{-accel hax}.
--Both options have been introduced in QEMU version 2.9.0.
--
- @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
- 
- The 'file' driver for drives is no longer appropriate for character or host
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 521511e..8f34dce 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
- if KVM support is enabled when compiling.
- ETEXI
- 
--DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
--    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
--STEXI
--@item -enable-hax
--@findex -enable-hax
--Enable HAX (Hardware-based Acceleration eXecution) support. This option
--is only available if HAX support is enabled when compiling. HAX is only
--applicable to MAC and Windows platform, and thus does not conflict with
--KVM. This option is deprecated, use @option{-accel hax} instead.
--ETEXI
--
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-diff --git a/vl.c b/vl.c
-index 9cf0fbe..804fbdb 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3655,11 +3655,6 @@ int main(int argc, char **argv, char **envp)
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
-                 break;
--            case QEMU_OPTION_enable_hax:
--                warn_report("Option is deprecated, use '-accel hax' instead");
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "accel=hax", false);
--                break;
-             case QEMU_OPTION_M:
-             case QEMU_OPTION_machine:
-                 olist = qemu_find_opts("machine");
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index be88870..d7b540c 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -6,7 +6,6 @@ CONFIG_VGA=y
+ CONFIG_NAND=y
+ CONFIG_ECC=y
+ CONFIG_SERIAL=y
+-CONFIG_SERIAL_ISA=y
+ CONFIG_PTIMER=y
+ CONFIG_SD=y
+ CONFIG_MAX7310=y
 -- 
 1.8.3.1
