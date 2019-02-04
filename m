@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59795)
+Received: from eggs.gnu.org ([209.51.188.92]:59748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7M-0005Xc-Gk
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:17 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7I-0005Vh-S0
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7K-0003q2-3b
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:16 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34881)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7G-0003oN-Ow
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:12 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38899)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7G-0003nS-Ny
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:12 -0500
-Received: by mail-wr1-x431.google.com with SMTP id z18so204034wrh.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:09 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	s132sm8836236wmf.28.2019.02.04.10.37.07 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 04 Feb 2019 10:37:07 -0800 (PST)
+	id 1gqj7E-0003lj-DS
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:10 -0500
+Received: by mail-wr1-x433.google.com with SMTP id v13so962158wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:05 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:50 +0100
-Message-Id: <1549305379-51117-49-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:46 +0100
+Message-Id: <1549305379-51117-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 48/77] vfio: move conditional up to
- hw/Makefile.objs
+Subject: [Qemu-devel] [PULL 44/77] Remove deprecated -enable-hax option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +28,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-Instead of wrapping the entire Makefile.objs with an ifeq/endif, just
-include the directory only for Linux.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-4-yang.zhong@intel.com>
+Our command line interface is really quite overcrowded, we should avoid
+duplicated options that do the same thing in just a slightly different
+way. "-accel hax" is shorter and more generic that "-enable-hax", so
+there is really no real usage for the latter option. "-enable-hax" has
+been deprecated since two releases, and nobody complained so far, so
+it's time to remove this now.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1544790073-23049-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      | 2 +-
- hw/vfio/Makefile.objs | 2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ qemu-deprecated.texi |  5 -----
+ qemu-options.hx      | 11 -----------
+ vl.c                 |  5 -----
+ 3 files changed, 21 deletions(-)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 39d882a..22dd211 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -30,7 +30,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += ssi/
- devices-dirs-$(CONFIG_SOFTMMU) += timer/
- devices-dirs-$(CONFIG_TPM) += tpm/
- devices-dirs-$(CONFIG_SOFTMMU) += usb/
--devices-dirs-$(CONFIG_SOFTMMU) += vfio/
-+devices-dirs-$(CONFIG_LINUX) += vfio/
- devices-dirs-$(CONFIG_SOFTMMU) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index 8b3f664..9180589 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -1,4 +1,3 @@
--ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
- obj-$(CONFIG_VFIO_CCW) += ccw.o
-@@ -7,4 +6,3 @@ obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
- obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
- obj-$(CONFIG_SOFTMMU) += spapr.o
- obj-$(CONFIG_VFIO_AP) += ap.o
--endif
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 9cc20b3..e184a7d 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -53,11 +53,6 @@ Option @option{-virtioconsole} has been replaced by
+ The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
+ replacement since it is not needed anymore.
+ 
+-@subsection -enable-hax (since 3.0.0)
+-
+-The @option{-enable-hax} option has been replaced by @option{-accel hax}.
+-Both options have been introduced in QEMU version 2.9.0.
+-
+ @subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
+ 
+ The 'file' driver for drives is no longer appropriate for character or host
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 521511e..8f34dce 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3381,17 +3381,6 @@ Enable KVM full virtualization support. This option is only available
+ if KVM support is enabled when compiling.
+ ETEXI
+ 
+-DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
+-    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
+-STEXI
+-@item -enable-hax
+-@findex -enable-hax
+-Enable HAX (Hardware-based Acceleration eXecution) support. This option
+-is only available if HAX support is enabled when compiling. HAX is only
+-applicable to MAC and Windows platform, and thus does not conflict with
+-KVM. This option is deprecated, use @option{-accel hax} instead.
+-ETEXI
+-
+ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
+     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
+ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+diff --git a/vl.c b/vl.c
+index 9cf0fbe..804fbdb 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3655,11 +3655,6 @@ int main(int argc, char **argv, char **envp)
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
+                 break;
+-            case QEMU_OPTION_enable_hax:
+-                warn_report("Option is deprecated, use '-accel hax' instead");
+-                olist = qemu_find_opts("machine");
+-                qemu_opts_parse_noisily(olist, "accel=hax", false);
+-                break;
+             case QEMU_OPTION_M:
+             case QEMU_OPTION_machine:
+                 olist = qemu_find_opts("machine");
 -- 
 1.8.3.1
