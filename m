@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47784)
+Received: from eggs.gnu.org ([209.51.188.92]:51475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqduv-0006t3-WD
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:07 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gqeBz-000110-J2
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gqduu-00041l-3G
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gqdus-0003yW-1J
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:04:03 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-7-yuval.shaia@oracle.com>
-Date: Mon, 04 Feb 2019 14:03:58 +0100
-In-Reply-To: <20190131130850.6850-7-yuval.shaia@oracle.com> (Yuval Shaia's
-	message of "Thu, 31 Jan 2019 15:08:46 +0200")
-Message-ID: <87bm3rso1t.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 06/10] hw/pvrdma: Dump device statistics
- counters to file
+	(envelope-from <richard.henderson@linaro.org>) id 1gqeBy-0006Uf-1A
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:43 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gqeBx-0006TC-Nd
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:41 -0500
+Received: by mail-wm1-x343.google.com with SMTP id p6so13435659wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 05:21:40 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Mon,  4 Feb 2019 13:21:26 +0000
+Message-Id: <20190204132126.3255-5-richard.henderson@linaro.org>
+In-Reply-To: <20190204132126.3255-1-richard.henderson@linaro.org>
+References: <20190204132126.3255-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 4/4] target/arm: Enable TBI for user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: dgilbert@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Yuval Shaia <yuval.shaia@oracle.com> writes:
+This has been enabled in the linux kernel since v3.11
+(commit d50240a5f6cea, 2013-09-03,
+"arm64: mm: permit use of tagged pointers at EL0").
 
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->  hw/rdma/vmw/pvrdma.h      |  1 +
->  hw/rdma/vmw/pvrdma_main.c | 72 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 73 insertions(+)
->
-> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> index 167706ec2c..dc10f21ca0 100644
-> --- a/hw/rdma/vmw/pvrdma.h
-> +++ b/hw/rdma/vmw/pvrdma.h
-> @@ -133,5 +133,6 @@ static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
->  }
->  
->  int pvrdma_exec_cmd(PVRDMADev *dev);
-> +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func);
->  
->  #endif
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-The only user appears in the next patch.  I'd squash the two patches.
-Matter of taste.
-
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index cf82e78f08..79900076ec 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -14,6 +14,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "qapi/error.h"
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
-> @@ -36,6 +37,8 @@
->  #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
->  #include "pvrdma_qp_ops.h"
->  
-> +GSList *devices;
-> +
->  static Property pvrdma_dev_properties[] = {
->      DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
->      DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
-> @@ -55,6 +58,72 @@ static Property pvrdma_dev_properties[] = {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> +static void pvrdma_dump_device_statistics(gpointer data, gpointer user_data)
-> +{
-> +    CPUListState *s = user_data;
-> +    PCIDevice *pdev = data;
-> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> +
-> +    (*s->cpu_fprintf)(s->file, "%s_%x.%x\n", pdev->name,
-> +                 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
-
-Why the indirection through CPUListState?  What's wrong with straight
-monitor_printf()?
-
-> +    (*s->cpu_fprintf)(s->file, "\tcommands         : %" PRId64 "\n",
-> +                      dev->stats.commands);
-> +    (*s->cpu_fprintf)(s->file, "\ttx               : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.tx);
-> +    (*s->cpu_fprintf)(s->file, "\ttx_len           : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.tx_len);
-> +    (*s->cpu_fprintf)(s->file, "\ttx_err           : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.tx_err);
-> +    (*s->cpu_fprintf)(s->file, "\trx_bufs          : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.rx_bufs);
-> +    (*s->cpu_fprintf)(s->file, "\trx_bufs_len      : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.rx_bufs_len);
-> +    (*s->cpu_fprintf)(s->file, "\trx_bufs_err      : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.rx_bufs_err);
-> +    (*s->cpu_fprintf)(s->file, "\tcompletions      : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.completions);
-> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (bk)     : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.poll_cq_from_bk);
-> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.poll_cq_ppoll_to);
-> +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (fe)     : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.poll_cq_from_guest);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_tx           : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_tx);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_tx_err       : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_tx_err);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_rx           : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_rx);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_err       : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_rx_err);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs      : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_rx_bufs);
-> +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs_err  : %" PRId64 "\n",
-> +                      dev->rdma_dev_res.stats.mad_rx_bufs_err);
-> +    (*s->cpu_fprintf)(s->file, "\tPDs              : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.pd_tbl.used);
-> +    (*s->cpu_fprintf)(s->file, "\tMRs              : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.mr_tbl.used);
-> +    (*s->cpu_fprintf)(s->file, "\tUCs              : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.uc_tbl.used);
-> +    (*s->cpu_fprintf)(s->file, "\tQPs              : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.qp_tbl.used);
-> +    (*s->cpu_fprintf)(s->file, "\tCQs              : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.cq_tbl.used);
-> +    (*s->cpu_fprintf)(s->file, "\tCEQ_CTXs         : %" PRId32 "\n",
-> +                      dev->rdma_dev_res.cqe_ctx_tbl.used);
-> +}
-> +
-> +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func)
-> +{
-> +    CPUListState s = {
-> +        .file = f,
-> +        .cpu_fprintf = fprintf_func,
-> +    };
-> +
-> +    g_slist_foreach(devices, pvrdma_dump_device_statistics, &s);
-> +}
-> +
->  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
->                            void *ring_state)
->  {
-> @@ -618,6 +687,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
->      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
->  
-> +    devices = g_slist_append(devices, pdev);
-> +
->  out:
->      if (rc) {
->          pvrdma_fini(pdev);
-> @@ -627,6 +698,7 @@ out:
->  
->  static void pvrdma_exit(PCIDevice *pdev)
->  {
-> +    devices = g_slist_remove(devices, pdev);
->      pvrdma_fini(pdev);
->  }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 3874dc9875..edf6e0e1f1 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -200,6 +200,12 @@ static void arm_cpu_reset(CPUState *s)
+         env->vfp.zcr_el[1] = cpu->sve_max_vq - 1;
+         env->vfp.zcr_el[2] = env->vfp.zcr_el[1];
+         env->vfp.zcr_el[3] = env->vfp.zcr_el[1];
++        /*
++         * Enable TBI0 and TBI1.  While the real kernel only enables TBI0,
++         * turning on both here will produce smaller code and otherwise
++         * make no difference to the user-level emulation.
++         */
++        env->cp15.tcr_el[1].raw_tcr = (3ULL << 37);
+ #else
+         /* Reset into the highest available EL */
+         if (arm_feature(env, ARM_FEATURE_EL3)) {
+-- 
+2.17.2
