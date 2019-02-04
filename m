@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49768)
+Received: from eggs.gnu.org ([209.51.188.92]:50008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gqh2E-0007O9-47
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:23:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gqh2G-0007Xz-Ov
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:23:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gqgsK-0004rQ-4y
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:13:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gqgsJ-0004fG-QP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:13:35 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Mon,  4 Feb 2019 17:03:20 +0100
-Message-Id: <20190204160325.4914-1-lersek@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gqgoX-0002gL-0F
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:09:41 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  4 Feb 2019 10:09:28 -0600
+Message-Id: <20190204160928.11209-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/5] add the BiosTablesTest UEFI app,
- build it with the new roms/edk2 submodule
+Subject: [Qemu-devel] [PATCH] dirty-bitmap: Expose persistent flag to
+ 'query-block'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +20,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, andrey.shinkevich@virtuozzo.com, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Previous version (v2):
-http://mid.mail-archive.com/20190124203959.30875-1-lersek@redhat.com
+Since qemu currently doesn't flush persistent bitmaps to disk until
+shutdown (which might be MUCH later), it's useful if 'query-block'
+at least shows WHICH bitmaps will (eventually) make it to persistent
+storage.
 
-Updates in v3 have been noted on each patch in the series.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qapi/block-core.json | 5 ++++-
+ block/dirty-bitmap.c | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index dae5c7b4d83..2e0bd3c245a 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -450,11 +450,14 @@
+ #
+ # @status: current status of the dirty bitmap (since 2.4)
+ #
++# @persistent: true if the bitmap will eventually be flushed to persiste=
+nt
++#              storage (since 4.0)
++#
+ # Since: 1.3
+ ##
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+-           'status': 'DirtyBitmapStatus'} }
++           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
 
-Thanks
-Laszlo
-
-Laszlo Ersek (5):
-  roms: add the edk2 project as a git submodule
-  roms: build the EfiRom utility from the roms/edk2 submodule
-  tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
-  tests/uefi-test-tools: add build scripts
-  tests/data: introduce "uefi-boot-images" with the "bios-tables-test"
-    ISOs
-
- .gitmodules                                                             =
- |   3 +
- Makefile                                                                =
- |   6 +-
- roms/Makefile                                                           =
- |  13 +-
- roms/edk2                                                               =
- |   1 +
- tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
- | Bin 0 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
- | Bin 0 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
- | Bin 0 -> 12800 bytes
- tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
- | Bin 0 -> 13312 bytes
- tests/uefi-test-tools/.gitignore                                        =
- |   3 +
- tests/uefi-test-tools/LICENSE                                           =
- |  25 ++++
- tests/uefi-test-tools/Makefile                                          =
- | 106 ++++++++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
- | 130 ++++++++++++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
- |  41 ++++++
- tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
- |  67 +++++++++
- tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec             =
- |  27 ++++
- tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc             =
- |  69 ++++++++++
- tests/uefi-test-tools/build.sh                                          =
- | 145 ++++++++++++++++++++
- 17 files changed, 628 insertions(+), 8 deletions(-)
- create mode 160000 roms/edk2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.=
-iso.qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.=
-qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso=
-.qcow2
- create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.i=
-so.qcow2
- create mode 100644 tests/uefi-test-tools/.gitignore
- create mode 100644 tests/uefi-test-tools/LICENSE
- create mode 100644 tests/uefi-test-tools/Makefile
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
-/BiosTablesTest.c
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
-/BiosTablesTest.inf
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/B=
-iosTablesTest.h
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
-kg.dec
- create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
-kg.dsc
- create mode 100755 tests/uefi-test-tools/build.sh
-
+ ##
+ # @Qcow2BitmapInfoFlags:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 00ea36f5545..e46f72b346c 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -440,6 +440,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDri=
+verState *bs)
+         info->has_name =3D !!bm->name;
+         info->name =3D g_strdup(bm->name);
+         info->status =3D bdrv_dirty_bitmap_status(bm);
++        info->persistent =3D bm->persistent;
+         entry->value =3D info;
+         *plist =3D entry;
+         plist =3D &entry->next;
 --=20
-2.19.1.3.g30247aa5d201
+2.20.1
