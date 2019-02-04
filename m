@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59275)
+Received: from eggs.gnu.org ([209.51.188.92]:59541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6r-00052Y-Ey
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6z-0005BL-BF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6p-0003TW-To
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:45 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40246)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6x-0003cg-RI
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:53 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6p-0003G4-LL
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:43 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id p4so943893wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:22 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	s132sm8836236wmf.28.2019.02.04.10.36.20 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 04 Feb 2019 10:36:21 -0800 (PST)
+	id 1gqj6x-0003bu-HE
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:51 -0500
+Received: by mail-wr1-x435.google.com with SMTP id a16so999616wrv.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:51 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:03 +0100
-Message-Id: <1549305379-51117-2-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:31 +0100
+Message-Id: <1549305379-51117-30-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/77] vhost-user-test: use g_cond_broadcast
+Subject: [Qemu-devel] [PULL 29/77] contrib/elf2dmp: use GLib in PDB
+ processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +29,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-g_cond_signal is rarely the right thing to do, it works now because
-vhost-user-test only has two threads but it is not correct in general.
-Fix it before adding more calls.
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Replace POSIX mmap with GLib g_mapped_file_new in PDB processing stage
+to make elf2dmp cross-platform. There are no direct POSIX in elf2dmp
+after this patch.
+
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-4-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-7-git-send-email-pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ contrib/elf2dmp/pdb.c | 29 ++++++++---------------------
+ contrib/elf2dmp/pdb.h |  2 +-
+ 2 files changed, 9 insertions(+), 22 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 84e50d8..9baaff4 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -393,7 +393,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-                                             G_N_ELEMENTS(s->fds));
+diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
+index bcb01b4..52e352d 100644
+--- a/contrib/elf2dmp/pdb.c
++++ b/contrib/elf2dmp/pdb.c
+@@ -277,28 +277,18 @@ static void pdb_reader_exit(struct pdb_reader *r)
  
-         /* signal the test that it can continue */
--        g_cond_signal(&s->data_cond);
-+        g_cond_broadcast(&s->data_cond);
-         break;
+ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
+ {
++    GError *gerr = NULL;
+     int err = 0;
+-    int fd;
+     void *map;
+-    struct stat st;
  
-     case VHOST_USER_SET_VRING_KICK:
-@@ -419,7 +419,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         p = (uint8_t *) &msg;
-         qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE);
+-    fd = open(name, O_RDONLY, 0);
+-    if (fd == -1) {
+-        eprintf("Failed to open PDB file \'%s\'\n", name);
++    reader->gmf = g_mapped_file_new(name, TRUE, &gerr);
++    if (gerr) {
++        eprintf("Failed to map PDB file \'%s\'\n", name);
+         return 1;
+     }
+-    reader->fd = fd;
+-
+-    fstat(fd, &st);
+-    reader->file_size = st.st_size;
+-
+-    map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+-    if (map == MAP_FAILED) {
+-        eprintf("Failed to map PDB file\n");
+-        err = 1;
+-        goto out_fd;
+-    }
  
--        g_cond_signal(&s->data_cond);
-+        g_cond_broadcast(&s->data_cond);
-         break;
++    reader->file_size = g_mapped_file_get_length(reader->gmf);
++    map = g_mapped_file_get_contents(reader->gmf);
+     if (pdb_reader_init(reader, map)) {
+         err = 1;
+         goto out_unmap;
+@@ -307,16 +297,13 @@ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
+     return 0;
  
-     case VHOST_USER_SET_VRING_BASE:
+ out_unmap:
+-    munmap(map, st.st_size);
+-out_fd:
+-    close(fd);
++    g_mapped_file_unref(reader->gmf);
+ 
+     return err;
+ }
+ 
+ void pdb_exit(struct pdb_reader *reader)
+ {
+-    munmap(reader->ds.header, reader->file_size);
+-    close(reader->fd);
++    g_mapped_file_unref(reader->gmf);
+     pdb_reader_exit(reader);
+ }
+diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
+index a3a3cac..1640d54 100644
+--- a/contrib/elf2dmp/pdb.h
++++ b/contrib/elf2dmp/pdb.h
+@@ -216,7 +216,7 @@ typedef struct pdb_seg {
+ #define IMAGE_FILE_MACHINE_AMD64 0x8664
+ 
+ struct pdb_reader {
+-    int fd;
++    GMappedFile *gmf;
+     size_t file_size;
+     struct {
+         PDB_DS_HEADER *header;
 -- 
 1.8.3.1
