@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59563)
+Received: from eggs.gnu.org ([209.51.188.92]:59595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj70-0005CT-3E
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:55 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj71-0005EM-K5
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6y-0003dq-Qu
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:54 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:33185)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj70-0003fL-FD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:55 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6y-0003ck-JE
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:52 -0500
-Received: by mail-wm1-x329.google.com with SMTP id r24so10736784wmh.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:52 -0800 (PST)
+	id 1gqj70-0003ef-7J
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:54 -0500
+Received: by mail-wm1-x335.google.com with SMTP id f188so990999wmf.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:54 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:32 +0100
-Message-Id: <1549305379-51117-31-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:34 +0100
+Message-Id: <1549305379-51117-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 30/77] contrib/elf2dmp: fix structures
- definitions
+Subject: [Qemu-devel] [PULL 32/77] configure: enable elf2dmp build for
+ Windows hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +33,46 @@ Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
 From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-Remove duplicate structures definitions in case of build for Windows hosts.
+After this patch contrib/elf2dmp can be built for Windows x86 and x86_64
+hosts by mingw.
 
 Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-5-viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-7-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/elf2dmp/kdbg.h | 12 ++++++++----
- contrib/elf2dmp/pdb.h  |  2 ++
- contrib/elf2dmp/pe.h   |  6 ++++--
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ Makefile  | 4 ++--
+ configure | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/contrib/elf2dmp/kdbg.h b/contrib/elf2dmp/kdbg.h
-index 851b57c..002e3d0 100644
---- a/contrib/elf2dmp/kdbg.h
-+++ b/contrib/elf2dmp/kdbg.h
-@@ -25,11 +25,15 @@ typedef struct DBGKD_GET_VERSION64 {
-     uint64_t DebuggerDataList;
- } DBGKD_GET_VERSION64;
+diff --git a/Makefile b/Makefile
+index 76f6ab4..3658310 100644
+--- a/Makefile
++++ b/Makefile
+@@ -570,8 +570,8 @@ ifneq ($(EXESUF),)
+ qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+ endif
  
-+#ifndef _WIN32
-+typedef struct LIST_ENTRY64 {
-+    struct LIST_ENTRY64 *Flink;
-+    struct LIST_ENTRY64 *Blink;
-+} LIST_ENTRY64;
-+#endif
-+
- typedef struct DBGKD_DEBUG_DATA_HEADER64 {
--    struct LIST_ENTRY64 {
--       struct LIST_ENTRY64 *Flink;
--       struct LIST_ENTRY64 *Blink;
--    } List;
-+    LIST_ENTRY64    List;
-     uint32_t           OwnerTag;
-     uint32_t           Size;
- } DBGKD_DEBUG_DATA_HEADER64;
-diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
-index 1640d54..4ea8925 100644
---- a/contrib/elf2dmp/pdb.h
-+++ b/contrib/elf2dmp/pdb.h
-@@ -9,12 +9,14 @@
- #define PDB_H
+-elf2dmp: LIBS = $(CURL_LIBS)
+-elf2dmp: $(elf2dmp-obj-y)
++elf2dmp$(EXESUF): LIBS += $(CURL_LIBS)
++elf2dmp$(EXESUF): $(elf2dmp-obj-y)
+ 	$(call LINK, $^)
  
- 
-+#ifndef _WIN32
- typedef struct GUID {
-     unsigned int Data1;
-     unsigned short Data2;
-     unsigned short Data3;
-     unsigned char Data4[8];
- } GUID;
-+#endif
- 
- struct PDB_FILE {
-     uint32_t size;
-diff --git a/contrib/elf2dmp/pe.h b/contrib/elf2dmp/pe.h
-index dafb26a..c2a4a6b 100644
---- a/contrib/elf2dmp/pe.h
-+++ b/contrib/elf2dmp/pe.h
-@@ -9,6 +9,7 @@
- #define PE_H
- 
- 
-+#ifndef _WIN32
- typedef struct IMAGE_DOS_HEADER {
-     uint16_t  e_magic;      /* 0x00: MZ Header signature */
-     uint16_t  e_cblp;       /* 0x02: Bytes on last page of file */
-@@ -87,8 +88,6 @@ typedef struct IMAGE_NT_HEADERS64 {
-   IMAGE_OPTIONAL_HEADER64 OptionalHeader;
- } __attribute__ ((packed)) IMAGE_NT_HEADERS64;
- 
--#define IMAGE_FILE_DEBUG_DIRECTORY  6
--
- typedef struct IMAGE_DEBUG_DIRECTORY {
-   uint32_t Characteristics;
-   uint32_t TimeDateStamp;
-@@ -101,6 +100,9 @@ typedef struct IMAGE_DEBUG_DIRECTORY {
- } __attribute__ ((packed)) IMAGE_DEBUG_DIRECTORY;
- 
- #define IMAGE_DEBUG_TYPE_CODEVIEW   2
-+#endif
-+
-+#define IMAGE_FILE_DEBUG_DIRECTORY  6
- 
- typedef struct guid_t {
-     uint32_t a;
+ ifdef CONFIG_IVSHMEM
+diff --git a/configure b/configure
+index f6a51e0..244bc7a 100755
+--- a/configure
++++ b/configure
+@@ -5790,8 +5790,8 @@ if test "$want_tools" = "yes" ; then
+   if [ "$ivshmem" = "yes" ]; then
+     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
+   fi
+-  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
+-    tools="elf2dmp $tools"
++  if [ "$curl" = "yes" ]; then
++      tools="elf2dmp\$(EXESUF) $tools"
+   fi
+ fi
+ if test "$softmmu" = yes ; then
 -- 
 1.8.3.1
