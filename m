@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38998)
+Received: from eggs.gnu.org ([209.51.188.92]:39173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqgW7-0001YP-9f
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:50:40 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqgWB-0001av-9O
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqgRe-0002Hs-TK
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:46:04 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:1251)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqgRe-0002EJ-JZ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:46:02 -0500
-Date: Mon, 4 Feb 2019 15:45:57 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20190204154557.GI2306@perard.uk.xensource.com>
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-34-git-send-email-pbonzini@redhat.com>
-	<6e8609da-a198-4457-afc2-88f911261994@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6e8609da-a198-4457-afc2-88f911261994@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 33/52] build: switch to Kconfig
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqgP3-0007i5-1c
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:43:24 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gqgP1-0007YR-06
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:43:20 -0500
+Received: by mail-wr1-x441.google.com with SMTP id a16so355484wrv.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 07:43:16 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 16:43:12 +0100
+Message-Id: <1549294992-46543-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] queue: fix QTAILQ_FOREACH_REVERSE_SAFE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul.durrant@citrix.com>, yang.zhong@intel.com, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com
 
-On Thu, Jan 31, 2019 at 10:48:50PM +0100, Philippe Mathieu-Daudé wrote:
-> I cc'ed the Xen team, it would be nice if one of them also tests this.
+The iteration was stopping as soon as prev_var was set to NULL, and
+therefore it skipped the first element.  Fortunately, or unfortunately,
+we have only one use of QTAILQ_FOREACH_REVERSE_SAFE.  Thus this only
+showed up as incorrect register preferences on the very first translation
+block that was compiled.
 
-I've tested the series, and here is the first issue:
-  CC      hw/9pfs/xen-9p-backend.o
-  LINK    i386-softmmu/qemu-system-i386
-/usr/bin/ld: ../hw/xen/xen-legacy-backend.o: in function `xen_be_register_common':
-xen-legacy-backend.c:(.text+0x1cb6): undefined reference to `xen_9pfs_ops'
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/qemu/queue.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The `struct xen_9pfs_ops` is in "xen-9p-backend", so it's built, but
-link time still fails.
-
-Building QEMU with --disable-virtfs works. (Same as commenting out the
-line that uses xen_9pfs_ops in xen-legacy-backend.) Part of the other
-options I have for configure: --enable-xen --target-list=i386-softmmu
---disable-user --cpu=x86_64
-
-
-I did also other build tests and one without --target-list, and that
-fails, but not because of xen:
-$ ./configure --enable-xen
-...
-$ make
-...
-  GEN     aarch64-softmmu/config-devices.mak.tmp
-  GEN     alpha-softmmu/config-devices.mak.tmp
-  GEN     arm-softmmu/config-devices.mak.tmp
-  GEN     cris-softmmu/config-devices.mak.tmp
-  GEN     hppa-softmmu/config-devices.mak.tmp
-  GEN     i386-softmmu/config-devices.mak.tmp
-  GEN     lm32-softmmu/config-devices.mak.tmp
-  GEN     m68k-softmmu/config-devices.mak.tmp
-  GEN     microblaze-softmmu/config-devices.mak.tmp
-undefined symbol ARMSSE_CPUID
-undefined symbol ARMSSE
-Traceback (most recent call last):
-  File "/var/tmp/qemu.rjWNchMAI4/qemu/scripts/minikconf.py", line 680, in <module>
-    config = data.compute_config()
-  File "/var/tmp/qemu.rjWNchMAI4/qemu/scripts/minikconf.py", line 214, in compute_config
-    raise Exception(parser, "there were undefined symbols")
-Exception: (<__main__.KconfigParser instance at 0x7f635c24e200>, 'there were undefined symbols')
-undefined symbol ARMSSE_CPUID
-undefined symbol ARMSSE
-Traceback (most recent call last):
-  File "/var/tmp/qemu.rjWNchMAI4/qemu/scripts/minikconf.py", line 680, in <module>
-    config = data.compute_config()
-  File "/var/tmp/qemu.rjWNchMAI4/qemu/scripts/minikconf.py", line 214, in compute_config
-    raise Exception(parser, "there were undefined symbols")
-Exception: (<__main__.KconfigParser instance at 0x7fd4d2374248>, 'there were undefined symbols')
-
-...
-
-make: *** No rule to make target 'aarch64-softmmu/config-devices.mak', needed by 'config-all-devices.mak'.  Stop.
-make: *** Waiting for unfinished jobs....
-
-Cheers,
-
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 1f8e219..0379bd8 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -439,7 +439,7 @@ union {                                                                 \
+ 
+ #define QTAILQ_FOREACH_REVERSE_SAFE(var, head, field, prev_var)         \
+         for ((var) = QTAILQ_LAST(head);                                 \
+-             (var) && ((prev_var) = QTAILQ_PREV(var, field));           \
++             (var) && ((prev_var) = QTAILQ_PREV(var, field), 1);        \
+              (var) = (prev_var))
+ 
+ /*
 -- 
-Anthony PERARD
+1.8.3.1
