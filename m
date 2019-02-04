@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49536)
+Received: from eggs.gnu.org ([209.51.188.92]:49653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqh0b-0006sD-2L
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:22:10 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gqh28-0007HA-DW
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqh0X-0006qa-Bt
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:22:06 -0500
-Received: from mail-eopbgr50098.outbound.protection.outlook.com
-	([40.107.5.98]:49024
-	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gqgtZ-0005c1-0x
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:14:54 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:40014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1gqh0W-0006ox-EP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:22:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 4 Feb 2019 16:22:00 +0000
-Message-ID: <cf6efb63-6542-1157-38a3-f880bbad7373@virtuozzo.com>
-References: <154917314614.27692.2830748026894633212.malonedeb@soybean.canonical.com>
-	<ec5e1ddc-9eac-193e-8937-c4146fe56a8f@redhat.com>
-In-Reply-To: <ec5e1ddc-9eac-193e-8937-c4146fe56a8f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <05299F365A3CB241BA66B445EF05DE5D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gqgtS-0005VG-Sy
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:14:48 -0500
+Date: Mon, 4 Feb 2019 18:14:30 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190204161430.GC14293@lap1>
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-7-yuval.shaia@oracle.com>
+	<87bm3rso1t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Bug 1814418] [NEW] persistent bitmap will be
- inconsistent when qemu crash,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bm3rso1t.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 06/10] hw/pvrdma: Dump device statistics
+ counters to file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,162 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Bug 1814418 <1814418@bugs.launchpad.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, John Snow <jsnow@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: dgilbert@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-MDQuMDIuMjAxOSAxNzo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMi8yLzE5IDExOjUyIFBN
-LCBDaGVuZyBDaGVuIHdyb3RlOg0KPj4gUHVibGljIGJ1ZyByZXBvcnRlZDoNCj4+DQo+PiBGb2xs
-b3cgdGhlc2Ugc3RlcHMgdG8gcmVhcHBlYXIgdGhlIGJ1ZzoNCj4+DQo+PiAxLiBzdGFydCBxZW11
-DQo+PiAyLiBhZGQgcGVyc2lzdGVudCBiaXRtYXA6ICd7ICJleGVjdXRlIjogImJsb2NrLWRpcnR5
-LWJpdG1hcC1hZGQiLCAiYXJndW1lbnRzIjogeyJub2RlIjogImRyaXZlLXZpcnRpby1kaXNrMSIs
-Im5hbWUiOiAiYml0bWFwMCIsICJwZXJzaXN0ZW50Ijp0cnVlIH19Jw0KPj4gMy4ga2lsbCAtOSBx
-ZW11IChzaW11bGF0ZSBIb3N0IGNyYXNoLCBlZy4gbG9zZSBwb3dlcikNCj4+IDQuIHJlc3RhcnQg
-cWVtdQ0KPj4NCj4+IE5vdywgdGhlICd7ICJleGVjdXRlIjogInF1ZXJ5LWJsb2NrIiB9JyBjYW4n
-dCBmaW5kIHRoZSBiaXRtYXAwLiBJIGNhbg0KPj4gdW5kZXJzdGFuZCBhdCB0aGlzIHBvaW50LCBi
-ZWNhdXNlIHRoZSBiaXRtYXAwIGhhcyBub3QgYmVlbiBzeW5jaHJvbml6ZWQNCj4+IHlldC4NCj4g
-DQo+IFRoaXMgbWF0Y2hlcyBteSBvYnNlcnZhdGlvbnMgaGVyZToNCj4gaHR0cHM6Ly9saXN0cy5n
-bnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDEvbXNnMDc3MDAuaHRtbA0KPiAN
-Cj4gSSdtIG9mIHRoZSBvcGluaW9uIHRoYXQgdXBkYXRpbmcgdGhlIHFjb3cyIGhlYWRlcnMgYW55
-IHRpbWUgYSBwZXJzaXN0ZW50DQo+IGJpdG1hcCBpcyBjcmVhdGVkIG9yIGRlc3Ryb3llZCBpcyB3
-b3J0aHdoaWxlLCBldmVuIGlmIHRoZSBoZWFkZXJzIG11c3QNCj4gc3RpbGwgbWFyayB0aGUgYml0
-bWFwIGFzIGluLXVzZS4gIFRydWUsIHRoZSBjcmFzaCB3aWxsIGxlYXZlIHRoZSBiaXRtYXANCj4g
-YXMgaW5jb25zaXN0ZW50LCB3aGljaCBpcyBubyBkaWZmZXJlbnQgdGhhbiBpZiB0aGUgYml0bWFw
-IGlzIG5ldmVyDQo+IHdyaXR0ZW4gdG8gdGhlIHFjb3cyIGhlYWRlciAod2hlbiBib290aW5nIGEg
-bmV3IHFlbXUsIGFuIGluY29uc2lzdGVudA0KPiBiaXRtYXAgb24gZGlzayBoYXMgdGhlIHNhbWUg
-c3RhdHVzIGFzIGEgbWlzc2luZyBiaXRtYXAgLSBib3RoIGltcGx5IHRoYXQNCj4gYW4gaW5jcmVt
-ZW50YWwgYmFja3VwIGlzIG5vdCBwb3NzaWJsZSwgYW5kIHNvIGEgZnVsbCBiYWNrdXAgaXMgbmVl
-ZGVkDQo+IGluc3RlYWQpLiAgQnV0IHRoZSBjcmVhdGlvbiBvZiBiaXRtYXBzIGlzIG5vdCBhIGNv
-bW1vbiBvY2Nhc2lvbiwgYW5kDQo+IGhhdmluZyB0aGUgbWV0YWRhdGEgdHJhY2sgdGhhdCBhIHBl
-cnNpc3RlbnQgYml0bWFwIGhhcyBiZWVuIHJlcXVlc3RlZA0KPiBzZWVtcyBsaWtlIGl0IHdvdWxk
-IGJlIHVzZWZ1bCBpbmZvcm1hdGlvbiBkdXJpbmcgYSBkZWJ1Z2dpbmcgc2Vzc2lvbi4NCg0KRXZl
-biBpZiB3ZSBzdG9yZSB0aGVtLCBmb2xsb3dpbmcgcXVlcnktYmxvY2sgd2lsbCBub3Qgc2hvdyB0
-aGVtLCBhcw0KaW4tdXNlIGJpdG1hcHMgYXJlIG5vdCBsb2FkZWQgb24gb3BlbiAob3IsIHdlIHNo
-b3VsZCBsb2FkIHRoZW0gdG9vKS4NCg0KPiANCj4gDQo+Pg0KPj4gQnV0LCB3aGVuIEkgdHJ5IHRv
-IGFkZCBwZXJzaXN0ZW50IGJpdG1hcDAgYWdhaW46ICd7ICJleGVjdXRlIjogImJsb2NrLQ0KPj4g
-ZGlydHktYml0bWFwLWFkZCIsICJhcmd1bWVudHMiOiB7Im5vZGUiOiAiZHJpdmUtdmlydGlvLWRp
-c2sxIiwibmFtZSI6DQo+PiAiYml0bWFwMCIsICJwZXJzaXN0ZW50Ijp0cnVlIH19JywgSXQgZmFp
-bGVkOg0KPj4NCj4+IHsiaWQiOiJsaWJ2aXJ0LTQyIiwiZXJyb3IiOnsiY2xhc3MiOiJHZW5lcmlj
-RXJyb3IiLCJkZXNjIjoiQ2FuJ3QgbWFrZQ0KPj4gYml0bWFwICdiaXRtYXAwJyBwZXJzaXN0ZW50
-IGluICdkcml2ZS12aXJ0aW8tZGlzazEnOiBCaXRtYXAgd2l0aCB0aGUNCj4+IHNhbWUgbmFtZSBp
-cyBhbHJlYWR5IHN0b3JlZCJ9fQ0KPj4NCj4+IEluIG90aGVyIHdvcmQsIHdoZW4gcWVtdSBjcmFz
-aCwgdGhlIHFjb3cyIGltYWdlIHJlbWFpbiB0aGUgaW5jb21wbGV0ZQ0KPj4gcGVyc2lzdGVudCBi
-aXRtYXAuDQoNClllcyAoaWYgaXQgd2FzIHN0b3JlZCBhdCBsZWFzdCBvbmNlLCBtYXkgYmUgb24g
-cHJldmlvdXMgcWVtdSBydW4pLg0KDQo+IA0KPiBEb2VzIEFuZHJleSdzIHByb3Bvc2VkIHBhdGNo
-IGFkZGluZyBwZXJzaXN0ZW50IGJpdG1hcCBkZXRhaWxzIHRvDQo+ICdxZW11LWltZyBpbmZvJyBz
-aG93IGFueXRoaW5nIGFmdGVyIHlvdSBmaXJzdCBraWxsIHFlbXU/DQo+IA0KPiAvbWUgZ29lcyBh
-bmQgdGVzdHMuLi4NCj4gDQo+IE9oIHdlaXJkIC0gd2l0aCBBbmRyZXkncyBwYXRjaCwgd2UgZ2V0
-IHNlbWktZHVwbGljYXRlZCBpbmZvcm1hdGlvbg0KPiBkdXJpbmcgcXVlcnktYmxvY2sgKGF0IGxl
-YXN0LCBhZnRlciBhbiBpbml0aWFsIGNsZWFuIHNodXRkb3duIHByaW9yIHRvDQo+IGF0dGVtcHRp
-bmcgYW4gYWJydXB0IHNodXRkb3duKToNCj4gDQo+IHsicmV0dXJuIjogW3siaW8tc3RhdHVzIjog
-Im9rIiwgImRldmljZSI6ICJpZGUwLWhkMCIsICJsb2NrZWQiOiBmYWxzZSwNCj4gInJlbW92YWJs
-ZSI6IGZhbHNlLCAiaW5zZXJ0ZWQiOiB7ImlvcHNfcmQiOiAwLCAiZGV0ZWN0X3plcm9lcyI6ICJv
-ZmYiLA0KPiAiaW1hZ2UiOiB7InZpcnR1YWwtc2l6ZSI6IDEwNDg1NzYwMCwgImZpbGVuYW1lIjog
-ImZpbGU1IiwNCj4gImNsdXN0ZXItc2l6ZSI6IDY1NTM2LCAiZm9ybWF0IjogInFjb3cyIiwgImFj
-dHVhbC1zaXplIjogMjA4ODk2LA0KPiAiZm9ybWF0LXNwZWNpZmljIjogeyJ0eXBlIjogInFjb3cy
-IiwgImRhdGEiOiB7ImNvbXBhdCI6ICIxLjEiLA0KPiAibGF6eS1yZWZjb3VudHMiOiBmYWxzZSwg
-ImJpdG1hcHMiOiBbeyJmbGFncyI6IFsiaW4tdXNlIiwgImF1dG8iXSwNCj4gIm5hbWUiOiAiYjIi
-LCAiZ3JhbnVsYXJpdHkiOiA2NTUzNn1dLCAicmVmY291bnQtYml0cyI6IDE2LCAiY29ycnVwdCI6
-DQo+IGZhbHNlfX0sICJkaXJ0eS1mbGFnIjogZmFsc2V9LCAiaW9wc193ciI6IDAsICJybyI6IGZh
-bHNlLCAibm9kZS1uYW1lIjoNCj4gIiNibG9jazE3MiIsICJiYWNraW5nX2ZpbGVfZGVwdGgiOiAw
-LCAiZHJ2IjogInFjb3cyIiwgImlvcHMiOiAwLA0KPiAiYnBzX3dyIjogMCwgIndyaXRlX3RocmVz
-aG9sZCI6IDAsICJlbmNyeXB0ZWQiOiBmYWxzZSwgImJwcyI6IDAsDQo+ICJicHNfcmQiOiAwLCAi
-Y2FjaGUiOiB7Im5vLWZsdXNoIjogZmFsc2UsICJkaXJlY3QiOiBmYWxzZSwgIndyaXRlYmFjayI6
-DQo+IHRydWV9LCAiZmlsZSI6ICJmaWxlNSIsICJlbmNyeXB0aW9uX2tleV9taXNzaW5nIjogZmFs
-c2V9LCAicWRldiI6DQo+ICIvbWFjaGluZS91bmF0dGFjaGVkL2RldmljZVsxOF0iLCAiZGlydHkt
-Yml0bWFwcyI6IFt7Im5hbWUiOiAiYjIiLA0KPiAic3RhdHVzIjogImFjdGl2ZSIsICJncmFudWxh
-cml0eSI6IDY1NTM2LCAiY291bnQiOiAwfSwgeyJuYW1lIjogImIiLA0KPiAic3RhdHVzIjogImFj
-dGl2ZSIsICJncmFudWxhcml0eSI6IDY1NTM2LCAiY291bnQiOiAwfV0sICJ0eXBlIjogInVua25v
-d24ifV19DQo+IA0KPiBOb3RlIHRoYXQgdGhlICJmb3JtYXQtc3BlY2lmaWMiIGxpc3RpbmcgaGFz
-IGEgImJpdG1hcHMiIGVudHJ5IHJlc3VsdGluZw0KPiBmcm9tIEFuZHJleSdzIHBhdGNoICh3aGlj
-aCBzaG93cyAiYXV0byIgYXMgb25lIG9mIHRoZSAiZmxhZ3MiIGZvciBhbnkNCj4gcGVyc2lzdGVu
-dCBiaXRtYXApIHNob3dpbmcgdGhlIHN0YXRlIG9mIHRoZSBwZXJzaXN0ZW50IGJpdG1hcHMgb24g
-ZGlzazsNCj4gYXMgd2VsbCBhcyB0aGUgImRpcnR5LWJpdG1hcHMiIGVudHJ5IHRoYXQgc2hvd3Mg
-dGhlIHN0YXRlIG9mIHRoZSBiaXRtYXBzDQo+IGluIG1lbW9yeS4gQW5ub3lpbmdseSwgdGhlICJk
-aXJ0eS1iaXRtYXBzIiBzZWN0aW9uIGRvZXMgTk9UIHN0YXRlIHdoaWNoDQo+IGJpdG1hcHMgYXJl
-IHBlcnNpc3RlbnQsIGFuZCBpZiBhIHBlcnNpc3RlbnQgYml0bWFwIGhhcyBub3QgeWV0IGJlZW4N
-Cj4gZmx1c2hlZCB0byBkaXNrLCB0aGVuIHRoZXJlIGlzIE5PIHdheSB0byBxdWlja2x5IGRldGVy
-bWluZSB3aGljaCBiaXRtYXBzDQo+IGFyZSBwZXJzaXN0ZW50IGFuZCB3aGljaCBhcmUgdHJhbnNp
-ZW50Lg0KPiANCj4gQXQgYW55IHJhdGUsIHdpdGggcWVtdS5naXQgbWFzdGVyICsgQW5kcmV5J3Mg
-cGF0Y2hlcyBmb3IgcWVtdS1pbWcgaW5mbywNCj4gSSB3YXMgYWJsZSB0byByZXByb2R1Y2UgYSBy
-ZWxhdGVkIG9kZGl0eTogYXR0ZW1wdGluZyB0bw0KPiBibG9jay1kaXJ0eS1iaXRtYXAtYWRkIGEg
-dHJhbnNpZW50IGJpdG1hcCB0aGF0IGhhcyB0aGUgc2FtZSBuYW1lIGFzIGFuDQo+IGV4aXN0aW5n
-IGluLXVzZSBwZXJzaXN0ZW50IGJpdG1hcCBzdWNjZWVkczsgd2hlbiBpdCBzaG91bGQgaGF2ZSBm
-YWlsZWQ6DQo+IA0KPiAkIHFlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiBmaWxlNSAxMDBtDQo+ICQg
-Li94ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgLW5vZGVmYXVsdHMgLW5vZ3JhcGhp
-YyAtcW1wIHN0ZGlvDQo+IGZpbGU1DQo+IHsnZXhlY3V0ZSc6J3FtcF9jYXBhYmlsaXRpZXMnfQ0K
-PiB7J2V4ZWN1dGUnOidxdWVyeS1ibG9jayd9ICMgbGVhcm4gdGhlIG5vZGUgbmFtZS4uLg0KPiB7
-J2V4ZWN1dGUnOidibG9jay1kaXJ0eS1iaXRtYXAtYWRkJywnYXJndW1lbnRzJzp7J25vZGUnOicj
-YmxvY2sxMTEnLCduYW1lJzonYjEnLCdwZXJzaXN0ZW50Jzp0cnVlfX0NCj4geydleGVjdXRlJzon
-cXVpdCd9DQo+ICQgLi9xZW11LWltZyBpbmZvIC1VIGZpbGU1DQo+IGltYWdlOiBmaWxlNQ0KPiBm
-aWxlIGZvcm1hdDogcWNvdzINCj4gdmlydHVhbCBzaXplOiAxMDBNICgxMDQ4NTc2MDAgYnl0ZXMp
-DQo+IGRpc2sgc2l6ZTogMjA0Sw0KPiBjbHVzdGVyX3NpemU6IDY1NTM2DQo+IEZvcm1hdCBzcGVj
-aWZpYyBpbmZvcm1hdGlvbjoNCj4gICAgICBjb21wYXQ6IDEuMQ0KPiAgICAgIGxhenkgcmVmY291
-bnRzOiBmYWxzZQ0KPiAgICAgIGJpdG1hcHM6DQo+ICAgICAgICAgIFswXToNCj4gICAgICAgICAg
-ICAgIGZsYWdzOg0KPiAgICAgICAgICAgICAgICAgIFswXTogYXV0bw0KPiAgICAgICAgICAgICAg
-bmFtZTogYjENCj4gICAgICAgICAgICAgIGdyYW51bGFyaXR5OiA2NTUzNg0KPiAgICAgIHJlZmNv
-dW50IGJpdHM6IDE2DQo+ICAgICAgY29ycnVwdDogZmFsc2UNCj4gJCAuL3g4Nl82NC1zb2Z0bW11
-L3FlbXUtc3lzdGVtLXg4Nl82NCAtbm9kZWZhdWx0cyAtbm9ncmFwaGljIC1xbXAgc3RkaW8NCj4g
-ZmlsZTUNCj4geydleGVjdXRlJzoncW1wX2NhcGFiaWxpdGllcyd9DQo+IHsnZXhlY3V0ZSc6J3F1
-ZXJ5LWJsb2NrJ30NCj4geyJyZXR1cm4iOiBbeyJpby1zdGF0dXMiOiAib2siLCAiZGV2aWNlIjog
-ImlkZTAtaGQwIiwgImxvY2tlZCI6IGZhbHNlLA0KPiAicmVtb3ZhYmxlIjogZmFsc2UsICJpbnNl
-cnRlZCI6IHsiaW9wc19yZCI6IDAsICJkZXRlY3RfemVyb2VzIjogIm9mZiIsDQo+ICJpbWFnZSI6
-IHsidmlydHVhbC1zaXplIjogMTA0ODU3NjAwLCAiZmlsZW5hbWUiOiAiZmlsZTUiLA0KPiAiY2x1
-c3Rlci1zaXplIjogNjU1MzYsICJmb3JtYXQiOiAicWNvdzIiLCAiYWN0dWFsLXNpemUiOiAyMDg4
-OTYsDQo+ICJmb3JtYXQtc3BlY2lmaWMiOiB7InR5cGUiOiAicWNvdzIiLCAiZGF0YSI6IHsiY29t
-cGF0IjogIjEuMSIsDQo+ICJsYXp5LXJlZmNvdW50cyI6IGZhbHNlLCAiYml0bWFwcyI6IFt7ImZs
-YWdzIjogWyJpbi11c2UiLCAiYXV0byJdLA0KPiAibmFtZSI6ICJiMSIsICJncmFudWxhcml0eSI6
-IDY1NTM2fV0sICJyZWZjb3VudC1iaXRzIjogMTYsICJjb3JydXB0IjoNCj4gZmFsc2V9fSwgImRp
-cnR5LWZsYWciOiBmYWxzZX0sICJpb3BzX3dyIjogMCwgInJvIjogZmFsc2UsICJub2RlLW5hbWUi
-Og0KPiAiI2Jsb2NrMTU3IiwgImJhY2tpbmdfZmlsZV9kZXB0aCI6IDAsICJkcnYiOiAicWNvdzIi
-LCAiaW9wcyI6IDAsDQo+ICJicHNfd3IiOiAwLCAid3JpdGVfdGhyZXNob2xkIjogMCwgImVuY3J5
-cHRlZCI6IGZhbHNlLCAiYnBzIjogMCwNCj4gImJwc19yZCI6IDAsICJjYWNoZSI6IHsibm8tZmx1
-c2giOiBmYWxzZSwgImRpcmVjdCI6IGZhbHNlLCAid3JpdGViYWNrIjoNCj4gdHJ1ZX0sICJmaWxl
-IjogImZpbGU1IiwgImVuY3J5cHRpb25fa2V5X21pc3NpbmciOiBmYWxzZX0sICJxZGV2IjoNCj4g
-Ii9tYWNoaW5lL3VuYXR0YWNoZWQvZGV2aWNlWzE4XSIsICJkaXJ0eS1iaXRtYXBzIjogW3sibmFt
-ZSI6ICJiMSIsDQo+ICJzdGF0dXMiOiAiYWN0aXZlIiwgImdyYW51bGFyaXR5IjogNjU1MzYsICJj
-b3VudCI6IDB9XSwgInR5cGUiOiAidW5rbm93biJ9XX0NCj4gJCBraWxsIC05ICRxZW11cGlkDQo+
-ICQgLi9xZW11LWltZyBpbmZvIC1VIGZpbGU1DQo+IGltYWdlOiBmaWxlNQ0KPiBmaWxlIGZvcm1h
-dDogcWNvdzINCj4gdmlydHVhbCBzaXplOiAxMDBNICgxMDQ4NTc2MDAgYnl0ZXMpDQo+IGRpc2sg
-c2l6ZTogMjA0Sw0KPiBjbHVzdGVyX3NpemU6IDY1NTM2DQo+IEZvcm1hdCBzcGVjaWZpYyBpbmZv
-cm1hdGlvbjoNCj4gICAgICBjb21wYXQ6IDEuMQ0KPiAgICAgIGxhenkgcmVmY291bnRzOiBmYWxz
-ZQ0KPiAgICAgIGJpdG1hcHM6DQo+ICAgICAgICAgIFswXToNCj4gICAgICAgICAgICAgIGZsYWdz
-Og0KPiAgICAgICAgICAgICAgICAgIFswXTogaW4tdXNlDQo+ICAgICAgICAgICAgICAgICAgWzFd
-OiBhdXRvDQo+ICAgICAgICAgICAgICBuYW1lOiBiMQ0KPiAgICAgICAgICAgICAgZ3JhbnVsYXJp
-dHk6IDY1NTM2DQo+ICAgICAgcmVmY291bnQgYml0czogMTYNCj4gICAgICBjb3JydXB0OiBmYWxz
-ZQ0KPiAkIC4veDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0IC1ub2RlZmF1bHRzIC1u
-b2dyYXBoaWMgLXFtcCBzdGRpbw0KPiBmaWxlNQ0KPiB7J2V4ZWN1dGUnOidxbXBfY2FwYWJpbGl0
-aWVzJ30NCj4geydleGVjdXRlJzoncXVlcnktYmxvY2snfQ0KPiB7InJldHVybiI6IFt7ImlvLXN0
-YXR1cyI6ICJvayIsICJkZXZpY2UiOiAiaWRlMC1oZDAiLCAibG9ja2VkIjogZmFsc2UsDQo+ICJy
-ZW1vdmFibGUiOiBmYWxzZSwgImluc2VydGVkIjogeyJpb3BzX3JkIjogMCwgImRldGVjdF96ZXJv
-ZXMiOiAib2ZmIiwNCj4gImltYWdlIjogeyJ2aXJ0dWFsLXNpemUiOiAxMDQ4NTc2MDAsICJmaWxl
-bmFtZSI6ICJmaWxlNSIsDQo+ICJjbHVzdGVyLXNpemUiOiA2NTUzNiwgImZvcm1hdCI6ICJxY293
-MiIsICJhY3R1YWwtc2l6ZSI6IDIwODg5NiwNCj4gImZvcm1hdC1zcGVjaWZpYyI6IHsidHlwZSI6
-ICJxY293MiIsICJkYXRhIjogeyJjb21wYXQiOiAiMS4xIiwNCj4gImxhenktcmVmY291bnRzIjog
-ZmFsc2UsICJiaXRtYXBzIjogW3siZmxhZ3MiOiBbImluLXVzZSIsICJhdXRvIl0sDQo+ICJuYW1l
-IjogImIxIiwgImdyYW51bGFyaXR5IjogNjU1MzZ9XSwgInJlZmNvdW50LWJpdHMiOiAxNiwgImNv
-cnJ1cHQiOg0KPiBmYWxzZX19LCAiZGlydHktZmxhZyI6IGZhbHNlfSwgImlvcHNfd3IiOiAwLCAi
-cm8iOiBmYWxzZSwgIm5vZGUtbmFtZSI6DQo+ICIjYmxvY2sxNDEiLCAiYmFja2luZ19maWxlX2Rl
-cHRoIjogMCwgImRydiI6ICJxY293MiIsICJpb3BzIjogMCwNCj4gImJwc193ciI6IDAsICJ3cml0
-ZV90aHJlc2hvbGQiOiAwLCAiZW5jcnlwdGVkIjogZmFsc2UsICJicHMiOiAwLA0KPiAiYnBzX3Jk
-IjogMCwgImNhY2hlIjogeyJuby1mbHVzaCI6IGZhbHNlLCAiZGlyZWN0IjogZmFsc2UsICJ3cml0
-ZWJhY2siOg0KPiB0cnVlfSwgImZpbGUiOiAiZmlsZTUiLCAiZW5jcnlwdGlvbl9rZXlfbWlzc2lu
-ZyI6IGZhbHNlfSwgInFkZXYiOg0KPiAiL21hY2hpbmUvdW5hdHRhY2hlZC9kZXZpY2VbMThdIiwg
-InR5cGUiOiAidW5rbm93biJ9XX0NCj4gDQo+IE5vdGUgLSBhZnRlciB0aGUgdW5jbGVhbiBkZWF0
-aCwgdGhlICJkaXJ0eS1iaXRtYXBzIiBlbnRyeSBpbiBxdWVyeS1ibG9jaw0KPiBpcyBOT1QgcHJl
-c2VudCwgYW5kIGFzIGEgcmVzdWx0Og0KPiANCj4geydleGVjdXRlJzonYmxvY2stZGlydHktYml0
-bWFwLWFkZCcsJ2FyZ3VtZW50cyc6eydub2RlJzonI2Jsb2NrMTQxJywnbmFtZSc6J2IxJ319DQo+
-IHsicmV0dXJuIjoge319DQo+IA0KPiBPb3BzIC0gd2Ugd2VyZSBhYmxlIHRvIGFkZCBhIHRlbXBv
-cmFyeSBiaXRtYXAgdGhhdCBvdmVycmlkZXMgdGhlIHN0aWxsDQo+IGluLXVzZSBwZXJzaXN0ZW50
-IGJpdG1hcCAod2hpY2ggd2UgcHJvcGVybHkgaWdub3JlZCBvbiBsb2FkaW5nLCBiZWNhdXNlDQo+
-IGl0IHdhcyBtYXJrZWQgaW4tdXNlKS4NCg0KWWVzLCBidXQgeW91IHdpbGwgbm90IGJlIGFibGUg
-dG8gY3JlYXRlIHBlcnNpc3RlbnQgYml0bWFwIHdpdGggdGhlIHNhbWUgbmFtZSBhcw0KaW4tdXNl
-IGJpdG1hcCBpbiB0aGUgaW1hZ2UsIHNvLCB0aGVyZSBpcyBubyBhY3R1YWwgY29sbGlzaW9uLi4g
-QnV0IGlzIG5vdCBnb29kDQp0b28uDQoNCkluLXVzZSBiaXRtYXBzIGluIHRoZSBpbWFnZSBtYXkg
-YXBwZWFyIG9ubHkgYWZ0ZXIgc29tZSBraW5kIG9mIHFlbXUgY3Jhc2guIElzbid0DQppdCBhIGdv
-b2QgcmVhc29uIHRvIGNhbGwgcWVtdS1pbWcgY2hlY2s/IFNvLCBoYXcgYWJvdXQganVzdCBmb3Ji
-aWQgdG8gc3RhcnQgcWVtdQ0KaWYgdGhlcmUgYXJlIGFueSBpbi11c2UgYml0bWFwcz8NCg0KPiAN
-Cj4gDQo+Pg0KPj4gLS0tDQo+Pg0KPj4gcWVtdSB2ZXJzaW9uOiAyLjEyLjAgYW5kIDMuMS4wLCBv
-dGhlciB2ZXJzaW9uIEkgZG9lcyBub3QgdGVzdCB5ZXQuDQo+IA0KPiBxZW11IDQuMCBwcm9tb3Rl
-cyB2YXJpb3VzIGRpcnR5IGJpdG1hcCBpbnRlcmZhY2VzIGZyb20gZXhwZXJpbWVudGFsIHRvDQo+
-IHN1cHBvcnRlZDsgZmxhd3MgaW4gMy4xIGFyZSBzb21ld2hhdCBleHBlY3RlZCwgYnV0IHdlIHdh
-bnQgdG8gbWFrZSBzdXJlDQo+IDQuMCBmaXhlcyBzdWNoIHByb2JsZW1zLCBzbyB3ZSBpbmRlZWQg
-aGF2ZSBhIGJ1ZyBoZXJlLg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Mon, Feb 04, 2019 at 02:03:58PM +0100, Markus Armbruster wrote:
+> Yuval Shaia <yuval.shaia@oracle.com> writes:
+> 
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >  hw/rdma/vmw/pvrdma.h      |  1 +
+> >  hw/rdma/vmw/pvrdma_main.c | 72 +++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 73 insertions(+)
+> >
+> > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> > index 167706ec2c..dc10f21ca0 100644
+> > --- a/hw/rdma/vmw/pvrdma.h
+> > +++ b/hw/rdma/vmw/pvrdma.h
+> > @@ -133,5 +133,6 @@ static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
+> >  }
+> >  
+> >  int pvrdma_exec_cmd(PVRDMADev *dev);
+> > +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func);
+> >  
+> >  #endif
+> 
+> The only user appears in the next patch.  I'd squash the two patches.
+> Matter of taste.
+
+Agree with you.
+I just did to help reviewers so ones that familiar with 'monitor' can
+review the other patch while rdma folks can review this one.
+
+Will probably squash them as soon as the conversion on the other patch will
+be over.
+
+> 
+> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> > index cf82e78f08..79900076ec 100644
+> > --- a/hw/rdma/vmw/pvrdma_main.c
+> > +++ b/hw/rdma/vmw/pvrdma_main.c
+> > @@ -14,6 +14,7 @@
+> >   */
+> >  
+> >  #include "qemu/osdep.h"
+> > +#include "qemu/units.h"
+> >  #include "qapi/error.h"
+> >  #include "hw/hw.h"
+> >  #include "hw/pci/pci.h"
+> > @@ -36,6 +37,8 @@
+> >  #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
+> >  #include "pvrdma_qp_ops.h"
+> >  
+> > +GSList *devices;
+> > +
+> >  static Property pvrdma_dev_properties[] = {
+> >      DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
+> >      DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
+> > @@ -55,6 +58,72 @@ static Property pvrdma_dev_properties[] = {
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >  
+> > +static void pvrdma_dump_device_statistics(gpointer data, gpointer user_data)
+> > +{
+> > +    CPUListState *s = user_data;
+> > +    PCIDevice *pdev = data;
+> > +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+> > +
+> > +    (*s->cpu_fprintf)(s->file, "%s_%x.%x\n", pdev->name,
+> > +                 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
+> 
+> Why the indirection through CPUListState?  What's wrong with straight
+> monitor_printf()?
+
+No special reasoning, just wanted to utilize an existing mechanism and
+design.
+
+> 
+> > +    (*s->cpu_fprintf)(s->file, "\tcommands         : %" PRId64 "\n",
+> > +                      dev->stats.commands);
+> > +    (*s->cpu_fprintf)(s->file, "\ttx               : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.tx);
+> > +    (*s->cpu_fprintf)(s->file, "\ttx_len           : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.tx_len);
+> > +    (*s->cpu_fprintf)(s->file, "\ttx_err           : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.tx_err);
+> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs          : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.rx_bufs);
+> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs_len      : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.rx_bufs_len);
+> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs_err      : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.rx_bufs_err);
+> > +    (*s->cpu_fprintf)(s->file, "\tcompletions      : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.completions);
+> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (bk)     : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.poll_cq_from_bk);
+> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.poll_cq_ppoll_to);
+> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (fe)     : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.poll_cq_from_guest);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_tx           : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_tx);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_tx_err       : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_tx_err);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx           : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_rx);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_err       : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_rx_err);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs      : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_rx_bufs);
+> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs_err  : %" PRId64 "\n",
+> > +                      dev->rdma_dev_res.stats.mad_rx_bufs_err);
+> > +    (*s->cpu_fprintf)(s->file, "\tPDs              : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.pd_tbl.used);
+> > +    (*s->cpu_fprintf)(s->file, "\tMRs              : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.mr_tbl.used);
+> > +    (*s->cpu_fprintf)(s->file, "\tUCs              : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.uc_tbl.used);
+> > +    (*s->cpu_fprintf)(s->file, "\tQPs              : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.qp_tbl.used);
+> > +    (*s->cpu_fprintf)(s->file, "\tCQs              : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.cq_tbl.used);
+> > +    (*s->cpu_fprintf)(s->file, "\tCEQ_CTXs         : %" PRId32 "\n",
+> > +                      dev->rdma_dev_res.cqe_ctx_tbl.used);
+> > +}
+> > +
+> > +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func)
+> > +{
+> > +    CPUListState s = {
+> > +        .file = f,
+> > +        .cpu_fprintf = fprintf_func,
+> > +    };
+> > +
+> > +    g_slist_foreach(devices, pvrdma_dump_device_statistics, &s);
+> > +}
+> > +
+> >  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
+> >                            void *ring_state)
+> >  {
+> > @@ -618,6 +687,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+> >      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
+> >      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
+> >  
+> > +    devices = g_slist_append(devices, pdev);
+> > +
+> >  out:
+> >      if (rc) {
+> >          pvrdma_fini(pdev);
+> > @@ -627,6 +698,7 @@ out:
+> >  
+> >  static void pvrdma_exit(PCIDevice *pdev)
+> >  {
+> > +    devices = g_slist_remove(devices, pdev);
+> >      pvrdma_fini(pdev);
+> >  }
