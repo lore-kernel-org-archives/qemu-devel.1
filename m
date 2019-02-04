@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59431)
+Received: from eggs.gnu.org ([209.51.188.92]:59471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6w-00055q-DL
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:52 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6x-00059A-RT
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6t-0003YF-TG
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:50 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34881)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj6v-0003b1-Lz
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:51 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:40245)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj6t-0003Xb-M6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:47 -0500
-Received: by mail-wr1-x434.google.com with SMTP id z18so202811wrh.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:47 -0800 (PST)
+	id 1gqj6v-0003ZZ-Ez
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:49 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id p4so945250wrt.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:49 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:27 +0100
-Message-Id: <1549305379-51117-26-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:29 +0100
+Message-Id: <1549305379-51117-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/77] Revert "i386: Add CPUID bit for PCONFIG"
+Subject: [Qemu-devel] [PULL 27/77] contrib/elf2dmp: fix elf.h including
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Robert Hoo <robert.hu@linux.intel.com>
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-From: Robert Hoo <robert.hu@linux.intel.com>
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-This reverts commit 5131dc433df54b37e8e918d8fba7fe10344e7a7b.
-For new instruction 'PCONFIG' will not be exposed to guest.
+Before this patch QEMU elf.h was not actually included.
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-Message-Id: <1545227081-213696-3-git-send-email-robert.hu@linux.intel.com>
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-2-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 2 +-
- target/i386/cpu.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ contrib/elf2dmp/qemu_elf.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7301e7d..6f3b841 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1077,7 +1077,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, "pconfig", NULL,
-+            NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
-             NULL, "arch-capabilities", NULL, "ssbd",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 59656a7..95112b9 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -694,7 +694,6 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
+index 86e6e68..da70aff 100644
+--- a/contrib/elf2dmp/qemu_elf.h
++++ b/contrib/elf2dmp/qemu_elf.h
+@@ -5,10 +5,10 @@
+  *
+  */
  
- #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
- #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
--#define CPUID_7_0_EDX_PCONFIG (1U << 18)       /* Platform Configuration */
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
- #define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities*/
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+-#ifndef QEMU_ELF_H
+-#define QEMU_ELF_H
++#ifndef ELF2DMP_ELF_H
++#define ELF2DMP_ELF_H
+ 
+-#include <elf.h>
++#include "elf.h"
+ 
+ typedef struct QEMUCPUSegment {
+     uint32_t selector;
+@@ -47,4 +47,4 @@ void QEMU_Elf_exit(QEMU_Elf *qe);
+ Elf64_Phdr *elf64_getphdr(void *map);
+ Elf64_Half elf_getphdrnum(void *map);
+ 
+-#endif /* QEMU_ELF_H */
++#endif /* ELF2DMP_ELF_H */
 -- 
 1.8.3.1
