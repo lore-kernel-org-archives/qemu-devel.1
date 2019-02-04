@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45800)
+Received: from eggs.gnu.org ([209.51.188.92]:45725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqfaR-00066I-73
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:04 -0500
+	(envelope-from <mst@redhat.com>) id 1gqfaT-00063p-Kt
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqfVU-0007IF-Ni
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:45:58 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36623)
+	(envelope-from <mst@redhat.com>) id 1gqfTg-0005jO-7q
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:44:05 -0500
+Received: from mail-qk1-f177.google.com ([209.85.222.177]:45956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gqfVU-0007GT-F8
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:45:56 -0500
-Received: by mail-ot1-x341.google.com with SMTP id k98so164505otk.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:45:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqfTg-0005iY-3N
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:44:04 -0500
+Received: by mail-qk1-f177.google.com with SMTP id y78so20547qka.12
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:44:02 -0800 (PST)
+Date: Mon, 4 Feb 2019 09:43:59 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190204142638.27021-22-mst@redhat.com>
+References: <20190204142638.27021-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <20190204132126.3255-1-richard.henderson@linaro.org>
-	<20190204132126.3255-4-richard.henderson@linaro.org>
-In-Reply-To: <20190204132126.3255-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Feb 2019 14:45:43 +0000
-Message-ID: <CAFEAcA84U00c=_q2Okkpd3vpwEC6O7KHMcz5NDTch+yOLLtd-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] target/arm: Compute TB_FLAGS for
- TBI for user-only
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190204142638.27021-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 21/25] i386,
+ acpi: cleanup build_facs by removing second unused argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, 4 Feb 2019 at 13:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Enables, but does not turn on, TBI for CONFIG_USER_ONLY.
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-This patch turns out to break compilation of the linux-user
-targets with clang, which is stricter than gcc about warning about
-unused static functions.
+The second argument of build_facs() is not used, just remove it.
 
-I propose to squash in the following fixup patch:
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/i386/acpi-build.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c99b69074a5..935c6f9bfa7 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9601,6 +9601,8 @@ static inline uint32_t regime_el(CPUARMState
-*env, ARMMMUIdx mmu_idx)
-     }
- }
-
-+#ifndef CONFIG_USER_ONLY
-+
- /* Return the SCTLR value which controls this address translation regime */
- static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 26cef4af2d..9ecc96dcc7 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -298,7 +298,7 @@ static void acpi_align_size(GArray *blob, unsigned align)
+ 
+ /* FACS */
+ static void
+-build_facs(GArray *table_data, BIOSLinker *linker)
++build_facs(GArray *table_data)
  {
-@@ -9656,6 +9658,22 @@ static inline bool
-regime_translation_big_endian(CPUARMState *env,
-     return (regime_sctlr(env, mmu_idx) & SCTLR_EE) != 0;
- }
-
-+/* Return the TTBR associated with this translation regime */
-+static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
-+                                   int ttbrn)
-+{
-+    if (mmu_idx == ARMMMUIdx_S2NS) {
-+        return env->cp15.vttbr_el2;
-+    }
-+    if (ttbrn == 0) {
-+        return env->cp15.ttbr0_el[regime_el(env, mmu_idx)];
-+    } else {
-+        return env->cp15.ttbr1_el[regime_el(env, mmu_idx)];
-+    }
-+}
-+
-+#endif /* !CONFIG_USER_ONLY */
-+
- /* Return the TCR controlling this translation regime */
- static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
- {
-@@ -9676,20 +9694,6 @@ static inline ARMMMUIdx
-stage_1_mmu_idx(ARMMMUIdx mmu_idx)
-     return mmu_idx;
- }
-
--/* Return the TTBR associated with this translation regime */
--static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
--                                   int ttbrn)
--{
--    if (mmu_idx == ARMMMUIdx_S2NS) {
--        return env->cp15.vttbr_el2;
--    }
--    if (ttbrn == 0) {
--        return env->cp15.ttbr0_el[regime_el(env, mmu_idx)];
--    } else {
--        return env->cp15.ttbr1_el[regime_el(env, mmu_idx)];
--    }
--}
--
- /* Return true if the translation regime is using LPAE format page tables */
- static inline bool regime_using_lpae_format(CPUARMState *env,
-                                             ARMMMUIdx mmu_idx)
-@@ -9715,6 +9719,7 @@ bool arm_s1_regime_using_lpae_format(CPUARMState
-*env, ARMMMUIdx mmu_idx)
-     return regime_using_lpae_format(env, mmu_idx);
- }
-
-+#ifndef CONFIG_USER_ONLY
- static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
- {
-     switch (mmu_idx) {
-@@ -9733,7 +9738,6 @@ static inline bool regime_is_user(CPUARMState
-*env, ARMMMUIdx mmu_idx)
-     }
- }
-
--#ifndef CONFIG_USER_ONLY
- /* Translate section/page access permissions to page
-  * R/W protection flags
-  *
-
-thanks
--- PMM
+     AcpiFacsDescriptorRev1 *facs = acpi_data_push(table_data, sizeof *facs);
+     memcpy(&facs->signature, "FACS", 4);
+@@ -2637,7 +2637,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+      * requirements.
+      */
+     facs = tables_blob->len;
+-    build_facs(tables_blob, tables->linker);
++    build_facs(tables_blob);
+ 
+     /* DSDT is pointed to by FADT */
+     dsdt = tables_blob->len;
+-- 
+MST
