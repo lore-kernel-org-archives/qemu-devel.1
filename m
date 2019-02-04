@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42736)
+Received: from eggs.gnu.org ([209.51.188.92]:43222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gqn9r-0005x8-Ve
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:10 -0500
+	(envelope-from <mst@redhat.com>) id 1gqnAh-0006k6-4b
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gqmwM-0008Dy-1r
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:42:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45868
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gqmwL-00087j-QF
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:42:09 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x14MYe3V083517
-	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 17:42:07 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2qewmn9nj7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 17:42:07 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Mon, 4 Feb 2019 22:42:06 -0000
-References: <20190130155733.32742-1-david@redhat.com>
-	<20190130155733.32742-4-david@redhat.com>
-	<80dae41f-f3f0-1acd-1fd6-8e7473712802@linux.ibm.com>
-	<5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Mon, 4 Feb 2019 17:42:02 -0500
+	(envelope-from <mst@redhat.com>) id 1gqnAf-0003mB-BP
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqnAe-0003kk-Sf
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:57 -0500
+Date: Mon, 4 Feb 2019 17:56:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190204170515-mutt-send-email-mst@kernel.org>
+References: <20190109144736.17452-1-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5c81b64a-7de0-210f-adb9-bf7f1ad10622@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <810ede3a-7d69-8cff-7058-9e2bb002fff9@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 3/6] s390x/pci: Warn when
- adding PCI devices without the 'zpci' feature
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190109144736.17452-1-pagupta@redhat.com>
+Subject: [Qemu-devel] security implications of caching with virtio pmem (was
+ Re: [PATCH v3 0/5] kvm "virtio pmem" device)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,77 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, david@redhat.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net, Andrea Arcangeli <aarcange@redhat.com>
 
-On 2/4/19 4:54 PM, David Hildenbrand wrote:
-> On 04.02.19 21:19, Collin Walling wrote:
->> On 1/30/19 10:57 AM, David Hildenbrand wrote:
->>> We decided to always create the PCI host bridge, even if 'zpci' is not
->>> enabled (due to migration compatibility). This however right now allows
->>> to add zPCI/PCI devices to a VM although the guest will never actually see
->>> them, confusing people that are using a simple CPU model that has no
->>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
->>>
->>> Let's check for 'zpci' and at least print a warning that this will not
->>> work as expected. We could also bail out, however that might break
->>> existing QEMU commandlines.
->>>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>    hw/s390x/s390-pci-bus.c | 5 +++++
->>>    1 file changed, 5 insertions(+)
->>>
->>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->>> index 9b5c5fff60..2efd9186c2 100644
->>> --- a/hw/s390x/s390-pci-bus.c
->>> +++ b/hw/s390x/s390-pci-bus.c
->>> @@ -826,6 +826,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>    {
->>>        S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->>>    
->>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
->>> +        warn_report("PCI/zPCI device without the 'zpci' CPU feature."
->>> +                    " The guest will not be able to see/use this device");
->>> +    }
->>> +
->>>        if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->>>            PCIDevice *pdev = PCI_DEVICE(dev);
->>>    
->>>
->>
->> I wonder if someone might misconstrue this as "the _PCI device_ needs
->> the zpci feature." I think "'zpci' CPU feature required to support
->> PCI/zPCI devices." reads better. The last sentence is fine to me.
->>
-> 
-> Well, the guest needs the 'zpci' feature to see the device. And that's
-> what that message says in my opinion. Not that a device needs to have a
-> feature (I added "CPU feature" for this reason).
-> 
-> "required to support" does it not make very clear what we actually want
-> to say.
-> 
-> Thanks!
-> 
 
-I see your point. We can still plug in the device without the CPU
-feature, but the device will ultimately be useless to the guest. Thanks
-for clearing that up.
+On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
+>  This patch series has implementation for "virtio pmem". 
+>  "virtio pmem" is fake persistent memory(nvdimm) in guest 
+>  which allows to bypass the guest page cache. This also
+>  implements a VIRTIO based asynchronous flush mechanism.  
 
-Still, the wording reads strangely to me. I read it as the PCI device
-itself requires a "zpci CPU feature" which of course does not make sense
-(and I fully understand that's not what you mean here).
 
-What do you think about:
+At Pankaj's request I looked at information leak implications of virtio
+pmem in light of the recent page cache side channels paper
+(https://arxiv.org/pdf/1901.01161.pdf) - to see what
+kind of side channels it might create if any.  TLDR - I think that
+depending on the host side implementation there could be some, but this
+might be addressable by better documentation in both code and spec.
+The fake dax approach backing the guest memory by a host page cache
+does seem to have potential issues.
 
-"PCI/zPCI device plugging without 'zpci' CPU feature enabled." along
-with your second sentence, of course.
+For clarity: we are talking about leaking information either to a VM, or
+within a VM (I did not look into leaks to hypervisor in configurations
+such as SEV) through host page cache.
 
-Either way you decide, it's still a good idea to have this warning in
-here. I'm really just debating syntax and not semantics, so it's not
-really important. I won't impede this patch over a differing opinion of
-a small rewording. :)
+Leaks into a VM: It seems clear that while pmem allows memory accesses
+versus read/write with e.g. a block device, from host page cache point
+of view this doesn't matter much: reads populate cache in the same way
+as memory faults.  Thus ignoring presence of information leaks (which is
+an interesting question e.g. in light of recent discard support) pmem
+doesn't seem to be any better or worse for leaking information into a
+VM.
 
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
+Leaks within VM: Right now pmem seems to bypass the guest page cache
+completely.  Whether pmem memory is then resident in a page cache would
+be up to the device/host. Assuming that it is, the "Preventing
+Efficient Eviction while Increasing the System Performance"
+countermeasure for the page cache side channel attack would appear to
+become ineffective with pmem. What is suggested is a per-process
+management of the page cache, and host does not have visibility of
+processes within a VM. Another possible countermeasure - not discussed
+in the paper - could be modify the applications to lock the security
+relevant pages in memory.  Again this becomes impractical with pmem as
+host does not have visibility into that. However note that as long
+as the only countermeasure linux uses is "Privileged Access"
+(i.e. blocking mincore) nothing can be done as guest page cache
+remains as vulnerable as host page cache.
+
+
+Countermeasures: which host-side countermeasures can be designed would
+depend on which countermeasures are used guest-side - we would need to
+make sure they are not broken by pmem.  For "Preventing Efficient
+Eviction while Increasing the System Performance" modifying the host
+implementation to ensure that pmem device bypasses the host page cache
+would seem to address the security problem.Similarly, ensuring that a
+real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
+virt) is used for pmem would make the memory locking countermeasure
+work.  Whether with such limitations the device is still useful
+performance wise is an open question.  These questions probably should
+be addressed in the documentation, spec and possible qemu code.
+
+
+
+Severity of the security implications: some people argue that the
+security implications of the page cache leaks are minor.  I do not have
+an opinion on this: the severity would seem to depend on the specific
+configuration.
+
+
+Other security implications: recent discussion seems to suggest there
+are other concerns around e.g. resource management and thus DOS
+potential. If that's so, it's a matter for a separate discussion
+as I didn't look into that in depth.
+
+Some or all of the above might be based on a misunderstanding of the
+current pmem code, the whitepaper and linux page cache in general.
+If so I apologise, do not hesitate to call out any mistakes.
+
+Thanks!
+
+-- 
+MST
