@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57067)
+Received: from eggs.gnu.org ([209.51.188.92]:57178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqb8C-0007Ec-Ow
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:05:37 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gqb8S-0007Pp-Om
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqb8B-0000AD-PG
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:05:36 -0500
-References: <87y378n5iy.fsf@dusky.pond.sub.org>
-	<CAFEAcA9b+7m1hL9atdm2_0fq66HPGWDhpAfZCRfPbegr2hKyGg@mail.gmail.com>
-	<87o97yi67d.fsf@dusky.pond.sub.org>
-	<300bdcd7-fbde-d7a3-12a0-eafdc0aa58f6@redhat.com>
-	<87d0oddxu2.fsf@dusky.pond.sub.org>
-	<f4528a7d-4bb5-f607-760e-72db3eaa34ad@redhat.com>
-	<877eelcgf9.fsf@dusky.pond.sub.org>
-	<9c4e222f-3941-426e-3195-5598b2af1501@redhat.com>
-	<87munh9gb6.fsf@dusky.pond.sub.org>
-	<cb465eba-8c54-af8e-fe0e-ce90f71d213a@redhat.com>
-	<002701d4b9bc$b1fe72e0$15fb58a0$@phi.nz>
-	<3ace3624-893b-82e1-3132-0dcd1896ec94@redhat.com>
-	<C29659EAAA3E0143B583467412621C605E408079@SHSMSX101.ccr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2294a001-ccfc-ab32-8b07-9f2f2c7f5cbd@redhat.com>
-Date: Mon, 4 Feb 2019 11:00:12 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gqb8Q-0001LH-Pp
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:05:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gqb8O-0000zH-SF
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:05:49 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A98C53DE0F
+	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 09:57:31 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  4 Feb 2019 10:57:25 +0100
+Message-Id: <20190204095725.27259-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <C29659EAAA3E0143B583467412621C605E408079@SHSMSX101.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Configuring pflash devices for OVMF firmware
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] qemu-gdb: add a QObject pretty printer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Ning, Yu" <yu.ning@intel.com>, Alexandro Sanchez Bach <alexandro@phi.nz>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Peter Krempa' <pkrempa@redhat.com>, 'Qemu-block' <qemu-block@nongnu.org>, 'Libvirt' <libvir-list@redhat.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, =?UTF-8?B?J0zDoXN6bMOzIMOJcnNlayc=?= <lersek@redhat.com>, "'Justin Terry (VM)'" <juterry@microsoft.com>, 'Markus Armbruster' <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, crosa@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 01/02/19 03:49, Ning, Yu wrote:
-> Thank you both for outlining the changes we have to make in order to
-> support ROMD memory regions!  The only question is whether we should
-> pass a new flag to HAX_VM_IOCTL_SET_RAM2 for ROMD, so the hypervisor
-> could respond differently to writes to ROM and ROMD regions.  Would
-> that be useful at all?  What would happen if HAXM asked QEMU to
-> emulate a write to ROM?
+Inspired by GObject/GType pretty printer.
 
-It's more about backwards compatibility.  As far as QEMU is concerned
-it's okay if all ROM reads are handled as MMIO.  However, other
-emulators may not expect that, so maybe you want to add another flag.
+Example:
+machine_set_accel (obj=3D0x555556807550 [pc-i440fx-4.0-machine],...
 
-Paolo
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
 
-> HAXM didn't implement ROMD support at first, because the guests we
-> tested could boot without it (including Chrome OS).  Now that this
-> feature has become more popular (and we want to be able to boot
-> OVMF), I think it's time to get it done.  I'd like to get to it after
-> the Lunar New Year holidays, but if anyone can finish it sooner, I'll
-> be happy to merge their patch into HAXM.
+v2:
+ - simplify python 2 compatibility code, suggested by Eduardo
+
+scripts/qemu-gdb.py | 58 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ mode change 100644 =3D> 100755 scripts/qemu-gdb.py
+
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+old mode 100644
+new mode 100755
+index 690827e6fc..1ec666e841
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -21,6 +21,9 @@ import gdb
+=20
+ import os, sys
+=20
++if sys.version_info[0] < 3:
++    int =3D long
++
+ # Annoyingly, gdb doesn't put the directory of scripts onto the
+ # module search path. Do it manually.
+=20
+@@ -47,3 +50,58 @@ coroutine.CoroutinePCFunction()
+ # Default to silently passing through SIGUSR1, because QEMU sends it
+ # to itself a lot.
+ gdb.execute('handle SIGUSR1 pass noprint nostop')
++
++
++def is_object(val):
++    def is_object_helper(type):
++        if str(type) =3D=3D "Object":
++            return True
++
++        while type.code =3D=3D gdb.TYPE_CODE_TYPEDEF:
++            type =3D type.target()
++
++        if type.code !=3D gdb.TYPE_CODE_STRUCT:
++            return False
++
++        fields =3D type.fields()
++        if len (fields) < 1:
++            return False
++
++        first_field =3D fields[0]
++        return is_object_helper(first_field.type)
++
++    type =3D val.type
++    if type.code !=3D gdb.TYPE_CODE_PTR:
++        return False
++    type =3D type.target()
++    return is_object_helper (type)
++
++
++def object_class_name(instance):
++    try:
++        inst =3D instance.cast(gdb.lookup_type("Object").pointer())
++        klass =3D inst["class"]
++        typ =3D klass["type"]
++        return typ["name"].string()
++    except RuntimeError:
++        pass
++
++
++class QObjectPrinter:
++    def __init__(self, val):
++        self.val =3D val
++
++    def to_string(self):
++        name =3D object_class_name(self.val)
++        if name:
++            return ("0x%x [%s]")% (int(self.val), name)
++        return  ("0x%x") % (int(self.val))
++
++
++def lookup_type(val):
++    if is_object(val):
++        return QObjectPrinter(val)
++    return None
++
++
++gdb.pretty_printers.append(lookup_type)
+--=20
+2.20.1.98.gecbdaf0899
