@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51758)
+Received: from eggs.gnu.org ([209.51.188.92]:53046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gqZHI-0000Rp-Qp
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqZOS-00025x-Ln
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:14:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gqZHI-00076T-0A
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:52 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1gqZHH-0006yc-KP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:06:51 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v23so11522214otk.9
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 00:06:45 -0800 (PST)
-MIME-Version: 1.0
-References: <20190204075023.GA15322@stefanha-x1.localdomain>
-In-Reply-To: <20190204075023.GA15322@stefanha-x1.localdomain>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Mon, 4 Feb 2019 00:06:32 -0800
-Message-ID: <CAPcyv4huSKQueADyF5wJPWxMdLAn6yvEqWyMZfWPVQ4vQ_X0RA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Querying the size of devdax devices from userspace
+	(envelope-from <thuth@redhat.com>) id 1gqZOR-00048Q-TZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:14:16 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  4 Feb 2019 09:14:05 +0100
+Message-Id: <1549268045-11861-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] ui/sdl_keysym: Remove obsolete SDL1.2 related
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +18,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Zhang Yi <yi.z.zhang@linux.intel.com>, Jeff Moyer <jmoyer@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On Sun, Feb 3, 2019 at 11:56 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> How can userspace applications query the size of devdax character
-> devices?
->
-> stat(1) doesn't know how large the device is:
->
->   # stat /dev/dax0.0
->     File: /dev/dax0.0
->     Size: 0             Blocks: 0          IO Block: 4096   character special file
->   Device: 6h/6d Inode: 56764       Links: 1     Device type: fa,d
->
-> ndctl(1) finds out by digging in /sys:
->
->   # ndctl list
->   [
->     {
->       "dev":"namespace0.0",
->       "mode":"devdax",
->       "map":"dev",
->       "size":2111832064,
->       "uuid":"235acf4d-503f-46be-bf64-f26faf9777ef",
->       "chardev":"dax0.0"
->     }
->   ]
->
-> I'm not sure how to do it without enumerating all nvdimms in /sys.  Is
-> there a mapping from devdax major/minor number to a /sys path?
->
-> The use case I have in mind is that QEMU currently takes the size as a
-> command-line parameter.  The failure mode is ugly when users get this
-> value wrong: the guest gets a softlockup and there is no error message
-> on the host side.
->
-> I'd like QEMU to detect the size or at least reject size values that are
-> too large.  In order to do that userspace needs a convenient way of
-> querying the size.  Any ideas?
+Support for SDL1.2 has been removed recently in commit:
 
-You're looking for /sys/dev/char. That will wake you from major:minor
-to sysfs. Perhaps borrow fio's implementation for the same:
+  0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
+  ("ui: remove support for SDL1.2 in favour of SDL2")
 
-   http://git.kernel.dk/cgit/fio/tree/engines/dev-dax.c#n258
+So we can drop the SDL1.2-specific code in sdl_keysym.h now, too.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ ui/sdl_keysym.h | 73 ---------------------------------------------------------
+ 1 file changed, 73 deletions(-)
+
+diff --git a/ui/sdl_keysym.h b/ui/sdl_keysym.h
+index 599d9fc..6994180 100644
+--- a/ui/sdl_keysym.h
++++ b/ui/sdl_keysym.h
+@@ -200,79 +200,6 @@ static const name2keysym_t name2keysym[]={
+ { "yacute",               0x0fd},
+ { "thorn",                0x0fe},
+ { "ydiaeresis",           0x0ff},
+-#if SDL_MAJOR_VERSION == 1
+-{"EuroSign", SDLK_EURO},
+ 
+-    /* modifiers */
+-{"Control_L", SDLK_LCTRL},
+-{"Control_R", SDLK_RCTRL},
+-{"Alt_L", SDLK_LALT},
+-{"Alt_R", SDLK_RALT},
+-{"Caps_Lock", SDLK_CAPSLOCK},
+-{"Meta_L", SDLK_LMETA},
+-{"Meta_R", SDLK_RMETA},
+-{"Shift_L", SDLK_LSHIFT},
+-{"Shift_R", SDLK_RSHIFT},
+-{"Super_L", SDLK_LSUPER},
+-{"Super_R", SDLK_RSUPER},
+-
+-    /* special keys */
+-{"BackSpace", SDLK_BACKSPACE},
+-{"Tab", SDLK_TAB},
+-{"Return", SDLK_RETURN},
+-{"Right", SDLK_RIGHT},
+-{"Left", SDLK_LEFT},
+-{"Up", SDLK_UP},
+-{"Down", SDLK_DOWN},
+-{"Page_Down", SDLK_PAGEDOWN},
+-{"Page_Up", SDLK_PAGEUP},
+-{"Insert", SDLK_INSERT},
+-{"Delete", SDLK_DELETE},
+-{"Home", SDLK_HOME},
+-{"End", SDLK_END},
+-{"Scroll_Lock", SDLK_SCROLLOCK},
+-{"F1", SDLK_F1},
+-{"F2", SDLK_F2},
+-{"F3", SDLK_F3},
+-{"F4", SDLK_F4},
+-{"F5", SDLK_F5},
+-{"F6", SDLK_F6},
+-{"F7", SDLK_F7},
+-{"F8", SDLK_F8},
+-{"F9", SDLK_F9},
+-{"F10", SDLK_F10},
+-{"F11", SDLK_F11},
+-{"F12", SDLK_F12},
+-{"F13", SDLK_F13},
+-{"F14", SDLK_F14},
+-{"F15", SDLK_F15},
+-{"Sys_Req", SDLK_SYSREQ},
+-{"KP_0", SDLK_KP0},
+-{"KP_1", SDLK_KP1},
+-{"KP_2", SDLK_KP2},
+-{"KP_3", SDLK_KP3},
+-{"KP_4", SDLK_KP4},
+-{"KP_5", SDLK_KP5},
+-{"KP_6", SDLK_KP6},
+-{"KP_7", SDLK_KP7},
+-{"KP_8", SDLK_KP8},
+-{"KP_9", SDLK_KP9},
+-{"KP_Add", SDLK_KP_PLUS},
+-{"KP_Decimal", SDLK_KP_PERIOD},
+-{"KP_Divide", SDLK_KP_DIVIDE},
+-{"KP_Enter", SDLK_KP_ENTER},
+-{"KP_Equal", SDLK_KP_EQUALS},
+-{"KP_Multiply", SDLK_KP_MULTIPLY},
+-{"KP_Subtract", SDLK_KP_MINUS},
+-{"help", SDLK_HELP},
+-{"Menu", SDLK_MENU},
+-{"Power", SDLK_POWER},
+-{"Print", SDLK_PRINT},
+-{"Mode_switch", SDLK_MODE},
+-{"Multi_Key", SDLK_COMPOSE},
+-{"Num_Lock", SDLK_NUMLOCK},
+-{"Pause", SDLK_PAUSE},
+-{"Escape", SDLK_ESCAPE},
+-#endif
+ {NULL, 0},
+ };
+-- 
+1.8.3.1
