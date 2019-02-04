@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60080)
+Received: from eggs.gnu.org ([209.51.188.92]:60267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbLI-0004eh-UP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1gqbM3-0005Gr-Cw
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbLH-0004t2-4I
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqbLG-0004m2-Rv
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:06 -0500
-Date: Mon, 4 Feb 2019 10:10:05 +0000
+	(envelope-from <berrange@redhat.com>) id 1gqbM2-00082z-L6
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:19:55 -0500
+Date: Mon, 4 Feb 2019 10:19:44 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204101005.GC1905@redhat.com>
+Message-ID: <20190204101944.GE1905@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190201185358.6972-1-ppandit@redhat.com>
-	<20190204010904.GD2593@umbus.fritz.box>
+References: <1549268743-18502-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190204010904.GD2593@umbus.fritz.box>
+In-Reply-To: <1549268743-18502-1-git-send-email-thuth@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc: add host-serial and host-model
- machine attributes
+Subject: Re: [Qemu-devel] [PATCH] tests/docker/test-mingw and docs: Remove
+ --with-sdlabi=2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Mon, Feb 04, 2019 at 12:09:04PM +1100, David Gibson wrote:
-> On Sat, Feb 02, 2019 at 12:23:58AM +0530, P J P wrote:
-> > From: Prasad J Pandit <pjp@fedoraproject.org>
-> >=20
-> > On ppc hosts, hypervisor shares following system attributes
-> >=20
-> >   - /proc/device-tree/system-id
-> >   - /proc/device-tree/model
-> >=20
-> > with a guest. This could lead to information leakage and misuse.[*]
-> > Add machine attributes to control such system information exposure
-> > to a guest.
-> >=20
-> > [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
-> >=20
-> > Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+On Mon, Feb 04, 2019 at 09:25:43AM +0100, Thomas Huth wrote:
+> Patchew currently reports failures with the mingw docker test - this
+> is due to --with-sdlabi=3D2.0 configure flag which does not exist anymo=
+re.
+> Remove this remainder from the docker test and the docs now.
 >=20
-> Hm.  This seems like it might be overkill.  I mean, obviously we need
-> to not leak that host information, but it's not clear we really need
-> these properties at all.  They're not specified in PAPR (contrary to
-> my previous guess) and it's not clear what actually uses them.
->=20
-> I'm wondering if we can just ditch them entirely, or at least make
-> them default to not present without regard to machine version.
->=20
-> Yes, that's technically a compatibility breaking change, but it's hard
-> to see anything that actually relied on these as not being broken
-> already, so I think that's actually a fair trade off for the security
-> improvement here.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  docs/multiseat.txt      | 2 +-
+>  tests/docker/test-mingw | 3 +--
+>  2 files changed, 2 insertions(+), 3 deletions(-)
 
-We cannot assume that no one is using it.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-In fact this issue came to light precisely because a person on IRC
-was asking why x86 couldn't provide the same info as PPC, because
-they found it useful on PPC.
-
-So we will definitely break people if we remove this from existing
-VMs.
 
 Regards,
 Daniel
