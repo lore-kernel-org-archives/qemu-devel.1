@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52180)
+Received: from eggs.gnu.org ([209.51.188.92]:52203)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQQ-0005yZ-DV
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:31 -0500
+	id 1gqcQb-00066w-Pb
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQO-00078o-Kk
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:30 -0500
+	id 1gqcQY-0007IJ-0Y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:39 -0500
 Received: from smtp03.citrix.com ([162.221.156.55]:14928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQO-00076s-7j
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:28 -0500
+	id 1gqcQS-00076s-Hk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:34 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 4 Feb 2019 11:28:01 +0000
-Message-ID: <20190204112803.11645-3-anthony.perard@citrix.com>
-In-Reply-To: <20190204112803.11645-1-anthony.perard@citrix.com>
-References: <20190204112803.11645-1-anthony.perard@citrix.com>
+Date: Mon, 4 Feb 2019 11:27:59 +0000
+Message-ID: <20190204112803.11645-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/4] configure: Don't add Xen's libs to LDFLAGS
+Subject: [Qemu-devel] [PULL 0/4] Xen queue 20190204
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +29,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>
 
-When Xen is detected via pkg-config, it isn't necessary to modify
-LDFLAGS as modifying libs_softmmu is enough.
+The following changes since commit b3fc0af1ff5e922d4dd7c875394dbd26dc7313b4:
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Michael Tokarev <mjt@tls.msk.ru>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- configure | 1 -
- 1 file changed, 1 deletion(-)
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-02-01 17:58:27 +0000)
 
-diff --git a/configure b/configure
-index ca1986125d..3d89870d99 100755
---- a/configure
-+++ b/configure
-@@ -2359,7 +2359,6 @@ if test "$xen" != "no" ; then
-     fi
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
-     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
--    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
-   else
- 
-     xen_libs="-lxenstore -lxenctrl -lxenguest"
--- 
-Anthony PERARD
+are available in the Git repository at:
+
+  https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190204
+
+for you to fetch changes up to 3149f183d7ca448b1dc30fe3d4acb9e367de01bf:
+
+  xen-block: handle resize callback (2019-02-04 11:04:49 +0000)
+
+----------------------------------------------------------------
+Xen queue
+
+* xen-block, the Xen PV backend, now handles resize.
+* configure cleanup.
+* xen-bus fix.
+
+----------------------------------------------------------------
+Anthony PERARD (2):
+      configure: xen: Stop build-testing for xc_domain_create
+      configure: Don't add Xen's libs to LDFLAGS
+
+Paul Durrant (2):
+      xen: fix xen-bus state model to allow frontend re-connection
+      xen-block: handle resize callback
+
+ configure                      | 20 --------------------
+ hw/block/dataplane/xen-block.c |  4 +---
+ hw/block/trace-events          |  1 +
+ hw/block/xen-block.c           | 40 ++++++++++++++++++++++++++++++++++++----
+ hw/xen/xen-bus.c               | 32 +++++++++++++++++++-------------
+ 5 files changed, 57 insertions(+), 40 deletions(-)
