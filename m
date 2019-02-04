@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47087)
+Received: from eggs.gnu.org ([209.51.188.92]:47120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqiLc-0008LC-LO
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:47:57 -0500
+	(envelope-from <mst@redhat.com>) id 1gqiLi-0008O3-7T
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqiLb-0000NW-Up
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:47:56 -0500
-Date: Mon, 4 Feb 2019 18:47:41 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190204184741.40e6859f.cohuck@redhat.com>
-In-Reply-To: <20190204154406.16122-1-david@redhat.com>
-References: <20190204154406.16122-1-david@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1gqiLg-0000RW-4o
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:48:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqiLf-0000QP-RW
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:48:00 -0500
+Date: Mon, 4 Feb 2019 12:47:51 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190204124613-mutt-send-email-mst@kernel.org>
+References: <20190204160325.4914-1-lersek@redhat.com>
+	<20190204160325.4914-5-lersek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/tcg: Don't model FP registers as
- globals
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190204160325.4914-5-lersek@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] tests/uefi-test-tools: add build
+ scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +29,406 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-On Mon,  4 Feb 2019 16:44:06 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> As floating point registers overlay some vector registers and we want
-> to make use of the general tcg_gvec infrastructure that assumes vectors
-> are not stored in globals but in memory, don't model flaoting point
-> registers as globals anymore. This is than similar to how arm handles
-> it.
-> 
-> Reading/writing a floating point register means reading/writing memory now.
-> 
-> Break up ugly in2_x2() handling that modifies both, in1 and in2 into
-> in1_x2l and in2_x2h. This makes things more readable. Also, in1_x1() is
-> ugly as it touches out/out2, get rid of that and use prep_x1() instead.
-> 
-> As we are no longer able to use the original global variables for
-> out/out2, we have to use new temporary variables and write from them to
-> the target registers using wout_ helpers.
-> 
-> E.g. an instruction that reads and writes x1 will use
-> - prep_x1 to get the values into out/out2
-> - wout_x1 to write the values from out/out2
-> This special handling is needed for x1 as it is often used along with
-> other inputs, so in1/in2 is already used.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Mon, Feb 04, 2019 at 05:03:24PM +0100, Laszlo Ersek wrote:
+> Introduce the following build scripts under "tests/uefi-test-tools":
+>=20
+> * "build.sh" builds a single module (a UEFI application) from
+>   UefiTestToolsPkg, for a single QEMU emulation target.
+>=20
+>   "build.sh" relies on cross-compilers when the emulation target and th=
+e
+>   build host architecture don't match. The cross-compiler prefix is
+>   computed according to a fixed, Linux-specific pattern. No attempt is
+>   made to copy or reimplement the GNU Make magic from "qemu/roms/Makefi=
+le"
+>   for cross-compiler prefix determination. The reason is that the build
+>   host OSes that are officially supported by edk2, and those that are
+>   supported by QEMU, intersect only in Linux. (Note that the UNIXGCC
+>   toolchain is being removed from edk2,
+>   <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1377>.)
+>=20
+> * "Makefile" currently builds the "UefiTestToolsPkg/BiosTablesTest"
+>   application, for arm, aarch64, i386, and x86_64, with the help of
+>   "build.sh".
+>=20
+>   "Makefile" turns each resultant UEFI executable into a UEFI-bootable,
+>   qcow2-compressed ISO image. The ISO images are output as
+>   "tests/data/uefi-boot-images/bios-tables-test.<TARGET>.iso.qcow2".
+>=20
+>   Each ISO image should be passed to QEMU as follows:
+>=20
+>     -drive id=3Dboot-cd,if=3Dnone,readonly,format=3Dqcow2,file=3D$ISO \
+>     -device virtio-scsi-pci,id=3Dscsi0 \
+>     -device scsi-cd,drive=3Dboot-cd,bus=3Dscsi0.0,bootindex=3D0 \
+>=20
+>   "Makefile" assumes that "mkdosfs", "mtools", and "genisoimage" are
+>   present.
+>=20
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
-> 
-> v1 -> v2:
-> - renamed x2h -> x2l and x2l -> x2h to match the actual meaning
->   ("high" on s390x is where the smaller bit numbers are ;) )
-> - did another quick sniff test
-> 
->  target/s390x/insn-data.def | 150 ++++++++++++++++++-------------------
->  target/s390x/translate.c   | 135 ++++++++++++++++++++-------------
->  2 files changed, 160 insertions(+), 125 deletions(-)
+>=20
+> Notes:
+>     v3:
+>     - explicitly mark the "./build.sh" recipe as recursive, with the "+=
+"
+>       indicator; document it in a comment [Phil]
+>     - pick up R-b, T-b [Phil]
+>    =20
+>     v2:
+>     - add the .NOTPARALLEL target [Phil, help-make, edk2-devel]
+>=20
+>  tests/uefi-test-tools/Makefile   | 106 ++++++++++++++
+>  tests/uefi-test-tools/.gitignore |   3 +
+>  tests/uefi-test-tools/build.sh   | 145 ++++++++++++++++++++
+>  3 files changed, 254 insertions(+)
+>=20
+> diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Mak=
+efile
+> new file mode 100644
+> index 000000000000..1d78bc14d51a
+> --- /dev/null
+> +++ b/tests/uefi-test-tools/Makefile
+> @@ -0,0 +1,106 @@
+> +# Makefile for the test helper UEFI applications that run in guests.
+> +#
+> +# Copyright (C) 2019, Red Hat, Inc.
+> +#
+> +# This program and the accompanying materials are licensed and made av=
+ailable
+> +# under the terms and conditions of the BSD License that accompanies t=
+his
+> +# distribution. The full text of the license may be found at
+> +# <http://opensource.org/licenses/bsd-license.php>.
+> +#
+> +# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS=
+, WITHOUT
+> +# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED=
+.
+> +
+> +edk2_dir              :=3D ../../roms/edk2
+> +images_dir            :=3D ../data/uefi-boot-images
+> +emulation_targets     :=3D arm aarch64 i386 x86_64
+> +uefi_binaries         :=3D bios-tables-test
+> +intermediate_suffixes :=3D .efi .fat .iso.raw
+> +
+> +images: $(foreach binary,$(uefi_binaries), \
+> +		$(foreach target,$(emulation_targets), \
+> +			$(images_dir)/$(binary).$(target).iso.qcow2))
+> +
+> +# Preserve all intermediate targets if the build succeeds.
+> +# - Intermediate targets help with development & debugging.
+> +# - Preserving intermediate targets also keeps spurious changes out of=
+ the
+> +#   final build products, in case the user re-runs "make" without any =
+changes
+> +#   to the UEFI source code. Normally, the intermediate files would ha=
+ve been
+> +#   removed by the last "make" invocation, hence the re-run would rebu=
+ild them
+> +#   from the unchanged UEFI sources. Unfortunately, the "mkdosfs" and
+> +#   "genisoimage" utilities embed timestamp-based information in their=
+ outputs,
+> +#   which causes git to report differences for the tracked qcow2 ISO i=
+mages.
+> +.SECONDARY: $(foreach binary,$(uefi_binaries), \
+> +		$(foreach target,$(emulation_targets), \
+> +			$(foreach suffix,$(intermediate_suffixes), \
+> +				Build/$(binary).$(target)$(suffix))))
+> +
+> +# In the pattern rules below, the stem (%, $*) stands for
+> +# "$(binary).$(target)".
+> +
+> +# Convert the raw ISO image to a qcow2 one, enabling compression, and =
+using a
+> +# small cluster size. This allows for small binary files under git con=
+trol,
+> +# hence for small binary patches.
+> +$(images_dir)/%.iso.qcow2: Build/%.iso.raw
+> +	mkdir -p -- $(images_dir)
+> +	$${QTEST_QEMU_IMG:-qemu-img} convert -f raw -O qcow2 -c \
+> +		-o cluster_size=3D512 -- $< $@
+> +
+> +# Embed the "UEFI system partition" into an ISO9660 file system as an =
+ElTorito
+> +# boot image.
+> +Build/%.iso.raw: Build/%.fat
+> +	genisoimage -input-charset ASCII -efi-boot $(notdir $<) -no-emul-boot=
+ \
+> +		-quiet -o $@ -- $<
+> +
+> +# Define chained macros in order to map QEMU system emulation targets =
+to
+> +# *short* UEFI architecture identifiers. Periods are allowed in, and u=
+ltimately
+> +# stripped from, the argument.
+> +map_arm_to_uefi     =3D $(subst arm,ARM,$(1))
+> +map_aarch64_to_uefi =3D $(subst aarch64,AA64,$(call map_arm_to_uefi,$(=
+1)))
+> +map_i386_to_uefi    =3D $(subst i386,IA32,$(call map_aarch64_to_uefi,$=
+(1)))
+> +map_x86_64_to_uefi  =3D $(subst x86_64,X64,$(call map_i386_to_uefi,$(1=
+)))
+> +map_to_uefi         =3D $(subst .,,$(call map_x86_64_to_uefi,$(1)))
+> +
+> +# Format a "UEFI system partition", using the UEFI binary as the defau=
+lt boot
+> +# loader. Add 10% size for filesystem metadata, round up to the next K=
+B, and
+> +# make sure the size is large enough for a FAT filesystem. Name the fi=
+lesystem
+> +# after the UEFI binary. (Excess characters are automatically dropped =
+from the
+> +# filesystem label.)
+> +Build/%.fat: Build/%.efi
+> +	rm -f -- $@
+> +	uefi_bin_b=3D$$(stat --format=3D%s -- $<) && \
+> +		uefi_fat_kb=3D$$(( (uefi_bin_b * 11 / 10 + 1023) / 1024 )) && \
+> +		uefi_fat_kb=3D$$(( uefi_fat_kb >=3D 64 ? uefi_fat_kb : 64 )) && \
+> +		mkdosfs -C $@ -n $(basename $(@F)) -- $$uefi_fat_kb
+> +	MTOOLS_SKIP_CHECK=3D1 mmd -i $@ ::EFI
+> +	MTOOLS_SKIP_CHECK=3D1 mmd -i $@ ::EFI/BOOT
+> +	MTOOLS_SKIP_CHECK=3D1 mcopy -i $@ -- $< \
+> +		::EFI/BOOT/BOOT$(call map_to_uefi,$(suffix $*)).EFI
+> +
+> +# In the pattern rules below, the stem (%, $*) stands for "$(target)" =
+only. The
+> +# association between the UEFI binary (such as "bios-tables-test") and=
+ the
+> +# component name from the edk2 platform DSC file (such as "BiosTablesT=
+est") is
+> +# explicit in each rule.
+> +
+> +# "build.sh" invokes the "build" utility of edk2 BaseTools. In any giv=
+en edk2
+> +# workspace, at most one "build" instance may be operating at a time. =
+Therefore
+> +# we must serialize the rebuilding of targets in this Makefile.
+> +.NOTPARALLEL:
+> +
+> +# In turn, the "build" utility of edk2 BaseTools invokes another "make=
+".
+> +# Although the outer "make" process advertizes its job server to all c=
+hild
+> +# processes via MAKEFLAGS in the environment, the outer "make" closes =
+the job
+> +# server file descriptors (exposed in MAKEFLAGS) before executing a re=
+cipe --
+> +# unless the recipe is recognized as a recursive "make" recipe. Recipe=
+s that
+> +# call $(MAKE) are classified automatically as recursive; for "build.s=
+h" below,
+> +# we must mark the recipe manually as recursive, by using the "+" indi=
+cator.
+> +# This way, when the inner "make" starts a parallel build of the targe=
+t edk2
+> +# module, it can communicate with the outer "make"'s job server.
+> +Build/bios-tables-test.%.efi: build-edk2-tools
+> +	+./build.sh $(edk2_dir) BiosTablesTest $* $@
 
-Thanks, applied.
+Does this actually work with an out of tree build?
+Shouldn't this be SRC_PATH/tests/uefi-test-tools/ ?
+
+
+
+> +
+> +build-edk2-tools:
+> +	$(MAKE) -C $(edk2_dir)/BaseTools
+> +
+> +clean:
+> +	rm -rf Build Conf log
+> +	$(MAKE) -C $(edk2_dir)/BaseTools clean
+> diff --git a/tests/uefi-test-tools/.gitignore b/tests/uefi-test-tools/.=
+gitignore
+> new file mode 100644
+> index 000000000000..9f246701dea1
+> --- /dev/null
+> +++ b/tests/uefi-test-tools/.gitignore
+> @@ -0,0 +1,3 @@
+> +Build
+> +Conf
+> +log
+> diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/bui=
+ld.sh
+> new file mode 100755
+> index 000000000000..155cb75c4ddb
+> --- /dev/null
+> +++ b/tests/uefi-test-tools/build.sh
+> @@ -0,0 +1,145 @@
+> +#!/bin/bash
+> +
+> +# Build script that determines the edk2 toolchain to use, invokes the =
+edk2
+> +# "build" utility, and copies the built UEFI binary to the requested l=
+ocation.
+> +#
+> +# Copyright (C) 2019, Red Hat, Inc.
+> +#
+> +# This program and the accompanying materials are licensed and made av=
+ailable
+> +# under the terms and conditions of the BSD License that accompanies t=
+his
+> +# distribution. The full text of the license may be found at
+> +# <http://opensource.org/licenses/bsd-license.php>.
+> +#
+> +# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS=
+, WITHOUT
+> +# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED=
+.
+> +
+> +set -e -u -C
+> +
+> +# Save the command line arguments. We need to reset $# to 0 before sou=
+rcing
+> +# "edksetup.sh", as it will inherit $@.
+> +program_name=3D$(basename -- "$0")
+> +edk2_dir=3D$1
+> +dsc_component=3D$2
+> +emulation_target=3D$3
+> +uefi_binary=3D$4
+> +shift 4
+> +
+> +# Set up the environment for edk2 building.
+> +export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
+> +export WORKSPACE=3D$PWD
+> +mkdir -p Conf
+> +
+> +# Source "edksetup.sh" carefully.
+> +set +e +u +C
+> +source "$PACKAGES_PATH/edksetup.sh"
+> +ret=3D$?
+> +set -e -u -C
+> +if [ $ret -ne 0 ]; then
+> +  exit $ret
+> +fi
+> +
+> +# Map the QEMU system emulation target to the following types of archi=
+tecture
+> +# identifiers:
+> +# - edk2,
+> +# - gcc cross-compilation.
+> +# Cover only those targets that are supported by the UEFI spec and edk=
+2.
+> +case "$emulation_target" in
+> +  (arm)
+> +    edk2_arch=3DARM
+> +    gcc_arch=3Darm
+> +    ;;
+> +  (aarch64)
+> +    edk2_arch=3DAARCH64
+> +    gcc_arch=3Daarch64
+> +    ;;
+> +  (i386)
+> +    edk2_arch=3DIA32
+> +    gcc_arch=3Di686
+> +    ;;
+> +  (x86_64)
+> +    edk2_arch=3DX64
+> +    gcc_arch=3Dx86_64
+> +    ;;
+> +  (*)
+> +    printf '%s: unknown/unsupported QEMU system emulation target "%s"\=
+n' \
+> +      "$program_name" "$emulation_target" >&2
+> +    exit 1
+> +    ;;
+> +esac
+> +
+> +# Check if cross-compilation is needed.
+> +host_arch=3D$(uname -m)
+> +if [ "$gcc_arch" =3D=3D "$host_arch" ] ||
+> +   ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); =
+then
+> +  cross_prefix=3D
+> +else
+> +  cross_prefix=3D${gcc_arch}-linux-gnu-
+> +fi
+> +
+> +# Expose cross_prefix (which is possibly empty) to the edk2 tools. Whi=
+le at it,
+> +# determine the suitable edk2 toolchain as well.
+> +# - For ARM and AARCH64, edk2 only offers the GCC5 toolchain tag, whic=
+h covers
+> +#   the gcc-5+ releases.
+> +# - For IA32 and X64, edk2 offers the GCC44 through GCC49 toolchain ta=
+gs, in
+> +#   addition to GCC5. Unfortunately, the mapping between the toolchain=
+ tags and
+> +#   the actual gcc releases isn't entirely trivial. Run "git-blame" on
+> +#   "OvmfPkg/build.sh" in edk2 for more information.
+> +# And, because the above is too simple, we have to assign cross_prefix=
+ to an
+> +# edk2 build variable that is specific to both the toolchain tag and t=
+he target
+> +# architecture.
+> +case "$edk2_arch" in
+> +  (ARM)
+> +    edk2_toolchain=3DGCC5
+> +    export GCC5_ARM_PREFIX=3D$cross_prefix
+> +    ;;
+> +  (AARCH64)
+> +    edk2_toolchain=3DGCC5
+> +    export GCC5_AARCH64_PREFIX=3D$cross_prefix
+> +    ;;
+> +  (IA32|X64)
+> +    gcc_version=3D$("${cross_prefix}gcc" -v 2>&1 | tail -1 | awk '{pri=
+nt $3}')
+> +    case "$gcc_version" in
+> +      ([1-3].*|4.[0-3].*)
+> +        printf '%s: unsupported gcc version "%s"\n' \
+> +          "$program_name" "$gcc_version" >&2
+> +        exit 1
+> +        ;;
+> +      (4.4.*)
+> +        edk2_toolchain=3DGCC44
+> +        ;;
+> +      (4.5.*)
+> +        edk2_toolchain=3DGCC45
+> +        ;;
+> +      (4.6.*)
+> +        edk2_toolchain=3DGCC46
+> +        ;;
+> +      (4.7.*)
+> +        edk2_toolchain=3DGCC47
+> +        ;;
+> +      (4.8.*)
+> +        edk2_toolchain=3DGCC48
+> +        ;;
+> +      (4.9.*|6.[0-2].*)
+> +        edk2_toolchain=3DGCC49
+> +        ;;
+> +      (*)
+> +        edk2_toolchain=3DGCC5
+> +        ;;
+> +    esac
+> +    eval "export ${edk2_toolchain}_BIN=3D\$cross_prefix"
+> +    ;;
+> +esac
+> +
+> +# Build the UEFI binary
+> +mkdir -p log
+> +build \
+> +  --arch=3D"$edk2_arch" \
+> +  --buildtarget=3DDEBUG \
+> +  --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
+> +  --tagname=3D"$edk2_toolchain" \
+> +  --module=3D"UefiTestToolsPkg/$dsc_component/$dsc_component.inf" \
+> +  --log=3D"log/$dsc_component.$edk2_arch.log" \
+> +  --report-file=3D"log/$dsc_component.$edk2_arch.report"
+> +cp -a -- \
+> +  "Build/UefiTestTools/DEBUG_${edk2_toolchain}/$edk2_arch/$dsc_compone=
+nt.efi" \
+> +  "$uefi_binary"
+> --=20
+> 2.19.1.3.g30247aa5d201
+>=20
