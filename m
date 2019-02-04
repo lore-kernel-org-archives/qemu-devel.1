@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39256)
+Received: from eggs.gnu.org ([209.51.188.92]:40144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9v-0001av-1f
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:22 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqaCL-0003i1-1Y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:05:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa9n-0000jE-VI
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:03:18 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:23 +1100
-Message-Id: <20190204090124.26191-37-david@gibson.dropbear.id.au>
-In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
-References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
+	(envelope-from <thuth@redhat.com>) id 1gqaCK-0002u6-4y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:05:48 -0500
+References: <mhng-99c129ef-4e70-4840-b80f-7b3c6b806083@palmer-si-x1c4>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <01c75f94-26ae-ffa4-dd46-4dd019702fa0@redhat.com>
+Date: Mon, 4 Feb 2019 10:05:42 +0100
 MIME-Version: 1.0
+In-Reply-To: <mhng-99c129ef-4e70-4840-b80f-7b3c6b806083@palmer-si-x1c4>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 36/37] mmap-alloc: unfold qemu_ram_mmap()
+Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.2, Part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,136 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Palmer Dabbelt <palmer@sifive.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-
-Unfold parts of qemu_ram_mmap() for the sake of understanding, moving
-declarations to the top, and keeping architecture-specifics in the
-ifdef-else blocks.  No changes in the function behaviour.
-
-Give ptr and ptr1 meaningful names:
-  ptr  -> guardptr : pointer to the PROT_NONE guard region
-  ptr1 -> ptr      : pointer to the mapped memory returned to caller
-
-Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- util/mmap-alloc.c | 53 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 34 insertions(+), 19 deletions(-)
-
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index fd329eccd8..f71ea038c8 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -77,11 +77,19 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-=20
- void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
- {
-+    int flags;
-+    int guardfd;
-+    size_t offset;
-+    size_t total;
-+    void *guardptr;
-+    void *ptr;
-+
-     /*
-      * Note: this always allocates at least one extra page of virtual ad=
-dress
-      * space, even if size is already aligned.
-      */
--    size_t total =3D size + align;
-+    total =3D size + align;
-+
- #if defined(__powerpc64__) && defined(__linux__)
-     /* On ppc64 mappings in the same segment (aka slice) must share the =
-same
-      * page size. Since we will be re-allocating part of this segment
-@@ -91,16 +99,22 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align=
-, bool shared)
-      * We do this unless we are using the system page size, in which cas=
+On 2019-02-02 09:41, Palmer Dabbelt wrote:
+> On Thu, 31 Jan 2019 01:51:52 PST (-0800), Peter Maydell wrote:
+>> On Thu, 31 Jan 2019 at 06:39, Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>> On 2019-01-30 20:01, Palmer Dabbelt wrote:
+>>> > On Wed, 30 Jan 2019 09:45:33 PST (-0800), eblake@redhat.com wrote:
+>>> >> On 1/30/19 11:35 AM, Palmer Dabbelt wrote:
+>>> >>> The following changes since commit
+>>> >>> 5385a5988c8a55bebdc878c05b96648579b5d6e0:
+>>> >>>
+>>> >>>=C2=A0=C2=A0 hw/virtio/virtio-balloon: zero-initialize the
+>>> virtio_balloon_config
+>>> >>> struct (2019-01-21 17:20:36 +0000)
+>>> >>>
+>>> >>> are available in the Git repository at:
+>>> >>>
+>>> >>>=C2=A0=C2=A0 git://github.com/palmer-dabbelt/qemu.git
+>>> >>> tags/riscv-for-master-3.2-part3
+>>> >>>
+>>> >>> for you to fetch changes up to
+>>> 461ab9de46d085a37b0da6f096aadc4e0dda4d4c:
+>>> >>>
+>>> >>>=C2=A0=C2=A0 target/riscv: fix counter-enable checks in ctr() (201=
+9-01-29
+>>> >>> 11:33:38 -0800)
+>>> >>>
+>>> >>> ----------------------------------------------------------------
+>>> >>> RISC-V Patches for 3.2, Part 3
+>>> >>
+>>> >> There is no 3.2 release; the next release is named 4.0.=C2=A0 Howe=
+ver,
+>>> if you
+>>> >> don't want to bother with sending a v2 pull request just to fix th=
 e
-      * anonymous memory is OK.
-      */
--    int anonfd =3D fd =3D=3D -1 || qemu_fd_getpagesize(fd) =3D=3D getpag=
-esize() ? -1 : fd;
--    int flags =3D anonfd =3D=3D -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
--    void *ptr =3D mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd,=
- 0);
-+    flags =3D MAP_PRIVATE;
-+    if (fd =3D=3D -1 || qemu_fd_getpagesize(fd) =3D=3D getpagesize()) {
-+        guardfd =3D -1;
-+        flags |=3D MAP_ANONYMOUS;
-+    } else {
-+        guardfd =3D fd;
-+        flags |=3D MAP_NORESERVE;
-+    }
- #else
--    void *ptr =3D mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE,=
- -1, 0);
-+    guardfd =3D -1;
-+    flags =3D MAP_PRIVATE | MAP_ANONYMOUS;
- #endif
--    size_t offset;
--    void *ptr1;
-=20
--    if (ptr =3D=3D MAP_FAILED) {
-+    guardptr =3D mmap(0, total, PROT_NONE, flags, guardfd, 0);
-+
-+    if (guardptr =3D=3D MAP_FAILED) {
-         return MAP_FAILED;
-     }
-=20
-@@ -108,19 +122,20 @@ void *qemu_ram_mmap(int fd, size_t size, size_t ali=
-gn, bool shared)
-     /* Always align to host page size */
-     assert(align >=3D getpagesize());
-=20
--    offset =3D QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
--    ptr1 =3D mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
--                MAP_FIXED |
--                (fd =3D=3D -1 ? MAP_ANONYMOUS : 0) |
--                (shared ? MAP_SHARED : MAP_PRIVATE),
--                fd, 0);
--    if (ptr1 =3D=3D MAP_FAILED) {
--        munmap(ptr, total);
-+    flags =3D MAP_FIXED;
-+    flags |=3D fd =3D=3D -1 ? MAP_ANONYMOUS : 0;
-+    flags |=3D shared ? MAP_SHARED : MAP_PRIVATE;
-+    offset =3D QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)gu=
-ardptr;
-+
-+    ptr =3D mmap(guardptr + offset, size, PROT_READ | PROT_WRITE, flags,=
- fd, 0);
-+
-+    if (ptr =3D=3D MAP_FAILED) {
-+        munmap(guardptr, total);
-         return MAP_FAILED;
-     }
-=20
-     if (offset > 0) {
--        munmap(ptr, offset);
-+        munmap(guardptr, offset);
-     }
-=20
-     /*
-@@ -129,10 +144,10 @@ void *qemu_ram_mmap(int fd, size_t size, size_t ali=
-gn, bool shared)
-      */
-     total -=3D offset;
-     if (total > size + getpagesize()) {
--        munmap(ptr1 + size + getpagesize(), total - size - getpagesize()=
-);
-+        munmap(ptr + size + getpagesize(), total - size - getpagesize())=
-;
-     }
-=20
--    return ptr1;
-+    return ptr;
- }
-=20
- void qemu_ram_munmap(void *ptr, size_t size)
---=20
-2.20.1
+>>> >> merge commit message, that's okay with me.
+>>> >
+>>> > Ah, sorry.=C2=A0 I think I'm just going to leave it as is, I'll get=
+ it
+>>> right
+>>> > next time.
+>>>
+>>> Also note that you used "PR RFC" in the title ... so not sure whether
+>>> Peter's scripts will catch this PR as a valid one...
+>>
+>> My mail filter finds these RFC pullrequests, yes. I'm then
+>> relying on my manual brain to not actually apply them.
+>> (If it's a slow day I might do a test merge on them, but
+>> usually my queue is full enough that I don't get to them
+>> before the real PR appears.)
+>=20
+> Ah, OK -- do you want me to do something else?
+
+At least I got a little bit confused by "PR RFC" ... I think some other
+maintainers rather send out patch series marked with "PATCH" first, and
+add some non-pull-request cover letter with a text like "I'm intending
+to send a pull request for this soon, please review one more time...".
+Then after a day or two, once Patchew checked the series and nobody else
+complained, they send a real "PULL" request.
+(at least that's how I saw the handling on the mailing list in the past,
+not sure whether Peter has a different point of view here, though).
+
+ Thomas
