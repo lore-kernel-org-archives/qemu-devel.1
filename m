@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32869)
+Received: from eggs.gnu.org ([209.51.188.92]:33542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqegX-0006DW-Gu
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:53:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1gqejN-0007HS-WA
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqegT-0000nc-IF
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:53:17 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gqegR-0000en-Mo
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:53:13 -0500
-Received: by mail-ot1-x344.google.com with SMTP id e12so13015293otl.5
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 05:53:07 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gqejM-0002ye-Nj
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:56:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqejM-0002xx-Fk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:56:12 -0500
+Date: Mon, 4 Feb 2019 13:56:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190204135608.GN1905@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190123172740.32452-1-berrange@redhat.com>
+	<20190123172740.32452-2-berrange@redhat.com>
+	<CAMxuvayRb9_FjR--Y9enzyh40TrkynfyXnx_860xtnkFevNb1Q@mail.gmail.com>
+	<CAJ+F1C+pYc9_M0PBNXFd9SSHoOu_4nV4jKCYB+YqgJ1Jom0r_Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190128173940.25813-1-alex.bennee@linaro.org>
-	<20190128173940.25813-5-alex.bennee@linaro.org>
-In-Reply-To: <20190128173940.25813-5-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Feb 2019 13:52:54 +0000
-Message-ID: <CAFEAcA_NoLsU2kg7TDhSH-Uv7+19B3-vC+=DwS=vLkCHuyNMcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+pYc9_M0PBNXFd9SSHoOu_4nV4jKCYB+YqgJ1Jom0r_Q@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 4/4] tests/tcg/aarch64: userspace system
- register test
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] io: store reference to thread
+ information in the QIOTask struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,192 +32,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Yongji Xie <elohimes@gmail.com>
 
-On Mon, 28 Jan 2019 at 17:39, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> This tests a bunch of registers that the kernel allows userspace to
-> read including the CPUID registers.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> ---
-> v4
->   - also test for extra bits that shouldn't be exposed
-> ---
->  tests/tcg/aarch64/Makefile.target |   2 +-
->  tests/tcg/aarch64/sysregs.c       | 120 ++++++++++++++++++++++++++++++
->  2 files changed, 121 insertions(+), 1 deletion(-)
->  create mode 100644 tests/tcg/aarch64/sysregs.c
->
-> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefi=
-le.target
-> index 08c45b8470..cc1a7eb486 100644
-> --- a/tests/tcg/aarch64/Makefile.target
-> +++ b/tests/tcg/aarch64/Makefile.target
-> @@ -7,7 +7,7 @@ VPATH           +=3D $(AARCH64_SRC)
->
->  # we don't build any of the ARM tests
->  AARCH64_TESTS=3D$(filter-out $(ARM_TESTS), $(TESTS))
-> -AARCH64_TESTS+=3Dfcvt
-> +AARCH64_TESTS+=3Dfcvt sysregs
->  TESTS:=3D$(AARCH64_TESTS)
->
->  fcvt: LDFLAGS+=3D-lm
-> diff --git a/tests/tcg/aarch64/sysregs.c b/tests/tcg/aarch64/sysregs.c
-> new file mode 100644
-> index 0000000000..8e11288ee3
-> --- /dev/null
-> +++ b/tests/tcg/aarch64/sysregs.c
-> @@ -0,0 +1,120 @@
-> +/*
-> + * Check emulated system register access for linux-user mode.
-> + *
-> + * See: https://www.kernel.org/doc/Documentation/arm64/cpu-feature-regis=
-ters.txt
-> + */
+On Mon, Feb 04, 2019 at 11:40:55AM +0100, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+> On Mon, Feb 4, 2019 at 11:38 AM Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > On Wed, Jan 23, 2019 at 6:27 PM Daniel P. Berrang=C3=A9 <berrange@red=
+hat.com> wrote:
+> > >
+> > > Currently the struct QIOTaskThreadData is only needed by the worker
+> > > thread, but a subsequent patch will need to access it from another
+> > > context.
+> > >
+> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >
+> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> nack:
+>=20
+>=20
+> $ tests/test-char
+> /char/null: OK
+> /char/invalid: OK
+> /char/ringbuf: OK
+> /char/mux: OK
+> /char/stdio: OK
+> /char/pipe: OK
+> /char/file: OK
+> /char/file-fifo: OK
+> /char/udp: OK
+> /char/serial: OK
+> /char/hotswap: OK
+> /char/websocket: OK
+> /char/socket/basic: OK
+> /char/socket/reconnect:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D22150=3D=3DERROR: AddressSanitizer: heap-use-after-free on addres=
+s
+> 0x606000004198 at pc 0x5618a22be8d3 bp 0x7fffa43d8a80 sp
+> 0x7fffa43d8a70
+> READ of size 8 at 0x606000004198 thread T0
+>     #0 0x5618a22be8d2 in qio_task_thread_result
+> /home/elmarco/src/qemu/io/task.c:91
+>     #1 0x7f111f08397a  (/lib64/libglib-2.0.so.0+0x4b97a)
+>     #2 0x7f111f08706c in g_main_context_dispatch
+> (/lib64/libglib-2.0.so.0+0x4f06c)
+>     #3 0x5618a23969b7 in glib_pollfds_poll
+> /home/elmarco/src/qemu/util/main-loop.c:215
+>     #4 0x5618a23969b7 in os_host_main_loop_wait
+> /home/elmarco/src/qemu/util/main-loop.c:238
+>     #5 0x5618a23969b7 in main_loop_wait
+> /home/elmarco/src/qemu/util/main-loop.c:497
+>     #6 0x5618a2299786 in main_loop /home/elmarco/src/qemu/tests/test-ch=
+ar.c:27
+>     #7 0x5618a229b651 in char_socket_test_common
+> /home/elmarco/src/qemu/tests/test-char.c:355
+>     #8 0x7f111f0aefc9  (/lib64/libglib-2.0.so.0+0x76fc9)
+>     #9 0x7f111f0aee83  (/lib64/libglib-2.0.so.0+0x76e83)
+>     #10 0x7f111f0aee83  (/lib64/libglib-2.0.so.0+0x76e83)
+>     #11 0x7f111f0af281 in g_test_run_suite (/lib64/libglib-2.0.so.0+0x7=
+7281)
+>     #12 0x7f111f0af2a4 in g_test_run (/lib64/libglib-2.0.so.0+0x772a4)
+>     #13 0x5618a2293859 in main /home/elmarco/src/qemu/tests/test-char.c=
+:971
+>     #14 0x7f111de11412 in __libc_start_main (/lib64/libc.so.6+0x24412)
+>     #15 0x5618a2295c1d in _start
+> (/home/elmarco/src/qemu/build/tests/test-char+0x23ac1d)
+>=20
+> 0x606000004198 is located 56 bytes inside of 64-byte region
+> [0x606000004160,0x6060000041a0)
+> freed by thread T0 here:
+>     #0 0x7f111f2f0480 in free (/lib64/libasan.so.5+0xef480)
+>     #1 0x7f111f08ced1 in g_free (/lib64/libglib-2.0.so.0+0x54ed1)
+>     #2 0x5618a243759f  (/home/elmarco/src/qemu/build/tests/test-char+0x=
+3dc59f)
+>=20
+> previously allocated by thread T0 here:
+>     #0 0x7f111f2f0a50 in __interceptor_calloc (/lib64/libasan.so.5+0xef=
+a50)
+>     #1 0x7f111f08ce1d in g_malloc0 (/lib64/libglib-2.0.so.0+0x54e1d)
+>=20
+> SUMMARY: AddressSanitizer: heap-use-after-free
+> /home/elmarco/src/qemu/io/task.c:91 in qio_task_thread_result
+> Shadow bytes around the buggy address:
 
-This needs the usual copyright line and license statement.
+FWIW, valgrind reports the same problem
 
-> +
-> +#include <asm/hwcap.h>
-> +#include <stdio.h>
-> +#include <sys/auxv.h>
-> +#include <signal.h>
-> +#include <string.h>
-> +#include <stdbool.h>
-> +
-> +int failed_mask_count;
-> +
-> +#define get_cpu_reg(id) ({                                      \
-> +            unsigned long __val =3D 0xdeadbeef;                   \
-> +            asm("mrs %0, "#id : "=3Dr" (__val));                  \
-> +            printf("%-20s: 0x%016lx\n", #id, __val);            \
-> +            __val;                                               \
-> +        })
-> +
-> +#define get_cpu_reg_check_mask(id, mask) ({                     \
-> +            unsigned long __cval =3D get_cpu_reg(id);             \
-> +            unsigned long __extra =3D __cval & ~mask;             \
-> +            if (__extra) {                                      \
-> +                printf("%-20s: 0x%016lx\n", "  !!extra bits!!", __extra)=
-;   \
-> +                failed_mask_count++;                            \
-> +            }                                                   \
-> +})
+Needs this change squashed in to fix it
 
-A brief comment describing what the arguments to these macros
-do would be helpful if we ever have to add more registers in future.
+diff --git a/io/task.c b/io/task.c
+index d100a754d3..396866b10f 100644
+--- a/io/task.c
++++ b/io/task.c
+@@ -66,6 +66,18 @@ QIOTask *qio_task_new(Object *source,
+=20
+ static void qio_task_free(QIOTask *task)
+ {
++    if (task->thread) {
++        if (task->thread->destroy) {
++            task->thread->destroy(task->thread->opaque);
++        }
++
++        if (task->thread->context) {
++            g_main_context_unref(task->thread->context);
++        }
++
++        g_free(task->thread);
++    }
++
+     if (task->destroy) {
+         task->destroy(task->opaque);
+     }
+@@ -88,17 +100,6 @@ static gboolean qio_task_thread_result(gpointer opaqu=
+e)
+     trace_qio_task_thread_result(task);
+     qio_task_complete(task);
+=20
+-    if (task->thread->destroy) {
+-        task->thread->destroy(task->thread->opaque);
+-    }
+-
+-    if (task->thread->context) {
+-        g_main_context_unref(task->thread->context);
+-    }
+-
+-    g_free(task->thread);
+-    task->thread =3D NULL;
+-
+     return FALSE;
+ }
 
-> +
-> +bool should_fail;
-> +int should_fail_count;
-> +int should_not_fail_count;
-> +uintptr_t failed_pc[10];
-> +
-> +void sigill_handler(int signo, siginfo_t *si, void *data)
-> +{
-> +    ucontext_t *uc =3D (ucontext_t *)data;
-> +
-> +    if (should_fail) {
-> +        should_fail_count++;
-> +    } else {
-> +        uintptr_t pc =3D (uintptr_t) uc->uc_mcontext.pc;
-> +        failed_pc[should_not_fail_count++] =3D  pc;
-> +    }
-> +    uc->uc_mcontext.pc +=3D 4;
-> +}
-> +
-> +int main(void)
-> +{
-> +    struct sigaction sa;
-> +
-> +    /* Hook in a SIGILL handler */
-> +    memset(&sa, 0, sizeof(struct sigaction));
-> +    sa.sa_flags =3D SA_SIGINFO;
-> +    sa.sa_sigaction =3D &sigill_handler;
-> +    sigemptyset(&sa.sa_mask);
-> +
-> +    if (sigaction(SIGILL, &sa, 0) !=3D 0) {
-> +        perror("sigaction");
-> +        return 1;
-> +    }
-> +
-> +    /* since 4.12 */
 
-This is a rather cryptic comment.
 
-> +    printf("Checking CNT registers\n");
-> +
-> +    get_cpu_reg(ctr_el0);
-> +    get_cpu_reg(cntvct_el0);
-> +    get_cpu_reg(cntfrq_el0);
-> +
-> +    /* when (getauxval(AT_HWCAP) & HWCAP_CPUID), since 4.11*/
-
-Missing space before "*/".
-
-> +    if (!(getauxval(AT_HWCAP) & HWCAP_CPUID)) {
-> +        printf("CPUID registers unavailable\n");
-> +        return 1;
-> +    } else {
-> +        printf("Checking CPUID registers\n");
-> +    }
-> +
-> +    /*
-> +     * Some registers only expose some bits to user-space. Anything
-> +     * that is IMDEF is exported as 0 to user-space.
-
-IMPDEF
-
-> +     */
-> +    get_cpu_reg_check_mask(id_aa64isar0_el1, 0x000fffffff0ffff0ULL);
-
-I can't make sense of this mask value. Presumably it's supposed to be
-1s where the value is visible, but the docs say that the visible
-bits for ID_AA64ISAR0_EL1 are [23..4] and [55..28], whereas the
-mask value here has 1s in [51..24] and [20..4], unless I've miscounted.
-
-> +    get_cpu_reg_check_mask(id_aa64isar1_el1, 0x00000000ffffffffULL);
-> +    get_cpu_reg(id_aa64mmfr0_el1);
-> +    get_cpu_reg(id_aa64mmfr1_el1);
-> +    get_cpu_reg_check_mask(id_aa64pfr0_el1, 0x000f000f0ff0000ULL);
-
-This seems to have [31..28] set but not [35..32]. The bits that
-should be [51..48] are also in the wrong place, and the whole
-number has one hex digit too few to be 64 bits.
-
-> +    get_cpu_reg(id_aa64pfr1_el1);
-> +    get_cpu_reg(id_aa64dfr0_el1);
-> +    get_cpu_reg(id_aa64dfr1_el1);
-> +
-> +    get_cpu_reg_check_mask(midr_el1, 0x00000000ffffffffULL);
-> +    get_cpu_reg(mpidr_el1);
-> +    /* REVIDR is all IMPDEF so should be all zeros to user-space */
-> +    get_cpu_reg_check_mask(revidr_el1, 0x0);
-
-Missing check of the mask value for ID_AA64MMFR2_EL1 ? Should have
-bits [35..32] visible.
-
-Missing checks for:
- ID_AA64ZFR0_EL1
- ID_AA64AFR0_EL1
- ID_AA64AFR1_EL1
-
-Missing checks for all the parts of the ID space that are currently
-unallocated (and which should be exposed as RAZ/WI).
-
-Missing checks for registers which are exposed but with all
-features hidden, eg ID_PFR0_EL1 and the other aarch32 ID regs.
-
-The kernel returns some value, ie does not fault, all the
-architecturally defined registers in Op0=3D3, Op1=3D0, CRn=3D0,
-CRm=3D0,4,5,6,7. For CRm =3D 0 only op2 =3D {0,5,6} [MIDR_EL1,
-MPIDR_EL1, REVIDR_EL1] are valid, but for CRm =3D {4,5,6,7}
-the whole set of op2 =3D {0..7} are defined (and RAZ if not
-yet given some meaning).
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
