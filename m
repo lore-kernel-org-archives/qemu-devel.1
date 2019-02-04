@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52202)
+Received: from eggs.gnu.org ([209.51.188.92]:52253)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQb-00066v-Pa
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:42 -0500
+	id 1gqcQh-0006Au-Jt
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQY-0007IW-3S
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:39 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:14941)
+	id 1gqcQf-0007MM-Vk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:47 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:14928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
-	id 1gqcQW-00078u-4i
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:38 -0500
+	id 1gqcQb-00076s-Ve
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:45 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 4 Feb 2019 11:28:03 +0000
-Message-ID: <20190204112803.11645-5-anthony.perard@citrix.com>
+Date: Mon, 4 Feb 2019 11:28:00 +0000
+Message-ID: <20190204112803.11645-2-anthony.perard@citrix.com>
 In-Reply-To: <20190204112803.11645-1-anthony.perard@citrix.com>
 References: <20190204112803.11645-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 4/4] xen-block: handle resize callback
+Subject: [Qemu-devel] [PULL 1/4] configure: xen: Stop build-testing for
+ xc_domain_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +34,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-From: Paul Durrant <paul.durrant@citrix.com>
+Its last uses was removed by: 6d7c06c213ddcfabcafdc178ccef81736f85a7c2
+"Remove broken Xen PV domain builder".
 
-Some frontend drivers will handle dynamic resizing of PV disks, so set up
-the BlockDevOps resize_cb() method during xen_block_realize() to allow
-this to be done.
-
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
 ---
- hw/block/dataplane/xen-block.c |  4 +---
- hw/block/trace-events          |  1 +
- hw/block/xen-block.c           | 40 ++++++++++++++++++++++++++++++----
- 3 files changed, 38 insertions(+), 7 deletions(-)
+ configure | 19 -------------------
+ 1 file changed, 19 deletions(-)
 
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index d0d8905a33..c6a15da024 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -50,7 +50,6 @@ struct XenBlockDataPlane {
-     unsigned int nr_ring_ref;
-     void *sring;
-     int64_t file_blk;
--    int64_t file_size;
-     int protocol;
-     blkif_back_rings_t rings;
-     int more_work;
-@@ -189,7 +188,7 @@ static int xen_block_parse_request(XenBlockRequest *request)
-                request->req.seg[i].first_sect + 1) * dataplane->file_blk;
-         request->size += len;
-     }
--    if (request->start + request->size > dataplane->file_size) {
-+    if (request->start + request->size > blk_getlength(dataplane->blk)) {
-         error_report("error: access beyond end of file");
-         goto err;
-     }
-@@ -638,7 +637,6 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
-     dataplane->xendev = xendev;
-     dataplane->file_blk = conf->logical_block_size;
-     dataplane->blk = conf->blk;
--    dataplane->file_size = blk_getlength(dataplane->blk);
+diff --git a/configure b/configure
+index f8176b3c40..ca1986125d 100755
+--- a/configure
++++ b/configure
+@@ -2474,7 +2474,6 @@ int main(void) {
+   xenforeignmemory_handle *xfmem;
+   xenevtchn_handle *xe;
+   xengnttab_handle *xg;
+-  xen_domain_handle_t handle;
+   xengnttab_grant_copy_segment_t* seg = NULL;
  
-     QLIST_INIT(&dataplane->inflight);
-     QLIST_INIT(&dataplane->freelist);
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index d0851953c5..8020f9226a 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -126,6 +126,7 @@ xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%
- xen_block_connect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
- xen_block_disconnect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
- xen_block_unrealize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_block_size(const char *type, uint32_t disk, uint32_t partition, int64_t sectors) "%s d%up%u %"PRIi64
- xen_disk_realize(void) ""
- xen_disk_unrealize(void) ""
- xen_cdrom_realize(void) ""
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index a636487b3e..5012af9cb6 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -144,6 +144,38 @@ static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-     }
- }
+   xs_daemon_open();
+@@ -2484,7 +2483,6 @@ int main(void) {
+   xc_domain_add_to_physmap(0, 0, XENMAPSPACE_gmfn, 0, 0);
+   xc_hvm_inject_msi(xc, 0, 0xf0000000, 0x00000000);
+   xc_hvm_create_ioreq_server(xc, 0, HVM_IOREQSRV_BUFIOREQ_ATOMIC, NULL);
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
  
-+static void xen_block_set_size(XenBlockDevice *blockdev)
-+{
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->props.vdev;
-+    BlockConf *conf = &blockdev->props.conf;
-+    int64_t sectors = blk_getlength(conf->blk) / conf->logical_block_size;
-+    XenDevice *xendev = XEN_DEVICE(blockdev);
-+
-+    trace_xen_block_size(type, vdev->disk, vdev->partition, sectors);
-+
-+    xen_device_backend_printf(xendev, "sectors", "%"PRIi64, sectors);
-+}
-+
-+static void xen_block_resize_cb(void *opaque)
-+{
-+    XenBlockDevice *blockdev = opaque;
-+    XenDevice *xendev = XEN_DEVICE(blockdev);
-+    enum xenbus_state state = xen_device_backend_get_state(xendev);
-+
-+    xen_block_set_size(blockdev);
-+
-+    /*
-+     * Mimic the behaviour of Linux xen-blkback and re-write the state
-+     * to trigger the frontend watch.
-+     */
-+    xen_device_backend_printf(xendev, "state", "%u", state);
-+}
-+
-+static const BlockDevOps xen_block_dev_ops = {
-+    .resize_cb = xen_block_resize_cb,
-+};
-+
- static void xen_block_realize(XenDevice *xendev, Error **errp)
- {
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-@@ -180,7 +212,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-     }
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map(xfmem, 0, 0, 0, 0, 0);
+@@ -2526,7 +2524,6 @@ int main(void) {
+   xenforeignmemory_handle *xfmem;
+   xenevtchn_handle *xe;
+   xengnttab_handle *xg;
+-  xen_domain_handle_t handle;
  
-     if (!blkconf_apply_backend_options(conf, blockdev->info & VDISK_READONLY,
--                                       false, errp)) {
-+                                       true, errp)) {
-         return;
-     }
+   xs_daemon_open();
  
-@@ -197,6 +229,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         return;
-     }
+@@ -2535,7 +2532,6 @@ int main(void) {
+   xc_domain_add_to_physmap(0, 0, XENMAPSPACE_gmfn, 0, 0);
+   xc_hvm_inject_msi(xc, 0, 0xf0000000, 0x00000000);
+   xc_hvm_create_ioreq_server(xc, 0, HVM_IOREQSRV_BUFIOREQ_ATOMIC, NULL);
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
  
-+    blk_set_dev_ops(conf->blk, &xen_block_dev_ops, blockdev);
-     blk_set_guest_block_size(conf->blk, conf->logical_block_size);
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map(xfmem, 0, 0, 0, 0, 0);
+@@ -2553,21 +2549,6 @@ EOF
+       then
+       xen_ctrl_version=40701
+       xen=yes
+-    elif
+-        cat > $TMPC <<EOF &&
+-#include <xenctrl.h>
+-#include <stdint.h>
+-int main(void) {
+-  xc_interface *xc = NULL;
+-  xen_domain_handle_t handle;
+-  xc_domain_create(xc, 0, handle, 0, NULL, NULL);
+-  return 0;
+-}
+-EOF
+-        compile_prog "" "$xen_libs"
+-      then
+-      xen_ctrl_version=40700
+-      xen=yes
  
-     if (conf->discard_granularity > 0) {
-@@ -215,9 +248,8 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
- 
-     xen_device_backend_printf(xendev, "sector-size", "%u",
-                               conf->logical_block_size);
--    xen_device_backend_printf(xendev, "sectors", "%"PRIi64,
--                              blk_getlength(conf->blk) /
--                              conf->logical_block_size);
-+
-+    xen_block_set_size(blockdev);
- 
-     blockdev->dataplane =
-         xen_block_dataplane_create(xendev, conf, blockdev->props.iothread);
+     # Xen 4.6
+     elif
 -- 
 Anthony PERARD
