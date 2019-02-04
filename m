@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56125)
+Received: from eggs.gnu.org ([209.51.188.92]:56252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqcjR-00074F-FH
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:48:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqcjX-0007BQ-GE
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:48:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqchI-0003Wc-7K
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:45:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gqchG-0003Re-7U
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:45:56 -0500
-References: <20181210182816.2014-1-pbonzini@redhat.com>
-	<20181210182816.2014-8-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <53f250f3-3455-5fad-14bc-27a9c439ecca@redhat.com>
-Date: Mon, 4 Feb 2019 12:45:42 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gqcfu-0002GD-SE
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:44:34 -0500
+Date: Mon, 4 Feb 2019 12:44:16 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190204124416.42a023bc.cohuck@redhat.com>
+In-Reply-To: <1548768562-20007-13-git-send-email-jjherne@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-13-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181210182816.2014-8-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] valgrind errors (was: [PATCH 7/8] qemu/queue.h:
- simplify reverse access to QTAILQ)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/15] s390-bios: Refactor virtio to run
+ channel programs via cio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, Richard Henderson <rth@twiddle.net>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 2018-12-10 19:28, Paolo Bonzini wrote:
-> The new definition of QTAILQ does not require passing the headname,
-> remove it.
+On Tue, 29 Jan 2019 08:29:19 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
- Hi Paolo,
+> Now that we have a Channel I/O library let's modify virtio boot code to
+> make use of it for running channel programs.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/virtio.c | 48 +++++++++++++++++++----------------------------
+>  1 file changed, 19 insertions(+), 29 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+> index aa9da72..f8d71ed 100644
+> --- a/pc-bios/s390-ccw/virtio.c
+> +++ b/pc-bios/s390-ccw/virtio.c
+> @@ -89,33 +89,20 @@ int drain_irqs(SubChannelId schid)
+>      }
+>  }
+>  
+> -static int run_ccw(VDev *vdev, int cmd, void *ptr, int len)
+> +static int run_ccw(VDev *vdev, int cmd, void *ptr, int len, bool sli)
+>  {
+>      Ccw1 ccw = {};
+> -    CmdOrb orb = {};
+> -    int r;
+> -
+> -    enable_subchannel(vdev->schid);
+> -
+> -    /* start subchannel command */
+> -    orb.fmt = 1;
+> -    orb.cpa = (u32)(long)&ccw;
+> -    orb.lpm = 0x80;
+>  
+>      ccw.cmd_code = cmd;
+>      ccw.cda = (long)ptr;
+>      ccw.count = len;
+>  
+> -    r = ssch(vdev->schid, &orb);
+> -    /*
+> -     * XXX Wait until device is done processing the CCW. For now we can
+> -     *     assume that a simple tsch will have finished the CCW processing,
+> -     *     but the architecture allows for asynchronous operation
+> -     */
+> -    if (!r) {
+> -        r = drain_irqs(vdev->schid);
+> +    if (sli) {
+> +        ccw.flags |= CCW_FLAG_SLI;
+>      }
+> -    return r;
+> +
+> +    enable_subchannel(vdev->schid);
+> +    return do_cio(vdev->schid, ptr2u32(&ccw), CCW_FMT1);
 
-when running current QEMU master branch with valgrind, I get
-"Conditional jump or move depends on uninitialised value" errors. I've
-bisected it to your patch series here. Everything is still fine and calm
-with f481ee2d5e3d77c12a4c9a7756b8c2612aad84c6 ("qemu/queue.h: typedef
-QTAILQ heads"), but starting with commit
-eae3eb3e185028d6e862db747e3b7397600d6762 ("qemu/queue.h: simplify
-reverse access to QTAILQ"), I now get:
+That still has the very odd pattern that you enable the subchannel
+every time you run a channel program...
 
-=3D=3D14580=3D=3D Thread 3:
-=3D=3D14580=3D=3D Conditional jump or move depends on uninitialised value=
-(s)
-=3D=3D14580=3D=3D    at 0x40C267: tcg_reg_alloc (tcg.c:3123)
-=3D=3D14580=3D=3D    by 0x40F8FB: tcg_reg_alloc_op (tcg.c:3506)
-=3D=3D14580=3D=3D    by 0x40F8FB: tcg_gen_code (tcg.c:3948)
-=3D=3D14580=3D=3D    by 0x47FAFF: tb_gen_code (translate-all.c:1748)
-=3D=3D14580=3D=3D    by 0x47E153: tb_find (cpu-exec.c:404)
-=3D=3D14580=3D=3D    by 0x47E153: cpu_exec (cpu-exec.c:724)
-=3D=3D14580=3D=3D    by 0x43D981: tcg_cpu_exec (cpus.c:1429)
-=3D=3D14580=3D=3D    by 0x43FB4F: qemu_tcg_cpu_thread_fn (cpus.c:1733)
-=3D=3D14580=3D=3D    by 0x879075: qemu_thread_start (qemu-thread-posix.c:=
-502)
-=3D=3D14580=3D=3D    by 0xB528DD4: start_thread (in /usr/lib64/libpthread=
--2.17.so)
-=3D=3D14580=3D=3D    by 0xB83BB3C: clone (in /usr/lib64/libc-2.17.so)
-
-Unfortunately, the commits in between do not compile, so I can not
-determine the exact commit that introduced the problem, but it
-definitely seems to happen due to your queue rework. Could you please
-have a look?
-
- Thanks,
-  Thomas
+>  }
+>  
+>  static void vring_init(VRing *vr, VqInfo *info)
