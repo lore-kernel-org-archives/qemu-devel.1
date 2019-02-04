@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39482)
+Received: from eggs.gnu.org ([209.51.188.92]:38815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqgWa-0001iR-KW
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:51:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gqgWf-0001M5-NU
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqgI7-0002jY-RF
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:36:12 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 4 Feb 2019 15:36:03 +0000
-Message-ID: <b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<87pnsbxsi7.fsf@dusky.pond.sub.org>
-	<20190204094621.GB5855@linux.fritz.box>
-	<87d0o7psz6.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d0o7psz6.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <050ED3C1EE124240A773D578A3AC28C2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1gqgHm-0002L1-V1
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:35:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gqgHm-000244-Jw
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:35:50 -0500
+References: <20181210182816.2014-1-pbonzini@redhat.com>
+	<20181210182816.2014-8-pbonzini@redhat.com>
+	<53f250f3-3455-5fad-14bc-27a9c439ecca@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c16f917b-7de6-6160-cd79-72dbb03510d4@redhat.com>
+Date: Mon, 4 Feb 2019 16:35:31 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+In-Reply-To: <53f250f3-3455-5fad-14bc-27a9c439ecca@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] valgrind errors (was: [PATCH 7/8] qemu/queue.h:
+ simplify reverse access to QTAILQ)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "fam@euphon.net" <fam@euphon.net>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Richard Henderson <rth@twiddle.net>
 
-MDQuMDIuMjAxOSAxNjo0NSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IEtldmluIFdvbGYg
-PGt3b2xmQHJlZGhhdC5jb20+IHdyaXRlczoNCj4gDQo+PiBBbSAwMS4wMi4yMDE5IHVtIDE5OjM5
-IGhhdCBNYXJrdXMgQXJtYnJ1c3RlciBnZXNjaHJpZWJlbjoNCj4+PiBBbmRyZXkgU2hpbmtldmlj
-aCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPj4+DQo+Pj4+IElu
-IHRoZSAnRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1p
-bWcgaW5mbycNCj4+Pj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRp
-b24gYWJvdXQgZXhpc3RpbmcgUUNPVzINCj4+Pj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNo
-IGFzIGEgYml0bWFwIG5hbWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4+Pj4NCj4+Pj4gaW1h
-Z2U6IC92ei92bXByaXZhdGUvVk0xL2hhcmRkaXNrLmhkZA0KPj4+PiBmaWxlIGZvcm1hdDogcWNv
-dzINCj4+Pj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2NzM2IGJ5dGVzKQ0KPj4+PiBkaXNr
-IHNpemU6IDMuME0NCj4+Pj4gY2x1c3Rlcl9zaXplOiAxMDQ4NTc2DQo+Pj4+IEZvcm1hdCBzcGVj
-aWZpYyBpbmZvcm1hdGlvbjoNCj4+Pj4gICAgICBjb21wYXQ6IDEuMQ0KPj4+PiAgICAgIGxhenkg
-cmVmY291bnRzOiB0cnVlDQo+Pj4+ICAgICAgYml0bWFwczoNCj4+Pj4gICAgICAgICAgWzBdOg0K
-Pj4+PiAgICAgICAgICAgICAgZmxhZ3M6DQo+Pj4+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11
-c2UNCj4+Pj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4gICAgICAgICAgICAgIG5h
-bWU6IGJhY2stdXAxDQo+Pj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA0DQo+Pj4+ICAg
-ICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4gICAgICAgICAgWzFdOg0KPj4+PiAg
-ICAgICAgICAgICAgZmxhZ3M6DQo+Pj4+ICAgICAgICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4+
-Pj4gICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4gICAgICAgICAgICAgIG5hbWU6IGJh
-Y2stdXAyDQo+Pj4+ICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA4DQo+Pj4+ICAgICAgICAg
-ICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4gICAgICByZWZjb3VudCBiaXRzOiAxNg0KPj4+
-PiAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+Pj4+DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBT
-aGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+
-PiBbLi4uXQ0KPj4+PiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Js
-b2NrLWNvcmUuanNvbg0KPj4+PiBpbmRleCA5MTY4NWJlLi4yNzFlMGRmIDEwMDY0NA0KPj4+PiAt
-LS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNv
-bg0KPj4+PiBAQCAtNjksNiArNjksOCBAQA0KPj4+PiAgICMgQGVuY3J5cHQ6IGRldGFpbHMgYWJv
-dXQgZW5jcnlwdGlvbiBwYXJhbWV0ZXJzOyBvbmx5IHNldCBpZiBpbWFnZQ0KPj4+PiAgICMgICAg
-ICAgICAgIGlzIGVuY3J5cHRlZCAoc2luY2UgMi4xMCkNCj4+Pj4gICAjDQo+Pj4+ICsjIEBiaXRt
-YXBzOiBBIGxpc3Qgb2YgcWNvdzIgYml0bWFwIGRldGFpbHMgKHNpbmNlIDQuMCkNCj4+Pj4gKyMN
-Cj4+Pj4gICAjIFNpbmNlOiAxLjcNCj4+Pj4gICAjIw0KPj4+PiAgIHsgJ3N0cnVjdCc6ICdJbWFn
-ZUluZm9TcGVjaWZpY1FDb3cyJywNCj4+Pj4gQEAgLTc3LDcgKzc5LDggQEANCj4+Pj4gICAgICAg
-ICAnKmxhenktcmVmY291bnRzJzogJ2Jvb2wnLA0KPj4+PiAgICAgICAgICcqY29ycnVwdCc6ICdi
-b29sJywNCj4+Pj4gICAgICAgICAncmVmY291bnQtYml0cyc6ICdpbnQnLA0KPj4+PiAtICAgICAg
-JyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9uJw0KPj4+PiArICAg
-ICAgJyplbmNyeXB0JzogJ0ltYWdlSW5mb1NwZWNpZmljUUNvdzJFbmNyeXB0aW9uJywNCj4+Pj4g
-KyAgICAgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRtYXBJbmZvJ10NCj4+Pj4gICAgIH0gfQ0KPj4+
-PiAgIA0KPj4+PiAgICMjDQo+Pj4+IEBAIC00NTQsNiArNDU3LDQxIEBADQo+Pj4+ICAgICAgICAg
-ICAgICAnc3RhdHVzJzogJ0RpcnR5Qml0bWFwU3RhdHVzJ30gfQ0KPj4+PiAgIA0KPj4+PiAgICMj
-DQo+Pj4+ICsjIEBRY293MkJpdG1hcEluZm9GbGFnczoNCj4+Pj4gKyMNCj4+Pj4gKyMgQW4gZW51
-bWVyYXRpb24gb2YgZmxhZ3MgdGhhdCBhIGJpdG1hcCBjYW4gcmVwb3J0IHRvIHRoZSB1c2VyLg0K
-Pj4+PiArIw0KPj4+PiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVj
-dGx5IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPj4+DQo+Pj4gSSBkb3VidCB0aGUgY2FzdWFs
-IHJlYWRlciBjb3VsZCBndWVzcyB0aGUgbWVhbmluZyBmcm9tIHRoZSBuYW1lLiAgV2hhdA0KPj4+
-IGFib3V0IEBkaXJ0eT8NCj4+DQo+PiBGZWVscyBsaWtlIG92ZXJsb2FkaW5nIHRoZSB3b3JkICJk
-aXJ0eSIgaW4gdGhlIGNvbnRleHQgb2YgImRpcnR5DQo+PiBiaXRtYXBzIi4gVGhpcyBtaWdodCBl
-YXNpbHkgbGVhZCB0byBtaXNpbnRlcnByZXRhdGlvbiBhcyAidGhpcyBiaXRtYXANCj4+IG1hcmtz
-IHNvbWUgY2x1c3RlcnMgYXMgZGlydHkiIHJhdGhlciB0aGFuICJ0aGlzIGJpdG1hcCBtaWdodCBi
-ZQ0KPj4gaW5jb25zaXN0ZW50Ii4NCj4gDQo+IENhbGwgaXQgQHBvc3NpYmx5LWluY29uc2lzdGVu
-dCB0aGVuPw0KPiANCg0KSWYgeW91IHJ1biBxbXAgcXVlcnktYmxvY2sgd2hpbGUgdm0gaXMgcnVu
-bmluZywgYWxsIGJpdG1hcHMgaW4gaW1hZ2Ugd2lsbA0KYmUgaW4gdXNlLiBBbmQgaW4gdGhpcyBj
-b250ZXh0LCBpbi11c2Ugc2VlbXMgbW9yZSBhcHByb3ByaWF0ZSB0aGFuDQpwb3NzaWJseS1pbmNv
-bnNpc3RlbnQuIEFuZCBpbi11c2UgaGFzIGxlc3MgaW50ZXJmZXJlbmNlIHdpdGggdGhlIGZhY3Qg
-dGhhdA0KYWN0dWFsIGJpdG1hcHMgbm93IGFyZSBpbi1SQU0gQmRydkRpcnR5Qml0bWFwIHN0cnVj
-dHVyZXMgd2hpY2ggYXJlIGFjdHVhbGx5DQpjb25zaXN0ZW50IChhbmQgYWxzbyBzaG93biBieSBx
-dWVyeS1ibG9jaykNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 04/02/19 12:45, Thomas Huth wrote:
+> when running current QEMU master branch with valgrind, I get
+> "Conditional jump or move depends on uninitialised value" errors. I've
+> bisected it to your patch series here. Everything is still fine and cal=
+m
+> with f481ee2d5e3d77c12a4c9a7756b8c2612aad84c6 ("qemu/queue.h: typedef
+> QTAILQ heads"), but starting with commit
+> eae3eb3e185028d6e862db747e3b7397600d6762 ("qemu/queue.h: simplify
+> reverse access to QTAILQ"), I now get:
+
+After fixing compilation with
+
+diff --git a/memory.c b/memory.c
+index 195c5cf..73b5ec6 100644
+--- a/memory.c
++++ b/memory.c
+@@ -128,7 +128,7 @@ enum ListenerDirection { Forward, Reverse };
+ #define MEMORY_LISTENER_CALL(_as, _callback, _direction, _section,
+_args...) \
+     do {                                                                =
+\
+         MemoryListener *_listener;                                      =
+\
+-        struct memory_listeners_as *list =3D &(_as)->listeners;         =
+  \
++        union memory_listeners_as *list =3D &(_as)->listeners;          =
+ \
+                                                                         =
+\
+         switch (_direction) {                                           =
+\
+         case Forward:                                                   =
+\
+
+I bisected it (not unexpectedly) to
+7274f01bb8b81ffe8f13f463b6b0f3b9246c5387.  It's a stupid stupid bug, and
+I'm sending a patch soon.
+
+Paolo
