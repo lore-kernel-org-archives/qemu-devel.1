@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51891)
+Received: from eggs.gnu.org ([209.51.188.92]:52180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqcQ2-0005XE-10
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:07 -0500
+	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
+	id 1gqcQQ-0005yZ-DV
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqcBy-0007mo-71
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:13:36 -0500
-Date: Mon, 4 Feb 2019 12:13:19 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190204121319.32915fd6.cohuck@redhat.com>
-In-Reply-To: <735ca9ff-76e3-966f-6fbc-a72bf994b413@linux.ibm.com>
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-11-git-send-email-jjherne@linux.ibm.com>
-	<735ca9ff-76e3-966f-6fbc-a72bf994b413@linux.ibm.com>
+	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
+	id 1gqcQO-00078o-Kk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:30 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:14928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=9310878b0=anthony.perard@citrix.com>)
+	id 1gqcQO-00076s-7j
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:28:28 -0500
+From: Anthony PERARD <anthony.perard@citrix.com>
+Date: Mon, 4 Feb 2019 11:28:01 +0000
+Message-ID: <20190204112803.11645-3-anthony.perard@citrix.com>
+In-Reply-To: <20190204112803.11645-1-anthony.perard@citrix.com>
+References: <20190204112803.11645-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
- format-0/1 channel programs
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 2/4] configure: Don't add Xen's libs to LDFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-On Thu, 31 Jan 2019 12:31:00 -0500
-Farhan Ali <alifm@linux.ibm.com> wrote:
+When Xen is detected via pkg-config, it isn't necessary to modify
+LDFLAGS as modifying libs_softmmu is enough.
 
-> On 01/29/2019 08:29 AM, Jason J. Herne wrote:
-> > Add struct for format-0 ccws. Support executing format-0 channel
-> > programs and waiting for their completion before continuing execution.
-> > This will be used for real dasd ipl.
-> > 
-> > Add cu_type() to channel io library. This will be used to query control
-> > unit type which is used to determine if we are booting a virtio device or a
-> > real dasd device.
-> > 
-> > Signed-off-by: Jason J. Herne<jjherne@linux.ibm.com>
-> > ---
-> >   pc-bios/s390-ccw/cio.c      | 114 +++++++++++++++++++++++++++++++++++++++
-> >   pc-bios/s390-ccw/cio.h      | 127 ++++++++++++++++++++++++++++++++++++++++++--
-> >   pc-bios/s390-ccw/s390-ccw.h |   1 +
-> >   pc-bios/s390-ccw/start.S    |  33 +++++++++++-
-> >   4 files changed, 270 insertions(+), 5 deletions(-)
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Michael Tokarev <mjt@tls.msk.ru>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ configure | 1 -
+ 1 file changed, 1 deletion(-)
 
-> > +/*
-> > + * Executes a channel program at a given subchannel. The request to run the
-> > + * channel program is sent to the subchannel, we then wait for the interrupt
-> > + * signaling completion of the I/O operation(s) performed by the channel
-> > + * program. Lastly we verify that the i/o operation completed without error and
-> > + * that the interrupt we received was for the subchannel used to run the
-> > + * channel program.
-> > + *
-> > + * Note: This function assumes it is running in an environment where no other
-> > + * cpus are generating or receiving I/O interrupts. So either run it in a
-> > + * single-cpu environment or make sure all other cpus are not doing I/O and
-> > + * have I/O interrupts masked off.
-> > + */
-> > +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
-> > +{
-> > +    CmdOrb orb = {};
-> > +    Irb irb = {};
-> > +    sense_data_eckd_dasd sd;
-> > +    int rc, retries = 0;
-> > +
-> > +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
-> > +
-> > +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
-> > +    if (fmt == 0) {
-> > +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
-> > +    }
-> > +
-> > +    orb.fmt = fmt ;
-> > +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
-> > +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
-> > +    orb.lpm = 0xFF; /* All paths allowed */
-> > +    orb.cpa = ccw_addr;
-> > +
-> > +    while (true) {
-> > +        rc = ssch(schid, &orb);
-> > +        if (rc == 1) {
-> > +            /* Status pending, not sure why. Let's eat the status and retry. */
-> > +            tsch(schid, &irb);
-> > +            retries++;
-> > +            continue;
-> > +        }
-> > +        if (rc) {
-> > +            print_int("ssch failed with rc=", rc);
-> > +            break;
-> > +        }
-> > +
-> > +        consume_io_int();
-> > +
-> > +        /* collect status */
-> > +        rc = tsch(schid, &irb);
-> > +        if (rc) {
-> > +            print_int("tsch failed with rc=", rc);
-> > +            break;
-> > +        }
-> > +
-> > +        if (!irb_error(&irb)) {
-> > +            break;
-> > +        }
-> > +
-> > +        /*
-> > +         * Unexpected unit check, or interface-control-check. Use sense to
-> > +         * clear unit check then retry.
-> > +         */
-> > +        if ((unit_check(&irb) || iface_ctrl_check(&irb)) && retries <= 2) {
-> > +            basic_sense(schid, &sd, sizeof(sd));  
-> 
-> We are using basic sense to clear any unit check or ifcc, but is it 
-> possible for the basic sense to cause another unit check?
-> 
-> The chapter on Basic Sense in the Common I/O Device Commands 
-> (http://publibz.boulder.ibm.com/support/libraryserver/FRAMESET/dz9ar501/2.1?SHELF=&DT=19920409154647&CASE=) 
->   says this:
-> 
-> ""
-> The basic sense command initiates a sense operation  at  all  devices 
-> and cannot  cause  the  command-reject,  intervention-required, 
-> data-check, or overrun bit to be set to one.  If the control unit 
-> detects  an  equipment malfunction  or  invalid  checking-block  code 
-> (CBC) on the sense-command code, the equipment-check or bus-out-check 
-> bit is set  to  one,  and  unit check is indicated in the device-status 
-> byte.
-> ""
-> 
-> If my understanding is correct, if there is an equipment malfunction 
-> then the control unit can return a unit check even for a basic sense. 
-> This can lead to infinite recursion in the bios.
-
-I think the retries variable is supposed to take care of that.
-
-What I don't understand is why we do the basic sense after an IFCC?
-Wouldn't it make more sense to simply retry the original command in
-that case?
-
-> 
-> 
-> 
-> > +            retries++;
-> > +            continue;
-> > +        }
-> > +
-> > +        break;
-> > +    }
-> > +
-> > +    return rc;
-> > +}  
-> 
+diff --git a/configure b/configure
+index ca1986125d..3d89870d99 100755
+--- a/configure
++++ b/configure
+@@ -2359,7 +2359,6 @@ if test "$xen" != "no" ; then
+     fi
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+-    LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+   else
+ 
+     xen_libs="-lxenstore -lxenctrl -lxenguest"
+-- 
+Anthony PERARD
