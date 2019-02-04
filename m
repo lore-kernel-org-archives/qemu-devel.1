@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58352)
+Received: from eggs.gnu.org ([209.51.188.92]:58788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbDr-0001Mo-Us
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:11:28 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1gqbGT-0002Cu-Gm
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbDr-00030K-2v
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:11:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53174)
+	(envelope-from <lhrazky@redhat.com>) id 1gqbGS-000126-BE
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqbDn-0002az-NU
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:11:24 -0500
-Date: Mon, 4 Feb 2019 10:05:28 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204100528.GA1905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190118133826.22447-1-berrange@redhat.com>
-	<20190128174857.GT4136@habkost.net>
-	<20190201171915-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gqbGS-0000mj-31
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:08 -0500
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Mon,  4 Feb 2019 11:08:10 +0100
+Message-Id: <20190204100810.14800-1-lhrazky@redhat.com>
+In-Reply-To: <20190128102605.15994-1-lhrazky@redhat.com>
+References: <20190128102605.15994-1-lhrazky@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190201171915-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw: report invalid disable-legacy|modern
- usage for virtio-1-only devs
+Subject: [Qemu-devel] [PATCH v2] spice: set device address and device
+ display ID in QXL interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +27,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: spice-devel@lists.freedesktop.org
 
-On Fri, Feb 01, 2019 at 05:19:32PM -0500, Michael S. Tsirkin wrote:
-> On Mon, Jan 28, 2019 at 03:48:57PM -0200, Eduardo Habkost wrote:
-> > On Fri, Jan 18, 2019 at 01:38:26PM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> > > A number of virtio devices (gpu, crypto, mouse, keyboard, tablet) o=
-nly
-> > > support the virtio-1 (aka modern) mode. Currently if the user launc=
-hes
-> > > QEMU, setting those devices to enable legacy mode, QEMU will silent=
-ly
-> > > create them in modern mode, ignoring the user's (mistaken) request.
-> > >=20
-> > > This patch introduces proper data validation so that an attempt to
-> > > configure a virtio-1-only devices in legacy mode gets reported as a=
-n
-> > > error to the user.
-> > >=20
-> > > Checking this required introduction of a new field to explicitly tr=
-ack
-> > > what operating model is to be used for a device, separately from th=
-e
-> > > disable_modern and disable_legacy fields that record the user's
-> > > requested configuration.
-> > >=20
-> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >=20
-> > This breaks the virtio-1-only devices on pc-*-2.6:
-> >=20
-> >   $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-vga -machine p=
-c-i440fx-2.6
-> >   qemu-system-x86_64: -device virtio-vga: Unable to set disable-legac=
-y=3Doff on a virtio-1.0 only device
-> >=20
-> > Probably the simplest way to fix that is to append the following to
-> > hw_compat_2_6:
-> >=20
-> >   { virtio-vga,        disable-modern, off },
-> >   { virtio-gpu-pci,    disable-modern, off },
-> >   { virtio-input-pci,  disable-modern, off },
-> >   { virtio-crypto-pci, disable-modern, off }
->=20
-> Daniel do you plan to take a stub at this approach?
+Calls the new SPICE QXL interface function spice_qxl_set_device_info to
+set the hardware address of the graphics device represented by the QXL
+interface (e.g. a PCI path) and the device display IDs (the IDs of the
+device's monitors that belong to this QXL interface).
 
-Yes, its on my todo list, just haven't got to it yet
+Also stops using the deprecated spice_qxl_set_max_monitors, the new
+interface function replaces it.
 
->=20
-> > We could also remove the property completely from those devices
-> > (e.g. by moving virtio-vga to virtio_vga_info.non_transitional_name),
-> > but it would break compatibility in case people are explicitly
-> > setting "disable-modern=3Doff" on those devices.
-> >=20
-> > --=20
-> > Eduardo
+Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
+---
+Hello,
 
-Regards,
-Daniel
+the spice part of the interface was merged to spice server, so this is
+ready to merge now too.
+
+The original series:
+https://lists.freedesktop.org/archives/spice-devel/2019-January/046997.ht=
+ml
+
+Changes since v1:
+* Fixed coding style according to the patchew check script.
+
+Cheers,
+Lukas
+
+ hw/display/qxl.c           | 14 ++++++++++-
+ include/ui/spice-display.h |  4 ++++
+ ui/spice-core.c            | 48 ++++++++++++++++++++++++++++++++++++++
+ ui/spice-display.c         | 11 +++++++++
+ 4 files changed, 76 insertions(+), 1 deletion(-)
+
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index da8fd5a40a..c8ce5781e0 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
+ice *qxl, int replay)
+                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
+                     0));
+     } else {
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
++/* >=3D release 0.12.6, < release 0.14.2 */
++#if SPICE_SERVER_VERSION >=3D 0x000c06 && SPICE_SERVER_VERSION < 0x000e0=
+2
+         if (qxl->max_outputs) {
+             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
+         }
+@@ -2188,6 +2189,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
+Error **errp)
+                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
+;
+         return;
+     }
++
++#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
++    char device_address[256] =3D "";
++    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
+)) {
++        spice_qxl_set_device_info(&qxl->ssd.qxl,
++                                  device_address,
++                                  0,
++                                  qxl->max_outputs);
++    }
++#endif
++
+     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
+=20
+     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
+diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
+index 87a84a59d4..53c3612c32 100644
+--- a/include/ui/spice-display.h
++++ b/include/ui/spice-display.h
+@@ -179,3 +179,7 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
+ void qemu_spice_display_start(void);
+ void qemu_spice_display_stop(void);
+ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
++
++bool qemu_spice_fill_device_address(QemuConsole *con,
++                                    char *device_address,
++                                    size_t size);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index a40fb2c00d..b3b644e304 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -34,6 +34,8 @@
+ #include "qemu/option.h"
+ #include "migration/misc.h"
+ #include "hw/hw.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
+ #include "ui/spice-display.h"
+=20
+ /* core bits */
+@@ -863,6 +865,52 @@ bool qemu_spice_have_display_interface(QemuConsole *=
+con)
+     return false;
+ }
+=20
++/*
++ * Recursively (in reverse order) appends addresses of PCI devices as it=
+ moves
++ * up in the PCI hierarchy.
++ *
++ * @returns true on success, false when the buffer wasn't large enough
++ */
++static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
+ce *pci)
++{
++    PCIBus *bus =3D pci_get_bus(pci);
++    if (!pci_bus_is_root(bus)) {
++        append_pci_address(buf, buf_size, bus->parent_dev);
++    }
++
++    size_t len =3D strlen(buf);
++    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
++        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
++
++    return written > 0 && written < buf_size - len;
++}
++
++bool qemu_spice_fill_device_address(QemuConsole *con,
++                                    char *device_address,
++                                    size_t size)
++{
++    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con),
++                                                       "device",
++                                                       &error_abort));
++    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev),
++                                                       TYPE_PCI_DEVICE);
++
++    if (pci =3D=3D NULL) {
++        warn_report("Setting device address of a display device to SPICE=
+: "
++                    "Not a PCI device.");
++        return false;
++    }
++
++    strncpy(device_address, "pci/0000", size);
++    if (!append_pci_address(device_address, size, pci)) {
++        warn_report("Setting device address of a display device to SPICE=
+: "
++            "Too many PCI devices in the chain.");
++        return false;
++    }
++
++    return true;
++}
++
+ int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
+n)
+ {
+     if (g_slist_find(spice_consoles, con)) {
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 52f8cb5ae1..c1605b3bc9 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
+e *con)
+=20
+     ssd->qxl.base.sif =3D &dpy_interface.base;
+     qemu_spice_add_display_interface(&ssd->qxl, con);
++
++#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
++    char device_address[256] =3D "";
++    if (qemu_spice_fill_device_address(con, device_address, 256)) {
++        spice_qxl_set_device_info(&ssd->qxl,
++                                  device_address,
++                                  qemu_console_get_head(con),
++                                  1);
++    }
++#endif
++
+     qemu_spice_create_host_memslot(ssd);
+=20
+     register_displaychangelistener(&ssd->dcl);
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.20.1
