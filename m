@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59899)
+Received: from eggs.gnu.org ([209.51.188.92]:59912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7a-0005ku-A6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:31 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7c-0005mk-Ij
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7R-0003x6-Nz
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:26 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39224)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7Y-00042f-By
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:30 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7O-0003pa-Nu
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:20 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id t27so954611wra.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:13 -0800 (PST)
+	id 1gqj7Q-0003pw-EW
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:21 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id f7so994901wrp.1
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:14 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:54 +0100
-Message-Id: <1549305379-51117-53-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:55 +0100
+Message-Id: <1549305379-51117-54-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 52/77] hw/arm/Makefile.objs: CONFIG_ARM_VIRT
- created for virt board
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 53/77] hw/m68k/Makefile.objs: Conditionally
+ build boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +32,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
+Cc: =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+From: Ákos Kovács <akoskovacs@gmx.com>
 
-Make ARM virt code configurable and the new CONFIG_ARM_VIRT
-definitions added to the default-configs/arm-softmmu.mak.
+CONFIG_AN5206, CONFIG_MCF5206 and CONFIG_MCF5208 make
+variables created for m68k boards, and added to
+default-configs/m86k-softmmu.mak.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-8-yang.zhong@intel.com>
+Message-Id: <20190202072456.6468-9-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 1 +
- hw/arm/Makefile.objs            | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ default-configs/m68k-softmmu.mak | 2 ++
+ hw/m68k/Makefile.objs            | 4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 32f4a4a..1db3639 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -148,6 +148,7 @@ CONFIG_XIO3130=y
- CONFIG_IOH3420=y
- CONFIG_I82801B11=y
- CONFIG_ACPI=y
-+CONFIG_ARM_VIRT=y
- CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 22b7f0e..fa40e8d 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -1,4 +1,5 @@
--obj-y += boot.o virt.o sysbus-fdt.o
-+obj-y += boot.o sysbus-fdt.o
-+obj-$(CONFIG_ARM_VIRT) += virt.o
- obj-$(CONFIG_ACPI) += virt-acpi-build.o
- obj-$(CONFIG_DIGIC) += digic_boards.o
- obj-$(CONFIG_EXYNOS4) += exynos4_boards.o
+diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
+index 60f7cdf..27f5274 100644
+--- a/default-configs/m68k-softmmu.mak
++++ b/default-configs/m68k-softmmu.mak
+@@ -2,3 +2,5 @@
+ 
+ CONFIG_COLDFIRE=y
+ CONFIG_PTIMER=y
++CONFIG_AN5206=y
++CONFIG_MCF5208=y
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index d1f089c..482f847 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,2 +1,2 @@
+-obj-y += an5206.o mcf5208.o
+-obj-y += mcf5206.o mcf_intc.o
++obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
++obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
 -- 
 1.8.3.1
