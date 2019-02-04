@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43834)
+Received: from eggs.gnu.org ([209.51.188.92]:46351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gqjlO-00068p-5t
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:18:39 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1gqjpi-0002Ef-Sg
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gqjX4-0003HI-Bt
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:03:54 -0500
-Received: from mail-lf1-x129.google.com ([2a00:1450:4864:20::129]:42898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gqjWz-000301-53
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:03:46 -0500
-Received: by mail-lf1-x129.google.com with SMTP id l10so727687lfh.9
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 11:03:29 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon,  4 Feb 2019 11:03:14 -0800
-Message-Id: <20190204190314.25373-1-jcmvbkbc@gmail.com>
+	(envelope-from <laurent.desnogues@gmail.com>) id 1gqjph-0007Im-NG
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:23:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/11] target/xtensa: SMP updates and various
- fixes
+References: <20181211151945.29137-1-aaron@os.amperecomputing.com>
+	<20181211151945.29137-11-aaron@os.amperecomputing.com>
+In-Reply-To: <20181211151945.29137-11-aaron@os.amperecomputing.com>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Mon, 4 Feb 2019 20:22:41 +0100
+Message-ID: <CABoDooPMwWR3TXxAqzoByeyuaReVmV0NFpWCJr897QL6r7n_nw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v10 10/14] target/arm: Finish
+ implementation of PM[X]EVCNTR and PM[X]EVTYPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +23,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Richard Henderson <richard.henderson@linaro.org>, Aaron Lindsay <alindsay@codeaurora.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi Peter,
+Hello,
 
-please pull the following series that enables SMP linux support for
-xtensa-softmmu.
+On Tue, Dec 11, 2018 at 4:25 PM Aaron Lindsay
+<aaron@os.amperecomputing.com> wrote:
+>
+> Add arrays to hold the registers, the definitions themselves, access
+> functions, and logic to reset counters when PMCR.P is set. Update
+> filtering code to support counters other than PMCCNTR. Support migration
+> with raw read/write functions.
+>
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    |   3 +
+>  target/arm/helper.c | 296 +++++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 282 insertions(+), 17 deletions(-)
+[...]
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index fd2923f033..1b851d1689 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+[...]
+> @@ -5301,6 +5526,43 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>          };
+>          define_one_arm_cp_reg(cpu, &pmcr);
+>          define_one_arm_cp_reg(cpu, &pmcr64);
+> +        for (i = 0; i < pmcrn; i++) {
+> +            char *pmevcntr_name = g_strdup_printf("PMEVCNTR%d", i);
+> +            char *pmevcntr_el0_name = g_strdup_printf("PMEVCNTR%d_EL0", i);
+> +            char *pmevtyper_name = g_strdup_printf("PMEVTYPER%d", i);
+> +            char *pmevtyper_el0_name = g_strdup_printf("PMEVTYPER%d_EL0", i);
+> +            ARMCPRegInfo pmev_regs[] = {
+> +                { .name = pmevcntr_name, .cp = 15, .crn = 15,
+> +                  .crm = 8 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
+> +                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
+> +                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
+> +                  .accessfn = pmreg_access },
+> +                { .name = pmevcntr_el0_name, .state = ARM_CP_STATE_AA64,
+> +                  .opc0 = 3, .opc1 = 3, .crn = 15, .crm = 8 | (3 & (i >> 3)),
+> +                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
+> +                  .type = ARM_CP_IO,
+> +                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
+> +                  .raw_readfn = pmevcntr_rawread,
+> +                  .raw_writefn = pmevcntr_rawwrite },
+> +                { .name = pmevtyper_name, .cp = 15, .crn = 15,
+> +                  .crm = 12 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
+> +                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
+> +                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
+> +                  .accessfn = pmreg_access },
+> +                { .name = pmevtyper_el0_name, .state = ARM_CP_STATE_AA64,
+> +                  .opc0 = 3, .opc1 = 3, .crn = 15, .crm = 12 | (3 & (i >> 3)),
 
-The following changes since commit 8b7a3e1e5434b55d7710071b00af97c7086cab7a:
+Looking at ARM documentation, I think the value for crn should be 14
+for PMEVCNTR<n>_EL0 and PMEVTYPER<n>_EL0.
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-01-24 15:04:47 +0000)
+Thanks,
 
-are available in the git repository at:
+Laurent
 
-  git://github.com/OSLL/qemu-xtensa.git tags/20190204-xtensa
-
-for you to fetch changes up to 174e09b73ab1c47408dd29fb36c4dd9fbda54f97:
-
-  hw/xtensa: xtfpga: raise CPU number limit (2019-01-28 11:55:20 -0800)
-
-----------------------------------------------------------------
-target/xtensa: SMP updates and various fixes
-
-- fix CPU wakeup on runstall changes; expose runstall as an IRQ line;
-- place mini-bootloader at the BSP reset vector;
-- expose CPU core frequency in XTFPGA board FPGA register;
-- rearrange access to external interrupts of xtensa cores;
-- add MX interrupt distributor and use it on SMP XTFPGA boards;
-- add test_mmuhifi_c3 xtensa core variant;
-- raise number of CPUs that can be instantiated on XTFPGA boards.
-
-----------------------------------------------------------------
-Max Filippov (11):
-      target/xtensa: add qemu_cpu_kick to xtensa_runstall
-      hw/xtensa: xtfpga: fix bootloader placement in SMP
-      hw/xtensa: xtfpga: use core frequency
-      target/xtensa: fix access to the INTERRUPT SR
-      target/xtensa: drop function xtensa_timer_irq
-      target/xtensa: rearrange access to external interrupts
-      target/xtensa: expose core runstall as an IRQ line
-      target/xtensa: add MX interrupt controller
-      hw/xtensa: xtfpga: use MX PIC for SMP
-      target/xtensa: add test_mmuhifi_c3 core
-      hw/xtensa: xtfpga: raise CPU number limit
-
- hw/xtensa/Makefile.objs                            |     1 +
- hw/xtensa/mx_pic.c                                 |   354 +
- hw/xtensa/pic_cpu.c                                |    47 +-
- hw/xtensa/xtfpga.c                                 |    65 +-
- include/hw/xtensa/mx_pic.h                         |    44 +
- target/xtensa/Makefile.objs                        |     1 +
- target/xtensa/core-test_mmuhifi_c3.c               |    53 +
- target/xtensa/core-test_mmuhifi_c3/core-isa.h      |   384 +
- .../xtensa/core-test_mmuhifi_c3/gdb-config.inc.c   |   140 +
- .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 36403 +++++++++++++++++++
- target/xtensa/cpu.h                                |     8 +-
- target/xtensa/exc_helper.c                         |    13 +
- target/xtensa/helper.c                             |     2 +-
- target/xtensa/helper.h                             |     2 +
- target/xtensa/op_helper.c                          |     2 +
- target/xtensa/translate.c                          |    14 +-
- 16 files changed, 37479 insertions(+), 54 deletions(-)
- create mode 100644 hw/xtensa/mx_pic.c
- create mode 100644 include/hw/xtensa/mx_pic.h
- create mode 100644 target/xtensa/core-test_mmuhifi_c3.c
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/core-isa.h
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/gdb-config.inc.c
- create mode 100644 target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc.c
-
--- 
-Thanks.
--- Max
+> +                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
+> +                  .type = ARM_CP_IO,
+> +                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
+> +                  .raw_writefn = pmevtyper_rawwrite },
+> +                REGINFO_SENTINEL
+> +            };
+> +            define_arm_cp_regs(cpu, pmev_regs);
+> +            g_free(pmevcntr_name);
+> +            g_free(pmevcntr_el0_name);
+> +            g_free(pmevtyper_name);
+> +            g_free(pmevtyper_el0_name);
+> +        }
+>  #endif
+>          ARMCPRegInfo clidr = {
+>              .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
+> --
+> 2.19.2
+>
+>
