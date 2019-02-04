@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38298)
+Received: from eggs.gnu.org ([209.51.188.92]:38339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8f-0000b6-P4
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8g-0000cF-UW
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gqa8e-0007dd-EN
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:01 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gqa8e-0007du-ID
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:02:02 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  4 Feb 2019 20:01:05 +1100
-Message-Id: <20190204090124.26191-19-david@gibson.dropbear.id.au>
+Date: Mon,  4 Feb 2019 20:00:59 +1100
+Message-Id: <20190204090124.26191-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 References: <20190204090124.26191-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/37] target/ppc: implement complete set of
- Vsr* macros
+Subject: [Qemu-devel] [PULL 12/37] hw/ppc/spapr: Encode the SCSI channel
+ (bus) in the SRP LUNs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, spopovyc@redhat.com, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
 
-This prepares us for eliminating the use of direct array access within th=
-e VMX
-instruction implementations.
+In hw/scsi/spapr_vio.c we declare that the controller supports multiple
+buses by specifying "max_channel =3D 7" there. So in the code that fixes
+up the device tree nodes, we must encode the channel number (a.k.a. bus
+number in the "Logical unit addressing format" table of SAM5) into the
+64-bit LUN, too.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1663160
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/internal.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index c7c0f77dd6..f26a71ffcf 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -206,16 +206,23 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, =
-1, 6, 6);
-=20
- #if defined(HOST_WORDS_BIGENDIAN)
- #define VsrB(i) u8[i]
-+#define VsrSB(i) s8[i]
- #define VsrH(i) u16[i]
-+#define VsrSH(i) s16[i]
- #define VsrW(i) u32[i]
-+#define VsrSW(i) s32[i]
- #define VsrD(i) u64[i]
-+#define VsrSD(i) s64[i]
- #else
- #define VsrB(i) u8[15 - (i)]
-+#define VsrSB(i) s8[15 - (i)]
- #define VsrH(i) u16[7 - (i)]
-+#define VsrSH(i) s16[7 - (i)]
- #define VsrW(i) u32[3 - (i)]
-+#define VsrSW(i) s32[3 - (i)]
- #define VsrD(i) u64[1 - (i)]
-+#define VsrSD(i) s64[1 - (i)]
- #endif
--
- static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
-     vsr->VsrD(0) =3D env->vsr[n].u64[0];
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0942f35bf8..71fe552c83 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2959,10 +2959,11 @@ static char *spapr_get_fw_dev_path(FWPathProvider=
+ *p, BusState *bus,
+         if (spapr) {
+             /*
+              * Replace "channel@0/disk@0,0" with "disk@8000000000000000"=
+:
+-             * We use SRP luns of the form 8000 | (bus << 8) | (id << 5)=
+ | lun
+-             * in the top 16 bits of the 64-bit LUN
++             * In the top 16 bits of the 64-bit LUN, we use SRP luns of =
+the form
++             * 0x8000 | (target << 8) | (bus << 5) | lun
++             * (see the "Logical unit addressing format" table in SAM5)
+              */
+-            unsigned id =3D 0x8000 | (d->id << 8) | d->lun;
++            unsigned id =3D 0x8000 | (d->id << 8) | (d->channel << 5) | =
+d->lun;
+             return g_strdup_printf("%s@%"PRIX64, qdev_fw_name(dev),
+                                    (uint64_t)id << 48);
+         } else if (virtio) {
 --=20
 2.20.1
