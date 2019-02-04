@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43222)
+Received: from eggs.gnu.org ([209.51.188.92]:43838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqnAh-0006k6-4b
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:57:00 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gqnC8-0007vi-4h
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:58:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqnAf-0003mB-BP
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqnAe-0003kk-Sf
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:56:57 -0500
-Date: Mon, 4 Feb 2019 17:56:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190204170515-mutt-send-email-mst@kernel.org>
-References: <20190109144736.17452-1-pagupta@redhat.com>
+	(envelope-from <walling@linux.ibm.com>) id 1gqnC5-0004cl-SZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:58:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gqnC5-0004ay-AN
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 17:58:25 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x14MnKtN015192
+	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 17:58:23 -0500
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qexa4gn8c-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 17:58:22 -0500
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Mon, 4 Feb 2019 22:58:21 -0000
+References: <20190130155733.32742-1-david@redhat.com>
+	<20190130155733.32742-2-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Mon, 4 Feb 2019 17:58:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190109144736.17452-1-pagupta@redhat.com>
-Subject: [Qemu-devel] security implications of caching with virtio pmem (was
- Re: [PATCH v3 0/5] kvm "virtio pmem" device)
+In-Reply-To: <20190130155733.32742-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <191e8d6f-31a7-93bd-376c-783a9dde90ba@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] s390x/pci: Fix primary bus number
+ for PCI bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +43,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, david@redhat.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net, Andrea Arcangeli <aarcange@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
+On 1/30/19 10:57 AM, David Hildenbrand wrote:
+> The primary bus number corresponds always to the bus number of the
+> bus the bridge is attached to.
+> 
+> Right now, if we have two bridges attached to the same bus (e.g. root
+> bus) this is however not the case. The first bridge will have primary
+> bus 0, the second bridge primary bus 1, which is wrong. Fix the assignment.
+> 
+> While at it, drop setting the PCI_SUBORDINATE_BUS temporarily to 0xff.
+> Setting it temporarily to that value (as discussed e.g. in [1]), is
+> only relevant for a running system that probes the buses. The value is
+> effectively unused for us just doing a DFS.
+> 
+> Also add a comment why we have to reassign during every reset (which I
+> found to be surprising.
+> 
+> Please note that hotplugging of bridges is in general still broken, will
+> be fixed next.
+> 
+> [1] http://www.science.unitn.it/~fiorella/guidelinux/tlk/node76.html
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
->  This patch series has implementation for "virtio pmem". 
->  "virtio pmem" is fake persistent memory(nvdimm) in guest 
->  which allows to bypass the guest page cache. This also
->  implements a VIRTIO based asynchronous flush mechanism.  
-
-
-At Pankaj's request I looked at information leak implications of virtio
-pmem in light of the recent page cache side channels paper
-(https://arxiv.org/pdf/1901.01161.pdf) - to see what
-kind of side channels it might create if any.  TLDR - I think that
-depending on the host side implementation there could be some, but this
-might be addressable by better documentation in both code and spec.
-The fake dax approach backing the guest memory by a host page cache
-does seem to have potential issues.
-
-For clarity: we are talking about leaking information either to a VM, or
-within a VM (I did not look into leaks to hypervisor in configurations
-such as SEV) through host page cache.
-
-Leaks into a VM: It seems clear that while pmem allows memory accesses
-versus read/write with e.g. a block device, from host page cache point
-of view this doesn't matter much: reads populate cache in the same way
-as memory faults.  Thus ignoring presence of information leaks (which is
-an interesting question e.g. in light of recent discard support) pmem
-doesn't seem to be any better or worse for leaking information into a
-VM.
-
-Leaks within VM: Right now pmem seems to bypass the guest page cache
-completely.  Whether pmem memory is then resident in a page cache would
-be up to the device/host. Assuming that it is, the "Preventing
-Efficient Eviction while Increasing the System Performance"
-countermeasure for the page cache side channel attack would appear to
-become ineffective with pmem. What is suggested is a per-process
-management of the page cache, and host does not have visibility of
-processes within a VM. Another possible countermeasure - not discussed
-in the paper - could be modify the applications to lock the security
-relevant pages in memory.  Again this becomes impractical with pmem as
-host does not have visibility into that. However note that as long
-as the only countermeasure linux uses is "Privileged Access"
-(i.e. blocking mincore) nothing can be done as guest page cache
-remains as vulnerable as host page cache.
-
-
-Countermeasures: which host-side countermeasures can be designed would
-depend on which countermeasures are used guest-side - we would need to
-make sure they are not broken by pmem.  For "Preventing Efficient
-Eviction while Increasing the System Performance" modifying the host
-implementation to ensure that pmem device bypasses the host page cache
-would seem to address the security problem.Similarly, ensuring that a
-real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
-virt) is used for pmem would make the memory locking countermeasure
-work.  Whether with such limitations the device is still useful
-performance wise is an open question.  These questions probably should
-be addressed in the documentation, spec and possible qemu code.
-
-
-
-Severity of the security implications: some people argue that the
-security implications of the page cache leaks are minor.  I do not have
-an opinion on this: the severity would seem to depend on the specific
-configuration.
-
-
-Other security implications: recent discussion seems to suggest there
-are other concerns around e.g. resource management and thus DOS
-potential. If that's so, it's a matter for a separate discussion
-as I didn't look into that in depth.
-
-Some or all of the above might be based on a misunderstanding of the
-current pmem code, the whitepaper and linux page cache in general.
-If so I apologise, do not hesitate to call out any mistakes.
-
-Thanks!
-
--- 
-MST
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
