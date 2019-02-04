@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52323)
+Received: from eggs.gnu.org ([209.51.188.92]:52368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gqapd-0007IY-9y
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:46:27 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gqapz-0007S2-OA
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gqapc-0002XU-Eu
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:46:25 -0500
-Date: Mon, 4 Feb 2019 10:36:27 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gqapw-0004B2-Jy
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 04:46:47 -0500
+Date: Mon, 4 Feb 2019 10:46:21 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190204093627.GA5855@linux.fritz.box>
+Message-ID: <20190204094621.GB5855@linux.fritz.box>
 References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190201171445.GB31750@localhost.localdomain>
-	<ab88488a-a715-5109-7f82-9de0919777f8@virtuozzo.com>
+	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<87pnsbxsi7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab88488a-a715-5109-7f82-9de0919777f8@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension
- new test 239
+In-Reply-To: <87pnsbxsi7.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
+ directory entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, fam@euphon.net, vsementsov@virtuozzo.com, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 
-Am 04.02.2019 um 08:53 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 01.02.2019 20:14, Kevin Wolf wrote:
-> > Am 31.01.2019 um 14:46 hat Andrey Shinkevich geschrieben:
-> >> A new test file 239 added to the qemu-iotests set. It checks
-> >> the output format of 'qemu-img info' for bitmaps extension of
-> >> qcow2 specific information.
-> >>
-> >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> > 
-> > 239 is already taken, so please rename this one. I usually search the
-> > mailing list for "239.out" etc. until I find a number that nobody has
-> > used even in a patch series yet.
-> > 
-> > Kevin
-> > 
+Am 01.02.2019 um 19:39 hat Markus Armbruster geschrieben:
+> Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
 > 
-> Interesting, wasn't it considered to give meaningful names to iotest files?
-> like migrate.bitmaps or qemu-img.qcow2-bitmaps, namespace.test? And then
-> we'll be able to ./check -qcow2 qemu-img.*. And all these conflicts in list
-> will be resolved
+> > In the 'Format specific information' section of the 'qemu-img info'
+> > command output, the supplemental information about existing QCOW2
+> > bitmaps will be shown, such as a bitmap name, flags and granularity:
+> >
+> > image: /vz/vmprivate/VM1/harddisk.hdd
+> > file format: qcow2
+> > virtual size: 64G (68719476736 bytes)
+> > disk size: 3.0M
+> > cluster_size: 1048576
+> > Format specific information:
+> >     compat: 1.1
+> >     lazy refcounts: true
+> >     bitmaps:
+> >         [0]:
+> >             flags:
+> >                 [0]: in-use
+> >                 [1]: auto
+> >             name: back-up1
+> >             unknown flags: 4
+> >             granularity: 65536
+> >         [1]:
+> >             flags:
+> >                 [0]: in-use
+> >                 [1]: auto
+> >             name: back-up2
+> >             unknown flags: 8
+> >             granularity: 65536
+> >     refcount bits: 16
+> >     corrupt: false
+> >
+> > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > ---
+> [...]
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 91685be..271e0df 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -69,6 +69,8 @@
+> >  # @encrypt: details about encryption parameters; only set if image
+> >  #           is encrypted (since 2.10)
+> >  #
+> > +# @bitmaps: A list of qcow2 bitmap details (since 4.0)
+> > +#
+> >  # Since: 1.7
+> >  ##
+> >  { 'struct': 'ImageInfoSpecificQCow2',
+> > @@ -77,7 +79,8 @@
+> >        '*lazy-refcounts': 'bool',
+> >        '*corrupt': 'bool',
+> >        'refcount-bits': 'int',
+> > -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
+> > +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
+> > +      '*bitmaps': ['Qcow2BitmapInfo']
+> >    } }
+> >  
+> >  ##
+> > @@ -454,6 +457,41 @@
+> >             'status': 'DirtyBitmapStatus'} }
+> >  
+> >  ##
+> > +# @Qcow2BitmapInfoFlags:
+> > +#
+> > +# An enumeration of flags that a bitmap can report to the user.
+> > +#
+> > +# @in-use: The bitmap was not saved correctly and may be inconsistent.
+> 
+> I doubt the casual reader could guess the meaning from the name.  What
+> about @dirty?
 
-You're not the first one to suggest this, and I don't think people ever
-fundamentally objected to the idea. But noone implemented it either -
-the current system is ugly, but it does kind of work in practice and
-renaming files in the repo always comes with some cost like 'git blame'
-and 'git log' stopping at the rename by default.
+Feels like overloading the word "dirty" in the context of "dirty
+bitmaps". This might easily lead to misinterpretation as "this bitmap
+marks some clusters as dirty" rather than "this bitmap might be
+inconsistent".
 
 Kevin
