@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59633)
+Received: from eggs.gnu.org ([209.51.188.92]:59692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj76-0005HP-Nl
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:01 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7A-0005LF-Gr
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj76-0003iW-0e
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:00 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:36810)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj78-0003kN-UT
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:03 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53877)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj74-0003hl-Su
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:59 -0500
-Received: by mail-wm1-x332.google.com with SMTP id p6so1025099wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:58 -0800 (PST)
+	id 1gqj78-0003jW-MC
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:02 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id d15so966188wmb.3
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:01 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s132sm8836236wmf.28.2019.02.04.10.36.59 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 04 Feb 2019 10:36:59 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:39 +0100
-Message-Id: <1549305379-51117-38-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:42 +0100
+Message-Id: <1549305379-51117-41-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 37/77] hw/core/loader.c: Read as long as
- possible in load_image_size()
+Subject: [Qemu-devel] [PULL 40/77] docker: adjust Xen repository for CentOS 7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +32,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Richard Henderson <richard.henderson@linaro.org>, Stefano Garzarella <sgarzare@redhat.com>
 
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
+The Xen repository is failing to install, pick the right name for the release package.
 
-Don't expect read(2) can always read as many as it's told.
-
-CC: Richard Henderson <richard.henderson@linaro.org>
-CC: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/loader.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ tests/docker/dockerfiles/centos7.docker | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 3a000d5..fe5cb24 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -77,21 +77,20 @@ int64_t get_image_size(const char *filename)
- ssize_t load_image_size(const char *filename, void *addr, size_t size)
- {
-     int fd;
--    ssize_t actsize;
-+    ssize_t actsize, l = 0;
- 
-     fd = open(filename, O_RDONLY | O_BINARY);
-     if (fd < 0) {
-         return -1;
-     }
- 
--    actsize = read(fd, addr, size);
--    if (actsize < 0) {
--        close(fd);
--        return -1;
-+    while ((actsize = read(fd, addr + l, size - l)) > 0) {
-+        l += actsize;
-     }
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+index e0f18f5..e0b9d7d 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -1,5 +1,6 @@
+ FROM centos:7
+-RUN yum install -y epel-release centos-release-xen
++RUN yum install -y epel-release centos-release-xen-48
 +
-     close(fd);
- 
--    return actsize;
-+    return actsize < 0 ? -1 : l;
- }
- 
- /* read()-like version */
+ RUN yum -y update
+ ENV PACKAGES \
+     bison \
+@@ -8,7 +9,7 @@ ENV PACKAGES \
+     ccache \
+     csnappy-devel \
+     flex \
+-    g++ \
++    gcc-c++ \
+     gcc \
+     gettext \
+     git \
 -- 
 1.8.3.1
