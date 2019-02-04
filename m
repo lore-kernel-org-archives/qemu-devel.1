@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59288)
+Received: from eggs.gnu.org ([209.51.188.92]:60241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqctM-0008Eo-Ig
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:58:25 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqcwu-0002y8-6K
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqctJ-0005TU-5M
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:58:23 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gqctI-0005Rx-3P
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 06:58:20 -0500
-Received: by mail-wr1-x441.google.com with SMTP id q15so3121898wro.12
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 03:58:19 -0800 (PST)
-References: <20190128223118.5255-1-richard.henderson@linaro.org>
-	<20190128223118.5255-6-richard.henderson@linaro.org>
-	<CAFEAcA_DHJf6-ewYoNEWyF2VDF+n6W_DtMgqTNA==rEpDE0AMA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6e640e9a-13c0-17ce-1490-9f002b11a783@linaro.org>
-Date: Mon, 4 Feb 2019 11:58:15 +0000
+	(envelope-from <no-reply@patchew.org>) id 1gqcwt-0001HY-4X
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:04 -0500
+Resent-Message-Id: <E1gqcwt-0001HY-4X@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gqcws-0001Fb-SC
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:02:03 -0500
+Message-ID: <154928079260.29184.375738094710200729@ebba9967afc0>
+In-Reply-To: <20190204112803.11645-1-anthony.perard@citrix.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_DHJf6-ewYoNEWyF2VDF+n6W_DtMgqTNA==rEpDE0AMA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/12] target/arm: Cache the GP bit for
- a page in MemTxAttrs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Feb 2019 03:46:33 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 0/4] Xen queue 20190204
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: anthony.perard@citrix.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, peter.maydell@linaro.org
 
-On 2/4/19 11:41 AM, Peter Maydell wrote:
-> On Mon, 28 Jan 2019 at 22:31, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> Caching the bit means that we will not have to re-walk the
->> page tables to look up the bit during translation.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  target/arm/helper.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index 6efe88a157..70277222da 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -10457,6 +10457,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->>      bool ttbr1_valid;
->>      uint64_t descaddrmask;
->>      bool aarch64 = arm_el_is_aa64(env, el);
->> +    bool guarded = false;
->>
->>      /* TODO:
->>       * This code does not handle the different format TCR for VTCR_EL2.
->> @@ -10629,6 +10630,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->>          }
->>          /* Merge in attributes from table descriptors */
->>          attrs |= nstable << 3; /* NS */
->> +        guarded |= extract64(descriptor, 50, 1);  /* GP */
-> 
-> Should just be "guarded =", as per previous discussion.
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-Agreed.  Do you need a re-spin for this?
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDExMjgwMy4xMTY0
+NS0xLWFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
+IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
+d0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKQ29uZmln
+dXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11
+LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsIC0tcHl0aG9u
+PS91c3IvYmluL3B5dGhvbjMgLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLSAtLWVu
+YWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUgLS1lbmFibGUtZ251dGxzIC0tZW5hYmxlLW5ldHRs
+ZSAtLWVuYWJsZS1jdXJsIC0tZW5hYmxlLXZuYyAtLWVuYWJsZS1iemlwMiAtLWVuYWJsZS1ndWVz
+dC1hZ2VudCAtLXdpdGgtc2RsYWJpPTIuMApFUlJPUjogdW5rbm93biBvcHRpb24gLS13aXRoLXNk
+bGFiaT0yLjAKVHJ5ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJlIC0taGVscCcgZm9yIG1v
+cmUgaW5mb3JtYXRpb24KIyBRRU1VIGNvbmZpZ3VyZSBsb2cgTW9uIEZlYiAgNCAxMTo0NjowNiBV
+VEMgMjAxOQojIENvbmZpZ3VyZWQgd2l0aDogJy90bXAvcWVtdS10ZXN0L3NyYy9jb25maWd1cmUn
+ICctLWVuYWJsZS13ZXJyb3InICctLXRhcmdldC1saXN0PXg4Nl82NC1zb2Z0bW11LGFhcmNoNjQt
+c29mdG1tdScgJy0tcHJlZml4PS90bXAvcWVtdS10ZXN0L2luc3RhbGwnICctLXB5dGhvbj0vdXNy
+L2Jpbi9weXRob24zJyAnLS1jcm9zcy1wcmVmaXg9eDg2XzY0LXc2NC1taW5ndzMyLScgJy0tZW5h
+YmxlLXRyYWNlLWJhY2tlbmRzPXNpbXBsZScgJy0tZW5hYmxlLWdudXRscycgJy0tZW5hYmxlLW5l
+dHRsZScgJy0tZW5hYmxlLWN1cmwnICctLWVuYWJsZS12bmMnICctLWVuYWJsZS1iemlwMicgJy0t
+ZW5hYmxlLWd1ZXN0LWFnZW50JyAnLS13aXRoLXNkbGFiaT0yLjAnCi0tLQpmdW5jczogZG9fY29t
+cGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEy
+MiA2MTcgNjM0IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVf
+T0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1X
+cmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1w
+cm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1n
+bnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9xZW11LWNvbmYu
+Ywpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19saW51eF9fIG5v
+dCBkZWZpbmVkCiAjZXJyb3IgX19saW51eF9fIG5vdCBkZWZpbmVkCiAgXn5+fn4KCi0tLQpmdW5j
+czogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGlu
+ZXM6IDkyIDEyMiA2MTcgNjg2IDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAtRF9HTlVfU09VUkNF
+IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
+b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
+bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
+cHYgLXN0ZD1nbnU5OSAtYyAtbyBjb25maWctdGVtcC9xZW11LWNvbmYubyBjb25maWctdGVtcC9x
+ZW11LWNvbmYuYwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoyOjI6IGVycm9yOiAjZXJyb3IgX19p
+Mzg2X18gbm90IGRlZmluZWQKICNlcnJvciBfX2kzODZfXyBub3QgZGVmaW5lZAogIF5+fn5+Cgot
+LS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBt
+YWluCmxpbmVzOiA5MiAxMjIgNjE3IDY4OSAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05V
+X1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJp
+Y3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3Ry
+aW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1v
+biAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmln
+LXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vy
+cm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAogI2Vycm9yIF9fSUxQMzJfXyBub3QgZGVmaW5lZAog
+IF5+fn5+CgotLS0KbGluZXM6IDkyIDEyOCA5MjAgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1t
+dGhyZWFkcyAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxF
+X1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5k
+ZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFz
+aW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAtbyBjb25maWctdGVtcC9xZW11LWNv
+bmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1nIC1saWJlcnR5Ci91c3IvbGliL2djYy94
+ODZfNjQtdzY0LW1pbmd3MzIvOC4yLjAvLi4vLi4vLi4vLi4veDg2XzY0LXc2NC1taW5ndzMyL2Jp
+bi9sZDogY2Fubm90IGZpbmQgLWxpYmVydHkKY29sbGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAx
+IGV4aXQgc3RhdHVzCkZhaWxlZCB0byBydW4gJ2NvbmZpZ3VyZScKVHJhY2ViYWNrIChtb3N0IHJl
+Y2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUg
+NTYzLCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvMjAxOTAyMDQxMTI4MDMuMTE2NDUtMS1hbnRob255LnBlcmFyZEBjaXRy
+aXguY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
