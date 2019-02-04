@@ -1,42 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51200)
+Received: from eggs.gnu.org ([209.51.188.92]:51775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gqk7h-00087f-Fz
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:41:42 -0500
+	(envelope-from <farman@linux.ibm.com>) id 1gqk88-0000Vn-I9
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:42:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gqjw4-00018R-Kd
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:29:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54528
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <farman@linux.ibm.com>) id 1gqjsH-0001aG-Qm
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:25:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gqjvr-0000oP-7X
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:29:31 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1gqjsF-0001Tu-NE
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 14:25:45 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x14JOd9s013466
-	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 14:29:24 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qercrh8hk-1
+	x14JOfch135702
+	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 14:25:41 -0500
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2qesjt540t-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 14:29:24 -0500
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 14:25:41 -0500
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Mon, 4 Feb 2019 19:29:23 -0000
-References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
-	<1548768562-20007-11-git-send-email-jjherne@linux.ibm.com>
-	<735ca9ff-76e3-966f-6fbc-a72bf994b413@linux.ibm.com>
-	<20190204121319.32915fd6.cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Mon, 4 Feb 2019 14:29:18 -0500
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Mon, 4 Feb 2019 19:25:39 -0000
+References: <20190130132212.7376-1-cohuck@redhat.com>
+	<20190130132212.7376-2-cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Mon, 4 Feb 2019 14:25:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190204121319.32915fd6.cohuck@redhat.com>
+In-Reply-To: <20190130132212.7376-2-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <bd0a3a4e-d82c-e01b-7c81-60ee2b50eebe@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 10/15] s390-bios: Support for running
- format-0/1 channel programs
+Message-Id: <9b35717e-8994-cde9-2afe-243ab80c371a@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
+ channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,143 +43,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 
 
-On 02/04/2019 06:13 AM, Cornelia Huck wrote:
-> On Thu, 31 Jan 2019 12:31:00 -0500
-> Farhan Ali <alifm@linux.ibm.com> wrote:
+On 01/30/2019 08:22 AM, Cornelia Huck wrote:
+> When we get a solicited interrupt, the start function may have
+> been cleared by a csch, but we still have a channel program
+> structure allocated. Make it safe to call the cp accessors in
+> any case, so we can call them unconditionally.
 > 
->> On 01/29/2019 08:29 AM, Jason J. Herne wrote:
->>> Add struct for format-0 ccws. Support executing format-0 channel
->>> programs and waiting for their completion before continuing execution.
->>> This will be used for real dasd ipl.
->>>
->>> Add cu_type() to channel io library. This will be used to query control
->>> unit type which is used to determine if we are booting a virtio device or a
->>> real dasd device.
->>>
->>> Signed-off-by: Jason J. Herne<jjherne@linux.ibm.com>
->>> ---
->>>    pc-bios/s390-ccw/cio.c      | 114 +++++++++++++++++++++++++++++++++++++++
->>>    pc-bios/s390-ccw/cio.h      | 127 ++++++++++++++++++++++++++++++++++++++++++--
->>>    pc-bios/s390-ccw/s390-ccw.h |   1 +
->>>    pc-bios/s390-ccw/start.S    |  33 +++++++++++-
->>>    4 files changed, 270 insertions(+), 5 deletions(-)
+> While at it, also make sure that functions called from other parts
+> of the code return gracefully if the channel program structure
+> has not been initialized (even though that is a bug in the caller).
 > 
->>> +/*
->>> + * Executes a channel program at a given subchannel. The request to run the
->>> + * channel program is sent to the subchannel, we then wait for the interrupt
->>> + * signaling completion of the I/O operation(s) performed by the channel
->>> + * program. Lastly we verify that the i/o operation completed without error and
->>> + * that the interrupt we received was for the subchannel used to run the
->>> + * channel program.
->>> + *
->>> + * Note: This function assumes it is running in an environment where no other
->>> + * cpus are generating or receiving I/O interrupts. So either run it in a
->>> + * single-cpu environment or make sure all other cpus are not doing I/O and
->>> + * have I/O interrupts masked off.
->>> + */
->>> +int do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt)
->>> +{
->>> +    CmdOrb orb = {};
->>> +    Irb irb = {};
->>> +    sense_data_eckd_dasd sd;
->>> +    int rc, retries = 0;
->>> +
->>> +    IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
->>> +
->>> +    /* ccw_addr must be <= 24 bits and point to at least one whole ccw. */
->>> +    if (fmt == 0) {
->>> +        IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
->>> +    }
->>> +
->>> +    orb.fmt = fmt ;
->>> +    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
->>> +    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
->>> +    orb.lpm = 0xFF; /* All paths allowed */
->>> +    orb.cpa = ccw_addr;
->>> +
->>> +    while (true) {
->>> +        rc = ssch(schid, &orb);
->>> +        if (rc == 1) {
->>> +            /* Status pending, not sure why. Let's eat the status and retry. */
->>> +            tsch(schid, &irb);
->>> +            retries++;
->>> +            continue;
->>> +        }
->>> +        if (rc) {
->>> +            print_int("ssch failed with rc=", rc);
->>> +            break;
->>> +        }
->>> +
->>> +        consume_io_int();
->>> +
->>> +        /* collect status */
->>> +        rc = tsch(schid, &irb);
->>> +        if (rc) {
->>> +            print_int("tsch failed with rc=", rc);
->>> +            break;
->>> +        }
->>> +
->>> +        if (!irb_error(&irb)) {
->>> +            break;
->>> +        }
->>> +
->>> +        /*
->>> +         * Unexpected unit check, or interface-control-check. Use sense to
->>> +         * clear unit check then retry.
->>> +         */
->>> +        if ((unit_check(&irb) || iface_ctrl_check(&irb)) && retries <= 2) {
->>> +            basic_sense(schid, &sd, sizeof(sd));
->>
->> We are using basic sense to clear any unit check or ifcc, but is it
->> possible for the basic sense to cause another unit check?
->>
->> The chapter on Basic Sense in the Common I/O Device Commands
->> (http://publibz.boulder.ibm.com/support/libraryserver/FRAMESET/dz9ar501/2.1?SHELF=&DT=19920409154647&CASE=)
->>    says this:
->>
->> ""
->> The basic sense command initiates a sense operation  at  all  devices
->> and cannot  cause  the  command-reject,  intervention-required,
->> data-check, or overrun bit to be set to one.  If the control unit
->> detects  an  equipment malfunction  or  invalid  checking-block  code
->> (CBC) on the sense-command code, the equipment-check or bus-out-check
->> bit is set  to  one,  and  unit check is indicated in the device-status
->> byte.
->> ""
->>
->> If my understanding is correct, if there is an equipment malfunction
->> then the control unit can return a unit check even for a basic sense.
->> This can lead to infinite recursion in the bios.
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   drivers/s390/cio/vfio_ccw_cp.c  | 20 +++++++++++++++++++-
+>   drivers/s390/cio/vfio_ccw_cp.h  |  2 ++
+>   drivers/s390/cio/vfio_ccw_fsm.c |  5 +++++
+>   3 files changed, 26 insertions(+), 1 deletion(-)
 > 
-> I think the retries variable is supposed to take care of that.
-> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index ba08fe137c2e..0bc0c38edda7 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
+>   	struct ccwchain *chain, *temp;
+>   	int i;
+>   
+> +	cp->initialized = false;
+>   	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+>   		for (i = 0; i < chain->ch_len; i++) {
+>   			pfn_array_table_unpin_free(chain->ch_pat + i,
+> @@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>   	 */
+>   	cp->orb.cmd.c64 = 1;
+>   
+> +	cp->initialized = true;
+> +
 
-If I understand the code correctly, the retries variable cannot prevent 
-infinite recursion. Because every time we get a unit check we do a basic 
-sense which calls the do_cio function again. If that basic sense returns 
-a unit check we do another basic sense....
+Not seen in this hunk, but we call ccwchain_loop_tic() just prior to 
+this point.  If that returns non-zero, we call cp_unpin_free()[1] (and 
+set initailized to false), and then fall through to here.  So this is 
+going to set initialized to true, even though we're taking an error 
+path.  :-(
 
-> What I don't understand is why we do the basic sense after an IFCC?
-> Wouldn't it make more sense to simply retry the original command in
-> that case?
-> 
->>
->>
->>
->>> +            retries++;
->>> +            continue;
->>> +        }
->>> +
->>> +        break;
->>> +    }
->>> +
->>> +    return rc;
->>> +}
->>
-> 
+[1] Wait, why is it calling cp_unpin_free()?  Oh, I had proposed 
+squashing cp_free() and cp_unpin_free() back in November[2], got an r-b 
+from Pierre but haven't gotten back to tidy up the series for a v2. 
+Okay, I'll try to do that again soon.  :-)
+[2] https://patchwork.kernel.org/patch/10675261/
+
+>   	return ret;
+>   }
+>   
+> @@ -715,7 +718,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>    */
+>   void cp_free(struct channel_program *cp)
+>   {
+> -	cp_unpin_free(cp);
+> +	if (cp->initialized)
+> +		cp_unpin_free(cp);
+>   }
+>   
+>   /**
+> @@ -760,6 +764,10 @@ int cp_prefetch(struct channel_program *cp)
+>   	struct ccwchain *chain;
+>   	int len, idx, ret;
+>   
+> +	/* this is an error in the caller */
+> +	if (!cp || !cp->initialized)
+> +		return -EINVAL;
+> +
+>   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+>   		len = chain->ch_len;
+>   		for (idx = 0; idx < len; idx++) {
+> @@ -795,6 +803,10 @@ union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm)
+>   	struct ccwchain *chain;
+>   	struct ccw1 *cpa;
+>   
+> +	/* this is an error in the caller */
+> +	if (!cp || !cp->initialized)
+> +		return NULL;
+> +
+>   	orb = &cp->orb;
+>   
+>   	orb->cmd.intparm = intparm;
+> @@ -831,6 +843,9 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+>   	u32 cpa = scsw->cmd.cpa;
+>   	u32 ccw_head, ccw_tail;
+>   
+> +	if (!cp->initialized)
+> +		return;
+> +
+>   	/*
+>   	 * LATER:
+>   	 * For now, only update the cmd.cpa part. We may need to deal with
+> @@ -869,6 +884,9 @@ bool cp_iova_pinned(struct channel_program *cp, u64 iova)
+>   	struct ccwchain *chain;
+>   	int i;
+>   
+> +	if (!cp->initialized)
+
+So, two of the checks added above look for a nonzero cp pointer prior to 
+checking initialized, while two don't.  I guess cp can't be NULL, since 
+it's embedded in the private struct directly and that's only free'd when 
+we do vfio_ccw_sch_remove() ... But I guess some consistency in how we 
+look would be nice.
+
+> +		return false;
+> +
+>   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+>   		for (i = 0; i < chain->ch_len; i++)
+>   			if (pfn_array_table_iova_pinned(chain->ch_pat + i,
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+> index a4b74fb1aa57..3c20cd208da5 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.h
+> +++ b/drivers/s390/cio/vfio_ccw_cp.h
+> @@ -21,6 +21,7 @@
+>    * @ccwchain_list: list head of ccwchains
+>    * @orb: orb for the currently processed ssch request
+>    * @mdev: the mediated device to perform page pinning/unpinning
+> + * @initialized: whether this instance is actually initialized
+>    *
+>    * @ccwchain_list is the head of a ccwchain list, that contents the
+>    * translated result of the guest channel program that pointed out by
+> @@ -30,6 +31,7 @@ struct channel_program {
+>   	struct list_head ccwchain_list;
+>   	union orb orb;
+>   	struct device *mdev;
+> +	bool initialized;
+>   };
+>   
+>   extern int cp_init(struct channel_program *cp, struct device *mdev,
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> index cab17865aafe..e7c9877c9f1e 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -31,6 +31,10 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>   	private->state = VFIO_CCW_STATE_BUSY;
+>   
+>   	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
+> +	if (!orb) {
+> +		ret = -EIO;
+> +		goto out;
+> +	}
+>   
+>   	/* Issue "Start Subchannel" */
+>   	ccode = ssch(sch->schid, orb);
+> @@ -64,6 +68,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>   	default:
+>   		ret = ccode;
+>   	}
+> +out:
+>   	spin_unlock_irqrestore(sch->lock, flags);
+>   	return ret;
+>   }
 > 
