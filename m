@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44297)
+Received: from eggs.gnu.org ([209.51.188.92]:44831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqbud-0004ga-Bf
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:40 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqbx2-0005dm-BY
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gqbub-0000ZI-Qb
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:39 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39396)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gqbub-0000Wh-BS
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:37 -0500
-Received: by mail-wr1-x434.google.com with SMTP id t27so13848992wra.6
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:55:35 -0800 (PST)
-References: <1549266858-5043-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <61f149b0-0b67-c692-df9e-5f4c9a5e561c@linaro.org>
-Date: Mon, 4 Feb 2019 10:55:30 +0000
+	(envelope-from <cohuck@redhat.com>) id 1gqbx0-0001vL-H3
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:58:08 -0500
+Date: Mon, 4 Feb 2019 11:57:58 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190204115758.765941f1.cohuck@redhat.com>
+In-Reply-To: <1548768562-20007-8-git-send-email-jjherne@linux.ibm.com>
+References: <1548768562-20007-1-git-send-email-jjherne@linux.ibm.com>
+	<1548768562-20007-8-git-send-email-jjherne@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1549266858-5043-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the
- file headers
+Subject: Re: [Qemu-devel] [PATCH 07/15] s390-bios: Decouple channel i/o
+ logic from virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Anthony Green <green@moxielogic.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, alifm@linux.ibm.com, borntraeger@de.ibm.com
 
-On 2/4/19 7:54 AM, Thomas Huth wrote:
-> It's either "GNU *Library* General Public License version 2" or "GNU
-> Lesser General Public License version *2.1*", but there was no "version
-> 2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
-> Also the files mentioned the GPL instead of the LGPL after declaring
-> that the files are licensed under the LGPL, so change these spots to
-> use LGPL, too.
+On Tue, 29 Jan 2019 08:29:14 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+
+> Create a separate library for channel i/o related code. This decouples
+> channel i/o operations from virtio and allows us to make use of them for
+> the real dasd boot path.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
 > ---
->  target/moxie/cpu.c       | 2 +-
->  target/moxie/cpu.h       | 4 ++--
->  target/moxie/helper.c    | 4 ++--
->  target/moxie/mmu.c       | 4 ++--
->  target/moxie/translate.c | 4 ++--
->  5 files changed, 9 insertions(+), 9 deletions(-)
+>  pc-bios/s390-ccw/Makefile        |  2 +-
+>  pc-bios/s390-ccw/cio.c           | 41 ++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/cio.h           |  3 +++
+>  pc-bios/s390-ccw/main.c          |  1 +
+>  pc-bios/s390-ccw/netboot.mak     |  2 +-
+>  pc-bios/s390-ccw/netmain.c       |  1 +
+>  pc-bios/s390-ccw/s390-ccw.h      |  1 -
+>  pc-bios/s390-ccw/virtio-blkdev.c |  1 +
+>  pc-bios/s390-ccw/virtio.c        | 27 ++------------------------
+>  9 files changed, 51 insertions(+), 28 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/cio.c
+> 
 
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+> diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
+> new file mode 100644
+> index 0000000..095f79b
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/cio.c
+> @@ -0,0 +1,41 @@
+> +/*
+> + * S390 Channel I/O
+> + *
+> + * Copyright (c) 2018 Jason J. Herne <jjherne@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
 
+Not sure that copyright header is correct. You moved some code that
+probably should be copyright IBM (although that was never added to the
+header in the first place...) Also not sure if Alex has some copyrights
+on the code you moved, or if that is only trivial stuff. (Don't want to
+be difficult, but we should try to get this right.)
 
-r~
+> +
+> +#include "libc.h"
+> +#include "s390-ccw.h"
+> +#include "cio.h"
+> +
+> +static char chsc_page[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+> +
+> +int enable_mss_facility(void)
+> +{
+> +    int ret;
+> +    ChscAreaSda *sda_area = (ChscAreaSda *) chsc_page;
+> +
+> +    memset(sda_area, 0, PAGE_SIZE);
+> +    sda_area->request.length = 0x0400;
+> +    sda_area->request.code = 0x0031;
+> +    sda_area->operation_code = 0x2;
+> +
+> +    ret = chsc(sda_area);
+> +    if ((ret == 0) && (sda_area->response.code == 0x0001)) {
+> +        return 0;
+> +    }
+> +    return -EIO;
+> +}
+> +
+> +void enable_subchannel(SubChannelId schid)
+> +{
+> +    Schib schib;
+> +
+> +    stsch_err(schid, &schib);
+> +    schib.pmcw.ena = 1;
+> +    msch(schid, &schib);
+> +}
+
+(...)
+
+> diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
+> index 11c5626..d2e7fcd 100644
+> --- a/pc-bios/s390-ccw/virtio-blkdev.c
+> +++ b/pc-bios/s390-ccw/virtio-blkdev.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include "libc.h"
+>  #include "s390-ccw.h"
+> +#include "cio.h"
+
+Not sure why you need to add this here?
+
+>  #include "virtio.h"
+>  #include "virtio-scsi.h"
+>  
+
+Otherwise, looks good.
