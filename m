@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53046)
+Received: from eggs.gnu.org ([209.51.188.92]:54692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqZOS-00025x-Ln
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:14:17 -0500
+	(envelope-from <armbru@redhat.com>) id 1gqZXm-0003u2-Jj
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gqZOR-00048Q-TZ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:14:16 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  4 Feb 2019 09:14:05 +0100
-Message-Id: <1549268045-11861-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] ui/sdl_keysym: Remove obsolete SDL1.2 related
- code
+	(envelope-from <armbru@redhat.com>) id 1gqZXl-0005KM-EZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:23:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gqZXl-0005Jn-6h
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:23:53 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190131130850.6850-1-yuval.shaia@oracle.com>
+	<20190131130850.6850-8-yuval.shaia@oracle.com>
+	<42ba3330-f7ca-b5c5-126f-8dd97e343d51@redhat.com>
+	<20190131200816.GA2838@lap1>
+	<3557b3f3-cec5-fcb1-1527-e613fa446b89@redhat.com>
+	<87ftt8j73b.fsf@dusky.pond.sub.org> <20190203070601.GA2893@lap1>
+Date: Mon, 04 Feb 2019 09:23:49 +0100
+In-Reply-To: <20190203070601.GA2893@lap1> (Yuval Shaia's message of "Sun, 3
+	Feb 2019 09:06:02 +0200")
+Message-ID: <87va20rmga.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 07/10] monitor: Expose pvrdma device
+ statistics counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,104 +32,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-Support for SDL1.2 has been removed recently in commit:
+Yuval Shaia <yuval.shaia@oracle.com> writes:
 
-  0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
-  ("ui: remove support for SDL1.2 in favour of SDL2")
+> On Fri, Feb 01, 2019 at 08:33:44AM +0100, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>> > On 1/31/19 2:08 PM, Yuval Shaia wrote:
+>> >> On Thu, Jan 31, 2019 at 07:17:16AM -0600, Eric Blake wrote:
+>> >>> On 1/31/19 7:08 AM, Yuval Shaia wrote:
+>> >>>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> >>>> ---
+>> >>>>  hmp-commands-info.hx | 14 ++++++++++++++
+>> >>>>  monitor.c            |  6 ++++++
+>> >>>>  2 files changed, 20 insertions(+)
+>> >> 
+>> >> Hi Eric,
+>> >> 
+>> >>>
+>> >>> Commit message should state WHY this is being added as an HMP-only
+>> >>> command, and does not have a QMP counterpart.  It may be okay if the
+>> >>> interface is only designed to be useful to developers, but having that
+>> >>> justification in the git log is important.
+>> >> 
+>> >> Thanks for your review.
+>> >> 
+>> >> See, i need this interface mainly for development/debug purposes, to help
+>> >> troubleshot problems and to give insights to what device "is doing".
+>> >> 
+>> >> Trace points are great but not effective in high load.
+>> >> QMP as i see it, and correct me if i'm wrong, is used to report management
+>> >> events etc and also here, is not effective in high load.
+>> 
+>> If QMP is not effective, HMP won't be effective, either.  But I guess
+>> you mean something else, namely QMP *events* aren't effective, but
+>> *polling* is.
+>
+> Yeah.
+> I really meant to say "QMP is not effective *choice* for my needs".
+>
+>> 
+>> That's an argument for polling, not an argument for not supporting QMP.
+>> 
+>> >> I choose this interface as it is interactive, i.e. whenever i need the info
+>> >> i trigger 'info pvrdmastats' command from the monitor console.
+>> >> 
+>> >> During my research i notice that some devices (or families) have nice user
+>> >> interface via virsh (blkstat, ifstat, memstat etc). Is it the preferred way
+>> >> for non-devel/debug purposes?
+>> 
+>> Libvirt interfaces like these are built on top of *QMP* interfaces.  If
+>> a libvirt interface would be useful, that's another argument for
+>> supporting QMP.
+>
+> I was asking in a context of what is the standard way to do it.
 
-So we can drop the SDL1.2-specific code in sdl_keysym.h now, too.
+You were right to ask it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- ui/sdl_keysym.h | 73 ---------------------------------------------------------
- 1 file changed, 73 deletions(-)
+>> > Using existing HMP-only debug interfaces as the design you copied is
+>> > indeed acceptable justification for making yours HMP-only as well.  So
+>> > now you just need to copy the rationale from this email into your commit
+>> > message, so it doesn't get lost.
+>> 
+>> Yes.  If we conclude HMP-only is okay, then the rationale for it goes
+>> into your commit message.
+>> 
+>> If we conclude we want HMP and QMP, I'll be happy to assist you with
+>> adapting your patch.
+>
+> Thanks!
+> Well, for now i want only to expose debugging-related info and have no idea
+> yet what would be the best to expose to end-users via QMP events.
+> Device statistics for end-users are currently exposed by the device driver
+> in guest. If in the future we will see that this info is also needed in the
+> host then i'll revisit it.
 
-diff --git a/ui/sdl_keysym.h b/ui/sdl_keysym.h
-index 599d9fc..6994180 100644
---- a/ui/sdl_keysym.h
-+++ b/ui/sdl_keysym.h
-@@ -200,79 +200,6 @@ static const name2keysym_t name2keysym[]={
- { "yacute",               0x0fd},
- { "thorn",                0x0fe},
- { "ydiaeresis",           0x0ff},
--#if SDL_MAJOR_VERSION == 1
--{"EuroSign", SDLK_EURO},
- 
--    /* modifiers */
--{"Control_L", SDLK_LCTRL},
--{"Control_R", SDLK_RCTRL},
--{"Alt_L", SDLK_LALT},
--{"Alt_R", SDLK_RALT},
--{"Caps_Lock", SDLK_CAPSLOCK},
--{"Meta_L", SDLK_LMETA},
--{"Meta_R", SDLK_RMETA},
--{"Shift_L", SDLK_LSHIFT},
--{"Shift_R", SDLK_RSHIFT},
--{"Super_L", SDLK_LSUPER},
--{"Super_R", SDLK_RSUPER},
--
--    /* special keys */
--{"BackSpace", SDLK_BACKSPACE},
--{"Tab", SDLK_TAB},
--{"Return", SDLK_RETURN},
--{"Right", SDLK_RIGHT},
--{"Left", SDLK_LEFT},
--{"Up", SDLK_UP},
--{"Down", SDLK_DOWN},
--{"Page_Down", SDLK_PAGEDOWN},
--{"Page_Up", SDLK_PAGEUP},
--{"Insert", SDLK_INSERT},
--{"Delete", SDLK_DELETE},
--{"Home", SDLK_HOME},
--{"End", SDLK_END},
--{"Scroll_Lock", SDLK_SCROLLOCK},
--{"F1", SDLK_F1},
--{"F2", SDLK_F2},
--{"F3", SDLK_F3},
--{"F4", SDLK_F4},
--{"F5", SDLK_F5},
--{"F6", SDLK_F6},
--{"F7", SDLK_F7},
--{"F8", SDLK_F8},
--{"F9", SDLK_F9},
--{"F10", SDLK_F10},
--{"F11", SDLK_F11},
--{"F12", SDLK_F12},
--{"F13", SDLK_F13},
--{"F14", SDLK_F14},
--{"F15", SDLK_F15},
--{"Sys_Req", SDLK_SYSREQ},
--{"KP_0", SDLK_KP0},
--{"KP_1", SDLK_KP1},
--{"KP_2", SDLK_KP2},
--{"KP_3", SDLK_KP3},
--{"KP_4", SDLK_KP4},
--{"KP_5", SDLK_KP5},
--{"KP_6", SDLK_KP6},
--{"KP_7", SDLK_KP7},
--{"KP_8", SDLK_KP8},
--{"KP_9", SDLK_KP9},
--{"KP_Add", SDLK_KP_PLUS},
--{"KP_Decimal", SDLK_KP_PERIOD},
--{"KP_Divide", SDLK_KP_DIVIDE},
--{"KP_Enter", SDLK_KP_ENTER},
--{"KP_Equal", SDLK_KP_EQUALS},
--{"KP_Multiply", SDLK_KP_MULTIPLY},
--{"KP_Subtract", SDLK_KP_MINUS},
--{"help", SDLK_HELP},
--{"Menu", SDLK_MENU},
--{"Power", SDLK_POWER},
--{"Print", SDLK_PRINT},
--{"Mode_switch", SDLK_MODE},
--{"Multi_Key", SDLK_COMPOSE},
--{"Num_Lock", SDLK_NUMLOCK},
--{"Pause", SDLK_PAUSE},
--{"Escape", SDLK_ESCAPE},
--#endif
- {NULL, 0},
- };
--- 
-1.8.3.1
+For me, there are four cases of the "get information from QEMU to the
+user":
+
+1. Information that is of use only for developers
+
+   a. When tracing works, use tracing
+
+   b. When it doesn't, we can consider QMP + HMP command, or HMP command
+      only.  A QMP command would carry an x- prefix to mark it unstable.
+
+2. Information that is of use only for human users
+
+   Provide an HMP command.
+
+3. Information a management application such as libvirt wants to
+   provide, but not monitor
+
+   The QEMU part is just like for 4a below.  The difference is that the
+   management application doesn't poll automatically.
+
+4. Information a management application such as libvirt wants to monitor
+
+   This is not the case here, but I mention it for completeness.
+
+   a. The obvious way to monitor is regular polling via QMP.  Provide a
+      QMP command to poll.
+
+   b. Another way is tracking a QMP event that reports changes, plus
+      polling on reconnect.  This is generally more efficient.  Provide
+      a QMP event tracking changes, and a command to poll.  The event
+      may have to be rate-limited.
+
+   If the information is also useful for human users, throw in a command
+   to poll via HMP.
+
+I'm not yet sure tracing doesn't work for your use case.  I replied
+to your claim it's not effective upthread.  Let's discuss it there.
+
+>> HMP commands without a QMP equivalent are okay if their functionality
+>> makes no sense in QMP, or is of use only for human users.
+>> 
+>> Example for "makes no sense in QMP": setting the current CPU, because a
+>> QMP monitor doesn't have a current CPU.
+>> 
+>> Examples for "is of use only for human users": HMP command "help", the
+>> integrated pocket calculator.
+>> 
+>> Debugging commands are kind of borderline.  Debugging is commonly a
+>> human activity, where HMP is just fine.  However, humans create tools to
+>> assist with their activities, and then QMP is useful.  While I wouldn't
+>> encourage HMP-only for the debugging use case, I wouldn't veto it.
+>> 
+>> "Device statistics" sounds like it should have debugging uses.  But
+>> statistics often have non-debugging uses as well.  What use cases can
+>> you imagine for this command?
+>
+> One use case from real live example is that this interface helped me to
+> detect a leak in freeing a context of a resource.
+
+Sounds like you can't think of a use other than debugging.  That means
+we should think harder about using tracepoints.
+
+>> >> If this is the correct method for this purpose then let me know and i'll
+>> >> update the git log message accordingly.
