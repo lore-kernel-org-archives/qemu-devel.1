@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48349)
+Received: from eggs.gnu.org ([209.51.188.92]:48496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ4i-00034z-6G
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:53:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqZ5I-0003TF-H8
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gqZ4h-00027b-GQ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:53:52 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 4 Feb 2019 07:53:46 +0000
-Message-ID: <ab88488a-a715-5109-7f82-9de0919777f8@virtuozzo.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<20190201171445.GB31750@localhost.localdomain>
-In-Reply-To: <20190201171445.GB31750@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <02ED79469743F645849880C553E85BE8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 3/3] qemu-img info: bitmaps extension
- new test 239
+	(envelope-from <thuth@redhat.com>) id 1gqZ5H-0002KV-Bs
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 02:54:28 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  4 Feb 2019 08:54:18 +0100
+Message-Id: <1549266858-5043-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the file
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +18,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Anthony Green <green@moxielogic.com>
 
-MDEuMDIuMjAxOSAyMDoxNCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMzEuMDEuMjAxOSB1bSAx
-NDo0NiBoYXQgQW5kcmV5IFNoaW5rZXZpY2ggZ2VzY2hyaWViZW46DQo+PiBBIG5ldyB0ZXN0IGZp
-bGUgMjM5IGFkZGVkIHRvIHRoZSBxZW11LWlvdGVzdHMgc2V0LiBJdCBjaGVja3MNCj4+IHRoZSBv
-dXRwdXQgZm9ybWF0IG9mICdxZW11LWltZyBpbmZvJyBmb3IgYml0bWFwcyBleHRlbnNpb24gb2YN
-Cj4+IHFjb3cyIHNwZWNpZmljIGluZm9ybWF0aW9uLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEFu
-ZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPiANCj4g
-MjM5IGlzIGFscmVhZHkgdGFrZW4sIHNvIHBsZWFzZSByZW5hbWUgdGhpcyBvbmUuIEkgdXN1YWxs
-eSBzZWFyY2ggdGhlDQo+IG1haWxpbmcgbGlzdCBmb3IgIjIzOS5vdXQiIGV0Yy4gdW50aWwgSSBm
-aW5kIGEgbnVtYmVyIHRoYXQgbm9ib2R5IGhhcw0KPiB1c2VkIGV2ZW4gaW4gYSBwYXRjaCBzZXJp
-ZXMgeWV0Lg0KPiANCj4gS2V2aW4NCj4gDQoNCkludGVyZXN0aW5nLCB3YXNuJ3QgaXQgY29uc2lk
-ZXJlZCB0byBnaXZlIG1lYW5pbmdmdWwgbmFtZXMgdG8gaW90ZXN0IGZpbGVzPw0KbGlrZSBtaWdy
-YXRlLmJpdG1hcHMgb3IgcWVtdS1pbWcucWNvdzItYml0bWFwcywgbmFtZXNwYWNlLnRlc3Q/IEFu
-ZCB0aGVuDQp3ZSdsbCBiZSBhYmxlIHRvIC4vY2hlY2sgLXFjb3cyIHFlbXUtaW1nLiouIEFuZCBh
-bGwgdGhlc2UgY29uZmxpY3RzIGluIGxpc3QNCndpbGwgYmUgcmVzb2x2ZWQNCg0KLS0gDQpCZXN0
-IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+It's either "GNU *Library* General Public License version 2" or "GNU
+Lesser General Public License version *2.1*", but there was no "version
+2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
+Also the files mentioned the GPL instead of the LGPL after declaring
+that the files are licensed under the LGPL, so change these spots to
+use LGPL, too.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/moxie/cpu.c       | 2 +-
+ target/moxie/cpu.h       | 4 ++--
+ target/moxie/helper.c    | 4 ++--
+ target/moxie/mmu.c       | 4 ++--
+ target/moxie/translate.c | 4 ++--
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 8d67eb6..46434e6 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -13,7 +13,7 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU General Public License
++ * You should have received a copy of the GNU Lesser General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index d40f1e6..080df4e 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -6,14 +6,14 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU General Public License
++ * You should have received a copy of the GNU Lesser General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+diff --git a/target/moxie/helper.c b/target/moxie/helper.c
+index 5b1532b..f3d8ee7 100644
+--- a/target/moxie/helper.c
++++ b/target/moxie/helper.c
+@@ -6,14 +6,14 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU General Public License
++ * You should have received a copy of the GNU Lesser General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+diff --git a/target/moxie/mmu.c b/target/moxie/mmu.c
+index bd90b1e..87783a3 100644
+--- a/target/moxie/mmu.c
++++ b/target/moxie/mmu.c
+@@ -6,14 +6,14 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU General Public License
++ * You should have received a copy of the GNU Lesser General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+diff --git a/target/moxie/translate.c b/target/moxie/translate.c
+index 29da02b..68ca223 100644
+--- a/target/moxie/translate.c
++++ b/target/moxie/translate.c
+@@ -5,7 +5,7 @@
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License
+- * as published by the Free Software Foundation; either version 2 of
++ * as published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful, but
+@@ -13,7 +13,7 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  * Lesser General Public License for more details.
+  *
+- * You should have received a copy of the GNU General Public License
++ * You should have received a copy of the GNU Lesser General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-- 
+1.8.3.1
