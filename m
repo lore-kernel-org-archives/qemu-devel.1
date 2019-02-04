@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54566)
+Received: from eggs.gnu.org ([209.51.188.92]:55413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqhBD-0007Lq-4D
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:33:11 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gqhD8-0000Qf-2T
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:35:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gqhB6-0008CY-BX
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:33:07 -0500
-References: <154929778819.29184.14263501563008780216@ebba9967afc0>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <351ec816-8414-2e24-050c-08043cc49cc6@redhat.com>
-Date: Mon, 4 Feb 2019 17:32:50 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1gqhD6-0001lp-5V
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:35:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41468)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gqhD4-0001hU-1y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:35:04 -0500
+Date: Mon, 4 Feb 2019 16:34:52 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190204163451.GE2680@work-vm>
+References: <20190201051806.53183-1-lifei1214@126.com>
+	<20190201051806.53183-10-lifei1214@126.com>
+	<878syz4j5y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <154929778819.29184.14263501563008780216@ebba9967afc0>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/tcg: Don't model FP registers as
- globals
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878syz4j5y.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v11 for-4.0 09/11] qemu_thread: supplement
+ error handling for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +29,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, qemu-s390x@nongnu.org, cohuck@redhat.com, thuth@redhat.com, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>, quintela@redhat.com
+Cc: Fei Li <lifei1214@126.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-On 04.02.19 17:29, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190204154406.16122-1-david@redhat.com/
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Dave, I tried to review the error paths, in particular resource cleanup,
+> but there's a lot going on, and I'm not feeling confident.  Please have
+> a close look.
 > 
+> Fei Li <lifei1214@126.com> writes:
 > 
+> > From: Fei Li <fli@suse.com>
+> >
+> > Update qemu_thread_create()'s callers by
+> > - setting an error on qemu_thread_create() failure for callers that
+> >   set an error on failure;
+> > - reporting the error and returning failure for callers that return
+> >   an error code on failure;
+> > - reporting the error and setting some state for callers that just
+> >   report errors and choose not to continue on.
+> >
+> > Besides, make compress_threads_save_cleanup() cope with partially
+> > initialized comp_param[i] to adapt to the new qemu_thread_create()
+> > failure case.
+> >
+> > Cc: Markus Armbruster <armbru@redhat.com>
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Fei Li <fli@suse.com>
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/migration.c    | 35 +++++++++++++-------
+> >  migration/postcopy-ram.c | 16 ++++++---
+> >  migration/ram.c          | 70 ++++++++++++++++++++++++++--------------
+> >  migration/savevm.c       | 12 ++++---
+> >  4 files changed, 89 insertions(+), 44 deletions(-)
+> >
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 1da71211c8..0034ca1334 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -447,10 +447,13 @@ static void process_incoming_migration_co(void *opaque)
+> >              goto fail;
+> >          }
+> >  
+> > -        /* TODO: let the further caller handle the error instead of abort() */
+> > -        qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> > -                           colo_process_incoming_thread, mis,
+> > -                           QEMU_THREAD_JOINABLE, &error_abort);
+> > +        if (qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> > +                               colo_process_incoming_thread, mis,
+> > +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +            error_reportf_err(local_err, "failed to create "
+> > +                              "colo_process_incoming_thread: ");
+> > +            goto fail;
+> > +        }
+> >          mis->have_colo_incoming_thread = true;
+> >          qemu_coroutine_yield();
+> >  
+> > @@ -2349,6 +2352,7 @@ out:
+> >  static int open_return_path_on_source(MigrationState *ms,
+> >                                        bool create_thread)
+> >  {
+> > +    Error *local_err = NULL;
+> >  
+> >      ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
+> >      if (!ms->rp_state.from_dst_file) {
+> > @@ -2362,10 +2366,15 @@ static int open_return_path_on_source(MigrationState *ms,
+> >          return 0;
+> >      }
+> >  
+> > -    /* TODO: let the further caller handle the error instead of abort() here */
+> > -    qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+> > -                       source_return_path_thread, ms,
+> > -                       QEMU_THREAD_JOINABLE, &error_abort);
+> > +    if (qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+> > +                           source_return_path_thread, ms,
+> > +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +        error_reportf_err(local_err,
+> > +                          "failed to create source_return_path_thread: ");
+> > +        qemu_fclose(ms->rp_state.from_dst_file);
+> > +        ms->rp_state.from_dst_file = NULL;
+> > +        return -1;
+> > +     }
+> >  
+> >      trace_open_return_path_on_source_continue();
+> >  
+> > @@ -3201,9 +3210,13 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
+>        if (multifd_save_setup() != 0) {
+>            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                              MIGRATION_STATUS_FAILED);
+> >          migrate_fd_cleanup(s);
+> >          return;
+> >      }
+> > -    /* TODO: let the further caller handle the error instead of abort() here */
+> > -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> > -                       QEMU_THREAD_JOINABLE, &error_abort);
+> > +    if (qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> > +                           QEMU_THREAD_JOINABLE, &error_in) < 0) {
+> > +        error_reportf_err(error_in, "failed to create migration_thread: ");
+> > +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+> > +        migrate_fd_cleanup(s);
 > 
-> Hi,
-> 
-> This series failed the docker-mingw@fedora build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> time make docker-test-mingw@fedora SHOW_ENV=1 J=14
-> === TEST SCRIPT END ===
-> 
-> 
-> Configure options:
-> --enable-werror --target-list=x86_64-softmmu,aarch64-softmmu --prefix=/tmp/qemu-test/install --python=/usr/bin/python3 --cross-prefix=x86_64-w64-mingw32- --enable-trace-backends=simple --enable-gnutls --enable-nettle --enable-curl --enable-vnc --enable-bzip2 --enable-guest-agent --with-sdlabi=2.0
-> ERROR: unknown option --with-sdlabi=2.0
-> Try '/tmp/qemu-test/src/configure --help' for more information
-> # QEMU configure log Mon Feb  4 16:29:29 UTC 2019
-> # Configured with: '/tmp/qemu-test/src/configure' '--enable-werror' '--target-list=x86_64-softmmu,aarch64-softmmu' '--prefix=/tmp/qemu-test/install' '--python=/usr/bin/python3' '--cross-prefix=x86_64-w64-mingw32-' '--enable-trace-backends=simple' '--enable-gnutls' '--enable-nettle' '--enable-curl' '--enable-vnc' '--enable-bzip2' '--enable-guest-agent' '--with-sdlabi=2.0'
-> ---
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 634 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 636 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 638 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 640 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 642 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 644 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 646 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 648 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 650 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 652 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 686 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 688 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 694 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 700 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 706 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 708 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 714 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 720 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> 
-> funcs: do_compiler do_cc compile_object check_define main
-> lines: 92 122 617 722 0
-> x86_64-w64-mingw32-gcc -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv -std=gnu99 -c -o config-temp/qemu-conf.o config-temp/qemu-conf.c
-> ccache: error: Failed to create temporary file for /var/tmp/ccache/tmp/qemu-conf.stdout: Permission denied
-> Failed to run 'configure'
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 563, in <module>
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190204154406.16122-1-david@redhat.com/testing.docker-mingw@fedora/?type=message.
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+> Is there anything to clean up for multifd_save_setup()?  Dave?
 
-Looks like Patchew is experiencing technical problems :)
+I need to bounce that one to Juan; he knows the multifd stuff; cc'd
 
--- 
+> > +        return;
+> > +    }
+> >      s->migration_thread_running = true;
+> >  }
+> >  
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 221ea24919..0934a1403a 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -1083,6 +1083,8 @@ retry:
+> >  
+> >  int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> >  {
+> > +    Error *local_err = NULL;
+> > +
+> >      /* Open the fd for the kernel to give us userfaults */
+> >      mis->userfault_fd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
+> >      if (mis->userfault_fd == -1) {
+> > @@ -1109,10 +1111,16 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> >      }
+> >  
+> >      qemu_sem_init(&mis->fault_thread_sem, 0);
+> > -    /* TODO: let the further caller handle the error instead of abort() here */
+> > -    qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+> > -                       postcopy_ram_fault_thread, mis,
+> > -                       QEMU_THREAD_JOINABLE, &error_abort);
+> > +    if (qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+> > +                           postcopy_ram_fault_thread, mis,
+> > +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +        error_reportf_err(local_err,
+> > +                          "failed to create postcopy_ram_fault_thread: ");
+> > +        close(mis->userfault_event_fd);
+> > +        close(mis->userfault_fd);
+> > +        qemu_sem_destroy(&mis->fault_thread_sem);
+> > +        return -1;
+> > +    }
+> >      qemu_sem_wait(&mis->fault_thread_sem);
+> >      qemu_sem_destroy(&mis->fault_thread_sem);
+> >      mis->have_fault_thread = true;
+> 
+>        /* Mark so that we get notified of accesses to unwritten areas */
+>        if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
+>            error_report("ram_block_enable_notify failed");
+>            return -1;
+> 
+> Not this patch's problem, but here goes anyway: where are
+> mis->userfault_event_fd and mis->userfault_fd closed?
 
-Thanks,
+As Fei replied, see postcopy_ram_incoming_cleanup; once the fault thread
+is running it does a bigger cleanup.
 
-David / dhildenb
+Dave
+
+>        }
+> 
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index 700ea229e0..66b8b764f1 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -441,6 +441,14 @@ static void compress_threads_save_cleanup(void)
+> >  
+> >      thread_count = migrate_compress_threads();
+> >      for (i = 0; i < thread_count; i++) {
+> > +        qemu_mutex_lock(&comp_param[i].mutex);
+> > +        comp_param[i].quit = true;
+> > +        qemu_cond_signal(&comp_param[i].cond);
+> > +        qemu_mutex_unlock(&comp_param[i].mutex);
+> > +
+> > +        qemu_mutex_destroy(&comp_param[i].mutex);
+> > +        qemu_cond_destroy(&comp_param[i].cond);
+> > +
+> >          /*
+> >           * we use it as a indicator which shows if the thread is
+> >           * properly init'd or not
+> > @@ -448,15 +456,7 @@ static void compress_threads_save_cleanup(void)
+> >          if (!comp_param[i].file) {
+> >              break;
+> >          }
+> > -
+> > -        qemu_mutex_lock(&comp_param[i].mutex);
+> > -        comp_param[i].quit = true;
+> > -        qemu_cond_signal(&comp_param[i].cond);
+> > -        qemu_mutex_unlock(&comp_param[i].mutex);
+> > -
+> >          qemu_thread_join(compress_threads + i);
+> > -        qemu_mutex_destroy(&comp_param[i].mutex);
+> > -        qemu_cond_destroy(&comp_param[i].cond);
+> >          deflateEnd(&comp_param[i].stream);
+> >          g_free(comp_param[i].originbuf);
+> >          qemu_fclose(comp_param[i].file);
+> > @@ -473,6 +473,7 @@ static void compress_threads_save_cleanup(void)
+> >  static int compress_threads_save_setup(void)
+> >  {
+> >      int i, thread_count;
+> > +    Error *local_err = NULL;
+> >  
+> >      if (!migrate_use_compression()) {
+> >          return 0;
+> > @@ -483,6 +484,9 @@ static int compress_threads_save_setup(void)
+> >      qemu_cond_init(&comp_done_cond);
+> >      qemu_mutex_init(&comp_done_lock);
+> >      for (i = 0; i < thread_count; i++) {
+> > +        qemu_mutex_init(&comp_param[i].mutex);
+> > +        qemu_cond_init(&comp_param[i].cond);
+> > +        comp_param[i].quit = false;
+> >          comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
+> >          if (!comp_param[i].originbuf) {
+> >              goto exit;
+> > @@ -499,13 +503,16 @@ static int compress_threads_save_setup(void)
+> >           */
+> >          comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
+> >          comp_param[i].done = true;
+> > -        comp_param[i].quit = false;
+> > -        qemu_mutex_init(&comp_param[i].mutex);
+> > -        qemu_cond_init(&comp_param[i].cond);
+> > -        /* TODO: let the further caller handle the error instead of abort() */
+> > -        qemu_thread_create(compress_threads + i, "compress",
+> > -                           do_data_compress, comp_param + i,
+> > -                           QEMU_THREAD_JOINABLE, &error_abort);
+> > +        if (qemu_thread_create(compress_threads + i, "compress",
+> > +                               do_data_compress, comp_param + i,
+> > +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +            error_reportf_err(local_err, "failed to create do_data_compress: ");
+> > +            deflateEnd(&comp_param[i].stream);
+> > +            g_free(comp_param[i].originbuf);
+> > +            qemu_fclose(comp_param[i].file);
+> > +            comp_param[i].file = NULL;
+> > +            goto exit;
+> > +        }
+> >      }
+> >      return 0;
+> >  
+> > @@ -1076,9 +1083,14 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+> >          p->c = QIO_CHANNEL(sioc);
+> >          qio_channel_set_delay(p->c, false);
+> >          p->running = true;
+> > -        /* TODO: let the further caller handle the error instead of abort() */
+> > -        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+> > -                           QEMU_THREAD_JOINABLE, &error_abort);
+> > +        if (qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+> > +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +            migrate_set_error(migrate_get_current(), local_err);
+> > +            error_reportf_err(local_err,
+> > +                              "failed to create multifd_send_thread: ");
+> > +            multifd_save_cleanup();
+> > +            return;
+> > +        }
+> >  
+> >          atomic_inc(&multifd_send_state->count);
+> >      }
+> > @@ -1357,9 +1369,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
+> >      p->num_packets = 1;
+> >  
+> >      p->running = true;
+> > -    /* TODO: let the further caller handle the error instead of abort() here */
+> > -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> > -                       QEMU_THREAD_JOINABLE, &error_abort);
+> > +    if (qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> > +                           QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +        error_propagate_prepend(errp, local_err,
+> > +                                "failed to create multifd_recv_thread: ");
+> 
+> This prepends only if @errp isn't null.  Fine from the caller's point of
+> view.  But it also affects multifd_recv_thread():
+> 
+> > +        multifd_recv_terminate_threads(local_err);
+> 
+> That's at least unclean.
+> 
+> I think you should use error_prepend() and error_propagate() here.
+> 
+> > +        return false;
+> > +    }
+> >      atomic_inc(&multifd_recv_state->count);
+> >      return atomic_read(&multifd_recv_state->count) ==
+> >             migrate_multifd_channels();
+> > @@ -3631,6 +3647,7 @@ static void compress_threads_load_cleanup(void)
+> >  static int compress_threads_load_setup(QEMUFile *f)
+> >  {
+> >      int i, thread_count;
+> > +    Error *local_err = NULL;
+> >  
+> >      if (!migrate_use_compression()) {
+> >          return 0;
+> > @@ -3652,10 +3669,13 @@ static int compress_threads_load_setup(QEMUFile *f)
+> >          qemu_cond_init(&decomp_param[i].cond);
+> >          decomp_param[i].done = true;
+> >          decomp_param[i].quit = false;
+> > -        /* TODO: let the further caller handle the error instead of abort() */
+> > -        qemu_thread_create(decompress_threads + i, "decompress",
+> > -                           do_data_decompress, decomp_param + i,
+> > -                           QEMU_THREAD_JOINABLE, &error_abort);
+> > +        if (qemu_thread_create(decompress_threads + i, "decompress",
+> > +                               do_data_decompress, decomp_param + i,
+> > +                               QEMU_THREAD_JOINABLE, &local_err) < 0) {
+> > +            error_reportf_err(local_err,
+> > +                              "failed to create do_data_decompress: ");
+> > +            goto exit;
+> > +        }
+> >      }
+> >      return 0;
+> >  exit:
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index d5b45843b6..310cecbf8f 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -1747,10 +1747,14 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+> >      mis->have_listen_thread = true;
+> >      /* Start up the listening thread and wait for it to signal ready */
+> >      qemu_sem_init(&mis->listen_thread_sem, 0);
+> > -    /* TODO: let the further caller handle the error instead of abort() here */
+> > -    qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > -                       postcopy_ram_listen_thread, NULL,
+> > -                       QEMU_THREAD_DETACHED, &error_abort);
+> > +    if (qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> > +                           postcopy_ram_listen_thread, NULL,
+> > +                           QEMU_THREAD_DETACHED, &local_err) < 0) {
+> > +        error_reportf_err(local_err,
+> > +                          "failed to create postcopy_ram_listen_thread: ");
+> > +        qemu_sem_destroy(&mis->listen_thread_sem);
+> > +        return -1;
+> > +    }
+> >      qemu_sem_wait(&mis->listen_thread_sem);
+> >      qemu_sem_destroy(&mis->listen_thread_sem);
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
