@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40854)
+Received: from eggs.gnu.org ([209.51.188.92]:44729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqlBl-00076f-98
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:49:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1gqlVQ-0002c0-Tk
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 16:10:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqlBk-0005a7-8t
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 15:49:57 -0500
-Resent-Message-Id: <E1gqlBk-0005a7-8t@eggs.gnu.org>
-Message-ID: <154931335810.29184.7999220470596987389@ebba9967afc0>
-In-Reply-To: <20190204204517.23698-1-philmd@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eblake@redhat.com>) id 1gqlQp-0004k0-H3
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 16:05:33 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon,  4 Feb 2019 15:05:12 -0600
+Message-Id: <20190204210512.27458-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 12:49:19 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hw/input/tsc210x: Fix building with no
- verbosity
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] dirty-bitmap: Expose persistent flag to
+ 'query-block'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +20,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, andrey.shinkevich@virtuozzo.com, vsementsov@virtuozzo.com, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNDIwNDUxNy4yMzY5
-OC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDIwNDIwNDUxNy4y
-MzY5OC0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+Since qemu currently doesn't flush persistent bitmaps to disk until
+shutdown (which might be MUCH later), it's useful if 'query-block'
+at least shows WHICH bitmaps will (eventually) make it to persistent
+storage.  Update affected iotests.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+---
+v2: also update iotest output [John]; R-b added since changes only to tes=
+ts
+---
+ qapi/block-core.json       |  5 ++++-
+ block/dirty-bitmap.c       |  1 +
+ tests/qemu-iotests/124     |  1 +
+ tests/qemu-iotests/236.out | 14 ++++++++++++++
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 5f17d67d714..f2bfe566d8d 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -447,11 +447,14 @@
+ #
+ # @status: current status of the dirty bitmap (since 2.4)
+ #
++# @persistent: true if the bitmap will eventually be flushed to persiste=
+nt
++#              storage (since 4.0)
++#
+ # Since: 1.3
+ ##
+ { 'struct': 'BlockDirtyInfo',
+   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
+-           'status': 'DirtyBitmapStatus'} }
++           'status': 'DirtyBitmapStatus', 'persistent': 'bool' } }
+
+ ##
+ # @BlockLatencyHistogramInfo:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 00ea36f5545..e46f72b346c 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -440,6 +440,7 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDri=
+verState *bs)
+         info->has_name =3D !!bm->name;
+         info->name =3D g_strdup(bm->name);
+         info->status =3D bdrv_dirty_bitmap_status(bm);
++        info->persistent =3D bm->persistent;
+         entry->value =3D info;
+         *plist =3D entry;
+         plist =3D &entry->next;
+diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
+index 9f189e3b540..5aa1bf1bd64 100755
+--- a/tests/qemu-iotests/124
++++ b/tests/qemu-iotests/124
+@@ -350,6 +350,7 @@ class TestIncrementalBackup(TestIncrementalBackupBase=
+):
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/count', 4587=
+52)
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/granularity'=
+, 65536)
+         self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/status', 'ac=
+tive')
++        self.assert_qmp(result, 'return[0]/dirty-bitmaps[0]/persistent',=
+ False)
+
+         # Prepare a cluster_size=3D128k backup target without a backing =
+file.
+         (target, _) =3D bitmap0.new_target()
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index bb2d71ea5ec..5006f7bca16 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -25,12 +25,14 @@ write -P0xcd 0x3ff0000 64k
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "active"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "active"
+       }
+     ]
+@@ -85,12 +87,14 @@ write -P0xcd 0x3ff0000 64k
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "active"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "active"
+       }
+     ]
+@@ -183,18 +187,21 @@ write -P0xea 0x3fe0000 64k
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
+@@ -247,18 +254,21 @@ write -P0xea 0x3fe0000 64k
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
+@@ -304,24 +314,28 @@ write -P0xea 0x3fe0000 64k
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapD",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 393216,
+         "granularity": 65536,
+         "name": "bitmapC",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 262144,
+         "granularity": 65536,
+         "name": "bitmapB",
++        "persistent": false,
+         "status": "disabled"
+       },
+       {
+         "count": 458752,
+         "granularity": 65536,
+         "name": "bitmapA",
++        "persistent": false,
+         "status": "disabled"
+       }
+     ]
+--=20
+2.20.1
