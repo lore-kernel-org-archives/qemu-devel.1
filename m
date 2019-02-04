@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58788)
+Received: from eggs.gnu.org ([209.51.188.92]:59403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gqbGT-0002Cu-Gm
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:10 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gqbIi-000341-8n
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gqbGS-000126-BE
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gqbGS-0000mj-31
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:14:08 -0500
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Mon,  4 Feb 2019 11:08:10 +0100
-Message-Id: <20190204100810.14800-1-lhrazky@redhat.com>
-In-Reply-To: <20190128102605.15994-1-lhrazky@redhat.com>
-References: <20190128102605.15994-1-lhrazky@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gqbIf-0003GW-9w
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:28 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52425)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gqbId-0002rx-RZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:25 -0500
+Received: by mail-wm1-f65.google.com with SMTP id m1so12503663wml.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:16:19 -0800 (PST)
+Date: Mon, 4 Feb 2019 11:16:14 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190204101614.hid4eiorvm37cq5f@steredhat>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-3-sgarzare@redhat.com>
+	<20190201101604-mutt-send-email-mst@kernel.org>
+	<CAGxU2F50t=OeuoJMn7q7iDYyy+mc=3vz7V8dVe77KtOu1hKHyw@mail.gmail.com>
+	<20190204033307.GC29523@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] spice: set device address and device
- display ID in QXL interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190204033307.GC29523@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,183 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kraxel@redhat.com
-Cc: spice-devel@lists.freedesktop.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 
-Calls the new SPICE QXL interface function spice_qxl_set_device_info to
-set the hardware address of the graphics device represented by the QXL
-interface (e.g. a PCI path) and the device display IDs (the IDs of the
-device's monitors that belong to this QXL interface).
+On Mon, Feb 04, 2019 at 11:33:07AM +0800, Stefan Hajnoczi wrote:
+> On Fri, Feb 01, 2019 at 06:18:52PM +0100, Stefano Garzarella wrote:
+> > On Fri, Feb 1, 2019 at 4:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
+> > > > In order to avoid migration issues, we enable DISCARD and
+> > > > WRITE ZEROES features only for machine type >= 4.0
+> > > >
+> > > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >  hw/block/virtio-blk.c          | 2 ++
+> > > >  hw/core/machine.c              | 1 +
+> > > >  include/hw/virtio/virtio-blk.h | 1 +
+> > > >  3 files changed, 4 insertions(+)
+> > > >
+> > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > > > index 8a6754d9a2..542ec52536 100644
+> > > > --- a/hw/block/virtio-blk.c
+> > > > +++ b/hw/block/virtio-blk.c
+> > > > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
+> > > >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+> > > >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+> > > >                       IOThread *),
+> > > > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
+> > > > +                     true),
+> > > >      DEFINE_PROP_END_OF_LIST(),
+> > > >  };
+> > > >
+> > >
+> > > Thinking about it, are there security implications for discard?
+> > > Should we make it default false?
+> > 
+> > Hi Michael,
+> > 
+> > I'm not completely sure but if the guest can write on a specific sector,
+> > discard or write_zeroes operations should not have a security implication.
+> > 
+> > Do I miss something?
+> 
+> Recently page cache attacks have been discussed in the Linux community:
+> https://arxiv.org/pdf/1901.01161.pdf
+> 
+> I guess the scenario Michael is thinking about involves either -drive
+> cache.direct=off (including cache=writeback or cache=writethrough) or
+> maybe a timing side-channel in the storage appliance.
+> 
+> The discard operation may allow a guest to evict the cache, an important
+> primitive for page cache attacks.
+> 
+> Most of the time disk images are not shared between guests at all.
+> Therefore the discard operation cannot be used to learn information
+> about other guests.
+> 
+> Let's focus on shared disk images: shared disk images are either
+> read-only (then discard isn't allowed anyway) or they are shared
+> writable (but this already implies a trust relationship between the
+> guests).
+> 
+> My opinion is that discard is safe because virtualization use cases are
+> quite different from the attacks possible with shared library files
+> between userspace processes.  I'm curious if anyone has figured out a
+> realistic scenario where it does matter though...
 
-Also stops using the deprecated spice_qxl_set_max_monitors, the new
-interface function replaces it.
+Many thanks for the explanation!
 
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
----
-Hello,
+I'll wait to send the v3 in order to understand if Michael agrees to
+leave discard feature enabled to default.
 
-the spice part of the interface was merged to spice server, so this is
-ready to merge now too.
-
-The original series:
-https://lists.freedesktop.org/archives/spice-devel/2019-January/046997.ht=
-ml
-
-Changes since v1:
-* Fixed coding style according to the patchew check script.
-
-Cheers,
-Lukas
-
- hw/display/qxl.c           | 14 ++++++++++-
- include/ui/spice-display.h |  4 ++++
- ui/spice-core.c            | 48 ++++++++++++++++++++++++++++++++++++++
- ui/spice-display.c         | 11 +++++++++
- 4 files changed, 76 insertions(+), 1 deletion(-)
-
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index da8fd5a40a..c8ce5781e0 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -276,7 +276,8 @@ static void qxl_spice_monitors_config_async(PCIQXLDev=
-ice *qxl, int replay)
-                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
-                     0));
-     } else {
--#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
-+/* >=3D release 0.12.6, < release 0.14.2 */
-+#if SPICE_SERVER_VERSION >=3D 0x000c06 && SPICE_SERVER_VERSION < 0x000e0=
-2
-         if (qxl->max_outputs) {
-             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
-         }
-@@ -2188,6 +2189,17 @@ static void qxl_realize_common(PCIQXLDevice *qxl, =
-Error **errp)
-                    SPICE_INTERFACE_QXL_MAJOR, SPICE_INTERFACE_QXL_MINOR)=
-;
-         return;
-     }
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(qxl->vga.con, device_address, 256=
-)) {
-+        spice_qxl_set_device_info(&qxl->ssd.qxl,
-+                                  device_address,
-+                                  0,
-+                                  qxl->max_outputs);
-+    }
-+#endif
-+
-     qemu_add_vm_change_state_handler(qxl_vm_change_state_handler, qxl);
-=20
-     qxl->update_irq =3D qemu_bh_new(qxl_update_irq_bh, qxl);
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 87a84a59d4..53c3612c32 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -179,3 +179,7 @@ void qemu_spice_wakeup(SimpleSpiceDisplay *ssd);
- void qemu_spice_display_start(void);
- void qemu_spice_display_stop(void);
- int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd);
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a40fb2c00d..b3b644e304 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -34,6 +34,8 @@
- #include "qemu/option.h"
- #include "migration/misc.h"
- #include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "ui/spice-display.h"
-=20
- /* core bits */
-@@ -863,6 +865,52 @@ bool qemu_spice_have_display_interface(QemuConsole *=
-con)
-     return false;
- }
-=20
-+/*
-+ * Recursively (in reverse order) appends addresses of PCI devices as it=
- moves
-+ * up in the PCI hierarchy.
-+ *
-+ * @returns true on success, false when the buffer wasn't large enough
-+ */
-+static bool append_pci_address(char *buf, size_t buf_size, const PCIDevi=
-ce *pci)
-+{
-+    PCIBus *bus =3D pci_get_bus(pci);
-+    if (!pci_bus_is_root(bus)) {
-+        append_pci_address(buf, buf_size, bus->parent_dev);
-+    }
-+
-+    size_t len =3D strlen(buf);
-+    ssize_t written =3D snprintf(buf + len, buf_size - len, "/%02x.%x",
-+        PCI_SLOT(pci->devfn), PCI_FUNC(pci->devfn));
-+
-+    return written > 0 && written < buf_size - len;
-+}
-+
-+bool qemu_spice_fill_device_address(QemuConsole *con,
-+                                    char *device_address,
-+                                    size_t size)
-+{
-+    DeviceState *dev =3D DEVICE(object_property_get_link(OBJECT(con),
-+                                                       "device",
-+                                                       &error_abort));
-+    PCIDevice *pci =3D (PCIDevice *) object_dynamic_cast(OBJECT(dev),
-+                                                       TYPE_PCI_DEVICE);
-+
-+    if (pci =3D=3D NULL) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+                    "Not a PCI device.");
-+        return false;
-+    }
-+
-+    strncpy(device_address, "pci/0000", size);
-+    if (!append_pci_address(device_address, size, pci)) {
-+        warn_report("Setting device address of a display device to SPICE=
-: "
-+            "Too many PCI devices in the chain.");
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *co=
-n)
- {
-     if (g_slist_find(spice_consoles, con)) {
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 52f8cb5ae1..c1605b3bc9 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -1147,6 +1147,17 @@ static void qemu_spice_display_init_one(QemuConsol=
-e *con)
-=20
-     ssd->qxl.base.sif =3D &dpy_interface.base;
-     qemu_spice_add_display_interface(&ssd->qxl, con);
-+
-+#if SPICE_SERVER_VERSION >=3D 0x000e02 /* release 0.14.2 */
-+    char device_address[256] =3D "";
-+    if (qemu_spice_fill_device_address(con, device_address, 256)) {
-+        spice_qxl_set_device_info(&ssd->qxl,
-+                                  device_address,
-+                                  qemu_console_get_head(con),
-+                                  1);
-+    }
-+#endif
-+
-     qemu_spice_create_host_memslot(ssd);
-=20
-     register_displaychangelistener(&ssd->dcl);
---=20
-2.20.1
+Thanks,
+Stefano
