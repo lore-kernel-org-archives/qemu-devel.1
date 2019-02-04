@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50490)
+Received: from eggs.gnu.org ([209.51.188.92]:50547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gqZBz-0006zQ-OK
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:25 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gqZCT-0007Bn-6H
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent.desnogues@gmail.com>) id 1gqZBq-0000uJ-0G
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:17 -0500
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:34344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
-	id 1gqZBn-0000c6-QL
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:13 -0500
-Received: by mail-it1-x143.google.com with SMTP id x124so10571740itd.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 00:01:10 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gqZCR-0001tu-SR
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 03:01:53 -0500
+Resent-Message-Id: <E1gqZCR-0001tu-SR@eggs.gnu.org>
+Message-ID: <154926727487.29184.96870218730905830@ebba9967afc0>
+In-Reply-To: <1549266858-5043-1-git-send-email-thuth@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20190204052712.30833-1-richard.henderson@linaro.org>
-	<20190204052712.30833-4-richard.henderson@linaro.org>
-In-Reply-To: <20190204052712.30833-4-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Mon, 4 Feb 2019 09:00:57 +0100
-Message-ID: <CABoDooOYVShpc+OAXVCnZ0CF2P1xqk=vEzOMsoxOiCzDjnkQjw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/arm: Implement ARMv8.3-JSConv
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Feb 2019 00:01:15 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the
+ file headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,285 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: thuth@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, green@moxielogic.com
 
-Hello,
-
-On Mon, Feb 4, 2019 at 6:38 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h           | 10 +++++
->  target/arm/helper.h        |  2 +
->  target/arm/cpu.c           |  1 +
->  target/arm/cpu64.c         |  2 +
->  target/arm/op_helper.c     | 91 ++++++++++++++++++++++++++++++++++++++
->  target/arm/translate-a64.c | 26 +++++++++++
->  target/arm/translate.c     | 15 +++++++
->  7 files changed, 147 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index a68bcc9fed..d2c2e2b0cf 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3209,6 +3209,11 @@ static inline bool isar_feature_aa32_vcma(const ARMISARegisters *id)
->      return FIELD_EX32(id->id_isar5, ID_ISAR5, VCMA) != 0;
->  }
->
-> +static inline bool isar_feature_aa32_jscvt(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX32(id->id_isar6, ID_ISAR6, JSCVT) != 0;
-> +}
-> +
->  static inline bool isar_feature_aa32_dp(const ARMISARegisters *id)
->  {
->      return FIELD_EX32(id->id_isar6, ID_ISAR6, DP) != 0;
-> @@ -3287,6 +3292,11 @@ static inline bool isar_feature_aa64_dp(const ARMISARegisters *id)
->      return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, DP) != 0;
->  }
->
-> +static inline bool isar_feature_aa64_jscvt(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, JSCVT) != 0;
-> +}
-> +
->  static inline bool isar_feature_aa64_fcma(const ARMISARegisters *id)
->  {
->      return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index 53a38188c6..6998f7e8d5 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -218,6 +218,8 @@ DEF_HELPER_FLAGS_2(rintd_exact, TCG_CALL_NO_RWG, f64, f64, ptr)
->  DEF_HELPER_FLAGS_2(rints, TCG_CALL_NO_RWG, f32, f32, ptr)
->  DEF_HELPER_FLAGS_2(rintd, TCG_CALL_NO_RWG, f64, f64, ptr)
->
-> +DEF_HELPER_FLAGS_2(fjcvtzs, TCG_CALL_NO_RWG, i64, f64, ptr)
-> +
->  /* neon_helper.c */
->  DEF_HELPER_FLAGS_3(neon_qadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
->  DEF_HELPER_FLAGS_3(neon_qadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 3874dc9875..2eb2ce6c8c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1995,6 +1995,7 @@ static void arm_max_initfn(Object *obj)
->              cpu->isar.id_isar5 = t;
->
->              t = cpu->isar.id_isar6;
-> +            t = FIELD_DP32(t, ID_ISAR6, JSCVT, 1);
->              t = FIELD_DP32(t, ID_ISAR6, DP, 1);
->              cpu->isar.id_isar6 = t;
->
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 7107ec8d7e..43d8ff047c 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -311,6 +311,7 @@ static void aarch64_max_initfn(Object *obj)
->          cpu->isar.id_aa64isar0 = t;
->
->          t = cpu->isar.id_aa64isar1;
-> +        t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
->          t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
-> @@ -340,6 +341,7 @@ static void aarch64_max_initfn(Object *obj)
->          cpu->isar.id_isar5 = u;
->
->          u = cpu->isar.id_isar6;
-> +        u = FIELD_DP32(u, ID_ISAR6, JSCVT, 1);
->          u = FIELD_DP32(u, ID_ISAR6, DP, 1);
->          cpu->isar.id_isar6 = u;
->
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index c998eadfaa..a7259a7194 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -24,6 +24,7 @@
->  #include "internals.h"
->  #include "exec/exec-all.h"
->  #include "exec/cpu_ldst.h"
-> +#include "fpu/softfloat.h"
->
->  #define SIGNBIT (uint32_t)0x80000000
->  #define SIGNBIT64 ((uint64_t)1 << 63)
-> @@ -1376,3 +1377,93 @@ uint32_t HELPER(ror_cc)(CPUARMState *env, uint32_t x, uint32_t i)
->          return ((uint32_t)x >> shift) | (x << (32 - shift));
->      }
->  }
-> +
-> +/*
-> + * Implement float64 to int32_t conversion without saturation;
-> + * the result is supplied modulo 2^32.
-> + */
-> +uint64_t HELPER(fjcvtzs)(float64 value, void *vstatus)
-> +{
-> +    float_status *status = vstatus;
-> +    uint32_t result, exp, sign;
-> +    uint64_t frac;
-> +    uint32_t inexact; /* !Z */
-> +
-> +    sign = extract64(value, 63, 1);
-> +    exp = extract64(value, 52, 11);
-> +    frac = extract64(value, 0, 52);
-> +
-> +    if (exp == 0) {
-> +        /* While not inexact for IEEE FP, -0.0 is inexact for JavaScript.  */
-> +        inexact = sign;
-> +        result = 0;
-> +        if (frac != 0) {
-> +            if (status->flush_inputs_to_zero) {
-> +                float_raise(float_flag_input_denormal, status);
-> +            } else {
-> +                float_raise(float_flag_inexact, status);
-> +                inexact = 1;
-> +            }
-> +        }
-> +    } else if (exp == 0x7ff) {
-> +        if (frac == 0) {
-> +            /* Infinity.  */
-> +            result = 0;
-> +        } else {
-> +            /* NaN */
-> +            result = INT32_MAX;
-> +        }
-
-The pseudo code asks for NaN inputs to return 0 since FPUnpack returns
-a value of 0 for NaN.
-
-The rest looks correct.
-
-Thanks,
-
-Laurent
-
-> +        /* This operation raises Invalid for both NaN and overflow (Inf).  */
-> +        float_raise(float_flag_invalid, status);
-> +        inexact = 1;
-> +    } else {
-> +        int shift, true_exp;
-> +
-> +        true_exp = exp - 1023;
-> +        shift = 52 - true_exp;
-> +
-> +        /* Restore implicit bit.  */
-> +        frac |= 1ull << 52;
-> +
-> +        /* Shift the fraction into place.  */
-> +        if (shift <= -64) {
-> +            /*
-> +             * The number is so large the fraction is shifted out entirely.
-> +             * The result mod 2^32 is 0 and will match the overflow case.
-> +             */
-> +            inexact = 1;
-> +            frac = 0;
-> +        } else if (shift <= 0) {
-> +            /* The number is so large we must shift the fraction left.  */
-> +            inexact = 1;
-> +            frac <<= -shift;
-> +        } else if (shift < 64) {
-> +            /* Normal case -- shift right and notice if bits shift out.  */
-> +            inexact = (frac << (64 - shift)) != 0;
-> +            frac >>= shift;
-> +        } else {
-> +            /* The number is so small the fraction is shifted out entirely.  */
-> +            inexact = 1;
-> +            frac = 0;
-> +        }
-> +
-> +        /* Notice overflow or inexact exceptions.  */
-> +        if (true_exp > 31
-> +            || frac > (sign ? 0x80000000ull : 0x7fffffff)) {
-> +            /* Overflow, for which this operation raises invalid.  */
-> +            float_raise(float_flag_invalid, status);
-> +            inexact = 1;
-> +        } else if (inexact) {
-> +            float_raise(float_flag_inexact, status);
-> +        }
-> +
-> +        /* Produce the result mod 2^32.  */
-> +        if (sign) {
-> +            frac = -frac;
-> +        }
-> +        result = frac;
-> +    }
-> +
-> +    /* Pack the result and the env->ZF representation of Z together.  */
-> +    return deposit64(result, 32, 32, inexact);
-> +}
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 90298ac562..49289bf1d8 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -6458,6 +6458,24 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
->      }
->  }
->
-> +static void handle_fjcvtzs(DisasContext *s, int rd, int rn)
-> +{
-> +    TCGv_i64 t = read_fp_dreg(s, rn);
-> +    TCGv_ptr fpstatus = get_fpstatus_ptr(false);
-> +
-> +    gen_helper_fjcvtzs(t, t, fpstatus);
-> +
-> +    tcg_temp_free_ptr(fpstatus);
-> +
-> +    tcg_gen_ext32u_i64(cpu_reg(s, rd), t);
-> +    tcg_gen_extrh_i64_i32(cpu_ZF, t);
-> +    tcg_gen_movi_i32(cpu_CF, 0);
-> +    tcg_gen_movi_i32(cpu_NF, 0);
-> +    tcg_gen_movi_i32(cpu_VF, 0);
-> +
-> +    tcg_temp_free_i64(t);
-> +}
-> +
->  /* Floating point <-> integer conversions
->   *   31   30  29 28       24 23  22  21 20   19 18 16 15         10 9  5 4  0
->   * +----+---+---+-----------+------+---+-------+-----+-------------+----+----+
-> @@ -6533,6 +6551,14 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
->              handle_fmov(s, rd, rn, type, itof);
->              break;
->
-> +        case 0b00111110: /* FJCVTZS */
-> +            if (!dc_isar_feature(aa64_jscvt, s)) {
-> +                goto do_unallocated;
-> +            } else if (fp_access_check(s)) {
-> +                handle_fjcvtzs(s, rd, rn);
-> +            }
-> +            break;
-> +
->          default:
->          do_unallocated:
->              unallocated_encoding(s);
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index eb25895876..a92d06b05b 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -4066,6 +4066,21 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
->                      case 17: /* fsito */
->                          gen_vfp_sito(dp, 0);
->                          break;
-> +                    case 19: /* vjcvt */
-> +                        if (!dp || !dc_isar_feature(aa32_jscvt, s)) {
-> +                            return 1;
-> +                        } else {
-> +                            TCGv_ptr fpst = get_fpstatus_ptr(0);
-> +                            gen_helper_fjcvtzs(cpu_F0d, cpu_F0d, fpst);
-> +                            tcg_temp_free_ptr(fpst);
-> +
-> +                            tcg_gen_extr_i64_i32(cpu_F0s, cpu_ZF, cpu_F0d);
-> +                            tcg_gen_movi_i32(cpu_NF, 0);
-> +                            tcg_gen_movi_i32(cpu_CF, 0);
-> +                            tcg_gen_movi_i32(cpu_VF, 0);
-> +                            dp = 0; /* always a single precision result */
-> +                        }
-> +                        break;
->                      case 20: /* fshto */
->                          if (!arm_dc_feature(s, ARM_FEATURE_VFP3)) {
->                              return 1;
-> --
-> 2.17.2
->
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ5MjY2ODU4LTUwNDMtMS1n
+aXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxl
+ZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVz
+dGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIg
+aW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
+Z3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCkNvbmZp
+Z3VyZSBvcHRpb25zOgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1t
+dSxhYXJjaDY0LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhv
+bj0vdXNyL2Jpbi9weXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1l
+bmFibGUtdHJhY2UtYmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0
+bGUgLS1lbmFibGUtY3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vl
+c3QtYWdlbnQgLS13aXRoLXNkbGFiaT0yLjAKRVJST1I6IHVua25vd24gb3B0aW9uIC0td2l0aC1z
+ZGxhYmk9Mi4wClRyeSAnL3RtcC9xZW11LXRlc3Qvc3JjL2NvbmZpZ3VyZSAtLWhlbHAnIGZvciBt
+b3JlIGluZm9ybWF0aW9uCiMgUUVNVSBjb25maWd1cmUgbG9nIE1vbiBGZWIgIDQgMDg6MDE6MDUg
+VVRDIDIwMTkKIyBDb25maWd1cmVkIHdpdGg6ICcvdG1wL3FlbXUtdGVzdC9zcmMvY29uZmlndXJl
+JyAnLS1lbmFibGUtd2Vycm9yJyAnLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0
+LXNvZnRtbXUnICctLXByZWZpeD0vdG1wL3FlbXUtdGVzdC9pbnN0YWxsJyAnLS1weXRob249L3Vz
+ci9iaW4vcHl0aG9uMycgJy0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0nICctLWVu
+YWJsZS10cmFjZS1iYWNrZW5kcz1zaW1wbGUnICctLWVuYWJsZS1nbnV0bHMnICctLWVuYWJsZS1u
+ZXR0bGUnICctLWVuYWJsZS1jdXJsJyAnLS1lbmFibGUtdm5jJyAnLS1lbmFibGUtYnppcDInICct
+LWVuYWJsZS1ndWVzdC1hZ2VudCcgJy0td2l0aC1zZGxhYmk9Mi4wJwotLS0KZnVuY3M6IGRvX2Nv
+bXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAx
+MjIgNjE3IDYzNCAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJDRSAtRF9GSUxF
+X09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAt
+V3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Npbmct
+cHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9
+Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25m
+LmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9fbGludXhfXyBu
+b3QgZGVmaW5lZAogI2Vycm9yIF9fbGludXhfXyBub3QgZGVmaW5lZAogIF5+fn5+CgotLS0KZnVu
+Y3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxp
+bmVzOiA5MiAxMjIgNjE3IDY4NiAwCng4Nl82NC13NjQtbWluZ3czMi1nY2MgLURfR05VX1NPVVJD
+RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
+dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
+V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
+YXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAv
+cWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MjoyOiBlcnJvcjogI2Vycm9yIF9f
+aTM4Nl9fIG5vdCBkZWZpbmVkCiAjZXJyb3IgX19pMzg2X18gbm90IGRlZmluZWQKICBefn5+fgoK
+LS0tCmZ1bmNzOiBkb19jb21waWxlciBkb19jYyBjb21waWxlX29iamVjdCBjaGVja19kZWZpbmUg
+bWFpbgpsaW5lczogOTIgMTIyIDYxNyA2ODkgMAp4ODZfNjQtdzY0LW1pbmd3MzItZ2NjIC1EX0dO
+VV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3Ry
+aWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0
+cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21t
+b24gLWZ3cmFwdiAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZp
+Zy10ZW1wL3FlbXUtY29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5jOjI6MjogZXJyb3I6ICNl
+cnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQKICNlcnJvciBfX0lMUDMyX18gbm90IGRlZmluZWQK
+ICBefn5+fgoKLS0tCmxpbmVzOiA5MiAxMjggOTIwIDAKeDg2XzY0LXc2NC1taW5ndzMyLWdjYyAt
+bXRocmVhZHMgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklM
+RV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3Vu
+ZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlh
+c2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLW8gY29uZmlnLXRlbXAvcWVtdS1j
+b25mLmV4ZSBjb25maWctdGVtcC9xZW11LWNvbmYuYyAtZyAtbGliZXJ0eQovdXNyL2xpYi9nY2Mv
+eDg2XzY0LXc2NC1taW5ndzMyLzguMi4wLy4uLy4uLy4uLy4uL3g4Nl82NC13NjQtbWluZ3czMi9i
+aW4vbGQ6IGNhbm5vdCBmaW5kIC1saWJlcnR5CmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQg
+MSBleGl0IHN0YXR1cwpGYWlsZWQgdG8gcnVuICdjb25maWd1cmUnClRyYWNlYmFjayAobW9zdCBy
+ZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5l
+IDU2MywgaW4gPG1vZHVsZT4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
+YXRjaGV3Lm9yZy9sb2dzLzE1NDkyNjY4NTgtNTA0My0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJl
+ZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
