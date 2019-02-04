@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42941)
+Received: from eggs.gnu.org ([209.51.188.92]:44297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gqbpB-0003OS-8v
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:50:01 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gqbud-0004ga-Bf
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gqbpA-0004DL-MQ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:50:01 -0500
-Received: from server54-2.web-hosting.com ([198.54.126.118]:50648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
-	id 1gqbp8-00048A-Nx
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:49:59 -0500
-Received: from [::1] (port=53350 helo=server54.web-hosting.com)
-	by server54.web-hosting.com with esmtpa (Exim 4.91)
-	(envelope-from <admin@grossmann-venter.com>) id 1gqbp1-0025RD-R6
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:49:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gqbub-0000ZI-Qb
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:39 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gqbub-0000Wh-BS
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:55:37 -0500
+Received: by mail-wr1-x434.google.com with SMTP id t27so13848992wra.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:55:35 -0800 (PST)
+References: <1549266858-5043-1-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <61f149b0-0b67-c692-df9e-5f4c9a5e561c@linaro.org>
+Date: Mon, 4 Feb 2019 10:55:30 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <1549266858-5043-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date: Mon, 04 Feb 2019 05:49:51 -0500
-From: liebrecht@grossmann-venter.com
-In-Reply-To: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
-References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
-	<665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
-Message-ID: <7d4a413036a784179b1b848a1cd98e13@grossmann-venter.com>
-Subject: [Qemu-devel] Usb device disappears from linux  after Qemu starts
+Subject: Re: [Qemu-devel] [PATCH] target/moxie: Fix LGPL information in the
+ file headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Anthony Green <green@moxielogic.com>
 
-Below is the string I use:
+On 2/4/19 7:54 AM, Thomas Huth wrote:
+> It's either "GNU *Library* General Public License version 2" or "GNU
+> Lesser General Public License version *2.1*", but there was no "version
+> 2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
+> Also the files mentioned the GPL instead of the LGPL after declaring
+> that the files are licensed under the LGPL, so change these spots to
+> use LGPL, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  target/moxie/cpu.c       | 2 +-
+>  target/moxie/cpu.h       | 4 ++--
+>  target/moxie/helper.c    | 4 ++--
+>  target/moxie/mmu.c       | 4 ++--
+>  target/moxie/translate.c | 4 ++--
+>  5 files changed, 9 insertions(+), 9 deletions(-)
 
-I use lsb to search for the the hostaddr of the usb device i want to 
-connect to qemu.
-Qemu when it starts with this hostaddr then removes the device from the 
-acticve usb list.
-Running lsusb after qemu starts shows the device disappeared.
-
-Is this a bug ? as I cannot see a device just disappearing when qemu 
-starts.
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-sudo qemu-system-x86_64 -usb -device usb-host,hostbus=1,hostaddr=42 
--device piix3-usb-uhci  -enable-kvm -soundhw all  -smp 4 -m 2048M -boot 
-d -cdrom /dev/cdrom -drive format=raw,file=hd.img
+r~
