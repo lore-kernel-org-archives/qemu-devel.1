@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45330)
+Received: from eggs.gnu.org ([209.51.188.92]:45566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqiF2-0005HB-Co
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:41:09 -0500
+	(envelope-from <david@redhat.com>) id 1gqiFk-0005mH-At
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:41:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gqiF0-0001E1-Hj
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:41:07 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gqiEw-00011J-Rh
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:41:03 -0500
-Received: by mail-ot1-x344.google.com with SMTP id t5so1242792otk.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 09:41:02 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gqiFj-0002JN-9z
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 12:41:52 -0500
+References: <20190204154406.16122-1-david@redhat.com>
+	<b477cf45-50d2-049d-0f80-befa70e74ffd@redhat.com>
+	<20190204183756.5bbf0782.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1affa165-8432-2923-ec5e-900986885c53@redhat.com>
+Date: Mon, 4 Feb 2019 18:41:42 +0100
 MIME-Version: 1.0
-References: <20190130192403.13754-1-jcmvbkbc@gmail.com>
-In-Reply-To: <20190130192403.13754-1-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Feb 2019 17:40:50 +0000
-Message-ID: <CAFEAcA_3_VAMM+Tc-kWoCZfGO_DJXDKqEHcFHCnf8SDQkJQ3uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] gdbstub: allow killing QEMU via vKill
- command
+In-Reply-To: <20190204183756.5bbf0782.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/tcg: Don't model FP registers as
+ globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +26,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Luc Michel <luc.michel@greensocs.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 30 Jan 2019 at 19:24, Max Filippov <jcmvbkbc@gmail.com> wrote:
->
-> With multiprocess extensions gdb uses 'vKill' packet instead of 'k' to
-> kill the inferior. Handle 'vKill' the same way 'k' was handled in the
-> presence of single process.
->
-> Fixes: 7cf48f6752e5 ("gdbstub: add multiprocess support to
-> (f|s)ThreadInfo and ThreadExtraInfo")
->
-> Cc: Luc Michel <luc.michel@greensocs.com>
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
-> Changes v1->v2:
-> - terminate QEMU in the vKill packet handler regardless of whatever the
->   PID is or how many processes are attached [Luc Michel]
->
+>>> Reading/writing a floating point register means reading/writing memory now.
+>>>
+>>> Break up ugly in2_x2() handling that modifies both, in1 and in2 into
+>>> in1_x2l and in2_x2h. This makes things more readable. Also, in1_x1() is  
+>>
+>> s/in1_x2l/in2_x2l/
+>> s/in1_x2h/in2_x2h/
+> 
+> Confused... it's already in2_x2h, I suppose that one should stay like
+> it is?
 
-Thanks; I'll take this via target-arm.next since I took the
-multiprocess-support gdbstub patches.
+Yes, I guess I am the confused one ;)
 
--- PMM
+> 
+>>
+>>
+>> Sorry Conny, I assume when you pick this up, you can fix this up :)
+> 
+> I would recommend a spell checker, only it would not help for the last
+> case :)
+
+I once tried to add a pre-commit hook  for that, but it didn't work that
+reliably. And if it's not automated, I guess I will forget it again.
+
+... as long as the code is not in a similar shape, we're fine ;)
+
+-- 
+
+Thanks,
+
+David / dhildenb
