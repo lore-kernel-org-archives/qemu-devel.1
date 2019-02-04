@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60051)
+Received: from eggs.gnu.org ([209.51.188.92]:60124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7w-00065I-3S
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7x-00066m-AU
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7u-0004FF-K5
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:51 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:37384)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj7v-0004Hc-Mf
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:53 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:37394)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj7u-0003zM-8M
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:50 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id g67so1017517wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:24 -0800 (PST)
+	id 1gqj7v-0003u7-2B
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:51 -0500
+Received: by mail-wm1-x336.google.com with SMTP id g67so1017273wmd.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:37:19 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s132sm8836236wmf.28.2019.02.04.10.37.17 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 04 Feb 2019 10:37:17 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:36:05 +0100
-Message-Id: <1549305379-51117-64-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:36:00 +0100
+Message-Id: <1549305379-51117-59-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 63/77] hw/riscv/Makefile.objs: Create CONFIG_*
- for riscv boards
+Subject: [Qemu-devel] [PULL 58/77] hw/s390/Makefile.objs: Create new
+ CONFIG_* variables for s390x boards and devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +33,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
 
-From: Yang Zhong <yang.zhong@intel.com>
+Make hw/s390x configurable and add new CONFIG_* to the
+default-configs/s390x*-softmmu.mak. This will be used to
+enable/disable vfio-ccw.
 
-Add the new configs to default-configs/riscv*-sofmmu.mak.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190202072456.6468-19-yang.zhong@intel.com>
+Message-Id: <20190202072456.6468-14-yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/riscv32-softmmu.mak |  7 +++++++
- default-configs/riscv64-softmmu.mak |  7 +++++++
- hw/riscv/Makefile.objs              | 22 +++++++++++-----------
- 3 files changed, 25 insertions(+), 11 deletions(-)
+ default-configs/s390x-softmmu.mak | 1 +
+ hw/s390x/Makefile.objs            | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index fbfd1d4..6533716 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+
-+CONFIG_SPIKE=y
-+CONFIG_HART=y
-+CONFIG_SIFIVE_E=y
-+CONFIG_SIFIVE=y
-+CONFIG_SIFIVE_U=y
-+CONFIG_RISCV_VIRT=y
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index fbfd1d4..6533716 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -12,3 +12,10 @@ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+
-+CONFIG_SPIKE=y
-+CONFIG_HART=y
-+CONFIG_SIFIVE_E=y
-+CONFIG_SIFIVE=y
-+CONFIG_SIFIVE_U=y
-+CONFIG_RISCV_VIRT=y
-diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-index 1dde01d..79bfb3a 100644
---- a/hw/riscv/Makefile.objs
-+++ b/hw/riscv/Makefile.objs
-@@ -1,11 +1,11 @@
--obj-y += riscv_htif.o
--obj-y += riscv_hart.o
--obj-y += sifive_e.o
--obj-y += sifive_clint.o
--obj-y += sifive_prci.o
--obj-y += sifive_plic.o
--obj-y += sifive_test.o
--obj-y += sifive_u.o
--obj-y += sifive_uart.o
--obj-y += spike.o
--obj-y += virt.o
-+obj-$(CONFIG_SPIKE) += riscv_htif.o
-+obj-$(CONFIG_HART) += riscv_hart.o
-+obj-$(CONFIG_SIFIVE_E) += sifive_e.o
-+obj-$(CONFIG_SIFIVE) += sifive_clint.o
-+obj-$(CONFIG_SIFIVE) += sifive_prci.o
-+obj-$(CONFIG_SIFIVE) += sifive_plic.o
-+obj-$(CONFIG_SIFIVE) += sifive_test.o
-+obj-$(CONFIG_SIFIVE_U) += sifive_u.o
-+obj-$(CONFIG_SIFIVE) += sifive_uart.o
-+obj-$(CONFIG_SPIKE) += spike.o
-+obj-$(CONFIG_RISCV_VIRT) += virt.o
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 5eef375..8bb7e43 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -8,3 +8,4 @@ CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+ CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+ CONFIG_WDT_DIAG288=y
+ CONFIG_VFIO_AP=$(CONFIG_LINUX)
++CONFIG_S390_CCW_VIRTIO=y
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index ca68806..a18c471 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -5,7 +5,7 @@ obj-y += sclpquiesce.o
+ obj-y += sclpcpu.o
+ obj-y += ipl.o
+ obj-y += css.o
+-obj-y += s390-virtio-ccw.o
++obj-$(CONFIG_S390_CCW_VIRTIO) += s390-virtio-ccw.o
+ obj-y += 3270-ccw.o
+ obj-y += virtio-ccw.o
+ obj-$(CONFIG_VIRTIO_SERIAL) += virtio-ccw-serial.o
 -- 
 1.8.3.1
