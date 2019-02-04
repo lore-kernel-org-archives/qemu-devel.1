@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49653)
+Received: from eggs.gnu.org ([209.51.188.92]:49768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gqh28-0007HA-DW
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:23:45 -0500
+	(envelope-from <lersek@redhat.com>) id 1gqh2E-0007O9-47
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gqgtZ-0005c1-0x
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:14:54 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:40014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gqgtS-0005VG-Sy
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:14:48 -0500
-Date: Mon, 4 Feb 2019 18:14:30 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190204161430.GC14293@lap1>
-References: <20190131130850.6850-1-yuval.shaia@oracle.com>
-	<20190131130850.6850-7-yuval.shaia@oracle.com>
-	<87bm3rso1t.fsf@dusky.pond.sub.org>
+	(envelope-from <lersek@redhat.com>) id 1gqgsK-0004rQ-4y
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:13:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gqgsJ-0004fG-QP
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:13:35 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Mon,  4 Feb 2019 17:03:20 +0100
+Message-Id: <20190204160325.4914-1-lersek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bm3rso1t.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 06/10] hw/pvrdma: Dump device statistics
- counters to file
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/5] add the BiosTablesTest UEFI app,
+ build it with the new roms/edk2 submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: dgilbert@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-On Mon, Feb 04, 2019 at 02:03:58PM +0100, Markus Armbruster wrote:
-> Yuval Shaia <yuval.shaia@oracle.com> writes:
-> 
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >  hw/rdma/vmw/pvrdma.h      |  1 +
-> >  hw/rdma/vmw/pvrdma_main.c | 72 +++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 73 insertions(+)
-> >
-> > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> > index 167706ec2c..dc10f21ca0 100644
-> > --- a/hw/rdma/vmw/pvrdma.h
-> > +++ b/hw/rdma/vmw/pvrdma.h
-> > @@ -133,5 +133,6 @@ static inline void post_interrupt(PVRDMADev *dev, unsigned vector)
-> >  }
-> >  
-> >  int pvrdma_exec_cmd(PVRDMADev *dev);
-> > +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func);
-> >  
-> >  #endif
-> 
-> The only user appears in the next patch.  I'd squash the two patches.
-> Matter of taste.
+Previous version (v2):
+http://mid.mail-archive.com/20190124203959.30875-1-lersek@redhat.com
 
-Agree with you.
-I just did to help reviewers so ones that familiar with 'monitor' can
-review the other patch while rdma folks can review this one.
+Updates in v3 have been noted on each patch in the series.
 
-Will probably squash them as soon as the conversion on the other patch will
-be over.
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 
-> 
-> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> > index cf82e78f08..79900076ec 100644
-> > --- a/hw/rdma/vmw/pvrdma_main.c
-> > +++ b/hw/rdma/vmw/pvrdma_main.c
-> > @@ -14,6 +14,7 @@
-> >   */
-> >  
-> >  #include "qemu/osdep.h"
-> > +#include "qemu/units.h"
-> >  #include "qapi/error.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/pci/pci.h"
-> > @@ -36,6 +37,8 @@
-> >  #include "standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h"
-> >  #include "pvrdma_qp_ops.h"
-> >  
-> > +GSList *devices;
-> > +
-> >  static Property pvrdma_dev_properties[] = {
-> >      DEFINE_PROP_STRING("netdev", PVRDMADev, backend_eth_device_name),
-> >      DEFINE_PROP_STRING("ibdev", PVRDMADev, backend_device_name),
-> > @@ -55,6 +58,72 @@ static Property pvrdma_dev_properties[] = {
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> >  
-> > +static void pvrdma_dump_device_statistics(gpointer data, gpointer user_data)
-> > +{
-> > +    CPUListState *s = user_data;
-> > +    PCIDevice *pdev = data;
-> > +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> > +
-> > +    (*s->cpu_fprintf)(s->file, "%s_%x.%x\n", pdev->name,
-> > +                 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
-> 
-> Why the indirection through CPUListState?  What's wrong with straight
-> monitor_printf()?
+Thanks
+Laszlo
 
-No special reasoning, just wanted to utilize an existing mechanism and
-design.
+Laszlo Ersek (5):
+  roms: add the edk2 project as a git submodule
+  roms: build the EfiRom utility from the roms/edk2 submodule
+  tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+  tests/uefi-test-tools: add build scripts
+  tests/data: introduce "uefi-boot-images" with the "bios-tables-test"
+    ISOs
 
-> 
-> > +    (*s->cpu_fprintf)(s->file, "\tcommands         : %" PRId64 "\n",
-> > +                      dev->stats.commands);
-> > +    (*s->cpu_fprintf)(s->file, "\ttx               : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.tx);
-> > +    (*s->cpu_fprintf)(s->file, "\ttx_len           : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.tx_len);
-> > +    (*s->cpu_fprintf)(s->file, "\ttx_err           : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.tx_err);
-> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs          : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.rx_bufs);
-> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs_len      : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.rx_bufs_len);
-> > +    (*s->cpu_fprintf)(s->file, "\trx_bufs_err      : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.rx_bufs_err);
-> > +    (*s->cpu_fprintf)(s->file, "\tcompletions      : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.completions);
-> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (bk)     : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.poll_cq_from_bk);
-> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq_ppoll_to : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.poll_cq_ppoll_to);
-> > +    (*s->cpu_fprintf)(s->file, "\tpoll_cq (fe)     : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.poll_cq_from_guest);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_tx           : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_tx);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_tx_err       : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_tx_err);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx           : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_rx);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_err       : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_rx_err);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs      : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_rx_bufs);
-> > +    (*s->cpu_fprintf)(s->file, "\tmad_rx_bufs_err  : %" PRId64 "\n",
-> > +                      dev->rdma_dev_res.stats.mad_rx_bufs_err);
-> > +    (*s->cpu_fprintf)(s->file, "\tPDs              : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.pd_tbl.used);
-> > +    (*s->cpu_fprintf)(s->file, "\tMRs              : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.mr_tbl.used);
-> > +    (*s->cpu_fprintf)(s->file, "\tUCs              : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.uc_tbl.used);
-> > +    (*s->cpu_fprintf)(s->file, "\tQPs              : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.qp_tbl.used);
-> > +    (*s->cpu_fprintf)(s->file, "\tCQs              : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.cq_tbl.used);
-> > +    (*s->cpu_fprintf)(s->file, "\tCEQ_CTXs         : %" PRId32 "\n",
-> > +                      dev->rdma_dev_res.cqe_ctx_tbl.used);
-> > +}
-> > +
-> > +void pvrdma_dump_statistics(FILE *f, fprintf_function fprintf_func)
-> > +{
-> > +    CPUListState s = {
-> > +        .file = f,
-> > +        .cpu_fprintf = fprintf_func,
-> > +    };
-> > +
-> > +    g_slist_foreach(devices, pvrdma_dump_device_statistics, &s);
-> > +}
-> > +
-> >  static void free_dev_ring(PCIDevice *pci_dev, PvrdmaRing *ring,
-> >                            void *ring_state)
-> >  {
-> > @@ -618,6 +687,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-> >      dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-> >      qemu_register_shutdown_notifier(&dev->shutdown_notifier);
-> >  
-> > +    devices = g_slist_append(devices, pdev);
-> > +
-> >  out:
-> >      if (rc) {
-> >          pvrdma_fini(pdev);
-> > @@ -627,6 +698,7 @@ out:
-> >  
-> >  static void pvrdma_exit(PCIDevice *pdev)
-> >  {
-> > +    devices = g_slist_remove(devices, pdev);
-> >      pvrdma_fini(pdev);
-> >  }
+ .gitmodules                                                             =
+ |   3 +
+ Makefile                                                                =
+ |   6 +-
+ roms/Makefile                                                           =
+ |  13 +-
+ roms/edk2                                                               =
+ |   1 +
+ tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
+ | Bin 0 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
+ | Bin 0 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
+ | Bin 0 -> 12800 bytes
+ tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
+ | Bin 0 -> 13312 bytes
+ tests/uefi-test-tools/.gitignore                                        =
+ |   3 +
+ tests/uefi-test-tools/LICENSE                                           =
+ |  25 ++++
+ tests/uefi-test-tools/Makefile                                          =
+ | 106 ++++++++++++++
+ tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
+ | 130 ++++++++++++++++++
+ tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
+ |  41 ++++++
+ tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
+ |  67 +++++++++
+ tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dec             =
+ |  27 ++++
+ tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsPkg.dsc             =
+ |  69 ++++++++++
+ tests/uefi-test-tools/build.sh                                          =
+ | 145 ++++++++++++++++++++
+ 17 files changed, 628 insertions(+), 8 deletions(-)
+ create mode 160000 roms/edk2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.aarch64.=
+iso.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.arm.iso.=
+qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.i386.iso=
+.qcow2
+ create mode 100644 tests/data/uefi-boot-images/bios-tables-test.x86_64.i=
+so.qcow2
+ create mode 100644 tests/uefi-test-tools/.gitignore
+ create mode 100644 tests/uefi-test-tools/LICENSE
+ create mode 100644 tests/uefi-test-tools/Makefile
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
+/BiosTablesTest.c
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest=
+/BiosTablesTest.inf
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/B=
+iosTablesTest.h
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
+kg.dec
+ create mode 100644 tests/uefi-test-tools/UefiTestToolsPkg/UefiTestToolsP=
+kg.dsc
+ create mode 100755 tests/uefi-test-tools/build.sh
+
+--=20
+2.19.1.3.g30247aa5d201
