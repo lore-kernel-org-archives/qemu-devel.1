@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54927)
+Received: from eggs.gnu.org ([209.51.188.92]:56634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gqeLp-0000wj-Ct
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:31:54 -0500
+	(envelope-from <mst@redhat.com>) id 1gqeRc-0005V7-4M
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:37:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gqeLo-0008EK-3L
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:31:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gqeLn-000885-Kt
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:31:51 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x14DPWgJ091154
-	for <qemu-devel@nongnu.org>; Mon, 4 Feb 2019 08:31:48 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qenupsnnf-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 08:31:48 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 4 Feb 2019 13:31:45 -0000
-References: <20190122094143.8857-1-david@redhat.com>
-	<20190122134457.212a60f3.cohuck@redhat.com>
-	<ae4f687e-ab41-fe9c-18be-ee678e3c9941@redhat.com>
-	<0fa341f4-0c37-f793-ee14-277e085d0159@de.ibm.com>
-	<98167131-5d68-269c-671a-1378aac9ac45@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 4 Feb 2019 14:31:40 +0100
+	(envelope-from <mst@redhat.com>) id 1gqeRa-00037j-FX
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:37:52 -0500
+Date: Mon, 4 Feb 2019 08:37:28 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190204083556-mutt-send-email-mst@kernel.org>
+References: <20190131151914.164903-1-sgarzare@redhat.com>
+	<20190131151914.164903-3-sgarzare@redhat.com>
+	<20190201101604-mutt-send-email-mst@kernel.org>
+	<CAGxU2F50t=OeuoJMn7q7iDYyy+mc=3vz7V8dVe77KtOu1hKHyw@mail.gmail.com>
+	<20190204033307.GC29523@stefanha-x1.localdomain>
+	<20190204101614.hid4eiorvm37cq5f@steredhat>
 MIME-Version: 1.0
-In-Reply-To: <98167131-5d68-269c-671a-1378aac9ac45@redhat.com>
-Content-Language: en-US
-Message-Id: <6c7a3dcd-0547-3a1d-eec4-4157deca4ab6@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/pci: Warn when
- adding PCI devices without the 'zpci' feature
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190204101614.hid4eiorvm37cq5f@steredhat>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio-blk: add "discard-wzeroes"
+ boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,64 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 
-
-
-On 22.01.2019 16:11, David Hildenbrand wrote:
-> On 22.01.19 16:03, Christian Borntraeger wrote:
->>
->>
->> On 22.01.2019 13:52, David Hildenbrand wrote:
->>> On 22.01.19 13:44, Cornelia Huck wrote:
->>>> On Tue, 22 Jan 2019 10:41:43 +0100
->>>> David Hildenbrand <david@redhat.com> wrote:
->>>>
->>>>> We decided to always create the PCI host bridge, even if 'zpci' is not
->>>>> enabled (due to migration compatibility). This however right now allows
->>>>> to add zPCI/PCI devices to a VM although the guest will never actually see
->>>>> them, confusing people that are using a simple CPU model that has no
->>>>> 'zpci' enabled - "Why isn't this working" (David Hildenbrand)
->>>>>
->>>>> Let's check for 'zpci' and at least print a warning that this will not
->>>>> work as expected. We could also bail out, however that might break
->>>>> existing QEMU commandlines.
->>>>>
->>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>>> ---
->>>>>  hw/s390x/s390-pci-bus.c | 5 +++++
->>>>>  1 file changed, 5 insertions(+)
->>>>>
->>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->>>>> index b86a8bdcd4..e7d4f49611 100644
->>>>> --- a/hw/s390x/s390-pci-bus.c
->>>>> +++ b/hw/s390x/s390-pci-bus.c
->>>>> @@ -863,6 +863,11 @@ static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->>>>>  {
->>>>>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
->>>>>  
->>>>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
->>>>> +        warn_report("Adding PCI or zPCI devices without the 'zpci' CPU feature."
->>>>> +                    " The guest will not be able to see/use these devices.");
->>>>> +    }
->>>>> +
->>>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->>>>>          PCIDevice *pdev = PCI_DEVICE(dev);
->>>>>  
->>>>
->>>> That's hotplug only, isn't it? IIRC coldplugging already fails?
->>>>
->>>
->>> No, applies also to coldplugging.
->>
->> Back then we made this a conscious decision, because removing the bridge triggered a
->> lot of issues regarding migration. And the current behaviour actually is a good
->> match to the real hardware, there are PCI devices in the system that can not be used
->> by guests. I understand that this is kind of surprising, so I am fine with the warn_report
->> but I do not want to have a hard error right now.
->>
+On Mon, Feb 04, 2019 at 11:16:14AM +0100, Stefano Garzarella wrote:
+> On Mon, Feb 04, 2019 at 11:33:07AM +0800, Stefan Hajnoczi wrote:
+> > On Fri, Feb 01, 2019 at 06:18:52PM +0100, Stefano Garzarella wrote:
+> > > On Fri, Feb 1, 2019 at 4:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > On Thu, Jan 31, 2019 at 04:19:11PM +0100, Stefano Garzarella wrote:
+> > > > > In order to avoid migration issues, we enable DISCARD and
+> > > > > WRITE ZEROES features only for machine type >= 4.0
+> > > > >
+> > > > > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > > ---
+> > > > >  hw/block/virtio-blk.c          | 2 ++
+> > > > >  hw/core/machine.c              | 1 +
+> > > > >  include/hw/virtio/virtio-blk.h | 1 +
+> > > > >  3 files changed, 4 insertions(+)
+> > > > >
+> > > > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > > > > index 8a6754d9a2..542ec52536 100644
+> > > > > --- a/hw/block/virtio-blk.c
+> > > > > +++ b/hw/block/virtio-blk.c
+> > > > > @@ -1026,6 +1026,8 @@ static Property virtio_blk_properties[] = {
+> > > > >      DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+> > > > >      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+> > > > >                       IOThread *),
+> > > > > +    DEFINE_PROP_BIT("discard-wzeroes", VirtIOBlock, conf.discard_wzeroes, 0,
+> > > > > +                     true),
+> > > > >      DEFINE_PROP_END_OF_LIST(),
+> > > > >  };
+> > > > >
+> > > >
+> > > > Thinking about it, are there security implications for discard?
+> > > > Should we make it default false?
+> > > 
+> > > Hi Michael,
+> > > 
+> > > I'm not completely sure but if the guest can write on a specific sector,
+> > > discard or write_zeroes operations should not have a security implication.
+> > > 
+> > > Do I miss something?
+> > 
+> > Recently page cache attacks have been discussed in the Linux community:
+> > https://arxiv.org/pdf/1901.01161.pdf
+> > 
+> > I guess the scenario Michael is thinking about involves either -drive
+> > cache.direct=off (including cache=writeback or cache=writethrough) or
+> > maybe a timing side-channel in the storage appliance.
+> > 
+> > The discard operation may allow a guest to evict the cache, an important
+> > primitive for page cache attacks.
+> > 
+> > Most of the time disk images are not shared between guests at all.
+> > Therefore the discard operation cannot be used to learn information
+> > about other guests.
+> > 
+> > Let's focus on shared disk images: shared disk images are either
+> > read-only (then discard isn't allowed anyway) or they are shared
+> > writable (but this already implies a trust relationship between the
+> > guests).
+> > 
+> > My opinion is that discard is safe because virtualization use cases are
+> > quite different from the attacks possible with shared library files
+> > between userspace processes.  I'm curious if anyone has figured out a
+> > realistic scenario where it does matter though...
 > 
-> So you agree to this patch, unmodified, correct? Thanks!
+> Many thanks for the explanation!
+> 
+> I'll wait to send the v3 in order to understand if Michael agrees to
+> leave discard feature enabled to default.
+> 
+> Thanks,
+> Stefano
 
-Sorry, somehow lost this mail. Yes.
+OK. Maybe mention the above in the commit log.
+
+-- 
+MST
