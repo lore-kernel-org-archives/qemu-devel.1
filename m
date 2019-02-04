@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59615)
+Received: from eggs.gnu.org ([209.51.188.92]:59653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj72-0005FX-LB
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:57 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj78-0005Jd-Kr
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj71-0003gQ-TU
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:56 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:41795)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gqj76-0003jE-Pd
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:02 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gqj71-0003fP-AW
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:36:55 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id x10so941874wrs.8
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:54 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	s132sm8836236wmf.28.2019.02.04.10.36.53 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 04 Feb 2019 10:36:53 -0800 (PST)
+	id 1gqj75-0003iE-W7
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 13:37:00 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t200so1042520wmt.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 10:36:59 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  4 Feb 2019 19:35:35 +0100
-Message-Id: <1549305379-51117-34-git-send-email-pbonzini@redhat.com>
+Date: Mon,  4 Feb 2019 19:35:40 +0100
+Message-Id: <1549305379-51117-39-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
 References: <1549305379-51117-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 33/77] monitor: do not use QTAILQ_FOREACH_SAFE
- across critical sections
+Subject: [Qemu-devel] [PULL 38/77] i386: import & use bootparam.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +28,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-monitor_qmp_requests_pop_any_with_lock cannot modify the monitor list
-concurrently with monitor_cleanup, since the dispatch bottom half
-runs in the main thread, but anyway it is a bit ugly to keep
-"next" live across critical sections of monitor_lock and Coverity
-complains (CID 1397072).
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Replace QTAILQ_FOREACH_SAFE with a while loop and QTAILQ_FIRST,
-it is cleaner and more future-proof.
+it's from v4.20-rc5.
 
+CC: Stefano Garzarella <sgarzare@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- monitor.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/i386/pc.c                                 |  8 +------
+ include/standard-headers/asm-x86/bootparam.h | 34 ++++++++++++++++++++++++++++
+ scripts/update-linux-headers.sh              |  6 +++++
+ 3 files changed, 41 insertions(+), 7 deletions(-)
+ create mode 100644 include/standard-headers/asm-x86/bootparam.h
 
-diff --git a/monitor.c b/monitor.c
-index c09fa63..e5de576 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4617,8 +4617,6 @@ void monitor_init(Chardev *chr, int flags)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 00166d1..9664822 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -76,6 +76,7 @@
+ #include "hw/usb.h"
+ #include "hw/i386/intel_iommu.h"
+ #include "hw/net/ne2000-isa.h"
++#include "standard-headers/asm-x86/bootparam.h"
  
- void monitor_cleanup(void)
- {
--    Monitor *mon, *next;
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+@@ -1059,13 +1060,6 @@ static long get_file_size(FILE *f)
+     return size;
+ }
+ 
+-/* setup_data types */
+-#define SETUP_NONE     0
+-#define SETUP_E820_EXT 1
+-#define SETUP_DTB      2
+-#define SETUP_PCI      3
+-#define SETUP_EFI      4
 -
-     /*
-      * We need to explicitly stop the I/O thread (but not destroy it),
-      * clean up the monitor resources, then destroy the I/O thread since
-@@ -4632,7 +4630,8 @@ void monitor_cleanup(void)
-     /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-     monitor_destroyed = true;
--    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-+    while (!QTAILQ_EMPTY(&mon_list)) {
-+        Monitor *mon = QTAILQ_FIRST(&mon_list);
-         QTAILQ_REMOVE(&mon_list, mon, entry);
-         /* Permit QAPI event emission from character frontend release */
-         qemu_mutex_unlock(&monitor_lock);
+ struct setup_data {
+     uint64_t next;
+     uint32_t type;
+diff --git a/include/standard-headers/asm-x86/bootparam.h b/include/standard-headers/asm-x86/bootparam.h
+new file mode 100644
+index 0000000..67d4f01
+--- /dev/null
++++ b/include/standard-headers/asm-x86/bootparam.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++#ifndef _ASM_X86_BOOTPARAM_H
++#define _ASM_X86_BOOTPARAM_H
++
++/* setup_data types */
++#define SETUP_NONE			0
++#define SETUP_E820_EXT			1
++#define SETUP_DTB			2
++#define SETUP_PCI			3
++#define SETUP_EFI			4
++#define SETUP_APPLE_PROPERTIES		5
++#define SETUP_JAILHOUSE			6
++
++/* ram_size flags */
++#define RAMDISK_IMAGE_START_MASK	0x07FF
++#define RAMDISK_PROMPT_FLAG		0x8000
++#define RAMDISK_LOAD_FLAG		0x4000
++
++/* loadflags */
++#define LOADED_HIGH	(1<<0)
++#define KASLR_FLAG	(1<<1)
++#define QUIET_FLAG	(1<<5)
++#define KEEP_SEGMENTS	(1<<6)
++#define CAN_USE_HEAP	(1<<7)
++
++/* xloadflags */
++#define XLF_KERNEL_64			(1<<0)
++#define XLF_CAN_BE_LOADED_ABOVE_4G	(1<<1)
++#define XLF_EFI_HANDOVER_32		(1<<2)
++#define XLF_EFI_HANDOVER_64		(1<<3)
++#define XLF_EFI_KEXEC			(1<<4)
++
++
++#endif /* _ASM_X86_BOOTPARAM_H */
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 0a964fe..3578cfe 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -120,6 +120,12 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+         cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
++        # Remove everything except the macros from bootparam.h avoiding the
++        # unnecessary import of several video/ist/etc headers
++        sed -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' \
++               "$tmpdir/include/asm/bootparam.h" > "$tmpdir/bootparam.h"
++        cp_portable "$tmpdir/bootparam.h" \
++                    "$output/include/standard-headers/asm-$arch"
+     fi
+ done
+ 
 -- 
 1.8.3.1
