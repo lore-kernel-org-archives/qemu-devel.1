@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59440)
+Received: from eggs.gnu.org ([209.51.188.92]:59492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbIr-00039G-Uc
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:39 -0500
+	(envelope-from <berrange@redhat.com>) id 1gqbJ4-0003GR-Q2
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbIm-0003hm-0x
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:33 -0500
-Date: Mon, 4 Feb 2019 10:06:27 +0000
+	(envelope-from <berrange@redhat.com>) id 1gqbJ3-0004qs-JT
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:16:50 -0500
+Date: Mon, 4 Feb 2019 10:16:42 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204100627.GB1905@redhat.com>
+Message-ID: <20190204101642.GD1905@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190125174653.4604-1-kwolf@redhat.com>
-	<20190125174653.4604-4-kwolf@redhat.com>
-	<20190129155832.GJ30796@redhat.com>
-	<20190204095628.GC5855@linux.fritz.box>
+References: <20190201185358.6972-1-ppandit@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190204095628.GC5855@linux.fritz.box>
+In-Reply-To: <20190201185358.6972-1-ppandit@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] scsi-disk: Deprecate device_id
- fallback to BlockBackend name
+Subject: Re: [Qemu-devel] [PATCH] ppc: add host-serial and host-model
+ machine attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, armbru@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com, eblake@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Prasad J Pandit <pjp@fedoraproject.org>
 
-On Mon, Feb 04, 2019 at 10:56:28AM +0100, Kevin Wolf wrote:
-> Am 29.01.2019 um 16:58 hat Daniel P. Berrang=C3=A9 geschrieben:
-> > On Fri, Jan 25, 2019 at 06:46:53PM +0100, Kevin Wolf wrote:
-> > > We should never have exposed BlockBackend names to the guest, it's =
-a
-> > > host detail. Deprecate this behaviour. Users who need to maintain t=
-he
-> > > guest ABI can explicitly set the value with the device_id property.
-> >=20
-> > I don't think we've deprecated things in the past which would cause
-> > a guest ABI change when finally deleted.
-> >=20
-> > Shouldn't we be instead setting using machine type versioning here,
-> > so that existing machine types keep using the blk_name() fallback
-> > forever, while QEMU 4.0+ machine types avoid blk_name() fallback
-> > immediately.
+On Sat, Feb 02, 2019 at 12:23:58AM +0530, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 >=20
-> I was going to implement this, but then I wondered if that's actually
-> worthwhile. With -blockdev, you don't get the bad behaviour anyway, and
-> tools that would select new machine types will hopefully also use new
-> backend options.
+> On ppc hosts, hypervisor shares following system attributes
 >=20
-> So if we need to keep the bad behaviour around anyway instead of
-> completely removing it as I intended originally, maybe -drive vs.
-> -blockdev is enough to make the difference and we shouldn't change
-> anything at the device model level at all.
+>   - /proc/device-tree/system-id
+>   - /proc/device-tree/model
+>=20
+> with a guest. This could lead to information leakage and misuse.[*]
+> Add machine attributes to control such system information exposure
+> to a guest.
+>=20
+> [*] https://wiki.openstack.org/wiki/OSSN/OSSN-0028
+>=20
+> Reported-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Fix-suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-Yeah, that rationale sounds ok to me.
+
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0942f35bf8..b497fe1701 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1249,11 +1249,34 @@ static void *spapr_build_fdt(sPAPRMachineState =
+*spapr,
+>       * Add info to guest to indentify which host is it being run on
+>       * and what is the uuid of the guest
+>       */
+> -    if (kvmppc_get_host_model(&buf)) {
+> +    if (machine->host_model && !strcmp(machine->host_model, "none")) {
+> +        /* -M host-model=3Dnone =3D do not set host-model */
+> +    } else if (machine->host_model
+> +        && !strcmp(machine->host_model, "passthrough")) {
+> +        /* -M host-model=3Dpassthrough */
+> +        _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+
+buf hasn't been initialized
+
+> +        g_free(buf);
+> +    } else if (machine->host_model) {
+> +        /* -M host-model=3D<user-string> */
+> +        _FDT(fdt_setprop_string(fdt, 0, "host-model", machine->host_mo=
+del));
+> +    } else if (kvmppc_get_host_model(&buf)) {
+> +        /* -M host-model=3Dxxx attribute not supplied */
+>          _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+>          g_free(buf);
+>      }
+
+This structure for the conditionals is a bit unreadable IMHO. It would
+be better as a nested if
+
+     if (machine->host_model && !g_str_equal(machine->host_model, "none")=
+) {
+         if (g_str_equal(machine->host_model, "passthrough") {
+      	     if (!kvmppc_get_host_model(&buf)) {
+	         ... report error...
+             }
+	    _FDT(fdt_setprop_string(fdt, 0, "host-model", buf));
+	    g_free(buf);
+	 } else {
+	    _FDT(fdt_setprop_string(fdt, 0, "host-model", machine->host_model));
+	 }
+     }
+
+
+
+> -    if (kvmppc_get_host_serial(&buf)) {
+> +
+> +    if (machine->host_serial && !strcmp(machine->host_serial, "none"))=
+ {
+> +        /* -M host-serial=3Dnone =3D do not set host-serial */
+> +    } else if (machine->host_serial
+> +        && !strcmp(machine->host_serial, "passthrough")) {
+> +        /* -M host-serial=3Dpassthrough */
+> +        _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
+> +        g_free(buf);
+> +    } else if (machine->host_serial) {
+> +        /* -M host-serial=3D<user-string> */
+> +        _FDT(fdt_setprop_string(fdt, 0, "host-serial", machine->host_s=
+erial));
+> +    } else if (kvmppc_get_host_serial(&buf)) {
+> +        /* -M host-serial=3Dxxx attribute not supplied */
+>          _FDT(fdt_setprop_string(fdt, 0, "host-serial", buf));
+>          g_free(buf);
+>      }
+
+Same comment for this block.
+
+
+There's missing logic to set host-model=3Dpassthrough for existing machin=
+e
+types too.
 
 Regards,
 Daniel
