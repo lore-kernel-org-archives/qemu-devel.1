@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51245)
+Received: from eggs.gnu.org ([209.51.188.92]:51529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqeC5-0000pZ-Cw
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:50 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqeC6-00011d-7p
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqe1K-00052R-J3
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqe1K-000526-GE
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:10:44 -0500
-Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:42027)
+Received: from forwardcorp1g.cmail.yandex.net ([87.250.241.190]:43579)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gqe1G-0004A4-I0
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:10:41 -0500
+	id 1gqe1G-0004Ay-NQ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:10:40 -0500
 From: Yury Kotov <yury-kotov@yandex-team.ru>
-Date: Mon,  4 Feb 2019 16:09:57 +0300
-Message-Id: <20190204130958.18904-4-yury-kotov@yandex-team.ru>
+Date: Mon,  4 Feb 2019 16:09:58 +0300
+Message-Id: <20190204130958.18904-5-yury-kotov@yandex-team.ru>
 In-Reply-To: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
 References: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/4] tests/migration-test: Add a test for
- ignore-shared capability
+Subject: [Qemu-devel] [PATCH v2 4/4] migration: Add capabilities validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,262 +29,196 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 Cc: wrfsh@yandex-team.ru
 
+Currently we don't check which capabilities set in the source QEMU.
+We just expect that the target QEMU has the same enabled capabilities.
+
+Add explicit validation for capabilities to make sure that the target VM
+has them too. This is enabled for only new capabilities to keep compatibi=
+ly.
+
 Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
- tests/migration-test.c | 109 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 89 insertions(+), 20 deletions(-)
+ migration/savevm.c | 101 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 8352612364..485f42b2d2 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -332,6 +332,13 @@ static void cleanup(const char *filename)
-     g_free(path);
- }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 322660438d..9603a38bca 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -57,6 +57,7 @@
+ #include "sysemu/replay.h"
+ #include "qjson.h"
+ #include "migration/colo.h"
++#include "qemu/bitmap.h"
 =20
-+static char *get_shmem_opts(const char *mem_size, const char *shmem_path=
-)
+ #ifndef ETH_P_RARP
+ #define ETH_P_RARP 0x8035
+@@ -316,6 +317,8 @@ typedef struct SaveState {
+     uint32_t len;
+     const char *name;
+     uint32_t target_page_bits;
++    uint32_t caps_count;
++    uint8_t *capabilities;
+ } SaveState;
+=20
+ static SaveState savevm_state =3D {
+@@ -323,15 +326,51 @@ static SaveState savevm_state =3D {
+     .global_section_id =3D 0,
+ };
+=20
++static bool should_validate_capability(int capability)
 +{
-+    return g_strdup_printf("-object memory-backend-file,id=3Dmem0,size=3D=
-%s"
-+                           ",mem-path=3D%s,share=3Don -numa node,memdev=3D=
-mem0",
-+                           mem_size, shmem_path);
++    assert(capability >=3D 0 && capability < MIGRATION_CAPABILITY__MAX);
++    /* Validate only new capabilities to keep compatibility. */
++    switch (capability) {
++    case MIGRATION_CAPABILITY_X_IGNORE_SHARED:
++        return true;
++    default:
++        return false;
++    }
 +}
 +
- static void migrate_check_parameter(QTestState *who, const char *paramet=
-er,
-                                     long long value)
++static uint32_t get_validatable_capabilities_count(void)
++{
++    MigrationState *s =3D migrate_get_current();
++    uint32_t result =3D 0;
++    int i;
++    for (i =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
++        if (should_validate_capability(i) && s->enabled_capabilities[i])=
  {
-@@ -430,73 +437,91 @@ static void migrate_postcopy_start(QTestState *from=
-, QTestState *to)
- }
-=20
- static int test_migrate_start(QTestState **from, QTestState **to,
--                               const char *uri, bool hide_stderr)
-+                               const char *uri, bool hide_stderr,
-+                               bool use_shmem)
- {
-     gchar *cmd_src, *cmd_dst;
-     char *bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
-+    char *extra_opts =3D NULL;
-+    char *shmem_path =3D NULL;
-     const char *arch =3D qtest_get_arch();
-     const char *accel =3D "kvm:tcg";
-=20
-     got_stop =3D false;
-=20
-+    if (use_shmem) {
-+        shmem_path =3D g_strdup_printf("/dev/shm/qemu-%d", getpid());
++            result++;
++        }
 +    }
++    return result;
++}
 +
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
-         init_bootfile(bootpath, x86_bootsect);
-+        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 150M"
-                                   " -name source,debug-threads=3Don"
-                                   " -serial file:%s/src_serial"
--                                  " -drive file=3D%s,format=3Draw",
--                                  accel, tmpfs, bootpath);
-+                                  " -drive file=3D%s,format=3Draw %s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 150M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial"
-                                   " -drive file=3D%s,format=3Draw"
--                                  " -incoming %s",
--                                  accel, tmpfs, bootpath, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
-         start_address =3D X86_TEST_MEM_START;
-         end_address =3D X86_TEST_MEM_END;
-     } else if (g_str_equal(arch, "s390x")) {
-         init_bootfile_s390x(bootpath);
-+        extra_opts =3D use_shmem ? get_shmem_opts("128M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 128M"
-                                   " -name source,debug-threads=3Don"
--                                  " -serial file:%s/src_serial -bios %s"=
-,
--                                  accel, tmpfs, bootpath);
-+                                  " -serial file:%s/src_serial -bios %s =
-%s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 128M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial -bios %s=
-"
--                                  " -incoming %s",
--                                  accel, tmpfs, bootpath, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
-         start_address =3D S390_TEST_MEM_START;
-         end_address =3D S390_TEST_MEM_END;
-     } else if (strcmp(arch, "ppc64") =3D=3D 0) {
-+        extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
-ults"
-                                   " -name source,debug-threads=3Don"
-                                   " -serial file:%s/src_serial"
-                                   " -prom-env 'use-nvramrc?=3Dtrue' -pro=
-m-env "
-                                   "'nvramrc=3Dhex .\" _\" begin %x %x "
-                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0=
- "
--                                  "until'",  accel, tmpfs, end_address,
--                                  start_address);
-+                                  "until' %s",  accel, tmpfs, end_addres=
-s,
-+                                  start_address, extra_opts ? extra_opts=
- : "");
-         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
-                                   " -name target,debug-threads=3Don"
-                                   " -serial file:%s/dest_serial"
--                                  " -incoming %s",
--                                  accel, tmpfs, uri);
-+                                  " -incoming %s %s",
-+                                  accel, tmpfs, uri,
-+                                  extra_opts ? extra_opts : "");
+ static int configuration_pre_save(void *opaque)
+ {
+     SaveState *state =3D opaque;
+     const char *current_name =3D MACHINE_GET_CLASS(current_machine)->nam=
+e;
++    MigrationState *s =3D migrate_get_current();
++    int i, j;
 =20
-         start_address =3D PPC_TEST_MEM_START;
-         end_address =3D PPC_TEST_MEM_END;
-     } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-         init_bootfile(bootpath, aarch64_kernel);
-+        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
-NULL;
-         cmd_src =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
-n=3Dmax "
-                                   "-name vmsource,debug-threads=3Don -cp=
-u max "
-                                   "-m 150M -serial file:%s/src_serial "
--                                  "-kernel %s ",
--                                  accel, tmpfs, bootpath);
-+                                  "-kernel %s %s",
-+                                  accel, tmpfs, bootpath,
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
-n=3Dmax "
-                                   "-name vmdest,debug-threads=3Don -cpu =
-max "
-                                   "-m 150M -serial file:%s/dest_serial "
-                                   "-kernel %s "
--                                  "-incoming %s ",
--                                  accel, tmpfs, bootpath, uri);
-+                                  "-incoming %s %s",
-+                                  accel, tmpfs, bootpath, uri,
-+                                  extra_opts ? extra_opts : "");
+     state->len =3D strlen(current_name);
+     state->name =3D current_name;
+     state->target_page_bits =3D qemu_target_page_bits();
 =20
-         start_address =3D ARM_TEST_MEM_START;
-         end_address =3D ARM_TEST_MEM_END;
-@@ -507,6 +532,7 @@ static int test_migrate_start(QTestState **from, QTes=
-tState **to,
-     }
-=20
-     g_free(bootpath);
-+    g_free(extra_opts);
-=20
-     if (hide_stderr) {
-         gchar *tmp;
-@@ -524,6 +550,16 @@ static int test_migrate_start(QTestState **from, QTe=
-stState **to,
-=20
-     *to =3D qtest_init(cmd_dst);
-     g_free(cmd_dst);
-+
-+    /*
-+     * Remove shmem file immediately to avoid memory leak in test failed=
- case.
-+     * It's valid becase QEMU has already opened this file
-+     */
-+    if (use_shmem) {
-+        unlink(shmem_path);
-+        g_free(shmem_path);
++    state->caps_count =3D get_validatable_capabilities_count();
++    state->capabilities =3D g_renew(uint8_t, state->capabilities,
++                                  state->caps_count);
++    for (i =3D j =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
++        if (should_validate_capability(i) && s->enabled_capabilities[i])=
+ {
++            state->capabilities[j++] =3D i;
++        }
 +    }
 +
      return 0;
  }
 =20
-@@ -603,7 +639,7 @@ static int migrate_postcopy_prepare(QTestState **from=
-_ptr,
-     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
-=20
--    if (test_migrate_start(&from, &to, uri, hide_error)) {
-+    if (test_migrate_start(&from, &to, uri, hide_error, false)) {
-         return -1;
-     }
-=20
-@@ -720,7 +756,7 @@ static void test_baddest(void)
-     char *status;
-     bool failed;
-=20
--    if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
-+    if (test_migrate_start(&from, &to, "tcp:0:0", true, false)) {
-         return;
-     }
-     migrate(from, "tcp:0:0", "{}");
-@@ -745,7 +781,7 @@ static void test_precopy_unix(void)
-     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
-=20
--    if (test_migrate_start(&from, &to, uri, false)) {
-+    if (test_migrate_start(&from, &to, uri, false, false)) {
-         return;
-     }
-=20
-@@ -781,6 +817,38 @@ static void test_precopy_unix(void)
-     g_free(uri);
+@@ -347,6 +386,45 @@ static int configuration_pre_load(void *opaque)
+     return 0;
  }
 =20
-+static void test_ignore_shared(void)
++static bool configuration_validate_capabilities(SaveState *state)
 +{
-+    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
-+    QTestState *from, *to;
++    bool ret =3D true;
++    MigrationState *s =3D migrate_get_current();
++    unsigned long *source_caps_bm;
++    int i;
 +
-+    if (test_migrate_start(&from, &to, uri, false, true)) {
-+        return;
++    source_caps_bm =3D bitmap_new(MIGRATION_CAPABILITY__MAX);
++    for (i =3D 0; i < state->caps_count; i++) {
++        int capability =3D state->capabilities[i];
++        if (capability >=3D MIGRATION_CAPABILITY__MAX) {
++            error_report("Received unknown capability %d", capability);
++            ret =3D false;
++        } else {
++            set_bit(capability, source_caps_bm);
++        }
 +    }
 +
-+    migrate_set_capability(from, "x-ignore-shared", true);
-+    migrate_set_capability(to, "x-ignore-shared", true);
-+
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    migrate(from, uri, "{}");
-+
-+    wait_for_migration_pass(from);
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
++    for (i =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
++        bool source_state, target_state;
++        if (!should_validate_capability(i)) {
++            continue;
++        }
++        source_state =3D test_bit(i, source_caps_bm);
++        target_state =3D s->enabled_capabilities[i];
++        if (source_state !=3D target_state) {
++            error_report("Capability %s is %s, but received capability i=
+s %s",
++                         MigrationCapability_str(i),
++                         target_state ? "on" : "off",
++                         source_state ? "on" : "off");
++            ret =3D false;
++            /* Don't break here to report all failed capabilities */
++        }
 +    }
 +
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
-+    g_free(uri);
++    g_free(source_caps_bm);
++    return ret;
 +}
 +
- int main(int argc, char **argv)
+ static int configuration_post_load(void *opaque, int version_id)
  {
-     char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -832,6 +900,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/deprecated", test_deprecated);
-     qtest_add_func("/migration/bad_dest", test_baddest);
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-+    qtest_add_func("/migration/ignore_shared", test_ignore_shared);
+     SaveState *state =3D opaque;
+@@ -364,6 +442,10 @@ static int configuration_post_load(void *opaque, int=
+ version_id)
+         return -EINVAL;
+     }
 =20
-     ret =3D g_test_run();
++    if (!configuration_validate_capabilities(state)) {
++        return -EINVAL;
++    }
++
+     return 0;
+ }
 =20
+@@ -380,6 +462,11 @@ static bool vmstate_target_page_bits_needed(void *op=
+aque)
+         > qemu_target_page_bits_min();
+ }
+=20
++static bool vmstate_capabilites_needed(void *opaque)
++{
++    return get_validatable_capabilities_count() > 0;
++}
++
+ static const VMStateDescription vmstate_target_page_bits =3D {
+     .name =3D "configuration/target-page-bits",
+     .version_id =3D 1,
+@@ -391,6 +478,19 @@ static const VMStateDescription vmstate_target_page_=
+bits =3D {
+     }
+ };
+=20
++static const VMStateDescription vmstate_capabilites =3D {
++    .name =3D "configuration/capabilities",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .needed =3D vmstate_capabilites_needed,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_V(caps_count, SaveState, 1),
++        VMSTATE_VARRAY_UINT32_ALLOC(capabilities, SaveState, caps_count,=
+ 1,
++                                    vmstate_info_uint8, uint8_t),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_configuration =3D {
+     .name =3D "configuration",
+     .version_id =3D 1,
+@@ -404,6 +504,7 @@ static const VMStateDescription vmstate_configuration=
+ =3D {
+     },
+     .subsections =3D (const VMStateDescription*[]) {
+         &vmstate_target_page_bits,
++        &vmstate_capabilites,
+         NULL
+     }
+ };
 --=20
 2.20.1
