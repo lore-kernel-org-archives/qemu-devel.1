@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51254)
+Received: from eggs.gnu.org ([209.51.188.92]:51245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqeC5-0000pe-Dd
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqeC5-0000pZ-Cw
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:21:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqe1K-00051y-Gq
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1gqe1K-00052R-J3
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:10:44 -0500
-Received: from forwardcorp1j.cmail.yandex.net ([5.255.227.105]:54187)
+Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:42027)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1gqe1G-00047s-L7
+	id 1gqe1G-0004A4-I0
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:10:41 -0500
 From: Yury Kotov <yury-kotov@yandex-team.ru>
-Date: Mon,  4 Feb 2019 16:09:55 +0300
-Message-Id: <20190204130958.18904-2-yury-kotov@yandex-team.ru>
+Date: Mon,  4 Feb 2019 16:09:57 +0300
+Message-Id: <20190204130958.18904-4-yury-kotov@yandex-team.ru>
 In-Reply-To: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
 References: <20190204130958.18904-1-yury-kotov@yandex-team.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/4] exec: Change RAMBlockIterFunc definition
+Subject: [Qemu-devel] [PATCH v2 3/4] tests/migration-test: Add a test for
+ ignore-shared capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,239 +30,262 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 Cc: wrfsh@yandex-team.ru
 
-Currently, qemu_ram_foreach_* calls RAMBlockIterFunc with many
-block-specific arguments. But often iter func needs RAMBlock*.
-It's more effective to call RAMBlockIterFunc with RAMBlock* argument.
-So, fix RAMBlockIterFunc definition and add some functions to read RAMBlo=
-ck*
-fields witch were passed.
-
 Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 ---
- exec.c                    | 21 +++++++++++++++++----
- include/exec/cpu-common.h |  6 ++++--
- migration/postcopy-ram.c  | 36 +++++++++++++++++++++---------------
- migration/rdma.c          |  7 +++++--
- util/vfio-helpers.c       |  6 +++---
- 5 files changed, 50 insertions(+), 26 deletions(-)
+ tests/migration-test.c | 109 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 89 insertions(+), 20 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index da3e635f91..a61d501568 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1970,6 +1970,21 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
-     return rb->idstr;
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 8352612364..485f42b2d2 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -332,6 +332,13 @@ static void cleanup(const char *filename)
+     g_free(path);
  }
 =20
-+void *qemu_ram_get_host_addr(RAMBlock *rb)
-+{
-+    return rb->host;
-+}
-+
-+ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
-+{
-+    return rb->offset;
-+}
-+
-+ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-+{
-+    return rb->used_length;
-+}
-+
- bool qemu_ram_is_shared(RAMBlock *rb)
- {
-     return rb->flags & RAM_SHARED;
-@@ -3960,8 +3975,7 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, v=
-oid *opaque)
-=20
-     rcu_read_lock();
-     RAMBLOCK_FOREACH(block) {
--        ret =3D func(block->idstr, block->host, block->offset,
--                   block->used_length, opaque);
-+        ret =3D func(block, opaque);
-         if (ret) {
-             break;
-         }
-@@ -3980,8 +3994,7 @@ int qemu_ram_foreach_migratable_block(RAMBlockIterF=
-unc func, void *opaque)
-         if (!qemu_ram_is_migratable(block)) {
-             continue;
-         }
--        ret =3D func(block->idstr, block->host, block->offset,
--                   block->used_length, opaque);
-+        ret =3D func(block, opaque);
-         if (ret) {
-             break;
-         }
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 2ad2d6d86b..bdae5446d7 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -72,6 +72,9 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, voi=
-d *host);
- void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *=
-dev);
- void qemu_ram_unset_idstr(RAMBlock *block);
- const char *qemu_ram_get_idstr(RAMBlock *rb);
-+void *qemu_ram_get_host_addr(RAMBlock *rb);
-+ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
-+ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
- bool qemu_ram_is_shared(RAMBlock *rb);
- bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
- void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-@@ -116,8 +119,7 @@ void cpu_flush_icache_range(hwaddr start, int len);
- extern struct MemoryRegion io_mem_rom;
- extern struct MemoryRegion io_mem_notdirty;
-=20
--typedef int (RAMBlockIterFunc)(const char *block_name, void *host_addr,
--    ram_addr_t offset, ram_addr_t length, void *opaque);
-+typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
-=20
- int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
- int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opaqu=
-e);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index fa09dba534..b098816221 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -319,10 +319,10 @@ static bool ufd_check_and_apply(int ufd, MigrationI=
-ncomingState *mis)
-=20
- /* Callback from postcopy_ram_supported_by_host block iterator.
-  */
--static int test_ramblock_postcopiable(const char *block_name, void *host=
-_addr,
--                             ram_addr_t offset, ram_addr_t length, void =
-*opaque)
-+static int test_ramblock_postcopiable(RAMBlock *rb, void *opaque)
- {
--    RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     size_t pagesize =3D qemu_ram_pagesize(rb);
-=20
-     if (length % pagesize) {
-@@ -443,9 +443,12 @@ out:
-  * must be done right at the start prior to pre-copy.
-  * opaque should be the MIS.
-  */
--static int init_range(const char *block_name, void *host_addr,
--                      ram_addr_t offset, ram_addr_t length, void *opaque=
++static char *get_shmem_opts(const char *mem_size, const char *shmem_path=
 )
-+static int init_range(RAMBlock *rb, void *opaque)
++{
++    return g_strdup_printf("-object memory-backend-file,id=3Dmem0,size=3D=
+%s"
++                           ",mem-path=3D%s,share=3Don -numa node,memdev=3D=
+mem0",
++                           mem_size, shmem_path);
++}
++
+ static void migrate_check_parameter(QTestState *who, const char *paramet=
+er,
+                                     long long value)
  {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     trace_postcopy_init_range(block_name, host_addr, offset, length);
+@@ -430,73 +437,91 @@ static void migrate_postcopy_start(QTestState *from=
+, QTestState *to)
+ }
 =20
-     /*
-@@ -465,9 +468,12 @@ static int init_range(const char *block_name, void *=
-host_addr,
-  * At the end of migration, undo the effects of init_range
-  * opaque should be the MIS.
-  */
--static int cleanup_range(const char *block_name, void *host_addr,
--                        ram_addr_t offset, ram_addr_t length, void *opaq=
-ue)
-+static int cleanup_range(RAMBlock *rb, void *opaque)
+ static int test_migrate_start(QTestState **from, QTestState **to,
+-                               const char *uri, bool hide_stderr)
++                               const char *uri, bool hide_stderr,
++                               bool use_shmem)
  {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     MigrationIncomingState *mis =3D opaque;
-     struct uffdio_range range_struct;
-     trace_postcopy_cleanup_range(block_name, host_addr, offset, length);
-@@ -586,9 +592,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
-tate *mis)
- /*
-  * Disable huge pages on an area
-  */
--static int nhp_range(const char *block_name, void *host_addr,
--                    ram_addr_t offset, ram_addr_t length, void *opaque)
-+static int nhp_range(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     trace_postcopy_nhp_range(block_name, host_addr, offset, length);
+     gchar *cmd_src, *cmd_dst;
+     char *bootpath =3D g_strdup_printf("%s/bootsect", tmpfs);
++    char *extra_opts =3D NULL;
++    char *shmem_path =3D NULL;
+     const char *arch =3D qtest_get_arch();
+     const char *accel =3D "kvm:tcg";
 =20
-     /*
-@@ -626,15 +635,13 @@ int postcopy_ram_prepare_discard(MigrationIncomingS=
-tate *mis)
-  *   opaque: MigrationIncomingState pointer
-  * Returns 0 on success
-  */
--static int ram_block_enable_notify(const char *block_name, void *host_ad=
-dr,
--                                   ram_addr_t offset, ram_addr_t length,
--                                   void *opaque)
-+static int ram_block_enable_notify(RAMBlock *rb, void *opaque)
- {
-     MigrationIncomingState *mis =3D opaque;
-     struct uffdio_register reg_struct;
+     got_stop =3D false;
 =20
--    reg_struct.range.start =3D (uintptr_t)host_addr;
--    reg_struct.range.len =3D length;
-+    reg_struct.range.start =3D (uintptr_t)qemu_ram_get_host_addr(rb);
-+    reg_struct.range.len =3D qemu_ram_get_used_length(rb);
-     reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
++    if (use_shmem) {
++        shmem_path =3D g_strdup_printf("/dev/shm/qemu-%d", getpid());
++    }
++
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
+         init_bootfile(bootpath, x86_bootsect);
++        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 150M"
+                                   " -name source,debug-threads=3Don"
+                                   " -serial file:%s/src_serial"
+-                                  " -drive file=3D%s,format=3Draw",
+-                                  accel, tmpfs, bootpath);
++                                  " -drive file=3D%s,format=3Draw %s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 150M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial"
+                                   " -drive file=3D%s,format=3Draw"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, bootpath, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+         start_address =3D X86_TEST_MEM_START;
+         end_address =3D X86_TEST_MEM_END;
+     } else if (g_str_equal(arch, "s390x")) {
+         init_bootfile_s390x(bootpath);
++        extra_opts =3D use_shmem ? get_shmem_opts("128M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 128M"
+                                   " -name source,debug-threads=3Don"
+-                                  " -serial file:%s/src_serial -bios %s"=
+,
+-                                  accel, tmpfs, bootpath);
++                                  " -serial file:%s/src_serial -bios %s =
+%s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 128M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial -bios %s=
+"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, bootpath, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+         start_address =3D S390_TEST_MEM_START;
+         end_address =3D S390_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") =3D=3D 0) {
++        extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
+ults"
+                                   " -name source,debug-threads=3Don"
+                                   " -serial file:%s/src_serial"
+                                   " -prom-env 'use-nvramrc?=3Dtrue' -pro=
+m-env "
+                                   "'nvramrc=3Dhex .\" _\" begin %x %x "
+                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0=
+ "
+-                                  "until'",  accel, tmpfs, end_address,
+-                                  start_address);
++                                  "until' %s",  accel, tmpfs, end_addres=
+s,
++                                  start_address, extra_opts ? extra_opts=
+ : "");
+         cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial"
+-                                  " -incoming %s",
+-                                  accel, tmpfs, uri);
++                                  " -incoming %s %s",
++                                  accel, tmpfs, uri,
++                                  extra_opts ? extra_opts : "");
 =20
-     /* Now tell our userfault_fd that it's responsible for this area */
-@@ -647,7 +654,6 @@ static int ram_block_enable_notify(const char *block_=
-name, void *host_addr,
+         start_address =3D PPC_TEST_MEM_START;
+         end_address =3D PPC_TEST_MEM_END;
+     } else if (strcmp(arch, "aarch64") =3D=3D 0) {
+         init_bootfile(bootpath, aarch64_kernel);
++        extra_opts =3D use_shmem ? get_shmem_opts("150M", shmem_path) : =
+NULL;
+         cmd_src =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
+n=3Dmax "
+                                   "-name vmsource,debug-threads=3Don -cp=
+u max "
+                                   "-m 150M -serial file:%s/src_serial "
+-                                  "-kernel %s ",
+-                                  accel, tmpfs, bootpath);
++                                  "-kernel %s %s",
++                                  accel, tmpfs, bootpath,
++                                  extra_opts ? extra_opts : "");
+         cmd_dst =3D g_strdup_printf("-machine virt,accel=3D%s,gic-versio=
+n=3Dmax "
+                                   "-name vmdest,debug-threads=3Don -cpu =
+max "
+                                   "-m 150M -serial file:%s/dest_serial "
+                                   "-kernel %s "
+-                                  "-incoming %s ",
+-                                  accel, tmpfs, bootpath, uri);
++                                  "-incoming %s %s",
++                                  accel, tmpfs, bootpath, uri,
++                                  extra_opts ? extra_opts : "");
+=20
+         start_address =3D ARM_TEST_MEM_START;
+         end_address =3D ARM_TEST_MEM_END;
+@@ -507,6 +532,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
+     }
+=20
+     g_free(bootpath);
++    g_free(extra_opts);
+=20
+     if (hide_stderr) {
+         gchar *tmp;
+@@ -524,6 +550,16 @@ static int test_migrate_start(QTestState **from, QTe=
+stState **to,
+=20
+     *to =3D qtest_init(cmd_dst);
+     g_free(cmd_dst);
++
++    /*
++     * Remove shmem file immediately to avoid memory leak in test failed=
+ case.
++     * It's valid becase QEMU has already opened this file
++     */
++    if (use_shmem) {
++        unlink(shmem_path);
++        g_free(shmem_path);
++    }
++
+     return 0;
+ }
+=20
+@@ -603,7 +639,7 @@ static int migrate_postcopy_prepare(QTestState **from=
+_ptr,
+     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+=20
+-    if (test_migrate_start(&from, &to, uri, hide_error)) {
++    if (test_migrate_start(&from, &to, uri, hide_error, false)) {
          return -1;
      }
-     if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
--        RAMBlock *rb =3D qemu_ram_block_by_name(block_name);
-         qemu_ram_set_uf_zeroable(rb);
+=20
+@@ -720,7 +756,7 @@ static void test_baddest(void)
+     char *status;
+     bool failed;
+=20
+-    if (test_migrate_start(&from, &to, "tcp:0:0", true)) {
++    if (test_migrate_start(&from, &to, "tcp:0:0", true, false)) {
+         return;
+     }
+     migrate(from, "tcp:0:0", "{}");
+@@ -745,7 +781,7 @@ static void test_precopy_unix(void)
+     char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+=20
+-    if (test_migrate_start(&from, &to, uri, false)) {
++    if (test_migrate_start(&from, &to, uri, false, false)) {
+         return;
      }
 =20
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 54a3c11540..7eb38ee764 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -624,9 +624,12 @@ static int rdma_add_block(RDMAContext *rdma, const c=
-har *block_name,
-  * in advanced before the migration starts. This tells us where the RAM =
-blocks
-  * are so that we can register them individually.
-  */
--static int qemu_rdma_init_one_block(const char *block_name, void *host_a=
-ddr,
--    ram_addr_t block_offset, ram_addr_t length, void *opaque)
-+static int qemu_rdma_init_one_block(RAMBlock *rb, void *opaque)
- {
-+    const char *block_name =3D qemu_ram_get_idstr(rb);
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t block_offset =3D qemu_ram_get_offset(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     return rdma_add_block(opaque, block_name, host_addr, block_offset, l=
-ength);
+@@ -781,6 +817,38 @@ static void test_precopy_unix(void)
+     g_free(uri);
  }
 =20
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 342d4a2285..2367fe8f7f 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -391,10 +391,10 @@ static void qemu_vfio_ram_block_removed(RAMBlockNot=
-ifier *n,
-     }
- }
-=20
--static int qemu_vfio_init_ramblock(const char *block_name, void *host_ad=
-dr,
--                                   ram_addr_t offset, ram_addr_t length,
--                                   void *opaque)
-+static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
++static void test_ignore_shared(void)
++{
++    char *uri =3D g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++
++    if (test_migrate_start(&from, &to, uri, false, true)) {
++        return;
++    }
++
++    migrate_set_capability(from, "x-ignore-shared", true);
++    migrate_set_capability(to, "x-ignore-shared", true);
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri, "{}");
++
++    wait_for_migration_pass(from);
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
  {
-+    void *host_addr =3D qemu_ram_get_host_addr(rb);
-+    ram_addr_t length =3D qemu_ram_get_used_length(rb);
-     int ret;
-     QEMUVFIOState *s =3D opaque;
+     char template[] =3D "/tmp/migration-test-XXXXXX";
+@@ -832,6 +900,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    qtest_add_func("/migration/ignore_shared", test_ignore_shared);
+=20
+     ret =3D g_test_run();
 =20
 --=20
 2.20.1
