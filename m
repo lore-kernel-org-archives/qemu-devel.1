@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45802)
+Received: from eggs.gnu.org ([209.51.188.92]:46089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqfaa-00066J-EB
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:13 -0500
+	(envelope-from <mst@redhat.com>) id 1gqfaf-0006Fc-Ng
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqfTS-0005a3-34
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:51 -0500
-Received: from mail-qt1-f169.google.com ([209.85.160.169]:46915)
+	(envelope-from <mst@redhat.com>) id 1gqfTO-0005T4-94
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:47 -0500
+Received: from mail-qk1-f169.google.com ([209.85.222.169]:40565)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqfTR-0005ZC-Qh
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:49 -0500
-Received: by mail-qt1-f169.google.com with SMTP id y20so31168qtm.13
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:43:49 -0800 (PST)
-Date: Mon, 4 Feb 2019 09:43:46 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqfTO-0005RP-2X
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:46 -0500
+Received: by mail-qk1-f169.google.com with SMTP id y16so41807qki.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:43:43 -0800 (PST)
+Date: Mon, 4 Feb 2019 09:43:40 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190204142638.27021-15-mst@redhat.com>
+Message-ID: <20190204142638.27021-12-mst@redhat.com>
 References: <20190204142638.27021-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190204142638.27021-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 14/25] i386/kvm: ignore masked irqs when update
- msi routes
+Subject: [Qemu-devel] [PULL 11/25] intel_iommu: fix operator in
+ vtd_switch_address_space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +30,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-When we are with intel-iommu device and with IR on, KVM will register
-an IEC notifier to detect interrupt updates from the guest and we'll
-kick off kvm_update_msi_routes_all() when it happens to make sure
-kernel IRQ cache is matching the latest.
+When calculating use_iommu, we wanted to first detect whether DMAR is
+enabled, then check whether PT is enabled if DMAR is enabled.  However
+in the current code we used "&" rather than "&&" so the ordering
+requirement is lost (instead it'll be an "AND" operation).  This could
+introduce errors dumped in QEMU console when rebooting a guest with
+both assigned device and vIOMMU, like:
 
-Though, kvm_update_msi_routes_all() is buggy in that it ignored the
-mask bit of either MSI/MSIX messages and it tries to translate the
-message even if the corresponding message was already masked by the
-guest driver (hence the MSI/MSIX message will be invalid).
+  qemu-system-x86_64: vtd_dev_to_context_entry: invalid root entry:
+  rsvd=0xf000ff53f000e2c3, val=0xf000ff53f000ff53 (reserved nonzero)
 
-Without this patch, we can receive an error message when we reboot a
-guest with both an assigned vfio-pci device and intel-iommu enabled:
-
-  qemu-system-x86_64: vtd_interrupt_remap_msi: MSI address low 32 bit invalid: 0x0
-
-The error does not affect functionality of the guest since when we
-failed to translate we'll just silently continue (which makes sense
-since crashing the VM for this seems even worse), but still it's
-better to fix it up.
-
+Acked-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/i386/kvm.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ hw/i386/intel_iommu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9af4542fb8..beae1b99da 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3894,7 +3894,7 @@ static QLIST_HEAD(, MSIRouteEntry) msi_route_list = \
- static void kvm_update_msi_routes_all(void *private, bool global,
-                                       uint32_t index, uint32_t mask)
- {
--    int cnt = 0;
-+    int cnt = 0, vector;
-     MSIRouteEntry *entry;
-     MSIMessage msg;
-     PCIDevice *dev;
-@@ -3902,11 +3902,19 @@ static void kvm_update_msi_routes_all(void *private, bool global,
-     /* TODO: explicit route update */
-     QLIST_FOREACH(entry, &msi_route_list, list) {
-         cnt++;
-+        vector = entry->vector;
-         dev = entry->dev;
--        if (!msix_enabled(dev) && !msi_enabled(dev)) {
-+        if (msix_enabled(dev) && !msix_is_masked(dev, vector)) {
-+            msg = msix_get_message(dev, vector);
-+        } else if (msi_enabled(dev) && !msi_is_masked(dev, vector)) {
-+            msg = msi_get_message(dev, vector);
-+        } else {
-+            /*
-+             * Either MSI/MSIX is disabled for the device, or the
-+             * specific message was masked out.  Skip this one.
-+             */
-             continue;
-         }
--        msg = pci_get_msi_message(dev, entry->vector);
-         kvm_irqchip_update_msi_route(kvm_state, entry->virq, msg, dev);
-     }
-     kvm_irqchip_commit_routes(kvm_state);
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 8b72735650..6d5cc1d039 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1153,7 +1153,7 @@ static bool vtd_switch_address_space(VTDAddressSpace *as)
+ 
+     assert(as);
+ 
+-    use_iommu = as->iommu_state->dmar_enabled & !vtd_dev_pt_enabled(as);
++    use_iommu = as->iommu_state->dmar_enabled && !vtd_dev_pt_enabled(as);
+ 
+     trace_vtd_switch_address_space(pci_bus_num(as->bus),
+                                    VTD_PCI_SLOT(as->devfn),
 -- 
 MST
