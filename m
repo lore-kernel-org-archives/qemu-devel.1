@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50937)
+Received: from eggs.gnu.org ([209.51.188.92]:55450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqfk1-0006H5-IQ
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:01:02 -0500
+	(envelope-from <groug@kaod.org>) id 1gqg2J-0002u5-Hd
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:19:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqfjv-0003tH-Of
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:00:57 -0500
-References: <20190202011048.12343-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6d3a1905-db14-cbbc-bdad-2f6da9dfaec5@redhat.com>
-Date: Mon, 4 Feb 2019 09:00:44 -0600
+	(envelope-from <groug@kaod.org>) id 1gqfyp-0002NE-Uo
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:16:17 -0500
+Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:39637)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gqfyp-00028z-Ou
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 10:16:15 -0500
+Received: from player791.ha.ovh.net (unknown [10.109.146.143])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 6B79843118
+	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 16:16:06 +0100 (CET)
+Date: Mon, 4 Feb 2019 16:15:54 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190204161554.253d810b@bahia.lan>
+In-Reply-To: <20190204142638.27021-24-mst@redhat.com>
+References: <20190204142638.27021-1-mst@redhat.com>
+	<20190204142638.27021-24-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190202011048.12343-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jH6TMN4rXcxH8BC9lXM8c3r0RgFQwUwZO"
-Subject: Re: [Qemu-devel] [PATCH v2] block/dirty-bitmap: Documentation and
- Comment fixups
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 23/25] mmap-alloc: fix hugetlbfs misaligned
+ length in ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +31,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jH6TMN4rXcxH8BC9lXM8c3r0RgFQwUwZO
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Fam Zheng <fam@euphon.net>
-Message-ID: <6d3a1905-db14-cbbc-bdad-2f6da9dfaec5@redhat.com>
-Subject: Re: [PATCH v2] block/dirty-bitmap: Documentation and Comment fixups
-References: <20190202011048.12343-1-jsnow@redhat.com>
-In-Reply-To: <20190202011048.12343-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Michael,
 
-On 2/1/19 7:10 PM, John Snow wrote:
-> The meaning of the states has changed subtly over time,
-> this should bring the understanding more in-line with the
-> current, actual usages.
->=20
-> Reported-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
->=20
+These two patches (22 and 23) from Murilo already got merged with a pull request
+from David earlier today.
+
+Cheers,
+
+--
+Greg
+
+On Mon, 4 Feb 2019 09:44:04 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> 
+> The commit 7197fb4058bcb68986bae2bb2c04d6370f3e7218 ("util/mmap-alloc:
+> fix hugetlb support on ppc64") fixed Huge TLB mappings on ppc64.
+> 
+> However, we still need to consider the underlying huge page size
+> during munmap() because it requires that both address and length be a
+> multiple of the underlying huge page size for Huge TLB mappings.
+> Quote from "Huge page (Huge TLB) mappings" paragraph under NOTES
+> section of the munmap(2) manual:
+> 
+>   "For munmap(), addr and length must both be a multiple of the
+>   underlying huge page size."
+> 
+> On ppc64, the munmap() in qemu_ram_munmap() does not work for Huge TLB
+> mappings because the mapped segment can be aligned with the underlying
+> huge page size, not aligned with the native system page size, as
+> returned by getpagesize().
+> 
+> This has the side effect of not releasing huge pages back to the pool
+> after a hugetlbfs file-backed memory device is hot-unplugged.
+> 
+> This patch fixes the situation in qemu_ram_mmap() and
+> qemu_ram_munmap() by considering the underlying page size on ppc64.
+> 
+> After this patch, memory hot-unplug releases huge pages back to the
+> pool.
+> 
+> Fixes: 7197fb4058bcb68986bae2bb2c04d6370f3e7218
+> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 > ---
-> V2: Amended some wordings, though this is a little chatty now.
->     Hopefully it's clearer, though.
-> ---
-
->  /**
-> - * A BdrvDirtyBitmap can be in three possible states:
-> - * (1) successor is NULL and disabled is false: full r/w mode
-> - * (2) successor is NULL and disabled is true: read only mode ("disabl=
-ed")
-> - * (3) successor is set: frozen mode.
-> - *     A frozen bitmap cannot be renamed, deleted, anonymized, cleared=
-, set,
-> - *     or enabled. A frozen bitmap can only abdicate() or reclaim().
-> + * A BdrvDirtyBitmap can be in four possible user-visible states:
-> + * (1) Active:   successor is NULL, and disabled is false: full r/w mo=
-de
-> + * (2) Disabled: successor is NULL, and disabled is true: qualified r/=
-w mode,
-> + *               guest writes are dropped, but monitor writes are poss=
-ible,
-> + *               through commands like merge and clear.
-> + * (3) Frozen:   successor is not NULL.
-> + *               A frozen bitmap cannot be renamed, deleted, cleared, =
-set,
-> + *               enabled, merged to, etc. A frozen bitmap can only abd=
-icate()
-> + *               or reclaim().
-> + *               In this state, the anonymous successor bitmap may be =
-either
-> + *               Active and recording writes from the guest (e.g. back=
-up jobs),
-> + *               but it can be Disabled and not recording writes.
-
-s/but/or/
-
-> + * (4) Locked:   Whether Active or Disabled, the user cannot modify th=
-is bitmap
-> + *               in any way from the monitor.
-
-Worth a parenthetical comment mentioning NBD export as a possible reason
-for Locked to be visible?
-
-With the one word fix,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jH6TMN4rXcxH8BC9lXM8c3r0RgFQwUwZO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxYU5wACgkQp6FrSiUn
-Q2oM+wgAmNrjr+fJC5RlUIR+EvhLXgEMx5m/gJfUqXEarKyB8IMBoAkDF4OKiYJU
-AwKONU4edh2B3r9zDa24M2nq+lVwDpzy2Otdi4Z3eIeR1lJGrZkDfr5ZA02wpvVf
-9n/r3HucAztWQwLPVcrS+9/snaUiFfXbmUGJqB/QMpss5J1IJgk0dIchV7lKzDMq
-nzxLbM5gdhHoenvnTQXpONQbJU7dk2hb6PCS7lIyhfOicuuZEeUbMTPES/3sSGWd
-miI33SzS3MuV5Oz2uYs2DbLjeI8YK/wmqzLr8UHDXZr0gxnscK9TygTrLJPCOVFc
-DhmOcRgObkPE+P286S0B11zRkjDOgA==
-=W7ip
------END PGP SIGNATURE-----
-
---jH6TMN4rXcxH8BC9lXM8c3r0RgFQwUwZO--
+>  include/qemu/mmap-alloc.h |  2 +-
+>  exec.c                    |  4 ++--
+>  util/mmap-alloc.c         | 22 ++++++++++++++++------
+>  util/oslib-posix.c        |  2 +-
+>  4 files changed, 20 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 50385e3f81..ef04f0ed5b 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -9,6 +9,6 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+>  
+>  void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+>  
+> -void qemu_ram_munmap(void *ptr, size_t size);
+> +void qemu_ram_munmap(int fd, void *ptr, size_t size);
+>  
+>  #endif
+> diff --git a/exec.c b/exec.c
+> index 25f3938a27..03dd673d36 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1873,7 +1873,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>      if (mem_prealloc) {
+>          os_mem_prealloc(fd, area, memory, smp_cpus, errp);
+>          if (errp && *errp) {
+> -            qemu_ram_munmap(area, memory);
+> +            qemu_ram_munmap(fd, area, memory);
+>              return NULL;
+>          }
+>      }
+> @@ -2394,7 +2394,7 @@ static void reclaim_ramblock(RAMBlock *block)
+>          xen_invalidate_map_cache_entry(block->host);
+>  #ifndef _WIN32
+>      } else if (block->fd >= 0) {
+> -        qemu_ram_munmap(block->host, block->max_length);
+> +        qemu_ram_munmap(block->fd, block->host, block->max_length);
+>          close(block->fd);
+>  #endif
+>      } else {
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index f71ea038c8..8565885420 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -80,6 +80,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>      int flags;
+>      int guardfd;
+>      size_t offset;
+> +    size_t pagesize;
+>      size_t total;
+>      void *guardptr;
+>      void *ptr;
+> @@ -100,7 +101,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       * anonymous memory is OK.
+>       */
+>      flags = MAP_PRIVATE;
+> -    if (fd == -1 || qemu_fd_getpagesize(fd) == getpagesize()) {
+> +    pagesize = qemu_fd_getpagesize(fd);
+> +    if (fd == -1 || pagesize == getpagesize()) {
+>          guardfd = -1;
+>          flags |= MAP_ANONYMOUS;
+>      } else {
+> @@ -109,6 +111,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>      }
+>  #else
+>      guardfd = -1;
+> +    pagesize = getpagesize();
+>      flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>  #endif
+>  
+> @@ -120,7 +123,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>  
+>      assert(is_power_of_2(align));
+>      /* Always align to host page size */
+> -    assert(align >= getpagesize());
+> +    assert(align >= pagesize);
+>  
+>      flags = MAP_FIXED;
+>      flags |= fd == -1 ? MAP_ANONYMOUS : 0;
+> @@ -143,17 +146,24 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       * a guard page guarding against potential buffer overflows.
+>       */
+>      total -= offset;
+> -    if (total > size + getpagesize()) {
+> -        munmap(ptr + size + getpagesize(), total - size - getpagesize());
+> +    if (total > size + pagesize) {
+> +        munmap(ptr + size + pagesize, total - size - pagesize);
+>      }
+>  
+>      return ptr;
+>  }
+>  
+> -void qemu_ram_munmap(void *ptr, size_t size)
+> +void qemu_ram_munmap(int fd, void *ptr, size_t size)
+>  {
+> +    size_t pagesize;
+> +
+>      if (ptr) {
+>          /* Unmap both the RAM block and the guard page */
+> -        munmap(ptr, size + getpagesize());
+> +#if defined(__powerpc64__) && defined(__linux__)
+> +        pagesize = qemu_fd_getpagesize(fd);
+> +#else
+> +        pagesize = getpagesize();
+> +#endif
+> +        munmap(ptr, size + pagesize);
+>      }
+>  }
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 4ce1ba9ca4..37c5854b9c 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -226,7 +226,7 @@ void qemu_vfree(void *ptr)
+>  void qemu_anon_ram_free(void *ptr, size_t size)
+>  {
+>      trace_qemu_anon_ram_free(ptr, size);
+> -    qemu_ram_munmap(ptr, size);
+> +    qemu_ram_munmap(-1, ptr, size);
+>  }
+>  
+>  void qemu_set_block(int fd)
