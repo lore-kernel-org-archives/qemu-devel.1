@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46181)
+Received: from eggs.gnu.org ([209.51.188.92]:46999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gqdqE-0004Gr-7O
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:17 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqdsq-0005r9-0v
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gqdqC-0008KY-7E
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:14 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52511)
+	(envelope-from <philmd@redhat.com>) id 1gqdsk-0001tM-2q
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:55 -0500
+Received: from mail-wr1-f42.google.com ([209.85.221.42]:40307)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gqdqC-0008JS-0O
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:12 -0500
-Received: by mail-wm1-x336.google.com with SMTP id m1so13083984wml.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 04:59:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqdsh-0001kT-5V
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 08:01:49 -0500
+Received: by mail-wr1-f42.google.com with SMTP id p4so14274530wrt.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 05:01:39 -0800 (PST)
 References: <20190201171229.3361-1-alex.bennee@linaro.org>
 	<3792ad53-69e1-e45e-1f0f-406288af0912@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <3792ad53-69e1-e45e-1f0f-406288af0912@redhat.com>
-Date: Mon, 04 Feb 2019 12:59:08 +0000
-Message-ID: <87pns74smb.fsf@zen.linaroharston>
+	<87pns74smb.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e533781e-914f-50dc-5df3-7a2d9831f1d1@redhat.com>
+Date: Mon, 4 Feb 2019 14:01:36 +0100
 MIME-Version: 1.0
+In-Reply-To: <87pns74smb.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] .travis.yml: separate tools and docs into
  another entry
 List-Id: <qemu-devel.nongnu.org>
@@ -31,83 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>
 
+On 2/4/19 1:59 PM, Alex Bennée wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>> On 2/1/19 6:12 PM, Alex Bennée wrote:
+>>> Re-building the tools and documents by default is a little wasteful as
+>>> they are not really affected by the main build options. Split tools
+>>> and documents into their own task with a minimal softmmu and
+>>> linux-user target list just to check they don't interact badly.
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  .travis.yml | 14 ++++++++++++--
+>>>  1 file changed, 12 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index 87d9fa971c..1c8effcf63 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -61,6 +61,7 @@ env:
+>>>    global:
+>>>      - SRC_DIR="."
+>>>      - BUILD_DIR="."
+>>> +    - BASE_CONFIG="--disable-docs --disable-tools"
+>>>      - TEST_CMD="make check -j3 V=1"
+>>>
+>>>
+>>> @@ -71,7 +72,7 @@ git:
+>>>
+>>>  before_script:
+>>>    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+>>> -  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
+>>> +  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+>>>  script:
+>>>    - make -j3 && ${TEST_CMD}
+>>>
+>>> @@ -106,6 +107,15 @@ matrix:
+>>>          - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
+>>>
+>>>
+>>> +    # Check we can build docs and tools
+>>> +    - env:
+>>> +        - BASE_CONFIG=""
+>>
+>> What about using explicit configure options?
+>>
+>>    BASE_CONFIG="--enable-docs --enable-tools"
+> 
+> Will add for clarity (although not effect ;-)
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+The effect will be in 10 months when I'll look at this again :P
 
-> Hi Alex,
->
-> On 2/1/19 6:12 PM, Alex Benn=C3=A9e wrote:
->> Re-building the tools and documents by default is a little wasteful as
->> they are not really affected by the main build options. Split tools
->> and documents into their own task with a minimal softmmu and
->> linux-user target list just to check they don't interact badly.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  .travis.yml | 14 ++++++++++++--
->>  1 file changed, 12 insertions(+), 2 deletions(-)
->>
->> diff --git a/.travis.yml b/.travis.yml
->> index 87d9fa971c..1c8effcf63 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -61,6 +61,7 @@ env:
->>    global:
->>      - SRC_DIR=3D"."
->>      - BUILD_DIR=3D"."
->> +    - BASE_CONFIG=3D"--disable-docs --disable-tools"
->>      - TEST_CMD=3D"make check -j3 V=3D1"
->>
->>
->> @@ -71,7 +72,7 @@ git:
->>
->>  before_script:
->>    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
->> -  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
->> +  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log &=
-& exit 1; }
->>  script:
->>    - make -j3 && ${TEST_CMD}
->>
->> @@ -106,6 +107,15 @@ matrix:
->>          - CONFIG=3D"--with-coroutine=3Dsigaltstack --disable-linux-user"
->>
->>
->> +    # Check we can build docs and tools
->> +    - env:
->> +        - BASE_CONFIG=3D""
->
-> What about using explicit configure options?
->
->    BASE_CONFIG=3D"--enable-docs --enable-tools"
+Thanks!
 
-Will add for clarity (although not effect ;-)
-
->
-> Regardless:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
->> +        - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-linux-user"
->> +      addons:
->> +        apt:
->> +          packages:
->> +            - python-sphinx
->> +
->>      # Test out-of-tree builds
->>      - env:
->>          - CONFIG=3D"--enable-debug --enable-debug-tcg"
->> @@ -243,5 +253,5 @@ matrix:
 >>
+>> Regardless:
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >>
->>      - env:
->> -        - CONFIG=3D"--disable-system --disable-docs"
->> +        - CONFIG=3D"--disable-system"
->>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>
-
-
---
-Alex Benn=C3=A9e
+>>> +        - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
+>>> +      addons:
+>>> +        apt:
+>>> +          packages:
+>>> +            - python-sphinx
+>>> +
+>>>      # Test out-of-tree builds
+>>>      - env:
+>>>          - CONFIG="--enable-debug --enable-debug-tcg"
+>>> @@ -243,5 +253,5 @@ matrix:
+>>>
+>>>
+>>>      - env:
+>>> -        - CONFIG="--disable-system --disable-docs"
+>>> +        - CONFIG="--disable-system"
+>>>          - TEST_CMD="make -j3 check-tcg V=1"
+>>>
+> 
+> 
+> --
+> Alex Bennée
+> 
