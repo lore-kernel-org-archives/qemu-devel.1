@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37411)
+Received: from eggs.gnu.org ([209.51.188.92]:38813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbb6-0006J7-L5
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:29 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gqbdj-0007ja-TQ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqbay-0000Jq-2b
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gqbav-0000A2-Uq
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:35:18 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDFA87F7B1
-	for <qemu-devel@nongnu.org>; Mon,  4 Feb 2019 10:35:12 +0000 (UTC)
-Date: Mon, 4 Feb 2019 10:35:06 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190204103506.GG1905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190202110834.24880-1-pbonzini@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1gqbdi-00034y-V9
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:38:11 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:41709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gqbdi-00030G-Qs
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 05:38:10 -0500
+Received: by mail-qt1-f195.google.com with SMTP id b15so2966720qto.8
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 02:38:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190202110834.24880-1-pbonzini@redhat.com>
+References: <20190123172740.32452-1-berrange@redhat.com>
+	<20190123172740.32452-2-berrange@redhat.com>
+In-Reply-To: <20190123172740.32452-2-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 4 Feb 2019 11:37:57 +0100
+Message-ID: <CAMxuvayRb9_FjR--Y9enzyh40TrkynfyXnx_860xtnkFevNb1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] char: allow specifying a GMainContext at
- opening time
+Subject: Re: [Qemu-devel] [PATCH v2 01/16] io: store reference to thread
+ information in the QIOTask struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +30,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Yongji Xie <elohimes@gmail.com>
 
-On Sat, Feb 02, 2019 at 12:08:34PM +0100, Paolo Bonzini wrote:
-> This will be needed by vhost-user-test, when each test switches to
-> its own GMainLoop and GMainContext.  Otherwise, for a reconnecting
-> socket the initial connection will happen on the default GMainContext,
-> and no one will be listening on it.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Based-on: <1544684731-18828-1-git-send-email-thuth@redhat.com>
+On Wed, Jan 23, 2019 at 6:27 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> Currently the struct QIOTaskThreadData is only needed by the worker
+> thread, but a subsequent patch will need to access it from another
+> context.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-I'm wondering if you had looked at my series related to the chardev
-reconnect feature, as this feature has many flaws as implemented
-right now:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05947.html
-
-Our patches will conflict, but I think yours is needed regardless.
-
-Incidentally I'm increasingly of the opinion that the qemu_chr_new()
-design right now is flawed.
-
-IMHO we should really decouple the parsing & creation of the
-Chardev object, from the opening of the backend. eg I would like
-to see a qemu_chr_open() as a separate explicitly callable step
-from qemu_chr_new(). If we had that, then we would not need to
-pass GMainContext into qemu_chr_new() as we would be able to
-call the API to set the GMainContext before calling qemu_chr_open
-
-I fear that would be a complex refactoring job though, so no
-objection to your current patch for solving the immediate need.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 > ---
->  chardev/char.c          | 30 +++++++++++++++-------------
->  gdbstub.c               |  4 ++--
->  hmp.c                   |  2 +-
->  hw/arm/omap2.c          |  2 +-
->  hw/bt/hci-csr.c         |  2 +-
->  hw/char/omap_uart.c     |  4 ++--
->  hw/char/xen_console.c   |  3 ++-
->  hw/isa/isa-superio.c    |  4 ++--
->  hw/mips/boston.c        |  2 +-
->  hw/mips/mips_malta.c    |  2 +-
->  hw/usb/dev-serial.c     |  2 +-
->  include/chardev/char.h  | 16 +++++++++++----
->  net/slirp.c             |  2 +-
->  qtest.c                 |  2 +-
->  tests/test-char.c       | 43 +++++++++++++++++++++--------------------
->  tests/vhost-user-test.c |  2 +-
->  vl.c                    |  8 ++++----
->  17 files changed, 72 insertions(+), 58 deletions(-)
-
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  io/task.c | 53 ++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 28 insertions(+), 25 deletions(-)
+>
+> diff --git a/io/task.c b/io/task.c
+> index 2886a2c1bc..d100a754d3 100644
+> --- a/io/task.c
+> +++ b/io/task.c
+> @@ -24,6 +24,14 @@
+>  #include "qemu/thread.h"
+>  #include "trace.h"
+>
+> +struct QIOTaskThreadData {
+> +    QIOTaskWorker worker;
+> +    gpointer opaque;
+> +    GDestroyNotify destroy;
+> +    GMainContext *context;
+> +};
+> +
+> +
+>  struct QIOTask {
+>      Object *source;
+>      QIOTaskFunc func;
+> @@ -32,6 +40,7 @@ struct QIOTask {
+>      Error *err;
+>      gpointer result;
+>      GDestroyNotify destroyResult;
+> +    struct QIOTaskThreadData *thread;
+>  };
+>
+>
+> @@ -72,31 +81,23 @@ static void qio_task_free(QIOTask *task)
+>  }
+>
+>
+> -struct QIOTaskThreadData {
+> -    QIOTask *task;
+> -    QIOTaskWorker worker;
+> -    gpointer opaque;
+> -    GDestroyNotify destroy;
+> -    GMainContext *context;
+> -};
+> -
+> -
+>  static gboolean qio_task_thread_result(gpointer opaque)
+>  {
+> -    struct QIOTaskThreadData *data =3D opaque;
+> +    QIOTask *task =3D opaque;
+>
+> -    trace_qio_task_thread_result(data->task);
+> -    qio_task_complete(data->task);
+> +    trace_qio_task_thread_result(task);
+> +    qio_task_complete(task);
+>
+> -    if (data->destroy) {
+> -        data->destroy(data->opaque);
+> +    if (task->thread->destroy) {
+> +        task->thread->destroy(task->thread->opaque);
+>      }
+>
+> -    if (data->context) {
+> -        g_main_context_unref(data->context);
+> +    if (task->thread->context) {
+> +        g_main_context_unref(task->thread->context);
+>      }
+>
+> -    g_free(data);
+> +    g_free(task->thread);
+> +    task->thread =3D NULL;
+>
+>      return FALSE;
+>  }
+> @@ -104,22 +105,23 @@ static gboolean qio_task_thread_result(gpointer opa=
+que)
+>
+>  static gpointer qio_task_thread_worker(gpointer opaque)
+>  {
+> -    struct QIOTaskThreadData *data =3D opaque;
+> +    QIOTask *task =3D opaque;
+>      GSource *idle;
+>
+> -    trace_qio_task_thread_run(data->task);
+> -    data->worker(data->task, data->opaque);
+> +    trace_qio_task_thread_run(task);
+> +
+> +    task->thread->worker(task, task->thread->opaque);
+>
+>      /* We're running in the background thread, and must only
+>       * ever report the task results in the main event loop
+>       * thread. So we schedule an idle callback to report
+>       * the worker results
+>       */
+> -    trace_qio_task_thread_exit(data->task);
+> +    trace_qio_task_thread_exit(task);
+>
+>      idle =3D g_idle_source_new();
+> -    g_source_set_callback(idle, qio_task_thread_result, data, NULL);
+> -    g_source_attach(idle, data->context);
+> +    g_source_set_callback(idle, qio_task_thread_result, task, NULL);
+> +    g_source_attach(idle, task->thread->context);
+>
+>      return NULL;
+>  }
+> @@ -138,17 +140,18 @@ void qio_task_run_in_thread(QIOTask *task,
+>          g_main_context_ref(context);
+>      }
+>
+> -    data->task =3D task;
+>      data->worker =3D worker;
+>      data->opaque =3D opaque;
+>      data->destroy =3D destroy;
+>      data->context =3D context;
+>
+> +    task->thread =3D data;
+> +
+>      trace_qio_task_thread_start(task, worker, opaque);
+>      qemu_thread_create(&thread,
+>                         "io-task-worker",
+>                         qio_task_thread_worker,
+> -                       data,
+> +                       task,
+>                         QEMU_THREAD_DETACHED);
+>  }
+>
+> --
+> 2.20.1
+>
