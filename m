@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45347)
+Received: from eggs.gnu.org ([209.51.188.92]:45473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gqgjv-0002L0-JI
+	(envelope-from <peter.maydell@linaro.org>) id 1gqgk1-0002ML-Q1
 	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:05:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gqgju-00082N-0H
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:04:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:9143)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gqgjs-0007Hi-19
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:04:52 -0500
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Mon,  4 Feb 2019 17:03:22 +0100
-Message-Id: <20190204160325.4914-3-lersek@redhat.com>
-In-Reply-To: <20190204160325.4914-1-lersek@redhat.com>
-References: <20190204160325.4914-1-lersek@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gqgjz-0008B0-I0
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:05:01 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41761)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gqgjx-00086l-Li
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 11:04:59 -0500
+Received: by mail-ot1-x341.google.com with SMTP id u16so583191otk.8
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 08:04:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/5] roms: build the EfiRom utility from the
- roms/edk2 submodule
+References: <20190130031427.13129-1-jasowang@redhat.com>
+In-Reply-To: <20190130031427.13129-1-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Feb 2019 16:04:43 +0000
+Message-ID: <CAFEAcA_no_9KX5v4WBWZ2Vu9zGjM5A3MtVzSLSwkure6y1=r8Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V2] test-filter-mirror: pass UNIX domain
+ socket through fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Building the EfiRom utility from "roms/edk2/BaseTools" should make
-"roms/Makefile" more self-contained. Otherwise, we'd call the system-wide
-EfiRom for building the combined iPXE option ROMs, but call the sibling
-utilities from "roms/edk2/BaseTools" for building "roms/edk2" content.
+On Wed, 30 Jan 2019 at 03:14, Jason Wang <jasowang@redhat.com> wrote:
+>
+> The tests tries to let qemu server mode to process the connection
+> which turns out to be racy after commit 8258292e18c3 ("monitor: Remove
+> "x-oob", offer capability "oob" unconditionally"). This is because the
+> filter may try to mirror the packets before UNIX socket object is
+> ready (connected was set to true) from the view of qemu. In this case
+> the packet will be dropped silently.
+>
+> Fixing this by passing pre-connected socket created by socketpair() to
+> qemu through fd.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
+Hi; assuming it passes my merge tests I'm planning to apply
+this directly to master since it will make my merge testing
+easier. Thanks for tracking down and fixing the bug!
 
-Notes:
-    v3:
-    - no change
-   =20
-    v2:
-    - pick up R-b / T-b [Gerd, Phil]
-
- roms/Makefile | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/roms/Makefile b/roms/Makefile
-index a6043eff37e9..78d5dd18c301 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -47,10 +47,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
- # We need that to combine multiple images (legacy bios,
- # efi ia32, efi x64) into a single rom binary.
- #
--# We try to find it in the path.  You can also pass the location on
--# the command line, i.e. "make EFIROM=3D/path/to/EfiRom efirom"
--#
--EFIROM ?=3D $(shell which EfiRom 2>/dev/null)
-+EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-=20
- default:
- 	@echo "nothing is build by default"
-@@ -59,8 +56,7 @@ default:
- 	@echo "  vgabios        -- update vgabios binaries (seabios)"
- 	@echo "  sgabios        -- update sgabios binaries"
- 	@echo "  pxerom         -- update nic roms (bios only)"
--	@echo "  efirom         -- update nic roms (bios+efi, this needs"
--	@echo "                    the EfiRom utility from edk2 / tianocore)"
-+	@echo "  efirom         -- update nic roms (bios+efi)"
- 	@echo "  slof           -- update slof.bin"
- 	@echo "  skiboot        -- update skiboot.lid"
- 	@echo "  u-boot.e500    -- update u-boot.e500"
-@@ -106,7 +102,7 @@ pxe-rom-%: build-pxe-roms
-=20
- efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
-=20
--efi-rom-%: build-pxe-roms build-efi-roms
-+efi-rom-%: build-pxe-roms build-efi-roms $(EFIROM)
- 	$(EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
- 		-b ipxe/src/bin/$(VID)$(DID).rom \
- 		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
-@@ -124,6 +120,8 @@ build-efi-roms: build-pxe-roms
- 		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
- 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
-=20
-+$(EFIROM):
-+	$(MAKE) -C edk2/BaseTools
-=20
- slof:
- 	$(MAKE) -C SLOF CROSS=3D$(powerpc64_cross_prefix) qemu
-@@ -150,6 +148,7 @@ clean:
- 	$(MAKE) -C sgabios clean
- 	rm -f sgabios/.depend
- 	$(MAKE) -C ipxe/src veryclean
-+	$(MAKE) -C edk2/BaseTools clean
- 	$(MAKE) -C SLOF clean
- 	rm -rf u-boot/build.e500
- 	$(MAKE) -C u-boot-sam460ex distclean
---=20
-2.19.1.3.g30247aa5d201
+-- PMM
