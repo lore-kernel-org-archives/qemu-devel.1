@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45857)
+Received: from eggs.gnu.org ([209.51.188.92]:45802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqfaX-00066m-Do
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:10 -0500
+	(envelope-from <mst@redhat.com>) id 1gqfaU-00066J-KJ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqfTY-0005fe-N1
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:57 -0500
-Received: from mail-qt1-f176.google.com ([209.85.160.176]:37771)
+	(envelope-from <mst@redhat.com>) id 1gqfTa-0005gU-JS
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:59 -0500
+Received: from mail-qt1-f176.google.com ([209.85.160.176]:39294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqfTY-0005fI-FD
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:56 -0500
-Received: by mail-qt1-f176.google.com with SMTP id t33so105079qtt.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:43:56 -0800 (PST)
-Date: Mon, 4 Feb 2019 09:43:53 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqfTa-0005gJ-BZ
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 09:43:58 -0500
+Received: by mail-qt1-f176.google.com with SMTP id u47so88911qtj.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 06:43:58 -0800 (PST)
+Date: Mon, 4 Feb 2019 09:43:55 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190204142638.27021-19-mst@redhat.com>
+Message-ID: <20190204142638.27021-20-mst@redhat.com>
 References: <20190204142638.27021-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190204142638.27021-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 18/25] hw/virtio: Use CONFIG_VIRTIO_PCI switch
- instead of CONFIG_PCI
+Subject: [Qemu-devel] [PULL 19/25] acpi: Make TPM 2.0 with TIS available as
+ MSFT0101
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +30,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
 
-For downstream s390x builds, we'd like to be able to build QEMU with
-CONFIG_VIRTIO_PCI disabled (since virtio-ccw is used here instead),
-but still with CONFIG_PCI enabled. This currently fails since the
-virtio-*-pci.o files are still included in the build, but virtio-pci.o
-is missing. Use the right config switch CONFIG_VIRTIO_PCI to exclude
-the virtio-*-pci.o files from the build.
+This patch makes the a TPM 2.0 with TIS interface available under the
+HID 'MSF0101'. This is supported by Linux and also Windows now
+recognizes the TPM 2.0 with TIS interface. Leave the TPM 1.2 as before.
 
-Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/virtio/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i386/acpi-build.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 16f8e1c154..757a45743e 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -13,7 +13,7 @@ obj-$(CONFIG_VHOST_USER) += vhost-user.o
- obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL)) += vhost.o vhost-backend.o
- common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL))) += vhost-stub.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
--ifeq ($(CONFIG_PCI),y)
-+ifeq ($(CONFIG_VIRTIO_PCI),y)
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
- obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
- obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d60603abd7..26cef4af2d 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2141,8 +2141,16 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+             build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+ 
+             if (TPM_IS_TIS(tpm)) {
+-                dev = aml_device("ISA.TPM");
+-                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
++                if (misc->tpm_version == TPM_VERSION_2_0) {
++                    dev = aml_device("TPM");
++                    aml_append(dev, aml_name_decl("_HID",
++                                                  aml_string("MSFT0101")));
++                } else {
++                    dev = aml_device("ISA.TPM");
++                    aml_append(dev, aml_name_decl("_HID",
++                                                  aml_eisaid("PNP0C31")));
++                }
++
+                 aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+                 crs = aml_resource_template();
+                 aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
 -- 
 MST
