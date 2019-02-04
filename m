@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46144)
+Received: from eggs.gnu.org ([209.51.188.92]:46181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqdq8-0004ES-5J
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:09 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gqdqE-0004Gr-7O
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gqdq6-0008HK-EU
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gqdq6-0008Gs-6p
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:06 -0500
-References: <1548410831-19553-1-git-send-email-pbonzini@redhat.com>
-	<1548410831-19553-34-git-send-email-pbonzini@redhat.com>
-	<6e8609da-a198-4457-afc2-88f911261994@redhat.com>
-	<b925a626-dee7-a95f-2721-a821c6edf209@redhat.com>
-	<469a90b3-c032-1373-01b2-9f29e49414c1@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d6cadf7-46b0-1823-54e5-19b07bfca1a9@redhat.com>
-Date: Mon, 4 Feb 2019 13:58:57 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gqdqC-0008KY-7E
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:14 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gqdqC-0008JS-0O
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 07:59:12 -0500
+Received: by mail-wm1-x336.google.com with SMTP id m1so13083984wml.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 04:59:11 -0800 (PST)
+References: <20190201171229.3361-1-alex.bennee@linaro.org>
+	<3792ad53-69e1-e45e-1f0f-406288af0912@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <3792ad53-69e1-e45e-1f0f-406288af0912@redhat.com>
+Date: Mon, 04 Feb 2019 12:59:08 +0000
+Message-ID: <87pns74smb.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <469a90b3-c032-1373-01b2-9f29e49414c1@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 33/52] build: switch to Kconfig
+Subject: Re: [Qemu-devel] [PATCH] .travis.yml: separate tools and docs into
+ another entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, thuth@redhat.com
-Cc: qemu-devel@nongnu.org, yang.zhong@intel.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>
 
-On 01/02/19 15:56, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/31/19 11:15 PM, Paolo Bonzini wrote:
->> On 31/01/19 22:48, Philippe Mathieu-Daud=C3=A9 wrote:
->>> There is something I don't understand here: Does CONFIG_XEN in
->>> Kconfig.host take precedence over the target configs? I'm looking at
->>> these configs:
->>>
->>>  if supported_xen_target $target; then
->>>      echo "CONFIG_XEN=3Dn" >> $config_target_mak
->>>      if test "$xen_pci_passthrough" =3D yes; then
->>>          echo "CONFIG_XEN_PCI_PASSTHROUGH=3Dy" >> "$config_target_mak=
-"
->>>      fi
->>>  fi
+
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Hi Alex,
+>
+> On 2/1/19 6:12 PM, Alex Benn=C3=A9e wrote:
+>> Re-building the tools and documents by default is a little wasteful as
+>> they are not really affected by the main build options. Split tools
+>> and documents into their own task with a minimal softmmu and
+>> linux-user target list just to check they don't interact badly.
 >>
->> You're right, Kconfig.host should contain CONFIG_XEN_BACKEND and not
->> CONFIG_XEN.
->=20
-> Now when I disable Xen, exec.o isn't rebuilt, so I get link errors:
->=20
-> /usr/bin/ld: exec.o: in function `reclaim_ramblock':
-> qemu/exec.c:2392: undefined reference to `xen_invalidate_map_cache_entr=
-y'
-> /usr/bin/ld: exec.o: in function `qemu_ram_ptr_length':
-> qemu/exec.c:2531: undefined reference to `xen_map_cache'
-> /usr/bin/ld: exec.o: in function `qemu_map_ram_ptr':
-> qemu/exec.c:2498: undefined reference to `xen_map_cache'
-> /usr/bin/ld: exec.o: in function `qemu_ram_block_from_host':
-> qemu/exec.c:2573: undefined reference to `xen_ram_addr_from_mapcache'
-> /usr/bin/ld: exec.o: in function `address_space_unmap':
-> qemu/exec.c:3699: undefined reference to `xen_invalidate_map_cache_entr=
-y'
-> /usr/bin/ld: exec.o: in function `address_space_cache_destroy':
-> qemu/exec.c:3791: undefined reference to `xen_invalidate_map_cache_entr=
-y'
-> /usr/bin/ld: exec.o: in function `qemu_ram_ptr_length':
-> qemu/exec.c:2528: undefined reference to `xen_map_cache'
-> /usr/bin/ld: exec.o: in function `qemu_map_ram_ptr':
-> qemu/exec.c:2495: undefined reference to `xen_map_cache'
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [Makefile:204: qemu-system-i386] Error 1
->=20
-> Moving those function stubs into a real xen-stub.c file would be simple=
-r
-> from the buildsys PoV IMHO, but I also remember we prefer to avoid
-> stubs, so not sure what's better here, neither what's wrong with make r=
-ules.
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  .travis.yml | 14 ++++++++++++--
+>>  1 file changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 87d9fa971c..1c8effcf63 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -61,6 +61,7 @@ env:
+>>    global:
+>>      - SRC_DIR=3D"."
+>>      - BUILD_DIR=3D"."
+>> +    - BASE_CONFIG=3D"--disable-docs --disable-tools"
+>>      - TEST_CMD=3D"make check -j3 V=3D1"
+>>
+>>
+>> @@ -71,7 +72,7 @@ git:
+>>
+>>  before_script:
+>>    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+>> -  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
+>> +  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log &=
+& exit 1; }
+>>  script:
+>>    - make -j3 && ${TEST_CMD}
+>>
+>> @@ -106,6 +107,15 @@ matrix:
+>>          - CONFIG=3D"--with-coroutine=3Dsigaltstack --disable-linux-user"
+>>
+>>
+>> +    # Check we can build docs and tools
+>> +    - env:
+>> +        - BASE_CONFIG=3D""
+>
+> What about using explicit configure options?
+>
+>    BASE_CONFIG=3D"--enable-docs --enable-tools"
 
-Sorry, I don't understand.  Can you provide reproduction instructions?
+Will add for clarity (although not effect ;-)
 
-Paolo
+>
+> Regardless:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>> +        - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-linux-user"
+>> +      addons:
+>> +        apt:
+>> +          packages:
+>> +            - python-sphinx
+>> +
+>>      # Test out-of-tree builds
+>>      - env:
+>>          - CONFIG=3D"--enable-debug --enable-debug-tcg"
+>> @@ -243,5 +253,5 @@ matrix:
+>>
+>>
+>>      - env:
+>> -        - CONFIG=3D"--disable-system --disable-docs"
+>> +        - CONFIG=3D"--disable-system"
+>>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>>
+
+
+--
+Alex Benn=C3=A9e
