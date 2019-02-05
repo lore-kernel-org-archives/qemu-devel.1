@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51966)
+Received: from eggs.gnu.org ([209.51.188.92]:52869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gr3eX-0005YG-Bx
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:32:55 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3hH-0007AK-FT
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gr3eV-0004X1-Q3
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:32:53 -0500
-Date: Tue, 5 Feb 2019 17:32:23 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190205173223.2a8c595c.cohuck@redhat.com>
-In-Reply-To: <bd078c02-e08a-545f-3c17-52e291ef60ad@linux.ibm.com>
-References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-3-cohuck@redhat.com>
-	<55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
-	<20190205131047.32f7c7a1.cohuck@redhat.com>
-	<bd078c02-e08a-545f-3c17-52e291ef60ad@linux.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3h5-0005d0-J7
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:35:36 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 5 Feb 2019 16:35:13 +0000
+Message-ID: <261d4eb9-eb91-5654-e5ad-995b7f93432b@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-7-vsementsov@virtuozzo.com>
+	<64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
+	<20190116165837.GF20275@redhat.com>
+In-Reply-To: <20190116165837.GF20275@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D835A1263BB5C0418B2E781F6544F83E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vfio-ccw: rework ssch state handling
+Subject: Re: [Qemu-devel] [PATCH v4 06/10] block/nbd-client: move from quit
+ to state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,133 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Tue, 5 Feb 2019 09:31:55 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On 02/05/2019 07:10 AM, Cornelia Huck wrote:
-> > On Mon, 4 Feb 2019 16:29:40 -0500
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> On 01/30/2019 08:22 AM, Cornelia Huck wrote:  
-> >>> The flow for processing ssch requests can be improved by splitting
-> >>> the BUSY state:
-> >>>
-> >>> - CP_PROCESSING: We reject any user space requests while we are in
-> >>>     the process of translating a channel program and submitting it to
-> >>>     the hardware. Use -EAGAIN to signal user space that it should
-> >>>     retry the request.
-> >>> - CP_PENDING: We have successfully submitted a request with ssch and
-> >>>     are now expecting an interrupt. As we can't handle more than one
-> >>>     channel program being processed, reject any further requests with
-> >>>     -EBUSY. A final interrupt will move us out of this state; this also
-> >>>     fixes a latent bug where a non-final interrupt might have freed up
-> >>>     a channel program that still was in progress.
-> >>>     By making this a separate state, we make it possible to issue a
-> >>>     halt or a clear while we're still waiting for the final interrupt
-> >>>     for the ssch (in a follow-on patch).
-> >>>
-> >>> It also makes a lot of sense not to preemptively filter out writes to
-> >>> the io_region if we're in an incorrect state: the state machine will
-> >>> handle this correctly.
-> >>>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>    drivers/s390/cio/vfio_ccw_drv.c     |  8 ++++++--
-> >>>    drivers/s390/cio/vfio_ccw_fsm.c     | 19 ++++++++++++++-----
-> >>>    drivers/s390/cio/vfio_ccw_ops.c     |  2 --
-> >>>    drivers/s390/cio/vfio_ccw_private.h |  3 ++-
-> >>>    4 files changed, 22 insertions(+), 10 deletions(-)  
-> >   
-> >>> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> >>> index e7c9877c9f1e..b4a141fbd1a8 100644
-> >>> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> >>> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> >>> @@ -28,7 +28,6 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
-> >>>    	sch = private->sch;
-> >>>    
-> >>>    	spin_lock_irqsave(sch->lock, flags);
-> >>> -	private->state = VFIO_CCW_STATE_BUSY;
-> >>>    
-> >>>    	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
-> >>>    	if (!orb) {
-> >>> @@ -46,6 +45,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
-> >>>    		 */
-> >>>    		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
-> >>>    		ret = 0;
-> >>> +		private->state = VFIO_CCW_STATE_CP_PENDING;  
-> >>
-> >> [1]
-> >>  
-> >>>    		break;
-> >>>    	case 1:		/* Status pending */
-> >>>    	case 2:		/* Busy */
-> >>> @@ -107,6 +107,12 @@ static void fsm_io_busy(struct vfio_ccw_private *private,
-> >>>    	private->io_region->ret_code = -EBUSY;
-> >>>    }
-> >>>    
-> >>> +static void fsm_io_retry(struct vfio_ccw_private *private,
-> >>> +			 enum vfio_ccw_event event)
-> >>> +{
-> >>> +	private->io_region->ret_code = -EAGAIN;
-> >>> +}
-> >>> +
-> >>>    static void fsm_disabled_irq(struct vfio_ccw_private *private,
-> >>>    			     enum vfio_ccw_event event)
-> >>>    {
-> >>> @@ -135,8 +141,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >>>    	struct mdev_device *mdev = private->mdev;
-> >>>    	char *errstr = "request";
-> >>>    
-> >>> -	private->state = VFIO_CCW_STATE_BUSY;
-> >>> -
-> >>> +	private->state = VFIO_CCW_STATE_CP_PROCESSING;  
-> >>
-> >> [1]
-> >>  
-> >>>    	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
-> >>>    
-> >>>    	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
-> >>> @@ -181,7 +186,6 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >>>    	}
-> >>>    
-> >>>    err_out:
-> >>> -	private->state = VFIO_CCW_STATE_IDLE;  
-> >>
-> >> [1] Revisiting these locations as from an earlier discussion [2]...
-> >> These go IDLE->CP_PROCESSING->CP_PENDING if we get a cc=0 on the SSCH,
-> >> but we stop in CP_PROCESSING if the SSCH gets a nonzero cc.  Shouldn't
-> >> we cleanup and go back to IDLE in this scenario, rather than forcing
-> >> userspace to escalate to CSCH/HSCH after some number of retries (via FSM)?
-> >>
-> >> [2] https://patchwork.kernel.org/patch/10773611/#22447997  
-> > 
-> > It does do that (in vfio_ccw_mdev_write), it was not needed here. Or do
-> > you think doing it here would be more obvious?  
-> 
-> Ah, my mistake, I missed that.  (That function is renamed to 
-> vfio_ccw_mdev_write_io_region in patch 4.)
-> 
-> I don't think keeping it here is necessary then.  I got too focused 
-> looking at what you ripped out that I lost the things that stayed.  Once 
-> this series gets in its entirety, and Pierre has a chance to rebase his 
-> FSM series on top of it all, this should be in great shape.
-
-Yeah, it's probably easier to look at the end result.
-
-> 
-> >   
-> >>
-> >> Besides that, I think this looks good to me.  
-> > 
-> > Thanks!
-> >   
-> 
-> You're welcome!  Here, have a thing to add to this patch:
-> 
-> Reviewed-by: Eric Farman <farman@linux.ibm.com>
-> 
-
-Thanks a lot!
+MTYuMDEuMjAxOSAxOTo1OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gV2VkLCBK
+YW4gMTYsIDIwMTkgYXQgMTA6MjU6MDNBTSAtMDYwMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IFth
+ZGRpbmcgRGFuXQ0KPj4NCj4+IE9uIDcvMzEvMTggMTI6MzAgUE0sIFZsYWRpbWlyIFNlbWVudHNv
+di1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gVG8gaW1wbGVtZW50IHJlY29ubmVjdCB3ZSBuZWVkIHNl
+dmVyYWwgc3RhdGVzIGZvciB0aGUgY2xpZW50Og0KPj4+IENPTk5FQ1RFRCwgUVVJVCBhbmQgdHdv
+IENPTk5FQ1RJTkcgc3RhdGVzLiBDT05ORUNUSU5HIHN0YXRlcyB3aWxsDQo+Pj4gYmUgcmVhbGl6
+ZWQgaW4gdGhlIGZvbGxvd2luZyBwYXRjaGVzLiBUaGlzIHBhdGNoIGltcGxlbWVudHMgQ09OTkVD
+VEVEDQo+Pj4gYW5kIFFVSVQuDQo+Pj4NCj4+PiBRVUlUIG1lYW5zLCB0aGF0IHdlIHNob3VsZCBj
+bG9zZSB0aGUgY29ubmVjdGlvbiBhbmQgZmFpbCBhbGwgY3VycmVudA0KPj4+IGFuZCBmdXJ0aGVy
+IHJlcXVlc3RzIChsaWtlIG9sZCBxdWl0ID0gdHJ1ZSkuDQo+Pj4NCj4+PiBDT05ORUNURUQgbWVh
+bnMgdGhhdCBjb25uZWN0aW9uIGlzIG9rLCB3ZSBjYW4gc2VuZCByZXF1ZXN0cyAobGlrZSBvbGQN
+Cj4+PiBxdWl0ID0gZmFsc2UpLg0KPj4+DQo+Pj4gRm9yIHJlY2VpdmluZyBsb29wIHdlIHVzZSBh
+IGNvbXBhcmlzb24gb2YgdGhlIGN1cnJlbnQgc3RhdGUgd2l0aCBRVUlULA0KPj4+IGJlY2F1c2Ug
+cmVjb25uZWN0IHdpbGwgYmUgaW4gdGhlIHNhbWUgbG9vcCwgc28gaXQgc2hvdWxkIGJlIGxvb3Bp
+bmcNCj4+PiB1bnRpbCB0aGUgZW5kLg0KPj4+DQo+Pj4gT3Bwb3NpdGUsIGZvciByZXF1ZXN0cyB3
+ZSB1c2UgYSBjb21wYXJpc29uIG9mIHRoZSBjdXJyZW50IHN0YXRlIHdpdGgNCj4+PiBDT05ORUNU
+RUQsIGFzIHdlIGRvbid0IHdhbnQgdG8gc2VuZCByZXF1ZXN0cyBpbiBDT05ORUNUSU5HIHN0YXRl
+cyAoDQo+Pj4gd2hpY2ggYXJlIHVucmVhY2hhYmxlIG5vdywgYnV0IHdpbGwgYmUgcmVhY2hhYmxl
+IGFmdGVyIHRoZSBmb2xsb3dpbmcNCj4+PiBjb21taXRzKQ0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1i
+eTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29t
+Pg0KPj4+IC0tLQ0KPj4+ICAgYmxvY2svbmJkLWNsaWVudC5oIHwgIDkgKysrKysrKystDQo+Pj4g
+ICBibG9jay9uYmQtY2xpZW50LmMgfCA1NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+PiAgIDIgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0
+aW9ucygrKSwgMjMgZGVsZXRpb25zKC0pDQo+Pg0KPj4gRGFuIGp1c3QgcmVjZW50bHkgcHJvcG9z
+ZWQgcGF0Y2hlcyB0byBTb2NrZXRDaGFyZGV2IGluIGdlbmVyYWwgdG8gdXNlIGENCj4+IHN0YXRl
+IG1hY2hpbmUgdGhhdCBkaXN0aW5ndWlzaGVzIGJldHdlZW4gY29ubmVjdGluZyBhbmQgY29ubmVj
+dGVkOg0KPj4NCj4+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZl
+bC8yMDE5LTAxL21zZzAzMzM5Lmh0bWwNCj4+DQo+PiBJJ20gd29uZGVyaW5nIGhvdyBtdWNoIG9m
+IGhpcyB3b3JrIGlzIHJlbGF0ZWQgb3IgY2FuIGJlIHJldXNlZCB0byBnZXQNCj4+IHJlc3RhcnRh
+YmxlIGNvbm5lY3Rpb25zIG9uIE5CRCBzb2NrZXRzPw0KPiANCj4gVGhlcmUncyBub3RoaW5nIHJl
+YWxseSBzcGVjaWFsIGFib3V0IHdoYXQgSSBkaWQuIFZsYWRpbWlyIGxvb2tzIHRvDQo+IGhhdmUg
+YmFzaWNhbGx5IGRvbmUgdGhlIHNhbWUga2luZCBvZiBhcHByb2FjaCwgYnV0IEkgZG9uJ3QgdGhp
+bmsNCj4gdGhlcmUncyByZWFsIHNjb3BlIGZvciBzaGFyaW5nIHdpdGggY2hhcmRldnMsIGFzIGVh
+Y2ggY2FyZSBhYm91dA0KPiB0aGVpciBvd24gc2V0IG9mIHN0YXRlcy4NCj4gDQo+PiBSZW1lbWJl
+ciwgcmlnaHQgbm93LCB0aGUgTkJEIGNvZGUgYWx3YXlzIHN0YXJ0cyBpbiBibG9ja2luZyBtb2Rl
+LCBhbmQNCj4+IGRvZXMgc2luZ2xlLXRocmVhZGVkIGhhbmRzaGFraW5nIHVudGlsIGl0IGlzIHJl
+YWR5IGZvciB0cmFuc21pc3Npb24sDQo+PiB0aGVuIHN3aXRjaGVzIHRvIG5vbi1ibG9ja2luZyBt
+b2RlIGZvciBhbGwgc3Vic2VxdWVudCB0cmFuc21pc3Npb25zIChzbywNCj4+IGZvciBleGFtcGxl
+LCBzZXJ2aWNpbmcgYSByZWFkIHJlcXVlc3QgY2FuIGFzc3VtZSB0aGF0IHRoZSBzb2NrZXQgaXMN
+Cj4+IHZhbGlkIHdpdGhvdXQgZnVydGhlciB3YWl0aW5nKS4gIEJ1dCBvbmNlIHdlIHN0YXJ0IGFs
+bG93aW5nIHJlY29ubmVjdHMsDQo+PiBhIHJlYWQgcmVxdWVzdCB3aWxsIG5lZWQgdG8gZGV0ZWN0
+IHdoZW4gb25lIHNvY2tldCBoYXMgZ29uZSBkb3duLCBhbmQNCj4+IHdhaXQgZm9yIGl0cyByZXBs
+YWNlbWVudCBzb2NrZXQgdG8gY29tZSBiYWNrIHVwLCBpbiBvcmRlciB0byByZXRyeSB0aGUNCj4+
+IHJlcXVlc3Q7IHRoaXMgcmV0cnkgaXMgaW4gYSBjb250ZXh0IHdoZXJlIHdlIGFyZSBpbiBub24t
+YmxvY2tpbmcNCj4+IGNvbnRleHQsIGJ1dCB0aGUgcmV0cnkgbXVzdCBlc3RhYmxpc2ggYSBuZXcg
+c29ja2V0LCBhbmQgcG9zc2libHkgY29udmVydA0KPj4gdGhlIHNvY2tldCBpbnRvIFRMUyBtb2Rl
+LCBhbGwgYmVmb3JlIGJlaW5nIHJlYWR5IHRvIHJldHJ5IHRoZSByZWFkIHJlcXVlc3QuDQo+IA0K
+PiBUaGF0IG1ha2VzIGl0IHNvdW5kIGxpa2UgdGhlIE5CRCBoYW5kc2hha2UgbmVlZHMgdG8gYmUg
+Y29udmVydGVkIHRvDQo+IHVzZSBlbnRpcmVseSBub24tYmxvY2tpbmcgSS9PLg0KPiANCj4gVGhl
+IFRMUyBoYW5kc2hha2UgYWxyZWFkeSB1c2VzIGFuIGFzeW5jaHJvbm91cyBjYWxsYmFjayBwYXR0
+ZXJuIGFuZA0KPiB0byBkZWFsIHdpdGggdGhhdCBOQkQgaGFkIHRvIGNyZWF0ZSAmIHJ1biBhIHBy
+aXZhdGUgbWFpbiBsb29wIHRvDQo+IGNvbXBsZXRlIHRoZSBUTFMgaGFuZHNoYWtlIGluIGl0cyBi
+bG9ja2luZyBjb2RlIHBhdHRlcm4uDQo+IA0KPiBZb3UgY291bGQgcG90ZW50aWFsbHkgcHVzaCB0
+aGlzIGNvbmNlcHQgdXAgdG8gdGhlIHRvcCBsZXZlbC4gaWUNCj4gaW1wbGVtZW50IHRoZSBlbnRp
+cmUgTkJEIGhhbmRzaGFrZSB3aXRoIGFzeW5jIGNhbGxiYWNrcyAvIG5vbi1ibG9ja2luZw0KPiBJ
+L08uIFRoZW4gc2ltcGx5IHVzZSBhIHByaXZhdGUgbWFpbiBsb29wIHRvIHJ1biB0aGF0IGluIGEg
+YmxvY2tpbmcNCj4gZmFzaGlvbiBmb3IgdGhlIGluaXRpYWwgY29ubmVjdGlvbi4gV2hlbiB5b3Ug
+bmVlZCB0byBkbyByZS1jb25uZWN0DQo+IHlvdSBub3cganVzdCBydW4gdGhlIGFzeW5jIGNvZGUg
+d2l0aG91dCB0aGUgZXh0cmEgbWFpbiBsb29wIGFyb3VuZA0KPiBpdC4NCj4gDQoNCkhtbSwgeW91
+IG1lYW4gdGhpcyBjb2RlOg0KDQogICAgIGRhdGEubG9vcCA9IGdfbWFpbl9sb29wX25ldyhnX21h
+aW5fY29udGV4dF9kZWZhdWx0KCksIEZBTFNFKTsNCiAgICAgdHJhY2VfbmJkX3JlY2VpdmVfc3Rh
+cnR0bHNfdGxzX2hhbmRzaGFrZSgpOw0KICAgICBxaW9fY2hhbm5lbF90bHNfaGFuZHNoYWtlKHRp
+b2MsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJkX3Rsc19oYW5kc2hha2UsDQog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmRhdGEsDQogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgTlVMTCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBOVUxMKTsN
+Cg0KICAgICBpZiAoIWRhdGEuY29tcGxldGUpIHsNCiAgICAgICAgIGdfbWFpbl9sb29wX3J1bihk
+YXRhLmxvb3ApOw0KICAgICB9DQogICAgIGdfbWFpbl9sb29wX3VucmVmKGRhdGEubG9vcCk7DQoN
+Cg0KV2hhdCB0aGlzIGRvZXMgaW4gY29udGV4dCBvZiBRZW11PyBJc24ndCBpdCBtb3JlIGNvcnJl
+Y3QgdG8gZG8NCmNvcm91dGluZSBiYXNlZCBhc3luYyBzdGFmZiwgbGlrZSBpbiBxY293Ml9vcGVu
+KCk6DQoNCiAgICAgaWYgKHFlbXVfaW5fY29yb3V0aW5lKCkpIHsNCiAgICAgICAgIC8qIEZyb20g
+YmRydl9jb19jcmVhdGUuICAqLw0KICAgICAgICAgcWNvdzJfb3Blbl9lbnRyeSgmcW9jKTsNCiAg
+ICAgfSBlbHNlIHsNCiAgICAgICAgIGFzc2VydChxZW11X2dldF9jdXJyZW50X2Fpb19jb250ZXh0
+KCkgPT0gcWVtdV9nZXRfYWlvX2NvbnRleHQoKSk7DQogICAgICAgICBxZW11X2Nvcm91dGluZV9l
+bnRlcihxZW11X2Nvcm91dGluZV9jcmVhdGUocWNvdzJfb3Blbl9lbnRyeSwgJnFvYykpOw0KICAg
+ICAgICAgQkRSVl9QT0xMX1dISUxFKGJzLCBxb2MucmV0ID09IC1FSU5QUk9HUkVTUyk7DQogICAg
+IH0NCiAgICAgcmV0dXJuIHFvYy5yZXQ7DQoNCkFuZCB0aGVuIHlpZWxkIGFmdGVyIGhhbmRzaGFr
+ZSgpIGFuZCBlbnRlciBiYWNrIGZyb20gbmJkX3Rsc19oYW5kc2hha2UgY2FsbGJhY2s/DQoNCkht
+bSwgYWxzbywgY2hlY2tlZCwgbm9ib2R5IGNhbGxzIGdfbWFpbl9jb250ZXh0X2RlZmF1bHQoKSBp
+biBxZW11LCBleGNlcHQNCnV0aWwvbWFpbi1sb29wLmMsIG5iZCBhbmQgdGVzdHMuIFNvLCBJJ20g
+bm90IHN1cmUgdGhhdCB0aGlzIGlzIGEgdmFsaWQgdGhpbmcNCnRvIGRvIGluIG5iZC4uDQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
