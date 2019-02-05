@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40062)
+Received: from eggs.gnu.org ([209.51.188.92]:53656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gqogV-00066l-AG
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:33:56 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gqplB-00081I-N4
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:42:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gqogU-0007sB-3R
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 19:33:55 -0500
-References: <20190205001835.25660-1-philmd@redhat.com>
-	<20190205001835.25660-9-philmd@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e68526b0-be93-ff63-8bda-bb2f3420e14e@redhat.com>
-Date: Mon, 4 Feb 2019 19:33:35 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gqpga-0004zD-Ih
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:38:05 -0500
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:44453)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gqpga-0004sW-Ea
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:38:04 -0500
+Received: by mail-yw1-xc43.google.com with SMTP id b63so1080915ywc.11
+	for <qemu-devel@nongnu.org>; Mon, 04 Feb 2019 17:38:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190205001835.25660-9-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20190122083152.10705-1-xieyongji@baidu.com>
+	<20190122083152.10705-4-xieyongji@baidu.com>
+	<09287313-0f6e-38a3-be36-9bf65bba7b9d@redhat.com>
+	<CAONzpcZ2fm11JdCA1aqaWTBjkHSagu5E_tquezJFGpWV4UT9fA@mail.gmail.com>
+	<f1208a8b-463c-0f03-3987-d623425dd5f3@redhat.com>
+In-Reply-To: <f1208a8b-463c-0f03-3987-d623425dd5f3@redhat.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Tue, 5 Feb 2019 09:37:50 +0800
+Message-ID: <CAONzpcYJZQ540L7dS6GVgPd0DtwjSTH0_MLz9g+VFFvRD3-Nag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] RFC iotests: Disable 236 and 238 on
- OpenBSD
+Subject: Re: [Qemu-devel] [PATCH v5 3/6] libvhost-user: Support tracking
+ inflight I/O in shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +33,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Brad Smith <brad@comstyle.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
+On Fri, 1 Feb 2019 at 10:28, Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2019/1/30 =E4=B8=8B=E5=8D=881:48, Yongji Xie wrote:
+> > On Wed, 30 Jan 2019 at 10:32, Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2019/1/22 =E4=B8=8B=E5=8D=884:31, elohimes@gmail.com wrote:
+> >>> +static int
+> >>> +vu_queue_inflight_get(VuDev *dev, VuVirtq *vq, int desc_idx)
+> >>> +{
+> >>> +    if (!has_feature(dev->protocol_features,
+> >>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+> >>> +        return 0;
+> >>> +    }
+> >>> +
+> >>> +    if (unlikely(!vq->inflight)) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +
+> >>> +    vq->inflight->desc[desc_idx].inuse =3D 1;
+> >>> +
+> >>> +    vq->inflight->desc[desc_idx].avail_idx =3D vq->last_avail_idx;
+> >>> +
+> >>> +    return 0;
+> >>> +}
+> >>> +
+> >>> +static int
+> >>> +vu_queue_inflight_pre_put(VuDev *dev, VuVirtq *vq, int desc_idx)
+> >>> +{
+> >>> +    if (!has_feature(dev->protocol_features,
+> >>> +        VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD)) {
+> >>> +        return 0;
+> >>> +    }
+> >>> +
+> >>> +    if (unlikely(!vq->inflight)) {
+> >>> +        return -1;
+> >>> +    }
+> >>> +
+> >>> +    vq->inflight->desc[desc_idx].used_idx =3D vq->used_idx;
+> >>> +
+> >>> +    barrier();
+> >>> +
+> >>> +    vq->inflight->desc[desc_idx].version++;
+> >>> +
+> >>> +    return 0;
+> >>> +}
+> >>
+> >> You probably need WRITE_ONCE() semantic (e.g volatile) to make sure th=
+e
+> >> value reach memory.
+> >>
+> > The cache line should have been flushed during crash. So we can see
+> > the correct value when backend reconnecting. If so, compile barrier
+> > should be enough here, right?
+>
+>
+> Maybe I worry too much but it's not about flushing cache, but about
+> whether or not compiler can generate mov to memory instead of mov to
+> registers.
+>
 
+OK, I see. I will declare those variables as volatile in v6. Thank you.
 
-On 2/4/19 7:18 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> These tests explode on OpenBSD:
->=20
->   $ gmake check-block
->   [...]
->   238                [17:16:09] [17:16:09] [failed, exit status 1] - ou=
-tput mismatch (see 238.out.bad)
->   --- /tmp/qemu-test.VKNS07/tests/qemu-iotests/238.out    Tue Jan 29 17=
-:09:03 2019
->   +++ /tmp/qemu-test.VKNS07/tests/qemu-iotests/238.out.bad        Tue J=
-an 29 17:16:09 2019
->   @@ -1,6 +1,14 @@
->   -{"return": {}}
->   -{"return": {}}
->   -{"return": {}}
->   -{"return": {}}
->   -{"return": {}}
->   -{"return": {}}
->   +Traceback (most recent call last):
->   +  File "238", line 37, in <module>
->   +    vm.launch()
->   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
-py", line 295, in launch
->   +    self._launch()
->   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
-py", line 321, in _launch
->   +    self._post_launch()
->   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qemu.=
-py", line 266, in _post_launch
->   +    self._qmp.accept()
->   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qmp/q=
-mp.py", line 157, in accept
->   +    return self.__negotiate_capabilities()
->   +  File "/tmp/qemu-test.VKNS07/tests/qemu-iotests/../../scripts/qmp/q=
-mp.py", line 73, in __negotiate_capabilities
->   +    raise QMPConnectError
->   +qmp.qmp.QMPConnectError
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> This might be due to these tests requiring KVM?...
-> Maybe we need a has_kvm argument to iotests.verify_platform()?
-
-Uhhh, 236 shouldn't be doing anything fancy. It does boot a VM, but so
-does 237, 222, 219, 218, 216, ...
-
-I actually don't know what this would be failing. Any chance to look at
-the core dump QEMU is leaving behind?
-
-> ---
->  tests/qemu-iotests/236 | 1 +
->  tests/qemu-iotests/238 | 2 ++
->  2 files changed, 3 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
-> index 79a6381f8e..b98df35ca4 100755
-> --- a/tests/qemu-iotests/236
-> +++ b/tests/qemu-iotests/236
-> @@ -23,6 +23,7 @@ import iotests
->  from iotests import log
-> =20
->  iotests.verify_image_format(supported_fmts=3D['generic'])
-> +iotests.verify_platform(unsupported_oses=3D['openbsd']) # FIXME
->  size =3D 64 * 1024 * 1024
->  granularity =3D 64 * 1024
-> =20
-> diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
-> index f81ee1112f..c62ff9a6dc 100755
-> --- a/tests/qemu-iotests/238
-> +++ b/tests/qemu-iotests/238
-> @@ -23,6 +23,8 @@ import os
->  import iotests
->  from iotests import log
-> =20
-> +iotests.verify_platform(unsupported_oses=3D['openbsd']) # FIXME
-> +
->  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 's=
-cripts'))
-> =20
->  from qemu import QEMUMachine
->=20
+Thanks,
+Yongji
