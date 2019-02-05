@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36005)
+Received: from eggs.gnu.org ([209.51.188.92]:35909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002No-HZ
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:08 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002Lk-Mq
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003nk-1a
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51894)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GG-0003ks-Jz
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44629)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003ZD-IS
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so4695097wmj.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:42 -0800 (PST)
+	id 1gr5GG-0003X1-2V
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:56 -0500
+Received: by mail-wr1-x436.google.com with SMTP id v16so2844396wrn.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:38 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:23 +0100
-Message-Id: <1549390526-24246-14-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:19 +0100
+Message-Id: <1549390526-24246-10-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 13/76] pvh: Add x86/HVM direct boot ABI header
- file
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 09/76] configure: Add a proper check for
+ openpty() in libutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,179 +32,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Liam Merwick <Liam.Merwick@oracle.com>
+From: Thomas Huth <thuth@redhat.com>
 
-The x86/HVM direct boot ABI permits Qemu to be able to boot directly
-into the uncompressed Linux kernel binary with minimal firmware involvement.
+On Linux (and maybe some BSDs), we require libutil for the openpty()
+function. However, this library is not available on some other systems, so
+we currently use a fragile if-statement in the configure script to check
+whether we need the library or not. Unfortunately, we also hard-coded a
+"-lutil" in the tests/Makefile.include file, so this breaks the build on
+Solaris, for example (see buglink below). To fix the issue, add the "-lutil"
+to "libs_tools" in the configure script instead, then this gets properly
+propagated to the tests, too.
+And while we're at it, also replace the fragile if-statement in the confi-
+gure script with a proper link-check for the availability of this function.
 
-	https://xenbits.xen.org/docs/unstable/misc/pvh.html
-
-This commit adds the header file that defines the start_info struct
-that needs to be populated in order to use this ABI.
-
-The canonical version of start_info.h is in the Xen codebase.
-(like QEMU, the Linux kernel uses a copy as well).
-
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-Reviewed-by: Konrad Rzeszutek Wilk <Konrad.Wilk@oracle.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1777252
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/hw/xen/start_info.h | 146 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 146 insertions(+)
- create mode 100644 include/hw/xen/start_info.h
+ configure              | 12 ++++++++++--
+ tests/Makefile.include |  4 ----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/xen/start_info.h b/include/hw/xen/start_info.h
-new file mode 100644
-index 0000000..348779e
---- /dev/null
-+++ b/include/hw/xen/start_info.h
-@@ -0,0 +1,146 @@
-+/*
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation the
-+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-+ * sell copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
-+ *
-+ * Copyright (c) 2016, Citrix Systems, Inc.
-+ */
+diff --git a/configure b/configure
+index 3d89870..f6a51e0 100755
+--- a/configure
++++ b/configure
+@@ -4612,9 +4612,17 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+   libs_qga="$libs_qga -lrt"
+ fi
+ 
+-if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+-        "$haiku" != "yes" ; then
++# Check whether we need to link libutil for openpty()
++cat > $TMPC << EOF
++extern int openpty(int *am, int *as, char *name, void *termp, void *winp);
++int main(void) { return openpty(0, 0, 0, 0, 0); }
++EOF
 +
-+#ifndef __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
-+#define __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__
-+
-+/*
-+ * Start of day structure passed to PVH guests and to HVM guests in %ebx.
-+ *
-+ * NOTE: nothing will be loaded at physical address 0, so a 0 value in any
-+ * of the address fields should be treated as not present.
-+ *
-+ *  0 +----------------+
-+ *    | magic          | Contains the magic value XEN_HVM_START_MAGIC_VALUE
-+ *    |                | ("xEn3" with the 0x80 bit of the "E" set).
-+ *  4 +----------------+
-+ *    | version        | Version of this structure. Current version is 1. New
-+ *    |                | versions are guaranteed to be backwards-compatible.
-+ *  8 +----------------+
-+ *    | flags          | SIF_xxx flags.
-+ * 12 +----------------+
-+ *    | nr_modules     | Number of modules passed to the kernel.
-+ * 16 +----------------+
-+ *    | modlist_paddr  | Physical address of an array of modules
-+ *    |                | (layout of the structure below).
-+ * 24 +----------------+
-+ *    | cmdline_paddr  | Physical address of the command line,
-+ *    |                | a zero-terminated ASCII string.
-+ * 32 +----------------+
-+ *    | rsdp_paddr     | Physical address of the RSDP ACPI data structure.
-+ * 40 +----------------+
-+ *    | memmap_paddr   | Physical address of the (optional) memory map. Only
-+ *    |                | present in version 1 and newer of the structure.
-+ * 48 +----------------+
-+ *    | memmap_entries | Number of entries in the memory map table. Only
-+ *    |                | present in version 1 and newer of the structure.
-+ *    |                | Zero if there is no memory map being provided.
-+ * 52 +----------------+
-+ *    | reserved       | Version 1 and newer only.
-+ * 56 +----------------+
-+ *
-+ * The layout of each entry in the module structure is the following:
-+ *
-+ *  0 +----------------+
-+ *    | paddr          | Physical address of the module.
-+ *  8 +----------------+
-+ *    | size           | Size of the module in bytes.
-+ * 16 +----------------+
-+ *    | cmdline_paddr  | Physical address of the command line,
-+ *    |                | a zero-terminated ASCII string.
-+ * 24 +----------------+
-+ *    | reserved       |
-+ * 32 +----------------+
-+ *
-+ * The layout of each entry in the memory map table is as follows:
-+ *
-+ *  0 +----------------+
-+ *    | addr           | Base address
-+ *  8 +----------------+
-+ *    | size           | Size of mapping in bytes
-+ * 16 +----------------+
-+ *    | type           | Type of mapping as defined between the hypervisor
-+ *    |                | and guest it's starting. E820_TYPE_xxx, for example.
-+ * 20 +----------------|
-+ *    | reserved       |
-+ * 24 +----------------+
-+ *
-+ * The address and sizes are always a 64bit little endian unsigned integer.
-+ *
-+ * NB: Xen on x86 will always try to place all the data below the 4GiB
-+ * boundary.
-+ *
-+ * Version numbers of the hvm_start_info structure have evolved like this:
-+ *
-+ * Version 0:
-+ *
-+ * Version 1:   Added the memmap_paddr/memmap_entries fields (plus 4 bytes of
-+ *              padding) to the end of the hvm_start_info struct. These new
-+ *              fields can be used to pass a memory map to the guest. The
-+ *              memory map is optional and so guests that understand version 1
-+ *              of the structure must check that memmap_entries is non-zero
-+ *              before trying to read the memory map.
-+ */
-+#define XEN_HVM_START_MAGIC_VALUE 0x336ec578
-+
-+/*
-+ * C representation of the x86/HVM start info layout.
-+ *
-+ * The canonical definition of this layout is above, this is just a way to
-+ * represent the layout described there using C types.
-+ */
-+struct hvm_start_info {
-+    uint32_t magic;             /* Contains the magic value 0x336ec578       */
-+                                /* ("xEn3" with the 0x80 bit of the "E" set).*/
-+    uint32_t version;           /* Version of this structure.                */
-+    uint32_t flags;             /* SIF_xxx flags.                            */
-+    uint32_t nr_modules;        /* Number of modules passed to the kernel.   */
-+    uint64_t modlist_paddr;     /* Physical address of an array of           */
-+                                /* hvm_modlist_entry.                        */
-+    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
-+    uint64_t rsdp_paddr;        /* Physical address of the RSDP ACPI data    */
-+                                /* structure.                                */
-+    uint64_t memmap_paddr;      /* Physical address of an array of           */
-+                                /* hvm_memmap_table_entry. Only present in   */
-+                                /* version 1 and newer of the structure      */
-+    uint32_t memmap_entries;    /* Number of entries in the memmap table.    */
-+                                /* Only present in version 1 and newer of    */
-+                                /* the structure. Value will be zero if      */
-+                                /* there is no memory map being provided.    */
-+    uint32_t reserved;
-+};
-+
-+struct hvm_modlist_entry {
-+    uint64_t paddr;             /* Physical address of the module.           */
-+    uint64_t size;              /* Size of the module in bytes.              */
-+    uint64_t cmdline_paddr;     /* Physical address of the command line.     */
-+    uint64_t reserved;
-+};
-+
-+struct hvm_memmap_table_entry {
-+    uint64_t addr;              /* Base address of the memory region         */
-+    uint64_t size;              /* Size of the memory region in bytes        */
-+    uint32_t type;              /* Mapping type                              */
-+    uint32_t reserved;
-+};
-+
-+#endif /* __XEN_PUBLIC_ARCH_X86_HVM_START_INFO_H__ */
++if ! compile_prog "" "" ; then
++  if compile_prog "" "-lutil" ; then
+     libs_softmmu="-lutil $libs_softmmu"
++    libs_tools="-lutil $libs_tools"
++  fi
+ fi
+ 
+ ##########################################
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 75ad9c0..b39e989 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -798,10 +798,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
+ 
+-ifeq ($(CONFIG_POSIX),y)
+-LIBS += -lutil
+-endif
+-
+ # QTest rules
+ 
+ TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
 -- 
 1.8.3.1
