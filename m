@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57908)
+Received: from eggs.gnu.org ([209.51.188.92]:33070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr3xK-0000yt-8X
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:19 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44d-0005eh-4U
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr3xI-00036z-2u
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:17 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr3xG-00034Q-0y
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:52:16 -0500
-Received: by mail-ot1-x332.google.com with SMTP id 32so6755020ota.12
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 08:52:11 -0800 (PST)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44b-0005t6-8r
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:50 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:40356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gr44X-0005ll-Oz
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:47 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 18:58:58 +0200
+Message-Id: <20190205165927.26599-4-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
+References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-References: <20190205105758.4230-1-kraxel@redhat.com>
-In-Reply-To: <20190205105758.4230-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Feb 2019 16:51:59 +0000
-Message-ID: <CAFEAcA8K-j4kMspa0THf1e2qzc8nXJxNuHF33rsDUjCeN4My6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/14] Ui 20190205 patches
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULLv2 03/32] slirp: Don't mark struct ipq or struct
+ ipasfrag as packed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: stefanha@redhat.com, jan.kiszka@siemens.com, Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Tue, 5 Feb 2019 at 10:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 773c4a6228fd910556cee2d477ee56c591a30000:
->
->   test-filter-mirror: pass UNIX domain socket through fd (2019-02-04 16:03:20 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20190205-pull-request
->
-> for you to fetch changes up to 19c1b9fd3dd5955893c0d3c187a4180313e9a0f1:
->
->   keymap: fix keyup mappings (2019-02-05 10:45:44 +0100)
->
-> ----------------------------------------------------------------
-> ui: add kbd stats tracker.
-> ui: gtk scroll fixes.
-> ui: egl cursor scale fix.
-> ui: more sdl1 cleanup.
->
-> ----------------------------------------------------------------
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Applied, thanks.
+There is no reason to mark the struct ipq and struct ipasfrag as
+packed: they are naturally aligned anyway, and are not representing
+any on-the-wire packet format.  Indeed they vary in size depending on
+the size of pointers on the host system, because the 'struct qlink'
+members include 'void *' fields.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+Dropping the 'packed' annotation fixes clang -Waddress-of-packed-member
+warnings and probably lets the compiler generate better code too.
 
--- PMM
+The only thing we do care about in the layout of the struct is
+that the frag_link matches up with the ipf_link of the struct
+ipasfrag, as documented in the comment on that struct; assert
+at build time that this is the case.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/ip.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/slirp/ip.h b/slirp/ip.h
+index 243b6c8b24..20614f3b53 100644
+--- a/slirp/ip.h
++++ b/slirp/ip.h
+@@ -217,7 +217,7 @@ struct ipq {
+ 	uint8_t	ipq_p;			/* protocol of this fragment */
+ 	uint16_t	ipq_id;			/* sequence id for reassembly */
+ 	struct	in_addr ipq_src,ipq_dst;
+-} QEMU_PACKED;
++};
+=20
+ /*
+  * Ip header, when holding a fragment.
+@@ -227,7 +227,10 @@ struct ipq {
+ struct	ipasfrag {
+ 	struct qlink ipf_link;
+ 	struct ip ipf_ip;
+-} QEMU_PACKED;
++};
++
++QEMU_BUILD_BUG_ON(offsetof(struct ipq, frag_link) !=3D
++                  offsetof(struct ipasfrag, ipf_link));
+=20
+ #define ipf_off      ipf_ip.ip_off
+ #define ipf_tos      ipf_ip.ip_tos
+--=20
+2.20.1
