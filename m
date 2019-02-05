@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46902)
+Received: from eggs.gnu.org ([209.51.188.92]:46957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gr4bt-0000QH-W2
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:34:14 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gr4c2-0000Z3-Po
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gr4bs-0004Te-Uy
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:34:13 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gr4c1-0004XW-Om
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:34:22 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Tue,  5 Feb 2019 18:32:59 +0100
-Message-Id: <20190205173306.20483-12-eric.auger@redhat.com>
+Date: Tue,  5 Feb 2019 18:33:01 +0100
+Message-Id: <20190205173306.20483-14-eric.auger@redhat.com>
 In-Reply-To: <20190205173306.20483-1-eric.auger@redhat.com>
 References: <20190205173306.20483-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 11/18] hw/arm/virt: Add memory hotplug
- framework
+Subject: [Qemu-devel] [PATCH v6 13/18] hw/arm/virt-acpi-build: Add PC-DIMM
+ in SRAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +25,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, imammedo@redhat.com, david@redhat.com
 Cc: dgilbert@redhat.com, david@gibson.dropbear.id.au, drjones@redhat.com
 
-This patch adds the the memory hot-plug/hot-unplug infrastructure
-in machvirt. It is still not enabled as no device memory is allocated.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Generate Memory Affinity Structures for PC-DIMM ranges.
+
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v5 -> v6:
+- fix mingw compil issue
+
 v4 -> v5:
-- change in pc_dimm_pre_plug signature
-- CONFIG_MEM_HOTPLUG replaced by CONFIG_MEM_DEVICE and CONFIG_DIMM
+- Align to x86 code and especially
+  "pc: acpi: revert back to 1 SRAT entry for hotpluggable area"
 
 v3 -> v4:
-- check the memory device is not hotplugged
-
-v2 -> v3:
-- change in pc_dimm_plug()'s signature
-- add pc_dimm_pre_plug call
+- do not use vms->bootinfo.device_memory_start/device_memory_size anymore
 
 v1 -> v2:
-- s/virt_dimm_plug|unplug/virt_memory_plug|unplug
-- s/pc_dimm_memory_plug/pc_dimm_plug
-- reworded title and commit message
-- added pre_plug cb
-- don't handle get_memory_region failure anymore
+- build_srat_hotpluggable_memory movedc to aml-build
 ---
- default-configs/arm-softmmu.mak |  2 ++
- hw/arm/virt.c                   | 64 ++++++++++++++++++++++++++++++++-
- 2 files changed, 65 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index be88870799..dc4624794f 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -160,3 +160,5 @@ CONFIG_PCI_DESIGNWARE=3Dy
- CONFIG_STRONGARM=3Dy
- CONFIG_HIGHBANK=3Dy
- CONFIG_MUSICPAL=3Dy
-+CONFIG_MEM_DEVICE=3Dy
-+CONFIG_DIMM=3Dy
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f01886da22..783468ba77 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -59,6 +59,8 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 829d2f0035..781eafaf5e 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -516,6 +516,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+     int i, srat_start;
+     uint64_t mem_base;
+     MachineClass *mc =3D MACHINE_GET_CLASS(vms);
++    MachineState *ms =3D MACHINE(vms);
+     const CPUArchIdList *cpu_list =3D mc->possible_cpu_arch_ids(MACHINE(=
+vms));
 =20
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1763,6 +1765,49 @@ static const CPUArchIdList *virt_possible_cpu_arch=
-_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
-=20
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceStat=
-e *dev,
-+                                 Error **errp)
-+{
-+    const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIM=
-M);
-+
-+    if (dev->hotplugged) {
-+        error_setg(errp, "memory hotplug is not supported");
-+    }
-+
-+    if (is_nvdimm) {
-+        error_setg(errp, "nvdimm is not yet supported");
-+        return;
-+    }
-+
-+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-+}
-+
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-+    Error *local_err =3D NULL;
-+
-+    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-+
-+    error_propagate(errp, local_err);
-+}
-+
-+static void virt_memory_unplug(HotplugHandler *hotplug_dev,
-+                               DeviceState *dev, Error **errp)
-+{
-+    pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
-+    object_unparent(OBJECT(dev));
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **er=
-rp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-@@ -1774,12 +1819,27 @@ static void virt_machine_device_plug_cb(HotplugHa=
-ndler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
+     srat_start =3D table_data->len;
+@@ -541,6 +542,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, V=
+irtMachineState *vms)
          }
      }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+            virt_memory_plug(hotplug_dev, dev, errp);
+=20
++    if (ms->device_memory) {
++        numamem =3D acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, ms->device_memory->base,
++                          memory_region_size(&ms->device_memory->mr),
++                          nb_numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABL=
+ED);
 +    }
-+}
 +
-+static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp=
-)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_unplug(hotplug_dev, dev, errp);
-+    } else {
-+        error_setg(errp, "device unplug request for unsupported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-+    }
+     build_header(linker, table_data, (void *)(table_data->data + srat_st=
+art),
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
  }
-=20
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *ma=
-chine,
-                                                         DeviceState *dev=
-)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
-=20
-@@ -1843,7 +1903,9 @@ static void virt_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->kvm_type =3D virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler =3D virt_machine_get_hotplug_handler;
-+    hc->pre_plug =3D virt_machine_device_pre_plug_cb;
-     hc->plug =3D virt_machine_device_plug_cb;
-+    hc->unplug =3D virt_machine_device_unplug_cb;
- }
-=20
- static void virt_instance_init(Object *obj)
 --=20
 2.20.1
