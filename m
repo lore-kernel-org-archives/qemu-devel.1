@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47204)
+Received: from eggs.gnu.org ([209.51.188.92]:47556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr0ab-00077w-Mw
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:16:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0bq-0007pM-5J
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:17:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gr0aa-0001ap-Kh
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:16:37 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 5 Feb 2019 13:16:24 +0000
-Message-ID: <8bdd3e6e-f83f-e73a-6dad-870d05698334@virtuozzo.com>
-References: <1548942405-760115-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1548942405-760115-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<87pnsbxsi7.fsf@dusky.pond.sub.org>
-	<20190204094621.GB5855@linux.fritz.box>
-	<87d0o7psz6.fsf@dusky.pond.sub.org>
-	<b448da30-7e0d-98be-d3dc-578fffc55de8@virtuozzo.com>
-	<20190205100039.GC5273@linux.fritz.box>
-In-Reply-To: <20190205100039.GC5273@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2A1CACF1CC41D14D83071138142E1DC7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gr0bp-0002df-7H
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:17:54 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gr0bo-0002cd-UW
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:17:53 -0500
+Received: by mail-ot1-x342.google.com with SMTP id g16so5502655otg.11
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 05:17:52 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 2/3] qemu-img info lists bitmap
- directory entries
+References: <20190129175403.18017-1-philmd@redhat.com>
+	<20190129175403.18017-2-philmd@redhat.com>
+In-Reply-To: <20190129175403.18017-2-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Feb 2019 13:17:35 +0000
+Message-ID: <CAFEAcA9fzLNP1ic1oK6wS4v=_7rKa2Y0cKjH=Fc_-6MOowSuvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/18] tests/vm: Be verbose while
+ extracting compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
-MDUuMDIuMjAxOSAxMzowMCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDQuMDIuMjAxOSB1bSAx
-NjozNiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA0
-LjAyLjIwMTkgMTY6NDUsIE1hcmt1cyBBcm1icnVzdGVyIHdyb3RlOg0KPj4+IEtldmluIFdvbGYg
-PGt3b2xmQHJlZGhhdC5jb20+IHdyaXRlczoNCj4+Pg0KPj4+PiBBbSAwMS4wMi4yMDE5IHVtIDE5
-OjM5IGhhdCBNYXJrdXMgQXJtYnJ1c3RlciBnZXNjaHJpZWJlbjoNCj4+Pj4+IEFuZHJleSBTaGlu
-a2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPiB3cml0ZXM6DQo+Pj4+Pg0K
-Pj4+Pj4+IEluIHRoZSAnRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRo
-ZSAncWVtdS1pbWcgaW5mbycNCj4+Pj4+PiBjb21tYW5kIG91dHB1dCwgdGhlIHN1cHBsZW1lbnRh
-bCBpbmZvcm1hdGlvbiBhYm91dCBleGlzdGluZyBRQ09XMg0KPj4+Pj4+IGJpdG1hcHMgd2lsbCBi
-ZSBzaG93biwgc3VjaCBhcyBhIGJpdG1hcCBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHk6DQo+
-Pj4+Pj4NCj4+Pj4+PiBpbWFnZTogL3Z6L3ZtcHJpdmF0ZS9WTTEvaGFyZGRpc2suaGRkDQo+Pj4+
-Pj4gZmlsZSBmb3JtYXQ6IHFjb3cyDQo+Pj4+Pj4gdmlydHVhbCBzaXplOiA2NEcgKDY4NzE5NDc2
-NzM2IGJ5dGVzKQ0KPj4+Pj4+IGRpc2sgc2l6ZTogMy4wTQ0KPj4+Pj4+IGNsdXN0ZXJfc2l6ZTog
-MTA0ODU3Ng0KPj4+Pj4+IEZvcm1hdCBzcGVjaWZpYyBpbmZvcm1hdGlvbjoNCj4+Pj4+PiAgICAg
-ICBjb21wYXQ6IDEuMQ0KPj4+Pj4+ICAgICAgIGxhenkgcmVmY291bnRzOiB0cnVlDQo+Pj4+Pj4g
-ICAgICAgYml0bWFwczoNCj4+Pj4+PiAgICAgICAgICAgWzBdOg0KPj4+Pj4+ICAgICAgICAgICAg
-ICAgZmxhZ3M6DQo+Pj4+Pj4gICAgICAgICAgICAgICAgICAgWzBdOiBpbi11c2UNCj4+Pj4+PiAg
-ICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4+PiAgICAgICAgICAgICAgIG5hbWU6IGJh
-Y2stdXAxDQo+Pj4+Pj4gICAgICAgICAgICAgICB1bmtub3duIGZsYWdzOiA0DQo+Pj4+Pj4gICAg
-ICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4+PiAgICAgICAgICAgWzFdOg0KPj4+
-Pj4+ICAgICAgICAgICAgICAgZmxhZ3M6DQo+Pj4+Pj4gICAgICAgICAgICAgICAgICAgWzBdOiBp
-bi11c2UNCj4+Pj4+PiAgICAgICAgICAgICAgICAgICBbMV06IGF1dG8NCj4+Pj4+PiAgICAgICAg
-ICAgICAgIG5hbWU6IGJhY2stdXAyDQo+Pj4+Pj4gICAgICAgICAgICAgICB1bmtub3duIGZsYWdz
-OiA4DQo+Pj4+Pj4gICAgICAgICAgICAgICBncmFudWxhcml0eTogNjU1MzYNCj4+Pj4+PiAgICAg
-ICByZWZjb3VudCBiaXRzOiAxNg0KPj4+Pj4+ICAgICAgIGNvcnJ1cHQ6IGZhbHNlDQo+Pj4+Pj4N
-Cj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZp
-Y2hAdmlydHVvenpvLmNvbT4NCj4+Pj4+PiAtLS0NCj4+Pj4+IFsuLi5dDQo+Pj4+Pj4gZGlmZiAt
-LWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+Pj4+
-PiBpbmRleCA5MTY4NWJlLi4yNzFlMGRmIDEwMDY0NA0KPj4+Pj4+IC0tLSBhL3FhcGkvYmxvY2st
-Y29yZS5qc29uDQo+Pj4+Pj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+Pj4+PiBAQCAt
-NjksNiArNjksOCBAQA0KPj4+Pj4+ICAgICMgQGVuY3J5cHQ6IGRldGFpbHMgYWJvdXQgZW5jcnlw
-dGlvbiBwYXJhbWV0ZXJzOyBvbmx5IHNldCBpZiBpbWFnZQ0KPj4+Pj4+ICAgICMgICAgICAgICAg
-IGlzIGVuY3J5cHRlZCAoc2luY2UgMi4xMCkNCj4+Pj4+PiAgICAjDQo+Pj4+Pj4gKyMgQGJpdG1h
-cHM6IEEgbGlzdCBvZiBxY293MiBiaXRtYXAgZGV0YWlscyAoc2luY2UgNC4wKQ0KPj4+Pj4+ICsj
-DQo+Pj4+Pj4gICAgIyBTaW5jZTogMS43DQo+Pj4+Pj4gICAgIyMNCj4+Pj4+PiAgICB7ICdzdHJ1
-Y3QnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293MicsDQo+Pj4+Pj4gQEAgLTc3LDcgKzc5LDggQEAN
-Cj4+Pj4+PiAgICAgICAgICAnKmxhenktcmVmY291bnRzJzogJ2Jvb2wnLA0KPj4+Pj4+ICAgICAg
-ICAgICcqY29ycnVwdCc6ICdib29sJywNCj4+Pj4+PiAgICAgICAgICAncmVmY291bnQtYml0cyc6
-ICdpbnQnLA0KPj4+Pj4+IC0gICAgICAnKmVuY3J5cHQnOiAnSW1hZ2VJbmZvU3BlY2lmaWNRQ293
-MkVuY3J5cHRpb24nDQo+Pj4+Pj4gKyAgICAgICcqZW5jcnlwdCc6ICdJbWFnZUluZm9TcGVjaWZp
-Y1FDb3cyRW5jcnlwdGlvbicsDQo+Pj4+Pj4gKyAgICAgICcqYml0bWFwcyc6IFsnUWNvdzJCaXRt
-YXBJbmZvJ10NCj4+Pj4+PiAgICAgIH0gfQ0KPj4+Pj4+ICAgIA0KPj4+Pj4+ICAgICMjDQo+Pj4+
-Pj4gQEAgLTQ1NCw2ICs0NTcsNDEgQEANCj4+Pj4+PiAgICAgICAgICAgICAgICdzdGF0dXMnOiAn
-RGlydHlCaXRtYXBTdGF0dXMnfSB9DQo+Pj4+Pj4gICAgDQo+Pj4+Pj4gICAgIyMNCj4+Pj4+PiAr
-IyBAUWNvdzJCaXRtYXBJbmZvRmxhZ3M6DQo+Pj4+Pj4gKyMNCj4+Pj4+PiArIyBBbiBlbnVtZXJh
-dGlvbiBvZiBmbGFncyB0aGF0IGEgYml0bWFwIGNhbiByZXBvcnQgdG8gdGhlIHVzZXIuDQo+Pj4+
-Pj4gKyMNCj4+Pj4+PiArIyBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVj
-dGx5IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPj4+Pj4NCj4+Pj4+IEkgZG91YnQgdGhlIGNh
-c3VhbCByZWFkZXIgY291bGQgZ3Vlc3MgdGhlIG1lYW5pbmcgZnJvbSB0aGUgbmFtZS4gIFdoYXQN
-Cj4+Pj4+IGFib3V0IEBkaXJ0eT8NCj4+Pj4NCj4+Pj4gRmVlbHMgbGlrZSBvdmVybG9hZGluZyB0
-aGUgd29yZCAiZGlydHkiIGluIHRoZSBjb250ZXh0IG9mICJkaXJ0eQ0KPj4+PiBiaXRtYXBzIi4g
-VGhpcyBtaWdodCBlYXNpbHkgbGVhZCB0byBtaXNpbnRlcnByZXRhdGlvbiBhcyAidGhpcyBiaXRt
-YXANCj4+Pj4gbWFya3Mgc29tZSBjbHVzdGVycyBhcyBkaXJ0eSIgcmF0aGVyIHRoYW4gInRoaXMg
-Yml0bWFwIG1pZ2h0IGJlDQo+Pj4+IGluY29uc2lzdGVudCIuDQo+Pj4NCj4+PiBDYWxsIGl0IEBw
-b3NzaWJseS1pbmNvbnNpc3RlbnQgdGhlbj8NCj4+Pg0KPj4NCj4+IElmIHlvdSBydW4gcW1wIHF1
-ZXJ5LWJsb2NrIHdoaWxlIHZtIGlzIHJ1bm5pbmcsIGFsbCBiaXRtYXBzIGluIGltYWdlIHdpbGwN
-Cj4+IGJlIGluIHVzZS4gQW5kIGluIHRoaXMgY29udGV4dCwgaW4tdXNlIHNlZW1zIG1vcmUgYXBw
-cm9wcmlhdGUgdGhhbg0KPj4gcG9zc2libHktaW5jb25zaXN0ZW50LiBBbmQgaW4tdXNlIGhhcyBs
-ZXNzIGludGVyZmVyZW5jZSB3aXRoIHRoZSBmYWN0IHRoYXQNCj4+IGFjdHVhbCBiaXRtYXBzIG5v
-dyBhcmUgaW4tUkFNIEJkcnZEaXJ0eUJpdG1hcCBzdHJ1Y3R1cmVzIHdoaWNoIGFyZSBhY3R1YWxs
-eQ0KPj4gY29uc2lzdGVudCAoYW5kIGFsc28gc2hvd24gYnkgcXVlcnktYmxvY2spDQo+IA0KPiBH
-b29kIHBvaW50LCBidXQgdGhlbiB0aGlzIGRlc2NyaXB0aW9uIGlzbid0IGNvcnJlY3QgZWl0aGVy
-Og0KPiANCj4gICAgICBAaW4tdXNlOiBUaGUgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5
-IGFuZCBtYXkgYmUgaW5jb25zaXN0ZW50Lg0KPiANCj4gTWF5YmUgd2hhdCBuZWVkcyB0byBjaGFu
-Z2UgaXMgdGhlIGRlc2NyaXB0aW9uLCBub3QgdGhlIG5hbWU/DQo+IA0KPiBLZXZpbg0KPiANCg0K
-SG93IGFib3V0IHRoZSBmb2xsb3dpbmc6DQoNCkBpbi11c2U6IFRoaXMgZmxhZyBpcyBzZXQgd2hp
-bGUgYml0bWFwIGlzIGluIHVzZSBieSBzb2Z0d2FyZSBhbmQgaXQncyBkYXRhIGluDQpxY293MiBp
-bWFnZSBtYXkgYmUgb3V0IG9mIGRhdGUgd2hlbiBhY3R1YWwgYml0bWFwIGRhdGEgaXMgbWFuYWdl
-ZCBieSBzb2Z0d2FyZS4NClByZXNlbmNlIG9mIHRoaXMgZmxhZyBpbiBvZmZsaW5lIGltYWdlIG1l
-YW5zIHRoYXQgYml0bWFwIHdhcyBub3Qgc2F2ZWQgY29ycmVjdGx5DQphZnRlciBsYXN0IHVzYWdl
-IGFuZCBpdCdzIGRhdGEgbWF5IGJlIGluY29uc2lzdGVudC4NCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+On Tue, 29 Jan 2019 at 17:54, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Depending of the host hardware, copying and extracting VM images can
+> take up to few minutes. Add verbosity to avoid the user to worry about
+> VMs hanging.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/vm/centos  | 3 ++-
+>  tests/vm/freebsd | 3 ++-
+>  tests/vm/netbsd  | 3 ++-
+>  tests/vm/openbsd | 3 ++-
+>  4 files changed, 8 insertions(+), 4 deletions(-)
+
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
