@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36226)
+Received: from eggs.gnu.org ([209.51.188.92]:36227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GT-0002VG-Lj
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GT-0002VH-Lv
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GK-0003rz-2j
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0003qd-9a
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:05 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:37802)
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:39702)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GJ-0003qO-Q3
+	id 1gr5GJ-0003oT-04
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id g67so4751223wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:59 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id y8so4738880wmi.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:58 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:39 +0100
-Message-Id: <1549390526-24246-30-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:38 +0100
+Message-Id: <1549390526-24246-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/76] contrib/elf2dmp: fix structures
- definitions
+Subject: [Qemu-devel] [PULL 28/76] contrib/elf2dmp: use GLib in PDB
+ processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +33,88 @@ Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
 From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-Remove duplicate structures definitions in case of build for Windows hosts.
+Replace POSIX mmap with GLib g_mapped_file_new in PDB processing stage
+to make elf2dmp cross-platform. There are no direct POSIX in elf2dmp
+after this patch.
 
 Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-Id: <20181220012441.13694-5-viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-4-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/elf2dmp/kdbg.h | 12 ++++++++----
- contrib/elf2dmp/pdb.h  |  2 ++
- contrib/elf2dmp/pe.h   |  6 ++++--
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ contrib/elf2dmp/pdb.c | 29 ++++++++---------------------
+ contrib/elf2dmp/pdb.h |  2 +-
+ 2 files changed, 9 insertions(+), 22 deletions(-)
 
-diff --git a/contrib/elf2dmp/kdbg.h b/contrib/elf2dmp/kdbg.h
-index 851b57c..002e3d0 100644
---- a/contrib/elf2dmp/kdbg.h
-+++ b/contrib/elf2dmp/kdbg.h
-@@ -25,11 +25,15 @@ typedef struct DBGKD_GET_VERSION64 {
-     uint64_t DebuggerDataList;
- } DBGKD_GET_VERSION64;
+diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
+index bcb01b4..52e352d 100644
+--- a/contrib/elf2dmp/pdb.c
++++ b/contrib/elf2dmp/pdb.c
+@@ -277,28 +277,18 @@ static void pdb_reader_exit(struct pdb_reader *r)
  
-+#ifndef _WIN32
-+typedef struct LIST_ENTRY64 {
-+    struct LIST_ENTRY64 *Flink;
-+    struct LIST_ENTRY64 *Blink;
-+} LIST_ENTRY64;
-+#endif
-+
- typedef struct DBGKD_DEBUG_DATA_HEADER64 {
--    struct LIST_ENTRY64 {
--       struct LIST_ENTRY64 *Flink;
--       struct LIST_ENTRY64 *Blink;
--    } List;
-+    LIST_ENTRY64    List;
-     uint32_t           OwnerTag;
-     uint32_t           Size;
- } DBGKD_DEBUG_DATA_HEADER64;
+ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
+ {
++    GError *gerr = NULL;
+     int err = 0;
+-    int fd;
+     void *map;
+-    struct stat st;
+ 
+-    fd = open(name, O_RDONLY, 0);
+-    if (fd == -1) {
+-        eprintf("Failed to open PDB file \'%s\'\n", name);
++    reader->gmf = g_mapped_file_new(name, TRUE, &gerr);
++    if (gerr) {
++        eprintf("Failed to map PDB file \'%s\'\n", name);
+         return 1;
+     }
+-    reader->fd = fd;
+-
+-    fstat(fd, &st);
+-    reader->file_size = st.st_size;
+-
+-    map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+-    if (map == MAP_FAILED) {
+-        eprintf("Failed to map PDB file\n");
+-        err = 1;
+-        goto out_fd;
+-    }
+ 
++    reader->file_size = g_mapped_file_get_length(reader->gmf);
++    map = g_mapped_file_get_contents(reader->gmf);
+     if (pdb_reader_init(reader, map)) {
+         err = 1;
+         goto out_unmap;
+@@ -307,16 +297,13 @@ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
+     return 0;
+ 
+ out_unmap:
+-    munmap(map, st.st_size);
+-out_fd:
+-    close(fd);
++    g_mapped_file_unref(reader->gmf);
+ 
+     return err;
+ }
+ 
+ void pdb_exit(struct pdb_reader *reader)
+ {
+-    munmap(reader->ds.header, reader->file_size);
+-    close(reader->fd);
++    g_mapped_file_unref(reader->gmf);
+     pdb_reader_exit(reader);
+ }
 diff --git a/contrib/elf2dmp/pdb.h b/contrib/elf2dmp/pdb.h
-index 1640d54..4ea8925 100644
+index a3a3cac..1640d54 100644
 --- a/contrib/elf2dmp/pdb.h
 +++ b/contrib/elf2dmp/pdb.h
-@@ -9,12 +9,14 @@
- #define PDB_H
+@@ -216,7 +216,7 @@ typedef struct pdb_seg {
+ #define IMAGE_FILE_MACHINE_AMD64 0x8664
  
- 
-+#ifndef _WIN32
- typedef struct GUID {
-     unsigned int Data1;
-     unsigned short Data2;
-     unsigned short Data3;
-     unsigned char Data4[8];
- } GUID;
-+#endif
- 
- struct PDB_FILE {
-     uint32_t size;
-diff --git a/contrib/elf2dmp/pe.h b/contrib/elf2dmp/pe.h
-index dafb26a..c2a4a6b 100644
---- a/contrib/elf2dmp/pe.h
-+++ b/contrib/elf2dmp/pe.h
-@@ -9,6 +9,7 @@
- #define PE_H
- 
- 
-+#ifndef _WIN32
- typedef struct IMAGE_DOS_HEADER {
-     uint16_t  e_magic;      /* 0x00: MZ Header signature */
-     uint16_t  e_cblp;       /* 0x02: Bytes on last page of file */
-@@ -87,8 +88,6 @@ typedef struct IMAGE_NT_HEADERS64 {
-   IMAGE_OPTIONAL_HEADER64 OptionalHeader;
- } __attribute__ ((packed)) IMAGE_NT_HEADERS64;
- 
--#define IMAGE_FILE_DEBUG_DIRECTORY  6
--
- typedef struct IMAGE_DEBUG_DIRECTORY {
-   uint32_t Characteristics;
-   uint32_t TimeDateStamp;
-@@ -101,6 +100,9 @@ typedef struct IMAGE_DEBUG_DIRECTORY {
- } __attribute__ ((packed)) IMAGE_DEBUG_DIRECTORY;
- 
- #define IMAGE_DEBUG_TYPE_CODEVIEW   2
-+#endif
-+
-+#define IMAGE_FILE_DEBUG_DIRECTORY  6
- 
- typedef struct guid_t {
-     uint32_t a;
+ struct pdb_reader {
+-    int fd;
++    GMappedFile *gmf;
+     size_t file_size;
+     struct {
+         PDB_DS_HEADER *header;
 -- 
 1.8.3.1
