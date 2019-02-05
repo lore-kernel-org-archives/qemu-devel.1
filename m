@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55784)
+Received: from eggs.gnu.org ([209.51.188.92]:55771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gr2T9-0002wg-2r
+	(envelope-from <imammedo@redhat.com>) id 1gr2T7-0002vy-SC
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 10:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gr2T6-0006LW-LI
+	(envelope-from <imammedo@redhat.com>) id 1gr2T4-0006KF-UH
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 10:17:01 -0500
-References: <1549378185-7970-1-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7d8e1cf1-77ca-2fa6-face-c164708cb078@redhat.com>
-Date: Tue, 5 Feb 2019 09:10:33 -0600
+Date: Tue, 5 Feb 2019 16:16:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190205161609.1640f733@Igors-MacBook-Pro.local>
+In-Reply-To: <20190131112240.8395-3-peter.maydell@linaro.org>
+References: <20190131112240.8395-1-peter.maydell@linaro.org>
+	<20190131112240.8395-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1549378185-7970-1-git-send-email-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="b2VWQlOQ85Ar4URTeWFS25C0VRJ3xIKwe"
-Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests: Remove redundant
- COPYING file
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/5] hw/arm/boot: Factor out "direct kernel
+ boot" code into its own function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +24,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Hongbo Zhang <hongbo.zhang@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---b2VWQlOQ85Ar4URTeWFS25C0VRJ3xIKwe
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
-Message-ID: <7d8e1cf1-77ca-2fa6-face-c164708cb078@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests: Remove redundant COPYING
- file
-References: <1549378185-7970-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1549378185-7970-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 31 Jan 2019 11:22:37 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-On 2/5/19 8:49 AM, Thomas Huth wrote:
-> The file tests/qemu-iotests/COPYING is the same text as in the
-> COPYING file in the main directory. So as far as I can see, we don't
-> need the duplicate here.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Factor out the "direct kernel boot" code path from arm_load_kernel()
+> into its own function; this function is getting long enough that
+> the code flow is a bit confusing.
+> 
+> This commit only moves code around; no semantic changes.
+> 
+> We leave the "load the dtb" code in arm_load_kernel() -- this
+> is currently only used by the "direct kernel boot" path, but
+> this is a bug which we will fix shortly.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  tests/qemu-iotests/COPYING | 339 -------------------------------------=
---------
->  1 file changed, 339 deletions(-)
->  delete mode 100644 tests/qemu-iotests/COPYING
+>  hw/arm/boot.c | 150 +++++++++++++++++++++++++++-----------------------
+>  1 file changed, 80 insertions(+), 70 deletions(-)
+> 
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 6f9ceeb0e89..108e9b979f8 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -953,9 +953,12 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
+>      return size;
+>  }
+>  
+> -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+> +static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+> +                                         struct arm_boot_info *info)
+>  {
+> +    /* Set up for a direct boot of a kernel image file. */
+>      CPUState *cs;
+> +    AddressSpace *as = arm_boot_address_space(cpu, info);
+>      int kernel_size;
+>      int initrd_size;
+>      int is_linux = 0;
+> @@ -963,75 +966,6 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+>      int elf_machine;
+>      hwaddr entry;
+>      static const ARMInsnFixup *primary_loader;
+> -    AddressSpace *as = arm_boot_address_space(cpu, info);
+> -
+> -    /*
+> -     * CPU objects (unlike devices) are not automatically reset on system
+> -     * reset, so we must always register a handler to do so. If we're
+> -     * actually loading a kernel, the handler is also responsible for
+> -     * arranging that we start it correctly.
+> -     */
+> -    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> -        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+> -    }
+> -
+> -    /*
+> -     * The board code is not supposed to set secure_board_setup unless
+> -     * running its code in secure mode is actually possible, and KVM
+> -     * doesn't support secure.
+> -     */
+> -    assert(!(info->secure_board_setup && kvm_enabled()));
+> -
+> -    info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
+> -    info->dtb_limit = 0;
+> -
+> -    /* Load the kernel.  */
+> -    if (!info->kernel_filename || info->firmware_loaded) {
+> -
+> -        if (have_dtb(info)) {
+> -            /*
+> -             * If we have a device tree blob, but no kernel to supply it to (or
+> -             * the kernel is supposed to be loaded by the bootloader), copy the
+> -             * DTB to the base of RAM for the bootloader to pick up.
+> -             */
+> -            info->dtb_start = info->loader_start;
+> -        }
+> -
+> -        if (info->kernel_filename) {
+> -            FWCfgState *fw_cfg;
+> -            bool try_decompressing_kernel;
+> -
+> -            fw_cfg = fw_cfg_find();
+> -            try_decompressing_kernel = arm_feature(&cpu->env,
+> -                                                   ARM_FEATURE_AARCH64);
+> -
+> -            /*
+> -             * Expose the kernel, the command line, and the initrd in fw_cfg.
+> -             * We don't process them here at all, it's all left to the
+> -             * firmware.
+> -             */
+> -            load_image_to_fw_cfg(fw_cfg,
+> -                                 FW_CFG_KERNEL_SIZE, FW_CFG_KERNEL_DATA,
+> -                                 info->kernel_filename,
+> -                                 try_decompressing_kernel);
+> -            load_image_to_fw_cfg(fw_cfg,
+> -                                 FW_CFG_INITRD_SIZE, FW_CFG_INITRD_DATA,
+> -                                 info->initrd_filename, false);
+> -
+> -            if (info->kernel_cmdline) {
+> -                fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+> -                               strlen(info->kernel_cmdline) + 1);
+> -                fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA,
+> -                                  info->kernel_cmdline);
+> -            }
+> -        }
+> -
+> -        /*
+> -         * We will start from address 0 (typically a boot ROM image) in the
+> -         * same way as hardware.
+> -         */
+> -        return;
+> -    }
+>  
+>      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>          primary_loader = bootloader_aarch64;
+> @@ -1206,6 +1140,82 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+>      for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+>          ARM_CPU(cs)->env.boot_info = info;
+>      }
+> +}
+> +
+> +void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+> +{
+> +    CPUState *cs;
+> +    AddressSpace *as = arm_boot_address_space(cpu, info);
+> +
+> +    /*
+> +     * CPU objects (unlike devices) are not automatically reset on system
+> +     * reset, so we must always register a handler to do so. If we're
+> +     * actually loading a kernel, the handler is also responsible for
+> +     * arranging that we start it correctly.
+> +     */
+> +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> +        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+> +    }
+Should we move this hunk to cpu code instead, like it's done for x86?
 
-qemu-iotests started life as a separate project, and was bulk-imported
-into qemu in commit 6bf19c94.  This is indeed leftovers from the
-pre-merge state.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---b2VWQlOQ85Ar4URTeWFS25C0VRJ3xIKwe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxZp2kACgkQp6FrSiUn
-Q2oNfAgAihsjG7bjc3K2DBQLOuizJRoUD5rizJBGm9U3fl1XTYbJuDA0JbsMXErJ
-p1Oi4ChP99vRlHUL4lf6s/5S2e1irCyk1aXYCDeqQcP1Plfy4ytyDrP5ae3Nr20b
-tDCfbeOkkvSPXazwJ2dUNWziytYEyVDNxiFvms1vkVQkbH8aau5VUsv2ZZkAkwTp
-uxWV2qQcPpa8FvgpGJK89eBO6XgpLD1MDAy7rHZsUpe34D3TRjdaKwEgDJrOao41
-PuAJESmQnbEranl98v390Zw3mIGiQLfxMa4ltfKgA2YnfAvwrLO1yUX1YrT4NqZf
-waX6z98z27SBEbpGJ3qwtV//bLeAqw==
-=/HHL
------END PGP SIGNATURE-----
-
---b2VWQlOQ85Ar4URTeWFS25C0VRJ3xIKwe--
+> +
+> +    /*
+> +     * The board code is not supposed to set secure_board_setup unless
+> +     * running its code in secure mode is actually possible, and KVM
+> +     * doesn't support secure.
+> +     */
+> +    assert(!(info->secure_board_setup && kvm_enabled()));
+> +
+> +    info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
+> +    info->dtb_limit = 0;
+> +
+> +    /* Load the kernel.  */
+> +    if (!info->kernel_filename || info->firmware_loaded) {
+> +
+> +        if (have_dtb(info)) {
+> +            /*
+> +             * If we have a device tree blob, but no kernel to supply it to (or
+> +             * the kernel is supposed to be loaded by the bootloader), copy the
+> +             * DTB to the base of RAM for the bootloader to pick up.
+> +             */
+> +            info->dtb_start = info->loader_start;
+> +        }
+> +
+> +        if (info->kernel_filename) {
+> +            FWCfgState *fw_cfg;
+> +            bool try_decompressing_kernel;
+> +
+> +            fw_cfg = fw_cfg_find();
+> +            try_decompressing_kernel = arm_feature(&cpu->env,
+> +                                                   ARM_FEATURE_AARCH64);
+> +
+> +            /*
+> +             * Expose the kernel, the command line, and the initrd in fw_cfg.
+> +             * We don't process them here at all, it's all left to the
+> +             * firmware.
+> +             */
+> +            load_image_to_fw_cfg(fw_cfg,
+> +                                 FW_CFG_KERNEL_SIZE, FW_CFG_KERNEL_DATA,
+> +                                 info->kernel_filename,
+> +                                 try_decompressing_kernel);
+> +            load_image_to_fw_cfg(fw_cfg,
+> +                                 FW_CFG_INITRD_SIZE, FW_CFG_INITRD_DATA,
+> +                                 info->initrd_filename, false);
+> +
+> +            if (info->kernel_cmdline) {
+> +                fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+> +                               strlen(info->kernel_cmdline) + 1);
+> +                fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA,
+> +                                  info->kernel_cmdline);
+> +            }
+> +        }
+> +
+> +        /*
+> +         * We will start from address 0 (typically a boot ROM image) in the
+> +         * same way as hardware.
+> +         */
+> +        return;
+> +    } else {
+> +        arm_setup_direct_kernel_boot(cpu, info);
+> +    }
+>  
+>      if (!info->skip_dtb_autoload && have_dtb(info)) {
+>          if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
