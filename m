@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33287)
+Received: from eggs.gnu.org ([209.51.188.92]:33303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44i-0005il-Q4
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:59 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44j-0005j0-21
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44f-0005zy-SJ
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44g-00061P-Nr
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:56 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:40520)
+Received: from hera.aquilenet.fr ([185.233.100.1]:60842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr44f-0005uW-Bx
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:53 -0500
+	id 1gr44g-0005zK-Ae
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:54 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 18:59:05 +0200
-Message-Id: <20190205165927.26599-11-samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 18:59:16 +0200
+Message-Id: <20190205165927.26599-22-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 10/32] slirp: replace QEMU_PACKED with
- SLIRP_PACKED
+Subject: [Qemu-devel] [PULLv2 21/32] slirp: replace net/eth.h inclusion with
+ own defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,162 +36,57 @@ From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip.h       | 10 +++++-----
- slirp/ip6_icmp.h |  6 +++---
- slirp/slirp.h    |  5 +++--
- slirp/util.h     | 32 ++++++++++++++++++++++++++++++++
- 4 files changed, 43 insertions(+), 10 deletions(-)
- create mode 100644 slirp/util.h
+ slirp/ip6.h   |  1 -
+ slirp/slirp.h |  1 -
+ slirp/util.h  | 10 ++++++++++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index 20614f3b53..2baeeb9a3a 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -89,7 +89,7 @@ struct ip {
- 	uint8_t ip_p;			/* protocol */
- 	uint16_t	ip_sum;			/* checksum */
- 	struct	in_addr ip_src,ip_dst;	/* source and dest address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 1e3e329ce6..4e7c366505 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -7,7 +7,6 @@
+ #define SLIRP_IP6_H
 =20
- #define	IP_MAXPACKET	65535		/* maximum packet size */
+ #include <glib.h>
+-#include "net/eth.h"
 =20
-@@ -151,7 +151,7 @@ struct	ip_timestamp {
- 			n_long ipt_time;
- 		} ipt_ta[1];
- 	} ipt_timestamp;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /* flag bits for ipt_flg */
- #define	IPOPT_TS_TSONLY		0		/* timestamps only */
-@@ -181,11 +181,11 @@ struct	ip_timestamp {
- struct mbuf_ptr {
- 	struct mbuf *mptr;
- 	uint32_t dummy;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
- #else
- struct mbuf_ptr {
- 	struct mbuf *mptr;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
- #endif
- struct qlink {
- 	void *next, *prev;
-@@ -201,7 +201,7 @@ struct ipovly {
- 	uint16_t	ih_len;			/* protocol length */
- 	struct	in_addr ih_src;		/* source internet address */
- 	struct	in_addr ih_dst;		/* destination internet address */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /*
-  * Ip reassembly queue structure.  Each fragment
-diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
-index 2ad2b75e67..3f44ed2f49 100644
---- a/slirp/ip6_icmp.h
-+++ b/slirp/ip6_icmp.h
-@@ -144,16 +144,16 @@ struct ndpopt {
-             uint32_t    pref_lt;                /* Preferred Lifetime */
-             uint32_t    reserved2;
-             struct in6_addr prefix;
--        } QEMU_PACKED prefixinfo;
-+        } SLIRP_PACKED prefixinfo;
- #define ndpopt_prefixinfo ndpopt_body.prefixinfo
-         struct rdnss {
-             uint16_t reserved;
-             uint32_t lifetime;
-             struct in6_addr addr;
--        } QEMU_PACKED rdnss;
-+        } SLIRP_PACKED rdnss;
- #define ndpopt_rdnss ndpopt_body.rdnss
-     } ndpopt_body;
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- /* NDP options type */
- #define NDPOPT_LINKLAYER_SOURCE     1   /* Source Link-Layer Address */
+ #define ALLNODES_MULTICAST  { .s6_addr =3D \
+                             { 0xff, 0x02, 0x00, 0x00,\
 diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 17056f4b83..67ff4d610c 100644
+index 5707805be2..c9f9143801 100644
 --- a/slirp/slirp.h
 +++ b/slirp/slirp.h
-@@ -45,6 +45,7 @@ typedef char *caddr_t;
- #define quehead slirp_quehead
-=20
- #include "debug.h"
-+#include "util.h"
+@@ -48,7 +48,6 @@ typedef char *caddr_t;
+ #include "util.h"
 =20
  #include "qemu/queue.h"
- #include "qemu/sockets.h"
-@@ -93,7 +94,7 @@ struct slirp_arphdr {
-     uint32_t      ar_sip;           /* sender IP address       */
-     unsigned char ar_tha[ETH_ALEN]; /* target hardware address */
-     uint32_t      ar_tip;           /* target IP address       */
--} QEMU_PACKED;
-+} SLIRP_PACKED;
+-#include "net/eth.h"
 =20
- #define ARP_TABLE_SIZE 16
-=20
-@@ -110,7 +111,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
- struct ndpentry {
-     unsigned char   eth_addr[ETH_ALEN];     /* sender hardware address *=
-/
-     struct in6_addr ip_addr;                /* sender IP address       *=
-/
--} QEMU_PACKED;
-+} SLIRP_PACKED;
-=20
- #define NDP_TABLE_SIZE 16
-=20
+ #include "libslirp.h"
+ #include "ip.h"
 diff --git a/slirp/util.h b/slirp/util.h
-new file mode 100644
-index 0000000000..00291c30a6
---- /dev/null
+index 4664e8159b..ef75804560 100644
+--- a/slirp/util.h
 +++ b/slirp/util.h
-@@ -0,0 +1,32 @@
-+/*
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2010-2019 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#ifndef UTIL_H_
-+#define UTIL_H_
+@@ -50,6 +50,16 @@
+=20
+ #define SCALE_MS 1000000
+=20
++#define ETH_ALEN    6
++#define ETH_HLEN    14
++#define ETH_P_IP                  (0x0800)      /* Internet Protocol pac=
+ket  */
++#define ETH_P_ARP                 (0x0806)      /* Address Resolution pa=
+cket */
++#define ETH_P_IPV6                (0x86dd)
++#define ETH_P_VLAN                (0x8100)
++#define ETH_P_DVLAN               (0x88a8)
++#define ETH_P_NCSI                (0x88f8)
++#define ETH_P_UNKNOWN             (0xffff)
 +
-+#if defined(_WIN32)
-+# define SLIRP_PACKED __attribute__((gcc_struct, packed))
-+#else
-+# define SLIRP_PACKED __attribute__((packed))
-+#endif
-+
-+#endif
+ #ifdef _WIN32
+ int slirp_closesocket(int fd);
+ int slirp_ioctlsocket(int fd, int req, void *val);
 --=20
 2.20.1
