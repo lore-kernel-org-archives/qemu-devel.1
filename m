@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57105)
+Received: from eggs.gnu.org ([209.51.188.92]:34425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gr98U-0007Kr-Dy
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 17:24:11 -0500
+	(envelope-from <jag.raman@oracle.com>) id 1gr9YF-0004mN-V7
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 17:50:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1gr98T-0003E0-He
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 17:24:10 -0500
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-	<CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
-	<e5dd8130-e041-7774-2141-cc506dee99f7@redhat.com>
-	<94f74717-0bab-ea0a-e7cc-239a1b1136bf@comstyle.com>
-	<e8177680-28fc-1213-a8f7-a3b94ef92e15@redhat.com>
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <f49796e8-7779-f8f3-a3a7-c4189d66d9de@comstyle.com>
-Date: Tue, 5 Feb 2019 17:24:02 -0500
-MIME-Version: 1.0
-In-Reply-To: <e8177680-28fc-1213-a8f7-a3b94ef92e15@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+	(envelope-from <jag.raman@oracle.com>) id 1gr9YF-00046A-6T
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 17:50:47 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:46764)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+	id 1gr9YE-0003zj-As
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 17:50:47 -0500
+From: Jagannathan Raman <jag.raman@oracle.com>
+Date: Tue,  5 Feb 2019 17:50:19 -0500
+Message-Id: <59572a7353830be4b7aa57d79ccb7ad6b72f0dda.1549406119.git.jag.raman@oracle.com>
+In-Reply-To: <cover.1549406119.git.jag.raman@oracle.com>
+References: <cover.1549406119.git.jag.raman@oracle.com>
+In-Reply-To: <cover.1549406119.git.jag.raman@oracle.com>
+References: <cover.1549406119.git.jag.raman@oracle.com>
+Subject: [Qemu-devel] [PATCH] memory: Do not update coalesced IO range in
+ the case of NOP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On 2/5/2019 9:23 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+Do not add/del coalesced IO ranges in the case where the
+same FlatRanges are present in both old and new FlatViews
 
-> Hi Brad,
->
-> On 2/5/19 2:57 PM, Brad Smith wrote:
->> If someone could point me in the right direction as to how the image i=
-s
->> created
->> I could look at coming up with something newer. I would prefer that ov=
-er
->> some
->> of the workarounds I've seen to date.
-> I'm not an OpenBSD user, so I'm more than happy if you can help the
-> upstream community to test QEMU codebase on this OS. Testing helps us t=
-o
-> avoid code rot.
->
-> What we currently use to run tests is the 'tests/vm/openbsd' script.
-> The script itself doesn't document how it was built, but looking at the
-> commit of his introduction fdfaa33291eb we have:
->
->      The image is prepared following instructions as in:
->
->      https://wiki.qemu.org/Hosts/BSD
+Fixes: 3ac7d43a6fbb ("memory: update coalesced_range on transaction_commit")
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+---
+ memory.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Ok, well that brings me to my next question. How do I get access to the=20
-Wiki to update
-the instructions?
+diff --git a/memory.c b/memory.c
+index 61d66e4..e49369d 100644
+--- a/memory.c
++++ b/memory.c
+@@ -932,9 +932,7 @@ static void address_space_update_topology_pass(AddressSpace *as,
+         } else if (frold && frnew && flatrange_equal(frold, frnew)) {
+             /* In both and unchanged (except logging may have changed) */
+ 
+-            if (!adding) {
+-                flat_range_coalesced_io_del(frold, as);
+-            } else {
++            if (adding) {
+                 MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, region_nop);
+                 if (frnew->dirty_log_mask & ~frold->dirty_log_mask) {
+                     MEMORY_LISTENER_UPDATE_REGION(frnew, as, Forward, log_start,
+@@ -946,7 +944,6 @@ static void address_space_update_topology_pass(AddressSpace *as,
+                                                   frold->dirty_log_mask,
+                                                   frnew->dirty_log_mask);
+                 }
+-                flat_range_coalesced_io_add(frnew, as);
+             }
+ 
+             ++iold;
+-- 
+1.8.3.1
