@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37452)
+Received: from eggs.gnu.org ([209.51.188.92]:42768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr6c4-0006Am-MP
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 14:42:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr6v1-0005xo-5R
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr6c3-00074N-Go
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 14:42:32 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41422)
+	(envelope-from <peter.maydell@linaro.org>) id 1gr6uz-0002ed-77
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:02:07 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:37865)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr6c3-00073N-7T
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 14:42:31 -0500
-Received: by mail-ot1-x342.google.com with SMTP id u16so7805692otk.8
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 11:42:30 -0800 (PST)
+	id 1gr6ux-0002dd-GP
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 15:02:05 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id s13so7958362otq.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 12:02:03 -0800 (PST)
 MIME-Version: 1.0
-References: <20190114011122.5995-1-richard.henderson@linaro.org>
-In-Reply-To: <20190114011122.5995-1-richard.henderson@linaro.org>
+References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Feb 2019 19:42:18 +0000
-Message-ID: <CAFEAcA8XTc5RTxifOA-cYb2FfRaC5ZMBh3AEcxL8LZqh7qxo7Q@mail.gmail.com>
+Date: Tue, 5 Feb 2019 20:01:51 +0000
+Message-ID: <CAFEAcA8-Hst3Buax1Qrrm1SVbTtkE-8a_Vj0y3N4TvfPTqR_zw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/17] target/arm: Implement ARMv8.5-MemTag
+Subject: Re: [Qemu-devel] [PULL v2 00/76] misc patches for 2019-02-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Will Deacon <will.deacon@arm.com>, Dave P Martin <dave.martin@arm.com>, szabolcs.nagy@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 14 Jan 2019 at 01:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Tue, 5 Feb 2019 at 18:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Based-on: 20190110124951.15473-1-richard.henderson@linaro.org
-> aka the TBID patch set, which itself is based on the BTI patch set.
+> The following changes since commit 1c3d45df5e94042d5fb2bb31416072563ab30e49:
 >
-> The full tree is available at
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-02-04' into staging (2019-02-05 12:46:18 +0000)
 >
->   https://github.org/rth7680/qemu.git tgt-arm-mte
+> are available in the git repository at:
 >
-> This extension isl also spelled MTE in the ARM.
 >
-> This patch set only attempts to implement linux-user emulation.
-> For system emulation, I still miss the new cache flushing insns (easy)
-> and the out-of-band physical memory for the allocation tags (harder).
+>   git://github.com/bonzini/qemu.git tags/for-upstream
 >
-> From a few mis-steps in writing the test cases for the extension,
-> I might suggest that some future kernel's userland ABI for this have
-> TCR.TCMA0 = 1, so that legacy code that is *not* MTE aware can use
-> a frame pointer without accidentally tripping left over stack tags.
-> (As seen in patch 5, SP+OFF is unchecked per the ISA but FP+OFF is not.)
+> for you to fetch changes up to 5ed76a4c63db9295c6c5d67895925810050d4a46:
 >
-> OTOH, depending on the application, that does make it easier for an
-> attack vector to clean the tag off the top of a pointer to bypass
-> store checking.  So, tricky.
+>   queue: fix QTAILQ_FOREACH_REVERSE_SAFE (2019-02-05 16:50:21 +0100)
+>
+> ----------------------------------------------------------------
+> * cpu-exec fixes (Emilio, Laurent)
+> * TCG bugfix in queue.h (Paolo)
+> * high address load for linuxboot (Zhijian)
+> * PVH support (Liam, Stefano)
+> * misc i386 changes (Paolo, Robert, Doug)
+> * configure tweak for openpty (Thomas)
+> * elf2dmp port to Windows (Viktor)
+> * initial improvements to Makefile infrastructure (Yang + GSoC 2013)
+>
+> ----------------------------------------------------------------
 
-I'm working through review of this, but feel free to rebase on
-current master (which has now got a pile of your other patches
-in it, since I've just merged target-arm.next) without waiting
-for me to finish going through it.
+The build tree where I do 'make clean' then 'make' failed when
+linking:
+
+  LINK    mips-softmmu/qemu-system-mips
+../hw/acpi/piix4.o: In function `piix4_pm_realize':
+/home/petmay01/linaro/qemu-for-merges/hw/acpi/piix4.c:515: undefined
+reference to `pm_smbus_init'
+../hw/i2c/smbus_ich9.o: In function `ich9_smbus_realize':
+/home/petmay01/linaro/qemu-for-merges/hw/i2c/smbus_ich9.c:89:
+undefined reference to `pm_smbus_init'
+
+(ditto the other mips binaries)
+
+and
+  LINK    aarch64-softmmu/qemu-system-aarch64
+hw/arm/aspeed.o: In function `palmetto_bmc_i2c_init':
+/home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:249: undefined
+reference to `smbus_eeprom_init_one'
+hw/arm/aspeed.o: In function `ast2500_evb_i2c_init':
+/home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:266: undefined
+reference to `smbus_eeprom_init_one'
+hw/arm/aspeed.o: In function `witherspoon_bmc_i2c_init':
+/home/petmay01/linaro/qemu-for-merges/hw/arm/aspeed.c:303: undefined
+reference to `smbus_eeprom_init_one'
+collect2: error: ld returned 1 exit status
 
 thanks
 -- PMM
