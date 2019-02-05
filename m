@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44242)
+Received: from eggs.gnu.org ([209.51.188.92]:48726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqyWt-0003ot-GX
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:04:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gqyp3-0003CO-JU
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:23:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gqyWq-0001cQ-IK
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:04:38 -0500
-Date: Tue, 5 Feb 2019 11:04:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190205110417.GF20321@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190204211204.27321-1-philmd@redhat.com>
-	<20190204211204.27321-4-philmd@redhat.com>
-	<87a7jaag7q.fsf@dusky.pond.sub.org>
-	<CAFEAcA8-YDTnszv7Mk+F+OAxGJSmdu4yEio1j-E477HNbh-SOQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8-YDTnszv7Mk+F+OAxGJSmdu4yEio1j-E477HNbh-SOQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] util/cutils: Move function
- documentations to the header
+	(envelope-from <kraxel@redhat.com>) id 1gqyp2-0006Bp-P0
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:23:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqyp2-0006BR-HW
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:23:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 03C13C034DE1
+	for <qemu-devel@nongnu.org>; Tue,  5 Feb 2019 11:23:23 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue,  5 Feb 2019 12:23:15 +0100
+Message-Id: <20190205112315.23454-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v4] scripts: use git archive in archive-source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +27,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-riscv@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Feb 05, 2019 at 10:56:51AM +0000, Peter Maydell wrote:
-> On Tue, 5 Feb 2019 at 06:44, Markus Armbruster <armbru@redhat.com> wrote:
-> > There are two justifiable function comment placement styles: (1) next to
-> > definition, and (2) next to declaration if it's in a header, else next
-> > to definition.
-> >
-> > The rationale for the latter is having the headers do double-duty as
-> > interface documentation.
-> >
-> > The rationale for the former is consistently placing the function
-> > comments close to the code gives them a fighting chance to actually
-> > match the code.
-> >
-> > I'm in the "next to definition" camp.  If you want concise interface
-> > specification, use something like Sphinx.
-> 
-> I'm in the "next to declaration" camp. I don't want to have
-> to wade into your implementation to find out what it does:
-> document it for me in the interface, please.
+Use git archive to create tarballs of qemu and submodules instead of
+cloning the repository and the submodules.  This is a order of magnitude
+faster because it doesn't fetch the submodules from the internet each
+time the script runs.
 
-I'm already looking at the header file to identify the function signature,
-having the explanation / docs at the same place is desirable, especially
-when the C file name is completely different from the header file name
-forcing me to go grepping the code base to find where it is implemented.
-The .c files are already volumous in size so not amenable to browsing
-for the purpose of reading the docs.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ scripts/archive-source.sh | 67 ++++++++++++++++++++++-------------------------
+ 1 file changed, 31 insertions(+), 36 deletions(-)
 
-Regards,
-Daniel
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+index 6eed2a29bd..a4ea98ded4 100755
+--- a/scripts/archive-source.sh
++++ b/scripts/archive-source.sh
+@@ -19,16 +19,25 @@ if test $# -lt 1; then
+ fi
+ 
+ tar_file=$(realpath "$1")
+-list_file="${tar_file}.list"
+-vroot_dir="${tar_file}.vroot"
++sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
++sub_file="${sub_tdir}/submodule.tar"
+ 
+ # We want a predictable list of submodules for builds, that is
+ # independent of what the developer currently has initialized
+ # in their checkout, because the build environment is completely
+ # different to the host OS.
+ submodules="dtc ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
++sub_deinit=""
+ 
+-trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
++function cleanup() {
++    local status=$?
++    rm -rf "$sub_tdir"
++    if test "$sub_deinit" != ""; then
++	git submodule deinit $sub_deinit
++    fi
++    exit $status
++}
++trap "cleanup" 0 1 2 3 15
+ 
+ if git diff-index --quiet HEAD -- &>/dev/null
+ then
+@@ -36,38 +45,24 @@ then
+ else
+     HEAD=$(git stash create)
+ fi
+-git clone --shared . "$vroot_dir"
+-test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+-
+-cd "$vroot_dir"
+-test $? -ne 0 && error "failed to change into '$vroot_dir'"
+-
+-git checkout $HEAD
+-test $? -ne 0 && error "failed to checkout $HEAD revision"
+-
++git archive --format tar $HEAD > "$tar_file"
++test $? -ne 0 && error "failed to archive qemu"
+ for sm in $submodules; do
+-    git submodule update --init $sm
+-    test $? -ne 0 && error "failed to init submodule $sm"
++    status="$(git submodule status "$sm")"
++    smhash="${status#[ +-]}"
++    smhash="${smhash%% *}"
++    case "$status" in
++	-*)
++	    sub_deinit="$sub_deinit $sm"
++	    git submodule update --init "$sm"
++	    test $? -ne 0 && error "failed to update submodule $sm"
++	    ;;
++	+*)
++	    echo "WARNING: submodule $sm is out of sync"
++	    ;;
++    esac
++    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
++    test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
++    tar --concatenate --file "$tar_file" "$sub_file"
++    test $? -ne 0 && error "failed append submodule $sm to $tar_file"
+ done
+-
+-if test -n "$submodules"; then
+-    {
+-        git ls-files || error "git ls-files failed"
+-        for sm in $submodules; do
+-            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+-            if test "${PIPESTATUS[*]}" != "0 0"; then
+-                error "git ls-files in submodule $sm failed"
+-            fi
+-        done
+-    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
+-else
+-    git ls-files > "$list_file"
+-fi
+-
+-if test $? -ne 0; then
+-    error "failed to generate list file"
+-fi
+-
+-tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
+-
+-exit 0
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.9.3
