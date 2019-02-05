@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45551)
+Received: from eggs.gnu.org ([209.51.188.92]:47140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gr5bL-0003P7-Av
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:37:46 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gr5gE-0007iA-Rk
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gr5bJ-0004Df-Gj
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:37:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gr5gD-0007dy-8X
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:42:46 -0500
+Resent-Message-Id: <E1gr5gD-0007dy-8X@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gr5gD-0007d5-0l
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:42:45 -0500
+Message-ID: <154939123974.29184.10661586488082000398@ebba9967afc0>
+In-Reply-To: <20190205170510.21984-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <154905879413.25667.2843143192142684785.malonedeb@chaenomeles.canonical.com>
-	<a667006b-44e2-f72d-8164-c52a9374cb84@redhat.com>
-In-Reply-To: <a667006b-44e2-f72d-8164-c52a9374cb84@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 5 Feb 2019 10:36:46 -0800
-Message-ID: <CAKmqyKMBF23CJTNtdqiQ7gO7kA5ZSAu3aXr1uoF+=rE_RKwgFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1814343] [NEW] Initrd not loaded on riscv32
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 5 Feb 2019 10:27:20 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/22] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Bug 1814343 <1814343@bugs.launchpad.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair@alistair23.me>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+To: peter.maydell@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-On Fri, Feb 1, 2019 at 3:26 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> Hi Jonathan,
->
-> On 2/1/19 11:06 PM, Jonathan Behrens wrote:
-> > Public bug reported:
-> >
-> > I attempted to run qemu with a ram disk. However, when reading the
-> > contents of the disk from within the VM I only get back zeros.
-> >
-> > I was able to trace the issue to a mismatch of expectations on line 93
-> > of hw/riscv/virt.c. Specifically, when running in 32-bit mode the value
-> > of kernel_entry is sign extended to 64-bits, but load_image_targphys
-> > expects the start address to not be sign extended.
-> >
-> > Straw man patch (works for 32-bit but would probably break 64-bit VMs?)=
-:
-> >
-> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > index e7f0716fb6..32216f993c 100644
-> > --- a/hw/riscv/virt.c
-> > +++ b/hw/riscv/virt.c
-> > @@ -90,7 +90,7 @@ static hwaddr load_initrd(const char *filename, uint6=
-4_t mem_size,
-> >       * halfway into RAM, and for boards with 256MB of RAM or more we p=
-ut
-> >       * the initrd at 128MB.
-> >       */
-> > -    *start =3D kernel_entry + MIN(mem_size / 2, 128 * MiB);
-> > +    *start =3D (kernel_entry & 0xffffffff) + MIN(mem_size / 2, 128 * M=
-iB);
-> >
-> >      size =3D load_ramdisk(filename, *start, mem_size - *start);
-> >      if (size =3D=3D -1) {
-> >
-> >
-> > Run command:
-> >
-> > $ qemu/build/riscv32-softmmu/qemu-system-riscv32 -machine virt -kernel
-> > mykernel.elf -nographic -initrd payload
-> >
-> > Commit hash:
-> >
-> > 3a183e330dbd7dbcac3841737ac874979552cca2
-> >
-> > ** Affects: qemu
-> >      Importance: Undecided
-> >          Status: New
->
-> I believe this is fixed by the following patch:
-> "Ensure the kernel start address is correctly cast"
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06358.html
->
-> Can you test it?
-> If if works you can reply to it with a
-> "Tested-by: Jonathan Behrens <your-email>"
-> to increases the odds it get merged ;)
-
-Did you get a chance to test this Jonathan?
-
-Alistair
-
->
-> Thanks,
->
-> Phil.
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTE3MDUxMC4yMTk4
+NC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzIyXSB0YXJn
+ZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDIwNTE3MDUxMC4yMTk4
+NC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAgIDY4ZGYwYzMwZWQuLjk2NjljOTc1NjIgIG1hc3RlciAgICAgLT4gbWFzdGVyCiB0
+IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxOTAxMjkxNzU0MDMuMTgwMTctMS1w
+aGlsbWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwMTI5MTc1NDAzLjE4MDE3LTEtcGhpbG1k
+QHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDIwNTE3
+MDUxMC4yMTk4NC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwMjA1
+MTcwNTEwLjIxOTg0LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCkF1dG8gcGFja2luZyB0aGUg
+cmVwb3NpdG9yeSBpbiBiYWNrZ3JvdW5kIGZvciBvcHRpbXVtIHBlcmZvcm1hbmNlLgpTZWUgImdp
+dCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGluZy4KU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0Jwo2NjQyM2ZjNTIzIHRhcmdldC9hcm06IE1ha2UgRlBTQ1IvRlBDUiB0cmFwcGVk
+LWV4Y2VwdGlvbiBiaXRzIFJBWi9XSQphNjFkYWQ0MjM3IGh3L2FybS9ib290OiBTdXBwb3J0IERU
+QiBhdXRvbG9hZCBmb3IgZmlybXdhcmUtb25seSBib290cwo3Njg4YWVlMjgyIGh3L2FybS9ib290
+OiBDbGFyaWZ5IHdoeSBhcm1fc2V0dXBfZmlybXdhcmVfYm9vdCgpIGRvZXNuJ3Qgc2V0IGVudi0+
+Ym9vdF9pbmZvCjgwY2MwNzI0NWMgaHcvYXJtL2Jvb3Q6IEZhY3RvciBvdXQgInNldCB1cCBmaXJt
+d2FyZSBib290IiBjb2RlCjcxNTE3NDQwMjUgaHcvYXJtL2Jvb3Q6IEZhY3RvciBvdXQgImRpcmVj
+dCBrZXJuZWwgYm9vdCIgY29kZSBpbnRvIGl0cyBvd24gZnVuY3Rpb24KYzEyYmYxODUyYyBody9h
+cm0vYm9vdDogRml4IGJsb2NrIGNvbW1lbnQgc3R5bGUgaW4gYXJtX2xvYWRfa2VybmVsKCkKY2U4
+MTM2MWZlNSBnZGJzdHViOiBhbGxvdyBraWxsaW5nIFFFTVUgdmlhIHZLaWxsIGNvbW1hbmQKOTNi
+NGQ2MWU0OSB0YXJnZXQvYXJtOiBFbmFibGUgVEJJIGZvciB1c2VyLW9ubHkKNjFmZDk1MDAzNyB0
+YXJnZXQvYXJtOiBDb21wdXRlIFRCX0ZMQUdTIGZvciBUQkkgZm9yIHVzZXItb25seQowZjAxMDQ1
+OTk5IHRhcmdldC9hcm06IENsZWFuIFRCSSBmb3IgZGF0YSBvcGVyYXRpb25zIGluIHRoZSB0cmFu
+c2xhdG9yCjUzZGE3ZDk4YzkgdGFyZ2V0L2FybTogQWRkIFRCRkxBR19BNjRfVEJJRCwgc3BsaXQg
+b3V0IGdlbl90b3BfYnl0ZV9pZ25vcmUKMTgxNWVjZDk1YiB0ZXN0cy90Y2cvYWFyY2g2NDogQWRk
+IHBhdXRoIHNtb2tlIHRlc3QKN2Q3MmI2NDMwNCBsaW51eC11c2VyOiBJbXBsZW1lbnQgUFJfUEFD
+X1JFU0VUX0tFWVMKM2FjZTc5NzUwZCB0YXJnZXQvYXJtOiBFbmFibGUgQlRJIGZvciAtY3B1IG1h
+eAozMGQ3ZjE3ODMwIHRhcmdldC9hcm06IFNldCBidHlwZSBmb3IgaW5kaXJlY3QgYnJhbmNoZXMK
+MDczZDZkZmJhNSB0YXJnZXQvYXJtOiBSZXNldCBidHlwZSBmb3IgZGlyZWN0IGJyYW5jaGVzCmRi
+ODk0MWY3NTkgdGFyZ2V0L2FybTogRGVmYXVsdCBoYW5kbGluZyBvZiBCVFlQRSBkdXJpbmcgdHJh
+bnNsYXRpb24KODFhYzU3MDU3OSB0YXJnZXQvYXJtOiBDYWNoZSB0aGUgR1AgYml0IGZvciBhIHBh
+Z2UgaW4gTWVtVHhBdHRycwpmMjE0YjY2MTk1IGV4ZWM6IEFkZCB0YXJnZXQtc3BlY2lmaWMgdGxi
+IGJpdHMgdG8gTWVtVHhBdHRycwo2MTI4MGY2ZjA5IHRhcmdldC9hcm06IEFkZCBCVCBhbmQgQlRZ
+UEUgdG8gdGItPmZsYWdzCmVlZTFkMGI3ZjIgdGFyZ2V0L2FybTogQWRkIFBTVEFURS5CVFlQRQo0
+NWIyZDg0NzJmIHRhcmdldC9hcm06IEludHJvZHVjZSBpc2FyX2ZlYXR1cmVfYWE2NF9idGkKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcgY29tbWl0IDQ1YjJkODQ3MmY2YSAodGFy
+Z2V0L2FybTogSW50cm9kdWNlIGlzYXJfZmVhdHVyZV9hYTY0X2J0aSkKMi8yMiBDaGVja2luZyBj
+b21taXQgZWVlMWQwYjdmMjRhICh0YXJnZXQvYXJtOiBBZGQgUFNUQVRFLkJUWVBFKQozLzIyIENo
+ZWNraW5nIGNvbW1pdCA2MTI4MGY2ZjA5YzcgKHRhcmdldC9hcm06IEFkZCBCVCBhbmQgQlRZUEUg
+dG8gdGItPmZsYWdzKQo0LzIyIENoZWNraW5nIGNvbW1pdCBmMjE0YjY2MTk1ZTQgKGV4ZWM6IEFk
+ZCB0YXJnZXQtc3BlY2lmaWMgdGxiIGJpdHMgdG8gTWVtVHhBdHRycykKRVJST1I6IHNwYWNlcyBw
+cm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzMxOiBGSUxFOiBpbmNsdWRlL2V4
+ZWMvbWVtYXR0cnMuaDo0NzoKKyAgICB1bnNpZ25lZCBpbnQgdGFyZ2V0X3RsYl9iaXQwIDogMTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGli
+aXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMzMjogRklMRTogaW5jbHVkZS9leGVjL21l
+bWF0dHJzLmg6NDg6CisgICAgdW5zaWduZWQgaW50IHRhcmdldF90bGJfYml0MSA6IDE7CiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQg
+YXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMzM6IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1hdHRy
+cy5oOjQ5OgorICAgIHVuc2lnbmVkIGludCB0YXJnZXRfdGxiX2JpdDIgOiAxOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA0LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo1
+LzIyIENoZWNraW5nIGNvbW1pdCA4MWFjNTcwNTc5OTUgKHRhcmdldC9hcm06IENhY2hlIHRoZSBH
+UCBiaXQgZm9yIGEgcGFnZSBpbiBNZW1UeEF0dHJzKQo2LzIyIENoZWNraW5nIGNvbW1pdCBkYjg5
+NDFmNzU5YjYgKHRhcmdldC9hcm06IERlZmF1bHQgaGFuZGxpbmcgb2YgQlRZUEUgZHVyaW5nIHRy
+YW5zbGF0aW9uKQpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBh
+cmUgbm90IHJlcXVpcmVkCiM5OTogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6MTM3
+OTY6CisgICAgcmV0dXJuICh0bGJfaGl0KGVudHJ5LT5hZGRyX2NvZGUsIGFkZHIpICYmCgp0b3Rh
+bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE5NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzIyIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzIyIENoZWNraW5nIGNvbW1pdCAwNzNkNmRmYmE1
+MWMgKHRhcmdldC9hcm06IFJlc2V0IGJ0eXBlIGZvciBkaXJlY3QgYnJhbmNoZXMpCjgvMjIgQ2hl
+Y2tpbmcgY29tbWl0IDMwZDdmMTc4MzBhZSAodGFyZ2V0L2FybTogU2V0IGJ0eXBlIGZvciBpbmRp
+cmVjdCBicmFuY2hlcykKOS8yMiBDaGVja2luZyBjb21taXQgM2FjZTc5NzUwZDdhICh0YXJnZXQv
+YXJtOiBFbmFibGUgQlRJIGZvciAtY3B1IG1heCkKMTAvMjIgQ2hlY2tpbmcgY29tbWl0IDdkNzJi
+NjQzMDQyNyAobGludXgtdXNlcjogSW1wbGVtZW50IFBSX1BBQ19SRVNFVF9LRVlTKQoxMS8yMiBD
+aGVja2luZyBjb21taXQgMTgxNWVjZDk1YmZjICh0ZXN0cy90Y2cvYWFyY2g2NDogQWRkIHBhdXRo
+IHNtb2tlIHRlc3QpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEv
+MjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTIvMjIgQ2hlY2tpbmcgY29tbWl0IDUzZGE3
+ZDk4YzlmMyAodGFyZ2V0L2FybTogQWRkIFRCRkxBR19BNjRfVEJJRCwgc3BsaXQgb3V0IGdlbl90
+b3BfYnl0ZV9pZ25vcmUpCjEzLzIyIENoZWNraW5nIGNvbW1pdCAwZjAxMDQ1OTk5YzggKHRhcmdl
+dC9hcm06IENsZWFuIFRCSSBmb3IgZGF0YSBvcGVyYXRpb25zIGluIHRoZSB0cmFuc2xhdG9yKQpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGlu
+ZQojNTE0OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzozMjU2OgorICAgIGRvX2dw
+cl9sZChzLCB0Y2dfcnQsIGNsZWFuX2FkZHIsIHNpemUsIC8qIGlzX3NpZ25lZCAqLyBmYWxzZSwK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTc0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEz
+LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE0LzIyIENoZWNraW5nIGNvbW1pdCA2MWZk
+OTUwMDM3ZGMgKHRhcmdldC9hcm06IENvbXB1dGUgVEJfRkxBR1MgZm9yIFRCSSBmb3IgdXNlci1v
+bmx5KQoxNS8yMiBDaGVja2luZyBjb21taXQgOTNiNGQ2MWU0OTFmICh0YXJnZXQvYXJtOiBFbmFi
+bGUgVEJJIGZvciB1c2VyLW9ubHkpCjE2LzIyIENoZWNraW5nIGNvbW1pdCBjZTgxMzYxZmU1YTYg
+KGdkYnN0dWI6IGFsbG93IGtpbGxpbmcgUUVNVSB2aWEgdktpbGwgY29tbWFuZCkKMTcvMjIgQ2hl
+Y2tpbmcgY29tbWl0IGMxMmJmMTg1MmM0MiAoaHcvYXJtL2Jvb3Q6IEZpeCBibG9jayBjb21tZW50
+IHN0eWxlIGluIGFybV9sb2FkX2tlcm5lbCgpKQoxOC8yMiBDaGVja2luZyBjb21taXQgNzE1MTc0
+NDAyNWRmIChody9hcm0vYm9vdDogRmFjdG9yIG91dCAiZGlyZWN0IGtlcm5lbCBib290IiBjb2Rl
+IGludG8gaXRzIG93biBmdW5jdGlvbikKMTkvMjIgQ2hlY2tpbmcgY29tbWl0IDgwY2MwNzI0NWM2
+ZSAoaHcvYXJtL2Jvb3Q6IEZhY3RvciBvdXQgInNldCB1cCBmaXJtd2FyZSBib290IiBjb2RlKQoy
+MC8yMiBDaGVja2luZyBjb21taXQgNzY4OGFlZTI4MjMxIChody9hcm0vYm9vdDogQ2xhcmlmeSB3
+aHkgYXJtX3NldHVwX2Zpcm13YXJlX2Jvb3QoKSBkb2Vzbid0IHNldCBlbnYtPmJvb3RfaW5mbykK
+MjEvMjIgQ2hlY2tpbmcgY29tbWl0IGE2MWRhZDQyMzc0YiAoaHcvYXJtL2Jvb3Q6IFN1cHBvcnQg
+RFRCIGF1dG9sb2FkIGZvciBmaXJtd2FyZS1vbmx5IGJvb3RzKQoyMi8yMiBDaGVja2luZyBjb21t
+aXQgNjY0MjNmYzUyMzdhICh0YXJnZXQvYXJtOiBNYWtlIEZQU0NSL0ZQQ1IgdHJhcHBlZC1leGNl
+cHRpb24gYml0cyBSQVovV0kpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzIwMTkwMjA1MTcwNTEwLjIxOTg0LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8u
+b3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
