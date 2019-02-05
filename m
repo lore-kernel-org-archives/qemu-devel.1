@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38976)
+Received: from eggs.gnu.org ([209.51.188.92]:39019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwip-0000Jq-Kt
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:08:52 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gqwiu-0000NJ-Tb
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwio-00035v-VI
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:08:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38936)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqwio-00035S-PC
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:08:50 -0500
-Date: Tue, 5 Feb 2019 10:08:47 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190205090847.hdf72mu7b2zn6qyu@sirius.home.kraxel.org>
-References: <20190201071225.20576-1-brendan@bslabs.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190201071225.20576-1-brendan@bslabs.net>
-Subject: Re: [Qemu-devel] [PATCH] ui/cocoa.m: Fix macOS 10.14 deprecation
- warnings
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gqwit-00037L-Hq
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 04:08:56 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Tue,  5 Feb 2019 12:08:25 +0300
+Message-Id: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] [RFC] qcow2: add compression type feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +17,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brendan Shanks <brendan@bslabs.net>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, den@virtuozzo.com, eblake@redhat.com
 
-On Thu, Jan 31, 2019 at 11:12:25PM -0800, Brendan Shanks wrote:
-> macOS 10.14 deprecated NSOnState/NSOffState in favour of
-> NSControlStateValueOn/NSControlStateValueOff. Use the new constants,
-> and #define them to the old ones when compiling against a pre-10.13 SDK.
-> Also [NSGraphicsContext graphicsPort] is now deprecated, use
-> [NSGraphicsContext CGContext] when available.
+The patch adds some preparation parts for incompatible compression type
+feature into QCOW2 header that indicates that *all* compressed clusters
+must be (de)compressed using a certain compression type.
 
-Added to UI patch queue.
+It is implied that the compression type is set on the image creation and
+can be changed only later by image convertion, thus the only compression
+algorithm is used for the image.
 
-thanks,
-  Gerd
+The plan is to add support for ZSTD and then may be something more effective
+in the future.
+
+ZSDT compression algorithm consumes 3-5 times less CPU power with a
+comparable comression ratio with zlib. It would be wise to use it for
+data compression f.e. for backups.
+
+The default compression is ZLIB.
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ block/qcow2.c | 25 +++++++++++++++++++++++++
+ block/qcow2.h | 26 ++++++++++++++++++++++----
+ 2 files changed, 47 insertions(+), 4 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 8c91b92865..cb3d6cc1c0 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -73,6 +73,7 @@ typedef struct {
+ #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
+ #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
+ #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
++#define  QCOW2_EXT_MAGIC_COMPRESSION_TYPE 0x434D5052
+ 
+ static int coroutine_fn
+ qcow2_co_preadv_compressed(BlockDriverState *bs,
+@@ -397,6 +398,9 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+ #endif
+             break;
+ 
++        case QCOW2_EXT_MAGIC_COMPRESSION_TYPE:
++            /* Setting compression type to BDRVQcow2State->compression_type */
++            /* from the image header is going to be here */
+         default:
+             /* unknown magic - save it in case we need to rewrite the header */
+             /* If you add a new feature, make sure to also update the fast
+@@ -2431,6 +2435,11 @@ int qcow2_update_header(BlockDriverState *bs)
+                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
+                 .name = "lazy refcounts",
+             },
++            {
++                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
++                .bit  = QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
++                .name = "compression type",
++            },
+         };
+ 
+         ret = header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
+@@ -2461,6 +2470,22 @@ int qcow2_update_header(BlockDriverState *bs)
+         buflen -= ret;
+     }
+ 
++    /* Compression type extension */
++    if (s->compression_type != 0) {
++        Qcow2CompressionTypeExt comp_header = {
++            .compression_type = cpu_to_be32(s->compression_type),
++        };
++        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_COMPRESSION_TYPE,
++                             &comp_header,
++                             cpu_to_be64(sizeof(comp_header)),
++                             buflen);
++        if (ret < 0) {
++            goto fail;
++        }
++        buf += ret;
++        buflen -= ret;
++    }
++
+     /* Keep unknown header extensions */
+     QLIST_FOREACH(uext, &s->unknown_header_ext, next) {
+         ret = header_ext_add(buf, uext->magic, uext->data, uext->len, buflen);
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 32cce9eee2..fdde5bbefd 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -112,6 +112,10 @@
+ #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+ #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
+ 
++/* Compression types */
++#define QCOW2_COMPRESSION_TYPE_ZLIB    0
++#define QCOW2_COMPRESSION_TYPE_ZSTD    1
++
+ typedef struct QCowHeader {
+     uint32_t magic;
+     uint32_t version;
+@@ -197,10 +201,13 @@ enum {
+ 
+ /* Incompatible feature bits */
+ enum {
+-    QCOW2_INCOMPAT_DIRTY_BITNR   = 0,
+-    QCOW2_INCOMPAT_CORRUPT_BITNR = 1,
+-    QCOW2_INCOMPAT_DIRTY         = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
+-    QCOW2_INCOMPAT_CORRUPT       = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
++    QCOW2_INCOMPAT_DIRTY_BITNR            = 0,
++    QCOW2_INCOMPAT_CORRUPT_BITNR          = 1,
++    QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR = 2,
++    QCOW2_INCOMPAT_DIRTY                  = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
++    QCOW2_INCOMPAT_CORRUPT                = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
++    QCOW2_INCOMPAT_COMPRESSION_TYPE       =
++                                    1 << QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
+ 
+     QCOW2_INCOMPAT_MASK          = QCOW2_INCOMPAT_DIRTY
+                                  | QCOW2_INCOMPAT_CORRUPT,
+@@ -256,6 +263,10 @@ typedef struct Qcow2BitmapHeaderExt {
+     uint64_t bitmap_directory_offset;
+ } QEMU_PACKED Qcow2BitmapHeaderExt;
+ 
++typedef struct Qcow2CompressionTypeExt {
++    uint32_t compression_type;
++} QEMU_PACKED Qcow2CompressionTypeExt;
++
+ typedef struct BDRVQcow2State {
+     int cluster_bits;
+     int cluster_size;
+@@ -340,6 +351,13 @@ typedef struct BDRVQcow2State {
+ 
+     CoQueue compress_wait_queue;
+     int nb_compress_threads;
++    /**
++     * Compression type used for the image. Default: 0 - ZLIB
++     * The image compression type is set on image creation.
++     * The only way to change the compression type is to convert the image
++     * with the desired compresion type set
++     */
++    uint32_t compression_type;
+ } BDRVQcow2State;
+ 
+ typedef struct Qcow2COWRegion {
+-- 
+2.17.0
