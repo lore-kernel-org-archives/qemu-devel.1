@@ -1,22 +1,29 @@
 Received: from eggs.gnu.org ([209.51.188.92]:59695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzaR-0005K8-Fg
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:12:24 -0500
+	(envelope-from <philmd@redhat.com>) id 1gqzap-0005K8-4y
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:12:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gqzSD-0001Xa-B6
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:03:59 -0500
-Date: Tue, 5 Feb 2019 13:03:44 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190205130344.30b8279f.cohuck@redhat.com>
-In-Reply-To: <9b35717e-8994-cde9-2afe-243ab80c371a@linux.ibm.com>
-References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-2-cohuck@redhat.com>
-	<9b35717e-8994-cde9-2afe-243ab80c371a@linux.ibm.com>
+	(envelope-from <philmd@redhat.com>) id 1gqzN8-000616-Am
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:58:40 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52214)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gqzN4-0005uO-IR
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:58:36 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so3327973wmj.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 03:58:24 -0800 (PST)
+References: <20190204202609.26956-1-philmd@redhat.com>
+	<20190204202609.26956-4-philmd@redhat.com>
+	<22042877-e949-9afc-4ee9-98d4a87f1bf1@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5aceca6a-02c8-2e8d-f6a3-97cb5bac6b18@redhat.com>
+Date: Tue, 5 Feb 2019 12:58:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
- channel programs
+In-Reply-To: <22042877-e949-9afc-4ee9-98d4a87f1bf1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] mips: Express dependencies of the
+ r4k platform with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,135 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Farman <farman@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>
 
-On Mon, 4 Feb 2019 14:25:34 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On 01/30/2019 08:22 AM, Cornelia Huck wrote:
-> > When we get a solicited interrupt, the start function may have
-> > been cleared by a csch, but we still have a channel program
-> > structure allocated. Make it safe to call the cp accessors in
-> > any case, so we can call them unconditionally.
-> > 
-> > While at it, also make sure that functions called from other parts
-> > of the code return gracefully if the channel program structure
-> > has not been initialized (even though that is a bug in the caller).
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >   drivers/s390/cio/vfio_ccw_cp.c  | 20 +++++++++++++++++++-
-> >   drivers/s390/cio/vfio_ccw_cp.h  |  2 ++
-> >   drivers/s390/cio/vfio_ccw_fsm.c |  5 +++++
-> >   3 files changed, 26 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> > index ba08fe137c2e..0bc0c38edda7 100644
-> > --- a/drivers/s390/cio/vfio_ccw_cp.c
-> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> > @@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
-> >   	struct ccwchain *chain, *temp;
-> >   	int i;
-> >   
-> > +	cp->initialized = false;
-> >   	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
-> >   		for (i = 0; i < chain->ch_len; i++) {
-> >   			pfn_array_table_unpin_free(chain->ch_pat + i,
-> > @@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
-> >   	 */
-> >   	cp->orb.cmd.c64 = 1;
-> >   
-> > +	cp->initialized = true;
-> > +  
+On 2/5/19 5:11 AM, Thomas Huth wrote:
+> On 2019-02-04 21:26, Philippe Mathieu-Daudé wrote:
+>> This platform use standard PC devices connected to an ISA bus.
+>> Networking is provided by a ne2000 chipset.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  hw/mips/Kconfig | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+>> index ab006477c7..ee6290d497 100644
+>> --- a/hw/mips/Kconfig
+>> +++ b/hw/mips/Kconfig
+>> @@ -1,5 +1,15 @@
+>>  config R4K
+>>      bool
+>> +    select ISA_BUS
+>> +    select SERIAL_ISA
+>> +    select I8259
+>> +    select I8254
+>> +    select MC146818RTC
+>> +    select VGA_ISA
+>> +    select NE2000_ISA
+>> +    select IDE_ISA
+>> +    # I8042
+>> +    select PCKBD
 > 
-> Not seen in this hunk, but we call ccwchain_loop_tic() just prior to 
-> this point.  If that returns non-zero, we call cp_unpin_free()[1] (and 
-> set initailized to false), and then fall through to here.  So this is 
-> going to set initialized to true, even though we're taking an error 
-> path.  :-(
+> I think you can now also remove "CONFIG_NE2000_ISA=y" from
+> default-configs/mips-softmmu-common.mak.
 
-Eek, setting c64 unconditionally threw me off. This needs to check
-for !ret, of course.
+Correct!
 
-> 
-> [1] Wait, why is it calling cp_unpin_free()?  Oh, I had proposed 
-> squashing cp_free() and cp_unpin_free() back in November[2], got an r-b 
-> from Pierre but haven't gotten back to tidy up the series for a v2. 
-> Okay, I'll try to do that again soon.  :-)
+Thanks,
 
-:)
-
-> [2] https://patchwork.kernel.org/patch/10675261/
-> 
-> >   	return ret;
-> >   }
-> >   
-> > @@ -715,7 +718,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
-> >    */
-> >   void cp_free(struct channel_program *cp)
-> >   {
-> > -	cp_unpin_free(cp);
-> > +	if (cp->initialized)
-> > +		cp_unpin_free(cp);
-> >   }
-> >   
-> >   /**
-> > @@ -760,6 +764,10 @@ int cp_prefetch(struct channel_program *cp)
-> >   	struct ccwchain *chain;
-> >   	int len, idx, ret;
-> >   
-> > +	/* this is an error in the caller */
-> > +	if (!cp || !cp->initialized)
-> > +		return -EINVAL;
-> > +
-> >   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
-> >   		len = chain->ch_len;
-> >   		for (idx = 0; idx < len; idx++) {
-> > @@ -795,6 +803,10 @@ union orb *cp_get_orb(struct channel_program *cp, u32 intparm, u8 lpm)
-> >   	struct ccwchain *chain;
-> >   	struct ccw1 *cpa;
-> >   
-> > +	/* this is an error in the caller */
-> > +	if (!cp || !cp->initialized)
-> > +		return NULL;
-> > +
-> >   	orb = &cp->orb;
-> >   
-> >   	orb->cmd.intparm = intparm;
-> > @@ -831,6 +843,9 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
-> >   	u32 cpa = scsw->cmd.cpa;
-> >   	u32 ccw_head, ccw_tail;
-> >   
-> > +	if (!cp->initialized)
-> > +		return;
-> > +
-> >   	/*
-> >   	 * LATER:
-> >   	 * For now, only update the cmd.cpa part. We may need to deal with
-> > @@ -869,6 +884,9 @@ bool cp_iova_pinned(struct channel_program *cp, u64 iova)
-> >   	struct ccwchain *chain;
-> >   	int i;
-> >   
-> > +	if (!cp->initialized)  
-> 
-> So, two of the checks added above look for a nonzero cp pointer prior to 
-> checking initialized, while two don't.  I guess cp can't be NULL, since 
-> it's embedded in the private struct directly and that's only free'd when 
-> we do vfio_ccw_sch_remove() ... But I guess some consistency in how we 
-> look would be nice.
-
-The idea was: In which context is this called? Is there a legitimate
-reason for the caller to pass in an uninitialized cp, or would that
-mean the caller had messed up (and we should not trust cp to be !NULL
-either?)
-
-But you're right, that does look inconsistent. Always checking for
-cp != NULL probably looks least odd, although it is overkill. Opinions?
-
-> 
-> > +		return false;
-> > +
-> >   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
-> >   		for (i = 0; i < chain->ch_len; i++)
-> >   			if (pfn_array_table_iova_pinned(chain->ch_pat + i,
+Phil.
