@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42533)
+Received: from eggs.gnu.org ([209.51.188.92]:42531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqyQo-0007La-Ss
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:23 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gqyQo-0007LZ-So
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqyQg-0006Bu-Ln
+	(envelope-from <kraxel@redhat.com>) id 1gqyQg-0006Br-Lk
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44922)
+Received: from mx1.redhat.com ([209.132.183.28]:34172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqyQc-000671-Td
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqyQc-000672-Uo
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 05:58:11 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  5 Feb 2019 11:57:45 +0100
-Message-Id: <20190205105758.4230-2-kraxel@redhat.com>
+Date: Tue,  5 Feb 2019 11:57:48 +0100
+Message-Id: <20190205105758.4230-5-kraxel@redhat.com>
 In-Reply-To: <20190205105758.4230-1-kraxel@redhat.com>
 References: <20190205105758.4230-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 01/14] Remove deprecated -no-frame option
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/14] ui/sdl_keysym: Remove obsolete SDL1.2
+ related code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +32,307 @@ Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <
 
 From: Thomas Huth <thuth@redhat.com>
 
-The -no-frame option has been deprecated with QEMU v2.12. It was only
-useful with SDL1.2 - now that we've removed support for SDL1.2, we
-can certainly remove the -no-frame option, too.
+sdl_keysym.h has only been included by sdl.c which has recently been
+removed recently with this commit:
+
+  0015ca5cbabe0b31d31610ddfaafd90a9e5911a4
+  ("ui: remove support for SDL1.2 in favour of SDL2")
+
+So we can drop this header file now completely, too.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1549351769-19620-1-git-send-email-thuth@redhat.com
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 1549282241-23535-1-git-send-email-thuth@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/sysemu/sysemu.h |  1 -
- vl.c                    | 23 +++--------------------
- qemu-deprecated.texi    |  6 ------
- qemu-options.hx         | 11 -----------
- 4 files changed, 3 insertions(+), 38 deletions(-)
+ ui/sdl_keysym.h | 278 --------------------------------------------------=
+------
+ 1 file changed, 278 deletions(-)
+ delete mode 100644 ui/sdl_keysym.h
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 85877b7e43..4b5a6b77f9 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -102,7 +102,6 @@ extern const char *keyboard_layout;
- extern int win2k_install_hack;
- extern int alt_grab;
- extern int ctrl_grab;
--extern int no_frame;
- extern int smp_cpus;
- extern unsigned int max_cpus;
- extern int cursor_hide;
-diff --git a/vl.c b/vl.c
-index 9cf0fbe0b8..33d226fb48 100644
---- a/vl.c
-+++ b/vl.c
-@@ -160,7 +160,6 @@ static int rtc_host_datetime_offset = -1; /* valid & used only with
- QEMUClockType rtc_clock;
- int vga_interface_type = VGA_NONE;
- static DisplayOptions dpy;
--int no_frame;
- static int num_serial_hds;
- static Chardev **serial_hds;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
-@@ -2113,18 +2112,7 @@ static void parse_display(const char *p)
-         while (*opts) {
-             const char *nextopt;
- 
--            if (strstart(opts, ",frame=", &nextopt)) {
--                g_printerr("The frame= sdl option is deprecated, and will be\n"
--                           "removed in a future release.\n");
--                opts = nextopt;
--                if (strstart(opts, "on", &nextopt)) {
--                    no_frame = 0;
--                } else if (strstart(opts, "off", &nextopt)) {
--                    no_frame = 1;
--                } else {
--                    goto invalid_sdl_args;
--                }
--            } else if (strstart(opts, ",alt_grab=", &nextopt)) {
-+            if (strstart(opts, ",alt_grab=", &nextopt)) {
-                 opts = nextopt;
-                 if (strstart(opts, "on", &nextopt)) {
-                     alt_grab = 1;
-@@ -3596,11 +3584,6 @@ int main(int argc, char **argv, char **envp)
-                 dpy.has_full_screen = true;
-                 dpy.full_screen = true;
-                 break;
--            case QEMU_OPTION_no_frame:
--                g_printerr("The -no-frame switch is deprecated, and will be\n"
--                           "removed in a future release.\n");
--                no_frame = 1;
--                break;
-             case QEMU_OPTION_alt_grab:
-                 alt_grab = 1;
-                 break;
-@@ -4279,8 +4262,8 @@ int main(int argc, char **argv, char **envp)
-         dpy.type = DISPLAY_TYPE_NONE;
-     }
- 
--    if ((no_frame || alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
--        error_report("-no-frame, -alt-grab and -ctrl-grab are only valid "
-+    if ((alt_grab || ctrl_grab) && dpy.type != DISPLAY_TYPE_SDL) {
-+        error_report("-alt-grab and -ctrl-grab are only valid "
-                      "for SDL, ignoring option");
-     }
-     if (dpy.has_window_close &&
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9cc20b365c..0b508e738f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -37,12 +37,6 @@ would automatically enable USB support on the machine type.
- If using the new syntax, USB support must be explicitly
- enabled via the ``-machine usb=on'' argument.
- 
--@subsection -no-frame (since 2.12.0)
+diff --git a/ui/sdl_keysym.h b/ui/sdl_keysym.h
+deleted file mode 100644
+index 599d9fc64d..0000000000
+--- a/ui/sdl_keysym.h
++++ /dev/null
+@@ -1,278 +0,0 @@
 -
--The @code{--no-frame} argument works with SDL 1.2 only. The other user
--interfaces never implemented this in the first place. So this will be
--removed together with SDL 1.2 support.
+-#include "keymaps.h"
 -
- @subsection -virtioconsole (since 3.0.0)
- 
- Option @option{-virtioconsole} has been replaced by
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 521511ec13..0180467dee 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1294,17 +1294,6 @@ mode using a curses/ncurses interface. Nothing is displayed in graphical
- mode.
- ETEXI
- 
--DEF("no-frame", 0, QEMU_OPTION_no_frame,
--    "-no-frame       open SDL window without a frame and window decorations\n",
--    QEMU_ARCH_ALL)
--STEXI
--@item -no-frame
--@findex -no-frame
--Do not use decorations for SDL windows and start them using the whole
--available screen space. This makes the using QEMU in a dedicated desktop
--workspace more convenient.
--ETEXI
+-static const name2keysym_t name2keysym[]=3D{
+-/* ascii */
+-    { "space",                0x020},
+-    { "exclam",               0x021},
+-    { "quotedbl",             0x022},
+-    { "numbersign",           0x023},
+-    { "dollar",               0x024},
+-    { "percent",              0x025},
+-    { "ampersand",            0x026},
+-    { "apostrophe",           0x027},
+-    { "parenleft",            0x028},
+-    { "parenright",           0x029},
+-    { "asterisk",             0x02a},
+-    { "plus",                 0x02b},
+-    { "comma",                0x02c},
+-    { "minus",                0x02d},
+-    { "period",               0x02e},
+-    { "slash",                0x02f},
+-    { "0",                    0x030},
+-    { "1",                    0x031},
+-    { "2",                    0x032},
+-    { "3",                    0x033},
+-    { "4",                    0x034},
+-    { "5",                    0x035},
+-    { "6",                    0x036},
+-    { "7",                    0x037},
+-    { "8",                    0x038},
+-    { "9",                    0x039},
+-    { "colon",                0x03a},
+-    { "semicolon",            0x03b},
+-    { "less",                 0x03c},
+-    { "equal",                0x03d},
+-    { "greater",              0x03e},
+-    { "question",             0x03f},
+-    { "at",                   0x040},
+-    { "A",                    0x041},
+-    { "B",                    0x042},
+-    { "C",                    0x043},
+-    { "D",                    0x044},
+-    { "E",                    0x045},
+-    { "F",                    0x046},
+-    { "G",                    0x047},
+-    { "H",                    0x048},
+-    { "I",                    0x049},
+-    { "J",                    0x04a},
+-    { "K",                    0x04b},
+-    { "L",                    0x04c},
+-    { "M",                    0x04d},
+-    { "N",                    0x04e},
+-    { "O",                    0x04f},
+-    { "P",                    0x050},
+-    { "Q",                    0x051},
+-    { "R",                    0x052},
+-    { "S",                    0x053},
+-    { "T",                    0x054},
+-    { "U",                    0x055},
+-    { "V",                    0x056},
+-    { "W",                    0x057},
+-    { "X",                    0x058},
+-    { "Y",                    0x059},
+-    { "Z",                    0x05a},
+-    { "bracketleft",          0x05b},
+-    { "backslash",            0x05c},
+-    { "bracketright",         0x05d},
+-    { "asciicircum",          0x05e},
+-    { "underscore",           0x05f},
+-    { "grave",                0x060},
+-    { "a",                    0x061},
+-    { "b",                    0x062},
+-    { "c",                    0x063},
+-    { "d",                    0x064},
+-    { "e",                    0x065},
+-    { "f",                    0x066},
+-    { "g",                    0x067},
+-    { "h",                    0x068},
+-    { "i",                    0x069},
+-    { "j",                    0x06a},
+-    { "k",                    0x06b},
+-    { "l",                    0x06c},
+-    { "m",                    0x06d},
+-    { "n",                    0x06e},
+-    { "o",                    0x06f},
+-    { "p",                    0x070},
+-    { "q",                    0x071},
+-    { "r",                    0x072},
+-    { "s",                    0x073},
+-    { "t",                    0x074},
+-    { "u",                    0x075},
+-    { "v",                    0x076},
+-    { "w",                    0x077},
+-    { "x",                    0x078},
+-    { "y",                    0x079},
+-    { "z",                    0x07a},
+-    { "braceleft",            0x07b},
+-    { "bar",                  0x07c},
+-    { "braceright",           0x07d},
+-    { "asciitilde",           0x07e},
 -
- DEF("alt-grab", 0, QEMU_OPTION_alt_grab,
-     "-alt-grab       use Ctrl-Alt-Shift to grab mouse (instead of Ctrl-Alt)\n",
-     QEMU_ARCH_ALL)
--- 
+-/* latin 1 extensions */
+-{ "nobreakspace",         0x0a0},
+-{ "exclamdown",           0x0a1},
+-{ "cent",         	  0x0a2},
+-{ "sterling",             0x0a3},
+-{ "currency",             0x0a4},
+-{ "yen",                  0x0a5},
+-{ "brokenbar",            0x0a6},
+-{ "section",              0x0a7},
+-{ "diaeresis",            0x0a8},
+-{ "copyright",            0x0a9},
+-{ "ordfeminine",          0x0aa},
+-{ "guillemotleft",        0x0ab},
+-{ "notsign",              0x0ac},
+-{ "hyphen",               0x0ad},
+-{ "registered",           0x0ae},
+-{ "macron",               0x0af},
+-{ "degree",               0x0b0},
+-{ "plusminus",            0x0b1},
+-{ "twosuperior",          0x0b2},
+-{ "threesuperior",        0x0b3},
+-{ "acute",                0x0b4},
+-{ "mu",                   0x0b5},
+-{ "paragraph",            0x0b6},
+-{ "periodcentered",       0x0b7},
+-{ "cedilla",              0x0b8},
+-{ "onesuperior",          0x0b9},
+-{ "masculine",            0x0ba},
+-{ "guillemotright",       0x0bb},
+-{ "onequarter",           0x0bc},
+-{ "onehalf",              0x0bd},
+-{ "threequarters",        0x0be},
+-{ "questiondown",         0x0bf},
+-{ "Agrave",               0x0c0},
+-{ "Aacute",               0x0c1},
+-{ "Acircumflex",          0x0c2},
+-{ "Atilde",               0x0c3},
+-{ "Adiaeresis",           0x0c4},
+-{ "Aring",                0x0c5},
+-{ "AE",                   0x0c6},
+-{ "Ccedilla",             0x0c7},
+-{ "Egrave",               0x0c8},
+-{ "Eacute",               0x0c9},
+-{ "Ecircumflex",          0x0ca},
+-{ "Ediaeresis",           0x0cb},
+-{ "Igrave",               0x0cc},
+-{ "Iacute",               0x0cd},
+-{ "Icircumflex",          0x0ce},
+-{ "Idiaeresis",           0x0cf},
+-{ "ETH",                  0x0d0},
+-{ "Eth",                  0x0d0},
+-{ "Ntilde",               0x0d1},
+-{ "Ograve",               0x0d2},
+-{ "Oacute",               0x0d3},
+-{ "Ocircumflex",          0x0d4},
+-{ "Otilde",               0x0d5},
+-{ "Odiaeresis",           0x0d6},
+-{ "multiply",             0x0d7},
+-{ "Ooblique",             0x0d8},
+-{ "Oslash",               0x0d8},
+-{ "Ugrave",               0x0d9},
+-{ "Uacute",               0x0da},
+-{ "Ucircumflex",          0x0db},
+-{ "Udiaeresis",           0x0dc},
+-{ "Yacute",               0x0dd},
+-{ "THORN",                0x0de},
+-{ "Thorn",                0x0de},
+-{ "ssharp",               0x0df},
+-{ "agrave",               0x0e0},
+-{ "aacute",               0x0e1},
+-{ "acircumflex",          0x0e2},
+-{ "atilde",               0x0e3},
+-{ "adiaeresis",           0x0e4},
+-{ "aring",                0x0e5},
+-{ "ae",                   0x0e6},
+-{ "ccedilla",             0x0e7},
+-{ "egrave",               0x0e8},
+-{ "eacute",               0x0e9},
+-{ "ecircumflex",          0x0ea},
+-{ "ediaeresis",           0x0eb},
+-{ "igrave",               0x0ec},
+-{ "iacute",               0x0ed},
+-{ "icircumflex",          0x0ee},
+-{ "idiaeresis",           0x0ef},
+-{ "eth",                  0x0f0},
+-{ "ntilde",               0x0f1},
+-{ "ograve",               0x0f2},
+-{ "oacute",               0x0f3},
+-{ "ocircumflex",          0x0f4},
+-{ "otilde",               0x0f5},
+-{ "odiaeresis",           0x0f6},
+-{ "division",             0x0f7},
+-{ "oslash",               0x0f8},
+-{ "ooblique",             0x0f8},
+-{ "ugrave",               0x0f9},
+-{ "uacute",               0x0fa},
+-{ "ucircumflex",          0x0fb},
+-{ "udiaeresis",           0x0fc},
+-{ "yacute",               0x0fd},
+-{ "thorn",                0x0fe},
+-{ "ydiaeresis",           0x0ff},
+-#if SDL_MAJOR_VERSION =3D=3D 1
+-{"EuroSign", SDLK_EURO},
+-
+-    /* modifiers */
+-{"Control_L", SDLK_LCTRL},
+-{"Control_R", SDLK_RCTRL},
+-{"Alt_L", SDLK_LALT},
+-{"Alt_R", SDLK_RALT},
+-{"Caps_Lock", SDLK_CAPSLOCK},
+-{"Meta_L", SDLK_LMETA},
+-{"Meta_R", SDLK_RMETA},
+-{"Shift_L", SDLK_LSHIFT},
+-{"Shift_R", SDLK_RSHIFT},
+-{"Super_L", SDLK_LSUPER},
+-{"Super_R", SDLK_RSUPER},
+-
+-    /* special keys */
+-{"BackSpace", SDLK_BACKSPACE},
+-{"Tab", SDLK_TAB},
+-{"Return", SDLK_RETURN},
+-{"Right", SDLK_RIGHT},
+-{"Left", SDLK_LEFT},
+-{"Up", SDLK_UP},
+-{"Down", SDLK_DOWN},
+-{"Page_Down", SDLK_PAGEDOWN},
+-{"Page_Up", SDLK_PAGEUP},
+-{"Insert", SDLK_INSERT},
+-{"Delete", SDLK_DELETE},
+-{"Home", SDLK_HOME},
+-{"End", SDLK_END},
+-{"Scroll_Lock", SDLK_SCROLLOCK},
+-{"F1", SDLK_F1},
+-{"F2", SDLK_F2},
+-{"F3", SDLK_F3},
+-{"F4", SDLK_F4},
+-{"F5", SDLK_F5},
+-{"F6", SDLK_F6},
+-{"F7", SDLK_F7},
+-{"F8", SDLK_F8},
+-{"F9", SDLK_F9},
+-{"F10", SDLK_F10},
+-{"F11", SDLK_F11},
+-{"F12", SDLK_F12},
+-{"F13", SDLK_F13},
+-{"F14", SDLK_F14},
+-{"F15", SDLK_F15},
+-{"Sys_Req", SDLK_SYSREQ},
+-{"KP_0", SDLK_KP0},
+-{"KP_1", SDLK_KP1},
+-{"KP_2", SDLK_KP2},
+-{"KP_3", SDLK_KP3},
+-{"KP_4", SDLK_KP4},
+-{"KP_5", SDLK_KP5},
+-{"KP_6", SDLK_KP6},
+-{"KP_7", SDLK_KP7},
+-{"KP_8", SDLK_KP8},
+-{"KP_9", SDLK_KP9},
+-{"KP_Add", SDLK_KP_PLUS},
+-{"KP_Decimal", SDLK_KP_PERIOD},
+-{"KP_Divide", SDLK_KP_DIVIDE},
+-{"KP_Enter", SDLK_KP_ENTER},
+-{"KP_Equal", SDLK_KP_EQUALS},
+-{"KP_Multiply", SDLK_KP_MULTIPLY},
+-{"KP_Subtract", SDLK_KP_MINUS},
+-{"help", SDLK_HELP},
+-{"Menu", SDLK_MENU},
+-{"Power", SDLK_POWER},
+-{"Print", SDLK_PRINT},
+-{"Mode_switch", SDLK_MODE},
+-{"Multi_Key", SDLK_COMPOSE},
+-{"Num_Lock", SDLK_NUMLOCK},
+-{"Pause", SDLK_PAUSE},
+-{"Escape", SDLK_ESCAPE},
+-#endif
+-{NULL, 0},
+-};
+--=20
 2.9.3
