@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48244)
+Received: from eggs.gnu.org ([209.51.188.92]:48723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr0e9-0000Qr-W7
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:20:18 -0500
+	(envelope-from <thuth@redhat.com>) id 1gr0fv-0001KC-PS
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr0e9-0003hB-4J
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:20:17 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr0e8-0003gj-Vf
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:20:17 -0500
-Received: by mail-ot1-x341.google.com with SMTP id v23so5532376otk.9
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 05:20:16 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gr0fv-0004Pw-0q
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 08:22:07 -0500
+References: <1549371525-29899-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA9PKSW92GJO1KcBEQcbGY7TB4pqaW8qSe9j6JJZ7Z2MKA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b23135c0-50d7-f203-5cfe-63cd0fa27377@redhat.com>
+Date: Tue, 5 Feb 2019 14:21:58 +0100
 MIME-Version: 1.0
-References: <20190129175403.18017-1-philmd@redhat.com>
-	<20190129175403.18017-10-philmd@redhat.com>
-In-Reply-To: <20190129175403.18017-10-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Feb 2019 13:20:04 +0000
-Message-ID: <CAFEAcA_ejg0yPkBZ_0-mgM5zgMHKqKe3SDGX0wMZ-neYC_Oy0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAFEAcA9PKSW92GJO1KcBEQcbGY7TB4pqaW8qSe9j6JJZ7Z2MKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/18] tests/vm/openbsd: Install Bash
- from the ports
+Subject: Re: [Qemu-devel] [PATCH] hw/cpu/cluster: Mark the cpu-cluster
+ device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Luc Michel <luc.michel@greensocs.com>, Alistair Francis <alistair.francis@wdc.com>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-On Tue, 29 Jan 2019 at 17:57, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Various iotests scripts (run via 'make check-block')  use bash
-> specific extentions.  OpenBSD comes with the Korn shell as default.
-> Install bash to be able to run those tests.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/vm/openbsd | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 6263c8956b..e9c2a3f2c8 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -45,6 +45,8 @@ class OpenBSDVM(basevm.BaseVM):
->          self.wait_ssh()
->          sys.stderr.write("Disabling W^X on the build partition...\n")
->          self.ssh_root_check("sed -E -i 's_(/tmp\ ffs)\ ([^\ ]*)_\\1 \\2,=
-wxallowed_' /etc/fstab")
-> +        sys.stderr.write("Installing bash...\n")
-> +        self.ssh_root_check("PKG_PATH=3Dhttps://ftp.openbsd.org/pub/Open=
-BSD/6.1/packages/amd64 pkg_add bash")
->          self.ssh_root("shutdown -p now")
->          self.wait()
->
+On 2019-02-05 14:09, Peter Maydell wrote:
+> On Tue, 5 Feb 2019 at 12:58, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> The device can not be instantiated by the user and QEMU currently
+>> aborts when you try to use it:
+>>
+>> $ x86_64-softmmu/qemu-system-x86_64 -device cpu-cluster
+>> qemu-system-x86_64: hw/cpu/cluster.c:73: cpu_cluster_realize:
+>>  Assertion `cbdata.cpu_count > 0' failed.
+>> Aborted (core dumped)
+>>
+>> Since this is an internal device only, mark it with user_creatable =3D=
+ false.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/cpu/cluster.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
+>> index 25f9070..6f5f037 100644
+>> --- a/hw/cpu/cluster.c
+>> +++ b/hw/cpu/cluster.c
+>> @@ -79,6 +79,9 @@ static void cpu_cluster_class_init(ObjectClass *klas=
+s, void *data)
+>>
+>>      dc->props =3D cpu_cluster_properties;
+>>      dc->realize =3D cpu_cluster_realize;
+>> +
+>> +    /* This is not directly for users, CPU children must be attached =
+by code */
+>> +    dc->user_creatable =3D false;
+>>  }
+>>
+>>  static const TypeInfo cpu_cluster_type_info =3D {
+>> --
+>=20
+>=20
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>=20
+> Would it be possible to add a 'make check' test that every device
+> we claim to be user-creatable can be created without crashing ?
 
-Wouldn't it make more sense to just update the image to include
-the necessary package, the same way we do with all QEMU's
-other build dependencies ?
+That's what Eduardo's scripts/device-crash-test is good for. It's just
+too slow to run during "make check" currently, since it checks each
+device with each machine type... But IIRC Eduardo once had ideas to
+improve this...?
 
-thanks
--- PMM
+ Thomas
