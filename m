@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36189)
+Received: from eggs.gnu.org ([209.51.188.92]:36838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4AZ-0001ze-Ee
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:06:09 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr4By-00037Q-Dq
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:07:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4AS-0000as-Im
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:59 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43045)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr4AS-0000L0-4u
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:52 -0500
-Received: by mail-wr1-x434.google.com with SMTP id r2so4429756wrv.10
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:05:25 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id w13sm5583164wmf.5.2019.02.05.09.05.22
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Feb 2019 09:05:23 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Feb 2019 17:04:56 +0000
-Message-Id: <20190205170510.21984-9-peter.maydell@linaro.org>
-In-Reply-To: <20190205170510.21984-1-peter.maydell@linaro.org>
-References: <20190205170510.21984-1-peter.maydell@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr4Bx-0001M4-Ej
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:07:26 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 5 Feb 2019 17:07:17 +0000
+Message-ID: <e78b4a65-e103-7df7-fa77-7d67699b9c91@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-10-vsementsov@virtuozzo.com>
+	<8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
+In-Reply-To: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <92546F0195CD3A4E898E367C60229100@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/22] target/arm: Set btype for indirect
- branches
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/nbd-client: nbd reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,100 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190128223118.5255-9-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-a64.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5d0341a6953..7375ebf7a9e 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -138,6 +138,19 @@ static void reset_btype(DisasContext *s)
-     }
- }
- 
-+static void set_btype(DisasContext *s, int val)
-+{
-+    TCGv_i32 tcg_val;
-+
-+    /* BTYPE is a 2-bit field, and 0 should be done with reset_btype.  */
-+    tcg_debug_assert(val >= 1 && val <= 3);
-+
-+    tcg_val = tcg_const_i32(val);
-+    tcg_gen_st_i32(tcg_val, cpu_env, offsetof(CPUARMState, btype));
-+    tcg_temp_free_i32(tcg_val);
-+    s->btype = -1;
-+}
-+
- void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-                             fprintf_function cpu_fprintf, int flags)
- {
-@@ -1982,6 +1995,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
- static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
- {
-     unsigned int opc, op2, op3, rn, op4;
-+    unsigned btype_mod = 2;   /* 0: BR, 1: BLR, 2: other */
-     TCGv_i64 dst;
-     TCGv_i64 modifier;
- 
-@@ -1999,6 +2013,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-     case 0: /* BR */
-     case 1: /* BLR */
-     case 2: /* RET */
-+        btype_mod = opc;
-         switch (op3) {
-         case 0:
-             /* BR, BLR, RET */
-@@ -2042,7 +2057,6 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         default:
-             goto do_unallocated;
-         }
--
-         gen_a64_set_pc(s, dst);
-         /* BLR also needs to load return address */
-         if (opc == 1) {
-@@ -2058,6 +2072,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         if ((op3 & ~1) != 2) {
-             goto do_unallocated;
-         }
-+        btype_mod = opc & 1;
-         if (s->pauth_active) {
-             dst = new_tmp_a64(s);
-             modifier = cpu_reg_sp(s, op4);
-@@ -2141,6 +2156,26 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
-+    switch (btype_mod) {
-+    case 0: /* BR */
-+        if (dc_isar_feature(aa64_bti, s)) {
-+            /* BR to {x16,x17} or !guard -> 1, else 3.  */
-+            set_btype(s, rn == 16 || rn == 17 || !s->guarded_page ? 1 : 3);
-+        }
-+        break;
-+
-+    case 1: /* BLR */
-+        if (dc_isar_feature(aa64_bti, s)) {
-+            /* BLR sets BTYPE to 2, regardless of source guarded page.  */
-+            set_btype(s, 2);
-+        }
-+        break;
-+
-+    default: /* RET or none of the above.  */
-+        /* BTYPE will be set to 0 by normal end-of-insn processing.  */
-+        break;
-+    }
-+
-     s->base.is_jmp = DISAS_JUMP;
- }
- 
--- 
-2.20.1
+MTYuMDEuMjAxOSAyMDowNCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNy8zMS8xOCAxMjozMCBQ
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEltcGxlbWVudCByZWNv
+bm5lY3QuIFRvIGFjaGlldmUgdGhpczoNCj4+DQo+PiAxLiBhZGQgbmV3IG1vZGVzOg0KPj4gICAg
+IGNvbm5lY3Rpbmctd2FpdDogbWVhbnMsIHRoYXQgcmVjb25uZWN0aW5nIGlzIGluIHByb2dyZXNz
+LCBhbmQgdGhlcmUNCj4+ICAgICAgIHdlcmUgc21hbGwgbnVtYmVyIG9mIHJlY29ubmVjdCBhdHRl
+bXB0cywgc28gYWxsIHJlcXVlc3RzIGFyZQ0KPj4gICAgICAgd2FpdGluZyBmb3IgdGhlIGNvbm5l
+Y3Rpb24uDQo+PiAgICAgY29ubmVjdGluZy1ub3dhaXQ6IHJlY29ubmVjdGluZyBpcyBpbiBwcm9n
+cmVzcywgdGhlcmUgd2VyZSBhIGxvdCBvZg0KPj4gICAgICAgYXR0ZW1wdHMgb2YgcmVjb25uZWN0
+LCBhbGwgcmVxdWVzdHMgd2lsbCByZXR1cm4gZXJyb3JzLg0KPj4NCj4+ICAgICB0d28gb2xkIG1v
+ZGVzIGFyZSB1c2VkIHRvbzoNCj4+ICAgICBjb25uZWN0ZWQ6IG5vcm1hbCBzdGF0ZQ0KPj4gICAg
+IHF1aXQ6IGV4aXRpbmcgYWZ0ZXIgZmF0YWwgZXJyb3Igb3Igb24gY2xvc2UNCj4gDQo+IFdoYXQg
+bWFrZXMgYW4gZXJyb3IgZmF0YWw/ICBXaXRob3V0IHJlY29ubmVjdCwgbGlmZSBpcyBzaW1wbGUg
+LSBpZiB0aGUNCj4gc2VydmVyIHNlbmRzIHNvbWV0aGluZyB3ZSBjYW4ndCBwYXJzZSwgd2UgcGVy
+bWFuZW50bHkgdHVybiB0aGUgZGV2aWNlDQo+IGludG8gYW4gZXJyb3IgY29uZGl0aW9uIC0gYmVj
+YXVzZSB3ZSBoYXZlIG5vIHdheSB0byBnZXQgYmFjayBpbiBzeW5jDQo+IHdpdGggdGhlIHNlcnZl
+ciBmb3IgZnVydGhlciBjb21tYW5kcy4gIFlvdXIgcGF0Y2ggYWxsb3dzIHJlY29ubmVjdA0KPiBh
+dHRlbXB0cyB3aGVyZSB0aGUgY29ubmVjdGlvbiBpcyBkb3duICh3ZSBmYWlsZWQgdG8gc2VuZCB0
+byB0aGUgc2VydmVyDQo+IG9yIGZhaWxlZCB0byByZWNlaXZlIHRoZSBzZXJ2ZXIncyByZXBseSks
+IGJ1dCB3aHkgY2FuIHdlIG5vdCBBTFNPDQo+IGF0dGVtcHQgdG8gcmVjb25uZWN0IGFmdGVyIGEg
+cGFyc2UgZXJyb3I/ICBBIHJlY29ubmVjdCB3b3VsZCBsZXQgdXMgZ2V0DQo+IGJhY2sgaW4gc3lu
+YyBmb3IgYXR0ZW1wdGluZyBmdXJ0aGVyIGNvbW1hbmRzLiAgWW91J3JlIHJpZ2h0IHRoYXQgdGhl
+DQo+IGN1cnJlbnQgY29tbWFuZCBzaG91bGQgcHJvYmFibHkgZmFpbCBpbiB0aGF0IGNhc2UgKGlm
+IHRoZSBzZXJ2ZXIgc2VudCB1cw0KPiBnYXJiYWdlIGZvciBhIHNwZWNpZmljIHJlcXVlc3QsIGl0
+IHdpbGwgcHJvYmFibHkgZG8gc28gYWdhaW4gb24gYSByZXBlYXQNCj4gb2YgdGhhdCByZXF1ZXN0
+OyB3aGljaCBpcyBkaWZmZXJlbnQgdGhhbiB3aGVuIHdlIGRvbid0IGV2ZW4ga25vdyB3aGF0DQo+
+IHRoZSBzZXJ2ZXIgd291bGQgaGF2ZSBzZW50IGJlY2F1c2Ugb2YgYSBkaXNjb25uZWN0KS4NCg0K
+TXkgdGhvdWdodCB3YXMgdGhhdCBwcm90b2NvbCBlcnJvciBpcyBmYXRhbCwgYXMgaXQgc2hvd3Mg
+dGhhdCBzZXJ2ZXIgaXMNCmJ1Z2d5LCBhbmQgaXQgc2VlbXMgdW5zYWZlIHRvIGNvbW11bmljYXRl
+IHRvIGJ1Z2d5IHNlcnZlci4uDQoNCj4gDQo+IE9yLCBwdXQgYW5vdGhlciB3YXksIHdlIEtOT1cg
+d2UgaGF2ZSAoY29ybmVyKSBjYXNlcyB3aGVyZSBhIG1pcy1hbGlnbmVkDQo+IGltYWdlIGNhbiBj
+dXJyZW50bHkgY2F1c2UgdGhlIHNlcnZlciB0byByZXR1cm4gQkxPQ0tfU1RBVFVTIHJlcGxpZXMg
+dGhhdA0KPiBhcmVuJ3QgYWxpZ25lZCB0byB0aGUgYWR2ZXJ0aXNlZCBtaW5pbXVtbSBibG9jayBz
+aXplLiAgQXR0ZW1wdGluZyB0bw0KPiByZWFkIHRoZSBsYXN0IHNlY3RvciBvZiBhbiBpbWFnZSB0
+aGVuIGNhdXNlcyB0aGUgY2xpZW50IHRvIHNlZSB0aGUNCj4gbWlzYWxpZ25lZCByZXBseSBhbmQg
+Y29tcGxhaW4sIHdoaWNoIHdlIGFyZSB0cmVhdGluZyBhcyBmYXRhbC4NCg0KRG8gd2UgaGF2ZSBm
+aXhlcyBmb3IgaXQ/DQoNCj4gQnV0IHdoeQ0KPiBub3QgaW5zdGVhZCBqdXN0IGZhaWwgdGhhdCBw
+YXJ0aWN1bGFyIHJlYWQsIGJ1dCBzdGlsbCBhdHRlbXB0IGENCj4gcmVjb25uZWN0LCBpbiBvcmRl
+ciB0byBhdHRlbXB0IGZ1cnRoZXIgcmVhZHMgZWxzZXdoZXJlIGluIHRoZSBpbWFnZSB0aGF0DQo+
+IGRvIG5vdCB0cmlwIHVwIHRoZSBzZXJ2ZXIncyBtaXNhbGlnbmVkIHJlcGx5Pw0KPiANCg0KSG1t
+LCBmb3IgdGhlc2UgY2FzZXMsIGlmIHdlIGNvbnNpZGVyIHRoaXMgZXJyb3JzIG5vdCBmYXRhbCwg
+d2UgZG9uJ3QgbmVlZA0KZXZlbiBhIHJlY29ubmVjdC4uDQoNCklmIHdlIHdhbnQgdG8gY29uc2lk
+ZXIgcHJvdG9jb2wgZXJyb3JzIHRvIGJlIHJlY292ZXJhYmxlLCB3ZSBuZWVkIHJlY29ubmVjdCBv
+bmx5DQpvbiB3cm9uZyBtYWdpYyBhbmQgbWF5IGJlIHNvbWUga2luZCBvZiBpbmNvbnNpc3RlbnQg
+dmFyaWFibGUgZGF0YSBsZW5naHRzLi4NCg0KQW5kIGl0IG1heSBuZWVkIGFkZGl0aW9uIG9wdGlv
+biwgbGlrZSAtLXN0cmljdD1mYWxzZQ0KDQo+Pg0KPj4gUG9zc2libGUgdHJhbnNpdGlvbnMgYXJl
+Og0KPj4NCj4+ICAgICAqIC0+IHF1aXQNCj4+ICAgICBjb25uZWN0aW5nLSogLT4gY29ubmVjdGVk
+DQo+PiAgICAgY29ubmVjdGluZy13YWl0IC0+IGNvbm5lY3Rpbmctbm93YWl0ICh0cmFuc2l0aW9u
+IGlzIGRvbmUgYWZ0ZXINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgcmVjb25uZWN0LWRlbGF5
+IHNlY29uZHMgaW4gY29ubmVjdGluZy13YWl0IG1vZGUpDQo+PiAgICAgY29ubmVjdGVkIC0+IGNv
+bm5lY3Rpbmctd2FpdA0KPj4NCj4+IDIuIEltcGxlbWVudCByZWNvbm5lY3QgaW4gY29ubmVjdGlv
+bl9jby4gU28sIGluIGNvbm5lY3RpbmctKiBtb2RlLA0KPj4gICAgICBjb25uZWN0aW9uX2NvLCB0
+cmllcyB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLg0KPj4NCj4+IDMuIFJldHJ5IG5iZCBx
+dWVyaWVzIG9uIGNoYW5uZWwgZXJyb3IsIGlmIHdlIGFyZSBpbiBjb25uZWN0aW5nLXdhaXQNCj4+
+ICAgICAgc3RhdGUuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9n
+aWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIGJsb2NrL25i
+ZC1jbGllbnQuaCB8ICAgNCArDQo+PiAgIGJsb2NrL25iZC1jbGllbnQuYyB8IDMwNCArKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPj4gICAyIGZp
+bGVzIGNoYW5nZWQsIDI1NSBpbnNlcnRpb25zKCspLCA1MyBkZWxldGlvbnMoLSkNCj4+DQo+IA0K
+Pj4gQEAgLTc4MSwxNiArOTM2LDIxIEBAIHN0YXRpYyBpbnQgbmJkX2NvX3JlcXVlc3QoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsIE5CRFJlcXVlc3QgKnJlcXVlc3QsDQo+PiAgICAgICB9IGVsc2Ugew0K
+Pj4gICAgICAgICAgIGFzc2VydChyZXF1ZXN0LT50eXBlICE9IE5CRF9DTURfV1JJVEUpOw0KPj4g
+ICAgICAgfQ0KPj4gLSAgICByZXQgPSBuYmRfY29fc2VuZF9yZXF1ZXN0KGJzLCByZXF1ZXN0LCB3
+cml0ZV9xaW92KTsNCj4+IC0gICAgaWYgKHJldCA8IDApIHsNCj4+IC0gICAgICAgIHJldHVybiBy
+ZXQ7DQo+PiAtICAgIH0NCj4+ICAgDQo+PiAtICAgIHJldCA9IG5iZF9jb19yZWNlaXZlX3JldHVy
+bl9jb2RlKGNsaWVudCwgcmVxdWVzdC0+aGFuZGxlLA0KPj4gLSAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAmcmVxdWVzdF9yZXQsICZsb2NhbF9lcnIpOw0KPj4gLSAgICBpZiAo
+bG9jYWxfZXJyKSB7DQo+PiAtICAgICAgICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQo+
+PiAtICAgIH0NCj4+ICsgICAgZG8gew0KPj4gKyAgICAgICAgcmV0ID0gbmJkX2NvX3NlbmRfcmVx
+dWVzdChicywgcmVxdWVzdCwgd3JpdGVfcWlvdik7DQo+PiArICAgICAgICBpZiAocmV0IDwgMCkg
+ew0KPj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gKyAgICAgICAgfQ0KPj4gKw0KPj4gKyAg
+ICAgICAgcmV0ID0gbmJkX2NvX3JlY2VpdmVfcmV0dXJuX2NvZGUoY2xpZW50LCByZXF1ZXN0LT5o
+YW5kbGUsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcmVx
+dWVzdF9yZXQsICZsb2NhbF9lcnIpOw0KPj4gKyAgICAgICAgaWYgKGxvY2FsX2Vycikgew0KPj4g
+KyAgICAgICAgICAgIGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCj4+ICsgICAgICAgICAg
+ICBsb2NhbF9lcnIgPSBOVUxMOw0KPiANCj4gQ29uZmxpY3RzIHdpdGggdGhlIGNvbnZlcnNpb24g
+dG8gdXNlIHRyYWNlIHBvaW50cy4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1p
+cg0K
