@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35829)
+Received: from eggs.gnu.org ([209.51.188.92]:35918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4AQ-0001rl-QI
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4AS-0001uV-M9
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gr4AK-0000VF-J7
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:48 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36749)
+	(envelope-from <peter.maydell@linaro.org>) id 1gr4AR-0000Yx-I2
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:52 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35761)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gr4AC-0000Nv-Sv
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:40 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id z3so4483221wrv.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:05:29 -0800 (PST)
+	id 1gr4AR-0000V1-7T
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 12:05:51 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z18so3712104wrh.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 09:05:44 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id w13sm5583164wmf.5.2019.02.05.09.05.25
+	by smtp.gmail.com with ESMTPSA id w13sm5583164wmf.5.2019.02.05.09.05.42
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Feb 2019 09:05:26 -0800 (PST)
+	Tue, 05 Feb 2019 09:05:42 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Feb 2019 17:04:58 +0000
-Message-Id: <20190205170510.21984-11-peter.maydell@linaro.org>
+Date: Tue,  5 Feb 2019 17:05:09 +0000
+Message-Id: <20190205170510.21984-22-peter.maydell@linaro.org>
 In-Reply-To: <20190205170510.21984-1-peter.maydell@linaro.org>
 References: <20190205170510.21984-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/22] linux-user: Implement PR_PAC_RESET_KEYS
+Subject: [Qemu-devel] [PULL 21/22] hw/arm/boot: Support DTB autoload for
+ firmware-only boots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +36,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The arm_boot_info struct has a skip_dtb_autoload flag: if this is
+set to true by the board code then arm_load_kernel() will not
+load the DTB itself, but will leave this for the board code to
+do itself later. However, the check for this is done in a
+code path which is only executed for the case where we load
+a kernel image file. If we're taking the "boot via firmware"
+code path then the flag isn't honoured and the DTB is never
+loaded.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190201195404.30486-2-richard.henderson@linaro.org
+We didn't notice this because the only real user of "boot
+via firmware" that cares about the DTB is the virt board
+(for UEFI boot), and that always wants skip_dtb_autoload
+anyway. But the SBSA reference board model we're planning to
+add will want the flag to behave correctly.
+
+Now we've refactored the arm_load_kernel() function, the
+fix is simple: drop the early 'return' so we fall into
+the same "load the DTB" code the boot-direct-kernel path uses.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-id: 20190131112240.8395-6-peter.maydell@linaro.org
 ---
- linux-user/aarch64/target_syscall.h |  7 ++++++
- linux-user/syscall.c                | 36 +++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ hw/arm/boot.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
-index 937fd7989e7..b595e5da820 100644
---- a/linux-user/aarch64/target_syscall.h
-+++ b/linux-user/aarch64/target_syscall.h
-@@ -22,6 +22,13 @@ struct target_pt_regs {
- #define TARGET_PR_SVE_SET_VL  50
- #define TARGET_PR_SVE_GET_VL  51
- 
-+#define TARGET_PR_PAC_RESET_KEYS 54
-+# define TARGET_PR_PAC_APIAKEY   (1 << 0)
-+# define TARGET_PR_PAC_APIBKEY   (1 << 1)
-+# define TARGET_PR_PAC_APDAKEY   (1 << 2)
-+# define TARGET_PR_PAC_APDBKEY   (1 << 3)
-+# define TARGET_PR_PAC_APGAKEY   (1 << 4)
-+
- void arm_init_pauth_key(ARMPACKey *key);
- 
- #endif /* AARCH64_TARGET_SYSCALL_H */
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b5786d4fc1f..bf076cbf8c4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9691,6 +9691,42 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 }
-             }
-             return ret;
-+        case TARGET_PR_PAC_RESET_KEYS:
-+            {
-+                CPUARMState *env = cpu_env;
-+                ARMCPU *cpu = arm_env_get_cpu(env);
-+
-+                if (arg3 || arg4 || arg5) {
-+                    return -TARGET_EINVAL;
-+                }
-+                if (cpu_isar_feature(aa64_pauth, cpu)) {
-+                    int all = (TARGET_PR_PAC_APIAKEY | TARGET_PR_PAC_APIBKEY |
-+                               TARGET_PR_PAC_APDAKEY | TARGET_PR_PAC_APDBKEY |
-+                               TARGET_PR_PAC_APGAKEY);
-+                    if (arg2 == 0) {
-+                        arg2 = all;
-+                    } else if (arg2 & ~all) {
-+                        return -TARGET_EINVAL;
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIAKEY) {
-+                        arm_init_pauth_key(&env->apia_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APIBKEY) {
-+                        arm_init_pauth_key(&env->apib_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDAKEY) {
-+                        arm_init_pauth_key(&env->apda_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APDBKEY) {
-+                        arm_init_pauth_key(&env->apdb_key);
-+                    }
-+                    if (arg2 & TARGET_PR_PAC_APGAKEY) {
-+                        arm_init_pauth_key(&env->apga_key);
-+                    }
-+                    return 0;
-+                }
-+            }
-+            return -TARGET_EINVAL;
- #endif /* AARCH64 */
-         case PR_GET_SECCOMP:
-         case PR_SET_SECCOMP:
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 328cc6bd245..496c8c18b08 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -1215,7 +1215,6 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+     /* Load the kernel.  */
+     if (!info->kernel_filename || info->firmware_loaded) {
+         arm_setup_firmware_boot(cpu, info);
+-        return;
+     } else {
+         arm_setup_direct_kernel_boot(cpu, info);
+     }
 -- 
 2.20.1
