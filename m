@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55630)
+Received: from eggs.gnu.org ([209.51.188.92]:60176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqpu6-00028M-8r
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:52:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1gqqG1-0005QX-8x
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 21:14:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gqpu5-0005YB-Ea
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:52:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gqpu5-0005Y2-8s
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 20:52:01 -0500
-Date: Mon, 4 Feb 2019 20:51:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190204205105-mutt-send-email-mst@kernel.org>
-References: <20190204142638.27021-1-mst@redhat.com>
-	<CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gqqFy-0006iF-AD
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 21:14:39 -0500
+References: <20190204225542.5597-1-eblake@redhat.com>
+	<9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <283d1622-7304-575c-5692-f4b7da983a45@redhat.com>
+Date: Mon, 4 Feb 2019 20:14:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8VGhubZk5HFEjNm5f9xdsgO2RdRR6Vcxzmzzyuj-b5JQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] pci, pc, virtio: fixes, cleanups,
- features
+In-Reply-To: <9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="A7dL0YhAzlYqpJe2yV6RWGjaUI6ZVev31"
+Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: Flag suspicious attribution
+ lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 
-On Mon, Feb 04, 2019 at 05:59:16PM +0000, Peter Maydell wrote:
-> On Mon, 4 Feb 2019 at 14:43, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > The following changes since commit b3fc0af1ff5e922d4dd7c875394dbd26dc=
-7313b4:
-> >
-> >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into=
- staging (2019-02-01 17:58:27 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstrea=
-m
-> >
-> > for you to fetch changes up to 5feab30ea98e30446361d184331b7b5ff94b41=
-16:
-> >
-> >   contrib/libvhost-user: cleanup casts (2019-02-04 09:23:56 -0500)
-> >
-> > ----------------------------------------------------------------
-> > pci, pc, virtio: fixes, cleanups, features
-> >
-> > vhost user blk discard/write zeroes features
-> > misc cleanups and fixes all over the place
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->=20
-> Hi; I'm afraid this failed build/test on various platforms.
->=20
->=20
-> Format string issues on ppc64 host:
->=20
-> /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c: In function
-> =E2=80=98vu_set_mem_table_exec_postcopy=E2=80=99:
-> /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c:636:9: error:
-> format =E2=80=98%llx=E2=80=99 expects argument of type =E2=80=98long lo=
-ng unsigned int=E2=80=99, but
-> argument 5 has type =E2=80=98__u64=E2=80=99 [-Werror=3Dformat=3D]
->          DPRINT("%s: region %d: Registered userfault for %llx + %llx\n"=
-,
->          ^
-> /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c:636:9: error:
-> format =E2=80=98%llx=E2=80=99 expects argument of type =E2=80=98long lo=
-ng unsigned int=E2=80=99, but
-> argument 6 has type =E2=80=98__u64=E2=80=99 [-Werror=3Dformat=3D]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--A7dL0YhAzlYqpJe2yV6RWGjaUI6ZVev31
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
+Message-ID: <283d1622-7304-575c-5692-f4b7da983a45@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] checkpatch: Flag suspicious attribution
+ lines
+References: <20190204225542.5597-1-eblake@redhat.com>
+ <9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
+In-Reply-To: <9a93a2a0-f352-1fb6-eb27-49f607cd0b97@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-So I think I fixed the build errors. And who knows maybe
-that will fix the runtime ones somehow ..
-Could you try pls? Re-pushed to same tag.
+On 2/4/19 5:29 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/4/19 11:55 PM, Eric Blake wrote:
+>> Flag commit attribution tags that are unusual (often because they
+>> were a typo), but only as a warning (because sometimes a humorous
+>> or otherwise useful tag is intentionally supplied).
+>>
+>> This picks the 6-most popular tags, each with 700 or more uses (well,
+>> S-o-b was already checked for case-sensitivity and typos, leaving
+>> only 5 new tags being checked), as determined by:
+>> $ git log | sed -n 's/^ *\([A-Za-z-]*-by:\).*/\1/p' | \
+>>   sort | uniq -c | sort -k1,1n | tail
+
+Use of [bB][yY] finds a few more interesting spellings...
+
+>>
+>> Most of the rejected lines were obvious typos (among others, we've
+>> had 4 cases of someone being burnt, based on Singed-off-by; and 2
+>> cases of list-reading via an e-reader, based on eviewed-by; there
+>> are also lines forgetting a space after the ':') or otherwise
+>> tongue-in-check (3 Approximately-suggested-by). A few lines not
+>> whitelisted here may be legitimate, but as they are orders of
+>> magnitude rarer, it is therefore not worth worrying about
+>> (7 Requested-by, 3 Co-authored-by, 1 Inspired-by, etc.).
+
+Among others, 48 Reviewed-By.
+
+
+>> @@ -1470,6 +1470,10 @@ sub process {
+>>  				ERROR("space required after Signed-off-by:\n" .
+>>  					$herecurr);
+>>  			}
+>> +		} elsif($line =3D~ /^\s*([A-Za-z-]*)-by:/ &&
+>=20
+> I guess we don't mind about angry typewriters who Ack-BY ;)
+
+I can send a v3 that makes this line case-insensitive,
+
+>=20
+>> +			($1 !~ /(Suggest|Report|Test|Ack|Review)ed/ ||
+>> +			 $line !~ /^\s*[a-z-]*-by:\s/i)) {
+
+although making this line require lower-case '-by' gets a bit trickier.
 
 --=20
-MST
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--A7dL0YhAzlYqpJe2yV6RWGjaUI6ZVev31
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxY8X4ACgkQp6FrSiUn
+Q2rmOAf8DSftPF+mM2fLrosehgT8sbO6ktZZc/xRIT0eUkVQxzcvcQWDR+m1EbhH
+4zLPl1vu/nYG8renqZCzoEpdyxZFqu7rZC7dbtiCG5AtKOypjYFnUyJr8ODJSLop
+B2Tz7z3aghBnRb/yo76ST0xb8R0LfS1tMZcUUlv6FetGCH3LSX0noW44GmJGEPeN
+dKjQ80JH/OhKwKGMVCgb8c3df+uJULSus+tHbOm6RPMz6N3SiNnm1mYnIu8XCBpw
+CxlQHlyzYk/z+/flZEj0mltd6OxIHGq1olYrRPi3ufi/CynMs2Ap42b5uVCQ2Kez
+jDuam9gXRuRSvO+6oB3gxX2K6B+Gfg==
+=GARM
+-----END PGP SIGNATURE-----
+
+--A7dL0YhAzlYqpJe2yV6RWGjaUI6ZVev31--
