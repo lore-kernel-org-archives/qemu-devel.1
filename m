@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35906)
+Received: from eggs.gnu.org ([209.51.188.92]:36020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GJ-0002Lh-LU
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:04 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GL-0002O5-S8
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GH-0003mm-HB
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:59 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:38876)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GI-0003p5-JG
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:01 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:37118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GH-0003ex-3N
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:57 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id m22so4768454wml.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:51 -0800 (PST)
+	id 1gr5GI-0003m4-5f
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:15:58 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id s12so4725308wrt.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:15:58 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:31 +0100
-Message-Id: <1549390526-24246-22-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:37 +0100
+Message-Id: <1549390526-24246-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 21/76] hw/i386/pc: enable PVH only for machine
- type >= 4.0
+Subject: [Qemu-devel] [PULL 27/76] contrib/elf2dmp: use GLib in ELF
+ processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +29,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
 
-In order to avoid migration issues, we enable PVH only for
-machine type >= 4.0
+Replace POSIX mmap with GLib g_mapped_file_new in ELF processing module
+to make elf2dmp cross-platform.
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Message-Id: <20181220012441.13694-3-viktor.prutyanov@phystech.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c         | 4 +++-
- hw/i386/pc_piix.c    | 3 +++
- hw/i386/pc_q35.c     | 3 +++
- include/hw/i386/pc.h | 3 +++
- 4 files changed, 12 insertions(+), 1 deletion(-)
+ contrib/elf2dmp/qemu_elf.c | 27 ++++++++-------------------
+ contrib/elf2dmp/qemu_elf.h |  2 +-
+ 2 files changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 9efbd16..00166d1 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1220,7 +1220,8 @@ static void load_linux(PCMachineState *pcms,
-          * saving the PVH entry point used by the x86/HVM direct boot ABI.
-          * If load_elfboot() is successful, populate the fw_cfg info.
-          */
--        if (load_elfboot(kernel_filename, kernel_size,
-+        if (pcmc->pvh_enabled &&
-+            load_elfboot(kernel_filename, kernel_size,
-                          header, pvh_start_addr, fw_cfg)) {
-             fclose(f);
+diff --git a/contrib/elf2dmp/qemu_elf.c b/contrib/elf2dmp/qemu_elf.c
+index e9c0d25..0db7816 100644
+--- a/contrib/elf2dmp/qemu_elf.c
++++ b/contrib/elf2dmp/qemu_elf.c
+@@ -120,25 +120,17 @@ static void exit_states(QEMU_Elf *qe)
  
-@@ -2783,6 +2784,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
-     pcmc->save_tsc_khz = true;
-     pcmc->linuxboot_dma_enabled = true;
-+    pcmc->pvh_enabled = true;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = pc_get_hotplug_handler;
-     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 63c84e3..fd0f2c2 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -440,9 +440,12 @@ DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
- 
- static void pc_i440fx_3_1_machine_options(MachineClass *m)
+ int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
  {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_i440fx_4_0_machine_options(m);
-     m->is_default = 0;
-     m->alias = NULL;
-+    pcmc->pvh_enabled = false;
-     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index b7b7959..4a175ea 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -376,9 +376,12 @@ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
++    GError *gerr = NULL;
+     int err = 0;
+-    struct stat st;
  
- static void pc_q35_3_1_machine_options(MachineClass *m)
+-    qe->fd = open(filename, O_RDONLY, 0);
+-    if (qe->fd == -1) {
+-        eprintf("Failed to open ELF dump file \'%s\'\n", filename);
++    qe->gmf = g_mapped_file_new(filename, TRUE, &gerr);
++    if (gerr) {
++        eprintf("Failed to map ELF dump file \'%s\'\n", filename);
+         return 1;
+     }
+ 
+-    fstat(qe->fd, &st);
+-    qe->size = st.st_size;
+-
+-    qe->map = mmap(NULL, qe->size, PROT_READ | PROT_WRITE,
+-            MAP_PRIVATE, qe->fd, 0);
+-    if (qe->map == MAP_FAILED) {
+-        eprintf("Failed to map ELF file\n");
+-        err = 1;
+-        goto out_fd;
+-    }
++    qe->map = g_mapped_file_get_contents(qe->gmf);
++    qe->size = g_mapped_file_get_length(qe->gmf);
+ 
+     if (init_states(qe)) {
+         eprintf("Failed to extract QEMU CPU states\n");
+@@ -149,9 +141,7 @@ int QEMU_Elf_init(QEMU_Elf *qe, const char *filename)
+     return 0;
+ 
+ out_unmap:
+-    munmap(qe->map, qe->size);
+-out_fd:
+-    close(qe->fd);
++    g_mapped_file_unref(qe->gmf);
+ 
+     return err;
+ }
+@@ -159,6 +149,5 @@ out_fd:
+ void QEMU_Elf_exit(QEMU_Elf *qe)
  {
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+
-     pc_q35_4_0_machine_options(m);
-     m->default_kernel_irqchip_split = false;
-     m->alias = NULL;
-+    pcmc->pvh_enabled = false;
-     compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
-     compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+     exit_states(qe);
+-    munmap(qe->map, qe->size);
+-    close(qe->fd);
++    g_mapped_file_unref(qe->gmf);
  }
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 882fd8d..3ff127e 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -133,6 +133,9 @@ typedef struct PCMachineClass {
+diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
+index da70aff..2a79638 100644
+--- a/contrib/elf2dmp/qemu_elf.h
++++ b/contrib/elf2dmp/qemu_elf.h
+@@ -33,7 +33,7 @@ typedef struct QEMUCPUState {
+ int is_system(QEMUCPUState *s);
  
-     /* use DMA capable linuxboot option rom */
-     bool linuxboot_dma_enabled;
-+
-+    /* use PVH to load kernels that support this feature */
-+    bool pvh_enabled;
- } PCMachineClass;
- 
- #define TYPE_PC_MACHINE "generic-pc-machine"
+ typedef struct QEMU_Elf {
+-    int fd;
++    GMappedFile *gmf;
+     size_t size;
+     void *map;
+     QEMUCPUState **state;
 -- 
 1.8.3.1
