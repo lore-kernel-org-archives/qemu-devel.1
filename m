@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54566)
+Received: from eggs.gnu.org ([209.51.188.92]:55237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqs2r-00081L-BF
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:09:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1gqs5Y-0000hM-Mo
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:12:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gqs2p-0003cs-UV
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:09:12 -0500
-Resent-Message-Id: <E1gqs2p-0003cs-UV@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gqs2p-0003cR-Ko
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:09:11 -0500
-Message-ID: <154933973377.29184.12706854976547721957@ebba9967afc0>
-In-Reply-To: <20190205035704.26014-1-eblake@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1gqs5W-0004rh-S4
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:12:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gqs5U-0004qt-Rl
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 23:11:58 -0500
+References: <20190204202609.26956-1-philmd@redhat.com>
+	<20190204202609.26956-4-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <22042877-e949-9afc-4ee9-98d4a87f1bf1@redhat.com>
+Date: Tue, 5 Feb 2019 05:11:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Feb 2019 20:08:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/8] NBD patches for 2019-02-04
+In-Reply-To: <20190204202609.26956-4-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] mips: Express dependencies of the
+ r4k platform with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yang Zhong <yang.zhong@intel.com>, Paul Burton <pburton@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, James Hogan <jhogan@kernel.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTAzNTcwNC4yNjAx
-NC0xLWVibGFrZUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDIwNTAzNTcwNC4yNjAxNC0xLWVibGFrZUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzhdIE5CRCBwYXRjaGVzIGZvciAy
-MDE5LTAyLTA0ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
-CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTU0OTMzNjEwMS0xNzYyMy0xLWdpdC1zZW5k
-LWVtYWlsLXRodXRoQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTQ5MzM2MTAxLTE3NjIzLTEtZ2l0
-LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3
-LzIwMTkwMjA0MjA0NTE3LjIzNjk4LTEtcGhpbG1kQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5
-MDIwNDIwNDUxNy4yMzY5OC0xLXBoaWxtZEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAg
-IHBhdGNoZXcvMjAxOTAyMDUwMzU3MDQuMjYwMTQtMS1lYmxha2VAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTkwMjA1MDM1NzA0LjI2MDE0LTEtZWJsYWtlQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo5ZjIyMDQ4IGJsb2NrL25iZC1jbGllbnQ6IHJlbmFtZSByZWFk
-X3JlcGx5X2NvIHRvIGNvbm5lY3Rpb25fY28KZTgxYWIyNyBibG9jay9uYmQtY2xpZW50OiBkb24n
-dCBjaGVjayBpb2MKY2U1NWI0YiBibG9jay9uYmQtY2xpZW50OiBmaXggbmJkX3JlcGx5X2NodW5r
-X2l0ZXJfcmVjZWl2ZQo4MGMwOTNmIGJsb2NrL25iZC1jbGllbnQ6IHNwbGl0IGNvbm5lY3Rpb24g
-ZnJvbSBpbml0aWFsaXphdGlvbgphMjQ1NDNlIGJsb2NrL25iZDogbW92ZSBjb25uZWN0aW9uIGNv
-ZGUgZnJvbSBibG9jay9uYmQgdG8gYmxvY2svbmJkLWNsaWVudAo0NjdhMjhkIGJsb2NrL25iZC1j
-bGllbnQ6IHNwbGl0IGNoYW5uZWwgZXJyb3JzIGZyb20gZXhwb3J0IGVycm9ycwpiZDkwNmIwIG5i
-ZDogZ2VuZXJhbGl6ZSB1c2FnZSBvZiBuYmRfcmVhZAozZDNiZTFmIHFlbXUtbmJkOiBEZXByZWNh
-dGUgcWVtdS1uYmQgLS1wYXJ0aXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOCBDaGVja2lu
-ZyBjb21taXQgM2QzYmUxZjliY2M4IChxZW11LW5iZDogRGVwcmVjYXRlIHFlbXUtbmJkIC0tcGFy
-dGl0aW9uKQoyLzggQ2hlY2tpbmcgY29tbWl0IGJkOTA2YjAxZmZlOCAobmJkOiBnZW5lcmFsaXpl
-IHVzYWdlIG9mIG5iZF9yZWFkKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
-JyAoY3R4Old4VikKIzg1OiBGSUxFOiBpbmNsdWRlL2Jsb2NrL25iZC5oOjM1NjoKKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQjI2JpdHMjI190ICp2YWwsICAgICAgICAgICAg
-ICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzg2IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDIvOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy84IENoZWNraW5nIGNvbW1pdCA0Njdh
-MjhkYmYyNjEgKGJsb2NrL25iZC1jbGllbnQ6IHNwbGl0IGNoYW5uZWwgZXJyb3JzIGZyb20gZXhw
-b3J0IGVycm9ycykKNC84IENoZWNraW5nIGNvbW1pdCBhMjQ1NDNlZTdiNDEgKGJsb2NrL25iZDog
-bW92ZSBjb25uZWN0aW9uIGNvZGUgZnJvbSBibG9jay9uYmQgdG8gYmxvY2svbmJkLWNsaWVudCkK
-NS84IENoZWNraW5nIGNvbW1pdCA4MGMwOTNmM2IxODAgKGJsb2NrL25iZC1jbGllbnQ6IHNwbGl0
-IGNvbm5lY3Rpb24gZnJvbSBpbml0aWFsaXphdGlvbikKNi84IENoZWNraW5nIGNvbW1pdCBjZTU1
-YjRiMzMxZjkgKGJsb2NrL25iZC1jbGllbnQ6IGZpeCBuYmRfcmVwbHlfY2h1bmtfaXRlcl9yZWNl
-aXZlKQo3LzggQ2hlY2tpbmcgY29tbWl0IGU4MWFiMjdmODI4ZSAoYmxvY2svbmJkLWNsaWVudDog
-ZG9uJ3QgY2hlY2sgaW9jKQo4LzggQ2hlY2tpbmcgY29tbWl0IDlmMjIwNDhjMGEwNyAoYmxvY2sv
-bmJkLWNsaWVudDogcmVuYW1lIHJlYWRfcmVwbHlfY28gdG8gY29ubmVjdGlvbl9jbykKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDUwMzU3
-MDQuMjYwMTQtMS1lYmxha2VAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+On 2019-02-04 21:26, Philippe Mathieu-Daud=C3=A9 wrote:
+> This platform use standard PC devices connected to an ISA bus.
+> Networking is provided by a ne2000 chipset.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/mips/Kconfig | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>=20
+> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+> index ab006477c7..ee6290d497 100644
+> --- a/hw/mips/Kconfig
+> +++ b/hw/mips/Kconfig
+> @@ -1,5 +1,15 @@
+>  config R4K
+>      bool
+> +    select ISA_BUS
+> +    select SERIAL_ISA
+> +    select I8259
+> +    select I8254
+> +    select MC146818RTC
+> +    select VGA_ISA
+> +    select NE2000_ISA
+> +    select IDE_ISA
+> +    # I8042
+> +    select PCKBD
+
+I think you can now also remove "CONFIG_NE2000_ISA=3Dy" from
+default-configs/mips-softmmu-common.mak.
+
+ Thomas
