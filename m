@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51031)
+Received: from eggs.gnu.org ([209.51.188.92]:51123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqrrI-0000em-Ea
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 22:57:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1gqrrM-0000gd-Bg
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 22:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gqrrH-0002nE-42
-	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 22:57:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1gqrrJ-0002p6-TO
+	for qemu-devel@nongnu.org; Mon, 04 Feb 2019 22:57:20 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  4 Feb 2019 21:56:57 -0600
-Message-Id: <20190205035704.26014-2-eblake@redhat.com>
+Date: Mon,  4 Feb 2019 21:56:58 -0600
+Message-Id: <20190205035704.26014-3-eblake@redhat.com>
 In-Reply-To: <20190205035704.26014-1-eblake@redhat.com>
 References: <20190205035704.26014-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/8] qemu-nbd: Deprecate qemu-nbd --partition
+Subject: [Qemu-devel] [PULL 2/8] nbd: generalize usage of nbd_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,117 +22,525 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Richard W . M . Jones" <rjones@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, "reviewer:Incompatible changes" <libvir-list@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The existing qemu-nbd --partition code claims to handle logical
-partitions up to 8, since its introduction in 2008 (commit 7a5ca86).
-However, the implementation is bogus (actual MBR logical partitions
-form a sort of linked list, with one partition per extended table
-entry, rather than four logical partitions in a single extended
-table), making the code unlikely to work for anything beyond -P5 on
-actual guest images. What's more, the code does not support GPT
-partitions, which are becoming more popular, and maintaining device
-subsetting in both NBD and the raw device is unnecessary duplication
-of effort (even if it is not too difficult).
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Note that obtaining the offsets of a partition (MBR or GPT) can be
-learned by using 'qemu-nbd -c /dev/nbd0 file.qcow2 && sfdisk --dump
-/dev/nbd0', but by the time you've done that, you might as well
-just mount /dev/nbd0p1 that the kernel creates for you instead of
-bothering with qemu exporting a subset.  Or, keeping to just
-user-space code, use nbdkit's partition filter, which has already
-known both GPT and primary MBR partitions for a while, and was
-just recently enhanced to support arbitrary logical MBR parititions.
+We generally do very similar things around nbd_read: error_prepend
+specifying what we have tried to read, and be_to_cpu conversion of
+integers.
 
-Start the clock on the deprecation cycle, with examples of how
-to accomplish device subsetting without using -P.
+So, it seems reasonable to move common things to helper functions,
+which:
+1. simplify code a bit
+2. generalize nbd_read error descriptions, all starting with
+   "Failed to read"
+3. make it more difficult to forget to convert things from BE
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190128165830.165170-1-vsementsov@virtuozzo.com>
+[eblake: rename macro to DEF_NBD_READ_N and formatting tweaks;
+checkpatch has false positive complaint]
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190125234837.2272-1-eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- qemu-deprecated.texi | 33 +++++++++++++++++++++++++++++++++
- qemu-nbd.texi        |  6 ++++--
- qemu-nbd.c           |  2 ++
- 3 files changed, 39 insertions(+), 2 deletions(-)
+ include/block/nbd.h | 32 +++++++++++++++--
+ block/nbd-client.c  |  5 ++-
+ nbd/client.c        | 88 +++++++++++++++------------------------------
+ nbd/common.c        |  2 +-
+ nbd/server.c        | 27 +++++---------
+ 5 files changed, 71 insertions(+), 83 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9cc20b365c5..8a6174df0c1 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -160,3 +160,36 @@ Example of legacy encoding:
- The above, converted to the current supported format:
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 4faf394e346..96cfb1d7d5d 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -23,6 +23,7 @@
+ #include "qapi/qapi-types-block.h"
+ #include "io/channel-socket.h"
+ #include "crypto/tlscreds.h"
++#include "qapi/error.h"
 
- @code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"=
-@}}
+ /* Handshake phase structs - this struct is passed on the wire */
+
+@@ -336,11 +337,38 @@ void nbd_server_start(SocketAddress *addr, const ch=
+ar *tls_creds,
+  * Reads @size bytes from @ioc. Returns 0 on success.
+  */
+ static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
+-                           Error **errp)
++                           const char *desc, Error **errp)
+ {
+-    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
++    int ret =3D qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO=
+ : 0;
 +
-+@section Related binaries
++    if (ret < 0) {
++        if (desc) {
++            error_prepend(errp, "Failed to read %s: ", desc);
++        }
++        return -1;
++    }
 +
-+@subsection qemu-nbd --partition (since 4.0.0)
++    return 0;
+ }
+
++#define DEF_NBD_READ_N(bits)                                            =
+\
++static inline int nbd_read##bits(QIOChannel *ioc,                       =
+\
++                                 uint##bits##_t *val,                   =
+\
++                                 const char *desc, Error **errp)        =
+\
++{                                                                       =
+\
++    if (nbd_read(ioc, val, sizeof(*val), desc, errp) < 0) {             =
+\
++        return -1;                                                      =
+\
++    }                                                                   =
+\
++    *val =3D be##bits##_to_cpu(*val);                                   =
+  \
++    return 0;                                                           =
+\
++}
 +
-+The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
-+can only handle MBR partitions, and has never correctly handled
-+logical partitions beyond partition 5.  If you know the offset and
-+length of the partition (perhaps by using @code{sfdisk} within the
-+guest), you can achieve the effect of exporting just that subset of
-+the disk by use of the @option{--image-opts} option with a raw
-+blockdev using the @code{offset} and @code{size} parameters layered on
-+top of any other existing blockdev. For example, if partition 1 is
-+100MiB long starting at 1MiB, the old command:
++DEF_NBD_READ_N(16) /* Defines nbd_read16(). */
++DEF_NBD_READ_N(32) /* Defines nbd_read32(). */
++DEF_NBD_READ_N(64) /* Defines nbd_read64(). */
 +
-+@code{qemu-nbd -t -P 1 -f qcow2 file.qcow2}
++#undef DEF_NBD_READ_N
 +
-+can be rewritten as:
-+
-+@code{qemu-nbd -t --image-opts driver=3Draw,offset=3D1M,size=3D100M,file=
-.driver=3Dqcow2,file.backing.driver=3Dfile,file.backing.filename=3Dfile.q=
-cow2}
-+
-+Alternatively, the @code{nbdkit} project provides a more powerful
-+partition filter on top of its nbd plugin, which can be used to select
-+an arbitrary MBR or GPT partition on top of any other full-image NBD
-+export.  Using this to rewrite the above example results in:
-+
-+@code{qemu-nbd -t -k /tmp/sock -f qcow2 file.qcow2 &}
-+@code{nbdkit -f --filter=3Dpartition nbd socket=3D/tmp/sock partition=3D=
-1}
-+
-+Note that if you are exposing the export via /dev/nbd0, it is easier
-+to just export the entire image and then mount only /dev/nbd0p1 than
-+it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
-+subset of the image.
-diff --git a/qemu-nbd.texi b/qemu-nbd.texi
-index 386bece4680..d0c51828149 100644
---- a/qemu-nbd.texi
-+++ b/qemu-nbd.texi
-@@ -56,8 +56,10 @@ auto-detecting.
- @item -r, --read-only
- Export the disk as read-only.
- @item -P, --partition=3D@var{num}
--Only expose MBR partition @var{num}.  Understands physical partitions
--1-4 and logical partitions 5-8.
-+Deprecated: Only expose MBR partition @var{num}.  Understands physical
-+partitions 1-4 and logical partition 5. New code should instead use
-+@option{--image-opts} with the raw driver wrapping a subset of the
-+original image.
- @item -B, --bitmap=3D@var{name}
- If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
- that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 1f7b2a03f5d..00c07fd27ea 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -787,6 +787,8 @@ int main(int argc, char **argv)
-             flags &=3D ~BDRV_O_RDWR;
+ static inline bool nbd_reply_is_simple(NBDReply *reply)
+ {
+     return reply->magic =3D=3D NBD_SIMPLE_REPLY_MAGIC;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 50a8dadd852..57f679ad4d0 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -338,10 +338,9 @@ static int nbd_co_receive_offset_data_payload(NBDCli=
+entSession *s,
+         return -EINVAL;
+     }
+
+-    if (nbd_read(s->ioc, &offset, sizeof(offset), errp) < 0) {
++    if (nbd_read64(s->ioc, &offset, "OFFSET_DATA offset", errp) < 0) {
+         return -EIO;
+     }
+-    be64_to_cpus(&offset);
+
+     data_size =3D chunk->length - sizeof(offset);
+     assert(data_size);
+@@ -388,7 +387,7 @@ static coroutine_fn int nbd_co_receive_structured_pay=
+load(
+     }
+
+     *payload =3D g_new(char, len);
+-    ret =3D nbd_read(s->ioc, *payload, len, errp);
++    ret =3D nbd_read(s->ioc, *payload, len, "structured payload", errp);
+     if (ret < 0) {
+         g_free(*payload);
+         *payload =3D NULL;
+diff --git a/nbd/client.c b/nbd/client.c
+index 8a083c2f42c..10a52ad7d0c 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -113,8 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, =
+uint32_t opt,
+                                     NBDOptionReply *reply, Error **errp)
+ {
+     QEMU_BUILD_BUG_ON(sizeof(*reply) !=3D 20);
+-    if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
+-        error_prepend(errp, "failed to read option reply: ");
++    if (nbd_read(ioc, reply, sizeof(*reply), "option reply", errp) < 0) =
+{
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+@@ -166,8 +165,8 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDO=
+ptionReply *reply,
+             goto cleanup;
+         }
+         msg =3D g_malloc(reply->length + 1);
+-        if (nbd_read(ioc, msg, reply->length, errp) < 0) {
+-            error_prepend(errp, "failed to read option error %" PRIu32
++        if (nbd_read(ioc, msg, reply->length, NULL, errp) < 0) {
++            error_prepend(errp, "Failed to read option error %" PRIu32
+                           " (%s) message: ",
+                           reply->type, nbd_rep_lookup(reply->type));
+             goto cleanup;
+@@ -284,12 +283,10 @@ static int nbd_receive_list(QIOChannel *ioc, char *=
+*name, char **description,
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
+-        error_prepend(errp, "failed to read option name length: ");
++    if (nbd_read32(ioc, &namelen, "option name length", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    namelen =3D be32_to_cpu(namelen);
+     len -=3D sizeof(namelen);
+     if (len < namelen) {
+         error_setg(errp, "incorrect option name length");
+@@ -298,8 +295,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **n=
+ame, char **description,
+     }
+
+     local_name =3D g_malloc(namelen + 1);
+-    if (nbd_read(ioc, local_name, namelen, errp) < 0) {
+-        error_prepend(errp, "failed to read export name: ");
++    if (nbd_read(ioc, local_name, namelen, "export name", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+         goto out;
+     }
+@@ -307,8 +303,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **n=
+ame, char **description,
+     len -=3D namelen;
+     if (len) {
+         local_desc =3D g_malloc(len + 1);
+-        if (nbd_read(ioc, local_desc, len, errp) < 0) {
+-            error_prepend(errp, "failed to read export description: ");
++        if (nbd_read(ioc, local_desc, len, "export description", errp) <=
+ 0) {
+             nbd_send_opt_abort(ioc);
+             goto out;
+         }
+@@ -410,13 +405,11 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint=
+32_t opt,
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+-        if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
+-            error_prepend(errp, "failed to read info type: ");
++        if (nbd_read16(ioc, &type, "info type", errp) < 0) {
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+         len -=3D sizeof(type);
+-        type =3D be16_to_cpu(type);
+         switch (type) {
+         case NBD_INFO_EXPORT:
+             if (len !=3D sizeof(info->size) + sizeof(info->flags)) {
+@@ -425,18 +418,14 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint=
+32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0=
+) {
+-                error_prepend(errp, "failed to read info size: ");
++            if (nbd_read64(ioc, &info->size, "info size", errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->size =3D be64_to_cpu(info->size);
+-            if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) <=
+ 0) {
+-                error_prepend(errp, "failed to read info flags: ");
++            if (nbd_read16(ioc, &info->flags, "info flags", errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->flags =3D be16_to_cpu(info->flags);
+             trace_nbd_receive_negotiate_size_flags(info->size, info->fla=
+gs);
              break;
-         case 'P':
-+            warn_report("The '-P' option is deprecated; use --image-opts=
- with "
-+                        "a raw device wrapper for subset exports instead=
-");
-             if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
-                 partition < 1 || partition > 8) {
-                 error_report("Invalid partition '%s'", optarg);
+
+@@ -447,27 +436,23 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint=
+32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
+-                         errp) < 0) {
+-                error_prepend(errp, "failed to read info minimum block s=
+ize: ");
++            if (nbd_read32(ioc, &info->min_block, "info minimum block si=
+ze",
++                           errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->min_block =3D be32_to_cpu(info->min_block);
+             if (!is_power_of_2(info->min_block)) {
+                 error_setg(errp, "server minimum block size %" PRIu32
+                            " is not a power of two", info->min_block);
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
+-                         errp) < 0) {
+-                error_prepend(errp,
+-                              "failed to read info preferred block size:=
+ ");
++            if (nbd_read32(ioc, &info->opt_block, "info preferred block =
+size",
++                           errp) < 0)
++            {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->opt_block =3D be32_to_cpu(info->opt_block);
+             if (!is_power_of_2(info->opt_block) ||
+                 info->opt_block < info->min_block) {
+                 error_setg(errp, "server preferred block size %" PRIu32
+@@ -475,13 +460,12 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint=
+32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
+-                         errp) < 0) {
+-                error_prepend(errp, "failed to read info maximum block s=
+ize: ");
++            if (nbd_read32(ioc, &info->max_block, "info maximum block si=
+ze",
++                           errp) < 0)
++            {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->max_block =3D be32_to_cpu(info->max_block);
+             if (info->max_block < info->min_block) {
+                 error_setg(errp, "server maximum block size %" PRIu32
+                            " is not valid", info->max_block);
+@@ -731,14 +715,13 @@ static int nbd_receive_one_meta_context(QIOChannel =
+*ioc,
+         return -1;
+     }
+
+-    if (nbd_read(ioc, &local_id, sizeof(local_id), errp) < 0) {
++    if (nbd_read32(ioc, &local_id, "context id", errp) < 0) {
+         return -1;
+     }
+-    local_id =3D be32_to_cpu(local_id);
+
+     reply.length -=3D sizeof(local_id);
+     local_name =3D g_malloc(reply.length + 1);
+-    if (nbd_read(ioc, local_name, reply.length, errp) < 0) {
++    if (nbd_read(ioc, local_name, reply.length, "context name", errp) < =
+0) {
+         g_free(local_name);
+         return -1;
+     }
+@@ -896,11 +879,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCry=
+ptoTLSCreds *tlscreds,
+         return -EINVAL;
+     }
+
+-    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+-        error_prepend(errp, "Failed to read initial magic: ");
++    if (nbd_read64(ioc, &magic, "initial magic", errp) < 0) {
+         return -EINVAL;
+     }
+-    magic =3D be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+
+     if (magic !=3D NBD_INIT_MAGIC) {
+@@ -908,11 +889,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCry=
+ptoTLSCreds *tlscreds,
+         return -EINVAL;
+     }
+
+-    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+-        error_prepend(errp, "Failed to read server magic: ");
++    if (nbd_read64(ioc, &magic, "server magic", errp) < 0) {
+         return -EINVAL;
+     }
+-    magic =3D be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+
+     if (magic =3D=3D NBD_OPTS_MAGIC) {
+@@ -920,11 +899,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCry=
+ptoTLSCreds *tlscreds,
+         uint16_t globalflags;
+         bool fixedNewStyle =3D false;
+
+-        if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) =
+{
+-            error_prepend(errp, "Failed to read server flags: ");
++        if (nbd_read16(ioc, &globalflags, "server flags", errp) < 0) {
+             return -EINVAL;
+         }
+-        globalflags =3D be16_to_cpu(globalflags);
+         trace_nbd_receive_negotiate_server_flags(globalflags);
+         if (globalflags & NBD_FLAG_FIXED_NEWSTYLE) {
+             fixedNewStyle =3D true;
+@@ -992,17 +969,13 @@ static int nbd_negotiate_finish_oldstyle(QIOChannel=
+ *ioc, NBDExportInfo *info,
+ {
+     uint32_t oldflags;
+
+-    if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-        error_prepend(errp, "Failed to read export length: ");
++    if (nbd_read64(ioc, &info->size, "export length", errp) < 0) {
+         return -EINVAL;
+     }
+-    info->size =3D be64_to_cpu(info->size);
+
+-    if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+-        error_prepend(errp, "Failed to read export flags: ");
++    if (nbd_read32(ioc, &oldflags, "export flags", errp) < 0) {
+         return -EINVAL;
+     }
+-    oldflags =3D be32_to_cpu(oldflags);
+     if (oldflags & ~0xffff) {
+         error_setg(errp, "Unexpected export flags %0x" PRIx32, oldflags)=
+;
+         return -EINVAL;
+@@ -1079,17 +1052,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCrypt=
+oTLSCreds *tlscreds,
+         }
+
+         /* Read the response */
+-        if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-            error_prepend(errp, "Failed to read export length: ");
++        if (nbd_read64(ioc, &info->size, "export length", errp) < 0) {
+             return -EINVAL;
+         }
+-        info->size =3D be64_to_cpu(info->size);
+
+-        if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) =
+{
+-            error_prepend(errp, "Failed to read export flags: ");
++        if (nbd_read16(ioc, &info->flags, "export flags", errp) < 0) {
+             return -EINVAL;
+         }
+-        info->flags =3D be16_to_cpu(info->flags);
+         break;
+     case 0: /* oldstyle, parse length and flags */
+         if (*info->name) {
+@@ -1379,7 +1348,7 @@ static int nbd_receive_simple_reply(QIOChannel *ioc=
+, NBDSimpleReply *reply,
+     assert(reply->magic =3D=3D NBD_SIMPLE_REPLY_MAGIC);
+
+     ret =3D nbd_read(ioc, (uint8_t *)reply + sizeof(reply->magic),
+-                   sizeof(*reply) - sizeof(reply->magic), errp);
++                   sizeof(*reply) - sizeof(reply->magic), "reply", errp)=
+;
+     if (ret < 0) {
+         return ret;
+     }
+@@ -1404,7 +1373,8 @@ static int nbd_receive_structured_reply_chunk(QIOCh=
+annel *ioc,
+     assert(chunk->magic =3D=3D NBD_STRUCTURED_REPLY_MAGIC);
+
+     ret =3D nbd_read(ioc, (uint8_t *)chunk + sizeof(chunk->magic),
+-                   sizeof(*chunk) - sizeof(chunk->magic), errp);
++                   sizeof(*chunk) - sizeof(chunk->magic), "structured ch=
+unk",
++                   errp);
+     if (ret < 0) {
+         return ret;
+     }
+diff --git a/nbd/common.c b/nbd/common.c
+index 41f5ed8d9fa..cc8b278e541 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -31,7 +31,7 @@ int nbd_drop(QIOChannel *ioc, size_t size, Error **errp=
+)
+     buffer =3D sizeof(small) >=3D size ? small : g_malloc(MIN(65536, siz=
+e));
+     while (size > 0) {
+         ssize_t count =3D MIN(65536, size);
+-        ret =3D nbd_read(ioc, buffer, MIN(65536, size), errp);
++        ret =3D nbd_read(ioc, buffer, MIN(65536, size), NULL, errp);
+
+         if (ret < 0) {
+             goto cleanup;
+diff --git a/nbd/server.c b/nbd/server.c
+index cb0d5634fa1..838c150d8ca 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -438,8 +438,7 @@ static int nbd_negotiate_handle_export_name(NBDClient=
+ *client,
+         error_setg(errp, "Bad length received");
+         return -EINVAL;
+     }
+-    if (nbd_read(client->ioc, name, client->optlen, errp) < 0) {
+-        error_prepend(errp, "read failed: ");
++    if (nbd_read(client->ioc, name, client->optlen, "export name", errp)=
+ < 0) {
+         return -EIO;
+     }
+     name[client->optlen] =3D '\0';
+@@ -1046,11 +1045,9 @@ static int nbd_negotiate_options(NBDClient *client=
+, uint16_t myflags,
+         ...           Rest of request
+     */
+
+-    if (nbd_read(client->ioc, &flags, sizeof(flags), errp) < 0) {
+-        error_prepend(errp, "read failed: ");
++    if (nbd_read32(client->ioc, &flags, "flags", errp) < 0) {
+         return -EIO;
+     }
+-    flags =3D be32_to_cpu(flags);
+     trace_nbd_negotiate_options_flags(flags);
+     if (flags & NBD_FLAG_C_FIXED_NEWSTYLE) {
+         fixedNewstyle =3D true;
+@@ -1070,30 +1067,23 @@ static int nbd_negotiate_options(NBDClient *clien=
+t, uint16_t myflags,
+         uint32_t option, length;
+         uint64_t magic;
+
+-        if (nbd_read(client->ioc, &magic, sizeof(magic), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read64(client->ioc, &magic, "opts magic", errp) < 0) {
+             return -EINVAL;
+         }
+-        magic =3D be64_to_cpu(magic);
+         trace_nbd_negotiate_options_check_magic(magic);
+         if (magic !=3D NBD_OPTS_MAGIC) {
+             error_setg(errp, "Bad magic received");
+             return -EINVAL;
+         }
+
+-        if (nbd_read(client->ioc, &option,
+-                     sizeof(option), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read32(client->ioc, &option, "option", errp) < 0) {
+             return -EINVAL;
+         }
+-        option =3D be32_to_cpu(option);
+         client->opt =3D option;
+
+-        if (nbd_read(client->ioc, &length, sizeof(length), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read32(client->ioc, &length, "option length", errp) < 0)=
+ {
+             return -EINVAL;
+         }
+-        length =3D be32_to_cpu(length);
+         assert(!client->optlen);
+         client->optlen =3D length;
+
+@@ -1306,7 +1296,7 @@ static int nbd_receive_request(QIOChannel *ioc, NBD=
+Request *request,
+     uint32_t magic;
+     int ret;
+
+-    ret =3D nbd_read(ioc, buf, sizeof(buf), errp);
++    ret =3D nbd_read(ioc, buf, sizeof(buf), "request", errp);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -2111,8 +2101,9 @@ static int nbd_co_receive_request(NBDRequestData *r=
+eq, NBDRequest *request,
+         }
+     }
+     if (request->type =3D=3D NBD_CMD_WRITE) {
+-        if (nbd_read(client->ioc, req->data, request->len, errp) < 0) {
+-            error_prepend(errp, "reading from socket failed: ");
++        if (nbd_read(client->ioc, req->data, request->len, "CMD_WRITE da=
+ta",
++                     errp) < 0)
++        {
+             return -EIO;
+         }
+         req->complete =3D true;
 --=20
 2.20.1
