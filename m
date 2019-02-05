@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55933)
+Received: from eggs.gnu.org ([209.51.188.92]:56991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gr3qx-0004iq-85
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:45:44 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3u6-0006vp-9x
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:48:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gr3qv-0001GD-7c
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:45:43 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:38416
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gr3qt-0001CG-4n
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:45:41 -0500
-References: <20190103154810.GB32032@Red>
-	<3a375dc6-f0ba-c3f0-6e86-2fd5cdf3ee35@ilande.co.uk>
-	<8c302745-5097-afed-5c7e-9a992da03cf6@ilande.co.uk>
-	<20190205091115.GA27918@Red>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <2a85b239-7117-71aa-b921-86c42a54aeba@ilande.co.uk>
-Date: Tue, 5 Feb 2019 16:45:16 +0000
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gr3u5-00025B-27
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:48:58 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 5 Feb 2019 16:48:38 +0000
+Message-ID: <ea7eb92a-7bc1-f12d-905b-daa5a151fa75@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-9-vsementsov@virtuozzo.com>
+	<ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
+In-Reply-To: <ac7e2dbf-0399-3b99-5cd5-42597b3027c1@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CD07586BF7C5A643B9505CE02EF91CF9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190205091115.GA27918@Red>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] sparc: crash when using initrd > 5M
+Subject: Re: [Qemu-devel] [PATCH v4 08/10] block/nbd: add cmdline and qapi
+ parameter reconnect-delay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 05/02/2019 09:11, Corentin Labbe wrote:
-
-> On Fri, Feb 01, 2019 at 02:15:15PM +0000, Mark Cave-Ayland wrote:
->> On 18/01/2019 13:33, Mark Cave-Ayland wrote:
->>
->>> On 03/01/2019 15:48, Corentin Labbe wrote:
->>>
->>>> Hello
->>>>
->>>> When using an initrd > 5M, I hit the following kernel crash:
->>>> qemu-system-sparc -kernel vmlinux -initrd rootfs.cpio.gz -nographic
->>>> Configuration device id QEMU version 1 machine id 32
->>>> Probing SBus slot 0 offset 0
->>>> Probing SBus slot 1 offset 0
->>>> Probing SBus slot 2 offset 0
->>>> Probing SBus slot 3 offset 0
->>>> Probing SBus slot 4 offset 0
->>>> Probing SBus slot 5 offset 0
->>>> Invalid FCode start byte
->>>> CPUs: 1 x FMI,MB86904
->>>> UUID: 00000000-0000-0000-0000-000000000000
->>>> Welcome to OpenBIOS v1.1 built on Oct 5 2018 08:20
->>>>   Type 'help' for detailed information
->>>> [sparc] Kernel already loaded
->>>> switching to new context:
->>>> PROMLIB: obio_ranges 1
->>>> [    0.000000] PROMLIB: Sun Boot Prom Version 3 Revision 2
->>>> [    0.000000] Linux version 4.20.0-next-20190102+ (compile@Red) (gcc version 7.3.0 (Gentoo 7.3.0-r3 p1.4)) #148 Thu Jan 3 16:17:08 CET 2019
->>>> [    0.000000] printk: bootconsole [earlyprom0] enabled
->>>> [    0.000000] ARCH: SUN4M
->>>> [    0.000000] TYPE: SPARCstation 5
->>>> [    0.000000] Ethernet address: 52:54:00:12:34:56
->>>> [    0.000000] Unable to handle kernel NULL pointer dereference
->>>> [    0.000000] tsk->{mm,active_mm}->context = ffffffff
->>>> [    0.000000] tsk->{mm,active_mm}->pgd = 00000000
->>>> [    0.000000]               \|/ ____ \|/
->>>> [    0.000000]               "@'/ ,. \`@"
->>>> [    0.000000]               /_| \__/ |_\
->>>> [    0.000000]                  \__U_/
->>>> [    0.000000] swapper(0): Oops [#1]
->>>> [    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 4.20.0-next-20190102+ #148
->>>> [    0.000000] PSR: 04001fc0 PC: f0010ef0 NPC: f0010ef4 Y: 00000000    Not tainted
->>>> [    0.000000] PC: <do_sparc_fault+0x158/0x404>
->>>> [    0.000000] %G: 0000000a 000003c4  f05ece08 f05ecc00  00000000 00e00000  f05d4000 00000001
->>>> [    0.000000] %O: 00000000 00e00000  00800000 00e00000  00000000 00000002  f05d5bb8 f00bba58
->>>> [    0.000000] RPC: <memblock_reserve+0x38/0x68>
->>>> [    0.000000] %L: 00000040 f05dfaf8  f05d5c68 00000001  0003ffff 006951e0  f05ed014 f0674ab4
->>>> [    0.000000] %I: f05d5c80 00000000  00000002 f1000000  ffffffff 00000000  f05d5c20 f0007fd8
->>>> [    0.000000] Disabling lock debugging due to kernel taint
->>>> [    0.000000] Caller[f0007fd8]: srmmu_fault+0x58/0x68
->>>> [    0.000000] Caller[f0618598]: memblock_alloc_try_nid+0xb8/0xc8
->>>> [    0.000000] Caller[f0611094]: srmmu_paging_init+0x174/0xaf8
->>>> [    0.000000] Caller[f06106a8]: paging_init+0x4/0x24
->>>> [    0.000000] Caller[f060e4f0]: setup_arch+0x3e8/0x480
->>>> [    0.000000] Caller[f060ab50]: start_kernel+0x48/0x460
->>>> [    0.000000] Caller[f060a43c]: continue_boot+0x324/0x334
->>>> [    0.000000] Caller[00000000]:   (null)
->>>> [    0.000000] Instruction DUMP:
->>>> [    0.000000]  c800a024 
->>>> [    0.000000]  83286002 
->>>> [    0.000000]  073c17b3 
->>>> [    0.000000] <c4010001>
->>>> [    0.000000]  c600e22c 
->>>> [    0.000000]  8a08a003 
->>>> [    0.000000]  80a16001 
->>>> [    0.000000]  0280003b 
->>>> [    0.000000]  c600c001 
->>>> [    0.000000] 
->>>> [    0.000000] Kernel panic - not syncing: Attempted to kill the idle task!
->>>> [    0.000000] Press Stop-A (L1-A) from sun keyboard or send break
->>>> [    0.000000] twice on console to return to the boot prom
->>>> [    0.000000] ---[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
->>>> qemu-system-sparc: terminating on signal 15 from pid 13043 (killall)
->>>>
->>>> The NULL ptr dereference is done by memset() in srmmu_nocache_init() and memblock_alloc_try_nid().
->>>> If I comment both memset, the boot pass
->>>>
->>>> But since nothing explain the NULL ptr deref in memset(), I suspect something is overriden by the initrd
->>>
->>> Sorry about the delay in replying to this, I haven't been too well recently.
->>>
->>> Looking at the code I suspect the problem is that when loading a kernel directly,
->>> OpenBIOS isn't adding the kernel/initrd memory ranges to the DT properties, and so
->>> the kernel doesn't recreate its own mapping on boot.
->>>
->>> It shouldn't be too hard to make this happen, let me take and look and see how
->>> difficult this would be.
->>
->> I think I now have a fix for this, with changes needed in both QEMU and OpenBIOS.
->>
->> Firstly you'll need to apply the QEMU patch from
->> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06635.html and then you'll
->> need an updated OpenBIOS.
->>
->> I've uploaded a pre-compiled openbios-sparc32 with the patches from
->> https://mail.coreboot.org/hyperkitty/list/openbios@openbios.org/thread/E6IMJNUFRF7W6ALWSYBOOCEYLBFXXQEN/
->> to https://www.ilande.co.uk/tmp/qemu/openbios-sparc32-initrdfix for testing.
->>
->> Please can you test and let me know if this solves the issue? If so, I'll see if I
->> can get them merged in time for the upcoming QEMU 4.0 release.
->>
-> 
-> Hello
-> 
-> Sorry even with the patch I still hit the issue.
-> 
-> I have added some debug and at least qemu set initrd_size correctly now.
-> 
-> I have tried to compile openbios-sparc32 for debugging but fail with
-> arch/sparc32/context.c:116:5: error: PIC register clobbered by 'l7' in 'asm'
->      asm __volatile__ ("\n\tcall __switch_context"
->      ^~~
-> make[1]: *** [rules.mak:219: target/arch/sparc32/context.o] Error 1
-> (gcc 7.2 and gc 6.4 with binutils 2.30)
-
-Hmmm. One other thing I've noticed is that newer kernels tend need a minimum of 256M
-RAM to start up - does it work if you add -m 256 to your command line?
-
-
-ATB,
-
-Mark.
+MDUuMDEuMjAxOSAxOjI1LCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiA3LzMxLzE4IDEyOjMwIFBN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gUmVjb25uZWN0IHdpbGwg
+YmUgaW1wbGVtZW50ZWQgaW4gdGhlIGZvbGxvd2luZyBjb21taXQsIHNvIGZvciBub3csDQo+PiBp
+biBzZW1hbnRpY3MgYmVsb3csIGRpc2Nvbm5lY3QgaXRzZWxmIGlzIGEgInNlcmlvdXMgZXJyb3Ii
+Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
+ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBxYXBpL2Jsb2NrLWNvcmUuanNv
+biB8IDEyICsrKysrKysrKysrLQ0KPj4gICBibG9jay9uYmQtY2xpZW50LmggICB8ICAxICsNCj4+
+ICAgYmxvY2svbmJkLWNsaWVudC5jICAgfCAgMSArDQo+PiAgIGJsb2NrL25iZC5jICAgICAgICAg
+IHwgMTYgKysrKysrKysrKysrKysrLQ0KPj4gICA0IGZpbGVzIGNoYW5nZWQsIDI4IGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29y
+ZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IGluZGV4IDViOTA4NGEzOTQuLmNmMDM0
+MDJlYzUgMTAwNjQ0DQo+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gKysrIGIvcWFw
+aS9ibG9jay1jb3JlLmpzb24NCj4+IEBAIC0zNTExLDEzICszNTExLDIzIEBADQo+PiAgICMgICAg
+ICAgICAgICAgICAgICB0cmFkaXRpb25hbCAiYmFzZTphbGxvY2F0aW9uIiBibG9jayBzdGF0dXMg
+KHNlZQ0KPj4gICAjICAgICAgICAgICAgICAgICAgTkJEX09QVF9MSVNUX01FVEFfQ09OVEVYVCBp
+biB0aGUgTkJEIHByb3RvY29sKSAoc2luY2UgMy4wKQ0KPj4gICAjDQo+PiArIyBAcmVjb25uZWN0
+LWRlbGF5OiBSZWNvbm5lY3QgZGVsYXkuIE9uIGRpc2Nvbm5lY3QsIG5iZCBjbGllbnQgdHJpZXMg
+dG8gY29ubmVjdA0KPiANCj4gTWF5YmUgJ09uIHVuZXhwZWN0ZWQgZGlzY29ubmVjdCcsIHNpbmNl
+IGludGVudGlvbmFsIGRpc2Nvbm5lY3QgaXMgbm90DQo+IHVuZXhwZWN0ZWQuDQo+IA0KPj4gKyMg
+ICAgICAgICAgICAgICAgICAgYWdhaW4sIHVudGlsIHN1Y2Nlc3Mgb3Igc2VyaW91cyBlcnJvci4g
+RHVyaW5nIGZpcnN0DQo+PiArIyAgICAgICAgICAgICAgICAgICBAcmVjb25uZWN0LWRlbGF5IHNl
+Y29uZHMgb2YgcmVjb25uZWN0aW5nIGxvb3AgYWxsIHJlcXVlc3RzDQo+PiArIyAgICAgICAgICAg
+ICAgICAgICBhcmUgcGF1c2VkIGFuZCBoYXZlIGEgY2hhbmNlIHRvIHJlcnVuLCBpZiBzdWNjZXNz
+ZnVsDQo+PiArIyAgICAgICAgICAgICAgICAgICBjb25uZWN0IG9jY3VyZXMgZHVyaW5nIHRoaXMg
+dGltZS4gQWZ0ZXIgQHJlY29ubmVjdC1kZWxheQ0KPiANCj4gb2NjdXJzDQo+IA0KPj4gKyMgICAg
+ICAgICAgICAgICAgICAgc2Vjb25kcyBhbGwgZGVsYXllZCByZXF1ZXN0cyBhcmUgZmFpbGVkIGFu
+ZCBhbGwgZm9sbG93aW5nDQo+PiArIyAgICAgICAgICAgICAgICAgICByZXF1ZXN0cyB3aWxsIGJl
+IGZhaWxlZCB0byAodW50aWwgc3VjY2Vzc2Z1bGwgcmVjb25uZWN0KS4NCj4gDQo+IHN1Y2Nlc3Nm
+dWwNCj4gDQo+PiArIyAgICAgICAgICAgICAgICAgICBEZWZhdWx0IDMwMCBzZWNvbmRzIChTaW5j
+ZSAzLjEpDQo+IA0KPiBNeSBkZWxheSBpbiByZXZpZXdpbmcgbWVhbnMgdGhpcyBub3cgaGFzIHRv
+IGJlIDQuMC4NCj4gDQo+IEknbSBndWVzc2luZyB0aGF0IGEgZGVsYXkgb2YgMCBtZWFucyBkaXNh
+YmxlIGF1dG8tcmVjb25uZWN0LiAgRnJvbSBhDQo+IGJhY2t3YXJkcy1jb21wYXRpYmlsaXR5IHN0
+YW5kcG9pbnQsIG5vIGF1dG8tcmVjb25uZWN0IGlzIG1vcmUgaW4gbGluZQ0KPiB3aXRoIHdoYXQg
+d2UgcHJldmlvdXNseSBoYWQgLSBidXQgZnJvbSBhIHVzYWJpbGl0eSBzdGFuZHBvaW50LCB0cnlp
+bmcgdG8NCj4gcmVjb25uZWN0IGNhbiBhdm9pZCB0dXJuaW5nIHRyYW5zaWVudCBuZXR3b3JrIGhp
+Y2N1cHMgaW50byBwZXJtYW5lbnQNCj4gbG9zcyBvZiBhIGRldmljZSB0byBFSU8gZXJyb3JzLCBl
+c3BlY2lhbGx5IGlmIHRoZSByZXRyeSB0aW1lb3V0IGlzIGxvbmcNCj4gZW5vdWdoIHRvIGFsbG93
+IGFuIGFkbWluaXN0cmF0b3IgdG8gcmVyb3V0ZSB0aGUgbmV0d29yayB0byBhbg0KPiBhbHRlcm5h
+dGl2ZSBzZXJ2ZXIuICBTbyBJJ20gcHJvYmFibHkgb2theSB3aXRoIHRoZSBkZWZhdWx0IGJlaW5n
+DQo+IG5vbi16ZXJvIC0gYnV0IGl0IERPRVMgbWVhbiB0aGF0IHdoZXJlIHlvdSB1c2VkIHRvIGdl
+dCBpbnN0YW50IEVJTw0KPiBmYWlsdXJlcyB3aGVuIGEgbmV0d29yayBjb25uZWN0aW9uIHdhcyBz
+ZXZlcmVkLCB5b3Ugbm93IGhhdmUgdG8gd2FpdCBmb3INCj4gdGhlIHJlY29ubmVjdCBkZWxheSB0
+byBleHBpcmUsIGFuZCA1IG1pbnV0ZXMgY2FuIGJlIGEgbG9uZyB3YWl0LiAgU2luY2UNCj4gdGhl
+IGxvbmcgZGVsYXkgaXMgZ3Vlc3Qtb2JzZXJ2YWJsZSwgY2FuIHdlIHJ1biBpbnRvIGlzc3VlcyB3
+aGVyZSBhIGd1ZXN0DQo+IHRoYXQgaXMgY3VycmVudGx5IHVzZWQgdG8gaW5zdGFudCBFSU8gYW5k
+IHRvdGFsIGxvc3Mgb2YgdGhlIGRldmljZSBjb3VsZA0KPiBpbnN0ZWFkIGdldCBjb25mdXNlZCBi
+eSBub3QgZ2V0dGluZyBhbnkgcmVzcG9uc2UgZm9yIHVwIHRvIDUgbWludXRlcywNCj4gd2hldGhl
+ciBvciBub3QgdGhhdCByZXNwb25zZSBldmVudHVhbGx5IHR1cm5zIG91dCB0byBiZSBFSU8gb3Ig
+YQ0KPiBzdWNjZXNzZnVsIHJlY292ZXJ5Pw0KDQpIbW0sIGRvIHlvdSBoYXZlIGluIG1pbmQgc3Vj
+aCBzY2VuYXJpb3M/IFdobyBjb3VsZCBrbm93Pw0KDQpJZiB3ZSB1bnN1cmUsIEknbSBPSyB0byBw
+cm9jZWVkIHdpdGggbm8tcmVjb25uZWN0IGJlaGF2aW9yIGJ5IGRlZmF1bHQuIFdlIGNhbg0KY2hh
+bmdlIHRoZSBkZWZhdWx0IGluIGEgc2VwYXJhdGUgcGF0Y2ggbGF0ZXIsIGlmIG5lZWRlZC4NCg0K
+PiANCj4+ICsrKyBiL2Jsb2NrL25iZC5jDQo+PiBAQCAtMzYwLDYgKzM2MCwxOCBAQCBzdGF0aWMg
+UWVtdU9wdHNMaXN0IG5iZF9ydW50aW1lX29wdHMgPSB7DQo+PiAgICAgICAgICAgICAgIC5oZWxw
+ID0gImV4cGVyaW1lbnRhbDogZXhwb3NlIG5hbWVkIGRpcnR5IGJpdG1hcCBpbiBwbGFjZSBvZiAi
+DQo+PiAgICAgICAgICAgICAgICAgICAgICAgImJsb2NrIHN0YXR1cyIsDQo+PiAgICAgICAgICAg
+fSwNCj4+ICsgICAgICAgIHsNCj4+ICsgICAgICAgICAgICAubmFtZSA9ICJyZWNvbm5lY3QtZGVs
+YXkiLA0KPj4gKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLA0KPj4gKyAgICAg
+ICAgICAgIC5oZWxwID0gIlJlY29ubmVjdCBkZWxheS4gT24gZGlzY29ubmVjdCwgbmJkIGNsaWVu
+dCB0cmllcyB0byINCj4+ICsgICAgICAgICAgICAgICAgICAgICJjb25uZWN0IGFnYWluLCB1bnRp
+bCBzdWNjZXNzIG9yIHNlcmlvdXMgZXJyb3IuIER1cmluZyINCj4+ICsgICAgICAgICAgICAgICAg
+ICAgICJmaXJzdCBAcmVjb25uZWN0LWRlbGF5IHNlY29uZHMgb2YgcmVjb25uZWN0aW5nIGxvb3Ag
+YWxsIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgInJlcXVlc3RzIGFyZSBwYXVzZWQgYW5kIGhh
+dmUgYSBjaGFuY2UgdG8gcmVydW4sIGlmIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgInN1Y2Nl
+c3NmdWwgY29ubmVjdCBvY2N1cmVzIGR1cmluZyB0aGlzIHRpbWUuIEFmdGVyIg0KPj4gKyAgICAg
+ICAgICAgICAgICAgICAgIkByZWNvbm5lY3QtZGVsYXkgc2Vjb25kcyBhbGwgZGVsYXllZCByZXF1
+ZXN0cyBhcmUgZmFpbGVkIg0KPj4gKyAgICAgICAgICAgICAgICAgICAgImFuZCBhbGwgZm9sbG93
+aW5nIHJlcXVlc3RzIHdpbGwgYmUgZmFpbGVkIHRvICh1bnRpbCINCj4+ICsgICAgICAgICAgICAg
+ICAgICAgICJzdWNjZXNzZnVsbCByZWNvbm5lY3QpLiBEZWZhdWx0IDMwMCBzZWNvbmRzIiwNCj4g
+DQo+IFNhbWUgdHlwb3MgYXMgaW4gcWFwaS4NCj4gDQo+IFRoZSBVSSBhc3BlY3RzIGxvb2sgZmlu
+ZSwgbm93IEkgbmVlZCB0byByZXZpZXcgdGhlIHBhdGNoIHNlcmllcyBmb3IgY29kZQ0KPiBpc3N1
+ZXMgOikNCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
