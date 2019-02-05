@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56072)
+Received: from eggs.gnu.org ([209.51.188.92]:59612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gqzHZ-0002Cl-E6
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:54 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gqzaG-0005Gp-RZ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gqzHY-0002Qy-Ek
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gqzHX-0002N1-T6
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 06:52:52 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x15Bo48S067453
-	for <qemu-devel@nongnu.org>; Tue, 5 Feb 2019 06:52:50 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2qf7maet7j-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 06:52:49 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 5 Feb 2019 11:52:46 -0000
-Date: Tue, 5 Feb 2019 12:52:29 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20190204163102.33d744d8.cohuck@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gqzYy-0007kb-Qs
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 07:10:53 -0500
+Date: Tue, 5 Feb 2019 13:10:47 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190205131047.32f7c7a1.cohuck@redhat.com>
+In-Reply-To: <55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
 References: <20190130132212.7376-1-cohuck@redhat.com>
-	<20190130132212.7376-2-cohuck@redhat.com>
-	<20190130195127.5ff3c849@oc2783563651>
-	<20190131125220.285a4bc8.cohuck@redhat.com>
-	<20190131133455.3097613f@oc2783563651>
-	<20190204163102.33d744d8.cohuck@redhat.com>
+	<20190130132212.7376-3-cohuck@redhat.com>
+	<55d9fc3d-12ec-9ad7-cdaa-72c5dbb65aca@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20190205125229.56c6e252@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] vfio-ccw: make it safe to access
- channel programs
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vfio-ccw: rework ssch state handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,64 +24,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Mon, 4 Feb 2019 16:31:02 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, 4 Feb 2019 16:29:40 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> On Thu, 31 Jan 2019 13:34:55 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > On Thu, 31 Jan 2019 12:52:20 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
+> On 01/30/2019 08:22 AM, Cornelia Huck wrote:
+> > The flow for processing ssch requests can be improved by splitting
+> > the BUSY state:
 > > 
-> > > On Wed, 30 Jan 2019 19:51:27 +0100
-> > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> > >   
-> > > > On Wed, 30 Jan 2019 14:22:07 +0100
-> > > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > > >   
-> > > > > When we get a solicited interrupt, the start function may have
-> > > > > been cleared by a csch, but we still have a channel program
-> > > > > structure allocated. Make it safe to call the cp accessors in
-> > > > > any case, so we can call them unconditionally.    
-> > > > 
-> > > > I read this like it is supposed to be safe regardless of
-> > > > parallelism and threads. However I don't see any explicit
-> > > > synchronization done for cp->initialized.
-> > > > 
-> > > > I've managed to figure out how is that supposed to be safe
-> > > > for the cp_free() (which is probably our main concern) in
-> > > > vfio_ccw_sch_io_todo(), but if fail when it comes to the one
-> > > > in vfio_ccw_mdev_notifier().
-> > > > 
-> > > > Can you explain us how does the synchronization work?  
-> > > 
-> > > You read that wrong, I don't add synchronization, I just add a check.
-> > >   
+> > - CP_PROCESSING: We reject any user space requests while we are in
+> >    the process of translating a channel program and submitting it to
+> >    the hardware. Use -EAGAIN to signal user space that it should
+> >    retry the request.
+> > - CP_PENDING: We have successfully submitted a request with ssch and
+> >    are now expecting an interrupt. As we can't handle more than one
+> >    channel program being processed, reject any further requests with
+> >    -EBUSY. A final interrupt will move us out of this state; this also
+> >    fixes a latent bug where a non-final interrupt might have freed up
+> >    a channel program that still was in progress.
+> >    By making this a separate state, we make it possible to issue a
+> >    halt or a clear while we're still waiting for the final interrupt
+> >    for the ssch (in a follow-on patch).
 > > 
-> > Now I'm confused. Does that mean we don't need synchronization for this?
+> > It also makes a lot of sense not to preemptively filter out writes to
+> > the io_region if we're in an incorrect state: the state machine will
+> > handle this correctly.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/vfio_ccw_drv.c     |  8 ++++++--
+> >   drivers/s390/cio/vfio_ccw_fsm.c     | 19 ++++++++++++++-----
+> >   drivers/s390/cio/vfio_ccw_ops.c     |  2 --
+> >   drivers/s390/cio/vfio_ccw_private.h |  3 ++-
+> >   4 files changed, 22 insertions(+), 10 deletions(-)
+
+> > diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> > index e7c9877c9f1e..b4a141fbd1a8 100644
+> > --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> > +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> > @@ -28,7 +28,6 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+> >   	sch = private->sch;
+> >   
+> >   	spin_lock_irqsave(sch->lock, flags);
+> > -	private->state = VFIO_CCW_STATE_BUSY;
+> >   
+> >   	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
+> >   	if (!orb) {
+> > @@ -46,6 +45,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+> >   		 */
+> >   		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
+> >   		ret = 0;
+> > +		private->state = VFIO_CCW_STATE_CP_PENDING;  
 > 
-> If we lack synchronization (that is not provided by the current state
-> machine handling, or the rework here), we should do a patch on top
-> (preferably on top of the whole series, so this does not get even more
-> tangled up.) This is really just about the extra check.
+> [1]
 > 
+> >   		break;
+> >   	case 1:		/* Status pending */
+> >   	case 2:		/* Busy */
+> > @@ -107,6 +107,12 @@ static void fsm_io_busy(struct vfio_ccw_private *private,
+> >   	private->io_region->ret_code = -EBUSY;
+> >   }
+> >   
+> > +static void fsm_io_retry(struct vfio_ccw_private *private,
+> > +			 enum vfio_ccw_event event)
+> > +{
+> > +	private->io_region->ret_code = -EAGAIN;
+> > +}
+> > +
+> >   static void fsm_disabled_irq(struct vfio_ccw_private *private,
+> >   			     enum vfio_ccw_event event)
+> >   {
+> > @@ -135,8 +141,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+> >   	struct mdev_device *mdev = private->mdev;
+> >   	char *errstr = "request";
+> >   
+> > -	private->state = VFIO_CCW_STATE_BUSY;
+> > -
+> > +	private->state = VFIO_CCW_STATE_CP_PROCESSING;  
+> 
+> [1]
+> 
+> >   	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+> >   
+> >   	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+> > @@ -181,7 +186,6 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+> >   	}
+> >   
+> >   err_out:
+> > -	private->state = VFIO_CCW_STATE_IDLE;  
+> 
+> [1] Revisiting these locations as from an earlier discussion [2]... 
+> These go IDLE->CP_PROCESSING->CP_PENDING if we get a cc=0 on the SSCH, 
+> but we stop in CP_PROCESSING if the SSCH gets a nonzero cc.  Shouldn't 
+> we cleanup and go back to IDLE in this scenario, rather than forcing 
+> userspace to escalate to CSCH/HSCH after some number of retries (via FSM)?
+> 
+> [2] https://patchwork.kernel.org/patch/10773611/#22447997
 
-I'm not a huge fan of keeping or introducing races -- it makes things
-difficult to reason about, but I do have some understanging your
-position.
+It does do that (in vfio_ccw_mdev_write), it was not needed here. Or do
+you think doing it here would be more obvious?
 
-This patch-series is AFAICT a big improvement over what we have. I would
-like Farhan confirming that it makes these hick-ups when he used to hit
-BUSY with another ssch request disappear. If it does (I hope it does)
-it's definitely a good thing for anybody who wants to use vfio-ccw.
+> 
+> Besides that, I think this looks good to me.
 
-Yet I find it difficult to slap my r-b over racy code, or partial
-solutions. In the latter case, when I lack conceptual clarity, I find it
-difficult to tell if we are heading into the right direction, or is what
-we build today going to turn against us tomorrow. Sorry for being a drag.
-
-Regards,
-Halil
+Thanks!
