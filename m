@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41430)
+Received: from eggs.gnu.org ([209.51.188.92]:42559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gqvGX-0006Dx-Mk
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:35:39 -0500
+	(envelope-from <pagupta@redhat.com>) id 1gqvKf-0000Cp-IF
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:39:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gqvGV-0004EC-N3
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:35:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gqvGR-0004CU-P6
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:35:29 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gqvGQ-0000vH-5N
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 07:35:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 21C342E8033
-	for <qemu-devel@nongnu.org>; Tue,  5 Feb 2019 07:35:26 +0000 (UTC)
+	(envelope-from <pagupta@redhat.com>) id 1gqvKe-0006sk-9w
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:39:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gqvKd-0006o2-7z
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:39:48 -0500
+Date: Tue, 5 Feb 2019 02:29:37 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1689233487.69735950.1549351777236.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190204170515-mutt-send-email-mst@kernel.org>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+	<20190204170515-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Feb 2019 07:23:50 -0000
-From: Thomas Huth <1545024@bugs.launchpad.net>
-Reply-To: Bug 1545024 <1545024@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160212151339.32708.72568.malonedeb@gac.canonical.com>
-Message-Id: <154935143094.31409.16159299515528756520.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1545024] Re: compiling on armv7 crashes compile
- qlx.o
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] security implications of caching with virtio pmem
+ (was Re: [PATCH v3 0/5] kvm "virtio pmem" device)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,189 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, jasowang@redhat.com, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, Andrea Arcangeli <aarcange@redhat.com>, dave jiang <dave.jiang@intel.com>, darrick wong <darrick.wong@oracle.com>, vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com, kwolf@redhat.com, linux-ext4@vger.kernel.org, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, rjw@rjwysocki.net, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, pbonzini@redhat.com, david@fromorbit.com
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
++CC [Dave Chinner], to maintain updated CC list  
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1545024
-
-Title:
-  compiling on armv7 crashes compile qlx.o
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  If i try to compile qemu on armv7 cpu i get this error:
-
-    LINK  qemu-nbd
-    CC    qemu-img.o
-    LINK  qemu-img
-    LINK  qemu-io
-    LINK  qemu-bridge-helper
-    CC    qmp-marshal.o
-    CC    hw/display/qxl.o
-  {standard input}: Assembler messages:
-  {standard input}:1704: Error: bad instruction `lock'
-  {standard input}:1704: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:1864: Error: bad instruction `lock'
-  {standard input}:1864: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:5239: Error: bad instruction `lock'
-  {standard input}:5239: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:5731: Error: bad instruction `lock'
-  {standard input}:5731: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:11923: Error: bad instruction `lock'
-  {standard input}:11923: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:13960: Error: bad instruction `lock'
-  {standard input}:13960: Error: bad instruction `addl $0,0(%rsp)'
-  {standard input}:14349: Error: bad instruction `lock'
-  {standard input}:14349: Error: bad instruction `addl $0,0(%rsp)'
-  /home/fleixi/git/qemu/rules.mak:57: recipe for target 'hw/display/qxl.o' =
-failed
-  make: *** [hw/display/qxl.o] Error 1
-
-  Build options are:
-
-   ./configure --target-list=3Di386-softmmu
-  Install prefix    /usr/local
-  BIOS directory    /usr/local/share/qemu
-  binary directory  /usr/local/bin
-  library directory /usr/local/lib
-  module directory  /usr/local/lib/qemu
-  libexec directory /usr/local/libexec
-  include directory /usr/local/include
-  config directory  /usr/local/etc
-  local state directory   /usr/local/var
-  Manual directory  /usr/local/share/man
-  ELF interp prefix /usr/gnemul/qemu-%M
-  Source path       /home/fleixi/git/qemu
-  C compiler        cc
-  Host C compiler   cc
-  C++ compiler      c++
-  Objective-C compiler cc
-  ARFLAGS           rv
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -pthread -I=
-/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include  -g -=
-mcpu=3Dcortex-a15.cortex-a7 -mfloat-abi=3Dhard -mfpu=3Dneon-vfpv4 -O2 -pipe=
- -ffast-math -ftree-vectorize -mvectorize-with-neon-quad -fstack-protector =
---param=3Dssp-buffer-size=3D4
-  QEMU_CFLAGS       -I/usr/include/pixman-1   -Werror  -D_GNU_SOURCE -D_FIL=
-E_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decl=
-s -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -=
-fno-common  -Wendif-labels -Wmissing-include-dirs -Wempty-body -Wnested-ext=
-erns -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wold-=
-style-declaration -Wold-style-definition -Wtype-limits -fstack-protector-st=
-rong   -I/usr/include/libpng12  -I/usr/local/include/spice-server -I/usr/lo=
-cal/include -I/usr/local/include/spice-1 -I/usr/include/glib-2.0 -I/usr/lib=
-/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 =
-
-  LDFLAGS           -Wl,--warn-common -g =
-
-  make              make
-  install           install
-  python            python -B
-  smbd              /usr/sbin/smbd
-  module support    no
-  host CPU          arm
-  host big endian   no
-  target list       i386-softmmu
-  tcg debug enabled no
-  gprof enabled     no
-  sparse enabled    no
-  strip binaries    yes
-  profiler          no
-  static build      no
-  pixman            system
-  SDL support       no
-  GTK support       yes
-  GTK GL support    no
-  GNUTLS support    no
-  GNUTLS hash       no
-  libgcrypt         no
-  nettle            no
-  libtasn1          no
-  VTE support       no
-  curses support    no
-  virgl support     no
-  curl support      yes
-  mingw32 support   no
-  Audio drivers     oss
-  Block whitelist (rw) =
-
-  Block whitelist (ro) =
-
-  VirtFS support    no
-  VNC support       yes
-  VNC SASL support  yes
-  VNC JPEG support  yes
-  VNC PNG support   yes
-  xen support       no
-  brlapi support    no
-  bluez  support    yes
-  Documentation     no
-  PIE               no
-  vde support       no
-  netmap support    no
-  Linux AIO support no
-  ATTR/XATTR support yes
-  Install blobs     yes
-  KVM support       yes
-  RDMA support      no
-  TCG interpreter   no
-  fdt support       no
-  preadv support    yes
-  fdatasync         yes
-  madvise           yes
-  posix_madvise     yes
-  sigev_thread_id   yes
-  uuid support      no
-  libcap-ng support no
-  vhost-net support yes
-  vhost-scsi support yes
-  Trace backends    log
-  spice support     yes (0.12.10/0.12.6)
-  rbd support       no
-  xfsctl support    no
-  smartcard support no
-  libusb            no
-  usb net redir     no
-  OpenGL support    no
-  libiscsi support  no
-  libnfs support    no
-  build guest agent yes
-  QGA VSS support   no
-  QGA w32 disk info no
-  QGA MSI support   no
-  seccomp support   no
-  coroutine backend ucontext
-  coroutine pool    yes
-  GlusterFS support no
-  Archipelago support no
-  gcov              gcov
-  gcov enabled      no
-  TPM support       yes
-  libssh2 support   no
-  TPM passthrough   no
-  QOM debugging     yes
-  vhdx              no
-  lzo support       no
-  snappy support    no
-  bzip2 support     yes
-  NUMA host support no
-  tcmalloc support  no
-  jemalloc support  no
-
-  testet with  qemu-git branch stable-2.4 and git master
-
-  Shoulded the configure detecting "bigendian" too?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1545024/+subscriptions
+> >  This patch series has implementation for "virtio pmem".
+> >  "virtio pmem" is fake persistent memory(nvdimm) in guest
+> >  which allows to bypass the guest page cache. This also
+> >  implements a VIRTIO based asynchronous flush mechanism.
+> 
+> 
+> At Pankaj's request I looked at information leak implications of virtio
+> pmem in light of the recent page cache side channels paper
+> (https://arxiv.org/pdf/1901.01161.pdf) - to see what
+> kind of side channels it might create if any.  TLDR - I think that
+> depending on the host side implementation there could be some, but this
+> might be addressable by better documentation in both code and spec.
+> The fake dax approach backing the guest memory by a host page cache
+> does seem to have potential issues.
+> 
+> For clarity: we are talking about leaking information either to a VM, or
+> within a VM (I did not look into leaks to hypervisor in configurations
+> such as SEV) through host page cache.
+> 
+> Leaks into a VM: It seems clear that while pmem allows memory accesses
+> versus read/write with e.g. a block device, from host page cache point
+> of view this doesn't matter much: reads populate cache in the same way
+> as memory faults.  Thus ignoring presence of information leaks (which is
+> an interesting question e.g. in light of recent discard support) pmem
+> doesn't seem to be any better or worse for leaking information into a
+> VM.
+> 
+> Leaks within VM: Right now pmem seems to bypass the guest page cache
+> completely.  Whether pmem memory is then resident in a page cache would
+> be up to the device/host. Assuming that it is, the "Preventing
+> Efficient Eviction while Increasing the System Performance"
+> countermeasure for the page cache side channel attack would appear to
+> become ineffective with pmem. What is suggested is a per-process
+> management of the page cache, and host does not have visibility of
+> processes within a VM. Another possible countermeasure - not discussed
+> in the paper - could be modify the applications to lock the security
+> relevant pages in memory.  Again this becomes impractical with pmem as
+> host does not have visibility into that. However note that as long
+> as the only countermeasure linux uses is "Privileged Access"
+> (i.e. blocking mincore) nothing can be done as guest page cache
+> remains as vulnerable as host page cache.
+> 
+> 
+> Countermeasures: which host-side countermeasures can be designed would
+> depend on which countermeasures are used guest-side - we would need to
+> make sure they are not broken by pmem.  For "Preventing Efficient
+> Eviction while Increasing the System Performance" modifying the host
+> implementation to ensure that pmem device bypasses the host page cache
+> would seem to address the security problem.Similarly, ensuring that a
+> real memory device (e.g. DAX, RAM such as hugetlbfs, pmem for nested
+> virt) is used for pmem would make the memory locking countermeasure
+> work.  Whether with such limitations the device is still useful
+> performance wise is an open question.  These questions probably should
+> be addressed in the documentation, spec and possible qemu code.
+> 
+> 
+> 
+> Severity of the security implications: some people argue that the
+> security implications of the page cache leaks are minor.  I do not have
+> an opinion on this: the severity would seem to depend on the specific
+> configuration.
+> 
+> 
+> Other security implications: recent discussion seems to suggest there
+> are other concerns around e.g. resource management and thus DOS
+> potential. If that's so, it's a matter for a separate discussion
+> as I didn't look into that in depth.
+> 
+> Some or all of the above might be based on a misunderstanding of the
+> current pmem code, the whitepaper and linux page cache in general.
+> If so I apologise, do not hesitate to call out any mistakes.
+> 
+> Thanks!
+> 
+> --
+> MST
+> 
+> 
