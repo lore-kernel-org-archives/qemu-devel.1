@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33245)
+Received: from eggs.gnu.org ([209.51.188.92]:33218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44h-0005i4-RI
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:58 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44g-0005hM-OB
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44f-0005zW-JB
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:55 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:40532)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gr44f-0005z8-AL
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:54 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:40506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gr44f-0005uu-5m
+	id 1gr44e-0005sy-WD
 	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 11:59:53 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Tue,  5 Feb 2019 18:59:07 +0200
-Message-Id: <20190205165927.26599-13-samuel.thibault@ens-lyon.org>
+Date: Tue,  5 Feb 2019 18:59:00 +0200
+Message-Id: <20190205165927.26599-6-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 References: <20190205165927.26599-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv2 12/32] slirp: replace qemu_set_nonblock()
+Subject: [Qemu-devel] [PULLv2 05/32] net/slirp: simplify checking for cmd:
+ prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,152 +33,25 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Replace qemu_set_nonblock() with slirp_set_nonblock()
-
-qemu_set_nonblock() does some event registration with the main
-loop. Add a new callback register_poll_fd() for that reason.
-
-Always build the fd-register stub, to avoid #if WIN32.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c         |  6 ++++++
- slirp/libslirp.h    |  2 ++
- slirp/misc.c        |  3 ++-
- slirp/tcp_subr.c    |  6 ++++--
- slirp/util.c        | 14 ++++++++++++++
- slirp/util.h        |  1 +
- stubs/Makefile.objs |  2 +-
- 7 files changed, 30 insertions(+), 4 deletions(-)
+ net/slirp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/slirp.c b/net/slirp.c
-index c24a779425..6f756a4dcc 100644
+index ec07f662c0..b91741b8fc 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -186,6 +186,11 @@ static void net_slirp_timer_mod(void *timer, int64_t=
- expire_timer)
-     timer_mod(timer, expire_timer);
- }
+@@ -773,7 +773,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
 =20
-+static void net_slirp_register_poll_fd(int fd)
-+{
-+    qemu_fd_register(fd);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-@@ -193,6 +198,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_new =3D net_slirp_timer_new,
-     .timer_free =3D net_slirp_timer_free,
-     .timer_mod =3D net_slirp_timer_mod,
-+    .register_poll_fd =3D net_slirp_register_poll_fd,
- };
+     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
 =20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e75dadfa3..70e99139bf 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -27,6 +27,8 @@ typedef struct SlirpCb {
-     void (*timer_free)(void *timer);
-     /* Modify a timer to expire at @expire_time */
-     void (*timer_mod)(void *timer, int64_t expire_time);
-+    /* Register a fd for future polling */
-+    void (*register_poll_fd)(int fd);
- } SlirpCb;
-=20
-=20
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 32ec02a525..4ee20a10e4 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -163,7 +163,8 @@ fork_exec(struct socket *so, const char *ex)
-     slirp_socket_set_fast_reuse(so->s);
-     opt =3D 1;
-     slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
-;
--    qemu_set_nonblock(so->s);
-+    slirp_set_nonblock(so->s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     return 1;
- }
-=20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 3567f320ff..8087ffc047 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -412,7 +412,8 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     int opt, s=3Dso->s;
-     struct sockaddr_storage addr;
-=20
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -484,7 +485,8 @@ void tcp_connect(struct socket *inso)
-         tcp_close(sototcpcb(so)); /* This will sofree() as well */
-         return;
-     }
--    qemu_set_nonblock(s);
-+    slirp_set_nonblock(s);
-+    so->slirp->cb->register_poll_fd(so->s);
-     slirp_socket_set_fast_reuse(s);
-     opt =3D 1;
-     slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
-diff --git a/slirp/util.c b/slirp/util.c
-index b1a36b27bc..59f6713c8b 100644
---- a/slirp/util.c
-+++ b/slirp/util.c
-@@ -43,6 +43,20 @@ int inet_aton(const char *cp, struct in_addr *ia)
- }
- #endif
-=20
-+void slirp_set_nonblock(int fd)
-+{
-+#ifndef _WIN32
-+    int f;
-+    f =3D fcntl(fd, F_GETFL);
-+    assert(f !=3D -1);
-+    f =3D fcntl(fd, F_SETFL, f | O_NONBLOCK);
-+    assert(f !=3D -1);
-+#else
-+    unsigned long opt =3D 1;
-+    ioctlsocket(fd, FIONBIO, &opt);
-+#endif
-+}
-+
- static void slirp_set_cloexec(int fd)
- {
- #ifndef _WIN32
-diff --git a/slirp/util.h b/slirp/util.h
-index fe6f1fbb62..4f6e80c3ed 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -68,6 +68,7 @@ int inet_aton(const char *cp, struct in_addr *ia);
- #endif
-=20
- int slirp_socket(int domain, int type, int protocol);
-+void slirp_set_nonblock(int fd);
-=20
- static inline int slirp_socket_set_nodelay(int fd)
- {
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5dd0aeeec6..cda0efa4e8 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -33,7 +33,7 @@ stub-obj-y +=3D trace-control.o
- stub-obj-y +=3D uuid.o
- stub-obj-y +=3D vm-stop.o
- stub-obj-y +=3D vmstate.o
--stub-obj-$(CONFIG_WIN32) +=3D fd-register.o
-+stub-obj-y +=3D fd-register.o
- stub-obj-y +=3D qmp_memory_device.o
- stub-obj-y +=3D target-monitor-defs.o
- stub-obj-y +=3D target-get-monitor-def.o
+-    if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
++    if (g_str_has_prefix(p, "cmd:")) {
+         if (slirp_add_exec(s->slirp, &p[4], &server, port) < 0) {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
 --=20
 2.20.1
