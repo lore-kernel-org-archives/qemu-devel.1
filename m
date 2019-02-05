@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58000)
+Received: from eggs.gnu.org ([209.51.188.92]:58323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwDy-0004ne-Ff
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:36:59 -0500
+	(envelope-from <hsp.cat7@gmail.com>) id 1gqwEr-0005Rv-Dl
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqwDx-0005di-Mp
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:36:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqwDx-0005dD-Gj
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:36:57 -0500
-Date: Tue, 5 Feb 2019 09:36:55 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190205083655.w7oyz7q65ifz4z3h@sirius.home.kraxel.org>
-References: <1548859022-3969-1-git-send-email-liam.merwick@oracle.com>
-	<1548859022-3969-3-git-send-email-liam.merwick@oracle.com>
-	<20190131080352.nymxlr5nc7xtqiom@sirius.home.kraxel.org>
-	<8ba1674d-915d-cd72-bee1-3a0774561318@oracle.com>
+	(envelope-from <hsp.cat7@gmail.com>) id 1gqwEq-00068R-38
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:37:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ba1674d-915d-cd72-bee1-3a0774561318@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] usb: deal with potential Null pointer
- returned by usb_ep_get()
+References: <ae28cefe-84fb-6c4e-0452-55b717726b2b@redhat.com>
+In-Reply-To: <ae28cefe-84fb-6c4e-0452-55b717726b2b@redhat.com>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Tue, 5 Feb 2019 09:37:39 +0100
+Message-ID: <CABLmASEAbmGRohbvZag0jWYqvxys=dUiKeTJyN2=CYE+X1JAXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-ppc] 2x-3x tcg performance regression on
+ ppc64 (maybe others)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +22,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>
-Cc: qemu-devel@nongnu.org, Darren.Kenny@oracle.com, Mark.Kanda@oracle.com, ameya.more@oracle.com
+To: Cleber Rosa <crosa@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Feb 04, 2019 at 11:50:33AM +0000, Liam Merwick wrote:
-> On 31/01/2019 08:03, Gerd Hoffmann wrote:
-> > On Wed, Jan 30, 2019 at 02:37:02PM +0000, Liam Merwick wrote:
-> > > From: Liam Merwick <Liam.Merwick@oracle.com>
-> > > 
-> > > usb_ep_get() can return a Null pointer in the (albeit unlikely) case
-> > > that a NULL USBDevice is passed in via the 'dev' parameter.
-> > That should never ever happen.
-> > 
-> > > Reported by the Parfait static code analysis tool
-> > Try add "assert(dev != NULL)" to usb_ep_get() instead of sprinkling
-> > pointless checks all over the place.
-> > 
-> Adding "assert(dev != NULL)" to usb_ep_get() isn't sufficient for that tool
-> unless the 'if (dev== NULL)' check is removed which seems a backwards step
-> even if that NULL USBDevice case is impossible.
+On Fri, Feb 1, 2019 at 11:54 PM Cleber Rosa <crosa@redhat.com> wrote:
 
-Looked at the code again.
+> While working on the "boot_linux_console.py" tests, after a given
+> rebase, I noticed that the ppc64 specific test began timing out.  The
+> original timeout set to the test was 60 seconds, and it "always" had
+> room to spare when running either on my system, or on Travis CI.
+>
+> Hi,
 
-The usb device emulation (hw/usb/dev-*.c) never ever calls usb_ep_get()
-with dev == NULL.  There are some places in usb host adapter emulation
-(hw/usb/hcd-*) which might do this.  uhci for example has this ...
+As reported on IRC on 31-01, performance loss also occurs with
+qemu-system-ppc:
+"I noticed a substantial performance loss (~35% in processor benchmark) in
+qemu-system-ppc running Mac OS 9.2. Bisecting shows that
+https://github.com/qemu/qemu/commit/f7b78602fdc6c6e4befc90159da8e93900b4bcb1
+introduces the issue. Reverting brings performance back."
 
-	[ ... ]
-        USBDevice *dev = uhci_find_device(s, (td->token >> 8) & 0x7f);
-        USBEndpoint *ep = usb_ep_get(dev, pid, (td->token >> 15) & 0xf);
+For a benchmark screen shot see:
+https://surfdrive.surf.nl/files/index.php/s/M1o9rcNCt3QQ3I7
 
-        if (ep == NULL) {
-	[ ... ]
-
-... and uhci_find_device can return NULL.
-
-So, I'd suggest to check all usb_ep_get() callers, fix them if needed,
-then remove the 'if (dev== NULL)' check in usb_ep_get() and add the
-assert() instead.
-
-cheers,
-  Gerd
+Best,
+Howard
