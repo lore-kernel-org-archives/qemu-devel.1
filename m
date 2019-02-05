@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36261)
+Received: from eggs.gnu.org ([209.51.188.92]:36418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GV-0002Vy-Kd
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:14 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gd-0002cS-W7
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5GN-0003w5-8R
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:09 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:40588)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gr5Gc-00047r-BQ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:19 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37937)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gr5GM-0003v2-Uw
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:03 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id f188so4725654wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:02 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-	by smtp.gmail.com with ESMTPSA id p5sm8931665wmh.16.2019.02.05.10.16.00
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 05 Feb 2019 10:16:00 -0800 (PST)
+	id 1gr5Gb-0003zj-LO
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:16:17 -0500
+Received: by mail-wr1-x441.google.com with SMTP id v13so4717969wrw.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Feb 2019 10:16:08 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  5 Feb 2019 19:14:42 +0100
-Message-Id: <1549390526-24246-33-git-send-email-pbonzini@redhat.com>
+Date: Tue,  5 Feb 2019 19:14:48 +0100
+Message-Id: <1549390526-24246-39-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
 References: <1549390526-24246-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 32/76] monitor: do not use QTAILQ_FOREACH_SAFE
- across critical sections
+Subject: [Qemu-devel] [PULL 38/76] i386: allow to load initrd below 4 GB for
+ recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +29,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-monitor_qmp_requests_pop_any_with_lock cannot modify the monitor list
-concurrently with monitor_cleanup, since the dispatch bottom half
-runs in the main thread, but anyway it is a bit ugly to keep
-"next" live across critical sections of monitor_lock and Coverity
-complains (CID 1397072).
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Replace QTAILQ_FOREACH_SAFE with a while loop and QTAILQ_FIRST,
-it is cleaner and more future-proof.
+Since linux commit: cf8fa920cb42 ("i386: handle an initrd in highmem (version 2)")
+linux has supported initrd up to 4 GB, but the header field
+ramdisk_max is still set to 2 GB to avoid "possible bootloader bugs".
 
+When use '-kernel vmlinux -initrd initrd.cgz' to launch a VM,
+the firmware(it could be linuxboot_dma.bin) helps to read initrd
+contents into guest memory(below ramdisk_max) and jump to kernel.
+that's similar with what bootloader does, like grub.
+
+In addition, initrd_max is uint32_t simply because QEMU doesn't support
+the 64-bit boot protocol (specifically the ext_ramdisk_image field).
+
+Therefore here just limit initrd_max to UINT32_MAX simply as well to
+allow initrd to be loaded below 4 GB.
+
+NOTE: it's possible that linux protocol within [0x208, 0x20c]
+supports up to 4 GB initrd as well.
+
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- monitor.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/i386/pc.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/monitor.c b/monitor.c
-index c09fa63..e5de576 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4617,8 +4617,6 @@ void monitor_init(Chardev *chr, int flags)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 9664822..7d8f351 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1299,7 +1299,26 @@ static void load_linux(PCMachineState *pcms,
+ #endif
  
- void monitor_cleanup(void)
- {
--    Monitor *mon, *next;
--
-     /*
-      * We need to explicitly stop the I/O thread (but not destroy it),
-      * clean up the monitor resources, then destroy the I/O thread since
-@@ -4632,7 +4630,8 @@ void monitor_cleanup(void)
-     /* Flush output buffers and destroy monitors */
-     qemu_mutex_lock(&monitor_lock);
-     monitor_destroyed = true;
--    QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
-+    while (!QTAILQ_EMPTY(&mon_list)) {
-+        Monitor *mon = QTAILQ_FIRST(&mon_list);
-         QTAILQ_REMOVE(&mon_list, mon, entry);
-         /* Permit QAPI event emission from character frontend release */
-         qemu_mutex_unlock(&monitor_lock);
+     /* highest address for loading the initrd */
+-    if (protocol >= 0x203) {
++    if (protocol >= 0x20c &&
++        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
++        /*
++         * Linux has supported initrd up to 4 GB for a very long time (2007,
++         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 2013),
++         * though it only sets initrd_max to 2 GB to "work around bootloader
++         * bugs". Luckily, QEMU firmware(which does something like bootloader)
++         * has supported this.
++         *
++         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
++         * be loaded into any address.
++         *
++         * In addition, initrd_max is uint32_t simply because QEMU doesn't
++         * support the 64-bit boot protocol (specifically the ext_ramdisk_image
++         * field).
++         *
++         * Therefore here just limit initrd_max to UINT32_MAX simply as well.
++         */
++        initrd_max = UINT32_MAX;
++    } else if (protocol >= 0x203) {
+         initrd_max = ldl_p(header+0x22c);
+     } else {
+         initrd_max = 0x37ffffff;
 -- 
 1.8.3.1
