@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59701)
+Received: from eggs.gnu.org ([209.51.188.92]:60533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gr55Y-0000ql-0a
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:04:53 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gr57X-0002Xq-B4
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gr55N-0003Mm-Vj
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:04:45 -0500
-Resent-Message-Id: <E1gr55N-0003Mm-Vj@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gr55H-0003FR-BL
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:04:35 -0500
-Message-ID: <154938985200.29184.4420072155203445881@ebba9967afc0>
-In-Reply-To: <20190205170510.21984-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <eric.auger@redhat.com>) id 1gr57Q-0004si-4r
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:06:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gr57P-0004rh-RQ
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 13:06:48 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Tue,  5 Feb 2019 19:05:56 +0100
+Message-Id: <20190205180556.10799-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 5 Feb 2019 10:04:13 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/22] target-arm queue
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5] hw/vfio/common: Refactor container
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +25,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+Cc: aik@ozlabs.ru, groug@kaod.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDIwNTE3MDUxMC4yMTk4
-NC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAyMDUxNzA1MTAuMjE5ODQtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzIyXSB0
-YXJnZXQtYXJtIHF1ZXVlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAgIDAxYTlhNTEuLjY4ZGYwYzMgIG1hc3RlciAgICAgLT4gbWFzdGVyCiAtIFt0YWcg
-dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAyMDUxNTE4MTAuNTcxLTEtcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMDUxNTE4MTAuNTcxLTEtcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTAyMDUxNjU5MjcuMjY1
-OTktMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24ub3JnIC0+IHBhdGNoZXcvMjAxOTAyMDUxNjU5
-MjcuMjY1OTktMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24ub3JnCiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMjAxOTAyMDUxNzA1MTAuMjE5ODQtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmcgLT4gcGF0Y2hldy8yMDE5MDIwNTE3MDUxMC4yMTk4NC0xLXBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjZmZmM3ZDcgdGFyZ2V0L2FybTog
-TWFrZSBGUFNDUi9GUENSIHRyYXBwZWQtZXhjZXB0aW9uIGJpdHMgUkFaL1dJCjMwYmJiZDUgaHcv
-YXJtL2Jvb3Q6IFN1cHBvcnQgRFRCIGF1dG9sb2FkIGZvciBmaXJtd2FyZS1vbmx5IGJvb3RzCjdi
-ZDUwMGIgaHcvYXJtL2Jvb3Q6IENsYXJpZnkgd2h5IGFybV9zZXR1cF9maXJtd2FyZV9ib290KCkg
-ZG9lc24ndCBzZXQgZW52LT5ib290X2luZm8KMjVlMTg4OSBody9hcm0vYm9vdDogRmFjdG9yIG91
-dCAic2V0IHVwIGZpcm13YXJlIGJvb3QiIGNvZGUKNTBkZTQ1MiBody9hcm0vYm9vdDogRmFjdG9y
-IG91dCAiZGlyZWN0IGtlcm5lbCBib290IiBjb2RlIGludG8gaXRzIG93biBmdW5jdGlvbgphY2E5
-YzI0IGh3L2FybS9ib290OiBGaXggYmxvY2sgY29tbWVudCBzdHlsZSBpbiBhcm1fbG9hZF9rZXJu
-ZWwoKQo3ODk0MWQ4IGdkYnN0dWI6IGFsbG93IGtpbGxpbmcgUUVNVSB2aWEgdktpbGwgY29tbWFu
-ZAo3MjFhNDMyIHRhcmdldC9hcm06IEVuYWJsZSBUQkkgZm9yIHVzZXItb25seQozNjJiNzlhIHRh
-cmdldC9hcm06IENvbXB1dGUgVEJfRkxBR1MgZm9yIFRCSSBmb3IgdXNlci1vbmx5CjFmYzIyMjAg
-dGFyZ2V0L2FybTogQ2xlYW4gVEJJIGZvciBkYXRhIG9wZXJhdGlvbnMgaW4gdGhlIHRyYW5zbGF0
-b3IKMGY1NDU0YSB0YXJnZXQvYXJtOiBBZGQgVEJGTEFHX0E2NF9UQklELCBzcGxpdCBvdXQgZ2Vu
-X3RvcF9ieXRlX2lnbm9yZQo5NTlkZTk4IHRlc3RzL3RjZy9hYXJjaDY0OiBBZGQgcGF1dGggc21v
-a2UgdGVzdAo2NDJjNzU5IGxpbnV4LXVzZXI6IEltcGxlbWVudCBQUl9QQUNfUkVTRVRfS0VZUwoz
-OWJkM2U2IHRhcmdldC9hcm06IEVuYWJsZSBCVEkgZm9yIC1jcHUgbWF4CjQ1YzZhNjEgdGFyZ2V0
-L2FybTogU2V0IGJ0eXBlIGZvciBpbmRpcmVjdCBicmFuY2hlcwo2NjhlMWVkIHRhcmdldC9hcm06
-IFJlc2V0IGJ0eXBlIGZvciBkaXJlY3QgYnJhbmNoZXMKZDU4YzczNiB0YXJnZXQvYXJtOiBEZWZh
-dWx0IGhhbmRsaW5nIG9mIEJUWVBFIGR1cmluZyB0cmFuc2xhdGlvbgphODUzZjJiIHRhcmdldC9h
-cm06IENhY2hlIHRoZSBHUCBiaXQgZm9yIGEgcGFnZSBpbiBNZW1UeEF0dHJzCjc0ZDUzZTIgZXhl
-YzogQWRkIHRhcmdldC1zcGVjaWZpYyB0bGIgYml0cyB0byBNZW1UeEF0dHJzCjFmOTllOGMgdGFy
-Z2V0L2FybTogQWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+ZmxhZ3MKYTk1MDY4YiB0YXJnZXQvYXJt
-OiBBZGQgUFNUQVRFLkJUWVBFCmEyMGU1Y2MgdGFyZ2V0L2FybTogSW50cm9kdWNlIGlzYXJfZmVh
-dHVyZV9hYTY0X2J0aQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMiBDaGVja2luZyBjb21taXQg
-YTIwZTVjYzdhNjFlICh0YXJnZXQvYXJtOiBJbnRyb2R1Y2UgaXNhcl9mZWF0dXJlX2FhNjRfYnRp
-KQoyLzIyIENoZWNraW5nIGNvbW1pdCBhOTUwNjhiZjEyNTQgKHRhcmdldC9hcm06IEFkZCBQU1RB
-VEUuQlRZUEUpCjMvMjIgQ2hlY2tpbmcgY29tbWl0IDFmOTllOGM4OTlmOCAodGFyZ2V0L2FybTog
-QWRkIEJUIGFuZCBCVFlQRSB0byB0Yi0+ZmxhZ3MpCjQvMjIgQ2hlY2tpbmcgY29tbWl0IDc0ZDUz
-ZTI3ZjAzNiAoZXhlYzogQWRkIHRhcmdldC1zcGVjaWZpYyB0bGIgYml0cyB0byBNZW1UeEF0dHJz
-KQpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMzE6
-IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1hdHRycy5oOjQ3OgorICAgIHVuc2lnbmVkIGludCB0YXJn
-ZXRfdGxiX2JpdDAgOiAxOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJS
-T1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzMyOiBGSUxF
-OiBpbmNsdWRlL2V4ZWMvbWVtYXR0cnMuaDo0ODoKKyAgICB1bnNpZ25lZCBpbnQgdGFyZ2V0X3Rs
-Yl9iaXQxIDogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
-cGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMzMzogRklMRTogaW5j
-bHVkZS9leGVjL21lbWF0dHJzLmg6NDk6CisgICAgdW5zaWduZWQgaW50IHRhcmdldF90bGJfYml0
-MiA6IDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMyBlcnJv
-cnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMjIgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjUvMjIgQ2hlY2tpbmcgY29tbWl0IGE4NTNmMmIzODNkMiAodGFyZ2V0
-L2FybTogQ2FjaGUgdGhlIEdQIGJpdCBmb3IgYSBwYWdlIGluIE1lbVR4QXR0cnMpCjYvMjIgQ2hl
-Y2tpbmcgY29tbWl0IGQ1OGM3MzY4ODNkMiAodGFyZ2V0L2FybTogRGVmYXVsdCBoYW5kbGluZyBv
-ZiBCVFlQRSBkdXJpbmcgdHJhbnNsYXRpb24pCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rp
-b24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzk5OiBGSUxFOiB0YXJnZXQvYXJtL3Ry
-YW5zbGF0ZS1hNjQuYzoxMzc5NjoKKyAgICByZXR1cm4gKHRsYl9oaXQoZW50cnktPmFkZHJfY29k
-ZSwgYWRkcikgJiYKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTk2IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvMjIgQ2hlY2tpbmcg
-Y29tbWl0IDY2OGUxZWRhZjViOCAodGFyZ2V0L2FybTogUmVzZXQgYnR5cGUgZm9yIGRpcmVjdCBi
-cmFuY2hlcykKOC8yMiBDaGVja2luZyBjb21taXQgNDVjNmE2MTZhOTA3ICh0YXJnZXQvYXJtOiBT
-ZXQgYnR5cGUgZm9yIGluZGlyZWN0IGJyYW5jaGVzKQo5LzIyIENoZWNraW5nIGNvbW1pdCAzOWJk
-M2U2MTRmOTIgKHRhcmdldC9hcm06IEVuYWJsZSBCVEkgZm9yIC1jcHUgbWF4KQoxMC8yMiBDaGVj
-a2luZyBjb21taXQgNjQyYzc1OTg3ZDMxIChsaW51eC11c2VyOiBJbXBsZW1lbnQgUFJfUEFDX1JF
-U0VUX0tFWVMpCjExLzIyIENoZWNraW5nIGNvbW1pdCA5NTlkZTk4OWM3YjQgKHRlc3RzL3RjZy9h
-YXJjaDY0OiBBZGQgcGF1dGggc21va2UgdGVzdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
-bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzQ6IApuZXcg
-ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzOCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAxMS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMi8yMiBDaGVj
-a2luZyBjb21taXQgMGY1NDU0YTBmZTFkICh0YXJnZXQvYXJtOiBBZGQgVEJGTEFHX0E2NF9UQklE
-LCBzcGxpdCBvdXQgZ2VuX3RvcF9ieXRlX2lnbm9yZSkKMTMvMjIgQ2hlY2tpbmcgY29tbWl0IDFm
-YzIyMjBiYmY0MyAodGFyZ2V0L2FybTogQ2xlYW4gVEJJIGZvciBkYXRhIG9wZXJhdGlvbnMgaW4g
-dGhlIHRyYW5zbGF0b3IpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyog
-b24gYSBzZXBhcmF0ZSBsaW5lCiM1MTQ6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5j
-OjMyNTY6CisgICAgZG9fZ3ByX2xkKHMsIHRjZ19ydCwgY2xlYW5fYWRkciwgc2l6ZSwgLyogaXNf
-c2lnbmVkICovIGZhbHNlLAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NzQgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMTMvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTQvMjIgQ2hl
-Y2tpbmcgY29tbWl0IDM2MmI3OWFjYmJiMCAodGFyZ2V0L2FybTogQ29tcHV0ZSBUQl9GTEFHUyBm
-b3IgVEJJIGZvciB1c2VyLW9ubHkpCjE1LzIyIENoZWNraW5nIGNvbW1pdCA3MjFhNDMyM2Q2OTMg
-KHRhcmdldC9hcm06IEVuYWJsZSBUQkkgZm9yIHVzZXItb25seSkKMTYvMjIgQ2hlY2tpbmcgY29t
-bWl0IDc4OTQxZDg4NDJlOCAoZ2Ric3R1YjogYWxsb3cga2lsbGluZyBRRU1VIHZpYSB2S2lsbCBj
-b21tYW5kKQoxNy8yMiBDaGVja2luZyBjb21taXQgYWNhOWMyNDBhYTQ3IChody9hcm0vYm9vdDog
-Rml4IGJsb2NrIGNvbW1lbnQgc3R5bGUgaW4gYXJtX2xvYWRfa2VybmVsKCkpCjE4LzIyIENoZWNr
-aW5nIGNvbW1pdCA1MGRlNDUyNjllNGQgKGh3L2FybS9ib290OiBGYWN0b3Igb3V0ICJkaXJlY3Qg
-a2VybmVsIGJvb3QiIGNvZGUgaW50byBpdHMgb3duIGZ1bmN0aW9uKQoxOS8yMiBDaGVja2luZyBj
-b21taXQgMjVlMTg4OWRhOGM2IChody9hcm0vYm9vdDogRmFjdG9yIG91dCAic2V0IHVwIGZpcm13
-YXJlIGJvb3QiIGNvZGUpCjIwLzIyIENoZWNraW5nIGNvbW1pdCA3YmQ1MDBiZDg3NGQgKGh3L2Fy
-bS9ib290OiBDbGFyaWZ5IHdoeSBhcm1fc2V0dXBfZmlybXdhcmVfYm9vdCgpIGRvZXNuJ3Qgc2V0
-IGVudi0+Ym9vdF9pbmZvKQoyMS8yMiBDaGVja2luZyBjb21taXQgMzBiYmJkNWZlNDU0IChody9h
-cm0vYm9vdDogU3VwcG9ydCBEVEIgYXV0b2xvYWQgZm9yIGZpcm13YXJlLW9ubHkgYm9vdHMpCjIy
-LzIyIENoZWNraW5nIGNvbW1pdCA2ZmZjN2Q3YzZlZWYgKHRhcmdldC9hcm06IE1ha2UgRlBTQ1Iv
-RlBDUiB0cmFwcGVkLWV4Y2VwdGlvbiBiaXRzIFJBWi9XSSkKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAyMDUxNzA1MTAuMjE5ODQtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+We introduce the vfio_init_container_type() helper.
+It computes the highest usable iommu type and then
+set the container and the iommu type.
+
+Its usage in vfio_connect_container() makes the code
+ready for addition of new iommu types.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+---
+
+v4 -> v5:
+- remove fd local variable in vfio_get_iommu_type
+- s/vfio_init_container_type/vfio_init_container
+
+v3 -> v4:
+- Take into account Alex' suggestions. Only exception is
+  I kept v2 bool.
+
+v2 -> v3:
+- fix ret/errno
+
+v1 -> v2:
+- handle SPAPR case, s/ret/errno in error error_setg_errno,
+  fix ret value when vfio_iommu_get_type fails
+- removed Greg's R-b
+
+v1:
+- originally submitted in [RFC v2 00/28] vSMMUv3/pSMMUv3
+  2 stage VFIO integration
+---
+ hw/vfio/common.c | 116 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 71 insertions(+), 45 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 4262b80c44..b516f87f25 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1036,6 +1036,60 @@ static void vfio_put_address_space(VFIOAddressSpac=
+e *space)
+     }
+ }
+=20
++/*
++ * vfio_get_iommu_type - selects the richest iommu_type (v2 first)
++ */
++static int vfio_get_iommu_type(VFIOContainer *container,
++                               Error **errp)
++{
++    int iommu_types[] =3D { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
++                          VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU =
+};
++    int i;
++
++    for (i =3D 0; i < ARRAY_SIZE(iommu_types); i++) {
++        if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) =
+{
++            return iommu_types[i];
++        }
++    }
++    error_setg(errp, "No available IOMMU models");
++    return -EINVAL;
++}
++
++static int vfio_init_container(VFIOContainer *container, int group_fd,
++                               Error **errp)
++{
++    int iommu_type, ret;
++
++    iommu_type =3D vfio_get_iommu_type(container, errp);
++    if (iommu_type < 0) {
++        return iommu_type;
++    }
++
++    ret =3D ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
++    if (ret) {
++        error_setg_errno(errp, errno, "Failed to set group container");
++        return -errno;
++    }
++
++    while (ioctl(container->fd, VFIO_SET_IOMMU, iommu_type)) {
++        if (iommu_type =3D=3D VFIO_SPAPR_TCE_v2_IOMMU) {
++            /*
++             * On sPAPR, despite the IOMMU subdriver always advertises v=
+1 and
++             * v2, the running platform may not support v2 and there is =
+no
++             * way to guess it until an IOMMU group gets added to the co=
+ntainer.
++             * So in case it fails with v2, try v1 as a fallback.
++             */
++            iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
++            continue;
++        }
++        error_setg_errno(errp, errno, "Failed to set iommu for container=
+");
++        return -errno;
++    }
++
++    container->iommu_type =3D iommu_type;
++    return 0;
++}
++
+ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+                                   Error **errp)
+ {
+@@ -1101,26 +1155,18 @@ static int vfio_connect_container(VFIOGroup *grou=
+p, AddressSpace *as,
+     container->fd =3D fd;
+     QLIST_INIT(&container->giommu_list);
+     QLIST_INIT(&container->hostwin_list);
+-    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+-        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+-        bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU=
+);
++
++    ret =3D vfio_init_container(container, group->fd, errp);
++    if (ret) {
++        goto free_container_exit;
++    }
++
++    switch (container->iommu_type) {
++    case VFIO_TYPE1v2_IOMMU:
++    case VFIO_TYPE1_IOMMU:
++    {
+         struct vfio_iommu_type1_info info;
+=20
+-        ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set group container=
+");
+-            ret =3D -errno;
+-            goto free_container_exit;
+-        }
+-
+-        container->iommu_type =3D v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_I=
+OMMU;
+-        ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set iommu for conta=
+iner");
+-            ret =3D -errno;
+-            goto free_container_exit;
+-        }
+-
+         /*
+          * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
+          * IOVA whatsoever.  That's not actually true, but the current
+@@ -1137,30 +1183,13 @@ static int vfio_connect_container(VFIOGroup *grou=
+p, AddressSpace *as,
+         }
+         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+         container->pgsizes =3D info.iova_pgsizes;
+-    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+-               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU))=
+ {
++        break;
++    }
++    case VFIO_SPAPR_TCE_v2_IOMMU:
++    case VFIO_SPAPR_TCE_IOMMU:
++    {
+         struct vfio_iommu_spapr_tce_info info;
+-        bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_=
+IOMMU);
+-
+-        ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set group container=
+");
+-            ret =3D -errno;
+-            goto free_container_exit;
+-        }
+-        container->iommu_type =3D
+-            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+-        ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        if (ret) {
+-            container->iommu_type =3D VFIO_SPAPR_TCE_IOMMU;
+-            v2 =3D false;
+-            ret =3D ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        }
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set iommu for conta=
+iner");
+-            ret =3D -errno;
+-            goto free_container_exit;
+-        }
++        bool v2 =3D container->iommu_type =3D=3D VFIO_SPAPR_TCE_v2_IOMMU=
+;
+=20
+         /*
+          * The host kernel code implementing VFIO_IOMMU_DISABLE is calle=
+d
+@@ -1222,10 +1251,7 @@ static int vfio_connect_container(VFIOGroup *group=
+, AddressSpace *as,
+                               info.dma32_window_size - 1,
+                               0x1000);
+         }
+-    } else {
+-        error_setg(errp, "No available IOMMU models");
+-        ret =3D -EINVAL;
+-        goto free_container_exit;
++    }
+     }
+=20
+     vfio_kvm_device_add_group(group);
+--=20
+2.20.1
