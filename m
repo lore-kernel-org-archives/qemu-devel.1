@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46078)
+Received: from eggs.gnu.org ([209.51.188.92]:50507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqvXM-0002RE-0b
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:52:59 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gqvqg-0006Ln-FF
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:12:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gqvXJ-0007p8-2o
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:52:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38174)
+	(envelope-from <kraxel@redhat.com>) id 1gqvqf-0003vr-Oi
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:12:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqvXI-0007mP-Pb
-	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 02:52:52 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5AAAD811D5
-	for <qemu-devel@nongnu.org>; Tue,  5 Feb 2019 07:52:51 +0000 (UTC)
-Date: Tue, 5 Feb 2019 08:52:49 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gqvqf-0003um-J6
+	for qemu-devel@nongnu.org; Tue, 05 Feb 2019 03:12:53 -0500
+Date: Tue, 5 Feb 2019 09:12:50 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190205075249.6tx74rgbnojzssyp@sirius.home.kraxel.org>
-References: <cb3e0855-a729-9a3d-e6ef-bfebea17b2cb@redhat.com>
+Message-ID: <20190205081250.2lixmdjrc6ag7sbe@sirius.home.kraxel.org>
+References: <20181106112829.1948-1-kraxel@redhat.com>
+	<20181106112829.1948-2-kraxel@redhat.com>
+	<20190202003519.GA29706@flamenco>
+	<20190204112033.52lvj2pjrolijx5v@sirius.home.kraxel.org>
+	<20190204152534.GA16991@flamenco>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cb3e0855-a729-9a3d-e6ef-bfebea17b2cb@redhat.com>
-Subject: Re: [Qemu-devel] SeaBIOS regression
+In-Reply-To: <20190204152534.GA16991@flamenco>
+Subject: Re: [Qemu-devel] [PULL 1/1] update seabios to master snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, seabios@seabios.org
 
-On Mon, Feb 04, 2019 at 04:10:37PM +0100, Thomas Huth wrote:
+On Mon, Feb 04, 2019 at 10:25:34AM -0500, Emilio G. Cota wrote:
+> On Mon, Feb 04, 2019 at 12:20:33 +0100, Gerd Hoffmann wrote:
+> > > How can I bisect seabios? I can't find a recipe to generate
+> > > the .bin files included in this commit.
+> > 
+> > "make -C roms bios" will build it, using the roms/seabios submodule.
 > 
->  Hi Gerd,
+> Thanks! This helped.
 > 
-> I noticed that certain FreeDOS images are not working correctly anymore
-> with the current version of QEMU, for example
-> http://www.qemu-advent-calendar.org/2016/download/day10.tar.xz ... It
-> aborts with:
+> The regression was introduced between 1.11 and 1.12 by:
+>   96060ad ("tpm: Wait for interface startup when probing", 2018-03-02)
 > 
->  Error reading from drive C: DOS area: write-protection violation attempted
+> Fortunately, the issue is fixed right after the 1.12 tag by:
+>   42efebd ("tpm: Check for TPM related ACPI tables before attempting hw
+>             probe", 2018-11-27)
 > 
-> I've bisected the issue, and it has apparently been introduced with:
-> 
->  cd1bfd5ef336166b275a09dc9842542bf5e63ae3
->  seabios: update bios and vgabios binaries
-> 
-> Any idea what might be going wrong here?
+> Are there any further seabios updates planned for 4.0? Would be
+> nice to get this fix in.
 
-Hmm, no.  bisect seabios?
+Created 1.12-stable branch and cherry-picked this fix.
+We'll do a 1.12.1 stable release in time for qemu 4.0.
 
 cheers,
   Gerd
